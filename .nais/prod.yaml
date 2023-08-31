@@ -1,0 +1,47 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: tilleggsstonader-sak
+  namespace: tilleggsstonader
+  labels:
+    team: tilleggsstonader
+
+spec:
+  port: 8080
+  image: {{ image }}
+  ingresses:
+    - https://tilleggsstonader-sak.intern.nav.no
+  liveness:
+    path: /internal/status/isAlive
+    initialDelay: 30
+    failureThreshold: 10
+  readiness:
+    path: /internal/status/isAlive
+    initialDelay: 30
+    failureThreshold: 10
+  prometheus:
+    enabled: true
+    path: /internal/prometheus
+  replicas:
+    min: 2
+    max: 4
+  resources:
+    limits:
+      memory: 2048Mi
+    requests:
+      memory: 512Mi
+      cpu: 500m
+  secureLogs:
+    enabled: true
+  azure:
+    application:
+      enabled: true
+      claims:
+        extra:
+          - "NAVident"
+          - "azp_name"
+  accessPolicy:
+    outbound:
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: prod

@@ -1,0 +1,11 @@
+server:
+  port: 9193
+
+logging:
+  config: classpath:logback-test.xml
+
+no.nav.security.jwt:
+  issuer.azuread:
+    discoveryurl: http://localhost:${mock-oauth2-server.port}/azuread/.well-known/openid-configuration
+    accepted_audience: aud-localhost
+    cookie_name: localhost-idtoken

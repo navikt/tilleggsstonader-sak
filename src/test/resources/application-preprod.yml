@@ -1,0 +1,5 @@
+server:
+  port: 8101
+
+logging:
+  config: classpath:logback-test.xml

@@ -1,0 +1,36 @@
+application:
+  name: tilleggsstonad-sak
+
+server:
+  port: 8080
+  shutdown: graceful
+  servlet:
+    context-path: /
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+
+spring:
+  mvc:
+    format:
+      date: iso
+      date-time: iso
+  main:
+    allow-bean-definition-overriding: true
+    banner-mode: "off"
+
+management:
+  endpoint.health.show-details: always
+  endpoints.web:
+    exposure.include: info, health, metrics, prometheus
+    base-path: "/internal"
+    path-mapping:
+      info: "status/isAlive"
+  prometheus.metrics.export.enabled: true
+
+no.nav.security.jwt:
+  issuer.azuread:
+    discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
+    accepted_audience: ${AZURE_APP_CLIENT_ID}
+    cookie_name: azure_token
+

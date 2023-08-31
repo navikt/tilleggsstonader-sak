@@ -1,0 +1,25 @@
+#######
+# Denne er brukt til å gjøre det mulig å bruke tokens lokalt
+#
+# secret kan hentes fra cluster med "kubectl -n tilleggsstonader get secret azuread-tilleggsstonader-sak-lokal -o json | jq '.data | map_values(@base64d)'"
+#
+# Kjøres en gang eller ved endringer med
+# kubectl apply -f .deploy/azure-ad-app-lokal.yaml
+###
+apiVersion: nais.io/v1
+kind: AzureAdApplication
+metadata:
+  name: tilleggsstonader-sak-lokal
+  namespace: tilleggsstonader
+  labels:
+    team: tilleggsstonader
+spec:
+  preAuthorizedApplications:
+    - application: tilleggsstonader-sak-frontend-lokal
+      cluster: dev-gcp
+      namespace: tilleggsstonader
+  secretName: azuread-tilleggsstonader-sak-lokal
+  claims:
+    extra:
+      - "NAVident"
+      - "azp_name"
