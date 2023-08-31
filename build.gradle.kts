@@ -1,7 +1,7 @@
 val javaVersion = JavaLanguageVersion.of(17)
 val tilleggsstønaderLibsVersion = "2023.08.29-20.43.64952624e213"
 val tokenSupportVersion = "3.1.3"
-val wiremockVersion = "2.35.0"
+val wiremockVersion = "3.0.0"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
