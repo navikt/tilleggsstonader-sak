@@ -2,6 +2,8 @@ val javaVersion = JavaLanguageVersion.of(17)
 val tilleggsstønaderLibsVersion = "2023.08.29-20.43.64952624e213"
 val tokenSupportVersion = "3.1.3"
 val wiremockVersion = "2.35.0"
+val mockkVersion = "1.13.7"
+val testcontainerVersion = "1.19.0"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -48,8 +50,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    implementation("org.postgresql:postgresql")
+    implementation("org.flywaydb:flyway-core")
 
     // Logging
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
@@ -65,7 +71,9 @@ dependencies {
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:$wiremockVersion")
-    testImplementation("io.mockk:mockk:1.13.7")
+    testImplementation("io.mockk:mockk:$mockkVersion")
+
+    testImplementation("org.testcontainers:postgresql:$testcontainerVersion")
 
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
