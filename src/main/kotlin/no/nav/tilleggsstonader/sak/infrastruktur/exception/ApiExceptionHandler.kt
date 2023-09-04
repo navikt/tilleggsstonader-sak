@@ -93,7 +93,7 @@ class ApiExceptionHandler {
     fun handleThrowable(feil: IntegrasjonException): ProblemDetail {
         secureLogger.error("Feil mot integrasjonsclienten har oppstått: uri={} data={}", feil.uri, feil.data, feil)
         logger.error("Feil mot integrasjonsclienten har oppstått exception=${rootCause(feil)}")
-        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, feil.message)
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, feil.message ?: "Mangler melding")
     }
 
     private fun lagTimeoutfeilRessurs(): ProblemDetail = ProblemDetail.forStatusAndDetail(
