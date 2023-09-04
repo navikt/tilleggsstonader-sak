@@ -43,7 +43,7 @@ spec:
           day: 7
           hour: 23
         databases:
-          - name: tilleggsstonader-sak
+          - name: tilleggsstonader-sak-db
             envVarPrefix: DB
   secureLogs:
     enabled: true

@@ -22,7 +22,7 @@ spring:
   flyway:
     enabled: true
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/tilleggsstonader-sak
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/tilleggsstonader-sak-db
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
