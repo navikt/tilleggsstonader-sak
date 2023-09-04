@@ -31,6 +31,19 @@ spec:
     requests:
       memory: 512Mi
       cpu: 500m
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_15
+        diskAutoresize: true
+        cascadingDelete: false
+        highAvailability: false
+        pointInTimeRecovery: false
+        maintenance:
+          day: 7
+          hour: 23
+        databases:
+          - name: tilleggsstonader-sak
+            envVarPrefix: DB
   secureLogs:
     enabled: true
   azure:
