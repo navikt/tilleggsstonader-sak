@@ -1,6 +1,6 @@
 val javaVersion = JavaLanguageVersion.of(17)
 val tilleggsstønaderLibsVersion = "2023.08.29-20.43.64952624e213"
-val tokenSupportVersion = "3.1.3"
+val tokenSupportVersion = "3.1.5"
 val wiremockVersion = "2.35.0"
 val mockkVersion = "1.13.7"
 val testcontainerVersion = "1.19.0"
