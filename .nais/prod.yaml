@@ -33,7 +33,7 @@ spec:
       cpu: 500m
   gcp:
     sqlInstances:
-      - type: POSTGRES_15
+      - type: POSTGRES_14
         tier: db-custom-1-3840
         diskAutoresize: true
         cascadingDelete: false
@@ -43,7 +43,7 @@ spec:
           day: 7
           hour: 23
         databases:
-          - name: tilleggsstonader-sak-db
+          - name: tilleggsstonader-sak
             envVarPrefix: DB
   secureLogs:
     enabled: true
