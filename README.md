@@ -23,3 +23,8 @@ App'en vil starte opp en container med siste versjon av postgres.
 For å kjøre opp postgres containern så kjører man `docker-compose up`
 For å ta ned containern så kjører man `docker-compose down`
 For å slette volymen `docker-compose down -v`
+
+
+#### Vurderinger
+Burde vi sette konfigurere en egen objectMapper, eller bruke eks `Jackson2ObjectMapperBuilder.json().build()` 
+som brukes som default i `MappingJackson2HttpMessageConverter`

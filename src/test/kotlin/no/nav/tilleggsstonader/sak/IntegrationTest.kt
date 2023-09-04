@@ -2,7 +2,9 @@ package no.nav.tilleggsstonader.sak
 
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
+import no.nav.tilleggsstonader.sak.util.TokenUtil
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,6 +49,9 @@ abstract class IntegrationTest {
     @Autowired
     private lateinit var mockOAuth2Server: MockOAuth2Server
 
+    @Autowired
+    protected lateinit var rolleConfig: RolleConfig
+
     @AfterEach
     fun tearDown() {
         headers.clear()
@@ -58,6 +63,13 @@ abstract class IntegrationTest {
 
     protected fun localhost(path: String): String {
         return "$LOCALHOST$port/$path"
+    }
+
+    protected fun onBehalfOfToken(
+        role: String = rolleConfig.beslutterRolle,
+        saksbehandler: String = "julenissen",
+    ): String {
+        return TokenUtil.onBehalfOfToken(mockOAuth2Server, role, saksbehandler)
     }
 
     companion object {
