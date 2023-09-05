@@ -13,7 +13,7 @@ import java.util.UUID
 data class FagsakDomain(
     @Id
     val id: UUID = UUID.randomUUID(),
-    // val fagsakPersonId: UUID,
+    val fagsakPersonId: UUID,
     @MappedCollection(idColumn = "fagsak_id")
     val eksternId: EksternFagsakId = EksternFagsakId(),
     @Column("stonadstype")

@@ -2,6 +2,9 @@ package no.nav.tilleggsstonader.sak
 
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
+import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
+import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
+import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
 import no.nav.tilleggsstonader.sak.util.TokenUtil
@@ -13,6 +16,7 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.jdbc.core.JdbcAggregateOperations
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -50,12 +54,24 @@ abstract class IntegrationTest {
     private lateinit var mockOAuth2Server: MockOAuth2Server
 
     @Autowired
+    private lateinit var jdbcAggregateOperations: JdbcAggregateOperations
+
+    @Autowired
     protected lateinit var rolleConfig: RolleConfig
 
     @AfterEach
     fun tearDown() {
         headers.clear()
         clearClientMocks()
+        resetDatabase()
+    }
+
+    private fun resetDatabase() {
+        listOf(
+            PersonIdent::class,
+            FagsakDomain::class,
+            FagsakPerson::class,
+        ).forEach { jdbcAggregateOperations.deleteAll(it.java) }
     }
 
     private fun clearClientMocks() {

@@ -10,13 +10,24 @@ import org.springframework.beans.factory.annotation.Autowired
 class FagsakRepositoryTest : IntegrationTest() {
 
     @Autowired
+    lateinit var fagsakPersonRepository: FagsakPersonRepository
+
+    @Autowired
     lateinit var fagsakRepository: FagsakRepository
 
     @Test
     fun `skal kunne lagre og hente fagsak`() {
-        val fagsak = fagsakRepository.insert(FagsakDomain(stønadstype = Stønadstype.BARNETILSYN))
+        val fagsakPerson = fagsakPersonRepository.insert(FagsakPerson(identer = setOf()))
+        val fagsak = fagsakRepository.insert(
+            FagsakDomain(
+                stønadstype = Stønadstype.BARNETILSYN,
+                fagsakPersonId = fagsakPerson.id,
+            ),
+        )
 
         val hentetFagsak = fagsakRepository.findByIdOrThrow(fagsak.id)
         assertThat(hentetFagsak).isEqualTo(fagsak)
     }
+
+    // TODO kopiere over flere tester?
 }
