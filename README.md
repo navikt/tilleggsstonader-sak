@@ -29,7 +29,8 @@ For å slette volymen `docker-compose down -v`
 Burde vi sette konfigurere en egen objectMapper, eller bruke eks `Jackson2ObjectMapperBuilder.json().build()` 
 som brukes som default i `MappingJackson2HttpMessageConverter`
 
-
+#### Kommentarer
+ * Har ikke tatt med flagget migrert på fagsak då det er uklart om vi skal migrere
 #### Saker som mangler
 * TilgangService
 * AuditLogger - Denne har avhengighet til Tilgang som er response fra integrasjoner
