@@ -4,6 +4,7 @@ import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
+import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -77,11 +78,12 @@ abstract class IntegrationTest {
 
     private fun resetDatabase() {
         listOf(
-            PersonIdent::class,
+            Behandlingshistorikk::class,
             EksternBehandlingId::class,
             Behandling::class,
             EksternFagsakId::class,
             FagsakDomain::class,
+            PersonIdent::class,
             FagsakPerson::class,
         ).forEach { jdbcAggregateOperations.deleteAll(it.java) }
     }
