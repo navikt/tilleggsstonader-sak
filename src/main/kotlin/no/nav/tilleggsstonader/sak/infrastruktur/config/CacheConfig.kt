@@ -85,7 +85,7 @@ fun CacheManager.getCacheOrThrow(cache: String) = this.getCache(cache) ?: error(
  * Henter tidligere cachet verdier, og henter ucachet verdier med [valueLoader]
  */
 @Suppress("UNCHECKED_CAST", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-fun <T, R> CacheManager.getCachedOrLoad(
+fun <T : Any, R> CacheManager.getCachedOrLoad(
     cacheName: String,
     values: List<T>,
     valueLoader: (List<T>) -> Map<T, R>,

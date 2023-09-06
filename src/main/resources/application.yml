@@ -21,6 +21,8 @@ spring:
   data.jdbc.repositories.enabled: true
   flyway:
     enabled: true
+    placeholders:
+      ignoreIfProd:
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/tilleggsstonader-sak
     username: ${DB_USERNAME}
