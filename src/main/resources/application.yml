@@ -40,12 +40,6 @@ management:
       info: "status/isAlive"
   prometheus.metrics.export.enabled: true
 
-no.nav.security.jwt:
-  issuer.azuread:
-    discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
-    accepted_audience: ${AZURE_APP_CLIENT_ID}
-    cookie_name: azure_token
-
 rolle:
   veileder: "3611981f-eda7-46ab-b8f2-50c3159e101c"
   saksbehandler: "31a99292-9461-40bf-b2d0-a815697dfbb4"
@@ -53,4 +47,29 @@ rolle:
   kode6: "ad7b87a6-9180-467c-affc-20a566b0fec0" # 0000-GA-Strengt_Fortrolig_Adresse
   kode7: "9ec6487d-f37a-4aad-a027-cd221c1ac32b" # 0000-GA-Fortrolig_Adresse
   egenAnsatt: "e750ceb5-b70b-4d94-b4fa-9d22467b786b" # 0000-GA-Egne_ansatte
+
+
+CLIENT_ENV: prod
+
+no.nav.security.jwt:
+  issuer.azuread:
+    discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
+    accepted_audience: ${AZURE_APP_CLIENT_ID}
+    cookie_name: azure_token
+  client.registration:
+    pdl-clientcredentials:
+      resource-url: ${clients.pdl.uri}
+      token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+      grant-type: client_credentials
+      scope: ${clients.pdl.scope}
+      authentication:
+        client-id: ${AZURE_APP_CLIENT_ID}
+        client-secret: ${AZURE_APP_CLIENT_SECRET}
+        client-auth-method: client_secret_basic
+
+clients:
+  pdl:
+    uri: https://pdl-api.${CLIENT_ENV}-fss-pub.nais.io
+    audience: ${CLIENT_ENV}-fss:pdl:pdl-api
+    scope: api://${CLIENT_ENV}-fss.pdl.pdl-api/.default
 
