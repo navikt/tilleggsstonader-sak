@@ -11,12 +11,13 @@ import org.springframework.boot.builder.SpringApplicationBuilder
 class AppLocal : App()
 
 fun main(args: Array<String>) {
-    appLocal().run(*args)
+    appLocal()
+        .initializers(DbContainerInitializer())
+        .run(*args)
 }
 
 fun appLocal(): SpringApplicationBuilder =
     SpringApplicationBuilder(AppLocal::class.java)
-        .initializers(DbContainerInitializer())
         .profiles(
             "local",
             "pdl-mock",

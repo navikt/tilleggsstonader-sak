@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.env.Environment
 import org.springframework.data.domain.AuditorAware
 import org.springframework.data.jdbc.core.convert.JdbcCustomConversions
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
@@ -32,6 +35,23 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     @Bean
     fun auditSporbarEndret(): AuditorAware<Endret> {
         return AuditorAware { Optional.of(Endret()) }
+    }
+
+    @Bean
+    fun verifyIgnoreIfProd(
+        @Value("\${spring.flyway.placeholders.ignoreIfProd}") ignoreIfProd: String,
+        environment: Environment,
+    ): FlywayConfigurationCustomizer {
+        val isProd = environment.activeProfiles.contains("prod")
+        val ignore = ignoreIfProd == "--"
+        return FlywayConfigurationCustomizer {
+            if (isProd && !ignore) {
+                throw RuntimeException("Prod profile men har ikke riktig verdi for placeholder ignoreIfProd=$ignoreIfProd")
+            }
+            if (!isProd && ignore) {
+                throw RuntimeException("Profile=${environment.activeProfiles} men har ignoreIfProd=--")
+            }
+        }
     }
 
     @Bean

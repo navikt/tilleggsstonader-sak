@@ -4,6 +4,13 @@ server:
 logging:
   config: classpath:logback-test.xml
 
+spring:
+  datasource:
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    url: ${DATASOURCE_URL}
+    driver-class-name: org.postgresql.Driver
+
 AZURE_APP_TENANT_ID: navq.onmicrosoft.com
 AZURE_OPENID_CONFIG_TOKEN_ENDPOINT: https://login.microsoftonline.com/${AZURE_APP_TENANT_ID}/oauth2/v2.0/token
 no.nav.security.jwt:
