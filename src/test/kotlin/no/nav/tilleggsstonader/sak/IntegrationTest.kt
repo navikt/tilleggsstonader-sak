@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
@@ -79,6 +80,7 @@ abstract class IntegrationTest {
     private fun resetDatabase() {
         listOf(
             Behandlingshistorikk::class,
+            Behandlingsjournalpost::class,
             EksternBehandlingId::class,
             Behandling::class,
             EksternFagsakId::class,
