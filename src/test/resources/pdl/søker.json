@@ -1,0 +1,159 @@
+{
+  "data": {
+    "person": {
+      "adressebeskyttelse": [
+        {
+          "gradering": "UGRADERT",
+          "metadata":  {
+            "historisk": false
+          }
+        }
+      ],
+      "bostedsadresse": [
+        {
+          "metadata":  {
+            "historisk": false
+          },
+          "angittFlyttedato": null,
+          "gyldigFraOgMed": "1966-11-18",
+          "gyldigTilOgMed": null,
+          "coAdressenavn": null,
+          "vegadresse": {
+            "husnummer": "77",
+            "husbokstav": null,
+            "bruksenhetsnummer": null,
+            "adressenavn": "INNGJERDSVEGEN",
+            "kommunenummer": "0301",
+            "tilleggsnavn": null,
+            "postnummer": "0862"
+          },
+          "ukjentBosted": null
+        }
+      ],
+      "doedsfall": [],
+      "forelderBarnRelasjon": [],
+      "folkeregisteridentifikator": [
+        {
+          "identifikasjonsnummer": "11111111111",
+          "status": "I_BRUK",
+          "metadata":  {
+            "historisk": false
+          }
+        }
+      ],
+      "foedsel": [
+        {
+          "foedselsaar": null,
+          "foedselsdato": "1966-11-18",
+          "foedeland": null,
+          "foedested": null,
+          "foedekommune": null,
+          "metadata":  {
+            "historisk": false
+          }
+        }
+      ],
+      "folkeregisterpersonstatus": [
+        {
+          "status": "bosatt",
+          "forenkletStatus": "bosattEtterFolkeregisterloven",
+          "metadata":  {
+            "historisk": false
+          }
+        }
+      ],
+      "fullmakt": [],
+      "kjoenn": [
+        {
+          "kjoenn": "MANN"
+        }
+      ],
+      "navn": [
+        {
+          "fornavn": "BRÅKETE",
+          "mellomnavn": null,
+          "etternavn": "KAMELEON",
+          "metadata": {
+            "endringer": [
+              {
+                "registrert": "2020-01-01T09:00:00"
+              }
+            ]
+          }
+        }
+      ],
+      "opphold": [],
+      "vergemaalEllerFremtidsfullmakt": [],
+      "kontaktadresse": [
+        {
+          "coAdressenavn": null,
+          "gyldigFraOgMed": "1966-11-18T00:00",
+          "gyldigTilOgMed": null,
+          "postadresseIFrittFormat": null,
+          "postboksadresse": null,
+          "type": "Innland",
+          "utenlandskAdresse": null,
+          "utenlandskAdresseIFrittFormat": null,
+          "vegadresse": {
+            "husnummer": "77",
+            "husbokstav": null,
+            "bruksenhetsnummer": null,
+            "adressenavn": "INNGJERDSVEGEN",
+            "kommunenummer": null,
+            "tilleggsnavn": null,
+            "postnummer": "0862"
+          }
+        }
+      ],
+      "oppholdsadresse": [
+        {
+          "metadata":  {
+            "historisk": false
+          },
+          "gyldigFraOgMed": "1966-11-18",
+          "coAdressenavn": null,
+          "utenlandskAdresse": null,
+          "vegadresse": {
+            "husnummer": "77",
+            "husbokstav": null,
+            "bruksenhetsnummer": null,
+            "adressenavn": "INNGJERDSVEGEN",
+            "kommunenummer": "0301",
+            "tilleggsnavn": null,
+            "postnummer": "0862"
+          },
+          "oppholdAnnetSted": null
+        }
+      ],
+      "sivilstand": [
+        {
+          "metadata":  {
+            "historisk": false
+          },
+          "type": "UGIFT",
+          "gyldigFraOgMed": null,
+          "relatertVedSivilstand": null,
+          "bekreftelsesdato": null
+        }
+      ],
+      "statsborgerskap": [
+        {
+          "land": "NOR",
+          "gyldigFraOgMed": null,
+          "gyldigTilOgMed": null
+        }
+      ],
+      "innflyttingTilNorge": [
+        {
+          "fraflyttingsland": "CYP",
+          "fraflyttingsstedIUtlandet": null,
+          "folkeregistermetadata": {
+            "gyldighetstidspunkt": "2020-05-29T12:09:02",
+            "opphoerstidspunkt": null
+          }
+        }
+      ],
+      "utflyttingFraNorge": []
+    }
+  }
+}

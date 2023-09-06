@@ -19,4 +19,5 @@ fun appLocal(): SpringApplicationBuilder =
         .initializers(DbContainerInitializer())
         .profiles(
             "local",
+            "pdl-mock",
         )

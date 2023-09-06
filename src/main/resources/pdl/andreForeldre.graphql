@@ -1,0 +1,79 @@
+query($identer: [ID!]!){
+    personBolk: hentPersonBolk(identer: $identer) {
+        code
+        ident
+        person {
+            adressebeskyttelse {
+                gradering
+                metadata {
+                    historisk
+                }
+            }
+            bostedsadresse(historikk: true) {
+                angittFlyttedato
+                gyldigFraOgMed
+                gyldigTilOgMed
+                coAdressenavn
+                utenlandskAdresse {
+                    adressenavnNummer
+                    bySted
+                    bygningEtasjeLeilighet
+                    landkode
+                    postboksNummerNavn
+                    postkode
+                    regionDistriktOmraade
+                }
+                vegadresse {
+                    husnummer
+                    husbokstav
+                    bruksenhetsnummer
+                    adressenavn
+                    kommunenummer
+                    tilleggsnavn
+                    postnummer
+                    matrikkelId
+                }
+                matrikkeladresse {
+                    matrikkelId
+                    bruksenhetsnummer
+                    tilleggsnavn
+                    postnummer
+                }
+                ukjentBosted {
+                    bostedskommune
+                }
+                metadata {
+                    historisk
+                }
+            }
+            doedsfall {
+                doedsdato
+            }
+            foedsel {
+                foedselsaar
+                foedselsdato
+                foedeland
+                foedested
+                foedekommune
+                metadata {
+                    historisk
+                }
+            }
+            folkeregisteridentifikator(historikk: true) {
+                identifikasjonsnummer
+                status
+                metadata {
+                    historisk
+                }
+            }
+            navn {
+                fornavn
+                mellomnavn
+                etternavn
+                metadata {
+                    historisk
+                }
+            }
+        }
+    }
+}

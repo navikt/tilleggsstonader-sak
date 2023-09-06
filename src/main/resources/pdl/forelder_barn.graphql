@@ -1,0 +1,97 @@
+query($identer: [ID!]!){
+    personBolk: hentPersonBolk(identer: $identer) {
+        code
+        ident
+        person {
+            adressebeskyttelse {
+                gradering
+                metadata {
+                    historisk
+                }
+            }
+            bostedsadresse {
+                angittFlyttedato
+                gyldigFraOgMed
+                gyldigTilOgMed
+                coAdressenavn
+                metadata {
+                    historisk
+                }
+                utenlandskAdresse {
+                    adressenavnNummer
+                    bySted
+                    bygningEtasjeLeilighet
+                    landkode
+                    postboksNummerNavn
+                    postkode
+                    regionDistriktOmraade
+                }
+                vegadresse {
+                    husnummer
+                    husbokstav
+                    bruksenhetsnummer
+                    adressenavn
+                    kommunenummer
+                    tilleggsnavn
+                    postnummer
+                    matrikkelId
+                }
+                matrikkeladresse {
+                    matrikkelId
+                    bruksenhetsnummer
+                    tilleggsnavn
+                    postnummer
+                }
+                ukjentBosted {
+                    bostedskommune
+                }
+            }
+            deltBosted (historikk: true){
+                startdatoForKontrakt
+                sluttdatoForKontrakt
+                vegadresse {
+                    husnummer
+                    husbokstav
+                    bruksenhetsnummer
+                    adressenavn
+                    kommunenummer
+                    tilleggsnavn
+                    postnummer
+                    matrikkelId
+                }
+                ukjentBosted {
+                    bostedskommune
+                }
+                metadata {
+                    historisk
+                }
+            }
+            doedsfall {
+                doedsdato
+            }
+            forelderBarnRelasjon {
+                relatertPersonsIdent
+                relatertPersonsRolle
+                minRolleForPerson
+            }
+            foedsel {
+                foedselsaar
+                foedselsdato
+                foedeland
+                foedested
+                foedekommune
+                metadata {
+                    historisk
+                }
+            }
+            navn {
+                fornavn
+                mellomnavn
+                etternavn
+                metadata {
+                    historisk
+                }
+            }
+        }
+    }
+}
