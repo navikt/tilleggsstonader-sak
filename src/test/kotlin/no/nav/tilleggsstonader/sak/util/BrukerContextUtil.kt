@@ -43,6 +43,7 @@ object BrukerContextUtil {
             RequestAttributes.SCOPE_REQUEST,
         )
         every { tokenValidationContext.getClaims("azuread") } returns jwtTokenClaims
+        every { tokenValidationContext.getJwtToken("azuread") } returns mockk()
     }
 
     fun <T> testWithBrukerContext(preferredUsername: String = "A", groups: List<String> = emptyList(), fn: () -> T): T {

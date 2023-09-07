@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Opphold
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Oppholdsadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonForelderBarn
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstand
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Statsborgerskap
@@ -41,10 +42,10 @@ object PdlTestdataHelper {
         historisk: Boolean = false,
     ): Navn {
         return Navn(
-            fornavn,
-            mellomnavn,
-            etternavn,
-            Metadata(historisk = historisk),
+            fornavn = fornavn,
+            mellomnavn = mellomnavn,
+            etternavn = etternavn,
+            metadata = Metadata(historisk = historisk),
         )
     }
 
@@ -69,24 +70,24 @@ object PdlTestdataHelper {
         folkeregisteridentifikator: List<Folkeregisteridentifikator> = emptyList(),
     ) =
         PdlSøker(
-            adressebeskyttelse,
-            bostedsadresse,
-            dødsfall,
-            forelderBarnRelasjon,
-            folkeregisteridentifikator,
-            fødsel,
-            folkeregisterpersonstatus,
-            fullmakt,
-            listOfNotNull(kjønn),
-            kontaktadresse,
-            navn,
-            opphold,
-            oppholdsadresse,
-            sivilstand,
-            statsborgerskap,
-            innflyttingTilNorge,
-            utflyttingFraNorge,
-            vergemaalEllerFremtidsfullmakt,
+            adressebeskyttelse = adressebeskyttelse,
+            bostedsadresse = bostedsadresse,
+            dødsfall = dødsfall,
+            forelderBarnRelasjon = forelderBarnRelasjon,
+            folkeregisteridentifikator = folkeregisteridentifikator,
+            fødsel = fødsel,
+            folkeregisterpersonstatus = folkeregisterpersonstatus,
+            fullmakt = fullmakt,
+            kjønn = listOfNotNull(kjønn),
+            kontaktadresse = kontaktadresse,
+            navn = navn,
+            opphold = opphold,
+            oppholdsadresse = oppholdsadresse,
+            sivilstand = sivilstand,
+            statsborgerskap = statsborgerskap,
+            innflyttingTilNorge = innflyttingTilNorge,
+            utflyttingFraNorge = utflyttingFraNorge,
+            vergemaalEllerFremtidsfullmakt = vergemaalEllerFremtidsfullmakt,
         )
 
     fun pdlBarn(
@@ -99,14 +100,24 @@ object PdlTestdataHelper {
         navn: Navn = lagNavn(),
     ) =
         PdlPersonForelderBarn(
-            adressebeskyttelse,
-            bostedsadresse,
-            deltBosted,
-            dødsfall,
-            forelderBarnRelasjon,
-            listOfNotNull(fødsel),
-            listOfNotNull(navn),
+            adressebeskyttelse = adressebeskyttelse,
+            bostedsadresse = bostedsadresse,
+            deltBosted = deltBosted,
+            dødsfall = dødsfall,
+            forelderBarnRelasjon = forelderBarnRelasjon,
+            fødsel = listOfNotNull(fødsel),
+            navn = listOfNotNull(navn),
         )
+
+    fun pdlPersonKort(
+        adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
+        navn: Navn = lagNavn(),
+        dødsfall: List<Dødsfall> = emptyList(),
+    ) = PdlPersonKort(
+        adressebeskyttelse = adressebeskyttelse,
+        navn = listOfNotNull(navn),
+        dødsfall = dødsfall,
+    )
 
     fun fødsel(år: Int = 2018, måned: Int = 1, dag: Int = 1): Fødsel =
         fødsel(LocalDate.of(år, måned, dag))
@@ -142,8 +153,8 @@ object PdlTestdataHelper {
         status: FolkeregisteridentifikatorStatus = FolkeregisteridentifikatorStatus.I_BRUK,
         gjeldende: Boolean = true,
     ) = Folkeregisteridentifikator(
-        ident,
-        status,
-        if (gjeldende) metadataGjeldende else metadataHistorisk,
+        ident = ident,
+        status = status,
+        metadata = if (gjeldende) metadataGjeldende else metadataHistorisk,
     )
 }

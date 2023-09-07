@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.util
 
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Condition
+import org.assertj.core.api.ThrowableAssert
 
 fun hasCauseMessageContaining(msg: String) =
     Condition<Throwable>({
@@ -9,3 +11,6 @@ fun hasCauseMessageContaining(msg: String) =
         assertThat(message).contains(msg)
         true
     }, "")
+
+inline fun <reified T : Throwable> catchThrowableOfType(shouldRaiseThrowable: ThrowableAssert.ThrowingCallable): T =
+    Assertions.catchThrowableOfType(shouldRaiseThrowable, T::class.java)

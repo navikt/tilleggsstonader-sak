@@ -14,6 +14,9 @@ object SikkerhetContext {
 
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
+    fun hentToken() =
+        SpringTokenValidationContextHolder().tokenValidationContext.getJwtToken("azuread")
+
     fun erMaskinTilMaskinToken(): Boolean {
         val claims = SpringTokenValidationContextHolder().tokenValidationContext.getClaims("azuread")
         return claims.get("oid") != null &&

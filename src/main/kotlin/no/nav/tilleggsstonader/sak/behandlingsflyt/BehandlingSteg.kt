@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 
 interface BehandlingSteg<T> {
 
@@ -112,12 +113,4 @@ enum class StegType(
             BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
         }
     }
-}
-
-enum class BehandlerRolle(val nivå: Int) {
-    SYSTEM(4),
-    BESLUTTER(3),
-    SAKSBEHANDLER(2),
-    VEILEDER(1),
-    UKJENT(0),
 }
