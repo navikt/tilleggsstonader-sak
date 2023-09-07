@@ -20,5 +20,6 @@ fun appLocal(): SpringApplicationBuilder =
     SpringApplicationBuilder(AppLocal::class.java)
         .profiles(
             "local",
-            "pdl-mock",
+            "mock-pdl",
+            "mock-egen-ansatt",
         )

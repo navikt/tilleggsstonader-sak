@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.infrastruktur
+package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import io.mockk.every
 import io.mockk.mockk
@@ -65,7 +65,9 @@ class PdlClientConfig {
             firstArg<List<String>>().associateWith { lagPersonKort(it) }
         }
 
-        every { pdlClient.hentSøker(any()) } returns opprettPdlSøker()
+        every { pdlClient.hentSøker(any()) } answers {
+            opprettPdlSøker()
+        }
 
         every { pdlClient.hentPersonForelderBarnRelasjon(any()) } returns barn()
 

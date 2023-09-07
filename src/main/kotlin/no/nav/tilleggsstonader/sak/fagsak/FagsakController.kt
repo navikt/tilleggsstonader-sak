@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.fagsak
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.fagsak.dto.FagsakDto
 import no.nav.tilleggsstonader.sak.fagsak.dto.FagsakRequest
+import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
+import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,11 +18,14 @@ import java.util.UUID
 @RequestMapping(path = ["/api/fagsak"])
 @ProtectedWithClaims(issuer = "azuread")
 @Validated
-class FagsakController(private val fagsakService: FagsakService) {
+class FagsakController(
+    private val fagsakService: FagsakService,
+    private val tilgangService: TilgangService,
+) {
 
     @PostMapping
     fun hentEllerOpprettFagsakForPerson(@RequestBody fagsakRequest: FagsakRequest): FagsakDto {
-        // tilgangService.validerTilgangTilPersonMedBarn(fagsakRequest.personIdent, AuditLoggerEvent.CREATE) // TODO dele opp denne?
+        tilgangService.validerTilgangTilPersonMedBarn(fagsakRequest.personIdent, AuditLoggerEvent.CREATE) // TODO dele opp denne?
         return fagsakService.hentEllerOpprettFagsakMedBehandlinger(
             fagsakRequest.personIdent,
             fagsakRequest.stønadstype,
@@ -29,14 +34,14 @@ class FagsakController(private val fagsakService: FagsakService) {
 
     @GetMapping("{fagsakId}")
     fun hentFagsak(@PathVariable fagsakId: UUID): FagsakDto {
-        // tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
         return fagsakService.hentFagsakMedBehandlinger(fagsakId)
     }
 
     @GetMapping("/ekstern/{eksternFagsakId}")
     fun hentFagsak(@PathVariable eksternFagsakId: Long): FagsakDto {
         val fagsakDto = fagsakService.hentFagsakDtoPåEksternId(eksternFagsakId)
-        // tilgangService.validerTilgangTilFagsak(fagsakDto.id, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilFagsak(fagsakDto.id, AuditLoggerEvent.ACCESS)
         return fagsakDto
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
 @Component
-class EgenAnsattRestClient(
+class EgenAnsattClient(
     @Value("\${clients.egen_ansatt.uri}") private val uri: URI,
     @Qualifier("utenAuth") private val restOperations: RestOperations,
 ) {

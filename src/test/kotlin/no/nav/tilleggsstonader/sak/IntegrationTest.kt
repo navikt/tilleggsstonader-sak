@@ -43,7 +43,8 @@ class DefaultRestTemplateConfiguration {
 @SpringBootTest(classes = [App::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(
     "integrasjonstest",
-    "pdl-mock",
+    "mock-pdl",
+    "mock-egen-ansatt",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {

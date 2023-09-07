@@ -8,6 +8,8 @@ import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
+import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -24,14 +26,14 @@ class BehandlingController(
     // private val behandlingPåVentService: BehandlingPåVentService,
     private val fagsakService: FagsakService,
     private val henleggService: HenleggService,
-    // private val tilgangService: TilgangService,
+    private val tilgangService: TilgangService,
     // private val gjenbrukVilkårService: GjenbrukVilkårService,
 ) {
 
     @GetMapping("{behandlingId}")
     fun hentBehandling(@PathVariable behandlingId: UUID): BehandlingDto {
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        // tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
         return saksbehandling.tilDto()
     }
 
@@ -74,8 +76,8 @@ class BehandlingController(
 
     @PostMapping("{behandlingId}/henlegg")
     fun henleggBehandling(@PathVariable behandlingId: UUID, @RequestBody henlagt: HenlagtDto): BehandlingDto {
-        // tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        // tilgangService.validerHarSaksbehandlerrolle()
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
         val henlagtBehandling = henleggService.henleggBehandling(behandlingId, henlagt)
         val fagsak: Fagsak = fagsakService.hentFagsak(henlagtBehandling.fagsakId)
         return henlagtBehandling.tilDto(fagsak.stønadstype)
@@ -84,7 +86,7 @@ class BehandlingController(
     @GetMapping("/ekstern/{eksternBehandlingId}")
     fun hentBehandling(@PathVariable eksternBehandlingId: Long): BehandlingDto {
         val saksbehandling = behandlingService.hentSaksbehandling(eksternBehandlingId)
-        // tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
         return saksbehandling.tilDto()
     }
 

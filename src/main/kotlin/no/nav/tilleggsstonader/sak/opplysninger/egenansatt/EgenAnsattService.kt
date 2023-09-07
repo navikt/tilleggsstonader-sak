@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class EgenAnsattService(
-    private val egenAnsattRestClient: EgenAnsattRestClient,
+    private val egenAnsattClient: EgenAnsattClient,
     private val cacheManager: CacheManager,
 ) {
 
@@ -15,6 +15,6 @@ class EgenAnsattService(
 
     fun erEgenAnsatt(personIdenter: Set<String>): Map<String, Boolean> =
         cacheManager.getCachedOrLoad("erEgenAnsattBolk", personIdenter) {
-            egenAnsattRestClient.erEgenAnsatt(personIdenter)
+            egenAnsattClient.erEgenAnsatt(personIdenter)
         }
 }

@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -18,6 +19,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.exchange
 import java.util.UUID
 
@@ -30,16 +32,15 @@ internal class BehandlingControllerTest : IntegrationTest() {
     fun setUp() {
         headers.setBearerAuth(onBehalfOfToken())
     }
-    /*
+
     @Test
     internal fun `Skal returnere 403 dersom man ikke har tilgang til brukeren`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("ikkeTilgang"))))
         val behandling = behandlingRepository.insert(behandling(fagsak))
-        val respons = hentBehandling(behandling.id)
+        val respons = catchThrowableOfType<HttpClientErrorException.Forbidden> { hentBehandling(behandling.id) }
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
     }
-     */
 
     @Test
     internal fun `Skal henlegge behandling`() {
