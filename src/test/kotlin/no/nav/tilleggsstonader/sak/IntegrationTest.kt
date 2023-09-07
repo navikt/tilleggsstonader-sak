@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
 import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
@@ -81,6 +83,9 @@ abstract class IntegrationTest {
 
     private fun resetDatabase() {
         listOf(
+            SøknadBehandling::class,
+            SøknadBarnetilsyn::class,
+
             Behandlingshistorikk::class,
             Behandlingsjournalpost::class,
             EksternBehandlingId::class,
