@@ -68,6 +68,9 @@ dependencies {
     implementation("no.nav.tilleggsstonader-libs:http-client:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:sikkerhet:$tilleggsstønaderLibsVersion")
 
+    // For auditlogger. August, 2014, men det er den som blir brukt på NAV
+    implementation("com.papertrailapp:logback-syslog4j:1.0.0")
+
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:$wiremockVersion")

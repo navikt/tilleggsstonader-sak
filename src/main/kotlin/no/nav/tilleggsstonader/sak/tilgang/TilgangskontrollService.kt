@@ -25,6 +25,17 @@ class TilgangskontrollService(
     private val adRoller = rolleConfig.rollerMedBeskrivelse
 
     @Cacheable(
+        cacheNames = ["TILGANG_TIL_BRUKER"],
+        key = "#jwtToken.subject.concat(#personIdent)",
+        condition = "#personIdent != null && #jwtToken.subject != null",
+    )
+    fun sjekkTilgang(personIdent: String, jwtToken: JwtToken): Tilgang {
+        val adressebeskyttelse = personService.hentPersonKortBolk(listOf(personIdent)).values.single()
+            .adressebeskyttelse.gradering()
+        return hentTilgang(adressebeskyttelse, jwtToken, personIdent) { egenAnsattService.erEgenAnsatt(personIdent) }
+    }
+
+    @Cacheable(
         cacheNames = ["TILGANG_TIL_PERSON_MED_RELASJONER"],
         key = "#jwtToken.subject.concat(#personIdent)",
         condition = "#jwtToken.subject != null",
@@ -39,7 +50,8 @@ class TilgangskontrollService(
 
     private fun hentPersonMedRelasjoner(personIdent: String): PersonMedRelasjoner {
         val søkerMedBarn = personService.hentPersonMedBarn(personIdent)
-        val barn = søkerMedBarn.barn.map { PersonMedAdresseBeskyttelse(it.key, it.value.adressebeskyttelse.gradering()) }
+        val barn =
+            søkerMedBarn.barn.map { PersonMedAdresseBeskyttelse(it.key, it.value.adressebeskyttelse.gradering()) }
 
         return PersonMedRelasjoner(
             personIdent = søkerMedBarn.søkerIdent,

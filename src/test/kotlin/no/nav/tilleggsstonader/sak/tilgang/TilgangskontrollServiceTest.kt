@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.tilgang
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.security.token.support.core.jwt.JwtTokenClaims
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
@@ -13,6 +14,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.metadataGjeldende
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlBarn
+import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlPersonKort
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlSøker
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -62,6 +64,28 @@ internal class TilgangskontrollServiceTest {
 
     private fun mockHarKode6() {
         every { jwtTokenClaims.getAsList(any()) }.returns(listOf(kode6Id))
+    }
+
+    @Test
+    internal fun `har tilgang når det ikke finnes noen adressebeskyttelser for enskild person`() {
+        mockHentPersonMedAdressebeskyttelse()
+        assertThat(sjekkTilgangTilPerson()).isTrue
+        verify(exactly = 1) { egenAnsattService.erEgenAnsatt(any<String>()) }
+    }
+
+    @Test
+    internal fun `har ikke tilgang når det finnes adressebeskyttelser for enskild person`() {
+        mockHentPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.FORTROLIG)
+        assertThat(sjekkTilgangTilPerson()).isFalse
+        verify(exactly = 0) { egenAnsattService.erEgenAnsatt(any<String>()) }
+    }
+
+    @Test
+    internal fun `har ikke tilgang når det ikke finnes noen adressebeskyttelser for enskild person men er ansatt`() {
+        every { egenAnsattService.erEgenAnsatt(any<String>()) } returns true
+        mockHentPersonMedAdressebeskyttelse()
+        assertThat(sjekkTilgangTilPerson()).isFalse
+        verify(exactly = 1) { egenAnsattService.erEgenAnsatt(any<String>()) }
     }
 
     @Test
@@ -120,8 +144,22 @@ internal class TilgangskontrollServiceTest {
         assertThat(slot.captured).containsOnly(søkerIdent)
     }
 
+    private fun sjekkTilgangTilPerson() = tilgangskontrollService.sjekkTilgang("", jwtToken).harTilgang
+
     private fun sjekkTilgangTilPersonMedRelasjoner() =
         tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner("", jwtToken).harTilgang
+
+    private fun mockHentPersonMedAdressebeskyttelse(adressebeskyttelse: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT) {
+        every { personService.hentPersonKortBolk(any()) } answers {
+            mapOf(
+                firstArg<List<String>>().single() to pdlPersonKort(
+                    adressebeskyttelse = adressebeskyttelse(
+                        adressebeskyttelse,
+                    ),
+                ),
+            )
+        }
+    }
 
     private fun lagPersonMedRelasjoner(
         graderingSøker: AdressebeskyttelseGradering? = null,
@@ -129,14 +167,11 @@ internal class TilgangskontrollServiceTest {
     ): SøkerMedBarn {
         val barnliste = mapOf(
             barnIdent to pdlBarn(
-                adressebeskyttelse = graderingBarn?.let {
-                    listOf(Adressebeskyttelse(it, metadataGjeldende))
-                } ?: emptyList(),
+                adressebeskyttelse = adressebeskyttelse(graderingBarn),
             ),
         )
         val søker = pdlSøker(
-            adressebeskyttelse = graderingSøker?.let { listOf(Adressebeskyttelse(it, metadataGjeldende)) }
-                ?: emptyList(),
+            adressebeskyttelse = adressebeskyttelse(graderingSøker),
         )
         return SøkerMedBarn(
             søkerIdent = søkerIdent,
@@ -144,4 +179,7 @@ internal class TilgangskontrollServiceTest {
             barn = barnliste,
         )
     }
+
+    private fun adressebeskyttelse(gradering: AdressebeskyttelseGradering?) =
+        gradering?.let { listOf(Adressebeskyttelse(it, metadataGjeldende)) } ?: emptyList()
 }

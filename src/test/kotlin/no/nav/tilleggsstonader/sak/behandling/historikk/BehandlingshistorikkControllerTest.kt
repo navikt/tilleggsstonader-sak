@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.config.ObjectMapperProvider.obj
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -21,7 +22,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.exchange
 import java.time.LocalDateTime
 import java.util.UUID
@@ -39,16 +42,14 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         headers.setBearerAuth(onBehalfOfToken())
     }
 
-    /*
     @Test
     internal fun `Skal returnere 403 dersom man ikke har tilgang til brukeren`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("ikkeTilgang"))))
         val behandling = behandlingRepository.insert(behandling(fagsak))
-        val respons = hentHistorikk(behandling.id)
+        val respons = catchThrowableOfType<HttpClientErrorException.Forbidden> { hentHistorikk(behandling.id) }
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
     }
-     */
 
     @Test
     internal fun `skal kun returnere den første hendelsen av typen OPPRETTET - etterfølgende hendelser av denne typen skal lukes vekk`() {
