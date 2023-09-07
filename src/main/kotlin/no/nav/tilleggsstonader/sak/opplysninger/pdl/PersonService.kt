@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
+import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
@@ -8,7 +9,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -16,11 +16,11 @@ import org.springframework.stereotype.Service
 @Service
 class PersonService(
     private val pdlClient: PdlClient,
-    @Qualifier("shortCache")
     private val cacheManager: CacheManager,
 ) {
+
     fun hentSøker(ident: String): PdlSøker {
-        return pdlClient.hentSøker(ident)
+        return cacheManager.getValue("personService_hentsoker", ident) { pdlClient.hentSøker(ident) }
     }
 
     fun hentPersonMedBarn(ident: String): SøkerMedBarn {

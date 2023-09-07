@@ -10,7 +10,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 
 interface CacheService {
 
-    fun getValue(i: List<Int>): Map<Int, Int>
+    fun getValue(i: Collection<Int>): Map<Int, Int>
 }
 
 internal class CacheUtilTest {

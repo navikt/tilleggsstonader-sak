@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
 import no.nav.tilleggsstonader.sak.infrastruktur.config.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.sak.infrastruktur.felles.Tema
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBolkResponse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentBolkResponse
@@ -13,7 +14,7 @@ val logger: Logger = LoggerFactory.getLogger(PdlClient::class.java)
 
 object PdlUtil {
     val httpHeaders = HttpHeaders().apply {
-        add("Tema", "ENF") // TODO
+        add("Tema", Tema.TEMA)
         add("behandlingsnummer", "B289")
     }
 }
