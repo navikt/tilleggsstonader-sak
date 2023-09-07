@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak
 
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
+import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
@@ -83,6 +84,7 @@ abstract class IntegrationTest {
             Behandlingshistorikk::class,
             Behandlingsjournalpost::class,
             EksternBehandlingId::class,
+            BehandlingBarn::class,
             Behandling::class,
             EksternFagsakId::class,
             FagsakDomain::class,

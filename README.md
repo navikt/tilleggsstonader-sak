@@ -34,5 +34,4 @@ som brukes som default i `MappingJackson2HttpMessageConverter`
  * Tilgangskontroll gjøres kun mot søker og barn, her må vi vurdere om vi skal ha med flere relasjoner og
 
 #### Saker som mangler
-* TilgangService
-* AuditLogger - Denne har avhengighet til Tilgang som er response fra integrasjoner
+* Verifisere at auditlogg kommer til arcsight

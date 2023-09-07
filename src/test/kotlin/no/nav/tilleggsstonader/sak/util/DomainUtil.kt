@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -134,6 +135,16 @@ fun Behandling.innvilgetOgFerdigstilt() =
         status = BehandlingStatus.FERDIGSTILT,
         vedtakstidspunkt = SporbarUtils.now(),
     )
+
+fun behandlingBarn(
+    behandlingId: UUID = UUID.randomUUID(),
+    personIdent: String = "1",
+    navn: String = "navn",
+) = BehandlingBarn(
+    behandlingId = behandlingId,
+    personIdent = personIdent,
+    navn = navn,
+)
 
 val defaultIdenter = setOf(PersonIdent("15"))
 fun fagsakPerson(

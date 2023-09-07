@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -16,7 +19,23 @@ import org.springframework.stereotype.Service
 class TestoppsettService(
     private val fagsakPersonRepository: FagsakPersonRepository,
     private val fagsakRepository: FagsakRepository,
+    private val behandlingRepository: BehandlingRepository,
 ) {
+
+    fun opprettBehandlingMedFagsak(
+        behandling: Behandling,
+        stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
+    ): Behandling {
+        val person = opprettPerson(fagsak())
+        lagreFagsak(
+            fagsak(
+                id = behandling.fagsakId,
+                stønadstype = stønadstype,
+                fagsakPersonId = person.id,
+            ),
+        )
+        return behandlingRepository.insert(behandling)
+    }
 
     fun opprettPerson(ident: String) = fagsakPersonRepository.insert(FagsakPerson(identer = setOf(PersonIdent(ident))))
 
