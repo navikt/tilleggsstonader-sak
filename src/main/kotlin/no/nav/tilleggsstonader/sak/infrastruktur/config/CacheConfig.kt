@@ -87,8 +87,8 @@ fun CacheManager.getCacheOrThrow(cache: String) = this.getCache(cache) ?: error(
 @Suppress("UNCHECKED_CAST", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 fun <T : Any, R> CacheManager.getCachedOrLoad(
     cacheName: String,
-    values: List<T>,
-    valueLoader: (List<T>) -> Map<T, R>,
+    values: Collection<T>,
+    valueLoader: (Collection<T>) -> Map<T, R>,
 ): Map<T, R> {
     val cache = this.getCacheOrThrow(cacheName)
     val previousValues: List<Pair<T, R?>> = values.distinct().map { it to cache.get(it)?.get() as R? }.toList()

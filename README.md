@@ -31,6 +31,8 @@ som brukes som default i `MappingJackson2HttpMessageConverter`
 
 #### Kommentarer
  * Har ikke tatt med flagget migrert på fagsak då det er uklart om vi skal migrere
+ * Tilgangskontroll gjøres kun mot søker og barn, her må vi vurdere om vi skal ha med flere relasjoner og
+
 #### Saker som mangler
 * TilgangService
 * AuditLogger - Denne har avhengighet til Tilgang som er response fra integrasjoner
