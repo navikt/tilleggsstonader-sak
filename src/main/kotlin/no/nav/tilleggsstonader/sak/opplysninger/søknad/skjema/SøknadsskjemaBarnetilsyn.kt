@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 data class SøknadsskjemaBarnetilsyn(
     val datoMottatt: LocalDateTime,
-    val barn: Set<SkjemaBarn>,
+    val barn: List<SkjemaBarn>,
 )
 
 data class SkjemaBarn(

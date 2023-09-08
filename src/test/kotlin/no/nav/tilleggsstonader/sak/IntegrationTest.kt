@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
 import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -83,13 +84,15 @@ abstract class IntegrationTest {
 
     private fun resetDatabase() {
         listOf(
+            Vilkårsvurdering::class,
+            BehandlingBarn::class,
+
             SøknadBehandling::class,
             SøknadBarnetilsyn::class,
 
             Behandlingshistorikk::class,
             Behandlingsjournalpost::class,
             EksternBehandlingId::class,
-            BehandlingBarn::class,
             Behandling::class,
             EksternFagsakId::class,
             FagsakDomain::class,

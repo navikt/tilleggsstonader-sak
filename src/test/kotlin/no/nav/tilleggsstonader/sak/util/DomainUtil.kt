@@ -19,6 +19,12 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
+import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
+import no.nav.tilleggsstonader.sak.vilkår.domain.Opphavsvilkår
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -139,9 +145,11 @@ fun Behandling.innvilgetOgFerdigstilt() =
 fun behandlingBarn(
     behandlingId: UUID = UUID.randomUUID(),
     personIdent: String = "1",
+    søknadBarnId: UUID? = null,
     navn: String = "navn",
 ) = BehandlingBarn(
     behandlingId = behandlingId,
+    søknadBarnId = søknadBarnId,
     personIdent = personIdent,
     navn = navn,
 )
@@ -200,11 +208,11 @@ fun Fagsak.tilFagsakDomain() =
         eksternId = eksternId,
         sporbar = sporbar,
     )
-/*
+
 fun vilkårsvurdering(
     behandlingId: UUID,
     resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
-    type: VilkårType = VilkårType.LOVLIG_OPPHOLD,
+    type: VilkårType = VilkårType.EKSEMPEL,
     delvilkårsvurdering: List<Delvilkårsvurdering> = emptyList(),
     barnId: UUID? = null,
     opphavsvilkår: Opphavsvilkår? = null,
@@ -217,8 +225,6 @@ fun vilkårsvurdering(
         delvilkårsvurdering = DelvilkårsvurderingWrapper(delvilkårsvurdering),
         opphavsvilkår = opphavsvilkår,
     )
-
- */
 
 fun fagsakpersoner(vararg identer: String): Set<PersonIdent> = identer.map {
     PersonIdent(ident = it)
