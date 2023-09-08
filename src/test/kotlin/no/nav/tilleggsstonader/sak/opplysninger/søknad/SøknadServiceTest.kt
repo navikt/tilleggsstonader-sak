@@ -59,7 +59,7 @@ class SøknadServiceTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak))
         val skjema = søknadskjemaBarnetilsyn(
-            barn = setOf(skjemaBarn(fødselsnummer = "barn1", navn = "navn1")),
+            barn = listOf(skjemaBarn(fødselsnummer = "barn1", navn = "navn1")),
         )
         val søknad = søknadService.lagreSøknad(behandling.id, "journalpostId", skjema)
         assertThat(søknad.journalpostId).isEqualTo("journalpostId")

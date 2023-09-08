@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
+import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.tilleggsstonader.sak.infrastruktur.config.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer
@@ -64,6 +67,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             listOf(
                 PGobjectTilJsonWrapperConverter(),
                 JsonWrapperTilPGobjectConverter(),
+
+                PGobjectTilDelvilkårConverter(),
+                DelvilkårTilPGobjectConverter(),
             ),
         )
     }
@@ -83,6 +89,24 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             PGobject().apply {
                 type = "json"
                 value = jsonWrapper.json
+            }
+    }
+
+    @ReadingConverter
+    class PGobjectTilDelvilkårConverter : Converter<PGobject, DelvilkårsvurderingWrapper> {
+
+        override fun convert(pGobject: PGobject): DelvilkårsvurderingWrapper {
+            return DelvilkårsvurderingWrapper(pGobject.value?.let { objectMapper.readValue(it) } ?: emptyList())
+        }
+    }
+
+    @WritingConverter
+    class DelvilkårTilPGobjectConverter : Converter<DelvilkårsvurderingWrapper, PGobject> {
+
+        override fun convert(delvilkårsvurdering: DelvilkårsvurderingWrapper): PGobject =
+            PGobject().apply {
+                type = "json"
+                value = objectMapper.writeValueAsString(delvilkårsvurdering.delvilkårsvurderinger)
             }
     }
 }

@@ -8,7 +8,7 @@ object SøknadUtil {
 
     fun søknadskjemaBarnetilsyn(
         datoMottatt: LocalDateTime = LocalDateTime.now(),
-        barn: Set<SkjemaBarn> = emptySet(),
+        barn: List<SkjemaBarn> = listOf(skjemaBarn()),
     ) = SøknadsskjemaBarnetilsyn(
         datoMottatt = datoMottatt,
         barn = barn,
