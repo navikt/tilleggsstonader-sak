@@ -7,5 +7,5 @@ import org.springframework.web.client.RestClientResponseException
 class ProblemDetailException(
     val detail: ProblemDetail,
     val responseException: RestClientResponseException,
-    val httpStatus: HttpStatus = HttpStatus.valueOf(responseException.rawStatusCode)
+    val httpStatus: HttpStatus = HttpStatus.valueOf(responseException.rawStatusCode),
 ) : RuntimeException(responseException)
