@@ -81,10 +81,8 @@ no.nav.security.jwt:
 clients:
   pdl:
     uri: https://pdl-api.${CLIENT_ENV}-fss-pub.nais.io
-    audience: ${CLIENT_ENV}-fss:pdl:pdl-api
     scope: api://${CLIENT_ENV}-fss.pdl.pdl-api/.default
   egen_ansatt:
     uri: http://nom.skjermede-personer-pip
-    audience: ${CLIENT_ENV}-gcp:nom:skjermede-personer-pip
     scope: api://${CLIENT_ENV}-gcp.nom.skjermede-personer-pip/.default
 
