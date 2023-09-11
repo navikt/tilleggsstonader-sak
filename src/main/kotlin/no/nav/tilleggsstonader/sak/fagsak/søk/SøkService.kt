@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.opplysninger.dto.NavnDto
 import no.nav.tilleggsstonader.sak.opplysninger.mapper.KjønnMapper
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -38,7 +39,10 @@ class SøkService(
             "Finner ingen personer for valgt personident"
         }
         val gjeldendePersonIdent = personIdenter.gjeldende().ident
-        // TODO opprett fagsak hvis personen finnes i Arena?
+        // TODO opprett fagsak hvis personen finnes i Arena? (finnFagsakEllerOpprettHvisPersonFinnesIInfotrygd)
+        brukerfeilHvisIkke(fagsakService.harFagsak(personIdenter.identer())) {
+            "Finner ikke fagsak for søkte personen"
+        }
         val fagsakPerson = fagsakPersonService.finnPerson(personIdenter.identer())
 
         return tilSøkeresultat(gjeldendePersonIdent, fagsakPerson)

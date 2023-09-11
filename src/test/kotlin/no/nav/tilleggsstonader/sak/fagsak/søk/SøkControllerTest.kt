@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.util.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpEntity
@@ -77,19 +78,18 @@ internal class SøkControllerTest : IntegrationTest() {
     inner class SøkPersonForEksternFagsak {
 
         @Test
+        @Disabled // TODO har ikke implementert andel_tilkjent_ytelse ennå
         internal fun `skal finne person hvis fagsaken eksisterer`() {
             val personIdent = "123"
             val fagsakPerson = testoppsettService.opprettPerson(personIdent)
             val fagsak =
                 testoppsettService.lagreFagsak(fagsak(person = fagsakPerson, stønadstype = Stønadstype.BARNETILSYN))
 
-            /* TODO har ikke implementert andel_tilkjent_ytelse ennå
             val response = søkPerson(fagsak.eksternId.id)
 
             assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
             val data = response.body!!
             assertThat(data.personIdent).isEqualTo(fagsak.hentAktivIdent())
-             */
         }
 
         @Test
@@ -115,15 +115,6 @@ internal class SøkControllerTest : IntegrationTest() {
     }
 
     private fun søkPerson(personIdent: String): ResponseEntity<Søkeresultat> {
-        return restTemplate.exchange(
-            localhost("/api/sok"),
-            HttpMethod.POST,
-            HttpEntity(PersonIdentDto(personIdent = personIdent), headers),
-        )
-    }
-
-    // TODO delete
-    private fun søkPerson2(personIdent: String): ResponseEntity<String> {
         return restTemplate.exchange(
             localhost("/api/sok"),
             HttpMethod.POST,
