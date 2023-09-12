@@ -22,6 +22,7 @@ data class Behandling(
     val forrigeBehandlingId: UUID? = null,
     @MappedCollection(idColumn = "behandling_id")
     val eksternId: EksternBehandlingId = EksternBehandlingId(),
+    // @Version ?
     val versjon: Int = 0,
 
     val type: BehandlingType,

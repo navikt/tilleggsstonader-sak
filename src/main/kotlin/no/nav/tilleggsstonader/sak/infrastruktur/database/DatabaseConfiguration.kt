@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.database
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.sak.infrastruktur.config.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
@@ -70,6 +71,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 PGobjectTilDelvilkårConverter(),
                 DelvilkårTilPGobjectConverter(),
+
+                PGobjectTilBeriketSimuleringsresultat(),
+                BeriketSimuleringsresultatTilPGobjectConverter(),
             ),
         )
     }
@@ -107,6 +111,24 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             PGobject().apply {
                 type = "json"
                 value = objectMapper.writeValueAsString(delvilkårsvurdering.delvilkårsvurderinger)
+            }
+    }
+
+    @ReadingConverter
+    class PGobjectTilBeriketSimuleringsresultat : Converter<PGobject, BeriketSimuleringsresultat?> {
+
+        override fun convert(pGobject: PGobject): BeriketSimuleringsresultat? {
+            return pGobject.value?.let { objectMapper.readValue(it) }
+        }
+    }
+
+    @WritingConverter
+    class BeriketSimuleringsresultatTilPGobjectConverter : Converter<BeriketSimuleringsresultat, PGobject> {
+
+        override fun convert(simuleringsresultat: BeriketSimuleringsresultat): PGobject =
+            PGobject().apply {
+                type = "json"
+                value = objectMapper.writeValueAsString(simuleringsresultat)
             }
     }
 }
