@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.kontrakt.AndelTilkjentYtelseDto
 import no.nav.tilleggsstonader.sak.util.Månedsperiode
 import org.springframework.data.relational.core.mapping.Column
 import java.time.LocalDate
@@ -32,11 +31,4 @@ data class AndelTilkjentYtelse(
 
     // Kan vi bruke periode direkt i domeneobjektet?
     val periode get() = Månedsperiode(stønadFom, stønadTom)
-
-    fun tilIverksettDto() =
-        AndelTilkjentYtelseDto(
-            beløp = this.beløp,
-            periode = this.periode,
-            kildeBehandlingId = this.kildeBehandlingId,
-        )
 }

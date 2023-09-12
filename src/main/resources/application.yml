@@ -79,6 +79,9 @@ no.nav.security.jwt:
         client-auth-method: client_secret_basic
 
 clients:
+  iverksett:
+    uri: http://tilleggsstonader-iverksett
+    scope: api://${CLIENT_ENV}-gcp.tilleggsstonader.tilleggsstonader-iverksett/.default
   pdl:
     uri: https://pdl-api.${CLIENT_ENV}-fss-pub.nais.io
     scope: api://${CLIENT_ENV}-fss.pdl.pdl-api/.default
