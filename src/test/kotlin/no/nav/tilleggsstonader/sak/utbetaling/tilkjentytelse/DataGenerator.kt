@@ -1,8 +1,8 @@
-package no.nav.tilleggsstonader.sak.tilkjentytelse
+package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
-import no.nav.tilleggsstonader.sak.tilkjentytelse.domain.AndelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.tilkjentytelse.domain.TilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import java.time.LocalDate

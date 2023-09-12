@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.tilkjentytelse
+package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
 import io.mockk.every
 import io.mockk.mockk
@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
-import no.nav.tilleggsstonader.sak.tilkjentytelse.domain.TilkjentYtelseRepository
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat

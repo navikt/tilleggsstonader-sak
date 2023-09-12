@@ -1,6 +1,6 @@
-package no.nav.tilleggsstonader.sak.tilkjentytelse.domain
+package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
-import no.nav.tilleggsstonader.sak.tilkjentytelse.kontrakt.AndelTilkjentYtelseDto
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.kontrakt.AndelTilkjentYtelseDto
 import no.nav.tilleggsstonader.sak.util.Månedsperiode
 import org.springframework.data.relational.core.mapping.Column
 import java.time.LocalDate

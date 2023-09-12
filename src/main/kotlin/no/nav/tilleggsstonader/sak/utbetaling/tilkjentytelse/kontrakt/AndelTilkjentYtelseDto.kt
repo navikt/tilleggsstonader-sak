@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.tilkjentytelse.kontrakt
+package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.kontrakt
 
 import no.nav.tilleggsstonader.sak.util.Månedsperiode
 import java.util.UUID

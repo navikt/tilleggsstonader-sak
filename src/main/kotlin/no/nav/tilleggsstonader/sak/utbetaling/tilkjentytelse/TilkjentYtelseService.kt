@@ -1,13 +1,13 @@
-package no.nav.tilleggsstonader.sak.tilkjentytelse
+package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
-import no.nav.tilleggsstonader.sak.tilkjentytelse.domain.TilkjentYtelse
-import no.nav.tilleggsstonader.sak.tilkjentytelse.domain.TilkjentYtelseRepository
-import no.nav.tilleggsstonader.sak.tilkjentytelse.kontrakt.KonsistensavstemmingTilkjentYtelseDto
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.kontrakt.KonsistensavstemmingTilkjentYtelseDto
 import no.nav.tilleggsstonader.sak.util.isEqualOrAfter
 import org.springframework.stereotype.Service
 import java.time.LocalDate

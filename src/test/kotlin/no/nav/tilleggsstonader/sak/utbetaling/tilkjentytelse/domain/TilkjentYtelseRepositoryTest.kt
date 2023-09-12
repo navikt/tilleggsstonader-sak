@@ -1,11 +1,11 @@
-package no.nav.tilleggsstonader.sak.tilkjentytelse.domain
+package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
-import no.nav.tilleggsstonader.sak.tilkjentytelse.DataGenerator
-import no.nav.tilleggsstonader.sak.tilkjentytelse.lagAndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.DataGenerator
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.lagAndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.innvilgetOgFerdigstilt

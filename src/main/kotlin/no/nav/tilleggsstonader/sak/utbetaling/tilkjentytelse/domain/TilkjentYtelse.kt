@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.tilkjentytelse.domain
+package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
