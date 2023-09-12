@@ -15,7 +15,7 @@ import java.net.URI
 
 @Component
 class IverksettClient(
-    @Value("\${FAMILIE_EF_IVERKSETT_URL}")
+    @Value("\${clients.iverksett.uri}")
     private val familieEfIverksettUri: String,
     @Qualifier("azure")
     private val restOperations: RestOperations,
