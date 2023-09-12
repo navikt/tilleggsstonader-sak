@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -62,20 +63,20 @@ internal class SimuleringControllerTest : IntegrationTest() {
 
         val respons: ResponseEntity<Simuleringsoppsummering> = simulerForBehandling(behandling.id)
 
-        Assertions.assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
-        Assertions.assertThat(respons.body!!.perioder).hasSize(8)
+        assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(respons.body!!.perioder).hasSize(8)
         val simuleringsresultat = simuleringsresultatRepository.findByIdOrThrow(behandling.id)
 
         // Verifiser at simuleringsresultatet er lagret
-        Assertions.assertThat(simuleringsresultat.data.detaljer.simuleringMottaker).hasSize(1)
-        Assertions.assertThat(simuleringsresultat.data.detaljer.simuleringMottaker.first().simulertPostering)
+        assertThat(simuleringsresultat.data.detaljer.simuleringMottaker).hasSize(1)
+        assertThat(simuleringsresultat.data.detaljer.simuleringMottaker.first().simulertPostering)
             .hasSizeGreaterThan(1)
     }
 
     private fun simulerForBehandling(behandlingId: UUID): ResponseEntity<Simuleringsoppsummering> {
         return restTemplate.exchange(
             localhost("/api/simulering/$behandlingId"),
-            HttpMethod.POST,
+            HttpMethod.GET,
             HttpEntity<BehandlingDto>(headers),
         )
     }

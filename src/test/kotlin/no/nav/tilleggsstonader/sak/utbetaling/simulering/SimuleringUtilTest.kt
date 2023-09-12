@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.simulering
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Simuleringsoppsummering
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Simuleringsperiode
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -43,15 +44,15 @@ class SimuleringUtilTest {
     internal fun `skal slå sammen perioder som har feilutbetalinger til sammenhengende perioder`() {
         val sammenhengendePerioderMedFeilutbetaling =
             simuleringsoppsummering.hentSammenhengendePerioderMedFeilutbetaling()
-        Assertions.assertThat(sammenhengendePerioderMedFeilutbetaling).hasSize(3)
-        Assertions.assertThat(sammenhengendePerioderMedFeilutbetaling.first().fomDato).isEqualTo(januarStart)
-        Assertions.assertThat(sammenhengendePerioderMedFeilutbetaling.first().tomDato).isEqualTo(aprilSlutt)
+        assertThat(sammenhengendePerioderMedFeilutbetaling).hasSize(3)
+        assertThat(sammenhengendePerioderMedFeilutbetaling.first().fomDato).isEqualTo(januarStart)
+        assertThat(sammenhengendePerioderMedFeilutbetaling.first().tomDato).isEqualTo(aprilSlutt)
 
-        Assertions.assertThat(sammenhengendePerioderMedFeilutbetaling.second().fomDato).isEqualTo(juniStart)
-        Assertions.assertThat(sammenhengendePerioderMedFeilutbetaling.second().tomDato).isEqualTo(augustSlutt)
+        assertThat(sammenhengendePerioderMedFeilutbetaling.second().fomDato).isEqualTo(juniStart)
+        assertThat(sammenhengendePerioderMedFeilutbetaling.second().tomDato).isEqualTo(augustSlutt)
 
-        Assertions.assertThat(sammenhengendePerioderMedFeilutbetaling.last().fomDato).isEqualTo(oktoberStart)
-        Assertions.assertThat(sammenhengendePerioderMedFeilutbetaling.last().tomDato).isEqualTo(oktoberSlutt)
+        assertThat(sammenhengendePerioderMedFeilutbetaling.last().fomDato).isEqualTo(oktoberStart)
+        assertThat(sammenhengendePerioderMedFeilutbetaling.last().tomDato).isEqualTo(oktoberSlutt)
     }
 
     fun lagSimuleringsperiode(mnd: YearMonth, nyttBeløp: Int, tidligereUtbetalt: Int): Simuleringsperiode {
