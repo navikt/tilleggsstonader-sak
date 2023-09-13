@@ -43,6 +43,8 @@ class FagsakService(
         return fagsak.tilFagsakMedPerson(oppdatertPerson.identer)
     }
 
+    fun harFagsak(personIdenter: Set<String>) = fagsakRepository.findBySøkerIdent(personIdenter).isNotEmpty()
+
     fun finnFagsak(personIdenter: Set<String>, stønadstype: Stønadstype): Fagsak? =
         fagsakRepository.findBySøkerIdent(personIdenter, stønadstype)?.tilFagsakMedPerson()
 
@@ -60,19 +62,19 @@ class FagsakService(
             erLøpende = erLøpende,
         )
     }
-/*
-    fun finnFagsakerForFagsakPersonId(fagsakPersonId: UUID): Fagsaker {
-        val fagsaker = fagsakRepository.findByFagsakPersonId(fagsakPersonId)
-            .map { it.tilFagsakMedPerson() }
-            .associateBy { it.stønadstype }
-        return Fagsaker(
-            overgangsstønad = fagsaker[Stønadstype.OVERGANGSSTØNAD],
-            barnetilsyn = fagsaker[Stønadstype.BARNETILSYN],
-            skolepenger = fagsaker[Stønadstype.SKOLEPENGER],
-        )
-    }
+    /*
+        fun finnFagsakerForFagsakPersonId(fagsakPersonId: UUID): Fagsaker {
+            val fagsaker = fagsakRepository.findByFagsakPersonId(fagsakPersonId)
+                .map { it.tilFagsakMedPerson() }
+                .associateBy { it.stønadstype }
+            return Fagsaker(
+                overgangsstønad = fagsaker[Stønadstype.OVERGANGSSTØNAD],
+                barnetilsyn = fagsaker[Stønadstype.BARNETILSYN],
+                skolepenger = fagsaker[Stønadstype.SKOLEPENGER],
+            )
+        }
 
- */
+     */
 
     fun erLøpende(fagsak: Fagsak): Boolean {
         return fagsakRepository.harLøpendeUtbetaling(fagsak.id)

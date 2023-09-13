@@ -14,6 +14,8 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.Simuleringsresultat
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
 import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
@@ -49,6 +51,7 @@ class DefaultRestTemplateConfiguration {
     "integrasjonstest",
     "mock-pdl",
     "mock-egen-ansatt",
+    "mock-iverksett",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
@@ -84,6 +87,8 @@ abstract class IntegrationTest {
 
     private fun resetDatabase() {
         listOf(
+            Simuleringsresultat::class,
+            TilkjentYtelse::class,
             Vilkårsvurdering::class,
             BehandlingBarn::class,
 
