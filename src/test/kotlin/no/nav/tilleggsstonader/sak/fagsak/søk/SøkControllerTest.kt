@@ -3,10 +3,8 @@ package no.nav.tilleggsstonader.sak.fagsak.søk
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ProblemDetailException
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.PersonIdentDto
-import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.execWithErrorHandler
-import no.nav.tilleggsstonader.sak.util.catchThrowableOfType
+import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -39,9 +37,8 @@ internal class SøkControllerTest : IntegrationTest() {
 
     @Test
     internal fun `Gitt person uten fagsak når søk på personensident kallas skal det returneres ProblemDetail`() {
-        val response = catchThrowableOfType<ProblemDetailException> {
-            execWithErrorHandler { søkPerson("01010166666") }
-        }
+        val response = catchProblemDetailException { søkPerson("01010166666") }
+
         assertThat(response.responseException.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
         assertThat(response.detail.status).isEqualTo(HttpStatus.BAD_REQUEST.value())
         assertThat(response.detail.detail).isEqualTo("Finner ikke fagsak for søkte personen")
@@ -49,27 +46,24 @@ internal class SøkControllerTest : IntegrationTest() {
 
     @Test
     internal fun `Skal feile hvis personIdenten ikke finnes i pdl`() {
-        val response = catchThrowableOfType<ProblemDetailException> {
-            execWithErrorHandler { søkPerson("19117313797") }
-        }
+        val response = catchProblemDetailException { søkPerson("19117313797") }
+
         assertThat(response.httpStatus).isEqualTo(HttpStatus.BAD_REQUEST)
         assertThat(response.detail.detail).isEqualTo("Finner ingen personer for valgt personident")
     }
 
     @Test
     internal fun `Skal feile hvis personIdenten har feil lengde`() {
-        val response = catchThrowableOfType<ProblemDetailException> {
-            execWithErrorHandler { søkPerson("010101999990") }
-        }
+        val response = catchProblemDetailException { søkPerson("010101999990") }
+
         assertThat(response.httpStatus).isEqualTo(HttpStatus.BAD_REQUEST)
         assertThat(response.detail.detail).isEqualTo("Ugyldig personident. Det må være 11 sifre")
     }
 
     @Test
     internal fun `Skal feile hvis personIdenten inneholder noe annet enn tall`() {
-        val response = catchThrowableOfType<ProblemDetailException> {
-            execWithErrorHandler { søkPerson("010et1ord02") }
-        }
+        val response = catchProblemDetailException { søkPerson("010et1ord02") }
+
         assertThat(response.httpStatus).isEqualTo(HttpStatus.BAD_REQUEST)
         assertThat(response.detail.detail).isEqualTo("Ugyldig personident. Det kan kun inneholde tall")
     }
@@ -95,9 +89,7 @@ internal class SøkControllerTest : IntegrationTest() {
         @Test
         internal fun `skal kaste feil hvis fagsaken ikke eksisterer`() {
             testoppsettService.lagreFagsak(fagsak())
-            val response = catchThrowableOfType<ProblemDetailException> {
-                execWithErrorHandler { søkPerson(100L) }
-            }
+            val response = catchProblemDetailException { søkPerson(100L) }
 
             assertThat(response.httpStatus).isEqualTo(HttpStatus.BAD_REQUEST)
             val data = response.detail

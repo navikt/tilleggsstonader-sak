@@ -1,5 +1,6 @@
 val javaVersion = JavaLanguageVersion.of(17)
-val tilleggsstønaderLibsVersion = "2023.09.04-15.58.86e7da46c21d"
+val tilleggsstønaderLibsVersion = "2023.09.14-10.25.400ea92abb53"
+val tilleggsstønaderKontrakterVersion = "2023.09.14-14.12.ac38d270e601"
 val tokenSupportVersion = "3.1.5"
 val wiremockVersion = "2.35.0"
 val mockkVersion = "1.13.7"
@@ -67,6 +68,8 @@ dependencies {
     implementation("no.nav.tilleggsstonader-libs:log:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:http-client:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:sikkerhet:$tilleggsstønaderLibsVersion")
+
+    implementation("no.nav.tilleggsstonader.kontrakter:tilleggsstonader-kontrakter:$tilleggsstønaderKontrakterVersion")
 
     // For auditlogger. August, 2014, men det er den som blir brukt på NAV
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")

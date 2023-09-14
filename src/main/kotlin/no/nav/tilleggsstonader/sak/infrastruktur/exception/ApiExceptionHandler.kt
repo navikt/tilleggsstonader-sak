@@ -41,9 +41,6 @@ class ApiExceptionHandler {
         secureLogger.error("Uventet feil: $metodeSomFeiler ${rootCause(throwable)}", throwable)
         logger.error("Uventet feil: $metodeSomFeiler ${rootCause(throwable)} ")
 
-        logger.error("Ukjent feil status=${responseStatus.value()}")
-        // TODO securelogger når vi har tilgang
-        secureLogger.error("Ukjent feil status=${responseStatus.value()}", throwable)
         return ProblemDetail.forStatusAndDetail(responseStatus, "Ukjent feil")
     }
 
