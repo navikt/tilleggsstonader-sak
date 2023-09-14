@@ -23,4 +23,5 @@ fun appLocal(): SpringApplicationBuilder =
             "mock-pdl",
             "mock-egen-ansatt",
             "mock-iverksett",
+            "mock-oppgave",
         )
