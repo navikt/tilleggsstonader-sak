@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.regler
 
-import no.nav.tilleggsstonader.sak.infrastruktur.config.ObjectMapperProvider
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

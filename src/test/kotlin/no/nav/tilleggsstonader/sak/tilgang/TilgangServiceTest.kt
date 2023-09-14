@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.tilgang
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -20,7 +21,6 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.metadataGjeldende
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlSøker
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakpersoner
 import org.assertj.core.api.Assertions.assertThat

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.historikk
 
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
@@ -8,7 +9,6 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.tilHendelseshisto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.infrastruktur.config.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import org.springframework.stereotype.Service
 import java.util.UUID

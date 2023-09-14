@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
+import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.IKKE_SATT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.INNVILGET
@@ -20,7 +21,6 @@ import no.nav.tilleggsstonader.sak.util.BehandlingOppsettUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakpersoner
-import no.nav.tilleggsstonader.sak.util.hasCauseMessageContaining
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
