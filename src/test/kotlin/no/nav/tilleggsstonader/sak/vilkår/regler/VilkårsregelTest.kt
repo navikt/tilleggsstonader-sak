@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.regler
 
-import no.nav.tilleggsstonader.sak.infrastruktur.config.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

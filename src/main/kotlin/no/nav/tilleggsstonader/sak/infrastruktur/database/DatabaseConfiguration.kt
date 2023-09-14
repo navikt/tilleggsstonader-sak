@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.sak.infrastruktur.config.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
 import org.postgresql.util.PGobject
