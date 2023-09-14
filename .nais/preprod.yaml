@@ -8,7 +8,7 @@ metadata:
 
 spec:
   port: 8080
-  image: {{ image }}
+  image: { { image } }
   ingresses:
     - https://tilleggsstonader-sak.intern.dev.nav.no
   liveness:
@@ -64,6 +64,8 @@ spec:
     outbound:
       rules:
         - application: tilleggsstonader-integrasjoner
+      external:
+        - host: pdl-api-q1.dev-fss-pub.nais.io
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev

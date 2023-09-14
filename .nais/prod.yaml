@@ -66,7 +66,8 @@ spec:
     outbound:
       rules:
         - application: tilleggsstonader-integrasjoner
-
+      external:
+        - host: pdl-api.prod-fss-pub.nais.io
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: prod
