@@ -61,6 +61,9 @@ spec:
           - id: "ea930b6b-9397-44d9-b9e6-f4cf527a632a" # 0000-GA-Fortrolig_Adresse
           - id: "dbe4ad45-320b-4e9a-aaa1-73cca4ee124d" # 0000-GA-Egne_ansatte
   accessPolicy:
+    inbound:
+      rules:
+        - application: tilleggsstonader-sak-frontend
     outbound:
       rules:
         - application: tilleggsstonader-integrasjoner
