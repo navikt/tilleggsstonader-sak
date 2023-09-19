@@ -25,7 +25,11 @@ class RessursAdvice : ResponseBodyAdvice<Any?> {
         request: ServerHttpRequest,
         response: ServerHttpResponse,
     ): Any? {
-        return Ressurs.success(body)
+        if (request.uri.path.contains("api")) {
+            return Ressurs.success(body)
+        } else {
+            return body
+        }
     }
 }
 
