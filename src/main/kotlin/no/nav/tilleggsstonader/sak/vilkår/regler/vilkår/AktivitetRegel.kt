@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.vilkår.regler.jaNeiSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.regelIder
 
 class AktivitetRegel : Vilkårsregel(
-    vilkårType = VilkårType.EKSEMPEL,
+    vilkårType = VilkårType.AKTIVITET,
     regler = setOf(ER_AKTIVITET_REGISTRERT),
     hovedregler = regelIder(ER_AKTIVITET_REGISTRERT),
 ) {
