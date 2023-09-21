@@ -1,29 +1,40 @@
 package no.nav.tilleggsstonader.sak.vilkår.regler
 
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.util.FileUtil.listFiles
+import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
+import kotlin.io.path.name
 
 internal class VilkårsregelTest {
 
     @Test
-    @Disabled // TOOO FIX
     internal fun `sjekker at output fortsatt er det samme på json`() {
         val objectWriter = objectMapper.writerWithDefaultPrettyPrinter()
-        Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.forEach {
-            val json = objectWriter.writeValueAsString(it.value)
+        val vilkårsregler = Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.map { it.value }
+        vilkårsregler.forEach {
+            val json = objectWriter.writeValueAsString(it)
             // kommentere ut hvis regler har endret seg for å lagre de nye reglene
             // skrivTilFil(it.value, json)
-            val fileJson = readFile(it.value)
+            val fileJson = readFile("vilkårregler/${it.vilkårType}.json")
             assertThat(json).isEqualTo(fileJson)
         }
     }
 
+    @Test
+    fun `vilkårregler skal ikke uaktuelle regler`() {
+        val vilkårsregler = Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.map { it.value }
+
+        assertThat(listFiles("vilkårregler").map { it.fileName.name })
+            .containsExactlyInAnyOrderElementsOf(vilkårsregler.map { "vilkårregler/${it.vilkårType}.json" }.toList())
+    }
+
     @Suppress("unused")
     private fun skrivTilFil(it: Vilkårsregel, json: String) {
-        val file = File("src/test/resources/regler/${it.vilkårType}.json")
+        val file = File("src/test/resources/vilkårregler/${it.vilkårType}.json")
         if (!file.exists()) {
             file.createNewFile()
         }
@@ -36,7 +47,4 @@ internal class VilkårsregelTest {
         val objectWriter = objectMapper.writerWithDefaultPrettyPrinter()
         println(objectWriter.writeValueAsString(Vilkårsregler.ALLE_VILKÅRSREGLER))
     }
-
-    private fun readFile(it: Vilkårsregel) =
-        this::class.java.classLoader.getResource("regler/${it.vilkårType}.json")!!.readText()
 }
