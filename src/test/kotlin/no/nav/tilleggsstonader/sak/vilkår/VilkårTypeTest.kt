@@ -10,6 +10,7 @@ internal class VilkårTypeTest {
     private val vilkårForBarnetilsyn = listOf(
         VilkårType.EKSEMPEL,
         VilkårType.EKSEMPEL2,
+        VilkårType.AKTIVITET,
     )
 
     @Test
