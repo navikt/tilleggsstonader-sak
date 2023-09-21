@@ -4,6 +4,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.PersonIdentDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.util.FnrUtil.validerIdent
@@ -24,6 +25,12 @@ class SøkController(
     private val personService: PersonService,
     private val tilgangService: TilgangService,
 ) {
+
+    // TODO remove skal kun teste pdl
+    @PostMapping("test")
+    fun hentPerson(@RequestBody personIdentRequest: PersonIdentDto): PdlSøker {
+        return personService.hentSøker(personIdentRequest.personIdent)
+    }
 
     @PostMapping("", "/person")
     fun søkPerson(@RequestBody personIdentRequest: PersonIdentDto): Søkeresultat {
