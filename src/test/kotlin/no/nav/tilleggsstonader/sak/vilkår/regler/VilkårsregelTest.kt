@@ -18,7 +18,7 @@ internal class VilkårsregelTest {
         vilkårsregler.forEach {
             val json = objectWriter.writeValueAsString(it)
             // kommentere ut hvis regler har endret seg for å lagre de nye reglene
-            // skrivTilFil(it.value, json)
+            // skrivTilFil(it, json)
             val fileJson = readFile("vilkårregler/${it.vilkårType}.json")
             assertThat(json).isEqualTo(fileJson)
         }
@@ -29,7 +29,7 @@ internal class VilkårsregelTest {
         val vilkårsregler = Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.map { it.value }
 
         assertThat(listFiles("vilkårregler").map { it.fileName.name })
-            .containsExactlyInAnyOrderElementsOf(vilkårsregler.map { "vilkårregler/${it.vilkårType}.json" }.toList())
+            .containsExactlyInAnyOrderElementsOf(vilkårsregler.map { "${it.vilkårType}.json" }.toList())
     }
 
     @Suppress("unused")
