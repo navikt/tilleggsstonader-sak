@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration
 @ComponentScan("no.nav.familie.prosessering")
 @Configuration
 class TaskProsesseringConfig(
-    private val rolleConfig: RolleConfig
+    private val rolleConfig: RolleConfig,
 ) {
 
     @Bean
@@ -27,6 +27,5 @@ class TaskProsesseringConfig(
         override fun harTilgang(): Boolean {
             return SikkerhetContext.hentGrupperFraToken().contains(rolleConfig.prosessering)
         }
-
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.lang.Nullable
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
 
-@Profile("!integrasjonstest")
+@Profile("integrasjonstest")
 @ControllerAdvice
 class RessursAdvice : ResponseBodyAdvice<Any?> {
     override fun supports(returnType: MethodParameter, converterType: Class<out HttpMessageConverter<*>>): Boolean {

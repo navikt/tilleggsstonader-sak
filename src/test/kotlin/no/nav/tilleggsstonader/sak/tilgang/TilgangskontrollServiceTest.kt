@@ -38,7 +38,7 @@ internal class TilgangskontrollServiceTest {
         kode7 = kode7Id,
         kode6 = kode6Id,
         egenAnsatt = egenAnsattId,
-        prosessering = ""
+        prosessering = "",
     )
     private val tilgangskontrollService = TilgangskontrollService(
         egenAnsattService,
