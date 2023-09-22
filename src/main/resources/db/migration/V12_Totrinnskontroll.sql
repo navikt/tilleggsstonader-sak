@@ -8,9 +8,9 @@ CREATE table totrinnsstatus
     sporbar        TIMESTAMP(3) NOT NULL,
     saksbehandler  VARCHAR NOT NULL,
     beslutter      VARCHAR,
-    begrunnelse    JSON,
+    begrunnelse    VARCHAR,
     årsak          JSON,
-    status         JSON NOT NULL
+    status         VARCHAR NOT NULL
 
 );
 CREATE INDEX ON totrinnsstatus (behandlings_Id);
