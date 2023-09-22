@@ -1,0 +1,18 @@
+{
+  "vilkårType" : "EKSEMPEL",
+  "regler" : {
+    "HAR_ET_NAVN" : {
+      "regelId" : "HAR_ET_NAVN",
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "UTEN",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    }
+  }
+}
