@@ -20,14 +20,13 @@ import java.util.*
 @ProtectedWithClaims(issuer = "azuread")
 @Profile("!prod")
 class OpprettTestBehandlingController(
-        private val behandlingService: BehandlingService,
-        private val fagsakService: FagsakService,
+    private val behandlingService: BehandlingService,
+    private val fagsakService: FagsakService,
 ) {
 
     @Transactional
     @PostMapping
     fun opprettBehandling(@RequestBody testBehandlingRequest: TestBehandlingRequest): UUID {
-
         val fagsak: Fagsak = lagFagsak(testBehandlingRequest)
         val behandling: Behandling = lagBehandling(fagsak)
 
@@ -36,15 +35,10 @@ class OpprettTestBehandlingController(
 
     private fun lagBehandling(fagsak: Fagsak) = behandlingService.opprettBehandling(behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING, fagsakId = fagsak.id, behandlingsårsak = BehandlingÅrsak.SØKNAD)
 
-
     private fun lagFagsak(testBehandlingRequest: TestBehandlingRequest) = fagsakService.hentEllerOpprettFagsak(testBehandlingRequest.personIdent, Stønadstype.BARNETILSYN)
-
-
 }
 
 data class TestBehandlingRequest(
-        val personIdent: String,
-        val stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
+    val personIdent: String,
+    val stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
 )
-
-
