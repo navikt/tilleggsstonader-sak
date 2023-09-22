@@ -49,6 +49,7 @@ rolle:
   kode6: "ad7b87a6-9180-467c-affc-20a566b0fec0" # 0000-GA-Strengt_Fortrolig_Adresse
   kode7: "9ec6487d-f37a-4aad-a027-cd221c1ac32b" # 0000-GA-Fortrolig_Adresse
   egenAnsatt: "e750ceb5-b70b-4d94-b4fa-9d22467b786b" # 0000-GA-Egne_ansatte
+  prosessering: "9f2c914f-9619-41a2-bea6-d62910514c8a" # Team Tilleggsstønader - Utviklere # tilgang ti prosessering
 
 
 CLIENT_ENV: prod
