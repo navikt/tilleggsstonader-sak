@@ -6,11 +6,11 @@ CREATE table totrinnsstatus
     opprettet_tid  TIMESTAMP(3) NOT NULL,
     endret_av      VARCHAR NOT NULL,
     sporbar        TIMESTAMP(3) NOT NULL,
-    saksbehandler  JSON,
-    beslutter      JSON,
+    saksbehandler  VARCHAR NOT NULL,
+    beslutter      VARCHAR,
     begrunnelse    JSON,
     årsak          JSON,
-    status         JSON
+    status         JSON NOT NULL
 
 );
 CREATE INDEX ON totrinnsstatus (behandlings_Id);
