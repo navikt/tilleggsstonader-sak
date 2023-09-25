@@ -1,7 +1,7 @@
 CREATE table totrinnsstatus
 (
     id             UUID PRIMARY KEY,
-    behandling_Id UUID NOT NULL REFERENCES behandling (id),
+    behandling_Id  UUID NOT NULL REFERENCES behandling (id),
     opprettet_av   VARCHAR      NOT NULL,
     opprettet_tid  TIMESTAMP(3) NOT NULL,
     endret_av      VARCHAR      NOT NULL,
