@@ -3,7 +3,7 @@ val familieProsesseringVersion = "2.20230926054831_994885a"
 val tilleggsstønaderLibsVersion = "2023.09.14-10.25.400ea92abb53"
 val tilleggsstønaderKontrakterVersion = "2023.09.26-09.37.899354321766"
 val tokenSupportVersion = "3.1.5"
-val wiremockVersion = "2.35.0"
+val wiremockVersion = "3.0.1"
 val mockkVersion = "1.13.8"
 val testcontainerVersion = "1.19.0"
 
