@@ -5,6 +5,7 @@ import no.nav.familie.prosessering.PropertiesWrapperTilStringConverter
 import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
+import no.nav.tilleggsstonader.sak.vedtak.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
@@ -79,6 +80,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 PGobjectTilBeriketSimuleringsresultat(),
                 BeriketSimuleringsresultatTilPGobjectConverter(),
+
+                PGobjectTilTotrinnsÅrsaker(),
+                TotrinnsÅrsakerTilPGobjectConverter(),
             ),
         )
     }
@@ -134,6 +138,24 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             PGobject().apply {
                 type = "json"
                 value = objectMapper.writeValueAsString(simuleringsresultat)
+            }
+    }
+
+    @ReadingConverter
+    class PGobjectTilTotrinnsÅrsaker : Converter<PGobject, Årsaker?> {
+
+        override fun convert(pGobject: PGobject): Årsaker? {
+            return pGobject.value?.let { objectMapper.readValue(it) }
+        }
+    }
+
+    @WritingConverter
+    class TotrinnsÅrsakerTilPGobjectConverter : Converter<Årsaker, PGobject> {
+
+        override fun convert(årsaker: Årsaker): PGobject =
+            PGobject().apply {
+                type = "json"
+                value = objectMapper.writeValueAsString(årsaker)
             }
     }
 }

@@ -27,7 +27,6 @@ class TotrinnskontrollService(
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val behandlingService: BehandlingService,
     private val tilgangService: TilgangService,
-    // private val validerOmregningService: ValiderOmregningService,
 ) {
 
     /**
@@ -38,24 +37,23 @@ class TotrinnskontrollService(
     fun lagreTotrinnskontrollOgReturnerBehandler(
         saksbehandling: Saksbehandling,
         beslutteVedtak: BeslutteVedtakDto,
-        // vedtakErUtenBeslutter: VedtakErUtenBeslutter,
+        //  vedtakErUtenBeslutter: VedtakErUtenBeslutter,
     ): String {
         val sisteBehandlingshistorikk =
             behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId = saksbehandling.id)
-        //  validerOmregningService.validerHarGammelGOgKanLagres(saksbehandling)
         if (sisteBehandlingshistorikk.steg != StegType.SEND_TIL_BESLUTTER) {
             throw Feil(
                 message = "Siste innslag i behandlingshistorikken har feil steg=${sisteBehandlingshistorikk.steg}",
                 frontendFeilmelding = "Behandlingen er i feil steg, last siden på nytt",
             )
         }
-
+/** Lar stå utkommentert fram til koden leser Totrinnsdataobjektetet der dette ligger tilgjengeleg **/
         /**  if (!vedtakErUtenBeslutter.value && beslutterErLikBehandler(sisteBehandlingshistorikk)) {
          throw ApiFeil(
          "Beslutter kan ikke behandle en behandling som den selv har sendt til beslutter",
          HttpStatus.BAD_REQUEST,
          )
-         }**/
+         } **/
 
         val nyStatus = if (beslutteVedtak.godkjent) BehandlingStatus.IVERKSETTER_VEDTAK else BehandlingStatus.UTREDES
         val utfall = if (beslutteVedtak.godkjent) StegUtfall.BESLUTTE_VEDTAK_GODKJENT else StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT
@@ -72,10 +70,10 @@ class TotrinnskontrollService(
     }
 
     fun hentSaksbehandlerSomSendteTilBeslutter(behandlingId: UUID): String {
-        val sisteBehandlingshistorikk =
+        val totrinnskontrollSaksbehandler =
             behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId, StegType.SEND_TIL_BESLUTTER)
 
-        return sisteBehandlingshistorikk?.opprettetAv ?: throw Feil("Fant ikke saksbehandler som sendte til beslutter")
+        return totrinnskontrollSaksbehandler?.opprettetAv ?: throw Feil("Fant ikke saksbehandler som sendte til beslutter")
     }
 
     fun hentBeslutter(behandlingId: UUID): String? {
@@ -148,7 +146,7 @@ class TotrinnskontrollService(
                         besluttetVedtakHendelse.endretTid,
                         beslutt.godkjent,
                         beslutt.begrunnelse,
-                        beslutt.årsakerUnderkjent,
+                        beslutt.årsak,
                     ),
                 )
             }

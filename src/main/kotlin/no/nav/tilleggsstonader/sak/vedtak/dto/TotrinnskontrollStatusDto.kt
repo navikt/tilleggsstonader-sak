@@ -1,11 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.dto
 
 import java.time.LocalDateTime
+import java.util.Collections.emptyList
 
 data class BeslutteVedtakDto(
     val godkjent: Boolean,
     val begrunnelse: String? = null,
-    val årsakerUnderkjent: List<ÅrsakUnderkjent> = emptyList(),
+    val årsak: List<Årsak> = emptyList(),
 )
 
 data class TotrinnskontrollStatusDto(
@@ -14,11 +15,11 @@ data class TotrinnskontrollStatusDto(
 )
 
 data class TotrinnskontrollDto(
-    val opprettetAv: String,
-    val opprettetTid: LocalDateTime,
+    val opprettet_av: String,
+    val opprettet_tid: LocalDateTime,
     val godkjent: Boolean? = null,
     val begrunnelse: String? = null,
-    val årsakerUnderkjent: List<ÅrsakUnderkjent> = emptyList(),
+    val årsak: List<Årsak> = emptyList(),
 )
 
 enum class TotrinnkontrollStatus {
@@ -28,7 +29,7 @@ enum class TotrinnkontrollStatus {
     UAKTUELT,
 }
 
-enum class ÅrsakUnderkjent {
+enum class Årsak {
     TIDLIGERE_VEDTAKSPERIODER,
     INNGANGSVILKÅR_FORUTGÅENDE_MEDLEMSKAP_OPPHOLD,
     INNGANGSVILKÅR_ALENEOMSORG,
