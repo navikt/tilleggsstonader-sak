@@ -1,7 +1,7 @@
 CREATE table totrinnsstatus
 (
     id             UUID PRIMARY KEY,
-    behandling_Id  UUID NOT NULL REFERENCES behandling (id),
+    behandling_id  UUID NOT NULL REFERENCES behandling (id),
     opprettet_av   VARCHAR      NOT NULL,
     opprettet_tid  TIMESTAMP(3) NOT NULL,
     endret_av      VARCHAR      NOT NULL,
@@ -13,4 +13,4 @@ CREATE table totrinnsstatus
     status         VARCHAR      NOT NULL
 
 );
-CREATE INDEX ON totrinnsstatus (behandling_Id);
+CREATE INDEX ON totrinnsstatus (behandling_id);
