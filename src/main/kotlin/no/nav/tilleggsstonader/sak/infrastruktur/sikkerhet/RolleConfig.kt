@@ -17,6 +17,8 @@ data class RolleConfig(
     val kode7: String,
     @Value("\${rolle.egenAnsatt}")
     val egenAnsatt: String,
+    @Value("\${rolle.prosessering}")
+    val prosessering: String,
 ) {
     val rollerMedBeskrivelse: AdRoller by lazy {
         AdRoller(

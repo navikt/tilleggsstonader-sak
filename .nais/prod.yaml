@@ -66,6 +66,7 @@ spec:
     inbound:
       rules:
         - application: tilleggsstonader-sak-frontend
+        - application: tilleggsstonader-prosessering
     outbound:
       rules:
         - application: tilleggsstonader-integrasjoner

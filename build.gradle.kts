@@ -1,4 +1,5 @@
 val javaVersion = JavaLanguageVersion.of(17)
+val familieProsesseringVersion = "2.20230919105024_7d939cb"
 val tilleggsstønaderLibsVersion = "2023.09.14-10.25.400ea92abb53"
 val tilleggsstønaderKontrakterVersion = "2023.09.14-14.12.ac38d270e601"
 val tokenSupportVersion = "3.1.5"
@@ -62,6 +63,8 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
+
+    implementation("no.nav.familie:prosessering-core:$familieProsesseringVersion")
 
     // Tillegggsstønader libs
     implementation("no.nav.tilleggsstonader-libs:util:$tilleggsstønaderLibsVersion")

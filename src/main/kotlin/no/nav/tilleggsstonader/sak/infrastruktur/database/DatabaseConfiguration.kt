@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.familie.prosessering.PropertiesWrapperTilStringConverter
+import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
@@ -27,7 +29,7 @@ import javax.sql.DataSource
 
 @Configuration
 @EnableJdbcAuditing
-@EnableJdbcRepositories("no.nav.tilleggsstonader.sak") // TODO task-prosessering
+@EnableJdbcRepositories("no.nav.tilleggsstonader.sak", "no.nav.familie.prosessering")
 class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @Bean
@@ -66,6 +68,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     override fun jdbcCustomConversions(): JdbcCustomConversions {
         return JdbcCustomConversions(
             listOf(
+                StringTilPropertiesWrapperConverter(),
+                PropertiesWrapperTilStringConverter(),
+
                 PGobjectTilJsonWrapperConverter(),
                 JsonWrapperTilPGobjectConverter(),
 
