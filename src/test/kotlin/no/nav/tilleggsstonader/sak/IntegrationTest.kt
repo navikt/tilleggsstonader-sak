@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak
 
+import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.TaskLogg
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -88,6 +90,9 @@ abstract class IntegrationTest {
 
     private fun resetDatabase() {
         listOf(
+            TaskLogg::class,
+            Task::class,
+
             Simuleringsresultat::class,
             TilkjentYtelse::class,
             Vilkårsvurdering::class,
