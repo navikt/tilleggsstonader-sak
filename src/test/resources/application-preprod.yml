@@ -3,3 +3,6 @@ server:
 
 logging:
   config: classpath:logback-test.xml
+
+prosessering:
+  enabled: false
