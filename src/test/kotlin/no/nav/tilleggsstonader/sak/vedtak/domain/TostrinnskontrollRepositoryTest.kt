@@ -79,6 +79,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
             assertThat(listemedtotrinnsstatusfradb.count()).isEqualTo(2)
         }
     }
+
     @Nested
     inner class FindTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc {
         @Test
