@@ -9,7 +9,7 @@ import java.util.UUID
 
 data class Totrinnsstatus(
     @Id
-    val id : UUID = UUID.randomUUID(),
+    val id: UUID = UUID.randomUUID(),
     val behandlingId: UUID,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
@@ -22,7 +22,5 @@ data class Totrinnsstatus(
 
 )
 data class Årsaker(
-    val årsaker: List<Årsak>
+    val årsaker: List<Årsak>,
 )
-
-

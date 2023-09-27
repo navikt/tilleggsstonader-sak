@@ -8,14 +8,8 @@ import java.util.*
 @Repository
 interface TotrinnskontrollRepository : RepositoryInterface<Totrinnsstatus, UUID>, InsertUpdateRepository<Totrinnsstatus> {
 
-    fun findLastBehandlingIdOrderBySporbarEndretEndretTid(behandlingId: UUID): Totrinnsstatus
+    fun findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(behandlingId: UUID, status: String): Totrinnsstatus
 
-   // fun findLastTotrinnskontrollByBehandlingIdAndStatusOrderByEndretTid(behandlingId: EksternBehandlingId, string: String): Totrinnskontroll
-
-   // fun findAllByBehandlingId(behandlingId: EksternBehandlingId): List<Totrinnskontroll>
-
-
-
-
-
+    fun findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId: UUID): Totrinnsstatus
+    fun findAllByBehandlingId(behandlingId: UUID): List<Totrinnsstatus>
 }
