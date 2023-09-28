@@ -203,7 +203,7 @@ internal class TotrinnskontrollServiceTest {
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
         assertThat(totrinnskontroll.totrinnskontroll?.begrunnelse).isEqualTo("begrunnelse")
-        assertThat(totrinnskontroll.totrinnskontroll?.årsak).containsExactlyInAnyOrder(Årsak.VEDTAKSBREV, Årsak.AKTIVITET)
+        assertThat(totrinnskontroll.totrinnskontroll?.årsakerUnderkjent).containsExactlyInAnyOrder(Årsak.VEDTAKSBREV, Årsak.AKTIVITET)
     }
 
     private fun behandlingshistorikk(
