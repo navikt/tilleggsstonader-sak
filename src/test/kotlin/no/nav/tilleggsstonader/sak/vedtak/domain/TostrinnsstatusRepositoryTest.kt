@@ -18,15 +18,15 @@ class TostrinnsstatusRepositoryTest : IntegrationTest() {
     @Test
     fun `skal kunne lagre og hente totrinnsstatus`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-        val totrinnsKontroll = totrinnsstatusRepository.insert(
-            TotrinnsKontroll(
+        val totrinnsstatus = totrinnsstatusRepository.insert(
+            Totrinnsstatus(
                 behandlingId = behandling.id,
                 saksbehandler = "1",
-                status = TotrinnsStatus.KLAR,
+                status = TotrinnsKontrollStatus.KLAR,
             ),
         )
-        val totrinnsstatusFraDb = totrinnsstatusRepository.findByIdOrThrow(totrinnsKontroll.id)
-        assertThat(totrinnsstatusFraDb).isEqualTo(totrinnsKontroll)
+        val totrinnsstatusFraDb = totrinnsstatusRepository.findByIdOrThrow(totrinnsstatus.id)
+        assertThat(totrinnsstatusFraDb).isEqualTo(totrinnsstatus)
     }
 
     @Nested
@@ -35,25 +35,25 @@ class TostrinnsstatusRepositoryTest : IntegrationTest() {
         @Test
         fun `skal finne siste totrinnsstatus basert på endret tidspunkt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val totrinnsKontrollFirst = totrinnsstatusRepository.insert(
-                TotrinnsKontroll(
+            val totrinnsstatusFirst = totrinnsstatusRepository.insert(
+                Totrinnsstatus(
                     behandlingId = behandling.id,
                     saksbehandler = "1",
-                    status = TotrinnsStatus.KLAR,
+                    status = TotrinnsKontrollStatus.KLAR,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
                 ),
 
             )
-            val totrinnsKontrollSecond = totrinnsstatusRepository.insert(
-                TotrinnsKontroll(
+            val totrinnsstatusSecond = totrinnsstatusRepository.insert(
+                Totrinnsstatus(
                     behandlingId = behandling.id,
                     saksbehandler = "2",
-                    status = TotrinnsStatus.KLAR,
+                    status = TotrinnsKontrollStatus.KLAR,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
                 ),
             )
-            val totrinnsstatusSecondFraDb = totrinnsstatusRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(totrinnsKontrollFirst.behandlingId)
-            assertThat(totrinnsstatusSecondFraDb).isNotEqualTo(totrinnsKontrollFirst)
+            val totrinnsstatusSecondFraDb = totrinnsstatusRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(totrinnsstatusFirst.behandlingId)
+            assertThat(totrinnsstatusSecondFraDb).isNotEqualTo(totrinnsstatusFirst)
         }
     }
 
@@ -62,20 +62,20 @@ class TostrinnsstatusRepositoryTest : IntegrationTest() {
         @Test
         fun `skal finne alle totrinnstatuser på gjeldene behandling`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val totrinnsKontrollFirst = totrinnsstatusRepository.insert(
-                TotrinnsKontroll(
+            val totrinnsstatusFirst = totrinnsstatusRepository.insert(
+                Totrinnsstatus(
                     behandlingId = behandling.id,
                     saksbehandler = "1",
-                    status = TotrinnsStatus.KLAR,
+                    status = TotrinnsKontrollStatus.KLAR,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
                 ),
 
             )
-            val totrinnsKontrollSecond = totrinnsstatusRepository.insert(
-                TotrinnsKontroll(
+            val totrinnsstatusSecond = totrinnsstatusRepository.insert(
+                Totrinnsstatus(
                     behandlingId = behandling.id,
                     saksbehandler = "2",
-                    status = TotrinnsStatus.KLAR,
+                    status = TotrinnsKontrollStatus.KLAR,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
                 ),
             )
@@ -91,34 +91,34 @@ class TostrinnsstatusRepositoryTest : IntegrationTest() {
         fun `skal finne siste totrinnsstatus basert på status og sist endret`() {
             val behandlingOne = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val totrinnsKontrollFirst = totrinnsstatusRepository.insert(
-                TotrinnsKontroll(
+            val totrinnsstatusFirst = totrinnsstatusRepository.insert(
+                Totrinnsstatus(
                     behandlingId = behandlingOne.id,
                     saksbehandler = "1",
-                    status = TotrinnsStatus.UNDERKJENT,
+                    status = TotrinnsKontrollStatus.UNDERKJENT,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
                 ),
 
             )
-            val totrinnsKontrollSecond = totrinnsstatusRepository.insert(
-                TotrinnsKontroll(
+            val totrinnsstatusSecond = totrinnsstatusRepository.insert(
+                Totrinnsstatus(
                     behandlingId = behandlingOne.id,
                     saksbehandler = "2",
-                    status = TotrinnsStatus.KLAR,
+                    status = TotrinnsKontrollStatus.KLAR,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
                 ),
             )
-            val totrinnsKontrollThird = totrinnsstatusRepository.insert(
-                TotrinnsKontroll(
+            val totrinnsstatusThird = totrinnsstatusRepository.insert(
+                Totrinnsstatus(
                     behandlingId = behandlingOne.id,
                     saksbehandler = "2",
-                    status = TotrinnsStatus.UNDERKJENT,
+                    status = TotrinnsKontrollStatus.UNDERKJENT,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(3)),
                 ),
             )
 
-            val totrinnsstatusFraDb = totrinnsstatusRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(totrinnsKontrollFirst.behandlingId, totrinnsKontrollSecond.status)
-            assertThat(totrinnsstatusFraDb).isEqualTo(totrinnsKontrollSecond)
+            val totrinnsstatusFraDb = totrinnsstatusRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(totrinnsstatusFirst.behandlingId, totrinnsstatusSecond.status)
+            assertThat(totrinnsstatusFraDb).isEqualTo(totrinnsstatusSecond)
         }
     }
 }

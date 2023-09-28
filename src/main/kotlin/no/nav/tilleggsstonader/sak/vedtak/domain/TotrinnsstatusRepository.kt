@@ -6,10 +6,11 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface TotrinnsstatusRepository : RepositoryInterface<TotrinnsKontroll, UUID>, InsertUpdateRepository<TotrinnsKontroll> {
+interface TotrinnsstatusRepository : RepositoryInterface<Totrinnsstatus, UUID>, InsertUpdateRepository<Totrinnsstatus> {
 
-    fun findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(behandlingId: UUID, status: TotrinnsStatus): TotrinnsKontroll
+    fun findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(behandlingId: UUID, status: TotrinnsKontrollStatus): Totrinnsstatus
 
-    fun findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId: UUID): TotrinnsKontroll
-    fun findAllByBehandlingId(behandlingId: UUID): List<TotrinnsKontroll>
+    fun findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId: UUID): Totrinnsstatus
+
+    fun findAllByBehandlingId(behandlingId: UUID): List<Totrinnsstatus>
 }

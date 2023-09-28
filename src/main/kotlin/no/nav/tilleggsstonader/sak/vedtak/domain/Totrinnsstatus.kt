@@ -7,14 +7,14 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import java.util.UUID
 
-data class TotrinnsKontroll(
+data class Totrinnsstatus(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: UUID,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     val saksbehandler: String,
-    val status: TotrinnsStatus,
+    val status: TotrinnsKontrollStatus,
     @Column("årsak")
     val årsakerUnderkjent: Årsaker? = null,
     val begrunnelse: String? = null,
@@ -23,7 +23,7 @@ data class TotrinnsKontroll(
 data class Årsaker(
     val årsaker: List<Årsak>,
 )
-enum class TotrinnsStatus {
+enum class TotrinnsKontrollStatus {
     UNDERKJENT,
     KLAR,
 }
