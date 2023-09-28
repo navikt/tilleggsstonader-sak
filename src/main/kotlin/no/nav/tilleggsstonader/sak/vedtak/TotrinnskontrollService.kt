@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.dto.TotrinnskontrollDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.TotrinnskontrollStatusDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.TotrinnsstatusDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -82,11 +82,11 @@ class TotrinnskontrollService(
             ?.takeIf { NAVIDENT_REGEX.matches(it) }
     }
 
-    fun hentTotrinnskontrollStatus(behandlingId: UUID): TotrinnskontrollStatusDto {
+    fun hentTotrinnskontrollStatus(behandlingId: UUID): TotrinnsstatusDto {
         val behandlingStatus = behandlingService.hentBehandling(behandlingId).status
 
         if (behandlingErGodkjentEllerOpprettet(behandlingStatus)) {
-            return TotrinnskontrollStatusDto(TotrinnkontrollStatus.UAKTUELT)
+            return TotrinnsstatusDto(TotrinnkontrollStatus.UAKTUELT)
         }
 
         return when (behandlingStatus) {
@@ -105,7 +105,7 @@ class TotrinnskontrollService(
     /**
      * Hvis behandlingsstatus er FATTER_VEDTAK så sjekkes det att saksbehandleren er autorisert til å fatte vedtak
      */
-    private fun finnStatusForVedtakSomSkalFattes(behandlingId: UUID): TotrinnskontrollStatusDto {
+    private fun finnStatusForVedtakSomSkalFattes(behandlingId: UUID): TotrinnsstatusDto {
         val historikkHendelse = behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId)
         if (historikkHendelse.steg != StegType.SEND_TIL_BESLUTTER) {
             throw Feil(
@@ -114,22 +114,22 @@ class TotrinnskontrollService(
             )
         }
         return if (beslutterErLikBehandler(historikkHendelse) || !tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)) {
-            TotrinnskontrollStatusDto(
+            TotrinnsstatusDto(
                 TotrinnkontrollStatus.IKKE_AUTORISERT,
                 TotrinnskontrollDto(historikkHendelse.opprettetAvNavn, historikkHendelse.endretTid),
             )
         } else {
-            TotrinnskontrollStatusDto(TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
+            TotrinnsstatusDto(TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
         }
     }
 
     /**
      * Hvis behandlingen utredes sjekkes det for om det finnes ett tidligere beslutt, som då kun kan være underkjent
      */
-    private fun finnStatusForVedtakSomErFattet(behandlingId: UUID): TotrinnskontrollStatusDto {
+    private fun finnStatusForVedtakSomErFattet(behandlingId: UUID): TotrinnsstatusDto {
         val besluttetVedtakHendelse =
             behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId, StegType.BESLUTTE_VEDTAK)
-                ?: return TotrinnskontrollStatusDto(TotrinnkontrollStatus.UAKTUELT)
+                ?: return TotrinnsstatusDto(TotrinnkontrollStatus.UAKTUELT)
         return when (besluttetVedtakHendelse.utfall) {
             StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT -> {
                 if (besluttetVedtakHendelse.metadata == null) {
@@ -139,7 +139,7 @@ class TotrinnskontrollService(
                     )
                 }
                 val beslutt = objectMapper.readValue<BeslutteVedtakDto>(besluttetVedtakHendelse.metadata.json)
-                TotrinnskontrollStatusDto(
+                TotrinnsstatusDto(
                     TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT,
                     TotrinnskontrollDto(
                         besluttetVedtakHendelse.opprettetAvNavn,
@@ -150,7 +150,7 @@ class TotrinnskontrollService(
                     ),
                 )
             }
-            StegUtfall.ANGRE_SEND_TIL_BESLUTTER -> TotrinnskontrollStatusDto(TotrinnkontrollStatus.UAKTUELT)
+            StegUtfall.ANGRE_SEND_TIL_BESLUTTER -> TotrinnsstatusDto(TotrinnkontrollStatus.UAKTUELT)
             else -> error(
                 "Skal ikke kunne være annen status enn UNDERKJENT når " +
                     "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",

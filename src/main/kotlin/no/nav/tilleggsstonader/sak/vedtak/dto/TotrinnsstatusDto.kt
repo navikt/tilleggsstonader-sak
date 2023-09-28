@@ -9,14 +9,14 @@ data class BeslutteVedtakDto(
     val årsak: List<Årsak> = emptyList(),
 )
 
-data class TotrinnskontrollStatusDto(
+data class TotrinnsstatusDto(
     val status: TotrinnkontrollStatus,
     val totrinnskontroll: TotrinnskontrollDto? = null,
 )
 
 data class TotrinnskontrollDto(
-    val opprettet_av: String,
-    val opprettet_tid: LocalDateTime,
+    val opprettetAv: String,
+    val opprettetTid: LocalDateTime,
     val godkjent: Boolean? = null,
     val begrunnelse: String? = null,
     val årsak: List<Årsak> = emptyList(),
