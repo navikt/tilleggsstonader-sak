@@ -5,13 +5,14 @@ Backend - saksbehandling for tilleggsstønader
 ## Kjøring lokalt
 
 ### Client id & client secret
-secret kan hentes fra cluster med
-`kubectl -n tilleggsstonader get secret azuread-tilleggsstonader-sak-lokal -o json | jq '.data | map_values(@base64d)' | grep CLIENT`
+secret kan hentes fra cluster: 
+1. `gcloud auth login`
+2. `kubectl -n tilleggsstonader get secret azuread-tilleggsstonader-sak-lokal -o json | jq '.data | map_values(@base64d)' | grep CLIENT`
 
 * `AZURE_APP_CLIENT_ID` (fra secret)
 * `AZURE_APP_CLIENT_SECRET` (fra secret)
 
-Variablene legges inn under ApplicationLocal -> Edit Configurations -> Environment Variables.
+Variablene legges inn under AppLocal -> Edit Configurations -> Environment Variables.
 
 ### Kjøring med temp-database
 For å kjøre opp appen lokalt, kan en kjøre `AppLocal`.

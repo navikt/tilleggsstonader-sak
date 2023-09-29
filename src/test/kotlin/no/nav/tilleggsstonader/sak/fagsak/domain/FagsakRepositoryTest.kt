@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
+import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
@@ -10,7 +11,6 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakDomain
 import no.nav.tilleggsstonader.sak.util.fagsakpersoner
-import no.nav.tilleggsstonader.sak.util.hasCauseMessageContaining
 import no.nav.tilleggsstonader.sak.util.tilFagsakDomain
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy

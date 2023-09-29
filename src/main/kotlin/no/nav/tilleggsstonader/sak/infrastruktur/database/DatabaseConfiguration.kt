@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.sak.infrastruktur.config.ObjectMapperProvider.objectMapper
+import no.nav.familie.prosessering.PropertiesWrapperTilStringConverter
+import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
@@ -26,7 +29,7 @@ import javax.sql.DataSource
 
 @Configuration
 @EnableJdbcAuditing
-@EnableJdbcRepositories("no.nav.tilleggsstonader.sak") // TODO task-prosessering
+@EnableJdbcRepositories("no.nav.tilleggsstonader.sak", "no.nav.familie.prosessering")
 class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @Bean
@@ -65,11 +68,17 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     override fun jdbcCustomConversions(): JdbcCustomConversions {
         return JdbcCustomConversions(
             listOf(
+                StringTilPropertiesWrapperConverter(),
+                PropertiesWrapperTilStringConverter(),
+
                 PGobjectTilJsonWrapperConverter(),
                 JsonWrapperTilPGobjectConverter(),
 
                 PGobjectTilDelvilkårConverter(),
                 DelvilkårTilPGobjectConverter(),
+
+                PGobjectTilBeriketSimuleringsresultat(),
+                BeriketSimuleringsresultatTilPGobjectConverter(),
             ),
         )
     }
@@ -107,6 +116,24 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             PGobject().apply {
                 type = "json"
                 value = objectMapper.writeValueAsString(delvilkårsvurdering.delvilkårsvurderinger)
+            }
+    }
+
+    @ReadingConverter
+    class PGobjectTilBeriketSimuleringsresultat : Converter<PGobject, BeriketSimuleringsresultat?> {
+
+        override fun convert(pGobject: PGobject): BeriketSimuleringsresultat? {
+            return pGobject.value?.let { objectMapper.readValue(it) }
+        }
+    }
+
+    @WritingConverter
+    class BeriketSimuleringsresultatTilPGobjectConverter : Converter<BeriketSimuleringsresultat, PGobject> {
+
+        override fun convert(simuleringsresultat: BeriketSimuleringsresultat): PGobject =
+            PGobject().apply {
+                type = "json"
+                value = objectMapper.writeValueAsString(simuleringsresultat)
             }
     }
 }

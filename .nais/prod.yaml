@@ -55,15 +55,23 @@ spec:
           - "NAVident"
           - "azp_name"
         groups:
-          - id: "3611981f-eda7-46ab-b8f2-50c3159e101c" # 0000-GA-Tilleggsstonader-Veileder
-          - id: "31a99292-9461-40bf-b2d0-a815697dfbb4" # 0000-GA-Tilleggsstonader-Saksbehandler
-          - id: "dab3f549-f5f0-4a9c-9f5b-1f6a15ae8424" # 0000-GA-Tilleggsstonader-Beslutter
+          - id: "0f841c83-0d64-407c-80d5-4eb51dfaee1e" # 0000-GA-Tilleggsstonader-Veileder
+          - id: "c1e9edec-0c10-4df2-8c74-324ab9922220" # 0000-GA-Tilleggsstonader-Saksbehandler
+          - id: "224b5097-d0af-462c-8d8e-49c0e8a42661" # 0000-GA-Tilleggsstonader-Beslutter
           - id: "ad7b87a6-9180-467c-affc-20a566b0fec0" # 0000-GA-Strengt_Fortrolig_Adresse
           - id: "9ec6487d-f37a-4aad-a027-cd221c1ac32b" # 0000-GA-Fortrolig_Adresse
           - id: "e750ceb5-b70b-4d94-b4fa-9d22467b786b" # 0000-GA-Egne_ansatte
           - id: "9f2c914f-9619-41a2-bea6-d62910514c8a" # Team Tilleggsstønader - Utviklere # tilgang ti prosessering
   accessPolicy:
+    inbound:
+      rules:
+        - application: tilleggsstonader-sak-frontend
+        - application: tilleggsstonader-prosessering
     outbound:
+      rules:
+        - application: tilleggsstonader-integrasjoner
+      external:
+        - host: pdl-api.prod-fss-pub.nais.io
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: prod

@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.libs.http.config.RestTemplateConfiguration
 import no.nav.tilleggsstonader.libs.log.filter.LogFilterConfiguration
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.context.annotation.Import
+import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootConfiguration
 @EnableJwtTokenValidation(ignore = ["org.springframework", "org.springdoc"])
@@ -14,4 +15,5 @@ import org.springframework.context.annotation.Import
     RestTemplateConfiguration::class,
     LogFilterConfiguration::class,
 )
+@EnableScheduling
 class ApplicationConfig

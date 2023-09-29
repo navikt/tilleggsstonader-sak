@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak
 
+import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.TaskLogg
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -14,6 +16,8 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.Simuleringsresultat
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
 import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
@@ -49,6 +53,8 @@ class DefaultRestTemplateConfiguration {
     "integrasjonstest",
     "mock-pdl",
     "mock-egen-ansatt",
+    "mock-iverksett",
+    "mock-oppgave",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
@@ -84,6 +90,11 @@ abstract class IntegrationTest {
 
     private fun resetDatabase() {
         listOf(
+            TaskLogg::class,
+            Task::class,
+
+            Simuleringsresultat::class,
+            TilkjentYtelse::class,
             Vilkårsvurdering::class,
             BehandlingBarn::class,
 

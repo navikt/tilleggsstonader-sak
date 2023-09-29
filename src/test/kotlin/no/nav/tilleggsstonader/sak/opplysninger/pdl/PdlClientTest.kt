@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.web.client.RestOperations
+import org.springframework.web.client.RestTemplate
 import java.net.URI
 import java.time.LocalDate
 
@@ -25,7 +25,7 @@ class PdlClientTest {
 
     companion object {
 
-        private val restOperations: RestOperations = RestTemplateBuilder().build()
+        private val restTemplate: RestTemplate = RestTemplateBuilder().build()
         lateinit var pdlClient: PdlClient
         lateinit var wiremockServerItem: WireMockServer
 
@@ -34,7 +34,7 @@ class PdlClientTest {
         fun initClass() {
             wiremockServerItem = WireMockServer(wireMockConfig().dynamicPort())
             wiremockServerItem.start()
-            pdlClient = PdlClient(PdlConfig(URI.create(wiremockServerItem.baseUrl())), restOperations)
+            pdlClient = PdlClient(URI.create(wiremockServerItem.baseUrl()), restTemplate)
         }
 
         @AfterAll
