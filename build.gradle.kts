@@ -1,5 +1,5 @@
 val javaVersion = JavaLanguageVersion.of(17)
-val familieProsesseringVersion = "2.20230926054831_994885a"
+val familieProsesseringVersion = "2.20230928100816_3cbdfc5"
 val tilleggsstønaderLibsVersion = "2023.09.14-10.25.400ea92abb53"
 val tilleggsstønaderKontrakterVersion = "2023.09.26-09.37.899354321766"
 val tokenSupportVersion = "3.1.5"
@@ -14,7 +14,7 @@ plugins {
     application
 
     kotlin("jvm") version "1.9.10"
-    id("com.diffplug.spotless") version "6.21.0"
+    id("com.diffplug.spotless") version "6.22.0"
     id("com.github.ben-manes.versions") version "0.48.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
