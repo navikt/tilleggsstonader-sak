@@ -70,8 +70,11 @@ spec:
     outbound:
       rules:
         - application: tilleggsstonader-integrasjoner
+        - application: skjermede-personer-pip
+          namespace: nom
       external:
         - host: pdl-api-q1.dev-fss-pub.nais.io
+
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev
