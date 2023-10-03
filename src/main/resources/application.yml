@@ -116,6 +116,6 @@ clients:
     uri: https://pdl-api.${CLIENT_ENV}-fss-pub.nais.io
     scope: api://${CLIENT_ENV}-fss.pdl.pdl-api/.default
   egen_ansatt:
-    uri: http://nom.skjermede-personer-pip
+    uri: http://skjermede-personer-pip.nom
     scope: api://${CLIENT_ENV}-gcp.nom.skjermede-personer-pip/.default
 
