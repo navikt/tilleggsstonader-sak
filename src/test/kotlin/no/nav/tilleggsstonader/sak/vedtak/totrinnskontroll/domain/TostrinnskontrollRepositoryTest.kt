@@ -27,7 +27,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 saksbehandler = "1",
                 status = TotrinnsKontrollStatus.KLAR,
-            )
+            ),
         )
         val totrinnskontrollFraDb = totrinnskontrollRepository.findByIdOrThrow(totrinnskontroll.id)
         assertThat(totrinnskontrollFraDb).isEqualTo(totrinnskontroll)
@@ -55,7 +55,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                     saksbehandler = "2",
                     status = TotrinnsKontrollStatus.KLAR,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
-                )
+                ),
             )
             assertThat(totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandling.id))
                 .isEqualTo(totrinnskontrollSecond)
@@ -73,7 +73,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                     saksbehandler = "1",
                     status = TotrinnsKontrollStatus.KLAR,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
-                )
+                ),
             )
             val totrinnskontrollSecond = lagreOgOppdaterEndretTidTilOpprettetTid(
                 Totrinnskontroll(
@@ -81,7 +81,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                     saksbehandler = "2",
                     status = TotrinnsKontrollStatus.KLAR,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
-                )
+                ),
             )
             val listemedtotrinnsstatusfradb = totrinnskontrollRepository.findAllByBehandlingId(behandling.id)
 
@@ -103,7 +103,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                     saksbehandler = "1",
                     status = TotrinnsKontrollStatus.UNDERKJENT,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
-                )
+                ),
             )
 
             val sisteTotrinskontroll = lagreOgOppdaterEndretTidTilOpprettetTid(
@@ -112,7 +112,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                     saksbehandler = "2",
                     status = TotrinnsKontrollStatus.UNDERKJENT,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(3)),
-                )
+                ),
             )
             lagreOgOppdaterEndretTidTilOpprettetTid(
                 Totrinnskontroll(
@@ -120,13 +120,13 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                     saksbehandler = "2",
                     status = TotrinnsKontrollStatus.KLAR,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
-                )
+                ),
             )
 
             val totrinnsstatusFraDb =
                 totrinnskontrollRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(
                     behandlingOne.id,
-                    sisteTotrinskontroll.status
+                    sisteTotrinskontroll.status,
                 )
             assertThat(totrinnsstatusFraDb).isEqualTo(sisteTotrinskontroll)
         }
@@ -136,7 +136,8 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
         totrinnskontrollRepository.insert(totrinnskontroll)
         jdbcTemplate.update(
             "UPDATE totrinnskontroll SET endret_tid = ? WHERE id = ?",
-            totrinnskontroll.sporbar.opprettetTid, totrinnskontroll.id
+            totrinnskontroll.sporbar.opprettetTid,
+            totrinnskontroll.id,
         )
         return totrinnskontrollRepository.findByIdOrThrow(totrinnskontroll.id)
     }
