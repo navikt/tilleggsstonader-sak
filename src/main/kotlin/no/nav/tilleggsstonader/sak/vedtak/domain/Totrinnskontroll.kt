@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
-import no.nav.tilleggsstonader.sak.vedtak.dto.Årsak
+import no.nav.tilleggsstonader.sak.vedtak.dto.ÅrsakUnderkjent
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -22,7 +22,7 @@ data class Totrinnskontroll(
 )
 
 data class Årsaker(
-    val årsaker: List<Årsak>,
+    val årsaker: List<ÅrsakUnderkjent>,
 )
 
 enum class TotrinnsKontrollStatus {

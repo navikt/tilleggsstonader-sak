@@ -146,7 +146,7 @@ class TotrinnskontrollService(
                         besluttetVedtakHendelse.endretTid,
                         beslutt.godkjent,
                         beslutt.begrunnelse,
-                        beslutt.årsak,
+                        beslutt.årsakerUnderkjent,
                     ),
                 )
             }

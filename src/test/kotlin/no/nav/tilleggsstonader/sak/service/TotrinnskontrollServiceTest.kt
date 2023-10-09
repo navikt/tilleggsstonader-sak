@@ -20,7 +20,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.TotrinnkontrollStatus
-import no.nav.tilleggsstonader.sak.vedtak.dto.Årsak
+import no.nav.tilleggsstonader.sak.vedtak.dto.ÅrsakUnderkjent
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -193,8 +193,8 @@ internal class TotrinnskontrollServiceTest {
                 opprettetAv = "Noe",
                 beslutt = BeslutteVedtakDto(
                     godkjent = false, begrunnelse = "begrunnelse",
-                    årsak = listOf(
-                        Årsak.VEDTAKSBREV, Årsak.AKTIVITET,
+                    årsakerUnderkjent = listOf(
+                        ÅrsakUnderkjent.VEDTAKSBREV, ÅrsakUnderkjent.AKTIVITET,
                     ),
                 ),
 
@@ -203,7 +203,7 @@ internal class TotrinnskontrollServiceTest {
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
         assertThat(totrinnskontroll.totrinnskontroll?.begrunnelse).isEqualTo("begrunnelse")
-        assertThat(totrinnskontroll.totrinnskontroll?.årsakerUnderkjent).containsExactlyInAnyOrder(Årsak.VEDTAKSBREV, Årsak.AKTIVITET)
+        assertThat(totrinnskontroll.totrinnskontroll?.årsakerUnderkjent).containsExactlyInAnyOrder(ÅrsakUnderkjent.VEDTAKSBREV, ÅrsakUnderkjent.AKTIVITET)
     }
 
     private fun behandlingshistorikk(
