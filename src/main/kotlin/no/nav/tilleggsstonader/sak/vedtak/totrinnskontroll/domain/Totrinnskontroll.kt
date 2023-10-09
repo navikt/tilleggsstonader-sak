@@ -1,7 +1,7 @@
-package no.nav.tilleggsstonader.sak.vedtak.domain
+package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
-import no.nav.tilleggsstonader.sak.vedtak.dto.ÅrsakUnderkjent
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded

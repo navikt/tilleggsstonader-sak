@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.domain
+package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
@@ -17,5 +17,6 @@ interface TotrinnskontrollRepository :
 
     fun findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId: UUID): Totrinnskontroll
 
+    // TODO trengs denne?
     fun findAllByBehandlingId(behandlingId: UUID): List<Totrinnskontroll>
 }

@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.dto
+package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto
 
 import java.time.LocalDateTime
 import java.util.Collections.emptyList

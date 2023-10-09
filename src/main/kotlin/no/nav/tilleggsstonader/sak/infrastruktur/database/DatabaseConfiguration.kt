@@ -5,7 +5,7 @@ import no.nav.familie.prosessering.PropertiesWrapperTilStringConverter
 import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
-import no.nav.tilleggsstonader.sak.vedtak.domain.Årsaker
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
