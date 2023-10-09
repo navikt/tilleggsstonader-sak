@@ -42,7 +42,7 @@ class VurderingService(
     fun hentEllerOpprettVurderinger(behandlingId: UUID): VilkårDto {
         val (grunnlag, metadata) = hentGrunnlagOgMetadata(behandlingId)
         val vurderinger = hentEllerOpprettVurderinger(behandlingId, metadata)
-        return VilkårDto(vurderinger = vurderinger, grunnlag = grunnlag)
+        return VilkårDto(vilkårsett = vurderinger, grunnlag = grunnlag)
     }
 
     @Transactional

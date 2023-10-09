@@ -172,7 +172,7 @@ internal class VurderingServiceTest {
         )
         every { vilkårsvurderingRepository.findByBehandlingId(behandlingId) } returns vilkårsvurderinger
 
-        val alleVilkårsvurderinger = vurderingService.hentEllerOpprettVurderinger(behandlingId).vurderinger
+        val alleVilkårsvurderinger = vurderingService.hentEllerOpprettVurderinger(behandlingId).vilkårsett
 
         assertThat(alleVilkårsvurderinger).hasSize(1)
         verify(exactly = 0) { vilkårsvurderingRepository.insertAll(any()) }

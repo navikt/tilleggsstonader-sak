@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.dto
 
 data class VilkårDto(
-    val vurderinger: List<VilkårsvurderingDto>,
+    val vilkårsett: List<VilkårsvurderingDto>,
     val grunnlag: VilkårGrunnlagDto,
 )
 
