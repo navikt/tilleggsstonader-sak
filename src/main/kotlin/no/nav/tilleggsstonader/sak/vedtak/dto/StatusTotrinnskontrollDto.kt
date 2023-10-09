@@ -9,7 +9,7 @@ data class BeslutteVedtakDto(
     val årsak: List<Årsak> = emptyList(),
 )
 
-data class TotrinnsstatusDto(
+data class StatusTotrinnskontrollDto(
     val status: TotrinnkontrollStatus,
     val totrinnskontroll: TotrinnskontrollDto? = null,
 )
