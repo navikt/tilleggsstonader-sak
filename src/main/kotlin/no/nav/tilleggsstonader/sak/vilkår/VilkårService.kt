@@ -147,10 +147,7 @@ class VilkårService(
     }*/
 
     /**
-     * Når en revurdering opprettes skal den kopiere de tidligere vilkåren med lik verdi for endretTid.
-     * Endret tid blir satt av Sporbar() som alltid vil sette endretTid til nåværende tispunkt, noe som blir feil.
-     * For å omgå dette problemet lagres først de kopierte vilkårsvurderingene til databasen. Til slutt
-     * vil oppdaterEndretTid() manuelt overskrive verdiene for endretTid til korrekte verdier.
+     * Når en revurdering opprettes skal den kopiere de tidligere vilkårene for samme stønad.
      */
     fun kopierVilkårsettTilNyBehandling(
         eksisterendeBehandlingId: UUID,
@@ -174,7 +171,6 @@ class VilkårService(
         val nyeBarnVurderinger = opprettVilkårForNyeBarn(kopiAvVurderinger, metadata, stønadstype)
 
         vilkårRepository.insertAll(kopiAvVurderinger.values.toList() + nyeBarnVurderinger)
-        tilbakestillEndretTidForKopierteVurderinger(kopiAvVurderinger, tidligereVurderinger) // TODO remove
     }
 
     private fun validerAtVurderingerKanKopieres(
@@ -214,18 +210,6 @@ class VilkårService(
             .filter { barn -> vilkårKopi.none { it.value.barnId == barn.id } }
             .map { OppdaterVilkår.lagVilkårForNyttBarn(metadata, it.behandlingId, it.id, stønadstype) }
             .flatten()
-
-    private fun tilbakestillEndretTidForKopierteVurderinger(
-        vilkår: Map<UUID, Vilkår>,
-        tidligereVurderinger: Map<UUID, Vilkår>,
-    ) {
-        vilkår.forEach { (forrigeId, vurdering) ->
-            vilkårRepository.oppdaterEndretTid(
-                vurdering.id,
-                tidligereVurderinger.getValue(forrigeId).sporbar.endret.endretTid,
-            )
-        }
-    }
 
     private fun finnBarnId(barnId: UUID?, barnIdMap: Map<UUID, BehandlingBarn>): UUID? {
         return barnId?.let {
