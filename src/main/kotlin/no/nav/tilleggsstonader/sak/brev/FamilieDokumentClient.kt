@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.soknad.dokument
+package no.nav.tilleggsstonader.sak.brev
 
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier

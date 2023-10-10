@@ -1,7 +1,6 @@
-package no.nav.tilleggsstonader.sak.behandling
+package no.nav.tilleggsstonader.sak.brev
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.soknad.dokument.FamilieDokumentClient
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -15,7 +14,7 @@ class BrevController(private val familieDokumentClient: FamilieDokumentClient) {
 
     @PostMapping("lag-pdf")
     fun genererPdf(@RequestBody request: GenererPdfRequest): ByteArray {
-        return familieDokumentClient.genererPdf(request.html)
+        return Base64.getEncoder().encode(familieDokumentClient.genererPdf(request.html))
     }
 
     data class GenererPdfRequest(val html: String)
