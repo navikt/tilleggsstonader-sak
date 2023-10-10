@@ -18,8 +18,8 @@ import no.nav.tilleggsstonader.sak.util.vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårsvurderingRepository
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.EksempelRegel
 import org.assertj.core.api.Assertions.assertThat
@@ -32,7 +32,7 @@ import java.util.UUID
 internal class VurderingServiceIntegrasjonsTest : IntegrationTest() {
 
     @Autowired
-    lateinit var vilkårsvurderingRepository: VilkårsvurderingRepository
+    lateinit var vilkårRepository: VilkårRepository
 
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
@@ -67,7 +67,7 @@ internal class VurderingServiceIntegrasjonsTest : IntegrationTest() {
             Stønadstype.BARNETILSYN,
         )
 
-        val vilkårForRevurdering = vilkårsvurderingRepository.findByBehandlingId(revurdering.id).first()
+        val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id).first()
 
         assertThat(vilkårForBehandling.id).isNotEqualTo(vilkårForRevurdering.id)
         assertThat(vilkårForBehandling.behandlingId).isNotEqualTo(vilkårForRevurdering.behandlingId)
@@ -120,7 +120,7 @@ internal class VurderingServiceIntegrasjonsTest : IntegrationTest() {
         søknadskjema: SøknadBarnetilsyn,
         behandling: Behandling,
         barn: List<BehandlingBarn>,
-    ): List<Vilkårsvurdering> {
+    ): List<Vilkår> {
         val hovedregelMetadata =
             HovedregelMetadata(
                 barn = barn,
@@ -133,10 +133,10 @@ internal class VurderingServiceIntegrasjonsTest : IntegrationTest() {
                 type = VilkårType.EKSEMPEL,
                 behandlingId = behandling.id,
                 barnId = barn.first().id,
-                delvilkårsvurdering = delvilkårsvurdering,
+                delvilkår = delvilkårsvurdering,
             ),
         )
-        return vilkårsvurderingRepository.insertAll(vilkårsvurderinger)
+        return vilkårRepository.insertAll(vilkårsvurderinger)
     }
 
     private fun lagreSøknad(

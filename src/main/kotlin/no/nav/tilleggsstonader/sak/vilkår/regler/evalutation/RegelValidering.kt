@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.regler.evalutation
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
@@ -19,7 +19,7 @@ object RegelValidering {
     fun validerVurdering(
         vilkårsregel: Vilkårsregel,
         oppdatering: List<DelvilkårDto>,
-        tidligereDelvilkårsvurderinger: List<Delvilkårsvurdering>,
+        tidligereDelvilkårsvurderinger: List<Delvilkår>,
     ) {
         validerAlleDelvilkårHarMinimumEttSvar(vilkårsregel.vilkårType, oppdatering)
         validerAlleHovedreglerFinnesMed(vilkårsregel, oppdatering, tidligereDelvilkårsvurderinger)
@@ -72,7 +72,7 @@ object RegelValidering {
 
     /**
      * Skal validere att man sender inn minimum ett svar for ett delvilkår
-     * Når backend initierar [Delvilkårsvurdering] så legges ett første svar in med regelId(hovedregel) for hvert delvilkår
+     * Når backend initierar [Delvilkår] så legges ett første svar in med regelId(hovedregel) for hvert delvilkår
      */
     private fun validerAlleDelvilkårHarMinimumEttSvar(
         vilkårType: VilkårType,
@@ -86,7 +86,7 @@ object RegelValidering {
     private fun validerAlleHovedreglerFinnesMed(
         vilkårsregel: Vilkårsregel,
         delvilkår: List<DelvilkårDto>,
-        tidligereDelvilkårsvurderinger: List<Delvilkårsvurdering>,
+        tidligereDelvilkårsvurderinger: List<Delvilkår>,
     ) {
         val aktuelleDelvilkår = aktuelleDelvilkår(tidligereDelvilkårsvurderinger)
         val delvilkårRegelIdn = delvilkår.map { it.hovedregel() }
@@ -100,7 +100,7 @@ object RegelValidering {
         }
     }
 
-    private fun aktuelleDelvilkår(tidligereDelvilkårsvurderinger: List<Delvilkårsvurdering>): Set<RegelId> {
+    private fun aktuelleDelvilkår(tidligereDelvilkårsvurderinger: List<Delvilkår>): Set<RegelId> {
         return tidligereDelvilkårsvurderinger
             .filter { it.resultat != Vilkårsresultat.IKKE_AKTUELL }
             .map { it.hovedregel }

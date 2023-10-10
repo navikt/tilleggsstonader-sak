@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.dto
 
-import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.regler.SvarId
@@ -56,9 +56,9 @@ data class VurderingDto(
 
 fun Vurdering.tilDto() = VurderingDto(this.regelId, this.svar, this.begrunnelse)
 
-fun Delvilkårsvurdering.tilDto() = DelvilkårDto(this.resultat, this.vurderinger.map { it.tilDto() })
+fun Delvilkår.tilDto() = DelvilkårDto(this.resultat, this.vurderinger.map { it.tilDto() })
 
-fun Vilkårsvurdering.tilDto() =
+fun Vilkår.tilDto() =
     VilkårDto(
         id = this.id,
         behandlingId = this.behandlingId,
@@ -67,7 +67,7 @@ fun Vilkårsvurdering.tilDto() =
         barnId = this.barnId,
         endretAv = this.sporbar.endret.endretAv,
         endretTid = this.sporbar.endret.endretTid,
-        delvilkårsett = this.delvilkårsvurdering.delvilkårsvurderinger
+        delvilkårsett = this.delvilkårwrapper.delvilkårsett
             .filter { it.resultat != Vilkårsresultat.IKKE_AKTUELL }
             .map { it.tilDto() },
         opphavsvilkår = this.opphavsvilkår?.let { OpphavsvilkårDto(it.behandlingId, it.vurderingstidspunkt) },

@@ -6,7 +6,7 @@ import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer
@@ -106,20 +106,20 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     }
 
     @ReadingConverter
-    class PGobjectTilDelvilkårConverter : Converter<PGobject, DelvilkårsvurderingWrapper> {
+    class PGobjectTilDelvilkårConverter : Converter<PGobject, DelvilkårWrapper> {
 
-        override fun convert(pGobject: PGobject): DelvilkårsvurderingWrapper {
-            return DelvilkårsvurderingWrapper(pGobject.value?.let { objectMapper.readValue(it) } ?: emptyList())
+        override fun convert(pGobject: PGobject): DelvilkårWrapper {
+            return DelvilkårWrapper(pGobject.value?.let { objectMapper.readValue(it) } ?: emptyList())
         }
     }
 
     @WritingConverter
-    class DelvilkårTilPGobjectConverter : Converter<DelvilkårsvurderingWrapper, PGobject> {
+    class DelvilkårTilPGobjectConverter : Converter<DelvilkårWrapper, PGobject> {
 
-        override fun convert(delvilkårsvurdering: DelvilkårsvurderingWrapper): PGobject =
+        override fun convert(delvilkårsvurdering: DelvilkårWrapper): PGobject =
             PGobject().apply {
                 type = "json"
-                value = objectMapper.writeValueAsString(delvilkårsvurdering.delvilkårsvurderinger)
+                value = objectMapper.writeValueAsString(delvilkårsvurdering.delvilkårsett)
             }
     }
 

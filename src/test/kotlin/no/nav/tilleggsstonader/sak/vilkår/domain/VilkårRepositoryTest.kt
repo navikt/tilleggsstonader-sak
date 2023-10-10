@@ -18,10 +18,10 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-internal class VilkårsvurderingRepositoryTest : IntegrationTest() {
+internal class VilkårRepositoryTest : IntegrationTest() {
 
     @Autowired
-    private lateinit var vilkårsvurderingRepository: VilkårsvurderingRepository
+    private lateinit var vilkårRepository: VilkårRepository
 
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
@@ -32,26 +32,26 @@ internal class VilkårsvurderingRepositoryTest : IntegrationTest() {
         val behandling = behandlingRepository.insert(behandling(fagsak))
 
         val vurderinger = listOf(Vurdering(RegelId.HAR_ET_NAVN, SvarId.JA, "ja"))
-        val vilkårsvurdering = vilkårsvurderingRepository.insert(
+        val vilkårsvurdering = vilkårRepository.insert(
             vilkårsvurdering(
                 behandlingId = behandling.id,
                 resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
                 type = VilkårType.EKSEMPEL,
-                delvilkårsvurdering = listOf(Delvilkårsvurdering(Vilkårsresultat.OPPFYLT, vurderinger)),
+                delvilkår = listOf(Delvilkår(Vilkårsresultat.OPPFYLT, vurderinger)),
                 barnId = null,
                 opphavsvilkår = Opphavsvilkår(behandling.id, SporbarUtils.now()),
             ),
         )
 
-        assertThat(vilkårsvurderingRepository.findByBehandlingId(UUID.randomUUID())).isEmpty()
-        assertThat(vilkårsvurderingRepository.findByBehandlingId(behandling.id)).containsOnly(vilkårsvurdering)
+        assertThat(vilkårRepository.findByBehandlingId(UUID.randomUUID())).isEmpty()
+        assertThat(vilkårRepository.findByBehandlingId(behandling.id)).containsOnly(vilkårsvurdering)
     }
 
     @Test
     internal fun `vilkårsvurdering uten opphavsvilkår`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak))
-        val vilkårsvurdering = vilkårsvurderingRepository.insert(
+        val vilkårsvurdering = vilkårRepository.insert(
             vilkårsvurdering(
                 behandlingId = behandling.id,
                 resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
@@ -59,7 +59,7 @@ internal class VilkårsvurderingRepositoryTest : IntegrationTest() {
                 opphavsvilkår = null,
             ),
         )
-        assertThat(vilkårsvurderingRepository.findByBehandlingId(behandling.id)).containsOnly(vilkårsvurdering)
+        assertThat(vilkårRepository.findByBehandlingId(behandling.id)).containsOnly(vilkårsvurdering)
     }
 
     @Test
@@ -67,7 +67,7 @@ internal class VilkårsvurderingRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak))
 
-        val vilkårsvurdering = vilkårsvurderingRepository.insert(
+        val vilkårsvurdering = vilkårRepository.insert(
             vilkårsvurdering(
                 behandling.id,
                 Vilkårsresultat.IKKE_TATT_STILLING_TIL,
@@ -76,9 +76,9 @@ internal class VilkårsvurderingRepositoryTest : IntegrationTest() {
         )
         val nyttTidspunkt = LocalDateTime.now().minusDays(1).truncatedTo(ChronoUnit.MILLIS)
 
-        vilkårsvurderingRepository.oppdaterEndretTid(vilkårsvurdering.id, nyttTidspunkt)
+        vilkårRepository.oppdaterEndretTid(vilkårsvurdering.id, nyttTidspunkt)
 
-        assertThat(vilkårsvurderingRepository.findByIdOrThrow(vilkårsvurdering.id).sporbar.endret.endretTid).isEqualTo(
+        assertThat(vilkårRepository.findByIdOrThrow(vilkårsvurdering.id).sporbar.endret.endretTid).isEqualTo(
             nyttTidspunkt,
         )
     }
@@ -89,16 +89,16 @@ internal class VilkårsvurderingRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak))
 
-        val vilkårsvurdering: Vilkårsvurdering = testWithBrukerContext(preferredUsername = saksbehandler) {
-            vilkårsvurderingRepository.insert(
+        val vilkår: Vilkår = testWithBrukerContext(preferredUsername = saksbehandler) {
+            vilkårRepository.insert(
                 vilkårsvurdering(behandling.id, Vilkårsresultat.IKKE_TATT_STILLING_TIL, VilkårType.EKSEMPEL),
             )
         }
-        assertThat(vilkårsvurdering.sporbar.opprettetAv).isEqualTo(saksbehandler)
-        assertThat(vilkårsvurdering.sporbar.endret.endretAv).isEqualTo(saksbehandler)
+        assertThat(vilkår.sporbar.opprettetAv).isEqualTo(saksbehandler)
+        assertThat(vilkår.sporbar.endret.endretAv).isEqualTo(saksbehandler)
 
-        vilkårsvurderingRepository.settMaskinelltOpprettet(vilkårsvurdering.id)
-        val oppdatertVilkårsvurdering = vilkårsvurderingRepository.findByIdOrThrow(vilkårsvurdering.id)
+        vilkårRepository.settMaskinelltOpprettet(vilkår.id)
+        val oppdatertVilkårsvurdering = vilkårRepository.findByIdOrThrow(vilkår.id)
         assertThat(oppdatertVilkårsvurdering.sporbar.opprettetAv).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
         assertThat(oppdatertVilkårsvurdering.sporbar.endret.endretAv).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
     }

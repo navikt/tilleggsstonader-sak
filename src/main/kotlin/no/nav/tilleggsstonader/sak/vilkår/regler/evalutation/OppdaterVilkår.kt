@@ -4,10 +4,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.svarTilDomene
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
@@ -22,25 +22,25 @@ import java.util.UUID
 object OppdaterVilkår {
 
     /**
-     * Oppdaterer [Vilkårsvurdering] med nye svar og resultat
+     * Oppdaterer [Vilkår] med nye svar og resultat
      * Validerer att svaren er gyldige
      */
     fun lagNyOppdatertVilkårsvurdering(
-        vilkårsvurdering: Vilkårsvurdering,
+        vilkår: Vilkår,
         oppdatering: List<DelvilkårDto>,
         vilkårsregler: Map<VilkårType, Vilkårsregel> = ALLE_VILKÅRSREGLER.vilkårsregler,
-    ): Vilkårsvurdering { // TODO: Ikke default input her, kanskje?
+    ): Vilkår { // TODO: Ikke default input her, kanskje?
         val vilkårsregel =
-            vilkårsregler[vilkårsvurdering.type] ?: error("Finner ikke vilkårsregler for ${vilkårsvurdering.type}")
+            vilkårsregler[vilkår.type] ?: error("Finner ikke vilkårsregler for ${vilkår.type}")
 
-        validerVurdering(vilkårsregel, oppdatering, vilkårsvurdering.delvilkårsvurdering.delvilkårsvurderinger)
+        validerVurdering(vilkårsregel, oppdatering, vilkår.delvilkårwrapper.delvilkårsett)
 
         val vilkårsresultat = utledResultat(vilkårsregel, oppdatering)
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
-        val oppdaterteDelvilkår = oppdaterDelvilkår(vilkårsvurdering, vilkårsresultat, oppdatering)
-        return vilkårsvurdering.copy(
+        val oppdaterteDelvilkår = oppdaterDelvilkår(vilkår, vilkårsresultat, oppdatering)
+        return vilkår.copy(
             resultat = vilkårsresultat.vilkår,
-            delvilkårsvurdering = oppdaterteDelvilkår,
+            delvilkårwrapper = oppdaterteDelvilkår,
             opphavsvilkår = null,
         )
     }
@@ -58,15 +58,15 @@ object OppdaterVilkår {
      * Den beholder den opprinnelige rekkefølgen som finnes på delvilkåren i databasen,
      * slik att frontend kan sende inn de i en annen rekkefølge
      *
-     * @param vilkårsvurdering Vilkårsoppdatering fra databasen som skal oppdateres
+     * @param vilkår Vilkårsoppdatering fra databasen som skal oppdateres
      */
     private fun oppdaterDelvilkår(
-        vilkårsvurdering: Vilkårsvurdering,
+        vilkår: Vilkår,
         vilkårsresultat: RegelResultat,
         oppdatering: List<DelvilkårDto>,
-    ): DelvilkårsvurderingWrapper {
+    ): DelvilkårWrapper {
         val vurderingerPåType = oppdatering.associateBy { it.vurderinger.first().regelId }
-        val delvilkårsvurderinger = vilkårsvurdering.delvilkårsvurdering.delvilkårsvurderinger.map {
+        val delvilkårsvurderinger = vilkår.delvilkårwrapper.delvilkårsett.map {
             if (it.resultat == Vilkårsresultat.IKKE_AKTUELL) {
                 it
             } else {
@@ -85,7 +85,7 @@ object OppdaterVilkår {
                 }
             }
         }.toList()
-        return vilkårsvurdering.delvilkårsvurdering.copy(delvilkårsvurderinger = delvilkårsvurderinger)
+        return vilkår.delvilkårwrapper.copy(delvilkårsett = delvilkårsvurderinger)
     }
 
     /**
@@ -99,7 +99,7 @@ object OppdaterVilkår {
         }
     }
 
-    fun utledResultatForVilkårSomGjelderFlereBarn(value: List<Vilkårsvurdering>): Vilkårsresultat {
+    fun utledResultatForVilkårSomGjelderFlereBarn(value: List<Vilkår>): Vilkårsresultat {
         feilHvis(value.any { !it.type.gjelderFlereBarn() }) {
             "Denne metoden kan kun kalles med vilkår som kan ha flere barn"
         }
@@ -119,7 +119,7 @@ object OppdaterVilkår {
         }
     }
 
-    fun utledBehandlingKategori(vilkårsvurderinger: List<Vilkårsvurdering>): BehandlingKategori {
+    fun utledBehandlingKategori(vilkårsvurderinger: List<Vilkår>): BehandlingKategori {
         return BehandlingKategori.NASJONAL
     }
     /*
@@ -152,7 +152,7 @@ object OppdaterVilkår {
 */
 
     fun erAlleVilkårsvurderingerOppfylt(
-        vilkårsvurderinger: List<Vilkårsvurdering>,
+        vilkårsvurderinger: List<Vilkår>,
         stønadstype: Stønadstype,
     ): Boolean {
         val inneholderAlleTyperVilkår =
@@ -161,7 +161,7 @@ object OppdaterVilkår {
         return inneholderAlleTyperVilkår && vilkårsresultat.all { it == Vilkårsresultat.OPPFYLT }
     }
 
-    private fun utledVilkårsresultat(lagredeVilkårsvurderinger: List<Vilkårsvurdering>): List<Vilkårsresultat> {
+    private fun utledVilkårsresultat(lagredeVilkårsvurderinger: List<Vilkår>): List<Vilkårsresultat> {
         val vilkårsresultat = lagredeVilkårsvurderinger.groupBy { it.type }.map {
             if (it.key.gjelderFlereBarn()) {
                 utledResultatForVilkårSomGjelderFlereBarn(it.value)
@@ -188,7 +188,7 @@ object OppdaterVilkår {
         behandlingId: UUID,
         metadata: HovedregelMetadata,
         stønadstype: Stønadstype,
-    ): List<Vilkårsvurdering> {
+    ): List<Vilkår> {
         return vilkårsreglerForStønad(stønadstype)
             .flatMap { vilkårsregel ->
                 if (vilkårsregel.vilkårType.gjelderFlereBarn() && metadata.barn.isNotEmpty()) {
@@ -204,7 +204,7 @@ object OppdaterVilkår {
         behandlingId: UUID,
         barnId: UUID,
         stønadstype: Stønadstype,
-    ): List<Vilkårsvurdering> {
+    ): List<Vilkår> {
         return emptyList()
     }
     /*
@@ -231,13 +231,13 @@ object OppdaterVilkår {
         metadata: HovedregelMetadata,
         behandlingId: UUID,
         barnId: UUID? = null,
-    ): Vilkårsvurdering {
+    ): Vilkår {
         val delvilkårsvurdering = vilkårsregel.initiereDelvilkårsvurdering(metadata, barnId = barnId)
-        return Vilkårsvurdering(
+        return Vilkår(
             behandlingId = behandlingId,
             type = vilkårsregel.vilkårType,
             barnId = barnId,
-            delvilkårsvurdering = DelvilkårsvurderingWrapper(delvilkårsvurdering),
+            delvilkårwrapper = DelvilkårWrapper(delvilkårsvurdering),
             resultat = utledResultat(vilkårsregel, delvilkårsvurdering.map { it.tilDto() }).vilkår,
             opphavsvilkår = null,
         )
