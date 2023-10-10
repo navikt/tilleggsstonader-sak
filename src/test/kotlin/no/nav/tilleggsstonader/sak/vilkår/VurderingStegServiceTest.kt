@@ -32,7 +32,7 @@ import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårsvurderingRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vurdering
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VurderingDto
@@ -142,7 +142,7 @@ internal class VurderingStegServiceTest {
         val vilkårsvurdering = initiererVurderinger(lagretVilkårsvurdering)
 
         val delvilkårDto = listOf(
-            DelvilkårsvurderingDto(
+            DelvilkårDto(
                 Vilkårsresultat.IKKE_OPPFYLT,
                 listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
             ),
@@ -240,7 +240,7 @@ internal class VurderingStegServiceTest {
         val lagretVilkårsvurdering = slot<Vilkårsvurdering>()
         val vilkårsvurdering = initiererVurderinger(lagretVilkårsvurdering)
         val delvilkårDto = listOf(
-            DelvilkårsvurderingDto(
+            DelvilkårDto(
                 Vilkårsresultat.IKKE_OPPFYLT,
                 listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
             ),
@@ -274,7 +274,7 @@ internal class VurderingStegServiceTest {
         val lagretVilkårsvurdering = slot<Vilkårsvurdering>()
         val vilkårsvurdering = initiererVurderinger(lagretVilkårsvurdering)
         val delvilkårDto = listOf(
-            DelvilkårsvurderingDto(
+            DelvilkårDto(
                 Vilkårsresultat.IKKE_OPPFYLT,
                 listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
             ),

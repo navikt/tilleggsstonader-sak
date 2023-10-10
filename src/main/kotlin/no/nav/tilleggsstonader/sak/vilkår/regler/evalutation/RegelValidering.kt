@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.BegrunnelseType
 import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
@@ -18,7 +18,7 @@ object RegelValidering {
 
     fun validerVurdering(
         vilkårsregel: Vilkårsregel,
-        oppdatering: List<DelvilkårsvurderingDto>,
+        oppdatering: List<DelvilkårDto>,
         tidligereDelvilkårsvurderinger: List<Delvilkårsvurdering>,
     ) {
         validerAlleDelvilkårHarMinimumEttSvar(vilkårsregel.vilkårType, oppdatering)
@@ -48,13 +48,13 @@ object RegelValidering {
      */
     private fun validerDelvilkår(
         vilkårsregel: Vilkårsregel,
-        delvilkårsvurderingDto: DelvilkårsvurderingDto,
+        delvilkårDto: DelvilkårDto,
     ) {
         val vilkårType = vilkårsregel.vilkårType
-        delvilkårsvurderingDto.vurderinger.forEachIndexed { index, svar ->
+        delvilkårDto.vurderinger.forEachIndexed { index, svar ->
             val (regelId: RegelId, svarId: SvarId?, _) = svar
             val regelMapping = vilkårsregel.regel(regelId)
-            val erIkkeSisteSvaret = index != (delvilkårsvurderingDto.vurderinger.size - 1)
+            val erIkkeSisteSvaret = index != (delvilkårDto.vurderinger.size - 1)
 
             if (svarId == null) {
                 feilHvis(erIkkeSisteSvaret) {
@@ -76,7 +76,7 @@ object RegelValidering {
      */
     private fun validerAlleDelvilkårHarMinimumEttSvar(
         vilkårType: VilkårType,
-        oppdatering: List<DelvilkårsvurderingDto>,
+        oppdatering: List<DelvilkårDto>,
     ) {
         oppdatering.forEach { vurdering ->
             feilHvis(vurdering.vurderinger.isEmpty()) { "Savner svar for en av delvilkåren for vilkår=$vilkårType" }
@@ -85,7 +85,7 @@ object RegelValidering {
 
     private fun validerAlleHovedreglerFinnesMed(
         vilkårsregel: Vilkårsregel,
-        delvilkår: List<DelvilkårsvurderingDto>,
+        delvilkår: List<DelvilkårDto>,
         tidligereDelvilkårsvurderinger: List<Delvilkårsvurdering>,
     ) {
         val aktuelleDelvilkår = aktuelleDelvilkår(tidligereDelvilkårsvurderinger)

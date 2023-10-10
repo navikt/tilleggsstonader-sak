@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.regler.evalutation
 
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.regler.SvarId
@@ -122,11 +122,11 @@ internal class RegelValideringTest {
 
     private fun valider(
         regel: Vilkårsregel,
-        vararg delvilkårsvurderingDto: DelvilkårsvurderingDto,
+        vararg delvilkårDto: DelvilkårDto,
     ) {
         RegelValidering.validerVurdering(
             vilkårsregel = regel,
-            oppdatering = delvilkårsvurderingDto.toList(),
+            oppdatering = delvilkårDto.toList(),
             tidligereDelvilkårsvurderinger = regel.initiereDelvilkårsvurdering(mockk()),
         )
     }

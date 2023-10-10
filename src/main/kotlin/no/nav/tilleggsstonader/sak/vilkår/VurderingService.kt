@@ -12,9 +12,9 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårsvurderingRepository
 import no.nav.tilleggsstonader.sak.vilkår.dto.Fellesgrunnlag
-import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår
@@ -39,14 +39,14 @@ class VurderingService(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @Transactional
-    fun hentEllerOpprettVurderinger(behandlingId: UUID): VilkårDto {
+    fun hentEllerOpprettVurderinger(behandlingId: UUID): VilkårsvurderingDto {
         val (grunnlag, metadata) = hentGrunnlagOgMetadata(behandlingId)
         val vurderinger = hentEllerOpprettVurderinger(behandlingId, metadata)
-        return VilkårDto(vilkårsett = vurderinger, grunnlag = grunnlag)
+        return VilkårsvurderingDto(vilkårsett = vurderinger, grunnlag = grunnlag)
     }
 
     @Transactional
-    fun hentOpprettEllerOppdaterVurderinger(behandlingId: UUID): VilkårDto {
+    fun hentOpprettEllerOppdaterVurderinger(behandlingId: UUID): VilkårsvurderingDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
         if (behandling.harStatusOpprettet) {
@@ -61,7 +61,7 @@ class VurderingService(
         return hentEllerOpprettVurderinger(behandlingId)
     }
 
-    fun hentAlleVurderinger(behandlingId: UUID): List<VilkårsvurderingDto> {
+    fun hentAlleVurderinger(behandlingId: UUID): List<VilkårDto> {
         val vurderinger = vilkårsvurderingRepository.findByBehandlingId(behandlingId)
         feilHvis(vurderinger.isEmpty()) {
             "Mangler vurderinger for behandling=$behandlingId"
@@ -70,7 +70,7 @@ class VurderingService(
     }
 
     @Transactional
-    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårDto {
+    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårsvurderingDto {
         // grunnlagsdataService.oppdaterOgHentNyGrunnlagsdata(behandlingId)
         return hentEllerOpprettVurderinger(behandlingId)
     }
@@ -116,7 +116,7 @@ class VurderingService(
     private fun hentEllerOpprettVurderinger(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
-    ): List<VilkårsvurderingDto> {
+    ): List<VilkårDto> {
         return hentEllerOpprettVurderingerForVilkår(behandlingId, metadata).map(Vilkårsvurdering::tilDto)
     }
 

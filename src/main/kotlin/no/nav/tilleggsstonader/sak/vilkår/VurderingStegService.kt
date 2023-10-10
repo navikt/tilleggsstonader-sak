@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårsvurderingRepository
 import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVurderingerDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.utledBehandlingKategori
@@ -38,7 +38,7 @@ class VurderingStegService(
 ) {
 
     @Transactional
-    fun oppdaterVilkår(vilkårsvurderingDto: SvarPåVurderingerDto): VilkårsvurderingDto {
+    fun oppdaterVilkår(vilkårsvurderingDto: SvarPåVurderingerDto): VilkårDto {
         val vilkårsvurdering = vilkårsvurderingRepository.findByIdOrThrow(vilkårsvurderingDto.id)
         val behandlingId = vilkårsvurdering.behandlingId
 
@@ -56,7 +56,7 @@ class VurderingStegService(
     }
 
     @Transactional
-    fun nullstillVilkår(vilkårsvurderingDto: OppdaterVilkårsvurderingDto): VilkårsvurderingDto {
+    fun nullstillVilkår(vilkårsvurderingDto: OppdaterVilkårsvurderingDto): VilkårDto {
         val vilkårsvurdering = vilkårsvurderingRepository.findByIdOrThrow(vilkårsvurderingDto.id)
         val behandlingId = vilkårsvurdering.behandlingId
 
@@ -71,7 +71,7 @@ class VurderingStegService(
     }
 
     @Transactional
-    fun settVilkårTilSkalIkkeVurderes(vilkårsvurderingDto: OppdaterVilkårsvurderingDto): VilkårsvurderingDto {
+    fun settVilkårTilSkalIkkeVurderes(vilkårsvurderingDto: OppdaterVilkårsvurderingDto): VilkårDto {
         val vilkårsvurdering = vilkårsvurderingRepository.findByIdOrThrow(vilkårsvurderingDto.id)
         val behandlingId = vilkårsvurdering.behandlingId
 
@@ -137,7 +137,7 @@ class VurderingStegService(
     private fun nullstillVilkårMedNyeHovedregler(
         behandlingId: UUID,
         vilkårsvurdering: Vilkårsvurdering,
-    ): VilkårsvurderingDto {
+    ): VilkårDto {
         val metadata = hentHovedregelMetadata(behandlingId)
         val nyeDelvilkår = hentVilkårsregel(vilkårsvurdering.type).initiereDelvilkårsvurdering(metadata)
         val delvilkårsvurdering = DelvilkårsvurderingWrapper(nyeDelvilkår)
@@ -153,7 +153,7 @@ class VurderingStegService(
     private fun oppdaterVilkårsvurderingTilSkalIkkeVurderes(
         behandlingId: UUID,
         vilkårsvurdering: Vilkårsvurdering,
-    ): VilkårsvurderingDto {
+    ): VilkårDto {
         val metadata = hentHovedregelMetadata(behandlingId)
         val nyeDelvilkår = hentVilkårsregel(vilkårsvurdering.type).initiereDelvilkårsvurdering(
             metadata,

@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.regler.evalutation
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.regler.SluttSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregel
@@ -28,7 +28,7 @@ object RegelEvaluering {
     /**
      * @return [RegelResultat] med resultat for vilkåret og delvilkår
      */
-    fun utledResultat(vilkårsregel: Vilkårsregel, delvilkår: List<DelvilkårsvurderingDto>): RegelResultat {
+    fun utledResultat(vilkårsregel: Vilkårsregel, delvilkår: List<DelvilkårDto>): RegelResultat {
         val delvilkårResultat = delvilkår.associate { vurdering ->
             vurdering.hovedregel() to utledResultatForDelvilkår(vilkårsregel, vurdering)
         }
@@ -56,7 +56,7 @@ object RegelEvaluering {
      */
     private fun utledResultatForDelvilkår(
         vilkårsregel: Vilkårsregel,
-        vurdering: DelvilkårsvurderingDto,
+        vurdering: DelvilkårDto,
     ): Vilkårsresultat {
         vurdering.vurderinger.forEach { svar ->
             val regel = vilkårsregel.regel(svar.regelId)

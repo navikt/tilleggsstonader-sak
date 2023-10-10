@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.svarTilDomene
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
@@ -27,7 +27,7 @@ object OppdaterVilkår {
      */
     fun lagNyOppdatertVilkårsvurdering(
         vilkårsvurdering: Vilkårsvurdering,
-        oppdatering: List<DelvilkårsvurderingDto>,
+        oppdatering: List<DelvilkårDto>,
         vilkårsregler: Map<VilkårType, Vilkårsregel> = ALLE_VILKÅRSREGLER.vilkårsregler,
     ): Vilkårsvurdering { // TODO: Ikke default input her, kanskje?
         val vilkårsregel =
@@ -63,7 +63,7 @@ object OppdaterVilkår {
     private fun oppdaterDelvilkår(
         vilkårsvurdering: Vilkårsvurdering,
         vilkårsresultat: RegelResultat,
-        oppdatering: List<DelvilkårsvurderingDto>,
+        oppdatering: List<DelvilkårDto>,
     ): DelvilkårsvurderingWrapper {
         val vurderingerPåType = oppdatering.associateBy { it.vurderinger.first().regelId }
         val delvilkårsvurderinger = vilkårsvurdering.delvilkårsvurdering.delvilkårsvurderinger.map {
