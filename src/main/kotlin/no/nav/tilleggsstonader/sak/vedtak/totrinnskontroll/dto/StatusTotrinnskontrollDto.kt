@@ -1,6 +1,7 @@
-package no.nav.tilleggsstonader.sak.vedtak.dto
+package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto
 
 import java.time.LocalDateTime
+import java.util.Collections.emptyList
 
 data class BeslutteVedtakDto(
     val godkjent: Boolean,
@@ -8,7 +9,7 @@ data class BeslutteVedtakDto(
     val årsakerUnderkjent: List<ÅrsakUnderkjent> = emptyList(),
 )
 
-data class TotrinnskontrollStatusDto(
+data class StatusTotrinnskontrollDto(
     val status: TotrinnkontrollStatus,
     val totrinnskontroll: TotrinnskontrollDto? = null,
 )

@@ -17,10 +17,10 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.TotrinnskontrollService
-import no.nav.tilleggsstonader.sak.vedtak.dto.BeslutteVedtakDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.TotrinnkontrollStatus
-import no.nav.tilleggsstonader.sak.vedtak.dto.ÅrsakUnderkjent
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
