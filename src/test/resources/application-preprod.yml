@@ -4,7 +4,5 @@ server:
 logging:
   config: classpath:logback-test.xml
 
-NAIS_CLUSTER_NAME: dev-gcp
-
 prosessering:
   enabled: false
