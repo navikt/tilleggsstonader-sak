@@ -48,7 +48,7 @@ object OppdaterVilkår {
     private fun validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat: RegelResultat) {
         if (!vilkårsresultat.vilkår.oppfyltEllerIkkeOppfylt()) {
             val message = "Mangler fullstendig vilkår for ${vilkårsresultat.vilkårType}. " +
-                    "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
+                "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
             throw Feil(message = message, frontendFeilmelding = message)
         }
     }
@@ -109,12 +109,12 @@ object OppdaterVilkår {
             value.any { it.resultat == Vilkårsresultat.IKKE_TATT_STILLING_TIL } -> Vilkårsresultat.IKKE_TATT_STILLING_TIL
             value.all { it.resultat == Vilkårsresultat.SKAL_IKKE_VURDERES } -> Vilkårsresultat.SKAL_IKKE_VURDERES
             value.any { it.resultat == Vilkårsresultat.IKKE_OPPFYLT } &&
-                    value.all { it.resultat == Vilkårsresultat.IKKE_OPPFYLT || it.resultat == Vilkårsresultat.SKAL_IKKE_VURDERES } ->
+                value.all { it.resultat == Vilkårsresultat.IKKE_OPPFYLT || it.resultat == Vilkårsresultat.SKAL_IKKE_VURDERES } ->
                 Vilkårsresultat.IKKE_OPPFYLT
 
             else -> throw Feil(
                 "Utled resultat for aleneomsorg - kombinasjon av resultat er ikke behandlet: " +
-                        "${value.map { it.resultat }}",
+                    "${value.map { it.resultat }}",
             )
         }
     }
@@ -178,11 +178,11 @@ object OppdaterVilkår {
      */
     private fun harNoenIkkeOppfyltOgRestenIkkeOppfyltEllerOppfyltEllerSkalIkkevurderes(vilkårsresultat: List<Vilkårsresultat>) =
         vilkårsresultat.any { it == Vilkårsresultat.IKKE_OPPFYLT } &&
-                vilkårsresultat.all {
-                    it == Vilkårsresultat.OPPFYLT ||
-                            it == Vilkårsresultat.IKKE_OPPFYLT ||
-                            it == Vilkårsresultat.SKAL_IKKE_VURDERES
-                }
+            vilkårsresultat.all {
+                it == Vilkårsresultat.OPPFYLT ||
+                    it == Vilkårsresultat.IKKE_OPPFYLT ||
+                    it == Vilkårsresultat.SKAL_IKKE_VURDERES
+            }
 
     fun opprettNyeVilkår(
         behandlingId: UUID,

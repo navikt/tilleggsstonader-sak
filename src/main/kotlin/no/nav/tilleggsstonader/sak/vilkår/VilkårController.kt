@@ -47,8 +47,8 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                        " svar=$delvilkårJson",
+                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                    " svar=$delvilkårJson",
             )
             throw e
         }
