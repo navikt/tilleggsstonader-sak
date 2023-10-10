@@ -31,7 +31,7 @@ internal class RegelValideringTest {
                 regel,
                 VurderingDto(RegelId.HAR_ET_NAVN2),
             )
-        }.hasMessageStartingWith("Delvilkårsvurderinger savner svar på hovedregler")
+        }.hasMessageStartingWith("Delvilkårsett mangler svar på hovedregler")
             .isInstanceOf(Feil::class.java)
     }
 
