@@ -22,7 +22,7 @@ import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
 import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -96,7 +96,7 @@ abstract class IntegrationTest {
 
             Simuleringsresultat::class,
             TilkjentYtelse::class,
-            Vilkårsvurdering::class,
+            Vilkår::class,
             BehandlingBarn::class,
 
             SøknadBehandling::class,

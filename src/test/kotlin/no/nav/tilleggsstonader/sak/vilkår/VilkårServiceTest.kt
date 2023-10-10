@@ -15,24 +15,24 @@ import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
-import no.nav.tilleggsstonader.sak.util.vilkårsvurdering
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtil.mockVilkårGrunnlagDto
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat.SKAL_IKKE_VURDERES
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårsvurderingRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-internal class VurderingServiceTest {
+internal class VilkårServiceTest {
 
     private val behandlingService = mockk<BehandlingService>()
     private val søknadService = mockk<SøknadService>()
-    private val vilkårsvurderingRepository = mockk<VilkårsvurderingRepository>()
+    private val vilkårRepository = mockk<VilkårRepository>()
 
     // private val personopplysningerIntegrasjonerClient = mockk<PersonopplysningerIntegrasjonerClient>()
     // private val blankettRepository = mockk<BlankettRepository>()
@@ -41,10 +41,10 @@ internal class VurderingServiceTest {
 
     // private val grunnlagsdataService = mockk<GrunnlagsdataService>()
     private val fagsakService = mockk<FagsakService>()
-    private val vurderingService = VurderingService(
+    private val vilkårService = VilkårService(
         behandlingService = behandlingService,
         søknadService = søknadService,
-        vilkårsvurderingRepository = vilkårsvurderingRepository,
+        vilkårRepository = vilkårRepository,
         vilkårGrunnlagService = vilkårGrunnlagService,
         // grunnlagsdataService = grunnlagsdataService,
         barnService = barnService,
@@ -64,7 +64,7 @@ internal class VurderingServiceTest {
         every { behandlingService.hentBehandling(behandlingId) } returns behandling
         // every { søknadService.hentSøknadsgrunnlag(any()) }.returns(søknad)
 
-        every { vilkårsvurderingRepository.insertAll(any()) } answers { firstArg() }
+        every { vilkårRepository.insertAll(any()) } answers { firstArg() }
         // every { featureToggleService.isEnabled(any()) } returns true
         every { barnService.finnBarnPåBehandling(behandlingId) } returns barn
         every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
@@ -75,7 +75,7 @@ internal class VurderingServiceTest {
 
     /*
     @Test
-    fun `skal opprette nye Vilkårsvurdering for barnetilsyn med alle vilkår dersom ingen vurderinger finnes`() {
+    fun `skal opprette nye Vilkår for barnetilsyn med alle vilkår dersom ingen vurderinger finnes`() {
         every { vilkårsvurderingRepository.findByBehandlingId(behandlingId) } returns emptyList()
         every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
 
@@ -108,20 +108,20 @@ internal class VurderingServiceTest {
      */
 
     @Test
-    fun `skal ikke opprette nye Vilkårsvurderinger for behandlinger som allerede har vurderinger`() {
-        every { vilkårsvurderingRepository.findByBehandlingId(behandlingId) } returns
+    fun `skal ikke opprette nye Vilkår for behandlinger som allerede har vurderinger`() {
+        every { vilkårRepository.findByBehandlingId(behandlingId) } returns
             listOf(
-                vilkårsvurdering(
+                vilkår(
                     resultat = OPPFYLT,
                     type = VilkårType.EKSEMPEL,
                     behandlingId = behandlingId,
                 ),
             )
 
-        vurderingService.hentEllerOpprettVurderinger(behandlingId)
+        vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
 
-        verify(exactly = 0) { vilkårsvurderingRepository.updateAll(any()) }
-        verify(exactly = 0) { vilkårsvurderingRepository.insertAll(any()) }
+        verify(exactly = 0) { vilkårRepository.updateAll(any()) }
+        verify(exactly = 0) { vilkårRepository.insertAll(any()) }
     }
 
     /*
@@ -162,69 +162,69 @@ internal class VurderingServiceTest {
     }*/
 
     @Test
-    internal fun `skal ikke opprette vilkårsvurderinger hvis behandling er låst for videre vurdering`() {
-        val vilkårsvurderinger = listOf(
-            vilkårsvurdering(
+    internal fun `skal ikke opprette vilkår hvis behandling er låst for videre vurdering`() {
+        val eksisterendeVilkårsett = listOf(
+            vilkår(
                 resultat = OPPFYLT,
                 type = VilkårType.EKSEMPEL,
                 behandlingId = behandlingId,
             ),
         )
-        every { vilkårsvurderingRepository.findByBehandlingId(behandlingId) } returns vilkårsvurderinger
+        every { vilkårRepository.findByBehandlingId(behandlingId) } returns eksisterendeVilkårsett
 
-        val alleVilkårsvurderinger = vurderingService.hentEllerOpprettVurderinger(behandlingId).vurderinger
+        val vilkårsett = vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId).vilkårsett
 
-        assertThat(alleVilkårsvurderinger).hasSize(1)
-        verify(exactly = 0) { vilkårsvurderingRepository.insertAll(any()) }
-        assertThat(alleVilkårsvurderinger.map { it.id }).isEqualTo(vilkårsvurderinger.map { it.id })
+        assertThat(vilkårsett).hasSize(1)
+        verify(exactly = 0) { vilkårRepository.insertAll(any()) }
+        assertThat(vilkårsett.map { it.id }).isEqualTo(eksisterendeVilkårsett.map { it.id })
     }
 
     @Test
-    internal fun `Skal returnere ikke oppfylt hvis vilkårsvurderinger ikke inneholder alle vilkår`() {
-        val vilkårsvurderinger = listOf(
-            vilkårsvurdering(
+    internal fun `Skal returnere ikke oppfylt hvis vilkårsett ikke inneholder alle vilkår`() {
+        val vilkårsett = listOf(
+            vilkår(
                 resultat = OPPFYLT,
                 type = VilkårType.EKSEMPEL,
                 behandlingId = behandlingId,
             ),
         )
-        every { vilkårsvurderingRepository.findByBehandlingId(behandlingId) } returns vilkårsvurderinger
-        val erAlleVilkårOppfylt = vurderingService.erAlleVilkårOppfylt(behandlingId)
+        every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
+        val erAlleVilkårOppfylt = vilkårService.erAlleVilkårOppfylt(behandlingId)
         assertThat(erAlleVilkårOppfylt).isFalse
     }
 
     @Test
-    internal fun `Skal returnere oppfylt hvis alle vilkårsvurderinger er oppfylt`() {
-        val vilkårsvurderinger = lagVilkårsvurderinger(behandlingId, OPPFYLT)
-        every { vilkårsvurderingRepository.findByBehandlingId(behandlingId) } returns vilkårsvurderinger
-        val erAlleVilkårOppfylt = vurderingService.erAlleVilkårOppfylt(behandlingId)
+    internal fun `Skal returnere oppfylt hvis alle vilår er oppfylt`() {
+        val vilkårsett = lagVilkårsett(behandlingId, OPPFYLT)
+        every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
+        val erAlleVilkårOppfylt = vilkårService.erAlleVilkårOppfylt(behandlingId)
         assertThat(erAlleVilkårOppfylt).isTrue
     }
 
     @Test
-    internal fun `Skal returnere ikke oppfylt hvis noen vurderinger er SKAL_IKKE_VURDERES`() {
-        val vilkårsvurderinger = lagVilkårsvurderinger(behandlingId, SKAL_IKKE_VURDERES)
+    internal fun `Skal returnere ikke oppfylt hvis noen vilkår er SKAL_IKKE_VURDERES`() {
+        val vilkårsett = lagVilkårsett(behandlingId, SKAL_IKKE_VURDERES)
         // Guard
         assertThat(
-            vilkårsvurderinger.map { it.type }
+            vilkårsett.map { it.type }
                 .containsAll(VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN)),
         ).isTrue()
-        every { vilkårsvurderingRepository.findByBehandlingId(behandlingId) } returns vilkårsvurderinger
+        every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
 
-        val erAlleVilkårOppfylt = vurderingService.erAlleVilkårOppfylt(behandlingId)
+        val erAlleVilkårOppfylt = vilkårService.erAlleVilkårOppfylt(behandlingId)
         assertThat(erAlleVilkårOppfylt).isFalse
     }
 
-    private fun lagVilkårsvurderinger(
+    private fun lagVilkårsett(
         behandlingId: UUID,
         resultat: Vilkårsresultat = OPPFYLT,
-    ): List<Vilkårsvurdering> {
+    ): List<Vilkår> {
         return VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN).map {
-            vilkårsvurdering(
+            vilkår(
                 behandlingId = behandlingId,
                 resultat = resultat,
                 type = it,
-                delvilkårsvurdering = listOf(),
+                delvilkår = listOf(),
             )
         }
     }

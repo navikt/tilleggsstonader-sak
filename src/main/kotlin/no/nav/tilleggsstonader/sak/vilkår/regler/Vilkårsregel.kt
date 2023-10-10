@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vurdering
@@ -27,13 +27,13 @@ abstract class Vilkårsregel(
     val hovedregler: Set<RegelId>,
 ) {
 
-    open fun initiereDelvilkårsvurdering(
+    open fun initiereDelvilkår(
         metadata: HovedregelMetadata,
         resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
         barnId: UUID? = null,
-    ): List<Delvilkårsvurdering> {
+    ): List<Delvilkår> {
         return hovedregler.map {
-            Delvilkårsvurdering(
+            Delvilkår(
                 resultat,
                 vurderinger = listOf(Vurdering(it)),
             )
@@ -51,8 +51,8 @@ abstract class Vilkårsregel(
         regelId: RegelId,
         svarId: SvarId,
         begrunnelse: String,
-    ): Delvilkårsvurdering {
-        return Delvilkårsvurdering(
+    ): Delvilkår {
+        return Delvilkår(
             resultat = Vilkårsresultat.AUTOMATISK_OPPFYLT,
             listOf(
                 Vurdering(
@@ -64,7 +64,7 @@ abstract class Vilkårsregel(
         )
     }
 
-    protected fun ubesvartDelvilkårsvurdering(regelId: RegelId) = Delvilkårsvurdering(
+    protected fun ubesvartDelvilkår(regelId: RegelId) = Delvilkår(
         resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
         vurderinger = listOf(
             Vurdering(

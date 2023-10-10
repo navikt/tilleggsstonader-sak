@@ -21,12 +21,12 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
-import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkårsvurdering
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårsvurderingWrapper
+import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkår
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.domain.Opphavsvilkår
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -211,20 +211,20 @@ fun Fagsak.tilFagsakDomain() =
         sporbar = sporbar,
     )
 
-fun vilkårsvurdering(
+fun vilkår(
     behandlingId: UUID,
     resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
     type: VilkårType = VilkårType.EKSEMPEL,
-    delvilkårsvurdering: List<Delvilkårsvurdering> = emptyList(),
+    delvilkår: List<Delvilkår> = emptyList(),
     barnId: UUID? = null,
     opphavsvilkår: Opphavsvilkår? = null,
-): Vilkårsvurdering =
-    Vilkårsvurdering(
+): Vilkår =
+    Vilkår(
         behandlingId = behandlingId,
         resultat = resultat,
         type = type,
         barnId = barnId,
-        delvilkårsvurdering = DelvilkårsvurderingWrapper(delvilkårsvurdering),
+        delvilkårwrapper = DelvilkårWrapper(delvilkår),
         opphavsvilkår = opphavsvilkår,
     )
 

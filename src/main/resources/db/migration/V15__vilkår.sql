@@ -1,0 +1,1 @@
+ALTER TABLE vilkarsvurdering RENAME TO vilkar;
