@@ -4,8 +4,8 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårsvurderingDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregler
@@ -37,16 +37,17 @@ class VilkårController(
         return Vilkårsregler.ALLE_VILKÅRSREGLER
     }
 
-    fun oppdaterVurderingVilkår(@RequestBody vilkårsvurdering: SvarPåVurderingerDto): VilkårDto {
-        tilgangService.validerTilgangTilBehandling(vilkårsvurdering.behandlingId, AuditLoggerEvent.UPDATE)
+    @PostMapping
+    fun oppdaterVilkår(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
+        tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         try {
-            return vilkårStegService.oppdaterVilkår(vilkårsvurdering)
+            return vilkårStegService.oppdaterVilkår(svarPåVilkårDto)
         } catch (e: Exception) {
-            val delvilkårJson = objectMapper.writeValueAsString(vilkårsvurdering.delvilkårsvurderinger)
+            val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
-                "id=${vilkårsvurdering.id}" +
-                        " behandlingId=${vilkårsvurdering.behandlingId}" +
+                "id=${svarPåVilkårDto.id}" +
+                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
                         " svar=$delvilkårJson",
             )
             throw e
@@ -54,14 +55,14 @@ class VilkårController(
     }
 
     @PostMapping("nullstill")
-    fun nullstillVilkår(@RequestBody request: OppdaterVilkårsvurderingDto): VilkårDto {
+    fun nullstillVilkår(@RequestBody request: OppdaterVilkårDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårStegService.nullstillVilkår(request)
     }
 
     @PostMapping("ikkevurder")
-    fun settVilkårTilSkalIkkeVurderes(@RequestBody request: OppdaterVilkårsvurderingDto): VilkårDto {
+    fun settVilkårTilSkalIkkeVurderes(@RequestBody request: OppdaterVilkårDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårStegService.settVilkårTilSkalIkkeVurderes(request)
@@ -70,7 +71,7 @@ class VilkårController(
     @GetMapping("{behandlingId}")
     fun getVilkår(@PathVariable behandlingId: UUID): VilkårsvurderingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return vilkårService.hentOpprettEllerOppdaterVurderinger(behandlingId)
+        return vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
     }
 
     @GetMapping("{behandlingId}/oppdater")
@@ -81,7 +82,7 @@ class VilkårController(
     }
 
     /*@PostMapping("gjenbruk")
-    fun gjenbrukVilkår(@RequestBody request: GjenbrukVilkårsvurderingerDto): VilkårDto {
+    fun gjenbrukVilkår(@RequestBody request: GjenbrukVilkårDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(request.kopierBehandlingId, AuditLoggerEvent.ACCESS)
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()

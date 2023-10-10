@@ -25,7 +25,7 @@ object OppdaterVilkår {
      * Oppdaterer [Vilkår] med nye svar og resultat
      * Validerer att svaren er gyldige
      */
-    fun lagNyOppdatertVilkår(
+    fun validerOgOppdatertVilkår(
         vilkår: Vilkår,
         oppdatering: List<DelvilkårDto>,
         vilkårsregler: Map<VilkårType, Vilkårsregel> = ALLE_VILKÅRSREGLER.vilkårsregler,
@@ -119,28 +119,28 @@ object OppdaterVilkår {
         }
     }
 
-    fun utledBehandlingKategori(vilkårsvurderinger: List<Vilkår>): BehandlingKategori {
+    fun utledBehandlingKategori(vilkårsett: List<Vilkår>): BehandlingKategori {
         return BehandlingKategori.NASJONAL
     }
     /*
     val medlemFolketrygd =
-        vilkårsvurderinger.utledVurderinger(VilkårType.FORUTGÅENDE_MEDLEMSKAP, RegelId.SØKER_MEDLEM_I_FOLKETRYGDEN)
+        vilkårsett.utledVurderinger(VilkårType.FORUTGÅENDE_MEDLEMSKAP, RegelId.SØKER_MEDLEM_I_FOLKETRYGDEN)
             .harSvar(SvarId.JA)
 
     val unntakEøsAnnenForelder =
-        vilkårsvurderinger.utledVurderinger(VilkårType.FORUTGÅENDE_MEDLEMSKAP, RegelId.MEDLEMSKAP_UNNTAK)
+        vilkårsett.utledVurderinger(VilkårType.FORUTGÅENDE_MEDLEMSKAP, RegelId.MEDLEMSKAP_UNNTAK)
             .harSvar(SvarId.MEDLEM_MER_ENN_5_ÅR_EØS_ANNEN_FORELDER_TRYGDEDEKKET_I_NORGE)
 
     val unntakEøsMedlemskap =
-        vilkårsvurderinger.utledVurderinger(VilkårType.FORUTGÅENDE_MEDLEMSKAP, RegelId.MEDLEMSKAP_UNNTAK)
+        vilkårsett.utledVurderinger(VilkårType.FORUTGÅENDE_MEDLEMSKAP, RegelId.MEDLEMSKAP_UNNTAK)
             .harSvar(SvarId.MEDLEM_MER_ENN_5_ÅR_EØS)
 
     val borOgOppholderSegINorge =
-        vilkårsvurderinger.utledVurderinger(VilkårType.LOVLIG_OPPHOLD, RegelId.BOR_OG_OPPHOLDER_SEG_I_NORGE)
+        vilkårsett.utledVurderinger(VilkårType.LOVLIG_OPPHOLD, RegelId.BOR_OG_OPPHOLDER_SEG_I_NORGE)
             .harSvar(SvarId.JA)
 
     val unntakEøsOpphold =
-        vilkårsvurderinger.utledVurderinger(VilkårType.LOVLIG_OPPHOLD, RegelId.OPPHOLD_UNNTAK)
+        vilkårsett.utledVurderinger(VilkårType.LOVLIG_OPPHOLD, RegelId.OPPHOLD_UNNTAK)
             .harSvar(SvarId.OPPHOLDER_SEG_I_ANNET_EØS_LAND)
 
     val forutgåendeMedelmskapUtløserEøs =
@@ -151,18 +151,18 @@ object OppdaterVilkår {
 }
 */
 
-    fun erAlleVilkårsvurderingerOppfylt(
-        vilkårsvurderinger: List<Vilkår>,
+    fun erAlleVilkårOppfylt(
+        vilkårsett: List<Vilkår>,
         stønadstype: Stønadstype,
     ): Boolean {
         val inneholderAlleTyperVilkår =
-            vilkårsvurderinger.map { it.type }.containsAll(VilkårType.hentVilkårForStønad(stønadstype))
-        val vilkårsresultat = utledVilkårsresultat(vilkårsvurderinger)
+            vilkårsett.map { it.type }.containsAll(VilkårType.hentVilkårForStønad(stønadstype))
+        val vilkårsresultat = utledVilkårsresultat(vilkårsett)
         return inneholderAlleTyperVilkår && vilkårsresultat.all { it == Vilkårsresultat.OPPFYLT }
     }
 
-    private fun utledVilkårsresultat(lagredeVilkårsvurderinger: List<Vilkår>): List<Vilkårsresultat> {
-        val vilkårsresultat = lagredeVilkårsvurderinger.groupBy { it.type }.map {
+    private fun utledVilkårsresultat(lagretVilkårsett: List<Vilkår>): List<Vilkårsresultat> {
+        val vilkårsresultat = lagretVilkårsett.groupBy { it.type }.map {
             if (it.key.gjelderFlereBarn()) {
                 utledResultatForVilkårSomGjelderFlereBarn(it.value)
             } else {
@@ -184,7 +184,7 @@ object OppdaterVilkår {
                             it == Vilkårsresultat.SKAL_IKKE_VURDERES
                 }
 
-    fun opprettNyeVilkårsvurderinger(
+    fun opprettNyeVilkår(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
         stønadstype: Stønadstype,
@@ -192,14 +192,14 @@ object OppdaterVilkår {
         return vilkårsreglerForStønad(stønadstype)
             .flatMap { vilkårsregel ->
                 if (vilkårsregel.vilkårType.gjelderFlereBarn() && metadata.barn.isNotEmpty()) {
-                    metadata.barn.map { lagNyVilkårsvurdering(vilkårsregel, metadata, behandlingId, it.id) }
+                    metadata.barn.map { lagNyVilkår(vilkårsregel, metadata, behandlingId, it.id) }
                 } else {
-                    listOf(lagNyVilkårsvurdering(vilkårsregel, metadata, behandlingId))
+                    listOf(lagNyVilkår(vilkårsregel, metadata, behandlingId))
                 }
             }
     }
 
-    fun lagVilkårsvurderingForNyttBarn(
+    fun lagVilkårForNyttBarn(
         metadata: HovedregelMetadata,
         behandlingId: UUID,
         barnId: UUID,
@@ -210,7 +210,7 @@ object OppdaterVilkår {
     /*
     return when (stønadstype) {
         OVERGANGSSTØNAD, SKOLEPENGER -> listOf(
-            lagNyVilkårsvurdering(
+            lagNyVilkår(
                 AleneomsorgRegel(),
                 metadata,
                 behandlingId,
@@ -219,26 +219,26 @@ object OppdaterVilkår {
         )
 
         BARNETILSYN -> listOf(
-            lagNyVilkårsvurdering(AleneomsorgRegel(), metadata, behandlingId, barnId),
-            lagNyVilkårsvurdering(AlderPåBarnRegel(), metadata, behandlingId, barnId),
+            lagNyVilkår(AleneomsorgRegel(), metadata, behandlingId, barnId),
+            lagNyVilkår(AlderPåBarnRegel(), metadata, behandlingId, barnId),
         )
     }
     }
      */
 
-    private fun lagNyVilkårsvurdering(
+    private fun lagNyVilkår(
         vilkårsregel: Vilkårsregel,
         metadata: HovedregelMetadata,
         behandlingId: UUID,
         barnId: UUID? = null,
     ): Vilkår {
-        val delvilkårsvurdering = vilkårsregel.initiereDelvilkårsvurdering(metadata, barnId = barnId)
+        val delvilkårsett = vilkårsregel.initiereDelvilkår(metadata, barnId = barnId)
         return Vilkår(
             behandlingId = behandlingId,
             type = vilkårsregel.vilkårType,
             barnId = barnId,
-            delvilkårwrapper = DelvilkårWrapper(delvilkårsvurdering),
-            resultat = utledResultat(vilkårsregel, delvilkårsvurdering.map { it.tilDto() }).vilkår,
+            delvilkårwrapper = DelvilkårWrapper(delvilkårsett),
+            resultat = utledResultat(vilkårsregel, delvilkårsett.map { it.tilDto() }).vilkår,
             opphavsvilkår = null,
         )
     }

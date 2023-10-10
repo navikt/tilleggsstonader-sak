@@ -13,8 +13,8 @@ import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårsvurderingDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår
@@ -38,63 +38,60 @@ class VilkårStegService(
 ) {
 
     @Transactional
-    fun oppdaterVilkår(vilkårsvurderingDto: SvarPåVurderingerDto): VilkårDto {
-        val vilkårsvurdering = vilkårRepository.findByIdOrThrow(vilkårsvurderingDto.id)
-        val behandlingId = vilkårsvurdering.behandlingId
+    fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
+        val vilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
+        val behandlingId = vilkår.behandlingId
 
         validerLåstForVidereRedigering(behandlingId)
-        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, vilkårsvurderingDto.behandlingId)
+        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, svarPåVilkårDto.behandlingId)
 
-        val nyVilkårsvurdering = OppdaterVilkår.lagNyOppdatertVilkår(
-            vilkårsvurdering,
-            vilkårsvurderingDto.delvilkårsvurderinger,
-        )
+        val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, svarPåVilkårDto.delvilkårsett)
         // blankettRepository.deleteById(behandlingId)
-        val oppdatertVilkårsvurderingDto = vilkårRepository.update(nyVilkårsvurdering).tilDto()
-        oppdaterStegOgKategoriPåBehandling(vilkårsvurdering.behandlingId)
-        return oppdatertVilkårsvurderingDto
+        val oppdatertVilkårDto = vilkårRepository.update(oppdatertVilkår).tilDto()
+        oppdaterStegOgKategoriPåBehandling(vilkår.behandlingId)
+        return oppdatertVilkårDto
     }
 
     @Transactional
-    fun nullstillVilkår(vilkårsvurderingDto: OppdaterVilkårsvurderingDto): VilkårDto {
-        val vilkårsvurdering = vilkårRepository.findByIdOrThrow(vilkårsvurderingDto.id)
-        val behandlingId = vilkårsvurdering.behandlingId
+    fun nullstillVilkår(oppdaterVilkårDto: OppdaterVilkårDto): VilkårDto {
+        val vilkår = vilkårRepository.findByIdOrThrow(oppdaterVilkårDto.id)
+        val behandlingId = vilkår.behandlingId
 
-        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, vilkårsvurderingDto.behandlingId)
+        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
         validerLåstForVidereRedigering(behandlingId)
 
         // blankettRepository.deleteById(behandlingId)
 
-        val nullstillVilkårMedNyeHovedregler = nullstillVilkårMedNyeHovedregler(behandlingId, vilkårsvurdering)
+        val oppdatertVilkår = nullstillVilkårMedNyeHovedregler(behandlingId, vilkår)
         oppdaterStegOgKategoriPåBehandling(behandlingId)
-        return nullstillVilkårMedNyeHovedregler
+        return oppdatertVilkår
     }
 
     @Transactional
-    fun settVilkårTilSkalIkkeVurderes(vilkårsvurderingDto: OppdaterVilkårsvurderingDto): VilkårDto {
-        val vilkårsvurdering = vilkårRepository.findByIdOrThrow(vilkårsvurderingDto.id)
-        val behandlingId = vilkårsvurdering.behandlingId
+    fun settVilkårTilSkalIkkeVurderes(oppdaterVilkårDto: OppdaterVilkårDto): VilkårDto {
+        val vilkår = vilkårRepository.findByIdOrThrow(oppdaterVilkårDto.id)
+        val behandlingId = vilkår.behandlingId
 
-        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, vilkårsvurderingDto.behandlingId)
+        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
         validerLåstForVidereRedigering(behandlingId)
 
         // blankettRepository.deleteById(behandlingId)
 
-        val oppdatertVilkår = oppdaterVilkårsvurderingTilSkalIkkeVurderes(behandlingId, vilkårsvurdering)
+        val oppdatertVilkår = oppdaterVilkårTilSkalIkkeVurderes(behandlingId, vilkår)
         oppdaterStegOgKategoriPåBehandling(behandlingId)
         return oppdatertVilkår
     }
 
     private fun oppdaterStegOgKategoriPåBehandling(behandlingId: UUID) {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        val lagredeVilkårsvurderinger = vilkårRepository.findByBehandlingId(behandlingId)
+        val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
 
-        oppdaterStegPåBehandling(saksbehandling, lagredeVilkårsvurderinger)
-        oppdaterKategoriPåBehandling(saksbehandling, lagredeVilkårsvurderinger)
+        oppdaterStegPåBehandling(saksbehandling, vilkårsett)
+        oppdaterKategoriPåBehandling(saksbehandling, vilkårsett)
     }
 
-    private fun oppdaterStegPåBehandling(saksbehandling: Saksbehandling, vilkårsvurderinger: List<Vilkår>) {
-        val vilkårsresultat = vilkårsvurderinger.groupBy { it.type }.map {
+    private fun oppdaterStegPåBehandling(saksbehandling: Saksbehandling, vilkårsett: List<Vilkår>) {
+        val vilkårsresultat = vilkårsett.groupBy { it.type }.map {
             if (it.key.gjelderFlereBarn()) {
                 utledResultatForVilkårSomGjelderFlereBarn(it.value)
             } else {
@@ -120,10 +117,10 @@ class VilkårStegService(
 
     private fun oppdaterKategoriPåBehandling(
         saksbehandling: Saksbehandling,
-        vilkårsvurderinger: List<Vilkår>,
+        vilkårsett: List<Vilkår>,
     ) {
         val lagretKategori = saksbehandling.kategori
-        val utledetKategori = utledBehandlingKategori(vilkårsvurderinger)
+        val utledetKategori = utledBehandlingKategori(vilkårsett)
 
         if (lagretKategori != utledetKategori) {
             behandlingService.oppdaterKategoriPåBehandling(saksbehandling.id, utledetKategori)
@@ -139,31 +136,31 @@ class VilkårStegService(
         vilkår: Vilkår,
     ): VilkårDto {
         val metadata = hentHovedregelMetadata(behandlingId)
-        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkårsvurdering(metadata)
-        val delvilkårsvurdering = DelvilkårWrapper(nyeDelvilkår)
+        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkår(metadata)
+        val delvilkårWrapper = DelvilkårWrapper(nyeDelvilkår)
         return vilkårRepository.update(
             vilkår.copy(
                 resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                delvilkårwrapper = delvilkårsvurdering,
+                delvilkårwrapper = delvilkårWrapper,
                 opphavsvilkår = null,
             ),
         ).tilDto()
     }
 
-    private fun oppdaterVilkårsvurderingTilSkalIkkeVurderes(
+    private fun oppdaterVilkårTilSkalIkkeVurderes(
         behandlingId: UUID,
         vilkår: Vilkår,
     ): VilkårDto {
         val metadata = hentHovedregelMetadata(behandlingId)
-        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkårsvurdering(
+        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkår(
             metadata,
             Vilkårsresultat.SKAL_IKKE_VURDERES,
         )
-        val delvilkårsvurdering = DelvilkårWrapper(nyeDelvilkår)
+        val delvilkårWrapper = DelvilkårWrapper(nyeDelvilkår)
         return vilkårRepository.update(
             vilkår.copy(
                 resultat = Vilkårsresultat.SKAL_IKKE_VURDERES,
-                delvilkårwrapper = delvilkårsvurdering,
+                delvilkårwrapper = delvilkårWrapper,
                 opphavsvilkår = null,
             ),
         ).tilDto()

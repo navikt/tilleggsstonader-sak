@@ -27,7 +27,7 @@ abstract class Vilkårsregel(
     val hovedregler: Set<RegelId>,
 ) {
 
-    open fun initiereDelvilkårsvurdering(
+    open fun initiereDelvilkår(
         metadata: HovedregelMetadata,
         resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
         barnId: UUID? = null,
@@ -64,7 +64,7 @@ abstract class Vilkårsregel(
         )
     }
 
-    protected fun ubesvartDelvilkårsvurdering(regelId: RegelId) = Delvilkår(
+    protected fun ubesvartDelvilkår(regelId: RegelId) = Delvilkår(
         resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
         vurderinger = listOf(
             Vurdering(

@@ -116,10 +116,10 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     @WritingConverter
     class DelvilkårTilPGobjectConverter : Converter<DelvilkårWrapper, PGobject> {
 
-        override fun convert(delvilkårsvurdering: DelvilkårWrapper): PGobject =
+        override fun convert(delvilkårWrapper: DelvilkårWrapper): PGobject =
             PGobject().apply {
                 type = "json"
-                value = objectMapper.writeValueAsString(delvilkårsvurdering.delvilkårsett)
+                value = objectMapper.writeValueAsString(delvilkårWrapper.delvilkårsett)
             }
     }
 

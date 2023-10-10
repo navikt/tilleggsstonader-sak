@@ -28,9 +28,9 @@ object RegelEvaluering {
     /**
      * @return [RegelResultat] med resultat for vilkåret og delvilkår
      */
-    fun utledResultat(vilkårsregel: Vilkårsregel, delvilkår: List<DelvilkårDto>): RegelResultat {
-        val delvilkårResultat = delvilkår.associate { vurdering ->
-            vurdering.hovedregel() to utledResultatForDelvilkår(vilkårsregel, vurdering)
+    fun utledResultat(vilkårsregel: Vilkårsregel, delvilkårsett: List<DelvilkårDto>): RegelResultat {
+        val delvilkårResultat = delvilkårsett.associate { delvilkår ->
+            delvilkår.hovedregel() to utledResultatForDelvilkår(vilkårsregel, delvilkår)
         }
         return RegelResultat(
             vilkårType = vilkårsregel.vilkårType,
@@ -56,9 +56,9 @@ object RegelEvaluering {
      */
     private fun utledResultatForDelvilkår(
         vilkårsregel: Vilkårsregel,
-        vurdering: DelvilkårDto,
+        delvilkår: DelvilkårDto,
     ): Vilkårsresultat {
-        vurdering.vurderinger.forEach { svar ->
+        delvilkår.vurderinger.forEach { svar ->
             val regel = vilkårsregel.regel(svar.regelId)
             val svarId = svar.svar ?: return Vilkårsresultat.IKKE_TATT_STILLING_TIL
             val svarMapping = regel.svarMapping(svarId)

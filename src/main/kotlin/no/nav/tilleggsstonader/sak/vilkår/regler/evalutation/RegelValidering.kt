@@ -18,14 +18,14 @@ object RegelValidering {
 
     fun validerVilkår(
         vilkårsregel: Vilkårsregel,
-        oppdatering: List<DelvilkårDto>,
-        tidligereDelvilkår: List<Delvilkår>,
+        oppdatertDelvilkårsett: List<DelvilkårDto>,
+        tidligereDelvilkårsett: List<Delvilkår>,
     ) {
-        validerAlleDelvilkårHarMinimumEttSvar(vilkårsregel.vilkårType, oppdatering)
-        validerAlleHovedreglerFinnesMed(vilkårsregel, oppdatering, tidligereDelvilkår)
+        validerAlleDelvilkårHarMinimumEttSvar(vilkårsregel.vilkårType, oppdatertDelvilkårsett)
+        validerAlleHovedreglerFinnesMed(vilkårsregel, oppdatertDelvilkårsett, tidligereDelvilkårsett)
 
-        oppdatering.forEach { delvilkårsvurderingDto ->
-            validerDelvilkår(vilkårsregel, delvilkårsvurderingDto)
+        oppdatertDelvilkårsett.forEach { oppdatertDelvilkår ->
+            validerDelvilkår(vilkårsregel, oppdatertDelvilkår)
         }
     }
 
@@ -76,23 +76,23 @@ object RegelValidering {
      */
     private fun validerAlleDelvilkårHarMinimumEttSvar(
         vilkårType: VilkårType,
-        oppdatering: List<DelvilkårDto>,
+        delvilkårsett: List<DelvilkårDto>,
     ) {
-        oppdatering.forEach { vurdering ->
-            feilHvis(vurdering.vurderinger.isEmpty()) { "Savner svar for en av delvilkåren for vilkår=$vilkårType" }
+        delvilkårsett.forEach { delvilkår ->
+            feilHvis(delvilkår.vurderinger.isEmpty()) { "Savner svar for en av delvilkåren for vilkår=$vilkårType" }
         }
     }
 
     private fun validerAlleHovedreglerFinnesMed(
         vilkårsregel: Vilkårsregel,
         delvilkår: List<DelvilkårDto>,
-        tidligereDelvilkårsvurderinger: List<Delvilkår>,
+        tidligereDelvilkårsett: List<Delvilkår>,
     ) {
-        val aktuelleDelvilkår = aktuelleDelvilkår(tidligereDelvilkårsvurderinger)
+        val aktuelleDelvilkår = aktuelleDelvilkår(tidligereDelvilkårsett)
         val delvilkårRegelIdn = delvilkår.map { it.hovedregel() }
         val aktuelleHvovedregler = vilkårsregel.hovedregler.filter { aktuelleDelvilkår.contains(it) }
         feilHvis(!aktuelleHvovedregler.containsAll(delvilkårRegelIdn)) {
-            "Delvilkårsvurderinger savner svar på hovedregler - hovedregler=$aktuelleHvovedregler delvilkår=$delvilkårRegelIdn"
+            "Delvilkårsett mangler svar på hovedregler - hovedregler=$aktuelleHvovedregler delvilkår=$delvilkårRegelIdn"
         }
         feilHvis(delvilkårRegelIdn.size != aktuelleHvovedregler.size) {
             "Feil i antall regler dto har ${delvilkårRegelIdn.size} " +
@@ -100,8 +100,8 @@ object RegelValidering {
         }
     }
 
-    private fun aktuelleDelvilkår(tidligereDelvilkårsvurderinger: List<Delvilkår>): Set<RegelId> {
-        return tidligereDelvilkårsvurderinger
+    private fun aktuelleDelvilkår(tidligereDelvilkårsett: List<Delvilkår>): Set<RegelId> {
+        return tidligereDelvilkårsett
             .filter { it.resultat != Vilkårsresultat.IKKE_AKTUELL }
             .map { it.hovedregel }
             .toSet()
