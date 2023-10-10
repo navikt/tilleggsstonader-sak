@@ -94,7 +94,7 @@ internal class VilkårStegServiceTest {
     private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
     val fagsak = fagsak()
     private val behandling = behandling(fagsak, BehandlingStatus.OPPRETTET)
-    private val behandlingId = UUID.randomUUID()
+    private val behandlingId = behandling.id
 
     @BeforeEach
     fun setUp() {
@@ -106,7 +106,7 @@ internal class VilkårStegServiceTest {
         // every { søknadService.hentSøknadsgrunnlag(any()) }.returns(søknad)
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsak(stønadstype = Stønadstype.BARNETILSYN)
         every { vilkårRepository.insertAll(any()) } answers { firstArg() }
-        every { vilkårGrunnlagService.hentGrunnlag(any(), any(), any()) } returns
+        every { vilkårGrunnlagService.hentGrunnlag(any()) } returns
             mockVilkårGrunnlagDto()
 
         justRun { behandlingshistorikkService.opprettHistorikkInnslag(any(), any(), any(), any()) }
