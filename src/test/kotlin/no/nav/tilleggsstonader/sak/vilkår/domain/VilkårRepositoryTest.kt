@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.vilkårsvurdering
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.regler.SvarId
 import org.assertj.core.api.Assertions.assertThat
@@ -32,8 +32,8 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         val behandling = behandlingRepository.insert(behandling(fagsak))
 
         val vurderinger = listOf(Vurdering(RegelId.HAR_ET_NAVN, SvarId.JA, "ja"))
-        val vilkårsvurdering = vilkårRepository.insert(
-            vilkårsvurdering(
+        val vilkår = vilkårRepository.insert(
+            vilkår(
                 behandlingId = behandling.id,
                 resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
                 type = VilkårType.EKSEMPEL,
@@ -44,22 +44,22 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         )
 
         assertThat(vilkårRepository.findByBehandlingId(UUID.randomUUID())).isEmpty()
-        assertThat(vilkårRepository.findByBehandlingId(behandling.id)).containsOnly(vilkårsvurdering)
+        assertThat(vilkårRepository.findByBehandlingId(behandling.id)).containsOnly(vilkår)
     }
 
     @Test
     internal fun `vilkårsvurdering uten opphavsvilkår`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak))
-        val vilkårsvurdering = vilkårRepository.insert(
-            vilkårsvurdering(
+        val vilkår = vilkårRepository.insert(
+            vilkår(
                 behandlingId = behandling.id,
                 resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
                 type = VilkårType.EKSEMPEL,
                 opphavsvilkår = null,
             ),
         )
-        assertThat(vilkårRepository.findByBehandlingId(behandling.id)).containsOnly(vilkårsvurdering)
+        assertThat(vilkårRepository.findByBehandlingId(behandling.id)).containsOnly(vilkår)
     }
 
     @Test
@@ -67,8 +67,8 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak))
 
-        val vilkårsvurdering = vilkårRepository.insert(
-            vilkårsvurdering(
+        val vilkår = vilkårRepository.insert(
+            vilkår(
                 behandling.id,
                 Vilkårsresultat.IKKE_TATT_STILLING_TIL,
                 VilkårType.EKSEMPEL,
@@ -76,9 +76,9 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         )
         val nyttTidspunkt = LocalDateTime.now().minusDays(1).truncatedTo(ChronoUnit.MILLIS)
 
-        vilkårRepository.oppdaterEndretTid(vilkårsvurdering.id, nyttTidspunkt)
+        vilkårRepository.oppdaterEndretTid(vilkår.id, nyttTidspunkt)
 
-        assertThat(vilkårRepository.findByIdOrThrow(vilkårsvurdering.id).sporbar.endret.endretTid).isEqualTo(
+        assertThat(vilkårRepository.findByIdOrThrow(vilkår.id).sporbar.endret.endretTid).isEqualTo(
             nyttTidspunkt,
         )
     }
@@ -91,15 +91,15 @@ internal class VilkårRepositoryTest : IntegrationTest() {
 
         val vilkår: Vilkår = testWithBrukerContext(preferredUsername = saksbehandler) {
             vilkårRepository.insert(
-                vilkårsvurdering(behandling.id, Vilkårsresultat.IKKE_TATT_STILLING_TIL, VilkårType.EKSEMPEL),
+                vilkår(behandling.id, Vilkårsresultat.IKKE_TATT_STILLING_TIL, VilkårType.EKSEMPEL),
             )
         }
         assertThat(vilkår.sporbar.opprettetAv).isEqualTo(saksbehandler)
         assertThat(vilkår.sporbar.endret.endretAv).isEqualTo(saksbehandler)
 
         vilkårRepository.settMaskinelltOpprettet(vilkår.id)
-        val oppdatertVilkårsvurdering = vilkårRepository.findByIdOrThrow(vilkår.id)
-        assertThat(oppdatertVilkårsvurdering.sporbar.opprettetAv).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
-        assertThat(oppdatertVilkårsvurdering.sporbar.endret.endretAv).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
+        val oppdatertVilkår = vilkårRepository.findByIdOrThrow(vilkår.id)
+        assertThat(oppdatertVilkår.sporbar.opprettetAv).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
+        assertThat(oppdatertVilkår.sporbar.endret.endretAv).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
     }
 }

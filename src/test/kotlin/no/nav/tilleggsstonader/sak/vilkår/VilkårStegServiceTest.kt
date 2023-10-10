@@ -23,7 +23,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
-import no.nav.tilleggsstonader.sak.util.vilkårsvurdering
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtil.mockVilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.Opphavsvilkår
@@ -33,13 +33,13 @@ import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårsvurderingDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkårsvurderinger
+import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkårsreglerForStønad
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
@@ -120,26 +120,26 @@ internal class VilkårStegServiceTest {
     }
 
     @Test
-    internal fun `kan ikke oppdatere vilkårsvurdering koblet til en behandling som ikke finnes`() {
-        val vurderingId = UUID.randomUUID()
-        every { vilkårRepository.findByIdOrNull(vurderingId) } returns null
+    internal fun `kan ikke oppdatere vilkår koblet til en behandling som ikke finnes`() {
+        val vilkårId = UUID.randomUUID()
+        every { vilkårRepository.findByIdOrNull(vilkårId) } returns null
         assertThat(
             catchThrowable {
                 vilkårStegService.oppdaterVilkår(
-                    SvarPåVurderingerDto(
-                        id = vurderingId,
+                    SvarPåVilkårDto(
+                        id = vilkårId,
                         behandlingId = behandlingId,
-                        delvilkårsvurderinger = listOf(),
+                        delvilkårsett = listOf(),
                     ),
                 )
             },
-        ).hasMessageContaining("Finner ikke Vilkårsvurdering med id")
+        ).hasMessageContaining("Finner ikke Vilkår med id")
     }
 
     @Test
-    internal fun `skal oppdatere vilkårsvurdering med resultat, begrunnelse og unntak`() {
+    internal fun `skal oppdatere vilkår med resultat, begrunnelse og unntak`() {
         val lagretVilkår = slot<Vilkår>()
-        val vilkårsvurdering = initiererVurderinger(lagretVilkår)
+        val vilkår = initiererVilkår(lagretVilkår)
 
         val delvilkårDto = listOf(
             DelvilkårDto(
@@ -148,79 +148,79 @@ internal class VilkårStegServiceTest {
             ),
         )
         vilkårStegService.oppdaterVilkår(
-            SvarPåVurderingerDto(
-                id = vilkårsvurdering.id,
+            SvarPåVilkårDto(
+                id = vilkår.id,
                 behandlingId = behandlingId,
-                delvilkårsvurderinger = delvilkårDto,
+                delvilkårsett = delvilkårDto,
             ),
         )
 
         assertThat(lagretVilkår.captured.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
-        assertThat(lagretVilkår.captured.type).isEqualTo(vilkårsvurdering.type)
+        assertThat(lagretVilkår.captured.type).isEqualTo(vilkår.type)
         assertThat(lagretVilkår.captured.opphavsvilkår).isNull()
 
-        val delvilkårsvurdering = lagretVilkår.captured.delvilkårsett.first()
-        assertThat(delvilkårsvurdering.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
-        assertThat(delvilkårsvurdering.vurderinger).hasSize(1)
-        assertThat(delvilkårsvurdering.vurderinger.first().svar).isEqualTo(SvarId.JA)
-        assertThat(delvilkårsvurdering.vurderinger.first().begrunnelse).isEqualTo("a")
+        val delvilkår = lagretVilkår.captured.delvilkårsett.first()
+        assertThat(delvilkår.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+        assertThat(delvilkår.vurderinger).hasSize(1)
+        assertThat(delvilkår.vurderinger.first().svar).isEqualTo(SvarId.JA)
+        assertThat(delvilkår.vurderinger.first().begrunnelse).isEqualTo("a")
     }
 
     @Test
-    internal fun `skal oppdatere vilkårsvurdering med resultat SKAL_IKKE_VURDERES`() {
+    internal fun `skal oppdatere vilkår med resultat SKAL_IKKE_VURDERES`() {
         every { barnService.finnBarnPåBehandling(behandlingId) } returns barn
-        val oppdatertVurdering = slot<Vilkår>()
-        val vilkårsvurdering = initiererVurderinger(oppdatertVurdering)
+        val oppdatertVilkår = slot<Vilkår>()
+        val vilkår = initiererVilkår(oppdatertVilkår)
 
         vilkårStegService.settVilkårTilSkalIkkeVurderes(
-            OppdaterVilkårsvurderingDto(
-                id = vilkårsvurdering.id,
+            OppdaterVilkårDto(
+                id = vilkår.id,
                 behandlingId = behandlingId,
             ),
         )
 
-        assertThat(oppdatertVurdering.captured.resultat).isEqualTo(Vilkårsresultat.SKAL_IKKE_VURDERES)
-        assertThat(oppdatertVurdering.captured.type).isEqualTo(vilkårsvurdering.type)
-        assertThat(oppdatertVurdering.captured.opphavsvilkår).isNull()
+        assertThat(oppdatertVilkår.captured.resultat).isEqualTo(Vilkårsresultat.SKAL_IKKE_VURDERES)
+        assertThat(oppdatertVilkår.captured.type).isEqualTo(vilkår.type)
+        assertThat(oppdatertVilkår.captured.opphavsvilkår).isNull()
 
-        val delvilkårsvurdering = oppdatertVurdering.captured.delvilkårsett.first()
-        assertThat(delvilkårsvurdering.resultat).isEqualTo(Vilkårsresultat.SKAL_IKKE_VURDERES)
-        assertThat(delvilkårsvurdering.vurderinger).hasSize(1)
-        assertThat(delvilkårsvurdering.vurderinger.first().svar).isNull()
-        assertThat(delvilkårsvurdering.vurderinger.first().begrunnelse).isNull()
+        val delvilkårsett = oppdatertVilkår.captured.delvilkårsett.first()
+        assertThat(delvilkårsett.resultat).isEqualTo(Vilkårsresultat.SKAL_IKKE_VURDERES)
+        assertThat(delvilkårsett.vurderinger).hasSize(1)
+        assertThat(delvilkårsett.vurderinger.first().svar).isNull()
+        assertThat(delvilkårsett.vurderinger.first().begrunnelse).isNull()
     }
 
     @Test
-    internal fun `nullstille skal fjerne opphavsvilkår fra vilkårsvurdering`() {
+    internal fun `nullstille skal fjerne opphavsvilkår fra vilkår`() {
         every { barnService.finnBarnPåBehandling(behandlingId) } returns barn
-        val oppdatertVurdering = slot<Vilkår>()
-        val vilkårsvurdering = initiererVurderinger(oppdatertVurdering)
+        val oppdatertVilkår = slot<Vilkår>()
+        val vilkår = initiererVilkår(oppdatertVilkår)
 
-        vilkårStegService.nullstillVilkår(OppdaterVilkårsvurderingDto(vilkårsvurdering.id, behandlingId))
+        vilkårStegService.nullstillVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
 
-        assertThat(oppdatertVurdering.captured.resultat).isEqualTo(Vilkårsresultat.IKKE_TATT_STILLING_TIL)
-        assertThat(oppdatertVurdering.captured.type).isEqualTo(vilkårsvurdering.type)
-        assertThat(oppdatertVurdering.captured.opphavsvilkår).isNull()
+        assertThat(oppdatertVilkår.captured.resultat).isEqualTo(Vilkårsresultat.IKKE_TATT_STILLING_TIL)
+        assertThat(oppdatertVilkår.captured.type).isEqualTo(vilkår.type)
+        assertThat(oppdatertVilkår.captured.opphavsvilkår).isNull()
     }
 
     @Test
-    internal fun `skal ikke oppdatere vilkårsvurdering hvis behandlingen er låst for videre behandling`() {
+    internal fun `skal ikke oppdatere vilkår hvis behandlingen er låst for videre behandling`() {
         every { behandlingService.hentBehandling(behandlingId) } returns behandling(
             fagsak(),
             BehandlingStatus.FERDIGSTILT,
         )
-        val vilkårsvurdering = vilkårsvurdering(
+        val vilkår = vilkår(
             behandlingId,
             resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
             VilkårType.EKSEMPEL,
         )
-        every { vilkårRepository.findByIdOrNull(vilkårsvurdering.id) } returns vilkårsvurdering
+        every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
         assertThat(
             catchThrowable {
                 vilkårStegService.oppdaterVilkår(
-                    SvarPåVurderingerDto(
-                        id = vilkårsvurdering.id,
+                    SvarPåVilkårDto(
+                        id = vilkår.id,
                         behandlingId = behandlingId,
                         listOf(),
                     ),
@@ -238,7 +238,7 @@ internal class VilkårStegServiceTest {
             status = BehandlingStatus.OPPRETTET,
         )
         val lagretVilkår = slot<Vilkår>()
-        val vilkårsvurdering = initiererVurderinger(lagretVilkår)
+        val vilkår = initiererVilkår(lagretVilkår)
         val delvilkårDto = listOf(
             DelvilkårDto(
                 Vilkårsresultat.IKKE_OPPFYLT,
@@ -246,10 +246,10 @@ internal class VilkårStegServiceTest {
             ),
         )
         vilkårStegService.oppdaterVilkår(
-            SvarPåVurderingerDto(
-                id = vilkårsvurdering.id,
+            SvarPåVilkårDto(
+                id = vilkår.id,
                 behandlingId = behandlingId,
-                delvilkårsvurderinger = delvilkårDto,
+                delvilkårsett = delvilkårDto,
             ),
         )
 
@@ -272,7 +272,7 @@ internal class VilkårStegServiceTest {
             status = BehandlingStatus.UTREDES,
         )
         val lagretVilkår = slot<Vilkår>()
-        val vilkårsvurdering = initiererVurderinger(lagretVilkår)
+        val vilkår = initiererVilkår(lagretVilkår)
         val delvilkårDto = listOf(
             DelvilkårDto(
                 Vilkårsresultat.IKKE_OPPFYLT,
@@ -280,10 +280,10 @@ internal class VilkårStegServiceTest {
             ),
         )
         vilkårStegService.oppdaterVilkår(
-            SvarPåVurderingerDto(
-                id = vilkårsvurdering.id,
+            SvarPåVilkårDto(
+                id = vilkår.id,
                 behandlingId = behandlingId,
-                delvilkårsvurderinger = delvilkårDto,
+                delvilkårsett = delvilkårDto,
             ),
         )
 
@@ -300,8 +300,8 @@ internal class VilkårStegServiceTest {
 
     @Test
     internal fun `behandlingen uten barn skal likevel opprette et vilkår for aleneomsorg`() {
-        val vilkårsvurderinger =
-            opprettNyeVilkårsvurderinger(
+        val vilkårsett =
+            opprettNyeVilkår(
                 behandlingId,
                 HovedregelMetadata(
                     barn = emptyList(),
@@ -310,14 +310,14 @@ internal class VilkårStegServiceTest {
                 Stønadstype.BARNETILSYN,
             )
 
-        assertThat(vilkårsvurderinger).hasSize(vilkårsreglerForStønad(Stønadstype.BARNETILSYN).size)
-        assertThat(vilkårsvurderinger.count { it.type == VilkårType.EKSEMPEL }).isEqualTo(1)
+        assertThat(vilkårsett).hasSize(vilkårsreglerForStønad(Stønadstype.BARNETILSYN).size)
+        assertThat(vilkårsett.count { it.type == VilkårType.EKSEMPEL }).isEqualTo(1)
     }
 
     // KUN FOR Å TESTE OPPDATERSTEG
-    private fun initiererVurderinger(lagretVilkår: CapturingSlot<Vilkår>): Vilkår {
-        val vilkårsvurdering =
-            vilkårsvurdering(
+    private fun initiererVilkår(lagretVilkår: CapturingSlot<Vilkår>): Vilkår {
+        val vilkår =
+            vilkår(
                 behandlingId,
                 Vilkårsresultat.IKKE_TATT_STILLING_TIL,
                 VilkårType.EKSEMPEL,
@@ -329,8 +329,8 @@ internal class VilkårStegServiceTest {
                 ),
                 opphavsvilkår = Opphavsvilkår(UUID.randomUUID(), LocalDateTime.now()),
             )
-        val vilkårsvurderinger =
-            opprettNyeVilkårsvurderinger(
+        val vilkårsett =
+            opprettNyeVilkår(
                 behandlingId,
                 HovedregelMetadata(
                     barn = barn,
@@ -338,12 +338,12 @@ internal class VilkårStegServiceTest {
                 ),
                 Stønadstype.BARNETILSYN,
             )
-                .map { if (it.type == vilkårsvurdering.type) vilkårsvurdering else it }
+                .map { if (it.type == vilkår.type) vilkår else it }
 
-        every { vilkårRepository.findByIdOrNull(vilkårsvurdering.id) } returns vilkårsvurdering
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsvurderinger
+        every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
+        every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
         every { vilkårRepository.update(capture(lagretVilkår)) } answers
             { it.invocation.args.first() as Vilkår }
-        return vilkårsvurdering
+        return vilkår
     }
 }

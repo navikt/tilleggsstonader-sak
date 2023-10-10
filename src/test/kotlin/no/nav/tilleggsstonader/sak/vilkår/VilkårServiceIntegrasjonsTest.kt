@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
-import no.nav.tilleggsstonader.sak.util.vilkårsvurdering
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
@@ -47,7 +47,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     lateinit var barnRepository: BarnRepository
 
     @Test
-    internal fun `kopierVurderingerTilNyBehandling - skal kopiere vurderinger til ny behandling`() {
+    internal fun `kopierVilkårsettTilNyBehandling - skal kopiere vilkår til ny behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
         val revurdering = behandlingRepository.insert(behandling(fagsak))
@@ -60,7 +60,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             barnPåRevurdering,
             mockk(),
         )
-        vilkårService.kopierVurderingerTilNyBehandling(
+        vilkårService.kopierVilkårsettTilNyBehandling(
             behandling.id,
             revurdering.id,
             metadata,
@@ -95,7 +95,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     }
 
     @Test
-    internal fun `kopierVurderingerTilNyBehandling - skal kaste feil hvis det ikke finnes noen vurderinger`() {
+    internal fun `kopierVilkårsettTilNyBehandling - skal kaste feil hvis det ikke finnes noen vurderinger`() {
         val tidligereBehandlingId = UUID.randomUUID()
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val revurdering = behandlingRepository.insert(behandling(fagsak))
@@ -105,7 +105,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         )
         assertThat(
             catchThrowable {
-                vilkårService.kopierVurderingerTilNyBehandling(
+                vilkårService.kopierVilkårsettTilNyBehandling(
                     tidligereBehandlingId,
                     revurdering.id,
                     metadata,
@@ -126,17 +126,17 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
                 barn = barn,
                 behandling = mockk(),
             )
-        val delvilkårsvurdering = EksempelRegel().initiereDelvilkårsvurdering(hovedregelMetadata)
-        val vilkårsvurderinger = listOf(
-            vilkårsvurdering(
+        val delvilkårsett = EksempelRegel().initiereDelvilkår(hovedregelMetadata)
+        val vilkårsett = listOf(
+            vilkår(
                 resultat = Vilkårsresultat.OPPFYLT,
                 type = VilkårType.EKSEMPEL,
                 behandlingId = behandling.id,
                 barnId = barn.first().id,
-                delvilkår = delvilkårsvurdering,
+                delvilkår = delvilkårsett,
             ),
         )
-        return vilkårRepository.insertAll(vilkårsvurderinger)
+        return vilkårRepository.insertAll(vilkårsett)
     }
 
     private fun lagreSøknad(

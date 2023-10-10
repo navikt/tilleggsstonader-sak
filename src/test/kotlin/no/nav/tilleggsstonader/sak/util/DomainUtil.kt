@@ -211,7 +211,7 @@ fun Fagsak.tilFagsakDomain() =
         sporbar = sporbar,
     )
 
-fun vilkårsvurdering(
+fun vilkår(
     behandlingId: UUID,
     resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
     type: VilkårType = VilkårType.EKSEMPEL,

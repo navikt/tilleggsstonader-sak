@@ -117,7 +117,7 @@ internal class RegelValideringTest {
         regel: Vilkårsregel,
         vararg vurderinger: VurderingDto,
     ) {
-        valider(regel, delvilkårsvurderingDto(*vurderinger))
+        valider(regel, delvilkårDto(*vurderinger))
     }
 
     private fun valider(
@@ -126,8 +126,8 @@ internal class RegelValideringTest {
     ) {
         RegelValidering.validerVilkår(
             vilkårsregel = regel,
-            oppdatering = delvilkårDto.toList(),
-            tidligereDelvilkår = regel.initiereDelvilkårsvurdering(mockk()),
+            oppdatertDelvilkårsett = delvilkårDto.toList(),
+            tidligereDelvilkårsett = regel.initiereDelvilkår(mockk()),
         )
     }
 }
