@@ -34,6 +34,8 @@ data class Vilkår(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "opphavsvilkaar_")
     val opphavsvilkår: Opphavsvilkår?,
 ) {
+    val delvilkårsett get() = delvilkårwrapper.delvilkårsett
+
     init {
         require(resultat.erIkkeDelvilkårsresultat()) // Verdien AUTOMATISK_OPPFYLT er kun forbeholdt delvilkår
     }
@@ -46,7 +48,7 @@ data class Vilkår(
 }
 
 fun List<Vilkår>.utledVurderinger(vilkårType: VilkårType, regelId: RegelId) =
-    this.filter { it.type == vilkårType }.flatMap { it.delvilkårwrapper.delvilkårsett }
+    this.filter { it.type == vilkårType }.flatMap { it.delvilkårsett }
         .flatMap { it.vurderinger }
         .filter { it.regelId == regelId }
 

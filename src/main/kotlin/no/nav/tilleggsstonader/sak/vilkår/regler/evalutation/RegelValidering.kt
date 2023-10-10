@@ -16,13 +16,13 @@ import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregel
 
 object RegelValidering {
 
-    fun validerVurdering(
+    fun validerVilkår(
         vilkårsregel: Vilkårsregel,
         oppdatering: List<DelvilkårDto>,
-        tidligereDelvilkårsvurderinger: List<Delvilkår>,
+        tidligereDelvilkår: List<Delvilkår>,
     ) {
         validerAlleDelvilkårHarMinimumEttSvar(vilkårsregel.vilkårType, oppdatering)
-        validerAlleHovedreglerFinnesMed(vilkårsregel, oppdatering, tidligereDelvilkårsvurderinger)
+        validerAlleHovedreglerFinnesMed(vilkårsregel, oppdatering, tidligereDelvilkår)
 
         oppdatering.forEach { delvilkårsvurderingDto ->
             validerDelvilkår(vilkårsregel, delvilkårsvurderingDto)

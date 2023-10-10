@@ -124,10 +124,10 @@ internal class RegelValideringTest {
         regel: Vilkårsregel,
         vararg delvilkårDto: DelvilkårDto,
     ) {
-        RegelValidering.validerVurdering(
+        RegelValidering.validerVilkår(
             vilkårsregel = regel,
             oppdatering = delvilkårDto.toList(),
-            tidligereDelvilkårsvurderinger = regel.initiereDelvilkårsvurdering(mockk()),
+            tidligereDelvilkår = regel.initiereDelvilkårsvurdering(mockk()),
         )
     }
 }

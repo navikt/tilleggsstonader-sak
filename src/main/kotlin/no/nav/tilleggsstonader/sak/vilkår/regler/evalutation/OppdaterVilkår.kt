@@ -5,9 +5,9 @@ import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.svarTilDomene
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregler.Companion.ALLE_VILKÅRSREGLER
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.RegelEvaluering.utledResultat
-import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.RegelValidering.validerVurdering
+import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.RegelValidering.validerVilkår
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkårsreglerForStønad
 import java.util.UUID
 
@@ -25,7 +25,7 @@ object OppdaterVilkår {
      * Oppdaterer [Vilkår] med nye svar og resultat
      * Validerer att svaren er gyldige
      */
-    fun lagNyOppdatertVilkårsvurdering(
+    fun lagNyOppdatertVilkår(
         vilkår: Vilkår,
         oppdatering: List<DelvilkårDto>,
         vilkårsregler: Map<VilkårType, Vilkårsregel> = ALLE_VILKÅRSREGLER.vilkårsregler,
@@ -33,7 +33,7 @@ object OppdaterVilkår {
         val vilkårsregel =
             vilkårsregler[vilkår.type] ?: error("Finner ikke vilkårsregler for ${vilkår.type}")
 
-        validerVurdering(vilkårsregel, oppdatering, vilkår.delvilkårwrapper.delvilkårsett)
+        validerVilkår(vilkårsregel, oppdatering, vilkår.delvilkårsett)
 
         val vilkårsresultat = utledResultat(vilkårsregel, oppdatering)
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
@@ -47,8 +47,8 @@ object OppdaterVilkår {
 
     private fun validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat: RegelResultat) {
         if (!vilkårsresultat.vilkår.oppfyltEllerIkkeOppfylt()) {
-            val message = "Mangler fullstendig vilkårsvurdering for ${vilkårsresultat.vilkårType}. " +
-                "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
+            val message = "Mangler fullstendig vilkår for ${vilkårsresultat.vilkårType}. " +
+                    "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
             throw Feil(message = message, frontendFeilmelding = message)
         }
     }
@@ -66,7 +66,7 @@ object OppdaterVilkår {
         oppdatering: List<DelvilkårDto>,
     ): DelvilkårWrapper {
         val vurderingerPåType = oppdatering.associateBy { it.vurderinger.first().regelId }
-        val delvilkårsvurderinger = vilkår.delvilkårwrapper.delvilkårsett.map {
+        val delvilkårsett = vilkår.delvilkårsett.map {
             if (it.resultat == Vilkårsresultat.IKKE_AKTUELL) {
                 it
             } else {
@@ -85,7 +85,7 @@ object OppdaterVilkår {
                 }
             }
         }.toList()
-        return vilkår.delvilkårwrapper.copy(delvilkårsett = delvilkårsvurderinger)
+        return vilkår.delvilkårwrapper.copy(delvilkårsett = delvilkårsett)
     }
 
     /**
@@ -109,12 +109,12 @@ object OppdaterVilkår {
             value.any { it.resultat == Vilkårsresultat.IKKE_TATT_STILLING_TIL } -> Vilkårsresultat.IKKE_TATT_STILLING_TIL
             value.all { it.resultat == Vilkårsresultat.SKAL_IKKE_VURDERES } -> Vilkårsresultat.SKAL_IKKE_VURDERES
             value.any { it.resultat == Vilkårsresultat.IKKE_OPPFYLT } &&
-                value.all { it.resultat == Vilkårsresultat.IKKE_OPPFYLT || it.resultat == Vilkårsresultat.SKAL_IKKE_VURDERES } ->
+                    value.all { it.resultat == Vilkårsresultat.IKKE_OPPFYLT || it.resultat == Vilkårsresultat.SKAL_IKKE_VURDERES } ->
                 Vilkårsresultat.IKKE_OPPFYLT
 
             else -> throw Feil(
                 "Utled resultat for aleneomsorg - kombinasjon av resultat er ikke behandlet: " +
-                    "${value.map { it.resultat }}",
+                        "${value.map { it.resultat }}",
             )
         }
     }
@@ -178,11 +178,11 @@ object OppdaterVilkår {
      */
     private fun harNoenIkkeOppfyltOgRestenIkkeOppfyltEllerOppfyltEllerSkalIkkevurderes(vilkårsresultat: List<Vilkårsresultat>) =
         vilkårsresultat.any { it == Vilkårsresultat.IKKE_OPPFYLT } &&
-            vilkårsresultat.all {
-                it == Vilkårsresultat.OPPFYLT ||
-                    it == Vilkårsresultat.IKKE_OPPFYLT ||
-                    it == Vilkårsresultat.SKAL_IKKE_VURDERES
-            }
+                vilkårsresultat.all {
+                    it == Vilkårsresultat.OPPFYLT ||
+                            it == Vilkårsresultat.IKKE_OPPFYLT ||
+                            it == Vilkårsresultat.SKAL_IKKE_VURDERES
+                }
 
     fun opprettNyeVilkårsvurderinger(
         behandlingId: UUID,

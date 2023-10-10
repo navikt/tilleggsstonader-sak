@@ -45,7 +45,7 @@ class VilkårStegService(
         validerLåstForVidereRedigering(behandlingId)
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, vilkårsvurderingDto.behandlingId)
 
-        val nyVilkårsvurdering = OppdaterVilkår.lagNyOppdatertVilkårsvurdering(
+        val nyVilkårsvurdering = OppdaterVilkår.lagNyOppdatertVilkår(
             vilkårsvurdering,
             vilkårsvurderingDto.delvilkårsvurderinger,
         )

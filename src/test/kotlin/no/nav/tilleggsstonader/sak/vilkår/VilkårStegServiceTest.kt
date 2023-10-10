@@ -159,7 +159,7 @@ internal class VilkårStegServiceTest {
         assertThat(lagretVilkår.captured.type).isEqualTo(vilkårsvurdering.type)
         assertThat(lagretVilkår.captured.opphavsvilkår).isNull()
 
-        val delvilkårsvurdering = lagretVilkår.captured.delvilkårwrapper.delvilkårsett.first()
+        val delvilkårsvurdering = lagretVilkår.captured.delvilkårsett.first()
         assertThat(delvilkårsvurdering.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         assertThat(delvilkårsvurdering.vurderinger).hasSize(1)
         assertThat(delvilkårsvurdering.vurderinger.first().svar).isEqualTo(SvarId.JA)
@@ -183,7 +183,7 @@ internal class VilkårStegServiceTest {
         assertThat(oppdatertVurdering.captured.type).isEqualTo(vilkårsvurdering.type)
         assertThat(oppdatertVurdering.captured.opphavsvilkår).isNull()
 
-        val delvilkårsvurdering = oppdatertVurdering.captured.delvilkårwrapper.delvilkårsett.first()
+        val delvilkårsvurdering = oppdatertVurdering.captured.delvilkårsett.first()
         assertThat(delvilkårsvurdering.resultat).isEqualTo(Vilkårsresultat.SKAL_IKKE_VURDERES)
         assertThat(delvilkårsvurdering.vurderinger).hasSize(1)
         assertThat(delvilkårsvurdering.vurderinger.first().svar).isNull()

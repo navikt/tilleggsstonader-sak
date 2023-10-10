@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.dto
 
 import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkår
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.regler.SvarId
@@ -67,7 +67,7 @@ fun Vilkår.tilDto() =
         barnId = this.barnId,
         endretAv = this.sporbar.endret.endretAv,
         endretTid = this.sporbar.endret.endretTid,
-        delvilkårsett = this.delvilkårwrapper.delvilkårsett
+        delvilkårsett = this.delvilkårsett
             .filter { it.resultat != Vilkårsresultat.IKKE_AKTUELL }
             .map { it.tilDto() },
         opphavsvilkår = this.opphavsvilkår?.let { OpphavsvilkårDto(it.behandlingId, it.vurderingstidspunkt) },
