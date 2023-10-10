@@ -6,8 +6,8 @@ import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVurderingerDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-@RequestMapping(path = ["/api/vurdering"])
+@RequestMapping(path = ["/api/vilkar"])
 @ProtectedWithClaims(issuer = "azuread")
 @Validated
-class VurderingController(
-    private val vurderingService: VurderingService,
-    private val vurderingStegService: VurderingStegService,
+class VilkårController(
+    private val vilkårService: VilkårService,
+    private val vilkårStegService: VilkårStegService,
     private val tilgangService: TilgangService,
     // private val gjenbrukVilkårService: GjenbrukVilkårService,
 ) {
@@ -37,18 +37,17 @@ class VurderingController(
         return Vilkårsregler.ALLE_VILKÅRSREGLER
     }
 
-    @PostMapping("vilkar")
     fun oppdaterVurderingVilkår(@RequestBody vilkårsvurdering: SvarPåVurderingerDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(vilkårsvurdering.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         try {
-            return vurderingStegService.oppdaterVilkår(vilkårsvurdering)
+            return vilkårStegService.oppdaterVilkår(vilkårsvurdering)
         } catch (e: Exception) {
             val delvilkårJson = objectMapper.writeValueAsString(vilkårsvurdering.delvilkårsvurderinger)
             secureLogger.warn(
                 "id=${vilkårsvurdering.id}" +
-                    " behandlingId=${vilkårsvurdering.behandlingId}" +
-                    " svar=$delvilkårJson",
+                        " behandlingId=${vilkårsvurdering.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
@@ -58,27 +57,27 @@ class VurderingController(
     fun nullstillVilkår(@RequestBody request: OppdaterVilkårsvurderingDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
         tilgangService.validerHarSaksbehandlerrolle()
-        return vurderingStegService.nullstillVilkår(request)
+        return vilkårStegService.nullstillVilkår(request)
     }
 
     @PostMapping("ikkevurder")
     fun settVilkårTilSkalIkkeVurderes(@RequestBody request: OppdaterVilkårsvurderingDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
-        return vurderingStegService.settVilkårTilSkalIkkeVurderes(request)
+        return vilkårStegService.settVilkårTilSkalIkkeVurderes(request)
     }
 
-    @GetMapping("{behandlingId}/vilkar")
+    @GetMapping("{behandlingId}")
     fun getVilkår(@PathVariable behandlingId: UUID): VilkårsvurderingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return vurderingService.hentOpprettEllerOppdaterVurderinger(behandlingId)
+        return vilkårService.hentOpprettEllerOppdaterVurderinger(behandlingId)
     }
 
     @GetMapping("{behandlingId}/oppdater")
     fun oppdaterRegisterdata(@PathVariable behandlingId: UUID): VilkårsvurderingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
-        return vurderingService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId)
+        return vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId)
     }
 
     /*@PostMapping("gjenbruk")

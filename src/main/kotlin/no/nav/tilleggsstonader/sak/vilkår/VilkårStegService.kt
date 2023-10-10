@@ -27,9 +27,9 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
-class VurderingStegService(
+class VilkårStegService(
     private val behandlingService: BehandlingService,
-    private val vurderingService: VurderingService,
+    private val vilkårService: VilkårService,
     private val vilkårRepository: VilkårRepository,
     // private val stegService: StegService,
     // private val taskService: TaskService,
@@ -170,7 +170,7 @@ class VurderingStegService(
     }
 
     private fun hentHovedregelMetadata(behandlingId: UUID) =
-        vurderingService.hentGrunnlagOgMetadata(behandlingId).second
+        vilkårService.hentGrunnlagOgMetadata(behandlingId).second
 
     private fun validerLåstForVidereRedigering(behandlingId: UUID) {
         if (behandlingErLåstForVidereRedigering(behandlingId)) {

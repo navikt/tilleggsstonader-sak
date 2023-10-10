@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
-class VurderingService(
+class VilkårService(
     private val behandlingService: BehandlingService,
     private val søknadService: SøknadService,
     private val vilkårRepository: VilkårRepository,

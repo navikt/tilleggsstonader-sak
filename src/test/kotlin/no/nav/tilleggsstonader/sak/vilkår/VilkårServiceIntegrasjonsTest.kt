@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 
-internal class VurderingServiceIntegrasjonsTest : IntegrationTest() {
+internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårRepository: VilkårRepository
@@ -38,7 +38,7 @@ internal class VurderingServiceIntegrasjonsTest : IntegrationTest() {
     lateinit var behandlingRepository: BehandlingRepository
 
     @Autowired
-    lateinit var vurderingService: VurderingService
+    lateinit var vilkårService: VilkårService
 
     @Autowired
     lateinit var søknadService: SøknadService
@@ -60,7 +60,7 @@ internal class VurderingServiceIntegrasjonsTest : IntegrationTest() {
             barnPåRevurdering,
             mockk(),
         )
-        vurderingService.kopierVurderingerTilNyBehandling(
+        vilkårService.kopierVurderingerTilNyBehandling(
             behandling.id,
             revurdering.id,
             metadata,
@@ -90,7 +90,7 @@ internal class VurderingServiceIntegrasjonsTest : IntegrationTest() {
     internal fun `oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger - skal kaste feil dersom behandlingen er låst for videre behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        assertThat(catchThrowable { vurderingService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandling.id) })
+        assertThat(catchThrowable { vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandling.id) })
             .hasMessage("Kan ikke laste inn nye grunnlagsdata for behandling med status ${behandling.status}")
     }
 
@@ -105,7 +105,7 @@ internal class VurderingServiceIntegrasjonsTest : IntegrationTest() {
         )
         assertThat(
             catchThrowable {
-                vurderingService.kopierVurderingerTilNyBehandling(
+                vilkårService.kopierVurderingerTilNyBehandling(
                     tidligereBehandlingId,
                     revurdering.id,
                     metadata,

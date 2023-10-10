@@ -50,7 +50,7 @@ import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDateTime
 import java.util.UUID
 
-internal class VurderingStegServiceTest {
+internal class VilkårStegServiceTest {
 
     private val behandlingService = mockk<BehandlingService>()
     private val søknadService = mockk<SøknadService>()
@@ -68,7 +68,7 @@ internal class VurderingStegServiceTest {
 
     // private val featureToggleService = mockk<FeatureToggleService>()
     private val behandlingshistorikkService = mockk<BehandlingshistorikkService>()
-    private val vurderingService = VurderingService(
+    private val vilkårService = VilkårService(
         behandlingService,
         søknadService,
         vilkårRepository,
@@ -78,9 +78,9 @@ internal class VurderingStegServiceTest {
         fagsakService,
         // featureToggleService,
     )
-    private val vurderingStegService = VurderingStegService(
+    private val vilkårStegService = VilkårStegService(
         behandlingService = behandlingService,
-        vurderingService = vurderingService,
+        vilkårService = vilkårService,
         vilkårRepository = vilkårRepository,
         // blankettRepository = blankettRepository,
         // stegService = stegService,
@@ -125,7 +125,7 @@ internal class VurderingStegServiceTest {
         every { vilkårRepository.findByIdOrNull(vurderingId) } returns null
         assertThat(
             catchThrowable {
-                vurderingStegService.oppdaterVilkår(
+                vilkårStegService.oppdaterVilkår(
                     SvarPåVurderingerDto(
                         id = vurderingId,
                         behandlingId = behandlingId,
@@ -147,7 +147,7 @@ internal class VurderingStegServiceTest {
                 listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
             ),
         )
-        vurderingStegService.oppdaterVilkår(
+        vilkårStegService.oppdaterVilkår(
             SvarPåVurderingerDto(
                 id = vilkårsvurdering.id,
                 behandlingId = behandlingId,
@@ -172,7 +172,7 @@ internal class VurderingStegServiceTest {
         val oppdatertVurdering = slot<Vilkår>()
         val vilkårsvurdering = initiererVurderinger(oppdatertVurdering)
 
-        vurderingStegService.settVilkårTilSkalIkkeVurderes(
+        vilkårStegService.settVilkårTilSkalIkkeVurderes(
             OppdaterVilkårsvurderingDto(
                 id = vilkårsvurdering.id,
                 behandlingId = behandlingId,
@@ -196,7 +196,7 @@ internal class VurderingStegServiceTest {
         val oppdatertVurdering = slot<Vilkår>()
         val vilkårsvurdering = initiererVurderinger(oppdatertVurdering)
 
-        vurderingStegService.nullstillVilkår(OppdaterVilkårsvurderingDto(vilkårsvurdering.id, behandlingId))
+        vilkårStegService.nullstillVilkår(OppdaterVilkårsvurderingDto(vilkårsvurdering.id, behandlingId))
 
         assertThat(oppdatertVurdering.captured.resultat).isEqualTo(Vilkårsresultat.IKKE_TATT_STILLING_TIL)
         assertThat(oppdatertVurdering.captured.type).isEqualTo(vilkårsvurdering.type)
@@ -218,7 +218,7 @@ internal class VurderingStegServiceTest {
 
         assertThat(
             catchThrowable {
-                vurderingStegService.oppdaterVilkår(
+                vilkårStegService.oppdaterVilkår(
                     SvarPåVurderingerDto(
                         id = vilkårsvurdering.id,
                         behandlingId = behandlingId,
@@ -245,7 +245,7 @@ internal class VurderingStegServiceTest {
                 listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
             ),
         )
-        vurderingStegService.oppdaterVilkår(
+        vilkårStegService.oppdaterVilkår(
             SvarPåVurderingerDto(
                 id = vilkårsvurdering.id,
                 behandlingId = behandlingId,
@@ -279,7 +279,7 @@ internal class VurderingStegServiceTest {
                 listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
             ),
         )
-        vurderingStegService.oppdaterVilkår(
+        vilkårStegService.oppdaterVilkår(
             SvarPåVurderingerDto(
                 id = vilkårsvurdering.id,
                 behandlingId = behandlingId,
