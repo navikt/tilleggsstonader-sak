@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.dto.Fellesgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
@@ -91,24 +90,9 @@ class VilkårService(
 
     fun hentGrunnlagOgMetadata(behandlingId: UUID): Pair<VilkårGrunnlagDto, HovedregelMetadata> {
         val behandling = behandlingService.hentBehandling(behandlingId)
-        /*val søknad = søknadService.hentSøknadsgrunnlag(behandlingId)
-        val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val barn = barnService.finnBarnPåBehandling(behandlingId)
-        val grunnlag = vilkårGrunnlagService.hentGrunnlag(behandlingId, søknad, personIdent, barn)
-        val søktOmBarnetilsyn =
-            grunnlag.barnMedSamvær.filter { it.barnepass?.skalHaBarnepass == true }.map { it.barnId }
-
-        val metadata = HovedregelMetadata(
-            sivilstandstype = grunnlag.sivilstand.registergrunnlag.type,
-            sivilstandSøknad = søknad?.sivilstand,
-            barn = barn,
-            søktOmBarnetilsyn = søktOmBarnetilsyn,
-            langAvstandTilSøker = grunnlag.barnMedSamvær.map { it.mapTilBarnForelderLangAvstandTilSøker() },
-            vilkårgrunnlagDto = grunnlag,
-            behandling = behandling,
-        )
-         */
-        return Pair(VilkårGrunnlagDto(Fellesgrunnlag("navn")), HovedregelMetadata(emptyList(), behandling))
+        val grunnlag = vilkårGrunnlagService.hentGrunnlag(behandlingId)
+        return Pair(grunnlag, HovedregelMetadata(emptyList(), behandling))
     }
 
     private fun hentEllerOpprettVilkår(
