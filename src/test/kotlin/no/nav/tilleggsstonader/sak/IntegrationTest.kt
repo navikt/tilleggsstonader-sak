@@ -99,8 +99,8 @@ abstract class IntegrationTest {
             Vilkår::class,
             BehandlingBarn::class,
 
-            SøknadBehandling::class,
             SøknadBarnetilsyn::class,
+            SøknadBehandling::class,
 
             Totrinnskontroll::class,
             Behandlingshistorikk::class,
