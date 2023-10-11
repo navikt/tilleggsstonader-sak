@@ -65,7 +65,6 @@ internal class UtledBarnFraVilkårServiceTest {
     ): BehandlingBarn = BehandlingBarn(
         behandlingId = UUID.randomUUID(),
         søknadBarnId = søknadBarnId,
-        navn = navn,
-        personIdent = personIdent,
+        ident = personIdent,
     )
 }

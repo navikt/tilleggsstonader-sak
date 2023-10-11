@@ -148,12 +148,10 @@ fun behandlingBarn(
     behandlingId: UUID = UUID.randomUUID(),
     personIdent: String = "1",
     søknadBarnId: UUID? = null,
-    navn: String = "navn",
 ) = BehandlingBarn(
     behandlingId = behandlingId,
     søknadBarnId = søknadBarnId,
-    personIdent = personIdent,
-    navn = navn,
+    ident = personIdent,
 )
 
 val defaultIdenter = setOf(PersonIdent("15"))
