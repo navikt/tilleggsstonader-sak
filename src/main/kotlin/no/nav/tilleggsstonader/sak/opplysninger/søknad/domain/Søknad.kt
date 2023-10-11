@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -12,7 +13,8 @@ import java.util.UUID
 interface Søknad {
     val id: UUID
     val journalpostId: String
-    val datoMottatt: LocalDateTime
+    val mottattTidspunkt: LocalDateTime
+    val språk: Språkkode
     val sporbar: Sporbar
 }
 
@@ -34,7 +36,9 @@ data class SøknadBarnetilsyn(
     @Id
     override val id: UUID = UUID.randomUUID(),
     override val journalpostId: String,
-    override val datoMottatt: LocalDateTime,
+    override val mottattTidspunkt: LocalDateTime,
+    @Column("sprak")
+    override val språk: Språkkode,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     override val sporbar: Sporbar = Sporbar(),
 

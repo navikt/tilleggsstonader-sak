@@ -8,7 +8,11 @@ class BarnService(
     private val barnRepository: BarnRepository,
 ) {
 
-    fun finnBarnPåBehandling(behandlingId: UUID): List<BehandlingBarn> = barnRepository.findByBehandlingId(behandlingId)
+    fun opprettBarn(barn: List<BehandlingBarn>): List<BehandlingBarn> =
+        barnRepository.insertAll(barn)
+
+    fun finnBarnPåBehandling(behandlingId: UUID): List<BehandlingBarn> =
+        barnRepository.findByBehandlingId(behandlingId)
 }
 
 /**
@@ -18,4 +22,6 @@ class BarnService(
  *  * Burde kunne opprette barn som blir lagt in manuellt via journalføringen?
  *  * Oppdatere personopplysninger -> oppdatere barn
  *  * Kopiere barn ved revurdering
+ *
+ *  * Ved revurdering burde vi appende barn, sånn at man fortsatt får med vilkår for tidligere barn?
  */
