@@ -5,9 +5,15 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataMedMetadat
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.vilkår.dto.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.dto.GrunnlagBarn
+import no.nav.tilleggsstonader.sak.vilkår.dto.GrunnlagHovedytelse
 import no.nav.tilleggsstonader.sak.vilkår.dto.RegistergrunnlagBarn
+import no.nav.tilleggsstonader.sak.vilkår.dto.SøknadsgrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.dto.SøknadsgrunnlagBarn
+import no.nav.tilleggsstonader.sak.vilkår.dto.SøknadsgrunnlagHovedytelse
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -27,22 +33,65 @@ class VilkårGrunnlagService(
         måImlementeresFørProdsetting {
             "Denne skal hente data fra databasen, og at grunnlagsdata lagres til databasen"
         }
-        val søknadBarnetilsyn = søknadService.hentSøknadBarnetilsyn(behandlingId)
+        val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
         val grunnlagsdata = grunnlagsdataService.hentFraRegister(behandlingId)
         return VilkårGrunnlagDto(
-            barn = grunnlagBarn(grunnlagsdata),
+            hovedytelse = mapHovedytelse(søknad),
+            aktivitet = mapAktivitet(søknad),
+            barn = mapBarn(grunnlagsdata, søknad),
         )
     }
 
-    private fun grunnlagBarn(grunnlagsdata: GrunnlagsdataMedMetadata) =
-        grunnlagsdata.grunnlagsdata.barn.map {
+    private fun mapAktivitet(søknad: SøknadBarnetilsyn?) =
+        GrunnlagAktivitet(
+            søknadsgrunnlag = søknad?.let {
+                SøknadsgrunnlagAktivitet(
+                    utdanning = it.data.aktivitet.utdanning,
+                )
+            },
+        )
+
+    private fun mapHovedytelse(søknad: SøknadBarnetilsyn?) =
+        GrunnlagHovedytelse(
+            søknadsgrunnlag = søknad?.let {
+                SøknadsgrunnlagHovedytelse(
+                    hovedytelse = it.data.hovedytelse.hovedytelse,
+                )
+            },
+        )
+
+    private fun mapBarn(grunnlagsdata: GrunnlagsdataMedMetadata, søknad: SøknadBarnetilsyn?): List<GrunnlagBarn> {
+        val søknadBarnPåIdent = søknad?.barn?.associateBy { it.ident } ?: emptyMap()
+        if (søknad != null) {
+            validerFinnesGrunnlagsdataForAlleBarnISøknad(grunnlagsdata, søknadBarnPåIdent)
+        }
+        return grunnlagsdata.grunnlagsdata.barn.map { barn ->
             GrunnlagBarn(
-                ident = it.ident,
+                ident = barn.ident,
                 registergrunnlag = RegistergrunnlagBarn(
-                    navn = it.navn.visningsnavn(),
-                    dødsdato = it.dødsdato,
+                    navn = barn.navn.visningsnavn(),
+                    dødsdato = barn.dødsdato,
                 ),
-                søknadgrunnlag = SøknadsgrunnlagBarn(true),
+                søknadgrunnlag = søknadBarnPåIdent[barn.ident]?.let { søknadBarn ->
+                    SøknadsgrunnlagBarn(
+                        type = søknadBarn.data.type,
+                        startetIFemte = søknadBarn.data.startetIFemte,
+                        årsak = søknadBarn.data.årsak,
+                    )
+                },
             )
         }
+    }
+
+    private fun validerFinnesGrunnlagsdataForAlleBarnISøknad(
+        grunnlagsdata: GrunnlagsdataMedMetadata,
+        søknadBarnPåIdent: Map<String, SøknadBarn>,
+    ) {
+        val identerIGrunnlagsdata = grunnlagsdata.grunnlagsdata.barn.map { it.ident }.toSet()
+        val identerSomManglerGrunnlagsdata = søknadBarnPåIdent.keys.filterNot { identerIGrunnlagsdata.contains(it) }
+        if (identerSomManglerGrunnlagsdata.isNotEmpty()) {
+            val kommaseparerteIdenter = identerSomManglerGrunnlagsdata.joinToString(",")
+            error("Mangler grunnlagsdata for barn i søknad ($kommaseparerteIdenter)")
+        }
+    }
 }
