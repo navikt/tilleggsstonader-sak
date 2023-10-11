@@ -22,7 +22,7 @@ internal class VilkårsregelTest {
     fun `vilkårregler skal ikke uaktuelle regler`() {
         val vilkårsregler = Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.map { it.value }
 
-        assertThat(listFiles("vilkårregler").map { it.fileName.name })
+        assertThat(listFiles("vilkår/regler").map { it.fileName.name })
             .containsExactlyInAnyOrderElementsOf(vilkårsregler.map { "${it.vilkårType}.json" }.toList())
     }
 
