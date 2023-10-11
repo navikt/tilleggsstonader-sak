@@ -14,7 +14,7 @@ internal class UtledBarnFraVilkårServiceTest {
         val nyttBarn = opprettBarn(søknadBarnId = søknadBarnId)
         val alleBarnPåForrigeBehandling = listOf(tidligereBarn)
         val alleBarnPåGjeldendeBehandling = listOf(nyttBarn)
-        val utledetBarnIdMap = VurderingService.byggBarnMapFraTidligereTilNyId(
+        val utledetBarnIdMap = VilkårService.byggBarnMapFraTidligereTilNyId(
             alleBarnPåForrigeBehandling,
             alleBarnPåGjeldendeBehandling,
         )
@@ -30,7 +30,7 @@ internal class UtledBarnFraVilkårServiceTest {
         val nyttBarnB = opprettBarn(søknadBarnId = søknadBarnId)
         val alleBarnPåForrigeBehandling = listOf(tidligereBarn)
         val alleBarnPåGjeldendeBehandling = listOf(nyttBarnA, nyttBarnB)
-        val utledetBarnIdMap = VurderingService.byggBarnMapFraTidligereTilNyId(
+        val utledetBarnIdMap = VilkårService.byggBarnMapFraTidligereTilNyId(
             alleBarnPåForrigeBehandling,
             alleBarnPåGjeldendeBehandling,
         )
@@ -49,7 +49,7 @@ internal class UtledBarnFraVilkårServiceTest {
         val nyttBarnB = opprettBarn(personIdent = personIdentB)
         val alleBarnPåForrigeBehandling = listOf(tidligereBarnA, tidligereBarnB)
         val alleBarnPåGjeldendeBehandling = listOf(nyttBarnB, nyttBarnA)
-        val utledetBarnIdMap = VurderingService.byggBarnMapFraTidligereTilNyId(
+        val utledetBarnIdMap = VilkårService.byggBarnMapFraTidligereTilNyId(
             alleBarnPåForrigeBehandling,
             alleBarnPåGjeldendeBehandling,
         )

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.regler.evalutation
 
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.regler.SvarId
@@ -45,7 +45,7 @@ internal class RegelEvalueringTest {
     @Test
     fun `utledVilkårResultat - utledResultat skal gi OPPFYLT når delvilkår er AUTOMATISK_OPPFYLT`() {
         val vurderingDto = VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "begrunnelse")
-        val delvilkår = DelvilkårsvurderingDto(Vilkårsresultat.AUTOMATISK_OPPFYLT, listOf(vurderingDto))
+        val delvilkår = DelvilkårDto(Vilkårsresultat.AUTOMATISK_OPPFYLT, listOf(vurderingDto))
 
         val regelResultat = RegelEvaluering.utledResultat(EksempelRegel(), listOf(delvilkår))
         assertThat(regelResultat.vilkår).isEqualTo(Vilkårsresultat.OPPFYLT)

@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.regler.evalutation
 
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.regler.SvarId
@@ -31,7 +31,7 @@ internal class RegelValideringTest {
                 regel,
                 VurderingDto(RegelId.HAR_ET_NAVN2),
             )
-        }.hasMessageStartingWith("Delvilkårsvurderinger savner svar på hovedregler")
+        }.hasMessageStartingWith("Delvilkårsett mangler svar på hovedregler")
             .isInstanceOf(Feil::class.java)
     }
 
@@ -117,17 +117,17 @@ internal class RegelValideringTest {
         regel: Vilkårsregel,
         vararg vurderinger: VurderingDto,
     ) {
-        valider(regel, delvilkårsvurderingDto(*vurderinger))
+        valider(regel, delvilkårDto(*vurderinger))
     }
 
     private fun valider(
         regel: Vilkårsregel,
-        vararg delvilkårsvurderingDto: DelvilkårsvurderingDto,
+        vararg delvilkårDto: DelvilkårDto,
     ) {
-        RegelValidering.validerVurdering(
+        RegelValidering.validerVilkår(
             vilkårsregel = regel,
-            oppdatering = delvilkårsvurderingDto.toList(),
-            tidligereDelvilkårsvurderinger = regel.initiereDelvilkårsvurdering(mockk()),
+            oppdatertDelvilkårsett = delvilkårDto.toList(),
+            tidligereDelvilkårsett = regel.initiereDelvilkår(mockk()),
         )
     }
 }

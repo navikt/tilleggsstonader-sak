@@ -9,8 +9,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsvurdering
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårsvurderingRepository
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.dto.Fellesgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
@@ -18,17 +18,17 @@ import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår
-import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkårsvurderinger
+import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
-class VurderingService(
+class VilkårService(
     private val behandlingService: BehandlingService,
     private val søknadService: SøknadService,
-    private val vilkårsvurderingRepository: VilkårsvurderingRepository,
+    private val vilkårRepository: VilkårRepository,
     private val barnService: BarnService,
     private val vilkårGrunnlagService: VilkårGrunnlagService,
     // private val grunnlagsdataService: GrunnlagsdataService,
@@ -39,14 +39,14 @@ class VurderingService(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @Transactional
-    fun hentEllerOpprettVurderinger(behandlingId: UUID): VilkårDto {
+    fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
         val (grunnlag, metadata) = hentGrunnlagOgMetadata(behandlingId)
-        val vurderinger = hentEllerOpprettVurderinger(behandlingId, metadata)
-        return VilkårDto(vurderinger = vurderinger, grunnlag = grunnlag)
+        val vurderinger = hentEllerOpprettVilkår(behandlingId, metadata).map(Vilkår::tilDto)
+        return VilkårsvurderingDto(vilkårsett = vurderinger, grunnlag = grunnlag)
     }
 
     @Transactional
-    fun hentOpprettEllerOppdaterVurderinger(behandlingId: UUID): VilkårDto {
+    fun hentOpprettEllerOppdaterVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
         if (behandling.harStatusOpprettet) {
@@ -58,21 +58,19 @@ class VurderingService(
                 vilkårsvurderingRepository.deleteByBehandlingId(behandlingId)
             }*/
         }
-        return hentEllerOpprettVurderinger(behandlingId)
+        return hentEllerOpprettVilkårsvurdering(behandlingId)
     }
 
-    fun hentAlleVurderinger(behandlingId: UUID): List<VilkårsvurderingDto> {
-        val vurderinger = vilkårsvurderingRepository.findByBehandlingId(behandlingId)
-        feilHvis(vurderinger.isEmpty()) {
-            "Mangler vurderinger for behandling=$behandlingId"
-        }
-        return vurderinger.map { it.tilDto() }
+    fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
+        val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
+        feilHvis(vilkårsett.isEmpty()) { "Mangler vilkår for behandling=$behandlingId" }
+        return vilkårsett.map { it.tilDto() }
     }
 
     @Transactional
-    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårDto {
+    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårsvurderingDto {
         // grunnlagsdataService.oppdaterOgHentNyGrunnlagsdata(behandlingId)
-        return hentEllerOpprettVurderinger(behandlingId)
+        return hentEllerOpprettVilkårsvurdering(behandlingId)
     }
 
     /*
@@ -113,37 +111,30 @@ class VurderingService(
         return Pair(VilkårGrunnlagDto(Fellesgrunnlag("navn")), HovedregelMetadata(emptyList(), behandling))
     }
 
-    private fun hentEllerOpprettVurderinger(
+    private fun hentEllerOpprettVilkår(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
-    ): List<VilkårsvurderingDto> {
-        return hentEllerOpprettVurderingerForVilkår(behandlingId, metadata).map(Vilkårsvurdering::tilDto)
-    }
-
-    private fun hentEllerOpprettVurderingerForVilkår(
-        behandlingId: UUID,
-        metadata: HovedregelMetadata,
-    ): List<Vilkårsvurdering> {
-        val lagredeVilkårsvurderinger = vilkårsvurderingRepository.findByBehandlingId(behandlingId)
+    ): List<Vilkår> {
+        val lagretVilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
 
         return when {
-            behandlingErLåstForVidereRedigering(behandlingId) -> lagredeVilkårsvurderinger
-            lagredeVilkårsvurderinger.isEmpty() -> lagreNyeVilkårsvurderinger(behandlingId, metadata)
-            else -> lagredeVilkårsvurderinger
+            behandlingErLåstForVidereRedigering(behandlingId) -> lagretVilkårsett
+            lagretVilkårsett.isEmpty() -> lagNyttVilkårsett(behandlingId, metadata)
+            else -> lagretVilkårsett
         }
     }
 
-    private fun lagreNyeVilkårsvurderinger(
+    private fun lagNyttVilkårsett(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
-    ): List<Vilkårsvurdering> {
+    ): List<Vilkår> {
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
-        val nyeVilkårsvurderinger: List<Vilkårsvurdering> = opprettNyeVilkårsvurderinger(
+        val nyttVilkårsett: List<Vilkår> = opprettNyeVilkår(
             behandlingId = behandlingId,
             metadata = metadata,
             stønadstype = stønadstype,
         )
-        return vilkårsvurderingRepository.insertAll(nyeVilkårsvurderinger)
+        return vilkårRepository.insertAll(nyttVilkårsett)
     }
 
     private fun behandlingErLåstForVidereRedigering(behandlingId: UUID) =
@@ -156,38 +147,38 @@ class VurderingService(
     }*/
 
     /**
-     * Når en revurdering opprettes skal den kopiere de tidligere vilkårsvurderingene med lik verdi for endretTid.
+     * Når en revurdering opprettes skal den kopiere de tidligere vilkåren med lik verdi for endretTid.
      * Endret tid blir satt av Sporbar() som alltid vil sette endretTid til nåværende tispunkt, noe som blir feil.
      * For å omgå dette problemet lagres først de kopierte vilkårsvurderingene til databasen. Til slutt
      * vil oppdaterEndretTid() manuelt overskrive verdiene for endretTid til korrekte verdier.
      */
-    fun kopierVurderingerTilNyBehandling(
+    fun kopierVilkårsettTilNyBehandling(
         eksisterendeBehandlingId: UUID,
         nyBehandlingsId: UUID,
         metadata: HovedregelMetadata,
         stønadstype: Stønadstype,
     ) {
         val tidligereVurderinger =
-            vilkårsvurderingRepository.findByBehandlingId(eksisterendeBehandlingId).associateBy { it.id }
+            vilkårRepository.findByBehandlingId(eksisterendeBehandlingId).associateBy { it.id }
         val barnPåForrigeBehandling = barnService.finnBarnPåBehandling(eksisterendeBehandlingId)
         val barnIdMap = byggBarnMapFraTidligereTilNyId(barnPåForrigeBehandling, metadata.barn)
         validerAtVurderingerKanKopieres(tidligereVurderinger, eksisterendeBehandlingId)
 
-        val kopiAvVurderinger: Map<UUID, Vilkårsvurdering> = lagKopiAvTidligereVurderinger(
+        val kopiAvVurderinger: Map<UUID, Vilkår> = lagKopiAvTidligereVurderinger(
             tidligereVurderinger,
             metadata.barn,
             nyBehandlingsId,
             barnIdMap,
         )
 
-        val nyeBarnVurderinger = opprettVurderingerForNyeBarn(kopiAvVurderinger, metadata, stønadstype)
+        val nyeBarnVurderinger = opprettVilkårForNyeBarn(kopiAvVurderinger, metadata, stønadstype)
 
-        vilkårsvurderingRepository.insertAll(kopiAvVurderinger.values.toList() + nyeBarnVurderinger)
-        tilbakestillEndretTidForKopierteVurderinger(kopiAvVurderinger, tidligereVurderinger)
+        vilkårRepository.insertAll(kopiAvVurderinger.values.toList() + nyeBarnVurderinger)
+        tilbakestillEndretTidForKopierteVurderinger(kopiAvVurderinger, tidligereVurderinger) // TODO remove
     }
 
     private fun validerAtVurderingerKanKopieres(
-        tidligereVurderinger: Map<UUID, Vilkårsvurdering>,
+        tidligereVurderinger: Map<UUID, Vilkår>,
         eksisterendeBehandlingId: UUID,
     ) {
         if (tidligereVurderinger.isEmpty()) {
@@ -197,39 +188,39 @@ class VurderingService(
     }
 
     private fun lagKopiAvTidligereVurderinger(
-        tidligereVurderinger: Map<UUID, Vilkårsvurdering>,
+        tidligereVilkår: Map<UUID, Vilkår>,
         barnPåGjeldendeBehandling: List<BehandlingBarn>,
         nyBehandlingsId: UUID,
         barnIdMap: Map<UUID, BehandlingBarn>,
-    ): Map<UUID, Vilkårsvurdering> =
-        tidligereVurderinger.values
-            .filter { skalKopiereVurdering(it, barnPåGjeldendeBehandling.isNotEmpty()) }
-            .associate { vurdering ->
-                vurdering.id to vurdering.copy(
+    ): Map<UUID, Vilkår> =
+        tidligereVilkår.values
+            .filter { skalKopiereVilkår(it, barnPåGjeldendeBehandling.isNotEmpty()) }
+            .associate { vilkår ->
+                vilkår.id to vilkår.copy(
                     id = UUID.randomUUID(),
                     behandlingId = nyBehandlingsId,
                     sporbar = Sporbar(),
-                    barnId = finnBarnId(vurdering.barnId, barnIdMap),
-                    opphavsvilkår = vurdering.opprettOpphavsvilkår(),
+                    barnId = finnBarnId(vilkår.barnId, barnIdMap),
+                    opphavsvilkår = vilkår.opprettOpphavsvilkår(),
                 )
             }
 
-    private fun opprettVurderingerForNyeBarn(
-        vurderingerKopi: Map<UUID, Vilkårsvurdering>,
+    private fun opprettVilkårForNyeBarn(
+        vilkårKopi: Map<UUID, Vilkår>,
         metadata: HovedregelMetadata,
         stønadstype: Stønadstype,
     ) =
         metadata.barn
-            .filter { barn -> vurderingerKopi.none { it.value.barnId == barn.id } }
-            .map { OppdaterVilkår.lagVilkårsvurderingForNyttBarn(metadata, it.behandlingId, it.id, stønadstype) }
+            .filter { barn -> vilkårKopi.none { it.value.barnId == barn.id } }
+            .map { OppdaterVilkår.lagVilkårForNyttBarn(metadata, it.behandlingId, it.id, stønadstype) }
             .flatten()
 
     private fun tilbakestillEndretTidForKopierteVurderinger(
-        vurderinger: Map<UUID, Vilkårsvurdering>,
-        tidligereVurderinger: Map<UUID, Vilkårsvurdering>,
+        vilkår: Map<UUID, Vilkår>,
+        tidligereVurderinger: Map<UUID, Vilkår>,
     ) {
-        vurderinger.forEach { (forrigeId, vurdering) ->
-            vilkårsvurderingRepository.oppdaterEndretTid(
+        vilkår.forEach { (forrigeId, vurdering) ->
+            vilkårRepository.oppdaterEndretTid(
                 vurdering.id,
                 tidligereVurderinger.getValue(forrigeId).sporbar.endret.endretTid,
             )
@@ -243,21 +234,20 @@ class VurderingService(
         }
     }
 
-    private fun skalKopiereVurdering(
-        it: Vilkårsvurdering,
-        harNyeBarnForVurdering: Boolean,
+    private fun skalKopiereVilkår(
+        it: Vilkår,
+        harNyeBarnForVilkår: Boolean,
     ) =
         if (it.type.gjelderFlereBarn() && it.barnId == null) {
-            !harNyeBarnForVurdering
+            !harNyeBarnForVilkår
         } else {
             true
         }
 
     fun erAlleVilkårOppfylt(behandlingId: UUID): Boolean {
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
-        val lagredeVilkårsvurderinger: List<Vilkårsvurdering> =
-            vilkårsvurderingRepository.findByBehandlingId(behandlingId)
-        return OppdaterVilkår.erAlleVilkårsvurderingerOppfylt(lagredeVilkårsvurderinger, stønadstype)
+        val lagretVilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
+        return OppdaterVilkår.erAlleVilkårOppfylt(lagretVilkårsett, stønadstype)
     }
 
     companion object {

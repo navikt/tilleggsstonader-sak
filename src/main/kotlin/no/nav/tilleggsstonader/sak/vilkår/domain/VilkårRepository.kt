@@ -9,23 +9,21 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Repository
-interface VilkårsvurderingRepository :
-    RepositoryInterface<Vilkårsvurdering, UUID>,
-    InsertUpdateRepository<Vilkårsvurdering> {
+interface VilkårRepository : RepositoryInterface<Vilkår, UUID>, InsertUpdateRepository<Vilkår> {
 
-    fun findByBehandlingId(behandlingId: UUID): List<Vilkårsvurdering>
+    fun findByBehandlingId(behandlingId: UUID): List<Vilkår>
 
     @Modifying
-    @Query("DELETE from vilkarsvurdering where behandling_id = :behandlingId")
+    @Query("DELETE from vilkar where behandling_id = :behandlingId")
     fun deleteByBehandlingId(behandlingId: UUID)
 
     @Modifying
-    @Query("UPDATE vilkarsvurdering SET endret_tid = :nyttTidspunkt WHERE id = :id")
+    @Query("UPDATE vilkar SET endret_tid = :nyttTidspunkt WHERE id = :id")
     fun oppdaterEndretTid(id: UUID, nyttTidspunkt: LocalDateTime)
 
     @Modifying
-    @Query("UPDATE vilkarsvurdering SET opprettet_av = 'VL', endret_av = 'VL' WHERE id = :id")
+    @Query("UPDATE vilkar SET opprettet_av = 'VL', endret_av = 'VL' WHERE id = :id")
     fun settMaskinelltOpprettet(id: UUID)
 
-    fun findByTypeAndBehandlingIdIn(vilkårtype: VilkårType, behandlingIds: Collection<UUID>): List<Vilkårsvurdering>
+    fun findByTypeAndBehandlingIdIn(vilkårtype: VilkårType, behandlingIds: Collection<UUID>): List<Vilkår>
 }

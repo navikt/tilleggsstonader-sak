@@ -19,8 +19,8 @@ import java.util.UUID
  *
  * Husk at [opphavsvilkår] må tas stilling til når man kopierer denne
  */
-@Table("vilkarsvurdering")
-data class Vilkårsvurdering(
+@Table("vilkar")
+data class Vilkår(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: UUID,
@@ -30,10 +30,12 @@ data class Vilkårsvurdering(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     @Column("delvilkar")
-    val delvilkårsvurdering: DelvilkårsvurderingWrapper,
+    val delvilkårwrapper: DelvilkårWrapper,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "opphavsvilkaar_")
     val opphavsvilkår: Opphavsvilkår?,
 ) {
+    val delvilkårsett get() = delvilkårwrapper.delvilkårsett
+
     init {
         require(resultat.erIkkeDelvilkårsresultat()) // Verdien AUTOMATISK_OPPFYLT er kun forbeholdt delvilkår
     }
@@ -45,8 +47,8 @@ data class Vilkårsvurdering(
         opphavsvilkår ?: Opphavsvilkår(behandlingId, sporbar.endret.endretTid)
 }
 
-fun List<Vilkårsvurdering>.utledVurderinger(vilkårType: VilkårType, regelId: RegelId) =
-    this.filter { it.type == vilkårType }.flatMap { it.delvilkårsvurdering.delvilkårsvurderinger }
+fun List<Vilkår>.utledVurderinger(vilkårType: VilkårType, regelId: RegelId) =
+    this.filter { it.type == vilkårType }.flatMap { it.delvilkårsett }
         .flatMap { it.vurderinger }
         .filter { it.regelId == regelId }
 
@@ -64,9 +66,9 @@ data class Opphavsvilkår(
 )
 
 // Ingen støtte for å ha en liste direkt i entiteten, wrapper+converter virker
-data class DelvilkårsvurderingWrapper(val delvilkårsvurderinger: List<Delvilkårsvurdering>)
+data class DelvilkårWrapper(val delvilkårsett: List<Delvilkår>)
 
-data class Delvilkårsvurdering(
+data class Delvilkår(
     val resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
     val vurderinger: List<Vurdering>,
 ) {

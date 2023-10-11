@@ -5,24 +5,24 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
 
-internal class VilkårsvurderingTest {
+internal class VilkårTest {
 
     private val behandlingIdFørstegangsbehandling = UUID.randomUUID()
     private val behandlingIdRevurdering = UUID.randomUUID()
 
     @Test
     internal fun `opprettOpphavsvilkår - et vilkår som ikke er gjenbrukt skal peke til behandlingen`() {
-        val vilkårsvurdering = Vilkårsvurdering(
+        val vilkår = Vilkår(
             behandlingId = behandlingIdFørstegangsbehandling,
-            delvilkårsvurdering = DelvilkårsvurderingWrapper(emptyList()),
+            delvilkårwrapper = DelvilkårWrapper(emptyList()),
             type = VilkårType.EKSEMPEL,
             opphavsvilkår = null,
         )
-        val opphavsvilkår = vilkårsvurdering.opprettOpphavsvilkår()
+        val opphavsvilkår = vilkår.opprettOpphavsvilkår()
         assertThat(opphavsvilkår).isEqualTo(
             Opphavsvilkår(
                 behandlingIdFørstegangsbehandling,
-                vilkårsvurdering.sporbar.endret.endretTid,
+                vilkår.sporbar.endret.endretTid,
             ),
         )
     }
@@ -30,13 +30,13 @@ internal class VilkårsvurderingTest {
     @Test
     internal fun `opprettOpphavsvilkår - skal bruke opphavsvilkår hvis den finnes og ikke lage en ny, for å peke til den opprinnelige behandlingen`() {
         val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, LocalDateTime.now())
-        val vilkårsvurdering = Vilkårsvurdering(
+        val vilkår = Vilkår(
             behandlingId = behandlingIdRevurdering,
-            delvilkårsvurdering = DelvilkårsvurderingWrapper(emptyList()),
+            delvilkårwrapper = DelvilkårWrapper(emptyList()),
             type = VilkårType.EKSEMPEL,
             opphavsvilkår = opphavsvilkår,
         )
-        val nyttOpphavsvilkår = vilkårsvurdering.opprettOpphavsvilkår()
+        val nyttOpphavsvilkår = vilkår.opprettOpphavsvilkår()
         assertThat(nyttOpphavsvilkår).isEqualTo(opphavsvilkår)
     }
 }
