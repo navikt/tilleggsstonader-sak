@@ -1,10 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad.domain
 
-import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
-import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -49,16 +45,3 @@ data class SøknadBarnetilsyn(
     @MappedCollection(idColumn = "soknad_id")
     val barn: Set<SøknadBarn>,
 ) : Søknad
-
-data class SkjemaBarnetilsyn(
-    val hovedytelse: HovedytelseAvsnitt,
-    val aktivitet: AktivitetAvsnitt,
-)
-
-data class HovedytelseAvsnitt(
-    val hovedytelse: Hovedytelse,
-)
-
-data class AktivitetAvsnitt(
-    val utdanning: JaNei,
-)
