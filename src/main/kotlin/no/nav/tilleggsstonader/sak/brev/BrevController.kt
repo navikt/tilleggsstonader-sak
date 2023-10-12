@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 @RestController
-@RequestMapping(path = ["/api/brev/"])
+@RequestMapping("/api/brev")
 @ProtectedWithClaims(issuer = "azuread")
 class BrevController(private val familieDokumentClient: FamilieDokumentClient) {
 
