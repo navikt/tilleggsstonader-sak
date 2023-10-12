@@ -15,7 +15,6 @@ data class AndelTilkjentYtelse(
     val stønadTom: LocalDate,
     val kildeBehandlingId: UUID,
 ) {
-
     constructor(
         beløp: Int,
         periode: Månedsperiode,

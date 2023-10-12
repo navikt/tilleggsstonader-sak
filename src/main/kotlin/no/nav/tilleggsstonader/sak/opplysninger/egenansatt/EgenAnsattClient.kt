@@ -16,7 +16,6 @@ class EgenAnsattClient(
     @Value("\${clients.egen_ansatt.uri}") private val uri: URI,
     @Qualifier("azureClientCredential") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
-
     private val egenAnsattUri: URI = UriComponentsBuilder.fromUri(uri).pathSegment("skjermet").build().toUri()
     private val egenAnsattBulkUri: URI = UriComponentsBuilder.fromUri(uri).pathSegment("skjermetBulk").build().toUri()
 
@@ -36,4 +35,5 @@ class EgenAnsattClient(
 }
 
 data class SkjermetDataRequestDTO(val personident: String)
+
 data class SkjermetDataBolkRequestDTO(val personidenter: Set<String>)

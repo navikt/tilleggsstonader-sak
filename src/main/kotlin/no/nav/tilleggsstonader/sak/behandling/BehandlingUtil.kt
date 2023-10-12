@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 
 object BehandlingUtil {
-
     fun List<Behandling>.sortertEtterVedtakstidspunkt() =
         this.sortedWith(compareBy(nullsLast()) { it.vedtakstidspunkt })
 

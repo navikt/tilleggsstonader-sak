@@ -10,8 +10,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class ObjectMapperProviderTest {
-
-    val expectedJson = """
+    val expectedJson =
+        """
         {
           "string" : "verdi",
           "manglerVerdi" : null,
@@ -24,7 +24,7 @@ class ObjectMapperProviderTest {
             "string" : "verdi"
           } ]
         }
-    """.trimIndent()
+        """.trimIndent()
 
     private val prettyPrinter = objectMapper.writerWithDefaultPrettyPrinter()
 

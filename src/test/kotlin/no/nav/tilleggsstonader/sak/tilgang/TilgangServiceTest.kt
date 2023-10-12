@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 
 internal class TilgangServiceTest {
-
     private val tilgangskontrollService = mockk<TilgangskontrollService>()
     private val behandlingService = mockk<BehandlingService>()
     private val fagsakService = mockk<FagsakService>()
@@ -74,9 +73,10 @@ internal class TilgangServiceTest {
     internal fun `skal kaste ManglerTilgang dersom saksbehandler ikke har tilgang til person eller dets barn`() {
         every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(false)
 
-        val assertThatThrownBy = assertThatThrownBy {
-            tilgangService.validerTilgangTilPersonMedBarn(mocketPersonIdent, AuditLoggerEvent.ACCESS)
-        }
+        val assertThatThrownBy =
+            assertThatThrownBy {
+                tilgangService.validerTilgangTilPersonMedBarn(mocketPersonIdent, AuditLoggerEvent.ACCESS)
+            }
         assertThatThrownBy.isInstanceOf(ManglerTilgang::class.java)
     }
 
@@ -92,12 +92,13 @@ internal class TilgangServiceTest {
         val tilgangsfeilNavAnsatt = Tilgang(false, "NAV-ansatt")
         every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns tilgangsfeilNavAnsatt
 
-        val feil = catchThrowableOfType<ManglerTilgang> {
-            tilgangService.validerTilgangTilBehandling(
-                behandling.id,
-                AuditLoggerEvent.ACCESS,
-            )
-        }
+        val feil =
+            catchThrowableOfType<ManglerTilgang> {
+                tilgangService.validerTilgangTilBehandling(
+                    behandling.id,
+                    AuditLoggerEvent.ACCESS,
+                )
+            }
 
         assertThat(feil.frontendFeilmelding).contains(tilgangsfeilNavAnsatt.begrunnelse)
         assertThat(feil.frontendFeilmelding).contains(tilgangsfeilNavAnsatt.begrunnelse)

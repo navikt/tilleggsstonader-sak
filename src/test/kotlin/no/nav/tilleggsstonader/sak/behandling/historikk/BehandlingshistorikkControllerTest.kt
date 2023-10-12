@@ -30,7 +30,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 internal class BehandlingshistorikkControllerTest : IntegrationTest() {
-
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
 

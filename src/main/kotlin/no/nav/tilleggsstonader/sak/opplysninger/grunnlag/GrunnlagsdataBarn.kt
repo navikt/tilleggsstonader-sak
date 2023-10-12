@@ -11,10 +11,11 @@ data class GrunnlagsdataBarn(
     val dødsdato: LocalDate?,
 )
 
-fun Map<String, PdlPersonForelderBarn>.tilGrunnlagsdataBarn() = entries.map { (ident, barn) ->
-    GrunnlagsdataBarn(
-        ident = ident,
-        navn = barn.navn.gjeldende(),
-        dødsdato = barn.dødsfall.gjeldende()?.dødsdato,
-    )
-}
+fun Map<String, PdlPersonForelderBarn>.tilGrunnlagsdataBarn() =
+    entries.map { (ident, barn) ->
+        GrunnlagsdataBarn(
+            ident = ident,
+            navn = barn.navn.gjeldende(),
+            dødsdato = barn.dødsfall.gjeldende()?.dødsdato,
+        )
+    }

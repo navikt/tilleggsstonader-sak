@@ -45,7 +45,6 @@ data class SøknadBarnetilsyn(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     override val sporbar: Sporbar = Sporbar(),
     override val data: SkjemaBarnetilsyn,
-
     @MappedCollection(idColumn = "soknad_id")
     val barn: Set<SøknadBarn>,
 ) : Søknad<SkjemaBarnetilsyn>

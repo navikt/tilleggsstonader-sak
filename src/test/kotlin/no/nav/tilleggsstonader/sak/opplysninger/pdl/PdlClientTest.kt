@@ -22,9 +22,7 @@ import java.net.URI
 import java.time.LocalDate
 
 class PdlClientTest {
-
     companion object {
-
         private val restTemplate: RestTemplate = RestTemplateBuilder().build()
         lateinit var pdlClient: PdlClient
         lateinit var wiremockServerItem: WireMockServer
@@ -155,7 +153,6 @@ class PdlClientTest {
 
     @Nested
     inner class HentIdenterBolk {
-
         @Test
         fun `håndterer response for uthenting av identer i bolk`() {
             wiremockServerItem.stubFor(

@@ -44,10 +44,11 @@ class OpprettTestBehandlingController(
     private val barnService: BarnService,
     private val søknadService: SøknadService,
 ) {
-
     @Transactional
     @PostMapping
-    fun opprettBehandling(@RequestBody testBehandlingRequest: TestBehandlingRequest): UUID {
+    fun opprettBehandling(
+        @RequestBody testBehandlingRequest: TestBehandlingRequest,
+    ): UUID {
         val fagsak: Fagsak = lagFagsak(testBehandlingRequest)
         val behandling = lagBehandling(fagsak)
         opprettSøknad(fagsak, behandling)
@@ -62,7 +63,10 @@ class OpprettTestBehandlingController(
             behandlingsårsak = BehandlingÅrsak.SØKNAD,
         )
 
-    private fun opprettSøknad(fagsak: Fagsak, behandling: Behandling) {
+    private fun opprettSøknad(
+        fagsak: Fagsak,
+        behandling: Behandling,
+    ) {
         when (fagsak.stønadstype) {
             Stønadstype.BARNETILSYN -> opprettSøknadBarnetilsyn(fagsak, behandling)
         }
@@ -73,45 +77,55 @@ class OpprettTestBehandlingController(
         behandling: Behandling,
     ) {
         val pdlBarn = personService.hentPersonMedBarn(fagsak.hentAktivIdent()).barn
-        val barnMedBarnepass = pdlBarn.entries.map { (ident, barn) ->
-            BarnMedBarnepass(
-                ident = TekstFelt("", ident),
-                navn = TekstFelt("", "navn"),
-                type = EnumFelt("", TypeBarnepass.BARNEHAGE_SFO_AKS, "", emptyList()),
-                startetIFemte = null,
-                årsak = null,
+        val barnMedBarnepass =
+            pdlBarn.entries.map { (ident, barn) ->
+                BarnMedBarnepass(
+                    ident = TekstFelt("", ident),
+                    navn = TekstFelt("", "navn"),
+                    type = EnumFelt("", TypeBarnepass.BARNEHAGE_SFO_AKS, "", emptyList()),
+                    startetIFemte = null,
+                    årsak = null,
+                )
+            }
+        val skjemaBarnetilsyn =
+            SøknadsskjemaBarnetilsyn(
+                hovedytelse =
+                    HovedytelseAvsnitt(
+                        hovedytelse = EnumFelt("", Hovedytelse.AAP, "", emptyList()),
+                    ),
+                aktivitet =
+                    AktivitetAvsnitt(
+                        utdanning = EnumFelt("", JaNei.JA, "", emptyList()),
+                    ),
+                barn =
+                    BarnAvsnitt(
+                        barnMedBarnepass = barnMedBarnepass,
+                    ),
             )
-        }
-        val skjemaBarnetilsyn = SøknadsskjemaBarnetilsyn(
-            hovedytelse = HovedytelseAvsnitt(
-                hovedytelse = EnumFelt("", Hovedytelse.AAP, "", emptyList()),
-            ),
-            aktivitet = AktivitetAvsnitt(
-                utdanning = EnumFelt("", JaNei.JA, "", emptyList()),
-            ),
-            barn = BarnAvsnitt(
-                barnMedBarnepass = barnMedBarnepass,
-            ),
-        )
-        val skjema = Søknadsskjema(
-            ident = fagsak.hentAktivIdent(),
-            mottattTidspunkt = LocalDateTime.now(),
-            språk = Språkkode.NB,
-            skjema = skjemaBarnetilsyn,
-        )
+        val skjema =
+            Søknadsskjema(
+                ident = fagsak.hentAktivIdent(),
+                mottattTidspunkt = LocalDateTime.now(),
+                språk = Språkkode.NB,
+                skjema = skjemaBarnetilsyn,
+            )
         val søknad = søknadService.lagreSøknad(behandling.id, "TESTJPID", skjema)
         opprettBarn(behandling, søknad)
     }
 
     // Oppretter BehandlingBarn for alle barn fra PDL for å få et vilkår per barn
-    private fun opprettBarn(behandling: Behandling, søknad: SøknadBarnetilsyn) {
-        val behandlingBarn = søknad.barn.map { barn ->
-            BehandlingBarn(
-                behandlingId = behandling.id,
-                ident = barn.ident,
-                søknadBarnId = barn.id,
-            )
-        }
+    private fun opprettBarn(
+        behandling: Behandling,
+        søknad: SøknadBarnetilsyn,
+    ) {
+        val behandlingBarn =
+            søknad.barn.map { barn ->
+                BehandlingBarn(
+                    behandlingId = behandling.id,
+                    ident = barn.ident,
+                    søknadBarnId = barn.id,
+                )
+            }
         barnService.opprettBarn(behandlingBarn)
     }
 

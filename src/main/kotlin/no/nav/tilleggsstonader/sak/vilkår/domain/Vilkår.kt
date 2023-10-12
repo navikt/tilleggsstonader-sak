@@ -47,7 +47,10 @@ data class Vilkår(
         opphavsvilkår ?: Opphavsvilkår(behandlingId, sporbar.endret.endretTid)
 }
 
-fun List<Vilkår>.utledVurderinger(vilkårType: VilkårType, regelId: RegelId) =
+fun List<Vilkår>.utledVurderinger(
+    vilkårType: VilkårType,
+    regelId: RegelId,
+) =
     this.filter { it.type == vilkårType }.flatMap { it.delvilkårsett }
         .flatMap { it.vurderinger }
         .filter { it.regelId == regelId }
@@ -72,7 +75,6 @@ data class Delvilkår(
     val resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
     val vurderinger: List<Vurdering>,
 ) {
-
     // regelId for første svaret er det samme som hovedregel
     val hovedregel = vurderinger.first().regelId
 }
@@ -95,6 +97,7 @@ enum class Vilkårsresultat(val beskrivelse: String) {
     ;
 
     fun oppfyltEllerIkkeOppfylt() = this == OPPFYLT || this == IKKE_OPPFYLT
+
     fun erIkkeDelvilkårsresultat() = this != AUTOMATISK_OPPFYLT
 }
 
@@ -108,9 +111,9 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Støn
     fun gjelderFlereBarn(): Boolean = false
 
     companion object {
-
-        fun hentVilkårForStønad(stønadstype: Stønadstype): List<VilkårType> = values().filter {
-            it.gjelderStønader.contains(stønadstype)
-        }
+        fun hentVilkårForStønad(stønadstype: Stønadstype): List<VilkårType> =
+            values().filter {
+                it.gjelderStønader.contains(stønadstype)
+            }
     }
 }

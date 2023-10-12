@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.vilkår.regler.SvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregel
 
 object RegelValidering {
-
     fun validerVilkår(
         vilkårsregel: Vilkårsregel,
         oppdatertDelvilkårsett: List<DelvilkårDto>,
@@ -32,7 +31,10 @@ object RegelValidering {
     /**
      * Validerer att begrunnelse er ifylt hvis [SvarRegel.begrunnelseType]=[BegrunnelseType.PÅKREVD]
      */
-    fun manglerPåkrevdBegrunnelse(svarRegel: SvarRegel, vurdering: VurderingDto): Boolean =
+    fun manglerPåkrevdBegrunnelse(
+        svarRegel: SvarRegel,
+        vurdering: VurderingDto,
+    ): Boolean =
         svarRegel.begrunnelseType == BegrunnelseType.PÅKREVD && vurdering.begrunnelse?.trim().isNullOrEmpty()
 
     /**

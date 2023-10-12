@@ -16,10 +16,11 @@ class VilkårsregelEnHovedregel :
             RegelSteg(
                 RegelId.HAR_ET_NAVN,
                 jaNeiSvarRegel(
-                    hvisNei = NesteRegel(
-                        RegelId.HAR_ET_NAVN2,
-                        BegrunnelseType.PÅKREVD,
-                    ),
+                    hvisNei =
+                        NesteRegel(
+                            RegelId.HAR_ET_NAVN2,
+                            BegrunnelseType.PÅKREVD,
+                        ),
                 ),
             ),
             RegelSteg(
@@ -43,8 +44,9 @@ class VilkårsregelToHovedregler :
                 svarMapping = jaNeiSvarRegel(),
             ),
         ),
-        hovedregler = setOf(
-            RegelId.HAR_ET_NAVN,
-            RegelId.HAR_ET_NAVN2,
-        ),
+        hovedregler =
+            setOf(
+                RegelId.HAR_ET_NAVN,
+                RegelId.HAR_ET_NAVN2,
+            ),
     )

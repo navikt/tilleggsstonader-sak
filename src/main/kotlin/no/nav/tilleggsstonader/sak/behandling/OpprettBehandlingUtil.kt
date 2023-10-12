@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.http.HttpStatus
 
 object OpprettBehandlingUtil {
-
     /**
      * @param behandlingType for ny behandling
      */
@@ -22,9 +21,10 @@ object OpprettBehandlingUtil {
         tidligereBehandlinger: List<Behandling>,
         erMigrering: Boolean = false,
     ) {
-        val sisteBehandling = tidligereBehandlinger
-            .filter { it.resultat != BehandlingResultat.HENLAGT }
-            .sisteFerdigstilteBehandling()
+        val sisteBehandling =
+            tidligereBehandlinger
+                .filter { it.resultat != BehandlingResultat.HENLAGT }
+                .sisteFerdigstilteBehandling()
 
         validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger)
         validerMigreringErRevurdering(behandlingType, erMigrering)
@@ -35,7 +35,10 @@ object OpprettBehandlingUtil {
         }
     }
 
-    private fun validerMigreringErRevurdering(behandlingType: BehandlingType, erMigrering: Boolean) {
+    private fun validerMigreringErRevurdering(
+        behandlingType: BehandlingType,
+        erMigrering: Boolean,
+    ) {
         feilHvis(erMigrering && behandlingType != REVURDERING) {
             "Det er ikke mulig å lage en migrering av annet enn revurdering"
         }
@@ -60,7 +63,10 @@ object OpprettBehandlingUtil {
         }
     }
 
-    private fun validerKanOppretteRevurdering(sisteBehandling: Behandling?, erMigrering: Boolean) {
+    private fun validerKanOppretteRevurdering(
+        sisteBehandling: Behandling?,
+        erMigrering: Boolean,
+    ) {
         if (sisteBehandling == null && !erMigrering) {
             throw ApiFeil("Det finnes ikke en tidligere behandling på fagsaken", HttpStatus.BAD_REQUEST)
         }

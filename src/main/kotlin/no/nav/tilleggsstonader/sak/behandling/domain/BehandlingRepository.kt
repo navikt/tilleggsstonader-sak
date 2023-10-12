@@ -13,10 +13,12 @@ import java.util.UUID
  */
 @Repository
 interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUpdateRepository<Behandling> {
-
     fun findByFagsakId(fagsakId: UUID): List<Behandling>
 
-    fun findByFagsakIdAndStatus(fagsakId: UUID, status: BehandlingStatus): List<Behandling>
+    fun findByFagsakIdAndStatus(
+        fagsakId: UUID,
+        status: BehandlingStatus,
+    ): List<Behandling>
 
     fun existsByFagsakId(fagsakId: UUID): Boolean
 
@@ -139,9 +141,15 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
     )
     fun finnBehandlingerForGjenbrukAvVilkår(fagsakPersonId: UUID): List<Behandling>
 
-    fun existsByFagsakIdAndStatusIsNot(fagsakId: UUID, behandlingStatus: BehandlingStatus): Boolean
+    fun existsByFagsakIdAndStatusIsNot(
+        fagsakId: UUID,
+        behandlingStatus: BehandlingStatus,
+    ): Boolean
 
-    fun existsByFagsakIdAndStatusIsNotIn(fagsakId: UUID, behandlingStatus: List<BehandlingStatus>): Boolean
+    fun existsByFagsakIdAndStatusIsNotIn(
+        fagsakId: UUID,
+        behandlingStatus: List<BehandlingStatus>,
+    ): Boolean
 
     // language=PostgreSQL
     @Query(

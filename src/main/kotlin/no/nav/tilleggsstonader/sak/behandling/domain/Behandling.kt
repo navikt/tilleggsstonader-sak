@@ -24,7 +24,6 @@ data class Behandling(
     val eksternId: EksternBehandlingId = EksternBehandlingId(),
     // @Version ?
     val versjon: Int = 0,
-
     val type: BehandlingType,
     val status: BehandlingStatus,
     val steg: StegType,
@@ -32,7 +31,6 @@ data class Behandling(
     @Column("arsak")
     val årsak: BehandlingÅrsak,
     val kravMottatt: LocalDate? = null,
-
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     val resultat: BehandlingResultat,
@@ -40,7 +38,6 @@ data class Behandling(
     val henlagtÅrsak: HenlagtÅrsak? = null,
     val vedtakstidspunkt: LocalDateTime? = null,
 ) {
-
     fun kanHenlegges(): Boolean = !status.behandlingErLåstForVidereRedigering()
 
     fun erMigrering(): Boolean = årsak == BehandlingÅrsak.MIGRERING

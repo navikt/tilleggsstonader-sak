@@ -26,10 +26,10 @@ class SøkService(
     private val personService: PersonService,
     private val fagsakService: FagsakService,
 ) {
-
     fun søkPersonForEksternFagsak(eksternFagsakId: Long): Søkeresultat {
-        val fagsak = fagsakService.hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId)
-            ?: throw ApiFeil("Finner ikke fagsak for eksternFagsakId=$eksternFagsakId", HttpStatus.BAD_REQUEST)
+        val fagsak =
+            fagsakService.hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId)
+                ?: throw ApiFeil("Finner ikke fagsak for eksternFagsakId=$eksternFagsakId", HttpStatus.BAD_REQUEST)
         val fagsakPerson = fagsakPersonService.hentPerson(fagsak.fagsakPersonId)
         return tilSøkeresultat(fagsakPerson.hentAktivIdent(), fagsakPerson)
     }

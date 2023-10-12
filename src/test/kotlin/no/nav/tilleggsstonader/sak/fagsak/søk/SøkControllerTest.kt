@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.exchange
 
 internal class SøkControllerTest : IntegrationTest() {
-
     @BeforeEach
     fun setUp() {
         headers.setBearerAuth(onBehalfOfToken())
@@ -70,7 +69,6 @@ internal class SøkControllerTest : IntegrationTest() {
 
     @Nested
     inner class SøkPersonForEksternFagsak {
-
         @Test
         @Disabled // TODO har ikke implementert andel_tilkjent_ytelse ennå
         internal fun `skal finne person hvis fagsaken eksisterer`() {

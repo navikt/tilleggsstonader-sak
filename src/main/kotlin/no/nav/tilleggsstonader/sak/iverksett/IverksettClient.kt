@@ -20,7 +20,6 @@ class IverksettClient(
     @Qualifier("azure")
     private val restOperations: RestOperations,
 ) {
-
     fun simuler(simuleringRequest: SimuleringDto): BeriketSimuleringsresultat {
         val url = URI.create("$familieEfIverksettUri/api/simulering")
 

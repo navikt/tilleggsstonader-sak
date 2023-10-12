@@ -7,9 +7,9 @@ import java.time.temporal.Temporal
 // TODO flytte til kontrakter?
 
 sealed class Periode<T> : Comparable<Periode<T>> where T : Comparable<T>, T : Temporal {
-
     abstract val fom: T
     abstract val tom: T
+
     protected fun validate() {
         require(tom >= fom) { "Til-og-med før fra-og-med: $fom > $tom" }
     }
@@ -68,11 +68,13 @@ sealed class Periode<T> : Comparable<Periode<T>> where T : Comparable<T>, T : Te
         return Comparator.comparing(Periode<T>::fom).thenComparing(Periode<T>::tom).compare(this, other)
     }
 
-    abstract fun lagPeriode(fom: T, tom: T): Periode<T>
+    abstract fun lagPeriode(
+        fom: T,
+        tom: T,
+    ): Periode<T>
 }
 
 data class Månedsperiode(override val fom: YearMonth, override val tom: YearMonth) : Periode<YearMonth>() {
-
     init {
         validate()
     }
@@ -87,7 +89,10 @@ data class Månedsperiode(override val fom: YearMonth, override val tom: YearMon
     constructor(fom: String, tom: String) : this(YearMonth.parse(fom), YearMonth.parse(tom))
     constructor(periode: Pair<String, String>) : this(periode.first, periode.second)
 
-    override fun lagPeriode(fom: YearMonth, tom: YearMonth): Månedsperiode {
+    override fun lagPeriode(
+        fom: YearMonth,
+        tom: YearMonth,
+    ): Månedsperiode {
         return Månedsperiode(fom, tom)
     }
 
@@ -111,7 +116,6 @@ data class Månedsperiode(override val fom: YearMonth, override val tom: YearMon
 }
 
 data class Datoperiode(override val fom: LocalDate, override val tom: LocalDate) : Periode<LocalDate>() {
-
     init {
         validate()
     }
@@ -123,7 +127,10 @@ data class Datoperiode(override val fom: LocalDate, override val tom: LocalDate)
     constructor(fom: String, tom: String) : this(LocalDate.parse(fom), LocalDate.parse(tom))
     constructor(periode: Pair<String, String>) : this(periode.first, periode.second)
 
-    override fun lagPeriode(fom: LocalDate, tom: LocalDate): Datoperiode {
+    override fun lagPeriode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): Datoperiode {
         return Datoperiode(fom, tom)
     }
 

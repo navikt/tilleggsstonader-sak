@@ -24,7 +24,6 @@ import java.time.LocalDate
 import java.util.UUID
 
 internal class SimuleringControllerTest : IntegrationTest() {
-
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
 
@@ -49,14 +48,15 @@ internal class SimuleringControllerTest : IntegrationTest() {
                 TilkjentYtelse(
                     behandlingId = behandling.id,
                     startdato = LocalDate.of(2021, 1, 1),
-                    andelerTilkjentYtelse = listOf(
-                        AndelTilkjentYtelse(
-                            15000,
-                            LocalDate.of(2021, 1, 1),
-                            LocalDate.of(2021, 12, 31),
-                            kildeBehandlingId = behandling.id,
+                    andelerTilkjentYtelse =
+                        listOf(
+                            AndelTilkjentYtelse(
+                                15000,
+                                LocalDate.of(2021, 1, 1),
+                                LocalDate.of(2021, 12, 31),
+                                kildeBehandlingId = behandling.id,
+                            ),
                         ),
-                    ),
                 ),
             )
 

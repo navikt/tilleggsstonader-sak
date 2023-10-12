@@ -22,9 +22,10 @@ class FagsakController(
     private val fagsakService: FagsakService,
     private val tilgangService: TilgangService,
 ) {
-
     @PostMapping
-    fun hentEllerOpprettFagsakForPerson(@RequestBody fagsakRequest: FagsakRequest): FagsakDto {
+    fun hentEllerOpprettFagsakForPerson(
+        @RequestBody fagsakRequest: FagsakRequest,
+    ): FagsakDto {
         tilgangService.validerTilgangTilPersonMedBarn(fagsakRequest.personIdent, AuditLoggerEvent.CREATE) // TODO dele opp denne?
         return fagsakService.hentEllerOpprettFagsakMedBehandlinger(
             fagsakRequest.personIdent,
@@ -33,13 +34,17 @@ class FagsakController(
     }
 
     @GetMapping("{fagsakId}")
-    fun hentFagsak(@PathVariable fagsakId: UUID): FagsakDto {
+    fun hentFagsak(
+        @PathVariable fagsakId: UUID,
+    ): FagsakDto {
         tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
         return fagsakService.hentFagsakMedBehandlinger(fagsakId)
     }
 
     @GetMapping("/ekstern/{eksternFagsakId}")
-    fun hentFagsak(@PathVariable eksternFagsakId: Long): FagsakDto {
+    fun hentFagsak(
+        @PathVariable eksternFagsakId: Long,
+    ): FagsakDto {
         val fagsakDto = fagsakService.hentFagsakDtoPåEksternId(eksternFagsakId)
         tilgangService.validerTilgangTilFagsak(fagsakDto.id, AuditLoggerEvent.ACCESS)
         return fagsakDto

@@ -10,7 +10,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 
 object SøknadsskjemaMapper {
-    fun map(skjema: Søknadsskjema<SøknadsskjemaBarnetilsyn>, journalpostId: String): SøknadBarnetilsyn {
+    fun map(
+        skjema: Søknadsskjema<SøknadsskjemaBarnetilsyn>,
+        journalpostId: String,
+    ): SøknadBarnetilsyn {
         return SøknadBarnetilsyn(
             journalpostId = journalpostId,
             mottattTidspunkt = skjema.mottattTidspunkt,
@@ -22,23 +25,26 @@ object SøknadsskjemaMapper {
 
     private fun mapSkjemaBarnetilsyn(skjema: Søknadsskjema<SøknadsskjemaBarnetilsyn>) =
         SkjemaBarnetilsyn(
-            hovedytelse = HovedytelseAvsnitt(
-                hovedytelse = skjema.skjema.hovedytelse.hovedytelse.verdi,
-            ),
-            aktivitet = AktivitetAvsnitt(
-                utdanning = skjema.skjema.aktivitet.utdanning.verdi,
-            ),
+            hovedytelse =
+                HovedytelseAvsnitt(
+                    hovedytelse = skjema.skjema.hovedytelse.hovedytelse.verdi,
+                ),
+            aktivitet =
+                AktivitetAvsnitt(
+                    utdanning = skjema.skjema.aktivitet.utdanning.verdi,
+                ),
         )
 
     private fun mapBarn(skjema: Søknadsskjema<SøknadsskjemaBarnetilsyn>) =
         skjema.skjema.barn.barnMedBarnepass.map {
             SøknadBarn(
                 ident = it.ident.verdi,
-                data = BarnMedBarnepass(
-                    type = it.type.verdi,
-                    startetIFemte = it.startetIFemte?.verdi,
-                    årsak = it.årsak?.verdi,
-                ),
+                data =
+                    BarnMedBarnepass(
+                        type = it.type.verdi,
+                        startetIFemte = it.startetIFemte?.verdi,
+                        årsak = it.årsak?.verdi,
+                    ),
             )
         }.toSet()
 }

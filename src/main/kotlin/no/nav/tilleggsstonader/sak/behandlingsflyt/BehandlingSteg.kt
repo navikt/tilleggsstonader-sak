@@ -5,21 +5,26 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 
 interface BehandlingSteg<T> {
-
     fun validerSteg(saksbehandling: Saksbehandling) {}
 
     /**
      * Hvis man trenger å overridea vanlige flytet og returnere en annen stegtype kan man overridea denne metoden,
      * hvis ikke kalles utførSteg uten å returnere en stegType
      */
-    fun utførOgReturnerNesteSteg(saksbehandling: Saksbehandling, data: T): StegType {
+    fun utførOgReturnerNesteSteg(
+        saksbehandling: Saksbehandling,
+        data: T,
+    ): StegType {
         utførSteg(saksbehandling, data)
         return nesteSteg()
     }
 
     fun nesteSteg() = stegType().hentNesteSteg()
 
-    fun utførSteg(saksbehandling: Saksbehandling, data: T)
+    fun utførSteg(
+        saksbehandling: Saksbehandling,
+        data: T,
+    )
 
     fun stegType(): StegType
 

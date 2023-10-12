@@ -21,7 +21,6 @@ class TestoppsettService(
     private val fagsakRepository: FagsakRepository,
     private val behandlingRepository: BehandlingRepository,
 ) {
-
     fun opprettBehandlingMedFagsak(
         behandling: Behandling,
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
@@ -65,10 +64,11 @@ class TestoppsettService(
             .takeIf { it.isNotEmpty() }
             ?.let { fagsakPersonRepository.findByIdent(it) }
 
-    private fun opprettPerson(fagsak: Fagsak) = fagsakPersonRepository.insert(
-        FagsakPerson(
-            fagsak.fagsakPersonId,
-            identer = fagsak.personIdenter,
-        ),
-    )
+    private fun opprettPerson(fagsak: Fagsak) =
+        fagsakPersonRepository.insert(
+            FagsakPerson(
+                fagsak.fagsakPersonId,
+                identer = fagsak.personIdenter,
+            ),
+        )
 }

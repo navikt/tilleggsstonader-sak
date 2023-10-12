@@ -20,7 +20,6 @@ class TilkjentYtelseService(
     private val tilkjentYtelseRepository: TilkjentYtelseRepository,
     private val fagsakService: FagsakService,
 ) {
-
     fun hentForBehandlingEllerNull(behandlingId: UUID): TilkjentYtelse? {
         return tilkjentYtelseRepository.findByBehandlingId(behandlingId)
     }
@@ -52,23 +51,27 @@ class TilkjentYtelseService(
         tilkjenteYtelser: List<TilkjentYtelse>,
         datoForAvstemming: LocalDate,
     ): List<KonsistensavstemmingTilkjentYtelseDto> {
-        val behandlinger = behandlingService.hentBehandlinger(tilkjenteYtelser.map { it.behandlingId }.toSet())
-            .associateBy { it.id }
+        val behandlinger =
+            behandlingService.hentBehandlinger(tilkjenteYtelser.map { it.behandlingId }.toSet())
+                .associateBy { it.id }
 
         val fagsakerMedOppdatertPersonIdenter =
             fagsakService.fagsakerMedOppdatertePersonIdenter(behandlinger.map { it.value.fagsakId })
                 .associateBy { it.id }
 
         return tilkjenteYtelser.map { tilkjentYtelse ->
-            val behandling = behandlinger[tilkjentYtelse.behandlingId]
-                ?: error("Finner ikke behandling for behandlingId=${tilkjentYtelse.behandlingId}")
-            val andelerTilkjentYtelse = tilkjentYtelse.andelerTilkjentYtelse
-                .filter { it.stønadTom.isEqualOrAfter(datoForAvstemming) }
-                .filter { it.beløp > 0 }
-                .map { it.tilIverksettDto() }
+            val behandling =
+                behandlinger[tilkjentYtelse.behandlingId]
+                    ?: error("Finner ikke behandling for behandlingId=${tilkjentYtelse.behandlingId}")
+            val andelerTilkjentYtelse =
+                tilkjentYtelse.andelerTilkjentYtelse
+                    .filter { it.stønadTom.isEqualOrAfter(datoForAvstemming) }
+                    .filter { it.beløp > 0 }
+                    .map { it.tilIverksettDto() }
 
-            val fagsakMedOppdatertPersonIdent = fagsakerMedOppdatertPersonIdenter[behandling.fagsakId]
-                ?: error("Finner ikke fagsak for fagsakId=${behandling.fagsakId}")
+            val fagsakMedOppdatertPersonIdent =
+                fagsakerMedOppdatertPersonIdenter[behandling.fagsakId]
+                    ?: error("Finner ikke fagsak for fagsakId=${behandling.fagsakId}")
 
             KonsistensavstemmingTilkjentYtelseDto(
                 behandlingId = tilkjentYtelse.behandlingId,

@@ -33,7 +33,6 @@ class VilkårService(
     // private val grunnlagsdataService: GrunnlagsdataService,
     private val fagsakService: FagsakService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
@@ -113,11 +112,12 @@ class VilkårService(
         metadata: HovedregelMetadata,
     ): List<Vilkår> {
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
-        val nyttVilkårsett: List<Vilkår> = opprettNyeVilkår(
-            behandlingId = behandlingId,
-            metadata = metadata,
-            stønadstype = stønadstype,
-        )
+        val nyttVilkårsett: List<Vilkår> =
+            opprettNyeVilkår(
+                behandlingId = behandlingId,
+                metadata = metadata,
+                stønadstype = stønadstype,
+            )
         return vilkårRepository.insertAll(nyttVilkårsett)
     }
 
@@ -145,12 +145,13 @@ class VilkårService(
         val barnIdMap = byggBarnMapFraTidligereTilNyId(barnPåForrigeBehandling, metadata.barn)
         validerAtVurderingerKanKopieres(tidligereVurderinger, eksisterendeBehandlingId)
 
-        val kopiAvVurderinger: Map<UUID, Vilkår> = lagKopiAvTidligereVurderinger(
-            tidligereVurderinger,
-            metadata.barn,
-            nyBehandlingsId,
-            barnIdMap,
-        )
+        val kopiAvVurderinger: Map<UUID, Vilkår> =
+            lagKopiAvTidligereVurderinger(
+                tidligereVurderinger,
+                metadata.barn,
+                nyBehandlingsId,
+                barnIdMap,
+            )
 
         val nyeBarnVurderinger = opprettVilkårForNyeBarn(kopiAvVurderinger, metadata, stønadstype)
 
@@ -176,13 +177,14 @@ class VilkårService(
         tidligereVilkår.values
             .filter { skalKopiereVilkår(it, barnPåGjeldendeBehandling.isNotEmpty()) }
             .associate { vilkår ->
-                vilkår.id to vilkår.copy(
-                    id = UUID.randomUUID(),
-                    behandlingId = nyBehandlingsId,
-                    sporbar = Sporbar(),
-                    barnId = finnBarnId(vilkår.barnId, barnIdMap),
-                    opphavsvilkår = vilkår.opprettOpphavsvilkår(),
-                )
+                vilkår.id to
+                    vilkår.copy(
+                        id = UUID.randomUUID(),
+                        behandlingId = nyBehandlingsId,
+                        sporbar = Sporbar(),
+                        barnId = finnBarnId(vilkår.barnId, barnIdMap),
+                        opphavsvilkår = vilkår.opprettOpphavsvilkår(),
+                    )
             }
 
     private fun opprettVilkårForNyeBarn(
@@ -195,7 +197,10 @@ class VilkårService(
             .map { OppdaterVilkår.lagVilkårForNyttBarn(metadata, it.behandlingId, it.id, stønadstype) }
             .flatten()
 
-    private fun finnBarnId(barnId: UUID?, barnIdMap: Map<UUID, BehandlingBarn>): UUID? {
+    private fun finnBarnId(
+        barnId: UUID?,
+        barnIdMap: Map<UUID, BehandlingBarn>,
+    ): UUID? {
         return barnId?.let {
             val barnIdMapping = barnIdMap.map { it.key to it.value.id }.toMap()
             barnIdMap[it]?.id ?: error("Fant ikke barn=$it på gjeldende behandling med barnIdMapping=$barnIdMapping")
@@ -219,7 +224,6 @@ class VilkårService(
     }
 
     companion object {
-
         fun byggBarnMapFraTidligereTilNyId(
             barnPåForrigeBehandling: List<BehandlingBarn>,
             barnPåGjeldendeBehandling: List<BehandlingBarn>,

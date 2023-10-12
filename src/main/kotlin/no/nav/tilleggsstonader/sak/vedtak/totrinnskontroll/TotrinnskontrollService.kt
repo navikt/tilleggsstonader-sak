@@ -20,7 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollSt
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnskontrollDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
+import java.util.UUID
 
 @Service
 class TotrinnskontrollService(
@@ -28,7 +28,6 @@ class TotrinnskontrollService(
     private val behandlingService: BehandlingService,
     private val tilgangService: TilgangService,
 ) {
-
     /**
      * Lagrer data om besluttning av totrinnskontroll
      * og returnerer navIdent til saksbehandleren som sendte behandling til beslutter
@@ -47,8 +46,8 @@ class TotrinnskontrollService(
                 frontendFeilmelding = "Behandlingen er i feil steg, last siden på nytt",
             )
         }
-/** Lar stå utkommentert fram til koden leser Totrinnsdataobjektetet der dette ligger tilgjengeleg **/
-        /**  if (!vedtakErUtenBeslutter.value && beslutterErLikBehandler(sisteBehandlingshistorikk)) {
+        /** Lar stå utkommentert fram til koden leser Totrinnsdataobjektetet der dette ligger tilgjengeleg
+         if (!vedtakErUtenBeslutter.value && beslutterErLikBehandler(sisteBehandlingshistorikk)) {
          throw ApiFeil(
          "Beslutter kan ikke behandle en behandling som den selv har sendt til beslutter",
          HttpStatus.BAD_REQUEST,
@@ -56,7 +55,8 @@ class TotrinnskontrollService(
          } **/
 
         val nyStatus = if (beslutteVedtak.godkjent) BehandlingStatus.IVERKSETTER_VEDTAK else BehandlingStatus.UTREDES
-        val utfall = if (beslutteVedtak.godkjent) StegUtfall.BESLUTTE_VEDTAK_GODKJENT else StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT
+        val utfall =
+            if (beslutteVedtak.godkjent) StegUtfall.BESLUTTE_VEDTAK_GODKJENT else StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT
 
         behandlingshistorikkService.opprettHistorikkInnslag(
             behandlingId = saksbehandling.id,
@@ -73,7 +73,8 @@ class TotrinnskontrollService(
         val totrinnskontrollSaksbehandler =
             behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId, StegType.SEND_TIL_BESLUTTER)
 
-        return totrinnskontrollSaksbehandler?.opprettetAv ?: throw Feil("Fant ikke saksbehandler som sendte til beslutter")
+        return totrinnskontrollSaksbehandler?.opprettetAv
+            ?: throw Feil("Fant ikke saksbehandler som sendte til beslutter")
     }
 
     fun hentBeslutter(behandlingId: UUID): String? {
@@ -150,11 +151,13 @@ class TotrinnskontrollService(
                     ),
                 )
             }
+
             StegUtfall.ANGRE_SEND_TIL_BESLUTTER -> StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
-            else -> error(
-                "Skal ikke kunne være annen status enn UNDERKJENT når " +
-                    "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",
-            )
+            else ->
+                error(
+                    "Skal ikke kunne være annen status enn UNDERKJENT når " +
+                        "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",
+                )
         }
     }
 

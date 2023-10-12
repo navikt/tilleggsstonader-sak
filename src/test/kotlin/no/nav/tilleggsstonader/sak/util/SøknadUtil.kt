@@ -16,21 +16,23 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import java.time.LocalDateTime
 
 object SøknadUtil {
-
     fun søknadskjemaBarnetilsyn(
         ident: String = "søker",
         mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
         barnMedBarnepass: List<BarnMedBarnepass> = listOf(barnMedBarnepass()),
     ): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
-        val skjemaBarnetilsyn = SøknadsskjemaBarnetilsyn(
-            hovedytelse = HovedytelseAvsnitt(
-                hovedytelse = EnumFelt("", Hovedytelse.AAP, "", emptyList()),
-            ),
-            aktivitet = AktivitetAvsnitt(
-                utdanning = EnumFelt("", JaNei.JA, "", emptyList()),
-            ),
-            barn = BarnAvsnitt(barnMedBarnepass = barnMedBarnepass),
-        )
+        val skjemaBarnetilsyn =
+            SøknadsskjemaBarnetilsyn(
+                hovedytelse =
+                    HovedytelseAvsnitt(
+                        hovedytelse = EnumFelt("", Hovedytelse.AAP, "", emptyList()),
+                    ),
+                aktivitet =
+                    AktivitetAvsnitt(
+                        utdanning = EnumFelt("", JaNei.JA, "", emptyList()),
+                    ),
+                barn = BarnAvsnitt(barnMedBarnepass = barnMedBarnepass),
+            )
         return Søknadsskjema(
             ident = ident,
             mottattTidspunkt = mottattTidspunkt,
@@ -42,11 +44,12 @@ object SøknadUtil {
     fun barnMedBarnepass(
         ident: String = "fnr",
         navn: String = "navn",
-    ): BarnMedBarnepass = BarnMedBarnepass(
-        ident = TekstFelt("", ident),
-        navn = TekstFelt("", navn),
-        type = EnumFelt("", TypeBarnepass.BARNEHAGE_SFO_AKS, "", emptyList()),
-        startetIFemte = EnumFelt("", JaNei.JA, "", emptyList()),
-        årsak = EnumFelt("", ÅrsakBarnepass.MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID, "", emptyList()),
-    )
+    ): BarnMedBarnepass =
+        BarnMedBarnepass(
+            ident = TekstFelt("", ident),
+            navn = TekstFelt("", navn),
+            type = EnumFelt("", TypeBarnepass.BARNEHAGE_SFO_AKS, "", emptyList()),
+            startetIFemte = EnumFelt("", JaNei.JA, "", emptyList()),
+            årsak = EnumFelt("", ÅrsakBarnepass.MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID, "", emptyList()),
+        )
 }

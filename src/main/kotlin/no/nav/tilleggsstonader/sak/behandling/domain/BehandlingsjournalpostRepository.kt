@@ -11,7 +11,6 @@ import java.util.UUID
 @Repository
 interface BehandlingsjournalpostRepository :
     RepositoryInterface<Behandlingsjournalpost, UUID>, InsertUpdateRepository<Behandlingsjournalpost> {
-
     fun findAllByBehandlingId(behandlingId: UUID): List<Behandlingsjournalpost>
 }
 

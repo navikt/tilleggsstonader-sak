@@ -29,9 +29,10 @@ class BehandlingController(
     private val tilgangService: TilgangService,
     // private val gjenbrukVilkårService: GjenbrukVilkårService,
 ) {
-
     @GetMapping("{behandlingId}")
-    fun hentBehandling(@PathVariable behandlingId: UUID): BehandlingDto {
+    fun hentBehandling(
+        @PathVariable behandlingId: UUID,
+    ): BehandlingDto {
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
         return saksbehandling.tilDto()
@@ -40,9 +41,10 @@ class BehandlingController(
     @GetMapping("gamle-behandlinger")
     fun hentGamleUferdigeBehandlinger(): List<BehandlingDto> {
         val stønadstyper = Stønadstype.values()
-        val gamleBehandlinger = stønadstyper.flatMap { stønadstype ->
-            behandlingService.hentUferdigeBehandlingerOpprettetFørDato(stønadstype).map { it.tilDto(stønadstype) }
-        }
+        val gamleBehandlinger =
+            stønadstyper.flatMap { stønadstype ->
+                behandlingService.hentUferdigeBehandlingerOpprettetFørDato(stønadstype).map { it.tilDto(stønadstype) }
+            }
         return gamleBehandlinger
     }
 
@@ -75,7 +77,10 @@ class BehandlingController(
      */
 
     @PostMapping("{behandlingId}/henlegg")
-    fun henleggBehandling(@PathVariable behandlingId: UUID, @RequestBody henlagt: HenlagtDto): BehandlingDto {
+    fun henleggBehandling(
+        @PathVariable behandlingId: UUID,
+        @RequestBody henlagt: HenlagtDto,
+    ): BehandlingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         val henlagtBehandling = henleggService.henleggBehandling(behandlingId, henlagt)
@@ -84,7 +89,9 @@ class BehandlingController(
     }
 
     @GetMapping("/ekstern/{eksternBehandlingId}")
-    fun hentBehandling(@PathVariable eksternBehandlingId: Long): BehandlingDto {
+    fun hentBehandling(
+        @PathVariable eksternBehandlingId: Long,
+    ): BehandlingDto {
         val saksbehandling = behandlingService.hentSaksbehandling(eksternBehandlingId)
         tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
         return saksbehandling.tilDto()

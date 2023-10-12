@@ -37,7 +37,6 @@ data class CustomKeyValue(val key: String, val value: String) {
 
 @Component
 class AuditLogger {
-
     private val logger = LoggerFactory.getLogger(javaClass)
     private val audit = LoggerFactory.getLogger("auditLogger")
 
@@ -60,7 +59,10 @@ class AuditLogger {
             ?.request
     }
 
-    private fun createAuditLogString(data: Sporingsdata, request: HttpServletRequest): String {
+    private fun createAuditLogString(
+        data: Sporingsdata,
+        request: HttpServletRequest,
+    ): String {
         val timestamp = System.currentTimeMillis()
         val name = "Saksbehandling"
         return "CEF:0|Tilleggsstonader|sak|1.0|audit:${data.event.type}|$name|INFO|end=$timestamp " +

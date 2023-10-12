@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 
 class TostrinnskontrollRepositoryTest : IntegrationTest() {
-
     @Autowired
     lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
 
@@ -22,41 +21,43 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
     @Test
     fun `skal kunne lagre og hente totrinnskontroll`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-        val totrinnskontroll = lagreOgOppdaterEndretTidTilOpprettetTid(
-            Totrinnskontroll(
-                behandlingId = behandling.id,
-                saksbehandler = "1",
-                status = TotrinnsKontrollStatus.KLAR,
-            ),
-        )
+        val totrinnskontroll =
+            lagreOgOppdaterEndretTidTilOpprettetTid(
+                Totrinnskontroll(
+                    behandlingId = behandling.id,
+                    saksbehandler = "1",
+                    status = TotrinnsKontrollStatus.KLAR,
+                ),
+            )
         val totrinnskontrollFraDb = totrinnskontrollRepository.findByIdOrThrow(totrinnskontroll.id)
         assertThat(totrinnskontrollFraDb).isEqualTo(totrinnskontroll)
     }
 
     @Nested
     inner class FindLastBehandlingIdOrderBySporbarEndretEndretTid {
-
         @Test
         fun `skal finne siste totrinnskontroll basert på endret tidspunkt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val t = Totrinnskontroll(
-                behandlingId = behandling.id,
-                saksbehandler = "1",
-                status = TotrinnsKontrollStatus.KLAR,
-                sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
-            )
+            val t =
+                Totrinnskontroll(
+                    behandlingId = behandling.id,
+                    saksbehandler = "1",
+                    status = TotrinnsKontrollStatus.KLAR,
+                    sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
+                )
             val totrinnskontrollFirst = lagreOgOppdaterEndretTidTilOpprettetTid(t)
             assertThat(totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandling.id))
                 .isEqualTo(totrinnskontrollFirst)
 
-            val totrinnskontrollSecond = lagreOgOppdaterEndretTidTilOpprettetTid(
-                Totrinnskontroll(
-                    behandlingId = behandling.id,
-                    saksbehandler = "2",
-                    status = TotrinnsKontrollStatus.KLAR,
-                    sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
-                ),
-            )
+            val totrinnskontrollSecond =
+                lagreOgOppdaterEndretTidTilOpprettetTid(
+                    Totrinnskontroll(
+                        behandlingId = behandling.id,
+                        saksbehandler = "2",
+                        status = TotrinnsKontrollStatus.KLAR,
+                        sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
+                    ),
+                )
             assertThat(totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandling.id))
                 .isEqualTo(totrinnskontrollSecond)
         }
@@ -67,22 +68,24 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
         @Test
         fun `skal finne alle totrinnskontroller på gjeldene behandling`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val totrinnskontrollFirst = lagreOgOppdaterEndretTidTilOpprettetTid(
-                Totrinnskontroll(
-                    behandlingId = behandling.id,
-                    saksbehandler = "1",
-                    status = TotrinnsKontrollStatus.KLAR,
-                    sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
-                ),
-            )
-            val totrinnskontrollSecond = lagreOgOppdaterEndretTidTilOpprettetTid(
-                Totrinnskontroll(
-                    behandlingId = behandling.id,
-                    saksbehandler = "2",
-                    status = TotrinnsKontrollStatus.KLAR,
-                    sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
-                ),
-            )
+            val totrinnskontrollFirst =
+                lagreOgOppdaterEndretTidTilOpprettetTid(
+                    Totrinnskontroll(
+                        behandlingId = behandling.id,
+                        saksbehandler = "1",
+                        status = TotrinnsKontrollStatus.KLAR,
+                        sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
+                    ),
+                )
+            val totrinnskontrollSecond =
+                lagreOgOppdaterEndretTidTilOpprettetTid(
+                    Totrinnskontroll(
+                        behandlingId = behandling.id,
+                        saksbehandler = "2",
+                        status = TotrinnsKontrollStatus.KLAR,
+                        sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
+                    ),
+                )
             val listemedtotrinnsstatusfradb = totrinnskontrollRepository.findAllByBehandlingId(behandling.id)
 
             assertThat(listemedtotrinnsstatusfradb)
@@ -106,14 +109,15 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                 ),
             )
 
-            val sisteTotrinskontroll = lagreOgOppdaterEndretTidTilOpprettetTid(
-                Totrinnskontroll(
-                    behandlingId = behandlingOne.id,
-                    saksbehandler = "2",
-                    status = TotrinnsKontrollStatus.UNDERKJENT,
-                    sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(3)),
-                ),
-            )
+            val sisteTotrinskontroll =
+                lagreOgOppdaterEndretTidTilOpprettetTid(
+                    Totrinnskontroll(
+                        behandlingId = behandlingOne.id,
+                        saksbehandler = "2",
+                        status = TotrinnsKontrollStatus.UNDERKJENT,
+                        sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(3)),
+                    ),
+                )
             lagreOgOppdaterEndretTidTilOpprettetTid(
                 Totrinnskontroll(
                     behandlingId = behandlingOne.id,

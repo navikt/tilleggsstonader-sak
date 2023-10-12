@@ -9,53 +9,57 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class TilgangskontrollUtilTest {
-
     @Test
     fun `høyesteGraderingen skal returnere høyeste gradering fra barn`() {
-        val person = lagPersonMedRelasjoner(
-            adressebeskyttelse = UGRADERT,
-            barn = STRENGT_FORTROLIG,
-        )
+        val person =
+            lagPersonMedRelasjoner(
+                adressebeskyttelse = UGRADERT,
+                barn = STRENGT_FORTROLIG,
+            )
 
         assertThat(TilgangskontrollUtil.høyesteGraderingen(person)).isEqualTo(STRENGT_FORTROLIG)
     }
 
     @Test
     fun `STRENGT_FORTROLIG trumfer FORTROLIG`() {
-        val person = lagPersonMedRelasjoner(
-            adressebeskyttelse = FORTROLIG,
-            barn = STRENGT_FORTROLIG,
-        )
+        val person =
+            lagPersonMedRelasjoner(
+                adressebeskyttelse = FORTROLIG,
+                barn = STRENGT_FORTROLIG,
+            )
 
         assertThat(TilgangskontrollUtil.høyesteGraderingen(person)).isEqualTo(STRENGT_FORTROLIG)
     }
 
     @Test
     fun `høyesteGraderingen skal returnere høyeste gradering fra hovedperson`() {
-        val person = lagPersonMedRelasjoner(
-            adressebeskyttelse = STRENGT_FORTROLIG,
-            barn = UGRADERT,
-        )
+        val person =
+            lagPersonMedRelasjoner(
+                adressebeskyttelse = STRENGT_FORTROLIG,
+                barn = UGRADERT,
+            )
 
         assertThat(TilgangskontrollUtil.høyesteGraderingen(person)).isEqualTo(STRENGT_FORTROLIG)
     }
 
     @Test
     fun `høyesteGraderingen skal returnere ugradert `() {
-        val person = lagPersonMedRelasjoner(
-            adressebeskyttelse = UGRADERT,
-            barn = UGRADERT,
-        )
+        val person =
+            lagPersonMedRelasjoner(
+                adressebeskyttelse = UGRADERT,
+                barn = UGRADERT,
+            )
 
         assertThat(TilgangskontrollUtil.høyesteGraderingen(person)).isEqualTo(UGRADERT)
     }
 
     @Test
     fun `høyesteGraderingen skal returnere strengeste gradering hvis mange`() {
-        val person = lagPersonMedRelasjoner(
-            adressebeskyttelse = UGRADERT,
-            barn = STRENGT_FORTROLIG_UTLAND,
-        )
+        val person =
+            lagPersonMedRelasjoner(
+                adressebeskyttelse = UGRADERT,
+                barn = STRENGT_FORTROLIG_UTLAND,
+            )
 
         assertThat(TilgangskontrollUtil.høyesteGraderingen(person)).isEqualTo(STRENGT_FORTROLIG_UTLAND)
     }
@@ -71,6 +75,9 @@ internal class TilgangskontrollUtilTest {
         )
     }
 
-    private fun lagPersonMedBeskyttelse(gradering: AdressebeskyttelseGradering?, personIdent: String) =
+    private fun lagPersonMedBeskyttelse(
+        gradering: AdressebeskyttelseGradering?,
+        personIdent: String,
+    ) =
         gradering?.let { listOf(PersonMedAdresseBeskyttelse(personIdent, it)) } ?: emptyList()
 }

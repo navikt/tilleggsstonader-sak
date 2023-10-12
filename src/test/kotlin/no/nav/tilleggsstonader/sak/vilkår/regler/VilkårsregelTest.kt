@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import kotlin.io.path.name
 
 internal class VilkårsregelTest {
-
     @Test
     internal fun `sjekker at output fortsatt er det samme på json`() {
         val vilkårsregler = Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.map { it.value }

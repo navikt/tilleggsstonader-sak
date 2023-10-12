@@ -15,16 +15,16 @@ import java.util.concurrent.TimeoutException
 
 @ControllerAdvice
 class ApiExceptionHandler {
-
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLogger = SecureLogger.secureLogger
 
     @ExceptionHandler(Throwable::class)
     fun handleThrowable(throwable: Throwable): ProblemDetail {
-        val responseStatus = throwable::class.annotations.find { it is ResponseStatus }
-            ?.let { it as ResponseStatus }
-            ?.value
-            ?: HttpStatus.INTERNAL_SERVER_ERROR
+        val responseStatus =
+            throwable::class.annotations.find { it is ResponseStatus }
+                ?.let { it as ResponseStatus }
+                ?.value
+                ?: HttpStatus.INTERNAL_SERVER_ERROR
 
         val metodeSomFeiler = finnMetodeSomFeiler(throwable)
 
@@ -94,17 +94,19 @@ class ApiExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, feil.message ?: "Mangler melding")
     }
 
-    private fun lagTimeoutfeilRessurs(): ProblemDetail = ProblemDetail.forStatusAndDetail(
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        "Kommunikasjonsproblemer med andre systemer - prøv igjen",
-    )
+    private fun lagTimeoutfeilRessurs(): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Kommunikasjonsproblemer med andre systemer - prøv igjen",
+        )
 
     fun finnMetodeSomFeiler(e: Throwable): String {
-        val firstElement = e.stackTrace.firstOrNull {
-            it.className.startsWith("no.nav.tilleggsstonader.sak") &&
-                !it.className.contains("$") &&
-                !it.className.contains("InsertUpdateRepositoryImpl")
-        }
+        val firstElement =
+            e.stackTrace.firstOrNull {
+                it.className.startsWith("no.nav.tilleggsstonader.sak") &&
+                    !it.className.contains("$") &&
+                    !it.className.contains("InsertUpdateRepositoryImpl")
+            }
         if (firstElement != null) {
             val className = firstElement.className.split(".").lastOrNull()
             return "$className::${firstElement.methodName}(${firstElement.lineNumber})"

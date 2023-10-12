@@ -7,12 +7,14 @@ import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
 object VilkårGrunnlagUtil {
     fun mockVilkårGrunnlagDto() =
         VilkårGrunnlagDto(
-            hovedytelse = GrunnlagHovedytelse(
-                søknadsgrunnlag = null,
-            ),
-            aktivitet = GrunnlagAktivitet(
-                søknadsgrunnlag = null,
-            ),
+            hovedytelse =
+                GrunnlagHovedytelse(
+                    søknadsgrunnlag = null,
+                ),
+            aktivitet =
+                GrunnlagAktivitet(
+                    søknadsgrunnlag = null,
+                ),
             barn = emptyList(),
         )
 }

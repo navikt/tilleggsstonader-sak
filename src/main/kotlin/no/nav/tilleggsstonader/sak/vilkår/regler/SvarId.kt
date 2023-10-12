@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.regler
 
 enum class SvarId {
-
     // Felles
     JA,
     NEI,

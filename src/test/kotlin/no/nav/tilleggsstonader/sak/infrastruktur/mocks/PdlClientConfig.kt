@@ -55,7 +55,6 @@ import java.time.Month
 @Configuration
 @Profile("mock-pdl")
 class PdlClientConfig {
-
     @Bean
     @Primary
     fun pdlClient(): PdlClient {
@@ -71,7 +70,7 @@ class PdlClientConfig {
 
         every { pdlClient.hentPersonForelderBarnRelasjon(any()) } returns barn()
 
-        every { pdlClient.hentAndreForeldre(any()) } returns mapOf(annenForelderFnr to annenForelder())
+        every { pdlClient.hentAndreForeldre(any()) } returns mapOf(FNR_ANNEN_FORELDER to annenForelder())
 
         val personIdentAktør = slot<String>()
         every { pdlClient.hentAktørIder(capture(personIdentAktør)) } answers {
@@ -119,14 +118,12 @@ class PdlClientConfig {
     }
 
     companion object {
-
         private val startdato = LocalDate.of(2020, 1, 1)
         private val sluttdato = LocalDate.of(2021, 1, 1)
-        const val barnFnr = "01012067050"
-        const val barn2Fnr = "14041385481"
-        const val søkerFnr = "01010172272"
-        const val annenForelderFnr = "17097926735"
-        private const val fnrPåAdresseSøk = "01012067050"
+        const val FNR_BARN = "01012067050"
+        const val FNR_BARN2 = "14041385481"
+        const val FNR_SØKER = "01010172272"
+        const val FNR_ANNEN_FORELDER = "17097926735"
 
         fun lagPersonKort(it: String) =
             PdlPersonKort(
@@ -140,32 +137,35 @@ class PdlClientConfig {
                 emptyList(),
             )
 
-        val folkeregisteridentifikatorSøker = Folkeregisteridentifikator(
-            søkerFnr,
-            FolkeregisteridentifikatorStatus.I_BRUK,
-            metadataGjeldende,
-        )
+        val folkeregisteridentifikatorSøker =
+            Folkeregisteridentifikator(
+                FNR_SØKER,
+                FolkeregisteridentifikatorStatus.I_BRUK,
+                metadataGjeldende,
+            )
 
         fun opprettPdlSøker() =
             pdlSøker(
-                adressebeskyttelse = listOf(
-                    Adressebeskyttelse(
-                        gradering = AdressebeskyttelseGradering.UGRADERT,
-                        metadata = metadataGjeldende,
+                adressebeskyttelse =
+                    listOf(
+                        Adressebeskyttelse(
+                            gradering = AdressebeskyttelseGradering.UGRADERT,
+                            metadata = metadataGjeldende,
+                        ),
                     ),
-                ),
                 bostedsadresse = bostedsadresse(),
                 dødsfall = listOf(),
                 forelderBarnRelasjon = forelderBarnRelasjoner(),
                 folkeregisteridentifikator = listOf(folkeregisteridentifikatorSøker),
                 fødsel = listOf(fødsel()),
-                folkeregisterpersonstatus = listOf(
-                    Folkeregisterpersonstatus(
-                        "bosatt",
-                        "bosattEtterFolkeregisterloven",
-                        metadataGjeldende,
+                folkeregisterpersonstatus =
+                    listOf(
+                        Folkeregisterpersonstatus(
+                            "bosatt",
+                            "bosattEtterFolkeregisterloven",
+                            metadataGjeldende,
+                        ),
                     ),
-                ),
                 fullmakt = fullmakter(),
                 kjønn = lagKjønn(KjønnType.KVINNE),
                 kontaktadresse = kontaktadresse(),
@@ -175,52 +175,57 @@ class PdlClientConfig {
                 sivilstand = sivilstand(),
                 statsborgerskap = statsborgerskap(),
                 innflyttingTilNorge = listOf(InnflyttingTilNorge("SWE", "Stockholm", folkeregistermetadata)),
-                utflyttingFraNorge = listOf(
-                    UtflyttingFraNorge(
-                        tilflyttingsland = "SWE",
-                        tilflyttingsstedIUtlandet = "Stockholm",
-                        utflyttingsdato = LocalDate.of(2021, 1, 1),
-                        folkeregistermetadata = folkeregistermetadata,
+                utflyttingFraNorge =
+                    listOf(
+                        UtflyttingFraNorge(
+                            tilflyttingsland = "SWE",
+                            tilflyttingsstedIUtlandet = "Stockholm",
+                            utflyttingsdato = LocalDate.of(2021, 1, 1),
+                            folkeregistermetadata = folkeregistermetadata,
+                        ),
                     ),
-                ),
                 vergemaalEllerFremtidsfullmakt = vergemaalEllerFremtidsfullmakt(),
             )
 
-        private val folkeregistermetadata = Folkeregistermetadata(
-            LocalDateTime.of(2010, Month.AUGUST, 30, 10, 10),
-            LocalDateTime.of(2018, Month.JANUARY, 15, 12, 55),
-        )
+        private val folkeregistermetadata =
+            Folkeregistermetadata(
+                LocalDateTime.of(2010, Month.AUGUST, 30, 10, 10),
+                LocalDateTime.of(2018, Month.JANUARY, 15, 12, 55),
+            )
 
         private fun barn(): Map<String, PdlPersonForelderBarn> =
             mapOf(
-                barnFnr to pdlBarn(
-                    bostedsadresse = bostedsadresse(),
-                    deltBosted = listOf(
-                        DeltBosted(
-                            LocalDate.of(2023, 1, 1),
-                            LocalDate.of(2053, 1, 1),
-                            null,
-                            null,
-                            Metadata(false),
-                        ),
-                        DeltBosted(
-                            LocalDate.of(2020, 1, 1),
-                            LocalDate.of(2023, 3, 31),
-                            null,
-                            null,
-                            Metadata(true),
-                        ),
+                FNR_BARN to
+                    pdlBarn(
+                        bostedsadresse = bostedsadresse(),
+                        deltBosted =
+                            listOf(
+                                DeltBosted(
+                                    LocalDate.of(2023, 1, 1),
+                                    LocalDate.of(2053, 1, 1),
+                                    null,
+                                    null,
+                                    Metadata(false),
+                                ),
+                                DeltBosted(
+                                    LocalDate.of(2020, 1, 1),
+                                    LocalDate.of(2023, 3, 31),
+                                    null,
+                                    null,
+                                    Metadata(true),
+                                ),
+                            ),
+                        forelderBarnRelasjon = familierelasjonerBarn(),
+                        fødsel = fødsel(),
+                        navn = lagNavn("Barn", null, "Barnesen"),
                     ),
-                    forelderBarnRelasjon = familierelasjonerBarn(),
-                    fødsel = fødsel(),
-                    navn = lagNavn("Barn", null, "Barnesen"),
-                ),
-                barn2Fnr to pdlBarn(
-                    bostedsadresse = bostedsadresse(),
-                    forelderBarnRelasjon = familierelasjonerBarn(),
-                    fødsel = fødsel(),
-                    navn = lagNavn("Barn2", null, "Barnesen"),
-                ),
+                FNR_BARN2 to
+                    pdlBarn(
+                        bostedsadresse = bostedsadresse(),
+                        forelderBarnRelasjon = familierelasjonerBarn(),
+                        fødsel = fødsel(),
+                        navn = lagNavn("Barn2", null, "Barnesen"),
+                    ),
             )
 
         private fun annenForelder(): PdlAnnenForelder =
@@ -230,24 +235,25 @@ class PdlClientConfig {
                 dødsfall = listOf(Dødsfall(LocalDate.of(2021, 9, 22))),
                 fødsel = listOf(fødsel(1994, 11, 1)),
                 navn = listOf(Navn("Bob", "", "Burger", metadataGjeldende)),
-                folkeregisteridentifikator = listOf(
-                    Folkeregisteridentifikator(
-                        annenForelderFnr,
-                        FolkeregisteridentifikatorStatus.I_BRUK,
-                        metadataGjeldende,
+                folkeregisteridentifikator =
+                    listOf(
+                        Folkeregisteridentifikator(
+                            FNR_ANNEN_FORELDER,
+                            FolkeregisteridentifikatorStatus.I_BRUK,
+                            metadataGjeldende,
+                        ),
                     ),
-                ),
             )
 
         private fun forelderBarnRelasjoner(): List<ForelderBarnRelasjon> =
             listOf(
                 ForelderBarnRelasjon(
-                    relatertPersonsIdent = barnFnr,
+                    relatertPersonsIdent = FNR_BARN,
                     relatertPersonsRolle = Familierelasjonsrolle.BARN,
                     minRolleForPerson = Familierelasjonsrolle.MOR,
                 ),
                 ForelderBarnRelasjon(
-                    relatertPersonsIdent = barn2Fnr,
+                    relatertPersonsIdent = FNR_BARN2,
                     relatertPersonsRolle = Familierelasjonsrolle.BARN,
                     minRolleForPerson = Familierelasjonsrolle.MOR,
                 ),
@@ -256,12 +262,12 @@ class PdlClientConfig {
         private fun familierelasjonerBarn(): List<ForelderBarnRelasjon> =
             listOf(
                 ForelderBarnRelasjon(
-                    relatertPersonsIdent = søkerFnr,
+                    relatertPersonsIdent = FNR_SØKER,
                     relatertPersonsRolle = Familierelasjonsrolle.MOR,
                     minRolleForPerson = Familierelasjonsrolle.BARN,
                 ),
                 ForelderBarnRelasjon(
-                    relatertPersonsIdent = annenForelderFnr,
+                    relatertPersonsIdent = FNR_ANNEN_FORELDER,
                     relatertPersonsRolle = Familierelasjonsrolle.FAR,
                     minRolleForPerson = Familierelasjonsrolle.BARN,
                 ),
@@ -352,24 +358,24 @@ class PdlClientConfig {
                     folkeregistermetadata = null,
                     type = "voksen",
                     vergeEllerFullmektig =
-                    VergeEllerFullmektig(
-                        motpartsPersonident = annenForelderFnr,
-                        navn = null,
-                        omfang = "personligeOgOekonomiskeInteresser",
-                        omfangetErInnenPersonligOmraade = false,
-                    ),
+                        VergeEllerFullmektig(
+                            motpartsPersonident = FNR_ANNEN_FORELDER,
+                            navn = null,
+                            omfang = "personligeOgOekonomiskeInteresser",
+                            omfangetErInnenPersonligOmraade = false,
+                        ),
                 ),
                 VergemaalEllerFremtidsfullmakt(
                     embete = null,
                     folkeregistermetadata = null,
                     type = "stadfestetFremtidsfullmakt",
                     vergeEllerFullmektig =
-                    VergeEllerFullmektig(
-                        motpartsPersonident = annenForelderFnr,
-                        navn = null,
-                        omfang = "personligeOgOekonomiskeInteresser",
-                        omfangetErInnenPersonligOmraade = false,
-                    ),
+                        VergeEllerFullmektig(
+                            motpartsPersonident = FNR_ANNEN_FORELDER,
+                            navn = null,
+                            omfang = "personligeOgOekonomiskeInteresser",
+                            omfangetErInnenPersonligOmraade = false,
+                        ),
                 ),
             )
         }

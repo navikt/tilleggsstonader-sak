@@ -7,7 +7,6 @@ import org.springframework.http.ProblemDetail
 import org.springframework.web.client.RestClientResponseException
 
 object ProblemDetailUtil {
-
     fun catchProblemDetailException(fn: () -> Unit): no.nav.tilleggsstonader.libs.http.client.ProblemDetailException {
         return catchThrowableOfType<no.nav.tilleggsstonader.libs.http.client.ProblemDetailException> {
             execWithErrorHandler(fn)

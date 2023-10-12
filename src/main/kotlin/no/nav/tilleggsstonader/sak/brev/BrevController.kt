@@ -11,9 +11,10 @@ import java.util.Base64
 @RequestMapping("/api/brev")
 @ProtectedWithClaims(issuer = "azuread")
 class BrevController(private val familieDokumentClient: FamilieDokumentClient) {
-
     @PostMapping("lag-pdf")
-    fun genererPdf(@RequestBody request: GenererPdfRequest): ByteArray {
+    fun genererPdf(
+        @RequestBody request: GenererPdfRequest,
+    ): ByteArray {
         return Base64.getEncoder().encode(familieDokumentClient.genererPdf(request.html))
     }
 

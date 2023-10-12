@@ -9,7 +9,6 @@ import java.util.UUID
 
 @Repository
 interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpdateRepository<FagsakDomain> {
-
     // language=PostgreSQL
     @Query(
         """SELECT DISTINCT f.*, fe.id AS eksternid_id
@@ -19,9 +18,15 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpda
                     WHERE pi.ident IN (:personIdenter)
                     AND f.stonadstype = :stønadstype""",
     )
-    fun findBySøkerIdent(personIdenter: Set<String>, stønadstype: Stønadstype): FagsakDomain?
+    fun findBySøkerIdent(
+        personIdenter: Set<String>,
+        stønadstype: Stønadstype,
+    ): FagsakDomain?
 
-    fun findByFagsakPersonIdAndStønadstype(fagsakPersonId: UUID, stønadstype: Stønadstype): FagsakDomain?
+    fun findByFagsakPersonIdAndStønadstype(
+        fagsakPersonId: UUID,
+        stønadstype: Stønadstype,
+    ): FagsakDomain?
 
     // language=PostgreSQL
     @Query(

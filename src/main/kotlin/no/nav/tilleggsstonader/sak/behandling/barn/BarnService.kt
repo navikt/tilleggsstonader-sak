@@ -7,7 +7,6 @@ import java.util.UUID
 class BarnService(
     private val barnRepository: BarnRepository,
 ) {
-
     fun opprettBarn(barn: List<BehandlingBarn>): List<BehandlingBarn> =
         barnRepository.insertAll(barn)
 

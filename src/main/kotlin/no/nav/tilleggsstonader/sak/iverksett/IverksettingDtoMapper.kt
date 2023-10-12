@@ -9,10 +9,11 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.kontrakt.TilkjentYt
 import java.time.LocalDate
 import java.time.YearMonth
 
-fun TilkjentYtelse.tilIverksettDto(): TilkjentYtelseDto = TilkjentYtelseDto(
-    andelerTilkjentYtelse = andelerTilkjentYtelse.map { andel -> andel.tilIverksettDto() },
-    startmåned = YearMonth.from(startdato),
-)
+fun TilkjentYtelse.tilIverksettDto(): TilkjentYtelseDto =
+    TilkjentYtelseDto(
+        andelerTilkjentYtelse = andelerTilkjentYtelse.map { andel -> andel.tilIverksettDto() },
+        startmåned = YearMonth.from(startdato),
+    )
 
 fun AndelTilkjentYtelse.tilIverksettDto() =
     AndelTilkjentYtelseDto(

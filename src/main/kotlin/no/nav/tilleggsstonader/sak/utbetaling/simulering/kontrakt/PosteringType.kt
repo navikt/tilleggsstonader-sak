@@ -10,7 +10,6 @@ enum class PosteringType(val kode: String) {
     ;
 
     companion object {
-
         private val kodeMap = PosteringType.values().associateBy { it.kode }
 
         fun fraKode(kode: String): PosteringType {

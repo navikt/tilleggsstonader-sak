@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Profile
 @Configuration
 @Profile("mock-oppgave")
 class OppgaveClientConfig {
-
     @Bean
     @Primary
     fun oppgaveClient(): OppgaveClient {

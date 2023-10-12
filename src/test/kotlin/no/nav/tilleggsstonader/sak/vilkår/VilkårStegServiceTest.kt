@@ -51,7 +51,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 internal class VilkårStegServiceTest {
-
     private val behandlingService = mockk<BehandlingService>()
     private val søknadService = mockk<SøknadService>()
     private val vilkårRepository = mockk<VilkårRepository>()
@@ -68,29 +67,32 @@ internal class VilkårStegServiceTest {
 
     // private val featureToggleService = mockk<FeatureToggleService>()
     private val behandlingshistorikkService = mockk<BehandlingshistorikkService>()
-    private val vilkårService = VilkårService(
-        behandlingService,
-        søknadService,
-        vilkårRepository,
-        barnService,
-        vilkårGrunnlagService,
-        // grunnlagsdataService,
-        fagsakService,
-        // featureToggleService,
-    )
-    private val vilkårStegService = VilkårStegService(
-        behandlingService = behandlingService,
-        vilkårService = vilkårService,
-        vilkårRepository = vilkårRepository,
-        // blankettRepository = blankettRepository,
-        // stegService = stegService,
-        // taskService = taskService,
-        behandlingshistorikkService = behandlingshistorikkService,
-    )
-    private val søknad = SøknadsskjemaMapper.map(
-        søknadskjemaBarnetilsyn(),
-        "id",
-    )
+    private val vilkårService =
+        VilkårService(
+            behandlingService,
+            søknadService,
+            vilkårRepository,
+            barnService,
+            vilkårGrunnlagService,
+            // grunnlagsdataService,
+            fagsakService,
+            // featureToggleService,
+        )
+    private val vilkårStegService =
+        VilkårStegService(
+            behandlingService = behandlingService,
+            vilkårService = vilkårService,
+            vilkårRepository = vilkårRepository,
+            // blankettRepository = blankettRepository,
+            // stegService = stegService,
+            // taskService = taskService,
+            behandlingshistorikkService = behandlingshistorikkService,
+        )
+    private val søknad =
+        SøknadsskjemaMapper.map(
+            søknadskjemaBarnetilsyn(),
+            "id",
+        )
     private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
     val fagsak = fagsak()
     private val behandling = behandling(fagsak, BehandlingStatus.OPPRETTET)
@@ -140,12 +142,13 @@ internal class VilkårStegServiceTest {
         val lagretVilkår = slot<Vilkår>()
         val vilkår = initiererVilkår(lagretVilkår)
 
-        val delvilkårDto = listOf(
-            DelvilkårDto(
-                Vilkårsresultat.IKKE_OPPFYLT,
-                listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
-            ),
-        )
+        val delvilkårDto =
+            listOf(
+                DelvilkårDto(
+                    Vilkårsresultat.IKKE_OPPFYLT,
+                    listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
+                ),
+            )
         vilkårStegService.oppdaterVilkår(
             SvarPåVilkårDto(
                 id = vilkår.id,
@@ -204,15 +207,17 @@ internal class VilkårStegServiceTest {
 
     @Test
     internal fun `skal ikke oppdatere vilkår hvis behandlingen er låst for videre behandling`() {
-        every { behandlingService.hentBehandling(behandlingId) } returns behandling(
-            fagsak(),
-            BehandlingStatus.FERDIGSTILT,
-        )
-        val vilkår = vilkår(
-            behandlingId,
-            resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-            VilkårType.EKSEMPEL,
-        )
+        every { behandlingService.hentBehandling(behandlingId) } returns
+            behandling(
+                fagsak(),
+                BehandlingStatus.FERDIGSTILT,
+            )
+        val vilkår =
+            vilkår(
+                behandlingId,
+                resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+                VilkårType.EKSEMPEL,
+            )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
         assertThat(
@@ -232,18 +237,20 @@ internal class VilkårStegServiceTest {
 
     @Test
     internal fun `skal oppdatere status fra OPPRETTET til UTREDES og lage historikkinnslag for første vilkår`() {
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling(
-            fagsak(),
-            status = BehandlingStatus.OPPRETTET,
-        )
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns
+            saksbehandling(
+                fagsak(),
+                status = BehandlingStatus.OPPRETTET,
+            )
         val lagretVilkår = slot<Vilkår>()
         val vilkår = initiererVilkår(lagretVilkår)
-        val delvilkårDto = listOf(
-            DelvilkårDto(
-                Vilkårsresultat.IKKE_OPPFYLT,
-                listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
-            ),
-        )
+        val delvilkårDto =
+            listOf(
+                DelvilkårDto(
+                    Vilkårsresultat.IKKE_OPPFYLT,
+                    listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
+                ),
+            )
         vilkårStegService.oppdaterVilkår(
             SvarPåVilkårDto(
                 id = vilkår.id,
@@ -266,18 +273,20 @@ internal class VilkårStegServiceTest {
     @Test
     internal fun `skal ikke oppdatere status til UTREDES eller opprette historikkinnslag hvis den allerede er dette `() {
         val fagsak = fagsak()
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling(
-            fagsak,
-            status = BehandlingStatus.UTREDES,
-        )
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns
+            saksbehandling(
+                fagsak,
+                status = BehandlingStatus.UTREDES,
+            )
         val lagretVilkår = slot<Vilkår>()
         val vilkår = initiererVilkår(lagretVilkår)
-        val delvilkårDto = listOf(
-            DelvilkårDto(
-                Vilkårsresultat.IKKE_OPPFYLT,
-                listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
-            ),
-        )
+        val delvilkårDto =
+            listOf(
+                DelvilkårDto(
+                    Vilkårsresultat.IKKE_OPPFYLT,
+                    listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
+                ),
+            )
         vilkårStegService.oppdaterVilkår(
             SvarPåVilkårDto(
                 id = vilkår.id,

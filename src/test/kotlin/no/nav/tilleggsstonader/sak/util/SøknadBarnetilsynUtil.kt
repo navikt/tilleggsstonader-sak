@@ -15,13 +15,12 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 object SøknadBarnetilsynUtil {
-
     fun søknadBarnetilsyn(
         data: SkjemaBarnetilsyn = lagSkjemaBarnetilsyn(),
-        barn: Set<SøknadBarn> = setOf(
-            lagSøknadBarn(),
-        ),
-
+        barn: Set<SøknadBarn> =
+            setOf(
+                lagSøknadBarn(),
+            ),
         journalpostId: String = "testId",
         språk: Språkkode = Språkkode.NB,
         mottattTidspunkt: LocalDateTime = LocalDate.of(2023, 1, 1).atStartOfDay(),

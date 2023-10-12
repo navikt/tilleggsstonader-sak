@@ -24,7 +24,6 @@ import org.springframework.web.client.exchange
 import java.util.UUID
 
 internal class BehandlingControllerTest : IntegrationTest() {
-
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
 
@@ -72,7 +71,10 @@ internal class BehandlingControllerTest : IntegrationTest() {
         )
     }
 
-    private fun henlegg(id: UUID, henlagt: HenlagtDto): ResponseEntity<BehandlingDto> {
+    private fun henlegg(
+        id: UUID,
+        henlagt: HenlagtDto,
+    ): ResponseEntity<BehandlingDto> {
         return restTemplate.exchange<BehandlingDto>(
             localhost("/api/behandling/$id/henlegg"),
             HttpMethod.POST,

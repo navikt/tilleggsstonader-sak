@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vilkår.regler.vilkårsreglerForStønad
 import java.util.UUID
 
 object OppdaterVilkår {
-
     /**
      * Oppdaterer [Vilkår] med nye svar og resultat
      * Validerer att svaren er gyldige
@@ -47,8 +46,9 @@ object OppdaterVilkår {
 
     private fun validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat: RegelResultat) {
         if (!vilkårsresultat.vilkår.oppfyltEllerIkkeOppfylt()) {
-            val message = "Mangler fullstendig vilkår for ${vilkårsresultat.vilkårType}. " +
-                "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
+            val message =
+                "Mangler fullstendig vilkår for ${vilkårsresultat.vilkårType}. " +
+                    "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
             throw Feil(message = message, frontendFeilmelding = message)
         }
     }
@@ -66,25 +66,26 @@ object OppdaterVilkår {
         oppdatering: List<DelvilkårDto>,
     ): DelvilkårWrapper {
         val vurderingerPåType = oppdatering.associateBy { it.vurderinger.first().regelId }
-        val delvilkårsett = vilkår.delvilkårsett.map {
-            if (it.resultat == Vilkårsresultat.IKKE_AKTUELL) {
-                it
-            } else {
-                val hovedregel = it.hovedregel
-                val resultat = vilkårsresultat.resultatHovedregel(hovedregel)
-                val svar = vurderingerPåType[hovedregel] ?: throw Feil("Savner svar for hovedregel=$hovedregel")
-
-                if (resultat.oppfyltEllerIkkeOppfylt()) {
-                    it.copy(
-                        resultat = resultat,
-                        vurderinger = svar.svarTilDomene(),
-                    )
+        val delvilkårsett =
+            vilkår.delvilkårsett.map {
+                if (it.resultat == Vilkårsresultat.IKKE_AKTUELL) {
+                    it
                 } else {
-                    // TODO håndtering for [Vilkårsresultat.SKAL_IKKE_VURDERES] som burde beholde første svaret i det delvilkåret
-                    throw Feil("Håndterer ikke oppdatering av resultat=$resultat ennå")
+                    val hovedregel = it.hovedregel
+                    val resultat = vilkårsresultat.resultatHovedregel(hovedregel)
+                    val svar = vurderingerPåType[hovedregel] ?: throw Feil("Savner svar for hovedregel=$hovedregel")
+
+                    if (resultat.oppfyltEllerIkkeOppfylt()) {
+                        it.copy(
+                            resultat = resultat,
+                            vurderinger = svar.svarTilDomene(),
+                        )
+                    } else {
+                        // TODO håndtering for [Vilkårsresultat.SKAL_IKKE_VURDERES] som burde beholde første svaret i det delvilkåret
+                        throw Feil("Håndterer ikke oppdatering av resultat=$resultat ennå")
+                    }
                 }
-            }
-        }.toList()
+            }.toList()
         return vilkår.delvilkårwrapper.copy(delvilkårsett = delvilkårsett)
     }
 
@@ -162,13 +163,14 @@ object OppdaterVilkår {
     }
 
     private fun utledVilkårsresultat(lagretVilkårsett: List<Vilkår>): List<Vilkårsresultat> {
-        val vilkårsresultat = lagretVilkårsett.groupBy { it.type }.map {
-            if (it.key.gjelderFlereBarn()) {
-                utledResultatForVilkårSomGjelderFlereBarn(it.value)
-            } else {
-                it.value.single().resultat
+        val vilkårsresultat =
+            lagretVilkårsett.groupBy { it.type }.map {
+                if (it.key.gjelderFlereBarn()) {
+                    utledResultatForVilkårSomGjelderFlereBarn(it.value)
+                } else {
+                    it.value.single().resultat
+                }
             }
-        }
         return vilkårsresultat
     }
 

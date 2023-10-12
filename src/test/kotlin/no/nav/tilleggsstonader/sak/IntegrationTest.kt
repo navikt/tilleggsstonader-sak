@@ -41,7 +41,6 @@ import org.springframework.web.client.RestTemplate
 // Slett denne når RestTemplateConfiguration er tatt i bruk?
 @Configuration
 class DefaultRestTemplateConfiguration {
-
     @Bean
     fun restTemplate(restTemplateBuilder: RestTemplateBuilder) =
         restTemplateBuilder.build()
@@ -59,7 +58,6 @@ class DefaultRestTemplateConfiguration {
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
-
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     protected lateinit var restTemplate: RestTemplate
@@ -93,15 +91,12 @@ abstract class IntegrationTest {
         listOf(
             TaskLogg::class,
             Task::class,
-
             Simuleringsresultat::class,
             TilkjentYtelse::class,
             Vilkår::class,
             BehandlingBarn::class,
-
             SøknadBehandling::class,
             SøknadBarnetilsyn::class,
-
             Totrinnskontroll::class,
             Behandlingshistorikk::class,
             Behandlingsjournalpost::class,

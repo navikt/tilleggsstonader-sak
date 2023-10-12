@@ -12,9 +12,10 @@ import org.springframework.http.HttpHeaders
 val logger: Logger = LoggerFactory.getLogger(PdlClient::class.java)
 
 object PdlUtil {
-    val httpHeaders = HttpHeaders().apply {
-        add("behandlingsnummer", "B289")
-    }
+    val httpHeaders =
+        HttpHeaders().apply {
+            add("behandlingsnummer", "B289")
+        }
 }
 
 inline fun <reified DATA : Any, reified RESULT : Any> feilsjekkOgReturnerData(

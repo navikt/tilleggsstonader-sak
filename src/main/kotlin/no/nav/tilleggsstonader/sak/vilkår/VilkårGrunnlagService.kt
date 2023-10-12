@@ -26,7 +26,6 @@ class VilkårGrunnlagService(
     private val grunnlagsdataService: GrunnlagsdataService,
     private val søknadService: SøknadService,
 ) {
-
     fun hentGrunnlag(
         behandlingId: UUID,
     ): VilkårGrunnlagDto {
@@ -44,23 +43,28 @@ class VilkårGrunnlagService(
 
     private fun mapAktivitet(søknad: SøknadBarnetilsyn?) =
         GrunnlagAktivitet(
-            søknadsgrunnlag = søknad?.let {
-                SøknadsgrunnlagAktivitet(
-                    utdanning = it.data.aktivitet.utdanning,
-                )
-            },
+            søknadsgrunnlag =
+                søknad?.let {
+                    SøknadsgrunnlagAktivitet(
+                        utdanning = it.data.aktivitet.utdanning,
+                    )
+                },
         )
 
     private fun mapHovedytelse(søknad: SøknadBarnetilsyn?) =
         GrunnlagHovedytelse(
-            søknadsgrunnlag = søknad?.let {
-                SøknadsgrunnlagHovedytelse(
-                    hovedytelse = it.data.hovedytelse.hovedytelse,
-                )
-            },
+            søknadsgrunnlag =
+                søknad?.let {
+                    SøknadsgrunnlagHovedytelse(
+                        hovedytelse = it.data.hovedytelse.hovedytelse,
+                    )
+                },
         )
 
-    private fun mapBarn(grunnlagsdata: GrunnlagsdataMedMetadata, søknad: SøknadBarnetilsyn?): List<GrunnlagBarn> {
+    private fun mapBarn(
+        grunnlagsdata: GrunnlagsdataMedMetadata,
+        søknad: SøknadBarnetilsyn?,
+    ): List<GrunnlagBarn> {
         val søknadBarnPåIdent = søknad?.barn?.associateBy { it.ident } ?: emptyMap()
         if (søknad != null) {
             validerFinnesGrunnlagsdataForAlleBarnISøknad(grunnlagsdata, søknadBarnPåIdent)
@@ -68,17 +72,19 @@ class VilkårGrunnlagService(
         return grunnlagsdata.grunnlagsdata.barn.map { barn ->
             GrunnlagBarn(
                 ident = barn.ident,
-                registergrunnlag = RegistergrunnlagBarn(
-                    navn = barn.navn.visningsnavn(),
-                    dødsdato = barn.dødsdato,
-                ),
-                søknadgrunnlag = søknadBarnPåIdent[barn.ident]?.let { søknadBarn ->
-                    SøknadsgrunnlagBarn(
-                        type = søknadBarn.data.type,
-                        startetIFemte = søknadBarn.data.startetIFemte,
-                        årsak = søknadBarn.data.årsak,
-                    )
-                },
+                registergrunnlag =
+                    RegistergrunnlagBarn(
+                        navn = barn.navn.visningsnavn(),
+                        dødsdato = barn.dødsdato,
+                    ),
+                søknadgrunnlag =
+                    søknadBarnPåIdent[barn.ident]?.let { søknadBarn ->
+                        SøknadsgrunnlagBarn(
+                            type = søknadBarn.data.type,
+                            startetIFemte = søknadBarn.data.startetIFemte,
+                            årsak = søknadBarn.data.årsak,
+                        )
+                    },
             )
         }
     }

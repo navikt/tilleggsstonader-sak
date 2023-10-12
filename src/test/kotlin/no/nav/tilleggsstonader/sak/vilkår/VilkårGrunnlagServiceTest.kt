@@ -17,13 +17,13 @@ import org.junit.jupiter.api.Test
 import java.util.UUID
 
 internal class VilkårGrunnlagServiceTest {
-
     val grunnlagsdataService = mockk<GrunnlagsdataService>()
     val søknadService = mockk<SøknadService>()
-    val service = VilkårGrunnlagService(
-        grunnlagsdataService,
-        søknadService,
-    )
+    val service =
+        VilkårGrunnlagService(
+            grunnlagsdataService,
+            søknadService,
+        )
 
     val behandlingId = UUID.randomUUID()
 
@@ -38,17 +38,19 @@ internal class VilkårGrunnlagServiceTest {
 
     @Nested
     inner class GrunnlagBarnTest {
-
         @Test
         fun `skal mappe søknadsgrunnlag for de barn som fantes i søknaden`() {
-            every { grunnlagsdataService.hentFraRegister(behandlingId) } returns grunnlagsdataMedMetadata(
-                grunnlagsdata = lagGrunnlagsdata(
-                    barn = listOf(lagGrunnlagsdataBarn("1"), lagGrunnlagsdataBarn("2")),
-                ),
-            )
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn(
-                barn = setOf(lagSøknadBarn(ident = "1")),
-            )
+            every { grunnlagsdataService.hentFraRegister(behandlingId) } returns
+                grunnlagsdataMedMetadata(
+                    grunnlagsdata =
+                        lagGrunnlagsdata(
+                            barn = listOf(lagGrunnlagsdataBarn("1"), lagGrunnlagsdataBarn("2")),
+                        ),
+                )
+            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
+                søknadBarnetilsyn(
+                    barn = setOf(lagSøknadBarn(ident = "1")),
+                )
 
             val data = service.hentGrunnlag(behandlingId)
 
@@ -65,14 +67,17 @@ internal class VilkårGrunnlagServiceTest {
 
         @Test
         fun `skal kaste feil hvis ikke alle barnen fra søknaden har grunnlagsdata`() {
-            every { grunnlagsdataService.hentFraRegister(behandlingId) } returns grunnlagsdataMedMetadata(
-                grunnlagsdata = lagGrunnlagsdata(
-                    barn = listOf(lagGrunnlagsdataBarn("1")),
-                ),
-            )
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn(
-                barn = setOf(lagSøknadBarn(ident = "1"), lagSøknadBarn(ident = "2"), lagSøknadBarn(ident = "3")),
-            )
+            every { grunnlagsdataService.hentFraRegister(behandlingId) } returns
+                grunnlagsdataMedMetadata(
+                    grunnlagsdata =
+                        lagGrunnlagsdata(
+                            barn = listOf(lagGrunnlagsdataBarn("1")),
+                        ),
+                )
+            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
+                søknadBarnetilsyn(
+                    barn = setOf(lagSøknadBarn(ident = "1"), lagSøknadBarn(ident = "2"), lagSøknadBarn(ident = "3")),
+                )
             assertThatThrownBy {
                 service.hentGrunnlag(behandlingId)
             }.hasMessage("Mangler grunnlagsdata for barn i søknad (2,3)")

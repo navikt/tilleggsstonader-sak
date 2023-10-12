@@ -4,7 +4,6 @@ import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 import org.slf4j.LoggerFactory
 
 object SikkerhetContext {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private const val SYSTEM_NAVN = "System"
@@ -80,30 +79,37 @@ object SikkerhetContext {
      * Hvis man gjør et kall uten token på en controller med @Unprotected så får man automatiskt systemrolle
      * Av den grunnen burde ikke vanlige controllers ha @Unprotected, men faktiskt validere kall
      */
-    fun harTilgangTilGittRolle(rolleConfig: RolleConfig, minimumsrolle: BehandlerRolle): Boolean {
+    fun harTilgangTilGittRolle(
+        rolleConfig: RolleConfig,
+        minimumsrolle: BehandlerRolle,
+    ): Boolean {
         val rollerFraToken = hentGrupperFraToken()
-        val rollerForBruker = when {
-            hentSaksbehandlerEllerSystembruker() == SYSTEM_FORKORTELSE -> listOf(
-                BehandlerRolle.SYSTEM,
-                BehandlerRolle.BESLUTTER,
-                BehandlerRolle.SAKSBEHANDLER,
-                BehandlerRolle.VEILEDER,
-            )
+        val rollerForBruker =
+            when {
+                hentSaksbehandlerEllerSystembruker() == SYSTEM_FORKORTELSE ->
+                    listOf(
+                        BehandlerRolle.SYSTEM,
+                        BehandlerRolle.BESLUTTER,
+                        BehandlerRolle.SAKSBEHANDLER,
+                        BehandlerRolle.VEILEDER,
+                    )
 
-            rollerFraToken.contains(rolleConfig.beslutterRolle) -> listOf(
-                BehandlerRolle.BESLUTTER,
-                BehandlerRolle.SAKSBEHANDLER,
-                BehandlerRolle.VEILEDER,
-            )
+                rollerFraToken.contains(rolleConfig.beslutterRolle) ->
+                    listOf(
+                        BehandlerRolle.BESLUTTER,
+                        BehandlerRolle.SAKSBEHANDLER,
+                        BehandlerRolle.VEILEDER,
+                    )
 
-            rollerFraToken.contains(rolleConfig.saksbehandlerRolle) -> listOf(
-                BehandlerRolle.SAKSBEHANDLER,
-                BehandlerRolle.VEILEDER,
-            )
+                rollerFraToken.contains(rolleConfig.saksbehandlerRolle) ->
+                    listOf(
+                        BehandlerRolle.SAKSBEHANDLER,
+                        BehandlerRolle.VEILEDER,
+                    )
 
-            rollerFraToken.contains(rolleConfig.veilederRolle) -> listOf(BehandlerRolle.VEILEDER)
-            else -> listOf(BehandlerRolle.UKJENT)
-        }
+                rollerFraToken.contains(rolleConfig.veilederRolle) -> listOf(BehandlerRolle.VEILEDER)
+                else -> listOf(BehandlerRolle.UKJENT)
+            }
         if (logger.isDebugEnabled) {
             logger.debug("Roller for kall=$rollerForBruker")
         }

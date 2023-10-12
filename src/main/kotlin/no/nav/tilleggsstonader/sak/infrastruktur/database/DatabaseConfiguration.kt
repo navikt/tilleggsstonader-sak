@@ -34,7 +34,6 @@ import javax.sql.DataSource
 @EnableJdbcAuditing
 @EnableJdbcRepositories("no.nav.tilleggsstonader.sak", "no.nav.familie.prosessering")
 class DatabaseConfiguration : AbstractJdbcConfiguration() {
-
     @Bean
     fun operations(dataSource: DataSource): NamedParameterJdbcOperations {
         return NamedParameterJdbcTemplate(dataSource)
@@ -73,19 +72,14 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             listOf(
                 StringTilPropertiesWrapperConverter(),
                 PropertiesWrapperTilStringConverter(),
-
                 PGobjectTilJsonWrapperConverter(),
                 JsonWrapperTilPGobjectConverter(),
-
                 PGobjectTilDelvilkårConverter(),
                 DelvilkårTilPGobjectConverter(),
-
                 PGobjectTilBeriketSimuleringsresultat(),
                 BeriketSimuleringsresultatTilPGobjectConverter(),
-
                 PGobjectTilTotrinnsÅrsaker(),
                 TotrinnsÅrsakerTilPGobjectConverter(),
-
                 PGobjectTilSkjemaBarnetilsyn(),
                 SkjemaBarnetilsynPGobjectConverter(),
                 PGobjectTilBarnMedBarnepass(),
@@ -96,7 +90,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @ReadingConverter
     class PGobjectTilJsonWrapperConverter : Converter<PGobject, JsonWrapper?> {
-
         override fun convert(pGobject: PGobject): JsonWrapper? {
             return pGobject.value?.let { JsonWrapper(it) }
         }
@@ -104,7 +97,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @WritingConverter
     class JsonWrapperTilPGobjectConverter : Converter<JsonWrapper, PGobject> {
-
         override fun convert(jsonWrapper: JsonWrapper): PGobject =
             PGobject().apply {
                 type = "json"
@@ -114,7 +106,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @ReadingConverter
     class PGobjectTilDelvilkårConverter : Converter<PGobject, DelvilkårWrapper> {
-
         override fun convert(pGobject: PGobject): DelvilkårWrapper {
             return DelvilkårWrapper(pGobject.value?.let { objectMapper.readValue(it) } ?: emptyList())
         }
@@ -122,7 +113,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @WritingConverter
     class DelvilkårTilPGobjectConverter : Converter<DelvilkårWrapper, PGobject> {
-
         override fun convert(data: DelvilkårWrapper): PGobject =
             PGobject().apply {
                 type = "json"
@@ -132,7 +122,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @ReadingConverter
     class PGobjectTilBeriketSimuleringsresultat : Converter<PGobject, BeriketSimuleringsresultat?> {
-
         override fun convert(pGobject: PGobject): BeriketSimuleringsresultat? {
             return pGobject.value?.let { objectMapper.readValue(it) }
         }
@@ -140,7 +129,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @WritingConverter
     class BeriketSimuleringsresultatTilPGobjectConverter : Converter<BeriketSimuleringsresultat, PGobject> {
-
         override fun convert(data: BeriketSimuleringsresultat): PGobject =
             PGobject().apply {
                 type = "json"
@@ -150,7 +138,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @ReadingConverter
     class PGobjectTilTotrinnsÅrsaker : Converter<PGobject, Årsaker?> {
-
         override fun convert(pGobject: PGobject): Årsaker? {
             return pGobject.value?.let { objectMapper.readValue(it) }
         }
@@ -158,7 +145,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @WritingConverter
     class TotrinnsÅrsakerTilPGobjectConverter : Converter<Årsaker, PGobject> {
-
         override fun convert(data: Årsaker): PGobject =
             PGobject().apply {
                 type = "json"
@@ -169,7 +155,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     // Søknad
     @ReadingConverter
     class PGobjectTilSkjemaBarnetilsyn : Converter<PGobject, SkjemaBarnetilsyn> {
-
         override fun convert(pGobject: PGobject): SkjemaBarnetilsyn {
             return objectMapper.readValue(pGobject.value!!)
         }
@@ -177,7 +162,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @WritingConverter
     class SkjemaBarnetilsynPGobjectConverter : Converter<SkjemaBarnetilsyn, PGobject> {
-
         override fun convert(data: SkjemaBarnetilsyn): PGobject =
             PGobject().apply {
                 type = "json"
@@ -187,7 +171,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @ReadingConverter
     class PGobjectTilBarnMedBarnepass : Converter<PGobject, BarnMedBarnepass> {
-
         override fun convert(pGobject: PGobject): BarnMedBarnepass {
             return objectMapper.readValue(pGobject.value!!)
         }
@@ -195,7 +178,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @WritingConverter
     class BarnMedBarnepassPGobjectConverter : Converter<BarnMedBarnepass, PGobject> {
-
         override fun convert(data: BarnMedBarnepass): PGobject =
             PGobject().apply {
                 type = "json"

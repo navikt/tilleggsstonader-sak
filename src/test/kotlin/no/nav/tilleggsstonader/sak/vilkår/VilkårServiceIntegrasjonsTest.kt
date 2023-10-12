@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 
 internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
-
     @Autowired
     lateinit var vilkårRepository: VilkårRepository
 
@@ -56,10 +55,11 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         val barnPåRevurdering = barnRepository.insertAll(søknadBarnTilBehandlingBarn(søknadskjema.barn, revurdering.id))
 
         val vilkårForBehandling = opprettVilkårsvurderinger(søknadskjema, behandling, barnPåFørsteSøknad).first()
-        val metadata = HovedregelMetadata(
-            barnPåRevurdering,
-            mockk(),
-        )
+        val metadata =
+            HovedregelMetadata(
+                barnPåRevurdering,
+                mockk(),
+            )
         vilkårService.kopierVilkårsettTilNyBehandling(
             behandling.id,
             revurdering.id,
@@ -99,10 +99,11 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         val tidligereBehandlingId = UUID.randomUUID()
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val revurdering = behandlingRepository.insert(behandling(fagsak))
-        val metadata = HovedregelMetadata(
-            emptyList(),
-            mockk(),
-        )
+        val metadata =
+            HovedregelMetadata(
+                emptyList(),
+                mockk(),
+            )
         assertThat(
             catchThrowable {
                 vilkårService.kopierVilkårsettTilNyBehandling(
@@ -127,15 +128,16 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
                 behandling = mockk(),
             )
         val delvilkårsett = EksempelRegel().initiereDelvilkår(hovedregelMetadata)
-        val vilkårsett = listOf(
-            vilkår(
-                resultat = Vilkårsresultat.OPPFYLT,
-                type = VilkårType.EKSEMPEL,
-                behandlingId = behandling.id,
-                barnId = barn.first().id,
-                delvilkår = delvilkårsett,
-            ),
-        )
+        val vilkårsett =
+            listOf(
+                vilkår(
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    type = VilkårType.EKSEMPEL,
+                    behandlingId = behandling.id,
+                    barnId = barn.first().id,
+                    delvilkår = delvilkårsett,
+                ),
+            )
         return vilkårRepository.insertAll(vilkårsett)
     }
 

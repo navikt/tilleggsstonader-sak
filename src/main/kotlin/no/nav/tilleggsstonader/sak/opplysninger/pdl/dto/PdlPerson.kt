@@ -9,23 +9,24 @@ data class PdlResponse<T>(
     val errors: List<PdlError>?,
     val extensions: PdlExtensions?,
 ) {
-
     fun harFeil(): Boolean {
         return errors != null && errors.isNotEmpty()
     }
+
     fun harAdvarsel(): Boolean {
         return !extensions?.warnings.isNullOrEmpty()
     }
+
     fun errorMessages(): String {
         return errors?.joinToString { it -> it.message } ?: ""
     }
 }
 
 data class PdlBolkResponse<T>(val data: PersonBolk<T>?, val errors: List<PdlError>?, val extensions: PdlExtensions?) {
-
     fun errorMessages(): String {
         return errors?.joinToString { it -> it.message } ?: ""
     }
+
     fun harAdvarsel(): Boolean {
         return !extensions?.warnings.isNullOrEmpty()
     }
@@ -37,19 +38,20 @@ data class PdlError(
 )
 
 data class PdlErrorExtensions(val code: String?) {
-
     fun notFound() = code == "not_found"
 }
+
 data class PdlExtensions(val warnings: List<PdlWarning>?)
+
 data class PdlWarning(val details: Any?, val id: String?, val message: String?, val query: String?)
 
 data class PdlSøkerData(val person: PdlSøker?)
 
 data class PersonDataBolk<T>(val ident: String, val code: String, val person: T?)
+
 data class PersonBolk<T>(val personBolk: List<PersonDataBolk<T>>)
 
 interface PdlPerson {
-
     val fødsel: List<Fødsel>
     val bostedsadresse: List<Bostedsadresse>
 }
@@ -58,7 +60,6 @@ data class PdlIdentBolkResponse(
     val data: IdentBolk?,
     val errors: List<PdlError>?,
 ) {
-
     fun errorMessages(): String {
         return errors?.joinToString { it -> it.message } ?: ""
     }
@@ -69,7 +70,6 @@ data class PdlIdenterBolk(
     val ident: String,
     val identer: List<PdlIdent>?,
 ) {
-
     fun gjeldende(): PdlIdent = this.identer?.first { !it.historisk } ?: PdlIdent(ident, false)
 }
 
@@ -78,7 +78,6 @@ data class IdentBolk(val hentIdenterBolk: List<PdlIdenterBolk>)
 data class PdlIdent(val ident: String, val historisk: Boolean)
 
 data class PdlIdenter(val identer: List<PdlIdent>) {
-
     fun gjeldende(): PdlIdent = this.identer.first { !it.historisk }
 }
 
@@ -115,7 +114,6 @@ data class PdlSøker(
     val utflyttingFraNorge: List<UtflyttingFraNorge>,
     val vergemaalEllerFremtidsfullmakt: List<VergemaalEllerFremtidsfullmakt>,
 ) : PdlPerson {
-
     fun alleIdenter(): Set<String> = folkeregisteridentifikator.map { it.ident }.toSet()
 }
 
@@ -176,7 +174,6 @@ data class Bostedsadresse(
     val matrikkeladresse: Matrikkeladresse?,
     val metadata: Metadata,
 ) {
-
     val matrikkelId get() = matrikkeladresse?.matrikkelId ?: vegadresse?.matrikkelId
 
     val bruksenhetsnummer get() = matrikkeladresse?.bruksenhetsnummer ?: vegadresse?.bruksenhetsnummer
@@ -206,7 +203,6 @@ data class Kontaktadresse(
 
 @Suppress("unused")
 enum class KontaktadresseType {
-
     @JsonProperty("Innland")
     INNLAND,
 
@@ -241,9 +237,9 @@ data class Vegadresse(
 data class UkjentBosted(val bostedskommune: String?)
 
 data class Adressebeskyttelse(val gradering: AdressebeskyttelseGradering, val metadata: Metadata) {
-
-    fun erStrengtFortrolig(): Boolean = this.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG ||
-        this.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+    fun erStrengtFortrolig(): Boolean =
+        this.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG ||
+            this.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
 }
 
 enum class AdressebeskyttelseGradering {
@@ -261,13 +257,15 @@ data class Fødsel(
     @JsonProperty("foedekommune") val fødekommune: String?,
     val metadata: Metadata,
 ) {
-
-    fun erUnder18År() = this.fødselsdato?.let { LocalDate.now() < it.plusYears(18) }
-        ?: this.fødselsår?.let { LocalDate.now() < LocalDate.of(it, 1, 1).plusYears(18) }
-        ?: true
+    fun erUnder18År() =
+        this.fødselsdato?.let { LocalDate.now() < it.plusYears(18) }
+            ?: this.fødselsår?.let { LocalDate.now() < LocalDate.of(it, 1, 1).plusYears(18) }
+            ?: true
 }
 
-data class Dødsfall(@JsonProperty("doedsdato") val dødsdato: LocalDate?)
+data class Dødsfall(
+    @JsonProperty("doedsdato") val dødsdato: LocalDate?,
+)
 
 data class ForelderBarnRelasjon(
     val relatertPersonsIdent: String?,
@@ -301,7 +299,9 @@ enum class MotpartsRolle {
     FULLMEKTIG,
 }
 
-data class Kjønn(@JsonProperty("kjoenn") val kjønn: KjønnType)
+data class Kjønn(
+    @JsonProperty("kjoenn") val kjønn: KjønnType,
+)
 
 enum class KjønnType {
     KVINNE,
@@ -322,7 +322,9 @@ data class Personnavn(
     val mellomnavn: String?,
 )
 
-data class Tolk(@JsonProperty("spraak") val språk: String?)
+data class Tolk(
+    @JsonProperty("spraak") val språk: String?,
+)
 
 data class Statsborgerskap(
     val land: String,

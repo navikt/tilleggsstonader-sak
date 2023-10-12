@@ -23,7 +23,6 @@ data class Fagsak(
     val stønadstype: Stønadstype,
     val sporbar: Sporbar,
 ) {
-
     fun erAktivIdent(personIdent: String): Boolean = hentAktivIdent() == personIdent
 
     fun hentAktivIdent(): String {

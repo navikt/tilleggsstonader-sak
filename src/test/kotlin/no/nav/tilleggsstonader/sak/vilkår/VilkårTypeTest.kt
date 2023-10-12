@@ -6,13 +6,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class VilkårTypeTest {
-
-    private val vilkårForBarnetilsyn = listOf(
-        VilkårType.EKSEMPEL,
-        VilkårType.EKSEMPEL2,
-        VilkårType.MÅLGRUPPE,
-        VilkårType.AKTIVITET,
-    )
+    private val vilkårForBarnetilsyn =
+        listOf(
+            VilkårType.EKSEMPEL,
+            VilkårType.EKSEMPEL2,
+            VilkårType.MÅLGRUPPE,
+            VilkårType.AKTIVITET,
+        )
 
     @Test
     internal fun `skal hente ut vilkår for barnetilsyn`() {

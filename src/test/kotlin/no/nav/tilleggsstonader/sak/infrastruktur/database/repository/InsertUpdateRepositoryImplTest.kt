@@ -15,7 +15,6 @@ import org.springframework.data.relational.core.conversion.DbActionExecutionExce
 import java.util.UUID
 
 class InsertUpdateRepositoryImplTest : IntegrationTest() {
-
     @Autowired
     lateinit var fagsakPersonRepository: FagsakPersonRepository
 
@@ -88,8 +87,9 @@ class InsertUpdateRepositoryImplTest : IntegrationTest() {
         val oppdatertPerson =
             fagsakPersonRepository.update(
                 person.copy(
-                    identer = person.identer.map { it.copy(ident = nyPersonIdent) }
-                        .toSet() + PersonIdent(annenIdent),
+                    identer =
+                        person.identer.map { it.copy(ident = nyPersonIdent) }
+                            .toSet() + PersonIdent(annenIdent),
                 ),
             )
         val oppdatertSøkerIdent = oppdatertPerson.identer.first { it.ident == nyPersonIdent }

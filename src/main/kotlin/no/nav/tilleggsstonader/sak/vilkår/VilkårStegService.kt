@@ -36,7 +36,6 @@ class VilkårStegService(
     // private val blankettRepository: BlankettRepository,
     private val behandlingshistorikkService: BehandlingshistorikkService,
 ) {
-
     @Transactional
     fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
         val vilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
@@ -90,14 +89,18 @@ class VilkårStegService(
         oppdaterKategoriPåBehandling(saksbehandling, vilkårsett)
     }
 
-    private fun oppdaterStegPåBehandling(saksbehandling: Saksbehandling, vilkårsett: List<Vilkår>) {
-        val vilkårsresultat = vilkårsett.groupBy { it.type }.map {
-            if (it.key.gjelderFlereBarn()) {
-                utledResultatForVilkårSomGjelderFlereBarn(it.value)
-            } else {
-                it.value.single().resultat
+    private fun oppdaterStegPåBehandling(
+        saksbehandling: Saksbehandling,
+        vilkårsett: List<Vilkår>,
+    ) {
+        val vilkårsresultat =
+            vilkårsett.groupBy { it.type }.map {
+                if (it.key.gjelderFlereBarn()) {
+                    utledResultatForVilkårSomGjelderFlereBarn(it.value)
+                } else {
+                    it.value.single().resultat
+                }
             }
-        }
 
         if (saksbehandling.steg == StegType.VILKÅR && OppdaterVilkår.erAlleVilkårTattStillingTil(vilkårsresultat)) {
             // stegService.håndterVilkår(saksbehandling).id
@@ -152,10 +155,11 @@ class VilkårStegService(
         vilkår: Vilkår,
     ): VilkårDto {
         val metadata = hentHovedregelMetadata(behandlingId)
-        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkår(
-            metadata,
-            Vilkårsresultat.SKAL_IKKE_VURDERES,
-        )
+        val nyeDelvilkår =
+            hentVilkårsregel(vilkår.type).initiereDelvilkår(
+                metadata,
+                Vilkårsresultat.SKAL_IKKE_VURDERES,
+            )
         val delvilkårWrapper = DelvilkårWrapper(nyeDelvilkår)
         return vilkårRepository.update(
             vilkår.copy(
@@ -179,7 +183,10 @@ class VilkårStegService(
      * Tilgangskontroll sjekker att man har tilgang til behandlingId som blir sendt inn, men det er mulig å sende inn
      * en annen behandlingId enn den som er på vilkåret
      */
-    private fun validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId: UUID, requestBehandlingId: UUID) {
+    private fun validerBehandlingIdErLikIRequestOgIVilkåret(
+        behandlingId: UUID,
+        requestBehandlingId: UUID,
+    ) {
         if (behandlingId != requestBehandlingId) {
             throw Feil(
                 "BehandlingId=$requestBehandlingId er ikke lik vilkårets sin behandlingId=$behandlingId",

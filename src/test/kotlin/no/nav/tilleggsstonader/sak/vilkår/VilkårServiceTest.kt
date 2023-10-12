@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test
 import java.util.UUID
 
 internal class VilkårServiceTest {
-
     private val behandlingService = mockk<BehandlingService>()
     private val søknadService = mockk<SøknadService>()
     private val vilkårRepository = mockk<VilkårRepository>()
@@ -41,19 +40,21 @@ internal class VilkårServiceTest {
 
     // private val grunnlagsdataService = mockk<GrunnlagsdataService>()
     private val fagsakService = mockk<FagsakService>()
-    private val vilkårService = VilkårService(
-        behandlingService = behandlingService,
-        søknadService = søknadService,
-        vilkårRepository = vilkårRepository,
-        vilkårGrunnlagService = vilkårGrunnlagService,
-        // grunnlagsdataService = grunnlagsdataService,
-        barnService = barnService,
-        fagsakService = fagsakService,
-    )
-    private val søknad = SøknadsskjemaMapper.map(
-        SøknadUtil.søknadskjemaBarnetilsyn(),
-        "id",
-    )
+    private val vilkårService =
+        VilkårService(
+            behandlingService = behandlingService,
+            søknadService = søknadService,
+            vilkårRepository = vilkårRepository,
+            vilkårGrunnlagService = vilkårGrunnlagService,
+            // grunnlagsdataService = grunnlagsdataService,
+            barnService = barnService,
+            fagsakService = fagsakService,
+        )
+    private val søknad =
+        SøknadsskjemaMapper.map(
+            SøknadUtil.søknadskjemaBarnetilsyn(),
+            "id",
+        )
     private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
     private val behandling = behandling(fagsak(), BehandlingStatus.OPPRETTET, årsak = BehandlingÅrsak.PAPIRSØKNAD)
     private val behandlingId = behandling.id
@@ -162,13 +163,14 @@ internal class VilkårServiceTest {
 
     @Test
     internal fun `skal ikke opprette vilkår hvis behandling er låst for videre vurdering`() {
-        val eksisterendeVilkårsett = listOf(
-            vilkår(
-                resultat = OPPFYLT,
-                type = VilkårType.EKSEMPEL,
-                behandlingId = behandlingId,
-            ),
-        )
+        val eksisterendeVilkårsett =
+            listOf(
+                vilkår(
+                    resultat = OPPFYLT,
+                    type = VilkårType.EKSEMPEL,
+                    behandlingId = behandlingId,
+                ),
+            )
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns eksisterendeVilkårsett
 
         val vilkårsett = vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId).vilkårsett
@@ -180,13 +182,14 @@ internal class VilkårServiceTest {
 
     @Test
     internal fun `Skal returnere ikke oppfylt hvis vilkårsett ikke inneholder alle vilkår`() {
-        val vilkårsett = listOf(
-            vilkår(
-                resultat = OPPFYLT,
-                type = VilkårType.EKSEMPEL,
-                behandlingId = behandlingId,
-            ),
-        )
+        val vilkårsett =
+            listOf(
+                vilkår(
+                    resultat = OPPFYLT,
+                    type = VilkårType.EKSEMPEL,
+                    behandlingId = behandlingId,
+                ),
+            )
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
         val erAlleVilkårOppfylt = vilkårService.erAlleVilkårOppfylt(behandlingId)
         assertThat(erAlleVilkårOppfylt).isFalse

@@ -17,7 +17,6 @@ class SøknadService(
     private val søknadBehandlingRepository: SøknadBehandlingRepository,
     private val søknadBarnetilsynRepository: SøknadBarnetilsynRepository,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun hentSøknadBarnetilsyn(behandlingId: UUID): SøknadBarnetilsyn? {
@@ -36,7 +35,10 @@ class SøknadService(
         return søknadBarnetilsyn
     }
 
-    fun kopierSøknad(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
+    fun kopierSøknad(
+        forrigeBehandlingId: UUID,
+        nyBehandlingId: UUID,
+    ) {
         val søknad = søknadBehandlingRepository.findByIdOrNull(forrigeBehandlingId)
         if (søknad == null) {
             logger.info("Finner ingen søknad på forrige behandling=$forrigeBehandlingId")

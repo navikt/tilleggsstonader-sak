@@ -9,7 +9,6 @@ import java.util.UUID
 
 @Service
 class FagsakPersonService(private val fagsakPersonRepository: FagsakPersonRepository) {
-
     fun hentPerson(personId: UUID): FagsakPerson = fagsakPersonRepository.findByIdOrThrow(personId)
 
     fun hentPersoner(personId: List<UUID>): Iterable<FagsakPerson> = fagsakPersonRepository.findAllById(personId)
@@ -25,18 +24,24 @@ class FagsakPersonService(private val fagsakPersonRepository: FagsakPersonReposi
     fun hentAktivIdent(personId: UUID): String = fagsakPersonRepository.hentAktivIdent(personId)
 
     @Transactional
-    fun hentEllerOpprettPerson(personIdenter: Set<String>, gjeldendePersonIdent: String): FagsakPerson {
+    fun hentEllerOpprettPerson(
+        personIdenter: Set<String>,
+        gjeldendePersonIdent: String,
+    ): FagsakPerson {
         feilHvisIkke(personIdenter.contains(gjeldendePersonIdent)) {
             "Liste med personidenter inneholder ikke gjeldende personident"
         }
         return (
             fagsakPersonRepository.findByIdent(personIdenter)
                 ?: fagsakPersonRepository.insert(FagsakPerson(identer = setOf(PersonIdent(gjeldendePersonIdent))))
-            )
+        )
     }
 
     @Transactional
-    fun oppdaterIdent(fagsakPerson: FagsakPerson, gjeldendePersonIdent: String): FagsakPerson {
+    fun oppdaterIdent(
+        fagsakPerson: FagsakPerson,
+        gjeldendePersonIdent: String,
+    ): FagsakPerson {
         return if (fagsakPerson.hentAktivIdent() != gjeldendePersonIdent) {
             fagsakPersonRepository.update(fagsakPerson.medOppdatertGjeldendeIdent(gjeldendePersonIdent))
         } else {

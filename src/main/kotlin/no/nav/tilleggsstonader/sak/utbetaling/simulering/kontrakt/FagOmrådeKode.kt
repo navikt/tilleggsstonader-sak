@@ -5,7 +5,6 @@ enum class FagOmrådeKode(val kode: String) {
     ;
 
     companion object {
-
         private val kodeMap = FagOmrådeKode.values().associateBy { it.kode }
 
         fun fraKode(kode: String): FagOmrådeKode {

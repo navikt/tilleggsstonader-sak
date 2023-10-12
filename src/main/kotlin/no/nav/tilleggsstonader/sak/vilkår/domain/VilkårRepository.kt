@@ -10,7 +10,6 @@ import java.util.UUID
 
 @Repository
 interface VilkårRepository : RepositoryInterface<Vilkår, UUID>, InsertUpdateRepository<Vilkår> {
-
     fun findByBehandlingId(behandlingId: UUID): List<Vilkår>
 
     @Modifying
@@ -19,11 +18,17 @@ interface VilkårRepository : RepositoryInterface<Vilkår, UUID>, InsertUpdateRe
 
     @Modifying
     @Query("UPDATE vilkar SET endret_tid = :nyttTidspunkt WHERE id = :id")
-    fun oppdaterEndretTid(id: UUID, nyttTidspunkt: LocalDateTime)
+    fun oppdaterEndretTid(
+        id: UUID,
+        nyttTidspunkt: LocalDateTime,
+    )
 
     @Modifying
     @Query("UPDATE vilkar SET opprettet_av = 'VL', endret_av = 'VL' WHERE id = :id")
     fun settMaskinelltOpprettet(id: UUID)
 
-    fun findByTypeAndBehandlingIdIn(vilkårtype: VilkårType, behandlingIds: Collection<UUID>): List<Vilkår>
+    fun findByTypeAndBehandlingIdIn(
+        vilkårtype: VilkårType,
+        behandlingIds: Collection<UUID>,
+    ): List<Vilkår>
 }

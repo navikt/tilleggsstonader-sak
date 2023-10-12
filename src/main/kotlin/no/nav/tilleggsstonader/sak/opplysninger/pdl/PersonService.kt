@@ -18,7 +18,6 @@ class PersonService(
     private val pdlClient: PdlClient,
     private val cacheManager: CacheManager,
 ) {
-
     fun hentSøker(ident: String): PdlSøker {
         return cacheManager.getValue("personService_hentsoker", ident) { pdlClient.hentSøker(ident) }
     }

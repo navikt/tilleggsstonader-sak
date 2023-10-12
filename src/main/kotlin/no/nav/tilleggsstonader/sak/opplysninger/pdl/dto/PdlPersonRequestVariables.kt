@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl.dto
 
 data class PdlPersonRequestVariables(val ident: String)
+
 data class PdlIdentRequestVariables(
     val ident: String,
     val gruppe: String,

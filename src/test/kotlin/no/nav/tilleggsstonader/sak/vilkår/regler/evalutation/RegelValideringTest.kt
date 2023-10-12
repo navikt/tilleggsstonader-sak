@@ -11,7 +11,6 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 internal class RegelValideringTest {
-
     @Test
     fun `sender in en tom liste med svar - skal kaste exception`() {
         val regel = VilkårsregelEnHovedregel()

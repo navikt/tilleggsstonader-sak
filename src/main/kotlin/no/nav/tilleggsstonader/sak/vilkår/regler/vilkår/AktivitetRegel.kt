@@ -14,7 +14,6 @@ class AktivitetRegel : Vilkårsregel(
     hovedregler = regelIder(ER_AKTIVITET_REGISTRERT),
 ) {
     companion object {
-
         private val ER_AKTIVITET_REGISTRERT =
             RegelSteg(
                 regelId = RegelId.ER_AKTIVITET_REGISTRERT,

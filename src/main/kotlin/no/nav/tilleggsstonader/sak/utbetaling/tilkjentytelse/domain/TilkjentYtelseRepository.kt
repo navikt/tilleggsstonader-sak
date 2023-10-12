@@ -10,7 +10,6 @@ import java.util.UUID
 
 @Repository
 interface TilkjentYtelseRepository : RepositoryInterface<TilkjentYtelse, UUID>, InsertUpdateRepository<TilkjentYtelse> {
-
     fun findByBehandlingId(behandlingId: UUID): TilkjentYtelse?
 
     // language=PostgreSQL

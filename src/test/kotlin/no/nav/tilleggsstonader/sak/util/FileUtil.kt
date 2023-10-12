@@ -26,17 +26,26 @@ object FileUtil {
      */
     const val SKAL_SKRIVE_TIL_FIL = false
 
-    fun assertFileIsEqual(filnavn: String, data: Any) {
+    fun assertFileIsEqual(
+        filnavn: String,
+        data: Any,
+    ) {
         val json = ObjectMapperProvider.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data)
         assertFileIsEqual(filnavn, json)
     }
 
-    fun assertFileIsEqual(filnavn: String, data: String) {
+    fun assertFileIsEqual(
+        filnavn: String,
+        data: String,
+    ) {
         skrivTilFil(filnavn, data)
         assertThat(data).isEqualTo(readFile(filnavn))
     }
 
-    fun skrivTilFil(filnavn: String, data: String) {
+    fun skrivTilFil(
+        filnavn: String,
+        data: String,
+    ) {
         if (!SKAL_SKRIVE_TIL_FIL) {
             return
         }

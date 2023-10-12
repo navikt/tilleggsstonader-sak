@@ -15,15 +15,15 @@ import java.util.UUID
 
 @Service
 class BehandlingshistorikkService(private val behandlingshistorikkRepository: BehandlingshistorikkRepository) {
-
     fun finnHendelseshistorikk(saksbehandling: Saksbehandling): List<HendelseshistorikkDto> {
-        val (hendelserOpprettet, andreHendelser) = behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidDesc(
-            saksbehandling.id,
-        ).map {
-            it.tilHendelseshistorikkDto(saksbehandling)
-        }.filter {
-            it.hendelse != Hendelse.UKJENT
-        }.partition { it.hendelse == Hendelse.OPPRETTET }
+        val (hendelserOpprettet, andreHendelser) =
+            behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidDesc(
+                saksbehandling.id,
+            ).map {
+                it.tilHendelseshistorikkDto(saksbehandling)
+            }.filter {
+                it.hendelse != Hendelse.UKJENT
+            }.partition { it.hendelse == Hendelse.OPPRETTET }
         val sisteOpprettetHendelse = hendelserOpprettet.lastOrNull()
         return if (sisteOpprettetHendelse != null) {
             andreHendelser + sisteOpprettetHendelse
@@ -36,7 +36,10 @@ class BehandlingshistorikkService(private val behandlingshistorikkRepository: Be
         return behandlingshistorikkRepository.findTopByBehandlingIdOrderByEndretTidDesc(behandlingId)
     }
 
-    fun finnSisteBehandlingshistorikk(behandlingId: UUID, type: StegType): Behandlingshistorikk? =
+    fun finnSisteBehandlingshistorikk(
+        behandlingId: UUID,
+        type: StegType,
+    ): Behandlingshistorikk? =
         behandlingshistorikkRepository.findTopByBehandlingIdAndStegOrderByEndretTidDesc(behandlingId, type)
 
     fun opprettHistorikkInnslag(behandlingshistorikk: Behandlingshistorikk) {
@@ -57,9 +60,10 @@ class BehandlingshistorikkService(private val behandlingshistorikkRepository: Be
                 behandlingId = behandlingId,
                 steg = stegtype,
                 utfall = utfall,
-                metadata = metadata?.let {
-                    JsonWrapper(objectMapper.writeValueAsString(it))
-                },
+                metadata =
+                    metadata?.let {
+                        JsonWrapper(objectMapper.writeValueAsString(it))
+                    },
             ),
         )
     }

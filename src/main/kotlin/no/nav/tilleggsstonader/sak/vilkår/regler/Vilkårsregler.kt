@@ -10,9 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeRegel
  * Singleton for å holde på alle regler
  */
 class Vilkårsregler private constructor(val vilkårsregler: Map<VilkårType, Vilkårsregel>) {
-
     companion object {
-
         val ALLE_VILKÅRSREGLER = Vilkårsregler(alleVilkårsregler.associateBy { it.vilkårType })
     }
 }
@@ -21,11 +19,12 @@ private val alleVilkårsregler = Stønadstype.values().map { vilkårsreglerForSt
 
 fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
     when (stønadstype) {
-        Stønadstype.BARNETILSYN -> listOf(
-            EksempelRegel(),
-            MålgruppeRegel(),
-            AktivitetRegel(),
-        )
+        Stønadstype.BARNETILSYN ->
+            listOf(
+                EksempelRegel(),
+                MålgruppeRegel(),
+                AktivitetRegel(),
+            )
     }
 
 fun hentVilkårsregel(vilkårType: VilkårType): Vilkårsregel {

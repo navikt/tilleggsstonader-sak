@@ -29,7 +29,6 @@ class SimuleringService(
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val tilgangService: TilgangService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional

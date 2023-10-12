@@ -41,7 +41,6 @@ import java.util.UUID
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class BehandlingServiceTest {
-
     private val behandlingRepository: BehandlingRepository = mockk()
     private val behandlingshistorikkService: BehandlingshistorikkService = mockk(relaxed = true)
 
@@ -93,7 +92,6 @@ internal class BehandlingServiceTest {
 
     @Nested
     inner class HenleggBehandling {
-
         @Test
         internal fun `skal kunne henlegge behandling som er førstegangsbehandling`() {
             val behandling =
@@ -107,7 +105,10 @@ internal class BehandlingServiceTest {
             henleggOgForventOk(behandling, FEILREGISTRERT)
         }
 
-        private fun henleggOgForventOk(behandling: Behandling, henlagtÅrsak: HenlagtÅrsak) {
+        private fun henleggOgForventOk(
+            behandling: Behandling,
+            henlagtÅrsak: HenlagtÅrsak,
+        ) {
             every {
                 behandlingRepository.findByIdOrThrow(any())
             } returns behandling
@@ -132,11 +133,12 @@ internal class BehandlingServiceTest {
 
         @Test
         internal fun `skal ikke kunne henlegge behandling som er iverksatt`() {
-            val behandling = behandling(
-                fagsak(),
-                type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                status = BehandlingStatus.IVERKSETTER_VEDTAK,
-            )
+            val behandling =
+                behandling(
+                    fagsak(),
+                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    status = BehandlingStatus.IVERKSETTER_VEDTAK,
+                )
             henleggOgForventApiFeilmelding(behandling, TRUKKET_TILBAKE)
         }
 
@@ -147,14 +149,18 @@ internal class BehandlingServiceTest {
             henleggOgForventApiFeilmelding(behandling, TRUKKET_TILBAKE)
         }
 
-        private fun henleggOgForventApiFeilmelding(behandling: Behandling, henlagtÅrsak: HenlagtÅrsak) {
+        private fun henleggOgForventApiFeilmelding(
+            behandling: Behandling,
+            henlagtÅrsak: HenlagtÅrsak,
+        ) {
             every {
                 behandlingRepository.findByIdOrThrow(any())
             } returns behandling
 
-            val feil: ApiFeil = assertThrows {
-                behandlingService.henleggBehandling(behandling.id, HenlagtDto(henlagtÅrsak))
-            }
+            val feil: ApiFeil =
+                assertThrows {
+                    behandlingService.henleggBehandling(behandling.id, HenlagtDto(henlagtÅrsak))
+                }
 
             assertThat(feil.httpStatus).isEqualTo(HttpStatus.BAD_REQUEST)
         }
@@ -162,7 +168,6 @@ internal class BehandlingServiceTest {
 
     @Nested
     inner class OppdaterResultatPåBehandling {
-
         private val behandling = behandling()
 
         @Test
@@ -193,7 +198,6 @@ internal class BehandlingServiceTest {
 
     @Nested
     inner class HentBehandlinger {
-
         @Test
         internal fun `skal sortere behandlinger etter vedtakstidspunkt og til sist uten vedtakstidspunkt`() {
             val tiDagerSiden = LocalDateTime.now().minusDays(10)
@@ -216,10 +220,11 @@ internal class BehandlingServiceTest {
             opprettetTid: LocalDateTime,
             endretTid: LocalDateTime,
         ) = behandling(vedtakstidspunkt = vedtakstidspunkt).copy(
-            sporbar = Sporbar(
-                opprettetTid = opprettetTid,
-                endret = Endret(endretTid = endretTid),
-            ),
+            sporbar =
+                Sporbar(
+                    opprettetTid = opprettetTid,
+                    endret = Endret(endretTid = endretTid),
+                ),
         )
     }
 }

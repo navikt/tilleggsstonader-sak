@@ -86,9 +86,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         ).size()
             .isEqualTo(1)
     }
-     */
 
-    /*
     Har ikke oppgave ennå
     @Test
     fun `hentUferdigeBehandlingerFørDato skal ikke hente behandling dersom oppgave er endret etter frist`() {
@@ -125,19 +123,20 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Test
     fun `finnBehandlingServiceObject returnerer korrekt konstruert BehandlingServiceObject`() {
-        val fagsak = testoppsettService
-            .lagreFagsak(
-                fagsak(
-                    setOf(
-                        PersonIdent(ident = "1"),
-                        PersonIdent(
-                            ident = "2",
-                            sporbar = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2))),
+        val fagsak =
+            testoppsettService
+                .lagreFagsak(
+                    fagsak(
+                        setOf(
+                            PersonIdent(ident = "1"),
+                            PersonIdent(
+                                ident = "2",
+                                sporbar = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2))),
+                            ),
+                            PersonIdent(ident = "3"),
                         ),
-                        PersonIdent(ident = "3"),
                     ),
-                ),
-            )
+                )
         val behandling = behandlingRepository.insert(behandling(fagsak, status = OPPRETTET, resultat = INNVILGET))
 
         val behandlingServiceObject = behandlingRepository.finnSaksbehandling(behandling.id)
@@ -175,18 +174,19 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Test
     fun `finnFnrForBehandlingId(sql) skal finne gjeldende fnr for behandlingsid`() {
-        val fagsak = testoppsettService.lagreFagsak(
-            fagsak(
-                setOf(
-                    PersonIdent(ident = "1"),
-                    PersonIdent(
-                        ident = "2",
-                        sporbar = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2))),
+        val fagsak =
+            testoppsettService.lagreFagsak(
+                fagsak(
+                    setOf(
+                        PersonIdent(ident = "1"),
+                        PersonIdent(
+                            ident = "2",
+                            sporbar = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2))),
+                        ),
+                        PersonIdent(ident = "3"),
                     ),
-                    PersonIdent(ident = "3"),
                 ),
-            ),
-        )
+            )
         val behandling = behandlingRepository.insert(behandling(fagsak))
         val fnr = behandlingRepository.finnAktivIdent(behandling.id)
         assertThat(fnr).isEqualTo("2")
@@ -279,7 +279,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class ExistsByFagsak {
-
         @Test
         fun `inner ikke når det ikke finnes noen behandlinger`() {
             assertThat(behandlingRepository.existsByFagsakId(UUID.randomUUID())).isFalse
@@ -314,7 +313,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class Maks1UtredesPerFagsak {
-
         @Test
         fun `skal ikke kunne ha flere behandlinger på samma fagsak med annen status enn ferdigstilt`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
@@ -323,9 +321,10 @@ class BehandlingRepositoryTest : IntegrationTest() {
             behandlingRepository.insert(behandling(fagsak, status = FERDIGSTILT))
 
             listOf(UTREDES, OPPRETTET, FATTER_VEDTAK, IVERKSETTER_VEDTAK).forEach { status ->
-                val cause = assertThatThrownBy {
-                    behandlingRepository.insert(behandling(fagsak, status = status))
-                }.cause
+                val cause =
+                    assertThatThrownBy {
+                        behandlingRepository.insert(behandling(fagsak, status = status))
+                    }.cause
                 cause.isInstanceOf(DuplicateKeyException::class.java)
                 cause.hasMessageContaining("duplicate key value violates unique constraint \"idx_behandlinger_i_arbeid\"")
             }
@@ -348,9 +347,10 @@ class BehandlingRepositoryTest : IntegrationTest() {
             val påVent = behandlingRepository.insert(behandling(fagsak, status = SATT_PÅ_VENT))
             behandlingRepository.insert(behandling(fagsak, status = IVERKSETTER_VEDTAK))
 
-            val cause = assertThatThrownBy {
-                behandlingRepository.update(påVent.copy(status = UTREDES))
-            }.cause
+            val cause =
+                assertThatThrownBy {
+                    behandlingRepository.update(påVent.copy(status = UTREDES))
+                }.cause
             cause.isInstanceOf(DuplicateKeyException::class.java)
             cause.hasMessageContaining("duplicate key value violates unique constraint \"idx_behandlinger_i_arbeid\"")
         }
@@ -366,7 +366,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class ExistsByFagsakIdAndStatusIsNot {
-
         @Test
         fun `returnerer true hvis behandling med annen status finnes og false om behandling med annen status ikke finnes`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak(fagsakpersoner("1")))
@@ -429,7 +428,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class Vedtakstidspunkt {
-
         private val fagsak = fagsak()
 
         @BeforeEach

@@ -13,9 +13,7 @@ class EksempelRegel : Vilkårsregel(
     regler = setOf(HAR_ET_NAVN),
     hovedregler = regelIder(HAR_ET_NAVN),
 ) {
-
     companion object {
-
         private val HAR_ET_NAVN =
             RegelSteg(
                 regelId = RegelId.HAR_ET_NAVN,

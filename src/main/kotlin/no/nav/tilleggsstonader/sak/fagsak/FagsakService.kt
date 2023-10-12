@@ -24,7 +24,10 @@ class FagsakService(
     private val fagsakRepository: FagsakRepository,
     private val personService: PersonService,
 ) {
-    fun hentEllerOpprettFagsakMedBehandlinger(personIdent: String, stønadstype: Stønadstype): FagsakDto {
+    fun hentEllerOpprettFagsakMedBehandlinger(
+        personIdent: String,
+        stønadstype: Stønadstype,
+    ): FagsakDto {
         return fagsakTilDto(hentEllerOpprettFagsak(personIdent, stønadstype))
     }
 
@@ -37,15 +40,19 @@ class FagsakService(
         val gjeldendePersonIdent = personIdenter.gjeldende()
         val person = fagsakPersonService.hentEllerOpprettPerson(personIdenter.identer(), gjeldendePersonIdent.ident)
         val oppdatertPerson = oppdatertPerson(person, gjeldendePersonIdent)
-        val fagsak = fagsakRepository.findByFagsakPersonIdAndStønadstype(oppdatertPerson.id, stønadstype)
-            ?: opprettFagsak(stønadstype, oppdatertPerson)
+        val fagsak =
+            fagsakRepository.findByFagsakPersonIdAndStønadstype(oppdatertPerson.id, stønadstype)
+                ?: opprettFagsak(stønadstype, oppdatertPerson)
 
         return fagsak.tilFagsakMedPerson(oppdatertPerson.identer)
     }
 
     fun harFagsak(personIdenter: Set<String>) = fagsakRepository.findBySøkerIdent(personIdenter).isNotEmpty()
 
-    fun finnFagsak(personIdenter: Set<String>, stønadstype: Stønadstype): Fagsak? =
+    fun finnFagsak(
+        personIdenter: Set<String>,
+        stønadstype: Stønadstype,
+    ): Fagsak? =
         fagsakRepository.findBySøkerIdent(personIdenter, stønadstype)?.tilFagsakMedPerson()
 
     fun finnFagsaker(personIdenter: Set<String>): List<Fagsak> =
@@ -144,7 +151,10 @@ class FagsakService(
         return aktiveIdenter.associateBy({ it.first }, { it.second })
     }
 
-    private fun opprettFagsak(stønadstype: Stønadstype, fagsakPerson: FagsakPerson): FagsakDomain {
+    private fun opprettFagsak(
+        stønadstype: Stønadstype,
+        fagsakPerson: FagsakPerson,
+    ): FagsakDomain {
         return fagsakRepository.insert(
             FagsakDomain(
                 stønadstype = stønadstype,

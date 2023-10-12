@@ -75,8 +75,9 @@ fun behandling(
         årsak = årsak,
         henlagtÅrsak = henlagtÅrsak,
         eksternId = eksternId,
-        vedtakstidspunkt = vedtakstidspunkt
-            ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
+        vedtakstidspunkt =
+            vedtakstidspunkt
+                ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
         kravMottatt = kravMottatt,
     )
 
@@ -155,6 +156,7 @@ fun behandlingBarn(
 )
 
 val defaultIdenter = setOf(PersonIdent("15"))
+
 fun fagsakPerson(
     identer: Set<PersonIdent> = defaultIdenter,
 ) = FagsakPerson(identer = identer)
@@ -226,17 +228,20 @@ fun vilkår(
         opphavsvilkår = opphavsvilkår,
     )
 
-fun fagsakpersoner(vararg identer: String): Set<PersonIdent> = identer.map {
-    PersonIdent(ident = it)
-}.toSet()
+fun fagsakpersoner(vararg identer: String): Set<PersonIdent> =
+    identer.map {
+        PersonIdent(ident = it)
+    }.toSet()
 
-fun fagsakpersoner(identer: Set<String>): Set<PersonIdent> = identer.map {
-    PersonIdent(ident = it)
-}.toSet()
+fun fagsakpersoner(identer: Set<String>): Set<PersonIdent> =
+    identer.map {
+        PersonIdent(ident = it)
+    }.toSet()
 
-fun fagsakpersonerAvPersonIdenter(identer: Set<PersonIdent>): Set<PersonIdent> = identer.map {
-    PersonIdent(ident = it.ident, sporbar = it.sporbar)
-}.toSet()
+fun fagsakpersonerAvPersonIdenter(identer: Set<PersonIdent>): Set<PersonIdent> =
+    identer.map {
+        PersonIdent(ident = it.ident, sporbar = it.sporbar)
+    }.toSet()
 
 /*
 fun årsakRevurdering(
@@ -251,8 +256,7 @@ fun årsakRevurdering(
         årsak = årsak,
         beskrivelse = beskrivelse,
     )
-*/
-/*
+
 fun revurderingsinformasjon() = RevurderingsinformasjonDto(
     LocalDate.now(),
     ÅrsakRevurderingDto(Opplysningskilde.MELDING_MODIA, Revurderingsårsak.ANNET, "beskrivelse"),
@@ -265,14 +269,15 @@ fun tilkjentYtelse(
     startdato: LocalDate? = null,
     beløp: Int = 11554,
 ): TilkjentYtelse {
-    val andeler = listOf(
-        AndelTilkjentYtelse(
-            beløp = beløp,
-            stønadFom = LocalDate.of(stønadsår, 1, 1),
-            stønadTom = LocalDate.of(stønadsår, 12, 31),
-            kildeBehandlingId = behandlingId,
-        ),
-    )
+    val andeler =
+        listOf(
+            AndelTilkjentYtelse(
+                beløp = beløp,
+                stønadFom = LocalDate.of(stønadsår, 1, 1),
+                stønadTom = LocalDate.of(stønadsår, 12, 31),
+                kildeBehandlingId = behandlingId,
+            ),
+        )
     return TilkjentYtelse(
         behandlingId = behandlingId,
         startdato = min(startdato, andeler.minOfOrNull { it.stønadFom }) ?: error("Må sette startdato"),
@@ -300,8 +305,7 @@ fun vedtak(
         opprettetAv = "VL",
         opprettetTid = LocalDateTime.now(),
     )
- */
-/*
+
 fun vedtakBarnetilsyn(
     behandlingId: UUID,
     barn: List<UUID>,
@@ -320,8 +324,7 @@ fun vedtakBarnetilsyn(
     opprettetAv = "VL",
     opprettetTid = LocalDateTime.now(),
 )
- */
-/*
+
 fun barnetilsynperiode(
     år: Int = 2022,
     fom: YearMonth = YearMonth.of(år, 1),
@@ -339,9 +342,7 @@ fun barnetilsynperiode(
     periodetype = periodetype,
     aktivitet = aktivitetstype,
 )
- */
 
-/*
 fun vedtaksperiode(
     år: Int = 2021,
     startDato: LocalDate = LocalDate.of(år, 1, 1),
@@ -353,8 +354,7 @@ fun vedtaksperiode(
         if (vedtaksperiodeType == VedtaksperiodeType.SANKSJON) Sanksjonsårsak.SAGT_OPP_STILLING else null,
 ) =
     Vedtaksperiode(startDato, sluttDato, aktivitetstype, vedtaksperiodeType, sanksjonsårsak)
- */
-/*
+
 fun vedtaksperiodeDto(
     årMånedFra: LocalDate = LocalDate.of(2021, 1, 1),
     årMånedTil: LocalDate = LocalDate.of(2021, 12, 1),
@@ -367,9 +367,7 @@ fun vedtaksperiodeDto(
         periodeType = periodeType,
         aktivitet = aktivitet,
     )
- */
 
-/*
 fun vedtaksperiodeDto(
     årMånedFra: YearMonth = YearMonth.of(2021, 1),
     årMånedTil: YearMonth = YearMonth.of(2021, 12),
@@ -384,9 +382,7 @@ fun vedtaksperiodeDto(
         periodeType = periodeType,
     )
 
- */
 
-/*
 fun behandlingBarn(
     id: UUID = UUID.randomUUID(),
     behandlingId: UUID,
@@ -405,9 +401,7 @@ fun behandlingBarn(
         sporbar = Sporbar(opprettetAv = "opprettetAv"),
     )
 }
- */
 
-/*
 fun barnMedIdent(fnr: String, navn: String, fødsel: Fødsel = fødsel(LocalDate.now())): BarnMedIdent =
     BarnMedIdent(
         adressebeskyttelse = emptyList(),
@@ -426,9 +420,7 @@ fun barnMedIdent(fnr: String, navn: String, fødsel: Fødsel = fødsel(LocalDate
         ),
         personIdent = fnr,
     )
- */
 
-/*
 
 fun søker(sivilstand: List<SivilstandMedNavn> = emptyList()): Søker =
     Søker(

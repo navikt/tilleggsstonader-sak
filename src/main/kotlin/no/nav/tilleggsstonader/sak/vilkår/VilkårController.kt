@@ -29,7 +29,6 @@ class VilkårController(
     private val tilgangService: TilgangService,
     // private val gjenbrukVilkårService: GjenbrukVilkårService,
 ) {
-
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @GetMapping("regler")
@@ -38,7 +37,9 @@ class VilkårController(
     }
 
     @PostMapping
-    fun oppdaterVilkår(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
+    fun oppdaterVilkår(
+        @RequestBody svarPåVilkårDto: SvarPåVilkårDto,
+    ): VilkårDto {
         tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         try {
@@ -55,27 +56,35 @@ class VilkårController(
     }
 
     @PostMapping("nullstill")
-    fun nullstillVilkår(@RequestBody request: OppdaterVilkårDto): VilkårDto {
+    fun nullstillVilkår(
+        @RequestBody request: OppdaterVilkårDto,
+    ): VilkårDto {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårStegService.nullstillVilkår(request)
     }
 
     @PostMapping("ikkevurder")
-    fun settVilkårTilSkalIkkeVurderes(@RequestBody request: OppdaterVilkårDto): VilkårDto {
+    fun settVilkårTilSkalIkkeVurderes(
+        @RequestBody request: OppdaterVilkårDto,
+    ): VilkårDto {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårStegService.settVilkårTilSkalIkkeVurderes(request)
     }
 
     @GetMapping("{behandlingId}")
-    fun getVilkår(@PathVariable behandlingId: UUID): VilkårsvurderingDto {
+    fun getVilkår(
+        @PathVariable behandlingId: UUID,
+    ): VilkårsvurderingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
     }
 
     @GetMapping("{behandlingId}/oppdater")
-    fun oppdaterRegisterdata(@PathVariable behandlingId: UUID): VilkårsvurderingDto {
+    fun oppdaterRegisterdata(
+        @PathVariable behandlingId: UUID,
+    ): VilkårsvurderingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId)

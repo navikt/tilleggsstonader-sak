@@ -19,9 +19,10 @@ class BehandlingshistorikkController(
     private val tilgangService: TilgangService,
     private val behandlingService: BehandlingService,
 ) {
-
     @GetMapping("{behandlingId}")
-    fun hentBehandlingshistorikk(@PathVariable behandlingId: UUID): List<HendelseshistorikkDto> {
+    fun hentBehandlingshistorikk(
+        @PathVariable behandlingId: UUID,
+    ): List<HendelseshistorikkDto> {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.ACCESS)
         val behandlingHistorikk = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling)

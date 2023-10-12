@@ -11,11 +11,10 @@ data class BeriketSimuleringsresultat(
 data class DetaljertSimuleringResultat(val simuleringMottaker: List<SimuleringMottaker>)
 
 data class SimuleringMottaker(
-    val simulertPostering: List<SimulertPostering>, // perioder
+    val simulertPostering: List<SimulertPostering>,
     val mottakerNummer: String? = null,
     val mottakerType: MottakerType,
 ) {
-
     override fun toString(): String {
         return (javaClass.simpleName + "< mottakerType=" + mottakerType + ">")
     }
@@ -23,7 +22,8 @@ data class SimuleringMottaker(
 
 data class SimulertPostering(
     val fagOmrådeKode: FagOmrådeKode,
-    val erFeilkonto: Boolean? = null, // brukes for å skille manuelle korigeringer og reelle feilutbetalinger
+    // brukes for å skille manuelle korigeringer og reelle feilutbetalinger
+    val erFeilkonto: Boolean? = null,
     val fom: LocalDate,
     val tom: LocalDate,
     val betalingType: BetalingType,

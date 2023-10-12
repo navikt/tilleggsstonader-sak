@@ -9,7 +9,6 @@ class EgenAnsattService(
     private val egenAnsattClient: EgenAnsattClient,
     private val cacheManager: CacheManager,
 ) {
-
     fun erEgenAnsatt(personIdent: String): Boolean =
         erEgenAnsatt(setOf(personIdent)).values.single()
 
