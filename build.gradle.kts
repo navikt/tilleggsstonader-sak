@@ -80,6 +80,7 @@ dependencies {
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.junit.platform:junit-platform-suite")
     testImplementation("org.wiremock:wiremock-standalone:$wiremockVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
 
@@ -87,6 +88,10 @@ dependencies {
 
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
+
+    testImplementation(platform("io.cucumber:cucumber-bom:7.14.0"))
+    testImplementation("io.cucumber:cucumber-java")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine")
 }
 
 kotlin {
@@ -107,6 +112,9 @@ if (project.hasProperty("skipLint")) {
 
 tasks.test {
     useJUnitPlatform()
+    // Work around. Gradle does not include enough information to disambiguate
+    // between different examples and scenarios.
+    systemProperty("cucumber.junit-platform.naming-strategy", "long")
 }
 
 tasks.bootJar {
