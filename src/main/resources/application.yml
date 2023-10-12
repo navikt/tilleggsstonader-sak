@@ -118,4 +118,5 @@ clients:
   egen_ansatt:
     uri: http://skjermede-personer-pip.nom
     scope: api://${CLIENT_ENV}-gcp.nom.skjermede-personer-pip/.default
-
+  familie-dokument:
+    uri: http://familie-dokument.teamfamilie

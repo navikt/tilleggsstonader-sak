@@ -72,6 +72,8 @@ spec:
         - application: tilleggsstonader-integrasjoner
         - application: skjermede-personer-pip
           namespace: nom
+        - application: familie-dokument
+          namespace: teamfamilie
       external:
         - host: pdl-api-q1.dev-fss-pub.nais.io
 
