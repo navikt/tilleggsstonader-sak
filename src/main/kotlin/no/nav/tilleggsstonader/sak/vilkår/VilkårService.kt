@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.dto.Fellesgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
@@ -91,24 +90,9 @@ class VilkårService(
 
     fun hentGrunnlagOgMetadata(behandlingId: UUID): Pair<VilkårGrunnlagDto, HovedregelMetadata> {
         val behandling = behandlingService.hentBehandling(behandlingId)
-        /*val søknad = søknadService.hentSøknadsgrunnlag(behandlingId)
-        val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val barn = barnService.finnBarnPåBehandling(behandlingId)
-        val grunnlag = vilkårGrunnlagService.hentGrunnlag(behandlingId, søknad, personIdent, barn)
-        val søktOmBarnetilsyn =
-            grunnlag.barnMedSamvær.filter { it.barnepass?.skalHaBarnepass == true }.map { it.barnId }
-
-        val metadata = HovedregelMetadata(
-            sivilstandstype = grunnlag.sivilstand.registergrunnlag.type,
-            sivilstandSøknad = søknad?.sivilstand,
-            barn = barn,
-            søktOmBarnetilsyn = søktOmBarnetilsyn,
-            langAvstandTilSøker = grunnlag.barnMedSamvær.map { it.mapTilBarnForelderLangAvstandTilSøker() },
-            vilkårgrunnlagDto = grunnlag,
-            behandling = behandling,
-        )
-         */
-        return Pair(VilkårGrunnlagDto(Fellesgrunnlag("navn")), HovedregelMetadata(emptyList(), behandling))
+        val grunnlag = vilkårGrunnlagService.hentGrunnlag(behandlingId)
+        return Pair(grunnlag, HovedregelMetadata(emptyList(), behandling))
     }
 
     private fun hentEllerOpprettVilkår(
@@ -147,10 +131,7 @@ class VilkårService(
     }*/
 
     /**
-     * Når en revurdering opprettes skal den kopiere de tidligere vilkåren med lik verdi for endretTid.
-     * Endret tid blir satt av Sporbar() som alltid vil sette endretTid til nåværende tispunkt, noe som blir feil.
-     * For å omgå dette problemet lagres først de kopierte vilkårsvurderingene til databasen. Til slutt
-     * vil oppdaterEndretTid() manuelt overskrive verdiene for endretTid til korrekte verdier.
+     * Når en revurdering opprettes skal den kopiere de tidligere vilkårene for samme stønad.
      */
     fun kopierVilkårsettTilNyBehandling(
         eksisterendeBehandlingId: UUID,
@@ -174,7 +155,6 @@ class VilkårService(
         val nyeBarnVurderinger = opprettVilkårForNyeBarn(kopiAvVurderinger, metadata, stønadstype)
 
         vilkårRepository.insertAll(kopiAvVurderinger.values.toList() + nyeBarnVurderinger)
-        tilbakestillEndretTidForKopierteVurderinger(kopiAvVurderinger, tidligereVurderinger) // TODO remove
     }
 
     private fun validerAtVurderingerKanKopieres(
@@ -214,18 +194,6 @@ class VilkårService(
             .filter { barn -> vilkårKopi.none { it.value.barnId == barn.id } }
             .map { OppdaterVilkår.lagVilkårForNyttBarn(metadata, it.behandlingId, it.id, stønadstype) }
             .flatten()
-
-    private fun tilbakestillEndretTidForKopierteVurderinger(
-        vilkår: Map<UUID, Vilkår>,
-        tidligereVurderinger: Map<UUID, Vilkår>,
-    ) {
-        vilkår.forEach { (forrigeId, vurdering) ->
-            vilkårRepository.oppdaterEndretTid(
-                vurdering.id,
-                tidligereVurderinger.getValue(forrigeId).sporbar.endret.endretTid,
-            )
-        }
-    }
 
     private fun finnBarnId(barnId: UUID?, barnIdMap: Map<UUID, BehandlingBarn>): UUID? {
         return barnId?.let {

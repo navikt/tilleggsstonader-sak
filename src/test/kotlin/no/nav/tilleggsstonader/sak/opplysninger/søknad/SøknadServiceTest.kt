@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
-import no.nav.tilleggsstonader.sak.util.SøknadUtil.skjemaBarn
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -59,13 +59,12 @@ class SøknadServiceTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak))
         val skjema = søknadskjemaBarnetilsyn(
-            barn = listOf(skjemaBarn(fødselsnummer = "barn1", navn = "navn1")),
+            barnMedBarnepass = listOf(barnMedBarnepass(ident = "barn1", navn = "navn1")),
         )
         val søknad = søknadService.lagreSøknad(behandling.id, "journalpostId", skjema)
         assertThat(søknad.journalpostId).isEqualTo("journalpostId")
         assertThat(søknad.barn).hasSize(1)
-        assertThat(søknad.barn.single().fødselsnummer).isEqualTo("barn1")
-        assertThat(søknad.barn.single().navn).isEqualTo("navn1")
+        assertThat(søknad.barn.single().ident).isEqualTo("barn1")
     }
 
     private fun kopierSøknadTilRevurdering(

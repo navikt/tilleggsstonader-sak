@@ -101,6 +101,7 @@ enum class Vilkårsresultat(val beskrivelse: String) {
 enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Stønadstype>) {
     EKSEMPEL("Eksempel", listOf(Stønadstype.BARNETILSYN)),
     EKSEMPEL2("Eksempel 2", listOf(Stønadstype.BARNETILSYN)),
+    MÅLGRUPPE("Målgruppe", listOf(Stønadstype.BARNETILSYN)),
     AKTIVITET("Aktivitet", listOf(Stønadstype.BARNETILSYN)),
     ;
 

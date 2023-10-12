@@ -19,12 +19,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaMapper
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.mockVilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtil.mockVilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
@@ -94,7 +94,7 @@ internal class VilkårStegServiceTest {
     private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
     val fagsak = fagsak()
     private val behandling = behandling(fagsak, BehandlingStatus.OPPRETTET)
-    private val behandlingId = UUID.randomUUID()
+    private val behandlingId = behandling.id
 
     @BeforeEach
     fun setUp() {
@@ -106,8 +106,7 @@ internal class VilkårStegServiceTest {
         // every { søknadService.hentSøknadsgrunnlag(any()) }.returns(søknad)
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsak(stønadstype = Stønadstype.BARNETILSYN)
         every { vilkårRepository.insertAll(any()) } answers { firstArg() }
-        every { vilkårGrunnlagService.hentGrunnlag(any(), any(), any()) } returns
-            mockVilkårGrunnlagDto()
+        every { vilkårGrunnlagService.hentGrunnlag(any()) } returns mockVilkårGrunnlagDto()
 
         justRun { behandlingshistorikkService.opprettHistorikkInnslag(any(), any(), any(), any()) }
 

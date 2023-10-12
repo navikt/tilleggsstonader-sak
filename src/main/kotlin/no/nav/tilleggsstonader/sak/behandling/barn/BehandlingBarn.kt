@@ -13,8 +13,7 @@ data class BehandlingBarn(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: UUID,
-    val personIdent: String,
-    val navn: String,
+    val ident: String,
     @Column("soknad_barn_id")
     val søknadBarnId: UUID? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
@@ -22,6 +21,5 @@ data class BehandlingBarn(
 ) {
 
     fun erMatchendeBarn(annetBarn: BehandlingBarn): Boolean =
-        (this.personIdent == annetBarn.personIdent)
-    // || (this.søknadBarnId != null && this.søknadBarnId == annetBarn.søknadBarnId)
+        this.ident == annetBarn.ident
 }

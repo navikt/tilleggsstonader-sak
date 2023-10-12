@@ -12,11 +12,11 @@ import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaMapper
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
+import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.mockVilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtil.mockVilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
@@ -56,7 +56,7 @@ internal class VilkårServiceTest {
     )
     private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
     private val behandling = behandling(fagsak(), BehandlingStatus.OPPRETTET, årsak = BehandlingÅrsak.PAPIRSØKNAD)
-    private val behandlingId = UUID.randomUUID()
+    private val behandlingId = behandling.id
 
     @BeforeEach
     fun setUp() {
@@ -69,8 +69,7 @@ internal class VilkårServiceTest {
         every { barnService.finnBarnPåBehandling(behandlingId) } returns barn
         every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
 
-        every { vilkårGrunnlagService.hentGrunnlag(any(), any(), any()) } returns
-            mockVilkårGrunnlagDto()
+        every { vilkårGrunnlagService.hentGrunnlag(behandlingId) } returns mockVilkårGrunnlagDto()
     }
 
     /*

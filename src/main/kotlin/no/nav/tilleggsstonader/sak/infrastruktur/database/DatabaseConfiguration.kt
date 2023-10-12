@@ -4,6 +4,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.PropertiesWrapperTilStringConverter
 import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
@@ -83,6 +85,11 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 PGobjectTilTotrinnsÅrsaker(),
                 TotrinnsÅrsakerTilPGobjectConverter(),
+
+                PGobjectTilSkjemaBarnetilsyn(),
+                SkjemaBarnetilsynPGobjectConverter(),
+                PGobjectTilBarnMedBarnepass(),
+                BarnMedBarnepassPGobjectConverter(),
             ),
         )
     }
@@ -116,10 +123,10 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     @WritingConverter
     class DelvilkårTilPGobjectConverter : Converter<DelvilkårWrapper, PGobject> {
 
-        override fun convert(delvilkårWrapper: DelvilkårWrapper): PGobject =
+        override fun convert(data: DelvilkårWrapper): PGobject =
             PGobject().apply {
                 type = "json"
-                value = objectMapper.writeValueAsString(delvilkårWrapper.delvilkårsett)
+                value = objectMapper.writeValueAsString(data.delvilkårsett)
             }
     }
 
@@ -134,10 +141,10 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     @WritingConverter
     class BeriketSimuleringsresultatTilPGobjectConverter : Converter<BeriketSimuleringsresultat, PGobject> {
 
-        override fun convert(simuleringsresultat: BeriketSimuleringsresultat): PGobject =
+        override fun convert(data: BeriketSimuleringsresultat): PGobject =
             PGobject().apply {
                 type = "json"
-                value = objectMapper.writeValueAsString(simuleringsresultat)
+                value = objectMapper.writeValueAsString(data)
             }
     }
 
@@ -152,10 +159,47 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     @WritingConverter
     class TotrinnsÅrsakerTilPGobjectConverter : Converter<Årsaker, PGobject> {
 
-        override fun convert(årsaker: Årsaker): PGobject =
+        override fun convert(data: Årsaker): PGobject =
             PGobject().apply {
                 type = "json"
-                value = objectMapper.writeValueAsString(årsaker)
+                value = objectMapper.writeValueAsString(data)
+            }
+    }
+
+    // Søknad
+    @ReadingConverter
+    class PGobjectTilSkjemaBarnetilsyn : Converter<PGobject, SkjemaBarnetilsyn> {
+
+        override fun convert(pGobject: PGobject): SkjemaBarnetilsyn {
+            return objectMapper.readValue(pGobject.value!!)
+        }
+    }
+
+    @WritingConverter
+    class SkjemaBarnetilsynPGobjectConverter : Converter<SkjemaBarnetilsyn, PGobject> {
+
+        override fun convert(data: SkjemaBarnetilsyn): PGobject =
+            PGobject().apply {
+                type = "json"
+                value = objectMapper.writeValueAsString(data)
+            }
+    }
+
+    @ReadingConverter
+    class PGobjectTilBarnMedBarnepass : Converter<PGobject, BarnMedBarnepass> {
+
+        override fun convert(pGobject: PGobject): BarnMedBarnepass {
+            return objectMapper.readValue(pGobject.value!!)
+        }
+    }
+
+    @WritingConverter
+    class BarnMedBarnepassPGobjectConverter : Converter<BarnMedBarnepass, PGobject> {
+
+        override fun convert(data: BarnMedBarnepass): PGobject =
+            PGobject().apply {
+                type = "json"
+                value = objectMapper.writeValueAsString(data)
             }
     }
 }

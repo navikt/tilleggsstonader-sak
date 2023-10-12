@@ -1,0 +1,24 @@
+{
+  "hovedytelse" : {
+    "søknadsgrunnlag" : {
+      "hovedytelse" : "AAP"
+    }
+  },
+  "aktivitet" : {
+    "søknadsgrunnlag" : {
+      "utdanning" : "JA"
+    }
+  },
+  "barn" : [ {
+    "ident" : "1",
+    "registergrunnlag" : {
+      "navn" : "Fornavn mellomnavn Etternavn",
+      "dødsdato" : null
+    },
+    "søknadgrunnlag" : {
+      "type" : "ANDRE",
+      "startetIFemte" : "JA",
+      "årsak" : "MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID"
+    }
+  } ]
+}
