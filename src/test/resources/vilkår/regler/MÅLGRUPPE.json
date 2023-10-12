@@ -1,0 +1,18 @@
+{
+  "vilkårType" : "MÅLGRUPPE",
+  "regler" : {
+    "MÅLGRUPPE" : {
+      "regelId" : "MÅLGRUPPE",
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    }
+  }
+}
