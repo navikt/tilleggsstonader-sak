@@ -24,6 +24,7 @@ data class TotrinnskontrollDto(
 
 enum class TotrinnkontrollStatus {
     TOTRINNSKONTROLL_UNDERKJENT,
+    GODKJENNT,
     KAN_FATTE_VEDTAK,
     IKKE_AUTORISERT,
     UAKTUELT,

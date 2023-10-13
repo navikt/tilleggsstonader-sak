@@ -28,4 +28,5 @@ data class Årsaker(
 enum class TotrinnsKontrollStatus {
     UNDERKJENT,
     KLAR,
+    ANGRE_SEND_TIL_BESLUTTER,
 }
