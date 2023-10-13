@@ -17,7 +17,7 @@ abstract class BeregnYtelseSteg<T>(
     private val stønadstype: Stønadstype,
     open val vedtakService: VedtakService,
     open val tilkjentytelseService: TilkjentYtelseService,
-    open val simuleringService: SimuleringService
+    open val simuleringService: SimuleringService,
 ) : BehandlingSteg<T> {
 
     override fun utførSteg(saksbehandling: Saksbehandling, data: T) {

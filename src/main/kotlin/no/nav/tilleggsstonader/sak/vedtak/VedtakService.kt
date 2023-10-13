@@ -11,7 +11,7 @@ data class VedtakTilsynBarn(
     @Id
     val behandlingId: UUID,
     val perioder: List<String>,
-    val beregningsresultat: List<String>
+    val beregningsresultat: List<String>,
 )
 
 @Repository
@@ -24,12 +24,11 @@ class VedtakTilsynBarnRepository {
     fun insert(vedtak: VedtakTilsynBarn): VedtakTilsynBarn = vedtak
 
     fun deleteById(behandlingId: UUID) {}
-
 }
 
 @Service
 class VedtakService(
-    private val vedtakTilsynBarnRepository: VedtakTilsynBarnRepository
+    private val vedtakTilsynBarnRepository: VedtakTilsynBarnRepository,
 ) {
 
     fun lagreVedtak(vedtak: VedtakTilsynBarn) {
@@ -41,5 +40,4 @@ class VedtakService(
             Stønadstype.BARNETILSYN -> vedtakTilsynBarnRepository.deleteById(saksbehandling.id)
         }
     }
-
 }

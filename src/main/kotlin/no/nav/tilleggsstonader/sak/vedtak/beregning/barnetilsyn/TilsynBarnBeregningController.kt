@@ -5,12 +5,11 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-
 @RestController
 @RequestMapping("/api/beregning/tilsyn-barn")
 @ProtectedWithClaims(issuer = "azuread")
 class TilsynBarnBeregningController(
-    private val tilsynBarnBeregningService: TilsynBarnBeregningService
+    private val tilsynBarnBeregningService: TilsynBarnBeregningService,
 ) {
 
     @PostMapping

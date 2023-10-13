@@ -18,12 +18,12 @@ class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     vedtakService: VedtakService,
     tilkjentytelseService: TilkjentYtelseService,
-    simuleringService: SimuleringService
+    simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<InnvilgelseTilsynBarnDto>(
     stønadstype = Stønadstype.BARNETILSYN,
     vedtakService = vedtakService,
     tilkjentytelseService = tilkjentytelseService,
-    simuleringService = simuleringService
+    simuleringService = simuleringService,
 ) {
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, data: InnvilgelseTilsynBarnDto) {
@@ -32,9 +32,9 @@ class TilsynBarnBeregnYtelseSteg(
         lagreAndeler(saksbehandling, data, beregningsresultat)
         /*
         Funksjonalitet som mangler:
-        * Avslag
-        * Revurdering
-        * Opphør
+         * Avslag
+         * Revurdering
+         * Opphør
 
          Simulering burde kanskje kun gjøres når man går inn på fanen for simulering,
          og ikke i dette steget for å unngå feil fra simulering
@@ -44,7 +44,7 @@ class TilsynBarnBeregnYtelseSteg(
     private fun lagreAndeler(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseTilsynBarnDto,
-        beregningsresultat: BeregningsresultatTilsynBarnDto
+        beregningsresultat: BeregningsresultatTilsynBarnDto,
     ) {
         // Burde vi lagre beløpsperioder? Kan man kanskje lagre det som en del av vedtaket?
         val andelerTilkjentYtelse = emptyList<AndelTilkjentYtelse>()
@@ -52,8 +52,8 @@ class TilsynBarnBeregnYtelseSteg(
             TilkjentYtelse(
                 behandlingId = saksbehandling.id,
                 andelerTilkjentYtelse = andelerTilkjentYtelse,
-                startdato = beregnStartdato(saksbehandling, andelerTilkjentYtelse)
-            )
+                startdato = beregnStartdato(saksbehandling, andelerTilkjentYtelse),
+            ),
         )
     }
 
