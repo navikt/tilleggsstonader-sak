@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.beregning
+package no.nav.tilleggsstonader.sak.vedtak.beregning.barnetilsyn
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
@@ -9,14 +9,13 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.beregning.dto.BeløpsperioderTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.beregning.dto.InnvilgelseTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.beregning.BeregnYtelseSteg
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class BeregnYtelseTilsynBarnSteg(
-    private val beregningTilsynBarnService: BeregningTilsynBarnService,
+class TilsynBarnBeregnYtelseSteg(
+    private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     vedtakService: VedtakService,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService
@@ -28,10 +27,15 @@ class BeregnYtelseTilsynBarnSteg(
 ) {
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, data: InnvilgelseTilsynBarnDto) {
-        val beløpsperioder = beregningTilsynBarnService.beregn(data)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(data)
         lagreVedtak(data)
-        lagreAndeler(saksbehandling, data, beløpsperioder)
+        lagreAndeler(saksbehandling, data, beregningsresultat)
         /*
+        Funksjonalitet som mangler:
+        * Avslag
+        * Revurdering
+        * Opphør
+
          Simulering burde kanskje kun gjøres når man går inn på fanen for simulering,
          og ikke i dette steget for å unngå feil fra simulering
          */
@@ -39,8 +43,8 @@ class BeregnYtelseTilsynBarnSteg(
 
     private fun lagreAndeler(
         saksbehandling: Saksbehandling,
-        data: InnvilgelseTilsynBarnDto,
-        beløpsperioder: List<BeløpsperioderTilsynBarnDto>
+        vedtak: InnvilgelseTilsynBarnDto,
+        beregningsresultat: BeregningsresultatTilsynBarnDto
     ) {
         // Burde vi lagre beløpsperioder? Kan man kanskje lagre det som en del av vedtaket?
         val andelerTilkjentYtelse = emptyList<AndelTilkjentYtelse>()
@@ -54,7 +58,8 @@ class BeregnYtelseTilsynBarnSteg(
     }
 
     private fun lagreVedtak(data: InnvilgelseTilsynBarnDto) {
-        val vedtak = VedtakTilsynBarn(data.behandlingId, data.perioder)
+        // validere at barnen finns på behandlingen
+        val vedtak = VedtakTilsynBarn(data.behandlingId, data.perioder, emptyList())
         vedtakService.lagreVedtak(vedtak)
     }
 

@@ -23,6 +23,7 @@ abstract class BeregnYtelseSteg<T>(
     override fun utførSteg(saksbehandling: Saksbehandling, data: T) {
         validerStønadstype(saksbehandling)
         nullstillEksisterendeVedtakPåBehandling(saksbehandling)
+        lagreVedtak(saksbehandling, data)
     }
 
     abstract fun lagreVedtak(saksbehandling: Saksbehandling, data: T)

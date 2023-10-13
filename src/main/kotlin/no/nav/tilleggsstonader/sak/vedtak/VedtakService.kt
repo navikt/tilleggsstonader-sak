@@ -10,12 +10,15 @@ import java.util.UUID
 data class VedtakTilsynBarn(
     @Id
     val behandlingId: UUID,
-    val perioder: List<String>
+    val perioder: List<String>,
+    val beregningsresultat: List<String>
 )
 
 @Repository
 class VedtakTilsynBarnRepository {
-
+    /**
+     * Erstatt disse metodene når det er et faktiskt repository
+     */
     fun findByIdOrNull(behandlingId: UUID): VedtakTilsynBarn? = null
 
     fun insert(vedtak: VedtakTilsynBarn): VedtakTilsynBarn = vedtak
