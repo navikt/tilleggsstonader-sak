@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -43,7 +44,8 @@ class TilkjentYtelseService(
         stønadstype: Stønadstype,
         datoForAvstemming: LocalDate,
     ): List<KonsistensavstemmingTilkjentYtelseDto> {
-        val tilkjentYtelser = tilkjentYtelseRepository.finnTilkjentYtelserTilKonsistensavstemming(stønadstype, datoForAvstemming)
+        val tilkjentYtelser =
+            tilkjentYtelseRepository.finnTilkjentYtelserTilKonsistensavstemming(stønadstype, datoForAvstemming)
 
         return tilkjentYtelser.chunked(PdlClient.MAKS_ANTALL_IDENTER).map { mapTilDto(it, datoForAvstemming) }.flatten()
     }
@@ -80,10 +82,10 @@ class TilkjentYtelseService(
         }
     }
 
-    fun slettTilkjentYtelseForBehandling(behandlingId: UUID) {
-        brukerfeilHvis(behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()) {
+    fun slettTilkjentYtelseForBehandling(saksbehandling: Saksbehandling) {
+        brukerfeilHvis(saksbehandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke reberegne tilkjent ytelse for en behandling som er låst for videre redigering"
         }
-        tilkjentYtelseRepository.findByBehandlingId(behandlingId)?.let { tilkjentYtelseRepository.deleteById(it.id) }
+        tilkjentYtelseRepository.deleteById(saksbehandling.id)
     }
 }
