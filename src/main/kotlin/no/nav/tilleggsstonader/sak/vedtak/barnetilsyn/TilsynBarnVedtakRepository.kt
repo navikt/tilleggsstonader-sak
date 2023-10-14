@@ -7,7 +7,7 @@ import java.util.UUID
 @Repository
 class TilsynBarnVedtakRepository {
     /**
-     * Erstatt disse metodene når det er et faktiskt repository
+     * TODO Erstatt disse metodene når det er et faktiskt repository
      */
     fun findByIdOrNull(behandlingId: UUID): VedtakTilsynBarn? = null
 
