@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.beregning.barnetilsyn
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import org.springframework.stereotype.Service
 

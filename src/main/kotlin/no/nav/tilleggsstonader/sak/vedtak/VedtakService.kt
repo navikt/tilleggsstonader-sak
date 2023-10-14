@@ -1,43 +1,23 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
-import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
-import org.springframework.data.annotation.Id
-import org.springframework.stereotype.Repository
-import org.springframework.stereotype.Service
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import java.util.UUID
 
-data class VedtakTilsynBarn(
-    @Id
-    val behandlingId: UUID,
-    val perioder: List<String>,
-    val beregningsresultat: List<String>,
-)
-
-@Repository
-class VedtakTilsynBarnRepository {
-    /**
-     * Erstatt disse metodene når det er et faktiskt repository
-     */
-    fun findByIdOrNull(behandlingId: UUID): VedtakTilsynBarn? = null
-
-    fun insert(vedtak: VedtakTilsynBarn): VedtakTilsynBarn = vedtak
-
-    fun deleteById(behandlingId: UUID) {}
-}
-
-@Service
-class VedtakService(
-    private val vedtakTilsynBarnRepository: VedtakTilsynBarnRepository,
+abstract class VedtakService<T>(
+    private val stegService: StegService,
+    private val steg: BeregnYtelseSteg<T>,
+    private val tilsynBarnVedtakRepository: TilsynBarnVedtakRepository,
 ) {
 
-    fun lagreVedtak(vedtak: VedtakTilsynBarn) {
-        vedtakTilsynBarnRepository.insert(vedtak)
+    fun håndterSteg(vedtak: T) {
+        stegService.håndterSteg(behandlingId(vedtak), steg, vedtak)
     }
 
-    fun slettVedtak(saksbehandling: Saksbehandling) {
-        when (saksbehandling.stønadstype) {
-            Stønadstype.BARNETILSYN -> vedtakTilsynBarnRepository.deleteById(saksbehandling.id)
-        }
+    fun hentVedtak(behandlingId: UUID): T {
+        // TODO erstatt med riktig repo når TilsynBarnVedtakRepository er et riktig repo med interface
+        return tilsynBarnVedtakRepository.findByIdOrNull(behandlingId) as T
     }
+
+    abstract fun behandlingId(vedtak: T): UUID
 }

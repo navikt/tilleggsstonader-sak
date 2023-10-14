@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.beregning.barnetilsyn
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
@@ -7,24 +7,25 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.VedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.beregning.BeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
-    vedtakService: VedtakService,
+    private val repository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<InnvilgelseTilsynBarnDto>(
     stønadstype = Stønadstype.BARNETILSYN,
-    vedtakService = vedtakService,
     tilkjentytelseService = tilkjentytelseService,
     simuleringService = simuleringService,
 ) {
+
+    override fun slettVedtak(saksbehandling: Saksbehandling) {
+        repository.deleteById(saksbehandling.id)
+    }
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, data: InnvilgelseTilsynBarnDto) {
         val beregningsresultat = tilsynBarnBeregningService.beregn(data)
@@ -60,7 +61,7 @@ class TilsynBarnBeregnYtelseSteg(
     private fun lagreVedtak(data: InnvilgelseTilsynBarnDto) {
         // validere at barnen finns på behandlingen
         val vedtak = VedtakTilsynBarn(data.behandlingId, data.perioder, emptyList())
-        vedtakService.lagreVedtak(vedtak)
+        repository.insert(vedtak)
     }
 
     /**

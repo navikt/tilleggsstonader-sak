@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.beregning
+package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 
 /**
  * Splitter opp BeregnYtelseSteg for ulike stønadstyper
@@ -15,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
  */
 abstract class BeregnYtelseSteg<T>(
     private val stønadstype: Stønadstype,
-    open val vedtakService: VedtakService,
     open val tilkjentytelseService: TilkjentYtelseService,
     open val simuleringService: SimuleringService,
 ) : BehandlingSteg<T> {
@@ -28,8 +26,10 @@ abstract class BeregnYtelseSteg<T>(
 
     abstract fun lagreVedtak(saksbehandling: Saksbehandling, data: T)
 
+    abstract fun slettVedtak(saksbehandling: Saksbehandling)
+
     private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
-        vedtakService.slettVedtak(saksbehandling)
+        slettVedtak(saksbehandling)
         tilkjentytelseService.slettTilkjentYtelseForBehandling(saksbehandling)
         simuleringService.slettSimuleringForBehandling(saksbehandling)
     }
