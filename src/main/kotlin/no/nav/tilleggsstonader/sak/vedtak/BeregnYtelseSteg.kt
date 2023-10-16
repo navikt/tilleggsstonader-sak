@@ -24,9 +24,9 @@ abstract class BeregnYtelseSteg<T>(
         lagreVedtak(saksbehandling, data)
     }
 
-    abstract fun lagreVedtak(saksbehandling: Saksbehandling, data: T)
+    protected abstract fun lagreVedtak(saksbehandling: Saksbehandling, data: T)
 
-    abstract fun slettVedtak(saksbehandling: Saksbehandling)
+    protected abstract fun slettVedtak(saksbehandling: Saksbehandling)
 
     private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
         slettVedtak(saksbehandling)

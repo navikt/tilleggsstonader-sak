@@ -37,6 +37,9 @@ class TilsynBarnBeregnYtelseSteg(
          * Revurdering
          * Opphør
 
+         Teste
+         * At vedtak, TY og simulering slettes når man kaller på denne på nytt
+
          Simulering burde kanskje kun gjøres når man går inn på fanen for simulering,
          og ikke i dette steget for å unngå feil fra simulering
          */
