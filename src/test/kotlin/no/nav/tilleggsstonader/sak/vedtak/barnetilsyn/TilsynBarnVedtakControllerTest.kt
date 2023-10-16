@@ -31,7 +31,7 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
         headers.setBearerAuth(onBehalfOfToken())
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-        val request = InnvilgelseTilsynBarnDto(UUID.randomUUID(), emptyList())
+        val request = InnvilgelseTilsynBarnDto(UUID.randomUUID(), emptyList(), emptyMap())
         val exception = catchProblemDetailException {
             restTemplate.exchange<Map<String, Any>?>(
                 localhost("api/vedtak/tilsyn-barn/${behandling.id}"),

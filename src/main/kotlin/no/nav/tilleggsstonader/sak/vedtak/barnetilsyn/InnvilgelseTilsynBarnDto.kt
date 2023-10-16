@@ -19,9 +19,10 @@ data class Stønadsperiode(
 ) : Periode<LocalDate>
 
 data class Utgift(
+    override val fom: YearMonth,
+    override val tom: YearMonth,
     val utgift: Int,
-    override val fom: YearMonth
-) : FomPeriode<YearMonth>
+) : Periode<YearMonth>
 
 /**
  * Hvordan betales dagsats ut fra økonomi? Hvordan skal vi egentlige iverksette perioder som strekker seg fra aug - des?
