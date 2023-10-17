@@ -1,10 +1,20 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
+import no.nav.tilleggsstonader.kontrakter.felles.erSortert
+import no.nav.tilleggsstonader.kontrakter.felles.overlapper
+import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
+import no.nav.tilleggsstonader.libs.utils.VirkedagerProvider
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.YearMonth
 import java.util.UUID
+
+private val SATS_PROSENT = BigDecimal(0.64)
+private val SNITT_ANTALL_DAGER_PER_MÅNED = BigDecimal(21.67)
 
 @Service
 class TilsynBarnBeregningService {
@@ -25,26 +35,24 @@ class TilsynBarnBeregningService {
     private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<Beregningsresultat> {
         return beregningsgrunnlag.map {
             Beregningsresultat(
-                fom = it.måned,
-                tom = it.måned,
-                makssats = 100, // TODO
-                dagsats = 100, // TODO
-                grunnlag = it
+                makssats = 100, // TODO trenger makssats
+                dagsats = beregn(it),
+                grunnlag = it,
             )
-        }.mergeSammenhengende(::skalSlåSammen)
+        }
     }
 
-    private fun skalSlåSammen(
-        b1: Beregningsresultat,
-        b2: Beregningsresultat
-    ) = b1.tom.plusMonths(1) == b2.fom &&
-            b1.makssats == b2.makssats &&
-            b1.dagsats == b2.dagsats &&
-            b1.grunnlag == b2.grunnlag
+    private fun beregn(grunnlag: Beregningsgrunnlag): Float {
+        val utgifter = grunnlag.utgifterTotal.toBigDecimal()
+        return utgifter.multiply(SATS_PROSENT)
+            .divide(SNITT_ANTALL_DAGER_PER_MÅNED, 4, RoundingMode.HALF_UP)
+            .setScale(2, RoundingMode.HALF_UP)
+            .toFloat()
+    }
 
     private fun lagBeregningsgrunnlag(
         stønadsperioder: List<Stønadsperiode>,
-        utgifterPerBarn: Map<UUID, List<Utgift>>
+        utgifterPerBarn: Map<UUID, List<Utgift>>,
     ): List<Beregningsgrunnlag> {
         val stønadsdagerPerÅrMåned = stønadsperioder.tilÅrMåneder()
 
@@ -52,14 +60,22 @@ class TilsynBarnBeregningService {
 
         val utgifterPerMåned = getUtgifterPerMåned(utgifterPerBarn, stønadsperiode)
 
-        return stønadsdagerPerÅrMåned.entries.mapNotNull { (måned, antallDager) ->
-            utgifterPerMåned[måned]?.let {
+        return stønadsdagerPerÅrMåned.entries.mapNotNull { (måned, stønadsperioder) ->
+            utgifterPerMåned[måned]?.let { utgifter ->
                 Beregningsgrunnlag(
                     måned = måned,
-                    antallDager = antallDager,
-                    utgifter = it
+                    stønadsperioder = stønadsperioder,
+                    utgifter = utgifter,
+                    antallDagerTotal = antallDager(stønadsperioder),
+                    utgifterTotal = utgifter.sumOf { it.utgift },
                 )
             }
+        }
+    }
+
+    private fun antallDager(stønadsperioder: List<Stønadsperiode>): Int {
+        return stønadsperioder.sumOf { stønadsperiode ->
+            stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
         }
     }
 
@@ -79,10 +95,17 @@ class TilsynBarnBeregningService {
      * Eksempel: 1stk UtgiftsperiodeDto fra januar til mars deles opp i 3:
      * listOf(UtgiftsMåned(jan), UtgiftsMåned(feb), UtgiftsMåned(mars))
      */
-    fun List<Stønadsperiode>.tilÅrMåneder(): Map<YearMonth, Int> {
-        return this.flatMap { it.splitPerMåned { 10 } } // TODO beregn dager i periode
-            .groupBy { it.first }
-            .mapValues { (_, values) -> values.sumOf { it.second } }
+    fun List<Stønadsperiode>.tilÅrMåneder(): Map<YearMonth, List<Stønadsperiode>> {
+        return this
+            .flatMap { stønadsperiode ->
+                stønadsperiode.splitPerMåned { måned, periode ->
+                    periode.copy(
+                        fom = maxOf(periode.fom, måned.atDay(1)),
+                        tom = minOf(periode.tom, måned.atEndOfMonth()),
+                    )
+                }
+            }
+            .groupBy({ it.first }, { it.second })
     }
 
     /**
@@ -90,10 +113,10 @@ class TilsynBarnBeregningService {
      */
     private fun getUtgifterPerMåned(
         utgifterPerBarn: Map<UUID, List<Utgift>>,
-        stønadsperiode: ClosedRange<YearMonth>
+        stønadsperiode: ClosedRange<YearMonth>,
     ): Map<YearMonth, List<UtgiftForBarn>> {
         return utgifterPerBarn.entries.flatMap { (barnId, utgifter) ->
-            utgifter.flatMap { utgift -> utgift.splitPerMåned { UtgiftForBarn(barnId, it.utgift) } }
+            utgifter.flatMap { utgift -> utgift.splitPerMåned { _, periode -> UtgiftForBarn(barnId, periode.utgift) } }
         }.groupBy({ it.first }, { it.second })
             .filterKeys { it in stønadsperiode }
     }
@@ -128,6 +151,11 @@ class TilsynBarnBeregningService {
             }
             feilHvis(utgifterForBarn.overlapper()) {
                 "Utgiftsperioder overlapper"
+            }
+
+            val ikkePositivUtgift = utgifterForBarn.firstOrNull { it.utgift < 1 }?.utgift
+            feilHvis(ikkePositivUtgift != null) {
+                "Utgiftsperioder inneholder ugyldig verdi: $ikkePositivUtgift"
             }
 
             // TODO burde vi validere utgiftsperioder vs stønadsperioder?

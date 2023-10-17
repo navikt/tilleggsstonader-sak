@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
@@ -33,25 +34,18 @@ data class BeregningsresultatTilsynBarnDto(
 )
 
 data class Beregningsresultat(
-    override val fom: YearMonth,
-    override val tom: YearMonth,
     val makssats: Int,
-    val dagsats: Int,
+    val dagsats: Float,
     val grunnlag: Beregningsgrunnlag,
-): Periode<YearMonth>, Mergeable<YearMonth, Beregningsresultat> {
-    override fun merge(other: Beregningsresultat): Beregningsresultat {
-        return this.copy(tom = other.tom)
-    }
+)
 
-}
-
-// Map<YearMonth, Beregningsgrunnlag>
-// Grunnlag for beregnet periode
-// TODO Hvordan burde denne se ut?
+// TODO kanskje ta med hvor mye av utgiftene som blir dekket? / dagsats innan avkortning
 data class Beregningsgrunnlag(
     val måned: YearMonth,
-    val antallDager: Int,
-    val utgifter: List<UtgiftForBarn>
+    val stønadsperioder: List<Stønadsperiode>,
+    val utgifter: List<UtgiftForBarn>,
+    val antallDagerTotal: Int,
+    val utgifterTotal: Int,
 )
 
 data class UtgiftForBarn(

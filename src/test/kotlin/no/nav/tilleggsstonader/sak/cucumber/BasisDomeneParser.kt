@@ -111,7 +111,7 @@ fun parseValgfriDato(domenebegrep: String, rad: Map<String, String?>): LocalDate
     }
 }
 
-private fun parseÅrMåned(verdi: String): YearMonth {
+fun parseÅrMåned(verdi: String): YearMonth {
     return if (verdi.contains(".")) {
         YearMonth.parse(verdi, norskÅrMånedFormatter)
     } else {
@@ -152,8 +152,12 @@ fun valgfriVerdi(nøkkel: String, rad: Map<String, String>): String? {
 
 fun parseInt(domenebegrep: Domenenøkkel, rad: Map<String, String>): Int {
     val verdi = verdi(domenebegrep.nøkkel, rad).replace("_", "")
-
     return Integer.parseInt(verdi)
+}
+
+fun parseFloat(domenebegrep: Domenenøkkel, rad: Map<String, String>): Float {
+    val verdi = verdi(domenebegrep.nøkkel, rad).replace("_", "")
+    return verdi.toFloat()
 }
 
 fun parseBigDecimal(domenebegrep: Domenenøkkel, rad: Map<String, String>): BigDecimal {
