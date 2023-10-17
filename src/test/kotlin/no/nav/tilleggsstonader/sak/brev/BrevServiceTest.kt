@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.brev
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevService.Companion.BESLUTTER_SIGNATUR_PLACEHOLDER
@@ -21,7 +22,6 @@ import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import java.time.LocalDateTime
 
@@ -52,7 +52,7 @@ internal class BrevServiceTest {
     internal fun `lagBeslutterBrev - skal kaste feil hvis behandlingen ikke har riktig steg`() {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev
 
-        val feil = assertThrows<Feil> {
+        val feil = catchThrowableOfType<Feil> {
             brevService.lagEndeligBeslutterbrev(
                 saksbehandling(
                     fagsak,
@@ -68,7 +68,7 @@ internal class BrevServiceTest {
     internal fun `lagBeslutterBrev - skal kaste feil hvis behandlingen ikke har riktig status`() {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev
 
-        val feilFerdigstilt = assertThrows<Feil> {
+        val feilFerdigstilt = catchThrowableOfType<Feil> {
             brevService.lagEndeligBeslutterbrev(
                 saksbehandling(
                     fagsak,
@@ -82,7 +82,7 @@ internal class BrevServiceTest {
         assertThat(feilFerdigstilt.httpStatus).isEqualTo(BAD_REQUEST)
         assertThat(feilFerdigstilt.message).contains("Behandling er i feil steg")
 
-        val feilUtredes = assertThrows<Feil> {
+        val feilUtredes = catchThrowableOfType<Feil> {
             brevService.lagEndeligBeslutterbrev(
                 saksbehandling(
                     fagsak,
@@ -98,7 +98,7 @@ internal class BrevServiceTest {
     internal fun `skal kaste feil når det finnes beslutterpdf i forveien`() {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(beslutterPdf = Fil("123".toByteArray()))
 
-        val feil = assertThrows<Feil> {
+        val feil = catchThrowableOfType<Feil> {
             brevService.lagEndeligBeslutterbrev(
                 saksbehandling(
                     fagsak,
@@ -126,7 +126,7 @@ internal class BrevServiceTest {
 
     @Test
     internal fun `lagSaksbehandlerBrev skal kaste feil når behandling er låst for videre behandling`() {
-        assertThrows<Feil> {
+        catchThrowableOfType<Feil> {
             brevService
                 .lagSaksbehandlerBrev(
                     saksbehandling(
@@ -168,7 +168,7 @@ internal class BrevServiceTest {
     fun `skal kaste feil hvis saksbehandlerHtml ikke inneholder placeholder for besluttersignatur`() {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(saksbehandlerHtml = "html uten placeholder")
 
-        val feilmelding = assertThrows<Feil> {
+        val feilmelding = catchThrowableOfType<Feil> {
             brevService.forhåndsvisBeslutterBrev(saksbehandling(fagsak, behandlingForBeslutter))
         }.message
         assertThat(feilmelding).isEqualTo("Brev-HTML mangler placeholder for besluttersignatur")
