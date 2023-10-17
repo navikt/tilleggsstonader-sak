@@ -132,6 +132,10 @@ class BrevService(
             "Brev-HTML mangler placeholder for besluttersignatur"
         }
 
+        feilHvis(!html.contains(BESLUTTER_VEDTAKSDATO_PLACEHOLDER)) {
+            "Brev-HTML mangler placeholder for vedtaksdato"
+        }
+
         return html
             .replace(BESLUTTER_SIGNATUR_PLACEHOLDER, beslutterSignatur)
             .replace(BESLUTTER_VEDTAKSDATO_PLACEHOLDER, LocalDate.now().norskFormat())
