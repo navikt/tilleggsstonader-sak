@@ -7,6 +7,6 @@ CREATE TABLE vedtaksbrev
     beslutter_pdf         BYTEA,
     saksbehandler_ident   VARCHAR NOT NULL,
     beslutter_ident       VARCHAR,
-    opprettet_tid         TIMESTAMP(3),
+    opprettet_tid         TIMESTAMP(3) NOT NULL,
     besluttet_tid         TIMESTAMP(3)
 )

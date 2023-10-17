@@ -14,6 +14,6 @@ data class Vedtaksbrev(
     val beslutterPdf: Fil? = null,
     val saksbehandlerIdent: String,
     val beslutterIdent: String? = null,
-    val opprettetTid: LocalDateTime? = null,
+    val opprettetTid: LocalDateTime,
     val besluttetTid: LocalDateTime? = null,
 )
