@@ -10,7 +10,7 @@ import java.util.UUID
 data class InnvilgelseTilsynBarnDto(
     val behandlingId: UUID,
     val stønadsperioder: List<Stønadsperiode>,
-    val utgifter: Map<UUID, List<Utgift>>
+    val utgifter: Map<UUID, List<Utgift>>,
 )
 
 data class Stønadsperiode(
@@ -29,7 +29,7 @@ data class Utgift(
  * Hvordan virker egentlige dagsats? Sender vi eks 20.08 - 31.08 med 100kr som stønadsbeløp og det betales ut per dag i den perioden? Hva skjer med helg/røde dager?
  */
 data class BeregningsresultatTilsynBarnDto(
-    val perioder: List<Beregningsresultat>
+    val perioder: List<Beregningsresultat>,
 )
 
 data class Beregningsresultat(
@@ -37,7 +37,7 @@ data class Beregningsresultat(
     val tom: YearMonth,
     val makssats: Int,
     val dagsats: Int,
-    val grunnlag: Beregningsgrunnlag
+    val grunnlag: Beregningsgrunnlag,
 )
 
 // Map<YearMonth, Beregningsgrunnlag>
@@ -48,5 +48,5 @@ data class Beregningsgrunnlag(
     val antallDager: Int,
     val barn: Map<UUID, Int>,
 
-    val perioder: List<Stønadsperiode>
+    val perioder: List<Stønadsperiode>,
 )

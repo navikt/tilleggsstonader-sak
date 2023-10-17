@@ -70,8 +70,8 @@ class TilsynBarnBeregningServiceTest {
             val utgifter = mapOf<UUID, List<Utgift>>(
                 barnId to listOf(
                     Utgift(feb, feb, 100),
-                    Utgift(jan, jan, 100)
-                )
+                    Utgift(jan, jan, 100),
+                ),
             )
             assertThatThrownBy {
                 service.beregn(stønadsperioder, utgifter)
@@ -84,12 +84,11 @@ class TilsynBarnBeregningServiceTest {
                 barnId to listOf(
                     Utgift(jan, mars, 100),
                     Utgift(feb, feb, 100),
-                )
+                ),
             )
             assertThatThrownBy {
                 service.beregn(stønadsperioder, utgifter)
             }.hasMessage("Utgiftsperioder overlapper")
         }
     }
-
 }

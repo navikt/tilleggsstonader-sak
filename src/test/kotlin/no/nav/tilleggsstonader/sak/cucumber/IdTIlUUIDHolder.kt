@@ -14,5 +14,4 @@ object IdTIlUUIDHolder {
     val barnIder = (1..10).associateWith { UUID.randomUUID() }
 
     fun barnIdFraUUID(id: UUID) = behandlingIdTilUUID.entries.single { it.value == id }.key
-
 }

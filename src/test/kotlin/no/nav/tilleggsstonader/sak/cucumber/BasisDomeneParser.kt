@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.cucumber
 
-import io.cucumber.datatable.DataTable
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth

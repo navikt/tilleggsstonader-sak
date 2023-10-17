@@ -63,8 +63,8 @@ class TilsynBarnBeregnYtelseSteg(
 
     private fun lagreVedtak(data: InnvilgelseTilsynBarnDto) {
         // validere at barnen finns på behandlingen
-        //val vedtak = VedtakTilsynBarn(data.behandlingId, data., emptyList())
-        //repository.insert(vedtak)
+        // val vedtak = VedtakTilsynBarn(data.behandlingId, data., emptyList())
+        // repository.insert(vedtak)
     }
 
     /**

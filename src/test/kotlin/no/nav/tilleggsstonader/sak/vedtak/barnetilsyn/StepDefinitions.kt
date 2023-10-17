@@ -15,7 +15,7 @@ import org.assertj.core.api.Assertions.assertThat
 import java.util.UUID
 
 private enum class NøkkelBeregningTilsynBarn(
-    override val nøkkel: String
+    override val nøkkel: String,
 ) : Domenenøkkel {
     UTGIFT("Utgift"),
 }
@@ -45,7 +45,7 @@ class StepDefinitions {
             Utgift(
                 fom = parseÅrMåned(DomenenøkkelFelles.FOM, rad),
                 tom = parseÅrMåned(DomenenøkkelFelles.TOM, rad),
-                utgift = parseInt(NøkkelBeregningTilsynBarn.UTGIFT, rad)
+                utgift = parseInt(NøkkelBeregningTilsynBarn.UTGIFT, rad),
             )
         }
     }
@@ -69,5 +69,4 @@ class StepDefinitions {
         assertThat(exception).isNull()
         // TODO
     }
-
 }
