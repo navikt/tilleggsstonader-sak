@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevService.Companion.BESLUTTER_SIGNATUR_PLACEHOLDER
+import no.nav.tilleggsstonader.sak.brev.BrevService.Companion.BESLUTTER_VEDTAKSDATO_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -17,12 +18,14 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.clearBrukerContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 internal class BrevServiceTest {
@@ -155,7 +158,7 @@ internal class BrevServiceTest {
 
     private fun lagVedtaksbrev(brevmal: String, saksbehandlerIdent: String = "123") = Vedtaksbrev(
         behandlingId = behandling.id,
-        saksbehandlerHtml = "Brev med $BESLUTTER_SIGNATUR_PLACEHOLDER",
+        saksbehandlerHtml = "Brev med $BESLUTTER_SIGNATUR_PLACEHOLDER og $BESLUTTER_VEDTAKSDATO_PLACEHOLDER",
         saksbehandlersignatur = "Saksbehandler Signatur",
         besluttersignatur = null,
         beslutterPdf = null,
@@ -178,13 +181,15 @@ internal class BrevServiceTest {
     fun `Skal erstatte placeholder med besluttersignatur`() {
         val htmlSlot = slot<String>()
 
-        every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(saksbehandlerHtml = "html med placeholder $BESLUTTER_SIGNATUR_PLACEHOLDER og en liten avslutning")
+        every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(saksbehandlerHtml = "html med placeholder $BESLUTTER_SIGNATUR_PLACEHOLDER, vedtaksdato $BESLUTTER_VEDTAKSDATO_PLACEHOLDER og en liten avslutning")
         every { vedtaksbrevRepository.update(any()) } returns vedtaksbrev
         every { familieDokumentClient.genererPdf(capture(htmlSlot)) } returns "123".toByteArray()
 
         brevService.forhåndsvisBeslutterBrev(saksbehandling(fagsak, behandlingForBeslutter))
 
-        assertThat(htmlSlot.captured).isEqualTo("html med placeholder $beslutterNavn og en liten avslutning")
+        val vedtaksdato = LocalDate.now().norskFormat()
+
+        assertThat(htmlSlot.captured).isEqualTo("html med placeholder $beslutterNavn, vedtaksdato $vedtaksdato og en liten avslutning")
     }
 
     @Test
