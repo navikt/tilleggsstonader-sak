@@ -33,20 +33,28 @@ data class BeregningsresultatTilsynBarnDto(
 )
 
 data class Beregningsresultat(
-    val fom: YearMonth,
-    val tom: YearMonth,
+    override val fom: YearMonth,
+    override val tom: YearMonth,
     val makssats: Int,
     val dagsats: Int,
     val grunnlag: Beregningsgrunnlag,
-)
+): Periode<YearMonth>, Mergeable<YearMonth, Beregningsresultat> {
+    override fun merge(other: Beregningsresultat): Beregningsresultat {
+        return this.copy(tom = other.tom)
+    }
+
+}
 
 // Map<YearMonth, Beregningsgrunnlag>
 // Grunnlag for beregnet periode
 // TODO Hvordan burde denne se ut?
 data class Beregningsgrunnlag(
-    val totalutgift: Int,
+    val måned: YearMonth,
     val antallDager: Int,
-    val barn: Map<UUID, Int>,
+    val utgifter: List<UtgiftForBarn>
+)
 
-    val perioder: List<Stønadsperiode>,
+data class UtgiftForBarn(
+    val barnId: UUID,
+    val utgift: Int,
 )
