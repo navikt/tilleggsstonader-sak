@@ -4,10 +4,13 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 internal class BrevRepositoryTest : IntegrationTest() {
 
@@ -30,6 +33,7 @@ internal class BrevRepositoryTest : IntegrationTest() {
             beslutterPdf = null,
             saksbehandlerIdent = "123",
             beslutterIdent = "321",
+            opprettetTid = LocalDateTime.now(),
         )
 
         vedtaksbrevRepository.insert(vedtaksbrev)
@@ -37,6 +41,7 @@ internal class BrevRepositoryTest : IntegrationTest() {
         val brevFraDb = vedtaksbrevRepository.findByIdOrNull(behandling.id)
 
         assertThat(brevFraDb).isNotNull
-        assertThat(brevFraDb).isEqualTo(vedtaksbrev)
+        assertThat(brevFraDb).usingRecursiveComparison().ignoringFields("opprettetTid").isEqualTo(vedtaksbrev)
+        assertThat(brevFraDb!!.opprettetTid).isCloseTo(vedtaksbrev.opprettetTid, Assertions.within(1, ChronoUnit.SECONDS))
     }
 }

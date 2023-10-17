@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import java.time.LocalDateTime
 
 internal class BrevServiceTest {
 
@@ -159,6 +160,7 @@ internal class BrevServiceTest {
         besluttersignatur = null,
         beslutterPdf = null,
         saksbehandlerIdent = saksbehandlerIdent,
+        opprettetTid = LocalDateTime.now(),
         beslutterIdent = null,
     )
 
