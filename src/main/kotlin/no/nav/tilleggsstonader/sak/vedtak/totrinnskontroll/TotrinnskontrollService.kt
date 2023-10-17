@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
@@ -39,22 +40,49 @@ class TotrinnskontrollService(
      * Lagrer data om besluttning av totrinnskontroll
      * og returnerer navIdent til saksbehandleren som sendte behandling til beslutter
      */
+
     @Transactional
-    fun lagreTotrinnskontrollOgReturnerBehandler(
+    fun opprettTotrinnskontroll(saksbehandling: Saksbehandling, beslutteVedtak: BeslutteVedtakDto): Totrinnskontroll {
+        val nytotrinnskontroll = Totrinnskontroll(
+            behandlingId = saksbehandling.id,
+            sporbar = Sporbar(),
+            saksbehandler = Sporbar().opprettetAv,
+            status = TotrinnsKontrollStatus.KLAR,
+        )
+        return totrinnskontrollRepository.insert(nytotrinnskontroll)
+    }
+
+    @Transactional
+    fun tilordneBeslutterforTostrinnKkontroll(behandlingId: UUID): Boolean {
+        val totrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+            ?: error("Finnes ikke eksisterende totrinnskontroll tilknyttet behandling")
+        if (totrinnskontroll.status != TotrinnsKontrollStatus.KLAR) {
+            throw Feil(
+                message = "Totrinnskontroll har feil status for tilodrning av beslutter, status =${totrinnskontroll.status}",
+                frontendFeilmelding = "Stauts for totrinnskontroll er feil, Kan ikke tilordne beslutter",
+            )
+        }
+        totrinnskontrollRepository.update(totrinnskontroll.copy(beslutter = SikkerhetContext.hentSaksbehandler(), sporbar = Sporbar()))
+
+        return true
+    }
+
+    @Transactional
+    fun lagreTotrinnskontrollOgReturnerSaksbehandler(
         saksbehandling: Saksbehandling,
         beslutteVedtak: BeslutteVedtakDto,
 
     ): String {
         val sisteTotrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId = saksbehandling.id)
-                ?: error("")
+                ?: error("Finnes ikke eksisterende Tostrinnskontroll på behandling")
         if (sisteTotrinnskontroll.status != TotrinnsKontrollStatus.KLAR) {
             throw Feil(
-                message = "Siste innslag i behandlingshistorikken har feil steg=${sisteTotrinnskontroll.status}",
-                frontendFeilmelding = "Status for totrinnskontroll er er feil, last siden på nytt",
+                message = "Siste innslag i behandlingshistorikken har feil status=${sisteTotrinnskontroll.status}",
+                frontendFeilmelding = "Status for totrinnskontroll er feil, last siden på nytt",
             )
         }
-/** Lar stå utkommentert fram til koden leser Totrinnsdataobjektetet der dette ligger tilgjengeleg **/
+
         beslutterErLikBehandler(sisteTotrinnskontroll) {
             throw ApiFeil(
                 "Beslutter kan ikke behandle en behandling som den selv har sendt til beslutter",
@@ -63,7 +91,7 @@ class TotrinnskontrollService(
         }
         // refaktorere til at totrinns er frikobla fra behandlinga
         val nyStatus = if (beslutteVedtak.godkjent) BehandlingStatus.IVERKSETTER_VEDTAK else BehandlingStatus.UTREDES
-        val nyTotrinnsKontrollStatus = if (beslutteVedtak.godkjent) TotrinnsKontrollStatus.KLAR else TotrinnsKontrollStatus.UNDERKJENT
+        val nyTotrinnsKontrollStatus = if (beslutteVedtak.godkjent) TotrinnsKontrollStatus.KLAR else TotrinnsKontrollStatus.UNDERKJENT // rett logikk??
         val utfall = if (beslutteVedtak.godkjent) StegUtfall.BESLUTTE_VEDTAK_GODKJENT else StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT
 
         behandlingshistorikkService.opprettHistorikkInnslag(
