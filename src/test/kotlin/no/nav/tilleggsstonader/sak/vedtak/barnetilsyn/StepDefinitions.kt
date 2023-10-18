@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.barnIder
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
-import no.nav.tilleggsstonader.sak.cucumber.parseFloat
+import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
@@ -81,7 +81,7 @@ class StepDefinitions {
             perioder = dataTable.mapRad { rad ->
                 Beregningsresultat(
                     makssats = 100,
-                    dagsats = parseFloat(NøkkelBeregningTilsynBarn.DAGSATS, rad),
+                    dagsats = parseBigDecimal(NøkkelBeregningTilsynBarn.DAGSATS, rad),
                     grunnlag = Beregningsgrunnlag(
                         måned = parseÅrMåned(NøkkelBeregningTilsynBarn.MÅNED, rad),
                         stønadsperioder = emptyList(),

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
@@ -35,7 +36,7 @@ data class BeregningsresultatTilsynBarnDto(
 
 data class Beregningsresultat(
     val makssats: Int,
-    val dagsats: Float,
+    val dagsats: BigDecimal,
     val grunnlag: Beregningsgrunnlag,
 )
 

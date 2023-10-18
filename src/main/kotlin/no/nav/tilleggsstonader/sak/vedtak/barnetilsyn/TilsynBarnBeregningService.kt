@@ -47,12 +47,11 @@ class TilsynBarnBeregningService {
      * Sånn sett blir `setScale(2, RoundingMode.HALF_UP)` etteråt unødvendig
      * Tar likevel med den for å gjøre det tydelig at resultatet skal maks ha 2 desimaler
      */
-    private fun beregnDagsats(grunnlag: Beregningsgrunnlag): Float {
+    private fun beregnDagsats(grunnlag: Beregningsgrunnlag): BigDecimal {
         val utgifter = grunnlag.utgifterTotal.toBigDecimal()
         return utgifter.multiply(SATS_PROSENT)
             .divide(SNITT_ANTALL_DAGER_PER_MÅNED, 2, RoundingMode.HALF_UP)
             .setScale(2, RoundingMode.HALF_UP)
-            .toFloat()
     }
 
     private fun lagBeregningsgrunnlag(
