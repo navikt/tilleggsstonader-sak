@@ -42,11 +42,15 @@ class TilsynBarnBeregningService {
         }
     }
 
-    // TODO avklare avrundinger
+    /**
+     * Divide trenger en scale som gir antall desimaler på resultatet fra divideringen
+     * Sånn sett blir `setScale(2, RoundingMode.HALF_UP)` etteråt unødvendig
+     * Tar likevel med den for å gjøre det tydelig at resultatet skal maks ha 2 desimaler
+     */
     private fun beregnDagsats(grunnlag: Beregningsgrunnlag): Float {
         val utgifter = grunnlag.utgifterTotal.toBigDecimal()
         return utgifter.multiply(SATS_PROSENT)
-            .divide(SNITT_ANTALL_DAGER_PER_MÅNED, 4, RoundingMode.HALF_UP)
+            .divide(SNITT_ANTALL_DAGER_PER_MÅNED, 2, RoundingMode.HALF_UP)
             .setScale(2, RoundingMode.HALF_UP)
             .toFloat()
     }
@@ -55,13 +59,11 @@ class TilsynBarnBeregningService {
         stønadsperioder: List<Stønadsperiode>,
         utgifterPerBarn: Map<UUID, List<Utgift>>,
     ): List<Beregningsgrunnlag> {
-        val stønadsdagerPerÅrMåned = stønadsperioder.tilÅrMåneder()
+        val stønadsperioderPerMåned = stønadsperioder.tilÅrMåneder()
 
-        val stønadsperiode = stønadsperiode(stønadsperioder)
+        val utgifterPerMåned = tilUtgifterPerMåned(utgifterPerBarn)
 
-        val utgifterPerMåned = getUtgifterPerMåned(utgifterPerBarn, stønadsperiode)
-
-        return stønadsdagerPerÅrMåned.entries.mapNotNull { (måned, stønadsperioder) ->
+        return stønadsperioderPerMåned.entries.mapNotNull { (måned, stønadsperioder) ->
             utgifterPerMåned[måned]?.let { utgifter ->
                 Beregningsgrunnlag(
                     måned = måned,
@@ -78,12 +80,6 @@ class TilsynBarnBeregningService {
         return stønadsperioder.sumOf { stønadsperiode ->
             stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
         }
-    }
-
-    private fun stønadsperiode(stønadsperioder: List<Stønadsperiode>): ClosedRange<YearMonth> {
-        val førsteStønadsmåned = YearMonth.from(stønadsperioder.first().fom)
-        val sisteStønadsmåned = YearMonth.from(stønadsperioder.last().tom)
-        return førsteStønadsmåned..sisteStønadsmåned
     }
 
     /**
@@ -111,15 +107,14 @@ class TilsynBarnBeregningService {
 
     /**
      * Splitter utgifter per måned
+     * Filtrerer vekk måneder som ikke er en del av stønadsperioden då vi ikke trenger å
      */
-    private fun getUtgifterPerMåned(
+    private fun tilUtgifterPerMåned(
         utgifterPerBarn: Map<UUID, List<Utgift>>,
-        stønadsperiode: ClosedRange<YearMonth>,
     ): Map<YearMonth, List<UtgiftForBarn>> {
         return utgifterPerBarn.entries.flatMap { (barnId, utgifter) ->
             utgifter.flatMap { utgift -> utgift.splitPerMåned { _, periode -> UtgiftForBarn(barnId, periode.utgift) } }
         }.groupBy({ it.first }, { it.second })
-            .filterKeys { it in stønadsperiode }
     }
 
     private fun validerPerioder(
@@ -158,10 +153,6 @@ class TilsynBarnBeregningService {
             feilHvis(ikkePositivUtgift != null) {
                 "Utgiftsperioder inneholder ugyldig verdi: $ikkePositivUtgift"
             }
-
-            // TODO burde vi validere utgiftsperioder vs stønadsperioder?
-            //  fom >= stønadsperiode
-            //  tom <= støndsperiode?
         }
     }
 }
