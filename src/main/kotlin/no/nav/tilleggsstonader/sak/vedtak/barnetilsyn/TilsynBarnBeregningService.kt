@@ -13,8 +13,8 @@ import java.math.RoundingMode
 import java.time.YearMonth
 import java.util.UUID
 
-private val SATS_PROSENT = BigDecimal(0.64)
-private val SNITT_ANTALL_DAGER_PER_MÅNED = BigDecimal(21.67)
+private val SATS_PROSENT = BigDecimal("0.64")
+private val SNITT_ANTALL_DAGER_PER_MÅNED = BigDecimal("21.67")
 
 @Service
 class TilsynBarnBeregningService {
