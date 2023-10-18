@@ -90,6 +90,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 SkjemaBarnetilsynPGobjectConverter(),
                 PGobjectTilBarnMedBarnepass(),
                 BarnMedBarnepassPGobjectConverter(),
+
+                FilTilBytearrayConverter(),
+                BytearrayTilFilConverter(),
             ),
         )
     }
@@ -201,5 +204,21 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 type = "json"
                 value = objectMapper.writeValueAsString(data)
             }
+    }
+
+    @WritingConverter
+    class FilTilBytearrayConverter : Converter<Fil, ByteArray> {
+
+        override fun convert(fil: Fil): ByteArray {
+            return fil.bytes
+        }
+    }
+
+    @ReadingConverter
+    class BytearrayTilFilConverter : Converter<ByteArray, Fil> {
+
+        override fun convert(bytes: ByteArray): Fil {
+            return Fil(bytes)
+        }
     }
 }
