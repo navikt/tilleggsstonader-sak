@@ -10,11 +10,11 @@ Egenskap: Beregning barnetilsyn 2 barn
       | 02.01.2023 | 06.01.2023 |
       | 01.02.2023 | 28.02.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 01.2023 | 01.2023 | 1000   |
 
-    Gitt følgende utgifter for barn: 2
+    Gitt følgende utgifter for barn med id: 2
       | Fom     | Tom     | Utgift |
       | 01.2023 | 02.2023 | 1000   |
 

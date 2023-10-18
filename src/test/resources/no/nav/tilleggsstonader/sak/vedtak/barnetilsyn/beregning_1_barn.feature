@@ -9,7 +9,7 @@ Egenskap: Beregning barnetilsyn 1 barn
       | Fom        | Tom        |
       | 01.01.2023 | 31.01.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 01.2023 | 01.2023 | 1000   |
 
@@ -29,7 +29,7 @@ Egenskap: Beregning barnetilsyn 1 barn
       | Fom        | Tom        |
       | 02.01.2023 | 11.01.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 01.2023 | 01.2023 | 1000   |
 
@@ -50,7 +50,7 @@ Egenskap: Beregning barnetilsyn 1 barn
       | 02.01.2023 | 06.01.2023 |
       | 16.01.2023 | 20.01.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 01.2023 | 01.2023 | 1000   |
 
@@ -71,7 +71,7 @@ Egenskap: Beregning barnetilsyn 1 barn
       | Fom        | Tom        |
       | 20.01.2023 | 31.03.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 01.2023 | 03.2023 | 1000   |
 
@@ -101,7 +101,7 @@ Egenskap: Beregning barnetilsyn 1 barn
       | Fom        | Tom        |
       | 01.10.2023 | 30.11.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 10.2023 | 11.2023 | 1000   |
 
@@ -118,7 +118,7 @@ Egenskap: Beregning barnetilsyn 1 barn
       | Fom        | Tom        |
       | 01.10.2023 | 30.11.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 10.2023 | 10.2023 | 1000   |
       | 11.2023 | 11.2023 | 1500   |
@@ -136,7 +136,7 @@ Egenskap: Beregning barnetilsyn 1 barn
       | Fom        | Tom        |
       | 01.01.2023 | 31.01.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 01.2023 | 01.2023 | 5000   |
 

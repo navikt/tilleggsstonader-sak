@@ -9,7 +9,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
       | Fom     | Tom     |
       | 01.2023 | 02.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom | Tom | Utgift |
 
     Når beregner
@@ -22,7 +22,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
       | Fom     | Tom     |
       | 01.2023 | 02.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 02.2023 | 02.2023 | 100    |
       | 01.2023 | 01.2023 | 100    |
@@ -37,7 +37,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
       | Fom     | Tom     |
       | 01.2023 | 03.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 01.2023 | 02.2023 | 100    |
       | 02.2023 | 01.2023 | 100    |
@@ -52,7 +52,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
       | Fom     | Tom     |
       | 01.2023 | 03.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 01.2023 | 02.2023 | 0      |
 
@@ -66,7 +66,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
       | Fom     | Tom     |
       | 01.2023 | 03.2023 |
 
-    Gitt følgende utgifter for barn: 1
+    Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 01.2023 | 02.2023 | -100   |
 

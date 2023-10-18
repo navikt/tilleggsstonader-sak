@@ -49,7 +49,7 @@ class StepDefinitions {
         )
     }
 
-    @Gitt("følgende utgifter for barn: {}")
+    @Gitt("følgende utgifter for barn med id: {}")
     fun `følgende utgifter`(barnId: Int, dataTable: DataTable) {
         utgifter[barnIder[barnId]!!] = dataTable.mapRad { rad ->
             Utgift(
