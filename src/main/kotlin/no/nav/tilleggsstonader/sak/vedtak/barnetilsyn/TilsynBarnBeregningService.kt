@@ -42,6 +42,7 @@ class TilsynBarnBeregningService {
         }
     }
 
+    // TODO avklare avrundinger
     private fun beregnDagsats(grunnlag: Beregningsgrunnlag): Float {
         val utgifter = grunnlag.utgifterTotal.toBigDecimal()
         return utgifter.multiply(SATS_PROSENT)
