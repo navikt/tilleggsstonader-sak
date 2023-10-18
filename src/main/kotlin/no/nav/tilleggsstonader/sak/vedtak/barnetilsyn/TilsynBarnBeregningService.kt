@@ -36,13 +36,13 @@ class TilsynBarnBeregningService {
         return beregningsgrunnlag.map {
             Beregningsresultat(
                 makssats = 100, // TODO trenger makssats
-                dagsats = beregn(it),
+                dagsats = beregnDagsats(it),
                 grunnlag = it,
             )
         }
     }
 
-    private fun beregn(grunnlag: Beregningsgrunnlag): Float {
+    private fun beregnDagsats(grunnlag: Beregningsgrunnlag): Float {
         val utgifter = grunnlag.utgifterTotal.toBigDecimal()
         return utgifter.multiply(SATS_PROSENT)
             .divide(SNITT_ANTALL_DAGER_PER_MÅNED, 4, RoundingMode.HALF_UP)
