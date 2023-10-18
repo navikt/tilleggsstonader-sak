@@ -33,10 +33,6 @@ data class Utgift(
     }
 }
 
-/**
- * Hvordan betales dagsats ut fra økonomi? Hvordan skal vi egentlige iverksette perioder som strekker seg fra aug - des?
- * Hvordan virker egentlige dagsats? Sender vi eks 20.08 - 31.08 med 100kr som stønadsbeløp og det betales ut per dag i den perioden? Hva skjer med helg/røde dager?
- */
 data class BeregningsresultatTilsynBarnDto(
     val perioder: List<Beregningsresultat>,
 )

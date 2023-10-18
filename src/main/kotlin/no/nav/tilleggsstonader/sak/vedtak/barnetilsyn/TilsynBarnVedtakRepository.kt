@@ -1,24 +1,33 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-class TilsynBarnVedtakRepository {
-    /**
-     * TODO Erstatt disse metodene når det er et faktiskt repository
-     */
-    fun findByIdOrNull(behandlingId: UUID): VedtakTilsynBarn? = null
+interface TilsynBarnVedtakRepository :
+    VedtakRepository<VedtakTilsynBarn>,
+    RepositoryInterface<VedtakTilsynBarn, UUID>,
+    InsertUpdateRepository<VedtakTilsynBarn>
 
-    fun insert(vedtak: VedtakTilsynBarn): VedtakTilsynBarn = vedtak
-
-    fun deleteById(behandlingId: UUID) {}
-}
-
+/**
+ * Trenger vi noe mer enn data her? Kan den kanskje dekke alle tilfeller?
+ * Eller om ma har vedtak, og beregningsgrunnlag som et eget?
+ * Trenger man begrunnelse som eget felt?
+ */
 data class VedtakTilsynBarn(
     @Id
     val behandlingId: UUID,
-    val perioder: List<String>,
-    val beregningsresultat: List<String>,
+    val type: TypeVedtak,
+    val vedtak: InnvilgelseTilsynBarnDto,
+    val beregningsresultat: BeregningsresultatTilsynBarnDto?,
+
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    val sporbar: Sporbar = Sporbar(),
 )

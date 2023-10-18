@@ -15,7 +15,7 @@ class TilsynBarnVedtakController(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     tilgangService: TilgangService,
     tilsynBarnVedtakService: TilsynBarnVedtakService,
-) : VedtakController<InnvilgelseTilsynBarnDto>(
+) : VedtakController<InnvilgelseTilsynBarnDto, VedtakTilsynBarn>(
     tilgangService,
     tilsynBarnVedtakService,
 ) {

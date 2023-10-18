@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.BeregningsresultatTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
 import org.postgresql.util.PGobject
@@ -93,6 +95,12 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 FilTilBytearrayConverter(),
                 BytearrayTilFilConverter(),
+
+                // TODO er det riktig at vi skal lage ned denne typen av objekt i vedtaket?
+                PGobjectTilInnvilgelseTilsynBarnDto(),
+                InnvilgelseTilsynBarnDtoPGobjectConverter(),
+                PGobjectTilBeregningsresultatTilsynBarnDto(),
+                BeregningsresultatTilsynBarnDtoPGobjectConverter(),
             ),
         )
     }
@@ -220,5 +228,41 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         override fun convert(bytes: ByteArray): Fil {
             return Fil(bytes)
         }
+    }
+
+    @ReadingConverter
+    class PGobjectTilInnvilgelseTilsynBarnDto : Converter<PGobject, InnvilgelseTilsynBarnDto> {
+
+        override fun convert(pGobject: PGobject): InnvilgelseTilsynBarnDto {
+            return objectMapper.readValue(pGobject.value!!)
+        }
+    }
+
+    @WritingConverter
+    class InnvilgelseTilsynBarnDtoPGobjectConverter : Converter<InnvilgelseTilsynBarnDto, PGobject> {
+
+        override fun convert(data: InnvilgelseTilsynBarnDto): PGobject =
+            PGobject().apply {
+                type = "json"
+                value = objectMapper.writeValueAsString(data)
+            }
+    }
+
+    @ReadingConverter
+    class PGobjectTilBeregningsresultatTilsynBarnDto : Converter<PGobject, BeregningsresultatTilsynBarnDto> {
+
+        override fun convert(pGobject: PGobject): BeregningsresultatTilsynBarnDto {
+            return objectMapper.readValue(pGobject.value!!)
+        }
+    }
+
+    @WritingConverter
+    class BeregningsresultatTilsynBarnDtoPGobjectConverter : Converter<BeregningsresultatTilsynBarnDto, PGobject> {
+
+        override fun convert(data: BeregningsresultatTilsynBarnDto): PGobject =
+            PGobject().apply {
+                type = "json"
+                value = objectMapper.writeValueAsString(data)
+            }
     }
 }
