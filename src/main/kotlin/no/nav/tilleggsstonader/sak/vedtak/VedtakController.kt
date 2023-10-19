@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,8 +17,7 @@ abstract class VedtakController<T>(
     @PostMapping("{behandlingId}")
     fun lagreVedtak(@PathVariable behandlingId: UUID, @RequestBody vedtak: T) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
-        validerBehandlingIdErLik(behandlingId, vedtakService.behandlingId(vedtak))
-        vedtakService.håndterSteg(vedtak)
+        vedtakService.håndterSteg(behandlingId, vedtak)
     }
 
     /**

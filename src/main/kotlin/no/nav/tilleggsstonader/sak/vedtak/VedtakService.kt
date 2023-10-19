@@ -10,14 +10,12 @@ abstract class VedtakService<T>(
     private val tilsynBarnVedtakRepository: TilsynBarnVedtakRepository,
 ) {
 
-    fun håndterSteg(vedtak: T) {
-        stegService.håndterSteg(behandlingId(vedtak), steg, vedtak)
+    fun håndterSteg(behandlingId: UUID, vedtak: T) {
+        stegService.håndterSteg(behandlingId, steg, vedtak)
     }
 
     fun hentVedtak(behandlingId: UUID): T {
         // TODO erstatt med riktig repo når TilsynBarnVedtakRepository er et riktig repo med interface
         return tilsynBarnVedtakRepository.findByIdOrNull(behandlingId) as T
     }
-
-    abstract fun behandlingId(vedtak: T): UUID
 }
