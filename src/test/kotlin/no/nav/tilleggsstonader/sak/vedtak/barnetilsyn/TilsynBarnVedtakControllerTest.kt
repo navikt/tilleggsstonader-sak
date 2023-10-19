@@ -27,24 +27,6 @@ class TilsynBarnVedtakControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun `skal validere at behandlingId i param og body er lik`() {
-        headers.setBearerAuth(onBehalfOfToken())
-        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-
-        val request = InnvilgelseTilsynBarnDto(UUID.randomUUID(), emptyList(), emptyMap())
-        val exception = catchProblemDetailException {
-            restTemplate.exchange<Map<String, Any>?>(
-                localhost("api/vedtak/tilsyn-barn/${behandling.id}"),
-                HttpMethod.POST,
-                HttpEntity(request, headers),
-            )
-        }
-
-        assertThat(exception.httpStatus).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR)
-        assertThat(exception.detail.detail).contains("BehandlingId er ikke lik")
-    }
-
-    @Test
     fun `skal returnere empty body når det ikke finnes noe lagret`() {
         headers.setBearerAuth(onBehalfOfToken())
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())

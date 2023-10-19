@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakController
 import org.springframework.web.bind.annotation.PathVariable
@@ -26,7 +25,6 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: UUID,
         @RequestBody vedtak: InnvilgelseTilsynBarnDto,
     ): BeregningsresultatTilsynBarnDto {
-        validerBehandlingIdErLik(behandlingId, vedtak.behandlingId)
         return tilsynBarnBeregningService.beregn(vedtak.stønadsperioder, vedtak.utgifter)
     }
 }

@@ -10,7 +10,6 @@ import java.util.UUID
  * @param utgifter map utgifter per [no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn]
  */
 data class InnvilgelseTilsynBarnDto(
-    val behandlingId: UUID,
     val stønadsperioder: List<Stønadsperiode>,
     val utgifter: Map<UUID, List<Utgift>>,
 )

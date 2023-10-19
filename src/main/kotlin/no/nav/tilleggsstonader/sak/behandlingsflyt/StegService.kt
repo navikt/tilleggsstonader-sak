@@ -26,6 +26,7 @@ class StegService(
         behandlingSteg: BehandlingSteg<T>,
         data: T,
     ) {
-        // TODO implmeneter
+        // TODO implementer det andre som skal skje her
+        behandlingSteg.utførSteg(saksbehandling, data)
     }
 }
