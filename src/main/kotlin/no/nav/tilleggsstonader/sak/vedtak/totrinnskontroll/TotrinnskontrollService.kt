@@ -47,24 +47,9 @@ class TotrinnskontrollService(
             behandlingId = saksbehandling.id,
             sporbar = Sporbar(),
             saksbehandler = Sporbar().opprettetAv,
-            status = TotrinnsKontrollStatus.KLAR,
+            status = TotrinnsKontrollStatus.SKAL_TOTRINNSKONTROLLERES,
         )
         return totrinnskontrollRepository.insert(nytotrinnskontroll)
-    }
-
-    @Transactional
-    fun tilordneBeslutterforTostrinnKkontroll(behandlingId: UUID): Boolean {
-        val totrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
-            ?: error("Finnes ikke eksisterende totrinnskontroll tilknyttet behandling")
-        if (totrinnskontroll.status != TotrinnsKontrollStatus.KLAR) {
-            throw Feil(
-                message = "Totrinnskontroll har feil status for tilodrning av beslutter, status =${totrinnskontroll.status}",
-                frontendFeilmelding = "Stauts for totrinnskontroll er feil, Kan ikke tilordne beslutter",
-            )
-        }
-        totrinnskontrollRepository.update(totrinnskontroll.copy(beslutter = SikkerhetContext.hentSaksbehandler(), sporbar = Sporbar()))
-
-        return true
     }
 
     @Transactional
@@ -180,7 +165,7 @@ class TotrinnskontrollService(
                 val beslutter = totrinnskontroll.beslutter
                 val årsakerUnderkjent = totrinnskontroll.årsakerUnderkjent?.årsaker
                 if (beslutter == null || årsakerUnderkjent == null) {
-                    error("Mangler beslutter/årsaker på totrinnskontroll=$totrinnskontroll.id")
+                    error("Mangler beslutter/årsaker på totrinnskontroll=${totrinnskontroll.id}")
                 }
                 StatusTotrinnskontrollDto(
                     TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT,
