@@ -13,8 +13,11 @@ import java.math.RoundingMode
 import java.time.YearMonth
 import java.util.UUID
 
-private val SATS_PROSENT = BigDecimal("0.64")
-private val SNITT_ANTALL_DAGER_PER_MÅNED = BigDecimal("21.67")
+/**
+ * Stønaden dekker 64% av utgifterne til barnetilsyn
+ */
+private val DEKNINGSGRAD = BigDecimal("0.64")
+private val SNITT_ANTALL_VIRKEDAGER_PER_MÅNED = BigDecimal("21.67")
 
 @Service
 class TilsynBarnBeregningService {
@@ -49,8 +52,8 @@ class TilsynBarnBeregningService {
      */
     private fun beregnDagsats(grunnlag: Beregningsgrunnlag): BigDecimal {
         val utgifter = grunnlag.utgifterTotal.toBigDecimal()
-        return utgifter.multiply(SATS_PROSENT)
-            .divide(SNITT_ANTALL_DAGER_PER_MÅNED, 2, RoundingMode.HALF_UP)
+        return utgifter.multiply(DEKNINGSGRAD)
+            .divide(SNITT_ANTALL_VIRKEDAGER_PER_MÅNED, 2, RoundingMode.HALF_UP)
             .setScale(2, RoundingMode.HALF_UP)
     }
 
@@ -106,7 +109,6 @@ class TilsynBarnBeregningService {
 
     /**
      * Splitter utgifter per måned
-     * Filtrerer vekk måneder som ikke er en del av stønadsperioden då vi ikke trenger å
      */
     private fun tilUtgifterPerMåned(
         utgifterPerBarn: Map<UUID, List<Utgift>>,
