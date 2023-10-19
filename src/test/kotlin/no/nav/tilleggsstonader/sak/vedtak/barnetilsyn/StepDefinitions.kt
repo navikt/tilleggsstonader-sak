@@ -21,8 +21,10 @@ private enum class NøkkelBeregningTilsynBarn(
 ) : Domenenøkkel {
     MÅNED("Måned"),
     ANTALL_DAGER("Antall dager"),
+    ANTALL_BARN("Antall barn"),
     UTGIFT("Utgift"),
     DAGSATS("Dagsats"),
+    MAKSSATS("Makssats"),
 }
 
 class StepDefinitions {
@@ -51,7 +53,9 @@ class StepDefinitions {
 
     @Gitt("følgende utgifter for barn med id: {}")
     fun `følgende utgifter`(barnId: Int, dataTable: DataTable) {
-        utgifter[barnIder[barnId]!!] = dataTable.mapRad { rad ->
+        val barnUuid = barnIder[barnId]!!
+        assertThat(utgifter).doesNotContainKey(barnUuid)
+        utgifter[barnUuid] = dataTable.mapRad { rad ->
             Utgift(
                 fom = parseÅrMåned(DomenenøkkelFelles.FOM, rad),
                 tom = parseÅrMåned(DomenenøkkelFelles.TOM, rad),
@@ -80,14 +84,15 @@ class StepDefinitions {
         val forventetBeregningsresultat = BeregningsresultatTilsynBarnDto(
             perioder = dataTable.mapRad { rad ->
                 Beregningsresultat(
-                    makssats = 100,
                     dagsats = parseBigDecimal(NøkkelBeregningTilsynBarn.DAGSATS, rad),
                     grunnlag = Beregningsgrunnlag(
                         måned = parseÅrMåned(NøkkelBeregningTilsynBarn.MÅNED, rad),
+                        makssats = parseInt(NøkkelBeregningTilsynBarn.MAKSSATS, rad),
                         stønadsperioder = emptyList(),
                         utgifter = emptyList(),
                         antallDagerTotal = parseInt(NøkkelBeregningTilsynBarn.ANTALL_DAGER, rad),
                         utgifterTotal = parseInt(NøkkelBeregningTilsynBarn.UTGIFT, rad),
+                        antallBarn = parseInt(NøkkelBeregningTilsynBarn.ANTALL_BARN, rad),
                     ),
                 )
             },
@@ -106,6 +111,9 @@ class StepDefinitions {
                 assertThat(resultat.grunnlag.utgifterTotal)
                     .`as` { "utgifterTotal" }
                     .isEqualTo(forventetResultat.grunnlag.utgifterTotal)
+                assertThat(resultat.grunnlag.makssats)
+                    .`as` { "makssats" }
+                    .isEqualTo(forventetResultat.grunnlag.makssats)
             } catch (e: Throwable) {
                 logger.error("Feilet validering av rad ${index + 1}")
                 throw e

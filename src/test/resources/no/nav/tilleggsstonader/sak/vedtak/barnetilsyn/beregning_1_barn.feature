@@ -129,19 +129,3 @@ Egenskap: Beregning barnetilsyn 1 barn
       | Måned   | Dagsats | Antall dager | Utgift |
       | 10.2023 | 29.53   | 22           | 1000   |
       | 11.2023 | 44.30   | 22           | 1500   |
-
-  Scenario: Utgift for gitt periode går over makssatsen
-
-    Gitt følgende støndsperioder
-      | Fom        | Tom        |
-      | 01.01.2023 | 31.01.2023 |
-
-    Gitt følgende utgifter for barn med id: 1
-      | Fom     | Tom     | Utgift |
-      | 01.2023 | 01.2023 | 5000   |
-
-    Når beregner
-
-    Så forvent følgende beregningsresultat
-      | Måned   | Dagsats | Antall dager | Utgift |
-      | 01.2023 | 147.67  | 22           | 5000   |

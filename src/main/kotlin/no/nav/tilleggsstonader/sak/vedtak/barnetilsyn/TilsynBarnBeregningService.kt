@@ -38,7 +38,6 @@ class TilsynBarnBeregningService {
     private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<Beregningsresultat> {
         return beregningsgrunnlag.map {
             Beregningsresultat(
-                makssats = 100, // TODO trenger makssats
                 dagsats = beregnDagsats(it),
                 grunnlag = it,
             )
@@ -52,7 +51,11 @@ class TilsynBarnBeregningService {
      */
     private fun beregnDagsats(grunnlag: Beregningsgrunnlag): BigDecimal {
         val utgifter = grunnlag.utgifterTotal.toBigDecimal()
-        return utgifter.multiply(DEKNINGSGRAD)
+        val utgifterSomDekkes = utgifter.multiply(DEKNINGSGRAD)
+            .setScale(0, RoundingMode.HALF_UP)
+            .toInt()
+        val satsjusterteUtgifter = minOf(utgifterSomDekkes, grunnlag.makssats).toBigDecimal()
+        return satsjusterteUtgifter
             .divide(SNITT_ANTALL_VIRKEDAGER_PER_MÅNED, 2, RoundingMode.HALF_UP)
             .setScale(2, RoundingMode.HALF_UP)
     }
@@ -67,15 +70,31 @@ class TilsynBarnBeregningService {
 
         return stønadsperioderPerMåned.entries.mapNotNull { (måned, stønadsperioder) ->
             utgifterPerMåned[måned]?.let { utgifter ->
+                val antallBarn = utgifter.map { it.barnId }.toSet().size
+                val makssats = finnMakssats(måned, antallBarn)
                 Beregningsgrunnlag(
                     måned = måned,
+                    makssats = makssats,
                     stønadsperioder = stønadsperioder,
                     utgifter = utgifter,
                     antallDagerTotal = antallDager(stønadsperioder),
                     utgifterTotal = utgifter.sumOf { it.utgift },
+                    antallBarn = antallBarn,
                 )
             }
         }
+    }
+
+    private fun finnMakssats(måned: YearMonth, antallBarn: Int): Int {
+        val sats = satser.find { måned in it.fom..it.tom }
+            ?: error("Finner ikke satser for $måned")
+        val satsa = when {
+            antallBarn == 1 -> sats.beløp[1]
+            antallBarn == 2 -> sats.beløp[2]
+            antallBarn > 2 -> sats.beløp[3]
+            else -> null
+        } ?: error("Kan ikke håndtere satser for antallBarn=$antallBarn")
+        return satsa
     }
 
     private fun antallDager(stønadsperioder: List<Stønadsperiode>): Int {
@@ -112,9 +131,9 @@ class TilsynBarnBeregningService {
      */
     private fun tilUtgifterPerMåned(
         utgifterPerBarn: Map<UUID, List<Utgift>>,
-    ): Map<YearMonth, List<UtgiftForBarn>> {
+    ): Map<YearMonth, List<UtgiftBarn>> {
         return utgifterPerBarn.entries.flatMap { (barnId, utgifter) ->
-            utgifter.flatMap { utgift -> utgift.splitPerMåned { _, periode -> UtgiftForBarn(barnId, periode.utgift) } }
+            utgifter.flatMap { utgift -> utgift.splitPerMåned { _, periode -> UtgiftBarn(barnId, periode.utgift) } }
         }.groupBy({ it.first }, { it.second })
     }
 

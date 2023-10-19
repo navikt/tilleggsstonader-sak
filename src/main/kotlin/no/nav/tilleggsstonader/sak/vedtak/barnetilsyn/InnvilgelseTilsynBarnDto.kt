@@ -18,13 +18,21 @@ data class InnvilgelseTilsynBarnDto(
 data class Stønadsperiode(
     override val fom: LocalDate,
     override val tom: LocalDate,
-) : Periode<LocalDate>
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+    }
+}
 
 data class Utgift(
     override val fom: YearMonth,
     override val tom: YearMonth,
     val utgift: Int,
-) : Periode<YearMonth>
+) : Periode<YearMonth> {
+    init {
+        validatePeriode()
+    }
+}
 
 /**
  * Hvordan betales dagsats ut fra økonomi? Hvordan skal vi egentlige iverksette perioder som strekker seg fra aug - des?
@@ -35,21 +43,24 @@ data class BeregningsresultatTilsynBarnDto(
 )
 
 data class Beregningsresultat(
-    val makssats: Int,
     val dagsats: BigDecimal,
     val grunnlag: Beregningsgrunnlag,
 )
 
-// TODO kanskje ta med hvor mye av utgiftene som blir dekket? / dagsats innan avkortning
+/**
+ * @param makssats er snitt per måned
+ */
 data class Beregningsgrunnlag(
     val måned: YearMonth,
+    val makssats: Int,
     val stønadsperioder: List<Stønadsperiode>,
-    val utgifter: List<UtgiftForBarn>,
+    val utgifter: List<UtgiftBarn>,
     val antallDagerTotal: Int,
     val utgifterTotal: Int,
+    val antallBarn: Int,
 )
 
-data class UtgiftForBarn(
+data class UtgiftBarn(
     val barnId: UUID,
     val utgift: Int,
 )
