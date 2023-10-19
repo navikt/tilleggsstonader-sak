@@ -40,7 +40,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
       | 01.2023 | 02.2023 | 100    |
-      | 02.2023 | 01.2023 | 100    |
+      | 02.2023 | 03.2023 | 100    |
 
     Når beregner
 
