@@ -10,10 +10,13 @@ import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.barnIder
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
+import java.math.BigDecimal
+import java.time.YearMonth
 import java.util.UUID
 
 private enum class NøkkelBeregningTilsynBarn(
@@ -81,46 +84,50 @@ class StepDefinitions {
     @Så("forvent følgende beregningsresultat")
     fun `forvent følgende beregningsresultat`(dataTable: DataTable) {
         assertThat(exception).isNull()
-        val forventetBeregningsresultat = BeregningsresultatTilsynBarnDto(
-            perioder = dataTable.mapRad { rad ->
-                Beregningsresultat(
-                    dagsats = parseBigDecimal(NøkkelBeregningTilsynBarn.DAGSATS, rad),
-                    grunnlag = Beregningsgrunnlag(
-                        måned = parseÅrMåned(NøkkelBeregningTilsynBarn.MÅNED, rad),
-                        makssats = parseInt(NøkkelBeregningTilsynBarn.MAKSSATS, rad),
-                        stønadsperioder = emptyList(),
-                        utgifter = emptyList(),
-                        antallDagerTotal = parseInt(NøkkelBeregningTilsynBarn.ANTALL_DAGER, rad),
-                        utgifterTotal = parseInt(NøkkelBeregningTilsynBarn.UTGIFT, rad),
-                        antallBarn = parseInt(NøkkelBeregningTilsynBarn.ANTALL_BARN, rad),
-                    ),
-                )
-            },
-        )
+        val forventetBeregningsresultat = dataTable.mapRad { rad ->
+            ForventetBeregningsresultat(
+                dagsats = parseBigDecimal(NøkkelBeregningTilsynBarn.DAGSATS, rad),
+                grunnlag = ForventetBeregningsgrunnlag(
+                    måned = parseÅrMåned(NøkkelBeregningTilsynBarn.MÅNED, rad),
+                    makssats = parseValgfriInt(NøkkelBeregningTilsynBarn.MAKSSATS, rad),
+                    antallDagerTotal = parseValgfriInt(NøkkelBeregningTilsynBarn.ANTALL_DAGER, rad),
+                    utgifterTotal = parseValgfriInt(NøkkelBeregningTilsynBarn.UTGIFT, rad),
+                    antallBarn = parseValgfriInt(NøkkelBeregningTilsynBarn.ANTALL_BARN, rad),
+                ),
+            )
+        }
 
         val perioder = beregningsresultat!!.perioder
         perioder.forEachIndexed { index, resultat ->
-            val forventetResultat = forventetBeregningsresultat.perioder[index]
+            val forventetResultat = forventetBeregningsresultat[index]
             try {
                 assertThat(resultat.dagsats)
                     .`as` { "dagsats" }
                     .isEqualTo(forventetResultat.dagsats)
-                assertThat(resultat.grunnlag.antallDagerTotal)
-                    .`as` { "antallDagerTotal" }
-                    .isEqualTo(forventetResultat.grunnlag.antallDagerTotal)
-                assertThat(resultat.grunnlag.utgifterTotal)
-                    .`as` { "utgifterTotal" }
-                    .isEqualTo(forventetResultat.grunnlag.utgifterTotal)
-                assertThat(resultat.grunnlag.makssats)
-                    .`as` { "makssats" }
-                    .isEqualTo(forventetResultat.grunnlag.makssats)
+                forventetResultat.grunnlag.antallDagerTotal?.let {
+                    assertThat(resultat.grunnlag.antallDagerTotal)
+                        .`as` { "antallDagerTotal" }
+                        .isEqualTo(it)
+                }
+
+                forventetResultat.grunnlag.utgifterTotal?.let {
+                    assertThat(resultat.grunnlag.utgifterTotal)
+                        .`as` { "utgifterTotal" }
+                        .isEqualTo(it)
+                }
+
+                forventetResultat.grunnlag.makssats?.let {
+                    assertThat(resultat.grunnlag.makssats)
+                        .`as` { "makssats" }
+                        .isEqualTo(it)
+                }
             } catch (e: Throwable) {
                 logger.error("Feilet validering av rad ${index + 1}")
                 throw e
             }
         }
 
-        assertThat(perioder).hasSize(forventetBeregningsresultat.perioder.size)
+        assertThat(perioder).hasSize(perioder.size)
     }
 
     @Så("forvent følgende stønadsperioder for: {}")
@@ -147,3 +154,16 @@ class StepDefinitions {
         assertThat(perioder).containsExactlyElementsOf(forventeteStønadsperioder)
     }
 }
+
+data class ForventetBeregningsresultat(
+    val dagsats: BigDecimal,
+    val grunnlag: ForventetBeregningsgrunnlag,
+)
+
+data class ForventetBeregningsgrunnlag(
+    val måned: YearMonth,
+    val makssats: Int?,
+    val antallDagerTotal: Int?,
+    val utgifterTotal: Int?,
+    val antallBarn: Int?,
+)
