@@ -28,7 +28,7 @@ class TilsynBarnBeregnYtelseSteg(
     }
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, data: InnvilgelseTilsynBarnDto) {
-        val beregningsresultat = tilsynBarnBeregningService.beregn(data)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(data.stønadsperioder, data.utgifter)
         lagreVedtak(data)
         lagreAndeler(saksbehandling, data, beregningsresultat)
         /*
@@ -63,8 +63,8 @@ class TilsynBarnBeregnYtelseSteg(
 
     private fun lagreVedtak(data: InnvilgelseTilsynBarnDto) {
         // validere at barnen finns på behandlingen
-        val vedtak = VedtakTilsynBarn(data.behandlingId, data.perioder, emptyList())
-        repository.insert(vedtak)
+        // val vedtak = VedtakTilsynBarn(data.behandlingId, data., emptyList())
+        // repository.insert(vedtak)
     }
 
     /**

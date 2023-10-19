@@ -27,6 +27,6 @@ class TilsynBarnVedtakController(
         @RequestBody vedtak: InnvilgelseTilsynBarnDto,
     ): BeregningsresultatTilsynBarnDto {
         validerBehandlingIdErLik(behandlingId, vedtak.behandlingId)
-        return tilsynBarnBeregningService.beregn(vedtak)
+        return tilsynBarnBeregningService.beregn(vedtak.stønadsperioder, vedtak.utgifter)
     }
 }
