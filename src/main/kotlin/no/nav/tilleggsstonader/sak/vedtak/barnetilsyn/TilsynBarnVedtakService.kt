@@ -9,4 +9,12 @@ class TilsynBarnVedtakService(
     repository: TilsynBarnVedtakRepository,
     stegService: StegService,
     tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
-) : VedtakService<InnvilgelseTilsynBarnDto>(stegService, tilsynBarnBeregnYtelseSteg, repository)
+) : VedtakService<InnvilgelseTilsynBarnDto, VedtakTilsynBarn>(stegService, tilsynBarnBeregnYtelseSteg, repository) {
+
+    override fun mapTilDto(vedtak: VedtakTilsynBarn): InnvilgelseTilsynBarnDto {
+        return InnvilgelseTilsynBarnDto(
+            stønadsperioder = vedtak.vedtak.stønadsperioder,
+            utgifter = vedtak.vedtak.utgifter,
+        )
+    }
+}

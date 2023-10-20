@@ -9,7 +9,7 @@ import java.util.UUID
 data class AndelTilkjentYtelse(
     @Column("belop")
     val beløp: Int,
-    @Column("stonad_fom")
+    @Column("stonad_fom") // TODO rename fom ?
     val stønadFom: LocalDate,
     @Column("stonad_tom")
     val stønadTom: LocalDate,

@@ -12,24 +12,23 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
  * Splitter opp BeregnYtelseSteg for ulike stønadstyper
  * Denne håndterer sletting av tidligere vedtak og andeler
  */
-abstract class BeregnYtelseSteg<T>(
+abstract class BeregnYtelseSteg<DTO, DOMENE>(
     private val stønadstype: Stønadstype,
+    open val vedtakRepository: VedtakRepository<DOMENE>,
     open val tilkjentytelseService: TilkjentYtelseService,
     open val simuleringService: SimuleringService,
-) : BehandlingSteg<T> {
+) : BehandlingSteg<DTO> {
 
-    override fun utførSteg(saksbehandling: Saksbehandling, data: T) {
+    override fun utførSteg(saksbehandling: Saksbehandling, vedtak: DTO) {
         validerStønadstype(saksbehandling)
         nullstillEksisterendeVedtakPåBehandling(saksbehandling)
-        lagreVedtak(saksbehandling, data)
+        lagreVedtak(saksbehandling, vedtak)
     }
 
-    protected abstract fun lagreVedtak(saksbehandling: Saksbehandling, data: T)
-
-    protected abstract fun slettVedtak(saksbehandling: Saksbehandling)
+    protected abstract fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: DTO)
 
     private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
-        slettVedtak(saksbehandling)
+        vedtakRepository.deleteById(saksbehandling.id)
         tilkjentytelseService.slettTilkjentYtelseForBehandling(saksbehandling)
         simuleringService.slettSimuleringForBehandling(saksbehandling)
     }

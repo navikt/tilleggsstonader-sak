@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
 import org.postgresql.util.PGobject
@@ -93,6 +95,11 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 FilTilBytearrayConverter(),
                 BytearrayTilFilConverter(),
+
+                PGobjectTilVedtaksdataTilsynBarn(),
+                VedtaksdataTilsynBarnPGobjectConverter(),
+                PGobjectTilVedtaksdataBeregningsresultat(),
+                VedtaksdataBeregningsresultatPGobjectConverter(),
             ),
         )
     }
@@ -220,5 +227,41 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         override fun convert(bytes: ByteArray): Fil {
             return Fil(bytes)
         }
+    }
+
+    @ReadingConverter
+    class PGobjectTilVedtaksdataTilsynBarn : Converter<PGobject, VedtaksdataTilsynBarn> {
+
+        override fun convert(pGobject: PGobject): VedtaksdataTilsynBarn {
+            return objectMapper.readValue(pGobject.value!!)
+        }
+    }
+
+    @WritingConverter
+    class VedtaksdataTilsynBarnPGobjectConverter : Converter<VedtaksdataTilsynBarn, PGobject> {
+
+        override fun convert(data: VedtaksdataTilsynBarn): PGobject =
+            PGobject().apply {
+                type = "json"
+                value = objectMapper.writeValueAsString(data)
+            }
+    }
+
+    @ReadingConverter
+    class PGobjectTilVedtaksdataBeregningsresultat : Converter<PGobject, VedtaksdataBeregningsresultat> {
+
+        override fun convert(pGobject: PGobject): VedtaksdataBeregningsresultat {
+            return objectMapper.readValue(pGobject.value!!)
+        }
+    }
+
+    @WritingConverter
+    class VedtaksdataBeregningsresultatPGobjectConverter : Converter<VedtaksdataBeregningsresultat, PGobject> {
+
+        override fun convert(data: VedtaksdataBeregningsresultat): PGobject =
+            PGobject().apply {
+                type = "json"
+                value = objectMapper.writeValueAsString(data)
+            }
     }
 }
