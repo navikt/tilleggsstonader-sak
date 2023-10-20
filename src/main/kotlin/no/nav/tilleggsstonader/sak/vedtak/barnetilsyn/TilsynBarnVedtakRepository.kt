@@ -30,12 +30,21 @@ data class VedtakTilsynBarn(
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
-)
+) {
+    init {
+        when (type) {
+            TypeVedtak.INNVILGET -> {
+                require(beregningsresultat != null) { "Mangler beregningsresultat for type=$type" }
+            }
+        }
+    }
+}
 
 data class VedtaksdataTilsynBarn(
     val stønadsperioder: List<Stønadsperiode>,
     val utgifter: Map<UUID, List<Utgift>>,
 )
+
 data class VedtaksdataBeregningsresultat(
     val perioder: List<Beregningsresultat>,
 )
