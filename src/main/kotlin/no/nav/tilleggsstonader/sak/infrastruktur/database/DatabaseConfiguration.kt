@@ -31,6 +31,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.PlatformTransactionManager
 import java.util.Optional
 import javax.sql.DataSource
+import kotlin.reflect.KClass
 
 @Configuration
 @EnableJdbcAuditing
@@ -82,26 +83,42 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 PGobjectTilDelvilkårConverter(),
                 DelvilkårTilPGobjectConverter(),
 
-                PGobjectTilBeriketSimuleringsresultat(),
-                BeriketSimuleringsresultatTilPGobjectConverter(),
+                BeriketSimuleringsresultatWriter(),
+                BeriketSimuleringsresultatReader(),
 
-                PGobjectTilTotrinnsÅrsaker(),
-                TotrinnsÅrsakerTilPGobjectConverter(),
+                ÅrsakerReader(),
+                ÅrsakerWriter(),
 
-                PGobjectTilSkjemaBarnetilsyn(),
-                SkjemaBarnetilsynPGobjectConverter(),
-                PGobjectTilBarnMedBarnepass(),
-                BarnMedBarnepassPGobjectConverter(),
+                SkjemaBarnetilsynReader(),
+                SkjemaBarnetilsynWriter(),
+                BarnMedBarnepassReader(),
+                BarnMedBarnepassWriter(),
 
                 FilTilBytearrayConverter(),
                 BytearrayTilFilConverter(),
 
-                PGobjectTilVedtaksdataTilsynBarn(),
-                VedtaksdataTilsynBarnPGobjectConverter(),
-                PGobjectTilVedtaksdataBeregningsresultat(),
-                VedtaksdataBeregningsresultatPGobjectConverter(),
+                VedtaksdataTilsynBarnReader(),
+                VedtaksdataTilsynBarnWriter(),
+                VedtaksdataBeregningsresultatReader(),
+                VedtaksdataBeregningsresultatWriter(),
             ),
         )
+    }
+
+    @WritingConverter
+    abstract class JsonWriter<T> : Converter<T, PGobject> {
+        override fun convert(source: T & Any): PGobject =
+            PGobject().apply {
+                type = "json"
+                value = objectMapper.writeValueAsString(source)
+            }
+    }
+
+    @ReadingConverter
+    abstract class JsonReader<T : Any>(val clazz: KClass<T>) : Converter<PGobject, T> {
+        override fun convert(pGobject: PGobject): T? {
+            return pGobject.value?.let { objectMapper.readValue(it, clazz.java) }
+        }
     }
 
     @ReadingConverter
@@ -122,6 +139,22 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             }
     }
 
+    @WritingConverter
+    class FilTilBytearrayConverter : Converter<Fil, ByteArray> {
+
+        override fun convert(fil: Fil): ByteArray {
+            return fil.bytes
+        }
+    }
+
+    @ReadingConverter
+    class BytearrayTilFilConverter : Converter<ByteArray, Fil> {
+
+        override fun convert(bytes: ByteArray): Fil {
+            return Fil(bytes)
+        }
+    }
+
     @ReadingConverter
     class PGobjectTilDelvilkårConverter : Converter<PGobject, DelvilkårWrapper> {
 
@@ -140,128 +173,24 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             }
     }
 
-    @ReadingConverter
-    class PGobjectTilBeriketSimuleringsresultat : Converter<PGobject, BeriketSimuleringsresultat?> {
+    class BeriketSimuleringsresultatWriter : JsonWriter<BeriketSimuleringsresultat>()
+    class BeriketSimuleringsresultatReader : JsonReader<BeriketSimuleringsresultat>(BeriketSimuleringsresultat::class)
 
-        override fun convert(pGobject: PGobject): BeriketSimuleringsresultat? {
-            return pGobject.value?.let { objectMapper.readValue(it) }
-        }
-    }
-
-    @WritingConverter
-    class BeriketSimuleringsresultatTilPGobjectConverter : Converter<BeriketSimuleringsresultat, PGobject> {
-
-        override fun convert(data: BeriketSimuleringsresultat): PGobject =
-            PGobject().apply {
-                type = "json"
-                value = objectMapper.writeValueAsString(data)
-            }
-    }
-
-    @ReadingConverter
-    class PGobjectTilTotrinnsÅrsaker : Converter<PGobject, Årsaker?> {
-
-        override fun convert(pGobject: PGobject): Årsaker? {
-            return pGobject.value?.let { objectMapper.readValue(it) }
-        }
-    }
-
-    @WritingConverter
-    class TotrinnsÅrsakerTilPGobjectConverter : Converter<Årsaker, PGobject> {
-
-        override fun convert(data: Årsaker): PGobject =
-            PGobject().apply {
-                type = "json"
-                value = objectMapper.writeValueAsString(data)
-            }
-    }
+    class ÅrsakerReader : JsonReader<Årsaker>(Årsaker::class)
+    class ÅrsakerWriter : JsonWriter<Årsaker>()
 
     // Søknad
-    @ReadingConverter
-    class PGobjectTilSkjemaBarnetilsyn : Converter<PGobject, SkjemaBarnetilsyn> {
+    class SkjemaBarnetilsynReader : JsonReader<SkjemaBarnetilsyn>(SkjemaBarnetilsyn::class)
+    class SkjemaBarnetilsynWriter : JsonWriter<SkjemaBarnetilsyn>()
 
-        override fun convert(pGobject: PGobject): SkjemaBarnetilsyn {
-            return objectMapper.readValue(pGobject.value!!)
-        }
-    }
+    class BarnMedBarnepassReader : JsonReader<BarnMedBarnepass>(BarnMedBarnepass::class)
+    class BarnMedBarnepassWriter : JsonWriter<BarnMedBarnepass>()
 
-    @WritingConverter
-    class SkjemaBarnetilsynPGobjectConverter : Converter<SkjemaBarnetilsyn, PGobject> {
+    class VedtaksdataTilsynBarnReader : JsonReader<VedtaksdataTilsynBarn>(VedtaksdataTilsynBarn::class)
+    class VedtaksdataTilsynBarnWriter : JsonWriter<VedtaksdataTilsynBarn>()
 
-        override fun convert(data: SkjemaBarnetilsyn): PGobject =
-            PGobject().apply {
-                type = "json"
-                value = objectMapper.writeValueAsString(data)
-            }
-    }
+    class VedtaksdataBeregningsresultatReader :
+        JsonReader<VedtaksdataBeregningsresultat>(VedtaksdataBeregningsresultat::class)
 
-    @ReadingConverter
-    class PGobjectTilBarnMedBarnepass : Converter<PGobject, BarnMedBarnepass> {
-
-        override fun convert(pGobject: PGobject): BarnMedBarnepass {
-            return objectMapper.readValue(pGobject.value!!)
-        }
-    }
-
-    @WritingConverter
-    class BarnMedBarnepassPGobjectConverter : Converter<BarnMedBarnepass, PGobject> {
-
-        override fun convert(data: BarnMedBarnepass): PGobject =
-            PGobject().apply {
-                type = "json"
-                value = objectMapper.writeValueAsString(data)
-            }
-    }
-
-    @WritingConverter
-    class FilTilBytearrayConverter : Converter<Fil, ByteArray> {
-
-        override fun convert(fil: Fil): ByteArray {
-            return fil.bytes
-        }
-    }
-
-    @ReadingConverter
-    class BytearrayTilFilConverter : Converter<ByteArray, Fil> {
-
-        override fun convert(bytes: ByteArray): Fil {
-            return Fil(bytes)
-        }
-    }
-
-    @ReadingConverter
-    class PGobjectTilVedtaksdataTilsynBarn : Converter<PGobject, VedtaksdataTilsynBarn> {
-
-        override fun convert(pGobject: PGobject): VedtaksdataTilsynBarn {
-            return objectMapper.readValue(pGobject.value!!)
-        }
-    }
-
-    @WritingConverter
-    class VedtaksdataTilsynBarnPGobjectConverter : Converter<VedtaksdataTilsynBarn, PGobject> {
-
-        override fun convert(data: VedtaksdataTilsynBarn): PGobject =
-            PGobject().apply {
-                type = "json"
-                value = objectMapper.writeValueAsString(data)
-            }
-    }
-
-    @ReadingConverter
-    class PGobjectTilVedtaksdataBeregningsresultat : Converter<PGobject, VedtaksdataBeregningsresultat> {
-
-        override fun convert(pGobject: PGobject): VedtaksdataBeregningsresultat {
-            return objectMapper.readValue(pGobject.value!!)
-        }
-    }
-
-    @WritingConverter
-    class VedtaksdataBeregningsresultatPGobjectConverter : Converter<VedtaksdataBeregningsresultat, PGobject> {
-
-        override fun convert(data: VedtaksdataBeregningsresultat): PGobject =
-            PGobject().apply {
-                type = "json"
-                value = objectMapper.writeValueAsString(data)
-            }
-    }
+    class VedtaksdataBeregningsresultatWriter : JsonWriter<VedtaksdataBeregningsresultat>()
 }
