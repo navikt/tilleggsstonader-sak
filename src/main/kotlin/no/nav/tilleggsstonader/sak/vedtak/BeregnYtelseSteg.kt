@@ -26,8 +26,6 @@ abstract class BeregnYtelseSteg<DTO>(
 
     protected abstract fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: DTO)
 
-    protected abstract fun slettVedtak(saksbehandling: Saksbehandling)
-
     private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
         slettVedtak(saksbehandling)
         tilkjentytelseService.slettTilkjentYtelseForBehandling(saksbehandling)

@@ -20,8 +20,8 @@ abstract class VedtakService<DTO, DOMENE>(
     }
 
     fun hentVedtakDto(behandlingId: UUID): DTO? {
-        return hentVedtak(behandlingId)?.let(::map)
+        return hentVedtak(behandlingId)?.let(::mapTilDto)
     }
 
-    abstract fun map(vedtak: DOMENE): DTO
+    abstract fun mapTilDto(vedtak: DOMENE): DTO
 }
