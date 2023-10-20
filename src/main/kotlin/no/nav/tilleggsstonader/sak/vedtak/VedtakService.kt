@@ -6,7 +6,7 @@ import java.util.UUID
 
 abstract class VedtakService<DTO, DOMENE>(
     private val stegService: StegService,
-    private val steg: BeregnYtelseSteg<DTO>,
+    private val steg: BeregnYtelseSteg<DTO, DOMENE>,
     private val repository: VedtakRepository<DOMENE>,
 ) {
 

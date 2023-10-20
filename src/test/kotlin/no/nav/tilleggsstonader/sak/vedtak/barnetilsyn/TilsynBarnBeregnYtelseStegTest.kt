@@ -23,7 +23,7 @@ class TilsynBarnBeregnYtelseStegTest {
 
     val steg = TilsynBarnBeregnYtelseSteg(
         tilsynBarnBeregningService = TilsynBarnBeregningService(),
-        tilsynBarnVedtakRepository = repository,
+        vedtakRepository = repository,
         barnService = barnService,
         tilkjentytelseService = tilkjentYtelseService,
         simuleringService = simuleringService,

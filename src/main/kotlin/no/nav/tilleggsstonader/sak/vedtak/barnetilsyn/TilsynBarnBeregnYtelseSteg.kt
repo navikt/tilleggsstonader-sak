@@ -17,24 +17,21 @@ import java.time.LocalDate
 @Service
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
-    private val tilsynBarnVedtakRepository: TilsynBarnVedtakRepository,
     private val barnService: BarnService,
+    vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-) : BeregnYtelseSteg<InnvilgelseTilsynBarnDto>(
+) : BeregnYtelseSteg<InnvilgelseTilsynBarnDto, VedtakTilsynBarn>(
     stønadstype = Stønadstype.BARNETILSYN,
+    vedtakRepository = vedtakRepository,
     tilkjentytelseService = tilkjentytelseService,
     simuleringService = simuleringService,
 ) {
 
-    override fun slettVedtak(saksbehandling: Saksbehandling) {
-        tilsynBarnVedtakRepository.deleteById(saksbehandling.id)
-    }
-
     override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
         val beregningsresultat = tilsynBarnBeregningService.beregn(vedtak.stønadsperioder, vedtak.utgifter)
         validerBarnFinnesPåBehandling(saksbehandling, vedtak)
-        tilsynBarnVedtakRepository.insert(lagVedtak(saksbehandling, vedtak, beregningsresultat))
+        vedtakRepository.insert(lagVedtak(saksbehandling, vedtak, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
         /*
         Funksjonalitet som mangler:
