@@ -5,7 +5,7 @@ val tilleggsstønaderKontrakterVersion = "2023.10.18-14.58.72cf06e4d584"
 val tokenSupportVersion = "3.1.5"
 val wiremockVersion = "3.2.0"
 val mockkVersion = "1.13.8"
-val testcontainerVersion = "1.19.0"
+val testcontainerVersion = "1.19.1"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
