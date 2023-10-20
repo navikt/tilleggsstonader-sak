@@ -15,7 +15,6 @@ abstract class VedtakService<DTO, DOMENE>(
     }
 
     fun hentVedtak(behandlingId: UUID): DOMENE? {
-        // TODO erstatt med riktig repo når TilsynBarnVedtakRepository er et riktig repo med interface
         return repository.findByIdOrNull(behandlingId)
     }
 
