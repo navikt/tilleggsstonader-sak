@@ -5,6 +5,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
+import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringResponse
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -14,48 +16,61 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.tilInternType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
+import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class AutomatiskJournalføringService(
-//    private val journalføringService: JournalføringService,
+    private val journalføringService: JournalføringService,
     private val fagsakService: FagsakService,
     private val personService: PersonService,
 //    private val arbeidsfordelingService: ArbeidsfordelingService,
-//    private val journalpostService: JournalpostService,
+    private val journalpostService: JournalpostService,
     private val behandlingService: BehandlingService,
 ) {
 
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
-//    @Transactional
-//    fun automatiskJournalførTilBehandling(
-//        journalpostId: String,
-//        personIdent: String,
-//        stønadstype: Stønadstype,
-//        mappeId: Long?,
-//        prioritet: OppgavePrioritet,
-//    ): AutomatiskJournalføringResponse {
-//        val journalpost = journalpostService.hentJournalpost(journalpostId)
-//        val fagsak = fagsakService.hentEllerOpprettFagsak(personIdent, stønadstype)
-//        val nesteBehandlingstype = utledNesteBehandlingstype(behandlingService.hentBehandlinger(fagsak.id))
-//        val journalførendeEnhet =
-//            arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(fagsak.hentAktivIdent())
-//
-//        validerKanAutomatiskJournalføre(personIdent, stønadstype, journalpost)
-//
-//        return journalføringService.automatiskJournalfør(
-//            fagsak,
-//            journalpost,
-//            journalførendeEnhet,
-//            mappeId,
-//            nesteBehandlingstype,
-//            prioritet,
-//        )
-//    }
+    @Transactional
+    fun automatiskJournalførTilBehandling(
+        journalpostId: String,
+        personIdent: String,
+        stønadstype: Stønadstype,
+        mappeId: Long?,
+        prioritet: OppgavePrioritet,
+    ): Boolean {
+        val journalpost = journalpostService.hentJournalpost(journalpostId)
+        val fagsak = fagsakService.hentEllerOpprettFagsak(personIdent, stønadstype.tilInternType())
+        val nesteBehandlingstype = utledNesteBehandlingstype(behandlingService.hentBehandlinger(fagsak.id))
+
+        val journalførendeEnhet = "enhet-TS" // TODO:
+//        val journalførendeEnhet = arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(fagsak.hentAktivIdent())
+
+        validerKanAutomatiskJournalføre(personIdent, stønadstype, journalpost)
+
+        if(kanOppretteBehandling(personIdent, stønadstype)){
+            journalføringService.automatiskJournalfør(
+                fagsak,
+                journalpost,
+                journalførendeEnhet,
+                mappeId,
+                nesteBehandlingstype,
+                prioritet,
+            )
+            return true
+        } else {
+            // Håndter søknad som ikke kan automatisk journalføres
+
+            // Lag journalføringsoppgave
+            return false
+        }
+
+    }
 
     fun kanOppretteBehandling(ident: String, stønadstype: Stønadstype): Boolean {
         val allePersonIdenter = personService.hentPersonIdenter(ident).identer()

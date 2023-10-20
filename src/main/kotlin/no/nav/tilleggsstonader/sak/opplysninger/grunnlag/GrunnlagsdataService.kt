@@ -25,6 +25,8 @@ class GrunnlagsdataService(
         )
     }
 
+    fun opprettGrunlagsdata(behandlingId: UUID) = NotImplementedError()
+
     private fun hentGrunnlagsdata(ident: String): Grunnlagsdata {
         val personMedBarn = personService.hentPersonMedBarn(ident)
         return Grunnlagsdata(

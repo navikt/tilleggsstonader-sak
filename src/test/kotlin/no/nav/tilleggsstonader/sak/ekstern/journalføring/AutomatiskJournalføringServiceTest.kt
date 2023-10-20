@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
+import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
@@ -22,20 +24,20 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class AutomatiskJournalføringServiceTest {
-//    val journalføringService: JournalføringService = mockk()
+    val journalføringService: JournalføringService = mockk()
     val behandlingService: BehandlingService = mockk()
     val fagsakService: FagsakService = mockk()
     val personService: PersonService = mockk()
 //    val arbeidsfordelingService: ArbeidsfordelingService = mockk()
-//    val journalpostService: JournalpostService = mockk()
+    val journalpostService: JournalpostService = mockk()
 
     val automatiskJournalføringService = AutomatiskJournalføringService(
-//        journalføringService = journalføringService,
+        journalføringService = journalføringService,
         behandlingService = behandlingService,
         fagsakService = fagsakService,
         personService = personService,
 //        arbeidsfordelingService = arbeidsfordelingService,
-//        journalpostService = journalpostService,
+        journalpostService = journalpostService,
     )
 
     val enhet = "4489"
