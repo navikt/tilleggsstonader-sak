@@ -25,9 +25,17 @@ data class VedtakTilsynBarn(
     @Id
     val behandlingId: UUID,
     val type: TypeVedtak,
-    val vedtak: InnvilgelseTilsynBarnDto,
-    val beregningsresultat: BeregningsresultatTilsynBarnDto?,
+    val vedtak: VedtaksdataTilsynBarn,
+    val beregningsresultat: VedtaksdataBeregningsresultat?,
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
+)
+
+data class VedtaksdataTilsynBarn(
+    val stønadsperioder: List<Stønadsperiode>,
+    val utgifter: Map<UUID, List<Utgift>>,
+)
+data class VedtaksdataBeregningsresultat(
+    val perioder: List<Beregningsresultat>,
 )
