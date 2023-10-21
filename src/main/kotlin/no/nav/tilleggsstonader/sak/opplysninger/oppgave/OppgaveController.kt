@@ -2,10 +2,15 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
+import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_EGEN_ANSATT
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.util.FnrUtil.validerOptionalIdent
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -16,8 +21,9 @@ import org.springframework.web.bind.annotation.RestController
 @ProtectedWithClaims(issuer = "azuread")
 @Validated
 class OppgaveController(
-    private val oppgaveClient: OppgaveClient, // erstatt med oppgaveService?
+    private val oppgaveService: OppgaveService,
     private val personService: PersonService,
+    private val tilgangService: TilgangService,
 ) {
 
     @PostMapping("/soek")
@@ -27,7 +33,15 @@ class OppgaveController(
         val aktørId = finnOppgaveRequest.ident.takeUnless { it.isNullOrBlank() }
             ?.let { personService.hentAktørIder(it).identer.first().ident }
 
-        return oppgaveClient.hentOppgaver(finnOppgaveRequest.tilFinnOppgaveRequest(aktørId))
+        return oppgaveService.hentOppgaver(finnOppgaveRequest.tilFinnOppgaveRequest(aktørId))
     }
 
+    @GetMapping("/mapper")
+    fun hentMapper(): List<MappeDto> {
+        val enheter = mutableListOf(ENHET_NR_NAY)
+        if (tilgangService.harEgenAnsattRolle()) {
+            enheter += ENHET_NR_EGEN_ANSATT
+        }
+        return oppgaveService.finnMapper(enheter = enheter)
+    }
 }
