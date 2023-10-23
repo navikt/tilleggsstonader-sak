@@ -48,7 +48,7 @@ class TilsynBarnBeregningService {
 
     private fun månedsbeløp(
         dagsats: BigDecimal,
-        beregningsgrunnlag: Beregningsgrunnlag
+        beregningsgrunnlag: Beregningsgrunnlag,
     ) =
         dagsats.multiply(beregningsgrunnlag.antallDagerTotal.toBigDecimal())
             .setScale(0, RoundingMode.HALF_UP)
