@@ -28,12 +28,12 @@ data class FinnOppgaveRequestDto(
         FinnOppgaveRequest(
             tema = Tema.TSO,
             behandlingstema = if (this.behandlingstema != null) {
-                Behandlingstema.values().find { it.value == this.behandlingstema }
+                Behandlingstema.entries.find { it.value == this.behandlingstema }
             } else {
                 null
             },
             oppgavetype = if (this.oppgavetype != null) {
-                Oppgavetype.values().find { it.value == this.oppgavetype }
+                Oppgavetype.entries.find { it.value == this.oppgavetype }
             } else {
                 null
             },
