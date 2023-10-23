@@ -51,12 +51,12 @@ class OppgaveClient(
         )
     }
 
-    fun fordelOppgave(oppgaveId: Long, saksbehandler: String?, versjon: Int? = null): Long {
+    fun fordelOppgave(oppgaveId: Long, saksbehandler: String?, versjon: Int): Oppgave {
         val uriBuilder = UriComponentsBuilder.fromUri(oppgaveUri)
             .pathSegment("{id}", "fordel")
         val uriVariables = oppgaveIdUriVariables(oppgaveId).toMutableMap()
 
-        val listOf = listOf("saksbehandler" to saksbehandler, "versjon" to versjon?.toString())
+        val listOf = listOf("saksbehandler" to saksbehandler, "versjon" to versjon.toString())
         listOf.forEach { (key, value) ->
             if (value != null) {
                 uriBuilder.queryParam(key, "{$key}")
@@ -65,12 +65,11 @@ class OppgaveClient(
         }
 
         try {
-            val respons = postForEntity<OppgaveResponse>(
+            return postForEntity<Oppgave>(
                 uriBuilder.encode().toUriString(),
                 HttpHeaders().medContentTypeJsonUTF8(),
                 uriVariables = uriVariables,
             )
-            return respons.oppgaveId
         } catch (e: ProblemDetailException) {
             if (e.detail.detail?.contains("allerede er ferdigstilt") == true) {
                 throw ApiFeil(

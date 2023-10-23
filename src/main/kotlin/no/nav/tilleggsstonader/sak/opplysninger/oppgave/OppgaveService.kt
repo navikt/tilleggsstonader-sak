@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
@@ -18,6 +19,14 @@ class OppgaveService(
 
     fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequest): FinnOppgaveResponseDto {
         return oppgaveClient.hentOppgaver(finnOppgaveRequest)
+    }
+
+    fun fordelOppgave(gsakOppgaveId: Long, saksbehandler: String?, versjon: Int): Oppgave {
+        return oppgaveClient.fordelOppgave(
+            gsakOppgaveId,
+            saksbehandler,
+            versjon,
+        )
     }
 
     fun finnMapper(enheter: List<String>): List<MappeDto> {
