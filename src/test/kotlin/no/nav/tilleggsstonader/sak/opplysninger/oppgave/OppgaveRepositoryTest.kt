@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
-
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository

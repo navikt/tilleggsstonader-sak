@@ -16,5 +16,5 @@ data class OppgaveDomain(
     val type: Oppgavetype,
     var erFerdigstilt: Boolean = false,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
-    val sporbar: Sporbar = Sporbar()
+    val sporbar: Sporbar = Sporbar(),
 )
