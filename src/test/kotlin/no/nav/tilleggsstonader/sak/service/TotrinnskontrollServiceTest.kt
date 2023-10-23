@@ -3,14 +3,10 @@ package no.nav.tilleggsstonader.sak.service
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
-import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
-import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -31,7 +27,7 @@ import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 
 internal class TotrinnskontrollServiceTest {
 
@@ -52,9 +48,9 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `skal returnere saksbehandler som sendte behandling til besluttning`() {
         val opprettetAv = "Behandler"
-        every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, status = TotrinnsKontrollStatus.KLAR)
-        every { totrinnskontrollRepository.findByIdOrThrow(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, status = TotrinnsKontrollStatus.KLAR)
-        every { totrinnskontrollRepository.update(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnsKontrollStatus.KLAR)
+        every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, status = TotrinnsKontrollStatus.GODKJENT)
+        every { totrinnskontrollRepository.findByIdOrThrow(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, status = TotrinnsKontrollStatus.GODKJENT)
+        every { totrinnskontrollRepository.update(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnsKontrollStatus.GODKJENT)
         val response = totrinnskontrollService
             .lagreTotrinnskontrollOgReturnerSaksbehandler(
                 saksbehandling(status = BehandlingStatus.UTREDES),
@@ -66,8 +62,8 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `skal utlede saksbehandler som sendte behandling til besluttning`() {
         val opprettetAv = "Behandler"
-        every { totrinnskontrollRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(any(), status = TotrinnsKontrollStatus.KLAR) } returns
-            totrinnskontroll(opprettetAv, TotrinnsKontrollStatus.KLAR)
+        every { totrinnskontrollRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(any(), status = TotrinnsKontrollStatus.GODKJENT) } returns
+            totrinnskontroll(opprettetAv, TotrinnsKontrollStatus.GODKJENT)
         val response = totrinnskontrollService
             .hentSaksbehandlerSomSendteTilBeslutter(UUID.randomUUID())
         assertThat(response).isEqualTo(opprettetAv)
@@ -121,7 +117,7 @@ internal class TotrinnskontrollServiceTest {
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
             totrinnskontroll(
                 opprettetAv = "Annen saksbehandler",
-                status = TotrinnsKontrollStatus.KLAR,
+                status = TotrinnsKontrollStatus.GODKJENT,
             )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
@@ -134,7 +130,7 @@ internal class TotrinnskontrollServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FATTER_VEDTAK)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
             totrinnskontroll(
-                status = TotrinnsKontrollStatus.SKAL_TOTRINNSKONTROLLERES,
+                status = TotrinnsKontrollStatus.KAN_FATTE_VEDTAK,
                 opprettetAv = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
             )
 
@@ -149,7 +145,7 @@ internal class TotrinnskontrollServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FATTER_VEDTAK)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
             totrinnskontroll(
-                status = TotrinnsKontrollStatus.KLAR,
+                status = TotrinnsKontrollStatus.GODKJENT,
                 opprettetAv = "Annen saksbehandler",
             )
 
@@ -165,7 +161,7 @@ internal class TotrinnskontrollServiceTest {
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
             totrinnskontroll(
                 opprettetAv = "Annen saksbehandler",
-                status = TotrinnsKontrollStatus.KLAR,
+                status = TotrinnsKontrollStatus.GODKJENT,
             )
 
         Assertions.assertThat(Assertions.catchThrowable { totrinnskontrollService.hentTotrinnskontrollStatus(ID) })
@@ -194,28 +190,53 @@ internal class TotrinnskontrollServiceTest {
         every { totrinnskontrollRepository.insert(any()) } returns
             totrinnskontroll(
                 opprettetAv = "noen",
-                status = TotrinnsKontrollStatus.SKAL_TOTRINNSKONTROLLERES,
+                status = TotrinnsKontrollStatus.KAN_FATTE_VEDTAK,
+
             )
 
-        val totrinnskontroll = totrinnskontrollService.opprettTotrinnskontroll(saksbehandling(), BeslutteVedtakDto(true, ""))
-        assertThat(totrinnskontroll.status).isEqualTo(TotrinnsKontrollStatus.SKAL_TOTRINNSKONTROLLERES)
+        val totrinnskontroll = totrinnskontrollService.opprettTotrinnskontroll(saksbehandling())
+        assertThat(totrinnskontroll.status).isEqualTo(TotrinnsKontrollStatus.KAN_FATTE_VEDTAK)
     }
 
-    private fun behandlingshistorikk(
-        steg: StegType,
-        utfall: StegUtfall? = null,
-        opprettetAv: String,
-        beslutt: BeslutteVedtakDto? = null,
-    ) =
-        Behandlingshistorikk(
-            behandlingId = UUID.randomUUID(),
-            steg = steg,
-            utfall = utfall,
-            opprettetAv = opprettetAv,
-            metadata = beslutt?.let {
-                JsonWrapper(objectMapper.writeValueAsString(it))
-            },
-        )
+    /**
+     @Test
+     internal fun `Skal oppdatere Tottrinnskontroll med underkjent og sette begrunnelse og årsaker`() {
+     every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) }   returns
+     totrinnskontrollMedbeslutterAArsakogBegrunnelse(
+     opprettetAv = "noen",
+     beslutter = "annen",
+     status = TotrinnsKontrollStatus.UNDERKJENT,
+
+     )
+     val totrinnskontroll = totrinnskontrollService.
+     saksbehandling(status = BehandlingStatus.UTREDES),
+     BeslutteVedtakDto(true, ""),
+     )
+
+     assertThat(totrinnskontroll.).isEqualTo(TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
+     assertThat(totrinnskontroll.totrinnskontroll?.begrunnelse).isEqualTo("begrunnelse")
+     assertThat(totrinnskontroll.totrinnskontroll?.årsakerUnderkjent).containsExactlyInAnyOrder(ÅrsakUnderkjent.INNGANGSVILKÅR_FORUTGÅENDE_MEDLEMSKAP_OPPHOLD, ÅrsakUnderkjent.VEDTAK_OG_BEREGNING)
+
+     }
+     **/
+    @Test
+    internal fun `Skal sette beslutter til totrinnskontroll`() {
+        every { totrinnskontrollRepository.findByIdOrThrow(any()) } returns
+            totrinnskontrollMedbeslutter(
+                opprettetAv = "Noen",
+                status = TotrinnsKontrollStatus.KAN_FATTE_VEDTAK,
+                beslutter = "Beslutter",
+            )
+        every { totrinnskontrollRepository.update(any()) } returns
+            totrinnskontrollMedbeslutter(
+                opprettetAv = "Noen",
+                status = TotrinnsKontrollStatus.KAN_FATTE_VEDTAK,
+                beslutter = "Beslutter",
+            )
+        val totrinnskontroll = totrinnskontrollService.settBeslutterForTotrinnsKontroll(ID, "Beslutter")
+
+        assertThat(totrinnskontroll.beslutter).isEqualTo("Beslutter")
+    }
 
     private fun totrinnskontroll(
         opprettetAv: String,
@@ -226,6 +247,20 @@ internal class TotrinnskontrollServiceTest {
             sporbar = Sporbar(opprettetAv),
             status = status,
             saksbehandler = opprettetAv,
+
+        )
+
+    private fun totrinnskontrollMedbeslutter(
+        opprettetAv: String,
+        status: TotrinnsKontrollStatus,
+        beslutter: String,
+    ) =
+        Totrinnskontroll(
+            behandlingId = UUID.randomUUID(),
+            sporbar = Sporbar(opprettetAv),
+            status = status,
+            saksbehandler = opprettetAv,
+            beslutter = beslutter,
 
         )
 
