@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
+import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
@@ -38,7 +39,12 @@ class OppgaveClientConfig {
         opprettNoenOppgaver()
 
         every { oppgaveClient.hentOppgaver(any()) } answers {
-            val oppgaver = oppgavelager.values.filter { it.status == StatusEnum.OPPRETTET }.toList()
+            val request = firstArg<FinnOppgaveRequest>()
+            val oppgaver = oppgavelager.values
+                .filter { it.status == StatusEnum.OPPRETTET }
+                .filter { oppgave -> request.behandlingstema?.let { oppgave.behandlingstema == it.value } ?: true }
+                .filter { oppgave -> request.oppgavetype?.let { oppgave.oppgavetype == it.value } ?: true }
+                .toList()
             FinnOppgaveResponseDto(antallTreffTotalt = oppgavelager.size.toLong(), oppgaver = oppgaver)
         }
 
@@ -46,7 +52,7 @@ class OppgaveClientConfig {
 
         every { oppgaveClient.opprettOppgave(any()) } answers {
             val oppgave = opprettOppgave(firstArg<OpprettOppgaveRequest>())
-            oppgave.id!!
+            oppgave.id
         }
 
         every { oppgaveClient.ferdigstillOppgave(any()) } answers {
@@ -59,14 +65,13 @@ class OppgaveClientConfig {
                 status = StatusEnum.FERDIGSTILT,
                 ferdigstiltTidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
             )
-            oppgavelager[oppgave.id!!] = oppdatertOppgave
+            oppgavelager[oppgave.id] = oppdatertOppgave
         }
 
         every { oppgaveClient.oppdaterOppgave(any()) } answers {
             val oppdaterOppgave = firstArg<Oppgave>()
-            val oppgaveId = oppdaterOppgave.id!!
-            oppgavelager[oppgaveId] = oppdaterOppgave // Forenklet, dette er ikke det som skje ri integrasjoner
-            oppgaveId
+            oppgavelager[oppdaterOppgave.id] = oppdaterOppgave // Forenklet, dette er ikke det som skje ri integrasjoner
+            oppdaterOppgave.id
         }
 
         mockFordeling(oppgaveClient, oppgavelager)
@@ -97,7 +102,7 @@ class OppgaveClientConfig {
             mappeId = oppgaveDto.mappeId,
             opprettetTidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
         )
-        oppgavelager[oppgave.id!!] = oppgave
+        oppgavelager[oppgave.id] = oppgave
         return oppgave
     }
 

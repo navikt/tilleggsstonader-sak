@@ -94,12 +94,11 @@ class OppgaveClient(
     fun oppdaterOppgave(oppgave: Oppgave): Long {
         val uri = UriComponentsBuilder.fromUri(oppgaveUri).pathSegment("{id}", "oppdater").encode().toUriString()
         try {
-            val oppgaveId = oppgave.id ?: error("Oppgave mangler id")
             val response = patchForEntity<OppgaveResponse>(
                 uri,
                 oppgave,
                 HttpHeaders().medContentTypeJsonUTF8(),
-                oppgaveIdUriVariables(oppgaveId),
+                oppgaveIdUriVariables(oppgave.id),
             )
             return response.oppgaveId
         } catch (e: ProblemDetailException) {
