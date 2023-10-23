@@ -6,9 +6,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerAtStegKanResettes
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerGyldigTilstand
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerHarTilgang
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerRollerForResetSteg
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -38,11 +38,11 @@ class StegService(
         if (steg.kommerEtter(behandling.steg)) {
             error(
                 "Kan ikke resette behandling til steg=$steg når behandling allerede " +
-                    "er på ${behandling.steg} behandling=$behandlingId",
+                        "er på ${behandling.steg} behandling=$behandlingId",
             )
         }
 
-        validerAtStegKanResettes(rolleConfig, behandling, steg)
+        validerRollerForResetSteg(rolleConfig, behandling, steg)
         behandlingService.oppdaterStegPåBehandling(behandlingId, steg)
     }
 
@@ -118,7 +118,7 @@ class StegService(
         if (!nesteSteg.erGyldigIKombinasjonMedStatus(behandlingService.hentBehandling(saksbehandling.id).status)) {
             error(
                 "Steg '${nesteSteg.displayName()}' kan ikke settes " +
-                    "på behandling i kombinasjon med status ${saksbehandling.status}",
+                        "på behandling i kombinasjon med status ${saksbehandling.status}",
             )
         }
     }

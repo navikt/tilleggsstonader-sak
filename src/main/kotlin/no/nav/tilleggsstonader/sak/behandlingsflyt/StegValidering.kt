@@ -53,7 +53,7 @@ object StegValidering {
         }
     }
 
-    fun validerAtStegKanResettes(
+    fun validerRollerForResetSteg(
         rolleConfig: RolleConfig,
         behandling: Behandling,
         steg: StegType,
