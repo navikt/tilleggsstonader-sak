@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.Simuleringsresultat
@@ -103,6 +104,7 @@ abstract class IntegrationTest {
             SøknadBehandling::class,
             SøknadBarnetilsyn::class,
 
+            OppgaveDomain::class,
             Totrinnskontroll::class,
             Vedtaksbrev::class,
             Behandlingshistorikk::class,
