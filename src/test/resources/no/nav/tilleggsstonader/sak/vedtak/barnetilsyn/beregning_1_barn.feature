@@ -19,9 +19,29 @@ Egenskap: Beregning barnetilsyn 1 barn
       | Måned   | Dagsats | Antall dager | Utgift |
       | 01.2023 | 29.53   | 22           | 1000   |
 
-    Så forvent følgende stønadsperioder for: 01.2023
+  Scenario: Skal avrunde månedsbeløpet
+
+    Gitt følgende støndsperioder
       | Fom        | Tom        |
-      | 01.01.2023 | 31.01.2023 |
+      | 02.01.2023 | 03.01.2023 |
+      | 06.02.2023 | 07.02.2023 |
+      | 06.03.2023 | 07.03.2023 |
+
+    Gitt følgende utgifter for barn med id: 1
+      | Fom     | Tom     | Utgift |
+      | 01.2023 | 01.2023 | 144    |
+      | 02.2023 | 02.2023 | 136    |
+      | 03.2023 | 03.2023 | 131    |
+
+    Når beregner
+
+    Så forvent følgende beregningsresultat
+      | Måned   | Dagsats | Månedsbeløp | Antall dager | Utgift |
+      # Denne gir en sats som blir 4.2455.., som blir arundet til 4.25
+      | 01.2023 | 4.25    | 9                  | 2            | 144    |
+      # Pga avrunding av utgift * sats, blir denne 4.01 og ikke 4.02
+      | 02.2023 | 4.01    | 8                  | 2            | 136    |
+      | 03.2023 | 3.88    | 8                  | 2            | 131    |
 
   Scenario: Stønadsperioder i 8 dager i januar
 
