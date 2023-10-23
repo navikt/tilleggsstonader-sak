@@ -29,7 +29,7 @@ class TilsynBarnBeregningService {
     ): BeregningsresultatTilsynBarnDto {
         validerPerioder(stønadsperioder, utgifterPerBarn)
 
-        val beregningsgrunnlag = lagBeregningsgrunnlag(stønadsperioder, utgifterPerBarn)
+        val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, utgifterPerBarn)
         val perioder = beregn(beregningsgrunnlag)
 
         return BeregningsresultatTilsynBarnDto(perioder)
@@ -37,12 +37,22 @@ class TilsynBarnBeregningService {
 
     private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<Beregningsresultat> {
         return beregningsgrunnlag.map {
+            val dagsats = beregnDagsats(it)
             Beregningsresultat(
-                dagsats = beregnDagsats(it),
+                dagsats = dagsats,
+                månedsbeløp = månedsbeløp(dagsats, it),
                 grunnlag = it,
             )
         }
     }
+
+    private fun månedsbeløp(
+        dagsats: BigDecimal,
+        beregningsgrunnlag: Beregningsgrunnlag
+    ) =
+        dagsats.multiply(beregningsgrunnlag.antallDagerTotal.toBigDecimal())
+            .setScale(0, RoundingMode.HALF_UP)
+            .toInt()
 
     /**
      * Divide trenger en scale som gir antall desimaler på resultatet fra divideringen
@@ -60,7 +70,7 @@ class TilsynBarnBeregningService {
             .setScale(2, RoundingMode.HALF_UP)
     }
 
-    private fun lagBeregningsgrunnlag(
+    private fun lagBeregningsgrunnlagPerMåned(
         stønadsperioder: List<Stønadsperiode>,
         utgifterPerBarn: Map<UUID, List<Utgift>>,
     ): List<Beregningsgrunnlag> {

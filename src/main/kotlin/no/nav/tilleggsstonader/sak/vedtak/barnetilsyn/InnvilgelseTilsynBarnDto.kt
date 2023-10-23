@@ -39,6 +39,7 @@ data class BeregningsresultatTilsynBarnDto(
 
 data class Beregningsresultat(
     val dagsats: BigDecimal,
+    val månedsbeløp: Int,
     val grunnlag: Beregningsgrunnlag,
 )
 

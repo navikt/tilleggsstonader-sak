@@ -4,6 +4,7 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.barnIder
@@ -27,6 +28,7 @@ private enum class NøkkelBeregningTilsynBarn(
     ANTALL_BARN("Antall barn"),
     UTGIFT("Utgift"),
     DAGSATS("Dagsats"),
+    MÅNEDSBELØP("Månedsbeløp"),
     MAKSSATS("Makssats"),
 }
 
@@ -87,6 +89,7 @@ class StepDefinitions {
         val forventetBeregningsresultat = dataTable.mapRad { rad ->
             ForventetBeregningsresultat(
                 dagsats = parseBigDecimal(NøkkelBeregningTilsynBarn.DAGSATS, rad),
+                månedsbeløp = parseValgfriInt(NøkkelBeregningTilsynBarn.MÅNEDSBELØP, rad),
                 grunnlag = ForventetBeregningsgrunnlag(
                     måned = parseÅrMåned(NøkkelBeregningTilsynBarn.MÅNED, rad),
                     makssats = parseValgfriInt(NøkkelBeregningTilsynBarn.MAKSSATS, rad),
@@ -104,6 +107,13 @@ class StepDefinitions {
                 assertThat(resultat.dagsats)
                     .`as` { "dagsats" }
                     .isEqualTo(forventetResultat.dagsats)
+
+                forventetResultat.månedsbeløp?.let {
+                    assertThat(resultat.månedsbeløp)
+                        .`as` { "totaltMånedsbeløp" }
+                        .isEqualTo(it)
+                }
+
                 forventetResultat.grunnlag.antallDagerTotal?.let {
                     assertThat(resultat.grunnlag.antallDagerTotal)
                         .`as` { "antallDagerTotal" }
@@ -122,7 +132,8 @@ class StepDefinitions {
                         .isEqualTo(it)
                 }
             } catch (e: Throwable) {
-                logger.error("Feilet validering av rad ${index + 1}")
+                val acutal = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(resultat)
+                logger.error("Feilet validering av rad ${index + 1} $acutal")
                 throw e
             }
         }
@@ -157,6 +168,7 @@ class StepDefinitions {
 
 data class ForventetBeregningsresultat(
     val dagsats: BigDecimal,
+    val månedsbeløp: Int?,
     val grunnlag: ForventetBeregningsgrunnlag,
 )
 
