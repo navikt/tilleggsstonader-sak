@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody
 import java.util.UUID
 
 @ProtectedWithClaims(issuer = "azuread")
-abstract class VedtakController<T>(
+abstract class VedtakController<DTO, DOMENE>(
     private val tilgangService: TilgangService,
-    private val vedtakService: VedtakService<T>,
+    private val vedtakService: VedtakService<DTO, DOMENE>,
 ) {
     @PostMapping("{behandlingId}")
-    fun lagreVedtak(@PathVariable behandlingId: UUID, @RequestBody vedtak: T) {
+    fun lagreVedtak(@PathVariable behandlingId: UUID, @RequestBody vedtak: DTO) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         vedtakService.håndterSteg(behandlingId, vedtak)
     }
@@ -25,8 +25,8 @@ abstract class VedtakController<T>(
      * På en måte hadde det vært fint hvis GET returnerer beløpsperioder
      */
     @GetMapping("{behandlingId}")
-    fun hentVedtak(@PathVariable behandlingId: UUID): T? {
+    fun hentVedtak(@PathVariable behandlingId: UUID): DTO? {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return vedtakService.hentVedtak(behandlingId)
+        return vedtakService.hentVedtakDto(behandlingId)
     }
 }

@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
 import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import org.junit.jupiter.api.AfterEach
@@ -96,6 +97,7 @@ abstract class IntegrationTest {
             TaskLogg::class,
             Task::class,
 
+            VedtakTilsynBarn::class,
             Simuleringsresultat::class,
             TilkjentYtelse::class,
             Vilkår::class,
