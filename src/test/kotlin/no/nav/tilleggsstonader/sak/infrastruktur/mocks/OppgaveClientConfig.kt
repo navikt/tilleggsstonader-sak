@@ -44,6 +44,7 @@ class OppgaveClientConfig {
                 .filter { it.status == StatusEnum.OPPRETTET }
                 .filter { oppgave -> request.behandlingstema?.let { oppgave.behandlingstema == it.value } ?: true }
                 .filter { oppgave -> request.oppgavetype?.let { oppgave.oppgavetype == it.value } ?: true }
+                .filter { oppgave -> request.behandlingstype?.let { oppgave.behandlingstype == it.value } ?: true }
                 .toList()
             FinnOppgaveResponseDto(antallTreffTotalt = oppgavelager.size.toLong(), oppgaver = oppgaver)
         }
@@ -63,7 +64,7 @@ class OppgaveClientConfig {
             val oppdatertOppgave = oppgave.copy(
                 versjon = oppgave.versjon!! + 1,
                 status = StatusEnum.FERDIGSTILT,
-                ferdigstiltTidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+                ferdigstiltTidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
             )
             oppgavelager[oppgave.id] = oppdatertOppgave
         }
@@ -79,7 +80,7 @@ class OppgaveClientConfig {
     }
 
     private fun opprettOppgave(
-        oppgaveDto: OpprettOppgaveRequest
+        oppgaveDto: OpprettOppgaveRequest,
     ): Oppgave {
         val oppgave = Oppgave(
             id = ++maxOppgaveId,
@@ -116,7 +117,7 @@ class OppgaveClientConfig {
             val versjon = oppgave.versjon!!
             feilHvis(versjon != thirdArg(), HttpStatus.CONFLICT) {
                 "Oppgaven har endret seg siden du sist hentet oppgaver. " +
-                        "For å kunne gjøre endringer må du hente oppgaver på nytt."
+                    "For å kunne gjøre endringer må du hente oppgaver på nytt."
             }
             val oppdatertOppgave = oppgave.copy(versjon = versjon + 1, tilordnetRessurs = secondArg())
             oppgaver[oppgaveId] = oppdatertOppgave
@@ -143,7 +144,7 @@ class OppgaveClientConfig {
                     behandlingstype = null,
                     behandlesAvApplikasjon = null,
                     mappeId = null,
-                )
+                ),
             )
         }
     }
