@@ -56,28 +56,23 @@ class OppgaveService(
         mappeId: Long? = null,
         prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
     ): Long {
-        val oppgaveFinnesFraFør = getOppgaveFinnesFraFør(oppgavetype, behandlingId)
-        return if (oppgaveFinnesFraFør !== null) {
-            oppgaveFinnesFraFør.gsakOppgaveId
-        } else {
-            val opprettetOppgaveId =
-                opprettOppgaveUtenÅLagreIRepository(
-                    behandlingId = behandlingId,
-                    oppgavetype = oppgavetype,
-                    fristFerdigstillelse = null,
-                    beskrivelse = lagOppgaveTekst(beskrivelse),
-                    tilordnetNavIdent = tilordnetNavIdent,
-                    mappeId = mappeId,
-                    prioritet = prioritet,
-                )
-            val oppgave = OppgaveDomain(
-                gsakOppgaveId = opprettetOppgaveId,
+        val opprettetOppgaveId =
+            opprettOppgaveUtenÅLagreIRepository(
                 behandlingId = behandlingId,
-                type = oppgavetype,
+                oppgavetype = oppgavetype,
+                fristFerdigstillelse = null,
+                beskrivelse = lagOppgaveTekst(beskrivelse),
+                tilordnetNavIdent = tilordnetNavIdent,
+                mappeId = mappeId,
+                prioritet = prioritet,
             )
-            oppgaveRepository.insert(oppgave)
-            opprettetOppgaveId
-        }
+        val oppgave = OppgaveDomain(
+            gsakOppgaveId = opprettetOppgaveId,
+            behandlingId = behandlingId,
+            type = oppgavetype,
+        )
+        oppgaveRepository.insert(oppgave)
+        return opprettetOppgaveId
     }
 
     private fun getOppgaveFinnesFraFør(
