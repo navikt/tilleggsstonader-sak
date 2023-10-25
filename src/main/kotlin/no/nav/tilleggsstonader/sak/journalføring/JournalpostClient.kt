@@ -36,7 +36,7 @@ class JournalpostClient(
         journalpostId: String,
         saksbehandler: String?,
     ): OppdaterJournalpostResponse {
-        val uri = UriComponentsBuilder.fromUri(dokarkivUri).pathSegment("{journalpostId}").toUriString()
+        val uri = UriComponentsBuilder.fromUri(dokarkivUri).pathSegment("{journalpostId}").encode().toUriString()
         return putForEntity<OppdaterJournalpostResponse>(
             uri,
             oppdaterJournalpostRequest,
@@ -47,7 +47,7 @@ class JournalpostClient(
 
     fun ferdigstillJournalpost(journalpostId: String, journalførendeEnhet: String, saksbehandler: String?): OppdaterJournalpostResponse {
         val uri = UriComponentsBuilder.fromUri(dokarkivUri).pathSegment("{journalpostId}", "ferdigstill")
-            .queryParam("journalfoerendeEnhet", journalførendeEnhet).toUriString()
+            .queryParam("journalfoerendeEnhet", { journalførendeEnhet }).encode().toUriString()
 
         return putForEntity<OppdaterJournalpostResponse>(
             uri,
