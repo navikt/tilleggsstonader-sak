@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
@@ -31,7 +32,8 @@ class VilkårStegService(
     private val behandlingService: BehandlingService,
     private val vilkårService: VilkårService,
     private val vilkårRepository: VilkårRepository,
-    // private val stegService: StegService,
+    private val stegService: StegService,
+    private val vilkårSteg: VilkårSteg,
     // private val taskService: TaskService,
     // private val blankettRepository: BlankettRepository,
     private val behandlingshistorikkService: BehandlingshistorikkService,
@@ -100,11 +102,12 @@ class VilkårStegService(
         }
 
         if (saksbehandling.steg == StegType.VILKÅR && OppdaterVilkår.erAlleVilkårTattStillingTil(vilkårsresultat)) {
-            // stegService.håndterVilkår(saksbehandling).id
+            stegService.håndterSteg(saksbehandling, vilkårSteg)
         } else if (saksbehandling.steg != StegType.VILKÅR && vilkårsresultat.any { it == Vilkårsresultat.IKKE_TATT_STILLING_TIL }) {
-            // stegService.resetSteg(saksbehandling.id, StegType.VILKÅR)
+            stegService.resetSteg(saksbehandling.id, StegType.VILKÅR)
         } else if (saksbehandling.harStatusOpprettet) {
             behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.UTREDES)
+            // TODO vurder denne koblet til når en behandling endrer status etc
             behandlingshistorikkService.opprettHistorikkInnslag(
                 behandlingId = saksbehandling.id,
                 stegtype = StegType.VILKÅR,

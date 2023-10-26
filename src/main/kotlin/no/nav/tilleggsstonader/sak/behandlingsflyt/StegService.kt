@@ -46,6 +46,17 @@ class StegService(
         behandlingService.oppdaterStegPåBehandling(behandlingId, steg)
     }
 
+    fun håndterSteg(
+        behandlingId: UUID,
+        behandlingSteg: BehandlingSteg<Void?>,
+    ): Behandling {
+        return håndterSteg(
+            behandlingService.hentSaksbehandling(behandlingId),
+            behandlingSteg,
+            null,
+        )
+    }
+
     fun <T> håndterSteg(
         behandlingId: UUID,
         behandlingSteg: BehandlingSteg<T>,
@@ -56,6 +67,13 @@ class StegService(
             behandlingSteg,
             data,
         )
+    }
+
+    fun håndterSteg(
+        saksbehandling: Saksbehandling,
+        behandlingSteg: BehandlingSteg<Void?>,
+    ): Behandling {
+        return håndterSteg(saksbehandling, behandlingSteg, null)
     }
 
     fun <T> håndterSteg(
