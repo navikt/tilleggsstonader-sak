@@ -17,12 +17,11 @@ class Vilkårsregler private constructor(val vilkårsregler: Map<VilkårType, Vi
     }
 }
 
-private val alleVilkårsregler = Stønadstype.values().map { vilkårsreglerForStønad(it) }.flatten()
+private val alleVilkårsregler = Stønadstype.entries.map { vilkårsreglerForStønad(it) }.flatten()
 
 fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
     when (stønadstype) {
         Stønadstype.BARNETILSYN -> listOf(
-            EksempelRegel(),
             MålgruppeRegel(),
             AktivitetRegel(),
         )
