@@ -32,6 +32,8 @@ object SikkerhetContext {
         return applikasjonsnavn.endsWith(forventetApplikasjonsSuffix)
     }
 
+    fun kallKommerFraSoknadApi(): Boolean = kallKommerFra("tilleggsstonader:tilleggsstonader-soknad-api")
+
     fun hentSaksbehandler(): String {
         val result = hentSaksbehandlerEllerSystembruker()
 
