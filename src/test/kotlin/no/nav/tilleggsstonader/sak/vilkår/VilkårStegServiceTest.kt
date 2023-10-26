@@ -143,7 +143,7 @@ internal class VilkårStegServiceTest {
         val delvilkårDto = listOf(
             DelvilkårDto(
                 Vilkårsresultat.IKKE_OPPFYLT,
-                listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
+                listOf(VurderingDto(RegelId.MÅLGRUPPE, SvarId.JA, "a")),
             ),
         )
         vilkårStegService.oppdaterVilkår(
@@ -211,7 +211,7 @@ internal class VilkårStegServiceTest {
         val vilkår = vilkår(
             behandlingId,
             resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-            VilkårType.EKSEMPEL,
+            VilkårType.MÅLGRUPPE,
         )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
@@ -241,7 +241,7 @@ internal class VilkårStegServiceTest {
         val delvilkårDto = listOf(
             DelvilkårDto(
                 Vilkårsresultat.IKKE_OPPFYLT,
-                listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
+                listOf(VurderingDto(RegelId.MÅLGRUPPE, SvarId.JA, "a")),
             ),
         )
         vilkårStegService.oppdaterVilkår(
@@ -275,7 +275,7 @@ internal class VilkårStegServiceTest {
         val delvilkårDto = listOf(
             DelvilkårDto(
                 Vilkårsresultat.IKKE_OPPFYLT,
-                listOf(VurderingDto(RegelId.HAR_ET_NAVN, SvarId.JA, "a")),
+                listOf(VurderingDto(RegelId.MÅLGRUPPE, SvarId.JA, "a")),
             ),
         )
         vilkårStegService.oppdaterVilkår(
@@ -310,7 +310,7 @@ internal class VilkårStegServiceTest {
             )
 
         assertThat(vilkårsett).hasSize(vilkårsreglerForStønad(Stønadstype.BARNETILSYN).size)
-        assertThat(vilkårsett.count { it.type == VilkårType.EKSEMPEL }).isEqualTo(1)
+        assertThat(vilkårsett.count { it.type == VilkårType.MÅLGRUPPE }).isEqualTo(1)
     }
 
     // KUN FOR Å TESTE OPPDATERSTEG
@@ -319,11 +319,11 @@ internal class VilkårStegServiceTest {
             vilkår(
                 behandlingId,
                 Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                VilkårType.EKSEMPEL,
+                VilkårType.MÅLGRUPPE,
                 listOf(
                     Delvilkår(
                         Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                        listOf(Vurdering(RegelId.HAR_ET_NAVN)),
+                        listOf(Vurdering(RegelId.MÅLGRUPPE)),
                     ),
                 ),
                 opphavsvilkår = Opphavsvilkår(UUID.randomUUID(), LocalDateTime.now()),
