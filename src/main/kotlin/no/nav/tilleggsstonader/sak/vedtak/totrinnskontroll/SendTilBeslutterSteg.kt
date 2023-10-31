@@ -100,7 +100,7 @@ class SendTilBeslutterSteg(
 
         val vedtaksbrev = vedtaksbrevRepository.findByIdOrThrow(saksbehandling.id)
 
-        brukerfeilHvis(vedtaksbrev.saksbehandlersignatur != SikkerhetContext.hentSaksbehandler()) {
+        brukerfeilHvis(vedtaksbrev.saksbehandlerIdent != SikkerhetContext.hentSaksbehandler()) {
             "En annen saksbehandler har signert vedtaksbrevet"
         }
     }
