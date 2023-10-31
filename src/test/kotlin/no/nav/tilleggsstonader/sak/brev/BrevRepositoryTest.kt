@@ -9,7 +9,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
-import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 internal class BrevRepositoryTest : IntegrationTest() {
@@ -33,7 +32,6 @@ internal class BrevRepositoryTest : IntegrationTest() {
             beslutterPdf = null,
             saksbehandlerIdent = "123",
             beslutterIdent = "321",
-            opprettetTid = LocalDateTime.now(),
         )
 
         vedtaksbrevRepository.insert(vedtaksbrev)
