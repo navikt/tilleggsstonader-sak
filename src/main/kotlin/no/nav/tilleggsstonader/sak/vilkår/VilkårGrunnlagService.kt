@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.måImlementeresFørProdsetting
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
@@ -25,6 +26,7 @@ import java.util.UUID
 class VilkårGrunnlagService(
     private val grunnlagsdataService: GrunnlagsdataService,
     private val søknadService: SøknadService,
+    private val barnService: BarnService,
 ) {
 
     fun hentGrunnlag(
@@ -38,7 +40,7 @@ class VilkårGrunnlagService(
         return VilkårGrunnlagDto(
             hovedytelse = mapHovedytelse(søknad),
             aktivitet = mapAktivitet(søknad),
-            barn = mapBarn(grunnlagsdata, søknad),
+            barn = mapBarn(grunnlagsdata, søknad, behandlingId),
         )
     }
 
@@ -60,14 +62,20 @@ class VilkårGrunnlagService(
             },
         )
 
-    private fun mapBarn(grunnlagsdata: GrunnlagsdataMedMetadata, søknad: SøknadBarnetilsyn?): List<GrunnlagBarn> {
+    private fun mapBarn(grunnlagsdata: GrunnlagsdataMedMetadata, søknad: SøknadBarnetilsyn?, behandlingId: UUID): List<GrunnlagBarn> {
         val søknadBarnPåIdent = søknad?.barn?.associateBy { it.ident } ?: emptyMap()
         if (søknad != null) {
             validerFinnesGrunnlagsdataForAlleBarnISøknad(grunnlagsdata, søknadBarnPåIdent)
         }
+        val barnPåBehandling = barnService.finnBarnPåBehandling(behandlingId).associateBy { it.ident }
+
         return grunnlagsdata.grunnlagsdata.barn.map { barn ->
+            val behandlingBarn = barnPåBehandling[barn.ident]
+                ?: error("Finner ikke barn med ident=${barn.ident} på behandling=$behandlingId")
+
             GrunnlagBarn(
                 ident = barn.ident,
+                barnId = behandlingBarn.id,
                 registergrunnlag = RegistergrunnlagBarn(
                     navn = barn.navn.visningsnavn(),
                     dødsdato = barn.dødsdato,
