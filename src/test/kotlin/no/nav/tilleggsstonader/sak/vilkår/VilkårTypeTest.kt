@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test
 internal class VilkårTypeTest {
 
     private val vilkårForBarnetilsyn = listOf(
-        VilkårType.EKSEMPEL,
-        VilkårType.EKSEMPEL2,
         VilkårType.MÅLGRUPPE,
         VilkårType.AKTIVITET,
     )
