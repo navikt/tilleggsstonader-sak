@@ -1,10 +1,11 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.kontrakt
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import java.time.LocalDateTime
 import java.util.UUID
 
 data class KonsistensavstemmingDto(
-    val stønadType: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
+    val stønadType: Stønadstype,
     val tilkjenteYtelser: List<KonsistensavstemmingTilkjentYtelseDto>,
     val avstemmingstidspunkt: LocalDateTime? = null,
 )

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.IKKE_SATT
@@ -491,7 +492,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     private fun lagreFagsak(
         fagsakId: UUID,
-        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
+        stønadstype: Stønadstype,
         fagsakPersonId: UUID,
     ): Fagsak {
         return testoppsettService.lagreFagsak(

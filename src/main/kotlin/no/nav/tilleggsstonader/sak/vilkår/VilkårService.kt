@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -136,7 +137,7 @@ class VilkårService(
         eksisterendeBehandlingId: UUID,
         nyBehandlingsId: UUID,
         metadata: HovedregelMetadata,
-        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
+        stønadstype: Stønadstype,
     ) {
         val tidligereVurderinger =
             vilkårRepository.findByBehandlingId(eksisterendeBehandlingId).associateBy { it.id }
@@ -187,7 +188,7 @@ class VilkårService(
     private fun opprettVilkårForNyeBarn(
         vilkårKopi: Map<UUID, Vilkår>,
         metadata: HovedregelMetadata,
-        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
+        stønadstype: Stønadstype,
     ) =
         metadata.barn
             .filter { barn -> vilkårKopi.none { it.value.barnId == barn.id } }

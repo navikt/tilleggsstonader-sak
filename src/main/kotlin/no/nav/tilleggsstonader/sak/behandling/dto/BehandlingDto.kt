@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.dto
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -25,12 +26,12 @@ data class BehandlingDto(
     val opprettet: LocalDateTime,
     val opprettetAv: String,
     val behandlingsårsak: BehandlingÅrsak,
-    val stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
+    val stønadstype: Stønadstype,
     val vedtaksdato: LocalDateTime? = null,
     val henlagtÅrsak: HenlagtÅrsak? = null,
 )
 
-fun Behandling.tilDto(stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype): BehandlingDto =
+fun Behandling.tilDto(stønadstype: Stønadstype): BehandlingDto =
     BehandlingDto(
         id = this.id,
         forrigeBehandlingId = this.forrigeBehandlingId,

@@ -187,7 +187,7 @@ object OppdaterVilkår {
     fun opprettNyeVilkår(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
-        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
+        stønadstype: Stønadstype,
     ): List<Vilkår> {
         return vilkårsreglerForStønad(stønadstype)
             .flatMap { vilkårsregel ->

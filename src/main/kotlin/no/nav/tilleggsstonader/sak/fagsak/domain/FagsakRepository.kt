@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.jdbc.repository.query.Query
@@ -18,9 +19,9 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpda
                     WHERE pi.ident IN (:personIdenter)
                     AND f.stonadstype = :stønadstype""",
     )
-    fun findBySøkerIdent(personIdenter: Set<String>, stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype): FagsakDomain?
+    fun findBySøkerIdent(personIdenter: Set<String>, stønadstype: Stønadstype): FagsakDomain?
 
-    fun findByFagsakPersonIdAndStønadstype(fagsakPersonId: UUID, stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype): FagsakDomain?
+    fun findByFagsakPersonIdAndStønadstype(fagsakPersonId: UUID, stønadstype: Stønadstype): FagsakDomain?
 
     // language=PostgreSQL
     @Query(

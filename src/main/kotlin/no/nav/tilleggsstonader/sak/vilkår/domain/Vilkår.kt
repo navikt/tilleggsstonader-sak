@@ -98,7 +98,7 @@ enum class Vilkårsresultat(val beskrivelse: String) {
     fun erIkkeDelvilkårsresultat() = this != AUTOMATISK_OPPFYLT
 }
 
-enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<no.nav.tilleggsstonader.kontrakter.felles.Stønadstype>) {
+enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Stønadstype>) {
     EKSEMPEL("Eksempel", listOf(Stønadstype.BARNETILSYN)),
     EKSEMPEL2("Eksempel 2", listOf(Stønadstype.BARNETILSYN)),
     MÅLGRUPPE("Målgruppe", listOf(Stønadstype.BARNETILSYN)),
@@ -109,7 +109,7 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<no.na
 
     companion object {
 
-        fun hentVilkårForStønad(stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype): List<VilkårType> = values().filter {
+        fun hentVilkårForStønad(stønadstype: Stønadstype): List<VilkårType> = values().filter {
             it.gjelderStønader.contains(stønadstype)
         }
     }

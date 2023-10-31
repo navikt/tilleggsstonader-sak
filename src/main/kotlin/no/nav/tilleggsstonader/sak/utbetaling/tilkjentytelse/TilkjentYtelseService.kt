@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -40,7 +41,7 @@ class TilkjentYtelseService(
     }
 
     fun finnTilkjentYtelserTilKonsistensavstemming(
-        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
+        stønadstype: Stønadstype,
         datoForAvstemming: LocalDate,
     ): List<KonsistensavstemmingTilkjentYtelseDto> {
         val tilkjentYtelser =

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -12,7 +13,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
  * Denne håndterer sletting av tidligere vedtak og andeler
  */
 abstract class BeregnYtelseSteg<DTO, DOMENE>(
-    private val stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
+    private val stønadstype: Stønadstype,
     open val vedtakRepository: VedtakRepository<DOMENE>,
     open val tilkjentytelseService: TilkjentYtelseService,
     open val simuleringService: SimuleringService,

@@ -128,7 +128,7 @@ class InsertUpdateRepositoryImplTest : IntegrationTest() {
 
     private fun fagsakDomain(
         fagsakPersonId: UUID,
-        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype = Stønadstype.BARNETILSYN,
+        stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     ) =
         FagsakDomain(
             fagsakPersonId = fagsakPersonId,

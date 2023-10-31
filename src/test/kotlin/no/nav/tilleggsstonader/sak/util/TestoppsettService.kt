@@ -24,7 +24,7 @@ class TestoppsettService(
 
     fun opprettBehandlingMedFagsak(
         behandling: Behandling,
-        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype = Stønadstype.BARNETILSYN,
+        stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     ): Behandling {
         val person = opprettPerson(fagsak())
         lagreFagsak(
