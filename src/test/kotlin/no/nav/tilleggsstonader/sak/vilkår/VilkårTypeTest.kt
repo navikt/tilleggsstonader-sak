@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
