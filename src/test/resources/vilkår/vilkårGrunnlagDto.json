@@ -11,6 +11,7 @@
   },
   "barn" : [ {
     "ident" : "1",
+    "barnId" : "60921c76-f8ef-4000-9824-f127a50a575e",
     "registergrunnlag" : {
       "navn" : "Fornavn mellomnavn Etternavn",
       "dødsdato" : null

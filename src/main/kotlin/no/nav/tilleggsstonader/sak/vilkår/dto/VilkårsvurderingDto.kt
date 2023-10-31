@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import java.time.LocalDate
+import java.util.UUID
 
 data class VilkårsvurderingDto(
     val vilkårsett: List<VilkårDto>,
@@ -35,6 +36,7 @@ data class SøknadsgrunnlagAktivitet(
 
 data class GrunnlagBarn(
     val ident: String,
+    val barnId: UUID,
     val registergrunnlag: RegistergrunnlagBarn,
     val søknadgrunnlag: SøknadsgrunnlagBarn?,
 )

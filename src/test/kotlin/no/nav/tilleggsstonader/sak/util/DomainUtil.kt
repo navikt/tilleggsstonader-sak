@@ -145,10 +145,12 @@ fun Behandling.innvilgetOgFerdigstilt() =
     )
 
 fun behandlingBarn(
+    id: UUID = UUID.randomUUID(),
     behandlingId: UUID = UUID.randomUUID(),
     personIdent: String = "1",
     søknadBarnId: UUID? = null,
 ) = BehandlingBarn(
+    id = id,
     behandlingId = behandlingId,
     søknadBarnId = søknadBarnId,
     ident = personIdent,
