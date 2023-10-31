@@ -120,6 +120,13 @@ class OppgaveService(
         return oppgaveClient.fordelOppgave(gsakOppgaveId, null, versjon = versjon)
     }
 
+    fun hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandlingId: UUID): OppgaveDomain? {
+        return oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
+            behandlingId,
+            setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak),
+        )
+    }
+
     fun hentOppgave(gsakOppgaveId: Long): Oppgave {
         return oppgaveClient.finnOppgaveMedId(gsakOppgaveId)
     }
