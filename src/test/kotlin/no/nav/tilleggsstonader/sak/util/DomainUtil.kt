@@ -38,9 +38,16 @@ fun oppgave(
     erFerdigstilt: Boolean = false,
     gsakOppgaveId: Long = 123,
     type: Oppgavetype = Oppgavetype.Journalføring,
+): OppgaveDomain = oppgave(behandling.id, erFerdigstilt, gsakOppgaveId, type)
+
+fun oppgave(
+    behandlingId: UUID,
+    erFerdigstilt: Boolean = false,
+    gsakOppgaveId: Long = 123,
+    type: Oppgavetype = Oppgavetype.Journalføring,
 ): OppgaveDomain =
     OppgaveDomain(
-        behandlingId = behandling.id,
+        behandlingId = behandlingId,
         gsakOppgaveId = gsakOppgaveId,
         type = type,
         erFerdigstilt = erFerdigstilt,

@@ -23,6 +23,7 @@ class TotrinnskontrollController(
     private val stegService: StegService,
     private val beslutteVedtakSteg: BeslutteVedtakSteg,
     private val sendTilBeslutterSteg: SendTilBeslutterSteg,
+    private val angreSendTilBeslutterService: AngreSendTilBeslutterService,
 ) {
 
     @GetMapping("{behandlingId}")
@@ -47,6 +48,13 @@ class TotrinnskontrollController(
     ): StatusTotrinnskontrollDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         stegService.håndterSteg(behandlingId, beslutteVedtakSteg, request)
+        return totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)
+    }
+
+    @PostMapping("/{behandlingId}/angre-send-til-beslutter")
+    fun angreSendTilBeslutter(@PathVariable behandlingId: UUID): StatusTotrinnskontrollDto {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        angreSendTilBeslutterService.angreSendTilBeslutter(behandlingId)
         return totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)
     }
 }
