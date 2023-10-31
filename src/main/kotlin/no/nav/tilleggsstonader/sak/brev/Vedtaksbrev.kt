@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
+import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import org.springframework.data.annotation.Id
 import java.time.LocalDateTime
 import java.util.UUID
@@ -14,6 +15,6 @@ data class Vedtaksbrev(
     val beslutterPdf: Fil? = null,
     val saksbehandlerIdent: String,
     val beslutterIdent: String? = null,
-    val opprettetTid: LocalDateTime,
+    val opprettetTid: LocalDateTime = SporbarUtils.now(),
     val besluttetTid: LocalDateTime? = null,
 )
