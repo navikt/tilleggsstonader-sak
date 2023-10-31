@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.regler.evalutation
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
@@ -187,7 +187,7 @@ object OppdaterVilkår {
     fun opprettNyeVilkår(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
-        stønadstype: Stønadstype,
+        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
     ): List<Vilkår> {
         return vilkårsreglerForStønad(stønadstype)
             .flatMap { vilkårsregel ->

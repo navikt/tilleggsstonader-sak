@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.IVERKSETTE
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
@@ -492,7 +491,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     private fun lagreFagsak(
         fagsakId: UUID,
-        stønadstype: Stønadstype,
+        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
         fagsakPersonId: UUID,
     ): Fagsak {
         return testoppsettService.lagreFagsak(

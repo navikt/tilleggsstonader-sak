@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.iverksett.tilIverksettDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
@@ -41,7 +40,7 @@ class TilkjentYtelseService(
     }
 
     fun finnTilkjentYtelserTilKonsistensavstemming(
-        stønadstype: Stønadstype,
+        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
         datoForAvstemming: LocalDate,
     ): List<KonsistensavstemmingTilkjentYtelseDto> {
         val tilkjentYtelser =

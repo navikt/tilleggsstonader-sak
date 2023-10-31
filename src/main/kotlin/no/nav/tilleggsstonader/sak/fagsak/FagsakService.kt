@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.fagsak
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -31,7 +32,7 @@ class FagsakService(
     @Transactional
     fun hentEllerOpprettFagsak(
         personIdent: String,
-        stønadstype: Stønadstype,
+        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
     ): Fagsak {
         val personIdenter = personService.hentPersonIdenter(personIdent)
         val gjeldendePersonIdent = personIdenter.gjeldende()
@@ -45,7 +46,7 @@ class FagsakService(
 
     fun harFagsak(personIdenter: Set<String>) = fagsakRepository.findBySøkerIdent(personIdenter).isNotEmpty()
 
-    fun finnFagsak(personIdenter: Set<String>, stønadstype: Stønadstype): Fagsak? =
+    fun finnFagsak(personIdenter: Set<String>, stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype): Fagsak? =
         fagsakRepository.findBySøkerIdent(personIdenter, stønadstype)?.tilFagsakMedPerson()
 
     fun finnFagsaker(personIdenter: Set<String>): List<Fagsak> =
@@ -144,7 +145,7 @@ class FagsakService(
         return aktiveIdenter.associateBy({ it.first }, { it.second })
     }
 
-    private fun opprettFagsak(stønadstype: Stønadstype, fagsakPerson: FagsakPerson): FagsakDomain {
+    private fun opprettFagsak(stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype, fagsakPerson: FagsakPerson): FagsakDomain {
         return fagsakRepository.insert(
             FagsakDomain(
                 stønadstype = stønadstype,

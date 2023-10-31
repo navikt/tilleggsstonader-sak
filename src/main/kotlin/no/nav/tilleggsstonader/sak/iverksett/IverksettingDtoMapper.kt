@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.iverksett
 
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.TilkjentYtelseMedMetadata
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
@@ -24,7 +23,7 @@ fun AndelTilkjentYtelse.tilIverksettDto() =
 fun TilkjentYtelse.tilTilkjentYtelseMedMetaData(
     saksbehandlerId: String,
     eksternBehandlingId: Long,
-    stønadstype: Stønadstype,
+    stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
     eksternFagsakId: Long,
     vedtaksdato: LocalDate,
 ): TilkjentYtelseMedMetadata {

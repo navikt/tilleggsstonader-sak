@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService

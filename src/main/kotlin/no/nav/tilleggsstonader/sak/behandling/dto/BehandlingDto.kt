@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -26,12 +25,12 @@ data class BehandlingDto(
     val opprettet: LocalDateTime,
     val opprettetAv: String,
     val behandlingsårsak: BehandlingÅrsak,
-    val stønadstype: Stønadstype,
+    val stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
     val vedtaksdato: LocalDateTime? = null,
     val henlagtÅrsak: HenlagtÅrsak? = null,
 )
 
-fun Behandling.tilDto(stønadstype: Stønadstype): BehandlingDto =
+fun Behandling.tilDto(stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype): BehandlingDto =
     BehandlingDto(
         id = this.id,
         forrigeBehandlingId = this.forrigeBehandlingId,

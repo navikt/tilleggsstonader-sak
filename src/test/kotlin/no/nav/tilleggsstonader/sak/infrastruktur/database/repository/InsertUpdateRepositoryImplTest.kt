@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database.repository
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonRepository
@@ -128,7 +128,7 @@ class InsertUpdateRepositoryImplTest : IntegrationTest() {
 
     private fun fagsakDomain(
         fagsakPersonId: UUID,
-        stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
+        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype = Stønadstype.BARNETILSYN,
     ) =
         FagsakDomain(
             fagsakPersonId = fagsakPersonId,

@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -20,7 +19,7 @@ data class Fagsak(
     val fagsakPersonId: UUID,
     val personIdenter: Set<PersonIdent>,
     val eksternId: EksternFagsakId,
-    val stønadstype: Stønadstype,
+    val stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
     val sporbar: Sporbar,
 ) {
 
@@ -40,7 +39,7 @@ data class FagsakDomain(
     @MappedCollection(idColumn = "fagsak_id")
     val eksternId: EksternFagsakId = EksternFagsakId(),
     @Column("stonadstype")
-    val stønadstype: Stønadstype,
+    val stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 )

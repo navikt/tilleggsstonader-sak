@@ -6,6 +6,7 @@ import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -15,7 +16,6 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaMapper

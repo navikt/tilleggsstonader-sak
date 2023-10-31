@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -137,7 +136,7 @@ class VilkårService(
         eksisterendeBehandlingId: UUID,
         nyBehandlingsId: UUID,
         metadata: HovedregelMetadata,
-        stønadstype: Stønadstype,
+        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
     ) {
         val tidligereVurderinger =
             vilkårRepository.findByBehandlingId(eksisterendeBehandlingId).associateBy { it.id }
@@ -188,7 +187,7 @@ class VilkårService(
     private fun opprettVilkårForNyeBarn(
         vilkårKopi: Map<UUID, Vilkår>,
         metadata: HovedregelMetadata,
-        stønadstype: Stønadstype,
+        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype,
     ) =
         metadata.barn
             .filter { barn -> vilkårKopi.none { it.value.barnId == barn.id } }

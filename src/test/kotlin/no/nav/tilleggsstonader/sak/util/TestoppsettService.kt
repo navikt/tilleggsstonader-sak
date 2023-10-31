@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -24,7 +24,7 @@ class TestoppsettService(
 
     fun opprettBehandlingMedFagsak(
         behandling: Behandling,
-        stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
+        stønadstype: no.nav.tilleggsstonader.kontrakter.felles.Stønadstype = Stønadstype.BARNETILSYN,
     ): Behandling {
         val person = opprettPerson(fagsak())
         lagreFagsak(
