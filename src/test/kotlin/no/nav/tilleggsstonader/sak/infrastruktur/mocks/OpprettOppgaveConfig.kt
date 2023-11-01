@@ -47,7 +47,9 @@ class OpprettOppgaveConfig(
             .filter { oppgavetyper.contains(it.type) }
         oppgaver.forEach { oppgave ->
             val behandling = behandlingService.hentSaksbehandling(oppgave.behandlingId)
-            opprettOppgave(behandling, oppgave)
+            val nyttOppgaveId = opprettOppgave(behandling, oppgave)
+            // Oppdaterer oppgaveId på oppgaven då vi oppretter alle oppgaver på nytt, og får då et nytt oppgaveId
+            oppgaveRepository.update(oppgave.copy(gsakOppgaveId = nyttOppgaveId))
         }
         logger.info("Opprettet ${oppgaver.size} oppgaver")
     }
@@ -55,9 +57,9 @@ class OpprettOppgaveConfig(
     private fun opprettOppgave(
         behandling: Saksbehandling,
         oppgave: OppgaveDomain,
-    ) {
+    ): Long {
         val oppgavetype = oppgave.type
-        oppgaveClient.opprettOppgave(
+        return oppgaveClient.opprettOppgave(
             OpprettOppgaveRequest(
                 ident = OppgaveIdentV2(ident = behandling.ident, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
                 tema = mapTema(behandling.stønadstype),
