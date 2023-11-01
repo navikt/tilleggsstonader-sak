@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import java.time.LocalDate
 
-
 /**
  * Oppretter oppgaver ut fra de som finnes i oppgaveRepository, for å populere oppgavebenken
  *
@@ -30,7 +29,7 @@ import java.time.LocalDate
 class OpprettOppgaveConfig(
     private val oppgaveRepository: OppgaveRepository,
     private val behandlingService: BehandlingService,
-    private val oppgaveClient: OppgaveClient
+    private val oppgaveClient: OppgaveClient,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -39,7 +38,7 @@ class OpprettOppgaveConfig(
         setOf(
             Oppgavetype.BehandleSak,
             Oppgavetype.GodkjenneVedtak,
-            Oppgavetype.BehandleUnderkjentVedtak
+            Oppgavetype.BehandleUnderkjentVedtak,
         )
 
     init {
@@ -55,7 +54,7 @@ class OpprettOppgaveConfig(
 
     private fun opprettOppgave(
         behandling: Saksbehandling,
-        oppgave: OppgaveDomain
+        oppgave: OppgaveDomain,
     ) {
         val oppgavetype = oppgave.type
         oppgaveClient.opprettOppgave(
@@ -67,11 +66,10 @@ class OpprettOppgaveConfig(
                 behandlingstema = mapBehandlingstema(behandling.stønadstype).value,
                 behandlingstype = Behandlingstype.NASJONAL.value,
                 enhetsnummer = mapEnhet(),
-                saksId = behandling.id.toString(),
                 fristFerdigstillelse = LocalDate.now().plusDays(14),
                 beskrivelse = mapBeskrivelse(oppgavetype),
-                behandlesAvApplikasjon = "tilleggsstonader-sak"
-            )
+                behandlesAvApplikasjon = "tilleggsstonader-sak",
+            ),
         )
     }
 
@@ -79,7 +77,7 @@ class OpprettOppgaveConfig(
 
     private fun mapTilordnetRessurs(
         oppgavetype: Oppgavetype,
-        behandling: Saksbehandling
+        behandling: Saksbehandling,
     ) = if (oppgavetype == Oppgavetype.BehandleSak) behandling.opprettetAv else null
 
     private fun mapBeskrivelse(oppgavetype: Oppgavetype): String = when (oppgavetype) {
