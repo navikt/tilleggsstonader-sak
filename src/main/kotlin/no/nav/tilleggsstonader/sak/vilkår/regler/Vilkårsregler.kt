@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.regler
 
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeRegel

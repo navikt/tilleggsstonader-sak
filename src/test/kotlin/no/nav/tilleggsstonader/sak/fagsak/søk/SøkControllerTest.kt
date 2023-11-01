@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.fagsak.søk
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.PersonIdentDto
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException

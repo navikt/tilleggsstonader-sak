@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.iverksett
 
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.TilkjentYtelseMedMetadata
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse

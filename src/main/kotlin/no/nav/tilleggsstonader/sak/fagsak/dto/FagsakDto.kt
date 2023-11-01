@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.fagsak.dto
 
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import java.util.UUID
 

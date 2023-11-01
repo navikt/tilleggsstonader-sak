@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -12,7 +13,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
@@ -38,9 +38,16 @@ fun oppgave(
     erFerdigstilt: Boolean = false,
     gsakOppgaveId: Long = 123,
     type: Oppgavetype = Oppgavetype.Journalføring,
+): OppgaveDomain = oppgave(behandling.id, erFerdigstilt, gsakOppgaveId, type)
+
+fun oppgave(
+    behandlingId: UUID,
+    erFerdigstilt: Boolean = false,
+    gsakOppgaveId: Long = 123,
+    type: Oppgavetype = Oppgavetype.Journalføring,
 ): OppgaveDomain =
     OppgaveDomain(
-        behandlingId = behandling.id,
+        behandlingId = behandlingId,
         gsakOppgaveId = gsakOppgaveId,
         type = type,
         erFerdigstilt = erFerdigstilt,
