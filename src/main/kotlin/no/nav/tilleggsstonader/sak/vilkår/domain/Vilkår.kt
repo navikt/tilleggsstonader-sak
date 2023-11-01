@@ -106,7 +106,7 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Støn
     PASSBARN("PassBarn", listOf(Stønadstype.BARNETILSYN)),
     ;
 
-    fun gjelderFlereBarn(): Boolean = false
+    fun gjelderFlereBarn(): Boolean = this == PASSBARN
 
     companion object {
 
