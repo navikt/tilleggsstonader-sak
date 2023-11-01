@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt
 
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.kontrakt.TilkjentYtelseDto
 import java.time.LocalDate
 import java.util.UUID
