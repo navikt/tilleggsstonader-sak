@@ -81,7 +81,7 @@ class OppgaveClientConfig {
             status = StatusEnum.OPPRETTET,
             identer = oppgaveDto.ident!!.let { listOf(OppgaveIdentV2(it.ident!!, it.gruppe!!)) },
             tildeltEnhetsnr = oppgaveDto.enhetsnummer,
-            saksreferanse = oppgaveDto.saksId,
+            saksreferanse = null,
             journalpostId = oppgaveDto.journalpostId,
             tema = oppgaveDto.tema,
             oppgavetype = oppgaveDto.oppgavetype.value,

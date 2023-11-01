@@ -101,7 +101,6 @@ class OppgaveService(
         val enhetsnummer = arbeidsfordelingService.hentNavEnhetId(personIdent, oppgavetype)
         val opprettOppgave = OpprettOppgaveRequest(
             ident = OppgaveIdentV2(ident = personIdent, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
-            saksId = fagsak.eksternId.id.toString(),
             tema = Tema.TSO,
             oppgavetype = oppgavetype,
             fristFerdigstillelse = fristFerdigstillelse ?: lagFristForOppgave(LocalDateTime.now()),
@@ -119,6 +118,9 @@ class OppgaveService(
     fun tilbakestillFordelingPåOppgave(gsakOppgaveId: Long, versjon: Int): Oppgave {
         return oppgaveClient.fordelOppgave(gsakOppgaveId, null, versjon = versjon)
     }
+
+    fun hentOppgaveDomain(oppgaveId: Long): OppgaveDomain? =
+        oppgaveRepository.findByGsakOppgaveId(oppgaveId)
 
     fun hentOppgaveSomIkkeErFerdigstilt(behandlingId: UUID, oppgavetype: Oppgavetype): OppgaveDomain? {
         return oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)

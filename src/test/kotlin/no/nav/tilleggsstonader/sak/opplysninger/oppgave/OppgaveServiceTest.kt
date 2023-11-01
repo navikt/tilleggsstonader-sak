@@ -65,7 +65,6 @@ internal class OppgaveServiceTest {
         oppgaveService.opprettOppgave(BEHANDLING_ID, Oppgavetype.BehandleSak)
 
         assertThat(slot.captured.enhetsnummer).isEqualTo(ENHETSNUMMER)
-        assertThat(slot.captured.saksId).isEqualTo(FAGSAK_EKSTERN_ID.toString())
         assertThat(slot.captured.ident).isEqualTo(OppgaveIdentV2(ident = FNR, gruppe = IdentGruppe.FOLKEREGISTERIDENT))
         assertThat(slot.captured.behandlingstema).isEqualTo(Behandlingstema.Barnetilsyn.value)
         assertThat(slot.captured.fristFerdigstillelse).isAfterOrEqualTo(LocalDate.now().plusDays(1))
