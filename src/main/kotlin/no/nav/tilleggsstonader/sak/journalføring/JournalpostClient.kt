@@ -6,9 +6,10 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostResponse
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.log.NavHttpHeaders
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -57,9 +58,9 @@ class JournalpostClient(
         )
     }
 
-    fun hentSøknadTilsynBarn(journalpostId: String, dokumentId: String): SøknadBarnetilsyn {
+    fun hentSøknadTilsynBarn(journalpostId: String, dokumentId: String): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
         val data = getForEntity<ByteArray>(jsonDokumentUri(journalpostId, dokumentId).toString())
-        return objectMapper.readValue<SøknadBarnetilsyn>(data)
+        return objectMapper.readValue(data)
     }
 
     private fun headerMedSaksbehandler(saksbehandler: String?): HttpHeaders {
