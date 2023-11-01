@@ -2,18 +2,13 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
-import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
-import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
-import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
-import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import org.springframework.context.annotation.Bean
@@ -21,7 +16,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -36,7 +30,6 @@ class OppgaveClientConfig {
     @Primary
     fun oppgaveClient(): OppgaveClient {
         val oppgaveClient = mockk<OppgaveClient>()
-        opprettNoenOppgaver()
 
         every { oppgaveClient.hentOppgaver(any()) } answers {
             val request = firstArg<FinnOppgaveRequest>()
@@ -122,30 +115,6 @@ class OppgaveClientConfig {
             val oppdatertOppgave = oppgave.copy(versjon = versjon + 1, tilordnetRessurs = secondArg())
             oppgaver[oppgaveId] = oppdatertOppgave
             oppdatertOppgave
-        }
-    }
-
-    private fun opprettNoenOppgaver() {
-        (0..20).forEach {
-            opprettOppgave(
-                OpprettOppgaveRequest(
-                    ident = OppgaveIdentV2(FnrGenerator.generer(), IdentGruppe.FOLKEREGISTERIDENT),
-                    enhetsnummer = "4489",
-                    saksId = null,
-                    journalpostId = null,
-                    tema = Tema.TSO,
-                    oppgavetype = Oppgavetype.BehandleSak,
-                    behandlingstema = null,
-                    tilordnetRessurs = null,
-                    fristFerdigstillelse = LocalDate.now(),
-                    aktivFra = LocalDate.now(),
-                    beskrivelse = "En beskrivelse",
-                    prioritet = OppgavePrioritet.NORM,
-                    behandlingstype = null,
-                    behandlesAvApplikasjon = null,
-                    mappeId = null,
-                ),
-            )
         }
     }
 }
