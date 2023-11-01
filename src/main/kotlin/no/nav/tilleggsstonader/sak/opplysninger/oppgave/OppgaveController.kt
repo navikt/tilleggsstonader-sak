@@ -43,7 +43,7 @@ class OppgaveController(
     }
 
     @GetMapping("/{oppgaveId}")
-    fun hentOppgave(@PathVariable(name = "oppgaveId") oppgaveId: Long): OppgaveDto {
+    fun hentOppgave(@PathVariable oppgaveId: Long): OppgaveDto {
         tilgangService.validerHarSaksbehandlerrolle()
         return oppgaveService.hentOppgaveDomain(oppgaveId)?.let {
             OppgaveDto(
