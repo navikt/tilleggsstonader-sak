@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -12,6 +13,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaMapper
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
 import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.mockVilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -21,10 +23,13 @@ import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat.AUTOMATISK_OPPFYLT
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat.IKKE_TATT_STILLING_TIL
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat.SKAL_IKKE_VURDERES
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -51,7 +56,12 @@ internal class VilkårServiceTest {
         fagsakService = fagsakService,
     )
     private val søknad = SøknadsskjemaMapper.map(
-        SøknadUtil.søknadskjemaBarnetilsyn(),
+        SøknadUtil.søknadskjemaBarnetilsyn(
+            barnMedBarnepass = listOf(
+                barnMedBarnepass(ident = "19852098840"),
+                barnMedBarnepass(ident = "13811397592"),
+            ),
+        ),
         "id",
     )
     private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
@@ -72,50 +82,72 @@ internal class VilkårServiceTest {
         every { vilkårGrunnlagService.hentGrunnlag(behandlingId) } returns mockVilkårGrunnlagDto()
     }
 
-    /*
-    @Test
-    fun `skal opprette nye Vilkår for barnetilsyn med alle vilkår dersom ingen vurderinger finnes`() {
-        every { vilkårsvurderingRepository.findByBehandlingId(behandlingId) } returns emptyList()
-        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
+    @Nested
+    inner class OppretteVilkårBarnetilsyn {
+        @BeforeEach
+        fun setUp() {
+            every { vilkårRepository.findByBehandlingId(behandlingId) } returns emptyList()
+            every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
+        }
 
-        val nyeVilkårsvurderinger = slot<List<Vilkårsvurdering>>()
-        every { vilkårsvurderingRepository.insertAll(capture(nyeVilkårsvurderinger)) } answers { firstArg() }
-        val vilkår = VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN)
+        @Test
+        fun `skal opprette nye Vilkår for barnetilsyn med alle vilkår dersom ingen vurderinger finnes`() {
+            val nyttVilkårsett = slot<List<Vilkår>>()
+            every { vilkårRepository.insertAll(capture(nyttVilkårsett)) } answers { firstArg() }
 
-        vurderingService.hentEllerOpprettVurderinger(behandlingId)
+            val aktuelleVilkårTyper = VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN)
 
-        assertThat(nyeVilkårsvurderinger.captured).hasSize(vilkår.size + 2) // 2 barn, Ekstra aleneomsorgsvilkår og aldersvilkår
-        assertThat(
-            nyeVilkårsvurderinger.captured.map { it.type }
-                .distinct(),
-        ).containsExactlyInAnyOrderElementsOf(vilkår)
-        // assertThat(nyeVilkårsvurderinger.captured.filter { it.type == VilkårType.ALENEOMSORG }).hasSize(2)
-        // assertThat(nyeVilkårsvurderinger.captured.filter { it.type == VilkårType.ALDER_PÅ_BARN }).hasSize(2)
-        assertThat(nyeVilkårsvurderinger.captured.filter { it.barnId != null }).hasSize(4)
-        assertThat(
-            nyeVilkårsvurderinger.captured.filter { it.type == VilkårType.EKSEMPEL }
-                .map { it.resultat }
-                .toSet(),
-        ).containsOnly(Vilkårsresultat.IKKE_TATT_STILLING_TIL)
-        assertThat(
-            nyeVilkårsvurderinger.captured.filter { it.type == VilkårType.EKSEMPEL }
-                .map { it.resultat }
-                .toSet(),
-        ).containsOnly(OPPFYLT)
-        assertThat(nyeVilkårsvurderinger.captured.map { it.behandlingId }.toSet()).containsOnly(behandlingId)
+            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
+
+            val vilkårsett = nyttVilkårsett.captured
+
+            assertThat(vilkårsett).hasSize(aktuelleVilkårTyper.size + 1) // 2 barn, ekstra vilkår av type PASS_BARN
+            assertThat(
+                vilkårsett.map { it.type }.distinct(),
+            ).containsExactlyInAnyOrderElementsOf(aktuelleVilkårTyper)
+
+            vilkårsett.finnVilkårAvType(VilkårType.MÅLGRUPPE).inneholderKunResultat(IKKE_TATT_STILLING_TIL)
+            vilkårsett.finnVilkårAvType(VilkårType.AKTIVITET).inneholderKunResultat(IKKE_TATT_STILLING_TIL)
+            vilkårsett.finnVilkårAvType(VilkårType.PASS_BARN).inneholderKunResultat(IKKE_TATT_STILLING_TIL)
+        }
+
+        @Test
+        fun `skal opprette et vilkår av type PASS_BARN per barn`() {
+            val nyttVilkårsett = slot<List<Vilkår>>()
+            every { vilkårRepository.insertAll(capture(nyttVilkårsett)) } answers { firstArg() }
+
+            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
+
+            val vilkårPassBarn = nyttVilkårsett.captured.finnVilkårAvType(VilkårType.PASS_BARN)
+            assertThat(vilkårPassBarn).hasSize(2)
+        }
+
+        @Test
+        fun `skal initiere automatisk verdi for ALDER_LAVERE_ENN_GRENSEVERDI`() {
+            val nyttVilkårsett = slot<List<Vilkår>>()
+            every { vilkårRepository.insertAll(capture(nyttVilkårsett)) } answers { firstArg() }
+
+            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
+
+            val vilkårPassBarn = nyttVilkårsett.captured.finnVilkårAvType(VilkårType.PASS_BARN)
+
+            val resultaterBarnUnder9år = vilkårPassBarn.finnVurderingResultaterForBarn(barn[0].id)
+            assertThat(resultaterBarnUnder9år).containsOnlyOnce(AUTOMATISK_OPPFYLT)
+
+            val resultaterBarnOver9år = vilkårPassBarn.finnVurderingResultaterForBarn(barn[1].id)
+            assertThat(resultaterBarnOver9år).containsOnly(IKKE_TATT_STILLING_TIL)
+        }
     }
-     */
 
     @Test
     fun `skal ikke opprette nye Vilkår for behandlinger som allerede har vurderinger`() {
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns
-            listOf(
-                vilkår(
-                    resultat = OPPFYLT,
-                    type = VilkårType.EKSEMPEL,
-                    behandlingId = behandlingId,
-                ),
-            )
+        every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(
+            vilkår(
+                resultat = OPPFYLT,
+                type = VilkårType.EKSEMPEL,
+                behandlingId = behandlingId,
+            ),
+        )
 
         vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
 
@@ -205,8 +237,7 @@ internal class VilkårServiceTest {
         val vilkårsett = lagVilkårsett(behandlingId, SKAL_IKKE_VURDERES)
         // Guard
         assertThat(
-            vilkårsett.map { it.type }
-                .containsAll(VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN)),
+            vilkårsett.map { it.type }.containsAll(VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN)),
         ).isTrue()
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
 
@@ -226,5 +257,23 @@ internal class VilkårServiceTest {
                 delvilkår = listOf(),
             )
         }
+    }
+
+    private fun List<Vilkår>.finnVilkårAvType(
+        vilkårType: VilkårType,
+    ): List<Vilkår> {
+        return this.filter { it.type == vilkårType }
+    }
+
+    private fun List<Vilkår>.inneholderKunResultat(
+        resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+    ) {
+        assertThat(
+            this.map { it.resultat }.toSet(),
+        ).containsOnly(resultat)
+    }
+
+    private fun List<Vilkår>.finnVurderingResultaterForBarn(ident: UUID): List<Vilkårsresultat>? {
+        return this.find { vilkår -> vilkår.barnId == ident }?.delvilkårsett?.map { delvilkår -> delvilkår.resultat }
     }
 }
