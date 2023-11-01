@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
@@ -19,8 +20,10 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
@@ -43,6 +46,7 @@ class OpprettTestBehandlingController(
     private val personService: PersonService,
     private val barnService: BarnService,
     private val søknadService: SøknadService,
+    private val taskService: TaskService,
 ) {
 
     @Transactional
@@ -51,6 +55,7 @@ class OpprettTestBehandlingController(
         val fagsak: Fagsak = lagFagsak(testBehandlingRequest)
         val behandling = lagBehandling(fagsak)
         opprettSøknad(fagsak, behandling)
+        opprettOppgave(behandling)
 
         return behandling.id
     }
@@ -113,6 +118,18 @@ class OpprettTestBehandlingController(
             )
         }
         barnService.opprettBarn(behandlingBarn)
+    }
+
+    private fun opprettOppgave(behandling: Behandling) {
+        taskService.save(
+            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                    behandlingId = behandling.id,
+                    saksbehandler = SikkerhetContext.hentSaksbehandler(),
+                    beskrivelse = "Testbehandling (ikke lagd med en ekte søknad)",
+                ),
+            ),
+        )
     }
 
     private fun lagFagsak(testBehandlingRequest: TestBehandlingRequest) =
