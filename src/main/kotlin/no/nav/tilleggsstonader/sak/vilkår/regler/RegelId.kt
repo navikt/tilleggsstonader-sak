@@ -13,4 +13,11 @@ enum class RegelId(val beskrivelse: String) {
 
     // AKTIVITET
     ER_AKTIVITET_REGISTRERT("Er bruker registrert med en aktivitet?"),
+
+    // PASSBARN
+    DEKKES_UTGIFTER_ANNET_REGELVERK("Dekkes utgifter av annet regelverk?"),
+    ANNEN_FORELDER_MOTTAR_STØTTE("Mottar den andre forelderen støtte for dette barnet?"),
+    UTGIFTER_DOKUMENTERT("Er utgiftene tilfredstillende dokumentert?"),
+    HAR_ALDER_LAVERE_ENN_GRENSEVERDI("Har barnet fullført 4. skoleår?"),
+    UNNTAK_ALDER("Oppfylles unntak etter å ha fullført 4. skoleår?"),
 }

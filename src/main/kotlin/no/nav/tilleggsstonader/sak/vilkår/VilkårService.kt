@@ -92,7 +92,7 @@ class VilkårService(
         val behandling = behandlingService.hentBehandling(behandlingId)
         val barn = barnService.finnBarnPåBehandling(behandlingId)
         val grunnlag = vilkårGrunnlagService.hentGrunnlag(behandlingId)
-        return Pair(grunnlag, HovedregelMetadata(emptyList(), behandling))
+        return Pair(grunnlag, HovedregelMetadata(barn, behandling))
     }
 
     private fun hentEllerOpprettVilkår(
