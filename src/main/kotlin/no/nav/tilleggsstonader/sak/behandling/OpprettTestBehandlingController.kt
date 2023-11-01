@@ -126,7 +126,7 @@ class OpprettTestBehandlingController(
                 OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
                     behandlingId = behandling.id,
                     saksbehandler = SikkerhetContext.hentSaksbehandler(),
-                    beskrivelse = "Behandle behandling i ny løsning",
+                    beskrivelse = "Testbehandling (ikke lagd med en ekte søknad)",
                 ),
             ),
         )
