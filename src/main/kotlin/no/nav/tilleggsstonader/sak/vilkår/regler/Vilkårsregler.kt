@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeRegel
+import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.PassBarnRegel
 
 /**
  * Singleton for å holde på alle regler
@@ -23,6 +24,7 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
         Stønadstype.BARNETILSYN -> listOf(
             MålgruppeRegel(),
             AktivitetRegel(),
+            PassBarnRegel(),
         )
     }
 

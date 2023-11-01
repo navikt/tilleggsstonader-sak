@@ -103,6 +103,7 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Støn
     EKSEMPEL2("Eksempel 2", listOf(Stønadstype.BARNETILSYN)),
     MÅLGRUPPE("Målgruppe", listOf(Stønadstype.BARNETILSYN)),
     AKTIVITET("Aktivitet", listOf(Stønadstype.BARNETILSYN)),
+    PASSBARN("PassBarn", listOf(Stønadstype.BARNETILSYN)),
     ;
 
     fun gjelderFlereBarn(): Boolean = false

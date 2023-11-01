@@ -6,6 +6,7 @@ enum class SvarId {
     JA,
     NEI,
 
-    // Eksempel
-    ANNET_SVAR,
+    // PASSBARN
+    FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID,
+    TRENGER_MER_TILSYN_ENN_JEVNALDRENDE,
 }

@@ -12,6 +12,7 @@ internal class VilkårTypeTest {
         VilkårType.EKSEMPEL2,
         VilkårType.MÅLGRUPPE,
         VilkårType.AKTIVITET,
+        VilkårType.PASSBARN,
     )
 
     @Test
