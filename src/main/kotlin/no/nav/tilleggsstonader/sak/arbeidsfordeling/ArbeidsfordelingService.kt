@@ -15,7 +15,7 @@ class ArbeidsfordelingService(
 
     companion object {
         const val MASKINELL_JOURNALFOERENDE_ENHET = "9999"
-        val ENHET_NAY_ROMERIKE = Arbeidsfordelingsenhet("4402", "NAY Romerike 4402")
+        val ENHET_NASJONAL_NAY = Arbeidsfordelingsenhet("4462", "Tilleggsstønad INN")
     }
 
     fun hentNavEnhetId(ident: String, oppgavetype: Oppgavetype) = when (oppgavetype) {
@@ -28,7 +28,7 @@ class ArbeidsfordelingService(
             "Teknisk feil. Arbeidsfordeling er ikke implementert"
         }
 
-        return ENHET_NAY_ROMERIKE
+        return ENHET_NASJONAL_NAY
         /*
         return cacheManager.getNullable("navEnhet", ident) {
             arbeidsfordelingClient.hentNavEnhetForPersonMedRelasjoner(ident).firstOrNull()
@@ -41,7 +41,7 @@ class ArbeidsfordelingService(
             "Teknisk feil. Arbeidsfordeling er ikke implementert"
         }
 
-        return ENHET_NAY_ROMERIKE
+        return ENHET_NASJONAL_NAY
     }
         /*
         cacheManager.getNullable("navEnhetForOppfølging", ident) {
