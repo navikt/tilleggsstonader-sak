@@ -58,7 +58,7 @@ internal class AutomatiskJournalføringServiceTest {
         taskService = taskService,
     )
 
-    val enhet = ArbeidsfordelingService.ENHET_NAY_ROMERIKE.enhetId
+    val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetId
     val mappeId = null
     val personIdent = "123456789"
     val aktørId = "9876543210127"
