@@ -110,7 +110,7 @@ class AngreSendTilBeslutterService(
     private fun validerOppgave(
         saksbehandling: Saksbehandling,
     ) {
-        val efOppgave = oppgaveService.hentOppgaveSomIkkeErFerdigstilt(
+        val oppgave = oppgaveService.hentOppgaveSomIkkeErFerdigstilt(
             behandlingId = saksbehandling.id,
             oppgavetype = Oppgavetype.GodkjenneVedtak,
         ) ?: throw ApiFeil(
@@ -118,7 +118,7 @@ class AngreSendTilBeslutterService(
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
         )
 
-        val tilordnetRessurs = oppgaveService.hentOppgave(efOppgave.gsakOppgaveId).tilordnetRessurs
+        val tilordnetRessurs = oppgaveService.hentOppgave(oppgave.gsakOppgaveId).tilordnetRessurs
         brukerfeilHvis(tilordnetRessurs != null && tilordnetRessurs != SikkerhetContext.hentSaksbehandler()) {
             "Kan ikke angre send til beslutter når oppgave er plukket av $tilordnetRessurs"
         }

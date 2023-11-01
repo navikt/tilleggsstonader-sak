@@ -54,6 +54,8 @@ class TotrinnskontrollController(
     @PostMapping("/{behandlingId}/angre-send-til-beslutter")
     fun angreSendTilBeslutter(@PathVariable behandlingId: UUID): StatusTotrinnskontrollDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
         angreSendTilBeslutterService.angreSendTilBeslutter(behandlingId)
         return totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)
     }
