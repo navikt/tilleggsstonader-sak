@@ -88,7 +88,7 @@ class OppgaveClientConfig {
             status = StatusEnum.OPPRETTET,
             identer = oppgaveDto.ident!!.let { listOf(OppgaveIdentV2(it.ident!!, it.gruppe!!)) },
             tildeltEnhetsnr = oppgaveDto.enhetsnummer,
-            saksreferanse = oppgaveDto.saksId,
+            saksreferanse = null,
             journalpostId = oppgaveDto.journalpostId,
             tema = oppgaveDto.tema,
             oppgavetype = oppgaveDto.oppgavetype.value,
@@ -131,7 +131,6 @@ class OppgaveClientConfig {
                 OpprettOppgaveRequest(
                     ident = OppgaveIdentV2(FnrGenerator.generer(), IdentGruppe.FOLKEREGISTERIDENT),
                     enhetsnummer = "4489",
-                    saksId = null,
                     journalpostId = null,
                     tema = Tema.TSO,
                     oppgavetype = Oppgavetype.BehandleSak,
