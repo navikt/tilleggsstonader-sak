@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.regler.jaNeiSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.regelIder
 
 class PassBarnRegel : Vilkårsregel(
-    vilkårType = VilkårType.PASSBARN,
+    vilkårType = VilkårType.PASS_BARN,
     regler = setOf(HAR_ALDER_LAVERE_ENN_GRENSEVERDI, UNNTAK_ALDER, DEKKES_UTGIFTER_ANNET_REGELVERK, ANNEN_FORELDER_MOTTAR_STØTTE, UTGIFTER_DOKUMENTERT),
     hovedregler = regelIder(HAR_ALDER_LAVERE_ENN_GRENSEVERDI, DEKKES_UTGIFTER_ANNET_REGELVERK, ANNEN_FORELDER_MOTTAR_STØTTE, UTGIFTER_DOKUMENTERT),
 ) {

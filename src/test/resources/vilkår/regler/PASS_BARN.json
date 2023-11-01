@@ -1,5 +1,5 @@
 {
-  "vilkårType" : "PASSBARN",
+  "vilkårType" : "PASS_BARN",
   "regler" : {
     "HAR_ALDER_LAVERE_ENN_GRENSEVERDI" : {
       "regelId" : "HAR_ALDER_LAVERE_ENN_GRENSEVERDI",
