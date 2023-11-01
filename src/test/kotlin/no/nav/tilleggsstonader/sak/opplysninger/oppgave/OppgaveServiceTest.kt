@@ -243,7 +243,7 @@ internal class OppgaveServiceTest {
         private const val FAGSAK_EKSTERN_ID = 98765L
         private const val GSAK_OPPGAVE_ID = 12345L
         private val BEHANDLING_ID = UUID.fromString("1c4209bd-3217-4130-8316-8658fe300a84")
-        private const val ENHETSNUMMER = "4489"
+        private const val ENHETSNUMMER = "4462"
         private const val ENHETSNAVN = "enhetsnavn"
         private const val FNR = "11223312345"
         private const val SAKSBEHANDLER_ID = "Z999999"
