@@ -42,6 +42,11 @@ class OppgaveClientConfig {
             FinnOppgaveResponseDto(antallTreffTotalt = oppgavelager.size.toLong(), oppgaver = oppgaver)
         }
 
+        every { oppgaveClient.finnOppgaveMedId(any()) } answers {
+            val oppgaveId = firstArg<Long>()
+            oppgavelager[oppgaveId] ?: error("Finner ikke oppgave=$oppgaveId")
+        }
+
         every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(0, emptyList())
 
         every { oppgaveClient.opprettOppgave(any()) } answers {
