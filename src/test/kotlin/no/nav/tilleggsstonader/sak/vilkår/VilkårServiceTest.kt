@@ -84,17 +84,17 @@ internal class VilkårServiceTest {
 
     @Nested
     inner class OppretteVilkårBarnetilsyn {
+        val nyttVilkårsett = slot<List<Vilkår>>()
+
         @BeforeEach
         fun setUp() {
+            every { vilkårRepository.insertAll(capture(nyttVilkårsett)) } answers { firstArg() }
             every { vilkårRepository.findByBehandlingId(behandlingId) } returns emptyList()
             every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
         }
 
         @Test
         fun `skal opprette nye Vilkår for barnetilsyn med alle vilkår dersom ingen vurderinger finnes`() {
-            val nyttVilkårsett = slot<List<Vilkår>>()
-            every { vilkårRepository.insertAll(capture(nyttVilkårsett)) } answers { firstArg() }
-
             val aktuelleVilkårTyper = VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN)
 
             vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
@@ -113,9 +113,6 @@ internal class VilkårServiceTest {
 
         @Test
         fun `skal opprette et vilkår av type PASS_BARN per barn`() {
-            val nyttVilkårsett = slot<List<Vilkår>>()
-            every { vilkårRepository.insertAll(capture(nyttVilkårsett)) } answers { firstArg() }
-
             vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
 
             val vilkårPassBarn = nyttVilkårsett.captured.finnVilkårAvType(VilkårType.PASS_BARN)
@@ -124,9 +121,6 @@ internal class VilkårServiceTest {
 
         @Test
         fun `skal initiere automatisk verdi for ALDER_LAVERE_ENN_GRENSEVERDI`() {
-            val nyttVilkårsett = slot<List<Vilkår>>()
-            every { vilkårRepository.insertAll(capture(nyttVilkårsett)) } answers { firstArg() }
-
             vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
 
             val vilkårPassBarn = nyttVilkårsett.captured.finnVilkårAvType(VilkårType.PASS_BARN)
