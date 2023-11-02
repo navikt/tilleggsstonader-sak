@@ -121,4 +121,6 @@ class BeslutteVedtakSteg(
     }
 
     override fun stegType(): StegType = StegType.BESLUTTE_VEDTAK
+
+    override fun settInnHistorikk(): Boolean = false
 }

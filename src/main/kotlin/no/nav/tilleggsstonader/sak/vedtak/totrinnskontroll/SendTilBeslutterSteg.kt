@@ -34,6 +34,7 @@ class SendTilBeslutterSteg(
     private val oppgaveService: OppgaveService,
 ) : BehandlingSteg<Void?> {
 
+    // TODO valider at man har opprettet vedtaksbrev?
     override fun validerSteg(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.steg != stegType()) {
             "Behandling er i feil steg=${saksbehandling.steg}"
