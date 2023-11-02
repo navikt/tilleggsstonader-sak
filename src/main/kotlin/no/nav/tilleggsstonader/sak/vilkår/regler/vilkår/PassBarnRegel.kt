@@ -41,6 +41,10 @@ class PassBarnRegel : Vilkårsregel(
         resultat: Vilkårsresultat,
         barnId: UUID?,
     ): List<Delvilkår> {
+        if (resultat != Vilkårsresultat.IKKE_TATT_STILLING_TIL) {
+            return super.initiereDelvilkår(metadata, resultat, barnId)
+        }
+
         return hovedregler.map {
             if (it == RegelId.HAR_ALDER_LAVERE_ENN_GRENSEVERDI && !harFullførtFjerdetrinn(barnId, metadata)) {
                 automatiskVurderAlderLavereEnnGrenseverdi()
