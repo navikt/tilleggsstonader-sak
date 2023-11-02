@@ -28,7 +28,7 @@ class JournalpostClient(
         UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/journalpost").build().toUri()
 
     private val dokarkivUri =
-        UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/dokarkiv").build().toUri()
+        UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/arkiv").build().toUri()
 
     fun hentJournalpost(journalpostId: String): Journalpost {
         val uri =
