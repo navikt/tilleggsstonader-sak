@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -31,6 +32,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.Year
 import java.util.UUID
 
 internal class VilkårServiceTest {
@@ -58,8 +60,8 @@ internal class VilkårServiceTest {
     private val søknad = SøknadsskjemaMapper.map(
         SøknadUtil.søknadskjemaBarnetilsyn(
             barnMedBarnepass = listOf(
-                barnMedBarnepass(ident = "19852098840"),
-                barnMedBarnepass(ident = "13811397592"),
+                barnMedBarnepass(ident = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)),
+                barnMedBarnepass(ident = FnrGenerator.generer(Year.now().minusYears(11).value, 1, 13)),
             ),
         ),
         "id",
