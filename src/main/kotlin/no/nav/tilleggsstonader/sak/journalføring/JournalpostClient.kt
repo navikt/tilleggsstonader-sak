@@ -31,7 +31,8 @@ class JournalpostClient(
         UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/dokarkiv").build().toUri()
 
     fun hentJournalpost(journalpostId: String): Journalpost {
-        val uri = UriComponentsBuilder.fromUri(journalpostUri).queryParam("journalpostId", { journalpostId }).encode().toUriString()
+        val uri =
+            UriComponentsBuilder.fromUri(journalpostUri).queryParam("journalpostId", "{journalpostId}").encode().toUriString()
 
         return getForEntity<Journalpost>(uri, uriVariables = journalpostIdUriVariables(journalpostId))
     }
