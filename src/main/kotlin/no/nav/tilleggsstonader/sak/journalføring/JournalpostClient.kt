@@ -24,13 +24,17 @@ class JournalpostClient(
     @Qualifier("azure") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
 
-    fun hentJournalpost(journalpostId: String): Journalpost =
-        getForEntity<Journalpost>(journalpostUri.toString(), uriVariables = journalpostIdUriVariables(journalpostId))
-
     private val journalpostUri =
         UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/journalpost").build().toUri()
+
     private val dokarkivUri =
         UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/dokarkiv").build().toUri()
+
+    fun hentJournalpost(journalpostId: String): Journalpost {
+        val uri = UriComponentsBuilder.fromUri(journalpostUri).queryParam("journalpostId", { journalpostId }).encode().toUriString()
+
+        return getForEntity<Journalpost>(uri, uriVariables = journalpostIdUriVariables(journalpostId))
+    }
 
     fun oppdaterJournalpost(
         oppdaterJournalpostRequest: OppdaterJournalpostRequest,
