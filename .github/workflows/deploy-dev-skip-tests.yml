@@ -27,9 +27,6 @@ jobs:
       - name: Build
         run: ./gradlew bootJar -PskipLint
 
-      - name: Generate and output SBOM
-        run: ./gradlew cyclonedxBom
-
       - uses: nais/docker-build-push@v0
         id: docker-push
         with:
