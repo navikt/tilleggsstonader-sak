@@ -57,11 +57,15 @@ internal class VilkårServiceTest {
         barnService = barnService,
         fagsakService = fagsakService,
     )
+
+    private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
+    private val barnOver10år = FnrGenerator.generer(Year.now().minusYears(11).value, 1, 13)
+
     private val søknad = SøknadsskjemaMapper.map(
         SøknadUtil.søknadskjemaBarnetilsyn(
             barnMedBarnepass = listOf(
-                barnMedBarnepass(ident = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)),
-                barnMedBarnepass(ident = FnrGenerator.generer(Year.now().minusYears(11).value, 1, 13)),
+                barnMedBarnepass(ident = barnUnder9år),
+                barnMedBarnepass(ident = barnOver10år),
             ),
         ),
         "id",
@@ -127,11 +131,13 @@ internal class VilkårServiceTest {
 
             val vilkårPassBarn = nyttVilkårsett.captured.finnVilkårAvType(VilkårType.PASS_BARN)
 
-            val resultaterBarnUnder9år = vilkårPassBarn.finnVurderingResultaterForBarn(barn[0].id)
+            val resultaterBarnUnder9år =
+                vilkårPassBarn.finnVurderingResultaterForBarn(barn.single { it.ident == barnUnder9år }.id)
             assertThat(resultaterBarnUnder9år).containsOnlyOnce(AUTOMATISK_OPPFYLT)
 
-            val resultaterBarnOver9år = vilkårPassBarn.finnVurderingResultaterForBarn(barn[1].id)
-            assertThat(resultaterBarnOver9år).containsOnly(IKKE_TATT_STILLING_TIL)
+            val resultaterBarnOver10år =
+                vilkårPassBarn.finnVurderingResultaterForBarn(barn.single { it.ident == barnOver10år }.id)
+            assertThat(resultaterBarnOver10år).containsOnly(IKKE_TATT_STILLING_TIL)
         }
     }
 
