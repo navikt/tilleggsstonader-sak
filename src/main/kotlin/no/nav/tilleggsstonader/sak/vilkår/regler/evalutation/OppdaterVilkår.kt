@@ -191,7 +191,11 @@ object OppdaterVilkår {
     ): List<Vilkår> {
         return vilkårsreglerForStønad(stønadstype)
             .flatMap { vilkårsregel ->
-                if (vilkårsregel.vilkårType.gjelderFlereBarn() && metadata.barn.isNotEmpty()) {
+                feilHvis(vilkårsregel.vilkårType.gjelderFlereBarn() && metadata.barn.isEmpty()) {
+                    "Kan ikke opprette vilkår når ingen barn er knyttet til behandling $behandlingId"
+                }
+
+                if (vilkårsregel.vilkårType.gjelderFlereBarn()) {
                     metadata.barn.map { lagNyVilkår(vilkårsregel, metadata, behandlingId, it.id) }
                 } else {
                     listOf(lagNyVilkår(vilkårsregel, metadata, behandlingId))
