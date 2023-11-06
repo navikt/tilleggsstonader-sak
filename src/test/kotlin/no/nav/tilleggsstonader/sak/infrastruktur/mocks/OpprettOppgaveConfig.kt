@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -70,7 +71,7 @@ class OpprettOppgaveConfig(
                 enhetsnummer = mapEnhet(),
                 fristFerdigstillelse = LocalDate.now().plusDays(14),
                 beskrivelse = mapBeskrivelse(oppgavetype),
-                behandlesAvApplikasjon = "tilleggsstonader-sak",
+                behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgavetype),
             ),
         )
     }
