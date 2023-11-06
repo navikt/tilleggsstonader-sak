@@ -45,8 +45,8 @@ import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
-import no.nav.tilleggsstonader.sak.vilkår.regler.vilkårsreglerForStønad
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -332,8 +332,8 @@ internal class VilkårStegServiceTest {
     }
 
     @Test
-    internal fun `behandlingen uten barn skal likevel opprette et vilkår for aleneomsorg`() {
-        val vilkårsett =
+    internal fun `behandlingen uten barn skal kaste feilmelding`() {
+        assertThatThrownBy {
             opprettNyeVilkår(
                 behandlingId,
                 HovedregelMetadata(
@@ -342,9 +342,7 @@ internal class VilkårStegServiceTest {
                 ),
                 Stønadstype.BARNETILSYN,
             )
-
-        assertThat(vilkårsett).hasSize(vilkårsreglerForStønad(Stønadstype.BARNETILSYN).size)
-        assertThat(vilkårsett.count { it.type == VilkårType.MÅLGRUPPE }).isEqualTo(1)
+        }.hasMessageContaining("Kan ikke opprette vilkår når ingen barn er knyttet til behandling")
     }
 
     // KUN FOR Å TESTE OPPDATERSTEG
