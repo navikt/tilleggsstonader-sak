@@ -53,13 +53,13 @@ class JournalpostClient(
 
     fun ferdigstillJournalpost(journalpostId: String, journalførendeEnhet: String, saksbehandler: String?): OppdaterJournalpostResponse {
         val uri = UriComponentsBuilder.fromUri(dokarkivUri).pathSegment("{journalpostId}", "ferdigstill")
-            .queryParam("journalfoerendeEnhet", { journalførendeEnhet }).encode().toUriString()
+            .queryParam("journalfoerendeEnhet", "{journalfoerendeEnhet}").encode().toUriString()
 
         return putForEntity<OppdaterJournalpostResponse>(
             uri,
             "",
             headerMedSaksbehandler(saksbehandler),
-            journalpostIdUriVariables(journalpostId),
+            journalpostIdUriVariables(journalpostId) + journalførendeEnhetUriVariables(journalførendeEnhet),
         )
     }
 
@@ -86,4 +86,6 @@ class JournalpostClient(
     }
 
     private fun journalpostIdUriVariables(journalpostId: String): Map<String, String> = mapOf("journalpostId" to journalpostId)
+    private fun journalførendeEnhetUriVariables(journalførendeEnhet: String): Map<String, String> =
+        mapOf("journalfoerendeEnhet" to journalførendeEnhet)
 }
