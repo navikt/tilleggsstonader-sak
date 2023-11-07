@@ -59,7 +59,6 @@ internal class AutomatiskJournalføringServiceTest {
     )
 
     val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetId
-    val mappeId = null
     val personIdent = "123456789"
     val aktørId = "9876543210127"
     val tidligerePersonIdent = "9123456789"
@@ -86,16 +85,6 @@ internal class AutomatiskJournalføringServiceTest {
         every { fagsakService.hentEllerOpprettFagsak(any(), any()) } returns fagsak
         every { arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(any()) } returns enhet
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
-//        every {
-//            journalføringService.automatiskJournalfør(
-//                any(),
-//                any(),
-//                any(),
-//                any(),
-//                any(),
-//                any(),
-//            )
-//        } returns mockk()
     }
 
     @Test
