@@ -218,7 +218,7 @@ internal class TilgangServiceTest {
     @Test
     internal fun `validerTilgangTilEksternFagsak `() {
         every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
-        every { fagsakService.hentFagsakDtoPåEksternId(any()) } returns fagsak.tilDto(true)
+        every { fagsakService.hentFagsakDtoPåEksternId(any()) } returns fagsak.tilDto(behandlinger = listOf(), true)
 
         tilgangService.validerTilgangTilEksternFagsak(fagsak.eksternId.id, AuditLoggerEvent.ACCESS)
     }

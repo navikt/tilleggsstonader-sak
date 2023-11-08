@@ -1,6 +1,9 @@
 package no.nav.tilleggsstonader.sak.fagsak
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -24,6 +27,7 @@ class FagsakService(
     private val fagsakPersonService: FagsakPersonService,
     private val fagsakRepository: FagsakRepository,
     private val personService: PersonService,
+    private val behandlingService: BehandlingService,
 ) {
     fun hentEllerOpprettFagsakMedBehandlinger(personIdent: String, stønadstype: Stønadstype): FagsakDto {
         return fagsakTilDto(hentEllerOpprettFagsak(personIdent, stønadstype))
@@ -57,9 +61,12 @@ class FagsakService(
     }
 
     fun fagsakTilDto(fagsak: Fagsak): FagsakDto {
-        // val behandlinger: List<Behandling> = behandlingService.hentBehandlinger(fagsak.id)
+        val behandlinger: List<Behandling> = behandlingService.hentBehandlinger(fagsak.id)
         val erLøpende = erLøpende(fagsak)
         return fagsak.tilDto(
+            behandlinger = behandlinger.map {
+                it.tilDto(fagsak.stønadstype)
+            },
             erLøpende = erLøpende,
         )
     }
