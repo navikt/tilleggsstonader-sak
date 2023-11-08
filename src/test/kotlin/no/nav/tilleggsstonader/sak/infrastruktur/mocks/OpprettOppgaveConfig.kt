@@ -94,6 +94,6 @@ class OpprettOppgaveConfig(
     }
 
     private fun mapBehandlingstema(stønadstype: Stønadstype): Behandlingstema = when (stønadstype) {
-        Stønadstype.BARNETILSYN -> Behandlingstema.Barnetilsyn
+        Stønadstype.BARNETILSYN -> Behandlingstema.TilsynBarn
     }
 }
