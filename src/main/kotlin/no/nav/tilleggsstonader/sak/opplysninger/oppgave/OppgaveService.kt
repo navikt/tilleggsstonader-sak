@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
@@ -99,6 +100,7 @@ class OppgaveService(
         val fagsak = fagsakService.hentFagsakForBehandling(behandlingId)
         val personIdent = fagsak.hentAktivIdent()
         val enhetsnummer = arbeidsfordelingService.hentNavEnhetId(personIdent, oppgavetype)
+
         val opprettOppgave = OpprettOppgaveRequest(
             ident = OppgaveIdentV2(ident = personIdent, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
             tema = Tema.TSO,
@@ -110,6 +112,7 @@ class OppgaveService(
             tilordnetRessurs = tilordnetNavIdent,
             mappeId = mappeId,
             prioritet = prioritet,
+            behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgavetype),
         )
 
         return oppgaveClient.opprettOppgave(opprettOppgave)
