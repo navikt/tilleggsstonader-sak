@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
+import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
 import no.nav.tilleggsstonader.sak.fagsak.dto.FagsakDto
 import no.nav.tilleggsstonader.sak.fagsak.dto.tilDto
@@ -70,19 +71,15 @@ class FagsakService(
             erLøpende = erLøpende,
         )
     }
-    /*
-        fun finnFagsakerForFagsakPersonId(fagsakPersonId: UUID): Fagsaker {
-            val fagsaker = fagsakRepository.findByFagsakPersonId(fagsakPersonId)
-                .map { it.tilFagsakMedPerson() }
-                .associateBy { it.stønadstype }
-            return Fagsaker(
-                overgangsstønad = fagsaker[Stønadstype.OVERGANGSSTØNAD],
-                barnetilsyn = fagsaker[Stønadstype.BARNETILSYN],
-                skolepenger = fagsaker[Stønadstype.SKOLEPENGER],
-            )
-        }
 
-     */
+    fun finnFagsakerForFagsakPersonId(fagsakPersonId: UUID): Fagsaker {
+        val fagsaker = fagsakRepository.findByFagsakPersonId(fagsakPersonId)
+            .map { it.tilFagsakMedPerson() }
+            .associateBy { it.stønadstype }
+        return Fagsaker(
+            barnetilsyn = fagsaker[Stønadstype.BARNETILSYN],
+        )
+    }
 
     fun erLøpende(fagsak: Fagsak): Boolean {
         return fagsakRepository.harLøpendeUtbetaling(fagsak.id)
