@@ -195,7 +195,7 @@ class OppgaveService(
 
     private fun finnBehandlingstema(stønadstype: Stønadstype): Behandlingstema {
         return when (stønadstype) {
-            Stønadstype.BARNETILSYN -> Behandlingstema.Barnetilsyn
+            Stønadstype.BARNETILSYN -> Behandlingstema.TilsynBarn
         }
     }
 
