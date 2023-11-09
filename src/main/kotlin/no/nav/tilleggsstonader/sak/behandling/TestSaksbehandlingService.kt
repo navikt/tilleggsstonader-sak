@@ -13,10 +13,12 @@ import no.nav.tilleggsstonader.sak.vilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.regler.SvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkårsreglerForStønad
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
+@Profile("!prod")
 class TestSaksbehandlingService(
     private val vilkårService: VilkårService,
     private val behandlingService: BehandlingService,
