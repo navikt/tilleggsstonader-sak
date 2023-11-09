@@ -33,4 +33,4 @@ no.nav.security.jwt:
 
 clients:
   familie-dokument:
-    uri: https://familie-dokument.intern.dev.nav.no
+    uri: http://localhost:8082
