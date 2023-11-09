@@ -60,16 +60,18 @@ enum class StegType(
         tillattFor = BehandlerRolle.BESLUTTER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FATTER_VEDTAK),
     ),
-    VENTE_PÅ_STATUS_FRA_IVERKSETT(
+    VENTE_PÅ_STATUS_FRA_UTBETALING(
         rekkefølge = 5,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
+
+    /*
     LAG_SAKSBEHANDLINGSBLANKETT(
         rekkefølge = 6,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
-    ),
+    ),*/
     FERDIGSTILLE_BEHANDLING(
         rekkefølge = 7,
         tillattFor = BehandlerRolle.SYSTEM,
@@ -105,9 +107,12 @@ enum class StegType(
             VILKÅR -> BEREGNE_YTELSE
             BEREGNE_YTELSE -> SEND_TIL_BESLUTTER
             SEND_TIL_BESLUTTER -> BESLUTTE_VEDTAK
-            BESLUTTE_VEDTAK -> VENTE_PÅ_STATUS_FRA_IVERKSETT
-            VENTE_PÅ_STATUS_FRA_IVERKSETT -> LAG_SAKSBEHANDLINGSBLANKETT
+            BESLUTTE_VEDTAK -> VENTE_PÅ_STATUS_FRA_UTBETALING
+            /*
+            VENTE_PÅ_STATUS_FRA_UTBETALING -> LAG_SAKSBEHANDLINGSBLANKETT
             LAG_SAKSBEHANDLINGSBLANKETT -> FERDIGSTILLE_BEHANDLING
+             */
+            VENTE_PÅ_STATUS_FRA_UTBETALING -> FERDIGSTILLE_BEHANDLING
             FERDIGSTILLE_BEHANDLING -> PUBLISER_VEDTAKSHENDELSE
             PUBLISER_VEDTAKSHENDELSE -> BEHANDLING_FERDIGSTILT
             BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
