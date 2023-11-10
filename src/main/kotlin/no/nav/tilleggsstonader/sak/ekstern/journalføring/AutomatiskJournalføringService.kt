@@ -107,15 +107,7 @@ class AutomatiskJournalføringService(
         val allePersonIdenter = personService.hentPersonIdenter(ident).identer()
         val fagsak = fagsakService.finnFagsak(allePersonIdenter, stønadstype)
         val behandlinger = fagsak?.let { behandlingService.hentBehandlinger(fagsak.id) } ?: emptyList()
-        val behandlingstype = utledNesteBehandlingstype(behandlinger)
 
-        return when (behandlingstype) {
-            BehandlingType.FØRSTEGANGSBEHANDLING -> true
-            BehandlingType.REVURDERING -> kanAutomatiskJournalføreRevurdering(behandlinger, fagsak)
-        }
-    }
-
-    private fun kanAutomatiskJournalføreRevurdering(behandlinger: List<Behandling>, fagsak: Fagsak?): Boolean {
         return if (!harÅpenBehandling(behandlinger)) {
             secureLogger.info("Kan automatisk journalføre for fagsak: ${fagsak?.id}")
             true

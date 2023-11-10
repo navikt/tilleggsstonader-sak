@@ -105,7 +105,7 @@ internal class AutomatiskJournalføringServiceTest {
 
     @Test
     internal fun `kan opprette behandling hvis alle behandlinger i ny løsning er henlagt`() {
-        every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling(resultat = BehandlingResultat.HENLAGT))
+        every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling(resultat = BehandlingResultat.HENLAGT, status = BehandlingStatus.FERDIGSTILT))
         val kanOppretteBehandling =
             automatiskJournalføringService.kanOppretteBehandling(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isTrue
