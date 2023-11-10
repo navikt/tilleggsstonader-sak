@@ -4,6 +4,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringRequest
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringResponse
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.FnrUtil.validerIdent
 import org.springframework.http.HttpStatus
@@ -26,8 +27,8 @@ class AutomatiskJournalføringController(private val automatiskJournalføringSer
     fun håndterSøknad(
         @RequestBody request: AutomatiskJournalføringRequest,
     ): AutomatiskJournalføringResponse {
-        if (!SikkerhetContext.kallKommerFraSoknadApi()) {
-            throw Feil(message = "Kallet utføres ikke av en autorisert klient", httpStatus = HttpStatus.UNAUTHORIZED)
+        feilHvisIkke(SikkerhetContext.kallKommerFraSoknadApi(), HttpStatus.UNAUTHORIZED){
+            "Kallet utføres ikke av en autorisert klient"
         }
         validerIdent(request.personIdent)
         return automatiskJournalføringService.håndterSøknad(request)
