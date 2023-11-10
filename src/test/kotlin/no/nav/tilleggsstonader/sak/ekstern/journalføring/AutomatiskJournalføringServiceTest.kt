@@ -126,48 +126,6 @@ internal class AutomatiskJournalføringServiceTest {
     }
 
     @Test
-    internal fun `skal ikke kunne automatisk journalføre hvis journalpostens bruker og personident ikke samsvarer`() {
-        val enAnnenBruker = Bruker(
-            id = personIdentAnnen,
-            type = BrukerIdType.FNR,
-        )
-        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost.copy(bruker = enAnnenBruker)
-        every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
-
-        assertThatThrownBy {
-            automatiskJournalføringService.håndterSøknad(
-                AutomatiskJournalføringRequest(
-                    personIdent,
-                    journalpostId,
-                    Stønadstype.BARNETILSYN,
-                ),
-            )
-        }.hasMessageContaining("Ikke samsvar mellom personident på journalposten")
-    }
-
-    @Test
-    internal fun `skal ikke kunne automatisk journalføre hvis journalpostens aktørId-bruker og personident ikke samsvarer`() {
-        val enAnnenBruker = Bruker(
-            id = aktørIdAnnen,
-            type = BrukerIdType.AKTOERID,
-        )
-        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost.copy(bruker = enAnnenBruker)
-        every { fagsakService.finnFagsak(any(), any()) } returns fagsak
-        every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
-        every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(personIdentAnnen, false)))
-
-        assertThatThrownBy {
-            automatiskJournalføringService.håndterSøknad(
-                AutomatiskJournalføringRequest(
-                    personIdent,
-                    journalpostId,
-                    Stønadstype.BARNETILSYN,
-                ),
-            )
-        }.hasMessageContaining("Ikke samsvar mellom personident på journalposten")
-    }
-
-    @Test
     internal fun `skal ikke kunne automatisk journalføre hvis journalpostens bruker mangler`() {
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost.copy(bruker = null)
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
@@ -183,28 +141,6 @@ internal class AutomatiskJournalføringServiceTest {
                 ),
             )
         }.hasMessageContaining("Journalposten mangler bruker")
-    }
-
-    @Test
-    internal fun `skal ikke kunne automatisk journalføre hvis journalpostens bruker er orgnr`() {
-        val enAnnenBruker = Bruker(
-            id = aktørIdAnnen,
-            type = BrukerIdType.ORGNR,
-        )
-        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost.copy(bruker = enAnnenBruker)
-        every { fagsakService.finnFagsak(any(), any()) } returns fagsak
-        every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
-        every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(aktørId, false)))
-
-        assertThatThrownBy {
-            automatiskJournalføringService.håndterSøknad(
-                AutomatiskJournalføringRequest(
-                    personIdent,
-                    journalpostId,
-                    Stønadstype.BARNETILSYN,
-                ),
-            )
-        }.hasMessageContaining("Ikke samsvar mellom personident på journalposten")
     }
 
     @Test

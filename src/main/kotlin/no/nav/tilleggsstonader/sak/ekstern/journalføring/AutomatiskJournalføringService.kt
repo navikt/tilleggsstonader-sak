@@ -132,12 +132,6 @@ class AutomatiskJournalføringService(
             "Journalposten mangler bruker. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
         }
 
-        journalpost.bruker?.let {
-            feilHvisIkke(fagsakPersonOgJournalpostBrukerErSammePerson(allePersonIdenter, personIdent, it)) {
-                "Ikke samsvar mellom personident på journalposten og personen vi forsøker å opprette behandling for. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
-            }
-        }
-
         feilHvis(journalpost.journalstatus != Journalstatus.MOTTATT) {
             "Journalposten har ugyldig journalstatus ${journalpost.journalstatus}. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
         }
