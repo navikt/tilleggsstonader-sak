@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdataBarn
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagSøknadBarn
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.søknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -20,9 +22,11 @@ internal class VilkårGrunnlagServiceTest {
 
     val grunnlagsdataService = mockk<GrunnlagsdataService>()
     val søknadService = mockk<SøknadService>()
+    val barnService = mockk<BarnService>()
     val service = VilkårGrunnlagService(
         grunnlagsdataService,
         søknadService,
+        barnService,
     )
 
     val behandlingId = UUID.randomUUID()
@@ -31,6 +35,8 @@ internal class VilkårGrunnlagServiceTest {
     fun `skal mappe søknad og grunnlag`() {
         every { grunnlagsdataService.hentFraRegister(behandlingId) } returns grunnlagsdataMedMetadata()
         every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn()
+        every { barnService.finnBarnPåBehandling(any()) } returns
+            listOf(behandlingBarn(personIdent = "1", id = UUID.fromString("60921c76-f8ef-4000-9824-f127a50a575e")))
 
         val data = service.hentGrunnlag(behandlingId)
         assertFileIsEqual("vilkår/vilkårGrunnlagDto.json", data)
@@ -48,6 +54,11 @@ internal class VilkårGrunnlagServiceTest {
             )
             every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn(
                 barn = setOf(lagSøknadBarn(ident = "1")),
+            )
+
+            every { barnService.finnBarnPåBehandling(any()) } returns listOf(
+                behandlingBarn(personIdent = "1"),
+                behandlingBarn(personIdent = "2"),
             )
 
             val data = service.hentGrunnlag(behandlingId)

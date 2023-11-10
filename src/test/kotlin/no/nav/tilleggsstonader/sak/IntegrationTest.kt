@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.Simuleringsresultat
@@ -22,6 +23,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
 import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import org.junit.jupiter.api.AfterEach
@@ -95,6 +97,7 @@ abstract class IntegrationTest {
             TaskLogg::class,
             Task::class,
 
+            VedtakTilsynBarn::class,
             Simuleringsresultat::class,
             TilkjentYtelse::class,
             Vilkår::class,
@@ -103,6 +106,7 @@ abstract class IntegrationTest {
             SøknadBehandling::class,
             SøknadBarnetilsyn::class,
 
+            OppgaveDomain::class,
             Totrinnskontroll::class,
             Vedtaksbrev::class,
             Behandlingshistorikk::class,

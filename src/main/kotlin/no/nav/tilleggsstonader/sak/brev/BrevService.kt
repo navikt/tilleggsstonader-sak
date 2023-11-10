@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
-import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -55,7 +54,6 @@ class BrevService(
             saksbehandlerHtml = saksbehandlerHtml,
             saksbehandlersignatur = saksbehandlersignatur,
             saksbehandlerIdent = SikkerhetContext.hentSaksbehandler(),
-            opprettetTid = SporbarUtils.now(),
         )
 
         return when (vedtaksbrevRepository.existsById(behandlingId)) {

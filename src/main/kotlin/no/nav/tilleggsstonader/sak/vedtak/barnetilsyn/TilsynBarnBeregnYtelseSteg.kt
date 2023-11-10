@@ -1,57 +1,72 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import org.springframework.stereotype.Service
+import java.math.RoundingMode
 import java.time.LocalDate
 
 @Service
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
-    private val repository: TilsynBarnVedtakRepository,
+    private val barnService: BarnService,
+    vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-) : BeregnYtelseSteg<InnvilgelseTilsynBarnDto>(
+) : BeregnYtelseSteg<InnvilgelseTilsynBarnDto, VedtakTilsynBarn>(
     stønadstype = Stønadstype.BARNETILSYN,
+    vedtakRepository = vedtakRepository,
     tilkjentytelseService = tilkjentytelseService,
     simuleringService = simuleringService,
 ) {
 
-    override fun slettVedtak(saksbehandling: Saksbehandling) {
-        repository.deleteById(saksbehandling.id)
-    }
-
-    override fun lagreVedtak(saksbehandling: Saksbehandling, data: InnvilgelseTilsynBarnDto) {
-        val beregningsresultat = tilsynBarnBeregningService.beregn(data)
-        lagreVedtak(data)
-        lagreAndeler(saksbehandling, data, beregningsresultat)
+    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
+        val beregningsresultat = tilsynBarnBeregningService.beregn(vedtak.stønadsperioder, vedtak.utgifter)
+        validerBarnFinnesPåBehandling(saksbehandling, vedtak)
+        vedtakRepository.insert(lagVedtak(saksbehandling, vedtak, beregningsresultat))
+        lagreAndeler(saksbehandling, beregningsresultat)
         /*
         Funksjonalitet som mangler:
          * Avslag
          * Revurdering
          * Opphør
 
-         Teste
-         * At vedtak, TY og simulering slettes når man kaller på denne på nytt
-
          Simulering burde kanskje kun gjøres når man går inn på fanen for simulering,
          og ikke i dette steget for å unngå feil fra simulering
          */
     }
 
+    private fun validerBarnFinnesPåBehandling(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
+        val barnPåBehandling = barnService.finnBarnPåBehandling(saksbehandling.id).map { it.id }.toSet()
+        val barnSomIkkeFinnesPåBehandling = vedtak.utgifter.keys.filter { !barnPåBehandling.contains(it) }
+        feilHvis(barnSomIkkeFinnesPåBehandling.isNotEmpty()) {
+            "Det finnes utgifter på barn som ikke finnes på behandlingen, id=$barnSomIkkeFinnesPåBehandling"
+        }
+    }
+
     private fun lagreAndeler(
         saksbehandling: Saksbehandling,
-        vedtak: InnvilgelseTilsynBarnDto,
         beregningsresultat: BeregningsresultatTilsynBarnDto,
     ) {
-        // Burde vi lagre beløpsperioder? Kan man kanskje lagre det som en del av vedtaket?
-        val andelerTilkjentYtelse = emptyList<AndelTilkjentYtelse>()
+        val andelerTilkjentYtelse = beregningsresultat.perioder.flatMap {
+            it.grunnlag.stønadsperioder.map { stønadsperiode ->
+                AndelTilkjentYtelse(
+                    // TODO hvordan burde vi egentligen gjøre med decimaler?
+                    beløp = it.dagsats.setScale(0, RoundingMode.HALF_UP).toInt(),
+                    stønadFom = stønadsperiode.fom,
+                    stønadTom = stønadsperiode.tom,
+                    kildeBehandlingId = saksbehandling.id,
+                )
+            }
+        }
         tilkjentytelseService.opprettTilkjentYtelse(
             TilkjentYtelse(
                 behandlingId = saksbehandling.id,
@@ -61,10 +76,20 @@ class TilsynBarnBeregnYtelseSteg(
         )
     }
 
-    private fun lagreVedtak(data: InnvilgelseTilsynBarnDto) {
-        // validere at barnen finns på behandlingen
-        val vedtak = VedtakTilsynBarn(data.behandlingId, data.perioder, emptyList())
-        repository.insert(vedtak)
+    private fun lagVedtak(
+        behandling: Saksbehandling,
+        vedtak: InnvilgelseTilsynBarnDto,
+        beregningsresultat: BeregningsresultatTilsynBarnDto,
+    ): VedtakTilsynBarn {
+        return VedtakTilsynBarn(
+            behandlingId = behandling.id,
+            type = TypeVedtak.INNVILGET,
+            vedtak = VedtaksdataTilsynBarn(
+                stønadsperioder = vedtak.stønadsperioder,
+                utgifter = vedtak.utgifter,
+            ),
+            beregningsresultat = VedtaksdataBeregningsresultat(beregningsresultat.perioder),
+        )
     }
 
     /**

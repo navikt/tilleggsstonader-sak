@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -8,10 +8,9 @@ import org.junit.jupiter.api.Test
 internal class VilkårTypeTest {
 
     private val vilkårForBarnetilsyn = listOf(
-        VilkårType.EKSEMPEL,
-        VilkårType.EKSEMPEL2,
         VilkårType.MÅLGRUPPE,
         VilkårType.AKTIVITET,
+        VilkårType.PASS_BARN,
     )
 
     @Test

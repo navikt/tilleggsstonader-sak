@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.domain
 
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.regler.SvarId
@@ -99,13 +99,14 @@ enum class Vilkårsresultat(val beskrivelse: String) {
 }
 
 enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Stønadstype>) {
-    EKSEMPEL("Eksempel", listOf(Stønadstype.BARNETILSYN)),
-    EKSEMPEL2("Eksempel 2", listOf(Stønadstype.BARNETILSYN)),
+    EKSEMPEL("Eksempel", listOf()),
+    EKSEMPEL2("Eksempel 2", listOf()),
     MÅLGRUPPE("Målgruppe", listOf(Stønadstype.BARNETILSYN)),
     AKTIVITET("Aktivitet", listOf(Stønadstype.BARNETILSYN)),
+    PASS_BARN("Pass av barn", listOf(Stønadstype.BARNETILSYN)),
     ;
 
-    fun gjelderFlereBarn(): Boolean = false
+    fun gjelderFlereBarn(): Boolean = this == PASS_BARN
 
     companion object {
 

@@ -1,7 +1,7 @@
 val javaVersion = JavaLanguageVersion.of(17)
 val familieProsesseringVersion = "2.20230926054831_994885a"
-val tilleggsstønaderLibsVersion = "2023.09.14-10.25.400ea92abb53"
-val tilleggsstønaderKontrakterVersion = "2023.09.29-11.29.adc626b7267e"
+val tilleggsstønaderLibsVersion = "2023.10.17-11.20.65cb9a56f6df"
+val tilleggsstønaderKontrakterVersion = "2023.11.08-08.00.f2ea26beb3e8"
 val tokenSupportVersion = "3.1.5"
 val wiremockVersion = "3.2.0"
 val mockkVersion = "1.13.8"
@@ -79,7 +79,9 @@ dependencies {
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
 
     // Test
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(module = "mockito-core")
+    }
     testImplementation("org.junit.platform:junit-platform-suite")
     testImplementation("org.wiremock:wiremock-standalone:$wiremockVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")

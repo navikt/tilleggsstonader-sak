@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -92,7 +92,7 @@ class VilkårService(
         val behandling = behandlingService.hentBehandling(behandlingId)
         val barn = barnService.finnBarnPåBehandling(behandlingId)
         val grunnlag = vilkårGrunnlagService.hentGrunnlag(behandlingId)
-        return Pair(grunnlag, HovedregelMetadata(emptyList(), behandling))
+        return Pair(grunnlag, HovedregelMetadata(barn, behandling))
     }
 
     private fun hentEllerOpprettVilkår(

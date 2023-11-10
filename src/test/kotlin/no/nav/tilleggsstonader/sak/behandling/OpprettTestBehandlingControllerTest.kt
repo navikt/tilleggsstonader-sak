@@ -5,7 +5,10 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
@@ -23,6 +26,16 @@ class OpprettTestBehandlingControllerTest : IntegrationTest() {
 
     @Autowired
     lateinit var søknadService: SøknadService
+
+    @BeforeEach
+    fun setUp() {
+        BrukerContextUtil.mockBrukerContext()
+    }
+
+    @AfterEach
+    override fun tearDown() {
+        BrukerContextUtil.clearBrukerContext()
+    }
 
     @Test
     fun `skal kunne opprette en behandling for barnetilsyn`() {

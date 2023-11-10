@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
@@ -11,7 +13,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.vilkår.domain.Delvilkår
@@ -31,20 +33,25 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-/*
 fun oppgave(
     behandling: Behandling,
     erFerdigstilt: Boolean = false,
     gsakOppgaveId: Long = 123,
     type: Oppgavetype = Oppgavetype.Journalføring,
-): Oppgave =
-    Oppgave(
-        behandlingId = behandling.id,
+): OppgaveDomain = oppgave(behandling.id, erFerdigstilt, gsakOppgaveId, type)
+
+fun oppgave(
+    behandlingId: UUID,
+    erFerdigstilt: Boolean = false,
+    gsakOppgaveId: Long = 123,
+    type: Oppgavetype = Oppgavetype.Journalføring,
+): OppgaveDomain =
+    OppgaveDomain(
+        behandlingId = behandlingId,
         gsakOppgaveId = gsakOppgaveId,
         type = type,
         erFerdigstilt = erFerdigstilt,
     )
- */
 
 fun behandling(
     fagsak: Fagsak = fagsak(),
@@ -145,10 +152,12 @@ fun Behandling.innvilgetOgFerdigstilt() =
     )
 
 fun behandlingBarn(
+    id: UUID = UUID.randomUUID(),
     behandlingId: UUID = UUID.randomUUID(),
     personIdent: String = "1",
     søknadBarnId: UUID? = null,
 ) = BehandlingBarn(
+    id = id,
     behandlingId = behandlingId,
     søknadBarnId = søknadBarnId,
     ident = personIdent,

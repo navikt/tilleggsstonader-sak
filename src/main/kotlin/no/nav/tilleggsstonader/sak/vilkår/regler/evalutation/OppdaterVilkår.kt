@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.regler.evalutation
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
-import no.nav.tilleggsstonader.sak.fagsak.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
@@ -191,7 +191,11 @@ object OppdaterVilkår {
     ): List<Vilkår> {
         return vilkårsreglerForStønad(stønadstype)
             .flatMap { vilkårsregel ->
-                if (vilkårsregel.vilkårType.gjelderFlereBarn() && metadata.barn.isNotEmpty()) {
+                feilHvis(vilkårsregel.vilkårType.gjelderFlereBarn() && metadata.barn.isEmpty()) {
+                    "Kan ikke opprette vilkår når ingen barn er knyttet til behandling $behandlingId"
+                }
+
+                if (vilkårsregel.vilkårType.gjelderFlereBarn()) {
                     metadata.barn.map { lagNyVilkår(vilkårsregel, metadata, behandlingId, it.id) }
                 } else {
                     listOf(lagNyVilkår(vilkårsregel, metadata, behandlingId))

@@ -13,7 +13,9 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
+import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import java.time.LocalDateTime
+import java.time.Year
 
 object SøknadUtil {
 
@@ -40,7 +42,11 @@ object SøknadUtil {
     }
 
     fun barnMedBarnepass(
-        ident: String = "fnr",
+        ident: String = FnrGenerator.generer(
+            Year.now().minusYears(1).value,
+            5,
+            19,
+        ),
         navn: String = "navn",
     ): BarnMedBarnepass = BarnMedBarnepass(
         ident = TekstFelt("", ident),
