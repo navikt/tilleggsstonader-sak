@@ -185,7 +185,7 @@ class AutomatiskJournalføringService(
             BehandlingBarn(
                 behandlingId = behandling.id,
                 ident = it.ident,
-                søknadBarnId = it.id
+                søknadBarnId = it.id,
             )
         } ?: error("Søknad mangler barn")
 

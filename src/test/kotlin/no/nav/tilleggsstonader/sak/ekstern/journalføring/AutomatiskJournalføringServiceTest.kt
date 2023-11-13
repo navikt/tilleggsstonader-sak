@@ -97,7 +97,7 @@ internal class AutomatiskJournalføringServiceTest {
             mottattTidspunkt = LocalDateTime.MIN,
             data = mockk(),
             barn = setOf(SøknadBarn(ident = "ident", data = mockk())),
-            språk = Språkkode.NB
+            språk = Språkkode.NB,
         )
         every { barnService.opprettBarn(any()) } returns mockk()
     }
