@@ -79,8 +79,8 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
             StegType.BESLUTTE_VEDTAK,
             stegUtfall = StegUtfall.BESLUTTE_VEDTAK_GODKJENT,
         )
-        leggInnHistorikk(behandling, "5", LocalDateTime.now().plusDays(4), StegType.VENTE_PÅ_STATUS_FRA_IVERKSETT)
-        leggInnHistorikk(behandling, "6", LocalDateTime.now().plusDays(5), StegType.LAG_SAKSBEHANDLINGSBLANKETT)
+        leggInnHistorikk(behandling, "5", LocalDateTime.now().plusDays(4), StegType.VENTE_PÅ_STATUS_FRA_UTBETALING)
+        // leggInnHistorikk(behandling, "6", LocalDateTime.now().plusDays(5), StegType.LAG_SAKSBEHANDLINGSBLANKETT)
         leggInnHistorikk(behandling, "7", LocalDateTime.now().plusDays(6), StegType.FERDIGSTILLE_BEHANDLING)
         leggInnHistorikk(behandling, "8", LocalDateTime.now().plusDays(7), StegType.PUBLISER_VEDTAKSHENDELSE)
         leggInnHistorikk(behandling, "9", LocalDateTime.now().plusDays(8), StegType.BEHANDLING_FERDIGSTILT)
