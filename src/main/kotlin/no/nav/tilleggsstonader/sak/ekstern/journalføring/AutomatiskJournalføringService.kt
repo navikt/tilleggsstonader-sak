@@ -10,6 +10,8 @@ import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalf�
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringResponse
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -40,6 +42,7 @@ class AutomatiskJournalføringService(
     private val behandlingService: BehandlingService,
     private val søknadService: SøknadService,
     private val taskService: TaskService,
+    private val barnService: BarnService,
     private val grunnlagsdataService: GrunnlagsdataService,
 ) {
 
@@ -178,17 +181,15 @@ class AutomatiskJournalføringService(
           val grunnlagsdata = grunnlagsdataService.opprettGrunlagsdata(behandling.id)
          */
 
-        /* TODO: Opprett barn
-        barnService.opprettBarnPåBehandlingMedSøknadsdata(
-            behandlingId = behandling.id,
-            fagsakId = fagsak.id,
-            grunnlagsdataBarn = grunnlagsdata.grunnlagsdata.barn,
-            stønadstype = fagsak.stønadstype,
-            ustrukturertDokumentasjonType = ustrukturertDokumentasjonType,
-            barnSomSkalFødes = barnSomSkalFødes,
-            vilkårsbehandleNyeBarn = vilkårsbehandleNyeBarn,
-        )
-         */
+        val barn = søknadService.hentSøknadBarnetilsyn(behandling.id)?.barn?.map {
+            BehandlingBarn(
+                behandlingId = behandling.id,
+                ident = it.ident,
+                søknadBarnId = it.id,
+            )
+        } ?: error("Søknad mangler barn")
+
+        barnService.opprettBarn(barn)
 
         return behandling
     }
