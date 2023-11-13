@@ -27,13 +27,15 @@ class BrevService(
 
         val saksbehandlersignatur = SikkerhetContext.hentSaksbehandlerNavn(strict = true)
 
+        val htmlMedSignatur = settInnSaksbehandlerSignatur(html, saksbehandlersignatur)
+
         lagreEllerOppdaterSaksbehandlerVedtaksbrev(
             behandlingId = saksbehandling.id,
             saksbehandlersignatur = saksbehandlersignatur,
-            saksbehandlerHtml = html,
+            saksbehandlerHtml = htmlMedSignatur,
         )
 
-        return familieDokumentClient.genererPdf(html)
+        return familieDokumentClient.genererPdf(htmlMedSignatur)
     }
 
     fun hentBeslutterbrevEllerRekonstruerSaksbehandlerBrev(behandlingId: UUID): ByteArray {
@@ -125,6 +127,14 @@ class BrevService(
         return Fil(familieDokumentClient.genererPdf(htmlMedBeslutterSignatur))
     }
 
+    private fun settInnSaksbehandlerSignatur(html: String, saksbehandlerSignatur: String): String {
+        feilHvisIkke(html.contains(SAKSBEHANDLER_SIGNATUR_PLACEHOLDER)) {
+            "Brev-HTML mangler placeholder for saksbehandlersignatur"
+        }
+
+        return html.replace(SAKSBEHANDLER_SIGNATUR_PLACEHOLDER, saksbehandlerSignatur)
+    }
+
     private fun settInnBeslutterSignaturOgVedtaksdato(html: String, beslutterSignatur: String): String {
         feilHvis(!html.contains(BESLUTTER_SIGNATUR_PLACEHOLDER)) {
             "Brev-HTML mangler placeholder for besluttersignatur"
@@ -151,6 +161,7 @@ class BrevService(
 
     companion object {
 
+        const val SAKSBEHANDLER_SIGNATUR_PLACEHOLDER = "SAKSBEHANDLER_SIGNATUR"
         const val BESLUTTER_SIGNATUR_PLACEHOLDER = "BESLUTTER_SIGNATUR"
         const val BESLUTTER_VEDTAKSDATO_PLACEHOLDER = "BESLUTTER_VEDTAKSDATO"
     }
