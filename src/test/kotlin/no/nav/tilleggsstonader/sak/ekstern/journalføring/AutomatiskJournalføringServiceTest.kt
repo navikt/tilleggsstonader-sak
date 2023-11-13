@@ -9,6 +9,7 @@ import io.mockk.verify
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
+import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
@@ -17,6 +18,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -29,12 +31,15 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 internal class AutomatiskJournalføringServiceTest {
 
@@ -46,6 +51,7 @@ internal class AutomatiskJournalføringServiceTest {
     val grunnlagsdataService: GrunnlagsdataService = mockk()
     val søknadService: SøknadService = mockk()
     val taskService: TaskService = mockk()
+    val barnService: BarnService = mockk()
 
     val automatiskJournalføringService = AutomatiskJournalføringService(
         behandlingService = behandlingService,
@@ -55,6 +61,7 @@ internal class AutomatiskJournalføringServiceTest {
         journalpostService = journalpostService,
         grunnlagsdataService = grunnlagsdataService,
         søknadService = søknadService,
+        barnService = barnService,
         taskService = taskService,
     )
 
@@ -85,6 +92,14 @@ internal class AutomatiskJournalføringServiceTest {
         every { fagsakService.hentEllerOpprettFagsak(any(), any()) } returns fagsak
         every { arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(any()) } returns enhet
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
+        every { søknadService.hentSøknadBarnetilsyn(any()) } returns SøknadBarnetilsyn(
+            journalpostId = "",
+            mottattTidspunkt = LocalDateTime.MIN,
+            data = mockk(),
+            barn = setOf(SøknadBarn(ident = "ident", data = mockk())),
+            språk = Språkkode.NB
+        )
+        every { barnService.opprettBarn(any()) } returns mockk()
     }
 
     @Test
