@@ -30,10 +30,10 @@ internal class FagsakPersonControllerTest : IntegrationTest() {
     @Test
     internal fun `skal finne fagsaker til person`() {
         val person = testoppsettService.opprettPerson("1")
-        val barnetilsyn = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.BARNETILSYN))
+        val tilsynBarn = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.BARNETILSYN))
 
         val fagsakPersonDto = testWithBrukerContext { fagsakPersonController.hentFagsakPersonUtvidet(person.id) }
 
-        assertThat(fagsakPersonDto.barnetilsyn?.id).isEqualTo(barnetilsyn.id)
+        assertThat(fagsakPersonDto.tilsynBarn?.id).isEqualTo(tilsynBarn.id)
     }
 }

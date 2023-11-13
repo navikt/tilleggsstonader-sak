@@ -40,7 +40,7 @@ class FagsakPersonController(
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(person.id)
         return FagsakPersonUtvidetDto(
             person.id,
-            barnetilsyn = fagsaker.barnetilsyn?.let { fagsakService.fagsakTilDto(it) },
+            tilsynBarn = fagsaker.barnetilsyn?.let { fagsakService.fagsakTilDto(it) },
         )
     }
 }

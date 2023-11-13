@@ -4,10 +4,10 @@ import java.util.UUID
 
 class FagsakPersonDto(
     val id: UUID,
-    val barnetilsyn: UUID?,
+    val tilsynBarn: UUID?,
 )
 
 class FagsakPersonUtvidetDto(
     val id: UUID,
-    val barnetilsyn: FagsakDto?,
+    val tilsynBarn: FagsakDto?,
 )
