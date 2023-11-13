@@ -6,9 +6,10 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostResponse
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.log.NavHttpHeaders
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -23,13 +24,18 @@ class JournalpostClient(
     @Qualifier("azure") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
 
-    fun hentJournalpost(journalpostId: String): Journalpost =
-        getForEntity<Journalpost>(journalpostUri.toString(), uriVariables = journalpostIdUriVariables(journalpostId))
-
     private val journalpostUri =
         UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/journalpost").build().toUri()
+
     private val dokarkivUri =
-        UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/dokarkiv").build().toUri()
+        UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/arkiv").build().toUri()
+
+    fun hentJournalpost(journalpostId: String): Journalpost {
+        val uri =
+            UriComponentsBuilder.fromUri(journalpostUri).queryParam("journalpostId", "{journalpostId}").encode().toUriString()
+
+        return getForEntity<Journalpost>(uri, uriVariables = journalpostIdUriVariables(journalpostId))
+    }
 
     fun oppdaterJournalpost(
         oppdaterJournalpostRequest: OppdaterJournalpostRequest,
@@ -47,19 +53,19 @@ class JournalpostClient(
 
     fun ferdigstillJournalpost(journalpostId: String, journalførendeEnhet: String, saksbehandler: String?): OppdaterJournalpostResponse {
         val uri = UriComponentsBuilder.fromUri(dokarkivUri).pathSegment("{journalpostId}", "ferdigstill")
-            .queryParam("journalfoerendeEnhet", { journalførendeEnhet }).encode().toUriString()
+            .queryParam("journalfoerendeEnhet", "{journalfoerendeEnhet}").encode().toUriString()
 
         return putForEntity<OppdaterJournalpostResponse>(
             uri,
             "",
             headerMedSaksbehandler(saksbehandler),
-            journalpostIdUriVariables(journalpostId),
+            journalpostIdUriVariables(journalpostId) + journalførendeEnhetUriVariables(journalførendeEnhet),
         )
     }
 
-    fun hentSøknadTilsynBarn(journalpostId: String, dokumentId: String): SøknadBarnetilsyn {
+    fun hentSøknadTilsynBarn(journalpostId: String, dokumentId: String): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
         val data = getForEntity<ByteArray>(jsonDokumentUri(journalpostId, dokumentId).toString())
-        return objectMapper.readValue<SøknadBarnetilsyn>(data)
+        return objectMapper.readValue(data)
     }
 
     private fun headerMedSaksbehandler(saksbehandler: String?): HttpHeaders {
@@ -80,4 +86,6 @@ class JournalpostClient(
     }
 
     private fun journalpostIdUriVariables(journalpostId: String): Map<String, String> = mapOf("journalpostId" to journalpostId)
+    private fun journalførendeEnhetUriVariables(journalførendeEnhet: String): Map<String, String> =
+        mapOf("journalfoerendeEnhet" to journalførendeEnhet)
 }
