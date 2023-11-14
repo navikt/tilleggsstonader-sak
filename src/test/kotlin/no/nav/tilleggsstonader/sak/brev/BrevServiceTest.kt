@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevService.Companion.BESLUTTER_SIGNATUR_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.brev.BrevService.Companion.BESLUTTER_VEDTAKSDATO_PLACEHOLDER
+import no.nav.tilleggsstonader.sak.brev.BrevService.Companion.SAKSBEHANDLER_SIGNATUR_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -166,6 +167,14 @@ internal class BrevServiceTest {
     )
 
     @Test
+    fun `skal kaste feil hvis saksbehandlerHtml ikke inneholder placeholder for saksbehandlersignatur`() {
+        val feilmelding = catchThrowableOfType<Feil> {
+            brevService.lagSaksbehandlerBrev(saksbehandling(fagsak, behandlingForSaksbehandler), "html uten placeholder")
+        }.message
+        assertThat(feilmelding).isEqualTo("Brev-HTML mangler placeholder for saksbehandlersignatur")
+    }
+
+    @Test
     fun `skal kaste feil hvis saksbehandlerHtml ikke inneholder placeholder for besluttersignatur`() {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(saksbehandlerHtml = "html uten placeholder")
 
@@ -198,7 +207,7 @@ internal class BrevServiceTest {
         every { familieDokumentClient.genererPdf(any()) } returns "123".toByteArray()
 
         val now = SporbarUtils.now()
-        brevService.lagSaksbehandlerBrev(saksbehandling(fagsak, behandling), "html")
+        brevService.lagSaksbehandlerBrev(saksbehandling(fagsak, behandling), "html med $SAKSBEHANDLER_SIGNATUR_PLACEHOLDER")
         assertThat(vedtaksbrevSlot.captured.opprettetTid).isAfterOrEqualTo(now)
     }
 }
