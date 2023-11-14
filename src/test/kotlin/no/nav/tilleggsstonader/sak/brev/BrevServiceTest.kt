@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -142,6 +143,15 @@ internal class BrevServiceTest {
                     "html",
                 )
         }
+    }
+
+    @Test
+    internal fun `hentBesluttetBrev skal feile dersom pdf mangler`() {
+        every { vedtaksbrevRepository.findByIdOrThrow(behandling.id) } returns vedtaksbrev.copy(beslutterPdf = null)
+
+        assertThatThrownBy {
+            brevService.hentBesluttetBrev(behandling.id)
+        }.hasMessage("Fant ikke besluttet pdf")
     }
 
     private val behandlingForBeslutter = behandling(
