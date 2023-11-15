@@ -3,33 +3,23 @@ package no.nav.tilleggsstonader.sak.brev
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import org.springframework.stereotype.Service
 import java.util.Properties
 import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = JournalførVedtaksbrevTask.TYPE,
+    taskStepType = DistribuerVedtaksbrevTask.TYPE,
     maxAntallFeil = 50,
     settTilManuellOppfølgning = true,
     triggerTidVedFeilISekunder = 31L,
-    beskrivelse = "Journalfører vedtaksbrev",
+    beskrivelse = "Distribuerer vedtaksbrev etter journalføring",
 )
-class JournalførVedtaksbrevTask(
-    private val stegService: StegService,
-    private val journalførVedtaksbrevSteg: JournalførVedtaksbrevSteg,
-    private val taskService: TaskService,
-) : AsyncTaskStep {
+class DistribuerVedtaksbrevTask : AsyncTaskStep {
 
     override fun doTask(task: Task) {
         val behandlingId = UUID.fromString(task.payload)
-        stegService.håndterSteg(behandlingId, journalførVedtaksbrevSteg)
-    }
-
-    override fun onCompletion(task: Task) {
-        taskService.save(DistribuerVedtaksbrevTask.opprettTask(UUID.fromString(task.payload)))
+        throw NotImplementedError() // TODO
     }
 
     companion object {
@@ -43,6 +33,6 @@ class JournalførVedtaksbrevTask(
                 },
             )
 
-        const val TYPE = "journalførVedtaksbrev"
+        const val TYPE = "distribuerVedtaksbrev"
     }
 }
