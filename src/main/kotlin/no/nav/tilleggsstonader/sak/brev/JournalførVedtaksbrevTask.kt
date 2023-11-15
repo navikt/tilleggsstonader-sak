@@ -1,37 +1,29 @@
-package no.nav.tilleggsstonader.sak.utbetaling
+package no.nav.tilleggsstonader.sak.brev
 
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
-import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevTask
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.Properties
 import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = PollStatusFraUtbetalingTask.TYPE,
+    taskStepType = JournalførVedtaksbrevTask.TYPE,
     maxAntallFeil = 50,
     settTilManuellOppfølgning = true,
     triggerTidVedFeilISekunder = 31L,
-    beskrivelse = "Sjekker status på utbetaling av behandling.",
+    beskrivelse = "Journalfører vedtaksbrev",
 )
-class PollStatusFraUtbetalingTask(
+class JournalførVedtaksbrevTask(
     private val stegService: StegService,
-    private val ventePåStatusFraUtbetalingSteg: VentePåStatusFraUtbetalingSteg,
-    private val taskService: TaskService,
+    private val journalførVedtaksbrevSteg: JournalførVedtaksbrevSteg,
 ) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
         val behandlingId = UUID.fromString(task.payload)
-        stegService.håndterSteg(behandlingId, ventePåStatusFraUtbetalingSteg)
-    }
-
-    override fun onCompletion(task: Task) {
-        taskService.save(JournalførVedtaksbrevTask.opprettTask(UUID.fromString(task.payload)))
+        stegService.håndterSteg(behandlingId, journalførVedtaksbrevSteg)
     }
 
     companion object {
@@ -43,8 +35,8 @@ class PollStatusFraUtbetalingTask(
                 properties = Properties().apply {
                     setProperty("behandlingId", behandlingId.toString())
                 },
-            ).copy(triggerTid = LocalDateTime.now().plusSeconds(31))
+            )
 
-        const val TYPE = "pollerStatusFraUtbetaling"
+        const val TYPE = "journalførVedtaksbrev"
     }
 }
