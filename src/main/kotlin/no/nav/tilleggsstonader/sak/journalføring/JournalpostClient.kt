@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostResponse
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
@@ -35,6 +37,10 @@ class JournalpostClient(
             UriComponentsBuilder.fromUri(journalpostUri).queryParam("journalpostId", "{journalpostId}").encode().toUriString()
 
         return getForEntity<Journalpost>(uri, uriVariables = journalpostIdUriVariables(journalpostId))
+    }
+
+    fun opprettJournalpost(arkiverDokumentRequest: ArkiverDokumentRequest, saksbehandler: String?): ArkiverDokumentResponse {
+        return postForEntity(dokarkivUri.toString(), arkiverDokumentRequest, headerMedSaksbehandler(saksbehandler))
     }
 
     fun oppdaterJournalpost(
