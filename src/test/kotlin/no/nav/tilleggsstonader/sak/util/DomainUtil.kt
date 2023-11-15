@@ -13,11 +13,14 @@ import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.brev.BrevService
+import no.nav.tilleggsstonader.sak.brev.Vedtaksbrev
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
@@ -288,6 +291,24 @@ fun tilkjentYtelse(
         andelerTilkjentYtelse = andeler,
     )
 }
+
+fun vedtaksbrev(
+    behandlingId: UUID = UUID.randomUUID(),
+    saksbehandlerHtml: String = "Brev med ${BrevService.BESLUTTER_SIGNATUR_PLACEHOLDER} og ${BrevService.BESLUTTER_VEDTAKSDATO_PLACEHOLDER}",
+    saksbehandlersignatur: String = "Saksbehandler Signatur",
+    besluttersignatur: String? = "Beslutter signatur",
+    beslutterPdf: Fil? = Fil("123".toByteArray()),
+    saksbehandlerIdent: String = "saksbehandlerIdent",
+    beslutterIdent: String = "beslutterIdent",
+) = Vedtaksbrev(
+    behandlingId = behandlingId,
+    saksbehandlerHtml = saksbehandlerHtml,
+    saksbehandlersignatur = saksbehandlersignatur,
+    besluttersignatur = besluttersignatur,
+    beslutterPdf = beslutterPdf,
+    saksbehandlerIdent = saksbehandlerIdent,
+    beslutterIdent = beslutterIdent,
+)
 
 /*
 fun vedtak(
