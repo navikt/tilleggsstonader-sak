@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
     id("org.springframework.boot") version "3.1.4"
-    id("io.spring.dependency-management") version "1.1.3"
+    id("io.spring.dependency-management") version "1.1.4"
     kotlin("plugin.spring") version "1.9.10"
 
     id("org.cyclonedx.bom") version "1.7.4"
