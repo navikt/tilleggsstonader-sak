@@ -20,6 +20,7 @@ class JournalførVedtaksbrevSteg(
     private val brevService: BrevService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val journalpostService: JournalpostService,
+    private val journalpostResultatRepository: JournalpostResultatRepository,
 ) : BehandlingSteg<Void?> {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -47,7 +48,15 @@ class JournalførVedtaksbrevSteg(
         )
 
         try {
-            journalpostService.opprettJournalpost(arkviverDokumentRequest)
+            val response = journalpostService.opprettJournalpost(arkviverDokumentRequest)
+
+            journalpostResultatRepository.insert(
+                JournalpostResultat(
+                    behandlingId = saksbehandling.id,
+                    mottakerId = saksbehandling.ident,
+                    journalpostId = response.journalpostId,
+                ),
+            )
         } catch (e: HttpClientErrorException) {
             if (e.statusCode == HttpStatus.CONFLICT) {
                 logger.warn("Konflikt ved arkivering av dokument. Vedtaksbrevet har sannsynligvis allerede blitt arkivert for behandlingId=${saksbehandling.id} med eksternReferanseId=$eksternReferanseId")
