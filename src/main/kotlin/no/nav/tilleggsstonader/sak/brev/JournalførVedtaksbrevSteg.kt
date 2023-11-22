@@ -20,7 +20,7 @@ class JournalførVedtaksbrevSteg(
     private val brevService: BrevService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val journalpostService: JournalpostService,
-    private val journalpostResultatRepository: JournalpostResultatRepository,
+    private val brevmottakerRepository: BrevmottakerRepository,
 ) : BehandlingSteg<Void?> {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -50,10 +50,9 @@ class JournalførVedtaksbrevSteg(
         try {
             val response = journalpostService.opprettJournalpost(arkviverDokumentRequest)
 
-            journalpostResultatRepository.insert(
-                JournalpostResultat(
+            brevmottakerRepository.insert(
+                Brevmottaker(
                     behandlingId = saksbehandling.id,
-                    mottakerId = saksbehandling.ident,
                     journalpostId = response.journalpostId,
                 ),
             )
