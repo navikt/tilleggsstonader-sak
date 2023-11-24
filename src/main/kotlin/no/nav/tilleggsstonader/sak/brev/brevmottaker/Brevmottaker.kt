@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.brev
+package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -11,9 +11,9 @@ data class Brevmottaker(
     val id: UUID = UUID.randomUUID(),
     val behandlingId: UUID,
 
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY, prefix = "person_mottaker")
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "person_mottaker_")
     val personMottaker: BrevmottakerPerson? = null,
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY, prefix = "organisasjon_mottaker")
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "organisasjon_mottaker_")
     val organisasjonMottaker: BrevmottakerOrganisasjon? = null,
 
     val journalpostId: String? = null,
@@ -22,11 +22,11 @@ data class Brevmottaker(
     val sporbar: Sporbar = Sporbar(),
 ) {
     init {
-        feilHvis(personMottaker == null && organisasjonMottaker == null){
+        feilHvis(personMottaker == null && organisasjonMottaker == null) {
             "Ugyldig brevmottaker. personMottaker eller organisasjonMottaker må være satt"
         }
 
-        feilHvis(personMottaker != null && organisasjonMottaker != null){
+        feilHvis(personMottaker != null && organisasjonMottaker != null) {
             "Ugyldig brevmottaker. personMottaker og organisajsonMottaker kan ikke begge være satt"
         }
     }
@@ -38,7 +38,13 @@ enum class MottakerRolle {
     FULLMAKT,
 }
 
-data class BrevmottakerPerson(val personIdent: String, val navn: String, val mottakerRolle: MottakerRolle)
+data class BrevmottakerPerson(val personIdent: String, val navn: String? = null, val mottakerRolle: MottakerRolle) {
+    init {
+        feilHvis(mottakerRolle != MottakerRolle.BRUKER && navn == null) {
+            "Navn for brevmottaker må settes dersom mottaker ikke er bruker"
+        }
+    }
+}
 
 data class BrevmottakerOrganisasjon(
     val organisasjonsnummer: String,
