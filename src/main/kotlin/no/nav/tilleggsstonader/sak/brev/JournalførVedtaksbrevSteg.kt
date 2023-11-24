@@ -9,6 +9,9 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -50,18 +53,25 @@ class JournalførVedtaksbrevSteg(
         try {
             val response = journalpostService.opprettJournalpost(arkviverDokumentRequest)
 
-            brevmottakerRepository.insert(
-                Brevmottaker(
-                    behandlingId = saksbehandling.id,
-                    journalpostId = response.journalpostId,
-                ),
-            )
+            val brevmottaker = hentBrevmottaker(saksbehandling)
+
+            brevmottakerRepository.update(brevmottaker.copy(journalpostId = response.journalpostId))
         } catch (e: HttpClientErrorException) {
             if (e.statusCode == HttpStatus.CONFLICT) {
                 logger.warn("Konflikt ved arkivering av dokument. Vedtaksbrevet har sannsynligvis allerede blitt arkivert for behandlingId=${saksbehandling.id} med eksternReferanseId=$eksternReferanseId")
             } else {
                 throw e
             }
+        }
+    }
+
+    private fun hentBrevmottaker(saksbehandling: Saksbehandling): Brevmottaker {
+        return brevmottakerRepository.findByBehandlingId(saksbehandling.id).let {
+            feilHvis(it.size > 1) {
+                "Støtte for flere brevmottakere er ikke implementert"
+            }
+
+            it.first()
         }
     }
 

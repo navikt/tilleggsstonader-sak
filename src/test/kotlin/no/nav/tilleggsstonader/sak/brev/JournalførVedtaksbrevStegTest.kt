@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.brev
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksbrev
