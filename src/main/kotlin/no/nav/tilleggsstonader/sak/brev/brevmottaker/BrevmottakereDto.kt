@@ -13,7 +13,7 @@ data class BrevmottakerPersonDto(
     val personIdent: String,
     val navn: String? = null,
     val mottakerRolle: MottakerRolle,
-){
+) {
     init {
         feilHvis(mottakerRolle != MottakerRolle.BRUKER && navn == null) {
             "Navn for brevmottaker må settes dersom mottaker ikke er bruker"

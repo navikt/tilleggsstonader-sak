@@ -10,5 +10,4 @@ interface BrevmottakerRepository : RepositoryInterface<Brevmottaker, UUID>, Inse
 
     fun existsByBehandlingId(behandlingId: UUID): Boolean
     fun findByBehandlingId(behandlingId: UUID): List<Brevmottaker>
-
 }
