@@ -48,12 +48,14 @@ class TotrinnskontrollService(
     ): String {
         val sisteTotrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId = saksbehandling.id)
-                ?: totrinnskontrollRepository.insert(Totrinnskontroll(
-                    behandlingId =  saksbehandling.id,
-                    sporbar = Sporbar(opprettetAv =  SikkerhetContext.hentSaksbehandlerEllerSystembruker(), opprettetTid = LocalDateTime.now()),
-                    status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
-                    saksbehandler =  SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-                ))//lagre ned nytt totrinnsobjekt til db.
+                ?: totrinnskontrollRepository.insert(
+                    Totrinnskontroll(
+                        behandlingId = saksbehandling.id,
+                        sporbar = Sporbar(opprettetAv = SikkerhetContext.hentSaksbehandlerEllerSystembruker(), opprettetTid = LocalDateTime.now()),
+                        status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
+                        saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                    ),
+                ) // lagre ned nytt totrinnsobjekt til db.
         if (sisteTotrinnskontroll.status != TotrinnInternStatus.KAN_FATTE_VEDTAK) {
             throw Feil(
                 message = "Siste innslag i behandlingshistorikken har feil status=${sisteTotrinnskontroll.status}",

@@ -60,7 +60,7 @@ internal class TotrinnskontrollServiceTest {
     }
 
     @Test
-    internal fun `skal returnere saksbehandler når totrinnskontroll blir opprettet`(){
+    internal fun `skal returnere saksbehandler når totrinnskontroll blir opprettet`() {
         val opprettetAv = "Behandler"
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns null
         every { totrinnskontrollRepository.insert(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
@@ -71,7 +71,6 @@ internal class TotrinnskontrollServiceTest {
                 BeslutteVedtakDto(true, ""),
             )
         assertThat(response).isEqualTo(opprettetAv)
-
     }
 
     @Test
