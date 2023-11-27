@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
@@ -24,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollSt
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnskontrollDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -46,14 +48,19 @@ class TotrinnskontrollService(
     ): String {
         val sisteTotrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId = saksbehandling.id)
-                ?: error("Finnes ikke eksisterende Tostrinnskontroll på behandling")
+                ?: totrinnskontrollRepository.insert(Totrinnskontroll(
+                    behandlingId =  saksbehandling.id,
+                    sporbar = Sporbar(opprettetAv =  SikkerhetContext.hentSaksbehandlerEllerSystembruker(), opprettetTid = LocalDateTime.now()),
+                    status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
+                    saksbehandler =  SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                ))//lagre ned nytt totrinnsobjekt til db.
         if (sisteTotrinnskontroll.status != TotrinnInternStatus.KAN_FATTE_VEDTAK) {
             throw Feil(
                 message = "Siste innslag i behandlingshistorikken har feil status=${sisteTotrinnskontroll.status}",
                 frontendFeilmelding = "Status for totrinnskontroll er feil, last siden på nytt",
             )
         }
-        // gjer om bør ikkje kaste feil ved at saksbehandler og beslutter er samme, dette må hånteres bedre ovanfor bruker.
+        // gjer om bør ikkje kaste feil ved at saksbehandler og beslutter er samme, dette må håndteres bedre ovanfor bruker.
         if (beslutterErLikBehandler(sisteTotrinnskontroll)) {
             throw Feil(
                 message = "Beslutter som er tilordnet kontrollen er samme som er saksbehandler ${sisteTotrinnskontroll.status}",
@@ -62,7 +69,7 @@ class TotrinnskontrollService(
         }
         // refaktorere til at totrinns er frikobla fra behandlinga
         val nyStatus = if (beslutteVedtak.godkjent) BehandlingStatus.IVERKSETTER_VEDTAK else BehandlingStatus.UTREDES
-        val nyTotrinnsKontrollStatus = if (beslutteVedtak.godkjent) TotrinnInternStatus.GODKJENT else TotrinnInternStatus.UNDERKJENT // rett logikk??
+        val nyTotrinnsKontrollStatus = if (beslutteVedtak.godkjent) TotrinnInternStatus.GODKJENT else TotrinnInternStatus.UNDERKJENT
         val utfall = if (beslutteVedtak.godkjent) StegUtfall.BESLUTTE_VEDTAK_GODKJENT else StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT
 
         behandlingshistorikkService.opprettHistorikkInnslag(

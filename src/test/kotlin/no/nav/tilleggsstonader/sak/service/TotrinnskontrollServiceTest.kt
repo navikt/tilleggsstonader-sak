@@ -60,6 +60,21 @@ internal class TotrinnskontrollServiceTest {
     }
 
     @Test
+    internal fun `skal returnere saksbehandler når totrinnskontroll blir opprettet`(){
+        val opprettetAv = "Behandler"
+        every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns null
+        every { totrinnskontrollRepository.insert(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
+        every { totrinnskontrollRepository.update(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
+        val response = totrinnskontrollService
+            .lagreTotrinnskontrollOgReturnerSaksbehandler(
+                saksbehandling(status = BehandlingStatus.UTREDES),
+                BeslutteVedtakDto(true, ""),
+            )
+        assertThat(response).isEqualTo(opprettetAv)
+
+    }
+
+    @Test
     internal fun `skal utlede saksbehandler som sendte behandling til besluttning`() {
         val opprettetAv = "Behandler"
         every { totrinnskontrollRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(any(), status = TotrinnInternStatus.GODKJENT) } returns
