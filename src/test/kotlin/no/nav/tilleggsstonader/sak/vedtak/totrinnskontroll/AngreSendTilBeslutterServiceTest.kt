@@ -95,7 +95,7 @@ class AngreSendTilBeslutterServiceTest {
         @Test
         fun `skal validere at steget ikke er etter beslutte vedtak`() {
             every { behandlingService.hentSaksbehandling(behandling.id) } returns
-                behandling.copy(steg = StegType.VENTE_PÅ_STATUS_FRA_IVERKSETT)
+                behandling.copy(steg = StegType.VENTE_PÅ_STATUS_FRA_UTBETALING)
 
             assertThat(
                 catchThrowableOfType<Feil> {

@@ -3,8 +3,9 @@ package no.nav.tilleggsstonader.sak.journalføring
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import org.springframework.stereotype.Service
 
 @Service
@@ -62,7 +63,7 @@ class JournalpostService(private val journalpostClient: JournalpostClient) {
         journalpostClient.oppdaterJournalpost(oppdatertJournalpost, journalpost.journalpostId, saksbehandler)
     }
 
-    fun hentSøknadFraJournalpost(søknadJournalpost: Journalpost): SøknadBarnetilsyn {
+    fun hentSøknadFraJournalpost(søknadJournalpost: Journalpost): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
         val dokumentinfo = JournalføringHelper.plukkUtOriginaldokument(søknadJournalpost, DokumentBrevkode.BARNETILSYN)
         return journalpostClient.hentSøknadTilsynBarn(søknadJournalpost.journalpostId, dokumentinfo.dokumentInfoId)
     }

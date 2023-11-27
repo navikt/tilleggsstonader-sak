@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
+import no.nav.tilleggsstonader.sak.utbetaling.PollStatusFraUtbetalingTask
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -59,7 +60,7 @@ class BeslutteVedtakSteg(
             // trenger vi denne? Er det greit hvis vi kun oppdaterer totrinnskontrollen?
             // val iverksettDto = iverksettingDtoMapper.tilDto(saksbehandling, beslutter)
             oppdaterResultatPåBehandling(saksbehandling)
-            // opprettPollForStatusOppgave(saksbehandling.id)
+            opprettPollStatusFraUtbetaling(saksbehandling)
             // opprettTaskForBehandlingsstatistikk(saksbehandling.id, oppgaveId)
             brevService.lagEndeligBeslutterbrev(saksbehandling)
             /*if (saksbehandling.skalIkkeSendeBrev) {
@@ -69,12 +70,16 @@ class BeslutteVedtakSteg(
                 iverksettClient.iverksett(iverksettDto, fil)
             }
              */
-            StegType.VENTE_PÅ_STATUS_FRA_IVERKSETT
+            StegType.VENTE_PÅ_STATUS_FRA_UTBETALING
         } else {
             // validerUnderkjentVedtak(data) // TODO flytt til totrinnskontroll
             opprettBehandleUnderkjentVedtakOppgave(saksbehandling, saksbehandler)
             StegType.SEND_TIL_BESLUTTER
         }
+    }
+
+    private fun opprettPollStatusFraUtbetaling(saksbehandling: Saksbehandling) {
+        taskService.save(PollStatusFraUtbetalingTask.opprettTask(saksbehandling.id))
     }
 
     private fun oppdaterResultatPåBehandling(saksbehandling: Saksbehandling) {
