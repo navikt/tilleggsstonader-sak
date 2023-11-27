@@ -14,7 +14,7 @@ data class Totrinnskontroll(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     val saksbehandler: String,
-    val status: TotrinnsKontrollStatus,
+    val status: TotrinnInternStatus,
     @Column("årsak")
     val årsakerUnderkjent: Årsaker? = null,
     val begrunnelse: String? = null,
@@ -25,7 +25,7 @@ data class Årsaker(
     val årsaker: List<ÅrsakUnderkjent>,
 )
 
-enum class TotrinnsKontrollStatus {
+enum class TotrinnInternStatus {
     UNDERKJENT,
     GODKJENT,
     ANGRET,

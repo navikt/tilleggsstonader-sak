@@ -24,10 +24,11 @@ data class TotrinnskontrollDto(
 
 enum class TotrinnkontrollStatus {
     TOTRINNSKONTROLL_UNDERKJENT,
-    GODKJENNT,
+    GODKJENT,
     KAN_FATTE_VEDTAK,
     IKKE_AUTORISERT,
     UAKTUELT,
+    ANGRET,
 }
 
 enum class ÅrsakUnderkjent {

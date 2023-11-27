@@ -26,7 +26,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
             Totrinnskontroll(
                 behandlingId = behandling.id,
                 saksbehandler = "1",
-                status = TotrinnsKontrollStatus.GODKJENT,
+                status = TotrinnInternStatus.GODKJENT,
             ),
         )
         val totrinnskontrollFraDb = totrinnskontrollRepository.findByIdOrThrow(totrinnskontroll.id)
@@ -42,7 +42,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
             val t = Totrinnskontroll(
                 behandlingId = behandling.id,
                 saksbehandler = "1",
-                status = TotrinnsKontrollStatus.GODKJENT,
+                status = TotrinnInternStatus.GODKJENT,
                 sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
             )
             val totrinnskontrollFirst = lagreOgOppdaterEndretTidTilOpprettetTid(t)
@@ -53,7 +53,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                 Totrinnskontroll(
                     behandlingId = behandling.id,
                     saksbehandler = "2",
-                    status = TotrinnsKontrollStatus.GODKJENT,
+                    status = TotrinnInternStatus.GODKJENT,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
                 ),
             )
@@ -71,7 +71,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                 Totrinnskontroll(
                     behandlingId = behandling.id,
                     saksbehandler = "1",
-                    status = TotrinnsKontrollStatus.GODKJENT,
+                    status = TotrinnInternStatus.GODKJENT,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
                 ),
             )
@@ -79,7 +79,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                 Totrinnskontroll(
                     behandlingId = behandling.id,
                     saksbehandler = "2",
-                    status = TotrinnsKontrollStatus.GODKJENT,
+                    status = TotrinnInternStatus.GODKJENT,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
                 ),
             )
@@ -101,7 +101,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                 Totrinnskontroll(
                     behandlingId = behandlingOne.id,
                     saksbehandler = "1",
-                    status = TotrinnsKontrollStatus.UNDERKJENT,
+                    status = TotrinnInternStatus.UNDERKJENT,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(1)),
                 ),
             )
@@ -110,7 +110,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                 Totrinnskontroll(
                     behandlingId = behandlingOne.id,
                     saksbehandler = "2",
-                    status = TotrinnsKontrollStatus.UNDERKJENT,
+                    status = TotrinnInternStatus.UNDERKJENT,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(3)),
                 ),
             )
@@ -118,7 +118,7 @@ class TostrinnskontrollRepositoryTest : IntegrationTest() {
                 Totrinnskontroll(
                     behandlingId = behandlingOne.id,
                     saksbehandler = "2",
-                    status = TotrinnsKontrollStatus.GODKJENT,
+                    status = TotrinnInternStatus.GODKJENT,
                     sporbar = Sporbar(opprettetTid = SporbarUtils.now().plusDays(2)),
                 ),
             )
