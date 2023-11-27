@@ -32,6 +32,16 @@ internal class FagsakPersonControllerTest : IntegrationTest() {
         val person = testoppsettService.opprettPerson("1")
         val tilsynBarn = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.BARNETILSYN))
 
+        val fagsakPersonDto = testWithBrukerContext { fagsakPersonController.hentFagsakPerson(person.id) }
+
+        assertThat(fagsakPersonDto.tilsynBarn).isEqualTo(tilsynBarn.id)
+    }
+
+    @Test
+    internal fun `skal finne utvidede fagsaker til person`() {
+        val person = testoppsettService.opprettPerson("1")
+        val tilsynBarn = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.BARNETILSYN))
+
         val fagsakPersonDto = testWithBrukerContext { fagsakPersonController.hentFagsakPersonUtvidet(person.id) }
 
         assertThat(fagsakPersonDto.tilsynBarn?.id).isEqualTo(tilsynBarn.id)
