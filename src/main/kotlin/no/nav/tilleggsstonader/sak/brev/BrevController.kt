@@ -44,6 +44,4 @@ class BrevController(private val tilgangService: TilgangService, private val beh
         tilgangService.validerHarBeslutterrolle()
         return Base64.getEncoder().encode(brevService.forhåndsvisBeslutterBrev(saksbehandling))
     }
-
-    data class GenererPdfRequest(val html: String)
 }
