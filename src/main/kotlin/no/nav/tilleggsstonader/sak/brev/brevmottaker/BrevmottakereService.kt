@@ -46,7 +46,7 @@ class BrevmottakereService(
         } else {
             val brevmottaker = opprettBrevmottaker(behandlingId)
 
-            BrevmottakereDto(personer = listOf(brevmottaker.tilPersonDto()), organisasjoner = emptyList())
+            listOf(brevmottaker).tilBrevmottakereDto()
         }
     }
 
