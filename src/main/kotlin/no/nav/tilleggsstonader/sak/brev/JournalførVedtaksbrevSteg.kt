@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.brev
 
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokument
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokumenttype
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Filtype
+import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -11,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import org.slf4j.LoggerFactory
@@ -30,6 +33,7 @@ class JournalførVedtaksbrevSteg(
 
     override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
         val vedtaksbrev = brevService.hentBesluttetBrev(saksbehandling.id)
+        val brevmottaker = hentBrevmottaker(saksbehandling)
 
         val dokument = Dokument(
             dokument = vedtaksbrev.beslutterPdf?.bytes ?: error("Mangler beslutterpdf"),
@@ -48,12 +52,11 @@ class JournalførVedtaksbrevSteg(
             journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(saksbehandling.ident)?.enhetId
                 ?: error("Fant ikke arbeidsfordelingsenhet"),
             eksternReferanseId = eksternReferanseId,
+            avsenderMottaker = lagAvsenderMottaker(brevmottaker),
         )
 
         try {
             val response = journalpostService.opprettJournalpost(arkviverDokumentRequest)
-
-            val brevmottaker = hentBrevmottaker(saksbehandling)
 
             brevmottakerRepository.update(brevmottaker.copy(journalpostId = response.journalpostId))
         } catch (e: HttpClientErrorException) {
@@ -64,6 +67,18 @@ class JournalførVedtaksbrevSteg(
             }
         }
     }
+
+    private fun lagAvsenderMottaker(brevmottaker: Brevmottaker) = AvsenderMottaker(
+        id = brevmottaker.ident,
+        idType = when (brevmottaker.mottakerType) {
+            MottakerType.PERSON -> BrukerIdType.FNR
+            MottakerType.ORGANISASJON -> BrukerIdType.ORGNR
+        },
+        navn = when (brevmottaker.mottakerType) {
+            MottakerType.PERSON -> null
+            MottakerType.ORGANISASJON -> brevmottaker.navnHosOrganisasjon
+        },
+    )
 
     private fun hentBrevmottaker(saksbehandling: Saksbehandling): Brevmottaker {
         return brevmottakerRepository.findByBehandlingId(saksbehandling.id).let {
