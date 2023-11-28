@@ -25,6 +25,10 @@ data class Brevmottaker(
         feilHvis(mottakerType == MottakerType.ORGANISASJON && navnHosOrganisasjon == null) {
             "Navn hos organisasjon er påkrevd"
         }
+
+        feilHvis(mottakerRolle == MottakerRolle.BRUKER && mottakerType == MottakerType.ORGANISASJON) {
+            "Ugyldig kombinasjon av mottakerType og mottakerRolle. Bruker/søker kan ikke være organisasjon."
+        }
     }
 }
 
