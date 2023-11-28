@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -57,6 +58,10 @@ class JournalførVedtaksbrevSteg(
 
         try {
             val response = journalpostService.opprettJournalpost(arkviverDokumentRequest)
+
+            feilHvisIkke(response.ferdigstilt) {
+                "Journalposten ble ikke ferdigstilt og kan derfor ikke distribueres"
+            }
 
             brevmottakerRepository.update(brevmottaker.copy(journalpostId = response.journalpostId))
         } catch (e: HttpClientErrorException) {
