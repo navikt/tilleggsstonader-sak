@@ -44,9 +44,18 @@ class BrevmottakereService(
         return if (brevmottakereRepository.existsByBehandlingId(behandlingId)) {
             brevmottakereRepository.findByBehandlingId(behandlingId).tilBrevmottakereDto()
         } else {
+
+            validerBehandlingKanRedigeres(behandlingId)
+
             val brevmottaker = opprettBrevmottaker(behandlingId)
 
             listOf(brevmottaker).tilBrevmottakereDto()
+        }
+    }
+
+    private fun validerBehandlingKanRedigeres(behandlingId: UUID) {
+        brukerfeilHvis(behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()) {
+            "Kan ikke oppdetere brevmottakere fordi behandling er låst for redigering."
         }
     }
 
