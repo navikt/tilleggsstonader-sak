@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import java.util.UUID
 
 data class BrevmottakereDto(
@@ -11,15 +10,8 @@ data class BrevmottakereDto(
 data class BrevmottakerPersonDto(
     val id: UUID,
     val personIdent: String,
-    val navn: String? = null,
     val mottakerRolle: MottakerRolle,
-) {
-    init {
-        feilHvis(mottakerRolle != MottakerRolle.BRUKER && navn == null) {
-            "Navn for brevmottaker må settes dersom mottaker ikke er bruker"
-        }
-    }
-}
+)
 
 data class BrevmottakerOrganisasjonDto(
     val id: UUID,
@@ -27,3 +19,20 @@ data class BrevmottakerOrganisasjonDto(
     val navnHosOrganisasjon: String,
     val mottakerRolle: MottakerRolle,
 )
+
+fun Brevmottaker.tilPersonDto(): BrevmottakerPersonDto =
+    BrevmottakerPersonDto(id = id, personIdent = ident, mottakerRolle = mottakerRolle)
+
+fun Brevmottaker.tilOrganisasjonDto(): BrevmottakerOrganisasjonDto =
+    BrevmottakerOrganisasjonDto(
+        id = id,
+        organisasjonsnummer = ident,
+        navnHosOrganisasjon = navnHosOrganisasjon ?: error("Navn hos organisasjon er påkrevd"),
+        mottakerRolle = mottakerRolle,
+    )
+
+fun List<Brevmottaker>.tilBrevmottakereDto(): BrevmottakereDto =
+    BrevmottakereDto(
+        personer = this.mapNotNull { if (it.mottakerType == MottakerType.PERSON) it.tilPersonDto() else null },
+        organisasjoner = this.mapNotNull { if (it.mottakerType == MottakerType.ORGANISASJON) it.tilOrganisasjonDto() else null },
+    )
