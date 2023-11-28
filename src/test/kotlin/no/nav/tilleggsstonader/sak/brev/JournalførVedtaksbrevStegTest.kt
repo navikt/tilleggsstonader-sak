@@ -3,7 +3,10 @@ package no.nav.tilleggsstonader.sak.brev
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksbrev
@@ -35,6 +38,14 @@ class JournalførVedtaksbrevStegTest {
         every { brevService.hentBesluttetBrev(saksbehandling.id) } returns vedtaksbrev(behandlingId = saksbehandling.id)
         every { arbeidsfordelingService.hentNavEnhet(any()) } returns ArbeidsfordelingService.ENHET_NASJONAL_NAY
         every { brevmottakerRepository.insert(any()) } returns mockk()
+        every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
+            Brevmottaker(
+                behandlingId = saksbehandling.id,
+                mottakerRolle = MottakerRolle.BRUKER,
+                mottakerType = MottakerType.PERSON,
+                ident = saksbehandling.ident,
+            ),
+        )
     }
 
     @Test
