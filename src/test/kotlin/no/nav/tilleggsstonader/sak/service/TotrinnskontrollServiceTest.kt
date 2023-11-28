@@ -25,8 +25,10 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollSt
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.util.UUID
 
 internal class TotrinnskontrollServiceTest {
@@ -48,9 +50,15 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `skal returnere saksbehandler som sendte behandling til besluttning`() {
         val opprettetAv = "Behandler"
-        every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, status = TotrinnInternStatus.KAN_FATTE_VEDTAK)
-        every { totrinnskontrollRepository.findByIdOrThrow(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, status = TotrinnInternStatus.KAN_FATTE_VEDTAK)
-        every { totrinnskontrollRepository.update(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
+        every {
+            totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
+        } returns totrinnskontroll(opprettetAv = opprettetAv, status = TotrinnInternStatus.KAN_FATTE_VEDTAK)
+        every {
+            totrinnskontrollRepository.findByIdOrThrow(any())
+        } returns totrinnskontroll(opprettetAv = opprettetAv, status = TotrinnInternStatus.KAN_FATTE_VEDTAK)
+        every {
+            totrinnskontrollRepository.update(any())
+        } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
         val response = totrinnskontrollService
             .lagreTotrinnskontrollOgReturnerSaksbehandler(
                 saksbehandling(status = BehandlingStatus.UTREDES),
@@ -60,23 +68,92 @@ internal class TotrinnskontrollServiceTest {
     }
 
     @Test
-    internal fun `skal returnere saksbehandler når totrinnskontroll blir opprettet`() {
+    internal fun `feiler når totrinnskontroll eksisterer og har ikkje underkjent eller angret som status`() {
+        assertThatThrownBy {
+            val opprettetAv = "Behandler"
+            every {
+                totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
+            } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
+            totrinnskontrollService
+                .sendtilBeslutterSteg(
+                    saksbehandling(status = BehandlingStatus.UTREDES),
+                )
+        }
+    }
+
+    @Test
+    internal fun `totrinnskontroll settes til angret fra saksbehandler`() {
+        assertDoesNotThrow("Should not throw an exception") {
+            val opprettetAv = "Behandler"
+            every {
+                totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
+            } returns totrinnskontroll(
+                opprettetAv = opprettetAv,
+                TotrinnInternStatus.KAN_FATTE_VEDTAK,
+            )
+            every {
+                totrinnskontrollRepository.update(any())
+            } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.ANGRET)
+            totrinnskontrollService.angreSendTilBeslutter(UUID.randomUUID())
+        }
+    }
+
+    @Test
+    internal fun `totrinnskontroll skal feile på angre om den ikke har status kan fatte vedtak`() {
+        val result = assertThatThrownBy {
+            val opprettetAv = "Behandler"
+            every {
+                totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
+            } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.UNDERKJENT)
+            totrinnskontrollService.angreSendTilBeslutter(UUID.randomUUID())
+
+            totrinnskontrollService.angreSendTilBeslutter(UUID.randomUUID())
+        }
+        assertThat(result).isNotNull
+    }
+
+    @Test
+    internal fun ` totrinnskontroll eksisterer men har underkjent eller angret som status`() {
+        assertDoesNotThrow("Should not throw an exception") {
+            val opprettetAv = "Behandler"
+            every {
+                totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
+            } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.UNDERKJENT)
+            every {
+                totrinnskontrollRepository.insert(any())
+            } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
+            every {
+                totrinnskontrollRepository.update(any())
+            } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
+            totrinnskontrollService
+                .sendtilBeslutterSteg(
+                    saksbehandling(status = BehandlingStatus.UTREDES),
+                )
+        }
+    }
+
+    @Test
+    internal fun ` totrinnskontroll eksisterer ikke før opprettelse`() {
         val opprettetAv = "Behandler"
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns null
-        every { totrinnskontrollRepository.insert(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
-        every { totrinnskontrollRepository.update(any()) } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
-        val response = totrinnskontrollService
-            .lagreTotrinnskontrollOgReturnerSaksbehandler(
+        every {
+            totrinnskontrollRepository.insert(any())
+        } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
+        every {
+            totrinnskontrollRepository.update(any())
+        } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.KAN_FATTE_VEDTAK)
+        totrinnskontrollService
+            .sendtilBeslutterSteg(
                 saksbehandling(status = BehandlingStatus.UTREDES),
-                BeslutteVedtakDto(true, ""),
             )
-        assertThat(response).isEqualTo(opprettetAv)
     }
 
     @Test
     internal fun `skal utlede saksbehandler som sendte behandling til besluttning`() {
         val opprettetAv = "Behandler"
-        every { totrinnskontrollRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(any(), status = TotrinnInternStatus.GODKJENT) } returns
+        every {
+            totrinnskontrollRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(any(), status = TotrinnInternStatus.GODKJENT)
+        } returns
             totrinnskontroll(opprettetAv, TotrinnInternStatus.GODKJENT)
         val response = totrinnskontrollService
             .hentSaksbehandlerSomSendteTilBeslutter(UUID.randomUUID())
@@ -199,24 +276,6 @@ internal class TotrinnskontrollServiceTest {
     }
 
     @Test
-    internal fun `Skal sette beslutter til totrinnskontroll`() {
-        every { totrinnskontrollRepository.findByIdOrThrow(any()) } returns
-            totrinnskontrollMedbeslutter(
-                opprettetAv = "Noen",
-                status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
-                beslutter = "Beslutter",
-            )
-        every { totrinnskontrollRepository.update(any()) } returns
-            totrinnskontrollMedbeslutter(
-                opprettetAv = "Noen",
-                status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
-                beslutter = "Beslutter",
-            )
-        val totrinnskontroll = totrinnskontrollService.settBeslutterForTotrinnsKontroll(ID, "Beslutter")
-
-        assertThat(totrinnskontroll.beslutter).isEqualTo("Beslutter")
-    }
-
     private fun totrinnskontroll(
         opprettetAv: String,
         status: TotrinnInternStatus,
