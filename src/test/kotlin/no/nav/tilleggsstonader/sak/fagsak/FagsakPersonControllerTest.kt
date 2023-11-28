@@ -24,6 +24,7 @@ internal class FagsakPersonControllerTest : IntegrationTest() {
 
     @AfterEach
     override fun tearDown() {
+        super.tearDown()
         MDC.remove(MDCConstants.MDC_CALL_ID)
     }
 
