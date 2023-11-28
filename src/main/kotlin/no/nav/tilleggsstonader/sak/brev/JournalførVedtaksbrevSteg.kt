@@ -9,6 +9,9 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -20,7 +23,7 @@ class JournalførVedtaksbrevSteg(
     private val brevService: BrevService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val journalpostService: JournalpostService,
-    private val journalpostResultatRepository: JournalpostResultatRepository,
+    private val brevmottakerRepository: BrevmottakerRepository,
 ) : BehandlingSteg<Void?> {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -50,19 +53,25 @@ class JournalførVedtaksbrevSteg(
         try {
             val response = journalpostService.opprettJournalpost(arkviverDokumentRequest)
 
-            journalpostResultatRepository.insert(
-                JournalpostResultat(
-                    behandlingId = saksbehandling.id,
-                    mottakerId = saksbehandling.ident,
-                    journalpostId = response.journalpostId,
-                ),
-            )
+            val brevmottaker = hentBrevmottaker(saksbehandling)
+
+            brevmottakerRepository.update(brevmottaker.copy(journalpostId = response.journalpostId))
         } catch (e: HttpClientErrorException) {
             if (e.statusCode == HttpStatus.CONFLICT) {
                 logger.warn("Konflikt ved arkivering av dokument. Vedtaksbrevet har sannsynligvis allerede blitt arkivert for behandlingId=${saksbehandling.id} med eksternReferanseId=$eksternReferanseId")
             } else {
                 throw e
             }
+        }
+    }
+
+    private fun hentBrevmottaker(saksbehandling: Saksbehandling): Brevmottaker {
+        return brevmottakerRepository.findByBehandlingId(saksbehandling.id).let {
+            feilHvis(it.size > 1) {
+                "Støtte for flere brevmottakere er ikke implementert"
+            }
+
+            it.first()
         }
     }
 

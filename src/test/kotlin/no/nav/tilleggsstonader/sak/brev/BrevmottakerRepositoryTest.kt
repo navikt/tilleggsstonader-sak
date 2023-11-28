@@ -2,6 +2,10 @@ package no.nav.tilleggsstonader.sak.brev
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions
@@ -13,39 +17,40 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.repository.findByIdOrNull
 import java.time.temporal.ChronoUnit
 
-internal class JournalpostResultatRepositoryTest : IntegrationTest() {
+internal class BrevmottakerRepositoryTest : IntegrationTest() {
 
     @Autowired
-    private lateinit var journalpostResultatRepository: JournalpostResultatRepository
+    private lateinit var brevmottakerRepository: BrevmottakerRepository
 
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
 
-    @Test
-    internal fun `lagre og hent journalpostResultat`() {
+    @Test internal fun `lagre og hent brevmottaker`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak))
 
-        val journalpostResultat = JournalpostResultat(
+        val brevmottaker = Brevmottaker(
             behandlingId = behandling.id,
-            mottakerId = fagsak.hentAktivIdent(),
+            ident = fagsak.hentAktivIdent(),
+            mottakerRolle = MottakerRolle.BRUKER,
+            mottakerType = MottakerType.PERSON,
             journalpostId = "123",
             bestillingId = null,
         )
 
-        journalpostResultatRepository.insert(journalpostResultat)
+        brevmottakerRepository.insert(brevmottaker)
 
-        val journalpostResultatFraDb = journalpostResultatRepository.findByIdOrNull(journalpostResultat.id)
+        val journalpostResultatFraDb = brevmottakerRepository.findByIdOrNull(brevmottaker.id)
 
         assertThat(journalpostResultatFraDb).isNotNull
         assertThat(journalpostResultatFraDb).usingRecursiveComparison().ignoringFields("opprettetTid", "sporbar.endret.endretTid")
-            .isEqualTo(journalpostResultat)
+            .isEqualTo(brevmottaker)
         assertThat(journalpostResultatFraDb!!.sporbar.opprettetTid).isCloseTo(
-            journalpostResultat.sporbar.opprettetTid,
+            brevmottaker.sporbar.opprettetTid,
             Assertions.within(1, ChronoUnit.SECONDS),
         )
         assertThat(journalpostResultatFraDb.sporbar.endret.endretTid).isCloseTo(
-            journalpostResultat.sporbar.endret.endretTid,
+            brevmottaker.sporbar.endret.endretTid,
             Assertions.within(1, ChronoUnit.SECONDS),
         )
     }
@@ -55,23 +60,27 @@ internal class JournalpostResultatRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak))
 
-        val journalpostResultat1 = JournalpostResultat(
+        val brevmottaker1 = Brevmottaker(
             behandlingId = behandling.id,
-            mottakerId = fagsak.hentAktivIdent(),
+            ident = "ident",
+            mottakerType = MottakerType.PERSON,
+            mottakerRolle = MottakerRolle.VERGE,
             journalpostId = "123",
             bestillingId = null,
         )
 
-        val journalpostResultat2 = JournalpostResultat(
+        val brevmottaker2 = Brevmottaker(
             behandlingId = behandling.id,
-            mottakerId = fagsak.hentAktivIdent(),
+            ident = "ident",
+            mottakerType = MottakerType.PERSON,
+            mottakerRolle = MottakerRolle.VERGE,
             journalpostId = "123",
             bestillingId = null,
         )
 
-        journalpostResultatRepository.insert(journalpostResultat1)
+        brevmottakerRepository.insert(brevmottaker1)
         assertThatThrownBy {
-            journalpostResultatRepository.insert(journalpostResultat2)
+            brevmottakerRepository.insert(brevmottaker2)
         }.hasCauseInstanceOf(DuplicateKeyException::class.java)
     }
 
@@ -80,35 +89,37 @@ internal class JournalpostResultatRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = behandlingRepository.insert(behandling(fagsak))
 
-        val journalpostResultat = JournalpostResultat(
+        val brevmottaker = Brevmottaker(
             behandlingId = behandling.id,
-            mottakerId = fagsak.hentAktivIdent(),
+            ident = fagsak.hentAktivIdent(),
+            mottakerType = MottakerType.PERSON,
+            mottakerRolle = MottakerRolle.BRUKER,
             journalpostId = "123",
             bestillingId = null,
         )
 
-        val annenMottakerId = "annenMottakerIdent"
-        val journalpostResultatAnnenMottaker = JournalpostResultat(
+        val brevmottakerAnnenMottaker = Brevmottaker(
             behandlingId = behandling.id,
-            mottakerId = annenMottakerId,
+            ident = "ident",
+            mottakerType = MottakerType.PERSON,
+            mottakerRolle = MottakerRolle.VERGE,
             journalpostId = "123",
             bestillingId = null,
         )
 
-        journalpostResultatRepository.insert(journalpostResultat)
-        journalpostResultatRepository.insert(journalpostResultatAnnenMottaker)
+        brevmottakerRepository.insert(brevmottaker)
+        brevmottakerRepository.insert(brevmottakerAnnenMottaker)
 
-        val hentetResultat = journalpostResultatRepository.findByBehandlingIdAndMottakerId(behandling.id, fagsak.hentAktivIdent())
-        val hentetResultatAnnenMottaker =
-            journalpostResultatRepository.findByBehandlingIdAndMottakerId(behandling.id, annenMottakerId)
+        val hentetResultat = brevmottakerRepository.findByIdOrNull(brevmottaker.id)
+        val hentetResultatAnnenMottaker = brevmottakerRepository.findByIdOrNull(brevmottakerAnnenMottaker.id)
 
         assertThat(hentetResultat).isNotNull
         assertThat(hentetResultat).usingRecursiveComparison().ignoringFields("opprettetTid", "sporbar.endret.endretTid")
-            .isEqualTo(journalpostResultat)
+            .isEqualTo(brevmottaker)
 
-        assertThat(hentetResultatAnnenMottaker).isNotNull
+        assertThat(hentetResultat).isNotNull
         assertThat(hentetResultatAnnenMottaker).usingRecursiveComparison()
             .ignoringFields("opprettetTid", "sporbar.endret.endretTid")
-            .isEqualTo(journalpostResultatAnnenMottaker)
+            .isEqualTo(brevmottakerAnnenMottaker)
     }
 }

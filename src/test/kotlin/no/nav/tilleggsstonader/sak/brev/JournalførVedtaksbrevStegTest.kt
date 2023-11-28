@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.brev
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksbrev
@@ -18,13 +19,13 @@ class JournalførVedtaksbrevStegTest {
     val brevService = mockk<BrevService>()
     val arbeidsfordelingService = mockk<ArbeidsfordelingService>()
     val journalpostService = mockk<JournalpostService>()
-    val journalpostResultatRepository = mockk<JournalpostResultatRepository>()
+    val brevmottakerRepository = mockk<BrevmottakerRepository>()
 
     private val journalførVedtaksbrevSteg = JournalførVedtaksbrevSteg(
         brevService,
         arbeidsfordelingService,
         journalpostService,
-        journalpostResultatRepository,
+        brevmottakerRepository,
     )
 
     val saksbehandling = saksbehandling()
@@ -33,7 +34,7 @@ class JournalførVedtaksbrevStegTest {
     fun setUp() {
         every { brevService.hentBesluttetBrev(saksbehandling.id) } returns vedtaksbrev(behandlingId = saksbehandling.id)
         every { arbeidsfordelingService.hentNavEnhet(any()) } returns ArbeidsfordelingService.ENHET_NASJONAL_NAY
-        every { journalpostResultatRepository.insert(any()) } returns mockk()
+        every { brevmottakerRepository.insert(any()) } returns mockk()
     }
 
     @Test
