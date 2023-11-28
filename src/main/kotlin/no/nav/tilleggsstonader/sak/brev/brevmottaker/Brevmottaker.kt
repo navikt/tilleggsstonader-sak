@@ -22,7 +22,7 @@ data class Brevmottaker(
     val sporbar: Sporbar = Sporbar(),
 ) {
     init {
-        feilHvis(mottakerType == MottakerType.ORGANISASJON && navnHosOrganisasjon == null) {
+        feilHvis(mottakerType == MottakerType.ORGANISASJON && navnHosOrganisasjon.isNullOrBlank()) {
             "Navn hos organisasjon er påkrevd"
         }
 
