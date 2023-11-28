@@ -44,7 +44,6 @@ class BrevmottakereService(
         return if (brevmottakereRepository.existsByBehandlingId(behandlingId)) {
             brevmottakereRepository.findByBehandlingId(behandlingId).tilBrevmottakereDto()
         } else {
-
             validerBehandlingKanRedigeres(behandlingId)
 
             val brevmottaker = opprettBrevmottaker(behandlingId)
