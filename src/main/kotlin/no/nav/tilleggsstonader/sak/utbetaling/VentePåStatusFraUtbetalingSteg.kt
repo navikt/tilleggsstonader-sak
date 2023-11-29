@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevTask
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,7 +15,8 @@ class VentePåStatusFraUtbetalingSteg(
 
     override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
         // TODO sjekk status
-        taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
+
+        taskService.save(JournalførVedtaksbrevTask.opprettTask(saksbehandling.id))
     }
 
     override fun stegType(): StegType {

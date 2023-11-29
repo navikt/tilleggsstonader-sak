@@ -30,10 +30,6 @@ class PollStatusFraUtbetalingTask(
         stegService.håndterSteg(behandlingId, ventePåStatusFraUtbetalingSteg)
     }
 
-    override fun onCompletion(task: Task) {
-        taskService.save(JournalførVedtaksbrevTask.opprettTask(UUID.fromString(task.payload)))
-    }
-
     companion object {
 
         fun opprettTask(behandlingId: UUID): Task =
