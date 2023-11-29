@@ -16,6 +16,7 @@ class BrevmottakereService(
 
     @Transactional
     fun lagreBrevmottakere(behandlingId: UUID, brevmottakereDto: BrevmottakereDto) {
+        validerBehandlingKanRedigeres(behandlingId)
         validerAntallBrevmottakere(brevmottakereDto)
         validerUnikeBrevmottakere(brevmottakereDto)
 
