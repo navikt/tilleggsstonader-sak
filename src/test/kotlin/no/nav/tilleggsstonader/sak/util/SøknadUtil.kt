@@ -32,6 +32,7 @@ object SøknadUtil {
                 utdanning = EnumFelt("", JaNei.JA, "", emptyList()),
             ),
             barn = BarnAvsnitt(barnMedBarnepass = barnMedBarnepass),
+            dokumentasjon = emptyList(),
         )
         return Søknadsskjema(
             ident = ident,
