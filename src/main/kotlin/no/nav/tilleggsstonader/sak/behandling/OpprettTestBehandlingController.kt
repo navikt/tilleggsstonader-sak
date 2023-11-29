@@ -97,6 +97,7 @@ class OpprettTestBehandlingController(
             barn = BarnAvsnitt(
                 barnMedBarnepass = barnMedBarnepass,
             ),
+            dokumentasjon = emptyList(),
         )
         val skjema = Søknadsskjema(
             ident = fagsak.hentAktivIdent(),
