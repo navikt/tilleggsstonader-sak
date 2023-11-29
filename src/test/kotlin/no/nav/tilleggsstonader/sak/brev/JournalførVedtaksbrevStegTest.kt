@@ -55,7 +55,7 @@ class JournalførVedtaksbrevStegTest {
 
         assertThatThrownBy {
             journalførVedtaksbrevSteg.utførSteg(saksbehandling, null)
-        }.hasCause(feil.cause)
+        }.isInstanceOf(HttpTimeoutException::class.java)
     }
 
     @Test
