@@ -82,7 +82,7 @@ class JournalpostClient(
         return postForEntity<String>(
             dokarkivUri.toString(),
             request,
-            headerMedSaksbehandler(saksbehandler)
+            headerMedSaksbehandler(saksbehandler),
         )
     }
 
