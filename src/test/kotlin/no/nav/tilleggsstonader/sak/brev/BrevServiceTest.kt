@@ -6,9 +6,9 @@ import io.mockk.slot
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.brev.BrevService.Companion.BESLUTTER_SIGNATUR_PLACEHOLDER
-import no.nav.tilleggsstonader.sak.brev.BrevService.Companion.BESLUTTER_VEDTAKSDATO_PLACEHOLDER
-import no.nav.tilleggsstonader.sak.brev.BrevService.Companion.SAKSBEHANDLER_SIGNATUR_PLACEHOLDER
+import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_SIGNATUR_PLACEHOLDER
+import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_VEDTAKSDATO_PLACEHOLDER
+import no.nav.tilleggsstonader.sak.brev.BrevUtil.SAKSBEHANDLER_SIGNATUR_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
