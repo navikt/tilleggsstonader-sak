@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
@@ -13,6 +15,10 @@ class JournalpostService(private val journalpostClient: JournalpostClient) {
 
     fun hentJournalpost(journalpostId: String): Journalpost {
         return journalpostClient.hentJournalpost(journalpostId)
+    }
+
+    fun opprettJournalpost(arkiverDokumentRequest: ArkiverDokumentRequest, saksbehandler: String? = null): ArkiverDokumentResponse {
+        return journalpostClient.opprettJournalpost(arkiverDokumentRequest, saksbehandler)
     }
 
     fun oppdaterOgFerdigstillJournalpostMaskinelt(

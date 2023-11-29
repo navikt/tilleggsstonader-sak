@@ -161,4 +161,14 @@ class BrevService(
     fun slettVedtaksbrev(saksbehandling: Saksbehandling) {
         vedtaksbrevRepository.deleteById(saksbehandling.id)
     }
+
+    fun hentBesluttetBrev(behandlingId: UUID): Vedtaksbrev {
+        val vedtaksbrev = vedtaksbrevRepository.findByIdOrThrow(behandlingId)
+
+        feilHvis(vedtaksbrev.beslutterPdf == null) {
+            "Fant ikke besluttet pdf"
+        }
+
+        return vedtaksbrev
+    }
 }
