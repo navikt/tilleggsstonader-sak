@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_SIGNATUR_PLACEHOLDER
-import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_VEDTAKSDATO_PLACEHOLDER
+import no.nav.tilleggsstonader.sak.brev.BrevUtil.BREVDATO_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.brev.Vedtaksbrev
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -295,7 +295,7 @@ fun tilkjentYtelse(
 
 fun vedtaksbrev(
     behandlingId: UUID = UUID.randomUUID(),
-    saksbehandlerHtml: String = "Brev med ${BESLUTTER_SIGNATUR_PLACEHOLDER} og ${BESLUTTER_VEDTAKSDATO_PLACEHOLDER}",
+    saksbehandlerHtml: String = "Brev med ${BESLUTTER_SIGNATUR_PLACEHOLDER} og ${BREVDATO_PLACEHOLDER}",
     saksbehandlersignatur: String = "Saksbehandler Signatur",
     besluttersignatur: String? = "Beslutter signatur",
     beslutterPdf: Fil? = Fil("123".toByteArray()),

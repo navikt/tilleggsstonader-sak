@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_SIGNATUR_PLACEHOLDER
-import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_VEDTAKSDATO_PLACEHOLDER
+import no.nav.tilleggsstonader.sak.brev.BrevUtil.BREVDATO_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.SAKSBEHANDLER_SIGNATUR_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
@@ -168,7 +168,7 @@ internal class BrevServiceTest {
 
     private fun lagVedtaksbrev(brevmal: String, saksbehandlerIdent: String = "123") = Vedtaksbrev(
         behandlingId = behandling.id,
-        saksbehandlerHtml = "Brev med $BESLUTTER_SIGNATUR_PLACEHOLDER og $BESLUTTER_VEDTAKSDATO_PLACEHOLDER",
+        saksbehandlerHtml = "Brev med $BESLUTTER_SIGNATUR_PLACEHOLDER og $BREVDATO_PLACEHOLDER",
         saksbehandlersignatur = "Saksbehandler Signatur",
         besluttersignatur = null,
         beslutterPdf = null,
@@ -198,7 +198,7 @@ internal class BrevServiceTest {
     fun `Skal erstatte placeholder med besluttersignatur`() {
         val htmlSlot = slot<String>()
 
-        every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(saksbehandlerHtml = "html med placeholder $BESLUTTER_SIGNATUR_PLACEHOLDER, vedtaksdato $BESLUTTER_VEDTAKSDATO_PLACEHOLDER og en liten avslutning")
+        every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(saksbehandlerHtml = "html med placeholder $BESLUTTER_SIGNATUR_PLACEHOLDER, vedtaksdato $BREVDATO_PLACEHOLDER og en liten avslutning")
         every { vedtaksbrevRepository.update(any()) } returns vedtaksbrev
         every { familieDokumentClient.genererPdf(capture(htmlSlot)) } returns "123".toByteArray()
 
