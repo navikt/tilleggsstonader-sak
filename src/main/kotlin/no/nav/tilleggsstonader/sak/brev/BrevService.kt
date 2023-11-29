@@ -3,6 +3,9 @@ package no.nav.tilleggsstonader.sak.brev
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_SIGNATUR_PLACEHOLDER
+import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_VEDTAKSDATO_PLACEHOLDER
+import no.nav.tilleggsstonader.sak.brev.BrevUtil.SAKSBEHANDLER_SIGNATUR_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
@@ -157,12 +160,5 @@ class BrevService(
 
     fun slettVedtaksbrev(saksbehandling: Saksbehandling) {
         vedtaksbrevRepository.deleteById(saksbehandling.id)
-    }
-
-    companion object {
-
-        const val SAKSBEHANDLER_SIGNATUR_PLACEHOLDER = "SAKSBEHANDLER_SIGNATUR"
-        const val BESLUTTER_SIGNATUR_PLACEHOLDER = "BESLUTTER_SIGNATUR"
-        const val BESLUTTER_VEDTAKSDATO_PLACEHOLDER = "BESLUTTER_VEDTAKSDATO"
     }
 }
