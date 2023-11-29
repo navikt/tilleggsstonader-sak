@@ -38,6 +38,8 @@ class BrevmottakereService(
                 lagreNyBrevmottakerPerson(behandlingId, it)
             }
         }
+
+        fjernMottakereIkkeIDto(brevmottakereDto, behandlingId)
     }
 
     @Transactional
@@ -50,6 +52,17 @@ class BrevmottakereService(
             val brevmottaker = opprettBrevmottaker(behandlingId)
 
             listOf(brevmottaker).tilBrevmottakereDto()
+        }
+    }
+
+    private fun fjernMottakereIkkeIDto(
+        brevmottakereDto: BrevmottakereDto,
+        behandlingId: UUID,
+    ) {
+        brevmottakereDto.personer.map { it.id } + brevmottakereDto.organisasjoner.map { it.id }.let { nyeBrevmottakere ->
+            brevmottakereRepository.findByBehandlingId(behandlingId)
+                .filter { it.id !in nyeBrevmottakere }
+                .forEach { brevmottakereRepository.deleteById(it.id) }
         }
     }
 
