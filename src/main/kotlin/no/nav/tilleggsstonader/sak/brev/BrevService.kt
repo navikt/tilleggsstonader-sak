@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_SIGNATUR_PLACEHOLDER
-import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_VEDTAKSDATO_PLACEHOLDER
+import no.nav.tilleggsstonader.sak.brev.BrevUtil.BREVDATO_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.SAKSBEHANDLER_SIGNATUR_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -143,13 +143,13 @@ class BrevService(
             "Brev-HTML mangler placeholder for besluttersignatur"
         }
 
-        feilHvis(!html.contains(BESLUTTER_VEDTAKSDATO_PLACEHOLDER)) {
+        feilHvis(!html.contains(BREVDATO_PLACEHOLDER)) {
             "Brev-HTML mangler placeholder for vedtaksdato"
         }
 
         return html
             .replace(BESLUTTER_SIGNATUR_PLACEHOLDER, beslutterSignatur)
-            .replace(BESLUTTER_VEDTAKSDATO_PLACEHOLDER, LocalDate.now().norskFormat())
+            .replace(BREVDATO_PLACEHOLDER, LocalDate.now().norskFormat())
     }
 
     private fun validerRedigerbarBehandling(saksbehandling: Saksbehandling) {

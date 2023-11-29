@@ -13,7 +13,7 @@ class FrittståendeBrevService(
     ): ByteArray {
         val signatur = SikkerhetContext.hentSaksbehandlerNavn(strict = true)
 
-        val htmlMedSignatur = BrevUtil.settInnSaksbehandlerSignatur(request.html, signatur)
+        val htmlMedSignatur = BrevUtil.settInnSaksbehandlerSignaturOgDato(request.html, signatur)
 
         return familieDokumentClient.genererPdf(htmlMedSignatur)
     }
