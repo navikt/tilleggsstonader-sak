@@ -34,7 +34,7 @@ class JournalpostClient(
         UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/arkiv").build().toUri()
 
     private val dokdistUri =
-        UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/dokdist").build().toUri()
+        UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/dist").build().toUri()
 
     fun hentJournalpost(journalpostId: String): Journalpost {
         val uri =
@@ -80,7 +80,7 @@ class JournalpostClient(
 
     fun distribuerJournalpost(request: DistribuerJournalpostRequest, saksbehandler: String? = null): String {
         return postForEntity<String>(
-            dokarkivUri.toString(),
+            dokdistUri.toString(),
             request,
             headerMedSaksbehandler(saksbehandler),
         )
