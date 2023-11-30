@@ -44,7 +44,7 @@ class TotrinnskontrollService(
                     eksisterandeTotrinnskontroll?.status == TotrinnInternStatus.UNDERKJENT
                 ),
         ) {
-            "Kan ikke sende til beslutter da det eksisterer ein totrinnskontroll med status= ${eksisterandeTotrinnskontroll?.status} "
+            "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status= ${eksisterandeTotrinnskontroll?.status} "
         }
         totrinnskontrollRepository.insert(
             Totrinnskontroll(
@@ -83,9 +83,19 @@ class TotrinnskontrollService(
         val sisteTotrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId = saksbehandling.id)
                 ?: error("Finnes ikke eksisterende Tostrinnskontroll på behandling")
+        if (sisteTotrinnskontroll.status != TotrinnInternStatus.KAN_FATTE_VEDTAK) {
+            throw Feil(
+                message = "Status for totrinnskontoll er ikke korrekt, status =  ${sisteTotrinnskontroll.status} ",
+                frontendFeilmelding = "Status for totrinnskontoll er ikke korrekt, vennligst last side på nytt ",
 
-        feilHvis((sisteTotrinnskontroll.status != TotrinnInternStatus.KAN_FATTE_VEDTAK || beslutterErLikBehandler(sisteTotrinnskontroll))) {
-            "Totrinnskontroll kan ikke uføres da status"
+            )
+        }
+
+        if (beslutterErLikBehandler(sisteTotrinnskontroll)) {
+            throw Feil(
+                message = "Beslutter er samme som saksbehandler, kan ikkje utføre totrinnskontroll",
+                frontendFeilmelding = "Beslutter er samme som behandler, samme person kan ikkje godkjenne vedtaket",
+            )
         }
         // refaktorere til at totrinns er frikobla fra behandlinga
         val nyStatus = if (beslutteVedtak.godkjent) BehandlingStatus.IVERKSETTER_VEDTAK else BehandlingStatus.UTREDES
@@ -156,7 +166,7 @@ class TotrinnskontrollService(
         if (behandling.steg != StegType.SEND_TIL_BESLUTTER) {
             throw Feil(
                 message = "Totrinnskontroll kan ikke gjennomføres da steg på behandling er feil , steg = ${behandling.steg}",
-                frontendFeilmelding = "Feil i steg, kontakt brukerstøtte id=${behandlingId}",
+                frontendFeilmelding = "Feil i steg, kontakt brukerstøtte id=$behandlingId",
             )
         }
         val totrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)

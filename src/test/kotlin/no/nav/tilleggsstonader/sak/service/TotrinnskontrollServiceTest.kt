@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -83,8 +82,6 @@ internal class TotrinnskontrollServiceTest {
                 saksbehandling(status = BehandlingStatus.UTREDES),
                 BeslutteVedtakDto(true, ""),
             )
-            println(result)
-            println("opprettetAv= " + opprettetAv + "," + "beslutter= " + beslutter)
         }
     }
 
@@ -118,6 +115,7 @@ internal class TotrinnskontrollServiceTest {
         val result = assertThatThrownBy {
             totrinnskontrollService.angreSendTilBeslutter(UUID.randomUUID())
         }
+
         assertThat(result).isNotNull
     }
 
@@ -137,12 +135,13 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun ` totrinnskontroll eksisterer ikke før opprettelse`() {
-        val opprettetAv = "Behandler"
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns null
-        totrinnskontrollService
-            .sendtilBeslutter(
-                saksbehandling(status = BehandlingStatus.UTREDES),
-            )
+        assertDoesNotThrow {
+            totrinnskontrollService
+                .sendtilBeslutter(
+                    saksbehandling(status = BehandlingStatus.UTREDES),
+                )
+        }
     }
 
     @Test
@@ -152,8 +151,10 @@ internal class TotrinnskontrollServiceTest {
             totrinnskontrollRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(any(), status = TotrinnInternStatus.GODKJENT)
         } returns
             totrinnskontroll(opprettetAv, TotrinnInternStatus.GODKJENT)
+
         val response = totrinnskontrollService
             .hentSaksbehandlerSomSendteTilBeslutter(UUID.randomUUID())
+
         assertThat(response).isEqualTo(opprettetAv)
     }
 
@@ -162,6 +163,7 @@ internal class TotrinnskontrollServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FERDIGSTILT)
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
+
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.UAKTUELT)
         assertThat(totrinnskontroll.totrinnskontroll).isNull()
     }
@@ -171,6 +173,7 @@ internal class TotrinnskontrollServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.IVERKSETTER_VEDTAK)
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
+
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.UAKTUELT)
         assertThat(totrinnskontroll.totrinnskontroll).isNull()
     }
@@ -195,6 +198,7 @@ internal class TotrinnskontrollServiceTest {
             )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
+
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
         assertThat(totrinnskontroll.totrinnskontroll?.begrunnelse).isEqualTo("begrunnelse")
     }
@@ -209,6 +213,7 @@ internal class TotrinnskontrollServiceTest {
             )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
+
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
         assertThat(totrinnskontroll.totrinnskontroll).isNull()
     }
@@ -220,15 +225,14 @@ internal class TotrinnskontrollServiceTest {
             totrinnskontrollMedbeslutter(
                 status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
                 opprettetAv = "Beslutter",
-                beslutter = "Beslutter"
+                beslutter = "Beslutter",
 
             )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
+
         assertThat(totrinnskontroll.totrinnskontroll).isNotNull
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.IKKE_AUTORISERT)
-
-
     }
 
     @Test
@@ -242,6 +246,7 @@ internal class TotrinnskontrollServiceTest {
             )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
+
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.IKKE_AUTORISERT)
         assertThat(totrinnskontroll.totrinnskontroll).isNotNull
         verify(exactly = 1) { tilgangService.harTilgangTilRolle(any()) }
@@ -271,6 +276,7 @@ internal class TotrinnskontrollServiceTest {
             )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
+
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
         assertThat(totrinnskontroll.totrinnskontroll?.begrunnelse).isEqualTo("begrunnelse")
         assertThat(totrinnskontroll.totrinnskontroll?.årsakerUnderkjent).containsExactlyInAnyOrder(ÅrsakUnderkjent.INNGANGSVILKÅR_FORUTGÅENDE_MEDLEMSKAP_OPPHOLD, ÅrsakUnderkjent.VEDTAK_OG_BEREGNING)
