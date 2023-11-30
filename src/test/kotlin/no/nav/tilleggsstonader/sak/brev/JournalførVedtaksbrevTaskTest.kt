@@ -35,15 +35,15 @@ class JournalførVedtaksbrevTaskTest {
 
     private val journalførVedtaksbrevTask = JournalførVedtaksbrevTask(
         taskService,
-        behandlingService, brevService,
-        arbeidsfordelingService, journalpostService,
-        brevmottakerRepository
+        behandlingService,
+        brevService,
+        arbeidsfordelingService,
+        journalpostService,
+        brevmottakerRepository,
     )
-
 
     val saksbehandling = saksbehandling()
     val task = Task(JournalførVedtaksbrevTask.TYPE, saksbehandling.id.toString(), Properties())
-
 
     @BeforeEach
     fun setUp() {

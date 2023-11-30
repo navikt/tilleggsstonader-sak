@@ -88,7 +88,6 @@ class JournalførVedtaksbrevTask(
                 throw e
             }
         }
-
     }
 
     private fun lagAvsenderMottaker(brevmottaker: Brevmottaker) = AvsenderMottaker(
