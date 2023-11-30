@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.utbetaling
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
