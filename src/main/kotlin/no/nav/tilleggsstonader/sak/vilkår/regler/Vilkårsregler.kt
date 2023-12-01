@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vilkår.regler
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetRegel
+import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetTiltakRegel
+import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetUtdanningRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeAAPFerdigAvklartRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeAAPRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeRegel
@@ -28,6 +30,8 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
             MålgruppeAAPFerdigAvklartRegel(),
             MålgruppeRegel(),
             AktivitetRegel(),
+            AktivitetTiltakRegel(),
+            AktivitetUtdanningRegel(),
             PassBarnRegel(),
         )
     }

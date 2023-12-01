@@ -14,6 +14,8 @@ enum class RegelId(val beskrivelse: String) {
 
     // AKTIVITET
     ER_AKTIVITET_REGISTRERT("Er bruker registrert med en aktivitet?"),
+    LØNN_GJENNOM_TILTAK("Mottar bruker lønn gjennom tiltak?"),
+    MOTTAR_SYKEPENGER_GJENNOM_AKTIVITET("Mottar bruker sykepenger gjennom aktivitet?"),
 
     // PASSBARN
     DEKKES_UTGIFTER_ANNET_REGELVERK("Dekkes utgifter av annet regelverk?"),
