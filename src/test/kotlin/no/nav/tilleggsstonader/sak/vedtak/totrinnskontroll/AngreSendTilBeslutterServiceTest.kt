@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
@@ -15,6 +16,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.oppgave
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +27,7 @@ class AngreSendTilBeslutterServiceTest {
 
     private val oppgaveService = mockk<OppgaveService>()
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
-    private val totrinnskontrollService = mockk<TotrinnskontrollService>()
+    private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
 
     val service = AngreSendTilBeslutterService(
         oppgaveService = oppgaveService,
@@ -39,6 +41,7 @@ class AngreSendTilBeslutterServiceTest {
     val saksbehandler1 = "saksbehandler1"
     val saksbehandler2 = "saksbehandler2"
     val oppgave = oppgave(behandlingId = behandling.id)
+
 
     @BeforeEach
     fun setUp() {

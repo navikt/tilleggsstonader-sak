@@ -41,15 +41,15 @@ internal class TotrinnskontrollServiceTest {
 
     @BeforeEach
     internal fun setUp() {
-        val opprettetAvStandard = "Behandler2"
+        val opprettetAvStandard = "Behandler"
         every { tilgangService.harTilgangTilRolle(any()) } returns true
         every { tilkjentYtelseRepository.findByBehandlingId(any()) } returns null
         every {
             totrinnskontrollRepository.insert(any())
-        } returns totrinnskontroll(opprettetAv = opprettetAvStandard, TotrinnInternStatus.KAN_FATTE_VEDTAK)
+        } answers  {firstArg()}
         every {
             totrinnskontrollRepository.update(any())
-        } returns totrinnskontroll(opprettetAv = opprettetAvStandard, TotrinnInternStatus.KAN_FATTE_VEDTAK)
+        } answers  {firstArg()}
         every {
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
         } returns totrinnskontroll(opprettetAv = opprettetAvStandard, status = TotrinnInternStatus.KAN_FATTE_VEDTAK)
@@ -72,13 +72,10 @@ internal class TotrinnskontrollServiceTest {
         val beslutter = "Z991234"
 
         every {
-            totrinnskontrollRepository.update(any())
-        } returns totrinnskontrollMedbeslutter(opprettetAv = opprettetAv, beslutter = beslutter, status = TotrinnInternStatus.KAN_FATTE_VEDTAK)
-        every {
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
         } returns totrinnskontrollMedbeslutter(opprettetAv = opprettetAv, beslutter = beslutter, status = TotrinnInternStatus.KAN_FATTE_VEDTAK)
         assertThatThrownBy {
-            val result = totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(
+                totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(
                 saksbehandling(status = BehandlingStatus.UTREDES),
                 BeslutteVedtakDto(true, ""),
             )
@@ -97,10 +94,6 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `totrinnskontroll settes til angret fra saksbehandler`() {
-        val opprettetAv = "Behandler"
-        every {
-            totrinnskontrollRepository.update(any())
-        } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.ANGRET)
         assertDoesNotThrow("Should not throw an exception") {
             totrinnskontrollService.angreSendTilBeslutter(UUID.randomUUID())
         }
