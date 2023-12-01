@@ -24,11 +24,22 @@ internal class FagsakPersonControllerTest : IntegrationTest() {
 
     @AfterEach
     override fun tearDown() {
+        super.tearDown()
         MDC.remove(MDCConstants.MDC_CALL_ID)
     }
 
     @Test
     internal fun `skal finne fagsaker til person`() {
+        val person = testoppsettService.opprettPerson("1")
+        val tilsynBarn = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.BARNETILSYN))
+
+        val fagsakPersonDto = testWithBrukerContext { fagsakPersonController.hentFagsakPerson(person.id) }
+
+        assertThat(fagsakPersonDto.tilsynBarn).isEqualTo(tilsynBarn.id)
+    }
+
+    @Test
+    internal fun `skal finne utvidede fagsaker til person`() {
         val person = testoppsettService.opprettPerson("1")
         val tilsynBarn = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.BARNETILSYN))
 
