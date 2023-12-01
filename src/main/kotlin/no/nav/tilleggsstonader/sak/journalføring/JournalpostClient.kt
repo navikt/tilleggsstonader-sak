@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostResponse
+import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
@@ -31,6 +32,9 @@ class JournalpostClient(
 
     private val dokarkivUri =
         UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/arkiv").build().toUri()
+
+    private val dokdistUri =
+        UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/dist").build().toUri()
 
     fun hentJournalpost(journalpostId: String): Journalpost {
         val uri =
@@ -72,6 +76,14 @@ class JournalpostClient(
     fun hentSøknadTilsynBarn(journalpostId: String, dokumentId: String): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
         val data = getForEntity<ByteArray>(jsonDokumentUri(journalpostId, dokumentId).toString())
         return objectMapper.readValue(data)
+    }
+
+    fun distribuerJournalpost(request: DistribuerJournalpostRequest, saksbehandler: String? = null): String {
+        return postForEntity<String>(
+            dokdistUri.toString(),
+            request,
+            headerMedSaksbehandler(saksbehandler),
+        )
     }
 
     private fun headerMedSaksbehandler(saksbehandler: String?): HttpHeaders {
