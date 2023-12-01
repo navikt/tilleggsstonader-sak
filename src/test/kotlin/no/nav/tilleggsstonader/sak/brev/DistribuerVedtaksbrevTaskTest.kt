@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
+import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
@@ -25,7 +26,8 @@ class DistribuerVedtaksbrevTaskTest {
     val brevSteg = mockk<BrevSteg>()
 
     val saksbehandling = saksbehandling()
-    val distribuerVedtaksbrevTask = DistribuerVedtaksbrevTask(brevmottakerRepository, journalpostClient, stegService, brevSteg)
+    val distribuerVedtaksbrevTask =
+        DistribuerVedtaksbrevTask(brevmottakerRepository, journalpostClient, stegService, brevSteg, TransactionHandler())
     val task = Task(type = DistribuerVedtaksbrevTask.TYPE, payload = saksbehandling.id.toString())
 
     @BeforeEach

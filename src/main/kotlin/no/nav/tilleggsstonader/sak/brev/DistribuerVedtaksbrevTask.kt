@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import org.springframework.stereotype.Service
 import java.util.Properties
@@ -28,6 +29,7 @@ class DistribuerVedtaksbrevTask(
     private val journalpostClient: JournalpostClient,
     private val stegService: StegService,
     private val brevSteg: BrevSteg,
+    private val transactionHandler: TransactionHandler,
 ) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
@@ -42,7 +44,9 @@ class DistribuerVedtaksbrevTask(
             .forEach { brevmottaker ->
                 val bestillingId = distribuerTilBrevmottaker(brevmottaker)
 
-                brevmottakerRepository.update(brevmottaker.copy(bestillingId = bestillingId))
+                transactionHandler.runInNewTransaction {
+                    brevmottakerRepository.update(brevmottaker.copy(bestillingId = bestillingId))
+                }
             }
 
         stegService.håndterSteg(behandlingId, brevSteg)
