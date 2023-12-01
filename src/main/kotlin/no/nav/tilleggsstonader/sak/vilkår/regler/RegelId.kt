@@ -10,6 +10,7 @@ enum class RegelId(val beskrivelse: String) {
 
     // MÅLGRUPPE
     MÅLGRUPPE("Tilhører bruker riktig målgruppe?"),
+    NEDSATT_ARBEIDSEVNE("Har bruker nedsatt arbeidsevne etter §11 A-3?"),
 
     // AKTIVITET
     ER_AKTIVITET_REGISTRERT("Er bruker registrert med en aktivitet?"),
