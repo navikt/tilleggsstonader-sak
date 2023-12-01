@@ -46,10 +46,10 @@ internal class TotrinnskontrollServiceTest {
         every { tilkjentYtelseRepository.findByBehandlingId(any()) } returns null
         every {
             totrinnskontrollRepository.insert(any())
-        } answers  {firstArg()}
+        } answers { firstArg() }
         every {
             totrinnskontrollRepository.update(any())
-        } answers  {firstArg()}
+        } answers { firstArg() }
         every {
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
         } returns totrinnskontroll(opprettetAv = opprettetAvStandard, status = TotrinnInternStatus.KAN_FATTE_VEDTAK)
@@ -75,7 +75,7 @@ internal class TotrinnskontrollServiceTest {
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
         } returns totrinnskontrollMedbeslutter(opprettetAv = opprettetAv, beslutter = beslutter, status = TotrinnInternStatus.KAN_FATTE_VEDTAK)
         assertThatThrownBy {
-                totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(
+            totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(
                 saksbehandling(status = BehandlingStatus.UTREDES),
                 BeslutteVedtakDto(true, ""),
             )
