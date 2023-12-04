@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
@@ -40,8 +39,10 @@ class TotrinnskontrollService(
 
         if (eksisterandeTotrinnskontroll != null) {
             feilHvis(
-                (eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET
-                        || eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT),
+                (
+                    eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET ||
+                        eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
+                    ),
             ) {
                 "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status= ${eksisterandeTotrinnskontroll?.status} "
             }
