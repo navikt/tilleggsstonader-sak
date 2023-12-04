@@ -84,7 +84,7 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `totrinnskontroll eksisterer og har ikkje underkjent eller angret som status`() {
-        assertDoesNotThrow {
+        assertThatThrownBy {
             totrinnskontrollService
                 .sendtilBeslutter(
                     saksbehandling(status = BehandlingStatus.UTREDES),

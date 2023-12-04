@@ -36,20 +36,19 @@ class TotrinnskontrollService(
 ) {
     @Transactional
     fun sendtilBeslutter(saksbehandling: Saksbehandling) {
-        val eksisterandeTotrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(saksbehandling.id)
+        val eksisterandeTotrinnskontroll = totrinnskontrollRepository?.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(saksbehandling.id)
 
-        feilHvis(
-            (
-                eksisterandeTotrinnskontroll?.status == TotrinnInternStatus.ANGRET ||
-                    eksisterandeTotrinnskontroll?.status == TotrinnInternStatus.UNDERKJENT
-                ),
-        ) {
-            "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status= ${eksisterandeTotrinnskontroll?.status} "
+        if (eksisterandeTotrinnskontroll != null) {
+            feilHvis(
+                (eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET
+                        || eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT),
+            ) {
+                "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status= ${eksisterandeTotrinnskontroll?.status} "
+            }
         }
         totrinnskontrollRepository.insert(
             Totrinnskontroll(
                 behandlingId = saksbehandling.id,
-                sporbar = Sporbar(),
                 saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
                 status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
             ),
