@@ -184,12 +184,14 @@ object OppdaterVilkår {
                     it == Vilkårsresultat.SKAL_IKKE_VURDERES
             }
 
+    // TODO rename noe stønadsspesifikt vilkår
     fun opprettNyeVilkår(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
         stønadstype: Stønadstype,
     ): List<Vilkår> {
         return vilkårsreglerForStønad(stønadstype)
+            .filterNot { it.vilkårType.gjelderMålgruppe() || it.vilkårType.gjelderAktivitet() }
             .flatMap { vilkårsregel ->
                 feilHvis(vilkårsregel.vilkårType.gjelderFlereBarn() && metadata.barn.isEmpty()) {
                     "Kan ikke opprette vilkår når ingen barn er knyttet til behandling $behandlingId"
