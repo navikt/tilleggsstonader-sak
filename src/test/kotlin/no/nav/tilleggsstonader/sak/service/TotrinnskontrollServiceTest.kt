@@ -151,7 +151,7 @@ internal class TotrinnskontrollServiceTest {
         assertThat(response).isEqualTo(opprettetAv)
     }
 
-    @Test // behandling skal vere forsatt ein del av prosessen,
+    @Test
     internal fun `skal returnere UAKTUELT når behandlingen FERDIGSTILT`() {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FERDIGSTILT)
 
@@ -219,7 +219,6 @@ internal class TotrinnskontrollServiceTest {
                 status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
                 opprettetAv = "Beslutter",
                 beslutter = "Beslutter",
-
             )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
@@ -285,7 +284,6 @@ internal class TotrinnskontrollServiceTest {
             sporbar = Sporbar(opprettetAv),
             status = status,
             saksbehandler = opprettetAv,
-
         )
 
     private fun totrinnskontrollMedbeslutter(
@@ -299,7 +297,6 @@ internal class TotrinnskontrollServiceTest {
             status = status,
             saksbehandler = opprettetAv,
             beslutter = beslutter,
-
         )
 
     private fun totrinnskontrollMedbeslutterAArsakogBegrunnelse(
@@ -315,7 +312,7 @@ internal class TotrinnskontrollServiceTest {
             saksbehandler = opprettetAv,
             beslutter = beslutter,
             årsakerUnderkjent = Årsaker(listOf(ÅrsakUnderkjent.INNGANGSVILKÅR_FORUTGÅENDE_MEDLEMSKAP_OPPHOLD, ÅrsakUnderkjent.VEDTAK_OG_BEREGNING)),
-            begrunnelse = "begrunnelse",
+            begrunnelse = "begrunnelse underkjent",
         )
 
     private fun behandling(status: BehandlingStatus) = behandling(fagsak, status, steg = StegType.SEND_TIL_BESLUTTER)

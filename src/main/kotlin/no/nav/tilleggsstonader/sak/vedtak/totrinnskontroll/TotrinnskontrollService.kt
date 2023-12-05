@@ -35,7 +35,7 @@ class TotrinnskontrollService(
 ) {
     @Transactional
     fun sendtilBeslutter(saksbehandling: Saksbehandling) {
-        val eksisterandeTotrinnskontroll = totrinnskontrollRepository?.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(saksbehandling.id)
+        val eksisterandeTotrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(saksbehandling.id)
 
         if (eksisterandeTotrinnskontroll != null) {
             feilHvis(
@@ -44,7 +44,7 @@ class TotrinnskontrollService(
                         eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
                     ),
             ) {
-                "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status= ${eksisterandeTotrinnskontroll?.status} "
+                "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status= ${eksisterandeTotrinnskontroll.status} "
             }
         }
         totrinnskontrollRepository.insert(
@@ -59,14 +59,11 @@ class TotrinnskontrollService(
     @Transactional
     fun angreSendTilBeslutter(behandlingId: UUID) {
         val eksisterandeTotrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
-        if (eksisterandeTotrinnskontroll?.status == TotrinnInternStatus.KAN_FATTE_VEDTAK) {
-            oppdaterStatusPåTotrinnskontroll(TotrinnInternStatus.ANGRET, eksisterandeTotrinnskontroll)
-        } else {
-            throw Feil(
-                message = "Totrinnskontroll er ikke i en status der den kan angres ${eksisterandeTotrinnskontroll?.status}",
-                frontendFeilmelding = "Status for totrinnskontroll er feil",
-            )
+
+        feilHvis((eksisterandeTotrinnskontroll == null || eksisterandeTotrinnskontroll?.status != TotrinnInternStatus.KAN_FATTE_VEDTAK)) {
+            "Totrinnskontroll er ikke i en status der den kan angres ${eksisterandeTotrinnskontroll?.status}"
         }
+        oppdaterStatusPåTotrinnskontroll(TotrinnInternStatus.ANGRET, eksisterandeTotrinnskontroll)
     }
 
     /**
@@ -79,7 +76,7 @@ class TotrinnskontrollService(
         beslutteVedtak: BeslutteVedtakDto,
 
     ): String {
-        settBeslutter(SikkerhetContext.hentSaksbehandlerEllerSystembruker(), saksbehandling.id)
+        settBeslutter(saksbehandling.id)
         val sisteTotrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId = saksbehandling.id)
                 ?: error("Finnes ikke eksisterende Tostrinnskontroll på behandling")
@@ -134,6 +131,7 @@ class TotrinnskontrollService(
         val behandling = behandlingService.hentBehandling(behandlingId)
         val behandlingStatus = behandling.status
 
+        // Behandling ligger som et ytre skall for Totrinnskontroll og håndterer statuser før og etter totrinnskontrolls opprettelse og ferdigstillelse
         if (behandlingErGodkjentEllerOpprettet(behandlingStatus)) {
             return StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
         }
@@ -227,7 +225,7 @@ class TotrinnskontrollService(
         )
         return totrinnskontrollRepository.update(gjeldeneTotrinnskontroll.copy(status = status))
     }
-    private fun settBeslutter(beslutter: String, behandlingId: UUID) {
+    private fun settBeslutter(behandlingId: UUID) {
         val totrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
         if (totrinnskontroll != null) {
             totrinnskontrollRepository.update(totrinnskontroll.copy(beslutter = SikkerhetContext.hentSaksbehandlerEllerSystembruker()))
