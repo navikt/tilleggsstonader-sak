@@ -72,7 +72,7 @@ class VilkårService(
     }
 
     @Transactional
-    fun opprettMålgruppe(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): VilkårperiodeDto {
+    fun opprettVilkårperiode(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): VilkårperiodeDto {
         val vilkår = lagNyVilkår(
             vilkårsregel = vilkårsregelForVilkårsperiodeType(opprettVilkårperiode.type),
             metadata = hentGrunnlagOgMetadata(behandlingId).second,
@@ -85,8 +85,8 @@ class VilkårService(
                 vilkårId = vilkår.id,
                 fom = opprettVilkårperiode.fom,
                 tom = opprettVilkårperiode.tom,
-                type = opprettVilkårperiode.type
-            )
+                type = opprettVilkårperiode.type,
+            ),
         )
 
         return vilkårperiode.tilDto(vilkår.tilDto())

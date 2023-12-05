@@ -49,8 +49,8 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                        " svar=$delvilkårJson",
+                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                    " svar=$delvilkårJson",
             )
             throw e
         }
@@ -101,9 +101,8 @@ class VilkårController(
     @PostMapping("{behandlingId}/perioder")
     fun opprettVilkårMedPeriode(
         @PathVariable behandlingId: UUID,
-        @RequestBody opprettVilkårperiode: OpprettVilkårperiode
+        @RequestBody opprettVilkårperiode: OpprettVilkårperiode,
     ): VilkårperiodeDto {
-        return vilkårService.opprettMålgruppe(behandlingId, opprettVilkårperiode)
+        return vilkårService.opprettVilkårperiode(behandlingId, opprettVilkårperiode)
     }
-
 }
