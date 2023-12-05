@@ -32,7 +32,7 @@ object SøknadUtil {
                 utdanning = EnumFelt("", JaNei.JA, "", emptyList()),
             ),
             barn = BarnAvsnitt(barnMedBarnepass = barnMedBarnepass),
-            dokumentasjon = emptyList(), // TODO run hack remove when code is updated
+            dokumentasjon = emptyList(),
         )
         return Søknadsskjema(
             ident = ident,
