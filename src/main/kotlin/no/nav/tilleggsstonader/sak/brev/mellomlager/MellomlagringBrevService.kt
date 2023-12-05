@@ -36,7 +36,7 @@ class MellomlagringBrevService(
     }
 
     fun hentMellomlagretFrittståendeSanitybrev(fagsakId: UUID): MellomlagreBrevDto? =
-        mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarEndretEndretAv(
+        mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(
             fagsakId,
             SikkerhetContext.hentSaksbehandler(),
         )?.let { MellomlagreBrevDto(it.brevverdier, it.brevmal) }
@@ -51,7 +51,7 @@ class MellomlagringBrevService(
     }
 
     fun slettMellomlagretFrittståendeBrev(fagsakId: UUID, saksbehandlerIdent: String) {
-        mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarEndretEndretAv(fagsakId, saksbehandlerIdent)
+        mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsakId, saksbehandlerIdent)
             ?.let { mellomlagerFrittståendeBrevRepository.deleteById(it.id) }
     }
 }

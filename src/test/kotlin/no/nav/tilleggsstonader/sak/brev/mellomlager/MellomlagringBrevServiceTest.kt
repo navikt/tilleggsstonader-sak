@@ -60,7 +60,7 @@ class MellomlagringBrevServiceTest {
             brevmal = mellomlagretBrev.brevmal,
         )
 
-        every { mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarEndretEndretAv(fagsakId, any()) } returns brev
+        every { mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsakId, any()) } returns brev
 
         assertThat(mellomlagringBrevService.hentMellomlagretFrittståendeSanitybrev(fagsakId)).isEqualTo(
             MellomlagreBrevDto(

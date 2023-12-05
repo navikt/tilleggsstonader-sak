@@ -10,5 +10,5 @@ interface MellomlagerFrittståendeBrevRepository :
     RepositoryInterface<MellomlagretFrittståendeBrev, UUID>,
     InsertUpdateRepository<MellomlagretFrittståendeBrev> {
 
-    fun findByFagsakIdAndSporbarEndretEndretAv(fagsakId: UUID, sporbarEndretEndretAv: String): MellomlagretFrittståendeBrev?
+    fun findByFagsakIdAndSporbarOpprettetAv(fagsakId: UUID, sporbarOpprettetAv: String): MellomlagretFrittståendeBrev?
 }

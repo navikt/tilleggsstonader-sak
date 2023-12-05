@@ -48,8 +48,8 @@ internal class MellomlagerFrittståendeBrevRepositoryTest : IntegrationTest() {
 
             mellomlagerFrittståendeBrevRepository.insert(mellomlagretBrev)
             val mellomlagretBrevFraDb =
-                mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarEndretEndretAv(fagsak.id, saksbehandlerIdent)
-            Assertions.assertThat(mellomlagretBrevFraDb)
+                mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsak.id, saksbehandlerIdent)
+            assertThat(mellomlagretBrevFraDb)
                 .usingRecursiveComparison()
                 .ignoringFields("sporbar.endret.endretTid")
                 .isEqualTo(mellomlagretBrev)
