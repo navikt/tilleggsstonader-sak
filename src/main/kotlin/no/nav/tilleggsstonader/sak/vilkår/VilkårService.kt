@@ -92,6 +92,10 @@ class VilkårService(
 
     @Transactional
     fun opprettVilkårperiode(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): VilkårperiodeDto {
+        feilHvis(behandlingErLåstForVidereRedigering(behandlingId)) {
+            "Kan ikke opprette vilkår når behandling er låst for videre redigering"
+        }
+
         val vilkår = lagNyVilkår(
             vilkårsregel = vilkårsregelForVilkårsperiodeType(opprettVilkårperiode.type),
             metadata = hentGrunnlagOgMetadata(behandlingId).second,

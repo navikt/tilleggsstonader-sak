@@ -94,16 +94,21 @@ class VilkårController(
     }
      */
 
-    @GetMapping("{behandlingId}/perioder")
+    @GetMapping("{behandlingId}/periode")
     fun hentMålgrupper(@PathVariable behandlingId: UUID): Vilkårperioder {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+
         return vilkårService.hentVilkårperioder(behandlingId)
     }
 
-    @PostMapping("{behandlingId}/perioder")
+    @PostMapping("{behandlingId}/periode")
     fun opprettVilkårMedPeriode(
         @PathVariable behandlingId: UUID,
         @RequestBody opprettVilkårperiode: OpprettVilkårperiode,
     ): VilkårperiodeDto {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
         return vilkårService.opprettVilkårperiode(behandlingId, opprettVilkårperiode)
     }
 }
