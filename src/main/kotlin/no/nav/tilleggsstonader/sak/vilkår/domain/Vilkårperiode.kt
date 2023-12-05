@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.domain
 
-import no.nav.tilleggsstonader.sak.vilkår.MålgruppeType
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
@@ -14,5 +13,15 @@ data class Vilkårperiode(
     val vilkårId: UUID,
     val fom: LocalDate,
     val tom: LocalDate,
-    val type: MålgruppeType,
+    val type: VilkårperiodeType,
 )
+
+enum class VilkårperiodeType {
+    // MÅLGRUPPE
+    AAP,
+    AAP_FERDIG_AVKLART,
+
+    // AKTIVITET
+    TILTAK,
+    UTDANNING
+}

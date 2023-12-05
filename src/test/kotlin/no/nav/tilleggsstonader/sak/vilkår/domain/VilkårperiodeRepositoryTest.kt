@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vilkår.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -28,7 +27,7 @@ internal class VilkårperiodeRepositoryTest : IntegrationTest() {
                 vilkårId = vilkår.id,
                 fom = LocalDate.now(),
                 tom = LocalDate.now().plusDays(5),
-                type = MålgruppeType.AAP,
+                type = VilkårperiodeType.AAP,
             ),
         )
 
@@ -54,7 +53,7 @@ internal class VilkårperiodeRepositoryTest : IntegrationTest() {
                     vilkårId = vilkårAAP.id,
                     fom = LocalDate.now(),
                     tom = LocalDate.now().plusDays(5),
-                    type = MålgruppeType.AAP,
+                    type = VilkårperiodeType.AAP,
                 ),
             )
 
@@ -63,7 +62,7 @@ internal class VilkårperiodeRepositoryTest : IntegrationTest() {
                     vilkårId = vilkårAAPFerdigAvklart.id,
                     fom = LocalDate.now(),
                     tom = LocalDate.now().plusDays(5),
-                    type = MålgruppeType.AAP_FERDIG_AVKLART,
+                    type = VilkårperiodeType.AAP_FERDIG_AVKLART,
                 ),
             )
 

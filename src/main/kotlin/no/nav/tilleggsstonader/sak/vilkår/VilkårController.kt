@@ -5,10 +5,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårPeriodeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
@@ -93,22 +93,17 @@ class VilkårController(
     }
      */
 
-    @PostMapping("maalgruppe")
-    fun hentMålgrupper(@RequestBody opprettMålgruppe: OpprettMålgruppe): List<VilkårMålgruppeDto> {
+    @GetMapping("{behandlingId}/perioder")
+    fun hentMålgrupper(@PathVariable behandlingId: UUID): List<VilkårPeriodeDto> {
         throw NotImplementedError("")
     }
 
-    @PostMapping("{behandlingId}/maalgruppe")
+    @PostMapping("{behandlingId}/perioder")
     fun opprettVilkårMedPeriode(
         @PathVariable behandlingId: UUID,
-        @RequestBody opprettMålgruppe: OpprettMålgruppe
-    ): VilkårMålgruppeDto {
-        return vilkårService.opprettMålgruppe(behandlingId, opprettMålgruppe)
+        @RequestBody opprettVilkårperiode: OpprettVilkårperiode
+    ): VilkårPeriodeDto {
+        return vilkårService.opprettMålgruppe(behandlingId, opprettVilkårperiode)
     }
 
-}
-
-enum class MålgruppeType {
-    AAP,
-    AAP_FERDIG_AVKLART
 }

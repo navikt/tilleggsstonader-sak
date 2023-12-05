@@ -11,16 +11,19 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårPeriodeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.lagNyVilkår
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
+import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetTiltakRegel
+import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetUtdanningRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeAAPFerdigAvklartRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeAAPRegel
 import org.slf4j.LoggerFactory
@@ -65,23 +68,31 @@ class VilkårService(
         return hentEllerOpprettVilkårsvurdering(behandlingId)
     }
 
-    fun opprettMålgruppe(behandlingId: UUID, opprettMålgruppe: OpprettMålgruppe): VilkårMålgruppeDto {
+    @Transactional
+    fun opprettMålgruppe(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): VilkårPeriodeDto {
+        val nyttVilkår = lagNyVilkår(
+            vilkårsregel = vilkårsregelForVilkårsperiodeType(opprettVilkårperiode.type),
+            metadata = hentGrunnlagOgMetadata(behandlingId).second,
+            behandlingId = behandlingId,
+        )
 
-        return VilkårMålgruppeDto(
+        return VilkårPeriodeDto(
             id = UUID.randomUUID(),
-            type = opprettMålgruppe.type,
-            fom = opprettMålgruppe.fom,
-            tom = opprettMålgruppe.tom,
-            vilkår = lagNyVilkår(
-                vilkårsregel = when (opprettMålgruppe.type) {
-                    MålgruppeType.AAP -> MålgruppeAAPRegel()
-                    MålgruppeType.AAP_FERDIG_AVKLART -> MålgruppeAAPFerdigAvklartRegel()
-                },
-                metadata = hentGrunnlagOgMetadata(behandlingId).second,
-                behandlingId = behandlingId,
-            ).tilDto()
+            type = opprettVilkårperiode.type,
+            fom = opprettVilkårperiode.fom,
+            tom = opprettVilkårperiode.tom,
+            vilkår = nyttVilkår.tilDto()
         )
     }
+
+    private fun vilkårsregelForVilkårsperiodeType(vilkårperiodeType: VilkårperiodeType) =
+        when (vilkårperiodeType) {
+            VilkårperiodeType.AAP -> MålgruppeAAPRegel()
+            VilkårperiodeType.AAP_FERDIG_AVKLART -> MålgruppeAAPFerdigAvklartRegel()
+
+            VilkårperiodeType.TILTAK -> AktivitetTiltakRegel()
+            VilkårperiodeType.UTDANNING -> AktivitetUtdanningRegel()
+        }
 
     fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
         val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
