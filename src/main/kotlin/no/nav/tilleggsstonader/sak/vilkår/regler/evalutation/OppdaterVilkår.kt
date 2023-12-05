@@ -230,7 +230,7 @@ object OppdaterVilkår {
     }
      */
 
-    private fun lagNyVilkår(
+    fun lagNyVilkår(
         vilkårsregel: Vilkårsregel,
         metadata: HovedregelMetadata,
         behandlingId: UUID,

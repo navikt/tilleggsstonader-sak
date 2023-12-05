@@ -5,8 +5,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
@@ -47,8 +49,8 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                    " svar=$delvilkårJson",
+                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
@@ -90,4 +92,23 @@ class VilkårController(
         return vurderingService.hentEllerOpprettVurderinger(request.behandlingId)
     }
      */
+
+    @PostMapping("maalgruppe")
+    fun hentMålgrupper(@RequestBody opprettMålgruppe: OpprettMålgruppe): List<VilkårMålgruppeDto> {
+        throw NotImplementedError("")
+    }
+
+    @PostMapping("{behandlingId}/maalgruppe")
+    fun opprettVilkårMedPeriode(
+        @PathVariable behandlingId: UUID,
+        @RequestBody opprettMålgruppe: OpprettMålgruppe
+    ): VilkårMålgruppeDto {
+        return vilkårService.opprettMålgruppe(behandlingId, opprettMålgruppe)
+    }
+
+}
+
+enum class MålgruppeType {
+    AAP,
+    AAP_FERDIG_AVKLART
 }

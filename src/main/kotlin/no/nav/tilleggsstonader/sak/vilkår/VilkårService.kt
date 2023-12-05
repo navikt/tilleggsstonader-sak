@@ -11,13 +11,18 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår
+import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.lagNyVilkår
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
+import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeAAPFerdigAvklartRegel
+import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeAAPRegel
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -58,6 +63,24 @@ class VilkårService(
             }*/
         }
         return hentEllerOpprettVilkårsvurdering(behandlingId)
+    }
+
+    fun opprettMålgruppe(behandlingId: UUID, opprettMålgruppe: OpprettMålgruppe): VilkårMålgruppeDto {
+
+        return VilkårMålgruppeDto(
+            id = UUID.randomUUID(),
+            type = opprettMålgruppe.type,
+            fom = opprettMålgruppe.fom,
+            tom = opprettMålgruppe.tom,
+            vilkår = lagNyVilkår(
+                vilkårsregel = when (opprettMålgruppe.type) {
+                    MålgruppeType.AAP -> MålgruppeAAPRegel()
+                    MålgruppeType.AAP_FERDIG_AVKLART -> MålgruppeAAPFerdigAvklartRegel()
+                },
+                metadata = hentGrunnlagOgMetadata(behandlingId).second,
+                behandlingId = behandlingId,
+            ).tilDto()
+        )
     }
 
     fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
