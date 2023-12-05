@@ -21,4 +21,6 @@ CREATE TABLE mellomlagret_frittstaende_brev (
     endret_tid    TIMESTAMP(3) NOT NULL
 );
 
+CREATE INDEX ON mellomlagret_frittstaende_brev (fagsak_id);
+
 
