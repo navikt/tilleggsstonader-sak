@@ -53,6 +53,7 @@ internal class TotrinnskontrollServiceTest {
         every {
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
         } returns totrinnskontroll(opprettetAv = opprettetAvStandard, status = TotrinnInternStatus.KAN_FATTE_VEDTAK)
+        every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.UTREDES)
     }
 
     @Test
@@ -173,7 +174,6 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `skal returnere UAKTUELT når behandlingen UTREDES og ikke har noen totrinnshistorikk`() {
-        every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.UTREDES)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns null
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
 
@@ -182,7 +182,6 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `skal returnere TOTRINNSKONTROLL_UNDERKJENT når behandlingen UTREDES og vedtak er underkjent`() {
-        every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.UTREDES)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
             totrinnskontrollMedbeslutterAArsakogBegrunnelse(
                 opprettetAv = "Noe",
@@ -246,7 +245,6 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `skal kaste feil når behandlingstatus er UTREDES og utfall er GODKJENT`() {
-        every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.UTREDES)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
             totrinnskontroll(
                 opprettetAv = "Annen saksbehandler",
@@ -259,7 +257,6 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `skal returnere begrunnelse og årsaker underkjent når vedtak er underkjent`() {
-        every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.UTREDES)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
             totrinnskontrollMedbeslutterAArsakogBegrunnelse(
                 opprettetAv = "Noe",
