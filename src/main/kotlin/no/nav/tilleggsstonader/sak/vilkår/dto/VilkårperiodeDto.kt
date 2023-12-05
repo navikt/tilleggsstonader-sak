@@ -9,7 +9,7 @@ data class VilkårperiodeDto(
     val type: VilkårperiodeType,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val vilkår: VilkårDto
+    val vilkår: VilkårDto,
 ) : Periode<LocalDate>
 
 fun Vilkårperiode.tilDto(vilkår: VilkårDto) =
@@ -17,11 +17,16 @@ fun Vilkårperiode.tilDto(vilkår: VilkårDto) =
         type = this.type,
         fom = this.fom,
         tom = this.tom,
-        vilkår = vilkår
+        vilkår = vilkår,
     )
 
 data class OpprettVilkårperiode(
     val type: VilkårperiodeType,
     override val fom: LocalDate,
-    override val tom: LocalDate
+    override val tom: LocalDate,
 ) : Periode<LocalDate>
+
+data class Vilkårperioder(
+    val målgrupper: List<VilkårperiodeDto>,
+    val aktiviteter: List<VilkårperiodeDto>,
+)

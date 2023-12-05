@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
@@ -70,6 +72,23 @@ class VilkårService(
         }
         return hentEllerOpprettVilkårsvurdering(behandlingId)
     }
+
+    fun hentVilkårperioder(behandlingId: UUID): Vilkårperioder {
+        val vilkår = vilkårRepository.findByBehandlingId(behandlingId)
+        val vilkårsperioder =
+            vilkårperiodeRepository.finnVilkårperioderForBehandling(behandlingId).associateBy { it.vilkårId }
+
+        return Vilkårperioder(
+            målgrupper = finnPerioder(vilkår, vilkårsperioder, VilkårType::gjelderMålgruppe),
+            aktiviteter = finnPerioder(vilkår, vilkårsperioder, VilkårType::gjelderAktivitet),
+        )
+    }
+
+    private fun finnPerioder(
+        vilkår: List<Vilkår>,
+        vilkårsperioder: Map<UUID, Vilkårperiode>,
+        gjelderFilter: (VilkårType) -> Boolean,
+    ) = vilkår.filter { gjelderFilter(it.type) }.map { vilkårsperioder.getValue(it.id).tilDto(it.tilDto()) }
 
     @Transactional
     fun opprettVilkårperiode(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): VilkårperiodeDto {

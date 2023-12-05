@@ -112,6 +112,10 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Støn
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN
 
+    fun gjelderMålgruppe(): Boolean = setOf(MÅLGRUPPE_AAP, MÅLGRUPPE_AAP_FERDIG_AVKLART).contains(this)
+
+    fun gjelderAktivitet(): Boolean = setOf(AKTIVITET_TILTAK, AKTIVITET_UTDANNING).contains(this)
+
     companion object {
 
         fun hentVilkårForStønad(stønadstype: Stønadstype): List<VilkårType> = values().filter {
