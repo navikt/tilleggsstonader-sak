@@ -11,11 +11,13 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårPeriodeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
@@ -36,6 +38,7 @@ class VilkårService(
     private val behandlingService: BehandlingService,
     private val søknadService: SøknadService,
     private val vilkårRepository: VilkårRepository,
+    private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val barnService: BarnService,
     private val vilkårGrunnlagService: VilkårGrunnlagService,
     // private val grunnlagsdataService: GrunnlagsdataService,
@@ -69,20 +72,24 @@ class VilkårService(
     }
 
     @Transactional
-    fun opprettMålgruppe(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): VilkårPeriodeDto {
-        val nyttVilkår = lagNyVilkår(
+    fun opprettMålgruppe(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): VilkårperiodeDto {
+        val vilkår = lagNyVilkår(
             vilkårsregel = vilkårsregelForVilkårsperiodeType(opprettVilkårperiode.type),
             metadata = hentGrunnlagOgMetadata(behandlingId).second,
             behandlingId = behandlingId,
         )
+        vilkårRepository.insert(vilkår)
 
-        return VilkårPeriodeDto(
-            id = UUID.randomUUID(),
-            type = opprettVilkårperiode.type,
-            fom = opprettVilkårperiode.fom,
-            tom = opprettVilkårperiode.tom,
-            vilkår = nyttVilkår.tilDto()
+        val vilkårperiode = vilkårperiodeRepository.insert(
+            Vilkårperiode(
+                vilkårId = vilkår.id,
+                fom = opprettVilkårperiode.fom,
+                tom = opprettVilkårperiode.tom,
+                type = opprettVilkårperiode.type
+            )
         )
+
+        return vilkårperiode.tilDto(vilkår.tilDto())
     }
 
     private fun vilkårsregelForVilkårsperiodeType(vilkårperiodeType: VilkårperiodeType) =

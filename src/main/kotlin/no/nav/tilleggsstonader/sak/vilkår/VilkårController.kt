@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårPeriodeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
@@ -94,7 +94,7 @@ class VilkårController(
      */
 
     @GetMapping("{behandlingId}/perioder")
-    fun hentMålgrupper(@PathVariable behandlingId: UUID): List<VilkårPeriodeDto> {
+    fun hentMålgrupper(@PathVariable behandlingId: UUID): List<VilkårperiodeDto> {
         throw NotImplementedError("")
     }
 
@@ -102,7 +102,7 @@ class VilkårController(
     fun opprettVilkårMedPeriode(
         @PathVariable behandlingId: UUID,
         @RequestBody opprettVilkårperiode: OpprettVilkårperiode
-    ): VilkårPeriodeDto {
+    ): VilkårperiodeDto {
         return vilkårService.opprettMålgruppe(behandlingId, opprettVilkårperiode)
     }
 
