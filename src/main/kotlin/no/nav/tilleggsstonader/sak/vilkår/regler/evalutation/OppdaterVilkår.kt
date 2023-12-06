@@ -191,7 +191,7 @@ object OppdaterVilkår {
         stønadstype: Stønadstype,
     ): List<Vilkår> {
         return vilkårsreglerForStønad(stønadstype)
-            .filterNot { it.vilkårType.gjelderMålgruppe() || it.vilkårType.gjelderAktivitet() }
+            .filterNot { it.vilkårType.gjelderMålgruppeEllerAktivitet() }
             .flatMap { vilkårsregel ->
                 feilHvis(vilkårsregel.vilkårType.gjelderFlereBarn() && metadata.barn.isEmpty()) {
                     "Kan ikke opprette vilkår når ingen barn er knyttet til behandling $behandlingId"

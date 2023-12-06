@@ -94,7 +94,7 @@ class VilkårStegService(
 
     private fun oppdaterStegPåBehandling(saksbehandling: Saksbehandling, vilkårsett: List<Vilkår>) {
         val vilkårsresultat =
-            vilkårsett.filterNot { it.type.gjelderMålgruppe() || it.type.gjelderAktivitet() }.groupBy { it.type }.map {
+            vilkårsett.filterNot { it.type.gjelderMålgruppeEllerAktivitet() }.groupBy { it.type }.map {
                 if (it.key.gjelderFlereBarn()) {
                     utledResultatForVilkårSomGjelderFlereBarn(it.value)
                 } else {

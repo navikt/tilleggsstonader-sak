@@ -21,17 +21,24 @@ class Vilkårsregler private constructor(val vilkårsregler: Map<VilkårType, Vi
     }
 }
 
-private val alleVilkårsregler = Stønadstype.entries.map { vilkårsreglerForStønad(it) }.flatten()
+private val målgrupper = listOf(
+    MålgruppeAAPRegel(),
+    MålgruppeAAPFerdigAvklartRegel(),
+)
+private val aktiviteter = listOf(
+    AktivitetTiltakRegel(),
+    AktivitetUtdanningRegel(),
+)
+
+private val alleVilkårsregler: List<Vilkårsregel> =
+    Stønadstype.entries.map { vilkårsreglerForStønad(it) }.flatten() +
+            målgrupper + aktiviteter // gjelder alle stønader
 
 fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
     when (stønadstype) {
         Stønadstype.BARNETILSYN -> listOf(
-            MålgruppeAAPRegel(),
-            MålgruppeAAPFerdigAvklartRegel(),
             MålgruppeRegel(),
             AktivitetRegel(),
-            AktivitetTiltakRegel(),
-            AktivitetUtdanningRegel(),
             PassBarnRegel(),
         )
     }
