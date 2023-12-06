@@ -18,8 +18,8 @@ class AktivitetTiltakRegel : Vilkårsregel(
             RegelSteg(
                 regelId = RegelId.LØNN_GJENNOM_TILTAK,
                 jaNeiSvarRegel(
-                    hvisJa = SluttSvarRegel.OPPFYLT,
-                    hvisNei = SluttSvarRegel.IKKE_OPPFYLT,
+                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT,
+                    hvisNei = SluttSvarRegel.OPPFYLT,
                 ),
             )
 
@@ -27,8 +27,8 @@ class AktivitetTiltakRegel : Vilkårsregel(
             RegelSteg(
                 regelId = RegelId.MOTTAR_SYKEPENGER_GJENNOM_AKTIVITET,
                 jaNeiSvarRegel(
-                    hvisJa = SluttSvarRegel.OPPFYLT,
-                    hvisNei = SluttSvarRegel.IKKE_OPPFYLT,
+                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT,
+                    hvisNei = SluttSvarRegel.OPPFYLT,
                 ),
             )
     }
