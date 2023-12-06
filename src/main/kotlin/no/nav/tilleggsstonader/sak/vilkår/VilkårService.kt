@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår
-import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.lagNyVilkår
+import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.lagNyttVilkår
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetTiltakRegel
 import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetUtdanningRegel
@@ -96,7 +96,7 @@ class VilkårService(
             "Kan ikke opprette vilkår når behandling er låst for videre redigering"
         }
 
-        val vilkår = lagNyVilkår(
+        val vilkår = lagNyttVilkår(
             vilkårsregel = vilkårsregelForVilkårsperiodeType(opprettVilkårperiode.type),
             metadata = hentGrunnlagOgMetadata(behandlingId).second,
             behandlingId = behandlingId,

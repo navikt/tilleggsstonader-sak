@@ -198,9 +198,9 @@ object OppdaterVilkår {
                 }
 
                 if (vilkårsregel.vilkårType.gjelderFlereBarn()) {
-                    metadata.barn.map { lagNyVilkår(vilkårsregel, metadata, behandlingId, it.id) }
+                    metadata.barn.map { lagNyttVilkår(vilkårsregel, metadata, behandlingId, it.id) }
                 } else {
-                    listOf(lagNyVilkår(vilkårsregel, metadata, behandlingId))
+                    listOf(lagNyttVilkår(vilkårsregel, metadata, behandlingId))
                 }
             }
     }
@@ -232,7 +232,7 @@ object OppdaterVilkår {
     }
      */
 
-    fun lagNyVilkår(
+    fun lagNyttVilkår(
         vilkårsregel: Vilkårsregel,
         metadata: HovedregelMetadata,
         behandlingId: UUID,
