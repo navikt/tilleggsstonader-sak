@@ -1,7 +1,11 @@
-CREATE TABLE vilkar_periode
+CREATE TABLE stonadsperiode
 (
-    vilkar_id UUID    NOT NULL PRIMARY KEY REFERENCES vilkar (id),
-    fom       DATE    NOT NULL,
-    tom       DATE    NOT NULL,
-    type      VARCHAR NOT NULL
+    id            UUID    NOT NULL PRIMARY KEY,
+    behandling_id UUID    NOT NULL REFERENCES behandling (id),
+    fom           DATE    NOT NULL,
+    tom           DATE    NOT NULL,
+    malgruppe     VARCHAR NOT NULL,
+    aktivitet     VARCHAR NOT NULL
 );
+
+CREATE INDEX ON stonadsperiode (behandling_id);

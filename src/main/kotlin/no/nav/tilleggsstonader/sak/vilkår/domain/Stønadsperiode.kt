@@ -9,9 +9,11 @@ import java.util.UUID
 @Table("stonadsperiode")
 data class Stønadsperiode(
     @Id
-    val id: UUID,
+    val id: UUID = UUID.randomUUID(),
     val behandlingId: UUID,
     val fom: LocalDate,
     val tom: LocalDate,
-    val type: VilkårperiodeType,
+    @Column("malgruppe")
+    val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType,
 )
