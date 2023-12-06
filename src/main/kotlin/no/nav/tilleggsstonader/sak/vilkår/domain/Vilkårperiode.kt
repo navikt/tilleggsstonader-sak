@@ -16,12 +16,25 @@ data class Vilkårperiode(
     val type: VilkårperiodeType,
 )
 
-enum class VilkårperiodeType {
-    // MÅLGRUPPE
+sealed interface VilkårperiodeType {
+    fun tilDbType(): String
+}
+
+enum class MålgruppeType : VilkårperiodeType {
     AAP,
     AAP_FERDIG_AVKLART,
+    ;
 
-    // AKTIVITET
+    override fun tilDbType(): String = this.name
+}
+
+enum class AktivitetType : VilkårperiodeType {
     TILTAK,
     UTDANNING,
+    ;
+
+    override fun tilDbType(): String = this.name
 }
+
+val vilkårperiodetyper: Map<String, VilkårperiodeType> =
+    listOf(MålgruppeType.entries, AktivitetType.entries).flatten().associateBy { it.name }

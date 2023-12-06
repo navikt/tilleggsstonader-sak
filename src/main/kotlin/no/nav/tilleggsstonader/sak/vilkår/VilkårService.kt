@@ -9,6 +9,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.vilkår.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
@@ -117,11 +119,11 @@ class VilkårService(
 
     private fun vilkårsregelForVilkårsperiodeType(vilkårperiodeType: VilkårperiodeType) =
         when (vilkårperiodeType) {
-            VilkårperiodeType.AAP -> MålgruppeAAPRegel()
-            VilkårperiodeType.AAP_FERDIG_AVKLART -> MålgruppeAAPFerdigAvklartRegel()
+            MålgruppeType.AAP -> MålgruppeAAPRegel()
+            MålgruppeType.AAP_FERDIG_AVKLART -> MålgruppeAAPFerdigAvklartRegel()
 
-            VilkårperiodeType.TILTAK -> AktivitetTiltakRegel()
-            VilkårperiodeType.UTDANNING -> AktivitetUtdanningRegel()
+            AktivitetType.TILTAK -> AktivitetTiltakRegel()
+            AktivitetType.UTDANNING -> AktivitetUtdanningRegel()
         }
 
     fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
