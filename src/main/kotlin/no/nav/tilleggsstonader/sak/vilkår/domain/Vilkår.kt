@@ -106,6 +106,7 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Støn
     EKSEMPEL2("Eksempel 2", listOf()),
     MÅLGRUPPE("Målgruppe", listOf(Stønadstype.BARNETILSYN)),
     AKTIVITET("Aktivitet", listOf(Stønadstype.BARNETILSYN)),
+
     // Barnetilsyn
     PASS_BARN("Pass av barn", listOf(Stønadstype.BARNETILSYN)),
 
@@ -113,6 +114,7 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Støn
     // Målgrupper
     MÅLGRUPPE_AAP("AAP", listOf()),
     MÅLGRUPPE_AAP_FERDIG_AVKLART("AAP Ferdig avklart", listOf()),
+
     // Aktiviteter
     AKTIVITET_TILTAK("Tiltak", listOf()),
     AKTIVITET_UTDANNING("Utdanning", listOf()),

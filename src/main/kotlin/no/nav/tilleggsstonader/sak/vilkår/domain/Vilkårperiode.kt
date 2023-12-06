@@ -23,5 +23,5 @@ enum class VilkårperiodeType {
 
     // AKTIVITET
     TILTAK,
-    UTDANNING
+    UTDANNING,
 }

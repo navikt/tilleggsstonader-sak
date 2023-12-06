@@ -35,7 +35,7 @@ internal class VilkårperiodeRepositoryTest : IntegrationTest() {
     }
 
     @Nested
-    inner class finnVilkårperioderForBehandling {
+    inner class FinnVilkårperioderForBehandling {
         @Test
         internal fun `skal finne alle vilkårsperioder for behandling`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())

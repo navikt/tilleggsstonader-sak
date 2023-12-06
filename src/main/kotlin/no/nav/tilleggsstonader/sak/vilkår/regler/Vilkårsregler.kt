@@ -32,7 +32,7 @@ private val aktiviteter = listOf(
 
 private val alleVilkårsregler: List<Vilkårsregel> =
     Stønadstype.entries.map { vilkårsreglerForStønad(it) }.flatten() +
-            målgrupper + aktiviteter // gjelder alle stønader
+        målgrupper + aktiviteter // gjelder alle stønader
 
 fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
     when (stønadstype) {
