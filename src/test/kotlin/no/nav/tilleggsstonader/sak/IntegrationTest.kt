@@ -11,6 +11,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.brev.Vedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
+import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretBrev
+import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretFrittståendeBrev
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -61,6 +63,7 @@ class DefaultRestTemplateConfiguration {
     "mock-egen-ansatt",
     "mock-iverksett",
     "mock-oppgave",
+    "mock-journalpost",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
@@ -113,6 +116,8 @@ abstract class IntegrationTest {
             Totrinnskontroll::class,
             Vedtaksbrev::class,
             Brevmottaker::class,
+            MellomlagretFrittståendeBrev::class,
+            MellomlagretBrev::class,
             Behandlingshistorikk::class,
             Behandlingsjournalpost::class,
             EksternBehandlingId::class,

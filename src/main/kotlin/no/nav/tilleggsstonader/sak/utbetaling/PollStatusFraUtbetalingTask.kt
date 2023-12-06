@@ -3,9 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
-import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevTask
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Properties
@@ -22,16 +20,11 @@ import java.util.UUID
 class PollStatusFraUtbetalingTask(
     private val stegService: StegService,
     private val ventePåStatusFraUtbetalingSteg: VentePåStatusFraUtbetalingSteg,
-    private val taskService: TaskService,
 ) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
         val behandlingId = UUID.fromString(task.payload)
         stegService.håndterSteg(behandlingId, ventePåStatusFraUtbetalingSteg)
-    }
-
-    override fun onCompletion(task: Task) {
-        taskService.save(JournalførVedtaksbrevTask.opprettTask(UUID.fromString(task.payload)))
     }
 
     companion object {
