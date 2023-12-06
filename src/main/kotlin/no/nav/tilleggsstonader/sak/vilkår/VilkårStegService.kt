@@ -93,13 +93,14 @@ class VilkårStegService(
     }
 
     private fun oppdaterStegPåBehandling(saksbehandling: Saksbehandling, vilkårsett: List<Vilkår>) {
-        val vilkårsresultat = vilkårsett.groupBy { it.type }.map {
-            if (it.key.gjelderFlereBarn()) {
-                utledResultatForVilkårSomGjelderFlereBarn(it.value)
-            } else {
-                it.value.single().resultat
+        val vilkårsresultat =
+            vilkårsett.filterNot { it.type.gjelderMålgruppe() || it.type.gjelderAktivitet() }.groupBy { it.type }.map {
+                if (it.key.gjelderFlereBarn()) {
+                    utledResultatForVilkårSomGjelderFlereBarn(it.value)
+                } else {
+                    it.value.single().resultat
+                }
             }
-        }
 
         if (saksbehandling.steg == StegType.VILKÅR && OppdaterVilkår.erAlleVilkårTattStillingTil(vilkårsresultat)) {
             stegService.håndterSteg(saksbehandling, vilkårSteg)
