@@ -184,21 +184,23 @@ object OppdaterVilkår {
                     it == Vilkårsresultat.SKAL_IKKE_VURDERES
             }
 
+    // TODO rename noe stønadsspesifikt vilkår
     fun opprettNyeVilkår(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
         stønadstype: Stønadstype,
     ): List<Vilkår> {
         return vilkårsreglerForStønad(stønadstype)
+            .filterNot { it.vilkårType.gjelderMålgruppeEllerAktivitet() }
             .flatMap { vilkårsregel ->
                 feilHvis(vilkårsregel.vilkårType.gjelderFlereBarn() && metadata.barn.isEmpty()) {
                     "Kan ikke opprette vilkår når ingen barn er knyttet til behandling $behandlingId"
                 }
 
                 if (vilkårsregel.vilkårType.gjelderFlereBarn()) {
-                    metadata.barn.map { lagNyVilkår(vilkårsregel, metadata, behandlingId, it.id) }
+                    metadata.barn.map { lagNyttVilkår(vilkårsregel, metadata, behandlingId, it.id) }
                 } else {
-                    listOf(lagNyVilkår(vilkårsregel, metadata, behandlingId))
+                    listOf(lagNyttVilkår(vilkårsregel, metadata, behandlingId))
                 }
             }
     }
@@ -230,7 +232,7 @@ object OppdaterVilkår {
     }
      */
 
-    private fun lagNyVilkår(
+    fun lagNyttVilkår(
         vilkårsregel: Vilkårsregel,
         metadata: HovedregelMetadata,
         behandlingId: UUID,

@@ -40,7 +40,7 @@ object FileUtil {
         if (!SKAL_SKRIVE_TIL_FIL) {
             return
         }
-        val file = File("src/resources/$filnavn")
+        val file = File("src/test/resources/$filnavn")
         if (!file.exists()) {
             file.createNewFile()
         }

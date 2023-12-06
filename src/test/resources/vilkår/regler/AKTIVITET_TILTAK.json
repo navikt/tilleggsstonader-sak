@@ -1,0 +1,31 @@
+{
+  "vilkårType" : "AKTIVITET_TILTAK",
+  "regler" : {
+    "LØNN_GJENNOM_TILTAK" : {
+      "regelId" : "LØNN_GJENNOM_TILTAK",
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "UTEN",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "UTEN",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    },
+    "MOTTAR_SYKEPENGER_GJENNOM_AKTIVITET" : {
+      "regelId" : "MOTTAR_SYKEPENGER_GJENNOM_AKTIVITET",
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "UTEN",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "UTEN",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    }
+  }
+}

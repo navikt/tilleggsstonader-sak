@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat.AUTOMATISK_OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat.IKKE_TATT_STILLING_TIL
@@ -40,6 +41,7 @@ internal class VilkårServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val søknadService = mockk<SøknadService>()
     private val vilkårRepository = mockk<VilkårRepository>()
+    private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
 
     // private val personopplysningerIntegrasjonerClient = mockk<PersonopplysningerIntegrasjonerClient>()
     // private val blankettRepository = mockk<BlankettRepository>()
@@ -48,10 +50,12 @@ internal class VilkårServiceTest {
 
     // private val grunnlagsdataService = mockk<GrunnlagsdataService>()
     private val fagsakService = mockk<FagsakService>()
+
     private val vilkårService = VilkårService(
         behandlingService = behandlingService,
         søknadService = søknadService,
         vilkårRepository = vilkårRepository,
+        vilkårperiodeRepository = vilkårperiodeRepository,
         vilkårGrunnlagService = vilkårGrunnlagService,
         // grunnlagsdataService = grunnlagsdataService,
         barnService = barnService,
