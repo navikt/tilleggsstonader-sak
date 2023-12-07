@@ -4,7 +4,6 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
-import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -23,8 +22,6 @@ class StønadsperiodeController(
     private val tilgangService: TilgangService,
 ) {
 
-    private val secureLogger = LoggerFactory.getLogger("secureLogger")
-
     @GetMapping("{behandlingId}")
     fun hentStønadsperioder(@PathVariable behandlingId: UUID): List<StønadsperiodeDto> {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
@@ -34,12 +31,11 @@ class StønadsperiodeController(
     @PostMapping("{behandlingId}")
     fun lagreStønadsperioder(
         @PathVariable behandlingId: UUID,
-        @RequestBody stønadsperioder: List<StønadsperiodeDto>
+        @RequestBody stønadsperioder: List<StønadsperiodeDto>,
     ): List<StønadsperiodeDto> {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         return stønadsperiodeService.lagreStønadsperioder(behandlingId, stønadsperioder)
     }
-
 }

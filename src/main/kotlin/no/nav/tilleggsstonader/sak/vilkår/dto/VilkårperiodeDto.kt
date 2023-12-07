@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
@@ -45,5 +43,4 @@ class VilkårperiodeTypeDeserializer : JsonDeserializer<VilkårperiodeType>() {
     override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): VilkårperiodeType {
         return vilkårperiodetyper[p!!.text] ?: error("Finner ikke mapping for ${p.text}")
     }
-
 }
