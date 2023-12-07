@@ -1,8 +1,10 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
+import no.nav.tilleggsstonader.sak.vilkår.StønadsperiodeValideringUtil.validerStønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.mergeSammenhengendeVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilSortertDto
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -10,6 +12,7 @@ import java.util.UUID
 @Service
 class StønadsperiodeService(
     private val stønadsperiodeRepository: StønadsperiodeRepository,
+    private val vilkårService: VilkårService,
 ) {
     fun hentStønadsperioder(behandlingId: UUID): List<StønadsperiodeDto> {
         return stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
@@ -17,7 +20,7 @@ class StønadsperiodeService(
 
     fun lagreStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>): List<StønadsperiodeDto> {
         // TODO valider behandling er ikke låst
-        // TODO valider stønadsperioder vs målgruppe/aktivitet
+        validerStønadsperioder(behandlingId, stønadsperioder)
         stønadsperiodeRepository.deleteAll() // TODO skal vi finne og oppdatere de som har blitt oppdatert/slettet
         return stønadsperiodeRepository.insertAll(
             stønadsperioder.map {
@@ -31,5 +34,16 @@ class StønadsperiodeService(
                 )
             },
         ).tilSortertDto()
+    }
+
+    fun validerStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>) {
+        val vilkårperioder = vilkårService.hentVilkårperioder(behandlingId)
+
+        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeVilkårperioder()
+        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeVilkårperioder()
+
+        stønadsperioder.map { validerStønadsperiode(it, målgrupper, aktiviteter) }
+
+        // TODO Sjekk overlapp mellom stønadsperioder
     }
 }
