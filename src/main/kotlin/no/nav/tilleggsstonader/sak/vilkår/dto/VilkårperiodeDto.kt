@@ -38,7 +38,6 @@ data class Vilkårperioder(
     val aktiviteter: List<VilkårperiodeDto>,
 )
 
-// TODO test controller sånn at vi får testet denne
 class VilkårperiodeTypeDeserializer : JsonDeserializer<VilkårperiodeType>() {
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): VilkårperiodeType {
         return vilkårperiodetyper[p.text] ?: error("Finner ikke mapping for ${p.text}")
