@@ -70,34 +70,36 @@ class StønadsperiodeControllerTest : IntegrationTest() {
     private fun opprettOppfylltInngangsvilkårForAktivitet(behandling: Behandling) {
         val aktivitet = opprettAktivitet(behandling)
         val delvilkår1 = DelvilkårDto(
-            Vilkårsresultat.OPPFYLT, listOf(
+            Vilkårsresultat.OPPFYLT,
+            listOf(
                 VurderingDto(RegelId.LØNN_GJENNOM_TILTAK, SvarId.NEI),
-            )
+            ),
         )
         val delvilkår2 = DelvilkårDto(
-            Vilkårsresultat.OPPFYLT, listOf(
+            Vilkårsresultat.OPPFYLT,
+            listOf(
                 VurderingDto(RegelId.MOTTAR_SYKEPENGER_GJENNOM_AKTIVITET, SvarId.NEI),
-            )
+            ),
         )
         vilkårStegService.oppdaterVilkår(
             SvarPåVilkårDto(
                 aktivitet.vilkår.id,
                 behandling.id,
-                listOf(delvilkår1, delvilkår2)
-            )
+                listOf(delvilkår1, delvilkår2),
+            ),
         )
     }
 
     private fun opprettMålgruppe(behandling: Behandling): VilkårperiodeDto =
         vilkårService.opprettVilkårperiode(
             behandling.id,
-            OpprettVilkårperiode(MålgruppeType.AAP, dagensDato, dagensDato)
+            OpprettVilkårperiode(MålgruppeType.AAP, dagensDato, dagensDato),
         )
 
     private fun opprettAktivitet(behandling: Behandling): VilkårperiodeDto =
         vilkårService.opprettVilkårperiode(
             behandling.id,
-            OpprettVilkårperiode(AktivitetType.TILTAK, dagensDato, dagensDato)
+            OpprettVilkårperiode(AktivitetType.TILTAK, dagensDato, dagensDato),
         )
 
     private fun hentStønadsperioder(behandling: Behandling) =

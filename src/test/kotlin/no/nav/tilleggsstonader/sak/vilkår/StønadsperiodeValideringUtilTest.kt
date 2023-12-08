@@ -243,7 +243,7 @@ internal class StønadsperiodeValideringUtilTest {
 
     private fun feilmeldingIkkeOverlappendePeriode(stønadsperiode: StønadsperiodeDto, type: VilkårperiodeType) =
         "Finnes ingen periode med oppfylte vilkår for $type i perioden " +
-                "${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}"
+            "${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}"
 
     private fun lagStønadsperiode(
         fom: LocalDate = LocalDate.of(2023, 1, 4),
