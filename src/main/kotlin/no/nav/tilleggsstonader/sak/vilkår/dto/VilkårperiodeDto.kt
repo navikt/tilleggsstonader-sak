@@ -45,7 +45,10 @@ data class Datoperiode(
 
 fun List<VilkårperiodeDto>.mergeSammenhengendeVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> =
     this.filter { it.vilkår.resultat == Vilkårsresultat.OPPFYLT }.groupBy { it.type }
-        .mapValues { it.value.map { Datoperiode(it.fom, it.tom) }.mergeSammenhengende { _, _ -> true } }
+        .mapValues {
+            it.value.map { Datoperiode(it.fom, it.tom) }
+                .mergeSammenhengende { a, b -> a.tom.plusDays(1) == b.fom }
+        }
 
 data class OpprettVilkårperiode(
     @JsonDeserialize(using = VilkårperiodeTypeDeserializer::class)

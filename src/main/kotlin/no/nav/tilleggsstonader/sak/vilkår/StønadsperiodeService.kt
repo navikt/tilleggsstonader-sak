@@ -1,10 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
-import no.nav.tilleggsstonader.sak.vilkår.StønadsperiodeValideringUtil.validerStønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.mergeSammenhengendeVilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilSortertDto
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -39,11 +37,6 @@ class StønadsperiodeService(
     fun validerStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>) {
         val vilkårperioder = vilkårService.hentVilkårperioder(behandlingId)
 
-        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeVilkårperioder()
-        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeVilkårperioder()
-
-        stønadsperioder.map { validerStønadsperiode(it, målgrupper, aktiviteter) }
-
-        // TODO Sjekk overlapp mellom stønadsperioder
+        StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder)
     }
 }

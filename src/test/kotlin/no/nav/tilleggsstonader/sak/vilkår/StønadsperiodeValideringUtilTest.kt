@@ -1,14 +1,21 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
 import no.nav.tilleggsstonader.sak.util.norskFormat
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.StønadsperiodeValideringUtil.validerStønadsperiode
+import no.nav.tilleggsstonader.sak.vilkår.StønadsperiodeValideringUtil.validerStønadsperioder
 import no.nav.tilleggsstonader.sak.vilkår.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.dto.Datoperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.UUID
@@ -83,7 +90,7 @@ internal class StønadsperiodeValideringUtilTest {
                 målgrupper,
                 aktiviteter,
             )
-        }.hasMessageContaining("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.målgruppe} i perioden ${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}")
+        }.hasMessageContaining(feilmeldingIkkeOverlappendePeriode(stønadsperiode, stønadsperiode.målgruppe))
     }
 
     @Test
@@ -96,8 +103,88 @@ internal class StønadsperiodeValideringUtilTest {
                 målgrupper,
                 aktiviteter,
             )
-        }.hasMessageContaining("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.aktivitet} i perioden ${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}")
+        }.hasMessageContaining(feilmeldingIkkeOverlappendePeriode(stønadsperiode, stønadsperiode.aktivitet))
     }
+
+    @Nested
+    inner class ValiderStønadsperioderIkkeOppfyltePerioder {
+        val fom = LocalDate.of(2023, 1, 1)
+        val tom = LocalDate.of(2023, 1, 7)
+
+        val målgrupper = listOf(
+            lagVilkårperiodeDto(
+                fom = fom,
+                tom = tom,
+                type = MålgruppeType.AAP,
+                vilkårsresultat = Vilkårsresultat.IKKE_OPPFYLT,
+            ),
+        )
+        val aktiviteter = målgrupper.map { it.copy(type = AktivitetType.TILTAK) }
+
+        @Test
+        fun `skal kaste feil hvis vilkårsresultat ikke er oppfylt`() {
+            val stønadsperiode = lagStønadsperiode(fom = fom, tom = tom)
+
+            assertThatThrownBy {
+                validerStønadsperioder(
+                    listOf(stønadsperiode),
+                    Vilkårperioder(målgrupper, aktiviteter),
+                )
+            }.hasMessageContaining("Finner ingen perioder hvor vilkår for ${stønadsperiode.målgruppe} er oppfylt")
+        }
+    }
+
+    @Nested
+    inner class ValiderStønadsperioderMergeSammenhengende {
+
+        val målgrupper = listOf(
+            lagVilkårperiodeDto(
+                fom = LocalDate.of(2023, 1, 1),
+                tom = LocalDate.of(2023, 1, 7),
+                type = MålgruppeType.AAP,
+            ),
+            lagVilkårperiodeDto(
+                fom = LocalDate.of(2023, 1, 8),
+                tom = LocalDate.of(2023, 1, 18),
+                type = MålgruppeType.AAP,
+            ),
+            lagVilkårperiodeDto(
+                fom = LocalDate.of(2023, 1, 20),
+                tom = LocalDate.of(2023, 1, 31),
+                type = MålgruppeType.AAP,
+            ),
+        )
+
+        val aktiviteter = målgrupper.map { it.copy(type = AktivitetType.TILTAK) }
+
+        @Test
+        fun `skal godta stønadsperiode på tvers av 2 godkjente sammenhengende vilkårsperioder`() {
+            val stønadsperiode = lagStønadsperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 10))
+
+            assertThatCode {
+                validerStønadsperioder(
+                    listOf(stønadsperiode),
+                    Vilkårperioder(målgrupper, aktiviteter),
+                )
+            }.doesNotThrowAnyException()
+        }
+
+        @Test
+        fun `skal ikke godta stønadsperiode på tvers av 2 godkjente, men ikke sammenhengende vilkårsperioder`() {
+            val stønadsperiode = lagStønadsperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 21))
+
+            assertThatThrownBy {
+                validerStønadsperioder(
+                    listOf(stønadsperiode),
+                    Vilkårperioder(målgrupper, aktiviteter),
+                )
+            }.hasMessageContaining(feilmeldingIkkeOverlappendePeriode(stønadsperiode, stønadsperiode.målgruppe))
+        }
+    }
+
+    private fun feilmeldingIkkeOverlappendePeriode(stønadsperiode: StønadsperiodeDto, type: VilkårperiodeType) =
+        "Finnes ingen periode med oppfylte vilkår for $type i perioden " +
+            "${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}"
 
     private fun lagStønadsperiode(
         fom: LocalDate = LocalDate.of(2023, 1, 4),
@@ -113,4 +200,19 @@ internal class StønadsperiodeValideringUtilTest {
             aktivitet = aktivitet,
         )
     }
+
+    fun lagVilkårperiodeDto(
+        fom: LocalDate,
+        tom: LocalDate,
+        type: VilkårperiodeType,
+        vilkårsresultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
+    ) = VilkårperiodeDto(
+        type = type,
+        fom = fom,
+        tom = tom,
+        vilkår = lagVilkårDto(vilkårsresultat),
+    )
+
+    fun lagVilkårDto(vilkårsresultat: Vilkårsresultat) =
+        vilkår(behandlingId = UUID.randomUUID(), resultat = vilkårsresultat).tilDto()
 }

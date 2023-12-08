@@ -5,8 +5,21 @@ import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.dto.Datoperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.dto.mergeSammenhengendeVilkårperioder
 
 object StønadsperiodeValideringUtil {
+
+    fun validerStønadsperioder(
+        stønadsperioder: List<StønadsperiodeDto>,
+        vilkårperioder: Vilkårperioder,
+    ) {
+        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeVilkårperioder()
+        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeVilkårperioder()
+
+        stønadsperioder.forEach { validerStønadsperiode(it, målgrupper, aktiviteter) }
+    }
+
     fun validerStønadsperiode(
         stønadsperiode: StønadsperiodeDto,
         målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
