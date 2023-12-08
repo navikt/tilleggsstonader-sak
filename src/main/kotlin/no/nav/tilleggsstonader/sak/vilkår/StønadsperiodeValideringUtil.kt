@@ -1,11 +1,13 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.dto.Datoperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.dto.formattertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vilkår.dto.mergeSammenhengendeVilkårperioder
 
 object StønadsperiodeValideringUtil {
@@ -14,10 +16,23 @@ object StønadsperiodeValideringUtil {
         stønadsperioder: List<StønadsperiodeDto>,
         vilkårperioder: Vilkårperioder,
     ) {
+        validerStønadsperioder(stønadsperioder)
         val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeVilkårperioder()
         val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeVilkårperioder()
 
         stønadsperioder.forEach { validerStønadsperiode(it, målgrupper, aktiviteter) }
+    }
+
+    private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
+        stønadsperioder.sortedBy { it.fom }.fold(listOf<StønadsperiodeDto>()) { acc, periode ->
+            val last = acc.lastOrNull()
+            if (last != null) {
+                feilHvis(last.tom >= periode.fom) {
+                    "Stønadsperiode ${last.formattertPeriodeNorskFormat()} og ${periode.formattertPeriodeNorskFormat()} overlapper"
+                }
+            }
+            acc + periode
+        }
     }
 
     fun validerStønadsperiode(

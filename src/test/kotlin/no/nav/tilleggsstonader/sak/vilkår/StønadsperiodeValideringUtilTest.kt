@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
+import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.StønadsperiodeValideringUtil.validerStønadsperiode
@@ -107,6 +108,64 @@ internal class StønadsperiodeValideringUtilTest {
     }
 
     @Nested
+    inner class ValiderStønadsperioderOverlapper {
+        val fom = LocalDate.of(2023, 1, 1)
+        val tom = LocalDate.of(2023, 1, 7)
+
+        @Test
+        fun `skal kaste feil hvis stønadsperioder overlapper`() {
+            val stønadsperiode = lagStønadsperiode(fom = fom, tom = tom)
+
+            assertThatThrownBy {
+                validerStønadsperioder(
+                    listOf(stønadsperiode, stønadsperiode),
+                    mockk(),
+                )
+            }.hasMessageContaining("overlapper")
+        }
+
+        @Test
+        fun `skal kaste feil hvis stønadsperioder overlapper med en dag, uavhengig sortering`() {
+            val stønadsperiode1 = lagStønadsperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 5))
+            val stønadsperiode2 = lagStønadsperiode(fom = LocalDate.of(2023, 1, 5), tom = LocalDate.of(2023, 1, 10))
+
+            assertThatThrownBy {
+                validerStønadsperioder(
+                    listOf(stønadsperiode1, stønadsperiode2),
+                    mockk(),
+                )
+            }.hasMessageContaining("overlapper")
+
+            assertThatThrownBy {
+                validerStønadsperioder(
+                    listOf(stønadsperiode2, stønadsperiode1),
+                    mockk(),
+                )
+            }.hasMessageContaining("overlapper")
+        }
+
+        @Test
+        fun `skal kaste feil hvis en stønadsperiode inneholder en annen`() {
+            val stønadsperiode1 = lagStønadsperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 10))
+            val stønadsperiode2 = lagStønadsperiode(fom = LocalDate.of(2023, 1, 5), tom = LocalDate.of(2023, 1, 5))
+
+            assertThatThrownBy {
+                validerStønadsperioder(
+                    listOf(stønadsperiode1, stønadsperiode2),
+                    mockk(),
+                )
+            }.hasMessageContaining("overlapper")
+
+            assertThatThrownBy {
+                validerStønadsperioder(
+                    listOf(stønadsperiode2, stønadsperiode1),
+                    mockk(),
+                )
+            }.hasMessageContaining("overlapper")
+        }
+    }
+
+    @Nested
     inner class ValiderStønadsperioderIkkeOppfyltePerioder {
         val fom = LocalDate.of(2023, 1, 1)
         val tom = LocalDate.of(2023, 1, 7)
@@ -184,7 +243,7 @@ internal class StønadsperiodeValideringUtilTest {
 
     private fun feilmeldingIkkeOverlappendePeriode(stønadsperiode: StønadsperiodeDto, type: VilkårperiodeType) =
         "Finnes ingen periode med oppfylte vilkår for $type i perioden " +
-            "${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}"
+                "${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}"
 
     private fun lagStønadsperiode(
         fom: LocalDate = LocalDate.of(2023, 1, 4),

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
@@ -29,7 +30,6 @@ fun Vilkårperiode.tilDto(vilkår: VilkårDto) =
         vilkår = vilkår,
     )
 
-// TODO: Slett når kontrakter oppdateres
 data class Datoperiode(
     override val fom: LocalDate,
     override val tom: LocalDate,
@@ -38,10 +38,14 @@ data class Datoperiode(
         return this.copy(tom = other.tom)
     }
 
+    // TODO: Slett når kontrakter oppdateres
     fun inneholder(other: Periode<LocalDate>): Boolean {
         return this.fom <= other.fom && this.tom >= other.tom
     }
 }
+
+// TODO flytt til kontrakter
+fun Periode<LocalDate>.formattertPeriodeNorskFormat() = "${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
 
 fun List<VilkårperiodeDto>.mergeSammenhengendeVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> =
     this.filter { it.vilkår.resultat == Vilkårsresultat.OPPFYLT }.groupBy { it.type }
