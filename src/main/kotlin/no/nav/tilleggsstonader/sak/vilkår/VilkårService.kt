@@ -75,57 +75,6 @@ class VilkårService(
         return hentEllerOpprettVilkårsvurdering(behandlingId)
     }
 
-    fun hentVilkårperioder(behandlingId: UUID): Vilkårperioder {
-        val vilkår = vilkårRepository.findByBehandlingId(behandlingId)
-        val vilkårsperioder =
-            vilkårperiodeRepository.finnVilkårperioderForBehandling(behandlingId).associateBy { it.vilkårId }
-
-        return Vilkårperioder(
-            målgrupper = finnPerioder(vilkår, vilkårsperioder, VilkårType::gjelderMålgruppe),
-            aktiviteter = finnPerioder(vilkår, vilkårsperioder, VilkårType::gjelderAktivitet),
-        )
-    }
-
-    private fun finnPerioder(
-        vilkår: List<Vilkår>,
-        vilkårsperioder: Map<UUID, Vilkårperiode>,
-        gjelderFilter: (VilkårType) -> Boolean,
-    ) = vilkår.filter { gjelderFilter(it.type) }.map { vilkårsperioder.getValue(it.id).tilDto(it.tilDto()) }
-
-    @Transactional
-    fun opprettVilkårperiode(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): VilkårperiodeDto {
-        feilHvis(behandlingErLåstForVidereRedigering(behandlingId)) {
-            "Kan ikke opprette vilkår når behandling er låst for videre redigering"
-        }
-
-        val vilkår = lagNyttVilkår(
-            vilkårsregel = vilkårsregelForVilkårsperiodeType(opprettVilkårperiode.type),
-            metadata = hentGrunnlagOgMetadata(behandlingId).second,
-            behandlingId = behandlingId,
-        )
-        vilkårRepository.insert(vilkår)
-
-        val vilkårperiode = vilkårperiodeRepository.insert(
-            Vilkårperiode(
-                vilkårId = vilkår.id,
-                fom = opprettVilkårperiode.fom,
-                tom = opprettVilkårperiode.tom,
-                type = opprettVilkårperiode.type,
-            ),
-        )
-
-        return vilkårperiode.tilDto(vilkår.tilDto())
-    }
-
-    private fun vilkårsregelForVilkårsperiodeType(vilkårperiodeType: VilkårperiodeType) =
-        when (vilkårperiodeType) {
-            MålgruppeType.AAP -> MålgruppeAAPRegel()
-            MålgruppeType.AAP_FERDIG_AVKLART -> MålgruppeAAPFerdigAvklartRegel()
-
-            AktivitetType.TILTAK -> AktivitetTiltakRegel()
-            AktivitetType.UTDANNING -> AktivitetUtdanningRegel()
-        }
-
     fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
         val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
         feilHvis(vilkårsett.isEmpty()) { "Mangler vilkår for behandling=$behandlingId" }
