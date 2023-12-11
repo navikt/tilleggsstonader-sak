@@ -10,6 +10,7 @@ import java.util.UUID
 @Service
 class StønadsperiodeService(
     private val stønadsperiodeRepository: StønadsperiodeRepository,
+    private val vilkårService: VilkårService,
 ) {
     fun hentStønadsperioder(behandlingId: UUID): List<StønadsperiodeDto> {
         return stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
@@ -17,7 +18,7 @@ class StønadsperiodeService(
 
     fun lagreStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>): List<StønadsperiodeDto> {
         // TODO valider behandling er ikke låst
-        // TODO valider stønadsperioder vs målgruppe/aktivitet
+        validerStønadsperioder(behandlingId, stønadsperioder)
         stønadsperiodeRepository.deleteAll() // TODO skal vi finne og oppdatere de som har blitt oppdatert/slettet
         return stønadsperiodeRepository.insertAll(
             stønadsperioder.map {
@@ -31,5 +32,11 @@ class StønadsperiodeService(
                 )
             },
         ).tilSortertDto()
+    }
+
+    fun validerStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>) {
+        val vilkårperioder = vilkårService.hentVilkårperioder(behandlingId)
+
+        StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder)
     }
 }

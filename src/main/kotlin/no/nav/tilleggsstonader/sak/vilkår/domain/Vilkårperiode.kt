@@ -20,9 +20,9 @@ sealed interface VilkårperiodeType {
     fun tilDbType(): String
 }
 
-enum class MålgruppeType : VilkårperiodeType {
-    AAP,
-    AAP_FERDIG_AVKLART,
+enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : VilkårperiodeType {
+    AAP(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
+    AAP_FERDIG_AVKLART(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
     ;
 
     override fun tilDbType(): String = this.name
