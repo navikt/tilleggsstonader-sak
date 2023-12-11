@@ -166,6 +166,7 @@ class BehandlingService(
         return behandlingRepository.update(behandling.copy(status = status))
     }
 
+    // TODO skal vi sette kategori på behandling?
     fun oppdaterKategoriPåBehandling(behandlingId: UUID, kategori: BehandlingKategori): Behandling {
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(

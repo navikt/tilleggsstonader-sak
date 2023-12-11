@@ -113,7 +113,6 @@ internal class VilkårStegServiceTest {
         every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling(fagsak, behandling)
         // every { behandlingService.hentAktivIdent(behandlingId) } returns søknad.fødselsnummer
         every { behandlingService.oppdaterStatusPåBehandling(any(), any()) } returns behandling
-        every { behandlingService.oppdaterKategoriPåBehandling(any(), any()) } returns behandling
         // every { søknadService.hentSøknadsgrunnlag(any()) }.returns(søknad)
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsak(stønadstype = Stønadstype.BARNETILSYN)
         every { vilkårRepository.insertAll(any()) } answers { firstArg() }
