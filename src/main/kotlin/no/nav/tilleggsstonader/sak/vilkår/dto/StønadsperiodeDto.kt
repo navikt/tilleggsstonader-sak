@@ -13,6 +13,8 @@ data class StønadsperiodeDto(
     override val tom: LocalDate,
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
+    val _id: UUID, // bruker for å kunne vise feil på en periode som ikke er lagret
+    val feil: String? = null
 ) : Periode<LocalDate>
 
 fun Stønadsperiode.tilDto() = StønadsperiodeDto(
@@ -21,6 +23,7 @@ fun Stønadsperiode.tilDto() = StønadsperiodeDto(
     tom = this.tom,
     målgruppe = this.målgruppe,
     aktivitet = this.aktivitet,
+    _id = this.id,
 )
 
 fun List<Stønadsperiode>.tilSortertDto() = this.map { it.tilDto() }.sortedBy { it.fom }

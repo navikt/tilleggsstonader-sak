@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.Stønadsperiodefeil
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilSortertDto
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -18,7 +19,9 @@ class StønadsperiodeService(
 
     fun lagreStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>): List<StønadsperiodeDto> {
         // TODO valider behandling er ikke låst
-        validerStønadsperioder(behandlingId, stønadsperioder)
+        validerStønadsperioder(behandlingId, stønadsperioder)?.let {
+
+        }
         stønadsperiodeRepository.deleteAll() // TODO skal vi finne og oppdatere de som har blitt oppdatert/slettet
         return stønadsperiodeRepository.insertAll(
             stønadsperioder.map {
@@ -34,9 +37,9 @@ class StønadsperiodeService(
         ).tilSortertDto()
     }
 
-    fun validerStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>) {
+    fun validerStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>): List<Stønadsperiodefeil>? {
         val vilkårperioder = vilkårService.hentVilkårperioder(behandlingId)
 
-        StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder)
+        return StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder)
     }
 }
