@@ -16,14 +16,14 @@ object StønadsperiodeValideringUtil {
         stønadsperioder: List<StønadsperiodeDto>,
         vilkårperioder: Vilkårperioder,
     ) {
-        validerStønadsperioder(stønadsperioder)
+        validerIkkeOverlappendeStønadsperioder(stønadsperioder)
         val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeVilkårperioder()
         val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeVilkårperioder()
 
         stønadsperioder.forEach { validerStønadsperiode(it, målgrupper, aktiviteter) }
     }
 
-    private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
+    private fun validerIkkeOverlappendeStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
         stønadsperioder.sortedBy { it.fom }.fold(listOf<StønadsperiodeDto>()) { acc, periode ->
             val last = acc.lastOrNull()
             if (last != null) {
