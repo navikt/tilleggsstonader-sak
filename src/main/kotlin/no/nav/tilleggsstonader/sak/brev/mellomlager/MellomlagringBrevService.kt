@@ -41,7 +41,7 @@ class MellomlagringBrevService(
             SikkerhetContext.hentSaksbehandler(),
         )?.let { MellomlagreBrevDto(it.brevverdier, it.brevmal) }
 
-    fun hentMellomlagretBrev(behhandlingId: UUID, sanityVersjon: String): MellomlagreBrevDto? =
+    fun hentMellomlagretBrev(behhandlingId: UUID): MellomlagreBrevDto? =
         mellomlagerBrevRepository.findByIdOrNull(behhandlingId)?.let {
             MellomlagreBrevDto(it.brevverdier, it.brevmal)
         }

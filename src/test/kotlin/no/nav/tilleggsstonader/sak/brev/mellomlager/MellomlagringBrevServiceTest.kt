@@ -39,7 +39,6 @@ class MellomlagringBrevServiceTest {
         assertThat(
             mellomlagringBrevService.hentMellomlagretBrev(
                 behandlingId,
-                sanityVersjon,
             ),
         )
             .isEqualTo(
@@ -72,7 +71,6 @@ class MellomlagringBrevServiceTest {
 
     private val behandlingId = UUID.randomUUID()
     private val brevmal = "testMal"
-    private val sanityVersjon = "1"
     private val brevverdier = "{}"
     private val mellomlagretBrev = MellomlagretBrev(behandlingId, brevverdier, brevmal)
 }
