@@ -94,7 +94,6 @@ class TotrinnskontrollService(
                 frontendFeilmelding = "Beslutter er samme som behandler, samme person kan ikkje godkjenne vedtaket",
             )
         }
-        // refaktorere til at totrinns er frikobla fra behandlinga
         val nyStatus = if (beslutteVedtak.godkjent) BehandlingStatus.IVERKSETTER_VEDTAK else BehandlingStatus.UTREDES
         val nyTotrinnsKontrollStatus = if (beslutteVedtak.godkjent) TotrinnInternStatus.GODKJENT else TotrinnInternStatus.UNDERKJENT
         val utfall = if (beslutteVedtak.godkjent) StegUtfall.BESLUTTE_VEDTAK_GODKJENT else StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT
