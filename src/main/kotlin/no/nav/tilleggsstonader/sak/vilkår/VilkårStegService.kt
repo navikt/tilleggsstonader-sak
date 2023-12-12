@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår
-import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.utledBehandlingKategori
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.utledResultatForVilkårSomGjelderFlereBarn
 import no.nav.tilleggsstonader.sak.vilkår.regler.hentVilkårsregel
 import org.springframework.http.HttpStatus
@@ -50,7 +49,7 @@ class VilkårStegService(
         val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, svarPåVilkårDto.delvilkårsett)
         // blankettRepository.deleteById(behandlingId)
         val oppdatertVilkårDto = vilkårRepository.update(oppdatertVilkår).tilDto()
-        oppdaterStegOgKategoriPåBehandling(vilkår.behandlingId)
+        oppdaterStegPåBehandling(vilkår.behandlingId)
         return oppdatertVilkårDto
     }
 
@@ -65,7 +64,7 @@ class VilkårStegService(
         // blankettRepository.deleteById(behandlingId)
 
         val oppdatertVilkår = nullstillVilkårMedNyeHovedregler(behandlingId, vilkår)
-        oppdaterStegOgKategoriPåBehandling(behandlingId)
+        oppdaterStegPåBehandling(behandlingId)
         return oppdatertVilkår
     }
 
@@ -80,16 +79,15 @@ class VilkårStegService(
         // blankettRepository.deleteById(behandlingId)
 
         val oppdatertVilkår = oppdaterVilkårTilSkalIkkeVurderes(behandlingId, vilkår)
-        oppdaterStegOgKategoriPåBehandling(behandlingId)
+        oppdaterStegPåBehandling(behandlingId)
         return oppdatertVilkår
     }
 
-    private fun oppdaterStegOgKategoriPåBehandling(behandlingId: UUID) {
+    private fun oppdaterStegPåBehandling(behandlingId: UUID) {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
 
         oppdaterStegPåBehandling(saksbehandling, vilkårsett)
-        oppdaterKategoriPåBehandling(saksbehandling, vilkårsett)
     }
 
     private fun oppdaterStegPåBehandling(saksbehandling: Saksbehandling, vilkårsett: List<Vilkår>) {
@@ -116,18 +114,6 @@ class VilkårStegService(
                 metadata = null,
             )
             opprettBehandlingsstatistikkTask(saksbehandling)
-        }
-    }
-
-    private fun oppdaterKategoriPåBehandling(
-        saksbehandling: Saksbehandling,
-        vilkårsett: List<Vilkår>,
-    ) {
-        val lagretKategori = saksbehandling.kategori
-        val utledetKategori = utledBehandlingKategori(vilkårsett)
-
-        if (lagretKategori != utledetKategori) {
-            behandlingService.oppdaterKategoriPåBehandling(saksbehandling.id, utledetKategori)
         }
     }
 
