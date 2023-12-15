@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprett
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
@@ -69,8 +70,6 @@ internal class AutomatiskJournalføringServiceTest {
     val personIdent = "123456789"
     val aktørId = "9876543210127"
     val tidligerePersonIdent = "9123456789"
-    val personIdentAnnen = "9876543210"
-    val aktørIdAnnen = "987654321012783123"
     val fagsak = fagsak()
     val journalpostId = "1"
     val journalpost = Journalpost(
@@ -81,8 +80,11 @@ internal class AutomatiskJournalføringServiceTest {
         bruker = Bruker(personIdent, BrukerIdType.FNR),
     )
 
+    val taskSlot = slot<Task>()
+
     @BeforeEach
     internal fun setUp() {
+        taskSlot.clear()
         every { personService.hentPersonIdenter(any()) } returns PdlIdenter(
             identer = listOf(
                 PdlIdent(personIdent, false),
@@ -100,6 +102,8 @@ internal class AutomatiskJournalføringServiceTest {
             språk = Språkkode.NB,
         )
         every { barnService.opprettBarn(any()) } returns mockk()
+        every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(aktørId, false)))
+        every { taskService.save(capture(taskSlot)) } returns mockk()
     }
 
     @Test
@@ -120,7 +124,12 @@ internal class AutomatiskJournalføringServiceTest {
 
     @Test
     internal fun `kan opprette behandling hvis alle behandlinger i ny løsning er henlagt`() {
-        every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling(resultat = BehandlingResultat.HENLAGT, status = BehandlingStatus.FERDIGSTILT))
+        every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(
+            behandling(
+                resultat = BehandlingResultat.HENLAGT,
+                status = BehandlingStatus.FERDIGSTILT,
+            ),
+        )
         val kanOppretteBehandling =
             automatiskJournalføringService.kanOppretteBehandling(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isTrue
@@ -143,9 +152,7 @@ internal class AutomatiskJournalføringServiceTest {
     @Test
     internal fun `skal ikke kunne automatisk journalføre hvis journalpostens bruker mangler`() {
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost.copy(bruker = null)
-        every { fagsakService.finnFagsak(any(), any()) } returns fagsak
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
-        every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(aktørId, false)))
 
         assertThatThrownBy {
             automatiskJournalføringService.håndterSøknad(
@@ -165,7 +172,6 @@ internal class AutomatiskJournalføringServiceTest {
             type = BrukerIdType.AKTOERID,
         )
         val journalpostMedAktørId = journalpost.copy(bruker = aktørIdBruker)
-        val taskSlot = slot<Task>()
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpostMedAktørId
         every { journalpostService.oppdaterOgFerdigstillJournalpostMaskinelt(any(), any(), any()) } just Runs
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
@@ -179,10 +185,8 @@ internal class AutomatiskJournalføringServiceTest {
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
             )
         } returns behandling(fagsak = fagsak)
-        every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(aktørId, false)))
         every { journalpostService.hentSøknadFraJournalpost(any()) } returns mockk()
         every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
-        every { taskService.save(capture(taskSlot)) } returns mockk()
 
         automatiskJournalføringService.håndterSøknad(
             AutomatiskJournalføringRequest(

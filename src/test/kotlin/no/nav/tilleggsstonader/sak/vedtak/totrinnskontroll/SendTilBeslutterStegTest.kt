@@ -29,7 +29,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask.OpprettOppgaveTaskData
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.clearBrukerContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -211,8 +210,8 @@ class SendTilBeslutterStegTest {
         verify { behandlingService.oppdaterStatusPåBehandling(behandling.id, BehandlingStatus.FATTER_VEDTAK) }
 
         assertThat(taskSlot[0].type).isEqualTo(OpprettOppgaveTask.TYPE)
-        assertThat(objectMapper.readValue<OpprettOppgaveTaskData>(taskSlot[0].payload).oppgavetype)
-            .isEqualTo(Oppgavetype.GodkjenneVedtak)
+        val taskData = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot[0].payload)
+        assertThat(taskData.oppgave.oppgavetype).isEqualTo(Oppgavetype.GodkjenneVedtak)
 
         assertThat(taskSlot[1].type).isEqualTo(FerdigstillOppgaveTask.TYPE)
         assertThat(objectMapper.readValue<FerdigstillOppgaveTask.FerdigstillOppgaveTaskData>(taskSlot[1].payload).oppgavetype)

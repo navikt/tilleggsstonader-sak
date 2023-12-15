@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import org.springframework.http.HttpStatus
@@ -52,8 +53,8 @@ class AngreSendTilBeslutterService(
     private fun opprettBehandleSakOppgave(saksbehandling: Saksbehandling) {
         taskService.save(
             OpprettOppgaveTask.opprettTask(
-                OpprettOppgaveTask.OpprettOppgaveTaskData(
-                    behandlingId = saksbehandling.id,
+                behandlingId = saksbehandling.id,
+                OpprettOppgave(
                     oppgavetype = Oppgavetype.BehandleSak,
                     beskrivelse = "Angret send til beslutter",
                     tilordnetNavIdent = SikkerhetContext.hentSaksbehandler(),
