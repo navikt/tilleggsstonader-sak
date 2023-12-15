@@ -63,7 +63,7 @@ class AutomatiskJournalføringService(
                 stønadstype = stønadstype,
             )
         } else {
-            håndterSøknadSomIkkeKanAutomatiskJournalføres()
+            håndterSøknadSomIkkeKanAutomatiskJournalføres(automatiskJournalføringRequest)
         }
     }
 
@@ -101,8 +101,26 @@ class AutomatiskJournalføringService(
         )
     }
 
-    private fun håndterSøknadSomIkkeKanAutomatiskJournalføres() {
-        TODO("Not yet implemented")
+    private fun håndterSøknadSomIkkeKanAutomatiskJournalføres(request: AutomatiskJournalføringRequest) {
+        val journalpost = journalpostService.hentJournalpost(request.journalpostId)
+        taskService.save(
+            OpprettOppgaveTask.opprettTask(
+                personIdent = request.personIdent,
+                stønadstype = request.stønadstype,
+                oppgave = OpprettOppgave(
+                    oppgavetype = Oppgavetype.Journalføring,
+                    enhetsnummer = journalpost.journalforendeEnhet?.takeIf { it != MASKINELL_JOURNALFOERENDE_ENHET },
+                    beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost),
+                    journalpostId = journalpost.journalpostId,
+                ),
+            ),
+        )
+    }
+
+    private fun lagOppgavebeskrivelseForJournalføringsoppgave(journalpost: Journalpost): String {
+        if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
+        val dokumentTittel = journalpost.dokumenter!!.firstOrNull { it.brevkode != null }?.tittel ?: ""
+        return "Må behandles i ny løsning - $dokumentTittel"
     }
 
     fun kanOppretteBehandling(ident: String, stønadstype: Stønadstype): Boolean {

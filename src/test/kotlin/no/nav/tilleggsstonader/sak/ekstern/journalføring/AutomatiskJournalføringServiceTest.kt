@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -9,12 +10,15 @@ import io.mockk.verify
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
+import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -76,8 +80,9 @@ internal class AutomatiskJournalføringServiceTest {
         journalpostId = journalpostId,
         journalposttype = Journalposttype.I,
         journalstatus = Journalstatus.MOTTATT,
-        dokumenter = emptyList(),
+        dokumenter = listOf(DokumentInfo("", brevkode = "1")),
         bruker = Bruker(personIdent, BrukerIdType.FNR),
+        journalforendeEnhet = "123",
     )
 
     val taskSlot = slot<Task>()
@@ -205,5 +210,25 @@ internal class AutomatiskJournalføringServiceTest {
         }
 
         assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+    }
+
+    @Test
+    fun `skal opprette journalføringsoppgave hvis man ikke kan automatisk journalføre`() {
+        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
+        every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling())
+
+        automatiskJournalføringService.håndterSøknad(
+            AutomatiskJournalføringRequest(
+                personIdent,
+                journalpostId,
+                Stønadstype.BARNETILSYN,
+            ),
+        )
+
+        assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveTask.TYPE)
+        val payload = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot.captured.payload)
+        assertThat(payload.oppgave.journalpostId).isEqualTo(journalpostId)
+        assertThat(payload.oppgave.oppgavetype).isEqualTo(Oppgavetype.Journalføring)
+        assertThat(payload.oppgave.enhetsnummer).isEqualTo("123")
     }
 }
