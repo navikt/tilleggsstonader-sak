@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.oppgave
@@ -21,6 +22,13 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
 
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
+
+    @Test
+    fun `skal kunne opprette oppgave uten kobling til behandling`() {
+        val oppgave = oppgaveRepository.insert(oppgave(behandlingId = null))
+
+        assertThat(oppgaveRepository.findByIdOrThrow(oppgave.id).behandlingId).isNull()
+    }
 
     @Test
     internal fun findByBehandlingIdAndTypeAndErFerdigstiltIsFalse() {
