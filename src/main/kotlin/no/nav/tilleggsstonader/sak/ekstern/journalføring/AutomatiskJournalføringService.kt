@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringRequest
-import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringResponse
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -49,11 +48,11 @@ class AutomatiskJournalføringService(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @Transactional
-    fun håndterSøknad(automatiskJournalføringRequest: AutomatiskJournalføringRequest): AutomatiskJournalføringResponse {
+    fun håndterSøknad(automatiskJournalføringRequest: AutomatiskJournalføringRequest) {
         val personIdent = automatiskJournalføringRequest.personIdent
         val stønadstype = automatiskJournalføringRequest.stønadstype
 
-        return if (kanOppretteBehandling(personIdent, stønadstype)) {
+        if (kanOppretteBehandling(personIdent, stønadstype)) {
             automatiskJournalførTilBehandling(
                 journalpostId = automatiskJournalføringRequest.journalpostId,
                 personIdent = personIdent,
@@ -68,7 +67,7 @@ class AutomatiskJournalføringService(
         journalpostId: String,
         personIdent: String,
         stønadstype: Stønadstype,
-    ): AutomatiskJournalføringResponse {
+    ) {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
         val fagsak = fagsakService.hentEllerOpprettFagsak(personIdent, stønadstype)
         val nesteBehandlingstype = utledNesteBehandlingstype(behandlingService.hentBehandlinger(fagsak.id))
@@ -96,13 +95,9 @@ class AutomatiskJournalføringService(
                 beskrivelse = "Automatisk journalført søknad",
             ),
         )
-        return AutomatiskJournalføringResponse(
-            fagsakId = fagsak.id,
-            behandlingId = behandling.id,
-        )
     }
 
-    private fun håndterSøknadSomIkkeKanAutomatiskJournalføres(): AutomatiskJournalføringResponse {
+    private fun håndterSøknadSomIkkeKanAutomatiskJournalføres() {
         TODO("Not yet implemented")
     }
 
