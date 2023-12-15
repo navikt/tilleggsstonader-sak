@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringRequest
-import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringResponse
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.FnrUtil.validerIdent
@@ -23,13 +22,11 @@ class AutomatiskJournalføringController(private val automatiskJournalføringSer
 
     @PostMapping
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
-    fun håndterSøknad(
-        @RequestBody request: AutomatiskJournalføringRequest,
-    ): AutomatiskJournalføringResponse {
+    fun håndterSøknad(@RequestBody request: AutomatiskJournalføringRequest) {
         feilHvisIkke(SikkerhetContext.kallKommerFraSoknadApi(), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
         validerIdent(request.personIdent)
-        return automatiskJournalføringService.håndterSøknad(request)
+        automatiskJournalføringService.håndterSøknad(request)
     }
 }
