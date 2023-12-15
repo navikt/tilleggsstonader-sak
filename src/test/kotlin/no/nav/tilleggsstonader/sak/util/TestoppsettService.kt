@@ -3,6 +3,10 @@ package no.nav.tilleggsstonader.sak.util
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
+import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
+import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
+import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakIdRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -19,7 +23,9 @@ import org.springframework.stereotype.Service
 class TestoppsettService(
     private val fagsakPersonRepository: FagsakPersonRepository,
     private val fagsakRepository: FagsakRepository,
+    private val eksternFagsakIdRepository: EksternFagsakIdRepository,
     private val behandlingRepository: BehandlingRepository,
+    private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
 ) {
 
     fun opprettBehandlingMedFagsak(
@@ -34,24 +40,35 @@ class TestoppsettService(
                 fagsakPersonId = person.id,
             ),
         )
-        return behandlingRepository.insert(behandling)
+        return lagre(behandling)
     }
 
     fun opprettPerson(ident: String) = fagsakPersonRepository.insert(FagsakPerson(identer = setOf(PersonIdent(ident))))
 
     fun opprettPerson(person: FagsakPerson) = fagsakPersonRepository.insert(person)
 
+    fun lagre(behandling: List<Behandling>) {
+        behandling.forEach(this::lagre)
+    }
+
+    fun lagre(behandling: Behandling): Behandling {
+        val dbBehandling = behandlingRepository.insert(behandling)
+        eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = dbBehandling.id))
+        return dbBehandling
+    }
+
     fun lagreFagsak(fagsak: Fagsak): Fagsak {
         val person = hentEllerOpprettPerson(fagsak)
-        return fagsakRepository.insert(
+        val fagsak = fagsakRepository.insert(
             FagsakDomain(
                 id = fagsak.id,
                 fagsakPersonId = person.id,
                 stønadstype = fagsak.stønadstype,
-                eksternId = fagsak.eksternId,
                 sporbar = fagsak.sporbar,
             ),
-        ).tilFagsakMedPerson(person.identer)
+        )
+        val eksternFagsakId = eksternFagsakIdRepository.insert(EksternFagsakId(fagsakId = fagsak.id))
+        return fagsak.tilFagsakMedPerson(person.identer, eksternFagsakId)
     }
 
     private fun hentEllerOpprettPerson(fagsak: Fagsak): FagsakPerson {

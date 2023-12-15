@@ -217,7 +217,7 @@ internal class OppgaveServiceTest {
         return fagsak(
             id = FAGSAK_ID,
             stønadstype = Stønadstype.BARNETILSYN,
-            eksternId = EksternFagsakId(FAGSAK_EKSTERN_ID),
+            eksternId = EksternFagsakId(FAGSAK_EKSTERN_ID, FAGSAK_ID),
             identer = setOf(PersonIdent(ident = FNR)),
         )
     }

@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
-import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import java.util.UUID
 
@@ -35,8 +34,6 @@ data class FagsakDomain(
     @Id
     val id: UUID = UUID.randomUUID(),
     val fagsakPersonId: UUID,
-    @MappedCollection(idColumn = "fagsak_id")
-    val eksternId: EksternFagsakId = EksternFagsakId(),
     @Column("stonadstype")
     val stønadstype: Stønadstype,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
@@ -47,14 +44,15 @@ data class FagsakDomain(
 data class EksternFagsakId(
     @Id
     val id: Long = 0,
+    val fagsakId: UUID,
 )
 
-fun FagsakDomain.tilFagsakMedPerson(personIdenter: Set<PersonIdent>): Fagsak =
+fun FagsakDomain.tilFagsakMedPerson(personIdenter: Set<PersonIdent>, eksternFagsakId: EksternFagsakId): Fagsak =
     Fagsak(
         id = id,
         fagsakPersonId = fagsakPersonId,
         personIdenter = personIdenter,
-        eksternId = eksternId,
+        eksternId = eksternFagsakId,
         stønadstype = stønadstype,
         sporbar = sporbar,
     )

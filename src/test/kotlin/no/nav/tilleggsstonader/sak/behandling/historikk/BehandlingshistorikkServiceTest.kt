@@ -34,7 +34,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
     fun `lagre behandling og hent historikk`() {
         /** Lagre */
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         val behandlingHistorikk =
             behandlingshistorikkRepository.insert(
                 Behandlingshistorikk(
@@ -57,7 +57,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
     fun `Finn hendelseshistorikk på behandling uten historikk`() {
         /** Lagre */
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         /** Hent */
         val list = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling(fagsak, behandling))
@@ -68,7 +68,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
     @Test
     internal fun `skal slå sammen hendelser av typen opprettet`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         val beslutteVedtak = behandling.copy(steg = StegType.BESLUTTE_VEDTAK)
 
         insert(behandling.copy(steg = StegType.VILKÅR), LocalDateTime.now().minusDays(8))
@@ -92,7 +92,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
     @Test
     internal fun `flere sett og av vent skal ikke slåes sammen`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak, steg = StegType.VILKÅR))
+        val behandling = testoppsettService.lagre(behandling(fagsak, steg = StegType.VILKÅR))
         insert(behandling, LocalDateTime.now().minusDays(10))
         insert(behandling, LocalDateTime.now().minusDays(8), StegUtfall.SATT_PÅ_VENT)
         insert(behandling, LocalDateTime.now().minusDays(5), StegUtfall.TATT_AV_VENT)
@@ -112,7 +112,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
     @Test
     internal fun `finn seneste behandlinghistorikk`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         insert(behandling, "A", LocalDateTime.now().minusDays(1))
         insert(behandling, "B", LocalDateTime.now().plusDays(1))
@@ -125,7 +125,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
     @Test
     internal fun `finn seneste behandlinghistorikk med type`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         insert(behandling, "A", LocalDateTime.now().minusDays(1))
         insert(behandling, "B", LocalDateTime.now().plusDays(1))

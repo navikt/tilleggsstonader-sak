@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
-import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -20,8 +19,6 @@ data class Behandling(
     val id: UUID = UUID.randomUUID(),
     val fagsakId: UUID,
     val forrigeBehandlingId: UUID? = null,
-    @MappedCollection(idColumn = "behandling_id")
-    val eksternId: EksternBehandlingId = EksternBehandlingId(),
     // @Version ?
     val versjon: Int = 0,
 
@@ -111,4 +108,5 @@ enum class BehandlingStatus {
 data class EksternBehandlingId(
     @Id
     val id: Long = 0,
+    val behandlingId: UUID,
 )

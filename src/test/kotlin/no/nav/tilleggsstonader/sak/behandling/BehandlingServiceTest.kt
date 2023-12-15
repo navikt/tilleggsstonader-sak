@@ -50,6 +50,7 @@ internal class BehandlingServiceTest {
         BehandlingService(
             mockk(),
             behandlingRepository,
+            mockk(),
             behandlingshistorikkService,
             // taskService,
         )
