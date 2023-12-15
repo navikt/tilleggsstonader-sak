@@ -3,17 +3,13 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
-import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.DataGenerator
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.lagAndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.innvilgetOgFerdigstilt
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
-import java.time.LocalDate
 
 internal class TilkjentYtelseRepositoryTest : IntegrationTest() {
 
@@ -22,9 +18,6 @@ internal class TilkjentYtelseRepositoryTest : IntegrationTest() {
 
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
-
-    @Autowired
-    private lateinit var fagsakRepository: FagsakRepository
 
     @Test
     fun `Opprett og hent tilkjent ytelse`() {
@@ -56,69 +49,6 @@ internal class TilkjentYtelseRepositoryTest : IntegrationTest() {
         val hentetTilkjentYtelse = repository.findByBehandlingId(behandling.id)
 
         assertThat(hentetTilkjentYtelse).isEqualTo(lagretTilkjentYtelse)
-    }
-
-    @Test
-    internal fun `finnTilkjentYtelserTilKonsistensAvstemming`() {
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak).innvilgetOgFerdigstilt())
-
-        val tilkjentYtelse = DataGenerator.tilfeldigTilkjentYtelse(behandling)
-        val stønadFom = tilkjentYtelse.andelerTilkjentYtelse.minOf { it.stønadFom }
-
-        repository.insert(tilkjentYtelse)
-
-        assertThat(repository.finnTilkjentYtelserTilKonsistensavstemming(fagsak.stønadstype, stønadFom.minusDays(1)))
-            .withFailMessage("Skal finne alle fremtidlige tilkjente ytelser")
-            .hasSize(1)
-        assertThat(repository.finnTilkjentYtelserTilKonsistensavstemming(fagsak.stønadstype, stønadFom))
-            .hasSize(1)
-
-        assertThat(repository.finnTilkjentYtelserTilKonsistensavstemming(fagsak.stønadstype, stønadFom.plusDays(1)))
-            .isEmpty()
-    }
-
-    @Test
-    internal fun `skal kun finne siste behandlingen sin tilkjenteytelse`() {
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val opprettetTid = LocalDate.of(2021, 1, 1).atStartOfDay()
-        val behandling =
-            behandlingRepository.insert(behandling(fagsak, opprettetTid = opprettetTid).innvilgetOgFerdigstilt())
-        val behandling2 = behandlingRepository.insert(behandling(fagsak).innvilgetOgFerdigstilt())
-        repository.insert(DataGenerator.tilfeldigTilkjentYtelse(behandling))
-        repository.insert(DataGenerator.tilfeldigTilkjentYtelse(behandling2))
-
-        assertThat(repository.findAll().map { it.behandlingId }).containsExactlyInAnyOrder(
-            behandling.id,
-            behandling2.id,
-        )
-
-        val result = repository.finnTilkjentYtelserTilKonsistensavstemming(fagsak.stønadstype, LocalDate.now())
-        assertThat(result.map { it.behandlingId }).containsExactly(behandling2.id)
-    }
-
-    @Test
-    internal fun `finnTilkjentYtelserTilKonsistensavstemming skal ikke få med tilkjent ytelser som kun har 0-beløp`() {
-        val beløp = 0
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(
-            behandling(fagsak, opprettetTid = LocalDate.of(2021, 1, 1).atStartOfDay())
-                .innvilgetOgFerdigstilt(),
-        )
-        val andelerTilkjentYtelse = listOf(
-            lagAndelTilkjentYtelse(
-                beløp = beløp,
-                fraOgMed = LocalDate.now(),
-                tilOgMed = LocalDate.now().plusDays(1),
-                kildeBehandlingId = behandling.id,
-            ),
-        )
-        repository.insert(
-            DataGenerator.tilfeldigTilkjentYtelse(behandling).copy(andelerTilkjentYtelse = andelerTilkjentYtelse),
-        )
-
-        assertThat(repository.finnTilkjentYtelserTilKonsistensavstemming(fagsak.stønadstype, LocalDate.now()))
-            .isEmpty()
     }
 
     private fun opprettBehandling(): Behandling {
