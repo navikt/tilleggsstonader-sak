@@ -14,6 +14,7 @@ data class AndelTilkjentYtelse(
     @Column("stonad_tom")
     val stønadTom: LocalDate,
     val kildeBehandlingId: UUID,
+    val iverksettingId: UUID? = null,
 ) {
 
     constructor(
