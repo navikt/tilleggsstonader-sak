@@ -1,7 +1,7 @@
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20231026103714_2f17845"
-val tilleggsstønaderLibsVersion = "2023.12.04-12.14.a6ecafd594a1"
-val tilleggsstønaderKontrakterVersion = "2023.12.04-12.03.40d61264fa02"
+val familieProsesseringVersion = "2.20231212093500_bfa0e7c"
+val tilleggsstønaderLibsVersion = "2023.12.15-09.40.7c554b900322"
+val tilleggsstønaderKontrakterVersion = "2023.12.15-09.39.8f8218c4f23c"
 val tokenSupportVersion = "3.2.0"
 val wiremockVersion = "3.3.1"
 val mockkVersion = "1.13.8"
@@ -91,7 +91,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.14.1"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.15.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 }
