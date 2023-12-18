@@ -114,17 +114,33 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Støn
     // Målgrupper
     MÅLGRUPPE_AAP("AAP", listOf()),
     MÅLGRUPPE_AAP_FERDIG_AVKLART("AAP Ferdig avklart", listOf()),
+    MÅLGRUPPE_DAGPENGER("Dagpenger", listOf()),
+    MÅLGRUPPE_OMSTILLINGSSTØNAD("Omstillingsstønad", listOf()),
+    MÅLGRUPPE_OVERGANGSSTØNAD("Rett til overgangsstønad", listOf()),
+    MÅLGRUPPE_UFØRETRYGD("Uføretrygd", listOf()),
 
     // Aktiviteter
     AKTIVITET_TILTAK("Tiltak", listOf()),
     AKTIVITET_UTDANNING("Utdanning", listOf()),
+    AKTIVITET_REEL_ARBEIDSSSØKER("Reel arbeidssøker", listOf()),
     ;
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN
 
-    fun gjelderMålgruppe(): Boolean = setOf(MÅLGRUPPE_AAP, MÅLGRUPPE_AAP_FERDIG_AVKLART).contains(this)
+    fun gjelderMålgruppe(): Boolean = setOf(
+        MÅLGRUPPE_AAP,
+        MÅLGRUPPE_AAP_FERDIG_AVKLART,
+        MÅLGRUPPE_DAGPENGER,
+        MÅLGRUPPE_OMSTILLINGSSTØNAD,
+        MÅLGRUPPE_OVERGANGSSTØNAD,
+        MÅLGRUPPE_UFØRETRYGD,
+    ).contains(this)
 
-    fun gjelderAktivitet(): Boolean = setOf(AKTIVITET_TILTAK, AKTIVITET_UTDANNING).contains(this)
+    fun gjelderAktivitet(): Boolean = setOf(
+        AKTIVITET_TILTAK,
+        AKTIVITET_UTDANNING,
+        AKTIVITET_REEL_ARBEIDSSSØKER,
+    ).contains(this)
 
     fun gjelderMålgruppeEllerAktivitet(): Boolean = gjelderMålgruppe() || gjelderAktivitet()
 

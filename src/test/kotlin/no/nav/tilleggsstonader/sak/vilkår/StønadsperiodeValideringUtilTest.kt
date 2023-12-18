@@ -53,7 +53,19 @@ internal class StønadsperiodeValideringUtilTest {
         }.doesNotThrowAnyException()
     }
 
-    // TODO: Test feil kombinasjoner av målgruppe og aktivitet
+    @Test
+    internal fun `skal kaste feil om kombinasjon av målgruppe og aktivitet er ugyldig`() {
+        val stønadsperiode =
+            lagStønadsperiode(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.TILTAK)
+
+        assertThatThrownBy {
+            validerStønadsperiode(
+                stønadsperiode,
+                målgrupper,
+                aktiviteter,
+            )
+        }.hasMessageContaining("Kombinasjonen av ${stønadsperiode.målgruppe} og ${stønadsperiode.aktivitet} er ikke gyldig")
+    }
 
     @Test
     internal fun `skal kaste feil om ingen periode for målgruppe matcher`() {
