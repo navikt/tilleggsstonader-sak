@@ -37,11 +37,6 @@ data class Datoperiode(
     override fun merge(other: Datoperiode): Datoperiode {
         return this.copy(tom = other.tom)
     }
-
-    // TODO: Slett når kontrakter oppdateres
-    fun inneholder(other: Periode<LocalDate>): Boolean {
-        return this.fom <= other.fom && this.tom >= other.tom
-    }
 }
 
 // TODO flytt til kontrakter
