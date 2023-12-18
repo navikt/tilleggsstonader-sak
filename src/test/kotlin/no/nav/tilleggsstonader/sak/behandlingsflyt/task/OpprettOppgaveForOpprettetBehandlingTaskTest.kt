@@ -7,10 +7,10 @@ import io.mockk.verify
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
-import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -29,7 +29,7 @@ internal class OpprettOppgaveForOpprettetBehandlingTaskTest {
 
     @BeforeEach
     internal fun setUp() {
-        every { oppgaveService.opprettOppgave(any(), any(), any(), any(), any()) } returns oppgaveId
+        every { oppgaveService.opprettOppgave(any(), any()) } returns oppgaveId
         every { taskService.save(capture(opprettTaskSlot)) } answers { firstArg() }
     }
 
@@ -51,7 +51,7 @@ internal class OpprettOppgaveForOpprettetBehandlingTaskTest {
             ),
         )
 
-        verify(exactly = 1) { oppgaveService.opprettOppgave(any(), any(), any(), any(), any()) }
+        verify(exactly = 1) { oppgaveService.opprettOppgave(any(), any()) }
     }
 
     @EnumSource(
@@ -72,12 +72,12 @@ internal class OpprettOppgaveForOpprettetBehandlingTaskTest {
             ),
         )
 
-        verify(exactly = 0) { oppgaveService.opprettOppgave(any(), any(), any(), any(), any()) }
+        verify(exactly = 0) { oppgaveService.opprettOppgave(any(), any()) }
     }
 
-    private fun mockBehandling(status: BehandlingStatus): Behandling {
-        val behandling = behandling(status = status)
-        every { behandlingService.hentBehandling(behandling.id) } returns behandling
+    private fun mockBehandling(status: BehandlingStatus): Saksbehandling {
+        val behandling = saksbehandling(status = status)
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         return behandling
     }
 }

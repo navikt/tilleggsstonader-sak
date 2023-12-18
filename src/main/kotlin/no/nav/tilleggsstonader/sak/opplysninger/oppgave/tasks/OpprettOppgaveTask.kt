@@ -1,14 +1,17 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -22,8 +25,8 @@ import java.util.UUID
     maxAntallFeil = 3,
 )
 class OpprettOppgaveTask(
-    private val oppgaveService: OppgaveService,
     private val behandlingService: BehandlingService,
+    private val oppgaveService: OppgaveService,
 ) : AsyncTaskStep {
 
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -32,35 +35,34 @@ class OpprettOppgaveTask(
      * Då payload er unik per task type, så settes unik inn
      */
     data class OpprettOppgaveTaskData(
-        val behandlingId: UUID,
-        val oppgavetype: Oppgavetype,
-        val tilordnetNavIdent: String? = null,
-        val beskrivelse: String? = null,
+        val kobling: Oppgavekobling,
+        val oppgave: OpprettOppgave,
         val unik: LocalDateTime? = LocalDateTime.now(),
     )
 
     override fun doTask(task: Task) {
         val data = objectMapper.readValue<OpprettOppgaveTaskData>(task.payload)
-        val oppgavetype = data.oppgavetype
+        val kobling = data.kobling
+        val oppgavetype = data.oppgave.oppgavetype
 
-        if (oppgavetype == Oppgavetype.BehandleSak) {
-            val behandling = behandlingService.hentBehandling(data.behandlingId)
-
-            /**
-             * Nødvendig sjekk for å unngå å lage en behandle sak oppgave som aldri ferdigstilles dersom
-             * SB sender til beslutter rett etter angring og oppgave ikke er opprettet enda.
-             */
-            if (behandling.status.behandlingErLåstForVidereRedigering()) {
-                logger.info("Opprettet ikke oppgave med oppgavetype = $oppgavetype fordi status = ${behandling.status}")
-                return
+        val koblingPerson: OppgavekoblingPerson = when (kobling) {
+            is OppgavekoblingBehandling -> {
+                val behandling = behandlingService.hentSaksbehandling(kobling.behandlingId)
+                if (behandling.status.behandlingErLåstForVidereRedigering()) {
+                    logger.info("Opprettet ikke oppgave med oppgavetype=$oppgavetype fordi status=${behandling.status}")
+                    return
+                }
+                OppgavekoblingPerson(behandling.ident, behandling.stønadstype)
             }
+
+            is OppgavekoblingPerson -> kobling
         }
 
         val oppgaveId = oppgaveService.opprettOppgave(
-            behandlingId = data.behandlingId,
-            oppgavetype = oppgavetype,
-            tilordnetNavIdent = data.tilordnetNavIdent,
-            beskrivelse = data.beskrivelse,
+            personIdent = koblingPerson.personIdent,
+            stønadstype = koblingPerson.stønadstype,
+            behandlingId = kobling.let { if (it is OppgavekoblingBehandling) it else null }?.behandlingId,
+            oppgave = data.oppgave,
         )
         logger.info("Opprettet oppgave=$oppgaveId for oppgavetype=$oppgavetype")
 
@@ -69,14 +71,29 @@ class OpprettOppgaveTask(
 
     companion object {
 
-        fun opprettTask(data: OpprettOppgaveTaskData): Task {
+        fun opprettTask(behandlingId: UUID, oppgave: OpprettOppgave): Task {
+            return opprettTask(OppgavekoblingBehandling(behandlingId), oppgave)
+        }
+
+        fun opprettTask(personIdent: String, stønadstype: Stønadstype, oppgave: OpprettOppgave): Task {
+            return opprettTask(OppgavekoblingPerson(personIdent, stønadstype), oppgave)
+        }
+
+        private fun opprettTask(oppgavekobling: Oppgavekobling, oppgave: OpprettOppgave): Task {
             return Task(
                 type = TYPE,
-                payload = objectMapper.writeValueAsString(data),
+                payload = objectMapper.writeValueAsString(
+                    OpprettOppgaveTaskData(
+                        kobling = oppgavekobling,
+                        oppgave = oppgave,
+                    ),
+                ),
                 properties = Properties().apply {
                     setProperty("saksbehandler", SikkerhetContext.hentSaksbehandlerEllerSystembruker())
-                    setProperty("behandlingId", data.behandlingId.toString())
-                    setProperty("oppgavetype", data.oppgavetype.name)
+                    setProperty("oppgavetype", oppgave.oppgavetype.name)
+                    if (oppgavekobling is OppgavekoblingBehandling) {
+                        setProperty("behandlingId", oppgavekobling.behandlingId.toString())
+                    }
                 },
             )
         }
@@ -84,3 +101,19 @@ class OpprettOppgaveTask(
         const val TYPE = "opprettOppgave"
     }
 }
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes(
+    JsonSubTypes.Type(OppgavekoblingBehandling::class, name = "OpprettOppgave"),
+    JsonSubTypes.Type(OppgavekoblingPerson::class, name = "OpprettOppgaveForBehandling"),
+)
+sealed class Oppgavekobling
+
+data class OppgavekoblingBehandling(
+    val behandlingId: UUID,
+) : Oppgavekobling()
+
+data class OppgavekoblingPerson(
+    val personIdent: String,
+    val stønadstype: Stønadstype,
+) : Oppgavekobling()
