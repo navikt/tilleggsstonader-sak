@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollSt
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnskontrollDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
+import java.util.*
 
 @Service
 class TotrinnskontrollService(
@@ -40,7 +40,7 @@ class TotrinnskontrollService(
         if (eksisterandeTotrinnskontroll != null) {
             feilHvis(
                 (
-                    eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET ||
+                    eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET &&
                         eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
                     ),
             ) {
@@ -60,7 +60,7 @@ class TotrinnskontrollService(
     fun angreSendTilBeslutter(behandlingId: UUID) {
         val eksisterandeTotrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
 
-        feilHvis((eksisterandeTotrinnskontroll == null || eksisterandeTotrinnskontroll?.status != TotrinnInternStatus.KAN_FATTE_VEDTAK)) {
+        feilHvis((eksisterandeTotrinnskontroll == null || eksisterandeTotrinnskontroll.status != TotrinnInternStatus.KAN_FATTE_VEDTAK)) {
             "Totrinnskontroll er ikke i en status der den kan angres ${eksisterandeTotrinnskontroll?.status}"
         }
         oppdaterStatusPåTotrinnskontroll(TotrinnInternStatus.ANGRET, eksisterandeTotrinnskontroll)
@@ -107,17 +107,18 @@ class TotrinnskontrollService(
 
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, nyStatus)
         if (nyTotrinnsKontrollStatus == TotrinnInternStatus.UNDERKJENT) {
-            oppdaterUtfallogÅrsakPåTotrinnskontroll(beslutteVedtak, sisteTotrinnskontroll)
+            oppdaterUtfallogÅrsakPåTotrinnskontroll(beslutteVedtak, sisteTotrinnskontroll, nyTotrinnsKontrollStatus)
         } else {
             oppdaterStatusPåTotrinnskontroll(nyTotrinnsKontrollStatus, sisteTotrinnskontroll)
         }
+
         return sisteTotrinnskontroll.saksbehandler
     }
 
     fun hentSaksbehandlerSomSendteTilBeslutter(behandlingId: UUID): String {
         val totrinnskontrollSaksbehandler =
             totrinnskontrollRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(behandlingId, TotrinnInternStatus.GODKJENT)
-        return totrinnskontrollSaksbehandler.saksbehandler ?: throw Feil("Fant ikke saksbehandler som sendte til beslutter")
+        return totrinnskontrollSaksbehandler.saksbehandler
     }
 
     fun hentBeslutter(behandlingId: UUID): String? {
@@ -145,10 +146,13 @@ class TotrinnskontrollService(
     private fun oppdaterUtfallogÅrsakPåTotrinnskontroll(
         beslutteVedtak: BeslutteVedtakDto,
         sisteTotrinnskontroll: Totrinnskontroll,
+        nyTotrinnsKontrollStatus: TotrinnInternStatus,
     ): Totrinnskontroll {
         val begrunnelse = beslutteVedtak.begrunnelse
-        val årsakUnderkjent = beslutteVedtak.årsakerUnderkjent as Årsaker
-        return totrinnskontrollRepository.update(sisteTotrinnskontroll.copy(begrunnelse = begrunnelse, årsakerUnderkjent = årsakUnderkjent))
+        val årsakUnderkjent = beslutteVedtak.årsakerUnderkjent
+        val status = nyTotrinnsKontrollStatus
+
+        return totrinnskontrollRepository.update(sisteTotrinnskontroll.copy(begrunnelse = begrunnelse, årsakerUnderkjent = Årsaker(årsakUnderkjent), status = status))
     }
 
     private fun behandlingErGodkjentEllerOpprettet(behandlingStatus: BehandlingStatus) =

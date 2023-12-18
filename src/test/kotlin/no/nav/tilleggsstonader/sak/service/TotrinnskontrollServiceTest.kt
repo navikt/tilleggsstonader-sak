@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.service
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -27,7 +28,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import java.util.UUID
+import java.util.*
 
 internal class TotrinnskontrollServiceTest {
 
@@ -119,7 +120,7 @@ internal class TotrinnskontrollServiceTest {
         every {
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
         } returns totrinnskontroll(opprettetAv = opprettetAv, TotrinnInternStatus.UNDERKJENT)
-        assertThatThrownBy() {
+        assertDoesNotThrow {
             totrinnskontrollService
                 .sendtilBeslutter(
                     saksbehandling(status = BehandlingStatus.UTREDES),
@@ -269,6 +270,20 @@ internal class TotrinnskontrollServiceTest {
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
         assertThat(totrinnskontroll.totrinnskontroll?.begrunnelse).isEqualTo("begrunnelse underkjent")
         assertThat(totrinnskontroll.totrinnskontroll?.årsakerUnderkjent).containsExactlyInAnyOrder(ÅrsakUnderkjent.INNGANGSVILKÅR_FORUTGÅENDE_MEDLEMSKAP_OPPHOLD, ÅrsakUnderkjent.VEDTAK_OG_BEREGNING)
+    }
+
+    @Test
+    internal fun `skal kunne underkjenne en totrinnskontroll`() {
+        val oppdaterSlot = slot<Totrinnskontroll>()
+        every {
+            totrinnskontrollRepository.update(capture(oppdaterSlot))
+        } answers { firstArg() }
+
+        totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(
+            saksbehandling(status = BehandlingStatus.UTREDES),
+            BeslutteVedtakDto(false, "manglende", årsakerUnderkjent = listOf(ÅrsakUnderkjent.AKTIVITET)),
+        )
+        assertThat(oppdaterSlot.captured.årsakerUnderkjent?.årsaker!!).containsExactly(ÅrsakUnderkjent.AKTIVITET)
     }
 
     @Test
