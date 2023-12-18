@@ -98,19 +98,55 @@ enum class Vilkårsresultat(val beskrivelse: String) {
     fun erIkkeDelvilkårsresultat() = this != AUTOMATISK_OPPFYLT
 }
 
+/**
+ * @param gjelderStønader er for stønadsspesifike regler
+ */
 enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Stønadstype>) {
     EKSEMPEL("Eksempel", listOf()),
     EKSEMPEL2("Eksempel 2", listOf()),
     MÅLGRUPPE("Målgruppe", listOf(Stønadstype.BARNETILSYN)),
     AKTIVITET("Aktivitet", listOf(Stønadstype.BARNETILSYN)),
+
+    // Barnetilsyn
     PASS_BARN("Pass av barn", listOf(Stønadstype.BARNETILSYN)),
+
+    // Generelle regler for alle stønader
+    // Målgrupper
+    MÅLGRUPPE_AAP("AAP", listOf()),
+    MÅLGRUPPE_AAP_FERDIG_AVKLART("AAP Ferdig avklart", listOf()),
+    MÅLGRUPPE_DAGPENGER("Dagpenger", listOf()),
+    MÅLGRUPPE_OMSTILLINGSSTØNAD("Omstillingsstønad", listOf()),
+    MÅLGRUPPE_OVERGANGSSTØNAD("Rett til overgangsstønad", listOf()),
+    MÅLGRUPPE_UFØRETRYGD("Uføretrygd", listOf()),
+
+    // Aktiviteter
+    AKTIVITET_TILTAK("Tiltak", listOf()),
+    AKTIVITET_UTDANNING("Utdanning", listOf()),
+    AKTIVITET_REEL_ARBEIDSSSØKER("Reel arbeidssøker", listOf()),
     ;
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN
 
+    fun gjelderMålgruppe(): Boolean = setOf(
+        MÅLGRUPPE_AAP,
+        MÅLGRUPPE_AAP_FERDIG_AVKLART,
+        MÅLGRUPPE_DAGPENGER,
+        MÅLGRUPPE_OMSTILLINGSSTØNAD,
+        MÅLGRUPPE_OVERGANGSSTØNAD,
+        MÅLGRUPPE_UFØRETRYGD,
+    ).contains(this)
+
+    fun gjelderAktivitet(): Boolean = setOf(
+        AKTIVITET_TILTAK,
+        AKTIVITET_UTDANNING,
+        AKTIVITET_REEL_ARBEIDSSSØKER,
+    ).contains(this)
+
+    fun gjelderMålgruppeEllerAktivitet(): Boolean = gjelderMålgruppe() || gjelderAktivitet()
+
     companion object {
 
-        fun hentVilkårForStønad(stønadstype: Stønadstype): List<VilkårType> = values().filter {
+        fun hentVilkårForStønad(stønadstype: Stønadstype): List<VilkårType> = entries.filter {
             it.gjelderStønader.contains(stønadstype)
         }
     }

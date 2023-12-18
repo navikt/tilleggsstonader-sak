@@ -11,7 +11,7 @@ import java.util.UUID
 data class OppgaveDomain(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val behandlingId: UUID,
+    val behandlingId: UUID?,
     val gsakOppgaveId: Long,
     val type: Oppgavetype,
     var erFerdigstilt: Boolean = false,

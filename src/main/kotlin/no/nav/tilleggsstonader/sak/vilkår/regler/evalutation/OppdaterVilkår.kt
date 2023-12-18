@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.regler.evalutation
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
@@ -119,38 +118,6 @@ object OppdaterVilkår {
         }
     }
 
-    fun utledBehandlingKategori(vilkårsett: List<Vilkår>): BehandlingKategori {
-        return BehandlingKategori.NASJONAL
-    }
-    /*
-    val medlemFolketrygd =
-        vilkårsett.utledVurderinger(VilkårType.FORUTGÅENDE_MEDLEMSKAP, RegelId.SØKER_MEDLEM_I_FOLKETRYGDEN)
-            .harSvar(SvarId.JA)
-
-    val unntakEøsAnnenForelder =
-        vilkårsett.utledVurderinger(VilkårType.FORUTGÅENDE_MEDLEMSKAP, RegelId.MEDLEMSKAP_UNNTAK)
-            .harSvar(SvarId.MEDLEM_MER_ENN_5_ÅR_EØS_ANNEN_FORELDER_TRYGDEDEKKET_I_NORGE)
-
-    val unntakEøsMedlemskap =
-        vilkårsett.utledVurderinger(VilkårType.FORUTGÅENDE_MEDLEMSKAP, RegelId.MEDLEMSKAP_UNNTAK)
-            .harSvar(SvarId.MEDLEM_MER_ENN_5_ÅR_EØS)
-
-    val borOgOppholderSegINorge =
-        vilkårsett.utledVurderinger(VilkårType.LOVLIG_OPPHOLD, RegelId.BOR_OG_OPPHOLDER_SEG_I_NORGE)
-            .harSvar(SvarId.JA)
-
-    val unntakEøsOpphold =
-        vilkårsett.utledVurderinger(VilkårType.LOVLIG_OPPHOLD, RegelId.OPPHOLD_UNNTAK)
-            .harSvar(SvarId.OPPHOLDER_SEG_I_ANNET_EØS_LAND)
-
-    val forutgåendeMedelmskapUtløserEøs =
-        !medlemFolketrygd && (unntakEøsAnnenForelder || unntakEøsMedlemskap)
-    val lovligOppholdUtløserEøs = !borOgOppholderSegINorge && unntakEøsOpphold
-
-    return if (forutgåendeMedelmskapUtløserEøs || lovligOppholdUtløserEøs) BehandlingKategori.EØS else BehandlingKategori.NASJONAL
-}
-*/
-
     fun erAlleVilkårOppfylt(
         vilkårsett: List<Vilkår>,
         stønadstype: Stønadstype,
@@ -184,21 +151,23 @@ object OppdaterVilkår {
                     it == Vilkårsresultat.SKAL_IKKE_VURDERES
             }
 
+    // TODO rename noe stønadsspesifikt vilkår
     fun opprettNyeVilkår(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
         stønadstype: Stønadstype,
     ): List<Vilkår> {
         return vilkårsreglerForStønad(stønadstype)
+            .filterNot { it.vilkårType.gjelderMålgruppeEllerAktivitet() }
             .flatMap { vilkårsregel ->
                 feilHvis(vilkårsregel.vilkårType.gjelderFlereBarn() && metadata.barn.isEmpty()) {
                     "Kan ikke opprette vilkår når ingen barn er knyttet til behandling $behandlingId"
                 }
 
                 if (vilkårsregel.vilkårType.gjelderFlereBarn()) {
-                    metadata.barn.map { lagNyVilkår(vilkårsregel, metadata, behandlingId, it.id) }
+                    metadata.barn.map { lagNyttVilkår(vilkårsregel, metadata, behandlingId, it.id) }
                 } else {
-                    listOf(lagNyVilkår(vilkårsregel, metadata, behandlingId))
+                    listOf(lagNyttVilkår(vilkårsregel, metadata, behandlingId))
                 }
             }
     }
@@ -230,7 +199,7 @@ object OppdaterVilkår {
     }
      */
 
-    private fun lagNyVilkår(
+    fun lagNyttVilkår(
         vilkårsregel: Vilkårsregel,
         metadata: HovedregelMetadata,
         behandlingId: UUID,

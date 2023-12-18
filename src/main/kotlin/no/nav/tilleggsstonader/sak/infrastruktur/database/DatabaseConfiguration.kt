@@ -11,6 +11,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresul
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.domain.vilkårperiodetyper
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer
@@ -101,6 +103,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 VedtaksdataTilsynBarnWriter(),
                 VedtaksdataBeregningsresultatReader(),
                 VedtaksdataBeregningsresultatWriter(),
+
+                TilVilkårperiodeTypeConverter(),
+                VilkårperiodeTypeTilStringConverter(),
             ),
         )
     }
@@ -171,6 +176,20 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 type = "json"
                 value = objectMapper.writeValueAsString(data.delvilkårsett)
             }
+    }
+
+    @ReadingConverter
+    class TilVilkårperiodeTypeConverter : Converter<String, VilkårperiodeType> {
+
+        override fun convert(type: String): VilkårperiodeType {
+            return vilkårperiodetyper[type] ?: error("Finner ikke mapping for $type")
+        }
+    }
+
+    @WritingConverter
+    class VilkårperiodeTypeTilStringConverter : Converter<VilkårperiodeType, String> {
+
+        override fun convert(data: VilkårperiodeType): String = data.tilDbType()
     }
 
     class BeriketSimuleringsresultatWriter : JsonWriter<BeriketSimuleringsresultat>()

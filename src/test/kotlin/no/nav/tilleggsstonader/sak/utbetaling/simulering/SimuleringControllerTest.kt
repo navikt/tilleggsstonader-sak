@@ -43,7 +43,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
     internal fun `Skal returnere 200 OK for simulering av behandling`() {
         val personIdent = "12345678901"
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(personIdent))))
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         tilkjentYtelseRepository
             .insert(
                 TilkjentYtelse(

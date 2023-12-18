@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface OppgaveRepository : RepositoryInterface<OppgaveDomain, Long>, InsertUpdateRepository<OppgaveDomain> {
+interface OppgaveRepository : RepositoryInterface<OppgaveDomain, UUID>, InsertUpdateRepository<OppgaveDomain> {
 
     fun findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId: UUID, oppgavetype: Oppgavetype): OppgaveDomain?
 

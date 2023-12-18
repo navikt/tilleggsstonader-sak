@@ -11,6 +11,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.brev.Vedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
+import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretBrev
+import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretFrittståendeBrev
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -26,7 +28,9 @@ import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
+import no.nav.tilleggsstonader.sak.vilkår.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -102,6 +106,8 @@ abstract class IntegrationTest {
             VedtakTilsynBarn::class,
             Simuleringsresultat::class,
             TilkjentYtelse::class,
+            Vilkårperiode::class,
+            Stønadsperiode::class,
             Vilkår::class,
             BehandlingBarn::class,
 
@@ -112,6 +118,8 @@ abstract class IntegrationTest {
             Totrinnskontroll::class,
             Vedtaksbrev::class,
             Brevmottaker::class,
+            MellomlagretFrittståendeBrev::class,
+            MellomlagretBrev::class,
             Behandlingshistorikk::class,
             Behandlingsjournalpost::class,
             EksternBehandlingId::class,

@@ -41,6 +41,7 @@ object RegelEvaluering {
 
     fun utledVilkårResultat(delvilkårResultat: Map<RegelId, Vilkårsresultat>): Vilkårsresultat {
         return when {
+            delvilkårResultat.isEmpty() -> Vilkårsresultat.OPPFYLT // TODO vurder denne, skal kanskje kun gjelde målgruppe/aktiitet?
             delvilkårResultat.values.all { it == Vilkårsresultat.OPPFYLT || it == Vilkårsresultat.AUTOMATISK_OPPFYLT } -> Vilkårsresultat.OPPFYLT
             delvilkårResultat.values.all { it == Vilkårsresultat.OPPFYLT || it == Vilkårsresultat.IKKE_OPPFYLT || it == Vilkårsresultat.AUTOMATISK_OPPFYLT } ->
                 Vilkårsresultat.IKKE_OPPFYLT

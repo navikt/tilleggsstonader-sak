@@ -10,9 +10,13 @@ enum class RegelId(val beskrivelse: String) {
 
     // MÅLGRUPPE
     MÅLGRUPPE("Tilhører bruker riktig målgruppe?"),
+    NEDSATT_ARBEIDSEVNE("Har bruker nedsatt arbeidsevne etter §11 A-3?"),
+    OMSTILLINGSSTØNAD_LEDD("Vurdert etter hvilket ledd?"),
 
     // AKTIVITET
     ER_AKTIVITET_REGISTRERT("Er bruker registrert med en aktivitet?"),
+    LØNN_GJENNOM_TILTAK("Mottar bruker lønn gjennom tiltak?"),
+    MOTTAR_SYKEPENGER_GJENNOM_AKTIVITET("Mottar bruker sykepenger gjennom aktivitet?"),
 
     // PASSBARN
     DEKKES_UTGIFTER_ANNET_REGELVERK("Dekkes utgifter av annet regelverk?"),

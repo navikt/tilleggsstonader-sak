@@ -34,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
@@ -61,6 +62,7 @@ internal class VilkårStegServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val søknadService = mockk<SøknadService>()
     private val vilkårRepository = mockk<VilkårRepository>()
+    private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     private val barnService = mockk<BarnService>()
 
     // private val personopplysningerIntegrasjonerClient = mockk<PersonopplysningerIntegrasjonerClient>()
@@ -79,6 +81,7 @@ internal class VilkårStegServiceTest {
         behandlingService,
         søknadService,
         vilkårRepository,
+        vilkårperiodeRepository,
         barnService,
         vilkårGrunnlagService,
         // grunnlagsdataService,
@@ -110,7 +113,6 @@ internal class VilkårStegServiceTest {
         every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling(fagsak, behandling)
         // every { behandlingService.hentAktivIdent(behandlingId) } returns søknad.fødselsnummer
         every { behandlingService.oppdaterStatusPåBehandling(any(), any()) } returns behandling
-        every { behandlingService.oppdaterKategoriPåBehandling(any(), any()) } returns behandling
         // every { søknadService.hentSøknadsgrunnlag(any()) }.returns(søknad)
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsak(stønadstype = Stønadstype.BARNETILSYN)
         every { vilkårRepository.insertAll(any()) } answers { firstArg() }

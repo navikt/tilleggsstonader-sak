@@ -18,6 +18,12 @@ internal class RegelEvalueringTest {
     }
 
     @Test
+    fun `utledVilkårResultat - er OPPFYLT når det ikke finnes noen delvilkår`() {
+        assertThat(RegelEvaluering.utledVilkårResultat(mapOf()))
+            .isEqualTo(Vilkårsresultat.OPPFYLT)
+    }
+
+    @Test
     fun `utledVilkårResultat - er IKKE_OPPFYLT når det finnes en med IKKE_OPPFYLT`() {
         assertThat(
             RegelEvaluering.utledVilkårResultat(

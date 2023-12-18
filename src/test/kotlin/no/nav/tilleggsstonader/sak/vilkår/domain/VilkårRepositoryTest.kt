@@ -29,7 +29,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
     @Test
     internal fun findByBehandlingId() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val vurderinger = listOf(Vurdering(RegelId.HAR_ET_NAVN, SvarId.JA, "ja"))
         val vilkår = vilkårRepository.insert(
@@ -50,7 +50,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
     @Test
     internal fun `vilkårsvurdering uten opphavsvilkår`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         val vilkår = vilkårRepository.insert(
             vilkår(
                 behandlingId = behandling.id,
@@ -65,7 +65,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
     @Test
     internal fun oppdaterEndretTid() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val vilkår = vilkårRepository.insert(
             vilkår(
@@ -87,7 +87,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
     internal fun `setter maskinellt opprettet på vilkår`() {
         val saksbehandler = "C000"
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val vilkår: Vilkår = testWithBrukerContext(preferredUsername = saksbehandler) {
             vilkårRepository.insert(
