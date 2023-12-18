@@ -47,10 +47,12 @@ class OpprettOppgaveConfig(
             .filterNot { it.erFerdigstilt }
             .filter { oppgavetyper.contains(it.type) }
         oppgaver.forEach { oppgave ->
-            val behandling = behandlingService.hentSaksbehandling(oppgave.behandlingId)
-            val nyttOppgaveId = opprettOppgave(behandling, oppgave)
-            // Oppdaterer oppgaveId på oppgaven då vi oppretter alle oppgaver på nytt, og får då et nytt oppgaveId
-            oppgaveRepository.update(oppgave.copy(gsakOppgaveId = nyttOppgaveId))
+            oppgave.behandlingId?.let { behandlingId ->
+                val behandling = behandlingService.hentSaksbehandling(behandlingId)
+                val nyttOppgaveId = opprettOppgave(behandling, oppgave)
+                // Oppdaterer oppgaveId på oppgaven då vi oppretter alle oppgaver på nytt, og får då et nytt oppgaveId
+                oppgaveRepository.update(oppgave.copy(gsakOppgaveId = nyttOppgaveId))
+            }
         }
         logger.info("Opprettet ${oppgaver.size} oppgaver")
     }

@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.PollStatusFraUtbetalingTask
@@ -98,8 +99,8 @@ class BeslutteVedtakSteg(
     private fun opprettBehandleUnderkjentVedtakOppgave(saksbehandling: Saksbehandling, navIdent: String) {
         taskService.save(
             OpprettOppgaveTask.opprettTask(
-                OpprettOppgaveTask.OpprettOppgaveTaskData(
-                    behandlingId = saksbehandling.id,
+                behandlingId = saksbehandling.id,
+                OpprettOppgave(
                     oppgavetype = Oppgavetype.BehandleUnderkjentVedtak,
                     tilordnetNavIdent = navIdent,
                 ),

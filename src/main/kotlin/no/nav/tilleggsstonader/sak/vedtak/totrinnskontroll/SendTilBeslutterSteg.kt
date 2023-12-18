@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -61,8 +62,8 @@ class SendTilBeslutterSteg(
     private fun opprettGodkjennVedtakOppgave(saksbehandling: Saksbehandling) {
         taskService.save(
             OpprettOppgaveTask.opprettTask(
-                OpprettOppgaveTask.OpprettOppgaveTaskData(
-                    behandlingId = saksbehandling.id,
+                behandlingId = saksbehandling.id,
+                oppgave = OpprettOppgave(
                     oppgavetype = Oppgavetype.GodkjenneVedtak,
                     beskrivelse = "Sendt til godkjenning av ${SikkerhetContext.hentSaksbehandlerNavn(true)}.",
                 ),

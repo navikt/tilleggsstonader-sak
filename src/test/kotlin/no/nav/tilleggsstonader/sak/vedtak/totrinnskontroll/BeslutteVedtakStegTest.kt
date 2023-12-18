@@ -136,12 +136,12 @@ class BeslutteVedtakStegTest {
             årsakerUnderkjent = listOf(ÅrsakUnderkjent.AKTIVITET),
         )
 
-        val deserializedPayload = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot[1].payload)
+        val taskData = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot[1].payload)
 
         assertThat(nesteSteg).isEqualTo(StegType.SEND_TIL_BESLUTTER)
         assertThat(taskSlot[0].type).isEqualTo(FerdigstillOppgaveTask.TYPE)
         assertThat(taskSlot[1].type).isEqualTo(OpprettOppgaveTask.TYPE)
-        assertThat(deserializedPayload.oppgavetype).isEqualTo(Oppgavetype.BehandleUnderkjentVedtak)
+        assertThat(taskData.oppgave.oppgavetype).isEqualTo(Oppgavetype.BehandleUnderkjentVedtak)
     }
 
     @Test

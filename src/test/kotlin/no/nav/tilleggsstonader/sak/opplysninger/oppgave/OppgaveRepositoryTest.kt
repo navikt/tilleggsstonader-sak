@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.oppgave
@@ -23,9 +24,16 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
     private lateinit var behandlingRepository: BehandlingRepository
 
     @Test
+    fun `skal kunne opprette oppgave uten kobling til behandling`() {
+        val oppgave = oppgaveRepository.insert(oppgave(behandlingId = null))
+
+        assertThat(oppgaveRepository.findByIdOrThrow(oppgave.id).behandlingId).isNull()
+    }
+
+    @Test
     internal fun findByBehandlingIdAndTypeAndErFerdigstiltIsFalse() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         val oppgave = oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true))
 
         assertThat(oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(UUID.randomUUID(), Oppgavetype.BehandleSak))
@@ -43,7 +51,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
     @Test
     internal fun findByBehandlingIdAndTypeInAndErFerdigstiltIsFalse() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = false, type = Oppgavetype.Journalføring))
         oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true, type = Oppgavetype.BehandleSak))
         oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = false, type = Oppgavetype.BehandleUnderkjentVedtak))
@@ -60,7 +68,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
     @Test
     internal fun `skal finne nyeste oppgave for behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         val sporbar = Sporbar(opprettetTid = LocalDateTime.now().plusDays(1))
         oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true, gsakOppgaveId = 1))
         oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true, gsakOppgaveId = 2).copy(sporbar = sporbar))
@@ -75,8 +83,8 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
     @Test
     internal fun `skal finne nyeste oppgave for riktig behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        val behandling2 = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
+        val behandling2 = testoppsettService.lagre(behandling(fagsak))
 
         oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true, gsakOppgaveId = 1))
         oppgaveRepository.insert(oppgave(behandling2, erFerdigstilt = true, gsakOppgaveId = 2))
@@ -89,7 +97,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
     @Test
     internal fun `skal finne oppgaver for oppgavetype og personident`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
+        val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
         oppgaveRepository.insert(
             OppgaveDomain(
                 behandlingId = behandling.id,
@@ -115,7 +123,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
     @Test
     internal fun `skal ikke feile hvis det ikke finnes en oppgave for behandlingen`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         assertThat(oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandling.id)).isNull()
     }

@@ -5,8 +5,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
@@ -90,4 +93,22 @@ class VilkårController(
         return vurderingService.hentEllerOpprettVurderinger(request.behandlingId)
     }
      */
+
+    @GetMapping("{behandlingId}/periode")
+    fun hentMålgrupper(@PathVariable behandlingId: UUID): Vilkårperioder {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+
+        return vilkårService.hentVilkårperioder(behandlingId)
+    }
+
+    @PostMapping("{behandlingId}/periode")
+    fun opprettVilkårMedPeriode(
+        @PathVariable behandlingId: UUID,
+        @RequestBody opprettVilkårperiode: OpprettVilkårperiode,
+    ): VilkårperiodeDto {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return vilkårService.opprettVilkårperiode(behandlingId, opprettVilkårperiode)
+    }
 }

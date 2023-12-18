@@ -6,9 +6,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringRequest
-import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringResponse
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -25,6 +26,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -49,18 +52,18 @@ class AutomatiskJournalføringService(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @Transactional
-    fun håndterSøknad(automatiskJournalføringRequest: AutomatiskJournalføringRequest): AutomatiskJournalføringResponse {
+    fun håndterSøknad(automatiskJournalføringRequest: AutomatiskJournalføringRequest) {
         val personIdent = automatiskJournalføringRequest.personIdent
         val stønadstype = automatiskJournalføringRequest.stønadstype
 
-        return if (kanOppretteBehandling(personIdent, stønadstype)) {
+        if (kanOppretteBehandling(personIdent, stønadstype)) {
             automatiskJournalførTilBehandling(
                 journalpostId = automatiskJournalføringRequest.journalpostId,
                 personIdent = personIdent,
                 stønadstype = stønadstype,
             )
         } else {
-            håndterSøknadSomIkkeKanAutomatiskJournalføres()
+            håndterSøknadSomIkkeKanAutomatiskJournalføres(automatiskJournalføringRequest)
         }
     }
 
@@ -68,7 +71,7 @@ class AutomatiskJournalføringService(
         journalpostId: String,
         personIdent: String,
         stønadstype: Stønadstype,
-    ): AutomatiskJournalføringResponse {
+    ) {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
         val fagsak = fagsakService.hentEllerOpprettFagsak(personIdent, stønadstype)
         val nesteBehandlingstype = utledNesteBehandlingstype(behandlingService.hentBehandlinger(fagsak.id))
@@ -96,14 +99,28 @@ class AutomatiskJournalføringService(
                 beskrivelse = "Automatisk journalført søknad",
             ),
         )
-        return AutomatiskJournalføringResponse(
-            fagsakId = fagsak.id,
-            behandlingId = behandling.id,
+    }
+
+    private fun håndterSøknadSomIkkeKanAutomatiskJournalføres(request: AutomatiskJournalføringRequest) {
+        val journalpost = journalpostService.hentJournalpost(request.journalpostId)
+        taskService.save(
+            OpprettOppgaveTask.opprettTask(
+                personIdent = request.personIdent,
+                stønadstype = request.stønadstype,
+                oppgave = OpprettOppgave(
+                    oppgavetype = Oppgavetype.Journalføring,
+                    enhetsnummer = journalpost.journalforendeEnhet?.takeIf { it != MASKINELL_JOURNALFOERENDE_ENHET },
+                    beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost),
+                    journalpostId = journalpost.journalpostId,
+                ),
+            ),
         )
     }
 
-    private fun håndterSøknadSomIkkeKanAutomatiskJournalføres(): AutomatiskJournalføringResponse {
-        TODO("Not yet implemented")
+    private fun lagOppgavebeskrivelseForJournalføringsoppgave(journalpost: Journalpost): String {
+        if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")
+        val dokumentTittel = journalpost.dokumenter!!.firstOrNull { it.brevkode != null }?.tittel ?: ""
+        return "Må behandles i ny løsning - $dokumentTittel"
     }
 
     fun kanOppretteBehandling(ident: String, stønadstype: Stønadstype): Boolean {

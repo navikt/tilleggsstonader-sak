@@ -14,10 +14,10 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
           cache: 'gradle'
       - name: Kjør ktlint
         run: ./gradlew spotlessCheck
@@ -30,10 +30,10 @@ jobs:
           persist-credentials: false
           fetch-depth: 0 # brukes for å unngå feil i differ i sonar
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
           cache: 'gradle'
       - name: Test and build
         run: ./gradlew build -PskipLint

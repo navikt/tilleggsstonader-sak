@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -48,17 +49,19 @@ class OpprettOppgaveForOpprettetBehandlingTask(
         data: OpprettOppgaveTaskData,
         task: Task,
     ): Long? {
-        val behandling = behandlingService.hentBehandling(data.behandlingId)
+        val behandling = behandlingService.hentSaksbehandling(data.behandlingId)
         if (behandling.status == BehandlingStatus.OPPRETTET || behandling.status == BehandlingStatus.UTREDES) {
             val tilordnetNavIdent =
                 if (data.saksbehandler == SikkerhetContext.SYSTEM_FORKORTELSE) null else data.saksbehandler
             val oppgaveId = oppgaveService.opprettOppgave(
                 behandlingId = data.behandlingId,
-                oppgavetype = Oppgavetype.BehandleSak,
-                tilordnetNavIdent = tilordnetNavIdent,
-                beskrivelse = data.beskrivelse,
-                mappeId = data.mappeId,
-                prioritet = data.prioritet,
+                oppgave = OpprettOppgave(
+                    oppgavetype = Oppgavetype.BehandleSak,
+                    tilordnetNavIdent = tilordnetNavIdent,
+                    beskrivelse = data.beskrivelse,
+                    mappeId = data.mappeId,
+                    prioritet = data.prioritet,
+                ),
             )
             task.metadata.setProperty("oppgaveId", oppgaveId.toString())
             return oppgaveId

@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
-import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
@@ -51,26 +50,31 @@ class OppgaveService(
 
     fun opprettOppgave(
         behandlingId: UUID,
-        oppgavetype: Oppgavetype,
-        tilordnetNavIdent: String? = null,
-        beskrivelse: String? = null,
-        mappeId: Long? = null,
-        prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
+        oppgave: OpprettOppgave,
     ): Long {
-        val opprettetOppgaveId =
-            opprettOppgaveUtenÅLagreIRepository(
-                behandlingId = behandlingId,
-                oppgavetype = oppgavetype,
-                fristFerdigstillelse = null,
-                beskrivelse = lagOppgaveTekst(beskrivelse),
-                tilordnetNavIdent = tilordnetNavIdent,
-                mappeId = mappeId,
-                prioritet = prioritet,
-            )
+        val fagsak = fagsakService.hentFagsakForBehandling(behandlingId)
+        return opprettOppgave(
+            personIdent = fagsak.hentAktivIdent(),
+            stønadstype = fagsak.stønadstype,
+            behandlingId = behandlingId,
+            oppgave = oppgave,
+        )
+    }
+
+    fun opprettOppgave(
+        personIdent: String,
+        stønadstype: Stønadstype,
+        behandlingId: UUID?,
+        oppgave: OpprettOppgave,
+    ): Long {
+        feilHvis(oppgave.oppgavetype == Oppgavetype.BehandleSak && behandlingId == null) {
+            "Må ha behandlingId når man oppretter oppgave for behandle sak"
+        }
+        val opprettetOppgaveId = opprettOppgaveUtenÅLagreIRepository(personIdent, stønadstype, oppgave)
         val oppgave = OppgaveDomain(
             gsakOppgaveId = opprettetOppgaveId,
             behandlingId = behandlingId,
-            type = oppgavetype,
+            type = oppgave.oppgavetype,
         )
         oppgaveRepository.insert(oppgave)
         return opprettetOppgaveId
@@ -88,31 +92,27 @@ class OppgaveService(
     /**
      * I de tilfeller en service ønsker å ansvare selv for lagring til [OppgaveRepository]
      */
-    fun opprettOppgaveUtenÅLagreIRepository(
-        behandlingId: UUID,
-        oppgavetype: Oppgavetype,
-        fristFerdigstillelse: LocalDate?,
-        beskrivelse: String,
-        tilordnetNavIdent: String?,
-        mappeId: Long? = null,
-        prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
+    private fun opprettOppgaveUtenÅLagreIRepository(
+        personIdent: String,
+        stønadstype: Stønadstype,
+        oppgave: OpprettOppgave,
     ): Long {
-        val fagsak = fagsakService.hentFagsakForBehandling(behandlingId)
-        val personIdent = fagsak.hentAktivIdent()
-        val enhetsnummer = arbeidsfordelingService.hentNavEnhetId(personIdent, oppgavetype)
+        val enhetsnummer =
+            oppgave.enhetsnummer ?: arbeidsfordelingService.hentNavEnhetId(personIdent, oppgave.oppgavetype)
 
         val opprettOppgave = OpprettOppgaveRequest(
             ident = OppgaveIdentV2(ident = personIdent, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
             tema = Tema.TSO,
-            oppgavetype = oppgavetype,
-            fristFerdigstillelse = fristFerdigstillelse ?: lagFristForOppgave(LocalDateTime.now()),
-            beskrivelse = beskrivelse,
+            journalpostId = oppgave.journalpostId,
+            oppgavetype = oppgave.oppgavetype,
+            fristFerdigstillelse = oppgave.fristFerdigstillelse ?: lagFristForOppgave(LocalDateTime.now()),
+            beskrivelse = lagOppgaveTekst(oppgave.beskrivelse),
             enhetsnummer = enhetsnummer,
-            behandlingstema = finnBehandlingstema(fagsak.stønadstype).value,
-            tilordnetRessurs = tilordnetNavIdent,
-            mappeId = mappeId,
-            prioritet = prioritet,
-            behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgavetype),
+            behandlingstema = finnBehandlingstema(stønadstype).value,
+            tilordnetRessurs = oppgave.tilordnetNavIdent,
+            mappeId = oppgave.mappeId,
+            prioritet = oppgave.prioritet,
+            behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgave.oppgavetype),
         )
 
         return oppgaveClient.opprettOppgave(opprettOppgave)

@@ -28,7 +28,9 @@ import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
+import no.nav.tilleggsstonader.sak.vilkår.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -104,6 +106,8 @@ abstract class IntegrationTest {
             VedtakTilsynBarn::class,
             Simuleringsresultat::class,
             TilkjentYtelse::class,
+            Vilkårperiode::class,
+            Stønadsperiode::class,
             Vilkår::class,
             BehandlingBarn::class,
 
