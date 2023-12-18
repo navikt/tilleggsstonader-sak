@@ -75,7 +75,7 @@ internal class TotrinnskontrollServiceTest {
 
         every {
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
-        } returns totrinnskontrollMedbeslutter(opprettetAv = opprettetAv, beslutter = beslutter, status = TotrinnInternStatus.KAN_FATTE_VEDTAK)
+        } returns totrinnskontrollMedbeslutter(opprettetAv = opprettetAv, beslutter = beslutter)
         assertThatThrownBy {
             totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(
                 saksbehandling(status = BehandlingStatus.UTREDES),
@@ -186,7 +186,6 @@ internal class TotrinnskontrollServiceTest {
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
             totrinnskontrollMedbeslutterAArsakogBegrunnelse(
                 opprettetAv = "Noe",
-                status = TotrinnInternStatus.UNDERKJENT,
                 beslutter = "noen to",
             )
 
@@ -216,7 +215,6 @@ internal class TotrinnskontrollServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FATTER_VEDTAK)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
             totrinnskontrollMedbeslutter(
-                status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
                 opprettetAv = "Beslutter",
                 beslutter = "Beslutter",
             )
@@ -262,7 +260,6 @@ internal class TotrinnskontrollServiceTest {
             totrinnskontrollMedbeslutterAArsakogBegrunnelse(
                 opprettetAv = "Noe",
                 beslutter = "Noen annen",
-                status = TotrinnInternStatus.UNDERKJENT,
             )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(ID)
@@ -286,7 +283,6 @@ internal class TotrinnskontrollServiceTest {
         assertThat(oppdaterSlot.captured.årsakerUnderkjent?.årsaker!!).containsExactly(ÅrsakUnderkjent.AKTIVITET)
     }
 
-    @Test
     private fun totrinnskontroll(
         opprettetAv: String,
         status: TotrinnInternStatus,
@@ -300,27 +296,25 @@ internal class TotrinnskontrollServiceTest {
 
     private fun totrinnskontrollMedbeslutter(
         opprettetAv: String,
-        status: TotrinnInternStatus,
         beslutter: String,
     ) =
         Totrinnskontroll(
             behandlingId = UUID.randomUUID(),
             sporbar = Sporbar(opprettetAv),
-            status = status,
+            status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
             saksbehandler = opprettetAv,
             beslutter = beslutter,
         )
 
     private fun totrinnskontrollMedbeslutterAArsakogBegrunnelse(
         opprettetAv: String,
-        status: TotrinnInternStatus,
         beslutter: String,
 
     ) =
         Totrinnskontroll(
             behandlingId = UUID.randomUUID(),
             sporbar = Sporbar(opprettetAv),
-            status = status,
+            status = TotrinnInternStatus.UNDERKJENT,
             saksbehandler = opprettetAv,
             beslutter = beslutter,
             årsakerUnderkjent = Årsaker(listOf(ÅrsakUnderkjent.INNGANGSVILKÅR_FORUTGÅENDE_MEDLEMSKAP_OPPHOLD, ÅrsakUnderkjent.VEDTAK_OG_BEREGNING)),

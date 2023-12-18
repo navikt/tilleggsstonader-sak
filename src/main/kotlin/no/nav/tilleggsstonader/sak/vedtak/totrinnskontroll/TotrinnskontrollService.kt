@@ -150,9 +150,14 @@ class TotrinnskontrollService(
     ): Totrinnskontroll {
         val begrunnelse = beslutteVedtak.begrunnelse
         val årsakUnderkjent = beslutteVedtak.årsakerUnderkjent
-        val status = nyTotrinnsKontrollStatus
 
-        return totrinnskontrollRepository.update(sisteTotrinnskontroll.copy(begrunnelse = begrunnelse, årsakerUnderkjent = Årsaker(årsakUnderkjent), status = status))
+        return totrinnskontrollRepository.update(
+            sisteTotrinnskontroll.copy(
+                begrunnelse = begrunnelse,
+                årsakerUnderkjent = Årsaker(årsakUnderkjent),
+                status = nyTotrinnsKontrollStatus,
+            ),
+        )
     }
 
     private fun behandlingErGodkjentEllerOpprettet(behandlingStatus: BehandlingStatus) =
