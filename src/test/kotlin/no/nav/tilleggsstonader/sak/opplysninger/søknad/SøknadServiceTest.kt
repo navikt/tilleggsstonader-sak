@@ -28,8 +28,8 @@ class SøknadServiceTest : IntegrationTest() {
     @Test
     internal fun `skal kopiere kobling av søknad til ny behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        val revurdering = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
+        val revurdering = testoppsettService.lagre(behandling(fagsak))
 
         val søknadsskjema = lagreSøknad(behandling)
         val søknadsskjemaForRevurdering = kopierSøknadTilRevurdering(behandling, revurdering)
@@ -40,8 +40,8 @@ class SøknadServiceTest : IntegrationTest() {
     @Test
     internal fun `kopiering av søknad til annen behandling skal kun beholde søknadId`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        val revurdering = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
+        val revurdering = testoppsettService.lagre(behandling(fagsak))
 
         lagreSøknad(behandling)
         kopierSøknadTilRevurdering(behandling, revurdering)
@@ -57,7 +57,7 @@ class SøknadServiceTest : IntegrationTest() {
     @Test
     fun `skal kunne lagre komplett søknad for barnetilsyn`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         val skjema = søknadskjemaBarnetilsyn(
             barnMedBarnepass = listOf(barnMedBarnepass(ident = "barn1", navn = "navn1")),
         )

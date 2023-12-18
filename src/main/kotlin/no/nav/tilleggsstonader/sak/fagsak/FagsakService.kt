@@ -4,12 +4,15 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
+import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
+import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakIdRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
+import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
 import no.nav.tilleggsstonader.sak.fagsak.dto.FagsakDto
 import no.nav.tilleggsstonader.sak.fagsak.dto.tilDto
@@ -27,6 +30,7 @@ import java.util.UUID
 class FagsakService(
     private val fagsakPersonService: FagsakPersonService,
     private val fagsakRepository: FagsakRepository,
+    private val eksternFagsakIdRepository: EksternFagsakIdRepository,
     private val personService: PersonService,
     private val behandlingService: BehandlingService,
 ) {
@@ -119,7 +123,7 @@ class FagsakService(
             ?: throw Feil("Finner ikke fagsak til behandlingId=$behandlingId")
     }
 
-    fun hentEksternId(fagsakId: UUID): Long = fagsakRepository.findByIdOrThrow(fagsakId).eksternId.id
+    fun hentEksternId(fagsakId: UUID): Long = eksternFagsakIdRepository.findByFagsakId(fagsakId).id
 
     fun hentFagsakPåEksternId(eksternFagsakId: Long): Fagsak =
         fagsakRepository.finnMedEksternId(eksternFagsakId)
@@ -150,16 +154,23 @@ class FagsakService(
     }
 
     private fun opprettFagsak(stønadstype: Stønadstype, fagsakPerson: FagsakPerson): FagsakDomain {
-        return fagsakRepository.insert(
+        val fagsak = fagsakRepository.insert(
             FagsakDomain(
                 stønadstype = stønadstype,
                 fagsakPersonId = fagsakPerson.id,
             ),
         )
+        eksternFagsakIdRepository.insert(EksternFagsakId(fagsakId = fagsak.id))
+        return fagsak
     }
 
-    fun FagsakDomain.tilFagsakMedPerson(): Fagsak {
+    private fun FagsakDomain.tilFagsakMedPerson(): Fagsak {
         val personIdenter = fagsakPersonService.hentIdenter(this.fagsakPersonId)
         return this.tilFagsakMedPerson(personIdenter)
+    }
+
+    private fun FagsakDomain.tilFagsakMedPerson(personIdenter: Set<PersonIdent>): Fagsak {
+        val eksternId = eksternFagsakIdRepository.findByFagsakId(this.id)
+        return this.tilFagsakMedPerson(personIdenter, eksternId)
     }
 }

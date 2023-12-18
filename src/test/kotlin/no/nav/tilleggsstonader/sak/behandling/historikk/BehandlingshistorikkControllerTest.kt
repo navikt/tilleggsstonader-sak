@@ -45,7 +45,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
     @Test
     internal fun `Skal returnere 403 dersom man ikke har tilgang til brukeren`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("ikkeTilgang"))))
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         val respons = catchThrowableOfType<HttpClientErrorException.Forbidden> { hentHistorikk(behandling.id) }
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
@@ -54,7 +54,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
     @Test
     internal fun `skal kun returnere den første hendelsen av typen OPPRETTET - etterfølgende hendelser av denne typen skal lukes vekk`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(""))))
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         leggInnHistorikk(behandling, "1", LocalDateTime.now(), StegType.VILKÅR)
         leggInnHistorikk(behandling, "2", LocalDateTime.now().minusDays(1), StegType.VILKÅR)
@@ -67,7 +67,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
     @Test
     internal fun `skal returnere hendelser av alle typer i riktig rekkefølge for invilget behandling `() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(""))))
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         leggInnHistorikk(behandling, "1", LocalDateTime.now(), StegType.VILKÅR)
         leggInnHistorikk(behandling, "2", LocalDateTime.now().plusDays(1), StegType.BEREGNE_YTELSE)
@@ -97,7 +97,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
     @Test
     internal fun `skal returnere hendelser av alle typer i riktig rekkefølge for henlagt behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(""))))
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         leggInnHistorikk(behandling, "1", LocalDateTime.now(), StegType.VILKÅR)
         leggInnHistorikk(behandling, "2", LocalDateTime.now().plusDays(1), StegType.BEREGNE_YTELSE)
@@ -124,7 +124,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
     @Test
     internal fun `skal returnere alle hendelser dersom en behandling blir underkjent i totrinnskontroll, deretter sendt til beslutter på nytt og deretter godkjent`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(""))))
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         leggInnHistorikk(behandling, "1", LocalDateTime.now(), StegType.VILKÅR)
         leggInnHistorikk(behandling, "2", LocalDateTime.now().plusDays(1), StegType.BEREGNE_YTELSE)
@@ -152,7 +152,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
     @Test
     internal fun `skal returnere metadata som json`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(""))))
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val jsonMap = mapOf("key" to "value")
         val metadata = JsonWrapper(objectMapper.writeValueAsString(jsonMap))

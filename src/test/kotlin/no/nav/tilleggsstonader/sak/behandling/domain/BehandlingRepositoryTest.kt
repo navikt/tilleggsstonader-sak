@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.BehandlingOppsettUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -37,6 +38,9 @@ class BehandlingRepositoryTest : IntegrationTest() {
     private lateinit var behandlingRepository: BehandlingRepository
 
     @Autowired
+    private lateinit var eksternBehandlingIdRepository: EksternBehandlingIdRepository
+
+    @Autowired
     private lateinit var fagsakPersonRepository: FagsakPersonRepository
 
     /*@Autowired
@@ -49,7 +53,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     fun `skal ikke være mulig å legge inn en behandling med referanse til en behandling som ikke eksisterer`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         assertThatThrownBy {
-            behandlingRepository.insert(behandling(fagsak, forrigeBehandlingId = UUID.randomUUID()))
+            testoppsettService.lagre(behandling(fagsak, forrigeBehandlingId = UUID.randomUUID()))
         }
             .isInstanceOf(DbActionExecutionException::class.java)
     }
@@ -57,7 +61,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     @Test
     fun findByFagsakId() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         assertThat(behandlingRepository.findByFagsakId(UUID.randomUUID())).isEmpty()
         assertThat(behandlingRepository.findByFagsakId(fagsak.id)).containsOnly(behandling)
@@ -71,10 +75,10 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
         val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = BARNETILSYN))
         val behandling = behandling(fagsak, opprettetTid = LocalDateTime.now().minusMonths(2))
-        behandlingRepository.insert(behandling)
+        testoppsettService.lagre(behandling)
         val annenFagsak =
             testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")), stønadstype = BARNETILSYN))
-        behandlingRepository.insert(behandling(annenFagsak, opprettetTid = LocalDateTime.now().minusWeeks(1)))
+        testoppsettService.lagre(behandling(annenFagsak, opprettetTid = LocalDateTime.now().minusWeeks(1)))
         val sporbar = Sporbar("saksbh", enMånedSiden.minusDays(1))
         val oppgave = Oppgave(sporbar = sporbar, behandlingId = behandling.id, gsakOppgaveId = 1, type = Oppgavetype.BehandleSak, erFerdigstilt = false)
         oppgaveRepository.insert(oppgave)
@@ -96,10 +100,10 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
         val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = BARNETILSYN))
         val behandling = behandling(fagsak, opprettetTid = LocalDateTime.now().minusMonths(2))
-        behandlingRepository.insert(behandling)
+        testoppsettService.lagre(behandling)
         val annenFagsak =
             testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")), stønadstype = BARNETILSYN))
-        behandlingRepository.insert(behandling(annenFagsak, opprettetTid = LocalDateTime.now().minusWeeks(1)))
+        testoppsettService.lagre(behandling(annenFagsak, opprettetTid = LocalDateTime.now().minusWeeks(1)))
         val sporbar = Sporbar("saksbh", enMånedSiden.plusDays(1))
         val oppgave = Oppgave(sporbar = sporbar, behandlingId = behandling.id, gsakOppgaveId = 1, type = Oppgavetype.BehandleSak, erFerdigstilt = false)
         oppgaveRepository.insert(oppgave)
@@ -116,7 +120,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     @Test
     fun findByFagsakAndStatus() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak, status = OPPRETTET))
+        val behandling = testoppsettService.lagre(behandling(fagsak, status = OPPRETTET))
 
         assertThat(behandlingRepository.findByFagsakIdAndStatus(UUID.randomUUID(), OPPRETTET)).isEmpty()
         assertThat(behandlingRepository.findByFagsakIdAndStatus(fagsak.id, FERDIGSTILT)).isEmpty()
@@ -138,12 +142,12 @@ class BehandlingRepositoryTest : IntegrationTest() {
                     ),
                 ),
             )
-        val behandling = behandlingRepository.insert(behandling(fagsak, status = OPPRETTET, resultat = INNVILGET))
+        val behandling = testoppsettService.lagre(behandling(fagsak, status = OPPRETTET, resultat = INNVILGET))
 
         val behandlingServiceObject = behandlingRepository.finnSaksbehandling(behandling.id)
 
         assertThat(behandlingServiceObject.id).isEqualTo(behandling.id)
-        assertThat(behandlingServiceObject.eksternId).isEqualTo(behandling.eksternId.id)
+        assertThat(behandlingServiceObject.eksternId).isGreaterThan(0)
         assertThat(behandlingServiceObject.forrigeBehandlingId).isEqualTo(behandling.forrigeBehandlingId)
         assertThat(behandlingServiceObject.type).isEqualTo(behandling.type)
         assertThat(behandlingServiceObject.status).isEqualTo(behandling.status)
@@ -165,12 +169,13 @@ class BehandlingRepositoryTest : IntegrationTest() {
     @Test
     fun finnMedEksternId() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
-        val findByBehandlingId = behandlingRepository.findById(behandling.id)
-        val findByEksternId = behandlingRepository.finnMedEksternId(behandling.eksternId.id)
+        val behandling = testoppsettService.lagre(behandling(fagsak))
+        val findByBehandlingId = behandlingRepository.findByIdOrThrow(behandling.id)
+        val saksbehandling = behandlingRepository.finnSaksbehandling(behandling.id)
+        val findByEksternId = behandlingRepository.finnMedEksternId(saksbehandling.eksternId)
 
         assertThat(findByEksternId).isEqualTo(behandling)
-        assertThat(findByEksternId).isEqualTo(findByBehandlingId.get())
+        assertThat(findByEksternId).isEqualTo(findByBehandlingId)
     }
 
     @Test
@@ -187,7 +192,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
                 ),
             ),
         )
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         val fnr = behandlingRepository.finnAktivIdent(behandling.id)
         assertThat(fnr).isEqualTo("2")
     }
@@ -201,7 +206,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     @Test
     fun `finnSisteIverksatteBehandling - skal ikke returnere noe hvis behandlingen ikke er ferdigstilt`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(ident))))
-        behandlingRepository.insert(
+        testoppsettService.lagre(
             behandling(
                 fagsak,
                 status = UTREDES,
@@ -218,7 +223,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
             testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1"))).copy(id = førstegangsbehandling.fagsakId))
 
         val behandlinger = BehandlingOppsettUtil.lagBehandlingerForSisteIverksatte()
-        behandlingRepository.insertAll(behandlinger)
+        testoppsettService.lagre(behandlinger)
 
         assertThat(behandlingRepository.finnSisteIverksatteBehandling(fagsak.id)?.id)
             .isEqualTo(førstegangsbehandling.id)
@@ -227,43 +232,45 @@ class BehandlingRepositoryTest : IntegrationTest() {
     @Test
     fun `finnEksterneIder - skal hente eksterne ider`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val eksterneIder = behandlingRepository.finnEksterneIder(setOf(behandling.id))
+        val eksternBehandlingId = eksternBehandlingIdRepository.findByBehandlingId(behandling.id)
 
         assertThat(fagsak.eksternId.id).isNotEqualTo(0L)
-        assertThat(behandling.eksternId.id).isNotEqualTo(0L)
+        assertThat(eksternBehandlingId.id).isNotEqualTo(0L)
 
         assertThat(eksterneIder).hasSize(1)
         val first = eksterneIder.first()
         assertThat(first.behandlingId).isEqualTo(behandling.id)
-        assertThat(first.eksternBehandlingId).isEqualTo(behandling.eksternId.id)
+        assertThat(first.eksternBehandlingId).isEqualTo(eksternBehandlingId.id)
         assertThat(first.eksternFagsakId).isEqualTo(fagsak.eksternId.id)
     }
 
     @Test
     fun `finnEksterneIder - send inn én behandlingId som finnes, forvent én eksternId `() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         val annenFagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1"))))
-        val annenBehandling = behandlingRepository.insert(behandling(annenFagsak))
+        val annenBehandling = testoppsettService.lagre(behandling(annenFagsak))
+        val annenEksternBehandlingId = eksternBehandlingIdRepository.findByBehandlingId(annenBehandling.id)
 
         val eksterneIder = behandlingRepository.finnEksterneIder(setOf(annenBehandling.id))
 
         assertThat(fagsak.eksternId.id).isNotEqualTo(0L)
-        assertThat(behandling.eksternId.id).isNotEqualTo(0L)
+        assertThat(annenEksternBehandlingId.id).isNotEqualTo(0L)
 
         assertThat(eksterneIder).hasSize(1)
         val first = eksterneIder.first()
         assertThat(first.behandlingId).isEqualTo(annenBehandling.id)
-        assertThat(first.eksternBehandlingId).isEqualTo(annenBehandling.eksternId.id)
+        assertThat(first.eksternBehandlingId).isEqualTo(annenEksternBehandlingId.id)
         assertThat(first.eksternFagsakId).isEqualTo(annenFagsak.eksternId.id)
     }
 
     @Test
     fun `finnEksterneIder - send inn behandlingIder som ikke finnes, forvent ingen treff `() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        behandlingRepository.insert(behandling(fagsak))
+        testoppsettService.lagre(behandling(fagsak))
         val eksterneIder = behandlingRepository.finnEksterneIder(setOf(UUID.randomUUID(), UUID.randomUUID()))
         assertThat(eksterneIder.isEmpty())
     }
@@ -271,7 +278,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     @Test
     fun `finnEksterneIder - send inn tomt sett, forvent unntak `() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        behandlingRepository.insert(behandling(fagsak))
+        testoppsettService.lagre(behandling(fagsak))
         org.junit.jupiter.api.assertThrows<Exception> {
             assertThat(behandlingRepository.finnEksterneIder(emptySet()))
         }
@@ -288,7 +295,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         @Test
         fun `finner ikke når det kun finnes av annen type`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
-            behandlingRepository.insert(
+            testoppsettService.lagre(
                 behandling(
                     fagsak,
                     status = FERDIGSTILT,
@@ -301,7 +308,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         @Test
         fun `true når det av typen man spør etter`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
-            behandlingRepository.insert(
+            testoppsettService.lagre(
                 behandling(
                     fagsak,
                     status = FERDIGSTILT,
@@ -318,13 +325,13 @@ class BehandlingRepositoryTest : IntegrationTest() {
         @Test
         fun `skal ikke kunne ha flere behandlinger på samma fagsak med annen status enn ferdigstilt`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
-            behandlingRepository.insert(behandling(fagsak, status = FERDIGSTILT))
-            behandlingRepository.insert(behandling(fagsak, status = UTREDES))
-            behandlingRepository.insert(behandling(fagsak, status = FERDIGSTILT))
+            testoppsettService.lagre(behandling(fagsak, status = FERDIGSTILT))
+            testoppsettService.lagre(behandling(fagsak, status = UTREDES))
+            testoppsettService.lagre(behandling(fagsak, status = FERDIGSTILT))
 
             listOf(UTREDES, OPPRETTET, FATTER_VEDTAK, IVERKSETTER_VEDTAK).forEach { status ->
                 val cause = assertThatThrownBy {
-                    behandlingRepository.insert(behandling(fagsak, status = status))
+                    testoppsettService.lagre(behandling(fagsak, status = status))
                 }.cause
                 cause.isInstanceOf(DuplicateKeyException::class.java)
                 cause.hasMessageContaining("duplicate key value violates unique constraint \"idx_behandlinger_i_arbeid\"")
@@ -334,19 +341,19 @@ class BehandlingRepositoryTest : IntegrationTest() {
         @Test
         fun `skal kunne ha en behandling som utredes når det finnes en behandling satt på vent`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
-            behandlingRepository.insert(behandling(fagsak, status = FERDIGSTILT))
-            behandlingRepository.insert(behandling(fagsak, status = SATT_PÅ_VENT))
-            behandlingRepository.insert(behandling(fagsak, status = SATT_PÅ_VENT))
+            testoppsettService.lagre(behandling(fagsak, status = FERDIGSTILT))
+            testoppsettService.lagre(behandling(fagsak, status = SATT_PÅ_VENT))
+            testoppsettService.lagre(behandling(fagsak, status = SATT_PÅ_VENT))
 
-            behandlingRepository.insert(behandling(fagsak, status = UTREDES))
+            testoppsettService.lagre(behandling(fagsak, status = UTREDES))
         }
 
         @Test
         fun `kan ikke endre en behandling fra satt på vent til utredes når det allerede finnes en behandling som ikke er ferdigstilt`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
-            behandlingRepository.insert(behandling(fagsak, status = FERDIGSTILT))
-            val påVent = behandlingRepository.insert(behandling(fagsak, status = SATT_PÅ_VENT))
-            behandlingRepository.insert(behandling(fagsak, status = IVERKSETTER_VEDTAK))
+            testoppsettService.lagre(behandling(fagsak, status = FERDIGSTILT))
+            val påVent = testoppsettService.lagre(behandling(fagsak, status = SATT_PÅ_VENT))
+            testoppsettService.lagre(behandling(fagsak, status = IVERKSETTER_VEDTAK))
 
             val cause = assertThatThrownBy {
                 behandlingRepository.update(påVent.copy(status = UTREDES))
@@ -359,8 +366,8 @@ class BehandlingRepositoryTest : IntegrationTest() {
         fun `skal kunne ha flere behandlinger på ulike fagsak med status utredes`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak(fagsakpersoner("1")))
             val fagsak2 = testoppsettService.lagreFagsak(fagsak(identer = fagsakpersoner("2")))
-            behandlingRepository.insert(behandling(fagsak, status = UTREDES))
-            behandlingRepository.insert(behandling(fagsak2, status = UTREDES))
+            testoppsettService.lagre(behandling(fagsak, status = UTREDES))
+            testoppsettService.lagre(behandling(fagsak2, status = UTREDES))
         }
     }
 
@@ -370,7 +377,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         @Test
         fun `returnerer true hvis behandling med annen status finnes og false om behandling med annen status ikke finnes`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak(fagsakpersoner("1")))
-            behandlingRepository.insert(behandling(fagsak, status = UTREDES))
+            testoppsettService.lagre(behandling(fagsak, status = UTREDES))
 
             val ikkeFerdigstiltFinnes = behandlingRepository.existsByFagsakIdAndStatusIsNot(fagsak.id, FERDIGSTILT)
             val ikkeUtredesFinnesIkke = behandlingRepository.existsByFagsakIdAndStatusIsNot(fagsak.id, UTREDES)
@@ -439,20 +446,20 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
         @Test
         internal fun `kan sette resultat med vedtakstidspunkt`() {
-            behandlingRepository.insert(behandling(fagsak, resultat = INNVILGET))
+            testoppsettService.lagre(behandling(fagsak, resultat = INNVILGET))
         }
 
         @Test
         internal fun `kan ikke sette resultat uten vedtakstidspunkt`() {
             assertThatThrownBy {
-                behandlingRepository.insert(behandling(fagsak, resultat = INNVILGET).copy(vedtakstidspunkt = null))
+                testoppsettService.lagre(behandling(fagsak, resultat = INNVILGET).copy(vedtakstidspunkt = null))
             }.has(hasCauseMessageContaining("behandling_resultat_vedtakstidspunkt_check"))
         }
 
         @Test
         internal fun `kan ikke sette vedtakstidspunkt uten resultat`() {
             assertThatThrownBy {
-                behandlingRepository.insert(
+                testoppsettService.lagre(
                     behandling(
                         fagsak,
                         resultat = IKKE_SATT,
@@ -464,7 +471,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         @Test
         internal fun `kan ikke sette resultat IKKE_SATT med vedtakstidspunkt`() {
             assertThatThrownBy {
-                behandlingRepository.insert(
+                testoppsettService.lagre(
                     behandling(
                         fagsak,
                         resultat = IKKE_SATT,
@@ -480,7 +487,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         resultat: BehandlingResultat,
         fagsak: Fagsak,
     ): Behandling {
-        return behandlingRepository.insert(
+        return testoppsettService.lagre(
             behandling(
                 id = behandlingId,
                 status = status,

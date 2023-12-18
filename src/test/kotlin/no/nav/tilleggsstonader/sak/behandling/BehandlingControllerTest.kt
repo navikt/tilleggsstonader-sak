@@ -36,7 +36,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
     @Test
     internal fun `Skal returnere 403 dersom man ikke har tilgang til brukeren`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("ikkeTilgang"))))
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
         val respons = catchThrowableOfType<HttpClientErrorException.Forbidden> { hentBehandling(behandling.id) }
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
@@ -45,7 +45,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
     @Test
     internal fun `Skal henlegge behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
-        val behandling = behandlingRepository.insert(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
+        val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
         val respons = henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT))
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
@@ -56,7 +56,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
     @Test
     internal fun `Skal henlegge FØRSTEGANGSBEHANDLING`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
-        val behandling = behandlingRepository.insert(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
+        val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
         val respons = henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT))
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
