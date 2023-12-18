@@ -1,11 +1,11 @@
-val javaVersion = JavaLanguageVersion.of(17)
-val familieProsesseringVersion = "2.20230926054831_994885a"
-val tilleggsstønaderLibsVersion = "2023.10.17-11.20.65cb9a56f6df"
-val tilleggsstønaderKontrakterVersion = "2023.11.24-13.28.529dcdcd30c2"
-val tokenSupportVersion = "3.1.5"
-val wiremockVersion = "3.2.0"
+val javaVersion = JavaLanguageVersion.of(21)
+val familieProsesseringVersion = "2.20231212093500_bfa0e7c"
+val tilleggsstønaderLibsVersion = "2023.12.15-09.40.7c554b900322"
+val tilleggsstønaderKontrakterVersion = "2023.12.15-09.39.8f8218c4f23c"
+val tokenSupportVersion = "3.2.0"
+val wiremockVersion = "3.3.1"
 val mockkVersion = "1.13.8"
-val testcontainerVersion = "1.19.0"
+val testcontainerVersion = "1.19.3"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -13,16 +13,16 @@ version = "1.0.0"
 plugins {
     application
 
-    kotlin("jvm") version "1.9.10"
-    id("com.diffplug.spotless") version "6.21.0"
-    id("com.github.ben-manes.versions") version "0.48.0"
+    kotlin("jvm") version "1.9.21"
+    id("com.diffplug.spotless") version "6.23.3"
+    id("com.github.ben-manes.versions") version "0.50.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
-    id("org.springframework.boot") version "3.1.4"
-    id("io.spring.dependency-management") version "1.1.3"
-    kotlin("plugin.spring") version "1.9.10"
+    id("org.springframework.boot") version "3.2.0"
+    id("io.spring.dependency-management") version "1.1.4"
+    kotlin("plugin.spring") version "1.9.21"
 
-    id("org.cyclonedx.bom") version "1.7.4"
+    id("org.cyclonedx.bom") version "1.8.1"
 }
 
 repositories {
@@ -91,7 +91,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.14.0"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.15.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 }
