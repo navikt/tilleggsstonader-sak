@@ -62,7 +62,7 @@ class FrittståendeBrevService(
             eksternReferanseId = UUID.randomUUID().toString(), // TODO Finn ut hva som bør brukes her
             forsøkFerdigstill = true,
             hoveddokumentvarianter = listOf(dokument),
-            fagsakId = fagsak.eksternId.toString(),
+            fagsakId = fagsak.eksternId.id.toString(),
             journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(saksbehandler)?.enhetId
                 ?: error("Fant ikke arbeidsfordelingsenhet"),
         )
