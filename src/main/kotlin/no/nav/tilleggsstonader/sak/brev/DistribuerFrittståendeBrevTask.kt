@@ -14,7 +14,7 @@ import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = DistribuerVedtaksbrevTask.TYPE,
+    taskStepType = DistribuerFrittståendeBrevTask.TYPE,
     maxAntallFeil = 50,
     settTilManuellOppfølgning = true,
     triggerTidVedFeilISekunder = 31L,
