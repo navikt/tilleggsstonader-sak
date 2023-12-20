@@ -5,13 +5,14 @@ on:
 env:
   IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
 
+permissions:
+  contents: "read"
+  id-token: "write"
+
 jobs:
   build:
     name: Build, push and deploy to dev-gcp uten tester
     runs-on: ubuntu-latest
-    permissions:
-      contents: "read"
-      id-token: "write"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,7 +46,6 @@ jobs:
 
       - uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .nais/preprod.yaml
           IMAGE: ${{ needs.build.outputs.image }}
