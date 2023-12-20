@@ -2,11 +2,13 @@ package no.nav.tilleggsstonader.sak.brev
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.Base64
+import java.util.UUID
 
 @RestController
 @RequestMapping(path = ["/api/frittstaende-brev"])
@@ -16,8 +18,9 @@ class FrittståendeBrevController(
     private val tilgangService: TilgangService,
 ) {
 
-    @PostMapping
+    @PostMapping("{fagsakPersonId}")
     fun forhåndsvisFrittsåendeSanitybrev(
+        @PathVariable("fagsakPersonId") uuid: UUID,
         @RequestBody request: GenererPdfRequest,
     ): ByteArray {
         tilgangService.validerHarSaksbehandlerrolle()
