@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
+import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagringBrevService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -26,6 +27,7 @@ class FrittståendeBrevService(
     private val journalpostService: JournalpostService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val taskService: TaskService,
+    private val mellomlagringBrevService: MellomlagringBrevService,
 ) {
 
     fun lagFrittståendeSanitybrev(
@@ -43,15 +45,19 @@ class FrittståendeBrevService(
         request: FrittståendeBrevDto,
     ) {
         val fagsak = fagsakService.hentFagsak(fagsakId)
+        val saksbehandler = SikkerhetContext.hentSaksbehandler()
 
-        val journalpostId = journalførFrittståendeBrev(request, fagsak)
+        val journalpostId = journalførFrittståendeBrev(request, fagsak, saksbehandler)
 
         taskService.save(DistribuerFrittståendeBrevTask.opprettTask(fagsakId, journalpostId))
+
+        mellomlagringBrevService.slettMellomlagretFrittståendeBrev(fagsakId, saksbehandler)
     }
 
     private fun journalførFrittståendeBrev(
         request: FrittståendeBrevDto,
         fagsak: Fagsak,
+        saksbehandler: String,
     ): String {
         val dokument = Dokument(
             dokument = request.pdf,
@@ -59,8 +65,6 @@ class FrittståendeBrevService(
             dokumenttype = utledDokumenttype(fagsak.stønadstype),
             tittel = request.tittel,
         )
-
-        val saksbehandler = SikkerhetContext.hentSaksbehandler()
 
         val arkiverDokumentRequest = ArkiverDokumentRequest(
             fnr = fagsak.hentAktivIdent(),

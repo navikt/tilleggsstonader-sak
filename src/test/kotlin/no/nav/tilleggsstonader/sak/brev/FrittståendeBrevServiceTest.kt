@@ -1,13 +1,16 @@
 package no.nav.tilleggsstonader.sak.brev
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 
 internal class FrittståendeBrevServiceTest : IntegrationTest() {
@@ -22,7 +25,14 @@ internal class FrittståendeBrevServiceTest : IntegrationTest() {
     @BeforeEach
     fun setUp() {
         mockBrukerContext("456")
+        MDC.put(MDCConstants.MDC_CALL_ID, "")
         testoppsettService.lagreFagsak(fagsakTilknyttetPesonIdent123)
+    }
+
+    @AfterEach
+    override fun tearDown() {
+        super.tearDown()
+        MDC.remove(MDCConstants.MDC_CALL_ID)
     }
 
     @Test
