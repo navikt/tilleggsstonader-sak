@@ -8,11 +8,13 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokumenttype
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Filtype
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
+import org.slf4j.MDC
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -61,7 +63,7 @@ class FrittståendeBrevService(
 
         val arkiverDokumentRequest = ArkiverDokumentRequest(
             fnr = fagsak.hentAktivIdent(),
-            eksternReferanseId = UUID.randomUUID().toString(), // TODO Finn ut hva som bør brukes her
+            eksternReferanseId = MDC.get(MDCConstants.MDC_CALL_ID) ?: throw IllegalStateException("Mangler callId"),
             forsøkFerdigstill = true,
             hoveddokumentvarianter = listOf(dokument),
             fagsakId = fagsak.eksternId.id.toString(),
