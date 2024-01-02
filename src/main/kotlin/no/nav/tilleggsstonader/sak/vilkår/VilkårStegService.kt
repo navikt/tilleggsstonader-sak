@@ -10,9 +10,11 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVilkårDto
@@ -50,7 +52,7 @@ class VilkårStegService(
         val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, svarPåVilkårDto.delvilkårsett)
         // blankettRepository.deleteById(behandlingId)
         val oppdatertVilkårDto = vilkårRepository.update(oppdatertVilkår).tilDto()
-        oppdaterStegPåBehandling(vilkår.behandlingId)
+        oppdaterStegPåBehandling(behandlingId, vilkår.type)
         return oppdatertVilkårDto
     }
 
@@ -59,13 +61,16 @@ class VilkårStegService(
         val vilkår = vilkårRepository.findByIdOrThrow(oppdaterVilkårDto.id)
         val behandlingId = vilkår.behandlingId
 
+        feilHvis(vilkår.type.gjelderMålgruppeEllerAktivitet()) {
+            "Har ikke støtte for å nullstille inngangsvilkår"
+        }
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
         validerLåstForVidereRedigering(behandlingId)
 
         // blankettRepository.deleteById(behandlingId)
 
         val oppdatertVilkår = nullstillVilkårMedNyeHovedregler(behandlingId, vilkår)
-        oppdaterStegPåBehandling(behandlingId)
+        oppdaterStegPåBehandling(behandlingId, vilkår.type)
         return oppdatertVilkår
     }
 
@@ -74,24 +79,38 @@ class VilkårStegService(
         val vilkår = vilkårRepository.findByIdOrThrow(oppdaterVilkårDto.id)
         val behandlingId = vilkår.behandlingId
 
+        feilHvis(vilkår.type.gjelderMålgruppeEllerAktivitet()) {
+            "Har ikke støtte for å sette inngangsvilkår til 'skal ikke vurderes'"
+        }
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
         validerLåstForVidereRedigering(behandlingId)
 
         // blankettRepository.deleteById(behandlingId)
 
         val oppdatertVilkår = oppdaterVilkårTilSkalIkkeVurderes(behandlingId, vilkår)
-        oppdaterStegPåBehandling(behandlingId)
+        oppdaterStegPåBehandling(behandlingId, vilkår.type)
         return oppdatertVilkår
     }
 
-    private fun oppdaterStegPåBehandling(behandlingId: UUID) {
+    private fun oppdaterStegPåBehandling(behandlingId: UUID, type: VilkårType) {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
 
-        oppdaterStegPåBehandling(saksbehandling, vilkårsett)
+        oppdaterStegPåBehandling(saksbehandling, type, vilkårsett)
     }
 
-    private fun oppdaterStegPåBehandling(saksbehandling: Saksbehandling, vilkårsett: List<Vilkår>) {
+    private fun oppdaterStegPåBehandling(saksbehandling: Saksbehandling, type: VilkårType, vilkårsett: List<Vilkår>) {
+        /**
+         * Hvis det er en endring på gjelderMålgruppeEllerAktivitet så skal vi validere at stønadsperiodene fortsatt er gyldige
+         * Hvis de ikke er gyldige burde vi vel resette steget?
+         * Hvis de er gyldige så kan vi beholde steget? Eller burde man sette det til beregning, sånn at man må kalle på beregning på nytt som oppretter nye Andeler?
+         * Og så etter det må man generere brevet på nytt
+         *
+         * Burde man då få en varning om at man er i ferd med å miste brev-informasjon?
+         *
+         * Hvis man endrer vilkår/stønadsperioder generellt så risikerer man ju at vedtaket ikke lengre er gyldig, og då burde man ju fjerne vedtaket generellt?
+         * Eks om man går fra innvilget -> avslått? Eller er det noe man skal validere når man er på beregningssiden?
+         */
         val vilkårsresultat =
             vilkårsett.filterNot { it.type.gjelderMålgruppeEllerAktivitet() }.groupBy { it.type }.map {
                 if (it.key.gjelderFlereBarn()) {
