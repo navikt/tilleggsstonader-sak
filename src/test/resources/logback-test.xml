@@ -8,5 +8,5 @@
 
 
     <logger name="no" level="INFO"/>
-    <logger name="no.tilleggsstonad" level="DEBUG"/>
+    <logger name="no.nav.tilleggsstonader" level="DEBUG"/>
 </configuration>
