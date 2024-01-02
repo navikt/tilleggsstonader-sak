@@ -13,7 +13,11 @@ data class StønadsperiodeDto(
     override val tom: LocalDate,
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
-) : Periode<LocalDate>
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+    }
+}
 
 fun Stønadsperiode.tilDto() = StønadsperiodeDto(
     id = this.id,
