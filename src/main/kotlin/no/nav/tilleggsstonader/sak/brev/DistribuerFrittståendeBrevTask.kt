@@ -35,7 +35,7 @@ class DistribuerFrittståendeBrevTask(
                 journalpostId = payload.journalpostId,
                 bestillendeFagsystem = Fagsystem.TILLEGGSSTONADER,
                 dokumentProdApp = "TILLEGGSSTONADER-SAK",
-                distribusjonstype = Distribusjonstype.VEDTAK,
+                distribusjonstype = Distribusjonstype.VIKTIG,
             ),
         )
     }
