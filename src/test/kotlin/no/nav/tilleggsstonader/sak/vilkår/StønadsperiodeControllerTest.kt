@@ -32,7 +32,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
     lateinit var barnRepository: BarnRepository
 
     @Autowired
-    lateinit var vilkårService: VilkårService
+    lateinit var vilkårperiodeService: VilkårperiodeService
 
     @Autowired
     lateinit var vilkårStegService: VilkårStegService
@@ -91,13 +91,13 @@ class StønadsperiodeControllerTest : IntegrationTest() {
     }
 
     private fun opprettMålgruppe(behandling: Behandling): VilkårperiodeDto =
-        vilkårService.opprettVilkårperiode(
+        vilkårperiodeService.opprettVilkårperiode(
             behandling.id,
             OpprettVilkårperiode(MålgruppeType.AAP, dagensDato, dagensDato),
         )
 
     private fun opprettAktivitet(behandling: Behandling): VilkårperiodeDto =
-        vilkårService.opprettVilkårperiode(
+        vilkårperiodeService.opprettVilkårperiode(
             behandling.id,
             OpprettVilkårperiode(AktivitetType.TILTAK, dagensDato, dagensDato),
         )

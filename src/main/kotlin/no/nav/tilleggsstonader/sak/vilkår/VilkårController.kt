@@ -28,6 +28,7 @@ import java.util.UUID
 @Validated
 class VilkårController(
     private val vilkårService: VilkårService,
+    private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårStegService: VilkårStegService,
     private val tilgangService: TilgangService,
     // private val gjenbrukVilkårService: GjenbrukVilkårService,
@@ -98,7 +99,7 @@ class VilkårController(
     fun hentMålgrupper(@PathVariable behandlingId: UUID): Vilkårperioder {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
-        return vilkårService.hentVilkårperioder(behandlingId)
+        return vilkårperiodeService.hentVilkårperioder(behandlingId)
     }
 
     @PostMapping("{behandlingId}/periode")
@@ -109,6 +110,6 @@ class VilkårController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return vilkårService.opprettVilkårperiode(behandlingId, opprettVilkårperiode)
+        return vilkårperiodeService.opprettVilkårperiode(behandlingId, opprettVilkårperiode)
     }
 }
