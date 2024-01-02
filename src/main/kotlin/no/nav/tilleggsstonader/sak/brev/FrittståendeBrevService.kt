@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import org.slf4j.MDC
@@ -72,7 +73,11 @@ class FrittståendeBrevService(
             avsenderMottaker = AvsenderMottaker(id = fagsak.hentAktivIdent(), idType = BrukerIdType.FNR, navn = null),
         )
 
-        return journalpostService.opprettJournalpost(arkiverDokumentRequest, saksbehandler).journalpostId
+        val journalpost = journalpostService.opprettJournalpost(arkiverDokumentRequest, saksbehandler)
+
+        feilHvisIkke(journalpost.ferdigstilt) { "Journalpost er ikke ferdigstilt" }
+
+        return journalpost.journalpostId
     }
 
     private fun utledDokumenttype(stønadstype: Stønadstype) =
