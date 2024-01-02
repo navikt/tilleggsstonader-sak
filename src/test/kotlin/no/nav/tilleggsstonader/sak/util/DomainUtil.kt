@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -45,7 +44,7 @@ fun oppgave(
 ): OppgaveDomain = oppgave(behandling.id, erFerdigstilt, gsakOppgaveId, type)
 
 fun oppgave(
-    behandlingId: UUID,
+    behandlingId: UUID?,
     erFerdigstilt: Boolean = false,
     gsakOppgaveId: Long = 123,
     type: Oppgavetype = Oppgavetype.Journalføring,
@@ -69,7 +68,6 @@ fun behandling(
     forrigeBehandlingId: UUID? = null,
     årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
-    eksternId: EksternBehandlingId = EksternBehandlingId(),
     vedtakstidspunkt: LocalDateTime? = null,
     kravMottatt: LocalDate? = null,
 ): Behandling =
@@ -85,7 +83,6 @@ fun behandling(
         sporbar = Sporbar(opprettetTid = opprettetTid),
         årsak = årsak,
         henlagtÅrsak = henlagtÅrsak,
-        eksternId = eksternId,
         vedtakstidspunkt = vedtakstidspunkt
             ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
         kravMottatt = kravMottatt,
@@ -128,7 +125,7 @@ fun saksbehandling(
 ): Saksbehandling =
     Saksbehandling(
         id = behandling.id,
-        eksternId = behandling.eksternId.id,
+        eksternId = 0,
         forrigeBehandlingId = behandling.forrigeBehandlingId,
         type = behandling.type,
         status = behandling.status,
@@ -176,7 +173,7 @@ fun fagsak(
     identer: Set<PersonIdent> = defaultIdenter,
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     id: UUID = UUID.randomUUID(),
-    eksternId: EksternFagsakId = EksternFagsakId(),
+    eksternId: EksternFagsakId = EksternFagsakId(fagsakId = id),
     sporbar: Sporbar = Sporbar(),
     fagsakPersonId: UUID = UUID.randomUUID(),
 ): Fagsak {
@@ -187,7 +184,7 @@ fun fagsak(
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     id: UUID = UUID.randomUUID(),
     person: FagsakPerson,
-    eksternId: EksternFagsakId = EksternFagsakId(),
+    eksternId: EksternFagsakId = EksternFagsakId(fagsakId = id),
     sporbar: Sporbar = Sporbar(),
 ): Fagsak {
     return Fagsak(
@@ -204,13 +201,11 @@ fun fagsakDomain(
     id: UUID = UUID.randomUUID(),
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     personId: UUID = UUID.randomUUID(),
-    eksternId: EksternFagsakId = EksternFagsakId(),
 ): FagsakDomain =
     FagsakDomain(
         id = id,
         fagsakPersonId = personId,
         stønadstype = stønadstype,
-        eksternId = eksternId,
     )
 
 fun Fagsak.tilFagsakDomain() =
@@ -218,7 +213,6 @@ fun Fagsak.tilFagsakDomain() =
         id = id,
         fagsakPersonId = fagsakPersonId,
         stønadstype = stønadstype,
-        eksternId = eksternId,
         sporbar = sporbar,
     )
 

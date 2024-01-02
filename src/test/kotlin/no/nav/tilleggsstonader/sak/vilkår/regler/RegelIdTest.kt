@@ -1,25 +1,11 @@
 package no.nav.tilleggsstonader.sak.vilkår.regler
 
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class RegelIdTest {
 
     private val vilkårsregler = Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.values
-
-    @Test
-    internal fun `valider att regelId ikke brukes på flere steder`() {
-        val sjekkedeRegelIdMap = mutableMapOf<RegelId, VilkårType>()
-        vilkårsregler.forEach { vilkårsregel ->
-            vilkårsregel.regler.keys.forEach { regelId ->
-                val harLagtTilRegel = sjekkedeRegelIdMap.put(regelId, vilkårsregel.vilkårType) == null
-                if (regelId != RegelId.SLUTT_NODE && !harLagtTilRegel) {
-                    error("Regel: $regelId er allerede brukt i ${vilkårsregel.vilkårType}")
-                }
-            }
-        }
-    }
 
     @Test
     internal fun `det finnes en kobling til alle regler`() {

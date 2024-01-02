@@ -20,8 +20,8 @@ internal class BehandlingsjournalpostRepositoryTest : IntegrationTest() {
     @Test
     internal fun `skal kunne lagre flere journalposter på samme behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling1 = behandlingRepository.insert(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        val behandling2 = behandlingRepository.insert(behandling(fagsak))
+        val behandling1 = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
+        val behandling2 = testoppsettService.lagre(behandling(fagsak))
         behandlingsjournalpostRepository.insert(Behandlingsjournalpost(behandling1.id, "1", Journalposttype.U))
         behandlingsjournalpostRepository.insert(Behandlingsjournalpost(behandling1.id, "2", Journalposttype.U))
         // setter inn en på behandling 2
@@ -33,7 +33,7 @@ internal class BehandlingsjournalpostRepositoryTest : IntegrationTest() {
     @Test
     internal fun `skal ikke være mulig å legge inn 2 journalposter med samme journalpostId`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling1 = behandlingRepository.insert(behandling(fagsak))
+        val behandling1 = testoppsettService.lagre(behandling(fagsak))
         behandlingsjournalpostRepository.insert(Behandlingsjournalpost(behandling1.id, "1", Journalposttype.U))
         val throwable = catchThrowable {
             behandlingsjournalpostRepository.insert(
