@@ -62,6 +62,7 @@ class DefaultRestTemplateConfiguration {
     "integrasjonstest",
     "mock-pdl",
     "mock-egen-ansatt",
+    "mock-familie-dokument",
     "mock-iverksett",
     "mock-oppgave",
     "mock-journalpost",
@@ -93,6 +94,7 @@ abstract class IntegrationTest {
 
     @AfterEach
     fun tearDown() {
+        println("teardown")
         headers.clear()
         clearClientMocks()
         resetDatabase()
