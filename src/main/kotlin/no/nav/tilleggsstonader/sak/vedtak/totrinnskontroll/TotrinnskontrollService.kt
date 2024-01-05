@@ -172,7 +172,7 @@ class TotrinnskontrollService(
     private fun finnStatusForVedtakSomSkalFattes(behandling: Behandling): StatusTotrinnskontrollDto {
         val behandlingId = behandling.id
 
-        if (behandling.steg != StegType.SEND_TIL_BESLUTTER) {
+        if (behandling.steg != StegType.BESLUTTE_VEDTAK) {
             throw Feil(
                 message = "Totrinnskontroll kan ikke gjennomføres da steg på behandling er feil , steg = ${behandling.steg}",
                 frontendFeilmelding = "Feil i steg, kontakt brukerstøtte id=$behandlingId",
