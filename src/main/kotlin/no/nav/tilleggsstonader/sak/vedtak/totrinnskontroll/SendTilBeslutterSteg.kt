@@ -51,9 +51,9 @@ class SendTilBeslutterSteg(
 
     override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FATTER_VEDTAK)
+        ferdigstillOppgave(saksbehandling)
         totrinnskontrollService.sendtilBeslutter(saksbehandling)
         opprettGodkjennVedtakOppgave(saksbehandling)
-        ferdigstillOppgave(saksbehandling)
         // opprettTaskForBehandlingsstatistikk(saksbehandling.id) TODO DVH
     }
 

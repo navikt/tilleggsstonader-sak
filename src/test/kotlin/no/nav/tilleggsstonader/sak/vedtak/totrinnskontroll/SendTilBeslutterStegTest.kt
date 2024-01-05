@@ -188,7 +188,7 @@ class SendTilBeslutterStegTest {
         //    .isEqualTo(Hendelse.VEDTATT)
     }
 
-    private fun utførOgVerifiserKall(oppgavetype: Oppgavetype) {
+    private fun utførOgVerifiserKall(ferdigstillOppgaveType: Oppgavetype) {
         mockBrukerContext("saksbehandlernavn")
 
         utførSteg()
@@ -196,13 +196,17 @@ class SendTilBeslutterStegTest {
 
         verify { behandlingService.oppdaterStatusPåBehandling(behandling.id, BehandlingStatus.FATTER_VEDTAK) }
 
-        assertThat(taskSlot[0].type).isEqualTo(OpprettOppgaveTask.TYPE)
-        val taskData = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot[0].payload)
-        assertThat(taskData.oppgave.oppgavetype).isEqualTo(Oppgavetype.GodkjenneVedtak)
+        with(taskSlot[1]) {
+            assertThat(type).isEqualTo(OpprettOppgaveTask.TYPE)
+            val taskData = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(payload)
+            assertThat(taskData.oppgave.oppgavetype).isEqualTo(Oppgavetype.GodkjenneVedtak)
+        }
 
-        assertThat(taskSlot[1].type).isEqualTo(FerdigstillOppgaveTask.TYPE)
-        assertThat(objectMapper.readValue<FerdigstillOppgaveTask.FerdigstillOppgaveTaskData>(taskSlot[1].payload).oppgavetype)
-            .isEqualTo(oppgavetype)
+        with(taskSlot[0]) {
+            assertThat(type).isEqualTo(FerdigstillOppgaveTask.TYPE)
+            assertThat(objectMapper.readValue<FerdigstillOppgaveTask.FerdigstillOppgaveTaskData>(payload).oppgavetype)
+                .isEqualTo(ferdigstillOppgaveType)
+        }
     }
 
     private fun utførSteg() {
