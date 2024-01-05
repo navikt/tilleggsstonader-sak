@@ -35,7 +35,7 @@ class AngreSendTilBeslutterService(
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
         validerKanAngreSendTilBeslutter(saksbehandling)
-
+        totrinnskontrollService.angreSendTilBeslutter(behandlingId)
         behandlingshistorikkService.opprettHistorikkInnslag(
             behandlingId = behandlingId,
             stegtype = saksbehandling.steg,

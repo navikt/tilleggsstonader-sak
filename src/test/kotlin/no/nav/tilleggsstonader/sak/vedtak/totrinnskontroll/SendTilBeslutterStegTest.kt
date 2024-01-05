@@ -36,6 +36,8 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.StatusTotrinnskontrollDto
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vilkår.VilkårService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -54,6 +56,7 @@ class SendTilBeslutterStegTest {
     private val vedtaksresultatService = mockk<VedtaksresultatService>()
     private val vilkårService = mockk<VilkårService>()
     private val oppgaveService = mockk<OppgaveService>()
+    private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
 
     private val beslutteVedtakSteg =
         SendTilBeslutterSteg(
@@ -64,6 +67,8 @@ class SendTilBeslutterStegTest {
             vedtaksresultatService,
             vilkårService,
             oppgaveService,
+            totrinnskontrollService,
+
         )
     private val fagsak = fagsak(
         stønadstype = Stønadstype.BARNETILSYN,
@@ -149,12 +154,8 @@ class SendTilBeslutterStegTest {
 
     @Test
     internal fun `Skal avslutte oppgave BehandleUnderkjentVedtak hvis den finnes`() {
-        every { behandlingshistorikkService.finnSisteBehandlingshistorikk(any(), StegType.BESLUTTE_VEDTAK) } returns
-            Behandlingshistorikk(
-                behandlingId = UUID.randomUUID(),
-                steg = StegType.BESLUTTE_VEDTAK,
-                utfall = StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT,
-            )
+        every { totrinnskontrollService.hentTotrinnskontrollStatus(any()) } returns StatusTotrinnskontrollDto(status = TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
+
         utførOgVerifiserKall(Oppgavetype.BehandleUnderkjentVedtak)
         verifiserVedtattBehandlingsstatistikkTask()
     }
