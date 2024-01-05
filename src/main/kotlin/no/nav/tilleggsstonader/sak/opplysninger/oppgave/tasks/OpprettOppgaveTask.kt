@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalIkkeOppretteOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -48,7 +49,7 @@ class OpprettOppgaveTask(
         val koblingPerson: OppgavekoblingPerson = when (kobling) {
             is OppgavekoblingBehandling -> {
                 val behandling = behandlingService.hentSaksbehandling(kobling.behandlingId)
-                if (behandling.status.behandlingErLåstForVidereRedigering()) {
+                if(skalIkkeOppretteOppgave(behandling, oppgavetype)) {
                     logger.info("Opprettet ikke oppgave med oppgavetype=$oppgavetype fordi status=${behandling.status}")
                     return
                 }
