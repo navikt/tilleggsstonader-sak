@@ -20,7 +20,11 @@ data class VilkårperiodeDto(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val vilkår: VilkårDto,
-) : Periode<LocalDate>
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+    }
+}
 
 fun Vilkårperiode.tilDto(vilkår: VilkårDto) =
     VilkårperiodeDto(
