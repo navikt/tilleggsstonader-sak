@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.VedtaksbrevRepository
@@ -29,7 +28,6 @@ class SendTilBeslutterSteg(
     private val taskService: TaskService,
     private val behandlingService: BehandlingService,
     private val vedtaksbrevRepository: VedtaksbrevRepository,
-    private val behandlingshistorikkService: BehandlingshistorikkService,
     private val vedtaksresultatService: VedtaksresultatService,
     private val vilkårService: VilkårService,
     private val oppgaveService: OppgaveService,
