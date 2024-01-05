@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import no.nav.tilleggsstonader.sak.vilkår.VilkårController
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -43,30 +44,77 @@ class BehandlingFlytTest(
     @Autowired val totrinnskontrollController: TotrinnskontrollController,
 ) : IntegrationTest() {
 
+    val personIdent = FnrGenerator.generer(år = 2000)
+
     @Test
     fun `saksbehandler innvilger vedtak og beslutter godkjenner vedtak`() {
-        val personIdent = FnrGenerator.generer(2000)
-
         val behandlingId = saksbehandler {
-            val behandlingId = opprettTestBehandlingController.opprettBehandling(TestBehandlingRequest(personIdent))
-            opprettOppgave(behandlingId)
-            vilkårController.getVilkår(behandlingId)
-            testSaksbehandlingController.utfyllVilkår(behandlingId)
-
-            opprettVedtak(behandlingId)
-            genererSaksbehandlerBrev(behandlingId)
-            totrinnskontrollController.sendTilBeslutter(behandlingId)
+            val behandlingId = opprettBehandlingOgSendTilBeslutter(personIdent)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
             behandlingId
         }
 
         beslutter {
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
-            totrinnskontrollController.beslutteVedtak(behandlingId, BeslutteVedtakDto(true))
+            godkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
         }
 
         verifiserBehandlingIverksettes(behandlingId)
+    }
+
+    @Test
+    fun `underkjenner og sender til beslutter på nytt`() {
+        val behandlingId = saksbehandler {
+            val behandlingId = opprettBehandlingOgSendTilBeslutter(personIdent)
+            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
+            behandlingId
+        }
+
+        beslutter {
+            underkjennTotrinnskontroll(behandlingId)
+            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
+        }
+
+        saksbehandler {
+            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
+            sendTilBeslutter(behandlingId)
+            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
+        }
+
+        beslutter {
+            godkjennTotrinnskontroll(behandlingId)
+            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
+        }
+
+        verifiserBehandlingIverksettes(behandlingId)
+    }
+
+    private fun godkjennTotrinnskontroll(behandlingId: UUID) {
+        totrinnskontrollController.beslutteVedtak(behandlingId, BeslutteVedtakDto(true))
+    }
+
+    private fun underkjennTotrinnskontroll(behandlingId: UUID) {
+        totrinnskontrollController.beslutteVedtak(
+            behandlingId,
+            BeslutteVedtakDto(false, "", listOf(ÅrsakUnderkjent.VEDTAK_OG_BEREGNING)),
+        )
+    }
+
+    private fun opprettBehandlingOgSendTilBeslutter(personIdent: String): UUID {
+        val behandlingId = opprettTestBehandlingController.opprettBehandling(TestBehandlingRequest(personIdent))
+        opprettOppgave(behandlingId)
+        vilkårController.getVilkår(behandlingId)
+        testSaksbehandlingController.utfyllVilkår(behandlingId)
+
+        opprettVedtak(behandlingId)
+        genererSaksbehandlerBrev(behandlingId)
+        sendTilBeslutter(behandlingId)
+        return behandlingId
+    }
+
+    private fun sendTilBeslutter(behandlingId: UUID) {
+        totrinnskontrollController.sendTilBeslutter(behandlingId)
     }
 
     private fun verifiserBehandlingIverksettes(behandlingId: UUID) {
@@ -92,7 +140,6 @@ class BehandlingFlytTest(
         oppgaveRepository.insert(oppgave)
     }
 
-
     private fun genererSaksbehandlerBrev(behandlingId: UUID) {
         val html = "SAKSBEHANDLER_SIGNATUR, BREVDATO_PLACEHOLDER, BESLUTTER_SIGNATUR"
         brevController.genererPdf(GenererPdfRequest(html), behandlingId)
@@ -103,16 +150,20 @@ class BehandlingFlytTest(
         val utgifter = barn.first().let { mapOf(it.id to listOf(utgift())) }
         val stønadsperioder = listOf(stønadsperiode())
         tilsynBarnVedtakController.lagreVedtak(
-            behandlingId, InnvilgelseTilsynBarnDto(stønadsperioder, utgifter)
+            behandlingId,
+            InnvilgelseTilsynBarnDto(stønadsperioder, utgifter),
         )
     }
 
     private fun stønadsperiode() = Stønadsperiode(
-        fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31)
+        fom = LocalDate.of(2023, 1, 1),
+        tom = LocalDate.of(2023, 1, 31),
     )
 
     private fun utgift() = Utgift(
-        fom = YearMonth.of(2023, 1), tom = YearMonth.of(2023, 1), utgift = 1000
+        fom = YearMonth.of(2023, 1),
+        tom = YearMonth.of(2023, 1),
+        utgift = 1000,
     )
 
     private fun <T> saksbehandler(fn: () -> T) =
