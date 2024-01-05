@@ -142,7 +142,7 @@ class OppgaveService(
 
     fun ferdigstillBehandleOppgave(behandlingId: UUID, oppgavetype: Oppgavetype) {
         val oppgave = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
-            ?: error("Finner ikke oppgave for behandling $behandlingId")
+            ?: error("Finner ikke oppgave for behandling $behandlingId type=$oppgavetype")
         ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
     }
 

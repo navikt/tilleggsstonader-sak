@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.extension.ExtendWith
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -91,6 +92,8 @@ abstract class IntegrationTest {
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     protected lateinit var testoppsettService: TestoppsettService
+
+    val logger = LoggerFactory.getLogger(javaClass)
 
     @AfterEach
     fun tearDown() {
