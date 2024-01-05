@@ -116,8 +116,8 @@ class TotrinnskontrollService(
     }
 
     fun hentSaksbehandlerSomSendteTilBeslutter(behandlingId: UUID): String {
-        val totrinnskontrollSaksbehandler =
-            totrinnskontrollRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(behandlingId, TotrinnInternStatus.GODKJENT)
+        val totrinnskontrollSaksbehandler = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+            ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
         return totrinnskontrollSaksbehandler.saksbehandler
     }
 
