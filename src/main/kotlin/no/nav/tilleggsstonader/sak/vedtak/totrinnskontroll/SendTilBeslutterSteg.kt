@@ -19,7 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vilkår.VilkårService
 import org.springframework.stereotype.Service
 
@@ -70,8 +70,8 @@ class SendTilBeslutterSteg(
     }
 
     private fun ferdigstillOppgave(saksbehandling: Saksbehandling) {
-        val totrinnskontrollServiceStatus = totrinnskontrollService.hentTotrinnskontrollStatus(saksbehandling.id)
-        val oppgavetype = if (totrinnskontrollServiceStatus.status == TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT) {
+        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(saksbehandling.id)
+        val oppgavetype = if (totrinnskontroll?.status == TotrinnInternStatus.UNDERKJENT) {
             Oppgavetype.BehandleUnderkjentVedtak
         } else {
             Oppgavetype.BehandleSak

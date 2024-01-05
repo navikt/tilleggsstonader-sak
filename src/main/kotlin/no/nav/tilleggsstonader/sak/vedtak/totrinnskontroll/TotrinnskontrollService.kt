@@ -127,6 +127,9 @@ class TotrinnskontrollService(
             ?.takeIf { NAVIDENT_REGEX.matches(it) }
     }
 
+    fun hentTotrinnskontroll(behandlingId: UUID): Totrinnskontroll? =
+        totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+
     fun hentTotrinnskontrollStatus(behandlingId: UUID): StatusTotrinnskontrollDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val behandlingStatus = behandling.status
