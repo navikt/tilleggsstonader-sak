@@ -57,14 +57,14 @@ class BehandlingFlytTest(
 
     @Test
     fun `saksbehandler innvilger vedtak og beslutter godkjenner vedtak`() {
-        val behandlingId = saksbehandler {
+        val behandlingId = somSaksbehandler {
             val behandlingId = opprettBehandlingOgSendTilBeslutter(personIdent)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
             behandlingId
         }
         assertSisteOpprettedeOppgave(behandlingId, Oppgavetype.GodkjenneVedtak)
 
-        beslutter {
+        somBeslutter {
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
             godkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
@@ -75,26 +75,26 @@ class BehandlingFlytTest(
 
     @Test
     fun `underkjenner og sender til beslutter på nytt`() {
-        val behandlingId = saksbehandler {
+        val behandlingId = somSaksbehandler {
             val behandlingId = opprettBehandlingOgSendTilBeslutter(personIdent)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
             assertSisteFerdigstillOppgaveTask(Oppgavetype.BehandleSak)
             behandlingId
         }
 
-        beslutter {
+        somBeslutter {
             underkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
         }
 
-        saksbehandler {
+        somSaksbehandler {
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
             sendTilBeslutter(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
             assertSisteFerdigstillOppgaveTask(Oppgavetype.BehandleUnderkjentVedtak)
         }
 
-        beslutter {
+        somBeslutter {
             godkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
         }
@@ -104,7 +104,7 @@ class BehandlingFlytTest(
 
     @Test
     fun `angrer send til beslutter`() {
-        val behandlingId = saksbehandler {
+        val behandlingId = somSaksbehandler {
             val behandlingId = opprettBehandlingOgSendTilBeslutter(personIdent)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
             assertSisteFerdigstillOppgaveTask(Oppgavetype.BehandleSak)
@@ -112,14 +112,14 @@ class BehandlingFlytTest(
         }
         assertSisteOpprettedeOppgave(behandlingId, Oppgavetype.GodkjenneVedtak)
 
-        saksbehandler {
+        somSaksbehandler {
             angreSendTilBeslutter(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
         }
 
         assertSisteOpprettedeOppgave(behandlingId, Oppgavetype.BehandleSak)
 
-        saksbehandler {
+        somSaksbehandler {
             sendTilBeslutter(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
             assertSisteFerdigstillOppgaveTask(Oppgavetype.BehandleSak)
@@ -127,7 +127,7 @@ class BehandlingFlytTest(
 
         assertSisteOpprettedeOppgave(behandlingId, Oppgavetype.GodkjenneVedtak)
 
-        beslutter {
+        somBeslutter {
             godkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
         }
@@ -244,7 +244,7 @@ class BehandlingFlytTest(
         utgift = 1000,
     )
 
-    private fun <T> saksbehandler(fn: () -> T): T {
+    private fun <T> somSaksbehandler(fn: () -> T): T {
         kjørTasks()
         return testWithBrukerContext(
             preferredUsername = "saksbehandler",
@@ -254,7 +254,7 @@ class BehandlingFlytTest(
         }
     }
 
-    private fun <T> beslutter(fn: () -> T): T {
+    private fun <T> somBeslutter(fn: () -> T): T {
         kjørTasks()
         return testWithBrukerContext(preferredUsername = "beslutter", groups = listOf(rolleConfig.beslutterRolle)) {
             withCallId(fn)
