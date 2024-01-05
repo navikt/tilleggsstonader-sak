@@ -94,7 +94,6 @@ abstract class IntegrationTest {
 
     @AfterEach
     fun tearDown() {
-        println("teardown")
         headers.clear()
         clearClientMocks()
         resetDatabase()
