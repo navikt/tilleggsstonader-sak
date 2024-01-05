@@ -321,7 +321,7 @@ internal class TotrinnskontrollServiceTest {
             begrunnelse = "begrunnelse underkjent",
         )
 
-    private fun behandling(status: BehandlingStatus) = behandling(fagsak, status, steg = StegType.SEND_TIL_BESLUTTER)
+    private fun behandling(status: BehandlingStatus) = behandling(fagsak, status, steg = StegType.BESLUTTE_VEDTAK)
 
     companion object {
 

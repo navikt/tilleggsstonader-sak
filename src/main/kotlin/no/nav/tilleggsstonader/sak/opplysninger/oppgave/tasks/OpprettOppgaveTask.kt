@@ -50,7 +50,7 @@ class OpprettOppgaveTask(
             is OppgavekoblingBehandling -> {
                 val behandling = behandlingService.hentSaksbehandling(kobling.behandlingId)
                 if (skalIkkeOppretteOppgave(behandling, oppgavetype)) {
-                    logger.info("Opprettet ikke oppgave med oppgavetype=$oppgavetype fordi status=${behandling.status}")
+                    logger.warn("Opprettet ikke oppgave med oppgavetype=$oppgavetype fordi status=${behandling.status}")
                     return
                 }
                 OppgavekoblingPerson(behandling.ident, behandling.stønadstype)
