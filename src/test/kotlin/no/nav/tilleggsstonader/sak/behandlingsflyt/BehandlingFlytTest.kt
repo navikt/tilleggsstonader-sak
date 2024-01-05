@@ -136,8 +136,8 @@ class BehandlingFlytTest(
     private fun newTransaction() {
         if (TestTransaction.isActive()) {
             TestTransaction.flagForCommit(); // need this, otherwise the next line does a rollback
-            TestTransaction.end();
-            TestTransaction.start();
+            TestTransaction.end()
+            TestTransaction.start()
         }
     }
 
@@ -248,7 +248,7 @@ class BehandlingFlytTest(
         kjørTasks()
         return testWithBrukerContext(
             preferredUsername = "saksbehandler",
-            groups = listOf(rolleConfig.saksbehandlerRolle)
+            groups = listOf(rolleConfig.saksbehandlerRolle),
         ) {
             withCallId(fn)
         }

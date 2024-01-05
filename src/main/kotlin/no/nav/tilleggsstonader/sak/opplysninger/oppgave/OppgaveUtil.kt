@@ -49,7 +49,7 @@ object OppgaveUtil {
      * Hvis saksbehandler angrer send til beslutter før oppgaven er opprettet, så skal man ikke opprette GodkjennVedtak-oppgaven
      */
     fun skalIkkeOppretteOppgave(saksbehandling: Saksbehandling, oppgavetype: Oppgavetype): Boolean {
-        return when(oppgavetype) {
+        return when (oppgavetype) {
             Oppgavetype.BehandleSak -> saksbehandling.status.behandlingErLåstForVidereRedigering()
             Oppgavetype.GodkjenneVedtak -> saksbehandling.status != BehandlingStatus.FATTER_VEDTAK
             Oppgavetype.BehandleUnderkjentVedtak -> saksbehandling.status.behandlingErLåstForVidereRedigering()
