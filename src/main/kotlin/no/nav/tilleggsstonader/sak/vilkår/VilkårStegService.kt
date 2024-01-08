@@ -36,6 +36,7 @@ class VilkårStegService(
     // private val taskService: TaskService,
     // private val blankettRepository: BlankettRepository,
     private val behandlingshistorikkService: BehandlingshistorikkService,
+    private val stønadsperiodeService: StønadsperiodeService,
 ) {
 
     @Transactional

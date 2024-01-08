@@ -97,6 +97,7 @@ internal class VilkårStegServiceTest {
         vilkårSteg = mockk<VilkårSteg>(relaxed = true),
         // taskService = taskService,
         behandlingshistorikkService = behandlingshistorikkService,
+        stønadsperiodeService = mockk(),
     )
     private val søknad = SøknadsskjemaMapper.map(
         søknadskjemaBarnetilsyn(),
