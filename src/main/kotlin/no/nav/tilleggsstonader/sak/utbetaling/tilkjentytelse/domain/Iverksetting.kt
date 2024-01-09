@@ -25,6 +25,7 @@ import java.util.UUID
  * * Behandling 2 fjerner alle andeler
  * * Hvordan vite om det er endring mellom behandling 1 og 2?
  * * Innværende måned skal utbetales direkte, lag en task for inneværende måned direkt når man iverksetter?
+ *   * Har vi et bryt-datum for når det skal betales innevärende måned eller vid neste batch?
  *
  * Hvis man iverksetter noe idag, jobbet for å iverksette den feiler
  * Så prøver man å iverksette noe i morgen, hva skjer då? Hva skjer hvis del 2 kommer først?
@@ -32,6 +33,13 @@ import java.util.UUID
  * Nye rader for oppdatering av status?
  *
  * Når vi iverksetter skal man peke til forrige iverksettingen
+ *
+ * Har status på iverksettingen noe å si?
+ * Har den kanskje ikke noe å si for selve saksbehandlingsflytet, men at det er fint hvis vi følger opp statusen (eks oppdaterer en iverksettingsrad med OK)?
+ * Då kan vi vise det i en utbetalingsoversikt?
+ *  Men hvis det eks blir etterbetaling, fra eks 100 til 200kr, då blir det en diff på 100kr, men det vi kommer vise er 100kr?
+ *  Hvis man viser alle "iverksettinger" så kommer det vise feilaktig informasjon, ettersom den måneden kommer se ut som at den fått utbetaling på 100 og 200kr?
+ *  Eller burde egentlige dp-iverksett kunne returnere faktisk utbetalt beløp for X måned? Sånn at vi kan vise hva som blitt utbetalt i en etterbetaling?
  */
 @Repository
 interface IverksettingRepository : RepositoryInterface<Iverksetting, UUID>, InsertUpdateRepository<Iverksetting> {
