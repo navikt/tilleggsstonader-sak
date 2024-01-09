@@ -54,6 +54,6 @@ internal class TilkjentYtelseRepositoryTest : IntegrationTest() {
     private fun opprettBehandling(): Behandling {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
 
-        return behandlingRepository.insert(behandling(fagsak))
+        return testoppsettService.lagre(behandling(fagsak))
     }
 }

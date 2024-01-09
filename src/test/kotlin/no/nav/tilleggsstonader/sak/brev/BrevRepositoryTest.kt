@@ -22,7 +22,7 @@ internal class BrevRepositoryTest : IntegrationTest() {
     @Test
     internal fun `lagre og hent vedtaksbrev`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val vedtaksbrev = Vedtaksbrev(
             behandlingId = behandling.id,

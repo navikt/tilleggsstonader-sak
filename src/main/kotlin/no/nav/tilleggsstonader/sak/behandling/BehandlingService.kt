@@ -15,6 +15,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
+import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
@@ -42,6 +44,7 @@ import java.util.UUID
 class BehandlingService(
     private val behandlingsjournalpostRepository: BehandlingsjournalpostRepository,
     private val behandlingRepository: BehandlingRepository,
+    private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
     private val behandlingshistorikkService: BehandlingshistorikkService,
     // private val taskService: TaskService,
 ) {
@@ -132,6 +135,7 @@ class BehandlingService(
                 kategori = BehandlingKategori.NASJONAL,
             ),
         )
+        eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = behandling.id))
 
         behandlingshistorikkService.opprettHistorikkInnslag(
             behandlingshistorikk = Behandlingshistorikk(

@@ -49,8 +49,8 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     @Test
     internal fun `kopierVilkårsettTilNyBehandling - skal kopiere vilkår til ny behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        val revurdering = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
+        val revurdering = testoppsettService.lagre(behandling(fagsak))
         val søknadskjema = lagreSøknad(behandling)
         val barnPåFørsteSøknad = barnRepository.insertAll(søknadBarnTilBehandlingBarn(søknadskjema.barn, behandling.id))
         val barnPåRevurdering = barnRepository.insertAll(søknadBarnTilBehandlingBarn(søknadskjema.barn, revurdering.id))
@@ -89,7 +89,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     @Test
     internal fun `oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger - skal kaste feil dersom behandlingen er låst for videre behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
+        val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
         assertThat(catchThrowable { vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandling.id) })
             .hasMessage("Kan ikke laste inn nye grunnlagsdata for behandling med status ${behandling.status}")
     }
@@ -98,7 +98,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     internal fun `kopierVilkårsettTilNyBehandling - skal kaste feil hvis det ikke finnes noen vurderinger`() {
         val tidligereBehandlingId = UUID.randomUUID()
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val revurdering = behandlingRepository.insert(behandling(fagsak))
+        val revurdering = testoppsettService.lagre(behandling(fagsak))
         val metadata = HovedregelMetadata(
             emptyList(),
             mockk(),

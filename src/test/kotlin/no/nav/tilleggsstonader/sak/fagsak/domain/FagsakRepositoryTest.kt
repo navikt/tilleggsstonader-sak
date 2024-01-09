@@ -29,6 +29,9 @@ class FagsakRepositoryTest : IntegrationTest() {
     private lateinit var fagsakPersonRepository: FagsakPersonRepository
 
     @Autowired
+    private lateinit var eksternFagsakIdRepository: EksternFagsakIdRepository
+
+    @Autowired
     private lateinit var fagsakRepository: FagsakRepository
 
     @Autowired
@@ -38,7 +41,7 @@ class FagsakRepositoryTest : IntegrationTest() {
     @Test
     fun `harLøpendeUtbetaling returnerer true for fagsak med ferdigstilt behandling med aktiv utbetaling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("321"))))
-        val behandling = behandlingRepository.insert(
+        val behandling = testoppsettService.lagre(
             behandling(
                 fagsak,
                 resultat = BehandlingResultat.INNVILGET,
@@ -55,7 +58,7 @@ class FagsakRepositoryTest : IntegrationTest() {
     @Test
     fun `harLøpendeUtbetaling returnerer true for fagsak med flere aktive ytelser`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("321"))))
-        val behandling = behandlingRepository.insert(
+        val behandling = testoppsettService.lagre(
             behandling(
                 fagsak,
                 resultat = BehandlingResultat.INNVILGET,
@@ -73,7 +76,7 @@ class FagsakRepositoryTest : IntegrationTest() {
     @Test
     fun `harLøpendeUtbetaling returnerer false for fagsak med ferdigstilt behandling med inaktiv utbetaling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("321"))))
-        val behandling = behandlingRepository.insert(
+        val behandling = testoppsettService.lagre(
             behandling(
                 fagsak,
                 resultat = BehandlingResultat.INNVILGET,
@@ -221,12 +224,12 @@ class FagsakRepositoryTest : IntegrationTest() {
     internal fun `skal hente fagsak på behandlingId`() {
         var fagsak = opprettFagsakMedFlereIdenter()
         fagsak = testoppsettService.lagreFagsak(fagsak)
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val finnFagsakTilBehandling = fagsakRepository.finnFagsakTilBehandling(behandling.id)!!
 
         assertThat(finnFagsakTilBehandling.id).isEqualTo(fagsak.id)
-        assertThat(finnFagsakTilBehandling.eksternId).isEqualTo(fagsak.eksternId)
+        assertThat(eksternFagsakIdRepository.findByFagsakId(fagsak.id)).isEqualTo(fagsak.eksternId)
     }
 
     @Test

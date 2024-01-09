@@ -27,7 +27,7 @@ internal class BrevmottakerRepositoryTest : IntegrationTest() {
 
     @Test internal fun `lagre og hent brevmottaker`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val brevmottaker = Brevmottaker(
             behandlingId = behandling.id,
@@ -58,7 +58,7 @@ internal class BrevmottakerRepositoryTest : IntegrationTest() {
     @Test
     internal fun `skal ikke kunne lagre to journalpostResultat på samme behandling med samme mottaker`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val brevmottaker1 = Brevmottaker(
             behandlingId = behandling.id,
@@ -87,7 +87,7 @@ internal class BrevmottakerRepositoryTest : IntegrationTest() {
     @Test
     internal fun `skal kunne lagre to journalpostResultat på samme behandling med forskjellige mottakere`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = behandlingRepository.insert(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val brevmottaker = Brevmottaker(
             behandlingId = behandling.id,

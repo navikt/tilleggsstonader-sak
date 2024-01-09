@@ -7,21 +7,6 @@ import java.time.LocalDate
 data class PersonopplysningerDto(
     val personIdent: String,
     val navn: NavnDto,
-    val kjønn: Kjønn,
-    val adressebeskyttelse: Adressebeskyttelse?,
-    val folkeregisterpersonstatus: Folkeregisterpersonstatus?,
-    val fødselsdato: LocalDate?,
-    val dødsdato: LocalDate?,
-    val statsborgerskap: List<StatsborgerskapDto>,
-    val sivilstand: List<SivilstandDto>,
-    val adresse: List<AdresseDto>,
-    val fullmakt: List<FullmaktDto>,
-    val egenAnsatt: Boolean,
-    val barn: List<BarnDto>,
-    val innflyttingTilNorge: List<InnflyttingDto>,
-    val utflyttingFraNorge: List<UtflyttingDto>,
-    val oppholdstillatelse: List<OppholdstillatelseDto>,
-    val vergemål: List<VergemålDto>,
 )
 
 data class StatsborgerskapDto(
@@ -153,7 +138,7 @@ enum class Folkeregisterpersonstatus(private val pdlStatus: String, val visnings
 
     companion object {
 
-        private val map = values().associateBy(Folkeregisterpersonstatus::pdlStatus)
+        private val map = entries.associateBy(Folkeregisterpersonstatus::pdlStatus)
         fun fraPdl(status: no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatus) =
             map.getOrDefault(status.status, UKJENT)
     }

@@ -51,10 +51,40 @@ internal class OppgaveServiceTest {
             cacheManager,
         )
 
+    val opprettOppgaveDomainSlot = slot<OppgaveDomain>()
+
     @BeforeEach
     internal fun setUp() {
+        opprettOppgaveDomainSlot.clear()
         every { oppgaveClient.finnOppgaveMedId(any()) } returns lagEksternTestOppgave()
+        every { oppgaveRepository.insert(capture(opprettOppgaveDomainSlot)) } returns lagTestOppgave()
         every { oppgaveRepository.update(any()) } answers { firstArg() }
+    }
+
+    @Test
+    fun `Opprett oppgave skal kunne opprettes uten behandlingId`() {
+        val slot = slot<OpprettOppgaveRequest>()
+        mockOpprettOppgave(slot)
+
+        oppgaveService.opprettOppgave(
+            personIdent = FNR,
+            stønadstype = Stønadstype.BARNETILSYN,
+            behandlingId = null,
+            oppgave = OpprettOppgave(oppgavetype = Oppgavetype.Journalføring),
+        )
+        assertThat(opprettOppgaveDomainSlot.captured.behandlingId).isNull()
+    }
+
+    @Test
+    fun `Opprett oppgave må ha kobling til behandling når man oppretter en BehandleSak-oppgave`() {
+        assertThatThrownBy {
+            oppgaveService.opprettOppgave(
+                personIdent = FNR,
+                stønadstype = Stønadstype.BARNETILSYN,
+                behandlingId = null,
+                oppgave = OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak),
+            )
+        }.hasMessage("Må ha behandlingId når man oppretter oppgave for behandle sak")
     }
 
     @Test
@@ -62,7 +92,7 @@ internal class OppgaveServiceTest {
         val slot = slot<OpprettOppgaveRequest>()
         mockOpprettOppgave(slot)
 
-        oppgaveService.opprettOppgave(BEHANDLING_ID, Oppgavetype.BehandleSak)
+        oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
 
         assertThat(slot.captured.enhetsnummer).isEqualTo(ENHETSNUMMER)
         assertThat(slot.captured.ident).isEqualTo(OppgaveIdentV2(ident = FNR, gruppe = IdentGruppe.FOLKEREGISTERIDENT))
@@ -70,6 +100,7 @@ internal class OppgaveServiceTest {
         assertThat(slot.captured.fristFerdigstillelse).isAfterOrEqualTo(LocalDate.now().plusDays(1))
         assertThat(slot.captured.aktivFra).isEqualTo(LocalDate.now())
         assertThat(slot.captured.tema).isEqualTo(Tema.TSO)
+        assertThat(opprettOppgaveDomainSlot.captured.behandlingId).isEqualTo(BEHANDLING_ID)
     }
 
     @Test
@@ -78,7 +109,7 @@ internal class OppgaveServiceTest {
         mockOpprettOppgave(slot)
         every { oppgaveClient.opprettOppgave(any()) } throws IntegrasjonException("En merkelig feil vi ikke kjenner til")
         assertThrows<IntegrasjonException> {
-            oppgaveService.opprettOppgave(BEHANDLING_ID, Oppgavetype.BehandleSak)
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
         }
     }
 
@@ -197,8 +228,6 @@ internal class OppgaveServiceTest {
     private fun mockOpprettOppgave(slot: CapturingSlot<OpprettOppgaveRequest>) {
         every { fagsakService.hentFagsakForBehandling(BEHANDLING_ID) } returns lagTestFagsak()
 
-        every { oppgaveRepository.insert(any()) } returns lagTestOppgave()
-
         every {
             oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(any(), any())
         } returns null
@@ -217,13 +246,17 @@ internal class OppgaveServiceTest {
         return fagsak(
             id = FAGSAK_ID,
             stønadstype = Stønadstype.BARNETILSYN,
-            eksternId = EksternFagsakId(FAGSAK_EKSTERN_ID),
+            eksternId = EksternFagsakId(FAGSAK_EKSTERN_ID, FAGSAK_ID),
             identer = setOf(PersonIdent(ident = FNR)),
         )
     }
 
     private fun lagTestOppgave(): OppgaveDomain {
-        return OppgaveDomain(behandlingId = BEHANDLING_ID, type = Oppgavetype.BehandleSak, gsakOppgaveId = GSAK_OPPGAVE_ID)
+        return OppgaveDomain(
+            behandlingId = BEHANDLING_ID,
+            type = Oppgavetype.BehandleSak,
+            gsakOppgaveId = GSAK_OPPGAVE_ID,
+        )
     }
 
     private fun lagEksternTestOppgave(): Oppgave {

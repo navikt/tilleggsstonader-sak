@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,6 +20,12 @@ class JournalpostClientConfig {
         val journalpostClient = mockk<JournalpostClient>()
 
         every { journalpostClient.distribuerJournalpost(any(), any()) } returns "bestillingId"
+        every {
+            journalpostClient.opprettJournalpost(
+                any(),
+                any(),
+            )
+        } returns ArkiverDokumentResponse(journalpostId = "journalpostId", ferdigstilt = true)
         mockFeiletDistribusjon(journalpostClient)
 
         return journalpostClient

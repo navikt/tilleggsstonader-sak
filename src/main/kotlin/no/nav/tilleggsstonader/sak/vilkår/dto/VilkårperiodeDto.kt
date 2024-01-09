@@ -20,7 +20,11 @@ data class VilkårperiodeDto(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val vilkår: VilkårDto,
-) : Periode<LocalDate>
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+    }
+}
 
 fun Vilkårperiode.tilDto(vilkår: VilkårDto) =
     VilkårperiodeDto(
@@ -36,11 +40,6 @@ data class Datoperiode(
 ) : Periode<LocalDate>, Mergeable<LocalDate, Datoperiode> {
     override fun merge(other: Datoperiode): Datoperiode {
         return this.copy(tom = other.tom)
-    }
-
-    // TODO: Slett når kontrakter oppdateres
-    fun inneholder(other: Periode<LocalDate>): Boolean {
-        return this.fom <= other.fom && this.tom >= other.tom
     }
 }
 

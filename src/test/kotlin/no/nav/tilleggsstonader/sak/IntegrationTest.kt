@@ -62,6 +62,7 @@ class DefaultRestTemplateConfiguration {
     "integrasjonstest",
     "mock-pdl",
     "mock-egen-ansatt",
+    "mock-familie-dokument",
     "mock-iverksett",
     "mock-oppgave",
     "mock-journalpost",
