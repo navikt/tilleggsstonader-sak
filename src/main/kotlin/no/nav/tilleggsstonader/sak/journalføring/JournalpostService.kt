@@ -23,7 +23,7 @@ class JournalpostService(private val journalpostClient: JournalpostClient) {
                 tema = vedleggRequest.tema ?: emptyList(),
                 journalposttype = listOfNotNull(vedleggRequest.journalposttype),
                 journalstatus = listOfNotNull(vedleggRequest.journalstatus),
-                antall = 10,
+                antall = 200,
             ),
         )
     }
