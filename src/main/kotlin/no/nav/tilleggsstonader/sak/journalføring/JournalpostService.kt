@@ -2,16 +2,31 @@ package no.nav.tilleggsstonader.sak.journalføring
 
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
+import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
+import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.vedlegg.VedleggRequest
 import org.springframework.stereotype.Service
 
 @Service
 class JournalpostService(private val journalpostClient: JournalpostClient) {
+    fun finnJournalposterForBruker(personIdent: String, vedleggRequest: VedleggRequest): List<Journalpost> {
+        return journalpostClient.finnJournalposterForBruker(
+            JournalposterForBrukerRequest(
+                brukerId = Bruker(id = personIdent, type = BrukerIdType.FNR),
+                tema = vedleggRequest.tema,
+                journalposttype = vedleggRequest.journalposttype,
+                journalstatus = vedleggRequest.journalstatus,
+                antall = 10,
+            )
+        )
+    }
 
     fun hentJournalpost(journalpostId: String): Journalpost {
         return journalpostClient.hentJournalpost(journalpostId)
