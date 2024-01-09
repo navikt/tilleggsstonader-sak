@@ -14,9 +14,11 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Profile("integrasjonstest")
 @Service
@@ -27,6 +29,8 @@ class TestoppsettService(
     private val behandlingRepository: BehandlingRepository,
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
 ) {
+
+    fun hentBehandling(behandlingId: UUID) = behandlingRepository.findByIdOrThrow(behandlingId)
 
     fun opprettBehandlingMedFagsak(
         behandling: Behandling,

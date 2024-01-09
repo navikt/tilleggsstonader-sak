@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import org.slf4j.LoggerFactory
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
@@ -39,5 +41,22 @@ object OppgaveUtil {
         -> "tilleggsstonader-sak"
 
         else -> error("Håndterer ikke behandlesAvApplikasjon for $oppgavetype")
+    }
+
+    /**
+     * Skal ikke opprette oppgave når en behandling har feil status for gitt oppgavetype
+     * Eks i en behandling som sendes til beslutter, så opprettes det en task for GodkjenneVedtak
+     * Hvis saksbehandler angrer send til beslutter før oppgaven er opprettet, så skal man ikke opprette GodkjennVedtak-oppgaven
+     */
+    fun skalIkkeOppretteOppgave(saksbehandling: Saksbehandling, oppgavetype: Oppgavetype): Boolean {
+        return when (oppgavetype) {
+            Oppgavetype.BehandleSak -> saksbehandling.status.behandlingErLåstForVidereRedigering()
+            Oppgavetype.GodkjenneVedtak -> saksbehandling.status != BehandlingStatus.FATTER_VEDTAK
+            Oppgavetype.BehandleUnderkjentVedtak -> saksbehandling.status.behandlingErLåstForVidereRedigering()
+            else -> {
+                logger.warn("Har ikke håndtering av $oppgavetype for behandling=${saksbehandling.id}")
+                return false
+            }
+        }
     }
 }
