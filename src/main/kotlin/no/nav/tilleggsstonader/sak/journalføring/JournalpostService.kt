@@ -20,9 +20,9 @@ class JournalpostService(private val journalpostClient: JournalpostClient) {
         return journalpostClient.finnJournalposterForBruker(
             JournalposterForBrukerRequest(
                 brukerId = Bruker(id = personIdent, type = BrukerIdType.FNR),
-                tema = vedleggRequest.tema,
-                journalposttype = vedleggRequest.journalposttype,
-                journalstatus = vedleggRequest.journalstatus,
+                tema = vedleggRequest.tema ?: emptyList(),
+                journalposttype = listOfNotNull(vedleggRequest.journalposttype),
+                journalstatus = listOfNotNull(vedleggRequest.journalstatus),
                 antall = 10,
             )
         )
