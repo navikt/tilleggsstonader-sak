@@ -24,7 +24,7 @@ class JournalpostService(private val journalpostClient: JournalpostClient) {
                 journalposttype = listOfNotNull(vedleggRequest.journalposttype),
                 journalstatus = listOfNotNull(vedleggRequest.journalstatus),
                 antall = 10,
-            )
+            ),
         )
     }
 
