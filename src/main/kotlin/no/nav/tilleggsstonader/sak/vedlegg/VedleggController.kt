@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 @ProtectedWithClaims(issuer = "azuread")
 class VedleggController(private val tilgangService: TilgangService, private val vedleggService: VedleggService) {
     @PostMapping("/fagsak-person")
-    fun finnVedleggForBruker(@RequestBody vedleggRequest: VedleggRequest): List<Journalpost> {
+    fun finnVedleggForBruker(@RequestBody vedleggRequest: VedleggRequest): List<DokumentInfoDto> {
         tilgangService.validerTilgangTilFagsakPerson(vedleggRequest.fagsakPersonId, AuditLoggerEvent.ACCESS)
         return vedleggService.finnVedleggForBruker(vedleggRequest)
     }

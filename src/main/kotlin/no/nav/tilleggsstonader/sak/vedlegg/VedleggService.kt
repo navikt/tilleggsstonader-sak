@@ -10,8 +10,17 @@ class VedleggService(
     private val journalpostService: JournalpostService,
     private val fagsakPersonService: FagsakPersonService
 ) {
-    fun finnVedleggForBruker(vedleggRequest: VedleggRequest): List<Journalpost> {
+    fun finnVedleggForBruker(vedleggRequest: VedleggRequest): List<DokumentInfoDto> {
         val aktivIdent = fagsakPersonService.hentAktivIdent(vedleggRequest.fagsakPersonId)
-        return journalpostService.finnJournalposterForBruker(aktivIdent, vedleggRequest)
+        val journalposter = journalpostService.finnJournalposterForBruker(aktivIdent, vedleggRequest)
+
+        return journalposter.flatMap { journalpost ->
+            journalpost.dokumenter?.map {
+                tilDokumentInfoDto(
+                    it,
+                    journalpost
+                )
+            } ?: emptyList()
+        }
     }
 }
