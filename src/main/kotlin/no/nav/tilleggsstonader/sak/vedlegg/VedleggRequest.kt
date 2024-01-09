@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import java.util.UUID
 
 data class VedleggRequest(
-    val fagsakPersonId: UUID,
     val tema: List<Tema>? = emptyList(),
     val journalposttype: Journalposttype?,
     val journalstatus: Journalstatus?,
