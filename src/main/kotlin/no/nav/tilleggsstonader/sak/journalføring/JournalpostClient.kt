@@ -109,7 +109,7 @@ class JournalpostClient(
             .pathSegment("hentdokument", "{journalpostId}", "{dokumentInfoId}")
             .queryParam("variantFormat", dokumentVariantformat).encode().toUriString()
 
-        return getForEntity<ByteArray>(uri, uriVariables = mapOf("journalpostId" to journalpostId))
+        return getForEntity<ByteArray>(uri, uriVariables = mapOf("journalpostId" to journalpostId, "dokumentInfoId" to dokumentInfoId))
     }
 
     private fun headerMedSaksbehandler(saksbehandler: String?): HttpHeaders {
