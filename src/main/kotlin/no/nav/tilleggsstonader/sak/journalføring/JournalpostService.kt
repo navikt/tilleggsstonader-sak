@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
@@ -87,5 +88,13 @@ class JournalpostService(private val journalpostClient: JournalpostClient) {
     fun hentSøknadFraJournalpost(søknadJournalpost: Journalpost): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
         val dokumentinfo = JournalføringHelper.plukkUtOriginaldokument(søknadJournalpost, DokumentBrevkode.BARNETILSYN)
         return journalpostClient.hentSøknadTilsynBarn(søknadJournalpost.journalpostId, dokumentinfo.dokumentInfoId)
+    }
+
+    fun hentDokument(
+        journalpostId: String,
+        dokumentInfoId: String,
+        dokumentVariantformat: Dokumentvariantformat = Dokumentvariantformat.ARKIV,
+    ): ByteArray {
+        return journalpostClient.hentDokument(journalpostId, dokumentInfoId, dokumentVariantformat)
     }
 }

@@ -99,6 +99,19 @@ class JournalpostClient(
         )
     }
 
+    fun hentDokument(
+        journalpostId: String,
+        dokumentInfoId: String,
+        dokumentVariantformat: Dokumentvariantformat,
+    ): ByteArray {
+        // TODO: kastApiFeilDersomUtviklerMedVeilederrolle() for å ikke gi tilgang til dokumenter med feil tema i prod
+        val uri = UriComponentsBuilder.fromUri(journalpostUri)
+            .pathSegment("hentdokument", "{journalpostId}", "{dokumentInfoId}")
+            .queryParam("variantFormat", dokumentVariantformat).encode().toUriString()
+
+        return getForEntity<ByteArray>(uri, uriVariables = mapOf("journalpostId" to journalpostId))
+    }
+
     private fun headerMedSaksbehandler(saksbehandler: String?): HttpHeaders {
         val httpHeaders = HttpHeaders()
         if (saksbehandler != null) {
