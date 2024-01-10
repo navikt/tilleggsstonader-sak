@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedlegg
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import java.util.UUID
 
 data class VedleggRequest(
     val tema: List<Tema>? = emptyList(),
