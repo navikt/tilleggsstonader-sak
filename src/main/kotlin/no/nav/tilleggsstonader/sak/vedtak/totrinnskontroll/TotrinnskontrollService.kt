@@ -116,8 +116,8 @@ class TotrinnskontrollService(
     }
 
     fun hentSaksbehandlerSomSendteTilBeslutter(behandlingId: UUID): String {
-        val totrinnskontrollSaksbehandler =
-            totrinnskontrollRepository.findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(behandlingId, TotrinnInternStatus.GODKJENT)
+        val totrinnskontrollSaksbehandler = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+            ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
         return totrinnskontrollSaksbehandler.saksbehandler
     }
 
@@ -126,6 +126,9 @@ class TotrinnskontrollService(
             ?.beslutter
             ?.takeIf { NAVIDENT_REGEX.matches(it) }
     }
+
+    fun hentTotrinnskontroll(behandlingId: UUID): Totrinnskontroll? =
+        totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
 
     fun hentTotrinnskontrollStatus(behandlingId: UUID): StatusTotrinnskontrollDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
@@ -169,7 +172,7 @@ class TotrinnskontrollService(
     private fun finnStatusForVedtakSomSkalFattes(behandling: Behandling): StatusTotrinnskontrollDto {
         val behandlingId = behandling.id
 
-        if (behandling.steg != StegType.SEND_TIL_BESLUTTER) {
+        if (behandling.steg != StegType.BESLUTTE_VEDTAK) {
             throw Feil(
                 message = "Totrinnskontroll kan ikke gjennomføres da steg på behandling er feil , steg = ${behandling.steg}",
                 frontendFeilmelding = "Feil i steg, kontakt brukerstøtte id=$behandlingId",

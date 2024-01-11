@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.familie.prosessering.internal.TaskWorker
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
@@ -19,7 +20,7 @@ import no.nav.tilleggsstonader.sak.brev.BrevController
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Stønadsperiode
@@ -161,13 +162,21 @@ class BehandlingFlytTest(
 
     private fun opprettBehandlingOgSendTilBeslutter(personIdent: String): UUID {
         val behandlingId = opprettBehandling(personIdent)
-        vilkårController.getVilkår(behandlingId)
-        testSaksbehandlingController.utfyllVilkår(behandlingId)
+        opprettVilkår(behandlingId)
+        utfyllVilkår(behandlingId)
 
         opprettVedtak(behandlingId)
         genererSaksbehandlerBrev(behandlingId)
         sendTilBeslutter(behandlingId)
         return behandlingId
+    }
+
+    private fun utfyllVilkår(behandlingId: UUID) {
+        testSaksbehandlingController.utfyllVilkår(behandlingId)
+    }
+
+    private fun opprettVilkår(behandlingId: UUID) {
+        vilkårController.getVilkår(behandlingId)
     }
 
     private fun opprettBehandling(personIdent: String): UUID {
@@ -187,10 +196,20 @@ class BehandlingFlytTest(
         logger.info("Kjører tasks")
         taskService.finnAlleTasksKlareForProsessering(Pageable.unpaged()).forEach {
             taskWorker.markerPlukket(it.id)
-            logger.info("Kjører task ${it.id} type=${it.type} payload=${it.payload}")
+            logger.info("Kjører task ${it.id} type=${it.type} msg=${taskMsg(it)}")
             taskWorker.doActualWork(it.id)
         }
         logger.info("Tasks kjørt OK")
+    }
+
+    private fun taskMsg(it: Task): String = when (it.type) {
+        OpprettOppgaveTask.TYPE -> objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(it.payload)
+            .let { "type=${it.oppgave.oppgavetype} kobling=${it.kobling}" }
+
+        FerdigstillOppgaveTask.TYPE -> objectMapper.readValue<FerdigstillOppgaveTask.FerdigstillOppgaveTaskData>(it.payload)
+            .let { "type=${it.oppgavetype} behandling=${it.behandlingId}" }
+
+        else -> it.payload
     }
 
     private fun verifiserBehandlingIverksettes(behandlingId: UUID) {
