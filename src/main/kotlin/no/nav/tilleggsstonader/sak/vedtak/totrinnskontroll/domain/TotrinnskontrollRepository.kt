@@ -12,10 +12,10 @@ interface TotrinnskontrollRepository :
 
     fun findTopByBehandlingIdAndStatusOrderBySporbarEndretEndretTidDesc(
         behandlingId: UUID,
-        status: TotrinnsKontrollStatus,
+        status: TotrinnInternStatus,
     ): Totrinnskontroll
 
-    fun findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId: UUID): Totrinnskontroll
+    fun findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId: UUID): Totrinnskontroll?
 
     // TODO trengs denne?
     fun findAllByBehandlingId(behandlingId: UUID): List<Totrinnskontroll>

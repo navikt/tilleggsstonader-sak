@@ -25,7 +25,7 @@ class AngreSendTilBeslutterServiceTest {
 
     private val oppgaveService = mockk<OppgaveService>()
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
-    private val totrinnskontrollService = mockk<TotrinnskontrollService>()
+    private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
 
     val service = AngreSendTilBeslutterService(
         oppgaveService = oppgaveService,

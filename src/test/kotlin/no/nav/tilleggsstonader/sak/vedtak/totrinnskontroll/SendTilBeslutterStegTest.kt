@@ -16,10 +16,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.INNVILGE
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
-import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
-import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.Vedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
@@ -36,6 +32,8 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
 import no.nav.tilleggsstonader.sak.vilkår.VilkårService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -50,21 +48,22 @@ class SendTilBeslutterStegTest {
     private val taskService = mockk<TaskService>()
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val vedtaksbrevRepository = mockk<VedtaksbrevRepository>()
-    private val behandlingshistorikkService = mockk<BehandlingshistorikkService>()
     private val vedtaksresultatService = mockk<VedtaksresultatService>()
     private val vilkårService = mockk<VilkårService>()
     private val oppgaveService = mockk<OppgaveService>()
+    private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
 
     private val beslutteVedtakSteg =
         SendTilBeslutterSteg(
             taskService,
             behandlingService,
             vedtaksbrevRepository,
-            behandlingshistorikkService,
             vedtaksresultatService,
             vilkårService,
             oppgaveService,
+            totrinnskontrollService,
         )
+
     private val fagsak = fagsak(
         stønadstype = Stønadstype.BARNETILSYN,
         identer = setOf(PersonIdent(ident = "12345678901")),
@@ -115,8 +114,6 @@ class SendTilBeslutterStegTest {
         // every { tilbakekrevingService.finnesÅpenTilbakekrevingsBehandling(any()) } returns true
 
         every { vedtaksresultatService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGET
-        every { behandlingshistorikkService.finnSisteBehandlingshistorikk(any(), any()) } returns
-            Behandlingshistorikk(behandlingId = UUID.randomUUID(), steg = StegType.SEND_TIL_BESLUTTER)
         mockBrukerContext(saksbehandlerNavn)
     }
 
@@ -149,24 +146,14 @@ class SendTilBeslutterStegTest {
 
     @Test
     internal fun `Skal avslutte oppgave BehandleUnderkjentVedtak hvis den finnes`() {
-        every { behandlingshistorikkService.finnSisteBehandlingshistorikk(any(), StegType.BESLUTTE_VEDTAK) } returns
-            Behandlingshistorikk(
-                behandlingId = UUID.randomUUID(),
-                steg = StegType.BESLUTTE_VEDTAK,
-                utfall = StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT,
-            )
+        every { totrinnskontrollService.hentTotrinnskontroll(any()) } returns totrinnskontroll(status = TotrinnInternStatus.UNDERKJENT)
+
         utførOgVerifiserKall(Oppgavetype.BehandleUnderkjentVedtak)
         verifiserVedtattBehandlingsstatistikkTask()
     }
 
     @Test
     internal fun `Skal kaste feil hvis oppgave med type BehandleUnderkjentVedtak eller BehandleSak ikke finnes`() {
-        every { behandlingshistorikkService.finnSisteBehandlingshistorikk(any(), StegType.BESLUTTE_VEDTAK) } returns
-            Behandlingshistorikk(
-                behandlingId = UUID.randomUUID(),
-                steg = StegType.BESLUTTE_VEDTAK,
-                utfall = StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT,
-            )
         every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(any()) } returns null
         val feil = catchThrowableOfType<Feil> { beslutteVedtakSteg.validerSteg(behandling) }
         assertThat(feil.frontendFeilmelding)
@@ -201,7 +188,7 @@ class SendTilBeslutterStegTest {
         //    .isEqualTo(Hendelse.VEDTATT)
     }
 
-    private fun utførOgVerifiserKall(oppgavetype: Oppgavetype) {
+    private fun utførOgVerifiserKall(ferdigstillOppgaveType: Oppgavetype) {
         mockBrukerContext("saksbehandlernavn")
 
         utførSteg()
@@ -209,13 +196,17 @@ class SendTilBeslutterStegTest {
 
         verify { behandlingService.oppdaterStatusPåBehandling(behandling.id, BehandlingStatus.FATTER_VEDTAK) }
 
-        assertThat(taskSlot[0].type).isEqualTo(OpprettOppgaveTask.TYPE)
-        val taskData = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot[0].payload)
-        assertThat(taskData.oppgave.oppgavetype).isEqualTo(Oppgavetype.GodkjenneVedtak)
+        with(taskSlot[1]) {
+            assertThat(type).isEqualTo(OpprettOppgaveTask.TYPE)
+            val taskData = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(payload)
+            assertThat(taskData.oppgave.oppgavetype).isEqualTo(Oppgavetype.GodkjenneVedtak)
+        }
 
-        assertThat(taskSlot[1].type).isEqualTo(FerdigstillOppgaveTask.TYPE)
-        assertThat(objectMapper.readValue<FerdigstillOppgaveTask.FerdigstillOppgaveTaskData>(taskSlot[1].payload).oppgavetype)
-            .isEqualTo(oppgavetype)
+        with(taskSlot[0]) {
+            assertThat(type).isEqualTo(FerdigstillOppgaveTask.TYPE)
+            assertThat(objectMapper.readValue<FerdigstillOppgaveTask.FerdigstillOppgaveTaskData>(payload).oppgavetype)
+                .isEqualTo(ferdigstillOppgaveType)
+        }
     }
 
     private fun utførSteg() {
