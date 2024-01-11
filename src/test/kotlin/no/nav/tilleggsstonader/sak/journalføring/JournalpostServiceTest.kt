@@ -71,9 +71,9 @@ class JournalpostServiceTest() {
             dokumenter = listOf(
                 dokumentInfo(
                     dokumentInfoId = dokumentInfoId,
-                    dokumentvarianter = listOf(dokumentvariant(Dokumentvariantformat.FULLVERSJON))
-                )
-            )
+                    dokumentvarianter = listOf(dokumentvariant(Dokumentvariantformat.FULLVERSJON)),
+                ),
+            ),
         )
 
         @Test
@@ -81,7 +81,7 @@ class JournalpostServiceTest() {
             assertThatThrownBy {
                 journalpostService.hentDokument(
                     journalpost,
-                    "feilId"
+                    "feilId",
                 )
             }.hasMessageContaining("Finner ikke dokument med id")
         }
@@ -91,7 +91,7 @@ class JournalpostServiceTest() {
             assertThatThrownBy {
                 journalpostService.hentDokument(
                     journalpost,
-                    dokumentInfoId
+                    dokumentInfoId,
                 )
             }.hasMessageContaining("Vedlegget er sannsynligvis under arbeid, må åpnes i gosys")
         }

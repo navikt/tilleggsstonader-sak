@@ -4,13 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
-import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariant
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -327,19 +325,18 @@ fun dokumentInfo(
     dokumentvarianter: List<Dokumentvariant>? = null,
 ) = DokumentInfo(
     dokumentInfoId = dokumentInfoId,
-    dokumentvarianter = dokumentvarianter
+    dokumentvarianter = dokumentvarianter,
 )
-
 
 fun dokumentvariant(
     variantformat: Dokumentvariantformat = Dokumentvariantformat.FULLVERSJON,
     saksbehandlerHarTilgang: Boolean = true,
-    filnavn: String? = "filnavn"
+    filnavn: String? = "filnavn",
 ) =
     Dokumentvariant(
         variantformat = variantformat,
         saksbehandlerHarTilgang = saksbehandlerHarTilgang,
-        filnavn = filnavn
+        filnavn = filnavn,
     )
 /*
 fun vedtak(
