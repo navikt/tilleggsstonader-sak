@@ -1,6 +1,16 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
+import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentstatus
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariant
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -48,13 +58,12 @@ fun oppgave(
     erFerdigstilt: Boolean = false,
     gsakOppgaveId: Long = 123,
     type: Oppgavetype = Oppgavetype.Journalføring,
-): OppgaveDomain =
-    OppgaveDomain(
-        behandlingId = behandlingId,
-        gsakOppgaveId = gsakOppgaveId,
-        type = type,
-        erFerdigstilt = erFerdigstilt,
-    )
+): OppgaveDomain = OppgaveDomain(
+    behandlingId = behandlingId,
+    gsakOppgaveId = gsakOppgaveId,
+    type = type,
+    erFerdigstilt = erFerdigstilt,
+)
 
 fun behandling(
     fagsak: Fagsak = fagsak(),
@@ -70,23 +79,21 @@ fun behandling(
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
     vedtakstidspunkt: LocalDateTime? = null,
     kravMottatt: LocalDate? = null,
-): Behandling =
-    Behandling(
-        fagsakId = fagsak.id,
-        forrigeBehandlingId = forrigeBehandlingId,
-        id = id,
-        type = type,
-        status = status,
-        steg = steg,
-        kategori = kategori,
-        resultat = resultat,
-        sporbar = Sporbar(opprettetTid = opprettetTid),
-        årsak = årsak,
-        henlagtÅrsak = henlagtÅrsak,
-        vedtakstidspunkt = vedtakstidspunkt
-            ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
-        kravMottatt = kravMottatt,
-    )
+): Behandling = Behandling(
+    fagsakId = fagsak.id,
+    forrigeBehandlingId = forrigeBehandlingId,
+    id = id,
+    type = type,
+    status = status,
+    steg = steg,
+    kategori = kategori,
+    resultat = resultat,
+    sporbar = Sporbar(opprettetTid = opprettetTid),
+    årsak = årsak,
+    henlagtÅrsak = henlagtÅrsak,
+    vedtakstidspunkt = vedtakstidspunkt ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
+    kravMottatt = kravMottatt,
+)
 
 fun saksbehandling(
     fagsak: Fagsak = fagsak(),
@@ -100,57 +107,54 @@ fun saksbehandling(
     årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
     kravMottatt: LocalDate? = null,
-): Saksbehandling =
-    saksbehandling(
-        fagsak,
-        Behandling(
-            fagsakId = fagsak.id,
-            forrigeBehandlingId = forrigeBehandlingId,
-            id = id,
-            type = type,
-            status = status,
-            steg = steg,
-            resultat = resultat,
-            sporbar = Sporbar(opprettetTid = opprettetTid),
-            årsak = årsak,
-            henlagtÅrsak = henlagtÅrsak,
-            kravMottatt = kravMottatt,
-            kategori = BehandlingKategori.NASJONAL,
-        ),
-    )
+): Saksbehandling = saksbehandling(
+    fagsak,
+    Behandling(
+        fagsakId = fagsak.id,
+        forrigeBehandlingId = forrigeBehandlingId,
+        id = id,
+        type = type,
+        status = status,
+        steg = steg,
+        resultat = resultat,
+        sporbar = Sporbar(opprettetTid = opprettetTid),
+        årsak = årsak,
+        henlagtÅrsak = henlagtÅrsak,
+        kravMottatt = kravMottatt,
+        kategori = BehandlingKategori.NASJONAL,
+    ),
+)
 
 fun saksbehandling(
     fagsak: Fagsak = fagsak(),
     behandling: Behandling = behandling(),
-): Saksbehandling =
-    Saksbehandling(
-        id = behandling.id,
-        eksternId = 0,
-        forrigeBehandlingId = behandling.forrigeBehandlingId,
-        type = behandling.type,
-        status = behandling.status,
-        steg = behandling.steg,
-        kategori = behandling.kategori,
-        årsak = behandling.årsak,
-        resultat = behandling.resultat,
-        vedtakstidspunkt = behandling.vedtakstidspunkt,
-        henlagtÅrsak = behandling.henlagtÅrsak,
-        ident = fagsak.hentAktivIdent(),
-        fagsakId = fagsak.id,
-        eksternFagsakId = fagsak.eksternId.id,
-        stønadstype = fagsak.stønadstype,
-        opprettetAv = behandling.sporbar.opprettetAv,
-        opprettetTid = behandling.sporbar.opprettetTid,
-        endretTid = behandling.sporbar.endret.endretTid,
-        kravMottatt = behandling.kravMottatt,
-    )
+): Saksbehandling = Saksbehandling(
+    id = behandling.id,
+    eksternId = 0,
+    forrigeBehandlingId = behandling.forrigeBehandlingId,
+    type = behandling.type,
+    status = behandling.status,
+    steg = behandling.steg,
+    kategori = behandling.kategori,
+    årsak = behandling.årsak,
+    resultat = behandling.resultat,
+    vedtakstidspunkt = behandling.vedtakstidspunkt,
+    henlagtÅrsak = behandling.henlagtÅrsak,
+    ident = fagsak.hentAktivIdent(),
+    fagsakId = fagsak.id,
+    eksternFagsakId = fagsak.eksternId.id,
+    stønadstype = fagsak.stønadstype,
+    opprettetAv = behandling.sporbar.opprettetAv,
+    opprettetTid = behandling.sporbar.opprettetTid,
+    endretTid = behandling.sporbar.endret.endretTid,
+    kravMottatt = behandling.kravMottatt,
+)
 
-fun Behandling.innvilgetOgFerdigstilt() =
-    this.copy(
-        resultat = BehandlingResultat.INNVILGET,
-        status = BehandlingStatus.FERDIGSTILT,
-        vedtakstidspunkt = SporbarUtils.now(),
-    )
+fun Behandling.innvilgetOgFerdigstilt() = this.copy(
+    resultat = BehandlingResultat.INNVILGET,
+    status = BehandlingStatus.FERDIGSTILT,
+    vedtakstidspunkt = SporbarUtils.now(),
+)
 
 fun behandlingBarn(
     id: UUID = UUID.randomUUID(),
@@ -201,20 +205,18 @@ fun fagsakDomain(
     id: UUID = UUID.randomUUID(),
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     personId: UUID = UUID.randomUUID(),
-): FagsakDomain =
-    FagsakDomain(
-        id = id,
-        fagsakPersonId = personId,
-        stønadstype = stønadstype,
-    )
+): FagsakDomain = FagsakDomain(
+    id = id,
+    fagsakPersonId = personId,
+    stønadstype = stønadstype,
+)
 
-fun Fagsak.tilFagsakDomain() =
-    FagsakDomain(
-        id = id,
-        fagsakPersonId = fagsakPersonId,
-        stønadstype = stønadstype,
-        sporbar = sporbar,
-    )
+fun Fagsak.tilFagsakDomain() = FagsakDomain(
+    id = id,
+    fagsakPersonId = fagsakPersonId,
+    stønadstype = stønadstype,
+    sporbar = sporbar,
+)
 
 fun vilkår(
     behandlingId: UUID,
@@ -223,15 +225,14 @@ fun vilkår(
     delvilkår: List<Delvilkår> = emptyList(),
     barnId: UUID? = null,
     opphavsvilkår: Opphavsvilkår? = null,
-): Vilkår =
-    Vilkår(
-        behandlingId = behandlingId,
-        resultat = resultat,
-        type = type,
-        barnId = barnId,
-        delvilkårwrapper = DelvilkårWrapper(delvilkår),
-        opphavsvilkår = opphavsvilkår,
-    )
+): Vilkår = Vilkår(
+    behandlingId = behandlingId,
+    resultat = resultat,
+    type = type,
+    barnId = barnId,
+    delvilkårwrapper = DelvilkårWrapper(delvilkår),
+    opphavsvilkår = opphavsvilkår,
+)
 
 fun fagsakpersoner(vararg identer: String): Set<PersonIdent> = identer.map {
     PersonIdent(ident = it)
@@ -305,6 +306,41 @@ fun vedtaksbrev(
     beslutterIdent = beslutterIdent,
 )
 
+fun journalpost(
+    journalpostId: String = UUID.randomUUID().toString(),
+    journalposttype: Journalposttype = Journalposttype.U,
+    journalstatus: Journalstatus = Journalstatus.FERDIGSTILT,
+    tema: String = Tema.TSO.toString(),
+    dokumenter: List<DokumentInfo>? = null,
+    bruker: Bruker? = null,
+) = Journalpost(
+    journalpostId = journalpostId,
+    journalposttype = journalposttype,
+    journalstatus = journalstatus,
+    tema = tema,
+    dokumenter = dokumenter,
+    bruker = bruker,
+)
+
+fun dokumentInfo(
+    dokumentInfoId: String = UUID.randomUUID().toString(),
+    dokumentvarianter: List<Dokumentvariant>? = null,
+) = DokumentInfo(
+    dokumentInfoId = dokumentInfoId,
+    dokumentvarianter = dokumentvarianter
+)
+
+
+fun dokumentvariant(
+    variantformat: Dokumentvariantformat = Dokumentvariantformat.FULLVERSJON,
+    saksbehandlerHarTilgang: Boolean = true,
+    filnavn: String? = "filnavn"
+) =
+    Dokumentvariant(
+        variantformat = variantformat,
+        saksbehandlerHarTilgang = saksbehandlerHarTilgang,
+        filnavn = filnavn
+    )
 /*
 fun vedtak(
     behandlingId: UUID,
