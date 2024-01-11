@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
@@ -35,6 +36,12 @@ class JournalpostClient(
 
     private val dokdistUri =
         UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/dist").build().toUri()
+
+    fun finnJournalposterForBruker(journalposterForBrukerRequest: JournalposterForBrukerRequest): List<Journalpost> {
+        val uri = URI.create("$journalpostUri").toString()
+
+        return postForEntity<List<Journalpost>>(uri, journalposterForBrukerRequest)
+    }
 
     fun hentJournalpost(journalpostId: String): Journalpost {
         val uri =
