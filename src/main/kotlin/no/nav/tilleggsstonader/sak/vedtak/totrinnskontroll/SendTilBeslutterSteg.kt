@@ -5,8 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
-import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.VedtaksbrevRepository
@@ -21,6 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vilkår.VilkårService
 import org.springframework.stereotype.Service
 
@@ -29,10 +28,10 @@ class SendTilBeslutterSteg(
     private val taskService: TaskService,
     private val behandlingService: BehandlingService,
     private val vedtaksbrevRepository: VedtaksbrevRepository,
-    private val behandlingshistorikkService: BehandlingshistorikkService,
     private val vedtaksresultatService: VedtaksresultatService,
     private val vilkårService: VilkårService,
     private val oppgaveService: OppgaveService,
+    private val totrinnskontrollService: TotrinnskontrollService,
 ) : BehandlingSteg<Void?> {
 
     // TODO valider at man har opprettet vedtaksbrev?
@@ -52,8 +51,9 @@ class SendTilBeslutterSteg(
 
     override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FATTER_VEDTAK)
-        opprettGodkjennVedtakOppgave(saksbehandling)
         ferdigstillOppgave(saksbehandling)
+        totrinnskontrollService.sendtilBeslutter(saksbehandling)
+        opprettGodkjennVedtakOppgave(saksbehandling)
         // opprettTaskForBehandlingsstatistikk(saksbehandling.id) TODO DVH
     }
 
@@ -70,10 +70,8 @@ class SendTilBeslutterSteg(
     }
 
     private fun ferdigstillOppgave(saksbehandling: Saksbehandling) {
-        // TODO skriv om til å bruke totrinnskontrollService
-        val besluttetVedtakHendelse =
-            behandlingshistorikkService.finnSisteBehandlingshistorikk(saksbehandling.id, StegType.BESLUTTE_VEDTAK)
-        val oppgavetype = if (besluttetVedtakHendelse?.utfall == StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT) {
+        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(saksbehandling.id)
+        val oppgavetype = if (totrinnskontroll?.status == TotrinnInternStatus.UNDERKJENT) {
             Oppgavetype.BehandleUnderkjentVedtak
         } else {
             Oppgavetype.BehandleSak

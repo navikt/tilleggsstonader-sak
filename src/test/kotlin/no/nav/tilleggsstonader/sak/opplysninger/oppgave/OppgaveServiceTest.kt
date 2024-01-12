@@ -156,7 +156,7 @@ internal class OppgaveServiceTest {
                 Oppgavetype.BehandleSak,
             )
         }
-            .hasMessage("Finner ikke oppgave for behandling $BEHANDLING_ID")
+            .hasMessage("Finner ikke oppgave for behandling $BEHANDLING_ID type=BehandleSak")
             .isInstanceOf(java.lang.IllegalStateException::class.java)
     }
 

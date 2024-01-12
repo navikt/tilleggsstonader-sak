@@ -1,19 +1,23 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
-import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.NAVIDENT_REGEX
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.StatusTotrinnskontrollDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
@@ -27,35 +31,71 @@ class TotrinnskontrollService(
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val behandlingService: BehandlingService,
     private val tilgangService: TilgangService,
+    private val totrinnskontrollRepository: TotrinnskontrollRepository,
 ) {
+    @Transactional
+    fun sendtilBeslutter(saksbehandling: Saksbehandling) {
+        val eksisterandeTotrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(saksbehandling.id)
+
+        if (eksisterandeTotrinnskontroll != null) {
+            feilHvis(
+                (
+                    eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET &&
+                        eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
+                    ),
+            ) {
+                "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status= ${eksisterandeTotrinnskontroll.status} "
+            }
+        }
+        totrinnskontrollRepository.insert(
+            Totrinnskontroll(
+                behandlingId = saksbehandling.id,
+                saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
+            ),
+        )
+    }
+
+    @Transactional
+    fun angreSendTilBeslutter(behandlingId: UUID) {
+        val eksisterandeTotrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+
+        feilHvis((eksisterandeTotrinnskontroll == null || eksisterandeTotrinnskontroll.status != TotrinnInternStatus.KAN_FATTE_VEDTAK)) {
+            "Totrinnskontroll er ikke i en status der den kan angres ${eksisterandeTotrinnskontroll?.status}"
+        }
+        oppdaterStatusPåTotrinnskontroll(TotrinnInternStatus.ANGRET, eksisterandeTotrinnskontroll)
+    }
 
     /**
      * Lagrer data om besluttning av totrinnskontroll
      * og returnerer navIdent til saksbehandleren som sendte behandling til beslutter
      */
     @Transactional
-    fun lagreTotrinnskontrollOgReturnerBehandler(
+    fun lagreTotrinnskontrollOgReturnerSaksbehandler(
         saksbehandling: Saksbehandling,
         beslutteVedtak: BeslutteVedtakDto,
-        //  vedtakErUtenBeslutter: VedtakErUtenBeslutter,
+
     ): String {
-        val sisteBehandlingshistorikk =
-            behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId = saksbehandling.id)
-        if (sisteBehandlingshistorikk.steg != StegType.SEND_TIL_BESLUTTER) {
+        settBeslutter(saksbehandling.id)
+        val sisteTotrinnskontroll =
+            totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId = saksbehandling.id)
+                ?: error("Finnes ikke eksisterende Tostrinnskontroll på behandling")
+        if (sisteTotrinnskontroll.status != TotrinnInternStatus.KAN_FATTE_VEDTAK) {
             throw Feil(
-                message = "Siste innslag i behandlingshistorikken har feil steg=${sisteBehandlingshistorikk.steg}",
-                frontendFeilmelding = "Behandlingen er i feil steg, last siden på nytt",
+                message = "Status for totrinnskontoll er ikke korrekt, status =  ${sisteTotrinnskontroll.status} ",
+                frontendFeilmelding = "Status for totrinnskontoll er ikke korrekt, vennligst last side på nytt ",
+
             )
         }
-/** Lar stå utkommentert fram til koden leser Totrinnsdataobjektetet der dette ligger tilgjengeleg **/
-        /**  if (!vedtakErUtenBeslutter.value && beslutterErLikBehandler(sisteBehandlingshistorikk)) {
-         throw ApiFeil(
-         "Beslutter kan ikke behandle en behandling som den selv har sendt til beslutter",
-         HttpStatus.BAD_REQUEST,
-         )
-         } **/
 
+        if (beslutterErLikBehandler(sisteTotrinnskontroll)) {
+            throw Feil(
+                message = "Beslutter er samme som saksbehandler, kan ikkje utføre totrinnskontroll",
+                frontendFeilmelding = "Beslutter er samme som behandler, samme person kan ikkje godkjenne vedtaket",
+            )
+        }
         val nyStatus = if (beslutteVedtak.godkjent) BehandlingStatus.IVERKSETTER_VEDTAK else BehandlingStatus.UTREDES
+        val nyTotrinnsKontrollStatus = if (beslutteVedtak.godkjent) TotrinnInternStatus.GODKJENT else TotrinnInternStatus.UNDERKJENT
         val utfall = if (beslutteVedtak.godkjent) StegUtfall.BESLUTTE_VEDTAK_GODKJENT else StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT
 
         behandlingshistorikkService.opprettHistorikkInnslag(
@@ -66,34 +106,61 @@ class TotrinnskontrollService(
         )
 
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, nyStatus)
-        return sisteBehandlingshistorikk.opprettetAv
+        if (nyTotrinnsKontrollStatus == TotrinnInternStatus.UNDERKJENT) {
+            oppdaterUtfallogÅrsakPåTotrinnskontroll(beslutteVedtak, sisteTotrinnskontroll, nyTotrinnsKontrollStatus)
+        } else {
+            oppdaterStatusPåTotrinnskontroll(nyTotrinnsKontrollStatus, sisteTotrinnskontroll)
+        }
+
+        return sisteTotrinnskontroll.saksbehandler
     }
 
     fun hentSaksbehandlerSomSendteTilBeslutter(behandlingId: UUID): String {
-        val totrinnskontrollSaksbehandler =
-            behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId, StegType.SEND_TIL_BESLUTTER)
-
-        return totrinnskontrollSaksbehandler?.opprettetAv ?: throw Feil("Fant ikke saksbehandler som sendte til beslutter")
+        val totrinnskontrollSaksbehandler = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+            ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
+        return totrinnskontrollSaksbehandler.saksbehandler
     }
 
     fun hentBeslutter(behandlingId: UUID): String? {
-        return behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId, StegType.BESLUTTE_VEDTAK)
-            ?.opprettetAv
+        return totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+            ?.beslutter
             ?.takeIf { NAVIDENT_REGEX.matches(it) }
     }
 
-    fun hentTotrinnskontrollStatus(behandlingId: UUID): StatusTotrinnskontrollDto {
-        val behandlingStatus = behandlingService.hentBehandling(behandlingId).status
+    fun hentTotrinnskontroll(behandlingId: UUID): Totrinnskontroll? =
+        totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
 
+    fun hentTotrinnskontrollStatus(behandlingId: UUID): StatusTotrinnskontrollDto {
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        val behandlingStatus = behandling.status
+
+        // Behandling ligger som et ytre skall for Totrinnskontroll og håndterer statuser før og etter totrinnskontrolls opprettelse og ferdigstillelse
         if (behandlingErGodkjentEllerOpprettet(behandlingStatus)) {
             return StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
         }
 
         return when (behandlingStatus) {
-            BehandlingStatus.FATTER_VEDTAK -> finnStatusForVedtakSomSkalFattes(behandlingId)
+            BehandlingStatus.FATTER_VEDTAK -> finnStatusForVedtakSomSkalFattes(behandling)
             BehandlingStatus.UTREDES -> finnStatusForVedtakSomErFattet(behandlingId)
             else -> error("Har ikke lagt til håndtering av behandlingStatus=$behandlingStatus")
         }
+    }
+
+    private fun oppdaterUtfallogÅrsakPåTotrinnskontroll(
+        beslutteVedtak: BeslutteVedtakDto,
+        sisteTotrinnskontroll: Totrinnskontroll,
+        nyTotrinnsKontrollStatus: TotrinnInternStatus,
+    ): Totrinnskontroll {
+        val begrunnelse = beslutteVedtak.begrunnelse
+        val årsakUnderkjent = beslutteVedtak.årsakerUnderkjent
+
+        return totrinnskontrollRepository.update(
+            sisteTotrinnskontroll.copy(
+                begrunnelse = begrunnelse,
+                årsakerUnderkjent = Årsaker(årsakUnderkjent),
+                status = nyTotrinnsKontrollStatus,
+            ),
+        )
     }
 
     private fun behandlingErGodkjentEllerOpprettet(behandlingStatus: BehandlingStatus) =
@@ -102,21 +169,22 @@ class TotrinnskontrollService(
             behandlingStatus == BehandlingStatus.SATT_PÅ_VENT ||
             behandlingStatus == BehandlingStatus.OPPRETTET
 
-    /**
-     * Hvis behandlingsstatus er FATTER_VEDTAK så sjekkes det att saksbehandleren er autorisert til å fatte vedtak
-     */
-    private fun finnStatusForVedtakSomSkalFattes(behandlingId: UUID): StatusTotrinnskontrollDto {
-        val historikkHendelse = behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId)
-        if (historikkHendelse.steg != StegType.SEND_TIL_BESLUTTER) {
+    private fun finnStatusForVedtakSomSkalFattes(behandling: Behandling): StatusTotrinnskontrollDto {
+        val behandlingId = behandling.id
+
+        if (behandling.steg != StegType.BESLUTTE_VEDTAK) {
             throw Feil(
-                message = "Siste historikken har feil steg, steg=${historikkHendelse.steg}",
-                frontendFeilmelding = "Feil i historikken, kontakt brukerstøtte id=$behandlingId",
+                message = "Totrinnskontroll kan ikke gjennomføres da steg på behandling er feil , steg = ${behandling.steg}",
+                frontendFeilmelding = "Feil i steg, kontakt brukerstøtte id=$behandlingId",
             )
         }
-        return if (beslutterErLikBehandler(historikkHendelse) || !tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)) {
+        val totrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+            ?: error("mangler totrinnskontroll på behandling id=$behandlingId")
+        return if (beslutterErLikBehandler(totrinnskontroll) || !tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)
+        ) {
             StatusTotrinnskontrollDto(
                 TotrinnkontrollStatus.IKKE_AUTORISERT,
-                TotrinnskontrollDto(historikkHendelse.opprettetAvNavn, historikkHendelse.endretTid),
+                TotrinnskontrollDto(totrinnskontroll.saksbehandler, totrinnskontroll.sporbar.opprettetTid),
             )
         } else {
             StatusTotrinnskontrollDto(TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
@@ -127,30 +195,27 @@ class TotrinnskontrollService(
      * Hvis behandlingen utredes sjekkes det for om det finnes ett tidligere beslutt, som då kun kan være underkjent
      */
     private fun finnStatusForVedtakSomErFattet(behandlingId: UUID): StatusTotrinnskontrollDto {
-        val besluttetVedtakHendelse =
-            behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId, StegType.BESLUTTE_VEDTAK)
-                ?: return StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
-        return when (besluttetVedtakHendelse.utfall) {
-            StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT -> {
-                if (besluttetVedtakHendelse.metadata == null) {
-                    throw Feil(
-                        message = "Har underkjent vedtak - savner metadata",
-                        frontendFeilmelding = "Savner metadata, kontakt brukerstøtte id=$behandlingId",
-                    )
+        val totrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+            ?: return StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
+        return when (totrinnskontroll.status) {
+            TotrinnInternStatus.UNDERKJENT -> {
+                val beslutter = totrinnskontroll.beslutter
+                val årsakerUnderkjent = totrinnskontroll.årsakerUnderkjent?.årsaker
+                if (beslutter == null || årsakerUnderkjent == null) {
+                    error("Mangler beslutter/årsaker på totrinnskontroll=${totrinnskontroll.id}")
                 }
-                val beslutt = objectMapper.readValue<BeslutteVedtakDto>(besluttetVedtakHendelse.metadata.json)
                 StatusTotrinnskontrollDto(
                     TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT,
                     TotrinnskontrollDto(
-                        besluttetVedtakHendelse.opprettetAvNavn,
-                        besluttetVedtakHendelse.endretTid,
-                        beslutt.godkjent,
-                        beslutt.begrunnelse,
-                        beslutt.årsakerUnderkjent,
+                        opprettetAv = beslutter,
+                        opprettetTid = totrinnskontroll.sporbar.endret.endretTid,
+                        godkjent = false,
+                        begrunnelse = totrinnskontroll.begrunnelse,
+                        årsakerUnderkjent = årsakerUnderkjent,
                     ),
                 )
             }
-            StegUtfall.ANGRE_SEND_TIL_BESLUTTER -> StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
+            TotrinnInternStatus.ANGRET -> StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
             else -> error(
                 "Skal ikke kunne være annen status enn UNDERKJENT når " +
                     "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",
@@ -158,6 +223,23 @@ class TotrinnskontrollService(
         }
     }
 
-    private fun beslutterErLikBehandler(beslutteVedtakHendelse: Behandlingshistorikk) =
-        SikkerhetContext.hentSaksbehandlerEllerSystembruker() == beslutteVedtakHendelse.opprettetAv
+    private fun beslutterErLikBehandler(beslutteTotrinnskontroll: Totrinnskontroll): Boolean {
+        return beslutteTotrinnskontroll.beslutter == beslutteTotrinnskontroll.saksbehandler
+    }
+
+    private fun oppdaterStatusPåTotrinnskontroll(status: TotrinnInternStatus, gjeldeneTotrinnskontroll: Totrinnskontroll): Totrinnskontroll {
+        // generisk metode for å logge endringene som er utført
+        secureLogger.info(
+            "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
+                "endrer på totrinnskontroll knyttet til behandlingId $gjeldeneTotrinnskontroll.id" +
+                "til $status",
+        )
+        return totrinnskontrollRepository.update(gjeldeneTotrinnskontroll.copy(status = status))
+    }
+    private fun settBeslutter(behandlingId: UUID) {
+        val totrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+        if (totrinnskontroll != null) {
+            totrinnskontrollRepository.update(totrinnskontroll.copy(beslutter = SikkerhetContext.hentSaksbehandlerEllerSystembruker()))
+        }
+    }
 }
