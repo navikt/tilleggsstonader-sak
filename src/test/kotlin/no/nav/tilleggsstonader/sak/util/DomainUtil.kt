@@ -329,7 +329,7 @@ fun dokumentInfo(
 )
 
 fun dokumentvariant(
-    variantformat: Dokumentvariantformat = Dokumentvariantformat.FULLVERSJON,
+    variantformat: Dokumentvariantformat = Dokumentvariantformat.ARKIV,
     saksbehandlerHarTilgang: Boolean = true,
     filnavn: String? = "filnavn",
 ) =
