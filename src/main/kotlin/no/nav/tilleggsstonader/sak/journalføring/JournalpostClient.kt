@@ -34,8 +34,7 @@ class JournalpostClient(
     private val dokarkivUri =
         UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/arkiv").build().toUri()
 
-    private val dokdistUri =
-        UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/dist").build().toUri()
+    private val dokdistUri = UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/dist").build().toUri()
 
     fun finnJournalposterForBruker(journalposterForBrukerRequest: JournalposterForBrukerRequest): List<Journalpost> {
         val uri = URI.create("$journalpostUri").toString()
@@ -44,13 +43,16 @@ class JournalpostClient(
     }
 
     fun hentJournalpost(journalpostId: String): Journalpost {
-        val uri =
-            UriComponentsBuilder.fromUri(journalpostUri).queryParam("journalpostId", "{journalpostId}").encode().toUriString()
+        val uri = UriComponentsBuilder.fromUri(journalpostUri).queryParam("journalpostId", "{journalpostId}").encode()
+            .toUriString()
 
         return getForEntity<Journalpost>(uri, uriVariables = journalpostIdUriVariables(journalpostId))
     }
 
-    fun opprettJournalpost(arkiverDokumentRequest: ArkiverDokumentRequest, saksbehandler: String?): ArkiverDokumentResponse {
+    fun opprettJournalpost(
+        arkiverDokumentRequest: ArkiverDokumentRequest,
+        saksbehandler: String?,
+    ): ArkiverDokumentResponse {
         return postForEntity(dokarkivUri.toString(), arkiverDokumentRequest, headerMedSaksbehandler(saksbehandler))
     }
 
@@ -68,7 +70,11 @@ class JournalpostClient(
         )
     }
 
-    fun ferdigstillJournalpost(journalpostId: String, journalførendeEnhet: String, saksbehandler: String?): OppdaterJournalpostResponse {
+    fun ferdigstillJournalpost(
+        journalpostId: String,
+        journalførendeEnhet: String,
+        saksbehandler: String?,
+    ): OppdaterJournalpostResponse {
         val uri = UriComponentsBuilder.fromUri(dokarkivUri).pathSegment("{journalpostId}", "ferdigstill")
             .queryParam("journalfoerendeEnhet", "{journalfoerendeEnhet}").encode().toUriString()
 
@@ -93,6 +99,19 @@ class JournalpostClient(
         )
     }
 
+    fun hentDokument(
+        journalpostId: String,
+        dokumentInfoId: String,
+        dokumentVariantformat: Dokumentvariantformat,
+    ): ByteArray {
+        // TODO: kastApiFeilDersomUtviklerMedVeilederrolle() for å ikke gi tilgang til dokumenter med feil tema i prod
+        val uri = UriComponentsBuilder.fromUri(journalpostUri)
+            .pathSegment("hentdokument", "{journalpostId}", "{dokumentInfoId}")
+            .queryParam("variantFormat", dokumentVariantformat).encode().toUriString()
+
+        return getForEntity<ByteArray>(uri, uriVariables = mapOf("journalpostId" to journalpostId, "dokumentInfoId" to dokumentInfoId))
+    }
+
     private fun headerMedSaksbehandler(saksbehandler: String?): HttpHeaders {
         val httpHeaders = HttpHeaders()
         if (saksbehandler != null) {
@@ -102,15 +121,13 @@ class JournalpostClient(
     }
 
     private fun jsonDokumentUri(journalpostId: String, dokumentInfoId: String): URI {
-        return UriComponentsBuilder
-            .fromUri(journalpostUri)
-            .pathSegment("hentdokument", journalpostId, dokumentInfoId)
-            .queryParam("variantFormat", Dokumentvariantformat.ORIGINAL)
-            .build()
-            .toUri()
+        return UriComponentsBuilder.fromUri(journalpostUri).pathSegment("hentdokument", journalpostId, dokumentInfoId)
+            .queryParam("variantFormat", Dokumentvariantformat.ORIGINAL).build().toUri()
     }
 
-    private fun journalpostIdUriVariables(journalpostId: String): Map<String, String> = mapOf("journalpostId" to journalpostId)
+    private fun journalpostIdUriVariables(journalpostId: String): Map<String, String> =
+        mapOf("journalpostId" to journalpostId)
+
     private fun journalførendeEnhetUriVariables(journalførendeEnhet: String): Map<String, String> =
         mapOf("journalfoerendeEnhet" to journalførendeEnhet)
 }
