@@ -77,7 +77,7 @@ class JournalpostServiceTest() {
         )
 
         @Test
-        fun `skal ikke hente dokument om dokument med riktig id ikke er i journalpost`() {
+        fun `skal ikke hente dokument om ikke dokument med samme id finnes i journalpost`() {
             assertThatThrownBy {
                 journalpostService.hentDokument(
                     journalpost,
@@ -87,7 +87,7 @@ class JournalpostServiceTest() {
         }
 
         @Test
-        fun `skal ikke hente dokument om ikke har dokumentvariant av type ARKIV`() {
+        fun `skal ikke hente dokument om det ikke har en dokumentvariant på format ARKIV`() {
             assertThatThrownBy {
                 journalpostService.hentDokument(
                     journalpost,
