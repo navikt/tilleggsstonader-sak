@@ -11,15 +11,9 @@ import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.VurderingDto
-import no.nav.tilleggsstonader.sak.vilkår.regler.RegelId
-import no.nav.tilleggsstonader.sak.vilkår.regler.SvarId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,9 +30,6 @@ class StønadsperiodeControllerTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårService: VilkårService
-
-    @Autowired
-    lateinit var vilkårStegService: VilkårStegService
 
     private val dagensDato = LocalDate.now()
 
@@ -67,30 +58,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
 
     private fun opprettOppfylteInngangsvilkår(behandling: Behandling) {
         opprettMålgruppe(behandling)
-        opprettOppfylltInngangsvilkårForAktivitet(behandling)
-    }
-
-    private fun opprettOppfylltInngangsvilkårForAktivitet(behandling: Behandling) {
-        val aktivitet = opprettAktivitet(behandling)
-        val delvilkår1 = DelvilkårDto(
-            Vilkårsresultat.OPPFYLT,
-            listOf(
-                VurderingDto(RegelId.LØNN_GJENNOM_TILTAK, SvarId.NEI),
-            ),
-        )
-        val delvilkår2 = DelvilkårDto(
-            Vilkårsresultat.OPPFYLT,
-            listOf(
-                VurderingDto(RegelId.MOTTAR_SYKEPENGER_GJENNOM_AKTIVITET, SvarId.NEI),
-            ),
-        )
-        vilkårStegService.oppdaterVilkår(
-            SvarPåVilkårDto(
-                aktivitet.vilkår.id,
-                behandling.id,
-                listOf(delvilkår1, delvilkår2),
-            ),
-        )
+        opprettAktivitet(behandling)
     }
 
     private fun opprettMålgruppe(behandling: Behandling): VilkårperiodeDto =

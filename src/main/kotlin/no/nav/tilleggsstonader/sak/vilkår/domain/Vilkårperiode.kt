@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.UUID
@@ -12,8 +11,8 @@ import java.util.UUID
 @Table("vilkar_periode")
 data class Vilkårperiode(
     @Id
-    @Column("vilkar_id")
-    val vilkårId: UUID,
+    val id: UUID = UUID.randomUUID(),
+    val behandlingId: UUID,
     val fom: LocalDate,
     val tom: LocalDate,
     val type: VilkårperiodeType,

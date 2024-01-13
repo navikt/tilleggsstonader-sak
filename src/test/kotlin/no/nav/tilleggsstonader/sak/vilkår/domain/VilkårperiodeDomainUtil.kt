@@ -6,14 +6,14 @@ import java.util.UUID
 object VilkårperiodeDomainUtil {
 
     fun målgruppe(
-        vilkårId: UUID = UUID.randomUUID(),
+        behandlingId: UUID = UUID.randomUUID(),
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate = LocalDate.now().plusDays(5),
         type: MålgruppeType = MålgruppeType.AAP,
         detaljer: DetaljerMålgruppe = detaljerMålgruppe(),
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
     ) = Vilkårperiode(
-        vilkårId = vilkårId,
+        behandlingId = behandlingId,
         fom = fom,
         tom = tom,
         type = type,
@@ -26,14 +26,14 @@ object VilkårperiodeDomainUtil {
     )
 
     fun aktivitet(
-        vilkårId: UUID = UUID.randomUUID(),
+        behandlingId: UUID = UUID.randomUUID(),
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate = LocalDate.now().plusDays(5),
         type: AktivitetType = AktivitetType.TILTAK,
         detaljer: DetaljerAktivitet = detaljerAktivitet(),
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
     ) = Vilkårperiode(
-        vilkårId = vilkårId,
+        behandlingId = behandlingId,
         fom = fom,
         tom = tom,
         type = type,

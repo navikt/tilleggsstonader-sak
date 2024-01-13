@@ -8,9 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig.Companion
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.detaljerMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.Vilkårperioder
@@ -56,9 +54,6 @@ class VilkårControllerTest : IntegrationTest() {
 
         val målgruppe = hentedeVilkårperioder.målgrupper[0]
         assertThat(målgruppe.type).isEqualTo(MålgruppeType.AAP)
-        assertThat(målgruppe.vilkår.vilkårType).isEqualTo(VilkårType.MÅLGRUPPE_AAP)
-        assertThat(målgruppe.vilkår.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
-        assertThat(målgruppe.vilkår.delvilkårsett).isEmpty()
     }
 
     private fun hentVilkårperioder(behandling: Behandling) =
