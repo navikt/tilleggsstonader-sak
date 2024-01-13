@@ -4,11 +4,12 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.målgruppe
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
 
 internal class VilkårperiodeRepositoryTest : IntegrationTest() {
     @Autowired
@@ -22,14 +23,7 @@ internal class VilkårperiodeRepositoryTest : IntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
         val vilkår = vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.MÅLGRUPPE_AAP))
 
-        val vilkårperiode = vilkårperiodeRepository.insert(
-            Vilkårperiode(
-                vilkårId = vilkår.id,
-                fom = LocalDate.now(),
-                tom = LocalDate.now().plusDays(5),
-                type = MålgruppeType.AAP,
-            ),
-        )
+        val vilkårperiode = vilkårperiodeRepository.insert(målgruppe(vilkårId = vilkår.id))
 
         assertThat(vilkårperiodeRepository.findByIdOrThrow(vilkårperiode.vilkårId)).isEqualTo(vilkårperiode)
     }
@@ -39,14 +33,7 @@ internal class VilkårperiodeRepositoryTest : IntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
         val vilkår = vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.MÅLGRUPPE_AAP))
 
-        val vilkårperiode = vilkårperiodeRepository.insert(
-            Vilkårperiode(
-                vilkårId = vilkår.id,
-                fom = LocalDate.now(),
-                tom = LocalDate.now().plusDays(5),
-                type = AktivitetType.TILTAK,
-            ),
-        )
+        val vilkårperiode = vilkårperiodeRepository.insert(aktivitet(vilkårId = vilkår.id))
 
         assertThat(vilkårperiodeRepository.findByIdOrThrow(vilkårperiode.vilkårId)).isEqualTo(vilkårperiode)
     }
@@ -65,21 +52,12 @@ internal class VilkårperiodeRepositoryTest : IntegrationTest() {
                 ),
             )
 
-            val vilkårperiode1 = vilkårperiodeRepository.insert(
-                Vilkårperiode(
-                    vilkårId = vilkårAAP.id,
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now().plusDays(5),
-                    type = MålgruppeType.AAP,
-                ),
-            )
+            val vilkårperiode1 = vilkårperiodeRepository.insert(målgruppe(vilkårId = vilkårAAP.id))
 
             val vilkårperiode2 = vilkårperiodeRepository.insert(
-                Vilkårperiode(
+                målgruppe(
                     vilkårId = vilkårAAPFerdigAvklart.id,
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now().plusDays(5),
-                    type = MålgruppeType.AAP_FERDIG_AVKLART,
+                    type = MålgruppeType.UFØRETRYGD,
                 ),
             )
 

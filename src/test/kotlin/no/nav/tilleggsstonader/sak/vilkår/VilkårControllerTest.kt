@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.detaljerMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
@@ -40,7 +41,12 @@ class VilkårControllerTest : IntegrationTest() {
 
         opprettVilkårperiode(
             behandling,
-            OpprettVilkårperiode(MålgruppeType.AAP, fom = LocalDate.now(), tom = LocalDate.now()),
+            OpprettVilkårperiode(
+                type = MålgruppeType.AAP,
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                detaljer = detaljerMålgruppe(),
+            ),
         )
 
         val hentedeVilkårperioder = hentVilkårperioder(behandling)

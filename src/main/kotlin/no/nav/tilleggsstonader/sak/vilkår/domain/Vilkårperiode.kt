@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.domain
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
@@ -14,7 +17,47 @@ data class Vilkårperiode(
     val fom: LocalDate,
     val tom: LocalDate,
     val type: VilkårperiodeType,
+
+    val detaljer: DetaljerVilkårperiode,
+) {
+    init {
+        val ugyldigTypeOgDetaljer = (type is MålgruppeType && detaljer !is DetaljerMålgruppe) ||
+            (type is AktivitetType && detaljer !is DetaljerAktivitet)
+        feilHvis(ugyldigTypeOgDetaljer) {
+            "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${detaljer.javaClass.simpleName}"
+        }
+    }
+}
+
+enum class ResultatVilkårperiode {
+    OPPFYLT,
+    IKKE_OPPFYLT,
+    IKKE_TATT_STILLING_TIL,
+    SLETTET,
+}
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes(
+    JsonSubTypes.Type(DetaljerMålgruppe::class, name = "målgruppe"),
+    JsonSubTypes.Type(DetaljerAktivitet::class, name = "aktivitet"),
 )
+sealed class DetaljerVilkårperiode
+
+data class DetaljerMålgruppe(
+    val medlemskap: SvarJaNei,
+) : DetaljerVilkårperiode()
+
+data class DetaljerAktivitet(
+    val lønnet: SvarJaNei,
+    val mottarSykepenger: SvarJaNei,
+) : DetaljerVilkårperiode()
+
+enum class SvarJaNei {
+    JA,
+    JA_IMPLISITT,
+    NEI,
+    IKKE_VURDERT,
+}
 
 sealed interface VilkårperiodeType {
     fun tilDbType(): String

@@ -7,7 +7,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.vilkår.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
@@ -93,13 +96,28 @@ class StønadsperiodeControllerTest : IntegrationTest() {
     private fun opprettMålgruppe(behandling: Behandling): VilkårperiodeDto =
         vilkårService.opprettVilkårperiode(
             behandling.id,
-            OpprettVilkårperiode(MålgruppeType.AAP, dagensDato, dagensDato),
+            OpprettVilkårperiode(
+                type = MålgruppeType.AAP,
+                fom = dagensDato,
+                tom = dagensDato,
+                detaljer = DetaljerMålgruppe(
+                    medlemskap = SvarJaNei.JA,
+                ),
+            ),
         )
 
     private fun opprettAktivitet(behandling: Behandling): VilkårperiodeDto =
         vilkårService.opprettVilkårperiode(
             behandling.id,
-            OpprettVilkårperiode(AktivitetType.TILTAK, dagensDato, dagensDato),
+            OpprettVilkårperiode(
+                type = AktivitetType.TILTAK,
+                fom = dagensDato,
+                tom = dagensDato,
+                detaljer = DetaljerAktivitet(
+                    lønnet = SvarJaNei.NEI,
+                    mottarSykepenger = SvarJaNei.NEI,
+                ),
+            ),
         )
 
     private fun hentStønadsperioder(behandling: Behandling) =

@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.util.norskFormat
+import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
@@ -58,6 +59,7 @@ data class OpprettVilkårperiode(
     val type: VilkårperiodeType,
     override val fom: LocalDate,
     override val tom: LocalDate,
+    val detaljer: DetaljerVilkårperiode,
 ) : Periode<LocalDate>
 
 data class Vilkårperioder(

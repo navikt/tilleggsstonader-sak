@@ -116,6 +116,7 @@ class VilkårService(
                 fom = opprettVilkårperiode.fom,
                 tom = opprettVilkårperiode.tom,
                 type = opprettVilkårperiode.type,
+                detaljer = opprettVilkårperiode.detaljer,
             ),
         )
 
