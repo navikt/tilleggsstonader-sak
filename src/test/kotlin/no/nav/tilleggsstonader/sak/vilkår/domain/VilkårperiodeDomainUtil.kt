@@ -11,6 +11,8 @@ object VilkårperiodeDomainUtil {
         tom: LocalDate = LocalDate.now().plusDays(5),
         type: MålgruppeType = MålgruppeType.AAP,
         detaljer: DetaljerMålgruppe = detaljerMålgruppe(),
+        begrunnelse: String? = null,
+        kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
     ) = Vilkårperiode(
         behandlingId = behandlingId,
@@ -18,6 +20,8 @@ object VilkårperiodeDomainUtil {
         tom = tom,
         type = type,
         detaljer = detaljer,
+        begrunnelse = begrunnelse,
+        kilde = kilde,
         resultat = resultat,
     )
 
@@ -31,6 +35,8 @@ object VilkårperiodeDomainUtil {
         tom: LocalDate = LocalDate.now().plusDays(5),
         type: AktivitetType = AktivitetType.TILTAK,
         detaljer: DetaljerAktivitet = detaljerAktivitet(),
+        begrunnelse: String? = null,
+        kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
     ) = Vilkårperiode(
         behandlingId = behandlingId,
@@ -38,6 +44,8 @@ object VilkårperiodeDomainUtil {
         tom = tom,
         type = type,
         detaljer = detaljer,
+        begrunnelse = begrunnelse,
+        kilde = kilde,
         resultat = resultat,
     )
 

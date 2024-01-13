@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.EvalueringVilkårperiode.evaulerVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
@@ -105,7 +106,9 @@ class VilkårService(
                 tom = opprettVilkårperiode.tom,
                 type = opprettVilkårperiode.type,
                 detaljer = opprettVilkårperiode.detaljer,
+                begrunnelse = opprettVilkårperiode.begrunnelse,
                 resultat = evaulerVilkårperiode(opprettVilkårperiode.detaljer),
+                kilde = KildeVilkårsperiode.MANUELL,
             ),
         )
 

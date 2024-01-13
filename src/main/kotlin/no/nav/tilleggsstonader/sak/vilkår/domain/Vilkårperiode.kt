@@ -2,8 +2,10 @@ package no.nav.tilleggsstonader.sak.vilkår.domain
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.UUID
@@ -13,12 +15,17 @@ data class Vilkårperiode(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: UUID,
+    val kilde: KildeVilkårsperiode,
+
     val fom: LocalDate,
     val tom: LocalDate,
     val type: VilkårperiodeType,
-
     val detaljer: DetaljerVilkårperiode,
+    val begrunnelse: String?,
     val resultat: ResultatVilkårperiode,
+
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    val sporbar: Sporbar = Sporbar(),
 ) {
     init {
         val ugyldigTypeOgDetaljer = (type is MålgruppeType && detaljer !is DetaljerMålgruppe) ||
@@ -27,6 +34,11 @@ data class Vilkårperiode(
             "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${detaljer.javaClass.simpleName}"
         }
     }
+}
+
+enum class KildeVilkårsperiode {
+    MANUELL,
+    SYSTEM
 }
 
 enum class ResultatVilkårperiode {

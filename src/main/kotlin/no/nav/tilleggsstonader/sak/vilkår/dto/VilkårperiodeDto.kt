@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
@@ -24,6 +25,8 @@ data class VilkårperiodeDto(
     override val tom: LocalDate,
     val detaljer: DetaljerVilkårperiode,
     val resultat: ResultatVilkårperiode,
+    val begrunnelse: String?,
+    val kilde: KildeVilkårsperiode
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -38,6 +41,8 @@ fun Vilkårperiode.tilDto() =
         tom = this.tom,
         detaljer = this.detaljer,
         resultat = this.resultat,
+        begrunnelse = this.begrunnelse,
+        kilde = this.kilde,
     )
 
 data class Datoperiode(
@@ -65,6 +70,7 @@ data class OpprettVilkårperiode(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val detaljer: DetaljerVilkårperiode,
+    val begrunnelse: String? = null
 ) : Periode<LocalDate>
 
 data class Vilkårperioder(
