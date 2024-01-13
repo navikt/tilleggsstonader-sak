@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.vilkår.EvalueringVilkårperiode.evaulerVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
@@ -117,6 +118,7 @@ class VilkårService(
                 tom = opprettVilkårperiode.tom,
                 type = opprettVilkårperiode.type,
                 detaljer = opprettVilkårperiode.detaljer,
+                resultat = evaulerVilkårperiode(opprettVilkårperiode.detaljer),
             ),
         )
 

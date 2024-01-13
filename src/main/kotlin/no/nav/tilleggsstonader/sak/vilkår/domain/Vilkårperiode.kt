@@ -19,6 +19,7 @@ data class Vilkårperiode(
     val type: VilkårperiodeType,
 
     val detaljer: DetaljerVilkårperiode,
+    val resultat: ResultatVilkårperiode,
 ) {
     init {
         val ugyldigTypeOgDetaljer = (type is MålgruppeType && detaljer !is DetaljerMålgruppe) ||

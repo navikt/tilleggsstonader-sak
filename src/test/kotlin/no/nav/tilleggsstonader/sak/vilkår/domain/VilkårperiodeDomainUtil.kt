@@ -11,12 +11,14 @@ object VilkårperiodeDomainUtil {
         tom: LocalDate = LocalDate.now().plusDays(5),
         type: MålgruppeType = MålgruppeType.AAP,
         detaljer: DetaljerMålgruppe = detaljerMålgruppe(),
+        resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
     ) = Vilkårperiode(
         vilkårId = vilkårId,
         fom = fom,
         tom = tom,
         type = type,
         detaljer = detaljer,
+        resultat = resultat,
     )
 
     fun detaljerMålgruppe() = DetaljerMålgruppe(
@@ -29,12 +31,14 @@ object VilkårperiodeDomainUtil {
         tom: LocalDate = LocalDate.now().plusDays(5),
         type: AktivitetType = AktivitetType.TILTAK,
         detaljer: DetaljerAktivitet = detaljerAktivitet(),
+        resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
     ) = Vilkårperiode(
         vilkårId = vilkårId,
         fom = fom,
         tom = tom,
         type = type,
         detaljer = detaljer,
+        resultat = resultat,
     )
 
     fun detaljerAktivitet() = DetaljerAktivitet(
