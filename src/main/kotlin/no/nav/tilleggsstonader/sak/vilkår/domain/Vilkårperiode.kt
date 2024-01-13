@@ -35,6 +35,21 @@ data class Vilkårperiode(
         feilHvis(ugyldigTypeOgDetaljer) {
             "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${detaljer.javaClass.simpleName}"
         }
+
+        validerSlettet()
+    }
+
+    private fun validerSlettet() {
+        feilHvis(kilde != KildeVilkårsperiode.MANUELL && resultat == ResultatVilkårperiode.SLETTET) {
+            "Kan ikke slette når kilde=$kilde"
+        }
+        feilHvis(resultat == ResultatVilkårperiode.SLETTET && slettetKommentar.isNullOrBlank()) {
+            "Mangler kommentar for resultat=$resultat"
+        }
+
+        feilHvis(resultat != ResultatVilkårperiode.SLETTET && !slettetKommentar.isNullOrBlank()) {
+            "Kan ikke ha slettetkommentar med resultat=$resultat"
+        }
     }
 }
 

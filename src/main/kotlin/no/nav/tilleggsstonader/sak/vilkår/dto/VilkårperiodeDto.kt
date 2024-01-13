@@ -27,6 +27,7 @@ data class VilkårperiodeDto(
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,
     val kilde: KildeVilkårsperiode,
+    val slettetKommentar: String?,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -43,6 +44,7 @@ fun Vilkårperiode.tilDto() =
         resultat = this.resultat,
         begrunnelse = this.begrunnelse,
         kilde = this.kilde,
+        slettetKommentar = this.slettetKommentar,
     )
 
 data class Datoperiode(
@@ -72,6 +74,10 @@ data class OpprettVilkårperiode(
     val detaljer: DetaljerVilkårperiode,
     val begrunnelse: String? = null,
 ) : Periode<LocalDate>
+
+data class SlettVikårperiode(
+    val kommentar: String,
+)
 
 data class Vilkårperioder(
     val målgrupper: List<VilkårperiodeDto>,
