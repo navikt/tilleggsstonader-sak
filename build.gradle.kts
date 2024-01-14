@@ -2,9 +2,9 @@ val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20240110093731_0eda75e"
 val tilleggsstønaderLibsVersion = "2024.01.02-12.46.9d660ad18bf7"
 val tilleggsstønaderKontrakterVersion = "2024.01.09-09.12.6e37e00e4ec2"
-val tokenSupportVersion = "3.2.0"
+val tokenSupportVersion = "4.1.0"
 val wiremockVersion = "3.3.1"
-val mockkVersion = "1.13.8"
+val mockkVersion = "1.13.9"
 val testcontainerVersion = "1.19.3"
 
 group = "no.nav.tilleggsstonader.sak"
