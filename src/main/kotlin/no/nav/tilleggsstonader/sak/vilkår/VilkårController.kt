@@ -4,8 +4,10 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
@@ -14,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -110,5 +113,17 @@ class VilkårController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         return vilkårService.opprettVilkårperiode(behandlingId, opprettVilkårperiode)
+    }
+
+    @DeleteMapping("{behandlingId}/periode/{id}")
+    fun slettPeriode(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("id") id: UUID,
+        @RequestBody slettVikårperiode: SlettVikårperiode,
+    ): Vilkårperiode {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return vilkårService.slettVilkårperiode(behandlingId, id, slettVikårperiode)
     }
 }
