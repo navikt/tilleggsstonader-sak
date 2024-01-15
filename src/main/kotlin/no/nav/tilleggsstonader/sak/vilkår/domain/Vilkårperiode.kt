@@ -2,9 +2,10 @@ package no.nav.tilleggsstonader.sak.vilkår.domain
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Column
+import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.UUID
@@ -12,14 +13,21 @@ import java.util.UUID
 @Table("vilkar_periode")
 data class Vilkårperiode(
     @Id
-    @Column("vilkar_id")
-    val vilkårId: UUID,
+    val id: UUID = UUID.randomUUID(),
+    val behandlingId: UUID,
+    val kilde: KildeVilkårsperiode,
+
     val fom: LocalDate,
     val tom: LocalDate,
     val type: VilkårperiodeType,
-
     val detaljer: DetaljerVilkårperiode,
+    val begrunnelse: String?,
     val resultat: ResultatVilkårperiode,
+
+    val slettetKommentar: String? = null,
+
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    val sporbar: Sporbar = Sporbar(),
 ) {
     init {
         val ugyldigTypeOgDetaljer = (type is MålgruppeType && detaljer !is DetaljerMålgruppe) ||
@@ -27,7 +35,29 @@ data class Vilkårperiode(
         feilHvis(ugyldigTypeOgDetaljer) {
             "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${detaljer.javaClass.simpleName}"
         }
+
+        validerSlettefelter()
     }
+
+    private fun validerSlettefelter() {
+        if (resultat == ResultatVilkårperiode.SLETTET) {
+            feilHvis(kilde != KildeVilkårsperiode.MANUELL) {
+                "Kan ikke slette når kilde=$kilde"
+            }
+            feilHvis(slettetKommentar.isNullOrBlank()) {
+                "Mangler kommentar for resultat=$resultat"
+            }
+        } else {
+            feilHvis(!slettetKommentar.isNullOrBlank()) {
+                "Kan ikke ha slettetkommentar med resultat=$resultat"
+            }
+        }
+    }
+}
+
+enum class KildeVilkårsperiode {
+    MANUELL,
+    SYSTEM,
 }
 
 enum class ResultatVilkårperiode {
