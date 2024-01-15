@@ -24,6 +24,8 @@ data class Vilkårperiode(
     val begrunnelse: String?,
     val resultat: ResultatVilkårperiode,
 
+    val slettetKommentar: String? = null,
+
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 ) {
@@ -38,7 +40,7 @@ data class Vilkårperiode(
 
 enum class KildeVilkårsperiode {
     MANUELL,
-    SYSTEM
+    SYSTEM,
 }
 
 enum class ResultatVilkårperiode {

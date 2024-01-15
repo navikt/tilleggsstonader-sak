@@ -26,7 +26,7 @@ data class VilkårperiodeDto(
     val detaljer: DetaljerVilkårperiode,
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,
-    val kilde: KildeVilkårsperiode
+    val kilde: KildeVilkårsperiode,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -70,7 +70,7 @@ data class OpprettVilkårperiode(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val detaljer: DetaljerVilkårperiode,
-    val begrunnelse: String? = null
+    val begrunnelse: String? = null,
 ) : Periode<LocalDate>
 
 data class Vilkårperioder(
