@@ -128,8 +128,6 @@ class VilkårService(
             "Kan ikke slette vilkårperiode når behandling er låst for videre redigering"
         }
 
-        // TODO skal kun slettemarkere hvis den ble opprettet i denne behandlingen
-
         return vilkårperiodeRepository.update(
             vilkårperiode.copy(
                 resultat = ResultatVilkårperiode.SLETTET,
