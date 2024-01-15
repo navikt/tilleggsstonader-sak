@@ -12,7 +12,7 @@ object VilkårperiodeDomainUtil {
         type: MålgruppeType = MålgruppeType.AAP,
         detaljer: DetaljerMålgruppe = detaljerMålgruppe(),
         begrunnelse: String? = null,
-        kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
+        kilde: KildeVilkårsperiode = KildeVilkårsperiode.SYSTEM,
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
     ) = Vilkårperiode(
         behandlingId = behandlingId,
@@ -36,7 +36,7 @@ object VilkårperiodeDomainUtil {
         type: AktivitetType = AktivitetType.TILTAK,
         detaljer: DetaljerAktivitet = detaljerAktivitet(),
         begrunnelse: String? = null,
-        kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
+        kilde: KildeVilkårsperiode = KildeVilkårsperiode.SYSTEM,
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
     ) = Vilkårperiode(
         behandlingId = behandlingId,

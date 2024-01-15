@@ -2,10 +2,12 @@ package no.nav.tilleggsstonader.sak.vilkår
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -13,12 +15,14 @@ import no.nav.tilleggsstonader.sak.vilkår.EvalueringVilkårperiode.evaulerVilk�
 import no.nav.tilleggsstonader.sak.vilkår.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
@@ -89,7 +93,7 @@ class VilkårService(
         )
     }
 
-    private inline fun <reified T : VilkårperiodeType>finnPerioder(
+    private inline fun <reified T : VilkårperiodeType> finnPerioder(
         vilkårsperioder: List<Vilkårperiode>,
     ) = vilkårsperioder.filter { it.type is T }.map(Vilkårperiode::tilDto)
 
@@ -113,6 +117,23 @@ class VilkårService(
         )
 
         return vilkårperiode.tilDto()
+    }
+
+    fun slettVilkårperiode(behandlingId: UUID, id: UUID, slettVikårperiode: SlettVikårperiode): Vilkårperiode {
+        val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
+
+        validerBehandlingIdErLik(behandlingId, vilkårperiode.behandlingId)
+
+        feilHvis(behandlingErLåstForVidereRedigering(vilkårperiode.behandlingId)) {
+            "Kan ikke slette vilkårperiode når behandling er låst for videre redigering"
+        }
+
+        return vilkårperiodeRepository.update(
+            vilkårperiode.copy(
+                resultat = ResultatVilkårperiode.SLETTET,
+                slettetKommentar = slettVikårperiode.kommentar,
+            ),
+        )
     }
 
     private fun vilkårsregelForVilkårsperiodeType(vilkårperiodeType: VilkårperiodeType) =
