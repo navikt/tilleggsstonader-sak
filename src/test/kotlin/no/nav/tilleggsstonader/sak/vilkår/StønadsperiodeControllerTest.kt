@@ -7,10 +7,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.vilkår.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
@@ -68,7 +68,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
                 type = MålgruppeType.AAP,
                 fom = dagensDato,
                 tom = dagensDato,
-                detaljer = DetaljerMålgruppe(
+                delvilkår = DelvilkårMålgruppeDto(
                     medlemskap = SvarJaNei.JA,
                 ),
             ),
@@ -81,7 +81,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
                 type = AktivitetType.TILTAK,
                 fom = dagensDato,
                 tom = dagensDato,
-                detaljer = DetaljerAktivitet(
+                delvilkår = DelvilkårAktivitetDto(
                     lønnet = SvarJaNei.NEI,
                     mottarSykepenger = SvarJaNei.NEI,
                 ),
