@@ -36,19 +36,21 @@ data class Vilkårperiode(
             "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${detaljer.javaClass.simpleName}"
         }
 
-        validerSlettet()
+        validerSlettefelter()
     }
 
-    private fun validerSlettet() {
-        feilHvis(kilde != KildeVilkårsperiode.MANUELL && resultat == ResultatVilkårperiode.SLETTET) {
-            "Kan ikke slette når kilde=$kilde"
-        }
-        feilHvis(resultat == ResultatVilkårperiode.SLETTET && slettetKommentar.isNullOrBlank()) {
-            "Mangler kommentar for resultat=$resultat"
-        }
-
-        feilHvis(resultat != ResultatVilkårperiode.SLETTET && !slettetKommentar.isNullOrBlank()) {
-            "Kan ikke ha slettetkommentar med resultat=$resultat"
+    private fun validerSlettefelter() {
+        if (resultat == ResultatVilkårperiode.SLETTET) {
+            feilHvis(kilde != KildeVilkårsperiode.MANUELL) {
+                "Kan ikke slette når kilde=$kilde"
+            }
+            feilHvis(slettetKommentar.isNullOrBlank()) {
+                "Mangler kommentar for resultat=$resultat"
+            }
+        } else {
+            feilHvis(!slettetKommentar.isNullOrBlank()) {
+                "Kan ikke ha slettetkommentar med resultat=$resultat"
+            }
         }
     }
 }
