@@ -91,14 +91,13 @@ class VilkårStegService(
     }
 
     private fun oppdaterStegPåBehandling(saksbehandling: Saksbehandling, vilkårsett: List<Vilkår>) {
-        val vilkårsresultat =
-            vilkårsett.filterNot { it.type.gjelderMålgruppeEllerAktivitet() }.groupBy { it.type }.map {
-                if (it.key.gjelderFlereBarn()) {
-                    utledResultatForVilkårSomGjelderFlereBarn(it.value)
-                } else {
-                    it.value.single().resultat
-                }
+        val vilkårsresultat = vilkårsett.groupBy { it.type }.map {
+            if (it.key.gjelderFlereBarn()) {
+                utledResultatForVilkårSomGjelderFlereBarn(it.value)
+            } else {
+                it.value.single().resultat
             }
+        }
 
         if (saksbehandling.steg == StegType.VILKÅR && OppdaterVilkår.erAlleVilkårTattStillingTil(vilkårsresultat)) {
             stegService.håndterSteg(saksbehandling, vilkårSteg)
@@ -126,7 +125,7 @@ class VilkårStegService(
         vilkår: Vilkår,
     ): VilkårDto {
         val metadata = hentHovedregelMetadata(behandlingId)
-        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkår(metadata)
+        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkår(metadata, barnId = vilkår.barnId)
         val delvilkårWrapper = DelvilkårWrapper(nyeDelvilkår)
         return vilkårRepository.update(
             vilkår.copy(

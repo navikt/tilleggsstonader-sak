@@ -32,15 +32,6 @@ import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
-import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetReelArbeidssøkerRegel
-import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetTiltakRegel
-import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.AktivitetUtdanningRegel
-import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeAAPFerdigAvklartRegel
-import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeAAPRegel
-import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeDagpengerRegel
-import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeOmstillingsstønadRegel
-import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeOvergangsstønadRegel
-import no.nav.tilleggsstonader.sak.vilkår.regler.vilkår.MålgruppeUføretrygdRegel
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -136,20 +127,6 @@ class VilkårService(
             ),
         )
     }
-
-    private fun vilkårsregelForVilkårsperiodeType(vilkårperiodeType: VilkårperiodeType) =
-        when (vilkårperiodeType) {
-            MålgruppeType.AAP -> MålgruppeAAPRegel()
-            MålgruppeType.AAP_FERDIG_AVKLART -> MålgruppeAAPFerdigAvklartRegel()
-            MålgruppeType.DAGPENGER -> MålgruppeDagpengerRegel()
-            MålgruppeType.OMSTILLINGSSTØNAD -> MålgruppeOmstillingsstønadRegel()
-            MålgruppeType.OVERGANGSSTØNAD -> MålgruppeOvergangsstønadRegel()
-            MålgruppeType.UFØRETRYGD -> MålgruppeUføretrygdRegel()
-
-            AktivitetType.TILTAK -> AktivitetTiltakRegel()
-            AktivitetType.UTDANNING -> AktivitetUtdanningRegel()
-            AktivitetType.REEL_ARBEIDSSØKER -> AktivitetReelArbeidssøkerRegel()
-        }
 
     fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
         val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
