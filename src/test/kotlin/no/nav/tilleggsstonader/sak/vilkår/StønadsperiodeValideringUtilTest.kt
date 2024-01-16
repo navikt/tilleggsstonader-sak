@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.detaljerAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.delvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.dto.Datoperiode
@@ -232,7 +232,7 @@ internal class StønadsperiodeValideringUtilTest {
             ),
         ).map(Vilkårperiode::tilDto)
 
-        val aktiviteter = målgrupper.map { it.copy(type = AktivitetType.TILTAK, detaljer = detaljerAktivitet()) }
+        val aktiviteter = målgrupper.map { it.copy(type = AktivitetType.TILTAK, detaljer = delvilkårAktivitet()) }
 
         @Test
         fun `skal godta stønadsperiode på tvers av 2 godkjente sammenhengende vilkårsperioder`() {

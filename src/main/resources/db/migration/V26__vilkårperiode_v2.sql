@@ -8,7 +8,7 @@ CREATE TABLE vilkar_periode
     tom               DATE         NOT NULL,
 
     type              VARCHAR      NOT NULL,
-    detaljer          JSON         NOT NULL,
+    delvilkar         JSON         NOT NULL,
     begrunnelse       VARCHAR,
     resultat          VARCHAR      NOT NULL,
 

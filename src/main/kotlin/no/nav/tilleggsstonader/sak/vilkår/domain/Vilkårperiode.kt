@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
@@ -20,7 +21,8 @@ data class Vilkårperiode(
     val fom: LocalDate,
     val tom: LocalDate,
     val type: VilkårperiodeType,
-    val detaljer: DetaljerVilkårperiode,
+    @Column("delvilkar")
+    val delvilkår: DelvilkårVilkårperiode,
     val begrunnelse: String?,
     val resultat: ResultatVilkårperiode,
 
@@ -30,10 +32,10 @@ data class Vilkårperiode(
     val sporbar: Sporbar = Sporbar(),
 ) {
     init {
-        val ugyldigTypeOgDetaljer = (type is MålgruppeType && detaljer !is DetaljerMålgruppe) ||
-            (type is AktivitetType && detaljer !is DetaljerAktivitet)
+        val ugyldigTypeOgDetaljer = (type is MålgruppeType && delvilkår !is DelvilkårMålgruppe) ||
+            (type is AktivitetType && delvilkår !is DelvilkårAktivitet)
         feilHvis(ugyldigTypeOgDetaljer) {
-            "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${detaljer.javaClass.simpleName}"
+            "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}"
         }
 
         validerSlettefelter()
@@ -63,31 +65,41 @@ enum class KildeVilkårsperiode {
 enum class ResultatVilkårperiode {
     OPPFYLT,
     IKKE_OPPFYLT,
-    IKKE_TATT_STILLING_TIL,
+    IKKE_VURDERT,
     SLETTET,
 }
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
-    JsonSubTypes.Type(DetaljerMålgruppe::class, name = "målgruppe"),
-    JsonSubTypes.Type(DetaljerAktivitet::class, name = "aktivitet"),
+    JsonSubTypes.Type(DelvilkårMålgruppe::class, name = "målgruppe"),
+    JsonSubTypes.Type(DelvilkårAktivitet::class, name = "aktivitet"),
 )
-sealed class DetaljerVilkårperiode
+sealed class DelvilkårVilkårperiode {
+    data class Vurdering(
+        val svar: SvarJaNei?,
+        val resultat: ResultatDelvilkårperiode,
+    )
+}
 
-data class DetaljerMålgruppe(
-    val medlemskap: SvarJaNei,
-) : DetaljerVilkårperiode()
+enum class ResultatDelvilkårperiode {
+    OPPFYLT,
+    IKKE_OPPFYLT,
+    IKKE_VURDERT,
+}
 
-data class DetaljerAktivitet(
-    val lønnet: SvarJaNei,
-    val mottarSykepenger: SvarJaNei,
-) : DetaljerVilkårperiode()
+data class DelvilkårMålgruppe(
+    val medlemskap: Vurdering,
+) : DelvilkårVilkårperiode()
+
+data class DelvilkårAktivitet(
+    val lønnet: Vurdering,
+    val mottarSykepenger: Vurdering,
+) : DelvilkårVilkårperiode()
 
 enum class SvarJaNei {
     JA,
     JA_IMPLISITT,
     NEI,
-    IKKE_VURDERT,
 }
 
 sealed interface VilkårperiodeType {

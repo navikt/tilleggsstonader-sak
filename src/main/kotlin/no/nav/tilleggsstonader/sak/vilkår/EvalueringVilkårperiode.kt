@@ -1,61 +1,86 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
-import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårVilkårperiode.Vurdering
+import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode.IKKE_OPPFYLT
-import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode.IKKE_TATT_STILLING_TIL
+import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode.IKKE_VURDERT
 import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårVilkårperiodeDto
 
 object EvalueringVilkårperiode {
 
-    fun evaulerVilkårperiode(detaljer: DetaljerVilkårperiode): ResultatVilkårperiode {
-        return when (detaljer) {
-            is DetaljerMålgruppe -> utledResultatMålgruppe(detaljer)
-            is DetaljerAktivitet -> utledResultatAktivitet(detaljer)
+    data class ResultatEvaluering(
+        val delvilkår: DelvilkårVilkårperiode,
+        val resultat: ResultatVilkårperiode,
+    )
+
+    fun evaulerVilkårperiode(delvilkår: DelvilkårVilkårperiodeDto): ResultatEvaluering {
+        return when (delvilkår) {
+            is DelvilkårMålgruppeDto -> delvilkår.utledResultat()
+            is DelvilkårAktivitetDto -> delvilkår.utledResultat()
         }
     }
 
-    private fun utledResultatMålgruppe(detaljer: DetaljerMålgruppe): ResultatVilkårperiode {
-        return when (detaljer.medlemskap) {
-            SvarJaNei.JA,
-            SvarJaNei.JA_IMPLISITT,
-            -> OPPFYLT
-
-            SvarJaNei.NEI -> IKKE_OPPFYLT
-            SvarJaNei.IKKE_VURDERT -> IKKE_TATT_STILLING_TIL
+    fun DelvilkårMålgruppeDto.utledResultat(): ResultatEvaluering {
+        val resultatDelvilkår = utledResultatMedlemskap(medlemskap)
+        val oppdatertDelvilkår = DelvilkårMålgruppe(medlemskap = Vurdering(svar = medlemskap, resultatDelvilkår))
+        val resultatVilkår = when (resultatDelvilkår) {
+            ResultatDelvilkårperiode.OPPFYLT -> ResultatVilkårperiode.OPPFYLT
+            ResultatDelvilkårperiode.IKKE_OPPFYLT -> ResultatVilkårperiode.IKKE_OPPFYLT
+            ResultatDelvilkårperiode.IKKE_VURDERT -> ResultatVilkårperiode.IKKE_VURDERT
         }
+        return ResultatEvaluering(oppdatertDelvilkår, resultatVilkår)
     }
 
-    private fun utledResultatAktivitet(detaljer: DetaljerAktivitet): ResultatVilkårperiode {
-        val resultatLønnet = utledResultatLønnet(detaljer)
-        val resultatMottarSykepenger = utledResultatMottarSykepenger(detaljer)
+    private fun utledResultatMedlemskap(svar: SvarJaNei?): ResultatDelvilkårperiode = when (svar) {
+        SvarJaNei.JA,
+        SvarJaNei.JA_IMPLISITT,
+        -> ResultatDelvilkårperiode.OPPFYLT
+
+        SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+        null -> ResultatDelvilkårperiode.IKKE_VURDERT
+    }
+
+    fun DelvilkårAktivitetDto.utledResultat(): ResultatEvaluering {
+        val resultatLønnet = utledResultatLønnet(lønnet)
+        val resultatMottarSykepenger = utledResultatMottarSykepenger(mottarSykepenger)
 
         val resultater = listOf(resultatLønnet, resultatMottarSykepenger)
 
-        return when {
-            resultater.contains(IKKE_TATT_STILLING_TIL) -> IKKE_TATT_STILLING_TIL
-            resultater.contains(IKKE_OPPFYLT) -> IKKE_OPPFYLT
-            resultatLønnet == OPPFYLT && resultatMottarSykepenger == OPPFYLT -> OPPFYLT
+        val resultatAktivitet = when {
+            resultater.contains(ResultatDelvilkårperiode.IKKE_VURDERT) -> IKKE_VURDERT
+            resultater.contains(ResultatDelvilkårperiode.IKKE_OPPFYLT) -> IKKE_OPPFYLT
+            resultater.all { it == ResultatDelvilkårperiode.OPPFYLT } -> OPPFYLT
+            resultatLønnet == ResultatDelvilkårperiode.OPPFYLT && resultatMottarSykepenger == ResultatDelvilkårperiode.OPPFYLT -> OPPFYLT
             else -> error("Ugyldig resultat resultatLønnet=$resultatLønnet resultatMottarSykepenger=$resultatMottarSykepenger")
         }
+        val oppdatertDelvilkår = DelvilkårAktivitet(
+            lønnet = Vurdering(lønnet, resultatLønnet),
+            mottarSykepenger = Vurdering(mottarSykepenger, resultatMottarSykepenger),
+        )
+        return ResultatEvaluering(oppdatertDelvilkår, resultatAktivitet)
     }
 
-    private fun utledResultatLønnet(detaljer: DetaljerAktivitet) =
-        when (detaljer.lønnet) {
-            SvarJaNei.JA -> IKKE_OPPFYLT
-            SvarJaNei.NEI -> OPPFYLT
-            SvarJaNei.IKKE_VURDERT -> IKKE_TATT_STILLING_TIL
+    private fun utledResultatLønnet(svar: SvarJaNei?) =
+        when (svar) {
+            SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+            SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
+            null -> ResultatDelvilkårperiode.IKKE_VURDERT
             SvarJaNei.JA_IMPLISITT -> error("Ikke gyldig svar for lønnet")
         }
 
-    private fun utledResultatMottarSykepenger(detaljer: DetaljerAktivitet) =
-        when (detaljer.mottarSykepenger) {
-            SvarJaNei.JA -> IKKE_OPPFYLT
-            SvarJaNei.NEI -> OPPFYLT
-            SvarJaNei.IKKE_VURDERT -> IKKE_TATT_STILLING_TIL
+    private fun utledResultatMottarSykepenger(svar: SvarJaNei?) =
+        when (svar) {
+            SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+            SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
+            null -> ResultatDelvilkårperiode.IKKE_VURDERT
             SvarJaNei.JA_IMPLISITT -> error("Ikke gyldig svar for mottarSykepenger")
         }
 }

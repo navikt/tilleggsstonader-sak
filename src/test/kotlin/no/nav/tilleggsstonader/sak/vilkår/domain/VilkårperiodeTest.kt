@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.domain
 
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.detaljerAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.detaljerMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.delvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.delvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.målgruppe
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -21,7 +21,7 @@ class VilkårperiodeTest {
         @Test
         fun `målgruppe ugyldige detaljer kaster feil`() {
             assertThatThrownBy {
-                målgruppe().copy(detaljer = detaljerAktivitet())
+                målgruppe().copy(delvilkår = delvilkårAktivitet())
             }.hasMessageContaining("Ugyldig kombinasjon")
         }
 
@@ -33,7 +33,7 @@ class VilkårperiodeTest {
         @Test
         fun `aktivitet ugyldige detaljer kaster feil`() {
             assertThatThrownBy {
-                aktivitet().copy(detaljer = detaljerMålgruppe())
+                aktivitet().copy(delvilkår = delvilkårMålgruppe())
             }.hasMessageContaining("Ugyldig kombinasjon")
         }
     }

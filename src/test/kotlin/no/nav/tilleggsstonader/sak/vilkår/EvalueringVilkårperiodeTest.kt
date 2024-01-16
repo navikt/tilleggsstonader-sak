@@ -1,10 +1,13 @@
 package no.nav.tilleggsstonader.sak.vilkår
 
 import no.nav.tilleggsstonader.sak.vilkår.EvalueringVilkårperiode.evaulerVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårMålgruppeDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -17,14 +20,28 @@ class EvalueringVilkårperiodeTest {
 
         @Test
         fun `utled resultat for målgruppe`() {
-            assertThat(utledResultatMålgruppe(SvarJaNei.JA)).isEqualTo(ResultatVilkårperiode.OPPFYLT)
-            assertThat(utledResultatMålgruppe(SvarJaNei.JA_IMPLISITT)).isEqualTo(ResultatVilkårperiode.OPPFYLT)
-            assertThat(utledResultatMålgruppe(SvarJaNei.NEI)).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
-            assertThat(utledResultatMålgruppe(SvarJaNei.IKKE_VURDERT))
-                .isEqualTo(ResultatVilkårperiode.IKKE_TATT_STILLING_TIL)
+            DelvilkårMålgruppeDto(medlemskap = SvarJaNei.JA)
+                .assertMappesTil(ResultatVilkårperiode.OPPFYLT, ResultatDelvilkårperiode.OPPFYLT)
+
+            DelvilkårMålgruppeDto(medlemskap = SvarJaNei.JA_IMPLISITT)
+                .assertMappesTil(ResultatVilkårperiode.OPPFYLT, ResultatDelvilkårperiode.OPPFYLT)
+
+            DelvilkårMålgruppeDto(medlemskap = SvarJaNei.NEI)
+                .assertMappesTil(ResultatVilkårperiode.IKKE_OPPFYLT, ResultatDelvilkårperiode.IKKE_OPPFYLT)
+
+            DelvilkårMålgruppeDto(medlemskap = null)
+                .assertMappesTil(ResultatVilkårperiode.IKKE_VURDERT, ResultatDelvilkårperiode.IKKE_VURDERT)
         }
 
-        private fun utledResultatMålgruppe(medlemskap: SvarJaNei) = evaulerVilkårperiode(DetaljerMålgruppe(medlemskap))
+        fun DelvilkårMålgruppeDto.assertMappesTil(
+            resultatVilkårperiode: ResultatVilkårperiode,
+            resultatMedlemskap: ResultatDelvilkårperiode,
+        ) {
+            val evaluering = evaulerVilkårperiode(this)
+            assertThat(evaluering.resultat).isEqualTo(resultatVilkårperiode)
+            assertThat((evaluering.delvilkår as DelvilkårMålgruppe).medlemskap.resultat).isEqualTo(resultatMedlemskap)
+            assertThat((evaluering.delvilkår as DelvilkårMålgruppe).medlemskap.svar).isEqualTo(this.medlemskap)
+        }
     }
 
     @Nested
@@ -58,52 +75,80 @@ class EvalueringVilkårperiodeTest {
             gyldigeSvarForAktivitet.forEach {
                 assertThat(
                     utledResultatAktivitet(
-                        lønnet = SvarJaNei.IKKE_VURDERT,
+                        lønnet = null,
                         mottarSykepenger = it,
-                    ),
-                ).isEqualTo(ResultatVilkårperiode.IKKE_TATT_STILLING_TIL)
+                    ).resultat,
+                ).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
 
                 assertThat(
                     utledResultatAktivitet(
                         lønnet = it,
-                        mottarSykepenger = SvarJaNei.IKKE_VURDERT,
-                    ),
-                ).isEqualTo(ResultatVilkårperiode.IKKE_TATT_STILLING_TIL)
+                        mottarSykepenger = null,
+                    ).resultat,
+                ).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
             }
         }
 
         @Test
         fun `hvis en ikke er oppfylt så er resultatet ikke oppfylt`() {
             val gyldigeSvarForAktivitet = SvarJaNei.entries
-                .filter { it != SvarJaNei.JA_IMPLISITT } // ikke gyldig
-                .filter { it != SvarJaNei.IKKE_VURDERT } // allerede testet i forrige test
+                .filter { it != SvarJaNei.JA_IMPLISITT }
             gyldigeSvarForAktivitet.forEach {
                 assertThat(
                     utledResultatAktivitet(
                         lønnet = SvarJaNei.JA,
                         mottarSykepenger = it,
-                    ),
+                    ).resultat,
                 ).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
 
                 assertThat(
                     utledResultatAktivitet(
                         lønnet = it,
                         mottarSykepenger = SvarJaNei.JA,
-                    ),
+                    ).resultat,
                 ).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
             }
         }
 
         @Test
         fun `hvis begge er oppfylt er resultatet oppfylt`() {
-            val resultat = utledResultatAktivitet(
+            val resultatEvaluering = utledResultatAktivitet(
                 lønnet = SvarJaNei.NEI,
                 mottarSykepenger = SvarJaNei.NEI,
             )
-            assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+            assertThat(resultatEvaluering.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
         }
 
-        private fun utledResultatAktivitet(lønnet: SvarJaNei, mottarSykepenger: SvarJaNei) =
-            evaulerVilkårperiode(DetaljerAktivitet(lønnet = lønnet, mottarSykepenger = mottarSykepenger))
+        @Test
+        fun `skal vurdere hvert delvilkår for seg`() {
+            with(
+                utledResultatAktivitet(
+                    lønnet = SvarJaNei.NEI,
+                    mottarSykepenger = null,
+                ).delvilkår as DelvilkårAktivitet,
+            ) {
+                assertThat(lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+                assertThat(lønnet.svar).isEqualTo(SvarJaNei.NEI)
+
+                assertThat(mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT)
+                assertThat(mottarSykepenger.svar).isNull()
+            }
+
+            with(
+                utledResultatAktivitet(
+                    lønnet = null,
+                    mottarSykepenger = SvarJaNei.JA,
+                ).delvilkår as DelvilkårAktivitet,
+            ) {
+                assertThat(lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT)
+                assertThat(lønnet.svar).isEqualTo(null)
+
+                assertThat(mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+                assertThat(mottarSykepenger.svar).isEqualTo(SvarJaNei.JA)
+            }
+        }
+
+        private fun utledResultatAktivitet(lønnet: SvarJaNei?, mottarSykepenger: SvarJaNei?) =
+            evaulerVilkårperiode(DelvilkårAktivitetDto(lønnet = lønnet, mottarSykepenger = mottarSykepenger))
     }
 }

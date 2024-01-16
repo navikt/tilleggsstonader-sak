@@ -103,15 +103,16 @@ class VilkårService(
             "Kan ikke opprette vilkår når behandling er låst for videre redigering"
         }
 
+        val resultatEvaluering = evaulerVilkårperiode(opprettVilkårperiode.delvilkår)
         val vilkårperiode = vilkårperiodeRepository.insert(
             Vilkårperiode(
                 behandlingId = behandlingId,
                 fom = opprettVilkårperiode.fom,
                 tom = opprettVilkårperiode.tom,
                 type = opprettVilkårperiode.type,
-                detaljer = opprettVilkårperiode.detaljer,
+                delvilkår = resultatEvaluering.delvilkår,
                 begrunnelse = opprettVilkårperiode.begrunnelse,
-                resultat = evaulerVilkårperiode(opprettVilkårperiode.detaljer),
+                resultat = resultatEvaluering.resultat,
                 kilde = KildeVilkårsperiode.MANUELL,
             ),
         )

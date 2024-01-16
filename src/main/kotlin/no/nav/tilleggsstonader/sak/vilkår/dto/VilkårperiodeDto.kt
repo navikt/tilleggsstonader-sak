@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.dto
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
@@ -8,9 +10,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vilkår.domain.DetaljerVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.vilkårperiodetyper
@@ -23,7 +26,7 @@ data class VilkårperiodeDto(
     val type: VilkårperiodeType,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val detaljer: DetaljerVilkårperiode,
+    val detaljer: DelvilkårVilkårperiode,
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,
     val kilde: KildeVilkårsperiode,
@@ -40,7 +43,7 @@ fun Vilkårperiode.tilDto() =
         type = this.type,
         fom = this.fom,
         tom = this.tom,
-        detaljer = this.detaljer,
+        detaljer = this.delvilkår,
         resultat = this.resultat,
         begrunnelse = this.begrunnelse,
         kilde = this.kilde,
@@ -71,9 +74,25 @@ data class OpprettVilkårperiode(
     val type: VilkårperiodeType,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val detaljer: DetaljerVilkårperiode,
+    val delvilkår: DelvilkårVilkårperiodeDto,
     val begrunnelse: String? = null,
 ) : Periode<LocalDate>
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes(
+    JsonSubTypes.Type(DelvilkårMålgruppeDto::class, name = "målgruppe"),
+    JsonSubTypes.Type(DelvilkårAktivitetDto::class, name = "aktivitet"),
+)
+sealed class DelvilkårVilkårperiodeDto
+
+data class DelvilkårMålgruppeDto(
+    val medlemskap: SvarJaNei?,
+) : DelvilkårVilkårperiodeDto()
+
+data class DelvilkårAktivitetDto(
+    val lønnet: SvarJaNei?,
+    val mottarSykepenger: SvarJaNei?,
+) : DelvilkårVilkårperiodeDto()
 
 data class SlettVikårperiode(
     val kommentar: String,
