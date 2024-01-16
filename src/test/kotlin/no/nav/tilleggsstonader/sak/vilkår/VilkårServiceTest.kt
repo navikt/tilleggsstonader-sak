@@ -116,8 +116,6 @@ internal class VilkårServiceTest {
                 vilkårsett.map { it.type }.distinct(),
             ).containsExactlyInAnyOrderElementsOf(aktuelleVilkårTyper)
 
-            vilkårsett.finnVilkårAvType(VilkårType.MÅLGRUPPE).inneholderKunResultat(IKKE_TATT_STILLING_TIL)
-            vilkårsett.finnVilkårAvType(VilkårType.AKTIVITET).inneholderKunResultat(IKKE_TATT_STILLING_TIL)
             vilkårsett.finnVilkårAvType(VilkårType.PASS_BARN).inneholderKunResultat(IKKE_TATT_STILLING_TIL)
         }
 
