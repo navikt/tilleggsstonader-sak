@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.domain
+package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
