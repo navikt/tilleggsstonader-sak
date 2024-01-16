@@ -2,16 +2,18 @@ package no.nav.tilleggsstonader.sak.vilkår
 
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.StønadsperiodeValideringUtil.validerStønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.StønadsperiodeValideringUtil.validerStønadsperioder
 import no.nav.tilleggsstonader.sak.vilkår.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.delvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.dto.Datoperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
 import org.assertj.core.api.Assertions.assertThatCode
@@ -183,14 +185,19 @@ internal class StønadsperiodeValideringUtilTest {
         val tom = LocalDate.of(2023, 1, 7)
 
         val målgrupper = listOf(
-            lagVilkårperiodeDto(
+            målgruppe(
                 fom = fom,
                 tom = tom,
-                type = MålgruppeType.AAP,
-                vilkårsresultat = Vilkårsresultat.IKKE_OPPFYLT,
-            ),
+                resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
+            ).tilDto(),
         )
-        val aktiviteter = målgrupper.map { it.copy(type = AktivitetType.TILTAK) }
+        val aktiviteter = listOf(
+            aktivitet(
+                fom = fom,
+                tom = tom,
+                resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
+            ).tilDto(),
+        )
 
         @Test
         fun `skal kaste feil hvis vilkårsresultat ikke er oppfylt`() {
@@ -209,24 +216,23 @@ internal class StønadsperiodeValideringUtilTest {
     inner class ValiderStønadsperioderMergeSammenhengende {
 
         val målgrupper = listOf(
-            lagVilkårperiodeDto(
+            målgruppe(
                 fom = LocalDate.of(2023, 1, 1),
                 tom = LocalDate.of(2023, 1, 7),
-                type = MålgruppeType.AAP,
             ),
-            lagVilkårperiodeDto(
+            målgruppe(
                 fom = LocalDate.of(2023, 1, 8),
                 tom = LocalDate.of(2023, 1, 18),
                 type = MålgruppeType.AAP,
             ),
-            lagVilkårperiodeDto(
+            målgruppe(
                 fom = LocalDate.of(2023, 1, 20),
                 tom = LocalDate.of(2023, 1, 31),
                 type = MålgruppeType.AAP,
             ),
-        )
+        ).map(Vilkårperiode::tilDto)
 
-        val aktiviteter = målgrupper.map { it.copy(type = AktivitetType.TILTAK) }
+        val aktiviteter = målgrupper.map { it.copy(type = AktivitetType.TILTAK, detaljer = delvilkårAktivitet()) }
 
         @Test
         fun `skal godta stønadsperiode på tvers av 2 godkjente sammenhengende vilkårsperioder`() {
@@ -271,19 +277,4 @@ internal class StønadsperiodeValideringUtilTest {
             aktivitet = aktivitet,
         )
     }
-
-    fun lagVilkårperiodeDto(
-        fom: LocalDate,
-        tom: LocalDate,
-        type: VilkårperiodeType,
-        vilkårsresultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
-    ) = VilkårperiodeDto(
-        type = type,
-        fom = fom,
-        tom = tom,
-        vilkår = lagVilkårDto(vilkårsresultat),
-    )
-
-    fun lagVilkårDto(vilkårsresultat: Vilkårsresultat) =
-        vilkår(behandlingId = UUID.randomUUID(), resultat = vilkårsresultat).tilDto()
 }

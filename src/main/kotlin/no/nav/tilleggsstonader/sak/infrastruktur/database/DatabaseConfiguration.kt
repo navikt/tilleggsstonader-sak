@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuler
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
+import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.vilkårperiodetyper
@@ -106,6 +107,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 TilVilkårperiodeTypeConverter(),
                 VilkårperiodeTypeTilStringConverter(),
+
+                DetaljerVilkårperiodeReader(),
+                DetaljerVilkårperiodeWriter(),
             ),
         )
     }
@@ -212,4 +216,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         JsonReader<VedtaksdataBeregningsresultat>(VedtaksdataBeregningsresultat::class)
 
     class VedtaksdataBeregningsresultatWriter : JsonWriter<VedtaksdataBeregningsresultat>()
+
+    class DetaljerVilkårperiodeReader : JsonReader<DelvilkårVilkårperiode>(DelvilkårVilkårperiode::class)
+
+    class DetaljerVilkårperiodeWriter : JsonWriter<DelvilkårVilkårperiode>()
 }
