@@ -20,7 +20,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
-import no.nav.tilleggsstonader.sak.vilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.springframework.stereotype.Service
 
 @Service

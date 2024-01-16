@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
-import no.nav.tilleggsstonader.sak.vilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

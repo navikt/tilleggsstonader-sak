@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.util
 
-import no.nav.tilleggsstonader.sak.vilkår.dto.GrunnlagAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.dto.GrunnlagBarn
-import no.nav.tilleggsstonader.sak.vilkår.dto.GrunnlagHovedytelse
-import no.nav.tilleggsstonader.sak.vilkår.dto.RegistergrunnlagBarn
-import no.nav.tilleggsstonader.sak.vilkår.dto.SøknadsgrunnlagBarn
-import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårGrunnlagDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.GrunnlagAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.GrunnlagBarn
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.GrunnlagHovedytelse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.RegistergrunnlagBarn
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SøknadsgrunnlagBarn
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårGrunnlagDto
 import java.util.UUID
 
 object VilkårGrunnlagUtil {

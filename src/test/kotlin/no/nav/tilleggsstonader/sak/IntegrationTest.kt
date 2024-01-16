@@ -28,9 +28,9 @@ import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
-import no.nav.tilleggsstonader.sak.vilkår.domain.Stønadsperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.LoggerFactory
