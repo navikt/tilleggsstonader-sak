@@ -8,11 +8,8 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.SYSTEM_FORKORTELSE
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
-import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -25,16 +22,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.EksempelRegel
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeDomainUtil.målgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
@@ -55,9 +45,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
     @Autowired
     lateinit var barnRepository: BarnRepository
-
-    @Autowired
-    lateinit var vilkårperiodeRepository: VilkårperiodeRepository
 
     @Test
     internal fun `kopierVilkårsettTilNyBehandling - skal kopiere vilkår til ny behandling`() {
@@ -127,77 +114,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             },
         )
             .hasMessage("Tidligere behandling=$tidligereBehandlingId har ikke noen vilkår")
-    }
-
-    @Nested
-    inner class SlettVilkårperiode {
-
-        @Test
-        fun `skal ikke kunne slette kommentar hvis behandlingen ikke er under behandling`() {
-            val behandling =
-                testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.MANUELL,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
-
-            assertThatThrownBy {
-                vilkårService.slettVilkårperiode(behandling.id, periode.id, SlettVikårperiode("kommentar"))
-            }.hasMessageContaining("Kan ikke slette vilkårperiode når behandling er låst for videre redigering")
-        }
-
-        @Test
-        fun `skal ikke kunne slette kommentar hvis man mangler kommentar`() {
-            val behandling =
-                testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.MANUELL,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
-
-            assertThatThrownBy {
-                vilkårService.slettVilkårperiode(behandling.id, periode.id, SlettVikårperiode("    "))
-            }.hasMessageContaining("Mangler kommentar")
-        }
-
-        @Test
-        fun `skal ikke kunne slette kommentar hvis kilden er system`() {
-            val behandling =
-                testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.SYSTEM,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
-
-            assertThatThrownBy {
-                vilkårService.slettVilkårperiode(behandling.id, periode.id, SlettVikårperiode("kommentar"))
-            }.hasMessageContaining("Kan ikke slette når kilde=")
-        }
-
-        @Test
-        fun `skal kunne slette kommentar som er manuellt opprettet`() {
-            val saksbehandler = "saksbehandlerX"
-            val behandling =
-                testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.MANUELL,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
-
-            assertThat(periode.sporbar.endret.endretAv).isEqualTo(SYSTEM_FORKORTELSE)
-
-            testWithBrukerContext(saksbehandler) {
-                vilkårService.slettVilkårperiode(behandling.id, periode.id, SlettVikårperiode("kommentar"))
-            }
-
-            val oppdatertPeriode = vilkårperiodeRepository.findByIdOrThrow(periode.id)
-            assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
-            assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
-        }
     }
 
     private fun opprettVilkårsvurderinger(
