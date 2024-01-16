@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.sak.vilkår.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.util.UUID
 

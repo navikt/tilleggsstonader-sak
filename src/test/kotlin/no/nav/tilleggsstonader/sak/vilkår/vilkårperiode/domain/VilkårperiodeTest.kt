@@ -1,9 +1,9 @@
-package no.nav.tilleggsstonader.sak.vilkår.domain
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.delvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.delvilkårMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeDomainUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeDomainUtil.delvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeDomainUtil.delvilkårMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeDomainUtil.målgruppe
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

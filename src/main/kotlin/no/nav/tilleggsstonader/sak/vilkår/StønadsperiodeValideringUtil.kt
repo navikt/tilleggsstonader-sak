@@ -3,12 +3,12 @@ package no.nav.tilleggsstonader.sak.vilkår
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
-import no.nav.tilleggsstonader.sak.vilkår.dto.Datoperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.Vilkårperioder
-import no.nav.tilleggsstonader.sak.vilkår.dto.formattertPeriodeNorskFormat
-import no.nav.tilleggsstonader.sak.vilkår.dto.mergeSammenhengendeVilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Datoperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.formattertPeriodeNorskFormat
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.mergeSammenhengendeVilkårperioder
 
 object StønadsperiodeValideringUtil {
 

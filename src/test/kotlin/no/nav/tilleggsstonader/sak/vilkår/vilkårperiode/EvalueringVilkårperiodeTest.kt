@@ -1,13 +1,13 @@
-package no.nav.tilleggsstonader.sak.vilkår
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.sak.vilkår.EvalueringVilkårperiode.evaulerVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatDelvilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårAktivitetDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.EvalueringVilkårperiode.evaulerVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested

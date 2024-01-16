@@ -1,6 +1,6 @@
-package no.nav.tilleggsstonader.sak.vilkår.dto
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeDomainUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeDomainUtil.målgruppe
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate

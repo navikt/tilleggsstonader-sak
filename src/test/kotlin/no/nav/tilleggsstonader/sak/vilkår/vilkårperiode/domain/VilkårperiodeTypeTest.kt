@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.domain
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

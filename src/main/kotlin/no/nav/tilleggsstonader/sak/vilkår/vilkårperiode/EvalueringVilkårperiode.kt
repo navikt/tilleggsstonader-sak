@@ -1,18 +1,18 @@
-package no.nav.tilleggsstonader.sak.vilkår
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårVilkårperiode.Vurdering
-import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatDelvilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode.IKKE_OPPFYLT
-import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode.IKKE_VURDERT
-import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode.OPPFYLT
-import no.nav.tilleggsstonader.sak.vilkår.domain.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårAktivitetDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårVilkårperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode.Vurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode.IKKE_OPPFYLT
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode.IKKE_VURDERT
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode.OPPFYLT
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårVilkårperiodeDto
 
 object EvalueringVilkårperiode {
 

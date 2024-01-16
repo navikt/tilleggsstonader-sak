@@ -1,7 +1,7 @@
-package no.nav.tilleggsstonader.sak.vilkår.domain
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårAktivitetDto
-import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import java.time.LocalDate
 import java.util.UUID
 

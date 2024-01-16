@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.dto
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
@@ -10,13 +10,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.KildeVilkårsperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.domain.Vilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
-import no.nav.tilleggsstonader.sak.vilkår.domain.vilkårperiodetyper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
 import java.time.LocalDate
 import java.util.UUID
 

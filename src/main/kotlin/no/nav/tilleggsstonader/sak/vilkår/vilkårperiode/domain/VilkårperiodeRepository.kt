@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.domain
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface

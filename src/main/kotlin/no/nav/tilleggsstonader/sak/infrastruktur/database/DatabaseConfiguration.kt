@@ -10,10 +10,10 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuler
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
-import no.nav.tilleggsstonader.sak.vilkår.domain.vilkårperiodetyper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer
