@@ -11,9 +11,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresul
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.domain.vilkårperiodetyper
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer

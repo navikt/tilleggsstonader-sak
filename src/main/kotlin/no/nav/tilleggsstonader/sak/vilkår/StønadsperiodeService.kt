@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.vilkår.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilSortertDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.springframework.stereotype.Service
 import java.util.UUID
 

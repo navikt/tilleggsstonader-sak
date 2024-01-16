@@ -30,7 +30,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollContr
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
-import no.nav.tilleggsstonader.sak.vilkår.VilkårController
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårController
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.slf4j.MDC

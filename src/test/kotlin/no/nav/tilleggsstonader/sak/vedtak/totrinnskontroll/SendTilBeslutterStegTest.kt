@@ -34,7 +34,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
-import no.nav.tilleggsstonader.sak.vilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

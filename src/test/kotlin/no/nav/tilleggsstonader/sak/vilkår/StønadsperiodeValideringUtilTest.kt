@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.dto.Datoperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested

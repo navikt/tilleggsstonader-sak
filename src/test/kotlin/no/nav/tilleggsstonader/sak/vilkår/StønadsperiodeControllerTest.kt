@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.dto.VilkårperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
