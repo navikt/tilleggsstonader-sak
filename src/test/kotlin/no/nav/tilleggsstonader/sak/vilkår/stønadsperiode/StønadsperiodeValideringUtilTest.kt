@@ -232,7 +232,7 @@ internal class StønadsperiodeValideringUtilTest {
             ),
         ).map(Vilkårperiode::tilDto)
 
-        val aktiviteter = målgrupper.map { it.copy(type = AktivitetType.TILTAK, detaljer = delvilkårAktivitet()) }
+        val aktiviteter = målgrupper.map { it.copy(type = AktivitetType.TILTAK, delvilkår = delvilkårAktivitet()) }
 
         @Test
         fun `skal godta stønadsperiode på tvers av 2 godkjente sammenhengende vilkårsperioder`() {
