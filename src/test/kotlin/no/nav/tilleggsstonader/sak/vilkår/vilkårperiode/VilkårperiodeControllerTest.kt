@@ -1,14 +1,10 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig.Companion.barn2Fnr
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig.Companion.barnFnr
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeDomainUtil.delvilkårMålgruppeDto
@@ -19,17 +15,13 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.web.client.exchange
 import java.time.LocalDate
 import java.util.UUID
 
-class VilkårControllerTest : IntegrationTest() {
-
-    @Autowired
-    lateinit var barnRepository: BarnRepository
+class VilkårperiodeControllerTest : IntegrationTest() {
 
     @BeforeEach
     fun setUp() {
@@ -39,8 +31,6 @@ class VilkårControllerTest : IntegrationTest() {
     @Test
     fun `skal kunne lagre og hente vilkarperioder for AAP`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-        barnRepository.insert(behandlingBarn(behandlingId = behandling.id, personIdent = barnFnr))
-        barnRepository.insert(behandlingBarn(behandlingId = behandling.id, personIdent = barn2Fnr))
 
         opprettVilkårperiode(
             behandling,
@@ -79,9 +69,8 @@ class VilkårControllerTest : IntegrationTest() {
         )
         val exception = catchProblemDetailException {
             slettVilkårperiode(
-                behandlingId = behandlingForAnnenFagsak.id,
                 vilkårperiodeId = periode.id,
-                SlettVikårperiode("test"),
+                SlettVikårperiode(behandlingForAnnenFagsak.id, "test"),
             )
         }
         assertThat(exception.detail.detail).contains("BehandlingId er ikke lik")
@@ -89,7 +78,7 @@ class VilkårControllerTest : IntegrationTest() {
 
     private fun hentVilkårperioder(behandling: Behandling) =
         restTemplate.exchange<Vilkårperioder>(
-            localhost("api/vilkar/${behandling.id}/periode"),
+            localhost("api/vilkarperiode/behandling/${behandling.id}"),
             HttpMethod.GET,
             HttpEntity(null, headers),
         ).body!!
@@ -98,17 +87,16 @@ class VilkårControllerTest : IntegrationTest() {
         behandling: Behandling,
         opprettVilkårperiode: OpprettVilkårperiode,
     ) = restTemplate.exchange<VilkårperiodeDto>(
-        localhost("api/vilkar/${behandling.id}/periode"),
+        localhost("api/vilkarperiode/behandling/${behandling.id}"),
         HttpMethod.POST,
         HttpEntity(opprettVilkårperiode, headers),
     ).body!!
 
     private fun slettVilkårperiode(
-        behandlingId: UUID,
         vilkårperiodeId: UUID,
         slettVikårperiode: SlettVikårperiode,
     ) = restTemplate.exchange<VilkårperiodeDto>(
-        localhost("api/vilkar/$behandlingId/periode/$vilkårperiodeId"),
+        localhost("api/vilkarperiode/$vilkårperiodeId"),
         HttpMethod.DELETE,
         HttpEntity(slettVikårperiode, headers),
     ).body!!

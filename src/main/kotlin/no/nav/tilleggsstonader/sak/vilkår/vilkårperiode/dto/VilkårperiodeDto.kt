@@ -95,6 +95,7 @@ data class DelvilkårAktivitetDto(
 ) : DelvilkårVilkårperiodeDto()
 
 data class SlettVikårperiode(
+    val behandlingId: UUID,
     val kommentar: String,
 )
 

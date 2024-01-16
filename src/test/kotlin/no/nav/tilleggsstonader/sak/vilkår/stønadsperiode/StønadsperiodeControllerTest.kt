@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
@@ -30,7 +30,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
     lateinit var barnRepository: BarnRepository
 
     @Autowired
-    lateinit var vilkårService: VilkårService
+    lateinit var vilkårperiodeService: VilkårperiodeService
 
     private val dagensDato = LocalDate.now()
 
@@ -63,7 +63,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
     }
 
     private fun opprettMålgruppe(behandling: Behandling): VilkårperiodeDto =
-        vilkårService.opprettVilkårperiode(
+        vilkårperiodeService.opprettVilkårperiode(
             behandling.id,
             OpprettVilkårperiode(
                 type = MålgruppeType.AAP,
@@ -76,7 +76,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
         )
 
     private fun opprettAktivitet(behandling: Behandling): VilkårperiodeDto =
-        vilkårService.opprettVilkårperiode(
+        vilkårperiodeService.opprettVilkårperiode(
             behandling.id,
             OpprettVilkårperiode(
                 type = AktivitetType.TILTAK,

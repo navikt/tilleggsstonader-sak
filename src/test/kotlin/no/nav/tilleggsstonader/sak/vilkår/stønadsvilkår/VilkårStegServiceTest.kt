@@ -39,7 +39,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.api.Assertions.catchThrowable
@@ -55,7 +54,6 @@ internal class VilkårStegServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val søknadService = mockk<SøknadService>()
     private val vilkårRepository = mockk<VilkårRepository>()
-    private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     private val barnService = mockk<BarnService>()
 
     // private val personopplysningerIntegrasjonerClient = mockk<PersonopplysningerIntegrasjonerClient>()
@@ -74,7 +72,6 @@ internal class VilkårStegServiceTest {
         behandlingService,
         søknadService,
         vilkårRepository,
-        vilkårperiodeRepository,
         barnService,
         vilkårGrunnlagService,
         // grunnlagsdataService,

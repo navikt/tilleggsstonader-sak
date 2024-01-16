@@ -28,7 +28,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.IKKE_TATT_STILLING_TIL
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.SKAL_IKKE_VURDERES
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -41,7 +40,6 @@ internal class VilkårServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val søknadService = mockk<SøknadService>()
     private val vilkårRepository = mockk<VilkårRepository>()
-    private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
 
     // private val personopplysningerIntegrasjonerClient = mockk<PersonopplysningerIntegrasjonerClient>()
     // private val blankettRepository = mockk<BlankettRepository>()
@@ -55,7 +53,6 @@ internal class VilkårServiceTest {
         behandlingService = behandlingService,
         søknadService = søknadService,
         vilkårRepository = vilkårRepository,
-        vilkårperiodeRepository = vilkårperiodeRepository,
         vilkårGrunnlagService = vilkårGrunnlagService,
         // grunnlagsdataService = grunnlagsdataService,
         barnService = barnService,
