@@ -110,6 +110,7 @@ sealed interface VilkårperiodeType {
 
 enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : VilkårperiodeType {
     AAP(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
+    DAGPENGER(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
     OMSTILLINGSSTØNAD(setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
     OVERGANGSSTØNAD(setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
     NEDSATT_ARBEIDSEVNE(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),

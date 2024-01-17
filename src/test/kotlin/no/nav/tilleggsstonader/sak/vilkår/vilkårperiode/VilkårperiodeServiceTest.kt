@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -12,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
@@ -58,6 +60,16 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat((vilkårperiode.delvilkår as DelvilkårMålgruppe).medlemskap.svar).isEqualTo(SvarJaNei.NEI)
             assertThat((vilkårperiode.delvilkår as DelvilkårMålgruppe).medlemskap.resultat)
                 .isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+        }
+
+        @Test
+        fun `skal kaste feil hvis målgruppe er ugyldig for stønadstype`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val opprettVilkårperiode = opprettVilkårperiode(type = MålgruppeType.DAGPENGER, medlemskap = SvarJaNei.NEI)
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(behandling.id, opprettVilkårperiode)
+            }.hasMessageContaining("målgruppe=DAGPENGER er ikke gyldig for ${Stønadstype.BARNETILSYN}")
         }
     }
 
