@@ -71,7 +71,7 @@ internal class StønadsperiodeValideringUtilTest {
 
     @Test
     internal fun `skal kaste feil om ingen periode for målgruppe matcher`() {
-        val stønadsperiode = lagStønadsperiode(målgruppe = MålgruppeType.AAP_FERDIG_AVKLART)
+        val stønadsperiode = lagStønadsperiode(målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE)
 
         assertThatThrownBy {
             validerStønadsperiode(

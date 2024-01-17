@@ -108,12 +108,10 @@ sealed interface VilkårperiodeType {
 
 enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : VilkårperiodeType {
     AAP(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
-    AAP_FERDIG_AVKLART(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
-    DAGPENGER(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
+    OMSTILLINGSSTØNAD(setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
+    OVERGANGSSTØNAD(setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
+    NEDSATT_ARBEIDSEVNE(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
     UFØRETRYGD(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
-
-    OMSTILLINGSSTØNAD(setOf(AktivitetType.REEL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
-    OVERGANGSSTØNAD(setOf(AktivitetType.REEL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
     ;
 
     override fun tilDbType(): String = this.name
@@ -122,7 +120,7 @@ enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : Vilkårper
 enum class AktivitetType : VilkårperiodeType {
     TILTAK,
     UTDANNING,
-    REEL_ARBEIDSSØKER,
+    REELL_ARBEIDSSØKER,
     ;
 
     override fun tilDbType(): String = this.name
