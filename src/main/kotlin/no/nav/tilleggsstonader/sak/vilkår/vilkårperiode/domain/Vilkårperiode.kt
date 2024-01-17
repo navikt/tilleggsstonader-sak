@@ -73,8 +73,8 @@ enum class ResultatVilkårperiode {
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
-    JsonSubTypes.Type(DelvilkårMålgruppe::class, name = "målgruppe"),
-    JsonSubTypes.Type(DelvilkårAktivitet::class, name = "aktivitet"),
+    JsonSubTypes.Type(DelvilkårMålgruppe::class, name = "MÅLGRUPPE"),
+    JsonSubTypes.Type(DelvilkårAktivitet::class, name = "AKTIVITET"),
 )
 sealed class DelvilkårVilkårperiode {
     data class Vurdering(
