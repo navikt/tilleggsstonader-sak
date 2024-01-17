@@ -11,9 +11,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OppdaterVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import org.springframework.stereotype.Service
@@ -40,13 +40,14 @@ class VilkårperiodeService(
     ) = vilkårsperioder.filter { it.type is T }.map(Vilkårperiode::tilDto)
 
     @Transactional
-    fun opprettVilkårperiode(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): VilkårperiodeDto {
+    fun opprettVilkårperiode(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): Vilkårperiode {
         feilHvis(behandlingErLåstForVidereRedigering(behandlingId)) {
             "Kan ikke opprette vilkår når behandling er låst for videre redigering"
         }
 
         val resultatEvaluering = EvalueringVilkårperiode.evaulerVilkårperiode(opprettVilkårperiode.delvilkår)
-        val vilkårperiode = vilkårperiodeRepository.insert(
+
+        return vilkårperiodeRepository.insert(
             Vilkårperiode(
                 behandlingId = behandlingId,
                 fom = opprettVilkårperiode.fom,
@@ -58,8 +59,48 @@ class VilkårperiodeService(
                 kilde = KildeVilkårsperiode.MANUELL,
             ),
         )
+    }
 
-        return vilkårperiode.tilDto()
+    fun oppdaterVilkårperiode(id: UUID, oppdaterVilkårperiode: OppdaterVilkårperiode): Vilkårperiode {
+        val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
+
+        validerBehandlingIdErLik(oppdaterVilkårperiode.behandlingId, vilkårperiode.behandlingId)
+        feilHvis(behandlingErLåstForVidereRedigering(vilkårperiode.behandlingId)) {
+            "Kan ikke oppdatere vilkårperiode når behandling er låst for videre redigering"
+        }
+        val resultatEvaluering = EvalueringVilkårperiode.evaulerVilkårperiode(oppdaterVilkårperiode.delvilkår)
+        val oppdatert = when (vilkårperiode.kilde) {
+            KildeVilkårsperiode.MANUELL -> {
+                vilkårperiode.copy(
+                    begrunnelse = oppdaterVilkårperiode.begrunnelse,
+                    fom = oppdaterVilkårperiode.fom,
+                    tom = oppdaterVilkårperiode.tom,
+                    delvilkår = resultatEvaluering.delvilkår,
+                    resultat = resultatEvaluering.resultat,
+                )
+            }
+            KildeVilkårsperiode.SYSTEM -> {
+                validerIkkeEndretFomTomForSystem(vilkårperiode, oppdaterVilkårperiode)
+                vilkårperiode.copy(
+                    begrunnelse = oppdaterVilkårperiode.begrunnelse,
+                    delvilkår = resultatEvaluering.delvilkår,
+                    resultat = resultatEvaluering.resultat,
+                )
+            }
+        }
+        return vilkårperiodeRepository.update(oppdatert)
+    }
+
+    private fun validerIkkeEndretFomTomForSystem(
+        vilkårperiode: Vilkårperiode,
+        oppdaterVilkårperiode: OppdaterVilkårperiode,
+    ) {
+        feilHvis(vilkårperiode.fom != oppdaterVilkårperiode.fom) {
+            "Kan ikke oppdatere fom når kilde=${KildeVilkårsperiode.SYSTEM}"
+        }
+        feilHvis(vilkårperiode.tom != oppdaterVilkårperiode.tom) {
+            "Kan ikke oppdatere tom når kilde=${KildeVilkårsperiode.SYSTEM}"
+        }
     }
 
     fun slettVilkårperiode(id: UUID, slettVikårperiode: SlettVikårperiode): Vilkårperiode {

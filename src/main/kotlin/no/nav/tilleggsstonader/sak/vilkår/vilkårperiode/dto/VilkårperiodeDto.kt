@@ -69,14 +69,22 @@ fun List<VilkårperiodeDto>.mergeSammenhengendeVilkårperioder(): Map<Vilkårper
                 .mergeSammenhengende { a, b -> a.tom.plusDays(1) == b.fom }
         }
 
+data class OppdaterVilkårperiode(
+    val behandlingId: UUID,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val delvilkår: DelvilkårVilkårperiodeDto,
+    val begrunnelse: String? = null,
+)
+
 data class OpprettVilkårperiode(
     @JsonDeserialize(using = VilkårperiodeTypeDeserializer::class)
     val type: VilkårperiodeType,
-    override val fom: LocalDate,
-    override val tom: LocalDate,
+    val fom: LocalDate,
+    val tom: LocalDate,
     val delvilkår: DelvilkårVilkårperiodeDto,
     val begrunnelse: String? = null,
-) : Periode<LocalDate>
+)
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(

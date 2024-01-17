@@ -11,10 +11,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -62,7 +62,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
         opprettAktivitet(behandling)
     }
 
-    private fun opprettMålgruppe(behandling: Behandling): VilkårperiodeDto =
+    private fun opprettMålgruppe(behandling: Behandling): Vilkårperiode =
         vilkårperiodeService.opprettVilkårperiode(
             behandling.id,
             OpprettVilkårperiode(
@@ -75,7 +75,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
             ),
         )
 
-    private fun opprettAktivitet(behandling: Behandling): VilkårperiodeDto =
+    private fun opprettAktivitet(behandling: Behandling): Vilkårperiode =
         vilkårperiodeService.opprettVilkårperiode(
             behandling.id,
             OpprettVilkårperiode(
