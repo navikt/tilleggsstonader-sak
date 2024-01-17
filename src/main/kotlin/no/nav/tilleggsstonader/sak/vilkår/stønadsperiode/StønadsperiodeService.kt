@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -10,6 +12,7 @@ import java.util.UUID
 
 @Service
 class StønadsperiodeService(
+    private val behandlingService: BehandlingService,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperiodeService: VilkårperiodeService,
 ) {
@@ -18,7 +21,9 @@ class StønadsperiodeService(
     }
 
     fun lagreStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>): List<StønadsperiodeDto> {
-        // TODO valider behandling er ikke låst
+        feilHvis(behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()) {
+            "Kan ikke lagre stønadsperioder når behandlingen er låst"
+        }
         validerStønadsperioder(behandlingId, stønadsperioder)
         stønadsperiodeRepository.deleteAll() // TODO skal vi finne og oppdatere de som har blitt oppdatert/slettet
         return stønadsperiodeRepository.insertAll(
