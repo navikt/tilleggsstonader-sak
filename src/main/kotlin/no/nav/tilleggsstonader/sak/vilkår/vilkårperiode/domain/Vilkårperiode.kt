@@ -32,6 +32,8 @@ data class Vilkårperiode(
     val sporbar: Sporbar = Sporbar(),
 ) {
     init {
+        require(tom >= fom) { "Til-og-med før fra-og-med: $fom > $tom" }
+
         val ugyldigTypeOgDetaljer = (type is MålgruppeType && delvilkår !is DelvilkårMålgruppe) ||
             (type is AktivitetType && delvilkår !is DelvilkårAktivitet)
         feilHvis(ugyldigTypeOgDetaljer) {
