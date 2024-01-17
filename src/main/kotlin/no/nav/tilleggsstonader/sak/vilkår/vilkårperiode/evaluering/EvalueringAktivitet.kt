@@ -38,6 +38,7 @@ object EvalueringAktivitet {
         val vurderingLønnet = delvilkår.lønnet
         val vurderingMottarSykepenger = delvilkår.mottarSykepenger
         val resultater = listOf(vurderingLønnet.resultat, vurderingMottarSykepenger.resultat)
+            .filterNot { it == ResultatDelvilkårperiode.IKKE_AKTUELT }
 
         return when {
             resultater.contains(ResultatDelvilkårperiode.IKKE_VURDERT) -> ResultatVilkårperiode.IKKE_VURDERT
@@ -52,10 +53,10 @@ object EvalueringAktivitet {
 
     private fun vurderingLønnet(type: AktivitetType, svar: SvarJaNei?): Vurdering {
         return when (type) {
-            AktivitetType.TILTAK,
+            AktivitetType.TILTAK -> Vurdering(svar, utledResultatLønnet(svar))
             AktivitetType.UTDANNING,
-            -> Vurdering(svar, utledResultatLønnet(svar))
-            AktivitetType.REELL_ARBEIDSSØKER -> ikkeVurdertLønnet(type, svar)
+            AktivitetType.REELL_ARBEIDSSØKER,
+            -> ikkeVurdertLønnet(type, svar)
         }
     }
 
@@ -63,8 +64,7 @@ object EvalueringAktivitet {
         feilHvis(svar != null) {
             "Ugyldig svar=$svar for lønnet for $type"
         }
-        return Vurdering(svar = svar, resultat = ResultatDelvilkårperiode.IKKE_VURDERT)
-        // TODO hvordan ønsker vi her? Denne er ikke nesvart, men er oppfylt
+        return Vurdering(svar = svar, resultat = ResultatDelvilkårperiode.IKKE_AKTUELT)
     }
 
     private fun utledResultatLønnet(svar: SvarJaNei?) =

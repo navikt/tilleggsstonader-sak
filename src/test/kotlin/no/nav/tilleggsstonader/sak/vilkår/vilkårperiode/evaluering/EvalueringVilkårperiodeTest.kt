@@ -15,7 +15,8 @@ class EvalueringVilkårperiodeTest {
 
     @Test
     fun `skal evaluere gyldig kombinasjon av målgruppe`() {
-        val resultatMålgruppe = evaulerVilkårperiode(MålgruppeType.AAP, DelvilkårMålgruppeDto(SvarJaNei.JA))
+        val resultatMålgruppe =
+            evaulerVilkårperiode(MålgruppeType.OMSTILLINGSSTØNAD, DelvilkårMålgruppeDto(SvarJaNei.JA))
         assertThat(resultatMålgruppe.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
     }
 

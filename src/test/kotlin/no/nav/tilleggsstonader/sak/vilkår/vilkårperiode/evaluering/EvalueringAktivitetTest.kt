@@ -18,12 +18,14 @@ import org.junit.jupiter.params.provider.EnumSource
 class EvalueringAktivitetTest {
 
     @Nested
-    inner class IkkeReelArbeidssøker {
+    inner class Tiltak {
 
-        @IkkeReellArbeidssøkerParameterizedTest
-        fun `hvis ikke lønnet og ikke mottar sykepenger så er resultatet oppfylt`(type: AktivitetType) {
-            val resultat =
-                utledResultat(type, delvilkårAktivitetDto(lønnet = SvarJaNei.NEI, mottarSykepenger = SvarJaNei.NEI))
+        @Test
+        fun `hvis ikke lønnet og ikke mottar sykepenger så er resultatet oppfylt`() {
+            val resultat = utledResultat(
+                AktivitetType.TILTAK,
+                delvilkårAktivitetDto(lønnet = SvarJaNei.NEI, mottarSykepenger = SvarJaNei.NEI),
+            )
             assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             assertThat(resultat.lønnet.svar).isEqualTo(SvarJaNei.NEI)
 
@@ -33,9 +35,12 @@ class EvalueringAktivitetTest {
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
         }
 
-        @IkkeReellArbeidssøkerParameterizedTest
-        fun `skal vurdere lønnet alene`(type: AktivitetType) {
-            val resultat = utledResultat(type, delvilkårAktivitetDto(lønnet = SvarJaNei.NEI, mottarSykepenger = null))
+        @Test
+        fun `skal vurdere lønnet alene`() {
+            val resultat = utledResultat(
+                AktivitetType.TILTAK,
+                delvilkårAktivitetDto(lønnet = SvarJaNei.NEI, mottarSykepenger = null),
+            )
             assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             assertThat(resultat.lønnet.svar).isEqualTo(SvarJaNei.NEI)
 
@@ -45,9 +50,12 @@ class EvalueringAktivitetTest {
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
         }
 
-        @IkkeReellArbeidssøkerParameterizedTest
-        fun `skal vurdere mottar sykepenger alene`(type: AktivitetType) {
-            val resultat = utledResultat(type, delvilkårAktivitetDto(lønnet = null, mottarSykepenger = SvarJaNei.JA))
+        @Test
+        fun `skal vurdere mottar sykepenger alene`() {
+            val resultat = utledResultat(
+                AktivitetType.TILTAK,
+                delvilkårAktivitetDto(lønnet = null, mottarSykepenger = SvarJaNei.JA),
+            )
             assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT)
             assertThat(resultat.lønnet.svar).isEqualTo(null)
 
@@ -56,46 +64,52 @@ class EvalueringAktivitetTest {
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
         }
 
-        @IkkeReellArbeidssøkerParameterizedTest
-        fun `hvis en ikke er oppfylt så er resultatet ikke oppfylt`(type: AktivitetType) {
+        @Test
+        fun `hvis en ikke er oppfylt så er resultatet ikke oppfylt`() {
             val gyldigeSvarForAktivitet = SvarJaNei.entries.filter { it != SvarJaNei.JA_IMPLISITT }
             gyldigeSvarForAktivitet.forEach {
                 assertThat(
-                    utledResultat(type, delvilkårAktivitetDto(lønnet = SvarJaNei.JA, mottarSykepenger = it)).resultat,
+                    utledResultat(
+                        AktivitetType.TILTAK,
+                        delvilkårAktivitetDto(lønnet = SvarJaNei.JA, mottarSykepenger = it),
+                    ).resultat,
                 ).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
 
                 assertThat(
-                    utledResultat(type, delvilkårAktivitetDto(lønnet = it, mottarSykepenger = SvarJaNei.JA)).resultat,
+                    utledResultat(
+                        AktivitetType.TILTAK,
+                        delvilkårAktivitetDto(lønnet = it, mottarSykepenger = SvarJaNei.JA),
+                    ).resultat,
                 ).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
             }
         }
     }
 
     @Nested
-    inner class ReelArbeidssøker {
-        @Test
-        fun `mottar sykepenger skal mappes til IKKE_OPPFYLT`() {
+    inner class UtdanningEllerReellArbeidssøker {
+        @ReellArbeidssøkerEllerUtdanningParameterizedTest
+        fun `mottar sykepenger skal mappes til IKKE_OPPFYLT`(type: AktivitetType) {
             val delvilkår = delvilkårAktivitetDto(mottarSykepenger = SvarJaNei.JA)
-            val resultat = utledResultat(AktivitetType.REELL_ARBEIDSSØKER, delvilkår)
+            val resultat = utledResultat(type, delvilkår)
 
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
 
             assertThat(resultat.lønnet.svar).isEqualTo(null)
-            assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT) // TODO?
+            assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
 
             assertThat(resultat.mottarSykepenger.svar).isEqualTo(SvarJaNei.JA)
             assertThat(resultat.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
         }
 
-        @Test
-        fun `mottar ikke sykepenger skal mappes til OPPFYLT`() {
+        @ReellArbeidssøkerEllerUtdanningParameterizedTest
+        fun `mottar ikke sykepenger skal mappes til OPPFYLT`(type: AktivitetType) {
             val delvilkår = delvilkårAktivitetDto(mottarSykepenger = SvarJaNei.NEI)
-            val resultat = utledResultat(AktivitetType.REELL_ARBEIDSSØKER, delvilkår)
+            val resultat = utledResultat(type, delvilkår)
 
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
 
             assertThat(resultat.lønnet.svar).isEqualTo(null)
-            assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT) // TODO?
+            assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
 
             assertThat(resultat.mottarSykepenger.svar).isEqualTo(SvarJaNei.NEI)
             assertThat(resultat.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
@@ -112,12 +126,12 @@ class EvalueringAktivitetTest {
 
     @Nested
     inner class JaImplisitt {
-        @ParameterizedTest
-        @EnumSource(value = AktivitetType::class, names = ["REEL_ARBEIDSSØKER"], mode = EnumSource.Mode.EXCLUDE)
-        fun `ja implicitt er ikke et gyldig svar for lønnet`(type: AktivitetType) {
+
+        @Test
+        fun `ja implicitt er ikke et gyldig svar for lønnet`() {
             assertThatThrownBy {
                 utledResultat(
-                    type = type,
+                    type = AktivitetType.TILTAK,
                     delvilkår = DelvilkårAktivitetDto(
                         lønnet = SvarJaNei.JA_IMPLISITT,
                         mottarSykepenger = null,
@@ -156,7 +170,7 @@ class EvalueringAktivitetTest {
 @ParameterizedTest
 @EnumSource(
     value = AktivitetType::class,
-    names = ["REELL_ARBEIDSSØKER"],
+    names = ["TILTAK"],
     mode = EnumSource.Mode.EXCLUDE,
 )
-private annotation class IkkeReellArbeidssøkerParameterizedTest
+private annotation class ReellArbeidssøkerEllerUtdanningParameterizedTest

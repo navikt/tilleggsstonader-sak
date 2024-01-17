@@ -1,11 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -27,9 +24,6 @@ import java.time.LocalDate
 class StønadsperiodeControllerTest : IntegrationTest() {
 
     @Autowired
-    lateinit var barnRepository: BarnRepository
-
-    @Autowired
     lateinit var vilkårperiodeService: VilkårperiodeService
 
     private val dagensDato = LocalDate.now()
@@ -42,8 +36,6 @@ class StønadsperiodeControllerTest : IntegrationTest() {
     @Test
     fun `skal kunne lagre og hente stønadsperioder`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-        barnRepository.insert(behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.barnFnr))
-        barnRepository.insert(behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.barn2Fnr))
 
         opprettOppfylteInngangsvilkår(behandling)
 
@@ -70,7 +62,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
                 fom = dagensDato,
                 tom = dagensDato,
                 delvilkår = DelvilkårMålgruppeDto(
-                    medlemskap = SvarJaNei.JA,
+                    medlemskap = null,
                 ),
             ),
         )

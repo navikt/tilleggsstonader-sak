@@ -46,6 +46,7 @@ object EvalueringMålgruppe {
             ResultatDelvilkårperiode.OPPFYLT -> ResultatVilkårperiode.OPPFYLT
             ResultatDelvilkårperiode.IKKE_OPPFYLT -> ResultatVilkårperiode.IKKE_OPPFYLT
             ResultatDelvilkårperiode.IKKE_VURDERT -> ResultatVilkårperiode.IKKE_VURDERT
+            ResultatDelvilkårperiode.IKKE_AKTUELT -> error("Ikke gyldig resultat for målgruppe $resultatDelvilkår")
         }
         return ResultatEvaluering(oppdatertDelvilkår, resultatVilkår)
     }
