@@ -88,8 +88,8 @@ data class OpprettVilkårperiode(
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
-    JsonSubTypes.Type(DelvilkårMålgruppeDto::class, name = "målgruppe"),
-    JsonSubTypes.Type(DelvilkårAktivitetDto::class, name = "aktivitet"),
+    JsonSubTypes.Type(DelvilkårMålgruppeDto::class, name = "MÅLGRUPPE"),
+    JsonSubTypes.Type(DelvilkårAktivitetDto::class, name = "AKTIVITET"),
 )
 sealed class DelvilkårVilkårperiodeDto
 
