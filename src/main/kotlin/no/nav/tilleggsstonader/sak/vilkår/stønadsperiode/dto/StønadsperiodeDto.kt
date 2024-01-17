@@ -8,7 +8,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 data class StønadsperiodeDto(
-    val id: UUID?,
+    val id: UUID? = null,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppe: MålgruppeType,
