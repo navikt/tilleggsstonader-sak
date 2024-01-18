@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValide
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil.validerStønadsperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -232,7 +232,7 @@ internal class StønadsperiodeValideringUtilTest {
             ),
         ).map(Vilkårperiode::tilDto)
 
-        val aktiviteter = målgrupper.map { it.copy(type = AktivitetType.TILTAK, delvilkår = delvilkårAktivitet()) }
+        val aktiviteter = målgrupper.map { it.copy(type = AktivitetType.TILTAK, delvilkår = delvilkårAktivitetDto()) }
 
         @Test
         fun `skal godta stønadsperiode på tvers av 2 godkjente sammenhengende vilkårsperioder`() {
