@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.tilVurdering
 
 object EvalueringMålgruppe {
 
@@ -33,7 +34,7 @@ object EvalueringMålgruppe {
         delvilkår: DelvilkårMålgruppeDto,
         type: MålgruppeType,
     ): ResultatEvaluering {
-        val medlemskap = delvilkår.medlemskap
+        val medlemskap = delvilkår.medlemskap?.svar
         feilHvis(medlemskap != null && medlemskap != SvarJaNei.JA_IMPLISITT) {
             "Kan ikke evaluere svar=$medlemskap på medlemskap for type=$type"
         }
@@ -42,8 +43,8 @@ object EvalueringMålgruppe {
 
     private fun utledResultat(delvilkår: DelvilkårMålgruppeDto): ResultatEvaluering {
         val medlemskap = delvilkår.medlemskap
-        val resultatDelvilkår = utledResultatMedlemskap(medlemskap)
-        val oppdatertDelvilkår = DelvilkårMålgruppe(medlemskap = Vurdering(svar = medlemskap, resultatDelvilkår))
+        val resultatDelvilkår = utledResultatMedlemskap(medlemskap?.svar)
+        val oppdatertDelvilkår = DelvilkårMålgruppe(medlemskap = medlemskap.tilVurdering(resultatDelvilkår))
         val resultatVilkår = when (resultatDelvilkår) {
             ResultatDelvilkårperiode.OPPFYLT -> ResultatVilkårperiode.OPPFYLT
             ResultatDelvilkårperiode.IKKE_OPPFYLT -> ResultatVilkårperiode.IKKE_OPPFYLT
@@ -64,6 +65,7 @@ object EvalueringMålgruppe {
         DelvilkårMålgruppe(
             medlemskap = Vurdering(
                 svar = SvarJaNei.JA_IMPLISITT,
+                begrunnelse = null,
                 resultat = ResultatDelvilkårperiode.OPPFYLT,
             ),
         ),

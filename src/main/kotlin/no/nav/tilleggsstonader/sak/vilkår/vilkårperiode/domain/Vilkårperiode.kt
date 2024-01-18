@@ -79,6 +79,7 @@ enum class ResultatVilkårperiode {
 sealed class DelvilkårVilkårperiode {
     data class Vurdering(
         val svar: SvarJaNei?,
+        val begrunnelse: String? = null,
         val resultat: ResultatDelvilkårperiode,
     )
 }

@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivite
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OppdaterVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -88,7 +89,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 fom = nyttDato,
                 tom = nyttDato,
                 begrunnelse = "Oppdatert begrunnelse",
-                delvilkår = DelvilkårMålgruppeDto(medlemskap = SvarJaNei.JA),
+                delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.JA)),
             )
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
 
@@ -115,7 +116,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val oppdatering = vilkårperiode.tilOddatering().copy(
                 begrunnelse = "Oppdatert begrunnelse",
-                delvilkår = DelvilkårMålgruppeDto(medlemskap = SvarJaNei.NEI),
+                delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.NEI)),
             )
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
 
@@ -177,12 +178,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         private fun Vilkårperiode.tilOddatering(): OppdaterVilkårperiode {
             val delvilkårDto = when (this.delvilkår) {
                 is DelvilkårMålgruppe ->
-                    DelvilkårMålgruppeDto((this.delvilkår as DelvilkårMålgruppe).medlemskap.svar)
+                    DelvilkårMålgruppeDto(VurderingDto((this.delvilkår as DelvilkårMålgruppe).medlemskap.svar))
 
                 is DelvilkårAktivitet -> (this.delvilkår as DelvilkårAktivitet).let {
                     DelvilkårAktivitetDto(
-                        it.lønnet.svar,
-                        it.mottarSykepenger.svar,
+                        lønnet = VurderingDto(it.lønnet.svar),
+                        mottarSykepenger = VurderingDto(it.mottarSykepenger.svar),
                     )
                 }
             }

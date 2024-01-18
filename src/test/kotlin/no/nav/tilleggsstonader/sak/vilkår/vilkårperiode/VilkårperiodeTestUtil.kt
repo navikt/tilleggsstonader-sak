@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import java.time.LocalDate
 import java.util.UUID
 
@@ -46,7 +47,7 @@ object VilkårperiodeTestUtil {
     )
 
     fun delvilkårMålgruppeDto() = DelvilkårMålgruppeDto(
-        medlemskap = SvarJaNei.JA_IMPLISITT,
+        medlemskap = VurderingDto(SvarJaNei.JA_IMPLISITT),
     )
 
     fun aktivitet(
@@ -81,8 +82,8 @@ object VilkårperiodeTestUtil {
     )
 
     fun delvilkårAktivitetDto() = DelvilkårAktivitetDto(
-        lønnet = SvarJaNei.NEI,
-        mottarSykepenger = SvarJaNei.NEI,
+        lønnet = VurderingDto(SvarJaNei.NEI),
+        mottarSykepenger = VurderingDto(SvarJaNei.NEI),
     )
 
     fun opprettVilkårperiode(
@@ -95,7 +96,7 @@ object VilkårperiodeTestUtil {
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårMålgruppeDto(medlemskap = medlemskap),
+        delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(medlemskap)),
         begrunnelse = begrunnelse,
     )
 }

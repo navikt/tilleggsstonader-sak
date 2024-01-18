@@ -8,6 +8,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.tilVurdering
 
 object EvalueringAktivitet {
     fun utledResultat(
@@ -46,27 +48,30 @@ object EvalueringAktivitet {
             resultater.contains(ResultatDelvilkårperiode.IKKE_VURDERT) -> ResultatVilkårperiode.IKKE_VURDERT
             resultater.contains(ResultatDelvilkårperiode.IKKE_OPPFYLT) -> ResultatVilkårperiode.IKKE_OPPFYLT
             resultater.all { it == ResultatDelvilkårperiode.OPPFYLT } -> ResultatVilkårperiode.OPPFYLT
-            else -> error(
-                "Ugyldig resultat resultatLønnet=$vurderingLønnet" + " resultatMottarSykepenger=$vurderingMottarSykepenger",
-            )
+            else ->
+                error(
+                    "Ugyldig resultat resultatLønnet=$vurderingLønnet" +
+                        " resultatMottarSykepenger=$vurderingMottarSykepenger",
+                )
         }
     }
 
-    private fun vurderingLønnet(type: AktivitetType, svar: SvarJaNei?): Vurdering {
+    private fun vurderingLønnet(type: AktivitetType, vurderingDto: VurderingDto?): Vurdering {
         return when (type) {
-            AktivitetType.TILTAK -> Vurdering(svar, utledResultatLønnet(svar))
+            AktivitetType.TILTAK -> vurderingDto.tilVurdering(utledResultatLønnet(vurderingDto?.svar))
 
             AktivitetType.UTDANNING,
             AktivitetType.REELL_ARBEIDSSØKER,
-            -> ikkeVurdertLønnet(type, svar)
+            -> ikkeVurdertLønnet(type, vurderingDto)
         }
     }
 
-    private fun ikkeVurdertLønnet(type: AktivitetType, svar: SvarJaNei?): Vurdering {
+    private fun ikkeVurdertLønnet(type: AktivitetType, vurderingDto: VurderingDto?): Vurdering {
+        val svar = vurderingDto?.svar
         feilHvis(svar != null) {
             "Ugyldig svar=$svar for lønnet for $type"
         }
-        return Vurdering(svar = svar, resultat = ResultatDelvilkårperiode.IKKE_AKTUELT)
+        return vurderingDto.tilVurdering(ResultatDelvilkårperiode.IKKE_AKTUELT)
     }
 
     private fun utledResultatLønnet(svar: SvarJaNei?) = when (svar) {
@@ -76,8 +81,8 @@ object EvalueringAktivitet {
         SvarJaNei.JA_IMPLISITT -> error("Svar=$svar er ikke gyldig svar for lønnet")
     }
 
-    private fun vurderingMottarSykepenger(svar: SvarJaNei?): Vurdering =
-        Vurdering(svar, utledResultatMottarSykepenger(svar))
+    private fun vurderingMottarSykepenger(vurderingDto: VurderingDto?): Vurdering =
+        vurderingDto.tilVurdering(utledResultatMottarSykepenger(vurderingDto?.svar))
 
     private fun utledResultatMottarSykepenger(svar: SvarJaNei?) = when (svar) {
         SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT

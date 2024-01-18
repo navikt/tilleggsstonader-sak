@@ -53,9 +53,21 @@ fun Vilkårperiode.tilDto() =
     )
 
 fun DelvilkårVilkårperiode.tilDto() = when (this) {
-    is DelvilkårMålgruppe -> DelvilkårMålgruppeDto(medlemskap = medlemskap.svar)
-    is DelvilkårAktivitet -> DelvilkårAktivitetDto(lønnet = lønnet.svar, mottarSykepenger = mottarSykepenger.svar)
+    is DelvilkårMålgruppe -> DelvilkårMålgruppeDto(
+        medlemskap = medlemskap.tilDto(),
+    )
+
+    is DelvilkårAktivitet -> DelvilkårAktivitetDto(
+        lønnet = lønnet.tilDto(),
+        mottarSykepenger = mottarSykepenger.tilDto(),
+    )
 }
+
+fun DelvilkårVilkårperiode.Vurdering.tilDto() =
+    VurderingDto(
+        svar = svar,
+        begrunnelse = begrunnelse,
+    )
 
 data class Datoperiode(
     override val fom: LocalDate,
@@ -101,13 +113,18 @@ data class OpprettVilkårperiode(
 sealed class DelvilkårVilkårperiodeDto
 
 data class DelvilkårMålgruppeDto(
-    val medlemskap: SvarJaNei?,
+    val medlemskap: VurderingDto?,
 ) : DelvilkårVilkårperiodeDto()
 
 data class DelvilkårAktivitetDto(
-    val lønnet: SvarJaNei?,
-    val mottarSykepenger: SvarJaNei?,
+    val lønnet: VurderingDto?,
+    val mottarSykepenger: VurderingDto?,
 ) : DelvilkårVilkårperiodeDto()
+
+data class VurderingDto(
+    val svar: SvarJaNei? = null,
+    val begrunnelse: String? = null,
+)
 
 data class SlettVikårperiode(
     val behandlingId: UUID,
