@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -95,9 +94,6 @@ class EvalueringMålgruppeTest {
             }.hasMessageContaining("Ugyldig svar=JA_IMPLISITT")
         }
     }
-
-    private val ResultatEvaluering.medlemskap: DelvilkårVilkårperiode.Vurdering
-        get() = (this.delvilkår as DelvilkårMålgruppe).medlemskap
 }
 
 @ParameterizedTest

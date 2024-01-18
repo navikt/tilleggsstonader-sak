@@ -117,13 +117,4 @@ object VilkårperiodeTestUtil {
         delvilkår = DelvilkårAktivitetDto(lønnet, mottarSykepenger),
         begrunnelse = begrunnelse,
     )
-
-    val Vilkårperiode.medlemskap: DelvilkårVilkårperiode.Vurdering
-        get() = (this.delvilkår as DelvilkårMålgruppe).medlemskap
-
-    val Vilkårperiode.lønnet: DelvilkårVilkårperiode.Vurdering
-        get() = (this.delvilkår as DelvilkårAktivitet).lønnet
-
-    val Vilkårperiode.mottarSykepenger: DelvilkårVilkårperiode.Vurdering
-        get() = (this.delvilkår as DelvilkårAktivitet).mottarSykepenger
 }
