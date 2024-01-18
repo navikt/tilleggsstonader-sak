@@ -10,6 +10,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.util.norskFormat
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -26,7 +28,7 @@ data class VilkårperiodeDto(
     val type: VilkårperiodeType,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val delvilkår: DelvilkårVilkårperiode,
+    val delvilkår: DelvilkårVilkårperiodeDto,
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,
     val kilde: KildeVilkårsperiode,
@@ -43,12 +45,17 @@ fun Vilkårperiode.tilDto() =
         type = this.type,
         fom = this.fom,
         tom = this.tom,
-        delvilkår = this.delvilkår,
+        delvilkår = this.delvilkår.tilDto(),
         resultat = this.resultat,
         begrunnelse = this.begrunnelse,
         kilde = this.kilde,
         slettetKommentar = this.slettetKommentar,
     )
+
+fun DelvilkårVilkårperiode.tilDto() = when (this) {
+    is DelvilkårMålgruppe -> DelvilkårMålgruppeDto(medlemskap = medlemskap.svar)
+    is DelvilkårAktivitet -> DelvilkårAktivitetDto(lønnet = lønnet.svar, mottarSykepenger = mottarSykepenger.svar)
+}
 
 data class Datoperiode(
     override val fom: LocalDate,
