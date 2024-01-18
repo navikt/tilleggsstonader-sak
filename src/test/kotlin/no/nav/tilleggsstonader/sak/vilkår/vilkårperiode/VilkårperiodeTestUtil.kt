@@ -42,7 +42,7 @@ object VilkårperiodeTestUtil {
     fun delvilkårMålgruppe() = DelvilkårMålgruppe(
         medlemskap = DelvilkårVilkårperiode.Vurdering(
             svar = SvarJaNei.JA_IMPLISITT,
-            begrunnelse = "begrunnelse",
+            begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
     )
@@ -74,12 +74,12 @@ object VilkårperiodeTestUtil {
     fun delvilkårAktivitet() = DelvilkårAktivitet(
         lønnet = DelvilkårVilkårperiode.Vurdering(
             svar = SvarJaNei.NEI,
-            begrunnelse = "begrunnelse",
+            begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
         mottarSykepenger = DelvilkårVilkårperiode.Vurdering(
             svar = SvarJaNei.NEI,
-            begrunnelse = "begrunnelse",
+            begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
     )
