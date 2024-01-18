@@ -15,7 +15,7 @@ object EvalueringAktivitet {
         delvilkår: DelvilkårAktivitetDto,
     ): ResultatEvaluering {
         val oppdatertDelvilkår = utledVurderingerDelvilkår(type, delvilkår)
-        val resultatAktivitet = resultatVilkårperiode(oppdatertDelvilkår)
+        val resultatAktivitet = utledResultatVilkårperiode(oppdatertDelvilkår)
         return ResultatEvaluering(oppdatertDelvilkår, resultatAktivitet)
     }
 
@@ -32,7 +32,7 @@ object EvalueringAktivitet {
         )
     }
 
-    private fun resultatVilkårperiode(
+    private fun utledResultatVilkårperiode(
         delvilkår: DelvilkårAktivitet,
     ): ResultatVilkårperiode {
         val vurderingLønnet = delvilkår.lønnet
