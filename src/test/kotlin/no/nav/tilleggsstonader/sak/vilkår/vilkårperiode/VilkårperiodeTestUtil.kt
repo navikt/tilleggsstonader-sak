@@ -42,6 +42,7 @@ object VilkårperiodeTestUtil {
     fun delvilkårMålgruppe() = DelvilkårMålgruppe(
         medlemskap = DelvilkårVilkårperiode.Vurdering(
             svar = SvarJaNei.JA_IMPLISITT,
+            begrunnelse = "begrunnelse",
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
     )
@@ -73,10 +74,12 @@ object VilkårperiodeTestUtil {
     fun delvilkårAktivitet() = DelvilkårAktivitet(
         lønnet = DelvilkårVilkårperiode.Vurdering(
             svar = SvarJaNei.NEI,
+            begrunnelse = "begrunnelse",
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
         mottarSykepenger = DelvilkårVilkårperiode.Vurdering(
             svar = SvarJaNei.NEI,
+            begrunnelse = "begrunnelse",
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
     )
@@ -86,17 +89,41 @@ object VilkårperiodeTestUtil {
         mottarSykepenger = VurderingDto(SvarJaNei.NEI),
     )
 
-    fun opprettVilkårperiode(
+    fun opprettVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate = LocalDate.now(),
-        medlemskap: SvarJaNei? = null,
+        medlemskap: VurderingDto? = null,
         begrunnelse: String? = null,
     ) = OpprettVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(medlemskap)),
+        delvilkår = DelvilkårMålgruppeDto(medlemskap = medlemskap),
         begrunnelse = begrunnelse,
     )
+
+    fun opprettVilkårperiodeAktivitet(
+        type: AktivitetType = AktivitetType.TILTAK,
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate = LocalDate.now(),
+        lønnet: VurderingDto? = null,
+        mottarSykepenger: VurderingDto? = null,
+        begrunnelse: String? = null,
+    ) = OpprettVilkårperiode(
+        type = type,
+        fom = fom,
+        tom = tom,
+        delvilkår = DelvilkårAktivitetDto(lønnet, mottarSykepenger),
+        begrunnelse = begrunnelse,
+    )
+
+    val Vilkårperiode.medlemskap: DelvilkårVilkårperiode.Vurdering
+        get() = (this.delvilkår as DelvilkårMålgruppe).medlemskap
+
+    val Vilkårperiode.lønnet: DelvilkårVilkårperiode.Vurdering
+        get() = (this.delvilkår as DelvilkårAktivitet).lønnet
+
+    val Vilkårperiode.mottarSykepenger: DelvilkårVilkårperiode.Vurdering
+        get() = (this.delvilkår as DelvilkårAktivitet).mottarSykepenger
 }

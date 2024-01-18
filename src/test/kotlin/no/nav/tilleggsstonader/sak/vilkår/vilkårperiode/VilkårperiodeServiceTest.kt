@@ -8,8 +8,12 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.lønnet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.mottarSykepenger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
@@ -24,7 +28,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgrup
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OppdaterVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -47,20 +50,50 @@ class VilkårperiodeServiceTest : IntegrationTest() {
     inner class OpprettVilkårperiode {
 
         @Test
-        fun `skal opprette vilkår periode som manuell`() {
+        fun `skal opprette periode for målgruppe manuelt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val opprettVilkårperiode = opprettVilkårperiode(medlemskap = SvarJaNei.NEI)
+            val opprettVilkårperiode = opprettVilkårperiodeMålgruppe(
+                medlemskap = VurderingDto(SvarJaNei.NEI, "begrunnelse medlemskap"),
+                begrunnelse = "begrunnelse målgruppe",
+            )
 
             val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(behandling.id, opprettVilkårperiode)
+            assertThat(vilkårperiode.type).isEqualTo(opprettVilkårperiode.type)
             assertThat(vilkårperiode.kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
             assertThat(vilkårperiode.fom).isEqualTo(opprettVilkårperiode.fom)
             assertThat(vilkårperiode.tom).isEqualTo(opprettVilkårperiode.tom)
-            assertThat(vilkårperiode.begrunnelse).isEqualTo(opprettVilkårperiode.begrunnelse)
+            assertThat(vilkårperiode.begrunnelse).isEqualTo("begrunnelse målgruppe")
 
             assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
-            assertThat((vilkårperiode.delvilkår as DelvilkårMålgruppe).medlemskap.svar).isEqualTo(SvarJaNei.NEI)
-            assertThat((vilkårperiode.delvilkår as DelvilkårMålgruppe).medlemskap.resultat)
-                .isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+            assertThat(vilkårperiode.medlemskap.svar).isEqualTo(SvarJaNei.NEI)
+            assertThat(vilkårperiode.medlemskap.begrunnelse).isEqualTo("begrunnelse medlemskap")
+            assertThat(vilkårperiode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+        }
+
+        @Test
+        fun `skal opprette periode for aktivitet manuelt`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val opprettVilkårperiode = opprettVilkårperiodeAktivitet(
+                lønnet = VurderingDto(SvarJaNei.NEI, "begrunnelse lønnet"),
+                mottarSykepenger = VurderingDto(SvarJaNei.NEI, "begrunnelse sykepenger"),
+                begrunnelse = "begrunnelse aktivitet",
+            )
+
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(behandling.id, opprettVilkårperiode)
+            assertThat(vilkårperiode.type).isEqualTo(opprettVilkårperiode.type)
+            assertThat(vilkårperiode.kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
+            assertThat(vilkårperiode.fom).isEqualTo(opprettVilkårperiode.fom)
+            assertThat(vilkårperiode.tom).isEqualTo(opprettVilkårperiode.tom)
+            assertThat(vilkårperiode.begrunnelse).isEqualTo("begrunnelse aktivitet")
+
+            assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+            assertThat(vilkårperiode.lønnet.svar).isEqualTo(SvarJaNei.NEI)
+            assertThat(vilkårperiode.lønnet.begrunnelse).isEqualTo("begrunnelse lønnet")
+            assertThat(vilkårperiode.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+
+            assertThat(vilkårperiode.mottarSykepenger.svar).isEqualTo(SvarJaNei.NEI)
+            assertThat(vilkårperiode.mottarSykepenger.begrunnelse).isEqualTo("begrunnelse sykepenger")
+            assertThat(vilkårperiode.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
         }
 
         @Test
@@ -82,14 +115,22 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(behandling.id, opprettVilkårperiode(medlemskap = null))
+                vilkårperiodeService.opprettVilkårperiode(
+                    behandling.id,
+                    opprettVilkårperiodeMålgruppe(medlemskap = null),
+                )
 
             val nyttDato = LocalDate.of(2020, 1, 1)
-            val oppdatering = vilkårperiode.tilOddatering().copy(
+            val oppdatering = vilkårperiode.tilOppdatering().copy(
                 fom = nyttDato,
                 tom = nyttDato,
                 begrunnelse = "Oppdatert begrunnelse",
-                delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.JA)),
+                delvilkår = DelvilkårMålgruppeDto(
+                    medlemskap = VurderingDto(
+                        SvarJaNei.JA,
+                        begrunnelse = "ny begrunnelse",
+                    ),
+                ),
             )
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
 
@@ -99,9 +140,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(oppdatertPeriode.fom).isEqualTo(nyttDato)
             assertThat(oppdatertPeriode.tom).isEqualTo(nyttDato)
             assertThat(oppdatertPeriode.begrunnelse).isEqualTo("Oppdatert begrunnelse")
-            assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.svar).isEqualTo(SvarJaNei.JA)
-            assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.resultat)
-                .isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+            assertThat(oppdatertPeriode.medlemskap.svar).isEqualTo(SvarJaNei.JA)
+            assertThat(oppdatertPeriode.medlemskap.begrunnelse).isEqualTo("ny begrunnelse")
+            assertThat(oppdatertPeriode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
         }
 
         @Test
@@ -111,10 +152,10 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val vilkårperiode =
                 vilkårperiodeService.opprettVilkårperiode(
                     behandling.id,
-                    opprettVilkårperiode(medlemskap = SvarJaNei.JA),
+                    opprettVilkårperiodeMålgruppe(medlemskap = VurderingDto(SvarJaNei.JA)),
                 )
 
-            val oppdatering = vilkårperiode.tilOddatering().copy(
+            val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "Oppdatert begrunnelse",
                 delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.NEI)),
             )
@@ -144,14 +185,14 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(
                     periode.id,
-                    periode.tilOddatering().copy(fom = LocalDate.now().minusYears(32)),
+                    periode.tilOppdatering().copy(fom = LocalDate.now().minusYears(32)),
                 )
             }.hasMessageContaining("Kan ikke oppdatere fom")
 
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(
                     periode.id,
-                    periode.tilOddatering().copy(tom = LocalDate.now().plusYears(32)),
+                    periode.tilOppdatering().copy(tom = LocalDate.now().plusYears(32)),
                 )
             }.hasMessageContaining("Kan ikke oppdatere tom")
         }
@@ -170,12 +211,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(
                     periode.id,
-                    periode.tilOddatering(),
+                    periode.tilOppdatering(),
                 )
             }.hasMessageContaining("Kan ikke oppdatere vilkårperiode når behandling er låst for videre redigering")
         }
 
-        private fun Vilkårperiode.tilOddatering(): OppdaterVilkårperiode {
+        private fun Vilkårperiode.tilOppdatering(): OppdaterVilkårperiode {
             val delvilkårDto = when (this.delvilkår) {
                 is DelvilkårMålgruppe ->
                     DelvilkårMålgruppeDto(VurderingDto((this.delvilkår as DelvilkårMålgruppe).medlemskap.svar))
@@ -256,15 +297,15 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             )
             val periode = vilkårperiodeRepository.insert(målgruppe)
 
-            Assertions.assertThat(periode.sporbar.endret.endretAv).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
+            assertThat(periode.sporbar.endret.endretAv).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
 
             BrukerContextUtil.testWithBrukerContext(saksbehandler) {
                 vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
             }
 
             val oppdatertPeriode = vilkårperiodeRepository.findByIdOrThrow(periode.id)
-            Assertions.assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
-            Assertions.assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
+            assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
+            assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
         }
     }
 }
