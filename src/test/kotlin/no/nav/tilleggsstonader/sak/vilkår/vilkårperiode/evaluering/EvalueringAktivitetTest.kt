@@ -36,6 +36,21 @@ class EvalueringAktivitetTest {
         }
 
         @Test
+        fun `hvis både lønnet og mottar sykepener mangler vurdering så blir resultatet IKKE_VURDERT`() {
+            val resultat = utledResultat(
+                AktivitetType.TILTAK,
+                delvilkårAktivitetDto(lønnet = null, mottarSykepenger = null),
+            )
+            assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT)
+            assertThat(resultat.lønnet.svar).isNull()
+
+            assertThat(resultat.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT)
+            assertThat(resultat.mottarSykepenger.svar).isNull()
+
+            assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
+        }
+
+        @Test
         fun `skal vurdere lønnet alene`() {
             val resultat = utledResultat(
                 AktivitetType.TILTAK,
