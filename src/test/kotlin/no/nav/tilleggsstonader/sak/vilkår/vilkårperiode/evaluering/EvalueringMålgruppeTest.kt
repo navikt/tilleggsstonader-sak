@@ -22,7 +22,7 @@ class EvalueringMålgruppeTest {
     val svarMangler = DelvilkårMålgruppeDto(null)
 
     @Nested
-    inner class Implicitt {
+    inner class Implisitt {
         @ImplisittParameterizedTest
         fun `mangler svar skal mappes til oppfylt`(type: MålgruppeType) {
             val resultat = utledResultat(type, svarMangler)

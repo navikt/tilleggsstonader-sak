@@ -128,7 +128,7 @@ class EvalueringAktivitetTest {
     inner class JaImplisitt {
 
         @Test
-        fun `ja implicitt er ikke et gyldig svar for lønnet`() {
+        fun `ja implisitt er ikke et gyldig svar for lønnet`() {
             assertThatThrownBy {
                 utledResultat(
                     type = AktivitetType.TILTAK,
@@ -142,7 +142,7 @@ class EvalueringAktivitetTest {
 
         @ParameterizedTest
         @EnumSource(value = AktivitetType::class)
-        fun `ja implicitt er ikke et gyldig svar for mottar sykepenger`(type: AktivitetType) {
+        fun `ja implisitt er ikke et gyldig svar for mottar sykepenger`(type: AktivitetType) {
             assertThatThrownBy {
                 utledResultat(
                     type = type,

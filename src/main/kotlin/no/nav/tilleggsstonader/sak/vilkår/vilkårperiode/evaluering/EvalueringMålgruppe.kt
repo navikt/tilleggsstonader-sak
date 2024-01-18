@@ -19,7 +19,7 @@ object EvalueringMålgruppe {
             MålgruppeType.AAP,
             MålgruppeType.OVERGANGSSTØNAD,
             MålgruppeType.UFØRETRYGD,
-            -> jaImplicitt(delvilkår, type)
+            -> jaImplisitt(delvilkår, type)
 
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.OMSTILLINGSSTØNAD,
@@ -27,7 +27,7 @@ object EvalueringMålgruppe {
         }
     }
 
-    private fun jaImplicitt(
+    private fun jaImplisitt(
         delvilkår: DelvilkårMålgruppeDto,
         type: MålgruppeType,
     ): ResultatEvaluering {
@@ -35,7 +35,7 @@ object EvalueringMålgruppe {
         feilHvis(medlemskap != null && medlemskap != SvarJaNei.JA_IMPLISITT) {
             "Kan ikke evaluere svar=$medlemskap på medlemskap for type=$type"
         }
-        return IMPLICITT_OPPFYLT_MÅLGRUPPE
+        return IMPLISITT_OPPFYLT_MÅLGRUPPE
     }
 
     private fun utledResultat(delvilkår: DelvilkårMålgruppeDto): ResultatEvaluering {
@@ -58,7 +58,7 @@ object EvalueringMålgruppe {
         null -> ResultatDelvilkårperiode.IKKE_VURDERT
     }
 
-    val IMPLICITT_OPPFYLT_MÅLGRUPPE = ResultatEvaluering(
+    val IMPLISITT_OPPFYLT_MÅLGRUPPE = ResultatEvaluering(
         DelvilkårMålgruppe(
             medlemskap = Vurdering(
                 svar = SvarJaNei.JA_IMPLISITT,

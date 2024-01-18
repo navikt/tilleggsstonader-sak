@@ -37,16 +37,17 @@ object EvalueringAktivitet {
     ): ResultatVilkårperiode {
         val vurderingLønnet = delvilkår.lønnet
         val vurderingMottarSykepenger = delvilkår.mottarSykepenger
-        val resultater = listOf(vurderingLønnet.resultat, vurderingMottarSykepenger.resultat)
-            .filterNot { it == ResultatDelvilkårperiode.IKKE_AKTUELT }
+        val resultater = listOf(
+            vurderingLønnet.resultat,
+            vurderingMottarSykepenger.resultat,
+        ).filterNot { it == ResultatDelvilkårperiode.IKKE_AKTUELT }
 
         return when {
             resultater.contains(ResultatDelvilkårperiode.IKKE_VURDERT) -> ResultatVilkårperiode.IKKE_VURDERT
             resultater.contains(ResultatDelvilkårperiode.IKKE_OPPFYLT) -> ResultatVilkårperiode.IKKE_OPPFYLT
             resultater.all { it == ResultatDelvilkårperiode.OPPFYLT } -> ResultatVilkårperiode.OPPFYLT
             else -> error(
-                "Ugyldig resultat resultatLønnet=$vurderingLønnet" +
-                    " resultatMottarSykepenger=$vurderingMottarSykepenger",
+                "Ugyldig resultat resultatLønnet=$vurderingLønnet" + " resultatMottarSykepenger=$vurderingMottarSykepenger",
             )
         }
     }
@@ -54,6 +55,7 @@ object EvalueringAktivitet {
     private fun vurderingLønnet(type: AktivitetType, svar: SvarJaNei?): Vurdering {
         return when (type) {
             AktivitetType.TILTAK -> Vurdering(svar, utledResultatLønnet(svar))
+
             AktivitetType.UTDANNING,
             AktivitetType.REELL_ARBEIDSSØKER,
             -> ikkeVurdertLønnet(type, svar)
@@ -67,22 +69,20 @@ object EvalueringAktivitet {
         return Vurdering(svar = svar, resultat = ResultatDelvilkårperiode.IKKE_AKTUELT)
     }
 
-    private fun utledResultatLønnet(svar: SvarJaNei?) =
-        when (svar) {
-            SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
-            SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
-            null -> ResultatDelvilkårperiode.IKKE_VURDERT
-            SvarJaNei.JA_IMPLISITT -> error("Svar=$svar er ikke gyldig svar for lønnet")
-        }
+    private fun utledResultatLønnet(svar: SvarJaNei?) = when (svar) {
+        SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+        SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
+        null -> ResultatDelvilkårperiode.IKKE_VURDERT
+        SvarJaNei.JA_IMPLISITT -> error("Svar=$svar er ikke gyldig svar for lønnet")
+    }
 
     private fun vurderingMottarSykepenger(svar: SvarJaNei?): Vurdering =
         Vurdering(svar, utledResultatMottarSykepenger(svar))
 
-    private fun utledResultatMottarSykepenger(svar: SvarJaNei?) =
-        when (svar) {
-            SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
-            SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
-            null -> ResultatDelvilkårperiode.IKKE_VURDERT
-            SvarJaNei.JA_IMPLISITT -> error("Svar=$svar er ikke gyldig svar for mottarSykepenger")
-        }
+    private fun utledResultatMottarSykepenger(svar: SvarJaNei?) = when (svar) {
+        SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+        SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
+        null -> ResultatDelvilkårperiode.IKKE_VURDERT
+        SvarJaNei.JA_IMPLISITT -> error("Svar=$svar er ikke gyldig svar for mottarSykepenger")
+    }
 }
