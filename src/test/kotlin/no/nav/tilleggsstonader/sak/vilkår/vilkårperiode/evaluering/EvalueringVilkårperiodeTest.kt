@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.evaulerVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -16,7 +17,7 @@ class EvalueringVilkårperiodeTest {
     @Test
     fun `skal evaluere gyldig kombinasjon av målgruppe`() {
         val resultatMålgruppe =
-            evaulerVilkårperiode(MålgruppeType.OMSTILLINGSSTØNAD, DelvilkårMålgruppeDto(SvarJaNei.JA))
+            evaulerVilkårperiode(MålgruppeType.OMSTILLINGSSTØNAD, DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.JA)))
         assertThat(resultatMålgruppe.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
     }
 
@@ -24,7 +25,7 @@ class EvalueringVilkårperiodeTest {
     fun `skal evaluere gyldig kombinasjon av aktivitet`() {
         val resultatAktivitet = evaulerVilkårperiode(
             AktivitetType.TILTAK,
-            DelvilkårAktivitetDto(SvarJaNei.NEI, SvarJaNei.NEI),
+            DelvilkårAktivitetDto(VurderingDto(SvarJaNei.NEI), VurderingDto(SvarJaNei.NEI)),
         )
         assertThat(resultatAktivitet.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
     }
@@ -32,7 +33,7 @@ class EvalueringVilkårperiodeTest {
     @Test
     fun `skal kaste feil hvis man kaller med feil type`() {
         assertThatThrownBy {
-            evaulerVilkårperiode(MålgruppeType.AAP, DelvilkårAktivitetDto(null, null))
+            evaulerVilkårperiode(MålgruppeType.AAP, DelvilkårAktivitetDto(VurderingDto(null), VurderingDto(null)))
         }.hasMessageContaining("Ugyldig kombinasjon")
 
         assertThatThrownBy {

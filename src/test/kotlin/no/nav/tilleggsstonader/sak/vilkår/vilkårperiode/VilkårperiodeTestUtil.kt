@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import java.time.LocalDate
 import java.util.UUID
 
@@ -41,12 +42,13 @@ object VilkårperiodeTestUtil {
     fun delvilkårMålgruppe() = DelvilkårMålgruppe(
         medlemskap = DelvilkårVilkårperiode.Vurdering(
             svar = SvarJaNei.JA_IMPLISITT,
+            begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
     )
 
     fun delvilkårMålgruppeDto() = DelvilkårMålgruppeDto(
-        medlemskap = SvarJaNei.JA_IMPLISITT,
+        medlemskap = VurderingDto(SvarJaNei.JA_IMPLISITT),
     )
 
     fun aktivitet(
@@ -72,30 +74,47 @@ object VilkårperiodeTestUtil {
     fun delvilkårAktivitet() = DelvilkårAktivitet(
         lønnet = DelvilkårVilkårperiode.Vurdering(
             svar = SvarJaNei.NEI,
+            begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
         mottarSykepenger = DelvilkårVilkårperiode.Vurdering(
             svar = SvarJaNei.NEI,
+            begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
     )
 
     fun delvilkårAktivitetDto() = DelvilkårAktivitetDto(
-        lønnet = SvarJaNei.NEI,
-        mottarSykepenger = SvarJaNei.NEI,
+        lønnet = VurderingDto(SvarJaNei.NEI),
+        mottarSykepenger = VurderingDto(SvarJaNei.NEI),
     )
 
-    fun opprettVilkårperiode(
+    fun opprettVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate = LocalDate.now(),
-        medlemskap: SvarJaNei? = null,
+        medlemskap: VurderingDto? = null,
         begrunnelse: String? = null,
     ) = OpprettVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
         delvilkår = DelvilkårMålgruppeDto(medlemskap = medlemskap),
+        begrunnelse = begrunnelse,
+    )
+
+    fun opprettVilkårperiodeAktivitet(
+        type: AktivitetType = AktivitetType.TILTAK,
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate = LocalDate.now(),
+        lønnet: VurderingDto? = null,
+        mottarSykepenger: VurderingDto? = null,
+        begrunnelse: String? = null,
+    ) = OpprettVilkårperiode(
+        type = type,
+        fom = fom,
+        tom = tom,
+        delvilkår = DelvilkårAktivitetDto(lønnet, mottarSykepenger),
         begrunnelse = begrunnelse,
     )
 }

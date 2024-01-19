@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringAktivitet.utledResultat
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -148,7 +149,7 @@ class EvalueringAktivitetTest {
                 utledResultat(
                     type = AktivitetType.TILTAK,
                     delvilkår = DelvilkårAktivitetDto(
-                        lønnet = SvarJaNei.JA_IMPLISITT,
+                        lønnet = VurderingDto(SvarJaNei.JA_IMPLISITT),
                         mottarSykepenger = null,
                     ),
                 )
@@ -163,7 +164,7 @@ class EvalueringAktivitetTest {
                     type = type,
                     delvilkår = DelvilkårAktivitetDto(
                         lønnet = null,
-                        mottarSykepenger = SvarJaNei.JA_IMPLISITT,
+                        mottarSykepenger = VurderingDto(SvarJaNei.JA_IMPLISITT),
                     ),
                 )
             }.hasMessageContaining("Svar=JA_IMPLISITT er ikke gyldig svar for mottarSykepenger")
@@ -173,7 +174,7 @@ class EvalueringAktivitetTest {
     private fun delvilkårAktivitetDto(
         lønnet: SvarJaNei? = null,
         mottarSykepenger: SvarJaNei? = null,
-    ) = DelvilkårAktivitetDto(lønnet = lønnet, mottarSykepenger = mottarSykepenger)
+    ) = DelvilkårAktivitetDto(lønnet = VurderingDto(lønnet), mottarSykepenger = VurderingDto(mottarSykepenger))
 
     private val ResultatEvaluering.lønnet: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårAktivitet).lønnet

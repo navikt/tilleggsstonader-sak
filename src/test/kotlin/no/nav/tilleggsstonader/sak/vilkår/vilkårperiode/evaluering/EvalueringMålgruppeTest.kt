@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringMålgruppe.utledResultat
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -16,10 +16,10 @@ import org.junit.jupiter.params.provider.EnumSource
 
 class EvalueringMålgruppeTest {
 
-    val svarJa = DelvilkårMålgruppeDto(SvarJaNei.JA)
-    val svarImplisitt = DelvilkårMålgruppeDto(SvarJaNei.JA_IMPLISITT)
-    val svarNei = DelvilkårMålgruppeDto(SvarJaNei.NEI)
-    val svarMangler = DelvilkårMålgruppeDto(null)
+    val svarJa = DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.JA))
+    val svarImplisitt = DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.JA_IMPLISITT))
+    val svarNei = DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.NEI))
+    val svarMangler = DelvilkårMålgruppeDto(VurderingDto(null))
 
     @Nested
     inner class Implisitt {
@@ -94,9 +94,6 @@ class EvalueringMålgruppeTest {
             }.hasMessageContaining("Ugyldig svar=JA_IMPLISITT")
         }
     }
-
-    private val ResultatEvaluering.medlemskap: DelvilkårVilkårperiode.Vurdering
-        get() = (this.delvilkår as DelvilkårMålgruppe).medlemskap
 }
 
 @ParameterizedTest

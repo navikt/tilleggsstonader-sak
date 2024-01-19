@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -75,8 +76,8 @@ class StønadsperiodeControllerTest : IntegrationTest() {
                 fom = dagensDato,
                 tom = dagensDato,
                 delvilkår = DelvilkårAktivitetDto(
-                    lønnet = SvarJaNei.NEI,
-                    mottarSykepenger = SvarJaNei.NEI,
+                    lønnet = VurderingDto(SvarJaNei.NEI),
+                    mottarSykepenger = VurderingDto(SvarJaNei.NEI),
                 ),
             ),
         )

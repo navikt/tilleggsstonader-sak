@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktiv
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -53,9 +54,25 @@ fun Vilkårperiode.tilDto() =
     )
 
 fun DelvilkårVilkårperiode.tilDto() = when (this) {
-    is DelvilkårMålgruppe -> DelvilkårMålgruppeDto(medlemskap = medlemskap.svar)
-    is DelvilkårAktivitet -> DelvilkårAktivitetDto(lønnet = lønnet.svar, mottarSykepenger = mottarSykepenger.svar)
+    is DelvilkårMålgruppe -> DelvilkårMålgruppeDto(
+        medlemskap = medlemskap.tilDto(),
+    )
+
+    is DelvilkårAktivitet -> DelvilkårAktivitetDto(
+        lønnet = lønnet.tilDto(),
+        mottarSykepenger = mottarSykepenger.tilDto(),
+    )
 }
+
+// Returnerer ikke vurdering hvis resultatet er IKKE_AKTUELT
+fun DelvilkårVilkårperiode.Vurdering.tilDto() =
+    this.takeIf { resultat != ResultatDelvilkårperiode.IKKE_AKTUELT }
+        ?.let {
+            VurderingDto(
+                svar = svar,
+                begrunnelse = begrunnelse,
+            )
+        }
 
 data class Datoperiode(
     override val fom: LocalDate,
@@ -101,13 +118,18 @@ data class OpprettVilkårperiode(
 sealed class DelvilkårVilkårperiodeDto
 
 data class DelvilkårMålgruppeDto(
-    val medlemskap: SvarJaNei?,
+    val medlemskap: VurderingDto?,
 ) : DelvilkårVilkårperiodeDto()
 
 data class DelvilkårAktivitetDto(
-    val lønnet: SvarJaNei?,
-    val mottarSykepenger: SvarJaNei?,
+    val lønnet: VurderingDto?,
+    val mottarSykepenger: VurderingDto?,
 ) : DelvilkårVilkårperiodeDto()
+
+data class VurderingDto(
+    val svar: SvarJaNei? = null,
+    val begrunnelse: String? = null,
+)
 
 data class SlettVikårperiode(
     val behandlingId: UUID,

@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -208,7 +209,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårMålgruppeDto(medlemskap),
+        delvilkår = DelvilkårMålgruppeDto(VurderingDto(medlemskap)),
     )
 
     private fun aktivitet(
@@ -221,7 +222,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårAktivitetDto(lønnet, mottarSykepenger),
+        delvilkår = DelvilkårAktivitetDto(VurderingDto(lønnet), VurderingDto(mottarSykepenger)),
     )
 
     private fun stønadsperiodeDto(

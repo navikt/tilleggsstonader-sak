@@ -3,11 +3,13 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårVilkårperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 
 data class ResultatEvaluering(
     val delvilkår: DelvilkårVilkårperiode,
@@ -26,4 +28,11 @@ object EvalueringVilkårperiode {
             else -> error("Ugyldig kombinasjon type=$type delvilkår=${delvilkår.javaClass.simpleName}")
         }
     }
+
+    fun VurderingDto?.tilVurdering(resultat: ResultatDelvilkårperiode) =
+        DelvilkårVilkårperiode.Vurdering(
+            svar = this?.svar,
+            begrunnelse = this?.begrunnelse,
+            resultat = resultat,
+        )
 }
