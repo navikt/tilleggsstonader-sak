@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperi
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.evaulerVilkårperiode
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -51,7 +52,7 @@ class VilkårperiodeService(
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, opprettVilkårperiode.type)
         }
 
-        val resultatEvaluering = EvalueringVilkårperiode.evaulerVilkårperiode(opprettVilkårperiode.delvilkår)
+        val resultatEvaluering = evaulerVilkårperiode(opprettVilkårperiode.type, opprettVilkårperiode.delvilkår)
 
         return vilkårperiodeRepository.insert(
             Vilkårperiode(
@@ -74,7 +75,7 @@ class VilkårperiodeService(
         feilHvis(behandlingErLåstForVidereRedigering(vilkårperiode.behandlingId)) {
             "Kan ikke oppdatere vilkårperiode når behandling er låst for videre redigering"
         }
-        val resultatEvaluering = EvalueringVilkårperiode.evaulerVilkårperiode(oppdaterVilkårperiode.delvilkår)
+        val resultatEvaluering = evaulerVilkårperiode(vilkårperiode.type, oppdaterVilkårperiode.delvilkår)
         val oppdatert = when (vilkårperiode.kilde) {
             KildeVilkårsperiode.MANUELL -> {
                 vilkårperiode.copy(
