@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -42,8 +43,13 @@ class VilkårperiodeService(
 
     @Transactional
     fun opprettVilkårperiode(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): Vilkårperiode {
-        feilHvis(behandlingErLåstForVidereRedigering(behandlingId)) {
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke opprette vilkår når behandling er låst for videre redigering"
+        }
+
+        if (opprettVilkårperiode.type is MålgruppeType) {
+            validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, opprettVilkårperiode.type)
         }
 
         val resultatEvaluering = evaulerVilkårperiode(opprettVilkårperiode.type, opprettVilkårperiode.delvilkår)
