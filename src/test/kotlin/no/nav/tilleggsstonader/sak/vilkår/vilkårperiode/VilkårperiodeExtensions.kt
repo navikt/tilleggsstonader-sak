@@ -4,6 +4,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktiv
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.ResultatEvaluering
 
 object VilkårperiodeExtensions {
@@ -15,6 +19,15 @@ object VilkårperiodeExtensions {
 
     val Vilkårperiode.mottarSykepenger: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårAktivitet).mottarSykepenger
+
+    val VilkårperiodeDto.medlemskap: VurderingDto?
+        get() = (this.delvilkår as DelvilkårMålgruppeDto).medlemskap
+
+    val VilkårperiodeDto.lønnet: VurderingDto?
+        get() = (this.delvilkår as DelvilkårAktivitetDto).lønnet
+
+    val VilkårperiodeDto.mottarSykepenger: VurderingDto?
+        get() = (this.delvilkår as DelvilkårAktivitetDto).mottarSykepenger
 
     val ResultatEvaluering.medlemskap: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårMålgruppe).medlemskap

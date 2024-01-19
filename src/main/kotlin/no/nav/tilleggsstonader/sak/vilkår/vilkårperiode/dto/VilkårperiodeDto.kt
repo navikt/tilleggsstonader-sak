@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktiv
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -63,11 +64,15 @@ fun DelvilkårVilkårperiode.tilDto() = when (this) {
     )
 }
 
+// Returnerer ikke vurdering hvis resultatet er IKKE_AKTUELT
 fun DelvilkårVilkårperiode.Vurdering.tilDto() =
-    VurderingDto(
-        svar = svar,
-        begrunnelse = begrunnelse,
-    )
+    this.takeIf { resultat != ResultatDelvilkårperiode.IKKE_AKTUELT }
+        ?.let {
+            VurderingDto(
+                svar = svar,
+                begrunnelse = begrunnelse,
+            )
+        }
 
 data class Datoperiode(
     override val fom: LocalDate,

@@ -99,7 +99,10 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kaste feil hvis målgruppe er ugyldig for stønadstype`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val opprettVilkårperiode = opprettVilkårperiode(type = MålgruppeType.DAGPENGER, medlemskap = SvarJaNei.NEI)
+            val opprettVilkårperiode = opprettVilkårperiodeMålgruppe(
+                type = MålgruppeType.DAGPENGER,
+                medlemskap = VurderingDto(SvarJaNei.NEI),
+            )
 
             assertThatThrownBy {
                 vilkårperiodeService.opprettVilkårperiode(behandling.id, opprettVilkårperiode)
