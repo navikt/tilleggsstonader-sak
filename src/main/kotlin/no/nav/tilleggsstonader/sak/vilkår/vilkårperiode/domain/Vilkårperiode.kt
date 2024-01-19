@@ -87,6 +87,7 @@ enum class ResultatDelvilkårperiode {
     OPPFYLT,
     IKKE_OPPFYLT,
     IKKE_VURDERT,
+    IKKE_AKTUELT,
 }
 
 data class DelvilkårMålgruppe(
