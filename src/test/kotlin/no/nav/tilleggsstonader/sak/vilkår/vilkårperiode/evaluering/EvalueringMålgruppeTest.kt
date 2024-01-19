@@ -102,7 +102,7 @@ class EvalueringMålgruppeTest {
 @ParameterizedTest
 @EnumSource(
     value = MålgruppeType::class,
-    names = ["NEDSATT_ARBEIDSEVNE", "OMSTILLINGSSTØNAD"],
+    names = ["NEDSATT_ARBEIDSEVNE", "OMSTILLINGSSTØNAD", "DAGPENGER"],
     mode = EnumSource.Mode.EXCLUDE,
 )
 private annotation class ImplisittParameterizedTest

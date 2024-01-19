@@ -24,6 +24,8 @@ object EvalueringMålgruppe {
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.OMSTILLINGSSTØNAD,
             -> utledResultat(delvilkår)
+
+            MålgruppeType.DAGPENGER -> utledResultat(delvilkår) // Foreløpig
         }
     }
 
