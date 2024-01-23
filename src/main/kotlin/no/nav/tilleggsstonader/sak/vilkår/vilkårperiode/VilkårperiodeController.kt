@@ -3,8 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OppdaterVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
@@ -35,26 +34,25 @@ class VilkårperiodeController(
         return vilkårperiodeService.hentVilkårperioder(behandlingId)
     }
 
-    @PostMapping("behandling/{behandlingId}")
+    @PostMapping
     fun opprettVilkårMedPeriode(
-        @PathVariable behandlingId: UUID,
-        @RequestBody opprettVilkårperiode: OpprettVilkårperiode,
+        @RequestBody vilkårperiode: LagreVilkårperiode,
     ): VilkårperiodeDto {
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return vilkårperiodeService.opprettVilkårperiode(behandlingId, opprettVilkårperiode).tilDto()
+        return vilkårperiodeService.opprettVilkårperiode(vilkårperiode).tilDto()
     }
 
     @PostMapping("{id}")
     fun oppdaterPeriode(
         @PathVariable("id") id: UUID,
-        @RequestBody oppdaterVilkårperiode: OppdaterVilkårperiode,
+        @RequestBody vilkårperiode: LagreVilkårperiode,
     ): VilkårperiodeDto {
-        tilgangService.validerTilgangTilBehandling(oppdaterVilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return vilkårperiodeService.oppdaterVilkårperiode(id, oppdaterVilkårperiode).tilDto()
+        return vilkårperiodeService.oppdaterVilkårperiode(id, vilkårperiode).tilDto()
     }
 
     @DeleteMapping("{id}")

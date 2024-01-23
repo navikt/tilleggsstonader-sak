@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -46,8 +46,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal feile hvis man prøver å opprette en støndsperiode med id`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet())
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             val periode = stønadsperiodeDto(UUID.randomUUID())
             assertThatThrownBy {
@@ -58,8 +58,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne opprette flere stønadsperioder`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet())
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             val lagredeStønadsperioder = testWithBrukerContext(SAKSHEH_A) {
                 stønadsperiodeService.lagreStønadsperioder(
@@ -81,10 +81,10 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `endring av perioden oppdaterer felter men ikke opprettetAv`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe(MålgruppeType.OVERGANGSSTØNAD))
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet(AktivitetType.UTDANNING, lønnet = null))
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(MålgruppeType.OVERGANGSSTØNAD, behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(AktivitetType.UTDANNING, lønnet = null, behandlingId = behandling.id))
 
             val periode = stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
@@ -115,8 +115,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne slette en periode`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet())
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
@@ -131,10 +131,10 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne endre, legge til og slette i en oppdatering`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe(MålgruppeType.OVERGANGSSTØNAD))
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet(AktivitetType.UTDANNING, lønnet = null))
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(MålgruppeType.OVERGANGSSTØNAD, behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(AktivitetType.UTDANNING, lønnet = null, behandlingId = behandling.id))
 
             val stønadsperioder = stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
@@ -205,11 +205,13 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         fom: LocalDate = this.FOM,
         tom: LocalDate = this.TOM,
         medlemskap: SvarJaNei? = null,
-    ) = OpprettVilkårperiode(
+        behandlingId: UUID = UUID.randomUUID(),
+    ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
         delvilkår = DelvilkårMålgruppeDto(VurderingDto(medlemskap)),
+        behandlingId = behandlingId,
     )
 
     private fun aktivitet(
@@ -218,11 +220,13 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         tom: LocalDate = this.TOM,
         lønnet: SvarJaNei? = SvarJaNei.NEI,
         mottarSykepenger: SvarJaNei? = SvarJaNei.NEI,
-    ) = OpprettVilkårperiode(
+        behandlingId: UUID = UUID.randomUUID(),
+    ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
         delvilkår = DelvilkårAktivitetDto(VurderingDto(lønnet), VurderingDto(mottarSykepenger)),
+        behandlingId = behandlingId,
     )
 
     private fun stønadsperiodeDto(
