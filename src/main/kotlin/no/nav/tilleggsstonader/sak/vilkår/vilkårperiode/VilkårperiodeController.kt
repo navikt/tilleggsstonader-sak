@@ -36,23 +36,23 @@ class VilkårperiodeController(
 
     @PostMapping
     fun opprettVilkårMedPeriode(
-        @RequestBody lagreVilkårperiode: LagreVilkårperiode,
+        @RequestBody vilkårperiode: LagreVilkårperiode,
     ): VilkårperiodeDto {
-        tilgangService.validerTilgangTilBehandling(lagreVilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return vilkårperiodeService.opprettVilkårperiode(lagreVilkårperiode.behandlingId, lagreVilkårperiode).tilDto()
+        return vilkårperiodeService.opprettVilkårperiode(vilkårperiode).tilDto()
     }
 
     @PostMapping("{id}")
     fun oppdaterPeriode(
         @PathVariable("id") id: UUID,
-        @RequestBody oppdaterVilkårperiode: LagreVilkårperiode,
+        @RequestBody vilkårperiode: LagreVilkårperiode,
     ): VilkårperiodeDto {
-        tilgangService.validerTilgangTilBehandling(oppdaterVilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return vilkårperiodeService.oppdaterVilkårperiode(id, oppdaterVilkårperiode).tilDto()
+        return vilkårperiodeService.oppdaterVilkårperiode(id, vilkårperiode).tilDto()
     }
 
     @DeleteMapping("{id}")

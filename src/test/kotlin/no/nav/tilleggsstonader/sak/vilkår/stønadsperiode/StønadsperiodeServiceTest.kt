@@ -46,8 +46,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal feile hvis man prøver å opprette en støndsperiode med id`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             val periode = stønadsperiodeDto(UUID.randomUUID())
             assertThatThrownBy {
@@ -58,8 +58,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne opprette flere stønadsperioder`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             val lagredeStønadsperioder = testWithBrukerContext(SAKSHEH_A) {
                 stønadsperiodeService.lagreStønadsperioder(
@@ -81,16 +81,10 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `endring av perioden oppdaterer felter men ikke opprettetAv`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(
-                behandling.id,
-                målgruppe(MålgruppeType.OVERGANGSSTØNAD, behandlingId = behandling.id),
-            )
-            vilkårperiodeService.opprettVilkårperiode(
-                behandling.id,
-                aktivitet(AktivitetType.UTDANNING, lønnet = null, behandlingId = behandling.id),
-            )
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(MålgruppeType.OVERGANGSSTØNAD, behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(AktivitetType.UTDANNING, lønnet = null, behandlingId = behandling.id))
 
             val periode = stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
@@ -121,8 +115,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne slette en periode`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
@@ -137,10 +131,10 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne endre, legge til og slette i en oppdatering`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, målgruppe(MålgruppeType.OVERGANGSSTØNAD))
-            vilkårperiodeService.opprettVilkårperiode(behandling.id, aktivitet(AktivitetType.UTDANNING, lønnet = null))
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(målgruppe(MålgruppeType.OVERGANGSSTØNAD, behandlingId = behandling.id))
+            vilkårperiodeService.opprettVilkårperiode(aktivitet(AktivitetType.UTDANNING, lønnet = null, behandlingId = behandling.id))
 
             val stønadsperioder = stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,

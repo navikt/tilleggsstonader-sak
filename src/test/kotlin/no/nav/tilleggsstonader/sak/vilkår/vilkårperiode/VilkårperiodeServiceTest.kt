@@ -58,7 +58,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 behandlingId = behandling.id,
             )
 
-            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(behandling.id, opprettVilkårperiode)
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiode)
             assertThat(vilkårperiode.type).isEqualTo(opprettVilkårperiode.type)
             assertThat(vilkårperiode.kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
             assertThat(vilkårperiode.fom).isEqualTo(opprettVilkårperiode.fom)
@@ -81,7 +81,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 behandlingId = behandling.id,
             )
 
-            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(behandling.id, opprettVilkårperiode)
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiode)
             assertThat(vilkårperiode.type).isEqualTo(opprettVilkårperiode.type)
             assertThat(vilkårperiode.kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
             assertThat(vilkårperiode.fom).isEqualTo(opprettVilkårperiode.fom)
@@ -108,7 +108,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             )
 
             assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiode(behandling.id, opprettVilkårperiode)
+                vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiode)
             }.hasMessageContaining("målgruppe=DAGPENGER er ikke gyldig for ${Stønadstype.BARNETILSYN}")
         }
     }
@@ -121,10 +121,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(
-                    behandling.id,
-                    opprettVilkårperiodeMålgruppe(medlemskap = null, behandlingId = behandling.id),
-                )
+                vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiodeMålgruppe(medlemskap = null, behandlingId = behandling.id))
 
             val nyttDato = LocalDate.of(2020, 1, 1)
             val oppdatering = vilkårperiode.tilOppdatering().copy(
@@ -156,10 +153,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(
-                    behandling.id,
-                    opprettVilkårperiodeMålgruppe(medlemskap = VurderingDto(SvarJaNei.JA), behandlingId = behandling.id),
-                )
+                vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiodeMålgruppe(medlemskap = VurderingDto(SvarJaNei.JA), behandlingId = behandling.id))
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "Oppdatert begrunnelse",

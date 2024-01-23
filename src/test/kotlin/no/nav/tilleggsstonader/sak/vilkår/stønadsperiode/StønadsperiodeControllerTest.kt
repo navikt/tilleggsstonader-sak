@@ -57,7 +57,6 @@ class StønadsperiodeControllerTest : IntegrationTest() {
 
     private fun opprettMålgruppe(behandling: Behandling): Vilkårperiode =
         vilkårperiodeService.opprettVilkårperiode(
-            behandling.id,
             LagreVilkårperiode(
                 type = MålgruppeType.AAP,
                 fom = dagensDato,
@@ -71,7 +70,6 @@ class StønadsperiodeControllerTest : IntegrationTest() {
 
     private fun opprettAktivitet(behandling: Behandling): Vilkårperiode =
         vilkårperiodeService.opprettVilkårperiode(
-            behandling.id,
             LagreVilkårperiode(
                 type = AktivitetType.TILTAK,
                 fom = dagensDato,
