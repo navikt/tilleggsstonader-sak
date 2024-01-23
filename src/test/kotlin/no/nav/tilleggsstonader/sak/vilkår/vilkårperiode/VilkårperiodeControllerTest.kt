@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
@@ -34,11 +34,12 @@ class VilkårperiodeControllerTest : IntegrationTest() {
 
         opprettVilkårperiode(
             behandling,
-            OpprettVilkårperiode(
+            LagreVilkårperiode(
                 type = MålgruppeType.AAP,
                 fom = LocalDate.now(),
                 tom = LocalDate.now(),
                 delvilkår = delvilkårMålgruppeDto(),
+                behandlingId = behandling.id,
             ),
         )
 
@@ -60,11 +61,12 @@ class VilkårperiodeControllerTest : IntegrationTest() {
 
         val periode = opprettVilkårperiode(
             behandling,
-            OpprettVilkårperiode(
+            LagreVilkårperiode(
                 type = MålgruppeType.AAP,
                 fom = LocalDate.now(),
                 tom = LocalDate.now(),
                 delvilkår = delvilkårMålgruppeDto(),
+                behandlingId = behandling.id,
             ),
         )
         val exception = catchProblemDetailException {
@@ -85,11 +87,11 @@ class VilkårperiodeControllerTest : IntegrationTest() {
 
     private fun opprettVilkårperiode(
         behandling: Behandling,
-        opprettVilkårperiode: OpprettVilkårperiode,
+        lagreVilkårperiode: LagreVilkårperiode,
     ) = restTemplate.exchange<VilkårperiodeDto>(
         localhost("api/vilkarperiode/behandling/${behandling.id}"),
         HttpMethod.POST,
-        HttpEntity(opprettVilkårperiode, headers),
+        HttpEntity(lagreVilkårperiode, headers),
     ).body!!
 
     private fun slettVilkårperiode(

@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OppdaterVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
@@ -55,6 +55,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val opprettVilkårperiode = opprettVilkårperiodeMålgruppe(
                 medlemskap = VurderingDto(SvarJaNei.NEI, "begrunnelse medlemskap"),
                 begrunnelse = "begrunnelse målgruppe",
+                behandlingId = behandling.id,
             )
 
             val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(behandling.id, opprettVilkårperiode)
@@ -77,6 +78,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 lønnet = VurderingDto(SvarJaNei.NEI, "begrunnelse lønnet"),
                 mottarSykepenger = VurderingDto(SvarJaNei.NEI, "begrunnelse sykepenger"),
                 begrunnelse = "begrunnelse aktivitet",
+                behandlingId = behandling.id,
             )
 
             val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(behandling.id, opprettVilkårperiode)
@@ -102,6 +104,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val opprettVilkårperiode = opprettVilkårperiodeMålgruppe(
                 type = MålgruppeType.DAGPENGER,
                 medlemskap = VurderingDto(SvarJaNei.NEI),
+                behandlingId = behandling.id,
             )
 
             assertThatThrownBy {
@@ -120,7 +123,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val vilkårperiode =
                 vilkårperiodeService.opprettVilkårperiode(
                     behandling.id,
-                    opprettVilkårperiodeMålgruppe(medlemskap = null),
+                    opprettVilkårperiodeMålgruppe(medlemskap = null, behandlingId = behandling.id),
                 )
 
             val nyttDato = LocalDate.of(2020, 1, 1)
@@ -155,7 +158,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val vilkårperiode =
                 vilkårperiodeService.opprettVilkårperiode(
                     behandling.id,
-                    opprettVilkårperiodeMålgruppe(medlemskap = VurderingDto(SvarJaNei.JA)),
+                    opprettVilkårperiodeMålgruppe(medlemskap = VurderingDto(SvarJaNei.JA), behandlingId = behandling.id),
                 )
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
@@ -219,7 +222,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             }.hasMessageContaining("Kan ikke oppdatere vilkårperiode når behandling er låst for videre redigering")
         }
 
-        private fun Vilkårperiode.tilOppdatering(): OppdaterVilkårperiode {
+        private fun Vilkårperiode.tilOppdatering(): LagreVilkårperiode {
             val delvilkårDto = when (this.delvilkår) {
                 is DelvilkårMålgruppe ->
                     DelvilkårMålgruppeDto(VurderingDto((this.delvilkår as DelvilkårMålgruppe).medlemskap.svar))
@@ -231,12 +234,13 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     )
                 }
             }
-            return OppdaterVilkårperiode(
+            return LagreVilkårperiode(
                 behandlingId = behandlingId,
                 fom = fom,
                 tom = tom,
                 delvilkår = delvilkårDto,
                 begrunnelse = begrunnelse,
+                type = type,
             )
         }
     }

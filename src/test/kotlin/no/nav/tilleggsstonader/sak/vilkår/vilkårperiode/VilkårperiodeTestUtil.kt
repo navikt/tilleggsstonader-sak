@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import java.time.LocalDate
 import java.util.UUID
@@ -95,12 +95,14 @@ object VilkårperiodeTestUtil {
         tom: LocalDate = LocalDate.now(),
         medlemskap: VurderingDto? = null,
         begrunnelse: String? = null,
-    ) = OpprettVilkårperiode(
+        behandlingId: UUID = UUID.randomUUID(),
+    ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
         delvilkår = DelvilkårMålgruppeDto(medlemskap = medlemskap),
         begrunnelse = begrunnelse,
+        behandlingId = behandlingId,
     )
 
     fun opprettVilkårperiodeAktivitet(
@@ -110,11 +112,13 @@ object VilkårperiodeTestUtil {
         lønnet: VurderingDto? = null,
         mottarSykepenger: VurderingDto? = null,
         begrunnelse: String? = null,
-    ) = OpprettVilkårperiode(
+        behandlingId: UUID = UUID.randomUUID(),
+    ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
         delvilkår = DelvilkårAktivitetDto(lønnet, mottarSykepenger),
         begrunnelse = begrunnelse,
+        behandlingId = behandlingId,
     )
 }

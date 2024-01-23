@@ -12,8 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OppdaterVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.OpprettVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
@@ -42,33 +41,33 @@ class VilkårperiodeService(
     ) = vilkårsperioder.filter { it.type is T }.map(Vilkårperiode::tilDto)
 
     @Transactional
-    fun opprettVilkårperiode(behandlingId: UUID, opprettVilkårperiode: OpprettVilkårperiode): Vilkårperiode {
+    fun opprettVilkårperiode(behandlingId: UUID, lagreVilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke opprette vilkår når behandling er låst for videre redigering"
         }
 
-        if (opprettVilkårperiode.type is MålgruppeType) {
-            validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, opprettVilkårperiode.type)
+        if (lagreVilkårperiode.type is MålgruppeType) {
+            validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, lagreVilkårperiode.type)
         }
 
-        val resultatEvaluering = evaulerVilkårperiode(opprettVilkårperiode.type, opprettVilkårperiode.delvilkår)
+        val resultatEvaluering = evaulerVilkårperiode(lagreVilkårperiode.type, lagreVilkårperiode.delvilkår)
 
         return vilkårperiodeRepository.insert(
             Vilkårperiode(
                 behandlingId = behandlingId,
-                fom = opprettVilkårperiode.fom,
-                tom = opprettVilkårperiode.tom,
-                type = opprettVilkårperiode.type,
+                fom = lagreVilkårperiode.fom,
+                tom = lagreVilkårperiode.tom,
+                type = lagreVilkårperiode.type,
                 delvilkår = resultatEvaluering.delvilkår,
-                begrunnelse = opprettVilkårperiode.begrunnelse,
+                begrunnelse = lagreVilkårperiode.begrunnelse,
                 resultat = resultatEvaluering.resultat,
                 kilde = KildeVilkårsperiode.MANUELL,
             ),
         )
     }
 
-    fun oppdaterVilkårperiode(id: UUID, oppdaterVilkårperiode: OppdaterVilkårperiode): Vilkårperiode {
+    fun oppdaterVilkårperiode(id: UUID, oppdaterVilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
         validerBehandlingIdErLik(oppdaterVilkårperiode.behandlingId, vilkårperiode.behandlingId)
@@ -100,7 +99,7 @@ class VilkårperiodeService(
 
     private fun validerIkkeEndretFomTomForSystem(
         vilkårperiode: Vilkårperiode,
-        oppdaterVilkårperiode: OppdaterVilkårperiode,
+        oppdaterVilkårperiode: LagreVilkårperiode,
     ) {
         feilHvis(vilkårperiode.fom != oppdaterVilkårperiode.fom) {
             "Kan ikke oppdatere fom når kilde=${KildeVilkårsperiode.SYSTEM}"
