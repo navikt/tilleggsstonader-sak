@@ -34,15 +34,14 @@ class VilkårperiodeController(
         return vilkårperiodeService.hentVilkårperioder(behandlingId)
     }
 
-    @PostMapping("behandling/{behandlingId}")
+    @PostMapping
     fun opprettVilkårMedPeriode(
-        @PathVariable behandlingId: UUID,
         @RequestBody lagreVilkårperiode: LagreVilkårperiode,
     ): VilkårperiodeDto {
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerTilgangTilBehandling(lagreVilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return vilkårperiodeService.opprettVilkårperiode(behandlingId, lagreVilkårperiode).tilDto()
+        return vilkårperiodeService.opprettVilkårperiode(lagreVilkårperiode.behandlingId, lagreVilkårperiode).tilDto()
     }
 
     @PostMapping("{id}")

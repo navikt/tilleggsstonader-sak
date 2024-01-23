@@ -33,7 +33,6 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
         opprettVilkårperiode(
-            behandling,
             LagreVilkårperiode(
                 type = MålgruppeType.AAP,
                 fom = LocalDate.now(),
@@ -60,7 +59,6 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         }
 
         val periode = opprettVilkårperiode(
-            behandling,
             LagreVilkårperiode(
                 type = MålgruppeType.AAP,
                 fom = LocalDate.now(),
@@ -86,10 +84,9 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         ).body!!
 
     private fun opprettVilkårperiode(
-        behandling: Behandling,
         lagreVilkårperiode: LagreVilkårperiode,
     ) = restTemplate.exchange<VilkårperiodeDto>(
-        localhost("api/vilkarperiode/behandling/${behandling.id}"),
+        localhost("api/vilkarperiode"),
         HttpMethod.POST,
         HttpEntity(lagreVilkårperiode, headers),
     ).body!!
