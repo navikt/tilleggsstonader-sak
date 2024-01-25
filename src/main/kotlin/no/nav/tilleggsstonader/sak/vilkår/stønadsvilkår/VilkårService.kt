@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
-import no.nav.tilleggsstonader.sak.behandling.fakta.VilkårGrunnlagService
+import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
@@ -30,7 +30,7 @@ class VilkårService(
     private val søknadService: SøknadService,
     private val vilkårRepository: VilkårRepository,
     private val barnService: BarnService,
-    private val vilkårGrunnlagService: VilkårGrunnlagService,
+    private val behandlingFaktaService: BehandlingFaktaService,
     // private val grunnlagsdataService: GrunnlagsdataService,
     private val fagsakService: FagsakService,
 ) {
@@ -92,7 +92,7 @@ class VilkårService(
     fun hentGrunnlagOgMetadata(behandlingId: UUID): Pair<VilkårGrunnlagDto, HovedregelMetadata> {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val barn = barnService.finnBarnPåBehandling(behandlingId)
-        val grunnlag = vilkårGrunnlagService.hentGrunnlag(behandlingId)
+        val grunnlag = behandlingFaktaService.hentGrunnlag(behandlingId)
         return Pair(grunnlag, HovedregelMetadata(barn, behandling))
     }
 

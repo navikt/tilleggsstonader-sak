@@ -23,7 +23,7 @@ import java.util.UUID
  * Denne klassen håndterer henting av VilkårGrunnlagDto
  */
 @Service
-class VilkårGrunnlagService(
+class BehandlingFaktaService(
     private val grunnlagsdataService: GrunnlagsdataService,
     private val søknadService: SøknadService,
     private val barnService: BarnService,

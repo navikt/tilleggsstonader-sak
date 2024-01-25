@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandling.fakta.VilkårGrunnlagService
+import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
@@ -59,7 +59,7 @@ internal class VilkårStegServiceTest {
 
     // private val personopplysningerIntegrasjonerClient = mockk<PersonopplysningerIntegrasjonerClient>()
     // private val blankettRepository = mockk<BlankettRepository>()
-    private val vilkårGrunnlagService = mockk<VilkårGrunnlagService>()
+    private val behandlingFaktaService = mockk<BehandlingFaktaService>()
 
     private val stegService = mockk<StegService>(relaxed = true)
 
@@ -74,7 +74,7 @@ internal class VilkårStegServiceTest {
         søknadService,
         vilkårRepository,
         barnService,
-        vilkårGrunnlagService,
+        behandlingFaktaService,
         // grunnlagsdataService,
         fagsakService,
         // featureToggleService,
@@ -111,7 +111,7 @@ internal class VilkårStegServiceTest {
         // every { søknadService.hentSøknadsgrunnlag(any()) }.returns(søknad)
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsak(stønadstype = Stønadstype.BARNETILSYN)
         every { vilkårRepository.insertAll(any()) } answers { firstArg() }
-        every { vilkårGrunnlagService.hentGrunnlag(any()) } returns grunnlag
+        every { behandlingFaktaService.hentGrunnlag(any()) } returns grunnlag
 
         justRun { behandlingshistorikkService.opprettHistorikkInnslag(any(), any(), any(), any()) }
         every { barnService.finnBarnPåBehandling(behandlingId) } returns barn

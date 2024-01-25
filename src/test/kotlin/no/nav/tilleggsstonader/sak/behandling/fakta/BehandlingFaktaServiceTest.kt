@@ -18,12 +18,12 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-internal class VilkårGrunnlagServiceTest {
+internal class BehandlingFaktaServiceTest {
 
     val grunnlagsdataService = mockk<GrunnlagsdataService>()
     val søknadService = mockk<SøknadService>()
     val barnService = mockk<BarnService>()
-    val service = VilkårGrunnlagService(
+    val service = BehandlingFaktaService(
         grunnlagsdataService,
         søknadService,
         barnService,
