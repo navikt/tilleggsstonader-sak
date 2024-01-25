@@ -43,7 +43,7 @@ internal class BehandlingFaktaServiceTest {
     }
 
     @Nested
-    inner class GrunnlagBarnTest {
+    inner class FaktaBarnTest {
 
         @Test
         fun `skal mappe søknadsgrunnlag for de barn som fantes i søknaden`() {

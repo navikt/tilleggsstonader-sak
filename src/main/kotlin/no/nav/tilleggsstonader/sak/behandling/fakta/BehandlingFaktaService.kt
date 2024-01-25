@@ -37,7 +37,7 @@ class BehandlingFaktaService(
     }
 
     private fun mapAktivitet(søknad: SøknadBarnetilsyn?) =
-        GrunnlagAktivitet(
+        FaktaAktivtet(
             søknadsgrunnlag = søknad?.let {
                 SøknadsgrunnlagAktivitet(
                     utdanning = it.data.aktivitet.utdanning,
@@ -46,7 +46,7 @@ class BehandlingFaktaService(
         )
 
     private fun mapHovedytelse(søknad: SøknadBarnetilsyn?) =
-        GrunnlagHovedytelse(
+        FaktaHovedytelse(
             søknadsgrunnlag = søknad?.let {
                 SøknadsgrunnlagHovedytelse(
                     hovedytelse = it.data.hovedytelse.hovedytelse,
@@ -54,7 +54,7 @@ class BehandlingFaktaService(
             },
         )
 
-    private fun mapBarn(grunnlagsdata: GrunnlagsdataMedMetadata, søknad: SøknadBarnetilsyn?, behandlingId: UUID): List<GrunnlagBarn> {
+    private fun mapBarn(grunnlagsdata: GrunnlagsdataMedMetadata, søknad: SøknadBarnetilsyn?, behandlingId: UUID): List<FaktaBarn> {
         val søknadBarnPåIdent = søknad?.barn?.associateBy { it.ident } ?: emptyMap()
         if (søknad != null) {
             validerFinnesGrunnlagsdataForAlleBarnISøknad(grunnlagsdata, søknadBarnPåIdent)
@@ -65,7 +65,7 @@ class BehandlingFaktaService(
             val behandlingBarn = barnPåBehandling[barn.ident]
                 ?: error("Finner ikke barn med ident=${barn.ident} på behandling=$behandlingId")
 
-            GrunnlagBarn(
+            FaktaBarn(
                 ident = barn.ident,
                 barnId = behandlingBarn.id,
                 registergrunnlag = RegistergrunnlagBarn(

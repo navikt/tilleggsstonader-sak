@@ -8,12 +8,12 @@ import java.time.LocalDate
 import java.util.UUID
 
 data class BehandlingFaktaDto(
-    val hovedytelse: GrunnlagHovedytelse,
-    val aktivitet: GrunnlagAktivitet,
-    val barn: List<GrunnlagBarn>,
+    val hovedytelse: FaktaHovedytelse,
+    val aktivitet: FaktaAktivtet,
+    val barn: List<FaktaBarn>,
 )
 
-data class GrunnlagHovedytelse(
+data class FaktaHovedytelse(
     val søknadsgrunnlag: SøknadsgrunnlagHovedytelse?,
 )
 
@@ -21,7 +21,7 @@ data class SøknadsgrunnlagHovedytelse(
     val hovedytelse: Hovedytelse,
 )
 
-data class GrunnlagAktivitet(
+data class FaktaAktivtet(
     val søknadsgrunnlag: SøknadsgrunnlagAktivitet?,
 )
 
@@ -29,7 +29,7 @@ data class SøknadsgrunnlagAktivitet(
     val utdanning: JaNei,
 )
 
-data class GrunnlagBarn(
+data class FaktaBarn(
     val ident: String,
     val barnId: UUID,
     val registergrunnlag: RegistergrunnlagBarn,
