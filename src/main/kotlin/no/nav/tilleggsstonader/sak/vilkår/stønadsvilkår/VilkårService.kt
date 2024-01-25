@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -13,7 +14,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
@@ -89,7 +89,7 @@ class VilkårService(
     }
      */
 
-    fun hentGrunnlagOgMetadata(behandlingId: UUID): Pair<VilkårGrunnlagDto, HovedregelMetadata> {
+    fun hentGrunnlagOgMetadata(behandlingId: UUID): Pair<BehandlingFaktaDto, HovedregelMetadata> {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val barn = barnService.finnBarnPåBehandling(behandlingId)
         val grunnlag = behandlingFaktaService.hentGrunnlag(behandlingId)

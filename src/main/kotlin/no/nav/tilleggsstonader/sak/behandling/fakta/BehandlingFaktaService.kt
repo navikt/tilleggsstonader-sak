@@ -8,14 +8,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.GrunnlagAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.GrunnlagBarn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.GrunnlagHovedytelse
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.RegistergrunnlagBarn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SøknadsgrunnlagAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SøknadsgrunnlagBarn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SøknadsgrunnlagHovedytelse
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårGrunnlagDto
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -31,13 +23,13 @@ class BehandlingFaktaService(
 
     fun hentGrunnlag(
         behandlingId: UUID,
-    ): VilkårGrunnlagDto {
+    ): BehandlingFaktaDto {
         måImlementeresFørProdsetting {
             "Denne skal hente data fra databasen, og at grunnlagsdata lagres til databasen"
         }
         val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
         val grunnlagsdata = grunnlagsdataService.hentFraRegister(behandlingId)
-        return VilkårGrunnlagDto(
+        return BehandlingFaktaDto(
             hovedytelse = mapHovedytelse(søknad),
             aktivitet = mapAktivitet(søknad),
             barn = mapBarn(grunnlagsdata, søknad, behandlingId),
