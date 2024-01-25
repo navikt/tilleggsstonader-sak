@@ -38,7 +38,7 @@ internal class BehandlingFaktaServiceTest {
         every { barnService.finnBarnPåBehandling(any()) } returns
             listOf(behandlingBarn(personIdent = "1", id = UUID.fromString("60921c76-f8ef-4000-9824-f127a50a575e")))
 
-        val data = service.hentGrunnlag(behandlingId)
+        val data = service.hentFakta(behandlingId)
         assertFileIsEqual("vilkår/vilkårGrunnlagDto.json", data)
     }
 
@@ -61,7 +61,7 @@ internal class BehandlingFaktaServiceTest {
                 behandlingBarn(personIdent = "2"),
             )
 
-            val data = service.hentGrunnlag(behandlingId)
+            val data = service.hentFakta(behandlingId)
 
             assertThat(data.barn).hasSize(2)
             data.barn[0].let {
@@ -85,7 +85,7 @@ internal class BehandlingFaktaServiceTest {
                 barn = setOf(lagSøknadBarn(ident = "1"), lagSøknadBarn(ident = "2"), lagSøknadBarn(ident = "3")),
             )
             assertThatThrownBy {
-                service.hentGrunnlag(behandlingId)
+                service.hentFakta(behandlingId)
             }.hasMessage("Mangler grunnlagsdata for barn i søknad (2,3)")
         }
     }

@@ -111,7 +111,7 @@ internal class VilkårStegServiceTest {
         // every { søknadService.hentSøknadsgrunnlag(any()) }.returns(søknad)
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsak(stønadstype = Stønadstype.BARNETILSYN)
         every { vilkårRepository.insertAll(any()) } answers { firstArg() }
-        every { behandlingFaktaService.hentGrunnlag(any()) } returns grunnlag
+        every { behandlingFaktaService.hentFakta(any()) } returns grunnlag
 
         justRun { behandlingshistorikkService.opprettHistorikkInnslag(any(), any(), any(), any()) }
         every { barnService.finnBarnPåBehandling(behandlingId) } returns barn

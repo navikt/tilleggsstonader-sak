@@ -87,7 +87,7 @@ internal class VilkårServiceTest {
         every { barnService.finnBarnPåBehandling(behandlingId) } returns barn
         every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
 
-        every { behandlingFaktaService.hentGrunnlag(behandlingId) } returns mockVilkårGrunnlagDto()
+        every { behandlingFaktaService.hentFakta(behandlingId) } returns mockVilkårGrunnlagDto()
     }
 
     @Nested

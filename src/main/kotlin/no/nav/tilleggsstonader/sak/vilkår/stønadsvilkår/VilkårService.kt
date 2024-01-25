@@ -92,7 +92,7 @@ class VilkårService(
     fun hentGrunnlagOgMetadata(behandlingId: UUID): Pair<BehandlingFaktaDto, HovedregelMetadata> {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val barn = barnService.finnBarnPåBehandling(behandlingId)
-        val grunnlag = behandlingFaktaService.hentGrunnlag(behandlingId)
+        val grunnlag = behandlingFaktaService.hentFakta(behandlingId)
         return Pair(grunnlag, HovedregelMetadata(barn, behandling))
     }
 

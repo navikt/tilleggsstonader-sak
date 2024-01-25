@@ -21,7 +21,7 @@ class BehandlingFaktaService(
     private val barnService: BarnService,
 ) {
 
-    fun hentGrunnlag(
+    fun hentFakta(
         behandlingId: UUID,
     ): BehandlingFaktaDto {
         måImlementeresFørProdsetting {
