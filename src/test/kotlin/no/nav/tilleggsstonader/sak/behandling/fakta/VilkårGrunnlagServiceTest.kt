@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
+package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import io.mockk.every
 import io.mockk.mockk

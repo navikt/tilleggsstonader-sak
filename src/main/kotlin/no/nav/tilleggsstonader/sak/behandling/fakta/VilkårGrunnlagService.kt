@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
+package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.måImlementeresFørProdsetting
