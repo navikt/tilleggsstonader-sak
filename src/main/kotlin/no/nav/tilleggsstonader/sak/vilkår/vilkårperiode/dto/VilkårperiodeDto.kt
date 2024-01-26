@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 data class VilkårperiodeDto(
@@ -34,6 +35,7 @@ data class VilkårperiodeDto(
     val begrunnelse: String?,
     val kilde: KildeVilkårsperiode,
     val slettetKommentar: String?,
+    val sistEndret: LocalDateTime,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -51,6 +53,7 @@ fun Vilkårperiode.tilDto() =
         begrunnelse = this.begrunnelse,
         kilde = this.kilde,
         slettetKommentar = this.slettetKommentar,
+        sistEndret = this.sporbar.endret.endretTid,
     )
 
 fun DelvilkårVilkårperiode.tilDto() = when (this) {
