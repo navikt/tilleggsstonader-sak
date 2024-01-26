@@ -65,7 +65,15 @@ no.nav.security.jwt:
     accepted_audience: ${AZURE_APP_CLIENT_ID}
     cookie_name: azure_token
   client.registration:
-    # todo iverksett
+    arena-client_credentials:
+      resource-url: ${clients.arena.uri}
+      token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+      grant-type: client_credentials
+      scope: ${clients.arena.scope}
+      authentication:
+        client-id: ${AZURE_APP_CLIENT_ID}
+        client-secret: ${AZURE_APP_CLIENT_SECRET}
+        client-auth-method: client_secret_basic
 
     integrasjoner:
       resource-url: ${clients.integrasjoner.uri}
@@ -120,3 +128,6 @@ clients:
     scope: api://${CLIENT_ENV}-gcp.nom.skjermede-personer-pip/.default
   familie-dokument:
     uri: http://familie-dokument.teamfamilie
+  arena:
+    uri: https://tilleggsstonader-arena.${CLIENT_ENV}-fss-pub.nais.io
+    scope: api://${CLIENT_ENV}-fss.tilleggsstonader.tilleggsstonader-arena/.default
