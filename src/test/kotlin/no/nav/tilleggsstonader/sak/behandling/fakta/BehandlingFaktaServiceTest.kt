@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
+package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import io.mockk.every
 import io.mockk.mockk
@@ -18,12 +18,12 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-internal class VilkårGrunnlagServiceTest {
+internal class BehandlingFaktaServiceTest {
 
     val grunnlagsdataService = mockk<GrunnlagsdataService>()
     val søknadService = mockk<SøknadService>()
     val barnService = mockk<BarnService>()
-    val service = VilkårGrunnlagService(
+    val service = BehandlingFaktaService(
         grunnlagsdataService,
         søknadService,
         barnService,
@@ -38,12 +38,12 @@ internal class VilkårGrunnlagServiceTest {
         every { barnService.finnBarnPåBehandling(any()) } returns
             listOf(behandlingBarn(personIdent = "1", id = UUID.fromString("60921c76-f8ef-4000-9824-f127a50a575e")))
 
-        val data = service.hentGrunnlag(behandlingId)
+        val data = service.hentFakta(behandlingId)
         assertFileIsEqual("vilkår/vilkårGrunnlagDto.json", data)
     }
 
     @Nested
-    inner class GrunnlagBarnTest {
+    inner class FaktaBarnTest {
 
         @Test
         fun `skal mappe søknadsgrunnlag for de barn som fantes i søknaden`() {
@@ -61,7 +61,7 @@ internal class VilkårGrunnlagServiceTest {
                 behandlingBarn(personIdent = "2"),
             )
 
-            val data = service.hentGrunnlag(behandlingId)
+            val data = service.hentFakta(behandlingId)
 
             assertThat(data.barn).hasSize(2)
             data.barn[0].let {
@@ -85,7 +85,7 @@ internal class VilkårGrunnlagServiceTest {
                 barn = setOf(lagSøknadBarn(ident = "1"), lagSøknadBarn(ident = "2"), lagSøknadBarn(ident = "3")),
             )
             assertThatThrownBy {
-                service.hentGrunnlag(behandlingId)
+                service.hentFakta(behandlingId)
             }.hasMessage("Mangler grunnlagsdata for barn i søknad (2,3)")
         }
     }

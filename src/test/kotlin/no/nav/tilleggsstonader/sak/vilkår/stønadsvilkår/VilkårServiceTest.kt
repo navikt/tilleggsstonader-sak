@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaMapper
@@ -44,7 +45,7 @@ internal class VilkårServiceTest {
     // private val personopplysningerIntegrasjonerClient = mockk<PersonopplysningerIntegrasjonerClient>()
     // private val blankettRepository = mockk<BlankettRepository>()
     private val barnService = mockk<BarnService>()
-    private val vilkårGrunnlagService = mockk<VilkårGrunnlagService>()
+    private val behandlingFaktaService = mockk<BehandlingFaktaService>()
 
     // private val grunnlagsdataService = mockk<GrunnlagsdataService>()
     private val fagsakService = mockk<FagsakService>()
@@ -53,7 +54,7 @@ internal class VilkårServiceTest {
         behandlingService = behandlingService,
         søknadService = søknadService,
         vilkårRepository = vilkårRepository,
-        vilkårGrunnlagService = vilkårGrunnlagService,
+        behandlingFaktaService = behandlingFaktaService,
         // grunnlagsdataService = grunnlagsdataService,
         barnService = barnService,
         fagsakService = fagsakService,
@@ -86,7 +87,7 @@ internal class VilkårServiceTest {
         every { barnService.finnBarnPåBehandling(behandlingId) } returns barn
         every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
 
-        every { vilkårGrunnlagService.hentGrunnlag(behandlingId) } returns mockVilkårGrunnlagDto()
+        every { behandlingFaktaService.hentFakta(behandlingId) } returns mockVilkårGrunnlagDto()
     }
 
     @Nested

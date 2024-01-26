@@ -1,22 +1,22 @@
 package no.nav.tilleggsstonader.sak.util
 
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.GrunnlagAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.GrunnlagBarn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.GrunnlagHovedytelse
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.RegistergrunnlagBarn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SøknadsgrunnlagBarn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårGrunnlagDto
+import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
+import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaAktivtet
+import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaBarn
+import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaHovedytelse
+import no.nav.tilleggsstonader.sak.behandling.fakta.RegistergrunnlagBarn
+import no.nav.tilleggsstonader.sak.behandling.fakta.SøknadsgrunnlagBarn
 import java.util.UUID
 
 object VilkårGrunnlagUtil {
     fun mockVilkårGrunnlagDto(
-        barn: List<GrunnlagBarn> = emptyList(),
+        barn: List<FaktaBarn> = emptyList(),
     ) =
-        VilkårGrunnlagDto(
-            hovedytelse = GrunnlagHovedytelse(
+        BehandlingFaktaDto(
+            hovedytelse = FaktaHovedytelse(
                 søknadsgrunnlag = null,
             ),
-            aktivitet = GrunnlagAktivitet(
+            aktivitet = FaktaAktivtet(
                 søknadsgrunnlag = null,
             ),
             barn = barn,
@@ -27,7 +27,7 @@ object VilkårGrunnlagUtil {
         barnId: UUID = UUID.randomUUID(),
         registergrunnlag: RegistergrunnlagBarn = RegistergrunnlagBarn("navn", null),
         søknadgrunnlag: SøknadsgrunnlagBarn? = null,
-    ) = GrunnlagBarn(
+    ) = FaktaBarn(
         ident = ident,
         barnId = barnId,
         registergrunnlag = registergrunnlag,
