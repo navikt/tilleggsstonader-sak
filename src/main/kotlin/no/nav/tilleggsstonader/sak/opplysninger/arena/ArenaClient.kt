@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.arena
 
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
-import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstype
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -18,6 +18,6 @@ class ArenaClient(
 
     val statusUri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "status").toUriString()
 
-    fun hentStatus(request: IdentStønadstype): ArenaStatusDto =
+    fun hentStatus(request: IdenterStønadstype): ArenaStatusDto =
         postForEntity(statusUri, request)
 }

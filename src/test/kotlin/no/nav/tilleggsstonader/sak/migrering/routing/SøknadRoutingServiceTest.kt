@@ -15,6 +15,9 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.util.EnvUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -31,8 +34,15 @@ class SøknadRoutingServiceTest {
     val fagsakService = mockk<FagsakService>()
     val behandlingService = mockk<BehandlingService>()
     val arenaClient = mockk<ArenaClient>()
+    val personService = mockk<PersonService>()
 
-    private val service = SøknadRoutingService(søknadRoutingRepository, fagsakService, behandlingService, arenaClient)
+    private val service = SøknadRoutingService(
+        søknadRoutingRepository,
+        fagsakService,
+        behandlingService,
+        arenaClient,
+        personService,
+    )
 
     private val ident = "1"
     private val stønadstype = Stønadstype.BARNETILSYN
@@ -51,6 +61,7 @@ class SøknadRoutingServiceTest {
         every { fagsakService.finnFagsak(any(), any()) } returns null
         every { behandlingService.hentBehandlinger(any<UUID>()) } returns emptyList()
         every { arenaClient.hentStatus(any()) } returns arenaStatusKanIkkeRoutes()
+        every { personService.hentPersonIdenter(any()) } answers { PdlIdenter(listOf(PdlIdent(firstArg(), false))) }
     }
 
     @AfterEach

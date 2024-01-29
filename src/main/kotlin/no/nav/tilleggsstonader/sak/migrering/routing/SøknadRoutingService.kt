@@ -2,11 +2,14 @@ package no.nav.tilleggsstonader.sak.migrering.routing
 
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.util.EnvUtil.erIDev
 import org.springframework.stereotype.Service
 
@@ -16,6 +19,7 @@ class SøknadRoutingService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val arenaClient: ArenaClient,
+    private val personService: PersonService,
 ) {
 
     fun sjekkRoutingForPerson(request: IdentStønadstype): SøknadRoutingResponse {
@@ -39,13 +43,19 @@ class SøknadRoutingService(
             lagreRouting(request, mapOf("harBehandling" to true))
             return true
         }
-        val arenaStatus = arenaClient.hentStatus(request)
+        val arenaStatus = arenaClient.hentStatus(tilArenaRequest(request))
         if (harGyldigStateIArena(arenaStatus)) {
             lagreRouting(request, arenaStatus)
             return true
         }
         return false
     }
+
+    private fun tilArenaRequest(request: IdentStønadstype) =
+        IdenterStønadstype(
+            identer = personService.hentPersonIdenter(request.ident).identer(),
+            stønadstype = request.stønadstype,
+        )
 
     private fun harGyldigStateIArena(arenaStatus: ArenaStatusDto): Boolean {
         return !arenaStatus.sak.harAktivSakUtenVedtak && !arenaStatus.vedtak.harVedtak
