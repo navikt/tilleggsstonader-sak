@@ -20,7 +20,7 @@ class ArenaClientConfig {
     fun arenaClient(): ArenaClient {
         val client = mockk<ArenaClient>()
         every { client.hentStatus(any()) } returns ArenaStatusDto(
-            SakStatus(harSaker = false, harÅpenSak = false),
+            SakStatus(harAktivSakUtenVedtak = false),
             VedtakStatus(harVedtak = false, harAktivtVedtak = false),
         )
         return client

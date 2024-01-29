@@ -149,12 +149,12 @@ class SøknadRoutingServiceTest {
     }
 
     private fun arenaStatusKanIkkeRoutes() = ArenaStatusDto(
-        SakStatus(harSaker = true, harÅpenSak = true),
+        SakStatus(harAktivSakUtenVedtak = true),
         VedtakStatus(harVedtak = true, harAktivtVedtak = true),
     )
 
     private fun arenaStatusKanRoutes() = ArenaStatusDto(
-        SakStatus(harSaker = false, harÅpenSak = false),
+        SakStatus(harAktivSakUtenVedtak = false),
         VedtakStatus(harVedtak = false, harAktivtVedtak = false),
     )
 

@@ -48,7 +48,7 @@ class SøknadRoutingService(
     }
 
     private fun harGyldigStateIArena(arenaStatus: ArenaStatusDto): Boolean {
-        return !arenaStatus.sak.harSaker && !arenaStatus.vedtak.harVedtak
+        return !arenaStatus.sak.harAktivSakUtenVedtak && !arenaStatus.vedtak.harVedtak
     }
 
     private fun lagreRouting(request: IdentStønadstype, detaljer: Any) {
