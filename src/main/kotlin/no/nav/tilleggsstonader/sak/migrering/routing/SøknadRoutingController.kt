@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping(path = ["/api/routing-soknad"])
+@RequestMapping(path = ["/api/ekstern/routing-soknad"])
 @ProtectedWithClaims(issuer = "azuread")
 class SøknadRoutingController(
     private val søknadRoutingService: SøknadRoutingService,
