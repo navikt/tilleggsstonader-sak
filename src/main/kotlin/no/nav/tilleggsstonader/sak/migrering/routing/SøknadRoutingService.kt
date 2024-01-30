@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
@@ -33,7 +34,7 @@ class SøknadRoutingService(
             return true
         }
 
-        val maksAntall = if (erIDev()) 1000 else 0 // erstatt med unleash
+        val maksAntall = maksAntall(request.stønadstype)
         val antall = søknadRoutingRepository.countByType(request.stønadstype)
         if (antall >= maksAntall) {
             return false
@@ -49,6 +50,10 @@ class SøknadRoutingService(
             return true
         }
         return false
+    }
+
+    private fun maksAntall(stønadstype: Stønadstype) = when (stønadstype) {
+        Stønadstype.BARNETILSYN -> if (erIDev()) 1000 else 0 // erstatt med unleash
     }
 
     private fun tilArenaRequest(request: IdentStønadstype) =
