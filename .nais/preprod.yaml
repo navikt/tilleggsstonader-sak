@@ -77,7 +77,10 @@ spec:
           namespace: teamfamilie
       external:
         - host: pdl-api-q1.dev-fss-pub.nais.io
+        - host: tilleggsstonader-unleash-api.nav.cloud.nais.io
 
+  envFrom:
+    - secret: tilleggsstonader-sak-unleash-api-token
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev
