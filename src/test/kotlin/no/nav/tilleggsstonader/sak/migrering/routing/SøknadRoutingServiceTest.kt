@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
+import io.getunleash.Variant
 import io.mockk.called
 import io.mockk.every
 import io.mockk.mockk
@@ -14,6 +15,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockGetVariant
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.søknadRoutingVariant
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
@@ -22,6 +27,7 @@ import no.nav.tilleggsstonader.sak.util.EnvUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -35,6 +41,9 @@ class SøknadRoutingServiceTest {
     val behandlingService = mockk<BehandlingService>()
     val arenaClient = mockk<ArenaClient>()
     val personService = mockk<PersonService>()
+    val unleashService = mockUnleashService().apply {
+        mockGetVariant(Toggle.SØKNAD_ROUTING_TILSYN_BARN, søknadRoutingVariant())
+    }
 
     private val service = SøknadRoutingService(
         søknadRoutingRepository,
@@ -42,6 +51,7 @@ class SøknadRoutingServiceTest {
         behandlingService,
         arenaClient,
         personService,
+        unleashService,
     )
 
     private val ident = "1"
@@ -85,18 +95,45 @@ class SøknadRoutingServiceTest {
         }
     }
 
-    @Test
-    fun `skal ikke sjekke behandling eller arena hvis antall er nått`() {
-        every { søknadRoutingRepository.countByType(any()) } returns 10000
+    @Nested
+    inner class MaksAntall {
+        @Test
+        fun `skal ikke sjekke behandling eller arena hvis antall er nått`() {
+            every { søknadRoutingRepository.countByType(any()) } returns 10000
 
-        assertThat(skalBehandlesINyLøsning()).isFalse()
+            assertThat(skalBehandlesINyLøsning()).isFalse()
 
-        verify {
-            søknadRoutingRepository.insert(any()) wasNot called
+            verify {
+                søknadRoutingRepository.insert(any()) wasNot called
 
-            fagsakService wasNot called
-            behandlingService wasNot called
-            arenaClient wasNot called
+                fagsakService wasNot called
+                behandlingService wasNot called
+                arenaClient wasNot called
+            }
+        }
+
+        @Test
+        fun `hvis toggle er disabled så skal man ikke routes`() {
+            unleashService.mockGetVariant(Toggle.SØKNAD_ROUTING_TILSYN_BARN, Variant.DISABLED_VARIANT)
+
+            assertThat(skalBehandlesINyLøsning()).isFalse()
+
+            verify {
+                søknadRoutingRepository.insert(any()) wasNot called
+
+                fagsakService wasNot called
+                behandlingService wasNot called
+                arenaClient wasNot called
+            }
+        }
+
+        @Test
+        fun `skal kaste feil hvis variant har feil navn`() {
+            unleashService.mockGetVariant(Toggle.SØKNAD_ROUTING_TILSYN_BARN, Variant("feilNavn", "1", true))
+
+            assertThatThrownBy {
+                skalBehandlesINyLøsning()
+            }.hasMessageContaining("Fant variant med annet navn")
         }
     }
 

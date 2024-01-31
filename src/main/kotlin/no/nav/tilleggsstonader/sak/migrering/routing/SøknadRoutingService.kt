@@ -5,13 +5,16 @@ import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantWithNameOrDefault
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
-import no.nav.tilleggsstonader.sak.util.EnvUtil.erIDev
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,7 +24,10 @@ class SøknadRoutingService(
     private val behandlingService: BehandlingService,
     private val arenaClient: ArenaClient,
     private val personService: PersonService,
+    private val unleashService: UnleashService,
 ) {
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     fun sjekkRoutingForPerson(request: IdentStønadstype): SøknadRoutingResponse {
         return SøknadRoutingResponse(skalBehandlesINyLøsning = skalBehandlesINyLøsning(request))
@@ -37,6 +43,7 @@ class SøknadRoutingService(
         val maksAntall = maksAntall(request.stønadstype)
         val antall = søknadRoutingRepository.countByType(request.stønadstype)
         if (antall >= maksAntall) {
+            logger.info("skalBehandlesINyLøsning antall=$antall maksAntall=$maksAntall")
             return false
         }
 
@@ -52,8 +59,11 @@ class SøknadRoutingService(
         return false
     }
 
-    private fun maksAntall(stønadstype: Stønadstype) = when (stønadstype) {
-        Stønadstype.BARNETILSYN -> if (erIDev()) 1000 else 0 // erstatt med unleash
+    private fun maksAntall(stønadstype: Stønadstype) =
+        unleashService.getVariantWithNameOrDefault(stønadstype.maksAntallToggle(), "antall", 0)
+
+    private fun Stønadstype.maksAntallToggle() = when (this) {
+        Stønadstype.BARNETILSYN -> Toggle.SØKNAD_ROUTING_TILSYN_BARN
     }
 
     private fun tilArenaRequest(request: IdentStønadstype) =
