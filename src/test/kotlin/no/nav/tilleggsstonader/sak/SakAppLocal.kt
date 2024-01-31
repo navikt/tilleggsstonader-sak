@@ -8,7 +8,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder
  * Starter en lokal instans mot en in-memory database
  */
 @EnableMockOAuth2Server
-class AppLocal : App()
+class SakAppLocal : App()
 
 fun main(args: Array<String>) {
     appLocal()
@@ -17,11 +17,12 @@ fun main(args: Array<String>) {
 }
 
 fun appLocal(): SpringApplicationBuilder =
-    SpringApplicationBuilder(AppLocal::class.java)
+    SpringApplicationBuilder(SakAppLocal::class.java)
         .profiles(
             "local",
             "mock-pdl",
             "mock-egen-ansatt",
             "mock-iverksett",
             "mock-oppgave",
+            "mock-featuretoggle"
         )
