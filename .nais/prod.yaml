@@ -71,12 +71,15 @@ spec:
     outbound:
       rules:
         - application: tilleggsstonader-integrasjoner
+        - application: tilleggsstonader-arena
+          cluster: prod-fss
         - application: skjermede-personer-pip
           namespace: nom
         - application: familie-dokument
           namespace: teamfamilie
       external:
         - host: pdl-api.prod-fss-pub.nais.io
+        - host: tilleggsstonader-arena.prod-fss-pub.nais.io
         - host: tilleggsstonader-unleash-api.nav.cloud.nais.io
   envFrom:
     - secret: tilleggsstonader-sak-unleash-api-token
