@@ -80,6 +80,9 @@ spec:
       external:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: tilleggsstonader-arena.prod-fss-pub.nais.io
+        - host: tilleggsstonader-unleash-api.nav.cloud.nais.io
+  envFrom:
+    - secret: tilleggsstonader-sak-unleash-api-token
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: prod
