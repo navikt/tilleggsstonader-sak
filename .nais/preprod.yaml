@@ -71,12 +71,15 @@ spec:
     outbound:
       rules:
         - application: tilleggsstonader-integrasjoner
+        - application: tilleggsstonader-arena
+          cluster: dev-fss
         - application: skjermede-personer-pip
           namespace: nom
         - application: familie-dokument
           namespace: teamfamilie
       external:
         - host: pdl-api-q1.dev-fss-pub.nais.io
+        - host: tilleggsstonader-arena.dev-fss-pub.nais.io
 
   env:
     - name: SPRING_PROFILES_ACTIVE
