@@ -88,7 +88,7 @@ class StønadsperiodeService(
     }
 
     fun validerStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>) {
-        val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
+        val vilkårperioder = vilkårperiodeService.hentVilkårperioderDto(behandlingId)
 
         StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder)
     }

@@ -33,7 +33,7 @@ internal class VilkårperiodeRepositoryTest : IntegrationTest() {
     }
 
     @Nested
-    inner class FinnVilkårperioderForBehandling {
+    inner class FinnVilkårperioderDtoForBehandling {
         @Test
         internal fun `skal finne alle vilkårsperioder for behandling`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
