@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.libs.utils.VirkedagerProvider
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import org.apache.commons.lang3.ObjectUtils.min
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -131,7 +132,7 @@ class TilsynBarnBeregningService {
         val desimalDelAvAntallUker = antallUker.subtract(antallHeleUker) // evt. fant dette på nettet: antallUker.remainder(BigDecimal.ONE)
         val antallEkstraDager = desimalDelAvAntallUker.multiply(BigDecimal(10)).divide(BigDecimal(2))
 
-        return antallHeleUker.multiply(BigDecimal(aktivitetsdager)).plus(antallEkstraDager).setScale(0, RoundingMode.FLOOR).toInt()
+        return antallHeleUker.multiply(BigDecimal(aktivitetsdager)).plus(min(antallEkstraDager, BigDecimal(aktivitetsdager))).setScale(0, RoundingMode.FLOOR).toInt()
     }
 
     /**
