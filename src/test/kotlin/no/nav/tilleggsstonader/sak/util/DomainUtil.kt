@@ -144,6 +144,7 @@ fun saksbehandling(
     stønadstype = fagsak.stønadstype,
     opprettetAv = behandling.sporbar.opprettetAv,
     opprettetTid = behandling.sporbar.opprettetTid,
+    endretAv = behandling.sporbar.endret.endretAv,
     endretTid = behandling.sporbar.endret.endretTid,
     kravMottatt = behandling.kravMottatt,
 )

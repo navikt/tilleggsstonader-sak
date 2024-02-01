@@ -32,6 +32,7 @@ data class Saksbehandling(
     val stønadstype: Stønadstype,
     val opprettetAv: String,
     val opprettetTid: LocalDateTime,
+    val endretAv: String,
     val endretTid: LocalDateTime,
 ) {
     val skalSendeBrev: Boolean = !skalIkkeSendeBrev
