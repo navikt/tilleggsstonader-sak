@@ -36,3 +36,7 @@ som brukes som default i `MappingJackson2HttpMessageConverter`
 
 #### Saker som mangler
 * Verifisere at auditlogg kommer til arcsight
+
+## Kode generert av GitHub Copilot
+
+Dette repoet bruker GitHub Copilot til å generere kode.
