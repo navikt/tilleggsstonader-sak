@@ -71,6 +71,7 @@ spec:
     outbound:
       rules:
         - application: tilleggsstonader-integrasjoner
+        - application: tilleggsstonader-htmlify
         - application: tilleggsstonader-arena
           cluster: dev-fss
         - application: skjermede-personer-pip
