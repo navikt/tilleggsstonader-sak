@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.YearMonth
+import java.util.Random
 import java.util.UUID
+import kotlin.math.floor
 
 /**
  * Stønaden dekker 64% av utgifterne til barnetilsyn
@@ -108,9 +110,28 @@ class TilsynBarnBeregningService {
     }
 
     private fun antallDager(stønadsperioder: List<Stønadsperiode>): Int {
-        return stønadsperioder.sumOf { stønadsperiode ->
+        val aktivitetsdager = (1..5).random() // TODO Legg inn aktivitetsdager i stønadsperioder (eller annet sted?)
+
+        val antallHverdager = stønadsperioder.sumOf { stønadsperiode ->
             stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
         }
+
+        return if (aktivitetsdager == 5){
+            antallHverdager
+        } else {
+            beregnAntallDager(antallHverdager, aktivitetsdager)
+        }
+    }
+
+    private fun beregnAntallDager(antallHverdager: Int, aktivitetsdager: Int):Int {
+        val antallUker = antallHverdager.toBigDecimal().divide(BigDecimal(5))
+        val antallHeleUker = antallUker.setScale(0, RoundingMode.FLOOR)
+
+        // Utregning av gjenstående dager, kan gjøres i et men oppdelt for leslighet nå
+        val desimalDelAvAntallUker = antallUker.subtract(antallHeleUker) // evt. fant dette på nettet: antallUker.remainder(BigDecimal.ONE)
+        val antallEkstraDager = desimalDelAvAntallUker.multiply(BigDecimal(10)).divide(BigDecimal(2))
+
+        return antallHeleUker.multiply(BigDecimal(aktivitetsdager)).plus(antallEkstraDager).setScale(0, RoundingMode.FLOOR).toInt()
     }
 
     /**
