@@ -68,6 +68,7 @@ class DefaultRestTemplateConfiguration {
     "mock-iverksett",
     "mock-oppgave",
     "mock-journalpost",
+    "mock-featuretoggle",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {

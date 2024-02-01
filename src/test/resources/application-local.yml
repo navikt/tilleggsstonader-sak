@@ -34,3 +34,6 @@ no.nav.security.jwt:
 clients:
   familie-dokument:
     uri: http://localhost:8082
+
+unleash:
+  enabled: false
