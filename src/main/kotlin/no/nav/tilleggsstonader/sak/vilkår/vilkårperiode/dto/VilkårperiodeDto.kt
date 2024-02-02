@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -132,9 +133,14 @@ data class SlettVikårperiode(
     val kommentar: String,
 )
 
-data class Vilkårperioder(
+data class VilkårperioderDto(
     val målgrupper: List<VilkårperiodeDto>,
     val aktiviteter: List<VilkårperiodeDto>,
+)
+
+fun Vilkårperioder.tilDto() = VilkårperioderDto(
+    målgrupper = målgrupper.map(Vilkårperiode::tilDto),
+    aktiviteter = aktiviteter.map(Vilkårperiode::tilDto),
 )
 
 class VilkårperiodeTypeDeserializer : JsonDeserializer<VilkårperiodeType>() {

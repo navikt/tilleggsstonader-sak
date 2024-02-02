@@ -4,6 +4,7 @@ import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilleggsstonader.libs.http.config.RestTemplateConfiguration
 import no.nav.tilleggsstonader.libs.log.filter.LogFilterConfiguration
+import no.nav.tilleggsstonader.libs.unleash.UnleashConfiguration
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @Import(
     RestTemplateConfiguration::class,
     LogFilterConfiguration::class,
+    UnleashConfiguration::class,
 )
 @EnableScheduling
 class ApplicationConfig

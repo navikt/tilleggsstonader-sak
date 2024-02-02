@@ -15,11 +15,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.evaulerVilkårperiode
 import org.springframework.stereotype.Service
@@ -42,9 +43,13 @@ class VilkårperiodeService(
         )
     }
 
+    fun hentVilkårperioderDto(behandlingId: UUID): VilkårperioderDto {
+        return hentVilkårperioder(behandlingId).tilDto()
+    }
+
     private inline fun <reified T : VilkårperiodeType> finnPerioder(
         vilkårsperioder: List<Vilkårperiode>,
-    ) = vilkårsperioder.filter { it.type is T }.map(Vilkårperiode::tilDto)
+    ) = vilkårsperioder.filter { it.type is T }
 
     @Transactional
     fun opprettVilkårperiodeOgValiderStønadsperioder(vilkårperiode: LagreVilkårperiode): LagreVilkårperiodeResponse {
@@ -117,7 +122,7 @@ class VilkårperiodeService(
         val vilkårperioder = hentVilkårperioder(behandlingId)
 
         return kotlin.runCatching {
-            StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder)
+            StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder.tilDto())
         }
     }
 
