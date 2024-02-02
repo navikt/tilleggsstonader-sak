@@ -4,6 +4,9 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
@@ -13,7 +16,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.evaulerVilkårperiode
@@ -25,6 +30,7 @@ import java.util.UUID
 class VilkårperiodeService(
     private val behandlingService: BehandlingService,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
+    private val stønadsperiodeRepository: StønadsperiodeRepository,
 ) {
 
     fun hentVilkårperioder(behandlingId: UUID): Vilkårperioder {
@@ -39,6 +45,45 @@ class VilkårperiodeService(
     private inline fun <reified T : VilkårperiodeType> finnPerioder(
         vilkårsperioder: List<Vilkårperiode>,
     ) = vilkårsperioder.filter { it.type is T }.map(Vilkårperiode::tilDto)
+
+    @Transactional
+    fun opprettVilkårperiodeOgValiderStønadsperioder(vilkårperiode: LagreVilkårperiode): LagreVilkårperiodeResponse {
+        val opprettetPeriode = opprettVilkårperiode(vilkårperiode)
+
+        val valideringsresultat = validerStønadsperioder(vilkårperiode.behandlingId)
+
+        return LagreVilkårperiodeResponse(
+            opprettetPeriode.tilDto(),
+            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.Ok else Stønadsperiodestatus.Feil,
+            stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
+        )
+    }
+
+    @Transactional
+    fun oppdaterVilkårperiodeOgValiderStønadsperioder(id: UUID, vilkårperiode: LagreVilkårperiode): LagreVilkårperiodeResponse {
+        val oppdatertPeriode = oppdaterVilkårperiode(id, vilkårperiode)
+
+        val valideringsresultat = validerStønadsperioder(vilkårperiode.behandlingId)
+
+        return LagreVilkårperiodeResponse(
+            oppdatertPeriode.tilDto(),
+            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.Ok else Stønadsperiodestatus.Feil,
+            stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
+        )
+    }
+
+    @Transactional
+    fun slettVilkårperiodeOgValiderStønadsperioder(id: UUID, slettVikårperiode: SlettVikårperiode): LagreVilkårperiodeResponse {
+        val slettetPeriode = slettVilkårperiode(id, slettVikårperiode)
+
+        val valideringsresultat = validerStønadsperioder(slettVikårperiode.behandlingId)
+
+        return LagreVilkårperiodeResponse(
+            slettetPeriode.tilDto(),
+            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.Ok else Stønadsperiodestatus.Feil,
+            stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
+        )
+    }
 
     @Transactional
     fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): Vilkårperiode {
@@ -67,6 +112,15 @@ class VilkårperiodeService(
         )
     }
 
+    private fun validerStønadsperioder(behandlingId: UUID): Result<Unit> {
+        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
+        val vilkårperioder = hentVilkårperioder(behandlingId)
+
+        return kotlin.runCatching {
+            StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder)
+        }
+    }
+
     fun oppdaterVilkårperiode(id: UUID, vilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val eksisterendeVilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
@@ -85,6 +139,7 @@ class VilkårperiodeService(
                     resultat = resultatEvaluering.resultat,
                 )
             }
+
             KildeVilkårsperiode.SYSTEM -> {
                 validerIkkeEndretFomTomForSystem(eksisterendeVilkårperiode, vilkårperiode)
                 eksisterendeVilkårperiode.copy(
