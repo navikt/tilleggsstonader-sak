@@ -46,6 +46,7 @@ data class Vilkårperiode(
     val kilde: KildeVilkårsperiode,
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,
+    val slettetKommentar: String?,
 )
 
 data class DelvilkårVilkårperiode(

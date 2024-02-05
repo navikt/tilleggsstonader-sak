@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
@@ -19,6 +20,7 @@ class HtmlifyClient(
         return postForEntity<String>(
             UriComponentsBuilder.fromUri(uri).pathSegment("api", "internt-vedtak").toUriString(),
             interntVedtak,
+            httpHeaders = HttpHeaders(),
         )
     }
 }

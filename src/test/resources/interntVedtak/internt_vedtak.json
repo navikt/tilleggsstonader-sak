@@ -1,0 +1,106 @@
+{
+  "behandling" : {
+    "behandlingId" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e31",
+    "eksternFagsakId" : 1673,
+    "stønadstype" : "BARNETILSYN",
+    "årsak" : "SØKNAD",
+    "ident" : "15",
+    "opprettetTidspunkt" : "2024-02-05T00:00:00",
+    "resultat" : "IKKE_SATT",
+    "vedtakstidspunkt" : "2024-01-01T00:00:00",
+    "saksbehandler" : "saksbehandler",
+    "beslutter" : "saksbeh2"
+  },
+  "søknad" : {
+    "mottattTidspunkt" : "2023-01-01T00:00:00"
+  },
+  "målgrupper" : [ {
+    "type" : "AAP",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
+    "delvilkår" : {
+      "medlemskap" : {
+        "svar" : "JA_IMPLISITT",
+        "begrunnelse" : null,
+        "resultat" : "OPPFYLT"
+      },
+      "lønnet" : null,
+      "mottarSykepenger" : null
+    },
+    "kilde" : "SYSTEM",
+    "resultat" : "OPPFYLT",
+    "begrunnelse" : "målgrupp abc",
+    "slettetKommentar" : null
+  }, {
+    "type" : "OVERGANGSSTØNAD",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
+    "delvilkår" : {
+      "medlemskap" : {
+        "svar" : "JA_IMPLISITT",
+        "begrunnelse" : null,
+        "resultat" : "OPPFYLT"
+      },
+      "lønnet" : null,
+      "mottarSykepenger" : null
+    },
+    "kilde" : "SYSTEM",
+    "resultat" : "OPPFYLT",
+    "begrunnelse" : "målgrupp os",
+    "slettetKommentar" : null
+  } ],
+  "aktiviteter" : [ {
+    "type" : "TILTAK",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
+    "delvilkår" : {
+      "medlemskap" : null,
+      "lønnet" : {
+        "svar" : "JA",
+        "begrunnelse" : "begrunnelse lønnet",
+        "resultat" : "IKKE_OPPFYLT"
+      },
+      "mottarSykepenger" : {
+        "svar" : "NEI",
+        "begrunnelse" : null,
+        "resultat" : "OPPFYLT"
+      }
+    },
+    "kilde" : "SYSTEM",
+    "resultat" : "IKKE_OPPFYLT",
+    "begrunnelse" : "aktivitet abd",
+    "slettetKommentar" : null
+  }, {
+    "type" : "TILTAK",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
+    "delvilkår" : {
+      "medlemskap" : null,
+      "lønnet" : {
+        "svar" : "NEI",
+        "begrunnelse" : null,
+        "resultat" : "OPPFYLT"
+      },
+      "mottarSykepenger" : {
+        "svar" : "NEI",
+        "begrunnelse" : null,
+        "resultat" : "OPPFYLT"
+      }
+    },
+    "kilde" : "MANUELL",
+    "resultat" : "SLETTET",
+    "begrunnelse" : null,
+    "slettetKommentar" : "kommentar slettet"
+  } ],
+  "stønadsperioder" : [ {
+    "målgruppe" : "AAP",
+    "aktivitet" : "TILTAK",
+    "fom" : "2024-02-01",
+    "tom" : "2024-03-31"
+  }, {
+    "målgruppe" : "NEDSATT_ARBEIDSEVNE",
+    "aktivitet" : "REELL_ARBEIDSSØKER",
+    "fom" : "2024-02-01",
+    "tom" : "2024-03-31"
+  } ]
+}

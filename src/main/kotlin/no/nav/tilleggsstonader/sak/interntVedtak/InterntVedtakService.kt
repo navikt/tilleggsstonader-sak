@@ -79,6 +79,7 @@ class InterntVedtakService(
                 kilde = it.kilde,
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
+                slettetKommentar = it.slettetKommentar,
             )
         }
     }
