@@ -37,6 +37,10 @@ object FileUtil {
     }
 
     fun skrivTilFil(filnavn: String, data: String) {
+        skrivTilFil(filnavn, data.toByteArray())
+    }
+
+    fun skrivTilFil(filnavn: String, data: ByteArray) {
         if (!SKAL_SKRIVE_TIL_FIL) {
             return
         }
@@ -44,6 +48,6 @@ object FileUtil {
         if (!file.exists()) {
             file.createNewFile()
         }
-        file.writeText(data)
+        file.writeBytes(data)
     }
 }

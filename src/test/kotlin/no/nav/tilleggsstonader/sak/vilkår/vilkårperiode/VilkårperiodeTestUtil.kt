@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
@@ -39,12 +39,18 @@ object VilkårperiodeTestUtil {
         resultat = resultat,
     )
 
-    fun delvilkårMålgruppe() = DelvilkårMålgruppe(
-        medlemskap = DelvilkårVilkårperiode.Vurdering(
-            svar = SvarJaNei.JA_IMPLISITT,
-            begrunnelse = null,
-            resultat = ResultatDelvilkårperiode.OPPFYLT,
-        ),
+    fun delvilkårMålgruppe(vurdering: Vurdering = vurdering()) = DelvilkårMålgruppe(
+        medlemskap = vurdering,
+    )
+
+    fun vurdering(
+        svar: SvarJaNei = SvarJaNei.JA_IMPLISITT,
+        begrunnelse: String? = null,
+        resultat: ResultatDelvilkårperiode = ResultatDelvilkårperiode.OPPFYLT,
+    ) = Vurdering(
+        svar = svar,
+        begrunnelse = begrunnelse,
+        resultat = resultat,
     )
 
     fun delvilkårMålgruppeDto() = DelvilkårMålgruppeDto(
@@ -60,6 +66,7 @@ object VilkårperiodeTestUtil {
         begrunnelse: String? = null,
         kilde: KildeVilkårsperiode = KildeVilkårsperiode.SYSTEM,
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
+        slettetKommentar: String? = null,
     ) = Vilkårperiode(
         behandlingId = behandlingId,
         fom = fom,
@@ -69,19 +76,23 @@ object VilkårperiodeTestUtil {
         begrunnelse = begrunnelse,
         kilde = kilde,
         resultat = resultat,
+        slettetKommentar = slettetKommentar,
     )
 
-    fun delvilkårAktivitet() = DelvilkårAktivitet(
-        lønnet = DelvilkårVilkårperiode.Vurdering(
+    fun delvilkårAktivitet(
+        lønnet: Vurdering = vurdering(
             svar = SvarJaNei.NEI,
             begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
-        mottarSykepenger = DelvilkårVilkårperiode.Vurdering(
+        mottarSykepenger: Vurdering = vurdering(
             svar = SvarJaNei.NEI,
             begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
+    ) = DelvilkårAktivitet(
+        lønnet = lønnet,
+        mottarSykepenger = mottarSykepenger,
     )
 
     fun delvilkårAktivitetDto() = DelvilkårAktivitetDto(
