@@ -323,7 +323,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal validere stønadsperioder ved opprettelse av vilkårperiode - ingen stønadsperioder`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val response = vilkårperiodeService.opprettVilkårperiodeOgValiderStønadsperioder(
+            val periode = vilkårperiodeService.opprettVilkårperiode(
                 LagreVilkårperiode(
                     type = MålgruppeType.AAP,
                     fom = LocalDate.now(),
@@ -332,6 +332,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     behandlingId = behandling.id,
                 ),
             )
+
+            val response = vilkårperiodeService.validerOgResponse(periode)
 
             assertThat(response.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.OK)
             assertThat(response.stønadsperiodeFeil).isNull()
@@ -347,7 +349,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val fom2 = LocalDate.of(2024, 2, 1)
             val tom2 = LocalDate.of(2024, 3, 1)
 
-            vilkårperiodeService.opprettVilkårperiodeOgValiderStønadsperioder(
+            vilkårperiodeService.opprettVilkårperiode(
                 LagreVilkårperiode(
                     type = MålgruppeType.AAP,
                     fom = fom1,
@@ -356,7 +358,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     behandlingId = behandling.id,
                 ),
             )
-            val oppprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiodeOgValiderStønadsperioder(
+            val oppprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiode(
                 LagreVilkårperiode(
                     type = AktivitetType.TILTAK,
                     fom = fom1,
@@ -368,8 +370,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyStønadsperiode(fom1, tom1)))
 
-            val oppdatertResponse = vilkårperiodeService.oppdaterVilkårperiodeOgValiderStønadsperioder(
-                id = oppprettetTiltakPeriode.periode.id,
+            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(
+                id = oppprettetTiltakPeriode.id,
                 vilkårperiode = LagreVilkårperiode(
                     type = AktivitetType.TILTAK,
                     fom = fom2,
@@ -379,7 +381,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 ),
             )
 
-            assertThat(oppdatertResponse.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.FEIL)
+            assertThat(vilkårperiodeService.validerOgResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.FEIL)
         }
 
         private fun nyStønadsperiode(fom: LocalDate = LocalDate.now(), tom: LocalDate = LocalDate.now()) =

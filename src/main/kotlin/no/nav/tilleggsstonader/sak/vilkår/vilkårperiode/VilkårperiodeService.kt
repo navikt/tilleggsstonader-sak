@@ -51,21 +51,7 @@ class VilkårperiodeService(
         vilkårsperioder: List<Vilkårperiode>,
     ) = vilkårsperioder.filter { it.type is T }
 
-    @Transactional
-    fun opprettVilkårperiodeOgValiderStønadsperioder(vilkårperiode: LagreVilkårperiode): LagreVilkårperiodeResponse {
-        val opprettetPeriode = opprettVilkårperiode(vilkårperiode)
-
-        return validerOgResponse(opprettetPeriode)
-    }
-
-    @Transactional
-    fun oppdaterVilkårperiodeOgValiderStønadsperioder(id: UUID, vilkårperiode: LagreVilkårperiode): LagreVilkårperiodeResponse {
-        val oppdatertPeriode = oppdaterVilkårperiode(id, vilkårperiode)
-
-        return validerOgResponse(oppdatertPeriode)
-    }
-
-    private fun validerOgResponse(
+    fun validerOgResponse(
         periode: Vilkårperiode,
     ): LagreVilkårperiodeResponse {
         val valideringsresultat = validerStønadsperioder(periode.behandlingId)
@@ -75,13 +61,6 @@ class VilkårperiodeService(
             stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
             stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
         )
-    }
-
-    @Transactional
-    fun slettVilkårperiodeOgValiderStønadsperioder(id: UUID, slettVikårperiode: SlettVikårperiode): LagreVilkårperiodeResponse {
-        val slettetPeriode = slettVilkårperiode(id, slettVikårperiode)
-
-        return validerOgResponse(slettetPeriode)
     }
 
     @Transactional
