@@ -66,16 +66,6 @@
             margin-left: 5px;
         }
 
-        .stonadsperioder table, td, th {
-            border: 1px solid;
-            border-collapse: collapse;
-        }
-
-        .stonadsperioder td, th {
-            text-align: left;
-            padding: 3px 10px;
-        }
-
         @page {
             @bottom-right {
                 content: 'Side ' counter(page) ' av ' counter(pages);
@@ -89,13 +79,14 @@
             width: 85%
         }
 
-        h1, h2, h3, h4 {
+        h2, h3, h4 {
             margin-bottom: 10px;
         }
 
         h1 {
             font-size: 36px;
-            margin-top: 30px
+            margin-top: 30px;
+            margin-bottom: 20px;
         }
 
         h2 {
@@ -129,6 +120,16 @@
             font-style: italic;
             font-size: 75%;
         }
+
+        table, td, th {
+            border: 1px solid;
+            border-collapse: collapse;
+        }
+
+        td, th {
+            text-align: left;
+            padding: 3px 10px;
+        }
     </style>
     <title>Internt vedtak Tilsyn barn</title></head>
 <body class="body">
@@ -158,17 +159,46 @@
 </div>
 <div class="internt-vedtak-page-break ">
     <div class="behandling"><h1>Internt vedtak Tilsyn barn</h1>
-        <div>Ident: 15</div>
-        <div>Fagsak: 1673</div>
-        <div>Behandling: 001464ca-20dc-4f6c-b3e8-c83bd98b3e31</div>
-        <div>Opprettet: 05.02.2024 kl.00:00</div>
-        <div>Årsak: SØKNAD</div>
-        <div style="margin-top:10px">
-            <div>Saksbehandler: saksbehandler</div>
-            <div>Beslutter: saksbeh2</div>
-            <div>Resultat: IKKE_SATT</div>
-            <div>Vedtakstidspunkt: 01.01.2024 kl.00:00</div>
-        </div>
+        <table>
+            <tbody>
+            <tr>
+                <th>Ident</th>
+                <td>15</td>
+            </tr>
+            <tr>
+                <th>Fagsak</th>
+                <td>1673</td>
+            </tr>
+            <tr>
+                <th>Behandling</th>
+                <td>001464ca-20dc-4f6c-b3e8-c83bd98b3e31</td>
+            </tr>
+            <tr>
+                <th>Opprettet</th>
+                <td>05.02.2024 kl.00:00</td>
+            </tr>
+            <tr>
+                <th>Årsak</th>
+                <td>SØKNAD</td>
+            </tr>
+            <tr>
+                <th>Saksbehandler</th>
+                <td>saksbehandler</td>
+            </tr>
+            <tr>
+                <th>Beslutter</th>
+                <td>saksbeh2</td>
+            </tr>
+            <tr>
+                <th>Resultat</th>
+                <td>IKKE_SATT</td>
+            </tr>
+            <tr>
+                <th>Vedtakstidspunkt</th>
+                <td>01.01.2024 kl.00:00</td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 <div class="internt-vedtak-page-break "><h2>Søknad</h2>
