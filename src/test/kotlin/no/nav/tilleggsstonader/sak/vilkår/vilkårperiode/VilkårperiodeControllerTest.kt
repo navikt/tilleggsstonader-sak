@@ -94,7 +94,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
             ),
         )
 
-        assertThat(response.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.Ok)
+        assertThat(response.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.OK)
         assertThat(response.stønadsperiodeFeil).isNull()
     }
 
@@ -140,7 +140,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
             ),
         )
 
-        assertThat(oppdatertResponse.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.Feil)
+        assertThat(oppdatertResponse.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.FEIL)
     }
 
     private fun hentVilkårperioder(behandling: Behandling) =

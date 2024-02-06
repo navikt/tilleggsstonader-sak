@@ -59,7 +59,7 @@ class VilkårperiodeService(
 
         return LagreVilkårperiodeResponse(
             opprettetPeriode.tilDto(),
-            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.Ok else Stønadsperiodestatus.Feil,
+            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
             stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
         )
     }
@@ -72,7 +72,7 @@ class VilkårperiodeService(
 
         return LagreVilkårperiodeResponse(
             oppdatertPeriode.tilDto(),
-            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.Ok else Stønadsperiodestatus.Feil,
+            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
             stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
         )
     }
@@ -85,7 +85,7 @@ class VilkårperiodeService(
 
         return LagreVilkårperiodeResponse(
             slettetPeriode.tilDto(),
-            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.Ok else Stønadsperiodestatus.Feil,
+            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
             stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
         )
     }
