@@ -132,5 +132,4 @@ clients:
     uri: https://tilleggsstonader-arena.${CLIENT_ENV}-fss-pub.nais.io
     scope: api://${CLIENT_ENV}-fss.tilleggsstonader.tilleggsstonader-arena/.default
   htmlify:
-    uri: https://tilleggsstonader-htmlify.${CLIENT_ENV}-gcp-pub.nais.io
-    scope: api://${CLIENT_ENV}-gcp.tilleggsstonader.tilleggsstonader-arena/.default
+    uri: http://tilleggsstonader-htmlify
