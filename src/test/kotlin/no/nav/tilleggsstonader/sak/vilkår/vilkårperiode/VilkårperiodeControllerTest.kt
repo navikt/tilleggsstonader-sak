@@ -9,8 +9,8 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -58,7 +58,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
             testoppsettService.lagre(behandling(it))
         }
 
-        val periode = opprettVilkårperiode(
+        val response = opprettVilkårperiode(
             LagreVilkårperiode(
                 type = MålgruppeType.AAP,
                 fom = LocalDate.now(),
@@ -69,7 +69,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         )
         val exception = catchProblemDetailException {
             slettVilkårperiode(
-                vilkårperiodeId = periode.id,
+                vilkårperiodeId = response.periode.id,
                 SlettVikårperiode(behandlingForAnnenFagsak.id, "test"),
             )
         }
@@ -85,7 +85,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
 
     private fun opprettVilkårperiode(
         lagreVilkårperiode: LagreVilkårperiode,
-    ) = restTemplate.exchange<VilkårperiodeDto>(
+    ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
         localhost("api/vilkarperiode"),
         HttpMethod.POST,
         HttpEntity(lagreVilkårperiode, headers),
@@ -94,7 +94,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     private fun slettVilkårperiode(
         vilkårperiodeId: UUID,
         slettVikårperiode: SlettVikårperiode,
-    ) = restTemplate.exchange<VilkårperiodeDto>(
+    ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
         localhost("api/vilkarperiode/$vilkårperiodeId"),
         HttpMethod.DELETE,
         HttpEntity(slettVikårperiode, headers),
