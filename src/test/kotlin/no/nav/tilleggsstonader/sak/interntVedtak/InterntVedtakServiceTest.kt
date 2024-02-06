@@ -158,6 +158,7 @@ class InterntVedtakServiceTest {
 
     /**
      * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
+     * Endre SKAL_SKRIVE_TIL_FIL til true
      * Formatter htmlfil etter generering for å unngå stor diff
      */
     @Disabled
