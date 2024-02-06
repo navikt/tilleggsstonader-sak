@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringRequest
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.FnrUtil.validerIdent
 import org.springframework.http.HttpStatus
@@ -23,7 +24,7 @@ class AutomatiskJournalføringController(private val automatiskJournalføringSer
     @PostMapping
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun håndterSøknad(@RequestBody request: AutomatiskJournalføringRequest) {
-        feilHvisIkke(SikkerhetContext.kallKommerFraSoknadApi(), HttpStatus.UNAUTHORIZED) {
+        feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
         validerIdent(request.personIdent)
