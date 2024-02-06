@@ -76,8 +76,6 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         assertThat(exception.detail.detail).contains("BehandlingId er ikke lik")
     }
 
-
-
     private fun hentVilkårperioder(behandling: Behandling) =
         restTemplate.exchange<VilkårperioderDto>(
             localhost("api/vilkarperiode/behandling/${behandling.id}"),
@@ -92,8 +90,6 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         HttpMethod.POST,
         HttpEntity(lagreVilkårperiode, headers),
     ).body!!
-
-
 
     private fun slettVilkårperiode(
         vilkårperiodeId: UUID,
