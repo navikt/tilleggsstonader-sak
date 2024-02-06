@@ -224,7 +224,7 @@ class TotrinnskontrollService(
     }
 
     private fun beslutterErLikBehandler(beslutteTotrinnskontroll: Totrinnskontroll): Boolean {
-        return beslutteTotrinnskontroll.beslutter == beslutteTotrinnskontroll.saksbehandler
+        return SikkerhetContext.hentSaksbehandler() == beslutteTotrinnskontroll.saksbehandler
     }
 
     private fun oppdaterStatusPåTotrinnskontroll(status: TotrinnInternStatus, gjeldeneTotrinnskontroll: Totrinnskontroll): Totrinnskontroll {

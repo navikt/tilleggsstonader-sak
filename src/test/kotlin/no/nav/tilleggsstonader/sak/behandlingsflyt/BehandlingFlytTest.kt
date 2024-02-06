@@ -65,6 +65,10 @@ class BehandlingFlytTest(
         }
         assertSisteOpprettedeOppgave(behandlingId, Oppgavetype.GodkjenneVedtak)
 
+        somSaksbehandler("annenSaksbehandler") {
+            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
+        }
+
         somBeslutter {
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
             godkjennTotrinnskontroll(behandlingId)
@@ -75,10 +79,26 @@ class BehandlingFlytTest(
     }
 
     @Test
+    fun `totrinnskontroll skal returnere riktig status etter sendt til beslutter når saksbehandler har beslutterrolle`() {
+        val behandlingId = somBeslutter {
+            val behandlingId = opprettBehandlingOgSendTilBeslutter(personIdent)
+            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
+            behandlingId
+        }
+
+        somSaksbehandler {
+            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
+        }
+
+        somBeslutter("annenBeslutter") {
+            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.KAN_FATTE_VEDTAK)
+        }
+    }
+
+    @Test
     fun `underkjenner og sender til beslutter på nytt`() {
         val behandlingId = somSaksbehandler {
             val behandlingId = opprettBehandlingOgSendTilBeslutter(personIdent)
-            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
             assertSisteFerdigstillOppgaveTask(Oppgavetype.BehandleSak)
             behandlingId
         }
@@ -107,7 +127,6 @@ class BehandlingFlytTest(
     fun `angrer send til beslutter`() {
         val behandlingId = somSaksbehandler {
             val behandlingId = opprettBehandlingOgSendTilBeslutter(personIdent)
-            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.IKKE_AUTORISERT)
             assertSisteFerdigstillOppgaveTask(Oppgavetype.BehandleSak)
             behandlingId
         }
@@ -263,19 +282,19 @@ class BehandlingFlytTest(
         utgift = 1000,
     )
 
-    private fun <T> somSaksbehandler(fn: () -> T): T {
+    private fun <T> somSaksbehandler(preferredUsername: String = "saksbehandler", fn: () -> T): T {
         kjørTasks()
         return testWithBrukerContext(
-            preferredUsername = "saksbehandler",
+            preferredUsername = preferredUsername,
             groups = listOf(rolleConfig.saksbehandlerRolle),
         ) {
             withCallId(fn)
         }
     }
 
-    private fun <T> somBeslutter(fn: () -> T): T {
+    private fun <T> somBeslutter(preferredUsername: String = "beslutter", fn: () -> T): T {
         kjørTasks()
-        return testWithBrukerContext(preferredUsername = "beslutter", groups = listOf(rolleConfig.beslutterRolle)) {
+        return testWithBrukerContext(preferredUsername = preferredUsername, groups = listOf(rolleConfig.beslutterRolle)) {
             withCallId(fn)
         }
     }
