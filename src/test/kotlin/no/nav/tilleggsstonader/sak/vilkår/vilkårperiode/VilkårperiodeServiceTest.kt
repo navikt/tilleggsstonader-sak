@@ -333,7 +333,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 ),
             )
 
-            val response = vilkårperiodeService.validerOgResponse(periode)
+            val response = vilkårperiodeService.validerOgLagResponse(periode)
 
             assertThat(response.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.OK)
             assertThat(response.stønadsperiodeFeil).isNull()
@@ -381,7 +381,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 ),
             )
 
-            assertThat(vilkårperiodeService.validerOgResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.FEIL)
+            assertThat(vilkårperiodeService.validerOgLagResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.FEIL)
         }
 
         private fun nyStønadsperiode(fom: LocalDate = LocalDate.now(), tom: LocalDate = LocalDate.now()) =

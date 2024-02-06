@@ -51,7 +51,7 @@ class VilkårperiodeService(
         vilkårsperioder: List<Vilkårperiode>,
     ) = vilkårsperioder.filter { it.type is T }
 
-    fun validerOgResponse(
+    fun validerOgLagResponse(
         periode: Vilkårperiode,
     ): LagreVilkårperiodeResponse {
         val valideringsresultat = validerStønadsperioder(periode.behandlingId)
