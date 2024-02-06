@@ -25,4 +25,6 @@ fun appLocal(): SpringApplicationBuilder =
             "mock-iverksett",
             "mock-oppgave",
             "mock-featuretoggle",
+            "mock-journalpost",
+            "mock-htmlify",
         )

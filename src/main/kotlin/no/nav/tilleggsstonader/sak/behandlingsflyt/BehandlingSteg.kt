@@ -70,13 +70,6 @@ enum class StegType(
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
-
-    /*
-    LAG_SAKSBEHANDLINGSBLANKETT(
-        rekkefølge = 6,
-        tillattFor = BehandlerRolle.SYSTEM,
-        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
-    ),*/
     FERDIGSTILLE_BEHANDLING(
         rekkefølge = 7,
         tillattFor = BehandlerRolle.SYSTEM,
