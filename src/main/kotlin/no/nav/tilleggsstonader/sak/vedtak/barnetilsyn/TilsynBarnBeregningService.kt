@@ -95,18 +95,6 @@ class TilsynBarnBeregningService {
         }
     }
 
-    private fun finnMakssats(måned: YearMonth, antallBarn: Int): Int {
-        val sats = satser.find { måned in it.fom..it.tom }
-            ?: error("Finner ikke satser for $måned")
-        val satsa = when {
-            antallBarn == 1 -> sats.beløp[1]
-            antallBarn == 2 -> sats.beløp[2]
-            antallBarn > 2 -> sats.beløp[3]
-            else -> null
-        } ?: error("Kan ikke håndtere satser for antallBarn=$antallBarn")
-        return satsa
-    }
-
     private fun antallDager(stønadsperioder: List<Stønadsperiode>): Int {
         return stønadsperioder.sumOf { stønadsperiode ->
             stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
