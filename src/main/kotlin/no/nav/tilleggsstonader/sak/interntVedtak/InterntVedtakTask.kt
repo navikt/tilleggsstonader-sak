@@ -52,7 +52,7 @@ class InterntVedtakTask(
                         dokumenttype = stønadstype.dokumentTypeInterntVedtak(),
                     ),
                 ),
-                fagsakId = null,
+                fagsakId = interntVedtak.behandling.eksternFagsakId.toString(),
                 avsenderMottaker = null,
                 journalførendeEnhet = enhet,
                 eksternReferanseId = "$behandlingId-blankett",
