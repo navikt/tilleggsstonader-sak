@@ -55,23 +55,23 @@ class VilkårperiodeService(
     fun opprettVilkårperiodeOgValiderStønadsperioder(vilkårperiode: LagreVilkårperiode): LagreVilkårperiodeResponse {
         val opprettetPeriode = opprettVilkårperiode(vilkårperiode)
 
-        val valideringsresultat = validerStønadsperioder(vilkårperiode.behandlingId)
-
-        return LagreVilkårperiodeResponse(
-            opprettetPeriode.tilDto(),
-            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
-            stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
-        )
+        return validerOgResponse(opprettetPeriode)
     }
 
     @Transactional
     fun oppdaterVilkårperiodeOgValiderStønadsperioder(id: UUID, vilkårperiode: LagreVilkårperiode): LagreVilkårperiodeResponse {
         val oppdatertPeriode = oppdaterVilkårperiode(id, vilkårperiode)
 
-        val valideringsresultat = validerStønadsperioder(vilkårperiode.behandlingId)
+        return validerOgResponse(oppdatertPeriode)
+    }
+
+    private fun validerOgResponse(
+        periode: Vilkårperiode,
+    ): LagreVilkårperiodeResponse {
+        val valideringsresultat = validerStønadsperioder(periode.behandlingId)
 
         return LagreVilkårperiodeResponse(
-            oppdatertPeriode.tilDto(),
+            periode.tilDto(),
             stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
             stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
         )
@@ -81,13 +81,7 @@ class VilkårperiodeService(
     fun slettVilkårperiodeOgValiderStønadsperioder(id: UUID, slettVikårperiode: SlettVikårperiode): LagreVilkårperiodeResponse {
         val slettetPeriode = slettVilkårperiode(id, slettVikårperiode)
 
-        val valideringsresultat = validerStønadsperioder(slettVikårperiode.behandlingId)
-
-        return LagreVilkårperiodeResponse(
-            slettetPeriode.tilDto(),
-            stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
-            stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
-        )
+        return validerOgResponse(slettetPeriode)
     }
 
     @Transactional
