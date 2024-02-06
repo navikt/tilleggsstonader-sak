@@ -19,11 +19,11 @@ object EvalueringMålgruppe {
         return when (type) {
             MålgruppeType.AAP,
             MålgruppeType.OVERGANGSSTØNAD,
-            MålgruppeType.UFØRETRYGD,
             -> jaImplisitt(delvilkår, type)
 
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.OMSTILLINGSSTØNAD,
+            MålgruppeType.UFØRETRYGD,
             -> utledResultat(delvilkår)
 
             MålgruppeType.DAGPENGER -> utledResultat(delvilkår) // Foreløpig
