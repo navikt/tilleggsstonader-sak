@@ -24,15 +24,12 @@ object SikkerhetContext {
             claims.getAsList("roles").contains("access_as_application")
     }
 
-    // eks kallKommerFra("teamfamilie:familie-ef-mottak")
-    private fun kallKommerFra(forventetApplikasjonsSuffix: String): Boolean {
+    fun kallKommerFra(eksternApplikasjon: EksternApplikasjon): Boolean {
         val claims = SpringTokenValidationContextHolder().tokenValidationContext.getClaims("azuread")
         val applikasjonsnavn = claims.get("azp_name")?.toString() ?: "" // e.g. dev-gcp:some-team:application-name
         secureLogger.info("Applikasjonsnavn: $applikasjonsnavn")
-        return applikasjonsnavn.endsWith(forventetApplikasjonsSuffix)
+        return applikasjonsnavn.endsWith(eksternApplikasjon.namespaceAppNavn)
     }
-
-    fun kallKommerFraSoknadApi(): Boolean = kallKommerFra("tilleggsstonader:tilleggsstonader-soknad-api")
 
     fun hentSaksbehandler(): String {
         val result = hentSaksbehandlerEllerSystembruker()
