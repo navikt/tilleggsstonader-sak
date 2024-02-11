@@ -1,11 +1,11 @@
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20240110093731_0eda75e"
 val tilleggsstønaderLibsVersion = "2024.01.31-13.14.525870bbcf52"
-val tilleggsstønaderKontrakterVersion = "2024.02.01-16.47.d4589a911198"
-val tokenSupportVersion = "3.2.0"
+val tilleggsstønaderKontrakterVersion = "2024.02.10-11.13.224861e5b075"
+val tokenSupportVersion = "4.1.3"
 val wiremockVersion = "3.3.1"
-val mockkVersion = "1.13.8"
-val testcontainerVersion = "1.19.3"
+val mockkVersion = "1.13.9"
+val testcontainerVersion = "1.19.5"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -14,15 +14,15 @@ plugins {
     application
 
     kotlin("jvm") version "1.9.22"
-    id("com.diffplug.spotless") version "6.23.3"
-    id("com.github.ben-manes.versions") version "0.50.0"
+    id("com.diffplug.spotless") version "6.25.0"
+    id("com.github.ben-manes.versions") version "0.51.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
-    id("org.springframework.boot") version "3.2.1"
+    id("org.springframework.boot") version "3.2.2"
     id("io.spring.dependency-management") version "1.1.4"
     kotlin("plugin.spring") version "1.9.22"
 
-    id("org.cyclonedx.bom") version "1.8.1"
+    id("org.cyclonedx.bom") version "1.8.2"
 }
 
 repositories {
