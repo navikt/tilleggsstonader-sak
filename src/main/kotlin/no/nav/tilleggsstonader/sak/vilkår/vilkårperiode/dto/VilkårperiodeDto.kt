@@ -8,7 +8,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.erSortert
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
@@ -90,21 +92,22 @@ data class Datoperiode(
 // TODO flytt til kontrakter
 fun Periode<LocalDate>.formattertPeriodeNorskFormat() = "${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
 
-fun List<VilkårperiodeDto>.mergeSammenhengendeVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> =
-    this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
-        .mapValues {
-            it.value.map { Datoperiode(it.fom, it.tom) }
-                .mergeSammenhengende { a, b -> a.tom.plusDays(1) == b.fom }
-        }
+/**
+ *  @receiver En sortert liste av vilkårsperioder
+ *  @return En map kategorisert på periodetype med de oppfylte vilkårsperiodene. Periodene slåes sammen dersom
+ *  de er sammenhengende, også selv om de har overlapp.
+ */
+fun List<VilkårperiodeDto>.mergeSammenhengendeOppfylteVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> {
+    feilHvisIkke(this.erSortert()) {
+        "Vilkårsperioder må være sortert for merging"
+    }
 
-fun List<VilkårperiodeDto>.mergeSammenhengendeOgOverlappendeVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> =
-    this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
+    return this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
         .mapValues {
             it.value.map { Datoperiode(it.fom, it.tom) }
-                .mergeSammenhengende { a, b ->
-                    a.tom.plusDays(1) >= b.fom && a.tom <= b.tom
-                }
+                .mergeSammenhengende { a, b -> a.overlapper(b) || a.tom.plusDays(1) == b.fom }
         }
+}
 
 data class LagreVilkårperiode(
     val behandlingId: UUID,
