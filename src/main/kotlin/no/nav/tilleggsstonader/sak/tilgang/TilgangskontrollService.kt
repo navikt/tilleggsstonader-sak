@@ -97,7 +97,7 @@ class TilgangskontrollService(
             return Tilgang(true)
         }
         secureLogger.info(
-            "${jwtToken.jwtTokenClaims["preferred_username"]} " +
+            "${jwtToken.jwtTokenClaims.get("preferred_username")} " +
                 "har ikke tilgang ${adRolle?.beskrivelse} for $personIdent",
         )
         return Tilgang(harTilgang = false, begrunnelse = adRolle?.beskrivelse)
