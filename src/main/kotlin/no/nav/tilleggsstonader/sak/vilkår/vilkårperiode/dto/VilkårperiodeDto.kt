@@ -97,6 +97,15 @@ fun List<VilkårperiodeDto>.mergeSammenhengendeVilkårperioder(): Map<Vilkårper
                 .mergeSammenhengende { a, b -> a.tom.plusDays(1) == b.fom }
         }
 
+fun List<VilkårperiodeDto>.mergeSammenhengendeOgOverlappendeVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> =
+    this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
+        .mapValues {
+            it.value.map { Datoperiode(it.fom, it.tom) }
+                .mergeSammenhengende { a, b ->
+                    a.tom.plusDays(1) >= b.fom && a.tom <= b.tom
+                }
+        }
+
 data class LagreVilkårperiode(
     val behandlingId: UUID,
     @JsonDeserialize(using = VilkårperiodeTypeDeserializer::class)
