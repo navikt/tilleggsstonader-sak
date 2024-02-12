@@ -81,7 +81,6 @@ object SikkerhetContext {
     private fun TokenValidationContext.getClaim(name: String) =
         this.getJwtToken("azuread")?.jwtTokenClaims?.get(name)
 
-
     /**
      * Denne sjekker at contexten har tilgang til påkrevd rolle
      * Hvis man gjør et kall uten token på en controller med @Unprotected så får man automatiskt systemrolle
