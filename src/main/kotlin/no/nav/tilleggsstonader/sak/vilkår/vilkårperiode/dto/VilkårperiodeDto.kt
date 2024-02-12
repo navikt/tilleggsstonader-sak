@@ -83,7 +83,7 @@ data class Datoperiode(
     override val tom: LocalDate,
 ) : Periode<LocalDate>, Mergeable<LocalDate, Datoperiode> {
     override fun merge(other: Datoperiode): Datoperiode {
-        return this.copy(tom = other.tom)
+        return if (this.inneholder(other)) this else this.copy(tom = other.tom)
     }
 }
 
