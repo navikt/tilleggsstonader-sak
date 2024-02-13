@@ -28,7 +28,7 @@ class TilkjentYtelseService(
 
     fun harLøpendeUtbetaling(behandlingId: UUID): Boolean {
         return tilkjentYtelseRepository.findByBehandlingId(behandlingId)
-            ?.let { it.andelerTilkjentYtelse.any { andel -> andel.stønadTom.isAfter(LocalDate.now()) } } ?: false
+            ?.let { it.andelerTilkjentYtelse.any { andel -> andel.tom.isAfter(LocalDate.now()) } } ?: false
     }
 
     fun slettTilkjentYtelseForBehandling(saksbehandling: Saksbehandling) {

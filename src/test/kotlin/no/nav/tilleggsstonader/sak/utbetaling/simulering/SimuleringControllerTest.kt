@@ -6,8 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Simuleringsoppsummering
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -46,17 +45,9 @@ internal class SimuleringControllerTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak))
         tilkjentYtelseRepository
             .insert(
-                TilkjentYtelse(
+                tilkjentYtelse(
                     behandlingId = behandling.id,
                     startdato = LocalDate.of(2021, 1, 1),
-                    andelerTilkjentYtelse = listOf(
-                        AndelTilkjentYtelse(
-                            15000,
-                            LocalDate.of(2021, 1, 1),
-                            LocalDate.of(2021, 12, 31),
-                            kildeBehandlingId = behandling.id,
-                        ),
-                    ),
                 ),
             )
 
