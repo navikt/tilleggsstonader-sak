@@ -69,7 +69,7 @@ enum class TypeAndel {
 enum class Satstype {
     DAG,
     MÅNED,
-    ENGANGS,
+    ENGANGSBELØP,
 }
 
 /**
