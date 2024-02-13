@@ -44,9 +44,10 @@ object BrukerContextUtil {
             tokenValidationContext,
             RequestAttributes.SCOPE_REQUEST,
         )
-        every { tokenValidationContext.getClaims("azuread") } returns jwtTokenClaims
         val jwtToken = mockk<JwtToken>()
         every { jwtToken.subject } returns preferredUsername
+        every { jwtToken.jwtTokenClaims } returns jwtTokenClaims
+        every { tokenValidationContext.getClaims("azuread") } returns jwtTokenClaims
         every { tokenValidationContext.getJwtToken("azuread") } returns jwtToken
     }
 
