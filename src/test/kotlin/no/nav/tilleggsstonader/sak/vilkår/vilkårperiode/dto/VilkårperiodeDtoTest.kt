@@ -205,23 +205,5 @@ class VilkårperiodeDtoTest {
                 ),
             )
         }
-
-        @Test
-        fun `skal feile hvis perioder ikke er sortert`() {
-            val perioder = listOf(
-                VilkårperiodeTestUtil.aktivitet(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 10),
-                ).tilDto(),
-                VilkårperiodeTestUtil.aktivitet(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 8),
-                ).tilDto(),
-            )
-
-            assertThatThrownBy {
-                perioder.mergeSammenhengendeOppfylteVilkårperioder()
-            }.hasMessageContaining("Vilkårsperioder må være sortert for merging")
-        }
     }
 }

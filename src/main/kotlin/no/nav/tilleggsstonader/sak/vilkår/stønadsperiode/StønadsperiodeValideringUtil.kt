@@ -17,8 +17,8 @@ object StønadsperiodeValideringUtil {
         vilkårperioder: VilkårperioderDto,
     ) {
         validerIkkeOverlappendeStønadsperioder(stønadsperioder)
-        val målgrupper = vilkårperioder.målgrupper.sorted().mergeSammenhengendeOppfylteVilkårperioder()
-        val aktiviteter = vilkårperioder.aktiviteter.sorted().mergeSammenhengendeOppfylteVilkårperioder()
+        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
+        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
 
         stønadsperioder.forEach { validerStønadsperiode(it, målgrupper, aktiviteter) }
     }
