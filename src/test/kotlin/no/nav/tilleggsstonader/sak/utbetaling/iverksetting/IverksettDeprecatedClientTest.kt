@@ -23,7 +23,7 @@ import org.springframework.web.client.RestTemplate
 import java.net.URI
 import java.util.UUID
 
-class IverksettClientTest {
+class IverksettDeprecatedClientTest {
 
     @Test
     fun `skal ignorere CONFLICT`() {

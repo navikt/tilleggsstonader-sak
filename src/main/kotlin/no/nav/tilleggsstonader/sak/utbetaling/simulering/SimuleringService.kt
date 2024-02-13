@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.iverksett.IverksettClient
+import no.nav.tilleggsstonader.sak.iverksett.IverksettDeprecatedClient
 import no.nav.tilleggsstonader.sak.iverksett.tilTilkjentYtelseMedMetaData
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
@@ -24,7 +24,7 @@ import java.util.UUID
 
 @Service
 class SimuleringService(
-    private val iverksettClient: IverksettClient,
+    private val iverksettClient: IverksettDeprecatedClient,
     private val simuleringsresultatRepository: SimuleringsresultatRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val tilgangService: TilgangService,
