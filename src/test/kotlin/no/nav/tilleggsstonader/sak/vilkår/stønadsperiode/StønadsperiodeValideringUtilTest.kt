@@ -121,6 +121,69 @@ internal class StønadsperiodeValideringUtilTest {
         }.hasMessageContaining(feilmeldingIkkeOverlappendePeriode(stønadsperiode, stønadsperiode.aktivitet))
     }
 
+    @Test
+    internal fun `skal ikke kaste feil dersom stønadsperiode går på tvers av to sammengengdende vilkårsperioder`() {
+        val stønadsperiode = lagStønadsperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 12))
+
+        val målgrupper = listOf(
+            målgruppe(
+                fom = LocalDate.of(2023, 1, 1),
+                tom = LocalDate.of(2023, 1, 31),
+            ).tilDto(),
+        )
+        val aktiviteter = listOf(
+            aktivitet(
+                fom = LocalDate.of(2023, 1, 1),
+                tom = LocalDate.of(2023, 1, 10),
+                type = AktivitetType.TILTAK,
+            ).tilDto(),
+            aktivitet(
+                fom = LocalDate.of(2023, 1, 11),
+                tom = LocalDate.of(2023, 1, 12),
+                type = AktivitetType.TILTAK,
+            ).tilDto(),
+        )
+
+        assertThatCode {
+            validerStønadsperioder(
+                listOf(stønadsperiode),
+                VilkårperioderDto(målgrupper, aktiviteter),
+            )
+        }.doesNotThrowAnyException()
+    }
+
+    @Test
+    internal fun `skal ikke kaste feil dersom stønadsperiode går på tvers av to delvis overlappende vilkårsperioder`() {
+        val stønadsperiode = lagStønadsperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 12))
+
+        val målgrupper = listOf(
+            målgruppe(
+                fom = LocalDate.of(2023, 1, 1),
+                tom = LocalDate.of(2023, 1, 31),
+            ).tilDto(),
+        )
+
+        val aktiviteter = listOf(
+            aktivitet(
+                fom = LocalDate.of(2023, 1, 1),
+                tom = LocalDate.of(2023, 1, 10),
+                type = AktivitetType.TILTAK,
+            ).tilDto(),
+            aktivitet(
+                fom = LocalDate.of(2023, 1, 7),
+                tom = LocalDate.of(2023, 1, 12),
+                type = AktivitetType.TILTAK,
+            ).tilDto(),
+        )
+
+        assertThatCode {
+            validerStønadsperioder(
+                listOf(stønadsperiode),
+                VilkårperioderDto(målgrupper, aktiviteter),
+            )
+        }.doesNotThrowAnyException()
+    }
+
     @Nested
     inner class ValiderStønadsperioderOverlapper {
         val fom = LocalDate.of(2023, 1, 1)

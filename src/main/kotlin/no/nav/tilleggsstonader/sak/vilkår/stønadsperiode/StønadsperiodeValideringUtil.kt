@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeT
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Datoperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.formattertPeriodeNorskFormat
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.mergeSammenhengendeVilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.mergeSammenhengendeOppfylteVilkårperioder
 
 object StønadsperiodeValideringUtil {
 
@@ -17,8 +17,8 @@ object StønadsperiodeValideringUtil {
         vilkårperioder: VilkårperioderDto,
     ) {
         validerIkkeOverlappendeStønadsperioder(stønadsperioder)
-        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeVilkårperioder()
-        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeVilkårperioder()
+        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
+        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
 
         stønadsperioder.forEach { validerStønadsperiode(it, målgrupper, aktiviteter) }
     }

@@ -83,19 +83,24 @@ data class Datoperiode(
     override val tom: LocalDate,
 ) : Periode<LocalDate>, Mergeable<LocalDate, Datoperiode> {
     override fun merge(other: Datoperiode): Datoperiode {
-        return this.copy(tom = other.tom)
+        return this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
     }
 }
 
 // TODO flytt til kontrakter
 fun Periode<LocalDate>.formattertPeriodeNorskFormat() = "${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
 
-fun List<VilkårperiodeDto>.mergeSammenhengendeVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> =
-    this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
+/**
+ *  @return En sortert map kategorisert på periodetype med de oppfylte vilkårsperiodene. Periodene slåes sammen dersom
+ *  de er sammenhengende, også selv om de har overlapp.
+ */
+fun List<VilkårperiodeDto>.mergeSammenhengendeOppfylteVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> {
+    return this.sorted().filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
         .mapValues {
             it.value.map { Datoperiode(it.fom, it.tom) }
-                .mergeSammenhengende { a, b -> a.tom.plusDays(1) == b.fom }
+                .mergeSammenhengende { a, b -> a.overlapper(b) || a.tom.plusDays(1) == b.fom }
         }
+}
 
 data class LagreVilkårperiode(
     val behandlingId: UUID,
