@@ -78,6 +78,8 @@ spec:
           namespace: nom
         - application: familie-dokument
           namespace: teamfamilie
+        - application: dp-iverksett
+          namespace: dagpenger
       external:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: tilleggsstonader-arena.prod-fss-pub.nais.io
