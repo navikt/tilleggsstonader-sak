@@ -39,7 +39,7 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
             fom = LocalDate.of(2023, 1, 1),
             tom = LocalDate.of(2023, 1, 1),
         )
-        val tilkjentYtelse = tilkjentYtelseRepository.insert(
+        tilkjentYtelseRepository.insert(
             TilkjentYtelse(
                 behandlingId = behandling.id,
                 andelerTilkjentYtelse = setOf(andel1, andel2),
@@ -53,11 +53,16 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
         )
         andelTilkjentYtelseRepository.update(iverksattAndel2)
 
-        val tyFraDb = tilkjentYtelseRepository.findByBehandlingId(behandling.id)
-        assertThat(tyFraDb).isEqualTo(tilkjentYtelse.copy(andelerTilkjentYtelse = setOf(andel1, iverksattAndel2.copy(version = 1))))
+        val tyFraDb = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
+        assertThat(tyFraDb.andelerTilkjentYtelse.toList())
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
+            .containsExactlyInAnyOrder(andel1, iverksattAndel2.copy(version = 1))
 
         val andel2FraDb = andelTilkjentYtelseRepository.findByIdOrThrow(andel2.id)
-        assertThat(andel2FraDb).isEqualTo(iverksattAndel2.copy(version = 1))
+        assertThat(andel2FraDb)
+            .usingRecursiveComparison()
+            .ignoringFields("endretTid")
+            .isEqualTo(iverksattAndel2.copy(version = 1))
     }
 
     @Test

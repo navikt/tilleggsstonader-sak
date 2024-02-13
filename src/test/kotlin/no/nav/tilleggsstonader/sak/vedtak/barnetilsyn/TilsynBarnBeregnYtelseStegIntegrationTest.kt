@@ -108,7 +108,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 )
             }
             assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
                 .containsExactlyElementsOf(forventedeAndeler)
         }
     }
