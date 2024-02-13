@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.kontrakter.felles.erSortert
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.norskFormat
@@ -85,7 +84,7 @@ data class Datoperiode(
     override val tom: LocalDate,
 ) : Periode<LocalDate>, Mergeable<LocalDate, Datoperiode> {
     override fun merge(other: Datoperiode): Datoperiode {
-        return if (this.inneholder(other)) this else this.copy(tom = other.tom)
+        return this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
     }
 }
 
