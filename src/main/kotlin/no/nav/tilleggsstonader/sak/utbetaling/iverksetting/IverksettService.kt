@@ -68,6 +68,7 @@ class IverksettService(
             iverksettingId = iverksettingId,
             forrigeIverksettingId = null,
         )
+        opprettPollStatusFraIverksettingTask(behandlingId, iverksettingId)
         iverksettClient.iverksett(dto)
     }
 
@@ -78,6 +79,17 @@ class IverksettService(
             "Totrinnskontroll må være godkjent for å kunne iverksette"
         }
         return totrinnskontroll
+    }
+
+    private fun opprettPollStatusFraIverksettingTask(behandlingId: UUID, iverksettingId: UUID) {
+        //TODO
+        /*taskService.save(
+            PollStatusFraIverksettingTask.opprettTask(
+                behandlingId = behandlingId,
+                iverksettingId = iverksettingId,
+            ),
+        )
+        */
     }
 
     private fun hentTilkjentYtelseOgOppdaterAndeler(
