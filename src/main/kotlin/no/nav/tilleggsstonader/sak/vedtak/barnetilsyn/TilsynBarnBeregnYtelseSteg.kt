@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StønadstypeIverksetting
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -66,7 +66,7 @@ class TilsynBarnBeregnYtelseSteg(
                     fom = stønadsperiode.fom,
                     tom = stønadsperiode.tom,
                     satstype = Satstype.DAG, // TODO
-                    type = StønadstypeIverksetting.TILSYN_BARN_AAP, // TODO
+                    type = TypeAndel.TILSYN_BARN_AAP, // TODO
                     kildeBehandlingId = saksbehandling.id,
                 )
             }

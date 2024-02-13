@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StønadstypeIverksetting
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.min
 import java.time.LocalDate
@@ -28,7 +28,7 @@ object TilkjentYtelseUtil {
         fom: LocalDate = LocalDate.of(2021, 1, 1),
         tom: LocalDate = LocalDate.of(2021, 1, 31),
         satstype: Satstype = Satstype.DAG,
-        type: StønadstypeIverksetting = StønadstypeIverksetting.TILSYN_BARN_AAP,
+        type: TypeAndel = TypeAndel.TILSYN_BARN_AAP,
     ) = AndelTilkjentYtelse(
         beløp = beløp,
         fom = fom,

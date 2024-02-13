@@ -28,7 +28,7 @@ data class AndelTilkjentYtelse(
     val fom: LocalDate,
     val tom: LocalDate,
     val satstype: Satstype,
-    val type: StønadstypeIverksetting,
+    val type: TypeAndel,
     val kildeBehandlingId: UUID,
     @Version
     val version: Int = 0,
@@ -60,7 +60,7 @@ data class Iverksetting(
  * Det er ønskelig at ulike typer brukes for ulike periodetyper.
  * Disse mappes fra stønadsperioden sin type målgruppe
  */
-enum class StønadstypeIverksetting {
+enum class TypeAndel {
     TILSYN_BARN_ENSLIG_FORSØRGER,
     TILSYN_BARN_AAP,
     TILSYN_BARN_ETTERLATTE,
