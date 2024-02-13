@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
@@ -33,6 +34,11 @@ class IverksettServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
+
+    @BeforeEach
+    fun setUp() {
+        clearMock(iverksettClient)
+    }
 
     @AfterEach
     override fun tearDown() {
