@@ -15,8 +15,8 @@ import java.util.UUID
 
 /**
  * [AndelTilkjentYtelse] inneholder informasjon om en andel er utbetalt eller ikke
- * Når man iverksetter lagres informasjon ned i [iverksetting] og [status] blir oppdatert
- * Når man fått kvittering fra økonomi oppdateres [status] på nytt
+ * Når man iverksetter lagres informasjon ned i [iverksetting] og [statusIverksetting] blir oppdatert
+ * Når man fått kvittering fra økonomi oppdateres [statusIverksetting] på nytt
  *
  * @param iverksetting når vi iverksetter en andel så oppdateres dette feltet med id og tidspunkt
  */
@@ -32,7 +32,7 @@ data class AndelTilkjentYtelse(
     val kildeBehandlingId: UUID,
     @Version
     val version: Int = 0,
-    val status: StatusIverksetting = StatusIverksetting.UBEHANDLET,
+    val statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     val iverksetting: Iverksetting? = null,
     @LastModifiedDate

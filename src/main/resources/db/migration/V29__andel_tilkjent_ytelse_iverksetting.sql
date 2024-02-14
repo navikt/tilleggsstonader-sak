@@ -11,7 +11,7 @@ CREATE TABLE andel_tilkjent_ytelse
     type                   VARCHAR      NOT NULL,
     version                BIGINT       NOT NULL,
     kilde_behandling_id    UUID         NOT NULL references behandling (id),
-    status                 VARCHAR      NOT NULL,
+    status_iverksetting    VARCHAR      NOT NULL,
     endret_tid             TIMESTAMP(3) NOT NULL,
     iverksetting_id        UUID,
     iverksetting_tidspunkt TIMESTAMP(3)

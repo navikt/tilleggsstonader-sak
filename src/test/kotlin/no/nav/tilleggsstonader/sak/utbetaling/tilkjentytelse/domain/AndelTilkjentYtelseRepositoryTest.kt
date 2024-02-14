@@ -48,7 +48,7 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
         )
 
         val iverksattAndel2 = andel2.copy(
-            status = StatusIverksetting.SENDT,
+            statusIverksetting = StatusIverksetting.SENDT,
             iverksetting = Iverksetting(UUID.randomUUID(), SporbarUtils.now()),
         )
         andelTilkjentYtelseRepository.update(iverksattAndel2)
@@ -88,7 +88,7 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
         )
 
         val andel = andelTilkjentYtelseRepository.findByIdOrThrow(andel1.id)
-        andelTilkjentYtelseRepository.update(andel.copy(status = StatusIverksetting.OK))
+        andelTilkjentYtelseRepository.update(andel.copy(statusIverksetting = StatusIverksetting.OK))
         val andelEtterOppdatering = andelTilkjentYtelseRepository.findByIdOrThrow(andel1.id)
 
         assertThat(andel.endretTid.toLocalDate()).isEqualTo(LocalDate.of(2023, 1, 1))
