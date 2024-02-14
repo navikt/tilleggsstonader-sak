@@ -44,7 +44,6 @@ class IverksettClient(
             "behandlingId" to behandlingId,
             "iverksettingId" to iverksettingId,
         )
-        println(url)
         return getForEntity<IverksettStatus>(url, uriVariables = uriVariables)
     }
 }

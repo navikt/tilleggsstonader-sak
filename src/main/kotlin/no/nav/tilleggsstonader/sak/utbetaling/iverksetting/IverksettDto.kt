@@ -4,6 +4,10 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
+/**
+ * Kopie fra dp-kontrakt, ønsker ikke å dra inn den avhengigheten
+ * https://github.com/navikt/dp-kontrakter/blob/main/iverksett/src/main/kotlin/no/nav/dagpenger/kontrakter/iverksett/IverksettTilleggsst%C3%B8naderDto.kt
+ */
 data class IverksettDto(
     val sakId: String,
     val behandlingId: UUID,
