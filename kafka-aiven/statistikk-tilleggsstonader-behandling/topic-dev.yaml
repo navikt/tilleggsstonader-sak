@@ -4,7 +4,7 @@ metadata:
   name: aapen-tilleggsstonader-behandling-test
   namespace: tilleggstonader
   labels:
-    team: teamtilleggsstoander
+    team: tilleggsstonader
 spec:
   pool: nav-dev
   config:

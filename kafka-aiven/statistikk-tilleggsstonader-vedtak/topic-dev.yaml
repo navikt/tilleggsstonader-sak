@@ -4,7 +4,7 @@ metadata:
   name: aapen-tilleggstonader-vedtak-test
   namespace: tilleggsstonader
   labels:
-    team: teamtilleggsstonader
+    team: tilleggsstonader
 spec:
   pool: nav-dev
   config:
@@ -15,6 +15,6 @@ spec:
     retentionBytes: -1
     retentionHours: 720
   acl:
-    - team: teamtilleggsstonader
+    - team: tilleggsstonader
       application: tilleggsstoander-sak
       access: readwrite

@@ -136,6 +136,10 @@ no.nav.security.jwt:
         client-secret: ${AZURE_APP_CLIENT_SECRET}
         client-auth-method: client_secret_basic
 
+TILLEGGSTONADER_VEDTAK_TOPIC: tilleggstonader.aapen-tilleggsstonader-vedtak
+TILLEGGSTONADER_BEHANDLING_TOPIC: tilleggstonader.aapen-tilleggsstonader-behandling
+
+
 clients:
   iverksett:
     uri: http://tilleggsstonader-iverksett
