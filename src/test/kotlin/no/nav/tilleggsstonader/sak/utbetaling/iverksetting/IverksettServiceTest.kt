@@ -47,9 +47,26 @@ class IverksettServiceTest : IntegrationTest() {
     }
 
     @Test
+    fun `skal ikke iverksette hvis resultat er avslag`() {
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(behandling(resultat = BehandlingResultat.AVSLÅTT))
+
+        iverksettService.iverksett(behandling.id)
+
+        verify(exactly = 0) { iverksettClient.iverksett(any()) }
+    }
+
+    @Test
     fun `skal iverksette og oppdatere andeler med status`() {
-        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(resultat = BehandlingResultat.INNVILGET))
-        totrinnskontrollRepository.insert(totrinnskontroll(TotrinnInternStatus.GODKJENT, behandlingId = behandling.id, beslutter = "beslutter"))
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(behandling(resultat = BehandlingResultat.INNVILGET))
+        totrinnskontrollRepository.insert(
+            totrinnskontroll(
+                status = TotrinnInternStatus.GODKJENT,
+                behandlingId = behandling.id,
+                beslutter = "beslutter",
+            ),
+        )
         val tilkjentYtelse = tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
         iverksettService.iverksett(behandling.id)
@@ -64,7 +81,8 @@ class IverksettServiceTest : IntegrationTest() {
 
     @Test
     fun `skal oppdatere andeler med riktig status når status fra iverksett er ok`() {
-        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(resultat = BehandlingResultat.INNVILGET))
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(behandling(resultat = BehandlingResultat.INNVILGET))
         val andel = andelTilkjentYtelse(
             kildeBehandlingId = behandling.id,
             status = StatusIverksetting.SENDT,
