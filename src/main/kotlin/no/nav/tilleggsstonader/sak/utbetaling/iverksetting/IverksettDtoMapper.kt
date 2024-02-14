@@ -28,7 +28,7 @@ object IverksettDtoMapper {
             forrigeIverksetting = behandling.forrigeBehandlingId?.let {
                 ForrigeIverksettingDto(
                     it,
-                    forrigeIverksettingId ?: error("Mangler forrigeIverksettingId"),
+                    forrigeIverksettingId ?: error("Mangler forrigeIverksettingId for behandling=${behandling.id}"),
                 )
             },
             vedtak = mapVedtak(behandling, totrinnskontroll, tilkjentYtelse),
