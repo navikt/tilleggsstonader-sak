@@ -1,0 +1,20 @@
+apiVersion: kafka.nais.io/v1
+kind: Topic
+metadata:
+  name: aapen-tilleggstonader-vedtak
+  namespace: tilleggsstonader
+  labels:
+    team: teamtilleggsstonader
+spec:
+  pool: nav-dev
+  config:
+    cleanupPolicy: delete
+    minimumInSyncReplicas: 2
+    partitions: 1
+    replication: 3
+    retentionBytes: -1
+    retentionHours: 720
+  acl:
+    - team: teamtilleggsstonader
+      application: tilleggsstoander-sak
+      access: readwrite
