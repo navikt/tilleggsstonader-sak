@@ -36,7 +36,7 @@ class IverksettDtoMapperTest {
             tilkjentYtelse = tilkjentYtelse,
             totrinnskontroll = totrinnskontroll,
             iverksettingId = iverksettingId,
-            forrigeIverksettingId = null,
+            forrigeIverksetting = null,
         )
 
         assertThat(dto.iverksettingId).isEqualTo(iverksettingId)

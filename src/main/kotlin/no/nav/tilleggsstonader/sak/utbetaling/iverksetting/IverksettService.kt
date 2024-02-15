@@ -66,10 +66,18 @@ class IverksettService(
             tilkjentYtelse = tilkjentYtelse,
             totrinnskontroll = totrinnskontroll,
             iverksettingId = iverksettingId,
-            forrigeIverksettingId = null,
+            forrigeIverksetting = forrigeIverksetting(),
         )
         opprettPollStatusFraIverksettingTask(behandlingId, iverksettingId)
         iverksettClient.iverksett(dto)
+    }
+
+    /**
+     * TODO denne skal finne forrige iverksetting og behandlingId som ble brukt
+     * I en iverksetting nr 2 på en og samme behandling kan det være den samme behandlingId som man har, og ikke forrigeBehandlingId på behandlingen
+     */
+    private fun forrigeIverksetting(): ForrigeIverksettingDto? {
+        return null
     }
 
     private fun hentTotrinnskontroll(behandlingId: UUID): Totrinnskontroll {
@@ -82,14 +90,14 @@ class IverksettService(
     }
 
     private fun opprettPollStatusFraIverksettingTask(behandlingId: UUID, iverksettingId: UUID) {
-        //TODO
+        // TODO
         /*taskService.save(
             PollStatusFraIverksettingTask.opprettTask(
                 behandlingId = behandlingId,
                 iverksettingId = iverksettingId,
             ),
         )
-        */
+         */
     }
 
     private fun hentTilkjentYtelseOgOppdaterAndeler(

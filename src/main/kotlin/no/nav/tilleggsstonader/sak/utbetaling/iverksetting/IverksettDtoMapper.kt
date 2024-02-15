@@ -15,7 +15,7 @@ object IverksettDtoMapper {
         tilkjentYtelse: TilkjentYtelse,
         totrinnskontroll: Totrinnskontroll,
         iverksettingId: UUID,
-        forrigeIverksettingId: UUID?,
+        forrigeIverksetting: ForrigeIverksettingDto?,
     ): IverksettDto {
         feilHvisIkke(tilkjentYtelse.andelerTilkjentYtelse.any { it.iverksetting?.iverksettingId == iverksettingId }) {
             "Må inneholde en andel med iverksettingId=$iverksettingId"
@@ -25,12 +25,7 @@ object IverksettDtoMapper {
             behandlingId = behandling.id,
             iverksettingId = iverksettingId,
             personident = behandling.ident,
-            forrigeIverksetting = behandling.forrigeBehandlingId?.let {
-                ForrigeIverksettingDto(
-                    it,
-                    forrigeIverksettingId ?: error("Mangler forrigeIverksettingId for behandling=${behandling.id}"),
-                )
-            },
+            forrigeIverksetting = forrigeIverksetting,
             vedtak = mapVedtak(behandling, totrinnskontroll, tilkjentYtelse),
         )
     }
