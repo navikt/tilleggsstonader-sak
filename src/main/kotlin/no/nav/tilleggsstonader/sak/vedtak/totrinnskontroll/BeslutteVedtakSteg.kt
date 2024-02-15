@@ -62,6 +62,8 @@ class BeslutteVedtakSteg(
             brevService.lagEndeligBeslutterbrev(saksbehandling)
             opprettJournalførVedtaksbrevTask(saksbehandling)
 
+            // TODO iverksettService.iverksett(saksbehandling.id, saksbehandling.id)
+
             StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
         } else {
             opprettBehandleUnderkjentVedtakOppgave(saksbehandling, saksbehandler)

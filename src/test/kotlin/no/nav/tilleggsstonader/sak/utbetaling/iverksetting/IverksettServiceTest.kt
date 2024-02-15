@@ -51,7 +51,7 @@ class IverksettServiceTest : IntegrationTest() {
         val behandling =
             testoppsettService.opprettBehandlingMedFagsak(behandling(resultat = BehandlingResultat.AVSLÅTT))
 
-        iverksettService.iverksett(behandling.id)
+        iverksettService.iverksett(behandling.id, behandling.id)
 
         verify(exactly = 0) { iverksettClient.iverksett(any()) }
     }
@@ -69,7 +69,7 @@ class IverksettServiceTest : IntegrationTest() {
         )
         val tilkjentYtelse = tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
-        iverksettService.iverksett(behandling.id)
+        iverksettService.iverksett(behandling.id, behandling.id)
 
         verify(exactly = 1) { iverksettClient.iverksett(any()) }
 

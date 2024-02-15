@@ -52,7 +52,7 @@ class IverksettService(
      * for å enkelt kunne gjenbruke samme id vid neste iverksetting
      */
     @Transactional
-    fun iverksett(behandlingId: UUID, iverksettingId: UUID = behandlingId) {
+    fun iverksett(behandlingId: UUID, iverksettingId: UUID) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         if (!behandling.resultat.skalIverksettes) {
             logger.info("Iverksetter ikke behandling=$behandlingId då status=${behandling.status}")
@@ -90,14 +90,12 @@ class IverksettService(
     }
 
     private fun opprettPollStatusFraIverksettingTask(behandlingId: UUID, iverksettingId: UUID) {
-        // TODO
-        /*taskService.save(
-            PollStatusFraIverksettingTask.opprettTask(
+        taskService.save(
+            HentStatusFraIverksettingTask.opprettTask(
                 behandlingId = behandlingId,
                 iverksettingId = iverksettingId,
             ),
         )
-         */
     }
 
     private fun hentTilkjentYtelseOgOppdaterAndeler(
