@@ -31,7 +31,7 @@ object TilkjentYtelseUtil {
         tom: LocalDate = LocalDate.of(2021, 1, 31),
         satstype: Satstype = Satstype.DAG,
         type: TypeAndel = TypeAndel.TILSYN_BARN_AAP,
-        status: StatusIverksetting = StatusIverksetting.UBEHANDLET,
+        statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
         iverksetting: Iverksetting? = null,
     ) = AndelTilkjentYtelse(
         beløp = beløp,
@@ -40,7 +40,7 @@ object TilkjentYtelseUtil {
         satstype = satstype,
         type = type,
         kildeBehandlingId = kildeBehandlingId,
-        status = status,
+        statusIverksetting = statusIverksetting,
         iverksetting = iverksetting,
     )
 }

@@ -76,7 +76,7 @@ class IverksettServiceTest : IntegrationTest() {
         val oppdatertTilkjentYtelse = tilkjentYtelseRepository.findByIdOrThrow(tilkjentYtelse.id)
         val andel = oppdatertTilkjentYtelse.andelerTilkjentYtelse.single()
         assertThat(andel.iverksetting?.iverksettingId).isEqualTo(behandling.id)
-        assertThat(andel.status).isEqualTo(StatusIverksetting.SENDT)
+        assertThat(andel.statusIverksetting).isEqualTo(StatusIverksetting.SENDT)
     }
 
     @Test
@@ -85,7 +85,7 @@ class IverksettServiceTest : IntegrationTest() {
             testoppsettService.opprettBehandlingMedFagsak(behandling(resultat = BehandlingResultat.INNVILGET))
         val andel = andelTilkjentYtelse(
             kildeBehandlingId = behandling.id,
-            status = StatusIverksetting.SENDT,
+            statusIverksetting = StatusIverksetting.SENDT,
             iverksetting = Iverksetting(behandling.id, LocalDateTime.now()),
         )
         val tilkjentYtelse = tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id, null, andel))
@@ -95,6 +95,6 @@ class IverksettServiceTest : IntegrationTest() {
         val oppdatertTilkjentYtelse = tilkjentYtelseRepository.findByIdOrThrow(tilkjentYtelse.id)
         val oppdatertAndel = oppdatertTilkjentYtelse.andelerTilkjentYtelse.single()
         assertThat(oppdatertAndel.iverksetting?.iverksettingId).isEqualTo(behandling.id)
-        assertThat(oppdatertAndel.status).isEqualTo(StatusIverksetting.OK)
+        assertThat(oppdatertAndel.statusIverksetting).isEqualTo(StatusIverksetting.OK)
     }
 }

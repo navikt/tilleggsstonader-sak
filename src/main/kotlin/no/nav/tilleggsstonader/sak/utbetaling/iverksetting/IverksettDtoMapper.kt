@@ -59,7 +59,7 @@ object IverksettDtoMapper {
     private fun Satstype.tilSatstype(): SatstypeIverksetting = when (this) {
         Satstype.DAG -> SatstypeIverksetting.DAGLIG
         Satstype.MÅNED -> SatstypeIverksetting.MÅNEDLIG
-        Satstype.ENGANGS -> SatstypeIverksetting.ENGANGS
+        Satstype.ENGANGSBELØP -> SatstypeIverksetting.ENGANGS
     }
 
     private fun TypeAndel.tilStønadstype(): StønadstypeIverksetting = when (this) {

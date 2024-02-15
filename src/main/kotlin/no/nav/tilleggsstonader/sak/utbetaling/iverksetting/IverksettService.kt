@@ -40,7 +40,7 @@ class IverksettService(
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
         val andeler = tilkjentYtelse.andelerTilkjentYtelse.filter { it.iverksetting?.iverksettingId == iverksettingId }
         logger.info("Oppdaterer ${andeler.size} andeler med iverksettingId=$iverksettingId")
-        andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(status = StatusIverksetting.OK) })
+        andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(statusIverksetting = StatusIverksetting.OK) })
     }
 
     /**
@@ -108,7 +108,7 @@ class IverksettService(
         val iverksetting = Iverksetting(iverksettingId, LocalDateTime.now())
         val oppdaterteAndeler = tilkjentYtelse.andelerTilkjentYtelse.map {
             it.copy(
-                status = StatusIverksetting.SENDT,
+                statusIverksetting = StatusIverksetting.SENDT,
                 iverksetting = iverksetting,
             )
         }
