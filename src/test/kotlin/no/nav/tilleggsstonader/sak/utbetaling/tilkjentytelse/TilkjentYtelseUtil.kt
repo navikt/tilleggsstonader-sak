@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.min
@@ -29,6 +31,8 @@ object TilkjentYtelseUtil {
         tom: LocalDate = LocalDate.of(2021, 1, 31),
         satstype: Satstype = Satstype.DAG,
         type: TypeAndel = TypeAndel.TILSYN_BARN_AAP,
+        statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
+        iverksetting: Iverksetting? = null,
     ) = AndelTilkjentYtelse(
         beløp = beløp,
         fom = fom,
@@ -36,5 +40,7 @@ object TilkjentYtelseUtil {
         satstype = satstype,
         type = type,
         kildeBehandlingId = kildeBehandlingId,
+        statusIverksetting = statusIverksetting,
+        iverksetting = iverksetting,
     )
 }
