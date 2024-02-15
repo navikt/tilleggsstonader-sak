@@ -14,8 +14,9 @@ import org.springframework.web.client.exchange
 import java.net.URI
 
 @Component
-class IverksettClient(
-    @Value("\${clients.iverksett.uri}")
+@Deprecated("Denne skal fjernes når dp-iverksett lagt til simulering")
+class IverksettDeprecatedClient(
+    @Value("\${clients.iverksetting.uri}")
     private val familieEfIverksettUri: String,
     @Qualifier("azure")
     private val restOperations: RestOperations,
