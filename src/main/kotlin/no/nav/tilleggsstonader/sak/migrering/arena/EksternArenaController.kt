@@ -24,13 +24,10 @@ class EksternArenaController(
     @PostMapping
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun hentStatusTilArena(@RequestBody request: ArenaFinnesPersonRequest): ArenaFinnesPersonResponse {
-        try {
-            feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.ARENA), HttpStatus.UNAUTHORIZED) {
-                "Kallet utføres ikke av en autorisert klient"
-            }
-        } catch (e: Exception) {
-            // TODO slett dette, vet ikke hva navnet på applikasjonen er
+        feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.ARENA), HttpStatus.UNAUTHORIZED) {
+            "Kallet utføres ikke av en autorisert klient"
         }
+
         return arenaStatusService.finnStatus(request)
     }
 }
