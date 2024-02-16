@@ -23,7 +23,7 @@ object SøknadsskjemaMapper {
     private fun mapSkjemaBarnetilsyn(skjema: Søknadsskjema<SøknadsskjemaBarnetilsyn>) =
         SkjemaBarnetilsyn(
             hovedytelse = HovedytelseAvsnitt(
-                hovedytelse = skjema.skjema.hovedytelse.hovedytelse.verdi,
+                hovedytelse = skjema.skjema.hovedytelse.hovedytelse.verdier.map { it.verdi },
             ),
             aktivitet = AktivitetAvsnitt(
                 utdanning = skjema.skjema.aktivitet.utdanning.verdi,
