@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.migrering.arena
 
 import no.nav.tilleggsstonader.kontrakter.arena.vedtak.Rettighet
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -14,7 +15,7 @@ class EksternArenaControllerTest : IntegrationTest() {
 
     @BeforeEach
     fun setUp() {
-        headers.setBearerAuth(clientCredential("dev-fss:arena:arena", true))
+        headers.setBearerAuth(clientCredential(EksternApplikasjon.ARENA.namespaceAppNavn, true))
     }
 
     @Test
