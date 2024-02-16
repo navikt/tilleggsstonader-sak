@@ -42,6 +42,7 @@ class IverksettService(
      */
     @Transactional
     fun iverksettBehandlingFørsteGang(behandlingId: UUID) {
+        // TODO denne skal oppdatere andeler i forrige behandling til UAKTUELL hvis de ikke er iverksatte
         iverksett(behandlingId, behandlingId, YearMonth.now().minusMonths(1))
     }
 
