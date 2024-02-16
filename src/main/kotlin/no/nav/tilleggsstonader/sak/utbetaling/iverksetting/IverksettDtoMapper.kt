@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import java.util.UUID
@@ -12,12 +12,12 @@ object IverksettDtoMapper {
 
     fun map(
         behandling: Saksbehandling,
-        tilkjentYtelse: TilkjentYtelse,
+        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll,
         iverksettingId: UUID,
         forrigeIverksetting: ForrigeIverksettingDto?,
     ): IverksettDto {
-        feilHvisIkke(tilkjentYtelse.andelerTilkjentYtelse.any { it.iverksetting?.iverksettingId == iverksettingId }) {
+        feilHvisIkke(andelerTilkjentYtelse.any { it.iverksetting?.iverksettingId == iverksettingId }) {
             "Må inneholde en andel med iverksettingId=$iverksettingId"
         }
         return IverksettDto(
@@ -26,35 +26,37 @@ object IverksettDtoMapper {
             iverksettingId = iverksettingId,
             personident = behandling.ident,
             forrigeIverksetting = forrigeIverksetting,
-            vedtak = mapVedtak(behandling, totrinnskontroll, tilkjentYtelse),
+            vedtak = mapVedtak(behandling, totrinnskontroll, andelerTilkjentYtelse),
         )
     }
 
     private fun mapVedtak(
         behandling: Saksbehandling,
         totrinnskontroll: Totrinnskontroll,
-        tilkjentYtelse: TilkjentYtelse,
+        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
     ): VedtaksdetaljerDto {
         return VedtaksdetaljerDto(
             vedtakstidspunkt = behandling.vedtakstidspunkt
                 ?: error("Mangler vedtakstidspunkt behandling=${behandling.id}"),
             saksbehandlerId = totrinnskontroll.saksbehandler,
             beslutterId = totrinnskontroll.beslutter ?: error("Mangler beslutter"),
-            utbetalinger = mapUtbetalinger(tilkjentYtelse),
+            utbetalinger = mapUtbetalinger(andelerTilkjentYtelse),
         )
     }
 
-    private fun mapUtbetalinger(tilkjentYtelse: TilkjentYtelse) =
-        tilkjentYtelse.andelerTilkjentYtelse.map {
-            UtbetalingDto(
-                beløp = it.beløp,
-                satstype = it.satstype.tilSatstype(),
-                fraOgMedDato = it.fom,
-                tilOgMedDato = it.tom,
-                stønadstype = it.type.tilStønadstype(),
-                brukersNavKontor = null,
-            )
-        }
+    private fun mapUtbetalinger(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>) =
+        andelerTilkjentYtelse
+            .filter { it.beløp != 0 }
+            .map {
+                UtbetalingDto(
+                    beløp = it.beløp,
+                    satstype = it.satstype.tilSatstype(),
+                    fraOgMedDato = it.fom,
+                    tilOgMedDato = it.tom,
+                    stønadstype = it.type.tilStønadstype(),
+                    brukersNavKontor = null, // TODO denne skal settes for reise?
+                )
+            }
 
     private fun Satstype.tilSatstype(): SatstypeIverksetting = when (this) {
         Satstype.DAG -> SatstypeIverksetting.DAGLIG
