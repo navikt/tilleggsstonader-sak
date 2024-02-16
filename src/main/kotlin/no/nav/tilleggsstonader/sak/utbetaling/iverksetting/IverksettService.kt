@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
-import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -29,19 +28,6 @@ class IverksettService(
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
-
-    @Transactional
-    fun hentStatusOgOppdaterAndeler(behandlingId: UUID, iverksettingId: UUID = behandlingId) {
-        val status = iverksettClient.hentStatus(behandlingId, iverksettingId)
-        if (status != IverksettStatus.OK) {
-            throw TaskExceptionUtenStackTrace("Status fra oppdrag er ikke ok, status=$status")
-        }
-
-        val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
-        val andeler = tilkjentYtelse.andelerTilkjentYtelse.filter { it.iverksetting?.iverksettingId == iverksettingId }
-        logger.info("Oppdaterer ${andeler.size} andeler med iverksettingId=$iverksettingId")
-        andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(statusIverksetting = StatusIverksetting.OK) })
-    }
 
     /**
      * Ved første iverksetting av en behandling er det krav på at det gjøres med jwt, dvs med saksbehandler-token

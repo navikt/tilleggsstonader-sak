@@ -19,12 +19,12 @@ import java.util.UUID
     beskrivelse = "Henter status på utbetaling av behandling.",
 )
 class HentStatusFraIverksettingTask(
-    private val iverksettService: IverksettService,
+    private val iverksettStatusService: IverksettStatusService,
 ) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
         val taskData = objectMapper.readValue<TaskData>(task.payload)
-        iverksettService.hentStatusOgOppdaterAndeler(
+        iverksettStatusService.hentStatusOgOppdaterAndeler(
             behandlingId = taskData.behandlingId,
             iverksettingId = taskData.iverksettingId,
         )
