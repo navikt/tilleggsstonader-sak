@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
-import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -30,19 +29,6 @@ class IverksettService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @Transactional
-    fun hentStatusOgOppdaterAndeler(behandlingId: UUID, iverksettingId: UUID = behandlingId) {
-        val status = iverksettClient.hentStatus(behandlingId, iverksettingId)
-        if (status != IverksettStatus.OK) {
-            throw TaskExceptionUtenStackTrace("Status fra oppdrag er ikke ok, status=$status")
-        }
-
-        val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
-        val andeler = tilkjentYtelse.andelerTilkjentYtelse.filter { it.iverksetting?.iverksettingId == iverksettingId }
-        logger.info("Oppdaterer ${andeler.size} andeler med iverksettingId=$iverksettingId")
-        andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(statusIverksetting = StatusIverksetting.OK) })
-    }
-
     /**
      * Ved første iverksetting av en behandling er det krav på at det gjøres med jwt, dvs med saksbehandler-token
      * Neste iverksettinger kan gjøres med client_credentials
@@ -52,7 +38,7 @@ class IverksettService(
      * for å enkelt kunne gjenbruke samme id vid neste iverksetting
      */
     @Transactional
-    fun iverksett(behandlingId: UUID, iverksettingId: UUID = behandlingId) {
+    fun iverksett(behandlingId: UUID, iverksettingId: UUID) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         if (!behandling.resultat.skalIverksettes) {
             logger.info("Iverksetter ikke behandling=$behandlingId då status=${behandling.status}")
@@ -68,7 +54,7 @@ class IverksettService(
             iverksettingId = iverksettingId,
             forrigeIverksetting = forrigeIverksetting(),
         )
-        opprettPollStatusFraIverksettingTask(behandlingId, iverksettingId)
+        opprettHentStatusFraIverksettingTask(behandlingId, iverksettingId)
         iverksettClient.iverksett(dto)
     }
 
@@ -89,15 +75,13 @@ class IverksettService(
         return totrinnskontroll
     }
 
-    private fun opprettPollStatusFraIverksettingTask(behandlingId: UUID, iverksettingId: UUID) {
-        // TODO
-        /*taskService.save(
-            PollStatusFraIverksettingTask.opprettTask(
+    private fun opprettHentStatusFraIverksettingTask(behandlingId: UUID, iverksettingId: UUID) {
+        taskService.save(
+            HentStatusFraIverksettingTask.opprettTask(
                 behandlingId = behandlingId,
                 iverksettingId = iverksettingId,
             ),
         )
-         */
     }
 
     private fun hentTilkjentYtelseOgOppdaterAndeler(

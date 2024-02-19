@@ -60,11 +60,6 @@ enum class StegType(
         tillattFor = BehandlerRolle.BESLUTTER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FATTER_VEDTAK),
     ),
-    VENTE_PÅ_STATUS_FRA_UTBETALING(
-        rekkefølge = 5,
-        tillattFor = BehandlerRolle.SYSTEM,
-        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
-    ),
     JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV(
         rekkefølge = 6,
         tillattFor = BehandlerRolle.SYSTEM,
@@ -105,8 +100,7 @@ enum class StegType(
             VILKÅR -> BEREGNE_YTELSE
             BEREGNE_YTELSE -> SEND_TIL_BESLUTTER
             SEND_TIL_BESLUTTER -> BESLUTTE_VEDTAK
-            BESLUTTE_VEDTAK -> VENTE_PÅ_STATUS_FRA_UTBETALING
-            VENTE_PÅ_STATUS_FRA_UTBETALING -> JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
+            BESLUTTE_VEDTAK -> JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
             JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> FERDIGSTILLE_BEHANDLING
             /*
             VENTE_PÅ_STATUS_FRA_UTBETALING -> LAG_SAKSBEHANDLINGSBLANKETT
