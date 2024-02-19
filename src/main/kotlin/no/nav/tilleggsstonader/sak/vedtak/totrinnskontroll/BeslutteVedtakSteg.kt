@@ -62,7 +62,7 @@ class BeslutteVedtakSteg(
             brevService.lagEndeligBeslutterbrev(saksbehandling)
             opprettJournalførVedtaksbrevTask(saksbehandling)
 
-            // TODO iverksettService.iverksett(saksbehandling.id, saksbehandling.id)
+            // TODO iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
 
             StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
         } else {
