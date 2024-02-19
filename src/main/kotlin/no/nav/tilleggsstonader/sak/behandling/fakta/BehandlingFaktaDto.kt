@@ -18,7 +18,7 @@ data class FaktaHovedytelse(
 )
 
 data class SøknadsgrunnlagHovedytelse(
-    val hovedytelse: Hovedytelse,
+    val hovedytelse: List<Hovedytelse>,
 )
 
 data class FaktaAktivtet(

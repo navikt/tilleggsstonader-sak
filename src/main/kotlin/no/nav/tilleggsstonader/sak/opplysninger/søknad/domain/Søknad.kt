@@ -56,7 +56,7 @@ data class SkjemaBarnetilsyn(
 )
 
 data class HovedytelseAvsnitt(
-    val hovedytelse: Hovedytelse,
+    val hovedytelse: List<Hovedytelse>,
 )
 
 data class AktivitetAvsnitt(
