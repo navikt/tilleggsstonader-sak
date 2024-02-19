@@ -1,13 +1,18 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.CapturingSlot
 import io.mockk.justRun
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.IverksettClientConfig.Companion.clearMock
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
@@ -48,6 +53,9 @@ class IverksettServiceTest : IntegrationTest() {
     @Autowired
     lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
 
+    @Autowired
+    lateinit var taskService: TaskService
+
     val forrigeMåned = YearMonth.now().minusMonths(1)
     val nåværendeMåned = YearMonth.now()
     val nesteMåned = YearMonth.now().plusMonths(1)
@@ -78,8 +86,8 @@ class IverksettServiceTest : IntegrationTest() {
 
     @Test
     fun `skal iverksette og oppdatere andeler med status`() {
-        val behandling =
-            testoppsettService.opprettBehandlingMedFagsak(behandling(resultat = BehandlingResultat.INNVILGET))
+        val fagsak = testoppsettService.lagreFagsak(fagsak())
+        val behandling = testoppsettService.lagre(behandling(fagsak, resultat = BehandlingResultat.INNVILGET))
         lagreTotrinnskontroll(behandling)
         val tilkjentYtelse = tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
@@ -91,6 +99,18 @@ class IverksettServiceTest : IntegrationTest() {
         val andel = oppdatertTilkjentYtelse.andelerTilkjentYtelse.single()
         assertThat(andel.iverksetting?.iverksettingId).isEqualTo(behandling.id)
         assertThat(andel.statusIverksetting).isEqualTo(StatusIverksetting.SENDT)
+        assertHarOpprettetTaskForÅSjekkeStatus(fagsak, behandling)
+    }
+
+    private fun assertHarOpprettetTaskForÅSjekkeStatus(fagsak: Fagsak, behandling: Behandling) {
+        val task = taskService.finnTasksMedStatus(Status.entries, HentStatusFraIverksettingTask.TYPE).single()
+        assertThat(objectMapper.readValue<Map<String, Any>>(task.payload)).isEqualTo(
+            mapOf(
+                "eksternFagsakId" to fagsak.eksternId.id.toInt(),
+                "behandlingId" to behandling.id.toString(),
+                "iverksettingId" to behandling.id.toString(),
+            ),
+        )
     }
 
     @Nested

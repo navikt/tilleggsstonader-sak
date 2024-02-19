@@ -50,7 +50,7 @@ class IverksettClientConfig {
         fun clearMock(iverksettClient: IverksettClient) {
             clearMocks(iverksettClient)
             justRun { iverksettClient.iverksett(any()) }
-            every { iverksettClient.hentStatus(any(), any()) } returns IverksettStatus.OK
+            every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK
         }
     }
 }

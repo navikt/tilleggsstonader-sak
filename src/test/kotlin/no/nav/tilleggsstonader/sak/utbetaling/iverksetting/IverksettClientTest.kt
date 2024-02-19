@@ -48,15 +48,16 @@ class IverksettClientTest {
 
     @Test
     fun `skal hente status for gitt behandlingId og iverksettingId`() {
+        val eksternFagsakId = 10L
         val behandlingId = UUID.randomUUID()
         val iverksettingId = UUID.randomUUID()
         val json = objectMapper.writeValueAsString("OK")
         wiremockServerItem.stubFor(
-            get(WireMock.urlEqualTo("/api/iverksetting/$behandlingId/$iverksettingId/status"))
+            get(WireMock.urlEqualTo("/api/iverksetting/$eksternFagsakId/$behandlingId/$iverksettingId/status"))
                 .willReturn(okJson(json)),
         )
 
-        assertThat(client.hentStatus(behandlingId, iverksettingId)).isEqualTo(IverksettStatus.OK)
+        assertThat(client.hentStatus(eksternFagsakId, behandlingId, iverksettingId)).isEqualTo(IverksettStatus.OK)
     }
 
     companion object {
