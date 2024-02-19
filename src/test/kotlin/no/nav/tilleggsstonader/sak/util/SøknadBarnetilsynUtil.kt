@@ -70,5 +70,7 @@ object SøknadBarnetilsynUtil {
         vararg hovedytelse: Hovedytelse = arrayOf(Hovedytelse.AAP),
     ) = HovedytelseAvsnitt(
         hovedytelse = hovedytelse.toList(),
+        boddSammenhengende = JaNei.NEI,
+        planleggerBoINorgeNeste12mnd = JaNei.JA,
     )
 }
