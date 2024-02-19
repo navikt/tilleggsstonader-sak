@@ -26,7 +26,7 @@ class ArenaStatusService(
 
     private fun finnesPerson(request: ArenaFinnesPersonRequest): Boolean {
         val identer = personService.hentPersonIdenter(request.ident).identer().toSet()
-        if (finnBehandlingStatus(identer, request.stønadstype)) {
+        if (harBehandling(identer, request.stønadstype)) {
             logger.info("Sjekker om person finnes i ny løsning finnes=true harBehandling")
             return true
         }
@@ -37,7 +37,7 @@ class ArenaStatusService(
         return false
     }
 
-    private fun finnBehandlingStatus(
+    private fun harBehandling(
         identer: Set<String>,
         stønadstype: Stønadstype,
     ): Boolean {
