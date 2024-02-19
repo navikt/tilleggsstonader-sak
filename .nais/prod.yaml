@@ -80,6 +80,9 @@ spec:
           namespace: teamfamilie
         - application: dp-iverksett
           namespace: dagpenger
+        - application: arena
+          namespace: teamarenanais
+          cluster: prod-fss
       external:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: tilleggsstonader-arena.prod-fss-pub.nais.io

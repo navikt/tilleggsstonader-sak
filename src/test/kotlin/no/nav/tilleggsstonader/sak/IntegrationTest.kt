@@ -154,6 +154,13 @@ abstract class IntegrationTest {
         return TokenUtil.onBehalfOfToken(mockOAuth2Server, role, saksbehandler)
     }
 
+    protected fun clientCredential(
+        clientId: String,
+        accessAsApplication: Boolean,
+    ): String {
+        return TokenUtil.clientToken(mockOAuth2Server, clientId, accessAsApplication)
+    }
+
     companion object {
         private const val LOCALHOST = "http://localhost:"
     }

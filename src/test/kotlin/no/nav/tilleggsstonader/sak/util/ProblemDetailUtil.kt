@@ -2,14 +2,15 @@ package no.nav.tilleggsstonader.sak.util
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.security.mock.oauth2.http.objectMapper
+import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import org.springframework.http.ProblemDetail
 import org.springframework.web.client.RestClientResponseException
 
 object ProblemDetailUtil {
 
-    fun catchProblemDetailException(fn: () -> Unit): no.nav.tilleggsstonader.libs.http.client.ProblemDetailException {
-        return catchThrowableOfType<no.nav.tilleggsstonader.libs.http.client.ProblemDetailException> {
+    fun catchProblemDetailException(fn: () -> Unit): ProblemDetailException {
+        return catchThrowableOfType<ProblemDetailException> {
             execWithErrorHandler(fn)
         }
     }
@@ -24,7 +25,7 @@ object ProblemDetailUtil {
         try {
             return fn()
         } catch (e: RestClientResponseException) {
-            readProblemDetail(e)?.let { throw no.nav.tilleggsstonader.libs.http.client.ProblemDetailException(it, e) }
+            readProblemDetail(e)?.let { throw ProblemDetailException(it, e) }
                 ?: throw e
         }
     }
