@@ -72,7 +72,7 @@ class IverksettService(
             iverksettingId = iverksettingId,
             forrigeIverksetting = forrigeIverksetting(behandling, tilkjentYtelse),
         )
-        opprettPollStatusFraIverksettingTask(behandlingId, iverksettingId)
+        opprettHentStatusFraIverksettingTask(behandlingId, iverksettingId)
         iverksettClient.iverksett(dto)
     }
 
@@ -129,7 +129,7 @@ class IverksettService(
         return totrinnskontroll
     }
 
-    private fun opprettPollStatusFraIverksettingTask(behandlingId: UUID, iverksettingId: UUID) {
+    private fun opprettHentStatusFraIverksettingTask(behandlingId: UUID, iverksettingId: UUID) {
         taskService.save(
             HentStatusFraIverksettingTask.opprettTask(
                 behandlingId = behandlingId,
