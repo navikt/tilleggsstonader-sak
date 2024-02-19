@@ -24,6 +24,8 @@ object SøknadsskjemaMapper {
         SkjemaBarnetilsyn(
             hovedytelse = HovedytelseAvsnitt(
                 hovedytelse = skjema.skjema.hovedytelse.hovedytelse.verdier.map { it.verdi },
+                boddSammenhengende = skjema.skjema.hovedytelse.boddSammenhengende?.verdi,
+                planleggerBoINorgeNeste12mnd = skjema.skjema.hovedytelse.planleggerBoINorgeNeste12mnd?.verdi,
             ),
             aktivitet = AktivitetAvsnitt(
                 utdanning = skjema.skjema.aktivitet.utdanning.verdi,
