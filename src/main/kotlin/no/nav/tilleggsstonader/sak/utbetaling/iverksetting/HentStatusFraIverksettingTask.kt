@@ -15,7 +15,7 @@ import java.util.UUID
     taskStepType = HentStatusFraIverksettingTask.TYPE,
     maxAntallFeil = 50,
     settTilManuellOppfølgning = true,
-    triggerTidVedFeilISekunder = 31L,
+    triggerTidVedFeilISekunder = 60L,
     beskrivelse = "Henter status på utbetaling av behandling.",
 )
 class HentStatusFraIverksettingTask(
