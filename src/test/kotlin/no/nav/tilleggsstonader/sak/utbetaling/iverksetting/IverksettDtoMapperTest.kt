@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -22,7 +21,6 @@ class IverksettDtoMapperTest {
     val behandling = saksbehandling(fagsak = fagsak, behandling = behandling(vedtakstidspunkt = LocalDateTime.now()))
     val iverksetting = Iverksetting(iverksettingId, LocalDateTime.now())
     val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = 100, iverksetting = iverksetting)
-    val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id, startdato = null, andel)
     val totrinnskontroll = totrinnskontroll(
         status = TotrinnInternStatus.GODKJENT,
         saksbehandler = "saksbehandler",
@@ -33,7 +31,7 @@ class IverksettDtoMapperTest {
     fun `skal mappe felter riktig`() {
         val dto = IverksettDtoMapper.map(
             behandling = behandling,
-            tilkjentYtelse = tilkjentYtelse,
+            andelerTilkjentYtelse = listOf(andel),
             totrinnskontroll = totrinnskontroll,
             iverksettingId = iverksettingId,
             forrigeIverksetting = null,
@@ -59,5 +57,30 @@ class IverksettDtoMapperTest {
                 ),
             )
         }
+    }
+
+    @Test
+    fun `skal filtrere vekk andeler med 0-beløp då disse ikke trenger iverksetting`() {
+        val dto = IverksettDtoMapper.map(
+            behandling = behandling,
+            andelerTilkjentYtelse = listOf(andel.copy(beløp = 0)),
+            totrinnskontroll = totrinnskontroll,
+            iverksettingId = iverksettingId,
+            forrigeIverksetting = null,
+        )
+        assertThat(dto.vedtak.utbetalinger).isEmpty()
+    }
+
+    @Test
+    fun `skal mappe forrigeIverksetting`() {
+        val forrigeIverksetting = ForrigeIverksettingDto(UUID.randomUUID(), UUID.randomUUID())
+        val dto = IverksettDtoMapper.map(
+            behandling = behandling,
+            andelerTilkjentYtelse = listOf(andel.copy(beløp = 0)),
+            totrinnskontroll = totrinnskontroll,
+            iverksettingId = iverksettingId,
+            forrigeIverksetting = forrigeIverksetting,
+        )
+        assertThat(dto.forrigeIverksetting).isEqualTo(forrigeIverksetting)
     }
 }
