@@ -149,5 +149,5 @@ clients:
   htmlify:
     uri: http://tilleggsstonader-htmlify
   iverksetting:
-    uri: http://dp-iverksett.dagpenger
+    uri: http://dp-iverksett.teamdagpenger
     scope: api://${CLIENT_ENV}-gcp.teamdagpenger.dp-iverksett/.default
