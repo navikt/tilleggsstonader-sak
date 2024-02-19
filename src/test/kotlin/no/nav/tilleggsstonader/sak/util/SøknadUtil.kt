@@ -29,6 +29,13 @@ object SøknadUtil {
         val skjemaBarnetilsyn = SøknadsskjemaBarnetilsyn(
             hovedytelse = HovedytelseAvsnitt(
                 hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "")), emptyList()),
+                boddSammenhengende = EnumFelt("Bodd sammenhengende?", JaNei.JA, "Ja", emptyList()),
+                planleggerBoINorgeNeste12mnd = EnumFelt(
+                    "Planlegger du å bo i Norge de neste 12 månedene?",
+                    JaNei.JA,
+                    "Ja",
+                    emptyList(),
+                ),
             ),
             aktivitet = AktivitetAvsnitt(
                 utdanning = EnumFelt("", JaNei.JA, "", emptyList()),
