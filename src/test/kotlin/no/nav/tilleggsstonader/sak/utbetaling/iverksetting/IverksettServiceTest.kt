@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.IverksettClientConfig.Com
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -21,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternS
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -39,6 +41,9 @@ class IverksettServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
+
+    @Autowired
+    lateinit var andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository
 
     @Autowired
     lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
@@ -134,11 +139,12 @@ class IverksettServiceTest : IntegrationTest() {
         @Test
         fun `første behandling  - andre iverksetting`() {
             val iverksettingId = UUID.randomUUID()
+            oppdaterAndelerTilOk(behandling)
             iverksettService.iverksett(behandling.id, iverksettingId, nåværendeMåned)
 
             val andeler = hentAndeler(behandling)
 
-            andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
+            andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
 
             andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
 
@@ -174,6 +180,7 @@ class IverksettServiceTest : IntegrationTest() {
         @Test
         fun `andre behandling - første iverksetting med 2 iverksettinger`() {
             val iverksettingIdBehandling1 = UUID.randomUUID()
+            oppdaterAndelerTilOk(behandling)
             iverksettService.iverksett(behandling.id, iverksettingIdBehandling1, nåværendeMåned)
 
             testoppsettService.lagre(behandling2)
@@ -199,16 +206,19 @@ class IverksettServiceTest : IntegrationTest() {
         fun `andre behandling  - andre iverksetting`() {
             val iverksettingId = UUID.randomUUID()
 
+            oppdaterAndelerTilOk(behandling)
+
             testoppsettService.lagre(behandling2)
             tilkjentYtelseRepository.insert(tilkjentYtelse2)
             lagreTotrinnskontroll(behandling2)
 
             iverksettService.iverksettBehandlingFørsteGang(behandling2.id)
+            oppdaterAndelerTilOk(behandling2)
             iverksettService.iverksett(behandling2.id, iverksettingId)
 
             val andeler = hentAndeler(behandling2)
 
-            andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
+            andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling2.id)
 
             andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
 
@@ -222,6 +232,7 @@ class IverksettServiceTest : IntegrationTest() {
 
         @Test
         fun `andre behandling kun med 0-beløp - skal ikke sende noen andeler`() {
+            oppdaterAndelerTilOk(behandling)
             testoppsettService.lagre(behandling2)
             tilkjentYtelseRepository.insert(
                 tilkjentYtelse(
@@ -238,6 +249,14 @@ class IverksettServiceTest : IntegrationTest() {
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
 
             assertThat(iverksettingDto.captured.vedtak.utbetalinger).isEmpty()
+        }
+
+        @Test
+        fun `skal feile hvis forrige iverksetting ikke er ferdigstilt`() {
+            val iverksettingId = UUID.randomUUID()
+            assertThatThrownBy {
+                iverksettService.iverksett(behandling.id, iverksettingId, nåværendeMåned)
+            }.hasMessageContaining("det finnes tidligere andeler med annen status enn OK/UBEHANDLET")
         }
     }
 
@@ -266,6 +285,13 @@ class IverksettServiceTest : IntegrationTest() {
     fun AndelTilkjentYtelse.assertHarStatusOgId(statusIverksetting: StatusIverksetting, iverksettingId: UUID? = null) {
         assertThat(this.statusIverksetting).isEqualTo(statusIverksetting)
         assertThat(this.iverksetting?.iverksettingId).isEqualTo(iverksettingId)
+    }
+
+    private fun oppdaterAndelerTilOk(behandling: Behandling) {
+        val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
+        val oppdaterteAndeler = andeler.filter { it.statusIverksetting == StatusIverksetting.SENDT }
+            .map { it.copy(statusIverksetting = StatusIverksetting.OK) }
+        andelTilkjentYtelseRepository.updateAll(oppdaterteAndeler)
     }
 
     private fun lag3Andeler(behandling: Behandling) = arrayOf(

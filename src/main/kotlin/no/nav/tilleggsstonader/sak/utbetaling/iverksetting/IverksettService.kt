@@ -98,6 +98,10 @@ class IverksettService(
                         iverksetting = iverksetting,
                     )
                 } else {
+                    feilHvis(it.statusIverksetting != StatusIverksetting.OK) {
+                        "Kan ikke iverksette behandling=${tilkjentYtelse.behandlingId} iverksetting=$iverksettingId " +
+                            "når det finnes tidligere andeler med annen status enn OK/UBEHANDLET"
+                    }
                     it
                 }
             }
