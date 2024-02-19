@@ -150,7 +150,7 @@ class StegServiceTest(
             val behandling = testoppsettService.opprettBehandlingMedFagsak(
                 behandling(
                     status = BehandlingStatus.IVERKSETTER_VEDTAK,
-                    steg = StegType.VENTE_PÅ_STATUS_FRA_UTBETALING,
+                    steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV,
                 ),
             )
             val exception = catchIllegalStateException {
@@ -213,7 +213,7 @@ class StegServiceTest(
 
     private fun behandlingSomIverksettes(): Behandling {
         val nyBehandling =
-            behandling(status = BehandlingStatus.IVERKSETTER_VEDTAK, steg = StegType.VENTE_PÅ_STATUS_FRA_UTBETALING)
+            behandling(status = BehandlingStatus.IVERKSETTER_VEDTAK, steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
         return testoppsettService.opprettBehandlingMedFagsak(nyBehandling)
     }
 }

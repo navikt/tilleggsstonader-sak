@@ -67,8 +67,8 @@ object SøknadBarnetilsynUtil {
     )
 
     private fun lagHovedytelse(
-        hovedytelse: Hovedytelse = Hovedytelse.AAP,
+        vararg hovedytelse: Hovedytelse = arrayOf(Hovedytelse.AAP),
     ) = HovedytelseAvsnitt(
-        hovedytelse = hovedytelse,
+        hovedytelse = hovedytelse.toList(),
     )
 }

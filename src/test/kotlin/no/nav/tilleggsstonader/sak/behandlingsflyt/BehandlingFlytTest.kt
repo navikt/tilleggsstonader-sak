@@ -18,6 +18,10 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.brev.BrevController
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -49,6 +53,7 @@ class BehandlingFlytTest(
     @Autowired val vilkårController: VilkårController,
     @Autowired val tilsynBarnVedtakController: TilsynBarnVedtakController,
     @Autowired val brevController: BrevController,
+    @Autowired val brevmottakereRepository: BrevmottakerRepository,
     @Autowired val totrinnskontrollController: TotrinnskontrollController,
     @Autowired val taskService: TaskService,
     @Autowired val taskWorker: TaskWorker,
@@ -186,6 +191,7 @@ class BehandlingFlytTest(
 
         opprettVedtak(behandlingId)
         genererSaksbehandlerBrev(behandlingId)
+        lagreBrevmottakere(behandlingId)
         sendTilBeslutter(behandlingId)
         return behandlingId
     }
@@ -234,7 +240,7 @@ class BehandlingFlytTest(
     private fun verifiserBehandlingIverksettes(behandlingId: UUID) {
         with(testoppsettService.hentBehandling(behandlingId)) {
             assertThat(status).isEqualTo(BehandlingStatus.IVERKSETTER_VEDTAK)
-            assertThat(steg).isEqualTo(StegType.VENTE_PÅ_STATUS_FRA_UTBETALING)
+            assertThat(steg).isEqualTo(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
         }
     }
 
@@ -259,6 +265,17 @@ class BehandlingFlytTest(
     private fun genererSaksbehandlerBrev(behandlingId: UUID) {
         val html = "SAKSBEHANDLER_SIGNATUR, BREVDATO_PLACEHOLDER, BESLUTTER_SIGNATUR"
         brevController.genererPdf(GenererPdfRequest(html), behandlingId)
+    }
+
+    private fun lagreBrevmottakere(behandlingId: UUID) {
+        brevmottakereRepository.insert(
+            Brevmottaker(
+                behandlingId = behandlingId,
+                mottakerRolle = MottakerRolle.BRUKER,
+                mottakerType = MottakerType.PERSON,
+                ident = "ident",
+            ),
+        )
     }
 
     private fun opprettVedtak(behandlingId: UUID) {
@@ -294,7 +311,10 @@ class BehandlingFlytTest(
 
     private fun <T> somBeslutter(preferredUsername: String = "beslutter", fn: () -> T): T {
         kjørTasks()
-        return testWithBrukerContext(preferredUsername = preferredUsername, groups = listOf(rolleConfig.beslutterRolle)) {
+        return testWithBrukerContext(
+            preferredUsername = preferredUsername,
+            groups = listOf(rolleConfig.beslutterRolle),
+        ) {
             withCallId(fn)
         }
     }

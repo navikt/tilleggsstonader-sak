@@ -112,7 +112,7 @@ class BeslutteVedtakStegTest {
 
         val nesteSteg = utførTotrinnskontroll(godkjent = true)
 
-        assertThat(nesteSteg).isEqualTo(StegType.VENTE_PÅ_STATUS_FRA_UTBETALING)
+        assertThat(nesteSteg).isEqualTo(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
         assertThat(taskSlot[0].type).isEqualTo(FerdigstillOppgaveTask.TYPE)
         // assertThat(taskSlot[1].type).isEqualTo(PollStatusFraIverksettTask.TYPE)
         // assertThat(taskSlot[2].type).isEqualTo(BehandlingsstatistikkTask.TYPE)
@@ -146,7 +146,7 @@ class BeslutteVedtakStegTest {
 
     @Test
     internal fun `Skal kaste feil når behandling allerede er iverksatt `() {
-        val behandling = behandling(fagsak, BehandlingStatus.IVERKSETTER_VEDTAK, StegType.VENTE_PÅ_STATUS_FRA_UTBETALING)
+        val behandling = behandling(fagsak, BehandlingStatus.IVERKSETTER_VEDTAK, StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
         val apiFeil =
             catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(saksbehandling(behandling = behandling)) }
         assertThat(apiFeil.message).isEqualTo("Behandlingen er allerede besluttet. Status på behandling er 'Iverksetter vedtak'")
