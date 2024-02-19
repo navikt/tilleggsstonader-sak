@@ -35,6 +35,8 @@ class TilkjentYtelseService(
         brukerfeilHvis(saksbehandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke reberegne tilkjent ytelse for en behandling som er låst for videre redigering"
         }
-        tilkjentYtelseRepository.deleteById(saksbehandling.id)
+        tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)?.let {
+            tilkjentYtelseRepository.deleteById(it.id)
+        }
     }
 }

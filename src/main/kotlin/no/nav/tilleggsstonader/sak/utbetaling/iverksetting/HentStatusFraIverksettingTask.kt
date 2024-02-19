@@ -25,6 +25,7 @@ class HentStatusFraIverksettingTask(
     override fun doTask(task: Task) {
         val taskData = objectMapper.readValue<TaskData>(task.payload)
         iverksettStatusService.hentStatusOgOppdaterAndeler(
+            eksternFagsakId = taskData.eksternFagsakId,
             behandlingId = taskData.behandlingId,
             iverksettingId = taskData.iverksettingId,
         )
@@ -32,12 +33,13 @@ class HentStatusFraIverksettingTask(
 
     companion object {
 
-        fun opprettTask(behandlingId: UUID, iverksettingId: UUID): Task {
-            val taskData = TaskData(behandlingId = behandlingId, iverksettingId = iverksettingId)
+        fun opprettTask(eksternFagsakId: Long, behandlingId: UUID, iverksettingId: UUID): Task {
+            val taskData = TaskData(eksternFagsakId = eksternFagsakId, behandlingId = behandlingId, iverksettingId = iverksettingId)
             return Task(
                 type = TYPE,
                 payload = objectMapper.writeValueAsString(taskData),
                 properties = Properties().apply {
+                    setProperty("eksternFagsakId", eksternFagsakId.toString())
                     setProperty("behandlingId", behandlingId.toString())
                     setProperty("iverksettingId", iverksettingId.toString())
                 },
@@ -48,6 +50,7 @@ class HentStatusFraIverksettingTask(
     }
 
     private data class TaskData(
+        val eksternFagsakId: Long,
         val behandlingId: UUID,
         val iverksettingId: UUID,
     )

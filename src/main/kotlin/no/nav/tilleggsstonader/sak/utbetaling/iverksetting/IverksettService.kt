@@ -72,7 +72,7 @@ class IverksettService(
             iverksettingId = iverksettingId,
             forrigeIverksetting = forrigeIverksetting(behandling, tilkjentYtelse),
         )
-        opprettHentStatusFraIverksettingTask(behandlingId, iverksettingId)
+        opprettHentStatusFraIverksettingTask(behandling, iverksettingId)
         iverksettClient.iverksett(dto)
     }
 
@@ -133,10 +133,11 @@ class IverksettService(
         return totrinnskontroll
     }
 
-    private fun opprettHentStatusFraIverksettingTask(behandlingId: UUID, iverksettingId: UUID) {
+    private fun opprettHentStatusFraIverksettingTask(behandling: Saksbehandling, iverksettingId: UUID) {
         taskService.save(
             HentStatusFraIverksettingTask.opprettTask(
-                behandlingId = behandlingId,
+                eksternFagsakId = behandling.eksternFagsakId,
+                behandlingId = behandling.id,
                 iverksettingId = iverksettingId,
             ),
         )

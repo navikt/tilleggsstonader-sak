@@ -21,7 +21,7 @@ class IverksettClient(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private val iverksettingUrl = UriComponentsBuilder.fromUri(uri)
-        .pathSegment("api", "iverksetting", "tilleggsstønader")
+        .pathSegment("api", "iverksetting", "tilleggsstonader")
         .encode().toUriString()
 
     fun iverksett(dto: IverksettDto) {
@@ -36,11 +36,12 @@ class IverksettClient(
         }
     }
 
-    fun hentStatus(behandlingId: UUID, iverksettingId: UUID): IverksettStatus {
+    fun hentStatus(sakId: Long, behandlingId: UUID, iverksettingId: UUID): IverksettStatus {
         val url = UriComponentsBuilder.fromUri(uri)
-            .pathSegment("api", "iverksetting", "{behandlingId}", "{iverksettingId}", "status")
+            .pathSegment("api", "iverksetting", "{sakId}", "{behandlingId}", "{iverksettingId}", "status")
             .encode().toUriString()
         val uriVariables = mapOf(
+            "sakId" to sakId,
             "behandlingId" to behandlingId,
             "iverksettingId" to iverksettingId,
         )
