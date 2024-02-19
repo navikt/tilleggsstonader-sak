@@ -82,7 +82,7 @@ spec:
         - application: familie-dokument
           namespace: teamfamilie
         - application: dp-iverksett
-          namespace: dagpenger
+          namespace: teamdagpenger
       external:
         - host: pdl-api-q1.dev-fss-pub.nais.io
         - host: tilleggsstonader-arena.dev-fss-pub.nais.io

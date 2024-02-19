@@ -79,7 +79,7 @@ spec:
         - application: familie-dokument
           namespace: teamfamilie
         - application: dp-iverksett
-          namespace: dagpenger
+          namespace: teamdagpenger
         - application: arena
           namespace: teamarenanais
           cluster: prod-fss
