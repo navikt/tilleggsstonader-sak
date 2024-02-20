@@ -21,8 +21,8 @@ class IverksettStatusService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun hentStatusOgOppdaterAndeler(behandlingId: UUID, iverksettingId: UUID) {
-        val status = iverksettClient.hentStatus(behandlingId, iverksettingId)
+    fun hentStatusOgOppdaterAndeler(eksternFagsakId: Long, behandlingId: UUID, iverksettingId: UUID) {
+        val status = iverksettClient.hentStatus(eksternFagsakId, behandlingId, iverksettingId)
         if (status != IverksettStatus.OK) {
             throw TaskExceptionUtenStackTrace("Status fra oppdrag er ikke ok, status=$status")
         }
@@ -42,7 +42,7 @@ class IverksettStatusService(
             "Finnes andeler på behandling=$behandlingId som har annen status enn ${StatusIverksetting.SENDT}"
         }
         feilHvis(andeler.isEmpty()) {
-            "Forventet å finne minumum en andel for behandling=$behandlingId iverksetting=$iverksettingId"
+            "Forventet å finne minimum en andel for behandling=$behandlingId iverksetting=$iverksettingId"
         }
         return andeler
     }

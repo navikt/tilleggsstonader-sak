@@ -33,10 +33,14 @@ class SøknadRoutingService(
         return SøknadRoutingResponse(skalBehandlesINyLøsning = skalBehandlesINyLøsning(request))
     }
 
+    fun harLagretRouting(request: IdentStønadstype): Boolean {
+        val søknadRouting = søknadRoutingRepository.findByIdentAndType(request.ident, request.stønadstype)
+        return søknadRouting != null
+    }
+
     // TODO burde vi sjekke om det finnes oppgave i arena/gosys?
     private fun skalBehandlesINyLøsning(request: IdentStønadstype): Boolean {
-        val søknadRouting = søknadRoutingRepository.findByIdentAndType(request.ident, request.stønadstype)
-        if (søknadRouting != null) {
+        if (harLagretRouting(request)) {
             return true
         }
 
