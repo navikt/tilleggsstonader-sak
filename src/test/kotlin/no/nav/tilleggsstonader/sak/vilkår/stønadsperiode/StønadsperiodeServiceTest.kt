@@ -96,7 +96,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 målgruppe = MålgruppeType.OVERGANGSSTØNAD,
                 aktivitet = AktivitetType.UTDANNING,
             )
-            val oppdatertePerioder = testWithBrukerContext(SAKSHEH_B) {
+            val oppdatertePerioder = testWithBrukerContext(SAKSHEH_B, groups = listOf(rolleConfig.saksbehandlerRolle)) {
                 stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(oppdatertPeriode))
             }
             assertThat(oppdatertePerioder).hasSize(1)
@@ -153,7 +153,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 aktivitet = AktivitetType.UTDANNING,
             )
             val nyPeriode = stønadsperiodeDto(fom = FOM.plusDays(10), tom = FOM.plusDays(10))
-            val stønadsperioder2 = testWithBrukerContext(SAKSHEH_B) {
+            val stønadsperioder2 = testWithBrukerContext(SAKSHEH_B, groups = listOf(rolleConfig.saksbehandlerRolle)) {
                 stønadsperiodeService.lagreStønadsperioder(
                     behandling.id,
                     listOf(oppdatertPeriode, nyPeriode),

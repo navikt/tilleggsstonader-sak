@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -16,6 +18,8 @@ class StønadsperiodeService(
     private val behandlingService: BehandlingService,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperiodeService: VilkårperiodeService,
+    private val stegService: StegService,
+    private val inngangsvilkårSteg: InngangsvilkårSteg,
 ) {
     fun hentStønadsperioder(behandlingId: UUID): List<StønadsperiodeDto> {
         return stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
@@ -27,6 +31,8 @@ class StønadsperiodeService(
             "Kan ikke lagre stønadsperioder når behandlingen er låst"
         }
         validerStønadsperioder(behandlingId, stønadsperioder)
+
+        stegService.håndterSteg(behandlingId, inngangsvilkårSteg)
 
         val tidligereStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId)
 

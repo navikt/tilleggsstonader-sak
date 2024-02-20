@@ -34,7 +34,15 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollContr
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårController
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.slf4j.MDC
@@ -57,6 +65,8 @@ class BehandlingFlytTest(
     @Autowired val totrinnskontrollController: TotrinnskontrollController,
     @Autowired val taskService: TaskService,
     @Autowired val taskWorker: TaskWorker,
+    @Autowired val vilkårperiodeService: VilkårperiodeService,
+    @Autowired val stønadsperiodeService: StønadsperiodeService,
 ) : IntegrationTest() {
 
     val personIdent = FnrGenerator.generer(år = 2000)
@@ -186,6 +196,7 @@ class BehandlingFlytTest(
 
     private fun opprettBehandlingOgSendTilBeslutter(personIdent: String): UUID {
         val behandlingId = opprettBehandling(personIdent)
+        vurderInngangsvilkår(behandlingId)
         opprettVilkår(behandlingId)
         utfyllVilkår(behandlingId)
 
@@ -194,6 +205,39 @@ class BehandlingFlytTest(
         lagreBrevmottakere(behandlingId)
         sendTilBeslutter(behandlingId)
         return behandlingId
+    }
+
+    private fun vurderInngangsvilkår(behandlingId: UUID) {
+        val fom = LocalDate.of(2024, 1, 1)
+        val tom = LocalDate.of(2024, 1, 31)
+        vilkårperiodeService.opprettVilkårperiode(
+            opprettVilkårperiodeMålgruppe(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                type = MålgruppeType.AAP,
+            ),
+        )
+        vilkårperiodeService.opprettVilkårperiode(
+            LagreVilkårperiode(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                type = AktivitetType.TILTAK,
+                delvilkår = delvilkårAktivitetDto(),
+            ),
+        )
+        stønadsperiodeService.lagreStønadsperioder(
+            behandlingId,
+            listOf(
+                StønadsperiodeDto(
+                    fom = fom,
+                    tom = tom,
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                ),
+            ),
+        )
     }
 
     private fun utfyllVilkår(behandlingId: UUID) {
