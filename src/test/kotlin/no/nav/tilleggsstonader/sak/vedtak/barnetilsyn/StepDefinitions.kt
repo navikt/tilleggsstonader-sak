@@ -42,7 +42,9 @@ class StepDefinitions {
 
     var stønadsperioder = emptyList<Stønadsperiode>()
     var utgifter = mutableMapOf<UUID, List<Utgift>>()
+    var aktiviteter = emptyList<TilsynBarnBeregningService.PeriodeMedDager>()
     var beregningsresultat: BeregningsresultatTilsynBarnDto? = null
+    var totaltAntallDager: Int? = null
 
     @Gitt("følgende støndsperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {
@@ -69,10 +71,35 @@ class StepDefinitions {
         }
     }
 
+    @Gitt("følgende aktiviteter")
+    fun `følgende aktiviteter`(dataTable: DataTable) {
+        aktiviteter = mapAktivitetMedDager(dataTable)
+    }
+
+    private fun mapAktivitetMedDager(dataTable: DataTable) = dataTable.mapRad { rad ->
+        TilsynBarnBeregningService.PeriodeMedDager(
+            fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
+            tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
+            dager = parseInt(DomenenøkkelFelles.AKTIVITETSDAGER, rad),
+        )
+    }
+
     @Når("beregner")
     fun `beregner`() {
         try {
-            beregningsresultat = service.beregn(stønadsperioder, utgifter)
+            beregningsresultat = service.beregn(stønadsperioder, utgifter, aktiviteter)
+            ekstraBeregninger()
+        } catch (e: Exception) {
+            exception = e
+        }
+    }
+
+    // Kan slettes
+    @Når("beregner for hele perioden")
+    fun `beregner for hele perioden`() {
+        try {
+            totaltAntallDager = service.beregnHelePeriode(stønadsperioder, aktiviteter)
+            println("Totalt antall dager: " + totaltAntallDager)
         } catch (e: Exception) {
             exception = e
         }
@@ -139,6 +166,55 @@ class StepDefinitions {
         }
 
         assertThat(perioder).hasSize(perioder.size)
+    }
+
+    private fun ekstraBeregninger() {
+        val antallDagerTotaltIPeriode = service.beregnHelePeriode(stønadsperioder, aktiviteter)
+        val antallDagerSummert = beregningsresultat!!.perioder.sumOf { it.grunnlag.antallDagerTotal }
+        println("------------------------------")
+        println("------------------------------")
+        println("Aktivitetsdager = " + aktiviteter[0].dager)
+        println("------------------------------")
+        println("------------------------------")
+
+        val v2 = service.antallDager2(aktiviteter)
+        println("Antall dager summert i grunnlag: " + antallDagerSummert)
+        println("Beregnet ant. dager i hele perioden: " + antallDagerTotaltIPeriode)
+        println("Differanse dager: " + (antallDagerSummert - antallDagerTotaltIPeriode))
+        println("Antall dager totalt v2 (sum): " + v2)
+        println("Antall dager totalt v2: " + v2.entries.sumOf { it.value })
+
+        val utgifter = beregningsresultat!!.perioder[1].grunnlag.utgifterTotal
+        val dagsats = beregningsresultat!!.perioder[1].dagsats
+
+        val totaltUtbetalt = beregningsresultat!!.perioder.sumOf { it.månedsbeløp }
+        val utbetaltVedHelPeriode = dagsats.multiply(antallDagerTotaltIPeriode.toBigDecimal())
+        val antallArbeidsdager = service.antallHverdager(stønadsperioder)
+
+        val skalDekkes = utgifter.toBigDecimal().multiply(BigDecimal.valueOf(64)).divide(BigDecimal.valueOf(100))
+        val gjennomsnittMnd = totaltUtbetalt / beregningsresultat!!.perioder.size
+
+        println("------------------------------")
+        println("Totalt utbetalt: " + totaltUtbetalt)
+        println("Utbetalt ved beregning hel periode: " + utbetaltVedHelPeriode)
+        println("Differanse utbetalt: " + (totaltUtbetalt.toBigDecimal() - utbetaltVedHelPeriode))
+        println("Totalt utbetalt ved prosent: " + dagsats.multiply(aktiviteter[0].dager.toBigDecimal().divide(BigDecimal(5))).multiply(antallArbeidsdager.toBigDecimal()))
+
+        println("------------------------------")
+        println("64% av utgift i mnd: " + skalDekkes)
+        println("Gjennomsnitt utbetalt i mnd: " + gjennomsnittMnd)
+        println("Gjennomsnitt utbetalt i mnd vs total: " + (gjennomsnittMnd.toBigDecimal().minus(utbetaltVedHelPeriode/beregningsresultat!!.perioder.size.toBigDecimal())))
+        println("Differanse: " + (gjennomsnittMnd.toBigDecimal()-skalDekkes))
+    }
+
+    @Så("forvent følgende summert antall dager: {}")
+    fun `forvent følgende summert antall dager`(forventetSum: Int) {
+        assertThat(beregningsresultat!!.perioder.sumOf { it.grunnlag.antallDagerTotal }).isEqualTo(forventetSum)
+    }
+
+    @Så("forvent følgende totalt antall dager: {}")
+    fun `forvent følgende totalt antall dager`(forventetAntallDager: Int) {
+        assertThat(totaltAntallDager).isEqualTo(forventetAntallDager)
     }
 
     @Så("forvent følgende stønadsperioder for: {}")

@@ -21,6 +21,7 @@ data class Vilkårperiode(
     val fom: LocalDate,
     val tom: LocalDate,
     val type: VilkårperiodeType,
+    val aktivitetsdager: Int = 5,
     @Column("delvilkar")
     val delvilkår: DelvilkårVilkårperiode,
     val begrunnelse: String?,

@@ -126,6 +126,10 @@ class VilkårperiodeService(
         )
     }
 
+    fun finnVilkårperioderAktivitet(behandlingId: UUID, type: AktivitetType): List<Vilkårperiode>{
+        return vilkårperiodeRepository.findByBehandlingIdAndType(behandlingId, type)
+    }
+
     private fun behandlingErLåstForVidereRedigering(behandlingId: UUID) =
         behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
 }

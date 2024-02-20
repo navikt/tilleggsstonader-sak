@@ -10,4 +10,5 @@ enum class DomenenøkkelFelles(
     FOM("Fom"),
     TOM("Tom"),
     BELØP("Beløp"),
+    AKTIVITETSDAGER("Aktivitetsdager")
 }

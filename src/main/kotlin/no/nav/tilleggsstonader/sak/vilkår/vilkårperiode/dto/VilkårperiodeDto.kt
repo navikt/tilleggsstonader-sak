@@ -36,6 +36,7 @@ data class VilkårperiodeDto(
     val kilde: KildeVilkårsperiode,
     val slettetKommentar: String?,
     val sistEndret: LocalDateTime,
+    val aktivitetsdager: Int = 5,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -54,6 +55,7 @@ fun Vilkårperiode.tilDto() =
         kilde = this.kilde,
         slettetKommentar = this.slettetKommentar,
         sistEndret = this.sporbar.endret.endretTid,
+        aktivitetsdager = this.aktivitetsdager,
     )
 
 fun DelvilkårVilkårperiode.tilDto() = when (this) {
@@ -94,6 +96,23 @@ fun List<VilkårperiodeDto>.mergeSammenhengendeVilkårperioder(): Map<Vilkårper
         .mapValues {
             it.value.map { Datoperiode(it.fom, it.tom) }
                 .mergeSammenhengende { a, b -> a.tom.plusDays(1) == b.fom }
+        }
+
+data class DatoperiodeMedAktivitetsdager(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val aktivitetsdager: Int,
+) : Periode<LocalDate>, Mergeable<LocalDate, DatoperiodeMedAktivitetsdager> {
+    override fun merge(other: DatoperiodeMedAktivitetsdager): DatoperiodeMedAktivitetsdager {
+        return this.copy(tom = other.tom)
+    }
+}
+
+fun List<VilkårperiodeDto>.mergeSammenhengendeVilkårperioder2(): Map<VilkårperiodeType, List<DatoperiodeMedAktivitetsdager>> =
+    this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
+        .mapValues {
+            it.value.map { DatoperiodeMedAktivitetsdager(it.fom, it.tom, it.aktivitetsdager) }
+                .mergeSammenhengende { a, b -> a.tom.plusDays(1) == b.fom && a.aktivitetsdager == b.aktivitetsdager }
         }
 
 data class LagreVilkårperiode(
