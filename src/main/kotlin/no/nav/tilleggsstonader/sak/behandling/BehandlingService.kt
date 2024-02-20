@@ -103,7 +103,7 @@ class BehandlingService(
         behandlingType: BehandlingType,
         fagsakId: UUID,
         status: BehandlingStatus = BehandlingStatus.OPPRETTET,
-        stegType: StegType = StegType.VILKÅR,
+        stegType: StegType = StegType.INNGANGSVILKÅR,
         behandlingsårsak: BehandlingÅrsak,
         kravMottatt: LocalDate? = null,
         erMigrering: Boolean = false,
@@ -140,7 +140,7 @@ class BehandlingService(
         behandlingshistorikkService.opprettHistorikkInnslag(
             behandlingshistorikk = Behandlingshistorikk(
                 behandlingId = behandling.id,
-                steg = StegType.VILKÅR, // TODO se over dette ping Sara
+                steg = stegType,
             ),
         )
 

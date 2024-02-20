@@ -40,23 +40,28 @@ enum class StegType(
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.OPPRETTET, BehandlingStatus.UTREDES),
     ),
-    VILKÅR(
+    INNGANGSVILKÅR(
         rekkefølge = 1,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.OPPRETTET, BehandlingStatus.UTREDES),
     ),
-    BEREGNE_YTELSE(
+    VILKÅR(
         rekkefølge = 2,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    SEND_TIL_BESLUTTER(
+    BEREGNE_YTELSE(
         rekkefølge = 3,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    BESLUTTE_VEDTAK(
+    SEND_TIL_BESLUTTER(
         rekkefølge = 4,
+        tillattFor = BehandlerRolle.SAKSBEHANDLER,
+        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
+    ),
+    BESLUTTE_VEDTAK(
+        rekkefølge = 5,
         tillattFor = BehandlerRolle.BESLUTTER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FATTER_VEDTAK),
     ),
@@ -96,7 +101,8 @@ enum class StegType(
 
     fun hentNesteSteg(): StegType {
         return when (this) {
-            REVURDERING_ÅRSAK -> VILKÅR
+            REVURDERING_ÅRSAK -> INNGANGSVILKÅR
+            INNGANGSVILKÅR -> VILKÅR
             VILKÅR -> BEREGNE_YTELSE
             BEREGNE_YTELSE -> SEND_TIL_BESLUTTER
             SEND_TIL_BESLUTTER -> BESLUTTE_VEDTAK
