@@ -69,6 +69,7 @@ class DefaultRestTemplateConfiguration {
     "mock-oppgave",
     "mock-journalpost",
     "mock-featuretoggle",
+    "mock-htmlify",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
@@ -151,6 +152,13 @@ abstract class IntegrationTest {
         saksbehandler: String = "julenissen",
     ): String {
         return TokenUtil.onBehalfOfToken(mockOAuth2Server, role, saksbehandler)
+    }
+
+    protected fun clientCredential(
+        clientId: String,
+        accessAsApplication: Boolean,
+    ): String {
+        return TokenUtil.clientToken(mockOAuth2Server, clientId, accessAsApplication)
     }
 
     companion object {

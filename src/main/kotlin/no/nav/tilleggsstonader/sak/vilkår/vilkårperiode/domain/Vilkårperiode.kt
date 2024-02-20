@@ -143,3 +143,8 @@ enum class AktivitetType : VilkårperiodeType {
 
 val vilkårperiodetyper: Map<String, VilkårperiodeType> =
     listOf(MålgruppeType.entries, AktivitetType.entries).flatten().associateBy { it.name }
+
+data class Vilkårperioder(
+    val målgrupper: List<Vilkårperiode>,
+    val aktiviteter: List<Vilkårperiode>,
+)

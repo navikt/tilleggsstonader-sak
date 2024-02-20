@@ -3,9 +3,12 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.clearMocks
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.iverksett.IverksettClient
+import no.nav.tilleggsstonader.sak.iverksett.IverksettDeprecatedClient
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettStatus
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import org.springframework.context.annotation.Bean
@@ -16,6 +19,14 @@ import org.springframework.context.annotation.Profile
 @Configuration
 @Profile("mock-iverksett")
 class IverksettClientConfig {
+
+    @Bean
+    @Primary
+    fun iverksettDeprecatedClient(): IverksettDeprecatedClient {
+        val iverksettClient = mockk<IverksettDeprecatedClient>(relaxed = true)
+        clearMock(iverksettClient)
+        return iverksettClient
+    }
 
     @Bean
     @Primary
@@ -31,9 +42,15 @@ class IverksettClientConfig {
             readFile("mock/iverksett/simuleringsresultat_beriket.json"),
         )
 
-        fun clearMock(iverksettClient: IverksettClient) {
+        fun clearMock(iverksettClient: IverksettDeprecatedClient) {
             clearMocks(iverksettClient)
             every { iverksettClient.simuler(any()) } returns simuleringsresultat
+        }
+
+        fun clearMock(iverksettClient: IverksettClient) {
+            clearMocks(iverksettClient)
+            justRun { iverksettClient.iverksett(any()) }
+            every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK
         }
     }
 }

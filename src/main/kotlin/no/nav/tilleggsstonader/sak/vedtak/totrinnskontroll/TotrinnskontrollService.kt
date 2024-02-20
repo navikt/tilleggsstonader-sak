@@ -44,7 +44,7 @@ class TotrinnskontrollService(
                         eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
                     ),
             ) {
-                "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status= ${eksisterandeTotrinnskontroll.status} "
+                "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=${eksisterandeTotrinnskontroll.status}"
             }
         }
         totrinnskontrollRepository.insert(
@@ -61,7 +61,7 @@ class TotrinnskontrollService(
         val eksisterandeTotrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
 
         feilHvis((eksisterandeTotrinnskontroll == null || eksisterandeTotrinnskontroll.status != TotrinnInternStatus.KAN_FATTE_VEDTAK)) {
-            "Totrinnskontroll er ikke i en status der den kan angres ${eksisterandeTotrinnskontroll?.status}"
+            "Kan ikke angre når status=${eksisterandeTotrinnskontroll?.status}"
         }
         oppdaterStatusPåTotrinnskontroll(TotrinnInternStatus.ANGRET, eksisterandeTotrinnskontroll)
     }
@@ -90,8 +90,8 @@ class TotrinnskontrollService(
 
         if (beslutterErLikBehandler(sisteTotrinnskontroll)) {
             throw Feil(
-                message = "Beslutter er samme som saksbehandler, kan ikkje utføre totrinnskontroll",
-                frontendFeilmelding = "Beslutter er samme som behandler, samme person kan ikkje godkjenne vedtaket",
+                message = "Beslutter er samme som saksbehandler, kan ikke utføre totrinnskontroll",
+                frontendFeilmelding = "Beslutter er samme som behandler, samme person kan ikke godkjenne vedtaket",
             )
         }
         val nyStatus = if (beslutteVedtak.godkjent) BehandlingStatus.IVERKSETTER_VEDTAK else BehandlingStatus.UTREDES
@@ -224,7 +224,7 @@ class TotrinnskontrollService(
     }
 
     private fun beslutterErLikBehandler(beslutteTotrinnskontroll: Totrinnskontroll): Boolean {
-        return beslutteTotrinnskontroll.beslutter == beslutteTotrinnskontroll.saksbehandler
+        return SikkerhetContext.hentSaksbehandler() == beslutteTotrinnskontroll.saksbehandler
     }
 
     private fun oppdaterStatusPåTotrinnskontroll(status: TotrinnInternStatus, gjeldeneTotrinnskontroll: Totrinnskontroll): Totrinnskontroll {

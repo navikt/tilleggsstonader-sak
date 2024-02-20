@@ -3,9 +3,11 @@ package no.nav.tilleggsstonader.sak.util
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
@@ -26,7 +28,14 @@ object SøknadUtil {
     ): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
         val skjemaBarnetilsyn = SøknadsskjemaBarnetilsyn(
             hovedytelse = HovedytelseAvsnitt(
-                hovedytelse = EnumFelt("", Hovedytelse.AAP, "", emptyList()),
+                hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "")), emptyList()),
+                boddSammenhengende = EnumFelt("Har du bodd sammenhengende i Norge de siste 12 månedene?", JaNei.JA, "Ja", emptyList()),
+                planleggerBoINorgeNeste12mnd = EnumFelt(
+                    "Planlegger du å bo i Norge de neste 12 månedene?",
+                    JaNei.JA,
+                    "Ja",
+                    emptyList(),
+                ),
             ),
             aktivitet = AktivitetAvsnitt(
                 utdanning = EnumFelt("", JaNei.JA, "", emptyList()),

@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Datoperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -121,6 +121,69 @@ internal class StønadsperiodeValideringUtilTest {
         }.hasMessageContaining(feilmeldingIkkeOverlappendePeriode(stønadsperiode, stønadsperiode.aktivitet))
     }
 
+    @Test
+    internal fun `skal ikke kaste feil dersom stønadsperiode går på tvers av to sammengengdende vilkårsperioder`() {
+        val stønadsperiode = lagStønadsperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 12))
+
+        val målgrupper = listOf(
+            målgruppe(
+                fom = LocalDate.of(2023, 1, 1),
+                tom = LocalDate.of(2023, 1, 31),
+            ).tilDto(),
+        )
+        val aktiviteter = listOf(
+            aktivitet(
+                fom = LocalDate.of(2023, 1, 1),
+                tom = LocalDate.of(2023, 1, 10),
+                type = AktivitetType.TILTAK,
+            ).tilDto(),
+            aktivitet(
+                fom = LocalDate.of(2023, 1, 11),
+                tom = LocalDate.of(2023, 1, 12),
+                type = AktivitetType.TILTAK,
+            ).tilDto(),
+        )
+
+        assertThatCode {
+            validerStønadsperioder(
+                listOf(stønadsperiode),
+                VilkårperioderDto(målgrupper, aktiviteter),
+            )
+        }.doesNotThrowAnyException()
+    }
+
+    @Test
+    internal fun `skal ikke kaste feil dersom stønadsperiode går på tvers av to delvis overlappende vilkårsperioder`() {
+        val stønadsperiode = lagStønadsperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 12))
+
+        val målgrupper = listOf(
+            målgruppe(
+                fom = LocalDate.of(2023, 1, 1),
+                tom = LocalDate.of(2023, 1, 31),
+            ).tilDto(),
+        )
+
+        val aktiviteter = listOf(
+            aktivitet(
+                fom = LocalDate.of(2023, 1, 1),
+                tom = LocalDate.of(2023, 1, 10),
+                type = AktivitetType.TILTAK,
+            ).tilDto(),
+            aktivitet(
+                fom = LocalDate.of(2023, 1, 7),
+                tom = LocalDate.of(2023, 1, 12),
+                type = AktivitetType.TILTAK,
+            ).tilDto(),
+        )
+
+        assertThatCode {
+            validerStønadsperioder(
+                listOf(stønadsperiode),
+                VilkårperioderDto(målgrupper, aktiviteter),
+            )
+        }.doesNotThrowAnyException()
+    }
+
     @Nested
     inner class ValiderStønadsperioderOverlapper {
         val fom = LocalDate.of(2023, 1, 1)
@@ -206,7 +269,7 @@ internal class StønadsperiodeValideringUtilTest {
             assertThatThrownBy {
                 validerStønadsperioder(
                     listOf(stønadsperiode),
-                    Vilkårperioder(målgrupper, aktiviteter),
+                    VilkårperioderDto(målgrupper, aktiviteter),
                 )
             }.hasMessageContaining("Finner ingen perioder hvor vilkår for ${stønadsperiode.målgruppe} er oppfylt")
         }
@@ -241,7 +304,7 @@ internal class StønadsperiodeValideringUtilTest {
             assertThatCode {
                 validerStønadsperioder(
                     listOf(stønadsperiode),
-                    Vilkårperioder(målgrupper, aktiviteter),
+                    VilkårperioderDto(målgrupper, aktiviteter),
                 )
             }.doesNotThrowAnyException()
         }
@@ -253,7 +316,7 @@ internal class StønadsperiodeValideringUtilTest {
             assertThatThrownBy {
                 validerStønadsperioder(
                     listOf(stønadsperiode),
-                    Vilkårperioder(målgrupper, aktiviteter),
+                    VilkårperioderDto(målgrupper, aktiviteter),
                 )
             }.hasMessageContaining(feilmeldingIkkeOverlappendePeriode(stønadsperiode, stønadsperiode.målgruppe))
         }

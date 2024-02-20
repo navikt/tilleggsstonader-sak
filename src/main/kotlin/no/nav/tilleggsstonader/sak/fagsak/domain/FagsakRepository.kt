@@ -81,8 +81,8 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpda
               JOIN tilkjent_ytelse ty
               ON b.id = ty.behandling_id
               JOIN andel_tilkjent_ytelse aty 
-              ON ty.id = aty.tilkjent_ytelse 
-              AND aty.stonad_tom >= CURRENT_DATE 
+              ON ty.id = aty.tilkjent_ytelse_id
+              AND aty.fom >= CURRENT_DATE 
               WHERE b.fagsak_id = :fagsakId
               LIMIT 1""",
     )

@@ -32,8 +32,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
@@ -144,6 +142,7 @@ fun saksbehandling(
     stønadstype = fagsak.stønadstype,
     opprettetAv = behandling.sporbar.opprettetAv,
     opprettetTid = behandling.sporbar.opprettetTid,
+    endretAv = behandling.sporbar.endret.endretAv,
     endretTid = behandling.sporbar.endret.endretTid,
     kravMottatt = behandling.kravMottatt,
 )
@@ -264,27 +263,6 @@ fun revurderingsinformasjon() = RevurderingsinformasjonDto(
     ÅrsakRevurderingDto(Opplysningskilde.MELDING_MODIA, Revurderingsårsak.ANNET, "beskrivelse"),
 )
  */
-
-fun tilkjentYtelse(
-    behandlingId: UUID,
-    stønadsår: Int = 2021,
-    startdato: LocalDate? = null,
-    beløp: Int = 11554,
-): TilkjentYtelse {
-    val andeler = listOf(
-        AndelTilkjentYtelse(
-            beløp = beløp,
-            stønadFom = LocalDate.of(stønadsår, 1, 1),
-            stønadTom = LocalDate.of(stønadsår, 12, 31),
-            kildeBehandlingId = behandlingId,
-        ),
-    )
-    return TilkjentYtelse(
-        behandlingId = behandlingId,
-        startdato = min(startdato, andeler.minOfOrNull { it.stønadFom }) ?: error("Må sette startdato"),
-        andelerTilkjentYtelse = andeler,
-    )
-}
 
 fun vedtaksbrev(
     behandlingId: UUID = UUID.randomUUID(),

@@ -8,12 +8,15 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.mottarSykepenger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
@@ -27,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivite
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -45,6 +49,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårperiodeRepository: VilkårperiodeRepository
+
+    @Autowired
+    lateinit var stønadsperiodeService: StønadsperiodeService
 
     @Nested
     inner class OpprettVilkårperiode {
@@ -308,5 +315,82 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
             assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
         }
+    }
+
+    @Nested
+    inner class ValiderStønadsperioder {
+        @Test
+        fun `skal validere stønadsperioder ved opprettelse av vilkårperiode - ingen stønadsperioder`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            val periode = vilkårperiodeService.opprettVilkårperiode(
+                LagreVilkårperiode(
+                    type = MålgruppeType.AAP,
+                    fom = LocalDate.now(),
+                    tom = LocalDate.now(),
+                    delvilkår = VilkårperiodeTestUtil.delvilkårMålgruppeDto(),
+                    behandlingId = behandling.id,
+                ),
+            )
+
+            val response = vilkårperiodeService.validerOgLagResponse(periode)
+
+            assertThat(response.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.OK)
+            assertThat(response.stønadsperiodeFeil).isNull()
+        }
+
+        @Test
+        fun `skal validere stønadsperioder ved oppdatering av vilkårperioder`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            val fom1 = LocalDate.of(2024, 1, 1)
+            val tom1 = LocalDate.of(2024, 2, 1)
+
+            val fom2 = LocalDate.of(2024, 2, 1)
+            val tom2 = LocalDate.of(2024, 3, 1)
+
+            vilkårperiodeService.opprettVilkårperiode(
+                LagreVilkårperiode(
+                    type = MålgruppeType.AAP,
+                    fom = fom1,
+                    tom = tom1,
+                    delvilkår = VilkårperiodeTestUtil.delvilkårMålgruppeDto(),
+                    behandlingId = behandling.id,
+                ),
+            )
+            val oppprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiode(
+                LagreVilkårperiode(
+                    type = AktivitetType.TILTAK,
+                    fom = fom1,
+                    tom = tom1,
+                    delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
+                    behandlingId = behandling.id,
+                ),
+            )
+
+            stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyStønadsperiode(fom1, tom1)))
+
+            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(
+                id = oppprettetTiltakPeriode.id,
+                vilkårperiode = LagreVilkårperiode(
+                    type = AktivitetType.TILTAK,
+                    fom = fom2,
+                    tom = tom2,
+                    delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
+                    behandlingId = behandling.id,
+                ),
+            )
+
+            assertThat(vilkårperiodeService.validerOgLagResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.FEIL)
+        }
+
+        private fun nyStønadsperiode(fom: LocalDate = LocalDate.now(), tom: LocalDate = LocalDate.now()) =
+            StønadsperiodeDto(
+                id = null,
+                fom = fom,
+                tom = tom,
+                målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.TILTAK,
+            )
     }
 }

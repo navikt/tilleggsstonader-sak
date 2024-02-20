@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevService
+import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -15,7 +16,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
-import no.nav.tilleggsstonader.sak.utbetaling.PollStatusFraUtbetalingTask
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -57,30 +57,22 @@ class BeslutteVedtakSteg(
         val oppgaveId = ferdigstillOppgave(saksbehandling)
 
         return if (data.godkjent) {
-            // validerGodkjentVedtak(data) TODO flytt til totrinnskontroll
-            // trenger vi denne? Er det greit hvis vi kun oppdaterer totrinnskontrollen?
-            // val iverksettDto = iverksettingDtoMapper.tilDto(saksbehandling, beslutter)
             oppdaterResultatPåBehandling(saksbehandling)
-            opprettPollStatusFraUtbetaling(saksbehandling)
             // opprettTaskForBehandlingsstatistikk(saksbehandling.id, oppgaveId)
             brevService.lagEndeligBeslutterbrev(saksbehandling)
-            /*if (saksbehandling.skalIkkeSendeBrev) {
-                iverksettClient.iverksettUtenBrev(iverksettDto)
-            } else {
-                val fil = vedtaksbrevService.lagEndeligBeslutterbrev(saksbehandling, vedtakErUtenBeslutter)
-                iverksettClient.iverksett(iverksettDto, fil)
-            }
-             */
-            StegType.VENTE_PÅ_STATUS_FRA_UTBETALING
+            opprettJournalførVedtaksbrevTask(saksbehandling)
+
+            // TODO iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
+
+            StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
         } else {
-            // validerUnderkjentVedtak(data) // TODO flytt til totrinnskontroll
             opprettBehandleUnderkjentVedtakOppgave(saksbehandling, saksbehandler)
             StegType.SEND_TIL_BESLUTTER
         }
     }
 
-    private fun opprettPollStatusFraUtbetaling(saksbehandling: Saksbehandling) {
-        taskService.save(PollStatusFraUtbetalingTask.opprettTask(saksbehandling.id))
+    private fun opprettJournalførVedtaksbrevTask(saksbehandling: Saksbehandling) {
+        taskService.save(JournalførVedtaksbrevTask.opprettTask(saksbehandling.id))
     }
 
     private fun oppdaterResultatPåBehandling(saksbehandling: Saksbehandling) {

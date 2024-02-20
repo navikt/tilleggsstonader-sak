@@ -12,17 +12,17 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.iverksett.IverksettClient
+import no.nav.tilleggsstonader.sak.iverksett.IverksettDeprecatedClient
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakpersoner
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.util.tilkjentYtelse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,7 +32,7 @@ import java.time.LocalDate
 
 internal class SimuleringServiceTest {
 
-    private val iverksettClient = mockk<IverksettClient>()
+    private val iverksettClient = mockk<IverksettDeprecatedClient>()
     private val behandlingService = mockk<BehandlingService>()
     private val fagsakService = mockk<FagsakService>()
     private val simuleringsresultatRepository = mockk<SimuleringsresultatRepository>()
@@ -85,9 +85,9 @@ internal class SimuleringServiceTest {
         assertThat(simulerSlot.captured.nyTilkjentYtelseMedMetaData.tilkjentYtelse.andelerTilkjentYtelse.first().beløp)
             .isEqualTo(tilkjentYtelse.andelerTilkjentYtelse.first().beløp)
         assertThat(simulerSlot.captured.nyTilkjentYtelseMedMetaData.tilkjentYtelse.andelerTilkjentYtelse.first().periode.fom.atDay(1))
-            .isEqualTo(tilkjentYtelse.andelerTilkjentYtelse.first().stønadFom)
+            .isEqualTo(tilkjentYtelse.andelerTilkjentYtelse.first().fom)
         assertThat(simulerSlot.captured.nyTilkjentYtelseMedMetaData.tilkjentYtelse.andelerTilkjentYtelse.first().periode.tom.atEndOfMonth())
-            .isEqualTo(tilkjentYtelse.andelerTilkjentYtelse.first().stønadTom)
+            .isEqualTo(tilkjentYtelse.andelerTilkjentYtelse.first().tom)
         assertThat(simulerSlot.captured.forrigeBehandlingId).isEqualTo(forrigeBehandlingId)
     }
 

@@ -6,19 +6,19 @@ import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Datoperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.formattertPeriodeNorskFormat
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.mergeSammenhengendeVilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.mergeSammenhengendeOppfylteVilkårperioder
 
 object StønadsperiodeValideringUtil {
 
     fun validerStønadsperioder(
         stønadsperioder: List<StønadsperiodeDto>,
-        vilkårperioder: Vilkårperioder,
+        vilkårperioder: VilkårperioderDto,
     ) {
         validerIkkeOverlappendeStønadsperioder(stønadsperioder)
-        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeVilkårperioder()
-        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeVilkårperioder()
+        val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
+        val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
 
         stønadsperioder.forEach { validerStønadsperiode(it, målgrupper, aktiviteter) }
     }

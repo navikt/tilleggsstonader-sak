@@ -68,15 +68,21 @@ spec:
         - application: tilleggsstonader-sak-frontend
         - application: tilleggsstonader-prosessering
         - application: tilleggsstonader-soknad-api
+        - application: arena
+          namespace: teamarenanais
+          cluster: prod-fss
     outbound:
       rules:
         - application: tilleggsstonader-integrasjoner
+        - application: tilleggsstonader-htmlify
         - application: tilleggsstonader-arena
           cluster: prod-fss
         - application: skjermede-personer-pip
           namespace: nom
         - application: familie-dokument
           namespace: teamfamilie
+        - application: dp-iverksett
+          namespace: teamdagpenger
       external:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: tilleggsstonader-arena.prod-fss-pub.nais.io

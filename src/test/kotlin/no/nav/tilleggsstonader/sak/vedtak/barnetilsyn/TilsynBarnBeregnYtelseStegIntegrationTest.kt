@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -100,15 +100,15 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 Pair(Stønadsperiode(fom = mars.atDay(1), tom = mars.atEndOfMonth()), dagsatsForUtgift200),
                 Pair(stønadsperiode4.copy(fom = april.atDay(1)), dagsatsForUtgift200),
             ).map {
-                AndelTilkjentYtelse(
-                    stønadFom = it.first.fom,
-                    stønadTom = it.first.tom,
+                andelTilkjentYtelse(
+                    fom = it.first.fom,
+                    tom = it.first.tom,
                     beløp = it.second,
                     kildeBehandlingId = behandling.id,
                 )
             }
-            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse)
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("sporbar")
+            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
                 .containsExactlyElementsOf(forventedeAndeler)
         }
     }

@@ -1,6 +1,9 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet
 
+import no.nav.security.token.support.core.context.TokenValidationContext
+import no.nav.security.token.support.core.exceptions.JwtTokenMissingException
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.getClaim
 import org.slf4j.LoggerFactory
 
 object SikkerhetContext {
@@ -15,24 +18,22 @@ object SikkerhetContext {
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     fun hentToken() =
-        SpringTokenValidationContextHolder().tokenValidationContext.getJwtToken("azuread")
+        SpringTokenValidationContextHolder().getTokenValidationContext().getJwtToken("azuread")
+            ?: throw JwtTokenMissingException()
 
     fun erMaskinTilMaskinToken(): Boolean {
-        val claims = SpringTokenValidationContextHolder().tokenValidationContext.getClaims("azuread")
+        val claims = SpringTokenValidationContextHolder().getTokenValidationContext().getClaims("azuread")
         return claims.get("oid") != null &&
             claims.get("oid") == claims.get("sub") &&
             claims.getAsList("roles").contains("access_as_application")
     }
 
-    // eks kallKommerFra("teamfamilie:familie-ef-mottak")
-    private fun kallKommerFra(forventetApplikasjonsSuffix: String): Boolean {
-        val claims = SpringTokenValidationContextHolder().tokenValidationContext.getClaims("azuread")
+    fun kallKommerFra(eksternApplikasjon: EksternApplikasjon): Boolean {
+        val claims = SpringTokenValidationContextHolder().getTokenValidationContext().getClaims("azuread")
         val applikasjonsnavn = claims.get("azp_name")?.toString() ?: "" // e.g. dev-gcp:some-team:application-name
         secureLogger.info("Applikasjonsnavn: $applikasjonsnavn")
-        return applikasjonsnavn.endsWith(forventetApplikasjonsSuffix)
+        return applikasjonsnavn.endsWith(eksternApplikasjon.namespaceAppNavn)
     }
-
-    fun kallKommerFraSoknadApi(): Boolean = kallKommerFra("tilleggsstonader:tilleggsstonader-soknad-api")
 
     fun hentSaksbehandler(): String {
         val result = hentSaksbehandlerEllerSystembruker()
@@ -46,19 +47,19 @@ object SikkerhetContext {
     fun erSaksbehandler(): Boolean = hentSaksbehandlerEllerSystembruker() != SYSTEM_FORKORTELSE
 
     fun hentSaksbehandlerEllerSystembruker() =
-        Result.runCatching { SpringTokenValidationContextHolder().tokenValidationContext }
+        Result.runCatching { SpringTokenValidationContextHolder().getTokenValidationContext() }
             .fold(
                 onSuccess = {
-                    it.getClaims("azuread")?.get("NAVident")?.toString() ?: SYSTEM_FORKORTELSE
+                    it.getClaim("NAVident")?.toString() ?: SYSTEM_FORKORTELSE
                 },
                 onFailure = { SYSTEM_FORKORTELSE },
             )
 
     fun hentSaksbehandlerNavn(strict: Boolean = false): String {
-        return Result.runCatching { SpringTokenValidationContextHolder().tokenValidationContext }
+        return Result.runCatching { SpringTokenValidationContextHolder().getTokenValidationContext() }
             .fold(
                 onSuccess = {
-                    it.getClaims("azuread")?.get("name")?.toString()
+                    it.getClaim("name")?.toString()
                         ?: if (strict) error("Finner ikke navn i azuread token") else SYSTEM_NAVN
                 },
                 onFailure = { if (strict) error("Finner ikke navn på innlogget bruker") else SYSTEM_NAVN },
@@ -66,16 +67,19 @@ object SikkerhetContext {
     }
 
     fun hentGrupperFraToken(): Set<String> {
-        return Result.runCatching { SpringTokenValidationContextHolder().tokenValidationContext }
+        return Result.runCatching { SpringTokenValidationContextHolder().getTokenValidationContext() }
             .fold(
                 onSuccess = {
                     @Suppress("UNCHECKED_CAST")
-                    val groups = it.getClaims("azuread")?.get("groups") as List<String>?
+                    val groups = it.getClaim("groups") as List<String>?
                     groups?.toSet() ?: emptySet()
                 },
                 onFailure = { emptySet() },
             )
     }
+
+    private fun TokenValidationContext.getClaim(name: String) =
+        this.getJwtToken("azuread")?.jwtTokenClaims?.get(name)
 
     /**
      * Denne sjekker at contexten har tilgang til påkrevd rolle

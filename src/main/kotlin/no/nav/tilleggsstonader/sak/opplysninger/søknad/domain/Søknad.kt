@@ -56,7 +56,9 @@ data class SkjemaBarnetilsyn(
 )
 
 data class HovedytelseAvsnitt(
-    val hovedytelse: Hovedytelse,
+    val hovedytelse: List<Hovedytelse>,
+    val boddSammenhengende: JaNei?,
+    val planleggerBoINorgeNeste12mnd: JaNei?,
 )
 
 data class AktivitetAvsnitt(

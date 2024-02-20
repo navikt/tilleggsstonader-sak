@@ -17,6 +17,7 @@ object TokenUtil {
         val claims = mapOf(
             "oid" to thisId,
             "azp" to clientId,
+            "azp_name" to clientId,
             "roles" to if (accessAsApplication) listOf("access_as_application") else emptyList(),
         )
 

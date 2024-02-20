@@ -162,6 +162,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         assertThat(behandlingServiceObject.stønadstype).isEqualTo(fagsak.stønadstype)
         assertThat(behandlingServiceObject.opprettetAv).isEqualTo(behandling.sporbar.opprettetAv)
         assertThat(behandlingServiceObject.opprettetTid).isEqualTo(behandling.sporbar.opprettetTid)
+        assertThat(behandlingServiceObject.endretAv).isEqualTo(behandling.sporbar.endret.endretAv)
         assertThat(behandlingServiceObject.endretTid).isEqualTo(behandling.sporbar.endret.endretTid)
         assertThat(behandlingServiceObject.vedtakstidspunkt).isEqualTo(behandling.vedtakstidspunkt)
     }

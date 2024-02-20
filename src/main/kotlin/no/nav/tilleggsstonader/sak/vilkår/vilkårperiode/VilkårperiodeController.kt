@@ -4,10 +4,9 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Vilkårperioder
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -28,41 +27,44 @@ class VilkårperiodeController(
 ) {
 
     @GetMapping("behandling/{behandlingId}")
-    fun hentMålgrupper(@PathVariable behandlingId: UUID): Vilkårperioder {
+    fun hentMålgrupper(@PathVariable behandlingId: UUID): VilkårperioderDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
-        return vilkårperiodeService.hentVilkårperioder(behandlingId)
+        return vilkårperiodeService.hentVilkårperioderDto(behandlingId)
     }
 
     @PostMapping
     fun opprettVilkårMedPeriode(
         @RequestBody vilkårperiode: LagreVilkårperiode,
-    ): VilkårperiodeDto {
+    ): LagreVilkårperiodeResponse {
         tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return vilkårperiodeService.opprettVilkårperiode(vilkårperiode).tilDto()
+        val periode = vilkårperiodeService.opprettVilkårperiode(vilkårperiode)
+        return vilkårperiodeService.validerOgLagResponse(periode)
     }
 
     @PostMapping("{id}")
     fun oppdaterPeriode(
         @PathVariable("id") id: UUID,
         @RequestBody vilkårperiode: LagreVilkårperiode,
-    ): VilkårperiodeDto {
+    ): LagreVilkårperiodeResponse {
         tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return vilkårperiodeService.oppdaterVilkårperiode(id, vilkårperiode).tilDto()
+        val periode = vilkårperiodeService.oppdaterVilkårperiode(id, vilkårperiode)
+        return vilkårperiodeService.validerOgLagResponse(periode)
     }
 
     @DeleteMapping("{id}")
     fun slettPeriode(
         @PathVariable("id") id: UUID,
         @RequestBody slettVikårperiode: SlettVikårperiode,
-    ): VilkårperiodeDto {
+    ): LagreVilkårperiodeResponse {
         tilgangService.validerTilgangTilBehandling(slettVikårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return vilkårperiodeService.slettVilkårperiode(id, slettVikårperiode).tilDto()
+        val periode = vilkårperiodeService.slettVilkårperiode(id, slettVikårperiode)
+        return vilkårperiodeService.validerOgLagResponse(periode)
     }
 }

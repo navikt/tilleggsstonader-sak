@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
+import org.springframework.data.relational.core.mapping.MappedCollection
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 import java.util.UUID
@@ -26,7 +27,8 @@ data class TilkjentYtelse(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: UUID,
-    val andelerTilkjentYtelse: List<AndelTilkjentYtelse>,
+    @MappedCollection(idColumn = "tilkjent_ytelse_id")
+    val andelerTilkjentYtelse: Set<AndelTilkjentYtelse>,
     val startdato: LocalDate,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
@@ -36,7 +38,7 @@ data class TilkjentYtelse(
         .filter { andel -> andel.periode.fomDato < fom }
         .map { andel ->
             if (andel.erStønadOverlappende(fom)) {
-                andel.copy(stønadTom = fom.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()))
+                andel.copy(tom = fom.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()))
             } else {
                 andel
             }

@@ -28,13 +28,15 @@ class TilkjentYtelseService(
 
     fun harLøpendeUtbetaling(behandlingId: UUID): Boolean {
         return tilkjentYtelseRepository.findByBehandlingId(behandlingId)
-            ?.let { it.andelerTilkjentYtelse.any { andel -> andel.stønadTom.isAfter(LocalDate.now()) } } ?: false
+            ?.let { it.andelerTilkjentYtelse.any { andel -> andel.tom.isAfter(LocalDate.now()) } } ?: false
     }
 
     fun slettTilkjentYtelseForBehandling(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke reberegne tilkjent ytelse for en behandling som er låst for videre redigering"
         }
-        tilkjentYtelseRepository.deleteById(saksbehandling.id)
+        tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)?.let {
+            tilkjentYtelseRepository.deleteById(it.id)
+        }
     }
 }

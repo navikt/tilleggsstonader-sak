@@ -1,32 +1,46 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
-import no.nav.tilleggsstonader.sak.util.Månedsperiode
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.min
 import java.time.LocalDate
 import java.util.UUID
 
-fun lagTilkjentYtelse(
-    andelerTilkjentYtelse: List<AndelTilkjentYtelse>,
-    id: UUID = UUID.randomUUID(),
-    behandlingId: UUID = UUID.randomUUID(),
-    startdato: LocalDate = andelerTilkjentYtelse.minOfOrNull { it.stønadFom } ?: LocalDate.now(),
-) =
-    TilkjentYtelse(
-        id = id,
-        behandlingId = behandlingId,
-        andelerTilkjentYtelse = andelerTilkjentYtelse,
-        startdato = startdato,
-    )
+object TilkjentYtelseUtil {
 
-fun lagAndelTilkjentYtelse(
-    beløp: Int,
-    fraOgMed: LocalDate,
-    tilOgMed: LocalDate,
-    kildeBehandlingId: UUID = UUID.randomUUID(),
-) =
-    AndelTilkjentYtelse(
+    fun tilkjentYtelse(
+        behandlingId: UUID,
+        startdato: LocalDate? = null,
+        vararg andeler: AndelTilkjentYtelse = arrayOf(andelTilkjentYtelse(kildeBehandlingId = behandlingId)),
+    ): TilkjentYtelse {
+        return TilkjentYtelse(
+            behandlingId = behandlingId,
+            startdato = min(startdato, andeler.minOfOrNull { it.fom }) ?: error("Må sette startdato"),
+            andelerTilkjentYtelse = andeler.toSet(),
+        )
+    }
+
+    fun andelTilkjentYtelse(
+        kildeBehandlingId: UUID,
+        beløp: Int = 11554,
+        fom: LocalDate = LocalDate.of(2021, 1, 1),
+        tom: LocalDate = LocalDate.of(2021, 1, 31),
+        satstype: Satstype = Satstype.DAG,
+        type: TypeAndel = TypeAndel.TILSYN_BARN_AAP,
+        statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
+        iverksetting: Iverksetting? = null,
+    ) = AndelTilkjentYtelse(
         beløp = beløp,
-        periode = Månedsperiode(fraOgMed, tilOgMed),
+        fom = fom,
+        tom = tom,
+        satstype = satstype,
+        type = type,
         kildeBehandlingId = kildeBehandlingId,
+        statusIverksetting = statusIverksetting,
+        iverksetting = iverksetting,
     )
+}
