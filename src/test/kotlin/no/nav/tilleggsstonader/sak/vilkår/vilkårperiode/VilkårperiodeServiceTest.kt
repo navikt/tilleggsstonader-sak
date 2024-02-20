@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -128,7 +129,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiodeMålgruppe(medlemskap = null, behandlingId = behandling.id))
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        medlemskap = null,
+                        behandlingId = behandling.id,
+                    ),
+                )
 
             val nyttDato = LocalDate.of(2020, 1, 1)
             val oppdatering = vilkårperiode.tilOppdatering().copy(
@@ -160,7 +166,14 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiodeMålgruppe(medlemskap = VurderingDto(SvarJaNei.JA), behandlingId = behandling.id))
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        medlemskap = VurderingDto(
+                            SvarJaNei.JA,
+                        ),
+                        behandlingId = behandling.id,
+                    ),
+                )
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "Oppdatert begrunnelse",
@@ -318,10 +331,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class ValiderStønadsperioder {
+    inner class InngangsvilkårSteg {
         @Test
-        fun `skal validere stønadsperioder ved opprettelse av vilkårperiode - ingen stønadsperioder`() {
+        fun `skal validere stønadsperioder og gjennomføre steg inngangsvilkår ved opprettelse av vilkårperiode - ingen stønadsperioder`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThat(behandling.steg).isEqualTo(StegType.INNGANGSVILKÅR)
 
             val periode = vilkårperiodeService.opprettVilkårperiode(
                 LagreVilkårperiode(
@@ -335,13 +350,15 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val response = vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(periode)
 
+            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
             assertThat(response.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.OK)
             assertThat(response.stønadsperiodeFeil).isNull()
         }
 
         @Test
-        fun `skal validere stønadsperioder ved oppdatering av vilkårperioder`() {
+        fun `skal validere stønadsperioder ved oppdatering av vilkårperioder og resette steg inngangsvilkår når status ikke ok`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            assertThat(behandling.steg).isEqualTo(StegType.INNGANGSVILKÅR)
 
             val fom1 = LocalDate.of(2024, 1, 1)
             val tom1 = LocalDate.of(2024, 2, 1)
@@ -349,7 +366,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val fom2 = LocalDate.of(2024, 2, 1)
             val tom2 = LocalDate.of(2024, 3, 1)
 
-            vilkårperiodeService.opprettVilkårperiode(
+            val opprettetMålgruppe = vilkårperiodeService.opprettVilkårperiode(
                 LagreVilkårperiode(
                     type = MålgruppeType.AAP,
                     fom = fom1,
@@ -358,7 +375,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     behandlingId = behandling.id,
                 ),
             )
-            val oppprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiode(
+            vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(opprettetMålgruppe)
+            val opprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiode(
                 LagreVilkårperiode(
                     type = AktivitetType.TILTAK,
                     fom = fom1,
@@ -367,11 +385,14 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     behandlingId = behandling.id,
                 ),
             )
+            vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(opprettetTiltakPeriode)
+            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
 
             stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyStønadsperiode(fom1, tom1)))
+            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
 
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(
-                id = oppprettetTiltakPeriode.id,
+                id = opprettetTiltakPeriode.id,
                 vilkårperiode = LagreVilkårperiode(
                     type = AktivitetType.TILTAK,
                     fom = fom2,
@@ -380,7 +401,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     behandlingId = behandling.id,
                 ),
             )
+            vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode)
 
+            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.INNGANGSVILKÅR)
             assertThat(vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.FEIL)
         }
 

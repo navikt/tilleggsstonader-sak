@@ -76,7 +76,7 @@ class VilkårperiodeService(
     private fun håndterMuligStegendring(
         saksbehandling: Saksbehandling,
         valideringsresultat: Result<Unit>,
-        periode: Vilkårperiode
+        periode: Vilkårperiode,
     ) {
         // TODO: Hvis vi legger aktivitetsdager på vilkårsperioder må vi rekjøre steget ved endring av vilkårsperioder for å sikre at beregning er gjort med oppdaterte vilkårsperioder
         if (saksbehandling.steg == StegType.INNGANGSVILKÅR && valideringsresultat.isSuccess) {
