@@ -37,6 +37,7 @@ object VilkårperiodeTestUtil {
         begrunnelse = begrunnelse,
         kilde = kilde,
         resultat = resultat,
+        aktivitetsdager = null,
     )
 
     fun delvilkårMålgruppe(vurdering: Vurdering = vurdering()) = DelvilkårMålgruppe(
@@ -76,6 +77,7 @@ object VilkårperiodeTestUtil {
         begrunnelse = begrunnelse,
         kilde = kilde,
         resultat = resultat,
+        aktivitetsdager = 5,
         slettetKommentar = slettetKommentar,
     )
 

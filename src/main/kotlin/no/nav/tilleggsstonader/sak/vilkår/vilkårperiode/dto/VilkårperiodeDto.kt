@@ -108,6 +108,7 @@ data class LagreVilkårperiode(
     val type: VilkårperiodeType,
     val fom: LocalDate,
     val tom: LocalDate,
+    val aktivitetsdager: Int? = null,
     val delvilkår: DelvilkårVilkårperiodeDto,
     val begrunnelse: String? = null,
 )

@@ -3,25 +3,14 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.*
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.*
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.evaulerVilkårperiode
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -72,6 +61,8 @@ class VilkårperiodeService(
 
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
+        } else if (vilkårperiode.type is AktivitetType) {
+            validerAktivitetsdager(vilkårperiode.aktivitetsdager)
         }
 
         val resultatEvaluering = evaulerVilkårperiode(vilkårperiode.type, vilkårperiode.delvilkår)
@@ -85,9 +76,16 @@ class VilkårperiodeService(
                 delvilkår = resultatEvaluering.delvilkår,
                 begrunnelse = vilkårperiode.begrunnelse,
                 resultat = resultatEvaluering.resultat,
+                aktivitetsdager = vilkårperiode.aktivitetsdager,
                 kilde = KildeVilkårsperiode.MANUELL,
             ),
         )
+    }
+
+    private fun validerAktivitetsdager(aktivitetsdager: Int?) {
+        brukerfeilHvisIkke(aktivitetsdager in 1..<5) {
+            "Aktivitetsdager må være et heltall mellom 1 og 5"
+        }
     }
 
     private fun validerStønadsperioder(behandlingId: UUID): Result<Unit> {
