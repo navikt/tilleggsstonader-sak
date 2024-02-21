@@ -58,11 +58,15 @@ class IverksettService(
      */
     @Transactional
     fun iverksett(behandlingId: UUID, iverksettingId: UUID, måned: YearMonth = YearMonth.now()) {
+        feilHvis(måned > YearMonth.now()) {
+            "Kan ikke iverksette for måned=$måned som er frem i tiden"
+        }
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         if (!behandling.resultat.skalIverksettes) {
             logger.info("Iverksetter ikke behandling=$behandlingId då status=${behandling.status}")
             return
         }
+
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
         val totrinnskontroll = hentTotrinnskontroll(behandlingId)
 
