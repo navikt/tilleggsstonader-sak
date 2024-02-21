@@ -20,7 +20,7 @@ data class FaktaHovedytelse(
 data class SøknadsgrunnlagHovedytelse(
     val hovedytelse: List<Hovedytelse>,
     val boddSammenhengende: JaNei?,
-    val planleggerBoINorgeNeste12mnd: JaNei?
+    val planleggerBoINorgeNeste12mnd: JaNei?,
 )
 
 data class FaktaAktivtet(
