@@ -64,5 +64,6 @@ enum class IverksettStatus {
     SENDT_TIL_OPPDRAG,
     FEILET_MOT_OPPDRAG,
     OK,
+    OK_UTEN_UTBETALING,
     IKKE_PAABEGYNT,
 }
