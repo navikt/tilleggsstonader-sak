@@ -114,6 +114,17 @@ class IverksettServiceTest : IntegrationTest() {
     }
 
     @Nested
+    inner class Validering {
+
+        @Test
+        fun `kan ikke iverksette frem i tiden`() {
+            assertThatThrownBy {
+                iverksettService.iverksett(UUID.randomUUID(), UUID.randomUUID(), YearMonth.now().plusMonths(1))
+            }.hasMessageContaining("som er frem i tiden")
+        }
+    }
+
+    @Nested
     inner class IverksettingFlyt {
 
         val fagsak = fagsak()

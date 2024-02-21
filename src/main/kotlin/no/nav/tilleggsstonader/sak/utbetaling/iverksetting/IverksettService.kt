@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollServi
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -57,11 +58,15 @@ class IverksettService(
      */
     @Transactional
     fun iverksett(behandlingId: UUID, iverksettingId: UUID, måned: YearMonth = YearMonth.now()) {
+        feilHvis(måned > YearMonth.now()) {
+            "Kan ikke iverksette for måned=$måned som er frem i tiden"
+        }
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         if (!behandling.resultat.skalIverksettes) {
             logger.info("Iverksetter ikke behandling=$behandlingId då status=${behandling.status}")
             return
         }
+
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
         val totrinnskontroll = hentTotrinnskontroll(behandlingId)
 
@@ -107,6 +112,16 @@ class IverksettService(
             }
         oppdaterAndeler(aktuelleAndeler, iverksetting)
         return aktuelleAndeler
+    }
+
+    // TODO denne skal fjernes når vi har opprettet denne i produksjon
+    @Scheduled(initialDelay = 10000, fixedDelay = Long.MAX_VALUE)
+    fun opprettTaskForMånedkjøring() {
+        try {
+            taskService.save(IverksettMånedTask.opprettTask(YearMonth.of(2024, 1)))
+        } catch (e: Exception) {
+            logger.error("Oppretter ikke task for månedkjøring pga den allerede er opprettet")
+        }
     }
 
     /**
