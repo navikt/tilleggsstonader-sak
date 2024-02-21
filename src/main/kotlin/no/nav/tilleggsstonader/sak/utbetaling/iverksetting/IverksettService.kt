@@ -43,7 +43,7 @@ class IverksettService(
      */
     @Transactional
     fun iverksettBehandlingFørsteGang(behandlingId: UUID) {
-        // TODO denne skal oppdatere andeler i forrige behandling til UAKTUELL hvis de ikke er iverksatte
+        markerAndelerFraForrieBehandlingSomUaktuelle(behandlingId)
         iverksett(behandlingId, behandlingId, YearMonth.now().minusMonths(1))
     }
 
@@ -79,6 +79,29 @@ class IverksettService(
         )
         opprettHentStatusFraIverksettingTask(behandling, iverksettingId)
         iverksettClient.iverksett(dto)
+    }
+
+    private fun markerAndelerFraForrieBehandlingSomUaktuelle(behandlingId: UUID) {
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+
+        if (behandling.forrigeBehandlingId == null) {
+            return
+        }
+
+        val forrigeBehandling = behandlingService.hentSaksbehandling(behandling.forrigeBehandlingId)
+
+        val andelerTilkjentYtelse =
+            tilkjentYtelseService.hentForBehandling(forrigeBehandling.id).andelerTilkjentYtelse
+
+        feilHvis(andelerTilkjentYtelse.any { it.statusIverksetting == StatusIverksetting.SENDT }) {
+            "Andeler fra forrige behandling er sendt til iverksetting men ikke kvittert OK. Prøv igjen senere."
+        }
+
+        val uaktuelleAndeler = andelerTilkjentYtelse
+            .filter { it.statusIverksetting == StatusIverksetting.UBEHANDLET }
+            .map { it.copy(statusIverksetting = StatusIverksetting.UAKTUELL) }
+
+        andelTilkjentYtelseRepository.updateAll(uaktuelleAndeler)
     }
 
     /**
