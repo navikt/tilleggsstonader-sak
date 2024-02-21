@@ -41,7 +41,7 @@ class BeslutteVedtakSteg(
     private val totrinnskontrollService: TotrinnskontrollService,
     private val vedtaksresultatService: VedtaksresultatService,
     private val brevService: BrevService,
-    private val iverksettService: IverksettService
+    private val iverksettService: IverksettService,
 ) : BehandlingSteg<BeslutteVedtakDto> {
 
     override fun validerSteg(saksbehandling: Saksbehandling) {

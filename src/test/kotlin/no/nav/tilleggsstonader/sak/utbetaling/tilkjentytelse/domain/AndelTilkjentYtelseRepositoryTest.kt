@@ -1,11 +1,17 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -93,5 +99,75 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
 
         assertThat(andel.endretTid.toLocalDate()).isEqualTo(LocalDate.of(2023, 1, 1))
         assertThat(andelEtterOppdatering.endretTid.toLocalDate()).isEqualTo(LocalDate.now())
+    }
+
+    @Nested
+    inner class FinnBehandlingerForIverksetting {
+
+        @Test
+        fun `skal ikke finne andeler for en behandling som ikke er iverksatt`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            opprettTilkjentYtelseMedEnAndel(behandling)
+
+            val behandlinger = andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(LocalDate.now())
+
+            assertThat(behandlinger).isEmpty()
+        }
+
+        @Test
+        fun `skal ikke finne behandlinger der alle andeler allerede er iverksatt`() {
+            val behandling1 = behandling(status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET)
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling1)
+            opprettTilkjentYtelseMedEnAndel(behandling, StatusIverksetting.OK)
+
+            val behandlinger = andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(LocalDate.now())
+
+            assertThat(behandlinger).isEmpty()
+        }
+
+        @Test
+        fun `skal finne behandlinger med andeler som ikke har blitt iverksatt`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(
+                behandling(
+                    status = BehandlingStatus.FERDIGSTILT,
+                    resultat = BehandlingResultat.INNVILGET,
+                ),
+            )
+            val fagsak2 = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("16"))))
+            val behandling2 = testoppsettService.lagre(
+                behandling(
+                    fagsak2,
+                    status = BehandlingStatus.FERDIGSTILT,
+                    resultat = BehandlingResultat.OPPHØRT,
+                ),
+            )
+
+            opprettTilkjentYtelseMedEnAndel(behandling)
+            opprettTilkjentYtelseMedEnAndel(behandling2)
+
+            val behandlinger = andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(LocalDate.now())
+
+            assertThat(behandlinger).containsExactlyInAnyOrder(behandling.id, behandling2.id)
+        }
+
+        private fun opprettTilkjentYtelseMedEnAndel(
+            behandling: Behandling,
+            statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
+        ) {
+            val andel1 = andelTilkjentYtelse(
+                kildeBehandlingId = behandling.id,
+                beløp = 100,
+                fom = LocalDate.of(2023, 1, 1),
+                tom = LocalDate.of(2023, 1, 1),
+                statusIverksetting = statusIverksetting,
+            )
+            tilkjentYtelseRepository.insert(
+                TilkjentYtelse(
+                    behandlingId = behandling.id,
+                    andelerTilkjentYtelse = setOf(andel1),
+                    startdato = LocalDate.now(),
+                ),
+            )
+        }
     }
 }
