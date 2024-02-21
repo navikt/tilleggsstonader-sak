@@ -34,17 +34,50 @@ class IverksettService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     /**
-     * Skal brukes når man iverksetter en behandling første gang, uansatt om det er behandling 1 eller behandling 2 på en fagsak
+     * Skal brukes når man iverksetter en behandling første gang, uansett om det er behandling 1 eller behandling 2 på en fagsak
      * Dette fordi man skal iverksette alle andeler tom forrige måned.
      * Dvs denne skal brukes fra [no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.BeslutteVedtakSteg]
      *
      * Ved første iverksetting av en behandling er det krav på at det gjøres med jwt, dvs med saksbehandler-token
-     * Neste iverksettinger kan gjøres med client_credentials
+     * Neste iverksettinger kan gjøres med client_credentials.
+     *
+     * Dersom det ikke finnes utbetalinger som skal iverksettes for forrige måned, så legges det til en nullandel
+     * for å kunne sjekke status på iverksetting og for å kunne opphøre andeler fra forrige behandling.
      */
     @Transactional
     fun iverksettBehandlingFørsteGang(behandlingId: UUID) {
-        markerAndelerFraForrieBehandlingSomUaktuelle(behandlingId)
-        iverksett(behandlingId, behandlingId, YearMonth.now().minusMonths(1))
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        if (!behandling.resultat.skalIverksettes) {
+            logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
+            return
+        }
+        markerAndelerFraForrieBehandlingSomUaktuelle(behandling)
+
+        val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
+        val andeler = andelerForFørsteIverksettingAvBehandling(tilkjentYtelse)
+
+        val totrinnskontroll = hentTotrinnskontroll(behandlingId)
+
+        val dto = IverksettDtoMapper.map(
+            behandling = behandling,
+            andelerTilkjentYtelse = andeler,
+            totrinnskontroll = totrinnskontroll,
+            iverksettingId = behandlingId,
+            forrigeIverksetting = forrigeIverksetting(behandling, tilkjentYtelse),
+        )
+        opprettHentStatusFraIverksettingTask(behandling, behandlingId)
+        iverksettClient.iverksett(dto)
+    }
+
+    private fun andelerForFørsteIverksettingAvBehandling(tilkjentYtelse: TilkjentYtelse): Collection<AndelTilkjentYtelse> {
+        val nullMåned = YearMonth.now().minusMonths(1)
+        val andelerTilIverksetting = finnAndelerTilIverksetting(tilkjentYtelse, tilkjentYtelse.behandlingId, nullMåned)
+
+        return andelerTilIverksetting.ifEmpty {
+            val iverksetting = Iverksetting(tilkjentYtelse.behandlingId, LocalDateTime.now())
+
+            listOf(tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, nullMåned))
+        }
     }
 
     /**
@@ -58,16 +91,15 @@ class IverksettService(
      */
     @Transactional
     fun iverksett(behandlingId: UUID, iverksettingId: UUID, måned: YearMonth = YearMonth.now()) {
-        feilHvis(måned > YearMonth.now()) {
-            "Kan ikke iverksette for måned=$måned som er frem i tiden"
-        }
+        validerIkkeFremITid(måned)
+
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         if (!behandling.resultat.skalIverksettes) {
-            logger.info("Iverksetter ikke behandling=$behandlingId då status=${behandling.status}")
+            logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
             return
         }
-
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
+
         val totrinnskontroll = hentTotrinnskontroll(behandlingId)
 
         val dto = IverksettDtoMapper.map(
@@ -81,9 +113,13 @@ class IverksettService(
         iverksettClient.iverksett(dto)
     }
 
-    private fun markerAndelerFraForrieBehandlingSomUaktuelle(behandlingId: UUID) {
-        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+    private fun validerIkkeFremITid(måned: YearMonth) {
+        feilHvis(måned > YearMonth.now()) {
+            "Kan ikke iverksette for måned=$måned som er frem i tiden"
+        }
+    }
 
+    private fun markerAndelerFraForrieBehandlingSomUaktuelle(behandling: Saksbehandling) {
         if (behandling.forrigeBehandlingId == null) {
             return
         }
@@ -133,8 +169,14 @@ class IverksettService(
                     it
                 }
             }
-        oppdaterAndeler(aktuelleAndeler, iverksetting)
-        return aktuelleAndeler
+
+        return if (aktuelleAndeler.isNotEmpty()) {
+            oppdaterAndeler(aktuelleAndeler, iverksetting)
+            aktuelleAndeler
+        } else {
+            tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned)
+            emptyList()
+        }
     }
 
     // TODO denne skal fjernes når vi har opprettet denne i produksjon

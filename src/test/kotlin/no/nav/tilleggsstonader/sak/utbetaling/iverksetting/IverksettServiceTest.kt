@@ -322,6 +322,36 @@ class IverksettServiceTest : IntegrationTest() {
         }
     }
 
+    @Nested
+    inner class IverksettingNullperioder {
+        val fagsak = fagsak()
+
+        val behandling =
+            behandling(fagsak, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT)
+
+        @Test
+        fun `skal iverksette uten utbetalinger når første periode er fremover i tid`() {
+            testoppsettService.opprettBehandlingMedFagsak(behandling)
+            lagreTotrinnskontroll(behandling)
+            tilkjentYtelseRepository.insert(
+                tilkjentYtelse(
+                    behandlingId = behandling.id,
+                    andeler = arrayOf(lagAndel(behandling, nesteMåned)),
+                ),
+            )
+
+            iverksettService.iverksettBehandlingFørsteGang(behandling.id)
+
+            val andeler = hentAndeler(behandling)
+
+            assertThat(andeler).hasSize(2)
+            val andelForrigeMåned = andeler.forMåned(forrigeMåned)
+            andelForrigeMåned.assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
+            assertThat(andelForrigeMåned.beløp).isEqualTo(0)
+            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+        }
+    }
+
     private fun CapturingSlot<IverksettDto>.assertUtbetalingerInneholder(vararg måned: YearMonth) {
         assertThat(captured.vedtak.utbetalinger.map { YearMonth.from(it.fraOgMedDato) })
             .containsExactly(*måned)
