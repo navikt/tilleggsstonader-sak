@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.clearBrukerContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -55,6 +56,7 @@ class BeslutteVedtakStegTest {
     private val vedtaksresultatService = mockk<VedtaksresultatService>()
     private val brevService = mockk<BrevService>()
     private val behandlingService = mockk<BehandlingService>()
+    private val iverksettService = mockk<IverksettService>(relaxed = true)
 
     private val beslutteVedtakSteg = BeslutteVedtakSteg(
         taskService = taskService,
@@ -64,6 +66,7 @@ class BeslutteVedtakStegTest {
         behandlingService = behandlingService,
         vedtaksresultatService = vedtaksresultatService,
         brevService = brevService,
+        iverksettService = iverksettService,
     )
 
     private val innloggetBeslutter = "sign2"
@@ -114,7 +117,8 @@ class BeslutteVedtakStegTest {
 
         assertThat(nesteSteg).isEqualTo(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
         assertThat(taskSlot[0].type).isEqualTo(FerdigstillOppgaveTask.TYPE)
-        // assertThat(taskSlot[1].type).isEqualTo(PollStatusFraIverksettTask.TYPE)
+
+        verify(exactly = 1) { iverksettService.iverksettBehandlingFørsteGang(behandlingId) }
         // assertThat(taskSlot[2].type).isEqualTo(BehandlingsstatistikkTask.TYPE)
         // assertThat(objectMapper.readValue<BehandlingsstatistikkTaskPayload>(taskSlot[2].payload).hendelse)
         //    .isEqualTo(Hendelse.BESLUTTET)
@@ -124,8 +128,6 @@ class BeslutteVedtakStegTest {
                 BehandlingResultat.INNVILGET,
             )
         }
-        // verify(exactly = 1) { iverksett.iverksett(any(), any()) }
-        // verify(exactly = 0) { iverksett.iverksettUtenBrev(any()) }
     }
 
     @Test
@@ -142,6 +144,7 @@ class BeslutteVedtakStegTest {
         assertThat(taskSlot[0].type).isEqualTo(FerdigstillOppgaveTask.TYPE)
         assertThat(taskSlot[1].type).isEqualTo(OpprettOppgaveTask.TYPE)
         assertThat(taskData.oppgave.oppgavetype).isEqualTo(Oppgavetype.BehandleUnderkjentVedtak)
+        verify(exactly = 0) { iverksettService.iverksettBehandlingFørsteGang(any()) }
     }
 
     @Test

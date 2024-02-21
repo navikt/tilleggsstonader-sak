@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -40,6 +41,7 @@ class BeslutteVedtakSteg(
     private val totrinnskontrollService: TotrinnskontrollService,
     private val vedtaksresultatService: VedtaksresultatService,
     private val brevService: BrevService,
+    private val iverksettService: IverksettService
 ) : BehandlingSteg<BeslutteVedtakDto> {
 
     override fun validerSteg(saksbehandling: Saksbehandling) {
@@ -62,7 +64,7 @@ class BeslutteVedtakSteg(
             brevService.lagEndeligBeslutterbrev(saksbehandling)
             opprettJournalførVedtaksbrevTask(saksbehandling)
 
-            // TODO iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
+            iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
 
             StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
         } else {
