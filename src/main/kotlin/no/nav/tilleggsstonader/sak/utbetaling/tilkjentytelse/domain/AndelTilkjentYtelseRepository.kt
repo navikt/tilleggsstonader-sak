@@ -2,9 +2,21 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
+import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
-import java.util.UUID
+import java.time.LocalDate
+import java.util.*
 
 @Repository
 interface AndelTilkjentYtelseRepository :
-    RepositoryInterface<AndelTilkjentYtelse, UUID>, InsertUpdateRepository<AndelTilkjentYtelse>
+    RepositoryInterface<AndelTilkjentYtelse, UUID>, InsertUpdateRepository<AndelTilkjentYtelse> {
+
+    @Query(
+        """
+        SELECT DISTINCT ty.behandling_id from andel_tilkjent_ytelse aty
+        JOIN tilkjent_ytelse ty ON aty.tilkjent_ytelse_id = ty.id
+        WHERE aty.tom <= :sisteDatoIMåned AND aty.status_iverksetting = 'UBEHANDLET'
+        """,
+    )
+    fun finnBehandlingerForIverksetting(sisteDatoIMåned: LocalDate): List<UUID>
+}
