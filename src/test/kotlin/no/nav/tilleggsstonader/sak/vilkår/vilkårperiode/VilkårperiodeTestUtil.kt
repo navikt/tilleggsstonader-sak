@@ -126,6 +126,7 @@ object VilkårperiodeTestUtil {
         mottarSykepenger: VurderingDto? = null,
         begrunnelse: String? = null,
         behandlingId: UUID = UUID.randomUUID(),
+        aktivitetsdager: Int = 5
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
@@ -133,5 +134,6 @@ object VilkårperiodeTestUtil {
         delvilkår = DelvilkårAktivitetDto(lønnet, mottarSykepenger),
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,
+        aktivitetsdager = aktivitetsdager,
     )
 }

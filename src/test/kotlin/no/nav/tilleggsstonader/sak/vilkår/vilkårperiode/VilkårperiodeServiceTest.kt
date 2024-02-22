@@ -383,6 +383,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     tom = tom1,
                     delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
                     behandlingId = behandling.id,
+                    aktivitetsdager = 5
                 ),
             )
             vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(opprettetTiltakPeriode)
@@ -399,6 +400,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     tom = tom2,
                     delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
                     behandlingId = behandling.id,
+                    aktivitetsdager = 5
                 ),
             )
             vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode)

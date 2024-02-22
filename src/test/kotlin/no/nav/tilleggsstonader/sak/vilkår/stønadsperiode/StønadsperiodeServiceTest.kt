@@ -302,12 +302,14 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         lønnet: SvarJaNei? = SvarJaNei.NEI,
         mottarSykepenger: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: UUID = UUID.randomUUID(),
+        aktivitetsdager: Int = 5,
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
         delvilkår = DelvilkårAktivitetDto(VurderingDto(lønnet), VurderingDto(mottarSykepenger)),
         behandlingId = behandlingId,
+        aktivitetsdager = aktivitetsdager,
     )
 
     private fun stønadsperiodeDto(
