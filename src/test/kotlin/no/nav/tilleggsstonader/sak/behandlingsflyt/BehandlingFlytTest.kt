@@ -170,7 +170,7 @@ class BehandlingFlytTest(
 
     private fun newTransaction() {
         if (TestTransaction.isActive()) {
-            TestTransaction.flagForCommit(); // need this, otherwise the next line does a rollback
+            TestTransaction.flagForCommit() // need this, otherwise the next line does a rollback
             TestTransaction.end()
             TestTransaction.start()
         }
@@ -225,6 +225,7 @@ class BehandlingFlytTest(
                 tom = tom,
                 type = AktivitetType.TILTAK,
                 delvilkår = delvilkårAktivitetDto(),
+                aktivitetsdager = 5,
             ),
         )
         stønadsperiodeService.lagreStønadsperioder(

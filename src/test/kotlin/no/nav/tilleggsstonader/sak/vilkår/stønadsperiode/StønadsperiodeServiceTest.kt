@@ -251,9 +251,13 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                     tom = tom1,
                     delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
                     behandlingId = behandling.id,
+                    aktivitetsdager = 5,
                 ),
             ).periode
-            val opprettetStønadsperioder = stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(stønadsperiodeDto(fom = fom1, tom = tom1)))
+            val opprettetStønadsperioder = stønadsperiodeService.lagreStønadsperioder(
+                behandling.id,
+                listOf(stønadsperiodeDto(fom = fom1, tom = tom1)),
+            )
             assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
 
             // Oppdater med nye vilkårsperioder som gjør stønadsperioder ugyldige
@@ -265,6 +269,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                     tom = tom2,
                     delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
                     behandlingId = behandling.id,
+                    aktivitetsdager = 5,
                 ),
             )
             vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode)
