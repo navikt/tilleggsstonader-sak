@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype.UGYLDIG
 import no.nav.tilleggsstonader.sak.util.Månedsperiode
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
@@ -59,17 +60,25 @@ data class Iverksetting(
 /**
  * Det er ønskelig at ulike typer brukes for ulike periodetyper.
  * Disse mappes fra stønadsperioden sin type målgruppe
+ * [UGYLDIG] Brukes for å lagre ned andeler med nullbeløp. Disse skal ikke iverksettes,
+ *  men nødvendige for å iverksette første gang og ved opphør tilbake i tid.
  */
 enum class TypeAndel {
     TILSYN_BARN_ENSLIG_FORSØRGER,
     TILSYN_BARN_AAP,
     TILSYN_BARN_ETTERLATTE,
+    UGYLDIG,
 }
 
+/**
+ * [UGYLDIG] Brukes for å lagre ned andeler med nullbeløp. Disse skal ikke iverksettes,
+ * men nødvendige for å iverksette første gang og ved opphør tilbake i tid.
+ */
 enum class Satstype {
     DAG,
     MÅNED,
     ENGANGSBELØP,
+    UGYLDIG,
 }
 
 /**
@@ -82,5 +91,6 @@ enum class StatusIverksetting {
     UBEHANDLET,
     SENDT,
     OK,
+    OK_UTEN_UTBETALING,
     UAKTUELL,
 }
