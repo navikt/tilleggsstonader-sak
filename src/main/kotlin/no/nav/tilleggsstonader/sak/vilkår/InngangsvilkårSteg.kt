@@ -9,13 +9,18 @@ import org.springframework.stereotype.Service
 
 @Service
 class InngangsvilkårSteg(
-    val behandlingService: BehandlingService,
+    private val behandlingService: BehandlingService,
 ) : BehandlingSteg<Void?> {
 
     override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
-        behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.UTREDES)
+        if (saksbehandling.status != BehandlingStatus.UTREDES) {
+            behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.UTREDES)
+        }
     }
 
+    /**
+     * håndteres av [StønadsperiodeService]
+     */
     override fun settInnHistorikk() = false
 
     override fun stegType(): StegType = StegType.INNGANGSVILKÅR
