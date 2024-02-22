@@ -91,5 +91,6 @@ enum class StatusIverksetting {
     UBEHANDLET,
     SENDT,
     OK,
+    OK_UTEN_UTBETALING,
     UAKTUELL,
 }

@@ -72,7 +72,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
     }
 
     @ParameterizedTest
-    @EnumSource(value = IverksettStatus::class, names = ["OK"], mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(value = IverksettStatus::class, names = ["OK", "OK_UTEN_UTBETALING"], mode = EnumSource.Mode.EXCLUDE)
     fun `skal kaste feil hvis status ikke er OK`(status: IverksettStatus) {
         every { iverksettClient.hentStatus(any(), any(), any()) } returns status
         assertThatThrownBy {
@@ -102,6 +102,42 @@ class IverksettStatusServiceTest : IntegrationTest() {
             iverksettStatusService.hentStatusOgOppdaterAndeler(fagsak.eksternId.id, behandling.id, behandling.id)
         }.isInstanceOf(Feil::class.java)
             .hasMessageContaining("Forventet å finne minimum en andel")
+    }
+
+    @Test
+    fun `skal kaste feil hvis det finnes andeler med annet beløp enn 0 når status er OK_UTEN_UTBETALING`() {
+        every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK_UTEN_UTBETALING
+
+        val iverksattAndel = andelTilkjentYtelse(
+            kildeBehandlingId = behandling.id,
+            statusIverksetting = StatusIverksetting.SENDT,
+            iverksetting = Iverksetting(behandling.id, LocalDateTime.now()),
+            beløp = 100,
+        )
+        opprettTilkjentYtelse(behandling, iverksattAndel)
+
+        assertThatThrownBy {
+            iverksettStatusService.hentStatusOgOppdaterAndeler(fagsak.eksternId.id, behandling.id, behandling.id)
+        }.isInstanceOf(Feil::class.java)
+            .hasMessageContaining("Forventet status=OK_UTEN_UTBETALING når det finnes en 0-andel")
+    }
+
+    @Test
+    fun `skal kaste feil hvis det finnes andeler med 0-beløp når status er OK`() {
+        every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK
+
+        val iverksattAndel = andelTilkjentYtelse(
+            kildeBehandlingId = behandling.id,
+            statusIverksetting = StatusIverksetting.SENDT,
+            iverksetting = Iverksetting(behandling.id, LocalDateTime.now()),
+            beløp = 0,
+        )
+        opprettTilkjentYtelse(behandling, iverksattAndel)
+
+        assertThatThrownBy {
+            iverksettStatusService.hentStatusOgOppdaterAndeler(fagsak.eksternId.id, behandling.id, behandling.id)
+        }.isInstanceOf(Feil::class.java)
+            .hasMessageContaining("Forventet status=OK når det finnes andeler med beløp 0 for iverksetting")
     }
 
     private fun opprettTilkjentYtelse(
