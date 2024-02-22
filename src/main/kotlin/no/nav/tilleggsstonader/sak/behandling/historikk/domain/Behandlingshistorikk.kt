@@ -61,7 +61,7 @@ private fun Behandlingshistorikk.mapUtfallTilHendelse() =
 
 private fun Behandlingshistorikk.mapStegTilHendelse(saksbehandling: Saksbehandling) =
     when (this.steg) {
-        StegType.VILKÅR -> Hendelse.OPPRETTET
+        StegType.INNGANGSVILKÅR -> Hendelse.OPPRETTET
         StegType.SEND_TIL_BESLUTTER -> Hendelse.SENDT_TIL_BESLUTTER
         StegType.BEHANDLING_FERDIGSTILT -> mapFraFerdigstiltTilHendelse(saksbehandling.resultat)
         StegType.FERDIGSTILLE_BEHANDLING -> mapFraFerdigstilleTilHendelse(saksbehandling.resultat)

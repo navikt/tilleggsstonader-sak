@@ -2,8 +2,12 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -32,6 +36,8 @@ class VilkårperiodeService(
     private val behandlingService: BehandlingService,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
+    private val stegService: StegService,
+    private val inngangsvilkårSteg: InngangsvilkårSteg,
 ) {
 
     fun hentVilkårperioder(behandlingId: UUID): Vilkårperioder {
@@ -51,16 +57,33 @@ class VilkårperiodeService(
         vilkårsperioder: List<Vilkårperiode>,
     ) = vilkårsperioder.filter { it.type is T }
 
-    fun validerOgLagResponse(
+    fun oppdaterBehandlingstegOgLagResponse(
         periode: Vilkårperiode,
     ): LagreVilkårperiodeResponse {
+        val saksbehandling = behandlingService.hentSaksbehandling(periode.behandlingId)
+
         val valideringsresultat = validerStønadsperioder(periode.behandlingId)
+
+        håndterMuligStegendring(saksbehandling, valideringsresultat, periode)
 
         return LagreVilkårperiodeResponse(
             periode.tilDto(),
             stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
             stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
         )
+    }
+
+    private fun håndterMuligStegendring(
+        saksbehandling: Saksbehandling,
+        valideringsresultat: Result<Unit>,
+        periode: Vilkårperiode,
+    ) {
+        // TODO: Hvis vi legger aktivitetsdager på vilkårsperioder må vi rekjøre steget ved endring av vilkårsperioder for å sikre at beregning er gjort med oppdaterte vilkårsperioder
+        if (saksbehandling.steg == StegType.INNGANGSVILKÅR && valideringsresultat.isSuccess) {
+            stegService.håndterSteg(periode.behandlingId, inngangsvilkårSteg)
+        } else if (saksbehandling.steg != StegType.INNGANGSVILKÅR && valideringsresultat.isFailure) {
+            stegService.resetSteg(periode.behandlingId, StegType.INNGANGSVILKÅR)
+        }
     }
 
     @Transactional

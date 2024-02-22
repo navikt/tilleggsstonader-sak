@@ -64,7 +64,7 @@ fun oppgave(
 fun behandling(
     fagsak: Fagsak = fagsak(),
     status: BehandlingStatus = BehandlingStatus.OPPRETTET,
-    steg: StegType = StegType.VILKÅR,
+    steg: StegType = StegType.INNGANGSVILKÅR,
     kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
     id: UUID = UUID.randomUUID(),
     type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
