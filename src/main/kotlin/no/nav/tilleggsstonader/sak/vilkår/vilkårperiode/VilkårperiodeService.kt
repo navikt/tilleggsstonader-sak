@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
@@ -96,6 +97,7 @@ class VilkårperiodeService(
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
         }
+        validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
 
         val resultatEvaluering = evaulerVilkårperiode(vilkårperiode.type, vilkårperiode.delvilkår)
 
@@ -108,9 +110,20 @@ class VilkårperiodeService(
                 delvilkår = resultatEvaluering.delvilkår,
                 begrunnelse = vilkårperiode.begrunnelse,
                 resultat = resultatEvaluering.resultat,
+                aktivitetsdager = vilkårperiode.aktivitetsdager,
                 kilde = KildeVilkårsperiode.MANUELL,
             ),
         )
+    }
+
+    private fun validerAktivitetsdager(vilkårPeriodeType: VilkårperiodeType, aktivitetsdager: Int?) {
+        if (vilkårPeriodeType is AktivitetType) {
+            brukerfeilHvisIkke(aktivitetsdager in 1..5) {
+                "Aktivitetsdager må være et heltall mellom 1 og 5"
+            }
+        } else if (vilkårPeriodeType is MålgruppeType) {
+            brukerfeilHvisIkke(aktivitetsdager == null) { "Kan ikke registrere aktivitetsdager på målgrupper" }
+        }
     }
 
     private fun validerStønadsperioder(behandlingId: UUID): Result<Unit> {
@@ -129,6 +142,9 @@ class VilkårperiodeService(
         feilHvis(behandlingErLåstForVidereRedigering(eksisterendeVilkårperiode.behandlingId)) {
             "Kan ikke oppdatere vilkårperiode når behandling er låst for videre redigering"
         }
+
+        validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
+
         val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.type, vilkårperiode.delvilkår)
         val oppdatert = when (eksisterendeVilkårperiode.kilde) {
             KildeVilkårsperiode.MANUELL -> {
@@ -137,6 +153,7 @@ class VilkårperiodeService(
                     fom = vilkårperiode.fom,
                     tom = vilkårperiode.tom,
                     delvilkår = resultatEvaluering.delvilkår,
+                    aktivitetsdager = vilkårperiode.aktivitetsdager,
                     resultat = resultatEvaluering.resultat,
                 )
             }

@@ -383,6 +383,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     tom = tom1,
                     delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
                     behandlingId = behandling.id,
+                    aktivitetsdager = 5,
                 ),
             )
             vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(opprettetTiltakPeriode)
@@ -399,12 +400,15 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     tom = tom2,
                     delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
                     behandlingId = behandling.id,
+                    aktivitetsdager = 5,
                 ),
             )
             vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode)
 
             assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.INNGANGSVILKÅR)
-            assertThat(vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.FEIL)
+            assertThat(vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(
+                Stønadsperiodestatus.FEIL,
+            )
         }
 
         private fun nyStønadsperiode(fom: LocalDate = LocalDate.now(), tom: LocalDate = LocalDate.now()) =

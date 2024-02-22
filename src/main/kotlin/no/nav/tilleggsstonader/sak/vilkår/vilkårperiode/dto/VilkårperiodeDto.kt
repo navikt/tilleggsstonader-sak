@@ -37,6 +37,7 @@ data class VilkårperiodeDto(
     val kilde: KildeVilkårsperiode,
     val slettetKommentar: String?,
     val sistEndret: LocalDateTime,
+    val aktivitetsdager: Int? = null,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -53,6 +54,7 @@ fun Vilkårperiode.tilDto() =
         resultat = this.resultat,
         begrunnelse = this.begrunnelse,
         kilde = this.kilde,
+        aktivitetsdager = this.aktivitetsdager,
         slettetKommentar = this.slettetKommentar,
         sistEndret = this.sporbar.endret.endretTid,
     )
@@ -108,6 +110,7 @@ data class LagreVilkårperiode(
     val type: VilkårperiodeType,
     val fom: LocalDate,
     val tom: LocalDate,
+    val aktivitetsdager: Int? = null,
     val delvilkår: DelvilkårVilkårperiodeDto,
     val begrunnelse: String? = null,
 )
