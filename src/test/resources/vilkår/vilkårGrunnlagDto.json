@@ -1,7 +1,9 @@
 {
   "hovedytelse" : {
     "søknadsgrunnlag" : {
-      "hovedytelse" : [ "AAP" ]
+      "hovedytelse" : [ "AAP" ],
+      "boddSammenhengende" : "NEI",
+      "planleggerBoINorgeNeste12mnd" : "JA"
     }
   },
   "aktivitet" : {

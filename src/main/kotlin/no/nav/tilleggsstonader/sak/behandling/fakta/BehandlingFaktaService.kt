@@ -50,6 +50,8 @@ class BehandlingFaktaService(
             søknadsgrunnlag = søknad?.let {
                 SøknadsgrunnlagHovedytelse(
                     hovedytelse = it.data.hovedytelse.hovedytelse,
+                    boddSammenhengende = it.data.hovedytelse.boddSammenhengende,
+                    planleggerBoINorgeNeste12mnd = it.data.hovedytelse.planleggerBoINorgeNeste12mnd,
                 )
             },
         )
