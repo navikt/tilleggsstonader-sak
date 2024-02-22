@@ -23,13 +23,29 @@ class IverksettStatusService(
     @Transactional
     fun hentStatusOgOppdaterAndeler(eksternFagsakId: Long, behandlingId: UUID, iverksettingId: UUID) {
         val status = iverksettClient.hentStatus(eksternFagsakId, behandlingId, iverksettingId)
-        if (status != IverksettStatus.OK) {
-            throw TaskExceptionUtenStackTrace("Status fra oppdrag er ikke ok, status=$status")
+        val statusIverksetting = when (status) {
+            IverksettStatus.OK -> StatusIverksetting.OK
+            IverksettStatus.OK_UTEN_UTBETALING -> StatusIverksetting.OK_UTEN_UTBETALING
+            else -> throw TaskExceptionUtenStackTrace("Status fra oppdrag er ikke ok, status=$status")
         }
 
         val andeler = hentAndelerForIverksettingId(behandlingId, iverksettingId)
         logger.info("Oppdaterer ${andeler.size} andeler med iverksettingId=$iverksettingId")
-        andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(statusIverksetting = StatusIverksetting.OK) })
+        validerStatus(status, andeler)
+
+        andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(statusIverksetting = statusIverksetting) })
+    }
+
+    private fun validerStatus(
+        status: IverksettStatus,
+        andeler: List<AndelTilkjentYtelse>,
+    ) {
+        feilHvis(status == IverksettStatus.OK_UTEN_UTBETALING && (andeler.size != 1 || andeler.single().beløp != 0)) {
+            "Forventet status=$status når det finnes en 0-andel"
+        }
+        feilHvis(status == IverksettStatus.OK && andeler.any { it.beløp == 0 }) {
+            "Forventet status=$status når det finnes andeler med beløp 0 for iverksetting"
+        }
     }
 
     private fun hentAndelerForIverksettingId(
