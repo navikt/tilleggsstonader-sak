@@ -61,9 +61,8 @@ class VilkårperiodeService(
 
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
-        } else if (vilkårperiode.type is AktivitetType) {
-            validerAktivitetsdager(vilkårperiode.aktivitetsdager)
         }
+        validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
 
         val resultatEvaluering = evaulerVilkårperiode(vilkårperiode.type, vilkårperiode.delvilkår)
 
@@ -82,9 +81,13 @@ class VilkårperiodeService(
         )
     }
 
-    private fun validerAktivitetsdager(aktivitetsdager: Int?) {
-        brukerfeilHvisIkke(aktivitetsdager in 1..<5) {
-            "Aktivitetsdager må være et heltall mellom 1 og 5"
+    private fun validerAktivitetsdager(vilkårPeriodeType: VilkårperiodeType, aktivitetsdager: Int?) {
+        if (vilkårPeriodeType is AktivitetType) {
+            brukerfeilHvisIkke(aktivitetsdager in 1..5) {
+                "Aktivitetsdager må være et heltall mellom 1 og 5"
+            }
+        } else if (vilkårPeriodeType is MålgruppeType) {
+            brukerfeilHvisIkke(aktivitetsdager == null) { "Kan ikke registrere aktivitetsdager på målgrupper" }
         }
     }
 
@@ -104,6 +107,9 @@ class VilkårperiodeService(
         feilHvis(behandlingErLåstForVidereRedigering(eksisterendeVilkårperiode.behandlingId)) {
             "Kan ikke oppdatere vilkårperiode når behandling er låst for videre redigering"
         }
+
+        validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
+
         val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.type, vilkårperiode.delvilkår)
         val oppdatert = when (eksisterendeVilkårperiode.kilde) {
             KildeVilkårsperiode.MANUELL -> {
@@ -112,6 +118,7 @@ class VilkårperiodeService(
                     fom = vilkårperiode.fom,
                     tom = vilkårperiode.tom,
                     delvilkår = resultatEvaluering.delvilkår,
+                    aktivitetsdager = vilkårperiode.aktivitetsdager,
                     resultat = resultatEvaluering.resultat,
                 )
             }
