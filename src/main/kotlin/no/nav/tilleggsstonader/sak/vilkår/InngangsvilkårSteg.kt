@@ -8,19 +8,20 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import org.springframework.stereotype.Service
 
 @Service
-class VilkårSteg(
+class InngangsvilkårSteg(
     private val behandlingService: BehandlingService,
 ) : BehandlingSteg<Void?> {
+
     override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
         if (saksbehandling.status != BehandlingStatus.UTREDES) {
             behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.UTREDES)
         }
     }
 
-    override fun stegType(): StegType = StegType.VILKÅR
-
     /**
-     * håndteres av [VilkårStegService]
+     * håndteres av [StønadsperiodeService]
      */
-    override fun settInnHistorikk(): Boolean = false
+    override fun settInnHistorikk() = false
+
+    override fun stegType(): StegType = StegType.INNGANGSVILKÅR
 }
