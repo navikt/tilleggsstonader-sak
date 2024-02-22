@@ -35,6 +35,10 @@ data class Vilkårperiode(
     init {
         require(tom >= fom) { "Til-og-med før fra-og-med: $fom > $tom" }
 
+        if (type is AktivitetType) {
+            require(aktivitetsdager != null) {"Aktivitetsdager må settes for aktivitet"}
+        }
+
         val ugyldigTypeOgDetaljer = (type is MålgruppeType && delvilkår !is DelvilkårMålgruppe) ||
             (type is AktivitetType && delvilkår !is DelvilkårAktivitet)
         feilHvis(ugyldigTypeOgDetaljer) {
