@@ -15,7 +15,6 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.Period
 import java.time.YearMonth
 import java.time.temporal.TemporalAdjusters
 import java.util.UUID
@@ -42,10 +41,12 @@ class TilsynBarnBeregningService() {
     }
 
     fun beregn(
-        stønadsperioder: List<Stønadsperiode>,
+        stønadsperioder: List<Stønadsperiode>, // skal ikke sendes inn
         utgifterPerBarn: Map<UUID, List<Utgift>>,
         aktiviteter: List<PeriodeMedDager> = emptyList(),
     ): BeregningsresultatTilsynBarnDto {
+        // TODO: Finn stønadsperioder
+        // TODO: Finn aktiviteter
         validerPerioder(stønadsperioder, utgifterPerBarn)
 
         val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, utgifterPerBarn, aktiviteter)
@@ -93,14 +94,10 @@ class TilsynBarnBeregningService() {
         val test = stønadsperioderPerUke.mapValues { (uke, periode) ->
             val maksAntallDagerDenneUka = min(periode.sumOf { it.dager }, 5)
 
-            val test2 =
+            val totaltAntallAktivitetsdagerPerUke =
                 aktiviteterPerUke[uke]?.sumOf { aktivitet -> aktivitet.sumOf { it.dager } } ?: 0 //TODO sjekk over denne
 
-//            if(test2 == null) {
-//                maksAntallDagerDenneUka
-//            } else {
-            min(maksAntallDagerDenneUka, test2)
-//            }
+            min(maksAntallDagerDenneUka, totaltAntallAktivitetsdagerPerUke)
         }
 
         return test.values.sum()
@@ -113,7 +110,7 @@ class TilsynBarnBeregningService() {
     ): List<Beregningsgrunnlag> {
         val stønadsperioderPerMåned = stønadsperioder.tilÅrMåneder()
         val utgifterPerMåned = tilUtgifterPerMåned(utgifterPerBarn)
-        val aktiviteterPerMåned = splittAktiviteterPåMåned(aktiviteter)
+        val aktiviteterPerMåned = splittAktiviteterPåMåned(aktiviteter) // todo: kun gyldige aktiviteter
 
         return stønadsperioderPerMåned.entries.mapNotNull { (måned, stønadsperioder) ->
             utgifterPerMåned[måned]?.let { utgifter ->
@@ -124,6 +121,7 @@ class TilsynBarnBeregningService() {
                     makssats = makssats,
                     stønadsperioder = stønadsperioder,
                     utgifter = utgifter,
+                    // aktiviteter = aktiviteterPerMåned[måned] i mnd?
                     antallDagerTotal = antallDager(stønadsperioder, aktiviteterPerMåned[måned]),
                     utgifterTotal = utgifter.sumOf { it.utgift },
                     antallBarn = antallBarn,
@@ -168,7 +166,7 @@ class TilsynBarnBeregningService() {
         stønadsperioder: List<Stønadsperiode>, aktiviteter: List<PeriodeMedDager>?
     ): Int {
         val antallUkedagerIStønadsperiode = stønadsperioder.sumOf { stønadsperiode ->
-            stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
+            stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) } // TODO: fjern fjerning av helligdager
         }
 
         if (aktiviteter.isNullOrEmpty()) {
@@ -182,9 +180,6 @@ class TilsynBarnBeregningService() {
         //return min(beregnetAntallDager, antallUkedagerIStønadsperiode)
         val stønadsperioderUker = stønadsperioderTilUker(stønadsperioder)
         val aktivitetUker = aktivitetsdagerTilUke(aktiviteter)
-
-        // make stønadsperioderUker into Map<Uke, Int>
-
 
         val test = stønadsperioderUker.mapValues { (uke, periode) ->
             val maksAntallDagerDenneUka = min(periode.sumOf { it.dager }, 5)
