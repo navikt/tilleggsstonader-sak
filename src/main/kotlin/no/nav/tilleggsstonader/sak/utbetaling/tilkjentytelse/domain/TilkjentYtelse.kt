@@ -5,7 +5,6 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.MappedCollection
 import java.time.LocalDate
-import java.time.temporal.TemporalAdjusters
 import java.util.UUID
 
 /**
@@ -32,15 +31,4 @@ data class TilkjentYtelse(
     val startdato: LocalDate,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
-) {
-
-    fun taMedAndelerFremTilDato(fom: LocalDate): List<AndelTilkjentYtelse> = andelerTilkjentYtelse
-        .filter { andel -> andel.periode.fomDato < fom }
-        .map { andel ->
-            if (andel.erStønadOverlappende(fom)) {
-                andel.copy(tom = fom.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()))
-            } else {
-                andel
-            }
-        }
-}
+)
