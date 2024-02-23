@@ -70,7 +70,7 @@ class FagsakService(
         val erLøpende = erLøpende(fagsak)
         return fagsak.tilDto(
             behandlinger = behandlinger.map {
-                it.tilDto(fagsak.stønadstype)
+                it.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId)
             },
             erLøpende = erLøpende,
         )

@@ -138,6 +138,7 @@ fun saksbehandling(
     henlagtÅrsak = behandling.henlagtÅrsak,
     ident = fagsak.hentAktivIdent(),
     fagsakId = fagsak.id,
+    fagsakPersonId = fagsak.fagsakPersonId,
     eksternFagsakId = fagsak.eksternId.id,
     stønadstype = fagsak.stønadstype,
     opprettetAv = behandling.sporbar.opprettetAv,
