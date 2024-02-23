@@ -146,11 +146,6 @@ class OppgaveService(
         ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
     }
 
-    /**
-     * @param ignorerFeilregistrert ignorerer oppgaver som allerede er feilregistrerte
-     * Den burde kun settes til true for lukking av oppgaver koblet til henleggelse
-     * Oppgaver skal ikke være lukket når denne kalles, då det er ef-sak som burde lukke oppgaver som vi har opprettet
-     */
     fun ferdigstillOppgaveHvisOppgaveFinnes(
         behandlingId: UUID,
         oppgavetype: Oppgavetype,
