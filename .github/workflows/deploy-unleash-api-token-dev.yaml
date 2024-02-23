@@ -3,6 +3,9 @@ name: Deploy unleash api-token for dev
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: "write"
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -13,5 +16,5 @@ jobs:
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
-          RESOURCE: .deploy/unleash-apitoken-preprod.yaml
+          RESOURCE: .nais/unleash-apitoken-preprod.yaml
           PRINT_PAYLOAD: true

@@ -64,12 +64,12 @@ jobs:
           RESOURCE: .nais/preprod.yaml
           IMAGE: ${{ needs.build.outputs.image }}
 
-#      - name: Deploy til prod-gcp
-#        uses: nais/deploy/actions/deploy@v2
-#        env:
-#          CLUSTER: prod-gcp
-#          RESOURCE: .nais/prod.yaml
-#          IMAGE: ${{ needs.build.outputs.image }}
+      - name: Deploy til prod-gcp
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: prod-gcp
+          RESOURCE: .nais/prod.yaml
+          IMAGE: ${{ needs.build.outputs.image }}
 
       - name: Post deploy failures to Slack
         if: failure()
