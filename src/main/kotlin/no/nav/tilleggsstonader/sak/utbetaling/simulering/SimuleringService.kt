@@ -7,8 +7,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
-import no.nav.tilleggsstonader.sak.iverksett.IverksettDeprecatedClient
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDto
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Simuleringsoppsummering
@@ -21,7 +21,7 @@ import java.util.UUID
 
 @Service
 class SimuleringService(
-    private val iverksettClient: IverksettDeprecatedClient,
+    private val iverksettClient: IverksettClient,
     private val simuleringsresultatRepository: SimuleringsresultatRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val tilgangService: TilgangService,
@@ -79,6 +79,7 @@ class SimuleringService(
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
 
         try {
+            // TODO map til riktig request når dp-iverksett har støtte for simulering
             return iverksettClient.simuler(SimuleringDto(saksbehandling.id))
         } catch (e: Exception) {
             val personFinnesIkkeITps = "Personen finnes ikke i TPS"
