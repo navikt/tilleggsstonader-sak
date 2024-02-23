@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -9,7 +11,7 @@ import java.util.UUID
 @Service
 class HenleggService(
     private val behandlingService: BehandlingService,
-    // private val oppgaveService: OppgaveService,
+    private val oppgaveService: OppgaveService,
 ) {
 
     @Transactional
@@ -20,17 +22,13 @@ class HenleggService(
     }
 
     private fun ferdigstillOppgaveTask(behandling: Behandling) {
-        /*
         oppgaveService.ferdigstillOppgaveHvisOppgaveFinnes(
             behandlingId = behandling.id,
             Oppgavetype.BehandleSak,
-            ignorerFeilregistrert = true,
         )
         oppgaveService.ferdigstillOppgaveHvisOppgaveFinnes(
             behandlingId = behandling.id,
             Oppgavetype.BehandleUnderkjentVedtak,
-            ignorerFeilregistrert = true,
         )
-         */
     }
 }
