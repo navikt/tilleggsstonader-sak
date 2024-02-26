@@ -23,17 +23,17 @@ import java.util.UUID
 class PassBarnRegel : Vilkårsregel(
     vilkårType = VilkårType.PASS_BARN,
     regler = setOf(
+        UTGIFTER_DOKUMENTERT,
+        DEKKES_UTGIFTER_ANNET_REGELVERK,
+        ANNEN_FORELDER_MOTTAR_STØTTE,
         HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
         UNNTAK_ALDER,
-        DEKKES_UTGIFTER_ANNET_REGELVERK,
-        ANNEN_FORELDER_MOTTAR_STØTTE,
-        UTGIFTER_DOKUMENTERT,
     ),
     hovedregler = regelIder(
-        HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
+        UTGIFTER_DOKUMENTERT,
         DEKKES_UTGIFTER_ANNET_REGELVERK,
         ANNEN_FORELDER_MOTTAR_STØTTE,
-        UTGIFTER_DOKUMENTERT,
+        HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
     ),
 ) {
 
