@@ -86,7 +86,7 @@ class PassBarnRegel : Vilkårsregel(
                 regelId = RegelId.UTGIFTER_DOKUMENTERT,
                 jaNeiSvarRegel(
                     hvisJa = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
-                    hvisNei = SluttSvarRegel.IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    hvisNei = SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                 ),
             )
 
@@ -94,7 +94,7 @@ class PassBarnRegel : Vilkårsregel(
             RegelSteg(
                 regelId = RegelId.ANNEN_FORELDER_MOTTAR_STØTTE,
                 jaNeiSvarRegel(
-                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     hvisNei = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
                 ),
             )
@@ -103,17 +103,16 @@ class PassBarnRegel : Vilkårsregel(
             RegelSteg(
                 regelId = RegelId.DEKKES_UTGIFTER_ANNET_REGELVERK,
                 jaNeiSvarRegel(
-                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     hvisNei = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
                 ),
             )
     }
 
     private fun automatiskVurderAlderLavereEnnGrenseverdi(): Delvilkår {
-        val begrunnelse = "Automatisk vurdert: Ut ifra barnets alder er det ${
-            LocalDate.now()
-                .norskFormat()
-        } automatisk vurdert at barnet ikke har fullført 4. skoleår."
+        val iDag = LocalDate.now().norskFormat()
+        val begrunnelse =
+            "Automatisk vurdert: Ut ifra barnets alder er det $iDag automatisk vurdert at barnet ikke har fullført 4. skoleår."
 
         return Delvilkår(
             resultat = Vilkårsresultat.AUTOMATISK_OPPFYLT,
