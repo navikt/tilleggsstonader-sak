@@ -5,37 +5,30 @@ Backend - saksbehandling for tilleggsstønader
 ## Kjøring lokalt
 
 ### Client id & client secret
-secret kan hentes fra cluster: 
+
+secret kan hentes fra cluster:
+
 1. `gcloud auth login`
-2. `kubectl -n tilleggsstonader get secret azuread-tilleggsstonader-sak-lokal -o json | jq '.data | map_values(@base64d)' | grep CLIENT`
+2. `brew install jq` hvis du mangler det.
+3. `kubectl --context dev-gcp -n tilleggsstonader get secret azuread-tilleggsstonader-sak-lokal -o json | jq '.data | map_values(@base64d)' | grep CLIENT`
 
-* `AZURE_APP_CLIENT_ID` (fra secret)
-* `AZURE_APP_CLIENT_SECRET` (fra secret)
-
-Variablene legges inn under AppLocal -> Edit Configurations -> Environment Variables.
+Variablene legges inn under SakAppLocal -> Edit Configurations -> Modify Options -> huk av for Environemntal Variables
+Legg inn `AZURE_APP_CLIENT_ID={secret},AZURE_APP_CLIENT_SECRET={secret}`
 
 ### Kjøring med temp-database
-For å kjøre opp appen lokalt, kan en kjøre `AppLocal`.
+
+Kjør opp Spring-appen `SakAppLocal`. Dette starter appen med en midlertidig database som kjører i minnet, og blir tømt
+når appen stoppes.
+For å kjøre med mer persistente data, se neste punkt.
 
 ### Kjøring med postgres-database
-For å kjøre opp appen lokalt med en postgres-database, kan en kjøre `AppLocalPostgres`.
-App'en vil starte opp en container med siste versjon av postgres.
 
-For å kjøre opp postgres containern så kjører man `docker-compose up`
+For å kjøre opp postgres-containern så kjører man `docker-compose up`
 For å ta ned containern så kjører man `docker-compose down`
 For å slette volymen `docker-compose down -v`
 
-
-#### Vurderinger
-Burde vi sette konfigurere en egen objectMapper, eller bruke eks `Jackson2ObjectMapperBuilder.json().build()` 
-som brukes som default i `MappingJackson2HttpMessageConverter`
-
-#### Kommentarer
- * Har ikke tatt med flagget migrert på fagsak då det er uklart om vi skal migrere
- * Tilgangskontroll gjøres kun mot søker og barn, her må vi vurdere om vi skal ha med flere relasjoner og
-
-#### Saker som mangler
-* Verifisere at auditlogg kommer til arcsight
+For lokal kjøring av appen mot postgres-databasen, start opp `SakAppLocalPostgres`. Husk å legge inn
+miljøvariablene også her.
 
 ## Kode generert av GitHub Copilot
 
