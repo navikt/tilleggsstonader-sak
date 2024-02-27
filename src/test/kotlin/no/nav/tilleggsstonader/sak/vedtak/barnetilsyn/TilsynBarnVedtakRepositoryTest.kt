@@ -17,7 +17,7 @@ class TilsynBarnVedtakRepositoryTest : IntegrationTest() {
     fun `skal kunne lagre og hente vedtak`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-        val vedtak = VedtaksdataTilsynBarn(emptyList(), emptyMap())
+        val vedtak = VedtaksdataTilsynBarn(emptyMap())
         val beregningsresultat = VedtaksdataBeregningsresultat(emptyList())
         tilsynBarnVedtakRepository.insert(
             VedtakTilsynBarn(

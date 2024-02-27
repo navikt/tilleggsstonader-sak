@@ -31,7 +31,7 @@ class TilsynBarnBeregnYtelseSteg(
 ) {
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
-        val beregningsresultat = tilsynBarnBeregningService.beregn(vedtak.stønadsperioder, vedtak.utgifter)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter)
         validerBarnFinnesPåBehandling(saksbehandling, vedtak)
         vedtakRepository.insert(lagVedtak(saksbehandling, vedtak, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -89,7 +89,6 @@ class TilsynBarnBeregnYtelseSteg(
             behandlingId = behandling.id,
             type = TypeVedtak.INNVILGET,
             vedtak = VedtaksdataTilsynBarn(
-                stønadsperioder = vedtak.stønadsperioder,
                 utgifter = vedtak.utgifter,
             ),
             beregningsresultat = VedtaksdataBeregningsresultat(beregningsresultat.perioder),
