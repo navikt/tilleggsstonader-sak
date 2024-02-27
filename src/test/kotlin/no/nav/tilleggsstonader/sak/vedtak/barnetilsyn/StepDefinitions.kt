@@ -4,6 +4,8 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
@@ -11,9 +13,15 @@ import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.barnIder
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
@@ -35,24 +43,28 @@ private enum class NøkkelBeregningTilsynBarn(
 class StepDefinitions {
 
     private val logger = LoggerFactory.getLogger(javaClass)
-
-    val service = TilsynBarnBeregningService()
+    val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
+    val service = TilsynBarnBeregningService(stønadsperiodeRepository)
 
     var exception: Exception? = null
 
-    var stønadsperioder = emptyList<Stønadsperiode>()
+    var stønadsperioder = emptyList<StønadsperiodeDto>()
     var utgifter = mutableMapOf<UUID, List<Utgift>>()
     var beregningsresultat: BeregningsresultatTilsynBarnDto? = null
+    val behandlingId = UUID.randomUUID()
 
     @Gitt("følgende støndsperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {
-        stønadsperioder = mapStønadsperider(dataTable)
+        every { stønadsperiodeRepository.findAllByBehandlingId(behandlingId) } returns mapStønadsperider(dataTable)
     }
 
     private fun mapStønadsperider(dataTable: DataTable) = dataTable.mapRad { rad ->
         Stønadsperiode(
+            behandlingId = behandlingId,
             fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
             tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
+            målgruppe = parseValgfriEnum<MålgruppeType>(NøkkelBeregningTilsynBarn.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+            aktivitet = parseValgfriEnum<AktivitetType>(NøkkelBeregningTilsynBarn.AKTIVITET, rad) ?: AktivitetType.TILTAK,
         )
     }
 
@@ -72,7 +84,7 @@ class StepDefinitions {
     @Når("beregner")
     fun `beregner`() {
         try {
-            beregningsresultat = service.beregn(stønadsperioder, utgifter)
+            beregningsresultat = service.lagBeregningsgrunnlagOgBeregn(behandlingId = behandlingId, utgifter)
         } catch (e: Exception) {
             exception = e
         }
