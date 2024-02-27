@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -38,6 +39,8 @@ private enum class NøkkelBeregningTilsynBarn(
     DAGSATS("Dagsats"),
     MÅNEDSBELØP("Månedsbeløp"),
     MAKSSATS("Makssats"),
+    AKTIVITET("Aktivitet"),
+    MÅLGRUPPE("Målgruppe"),
 }
 
 class StepDefinitions {
@@ -64,7 +67,8 @@ class StepDefinitions {
             fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
             tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
             målgruppe = parseValgfriEnum<MålgruppeType>(NøkkelBeregningTilsynBarn.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
-            aktivitet = parseValgfriEnum<AktivitetType>(NøkkelBeregningTilsynBarn.AKTIVITET, rad) ?: AktivitetType.TILTAK,
+            aktivitet = parseValgfriEnum<AktivitetType>(NøkkelBeregningTilsynBarn.AKTIVITET, rad)
+                ?: AktivitetType.TILTAK,
         )
     }
 
@@ -174,7 +178,9 @@ class StepDefinitions {
             }
         }
 
-        assertThat(perioder).containsExactlyElementsOf(forventeteStønadsperioder)
+        assertThat(perioder)
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+            .containsExactlyElementsOf(forventeteStønadsperioder.tilSortertDto())
     }
 }
 
