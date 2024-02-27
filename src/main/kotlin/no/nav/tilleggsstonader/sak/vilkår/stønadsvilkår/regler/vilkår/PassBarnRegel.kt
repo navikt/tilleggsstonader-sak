@@ -63,7 +63,7 @@ class PassBarnRegel : Vilkårsregel(
                 SvarId.FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID,
             )
                 .associateWith {
-                    SluttSvarRegel.OPPFYLT_MED_PÅKREVD_BEGRUNNELSE
+                    SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE
                 } + mapOf(SvarId.NEI to SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE)
 
         private val UNNTAK_ALDER =
