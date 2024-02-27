@@ -151,12 +151,6 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
         feilHvis(stønadsperioder.isEmpty()) {
             "Stønadsperioder mangler"
         }
-        feilHvisIkke(stønadsperioder.erSortert()) {
-            "Stønadsperioder er ikke sortert"
-        }
-        feilHvis(stønadsperioder.overlapper()) {
-            "Stønadsperioder overlapper"
-        }
     }
 
     private fun validerUtgifter(utgifter: Map<UUID, List<Utgift>>) {
