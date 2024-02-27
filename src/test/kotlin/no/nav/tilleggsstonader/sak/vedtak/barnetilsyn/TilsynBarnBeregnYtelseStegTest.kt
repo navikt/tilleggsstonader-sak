@@ -46,7 +46,7 @@ class TilsynBarnBeregnYtelseStegTest {
                 behandlingId = saksbehandling.id,
                 fom = LocalDate.of(2023, 1, 1),
                 tom = LocalDate.of(2023, 1, 31),
-            )
+            ),
         )
     }
 

@@ -224,7 +224,7 @@ fun stønadsperiode(
     fom: LocalDate,
     tom: LocalDate,
     målgruppe: MålgruppeType = MålgruppeType.AAP,
-    aktivitet: AktivitetType = AktivitetType.TILTAK
+    aktivitet: AktivitetType = AktivitetType.TILTAK,
 ): Stønadsperiode = Stønadsperiode(
     behandlingId = behandlingId,
     fom = fom,

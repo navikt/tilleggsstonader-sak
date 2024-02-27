@@ -27,7 +27,7 @@ class TilsynBarnVedtakControllerTest(
     @Autowired
     val barnRepository: BarnRepository,
     @Autowired
-    val stønadsperiodeRepository: StønadsperiodeRepository
+    val stønadsperiodeRepository: StønadsperiodeRepository,
 ) : IntegrationTest() {
 
     val behandling = behandling(steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)

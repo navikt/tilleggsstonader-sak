@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import java.math.BigDecimal
-import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 

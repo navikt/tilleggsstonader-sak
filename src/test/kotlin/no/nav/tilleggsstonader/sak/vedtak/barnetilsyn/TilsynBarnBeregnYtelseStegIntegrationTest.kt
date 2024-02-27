@@ -33,7 +33,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
     val tilkjentYtelseRepository: TilkjentYtelseRepository,
     @Autowired
-    val stønadsperiodeRepository: StønadsperiodeRepository
+    val stønadsperiodeRepository: StønadsperiodeRepository,
 ) : IntegrationTest() {
 
     val behandling = behandling()
@@ -97,7 +97,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             val stønadsperiode4 = stønadsperiode(
                 behandlingId = behandling.id,
                 fom = februar.atDay(28),
-                tom = april.atDay(3)
+                tom = april.atDay(3),
             )
 
             stønadsperiodeRepository.insertAll(
@@ -105,8 +105,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     stønadsperiode1,
                     stønadsperiode2,
                     stønadsperiode3,
-                    stønadsperiode4
-                )
+                    stønadsperiode4,
+                ),
             )
 
             val vedtakDto = innvilgelseDto(
