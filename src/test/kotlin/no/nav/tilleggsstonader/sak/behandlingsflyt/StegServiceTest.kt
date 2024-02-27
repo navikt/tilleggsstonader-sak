@@ -16,11 +16,12 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.InnvilgelseTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchIllegalStateException
 import org.junit.jupiter.api.AfterEach
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 import java.time.YearMonth
 
 class StegServiceTest(
@@ -42,6 +44,8 @@ class StegServiceTest(
     val barnRepository: BarnRepository,
     @Autowired
     val tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
+    @Autowired
+    val stønadsperiodeRepository: StønadsperiodeRepository,
 ) : IntegrationTest() {
 
     val stegForBeslutter = object : BehandlingSteg<String> {
@@ -203,10 +207,10 @@ class StegServiceTest(
 
     private fun opprettVedtakTilsynBarn(behandling: Behandling): InnvilgelseTilsynBarnDto {
         val barn = barnRepository.insert(BehandlingBarn(behandlingId = behandling.id, ident = "123"))
+        stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31)))
 
         val måned = YearMonth.of(2023, 1)
         return InnvilgelseTilsynBarnDto(
-            stønadsperioder = listOf(Stønadsperiode(måned.atDay(2), måned.atDay(2))),
             utgifter = mapOf(barn.id to listOf(Utgift(måned, måned, 100))),
         )
     }

@@ -62,6 +62,7 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
               b.endret_av,
               b.endret_tid,
               pi.ident,
+              pi.fagsak_person_id,
               b.fagsak_id,
               fe.id AS ekstern_fagsak_id,
               f.stonadstype
@@ -97,6 +98,7 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
               b.endret_av,
               b.endret_tid,
               pi.ident,
+              pi.fagsak_person_id,
               b.fagsak_id,
               fe.id AS ekstern_fagsak_id,
               f.stonadstype

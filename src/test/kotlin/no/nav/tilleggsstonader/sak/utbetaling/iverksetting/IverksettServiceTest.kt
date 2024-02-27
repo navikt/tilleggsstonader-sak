@@ -114,6 +114,17 @@ class IverksettServiceTest : IntegrationTest() {
     }
 
     @Nested
+    inner class Validering {
+
+        @Test
+        fun `kan ikke iverksette frem i tiden`() {
+            assertThatThrownBy {
+                iverksettService.iverksett(UUID.randomUUID(), UUID.randomUUID(), YearMonth.now().plusMonths(1))
+            }.hasMessageContaining("som er frem i tiden")
+        }
+    }
+
+    @Nested
     inner class IverksettingFlyt {
 
         val fagsak = fagsak()
@@ -181,6 +192,7 @@ class IverksettServiceTest : IntegrationTest() {
             testoppsettService.lagre(behandling2)
             tilkjentYtelseRepository.insert(tilkjentYtelse2)
             lagreTotrinnskontroll(behandling2)
+            oppdaterAndelerTilOk(behandling)
             iverksettService.iverksettBehandlingFørsteGang(behandling2.id)
 
             val andeler = hentAndeler(behandling2)
@@ -206,6 +218,7 @@ class IverksettServiceTest : IntegrationTest() {
             testoppsettService.lagre(behandling2)
             tilkjentYtelseRepository.insert(tilkjentYtelse2)
             lagreTotrinnskontroll(behandling2)
+            oppdaterAndelerTilOk(behandling)
             iverksettService.iverksettBehandlingFørsteGang(behandling2.id)
 
             val andeler = hentAndeler(behandling2)
@@ -258,7 +271,7 @@ class IverksettServiceTest : IntegrationTest() {
                 tilkjentYtelse(
                     behandling2.id,
                     null,
-                    lagAndel(behandling, forrigeMåned, beløp = 0),
+                    lagAndel(behandling2, forrigeMåned, beløp = 0),
                 ),
             )
             lagreTotrinnskontroll(behandling2)
@@ -277,6 +290,65 @@ class IverksettServiceTest : IntegrationTest() {
             assertThatThrownBy {
                 iverksettService.iverksett(behandling.id, iverksettingId, nåværendeMåned)
             }.hasMessageContaining("det finnes tidligere andeler med annen status enn OK/UBEHANDLET")
+        }
+
+        @Test
+        fun `skal markere andeler fra forrige behandling som UAKTUELL`() {
+            oppdaterAndelerTilOk(behandling)
+            testoppsettService.lagre(behandling2)
+            tilkjentYtelseRepository.insert(
+                tilkjentYtelse(
+                    behandling2.id,
+                    null,
+                    lagAndel(behandling2, forrigeMåned, beløp = 100),
+                ),
+            )
+            lagreTotrinnskontroll(behandling2)
+            iverksettService.iverksettBehandlingFørsteGang(behandling2.id)
+
+            val andeler = hentAndeler(behandling)
+
+            andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
+            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
+            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
+        }
+
+        @Test
+        fun `skal feile hvis en andel fra forrige behandling er sendt til iverksetting med ikke kvittert OK`() {
+            testoppsettService.lagre(behandling2)
+
+            assertThatThrownBy { iverksettService.iverksettBehandlingFørsteGang(behandling2.id) }
+                .hasMessageContaining("Andeler fra forrige behandling er sendt til iverksetting men ikke kvittert OK. Prøv igjen senere.")
+        }
+    }
+
+    @Nested
+    inner class IverksettingNullperioder {
+        val fagsak = fagsak()
+
+        val behandling =
+            behandling(fagsak, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT)
+
+        @Test
+        fun `skal iverksette uten utbetalinger når første periode er fremover i tid`() {
+            testoppsettService.opprettBehandlingMedFagsak(behandling)
+            lagreTotrinnskontroll(behandling)
+            tilkjentYtelseRepository.insert(
+                tilkjentYtelse(
+                    behandlingId = behandling.id,
+                    andeler = arrayOf(lagAndel(behandling, nesteMåned)),
+                ),
+            )
+
+            iverksettService.iverksettBehandlingFørsteGang(behandling.id)
+
+            val andeler = hentAndeler(behandling)
+
+            assertThat(andeler).hasSize(2)
+            val andelForrigeMåned = andeler.forMåned(forrigeMåned)
+            andelForrigeMåned.assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
+            assertThat(andelForrigeMåned.beløp).isEqualTo(0)
+            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
         }
     }
 

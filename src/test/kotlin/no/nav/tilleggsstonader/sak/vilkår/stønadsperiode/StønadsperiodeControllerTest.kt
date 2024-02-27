@@ -79,6 +79,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
                     mottarSykepenger = VurderingDto(SvarJaNei.NEI),
                 ),
                 behandlingId = behandling.id,
+                aktivitetsdager = 5,
             ),
         )
 

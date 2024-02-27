@@ -2,8 +2,13 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -32,6 +37,8 @@ class VilkårperiodeService(
     private val behandlingService: BehandlingService,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
+    private val stegService: StegService,
+    private val inngangsvilkårSteg: InngangsvilkårSteg,
 ) {
 
     fun hentVilkårperioder(behandlingId: UUID): Vilkårperioder {
@@ -51,16 +58,33 @@ class VilkårperiodeService(
         vilkårsperioder: List<Vilkårperiode>,
     ) = vilkårsperioder.filter { it.type is T }
 
-    fun validerOgLagResponse(
+    fun oppdaterBehandlingstegOgLagResponse(
         periode: Vilkårperiode,
     ): LagreVilkårperiodeResponse {
+        val saksbehandling = behandlingService.hentSaksbehandling(periode.behandlingId)
+
         val valideringsresultat = validerStønadsperioder(periode.behandlingId)
+
+        håndterMuligStegendring(saksbehandling, valideringsresultat, periode)
 
         return LagreVilkårperiodeResponse(
             periode.tilDto(),
             stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
             stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
         )
+    }
+
+    private fun håndterMuligStegendring(
+        saksbehandling: Saksbehandling,
+        valideringsresultat: Result<Unit>,
+        periode: Vilkårperiode,
+    ) {
+        // TODO: Hvis vi legger aktivitetsdager på vilkårsperioder må vi rekjøre steget ved endring av vilkårsperioder for å sikre at beregning er gjort med oppdaterte vilkårsperioder
+        if (saksbehandling.steg == StegType.INNGANGSVILKÅR && valideringsresultat.isSuccess) {
+            stegService.håndterSteg(periode.behandlingId, inngangsvilkårSteg)
+        } else if (saksbehandling.steg != StegType.INNGANGSVILKÅR && valideringsresultat.isFailure) {
+            stegService.resetSteg(periode.behandlingId, StegType.INNGANGSVILKÅR)
+        }
     }
 
     @Transactional
@@ -73,6 +97,7 @@ class VilkårperiodeService(
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
         }
+        validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
 
         val resultatEvaluering = evaulerVilkårperiode(vilkårperiode.type, vilkårperiode.delvilkår)
 
@@ -85,9 +110,20 @@ class VilkårperiodeService(
                 delvilkår = resultatEvaluering.delvilkår,
                 begrunnelse = vilkårperiode.begrunnelse,
                 resultat = resultatEvaluering.resultat,
+                aktivitetsdager = vilkårperiode.aktivitetsdager,
                 kilde = KildeVilkårsperiode.MANUELL,
             ),
         )
+    }
+
+    private fun validerAktivitetsdager(vilkårPeriodeType: VilkårperiodeType, aktivitetsdager: Int?) {
+        if (vilkårPeriodeType is AktivitetType) {
+            brukerfeilHvisIkke(aktivitetsdager in 1..5) {
+                "Aktivitetsdager må være et heltall mellom 1 og 5"
+            }
+        } else if (vilkårPeriodeType is MålgruppeType) {
+            brukerfeilHvisIkke(aktivitetsdager == null) { "Kan ikke registrere aktivitetsdager på målgrupper" }
+        }
     }
 
     private fun validerStønadsperioder(behandlingId: UUID): Result<Unit> {
@@ -106,6 +142,9 @@ class VilkårperiodeService(
         feilHvis(behandlingErLåstForVidereRedigering(eksisterendeVilkårperiode.behandlingId)) {
             "Kan ikke oppdatere vilkårperiode når behandling er låst for videre redigering"
         }
+
+        validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
+
         val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.type, vilkårperiode.delvilkår)
         val oppdatert = when (eksisterendeVilkårperiode.kilde) {
             KildeVilkårsperiode.MANUELL -> {
@@ -114,6 +153,7 @@ class VilkårperiodeService(
                     fom = vilkårperiode.fom,
                     tom = vilkårperiode.tom,
                     delvilkår = resultatEvaluering.delvilkår,
+                    aktivitetsdager = vilkårperiode.aktivitetsdager,
                     resultat = resultatEvaluering.resultat,
                 )
             }

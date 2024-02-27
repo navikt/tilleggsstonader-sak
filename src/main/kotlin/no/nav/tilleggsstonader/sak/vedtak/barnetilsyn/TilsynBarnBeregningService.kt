@@ -10,6 +10,9 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DatoperiodeMedAktivitetsdager
 import org.apache.commons.lang3.ObjectUtils.min
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -26,7 +29,7 @@ private val DEKNINGSGRAD = BigDecimal("0.64")
 private val SNITT_ANTALL_VIRKEDAGER_PER_MÅNED = BigDecimal("21.67")
 
 @Service
-class TilsynBarnBeregningService() {
+class TilsynBarnBeregningService(private val stønadsperiodeRepository: StønadsperiodeRepository) {
 
     // Hva burde denne ta inn? Hva burde bli sendt inn i beregningscontroller?
     data class PeriodeMedDager(
@@ -41,12 +44,11 @@ class TilsynBarnBeregningService() {
     }
 
     fun beregn(
-        stønadsperioder: List<Stønadsperiode>, // skal ikke sendes inn
+        behandlingId: UUID,
         utgifterPerBarn: Map<UUID, List<Utgift>>,
         aktiviteter: List<PeriodeMedDager> = emptyList(),
     ): BeregningsresultatTilsynBarnDto {
-        // TODO: Finn stønadsperioder
-        // TODO: Finn aktiviteter
+        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
         validerPerioder(stønadsperioder, utgifterPerBarn)
 
         val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, utgifterPerBarn, aktiviteter)
@@ -78,14 +80,17 @@ class TilsynBarnBeregningService() {
      */
     private fun beregnDagsats(grunnlag: Beregningsgrunnlag): BigDecimal {
         val utgifter = grunnlag.utgifterTotal.toBigDecimal()
-        val utgifterSomDekkes = utgifter.multiply(DEKNINGSGRAD).setScale(0, RoundingMode.HALF_UP).toInt()
+        val utgifterSomDekkes = utgifter.multiply(DEKNINGSGRAD)
+            .setScale(0, RoundingMode.HALF_UP)
+            .toInt()
         val satsjusterteUtgifter = minOf(utgifterSomDekkes, grunnlag.makssats).toBigDecimal()
-        return satsjusterteUtgifter.divide(SNITT_ANTALL_VIRKEDAGER_PER_MÅNED, 2, RoundingMode.HALF_UP)
+        return satsjusterteUtgifter
+            .divide(SNITT_ANTALL_VIRKEDAGER_PER_MÅNED, 2, RoundingMode.HALF_UP)
             .setScale(2, RoundingMode.HALF_UP)
     }
 
     fun beregnHelePeriode(
-        stønadsperioder: List<Stønadsperiode>,
+        stønadsperioder: List<StønadsperiodeDto>,
         aktiviteter: List<PeriodeMedDager>,
     ): Int {
         val stønadsperioderPerUke = stønadsperioderTilUker(stønadsperioder)
@@ -104,7 +109,7 @@ class TilsynBarnBeregningService() {
     }
 
     private fun lagBeregningsgrunnlagPerMåned(
-        stønadsperioder: List<Stønadsperiode>,
+        stønadsperioder: List<StønadsperiodeDto>,
         utgifterPerBarn: Map<UUID, List<Utgift>>,
         aktiviteter: List<PeriodeMedDager>,
     ): List<Beregningsgrunnlag> {
@@ -130,6 +135,12 @@ class TilsynBarnBeregningService() {
         }
     }
 
+    private fun antallDager(stønadsperioder: List<StønadsperiodeDto>): Int {
+        return stønadsperioder.sumOf { stønadsperiode ->
+            stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
+        }
+    }
+
     private fun finnMakssats(måned: YearMonth, antallBarn: Int): Int {
         val sats = satser.find { måned in it.fom..it.tom } ?: error("Finner ikke satser for $måned")
         val satsa = when {
@@ -142,7 +153,8 @@ class TilsynBarnBeregningService() {
     }
 
     private fun antallDagerIPeriode(aktivitet: PeriodeMedDager): Int {
-        val antallHverdager = aktivitet.alleDatoer().count { it.dayOfWeek !== DayOfWeek.SATURDAY && it.dayOfWeek !== DayOfWeek.SUNDAY }
+        val antallHverdager =
+            aktivitet.alleDatoer().count { it.dayOfWeek !== DayOfWeek.SATURDAY && it.dayOfWeek !== DayOfWeek.SUNDAY }
 
         return if (aktivitet.dager == 5) {
             antallHverdager
@@ -151,22 +163,25 @@ class TilsynBarnBeregningService() {
         }
     }
 
-    fun antallHverdager(perioder: List<Stønadsperiode>): Int {
-        return perioder.sumOf { it.alleDatoer().count { it.dayOfWeek !== DayOfWeek.SATURDAY && it.dayOfWeek !== DayOfWeek.SUNDAY } }
+    fun antallHverdager(perioder: List<StønadsperiodeDto>): Int {
+        return perioder.sumOf {
+            it.alleDatoer().count { it.dayOfWeek !== DayOfWeek.SATURDAY && it.dayOfWeek !== DayOfWeek.SUNDAY }
+        }
     }
 
     fun antallDager2(
         aktiviteter: List<PeriodeMedDager>
     ): Map<YearMonth, Int> {
         val aktiviteterPerMånedÅr = splittAktiviteterPåMåned(aktiviteter)
-        return aktiviteterPerMånedÅr.mapValues{ (mnd, perioder) -> perioder.sumOf{ antallDagerIPeriode(it) }}
+        return aktiviteterPerMånedÅr.mapValues { (mnd, perioder) -> perioder.sumOf { antallDagerIPeriode(it) } }
     }
 
     fun antallDager(
-        stønadsperioder: List<Stønadsperiode>, aktiviteter: List<PeriodeMedDager>?
+        stønadsperioder: List<StønadsperiodeDto>, aktiviteter: List<PeriodeMedDager>?
     ): Int {
         val antallUkedagerIStønadsperiode = stønadsperioder.sumOf { stønadsperiode ->
-            stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) } // TODO: fjern fjerning av helligdager
+            stønadsperiode.alleDatoer()
+                .count { !VirkedagerProvider.erHelgEllerHelligdag(it) } // TODO: fjern fjerning av helligdager
         }
 
         if (aktiviteter.isNullOrEmpty()) {
@@ -233,15 +248,17 @@ class TilsynBarnBeregningService() {
      * Eksempel: 1stk UtgiftsperiodeDto fra januar til mars deles opp i 3:
      * listOf(UtgiftsMåned(jan), UtgiftsMåned(feb), UtgiftsMåned(mars))
      */
-    fun List<Stønadsperiode>.tilÅrMåneder(): Map<YearMonth, List<Stønadsperiode>> {
-        return this.flatMap { stønadsperiode ->
-            stønadsperiode.splitPerMåned { måned, periode ->
-                periode.copy(
-                    fom = maxOf(periode.fom, måned.atDay(1)),
-                    tom = minOf(periode.tom, måned.atEndOfMonth()),
-                )
+    fun List<StønadsperiodeDto>.tilÅrMåneder(): Map<YearMonth, List<StønadsperiodeDto>> {
+        return this
+            .flatMap { stønadsperiode ->
+                stønadsperiode.splitPerMåned { måned, periode ->
+                    periode.copy(
+                        fom = maxOf(periode.fom, måned.atDay(1)),
+                        tom = minOf(periode.tom, måned.atEndOfMonth()),
+                    )
+                }
             }
-        }.groupBy({ it.first }, { it.second })
+            .groupBy({ it.first }, { it.second })
     }
 
     /**
@@ -267,22 +284,16 @@ class TilsynBarnBeregningService() {
     }
 
     private fun validerPerioder(
-        stønadsperioder: List<Stønadsperiode>,
+        stønadsperioder: List<StønadsperiodeDto>,
         utgifter: Map<UUID, List<Utgift>>,
     ) {
         validerStønadsperioder(stønadsperioder)
         validerUtgifter(utgifter)
     }
 
-    private fun validerStønadsperioder(stønadsperioder: List<Stønadsperiode>) {
+    private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
         feilHvis(stønadsperioder.isEmpty()) {
             "Stønadsperioder mangler"
-        }
-        feilHvisIkke(stønadsperioder.erSortert()) {
-            "Stønadsperioder er ikke sortert"
-        }
-        feilHvis(stønadsperioder.overlapper()) {
-            "Stønadsperioder overlapper"
         }
     }
 
@@ -328,7 +339,7 @@ class TilsynBarnBeregningService() {
         return perioder
     }
 
-    fun stønadsperioderTilUker(perioder: List<Stønadsperiode>): Map<Uke, List<PeriodeMedDager>> {
+    fun stønadsperioderTilUker(perioder: List<StønadsperiodeDto>): Map<Uke, List<PeriodeMedDager>> {
         return perioder.map {
             it.splitPerUke { uke, periode ->
                 val fom = maxOf(uke.fom, periode.fom)

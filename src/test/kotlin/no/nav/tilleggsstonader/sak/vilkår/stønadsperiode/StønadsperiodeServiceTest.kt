@@ -2,18 +2,21 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -46,8 +49,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal feile hvis man prøver å opprette en støndsperiode med id`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             val periode = stønadsperiodeDto(UUID.randomUUID())
             assertThatThrownBy {
@@ -58,8 +61,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne opprette flere stønadsperioder`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             val lagredeStønadsperioder = testWithBrukerContext(SAKSHEH_A) {
                 stønadsperiodeService.lagreStønadsperioder(
@@ -81,10 +84,21 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `endring av perioden oppdaterer felter men ikke opprettetAv`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(MålgruppeType.OVERGANGSSTØNAD, behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(AktivitetType.UTDANNING, lønnet = null, behandlingId = behandling.id))
+            opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            opprettVilkårperiode(
+                målgruppe(
+                    MålgruppeType.OVERGANGSSTØNAD,
+                    behandlingId = behandling.id,
+                ),
+            )
+            opprettVilkårperiode(
+                aktivitet(
+                    AktivitetType.UTDANNING,
+                    lønnet = null,
+                    behandlingId = behandling.id,
+                ),
+            )
 
             val periode = stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
@@ -96,7 +110,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 målgruppe = MålgruppeType.OVERGANGSSTØNAD,
                 aktivitet = AktivitetType.UTDANNING,
             )
-            val oppdatertePerioder = testWithBrukerContext(SAKSHEH_B) {
+            val oppdatertePerioder = testWithBrukerContext(SAKSHEH_B, groups = listOf(rolleConfig.saksbehandlerRolle)) {
                 stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(oppdatertPeriode))
             }
             assertThat(oppdatertePerioder).hasSize(1)
@@ -115,8 +129,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne slette en periode`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
@@ -131,10 +145,21 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne endre, legge til og slette i en oppdatering`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(MålgruppeType.OVERGANGSSTØNAD, behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(AktivitetType.UTDANNING, lønnet = null, behandlingId = behandling.id))
+            opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            opprettVilkårperiode(
+                målgruppe(
+                    MålgruppeType.OVERGANGSSTØNAD,
+                    behandlingId = behandling.id,
+                ),
+            )
+            opprettVilkårperiode(
+                aktivitet(
+                    AktivitetType.UTDANNING,
+                    lønnet = null,
+                    behandlingId = behandling.id,
+                ),
+            )
 
             val stønadsperioder = stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
@@ -153,7 +178,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 aktivitet = AktivitetType.UTDANNING,
             )
             val nyPeriode = stønadsperiodeDto(fom = FOM.plusDays(10), tom = FOM.plusDays(10))
-            val stønadsperioder2 = testWithBrukerContext(SAKSHEH_B) {
+            val stønadsperioder2 = testWithBrukerContext(SAKSHEH_B, groups = listOf(rolleConfig.saksbehandlerRolle)) {
                 stønadsperiodeService.lagreStønadsperioder(
                     behandling.id,
                     listOf(oppdatertPeriode, nyPeriode),
@@ -198,6 +223,67 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 stønadsperiodeService.lagreStønadsperioder(behandlingId = behandling.id, listOf())
             }.hasMessageContaining("Kan ikke lagre stønadsperioder når behandlingen er låst")
         }
+
+        @Test
+        fun `skal være i steg VILKÅR etter lagring av stønadsperioder`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            assertThat(behandling.steg).isEqualTo(StegType.INNGANGSVILKÅR)
+
+            val fom1 = LocalDate.of(2024, 1, 1)
+            val tom1 = LocalDate.of(2024, 2, 1)
+            val fom2 = LocalDate.of(2024, 2, 1)
+            val tom2 = LocalDate.of(2024, 3, 1)
+
+            // Opprett vilkårperioder og stønadsperioder som er gyldige
+            opprettVilkårperiode(
+                LagreVilkårperiode(
+                    type = MålgruppeType.AAP,
+                    fom = fom1,
+                    tom = tom2,
+                    delvilkår = VilkårperiodeTestUtil.delvilkårMålgruppeDto(),
+                    behandlingId = behandling.id,
+                ),
+            )
+            val oppprettetTiltakPeriode = opprettVilkårperiode(
+                LagreVilkårperiode(
+                    type = AktivitetType.TILTAK,
+                    fom = fom1,
+                    tom = tom1,
+                    delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
+                    behandlingId = behandling.id,
+                    aktivitetsdager = 5,
+                ),
+            ).periode
+            val opprettetStønadsperioder = stønadsperiodeService.lagreStønadsperioder(
+                behandling.id,
+                listOf(stønadsperiodeDto(fom = fom1, tom = tom1)),
+            )
+            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
+
+            // Oppdater med nye vilkårsperioder som gjør stønadsperioder ugyldige
+            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(
+                id = oppprettetTiltakPeriode.id,
+                vilkårperiode = LagreVilkårperiode(
+                    type = AktivitetType.TILTAK,
+                    fom = fom2,
+                    tom = tom2,
+                    delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
+                    behandlingId = behandling.id,
+                    aktivitetsdager = 5,
+                ),
+            )
+            vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode)
+
+            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.INNGANGSVILKÅR)
+
+            // Oppdater stønadsperioder som gjør stønadsperioder gyldige igjen
+            stønadsperiodeService.lagreStønadsperioder(
+                behandling.id,
+                listOf(stønadsperiodeDto(opprettetStønadsperioder.first().id, fom = fom2, tom = tom2)),
+            )
+
+            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
+        }
     }
 
     private fun målgruppe(
@@ -221,12 +307,14 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         lønnet: SvarJaNei? = SvarJaNei.NEI,
         mottarSykepenger: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: UUID = UUID.randomUUID(),
+        aktivitetsdager: Int = 5,
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
         delvilkår = DelvilkårAktivitetDto(VurderingDto(lønnet), VurderingDto(mottarSykepenger)),
         behandlingId = behandlingId,
+        aktivitetsdager = aktivitetsdager,
     )
 
     private fun stønadsperiodeDto(
@@ -242,4 +330,9 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         målgruppe = målgruppeType,
         aktivitet = aktivitet,
     )
+
+    private fun opprettVilkårperiode(periode: LagreVilkårperiode): LagreVilkårperiodeResponse {
+        val oppdatertPeriode = vilkårperiodeService.opprettVilkårperiode(periode)
+        return vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode)
+    }
 }

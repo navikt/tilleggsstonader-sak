@@ -41,7 +41,10 @@ class BehandlingController(
     fun hentGamleUferdigeBehandlinger(): List<BehandlingDto> {
         val stønadstyper = Stønadstype.values()
         val gamleBehandlinger = stønadstyper.flatMap { stønadstype ->
-            behandlingService.hentUferdigeBehandlingerOpprettetFørDato(stønadstype).map { it.tilDto(stønadstype) }
+            behandlingService.hentUferdigeBehandlingerOpprettetFørDato(stønadstype).map {
+                val fagsak = fagsakService.hentFagsak(it.fagsakId)
+                it.tilDto(stønadstype, fagsak.fagsakPersonId)
+            }
         }
         return gamleBehandlinger
     }
@@ -80,7 +83,7 @@ class BehandlingController(
         tilgangService.validerHarSaksbehandlerrolle()
         val henlagtBehandling = henleggService.henleggBehandling(behandlingId, henlagt)
         val fagsak: Fagsak = fagsakService.hentFagsak(henlagtBehandling.fagsakId)
-        return henlagtBehandling.tilDto(fagsak.stønadstype)
+        return henlagtBehandling.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId)
     }
 
     @GetMapping("/ekstern/{eksternBehandlingId}")

@@ -37,6 +37,7 @@ object VilkårperiodeTestUtil {
         begrunnelse = begrunnelse,
         kilde = kilde,
         resultat = resultat,
+        aktivitetsdager = null,
     )
 
     fun delvilkårMålgruppe(vurdering: Vurdering = vurdering()) = DelvilkårMålgruppe(
@@ -76,6 +77,7 @@ object VilkårperiodeTestUtil {
         begrunnelse = begrunnelse,
         kilde = kilde,
         resultat = resultat,
+        aktivitetsdager = 5,
         slettetKommentar = slettetKommentar,
     )
 
@@ -124,6 +126,7 @@ object VilkårperiodeTestUtil {
         mottarSykepenger: VurderingDto? = null,
         begrunnelse: String? = null,
         behandlingId: UUID = UUID.randomUUID(),
+        aktivitetsdager: Int = 5,
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
@@ -131,5 +134,6 @@ object VilkårperiodeTestUtil {
         delvilkår = DelvilkårAktivitetDto(lønnet, mottarSykepenger),
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,
+        aktivitetsdager = aktivitetsdager,
     )
 }

@@ -11,25 +11,3 @@ Egenskap: Beregning barnetilsyn - validering av stønadsperioder
     Når beregner
 
     Så forvent følgende feil: Stønadsperioder mangler
-
-  Scenario: Sender inn usorterte stønadsperioder
-
-    Gitt følgende støndsperioder
-      | Fom     | Tom     |
-      | 02.2023 | 02.2023 |
-      | 01.2023 | 01.2023 |
-
-    Når beregner
-
-    Så forvent følgende feil: Stønadsperioder er ikke sortert
-
-  Scenario: Sender inn overlappende stønadsperioder
-
-    Gitt følgende støndsperioder
-      | Fom     | Tom     |
-      | 01.2023 | 03.2023 |
-      | 02.2023 | 02.2023 |
-
-    Når beregner
-
-    Så forvent følgende feil: Stønadsperioder overlapper

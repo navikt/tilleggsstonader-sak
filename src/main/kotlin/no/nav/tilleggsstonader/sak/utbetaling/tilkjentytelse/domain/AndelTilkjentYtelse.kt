@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.util.Månedsperiode
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
@@ -44,11 +43,6 @@ data class AndelTilkjentYtelse(
             "For å unngå at man iverksetter frem i tiden skal perioder kun løpe over 1 måned"
         }
     }
-
-    fun erStønadOverlappende(fom: LocalDate): Boolean = this.periode.inneholder(YearMonth.from(fom))
-
-    // Kan vi bruke periode direkt i domeneobjektet?
-    val periode get() = Månedsperiode(fom, tom)
 }
 
 data class Iverksetting(
@@ -59,28 +53,37 @@ data class Iverksetting(
 /**
  * Det er ønskelig at ulike typer brukes for ulike periodetyper.
  * Disse mappes fra stønadsperioden sin type målgruppe
+ * [TypeAndel.UGYLDIG] Brukes for å lagre ned andeler med nullbeløp. Disse skal ikke iverksettes,
+ *  men nødvendige for å iverksette første gang og ved opphør tilbake i tid.
  */
 enum class TypeAndel {
     TILSYN_BARN_ENSLIG_FORSØRGER,
     TILSYN_BARN_AAP,
     TILSYN_BARN_ETTERLATTE,
+    UGYLDIG,
 }
 
+/**
+ * [Satstype.UGYLDIG] Brukes for å lagre ned andeler med nullbeløp. Disse skal ikke iverksettes,
+ * men nødvendige for å iverksette første gang og ved opphør tilbake i tid.
+ */
 enum class Satstype {
     DAG,
     MÅNED,
     ENGANGSBELØP,
+    UGYLDIG,
 }
 
 /**
- * Når man oppretter andelen er statusen [UBEHANDLET]
- * Når man iverksetter oppdateres status til [SENDT]
- * Når man mottatt kvittering oppdateres statusen til [OK]
- * Hvis det er lagret en andel som ikke blir iverksatt fordi en ny behandling blir gjeldende, settes status til [UAKTUELL]
+ * Når man oppretter andelen er statusen [StatusIverksetting.UBEHANDLET]
+ * Når man iverksetter oppdateres status til [StatusIverksetting.SENDT]
+ * Når man mottatt kvittering oppdateres statusen til [StatusIverksetting.OK]
+ * Hvis det er lagret en andel som ikke blir iverksatt fordi en ny behandling blir gjeldende, settes status til [StatusIverksetting.UAKTUELL]
  */
 enum class StatusIverksetting {
     UBEHANDLET,
     SENDT,
     OK,
+    OK_UTEN_UTBETALING,
     UAKTUELL,
 }

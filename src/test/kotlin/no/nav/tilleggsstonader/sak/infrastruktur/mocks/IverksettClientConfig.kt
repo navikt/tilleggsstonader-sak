@@ -6,7 +6,6 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.iverksett.IverksettDeprecatedClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettStatus
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
@@ -22,14 +21,6 @@ class IverksettClientConfig {
 
     @Bean
     @Primary
-    fun iverksettDeprecatedClient(): IverksettDeprecatedClient {
-        val iverksettClient = mockk<IverksettDeprecatedClient>(relaxed = true)
-        clearMock(iverksettClient)
-        return iverksettClient
-    }
-
-    @Bean
-    @Primary
     fun iverksettClient(): IverksettClient {
         val iverksettClient = mockk<IverksettClient>(relaxed = true)
         clearMock(iverksettClient)
@@ -42,15 +33,11 @@ class IverksettClientConfig {
             readFile("mock/iverksett/simuleringsresultat_beriket.json"),
         )
 
-        fun clearMock(iverksettClient: IverksettDeprecatedClient) {
-            clearMocks(iverksettClient)
-            every { iverksettClient.simuler(any()) } returns simuleringsresultat
-        }
-
         fun clearMock(iverksettClient: IverksettClient) {
             clearMocks(iverksettClient)
             justRun { iverksettClient.iverksett(any()) }
             every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK
+            every { iverksettClient.simuler(any()) } returns simuleringsresultat
         }
     }
 }

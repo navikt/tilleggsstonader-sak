@@ -21,11 +21,11 @@ data class Vilkårperiode(
     val fom: LocalDate,
     val tom: LocalDate,
     val type: VilkårperiodeType,
-    val aktivitetsdager: Int = 5,
     @Column("delvilkar")
     val delvilkår: DelvilkårVilkårperiode,
     val begrunnelse: String?,
     val resultat: ResultatVilkårperiode,
+    val aktivitetsdager: Int?,
 
     val slettetKommentar: String? = null,
 
@@ -34,6 +34,10 @@ data class Vilkårperiode(
 ) {
     init {
         require(tom >= fom) { "Til-og-med før fra-og-med: $fom > $tom" }
+
+        if (type is AktivitetType) {
+            require(aktivitetsdager != null) { "Aktivitetsdager må settes for aktivitet" }
+        }
 
         val ugyldigTypeOgDetaljer = (type is MålgruppeType && delvilkår !is DelvilkårMålgruppe) ||
             (type is AktivitetType && delvilkår !is DelvilkårAktivitet)

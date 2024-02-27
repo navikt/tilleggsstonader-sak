@@ -37,7 +37,7 @@ data class VilkårperiodeDto(
     val kilde: KildeVilkårsperiode,
     val slettetKommentar: String?,
     val sistEndret: LocalDateTime,
-    val aktivitetsdager: Int = 5,
+    val aktivitetsdager: Int? = null,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -54,9 +54,9 @@ fun Vilkårperiode.tilDto() =
         resultat = this.resultat,
         begrunnelse = this.begrunnelse,
         kilde = this.kilde,
+        aktivitetsdager = this.aktivitetsdager,
         slettetKommentar = this.slettetKommentar,
         sistEndret = this.sporbar.endret.endretTid,
-        aktivitetsdager = this.aktivitetsdager,
     )
 
 fun DelvilkårVilkårperiode.tilDto() = when (this) {
@@ -96,6 +96,7 @@ fun Periode<LocalDate>.formattertPeriodeNorskFormat() = "${this.fom.norskFormat(
  *  @return En sortert map kategorisert på periodetype med de oppfylte vilkårsperiodene. Periodene slåes sammen dersom
  *  de er sammenhengende, også selv om de har overlapp.
  */
+// TODO: ta hensyn til aktivitetsdager
 fun List<VilkårperiodeDto>.mergeSammenhengendeOppfylteVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> {
     return this.sorted().filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
         .mapValues {
@@ -114,19 +115,13 @@ data class DatoperiodeMedAktivitetsdager(
     }
 }
 
-fun List<VilkårperiodeDto>.mergeSammenhengendeVilkårperioder2(): Map<VilkårperiodeType, List<DatoperiodeMedAktivitetsdager>> =
-    this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
-        .mapValues {
-            it.value.map { DatoperiodeMedAktivitetsdager(it.fom, it.tom, it.aktivitetsdager) }
-                .mergeSammenhengende { a, b -> a.tom.plusDays(1) == b.fom && a.aktivitetsdager == b.aktivitetsdager }
-        }
-
 data class LagreVilkårperiode(
     val behandlingId: UUID,
     @JsonDeserialize(using = VilkårperiodeTypeDeserializer::class)
     val type: VilkårperiodeType,
     val fom: LocalDate,
     val tom: LocalDate,
+    val aktivitetsdager: Int? = null,
     val delvilkår: DelvilkårVilkårperiodeDto,
     val begrunnelse: String? = null,
 )

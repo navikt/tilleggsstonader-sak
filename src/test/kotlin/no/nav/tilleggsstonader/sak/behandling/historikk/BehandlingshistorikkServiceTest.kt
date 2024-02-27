@@ -71,11 +71,11 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak))
         val beslutteVedtak = behandling.copy(steg = StegType.BESLUTTE_VEDTAK)
 
-        insert(behandling.copy(steg = StegType.VILKÅR), LocalDateTime.now().minusDays(8))
-        insert(behandling.copy(steg = StegType.VILKÅR), LocalDateTime.now().minusDays(7))
+        insert(behandling.copy(steg = StegType.INNGANGSVILKÅR), LocalDateTime.now().minusDays(8))
+        insert(behandling.copy(steg = StegType.INNGANGSVILKÅR), LocalDateTime.now().minusDays(7))
         insert(behandling.copy(steg = StegType.SEND_TIL_BESLUTTER), LocalDateTime.now().minusDays(6))
         insert(beslutteVedtak, LocalDateTime.now().minusDays(5), StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT)
-        insert(behandling.copy(steg = StegType.VILKÅR), LocalDateTime.now().minusDays(4))
+        insert(behandling.copy(steg = StegType.INNGANGSVILKÅR), LocalDateTime.now().minusDays(4))
         insert(behandling.copy(steg = StegType.SEND_TIL_BESLUTTER), LocalDateTime.now().minusDays(3))
         insert(beslutteVedtak, LocalDateTime.now().minusDays(2), StegUtfall.BESLUTTE_VEDTAK_GODKJENT)
 
@@ -92,7 +92,7 @@ internal class BehandlingshistorikkServiceTest : IntegrationTest() {
     @Test
     internal fun `flere sett og av vent skal ikke slåes sammen`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = testoppsettService.lagre(behandling(fagsak, steg = StegType.VILKÅR))
+        val behandling = testoppsettService.lagre(behandling(fagsak, steg = StegType.INNGANGSVILKÅR))
         insert(behandling, LocalDateTime.now().minusDays(10))
         insert(behandling, LocalDateTime.now().minusDays(8), StegUtfall.SATT_PÅ_VENT)
         insert(behandling, LocalDateTime.now().minusDays(5), StegUtfall.TATT_AV_VENT)

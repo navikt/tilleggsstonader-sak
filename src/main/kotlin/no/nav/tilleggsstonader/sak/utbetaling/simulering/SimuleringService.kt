@@ -7,10 +7,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.iverksett.IverksettDeprecatedClient
-import no.nav.tilleggsstonader.sak.iverksett.tilTilkjentYtelseMedMetaData
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDto
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Simuleringsoppsummering
@@ -19,12 +17,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 import java.util.UUID
 
 @Service
 class SimuleringService(
-    private val iverksettClient: IverksettDeprecatedClient,
+    private val iverksettClient: IverksettClient,
     private val simuleringsresultatRepository: SimuleringsresultatRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val tilgangService: TilgangService,
@@ -81,22 +78,9 @@ class SimuleringService(
     private fun simulerMedTilkjentYtelse(saksbehandling: Saksbehandling): BeriketSimuleringsresultat {
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
 
-        val tilkjentYtelseMedMedtadata =
-            tilkjentYtelse.tilTilkjentYtelseMedMetaData(
-                saksbehandlerId = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-                eksternBehandlingId = saksbehandling.eksternId,
-                stønadstype = saksbehandling.stønadstype,
-                eksternFagsakId = saksbehandling.eksternFagsakId,
-                vedtaksdato = LocalDate.now(),
-            )
-
         try {
-            return iverksettClient.simuler(
-                SimuleringDto(
-                    nyTilkjentYtelseMedMetaData = tilkjentYtelseMedMedtadata,
-                    forrigeBehandlingId = saksbehandling.forrigeBehandlingId,
-                ),
-            )
+            // TODO map til riktig request når dp-iverksett har støtte for simulering
+            return iverksettClient.simuler(SimuleringDto(saksbehandling.id))
         } catch (e: Exception) {
             val personFinnesIkkeITps = "Personen finnes ikke i TPS"
             brukerfeilHvis(e is ProblemDetailException && e.detail.detail == personFinnesIkkeITps) {

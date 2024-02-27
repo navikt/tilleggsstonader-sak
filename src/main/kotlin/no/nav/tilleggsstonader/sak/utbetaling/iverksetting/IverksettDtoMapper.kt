@@ -62,11 +62,13 @@ object IverksettDtoMapper {
         Satstype.DAG -> SatstypeIverksetting.DAGLIG
         Satstype.MÅNED -> SatstypeIverksetting.MÅNEDLIG
         Satstype.ENGANGSBELØP -> SatstypeIverksetting.ENGANGS
+        Satstype.UGYLDIG -> error("Ugyldig satstype. Skal ikke iverksettes")
     }
 
     private fun TypeAndel.tilStønadstype(): StønadstypeIverksetting = when (this) {
         TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> StønadstypeIverksetting.TILSYN_BARN_ENSLIG_FORSØRGER
         TypeAndel.TILSYN_BARN_AAP -> StønadstypeIverksetting.TILSYN_BARN_AAP
         TypeAndel.TILSYN_BARN_ETTERLATTE -> StønadstypeIverksetting.TILSYN_BARN_ETTERLATTE
+        TypeAndel.UGYLDIG -> error("Ugyldig type andel. Skal ikke iverksettes")
     }
 }
