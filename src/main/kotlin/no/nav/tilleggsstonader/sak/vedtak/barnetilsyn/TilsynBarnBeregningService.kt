@@ -7,6 +7,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.libs.utils.VirkedagerProvider
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -20,13 +23,14 @@ private val DEKNINGSGRAD = BigDecimal("0.64")
 private val SNITT_ANTALL_VIRKEDAGER_PER_MÅNED = BigDecimal("21.67")
 
 @Service
-class TilsynBarnBeregningService {
+class TilsynBarnBeregningService(private val stønadsperiodeRepository: StønadsperiodeRepository) {
 
     // Hva burde denne ta inn? Hva burde bli sendt inn i beregningscontroller?
-    fun beregn(
-        stønadsperioder: List<Stønadsperiode>,
+    fun lagBeregningsgrunnlagOgBeregn(
+        behandlingId: UUID,
         utgifterPerBarn: Map<UUID, List<Utgift>>,
     ): BeregningsresultatTilsynBarnDto {
+        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
         validerPerioder(stønadsperioder, utgifterPerBarn)
 
         val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, utgifterPerBarn)
@@ -71,7 +75,7 @@ class TilsynBarnBeregningService {
     }
 
     private fun lagBeregningsgrunnlagPerMåned(
-        stønadsperioder: List<Stønadsperiode>,
+        stønadsperioder: List<StønadsperiodeDto>,
         utgifterPerBarn: Map<UUID, List<Utgift>>,
     ): List<Beregningsgrunnlag> {
         val stønadsperioderPerMåned = stønadsperioder.tilÅrMåneder()
@@ -95,7 +99,7 @@ class TilsynBarnBeregningService {
         }
     }
 
-    private fun antallDager(stønadsperioder: List<Stønadsperiode>): Int {
+    private fun antallDager(stønadsperioder: List<StønadsperiodeDto>): Int {
         return stønadsperioder.sumOf { stønadsperiode ->
             stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
         }
@@ -111,7 +115,7 @@ class TilsynBarnBeregningService {
      * Eksempel: 1stk UtgiftsperiodeDto fra januar til mars deles opp i 3:
      * listOf(UtgiftsMåned(jan), UtgiftsMåned(feb), UtgiftsMåned(mars))
      */
-    fun List<Stønadsperiode>.tilÅrMåneder(): Map<YearMonth, List<Stønadsperiode>> {
+    fun List<StønadsperiodeDto>.tilÅrMåneder(): Map<YearMonth, List<StønadsperiodeDto>> {
         return this
             .flatMap { stønadsperiode ->
                 stønadsperiode.splitPerMåned { måned, periode ->
@@ -136,14 +140,14 @@ class TilsynBarnBeregningService {
     }
 
     private fun validerPerioder(
-        stønadsperioder: List<Stønadsperiode>,
+        stønadsperioder: List<StønadsperiodeDto>,
         utgifter: Map<UUID, List<Utgift>>,
     ) {
         validerStønadsperioder(stønadsperioder)
         validerUtgifter(utgifter)
     }
 
-    private fun validerStønadsperioder(stønadsperioder: List<Stønadsperiode>) {
+    private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
         feilHvis(stønadsperioder.isEmpty()) {
             "Stønadsperioder mangler"
         }
