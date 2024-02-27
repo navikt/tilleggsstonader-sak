@@ -26,7 +26,7 @@ private val SNITT_ANTALL_VIRKEDAGER_PER_MÅNED = BigDecimal("21.67")
 class TilsynBarnBeregningService(private val stønadsperiodeRepository: StønadsperiodeRepository) {
 
     // Hva burde denne ta inn? Hva burde bli sendt inn i beregningscontroller?
-    fun lagBeregningsgrunnlagOgBeregn(
+    fun beregn(
         behandlingId: UUID,
         utgifterPerBarn: Map<UUID, List<Utgift>>,
     ): BeregningsresultatTilsynBarnDto {

@@ -88,7 +88,7 @@ class StepDefinitions {
     @Når("beregner")
     fun `beregner`() {
         try {
-            beregningsresultat = service.lagBeregningsgrunnlagOgBeregn(behandlingId = behandlingId, utgifter)
+            beregningsresultat = service.beregn(behandlingId = behandlingId, utgifter)
         } catch (e: Exception) {
             exception = e
         }
