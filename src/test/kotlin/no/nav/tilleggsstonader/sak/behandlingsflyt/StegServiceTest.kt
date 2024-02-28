@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
+import no.nav.tilleggsstonader.sak.util.aktivitet
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
@@ -22,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchIllegalStateException
 import org.junit.jupiter.api.AfterEach
@@ -46,6 +48,9 @@ class StegServiceTest(
     val tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
     @Autowired
     val stønadsperiodeRepository: StønadsperiodeRepository,
+    @Autowired
+    val vilkårperiodeRepository: VilkårperiodeRepository,
+
 ) : IntegrationTest() {
 
     val stegForBeslutter = object : BehandlingSteg<String> {
@@ -53,6 +58,7 @@ class StegServiceTest(
             val behandling = behandlingRepository.findByIdOrThrow(saksbehandling.id)
             behandlingRepository.update(behandling.copy(status = BehandlingStatus.IVERKSETTER_VEDTAK))
         }
+
         override fun stegType(): StegType = StegType.BESLUTTE_VEDTAK
     }
 
@@ -207,8 +213,10 @@ class StegServiceTest(
 
     private fun opprettVedtakTilsynBarn(behandling: Behandling): InnvilgelseTilsynBarnDto {
         val barn = barnRepository.insert(BehandlingBarn(behandlingId = behandling.id, ident = "123"))
-        stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31)))
-
+        val fom = LocalDate.of(2023, 1, 1)
+        val tom = LocalDate.of(2023, 1, 31)
+        stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandling.id, fom = fom, tom = tom))
+        vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = fom, tom = tom))
         val måned = YearMonth.of(2023, 1)
         return InnvilgelseTilsynBarnDto(
             utgifter = mapOf(barn.id to listOf(Utgift(måned, måned, 100))),
@@ -217,7 +225,10 @@ class StegServiceTest(
 
     private fun behandlingSomIverksettes(): Behandling {
         val nyBehandling =
-            behandling(status = BehandlingStatus.IVERKSETTER_VEDTAK, steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
+            behandling(
+                status = BehandlingStatus.IVERKSETTER_VEDTAK,
+                steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV,
+            )
         return testoppsettService.opprettBehandlingMedFagsak(nyBehandling)
     }
 }

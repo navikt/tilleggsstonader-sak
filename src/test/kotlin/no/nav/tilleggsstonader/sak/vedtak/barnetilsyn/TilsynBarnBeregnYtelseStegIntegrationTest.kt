@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
+import no.nav.tilleggsstonader.sak.util.aktivitet
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
@@ -13,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -34,6 +36,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     val tilkjentYtelseRepository: TilkjentYtelseRepository,
     @Autowired
     val stønadsperiodeRepository: StønadsperiodeRepository,
+    @Autowired
+    val vilkårperiodeRepository: VilkårperiodeRepository,
 ) : IntegrationTest() {
 
     val behandling = behandling()
@@ -41,6 +45,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")
     val stønadsperiode =
         stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
+    val aktivitet = aktivitet(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
 
     val januar = YearMonth.of(2023, 1)
     val februar = YearMonth.of(2023, 2)
@@ -60,6 +65,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         @Test
         fun `skal lagre vedtak`() {
             stønadsperiodeRepository.insert(stønadsperiode)
+            vilkårperiodeRepository.insert(aktivitet)
 
             val vedtakDto = innvilgelseDto(
                 utgifter = mapOf(barn(barn.id, Utgift(januar, januar, 100))),
@@ -108,6 +114,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     stønadsperiode4,
                 ),
             )
+            vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
 
             val vedtakDto = innvilgelseDto(
                 mapOf(
@@ -150,6 +157,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         @Test
         fun `skal validere at barn finnes på behandlingen`() {
             stønadsperiodeRepository.insert(stønadsperiode)
+            vilkårperiodeRepository.insert(aktivitet)
 
             val vedtak = innvilgelseDto(
                 utgifter = mapOf(barn(UUID.randomUUID(), Utgift(januar, januar, utgift))),

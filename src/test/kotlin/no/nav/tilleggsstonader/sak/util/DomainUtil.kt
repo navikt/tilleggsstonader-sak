@@ -40,7 +40,14 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -231,6 +238,44 @@ fun stønadsperiode(
     tom = tom,
     målgruppe = målgruppe,
     aktivitet = aktivitet,
+)
+
+fun aktivitet(
+    behandlingId: UUID,
+    fom: LocalDate,
+    tom: LocalDate,
+    type: AktivitetType = AktivitetType.TILTAK,
+    aktivitetsdager: Int = 5,
+    begrunnelse: String? = null,
+    delvilkår: DelvilkårAktivitet = delvilkårAktivitet(),
+    kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
+    resultatVilkårperiode: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
+): Vilkårperiode = Vilkårperiode(
+    behandlingId = behandlingId,
+    type = type,
+    fom = fom,
+    tom = tom,
+    aktivitetsdager = aktivitetsdager,
+    begrunnelse = begrunnelse,
+    kilde = kilde,
+    resultat = resultatVilkårperiode,
+    delvilkår = delvilkår,
+)
+
+fun delvilkårAktivitet(
+    lønnet: DelvilkårVilkårperiode.Vurdering = vurdering(svar = SvarJaNei.NEI),
+    mottarSykepenger: DelvilkårVilkårperiode.Vurdering = vurdering(svar = SvarJaNei.NEI),
+) = DelvilkårAktivitet(
+    lønnet = lønnet,
+    mottarSykepenger = mottarSykepenger,
+)
+
+fun vurdering(
+    resultat: ResultatDelvilkårperiode = ResultatDelvilkårperiode.OPPFYLT,
+    svar: SvarJaNei = SvarJaNei.JA,
+): DelvilkårVilkårperiode.Vurdering = DelvilkårVilkårperiode.Vurdering(
+    resultat = resultat,
+    svar = svar,
 )
 
 fun vilkår(

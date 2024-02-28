@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
+import no.nav.tilleggsstonader.sak.util.aktivitet
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
@@ -43,11 +44,20 @@ class TilsynBarnBeregnYtelseStegTest {
     fun setUp() {
         every { barnService.finnBarnPåBehandling(saksbehandling.id) } returns listOf(barn)
         every { repository.insert(any()) } answers { firstArg() }
+        val fom = LocalDate.of(2023, 1, 1)
+        val tom = LocalDate.of(2023, 1, 31)
         every { stønadsperiodeService.findAllByBehandlingId(saksbehandling.id) } returns listOf(
             stønadsperiode(
                 behandlingId = saksbehandling.id,
-                fom = LocalDate.of(2023, 1, 1),
-                tom = LocalDate.of(2023, 1, 31),
+                fom = fom,
+                tom = tom,
+            ),
+        )
+        every { vilkårperiodeRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
+            aktivitet(
+                behandlingId = saksbehandling.id,
+                fom = fom,
+                tom = tom,
             ),
         )
     }

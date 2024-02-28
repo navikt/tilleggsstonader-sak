@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
+import no.nav.tilleggsstonader.sak.util.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -27,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeR
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
@@ -61,6 +63,13 @@ class StepDefinitions {
     @Gitt("følgende støndsperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {
         every { stønadsperiodeRepository.findAllByBehandlingId(behandlingId) } returns mapStønadsperider(dataTable)
+        every { vilkårperiodeRepository.findByBehandlingId(behandlingId) } returns listOf(
+            aktivitet(
+                behandlingId,
+                LocalDate.now(),
+                LocalDate.now(),
+            ),
+        )
     }
 
     private fun mapStønadsperider(dataTable: DataTable) = dataTable.mapRad { rad ->
