@@ -162,7 +162,7 @@ internal class VilkårStegServiceTest {
 
             assertThat(lagretVilkår.captured.delvilkårsett).hasSize(4)
 
-            val delvilkår = lagretVilkår.captured.delvilkårsett.first()
+            val delvilkår = lagretVilkår.captured.delvilkårsett.last()
             assertThat(delvilkår.hovedregel).isEqualTo(RegelId.HAR_ALDER_LAVERE_ENN_GRENSEVERDI)
             assertThat(delvilkår.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
             assertThat(delvilkår.vurderinger).hasSize(1)
