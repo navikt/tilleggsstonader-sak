@@ -29,7 +29,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeR
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
-import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
@@ -63,28 +62,32 @@ class StepDefinitions {
 
     @Gitt("følgende støndsperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {
-        every { stønadsperiodeRepository.findAllByBehandlingId(behandlingId) } returns mapStønadsperider(dataTable)
+        every { stønadsperiodeRepository.findAllByBehandlingId(behandlingId) } returns mapStønadsperioder(dataTable)
         every {
             vilkårperiodeRepository.findByBehandlingIdAndResultat(
                 behandlingId,
                 ResultatVilkårperiode.OPPFYLT,
             )
-        } returns listOf(
-            aktivitet(
-                behandlingId,
-                LocalDate.now(),
-                LocalDate.now(),
-            ),
-        )
+        } returns mapAktivitet(dataTable)
     }
 
-    private fun mapStønadsperider(dataTable: DataTable) = dataTable.mapRad { rad ->
+    private fun mapStønadsperioder(dataTable: DataTable) = dataTable.mapRad { rad ->
         Stønadsperiode(
             behandlingId = behandlingId,
             fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
             tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
             målgruppe = parseValgfriEnum<MålgruppeType>(NøkkelBeregningTilsynBarn.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
             aktivitet = parseValgfriEnum<AktivitetType>(NøkkelBeregningTilsynBarn.AKTIVITET, rad)
+                ?: AktivitetType.TILTAK,
+        )
+    }
+
+    private fun mapAktivitet(dataTable: DataTable) = dataTable.mapRad { rad ->
+        aktivitet(
+            behandlingId = behandlingId,
+            fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
+            tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
+            type = parseValgfriEnum<AktivitetType>(NøkkelBeregningTilsynBarn.AKTIVITET, rad)
                 ?: AktivitetType.TILTAK,
         )
     }
@@ -148,7 +151,7 @@ class StepDefinitions {
                 }
 
                 forventetResultat.grunnlag.antallDagerTotal?.let {
-                    assertThat(resultat.grunnlag.antallDagerTotal)
+                    assertThat(resultat.grunnlag.stønadsperioderGrunnlag.sumOf { it.antallDager })
                         .`as` { "antallDagerTotal" }
                         .isEqualTo(it)
                 }
@@ -178,10 +181,10 @@ class StepDefinitions {
     fun `forvent følgende stønadsperioder`(månedStr: String, dataTable: DataTable) {
         assertThat(exception).isNull()
         val måned = parseÅrMåned(månedStr)
-        val forventeteStønadsperioder = mapStønadsperider(dataTable)
+        val forventeteStønadsperioder = mapStønadsperioder(dataTable)
 
         val perioder = beregningsresultat!!.perioder.find { it.grunnlag.måned == måned }
-            ?.grunnlag?.stønadsperioder
+            ?.grunnlag?.stønadsperioderGrunnlag?.map { it.stønadsperiode }
             ?: error("Finner ikke beregningsresultat for $måned")
 
         forventeteStønadsperioder.forEachIndexed { index, resultat ->

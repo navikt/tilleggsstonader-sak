@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
 import java.math.BigDecimal
 import java.time.YearMonth
 import java.util.UUID
@@ -39,11 +40,16 @@ data class Beregningsresultat(
 data class Beregningsgrunnlag(
     val måned: YearMonth,
     val makssats: Int,
-    val stønadsperioder: List<StønadsperiodeDto>,
+    val stønadsperioderGrunnlag: List<StønadsperiodeGrunnlag>,
     val utgifter: List<UtgiftBarn>,
-    val antallDagerTotal: Int,
     val utgifterTotal: Int,
     val antallBarn: Int,
+)
+
+data class StønadsperiodeGrunnlag(
+    val stønadsperiode: StønadsperiodeDto,
+    val aktiviteter: List<Aktivitet>,
+    val antallDager: Int,
 )
 
 data class UtgiftBarn(

@@ -64,7 +64,7 @@ class TilsynBarnBeregningService(
         dagsats: BigDecimal,
         beregningsgrunnlag: Beregningsgrunnlag,
     ) =
-        dagsats.multiply(beregningsgrunnlag.antallDagerTotal.toBigDecimal())
+        dagsats.multiply(beregningsgrunnlag.stønadsperioderGrunnlag.sumOf { it.antallDager }.toBigDecimal())
             .setScale(0, RoundingMode.HALF_UP)
             .toInt()
 
@@ -91,24 +91,46 @@ class TilsynBarnBeregningService(
     ): List<Beregningsgrunnlag> {
         val stønadsperioderPerMåned = stønadsperioder.tilÅrMåneder()
         val utgifterPerMåned = tilUtgifterPerMåned(utgifterPerBarn)
-
         val aktiviteterPerMånedPerType = aktiviteter.tilAktiviteterPerMånedPerType()
 
         return stønadsperioderPerMåned.entries.mapNotNull { (måned, stønadsperioder) ->
+            val aktiviteter = aktiviteterPerMånedPerType[måned] ?: error("Ingen aktiviteter for måned $måned")
             utgifterPerMåned[måned]?.let { utgifter ->
                 val antallBarn = utgifter.map { it.barnId }.toSet().size
                 val makssats = finnMakssats(måned, antallBarn)
                 Beregningsgrunnlag(
                     måned = måned,
                     makssats = makssats,
-                    stønadsperioder = stønadsperioder,
+                    stønadsperioderGrunnlag = finnStønadsaktiviteterMedAktiviteter(stønadsperioder, aktiviteter),
                     utgifter = utgifter,
-                    antallDagerTotal = antallDager(stønadsperioder),
                     utgifterTotal = utgifter.sumOf { it.utgift },
                     antallBarn = antallBarn,
                 )
             }
         }
+    }
+
+    private fun finnStønadsaktiviteterMedAktiviteter(
+        stønadsperioder: List<StønadsperiodeDto>,
+        aktiviteter: Map<AktivitetType, List<Aktivitet>>,
+    ): List<StønadsperiodeGrunnlag> {
+        return stønadsperioder.map { stønadsperiode ->
+            val relevanteAktiviteter = finnAktiviteterForStønadsperiode(stønadsperiode, aktiviteter)
+
+            StønadsperiodeGrunnlag(
+                stønadsperiode = stønadsperiode,
+                aktiviteter = relevanteAktiviteter,
+                antallDager = antallDager(stønadsperiode),
+            )
+        }
+    }
+
+    private fun finnAktiviteterForStønadsperiode(
+        stønadsperiode: StønadsperiodeDto,
+        aktiviteter: Map<AktivitetType, List<Aktivitet>>,
+    ): List<Aktivitet> {
+        return aktiviteter[stønadsperiode.aktivitet]?.filter { it.overlapper(stønadsperiode) }
+            ?: error("Finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som passer med stønadsperiode")
     }
 
     private fun List<Aktivitet>.tilAktiviteterPerMånedPerType(): Map<YearMonth, Map<AktivitetType, List<Aktivitet>>> {
@@ -124,10 +146,9 @@ class TilsynBarnBeregningService(
             .groupBy({ it.first }, { it.second }).mapValues { it.value.groupBy { it.type } }
     }
 
-    private fun antallDager(stønadsperioder: List<StønadsperiodeDto>): Int {
-        return stønadsperioder.sumOf { stønadsperiode ->
-            stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
-        }
+    // TODO: Ta inn relevante aktiviteter og finn antall dager det skal utbetales for
+    private fun antallDager(stønadsperiode: StønadsperiodeDto): Int {
+        return stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
     }
 
     private fun finnAktiviteter(behandlingId: UUID): List<Aktivitet> {
