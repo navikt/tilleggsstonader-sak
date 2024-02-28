@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiod
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktivitet
@@ -91,6 +92,8 @@ class TilsynBarnBeregningService(
         val stønadsperioderPerMåned = stønadsperioder.tilÅrMåneder()
         val utgifterPerMåned = tilUtgifterPerMåned(utgifterPerBarn)
 
+        val aktiviteterPerMånedPerType = aktiviteter.tilAktiviteterPerMånedPerType()
+
         return stønadsperioderPerMåned.entries.mapNotNull { (måned, stønadsperioder) ->
             utgifterPerMåned[måned]?.let { utgifter ->
                 val antallBarn = utgifter.map { it.barnId }.toSet().size
@@ -106,6 +109,19 @@ class TilsynBarnBeregningService(
                 )
             }
         }
+    }
+
+    private fun List<Aktivitet>.tilAktiviteterPerMånedPerType(): Map<YearMonth, Map<AktivitetType, List<Aktivitet>>> {
+        return this
+            .flatMap { stønadsperiode ->
+                stønadsperiode.splitPerMåned { måned, periode ->
+                    periode.copy(
+                        fom = maxOf(periode.fom, måned.atDay(1)),
+                        tom = minOf(periode.tom, måned.atEndOfMonth()),
+                    )
+                }
+            }
+            .groupBy({ it.first }, { it.second }).mapValues { it.value.groupBy { it.type } }
     }
 
     private fun antallDager(stønadsperioder: List<StønadsperiodeDto>): Int {
