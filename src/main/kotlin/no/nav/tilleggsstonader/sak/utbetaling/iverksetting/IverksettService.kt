@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollServi
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.slf4j.LoggerFactory
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -176,16 +175,6 @@ class IverksettService(
         } else {
             tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned)
             emptyList()
-        }
-    }
-
-    // TODO denne skal fjernes når vi har opprettet denne i produksjon
-    @Scheduled(initialDelay = 10000, fixedDelay = Long.MAX_VALUE)
-    fun opprettTaskForMånedkjøring() {
-        try {
-            taskService.save(IverksettMånedTask.opprettTask(YearMonth.of(2024, 1)))
-        } catch (e: Exception) {
-            logger.error("Oppretter ikke task for månedkjøring pga den allerede er opprettet")
         }
     }
 
