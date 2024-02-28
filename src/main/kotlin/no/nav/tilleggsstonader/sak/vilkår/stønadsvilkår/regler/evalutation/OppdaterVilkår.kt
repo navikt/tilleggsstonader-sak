@@ -79,7 +79,6 @@ object OppdaterVilkår {
                         vurderinger = svar.svarTilDomene(),
                     )
                 } else {
-                    // TODO håndtering for [Vilkårsresultat.SKAL_IKKE_VURDERES] som burde beholde første svaret i det delvilkåret
                     throw Feil("Håndterer ikke oppdatering av resultat=$resultat ennå")
                 }
             }
