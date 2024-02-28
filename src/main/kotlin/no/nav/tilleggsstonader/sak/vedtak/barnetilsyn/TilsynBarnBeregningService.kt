@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiod
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktivitet
 import org.springframework.stereotype.Service
@@ -114,8 +115,8 @@ class TilsynBarnBeregningService(
     }
 
     private fun finnAktiviteter(behandlingId: UUID): List<Aktivitet> {
-        val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId)
-        return vilkårsperioder.tilAktivitet()
+        return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
+            .tilAktivitet()
     }
 
     /**

@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
@@ -63,7 +64,12 @@ class StepDefinitions {
     @Gitt("følgende støndsperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {
         every { stønadsperiodeRepository.findAllByBehandlingId(behandlingId) } returns mapStønadsperider(dataTable)
-        every { vilkårperiodeRepository.findByBehandlingId(behandlingId) } returns listOf(
+        every {
+            vilkårperiodeRepository.findByBehandlingIdAndResultat(
+                behandlingId,
+                ResultatVilkårperiode.OPPFYLT,
+            )
+        } returns listOf(
             aktivitet(
                 behandlingId,
                 LocalDate.now(),
