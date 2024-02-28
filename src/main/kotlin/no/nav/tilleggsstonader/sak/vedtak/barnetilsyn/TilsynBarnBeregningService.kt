@@ -10,6 +10,9 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktivitet
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -23,7 +26,10 @@ private val DEKNINGSGRAD = BigDecimal("0.64")
 private val SNITT_ANTALL_VIRKEDAGER_PER_MÅNED = BigDecimal("21.67")
 
 @Service
-class TilsynBarnBeregningService(private val stønadsperiodeRepository: StønadsperiodeRepository) {
+class TilsynBarnBeregningService(
+    private val stønadsperiodeRepository: StønadsperiodeRepository,
+    private val vilkårperiodeRepository: VilkårperiodeRepository,
+) {
 
     // Hva burde denne ta inn? Hva burde bli sendt inn i beregningscontroller?
     fun beregn(
@@ -31,9 +37,11 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
         utgifterPerBarn: Map<UUID, List<Utgift>>,
     ): BeregningsresultatTilsynBarnDto {
         val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
-        validerPerioder(stønadsperioder, utgifterPerBarn)
+        val aktiviteter = finnAktiviteter(behandlingId)
 
-        val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, utgifterPerBarn)
+        validerPerioder(stønadsperioder, aktiviteter, utgifterPerBarn)
+
+        val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, aktiviteter, utgifterPerBarn)
         val perioder = beregn(beregningsgrunnlag)
 
         return BeregningsresultatTilsynBarnDto(perioder)
@@ -76,10 +84,10 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
 
     private fun lagBeregningsgrunnlagPerMåned(
         stønadsperioder: List<StønadsperiodeDto>,
+        aktiviteter: List<Aktivitet>,
         utgifterPerBarn: Map<UUID, List<Utgift>>,
     ): List<Beregningsgrunnlag> {
         val stønadsperioderPerMåned = stønadsperioder.tilÅrMåneder()
-
         val utgifterPerMåned = tilUtgifterPerMåned(utgifterPerBarn)
 
         return stønadsperioderPerMåned.entries.mapNotNull { (måned, stønadsperioder) ->
@@ -103,6 +111,11 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
         return stønadsperioder.sumOf { stønadsperiode ->
             stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
         }
+    }
+
+    private fun finnAktiviteter(behandlingId: UUID): List<Aktivitet> {
+        val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId)
+        return vilkårsperioder.tilAktivitet()
     }
 
     /**
@@ -141,15 +154,23 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
 
     private fun validerPerioder(
         stønadsperioder: List<StønadsperiodeDto>,
+        aktiviteter: List<Aktivitet>,
         utgifter: Map<UUID, List<Utgift>>,
     ) {
         validerStønadsperioder(stønadsperioder)
+        validerAktiviteter(aktiviteter)
         validerUtgifter(utgifter)
     }
 
     private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
         feilHvis(stønadsperioder.isEmpty()) {
             "Stønadsperioder mangler"
+        }
+    }
+
+    private fun validerAktiviteter(aktiviteter: List<Aktivitet>) {
+        feilHvis(aktiviteter.isEmpty()) {
+            "Aktiviteter mangler"
         }
     }
 

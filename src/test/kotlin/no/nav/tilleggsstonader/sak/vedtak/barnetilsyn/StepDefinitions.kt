@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
@@ -47,7 +48,8 @@ class StepDefinitions {
 
     private val logger = LoggerFactory.getLogger(javaClass)
     val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
-    val service = TilsynBarnBeregningService(stønadsperiodeRepository)
+    val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
+    val service = TilsynBarnBeregningService(stønadsperiodeRepository, vilkårperiodeRepository)
 
     var exception: Exception? = null
 

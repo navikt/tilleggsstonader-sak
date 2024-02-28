@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -24,9 +25,10 @@ class TilsynBarnBeregnYtelseStegTest {
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>(relaxed = true)
     private val simuleringService = mockk<SimuleringService>(relaxed = true)
     private val stønadsperiodeService = mockk<StønadsperiodeRepository>(relaxed = true)
+    private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>(relaxed = true)
 
     val steg = TilsynBarnBeregnYtelseSteg(
-        tilsynBarnBeregningService = TilsynBarnBeregningService(stønadsperiodeService),
+        tilsynBarnBeregningService = TilsynBarnBeregningService(stønadsperiodeService, vilkårperiodeRepository),
         vedtakRepository = repository,
         barnService = barnService,
         tilkjentytelseService = tilkjentYtelseService,
