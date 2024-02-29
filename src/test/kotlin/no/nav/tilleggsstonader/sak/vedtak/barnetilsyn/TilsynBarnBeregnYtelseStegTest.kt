@@ -13,6 +13,9 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -24,9 +27,10 @@ class TilsynBarnBeregnYtelseStegTest {
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>(relaxed = true)
     private val simuleringService = mockk<SimuleringService>(relaxed = true)
     private val stønadsperiodeService = mockk<StønadsperiodeRepository>(relaxed = true)
+    private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>(relaxed = true)
 
     val steg = TilsynBarnBeregnYtelseSteg(
-        tilsynBarnBeregningService = TilsynBarnBeregningService(stønadsperiodeService),
+        tilsynBarnBeregningService = TilsynBarnBeregningService(stønadsperiodeService, vilkårperiodeRepository),
         vedtakRepository = repository,
         barnService = barnService,
         tilkjentytelseService = tilkjentYtelseService,
@@ -41,11 +45,20 @@ class TilsynBarnBeregnYtelseStegTest {
     fun setUp() {
         every { barnService.finnBarnPåBehandling(saksbehandling.id) } returns listOf(barn)
         every { repository.insert(any()) } answers { firstArg() }
+        val fom = LocalDate.of(2023, 1, 1)
+        val tom = LocalDate.of(2023, 1, 31)
         every { stønadsperiodeService.findAllByBehandlingId(saksbehandling.id) } returns listOf(
             stønadsperiode(
                 behandlingId = saksbehandling.id,
-                fom = LocalDate.of(2023, 1, 1),
-                tom = LocalDate.of(2023, 1, 31),
+                fom = fom,
+                tom = tom,
+            ),
+        )
+        every { vilkårperiodeRepository.findByBehandlingIdAndResultat(saksbehandling.id, ResultatVilkårperiode.OPPFYLT) } returns listOf(
+            aktivitet(
+                behandlingId = saksbehandling.id,
+                fom = fom,
+                tom = tom,
             ),
         )
     }

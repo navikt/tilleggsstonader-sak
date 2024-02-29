@@ -11,6 +11,8 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,11 +30,15 @@ class TilsynBarnVedtakControllerTest(
     val barnRepository: BarnRepository,
     @Autowired
     val stønadsperiodeRepository: StønadsperiodeRepository,
+    @Autowired
+    val vilkårperiodeRepository: VilkårperiodeRepository,
 ) : IntegrationTest() {
 
     val behandling = behandling(steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
     val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")
-    val stønadsperiode = stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
+    val stønadsperiode =
+        stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
+    val aktivitet = aktivitet(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
 
     @BeforeEach
     fun setUp() {
@@ -40,6 +46,7 @@ class TilsynBarnVedtakControllerTest(
         testoppsettService.opprettBehandlingMedFagsak(behandling)
         barnRepository.insert(barn)
         stønadsperiodeRepository.insert(stønadsperiode)
+        vilkårperiodeRepository.insert(aktivitet)
     }
 
     @Test
