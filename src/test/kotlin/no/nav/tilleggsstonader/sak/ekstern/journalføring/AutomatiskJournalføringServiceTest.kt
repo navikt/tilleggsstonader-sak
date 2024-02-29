@@ -19,7 +19,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringRequest
+import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -161,7 +161,7 @@ internal class AutomatiskJournalføringServiceTest {
 
         assertThatThrownBy {
             automatiskJournalføringService.håndterSøknad(
-                AutomatiskJournalføringRequest(
+                HåndterSøknadRequest(
                     personIdent,
                     journalpostId,
                     Stønadstype.BARNETILSYN,
@@ -194,7 +194,7 @@ internal class AutomatiskJournalføringServiceTest {
         every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
 
         automatiskJournalføringService.håndterSøknad(
-            AutomatiskJournalføringRequest(
+            HåndterSøknadRequest(
                 personIdent = personIdent,
                 journalpostId = journalpostId,
                 stønadstype = Stønadstype.BARNETILSYN,
@@ -218,7 +218,7 @@ internal class AutomatiskJournalføringServiceTest {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling())
 
         automatiskJournalføringService.håndterSøknad(
-            AutomatiskJournalføringRequest(
+            HåndterSøknadRequest(
                 personIdent,
                 journalpostId,
                 Stønadstype.BARNETILSYN,
