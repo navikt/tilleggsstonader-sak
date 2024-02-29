@@ -23,17 +23,17 @@ import java.util.UUID
 class PassBarnRegel : Vilkårsregel(
     vilkårType = VilkårType.PASS_BARN,
     regler = setOf(
+        UTGIFTER_DOKUMENTERT,
+        DEKKES_UTGIFTER_ANNET_REGELVERK,
+        ANNEN_FORELDER_MOTTAR_STØTTE,
         HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
         UNNTAK_ALDER,
-        DEKKES_UTGIFTER_ANNET_REGELVERK,
-        ANNEN_FORELDER_MOTTAR_STØTTE,
-        UTGIFTER_DOKUMENTERT,
     ),
     hovedregler = regelIder(
-        HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
+        UTGIFTER_DOKUMENTERT,
         DEKKES_UTGIFTER_ANNET_REGELVERK,
         ANNEN_FORELDER_MOTTAR_STØTTE,
-        UTGIFTER_DOKUMENTERT,
+        HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
     ),
 ) {
 
@@ -63,7 +63,7 @@ class PassBarnRegel : Vilkårsregel(
                 SvarId.FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID,
             )
                 .associateWith {
-                    SluttSvarRegel.OPPFYLT_MED_PÅKREVD_BEGRUNNELSE
+                    SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE
                 } + mapOf(SvarId.NEI to SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE)
 
         private val UNNTAK_ALDER =
@@ -86,7 +86,7 @@ class PassBarnRegel : Vilkårsregel(
                 regelId = RegelId.UTGIFTER_DOKUMENTERT,
                 jaNeiSvarRegel(
                     hvisJa = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
-                    hvisNei = SluttSvarRegel.IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    hvisNei = SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                 ),
             )
 
@@ -94,7 +94,7 @@ class PassBarnRegel : Vilkårsregel(
             RegelSteg(
                 regelId = RegelId.ANNEN_FORELDER_MOTTAR_STØTTE,
                 jaNeiSvarRegel(
-                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     hvisNei = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
                 ),
             )
@@ -103,17 +103,16 @@ class PassBarnRegel : Vilkårsregel(
             RegelSteg(
                 regelId = RegelId.DEKKES_UTGIFTER_ANNET_REGELVERK,
                 jaNeiSvarRegel(
-                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     hvisNei = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
                 ),
             )
     }
 
     private fun automatiskVurderAlderLavereEnnGrenseverdi(): Delvilkår {
-        val begrunnelse = "Automatisk vurdert: Ut ifra barnets alder er det ${
-            LocalDate.now()
-                .norskFormat()
-        } automatisk vurdert at barnet ikke har fullført 4. skoleår."
+        val iDag = LocalDate.now().norskFormat()
+        val begrunnelse =
+            "Automatisk vurdert: Ut ifra barnets alder er det $iDag automatisk vurdert at barnet ikke har fullført 4. skoleår."
 
         return Delvilkår(
             resultat = Vilkårsresultat.AUTOMATISK_OPPFYLT,

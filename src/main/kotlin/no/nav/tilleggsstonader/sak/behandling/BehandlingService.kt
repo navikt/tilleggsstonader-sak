@@ -111,13 +111,7 @@ class BehandlingService(
         brukerfeilHvis(kravMottatt != null && kravMottatt.isAfter(LocalDate.now())) {
             "Kan ikke sette krav mottattdato frem i tid"
         }
-        /* TODO skal denne featuretoggles?
-        feilHvis(
-            behandlingsårsak == BehandlingÅrsak.KORRIGERING_UTEN_BREV &&
-                !featureToggleService.isEnabled(Toggle.BEHANDLING_KORRIGERING),
-        ) {
-            "Feature toggle for korrigering er ikke skrudd på for bruker"
-        }*/
+
         val tidligereBehandlinger = behandlingRepository.findByFagsakId(fagsakId)
         val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
         validerKanOppretteNyBehandling(behandlingType, tidligereBehandlinger, erMigrering)

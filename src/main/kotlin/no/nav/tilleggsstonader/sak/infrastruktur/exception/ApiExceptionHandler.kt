@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.exception
 
 import no.nav.security.token.support.core.exceptions.JwtTokenMissingException
-import no.nav.tilleggsstonader.sak.infrastruktur.config.SecureLogger
+import no.nav.tilleggsstonader.libs.log.SecureLogger
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.core.NestedExceptionUtils

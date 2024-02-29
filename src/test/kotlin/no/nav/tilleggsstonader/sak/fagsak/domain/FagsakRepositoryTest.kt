@@ -4,9 +4,14 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakDomain
@@ -18,12 +23,13 @@ import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class FagsakRepositoryTest : IntegrationTest() {
 
-    // @Autowired
-    // private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
+    @Autowired
+    private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
     @Autowired
     private lateinit var fagsakPersonRepository: FagsakPersonRepository
@@ -37,7 +43,6 @@ class FagsakRepositoryTest : IntegrationTest() {
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
 
-    /* TODO har ikke tilkjent ytelse ennå
     @Test
     fun `harLøpendeUtbetaling returnerer true for fagsak med ferdigstilt behandling med aktiv utbetaling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("321"))))
@@ -48,13 +53,15 @@ class FagsakRepositoryTest : IntegrationTest() {
                 status = BehandlingStatus.FERDIGSTILT,
             ),
         )
-        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, "321", LocalDate.now().year))
+        val andel = andelTilkjentYtelse(behandling.id, fom = LocalDate.now(), tom = LocalDate.now())
+        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andeler = arrayOf(andel)))
 
         val harLøpendeUtbetaling = fagsakRepository.harLøpendeUtbetaling(fagsak.id)
 
         assertThat(harLøpendeUtbetaling).isTrue()
     }
 
+    /* TODO har ikke flere ytelser ennå
     @Test
     fun `harLøpendeUtbetaling returnerer true for fagsak med flere aktive ytelser`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("321"))))
@@ -72,6 +79,7 @@ class FagsakRepositoryTest : IntegrationTest() {
 
         assertThat(harLøpendeUtbetaling).isTrue()
     }
+     */
 
     @Test
     fun `harLøpendeUtbetaling returnerer false for fagsak med ferdigstilt behandling med inaktiv utbetaling`() {
@@ -83,13 +91,12 @@ class FagsakRepositoryTest : IntegrationTest() {
                 status = BehandlingStatus.FERDIGSTILT,
             ),
         )
-        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, "321"))
+        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id))
 
         val harLøpendeUtbetaling = fagsakRepository.harLøpendeUtbetaling(fagsak.id)
 
         assertThat(harLøpendeUtbetaling).isFalse()
     }
-     */
 
     @Test
     internal fun `skal ikke være mulig med flere stønader av samme typen for samme person`() {
