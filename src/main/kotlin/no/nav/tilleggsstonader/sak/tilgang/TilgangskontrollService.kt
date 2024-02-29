@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
 import no.nav.security.token.support.core.jwt.JwtToken
-import no.nav.tilleggsstonader.sak.infrastruktur.config.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.AdRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService

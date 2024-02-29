@@ -13,7 +13,6 @@ class TilsynBarnVedtakService(
 
     override fun mapTilDto(vedtak: VedtakTilsynBarn): InnvilgelseTilsynBarnDto {
         return InnvilgelseTilsynBarnDto(
-            stønadsperioder = vedtak.vedtak.stønadsperioder,
             utgifter = vedtak.vedtak.utgifter,
         )
     }

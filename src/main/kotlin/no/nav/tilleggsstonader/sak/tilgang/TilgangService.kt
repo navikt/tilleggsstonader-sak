@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
-import no.nav.tilleggsstonader.sak.infrastruktur.config.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle

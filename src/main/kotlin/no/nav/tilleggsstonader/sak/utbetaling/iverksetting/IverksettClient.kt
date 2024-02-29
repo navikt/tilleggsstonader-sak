@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDto
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -46,5 +48,14 @@ class IverksettClient(
             "iverksettingId" to iverksettingId,
         )
         return getForEntity<IverksettStatus>(url, uriVariables = uriVariables)
+    }
+
+    // TODO oppdater url når dp-iverksett har støtte for simulering
+    fun simuler(simuleringRequest: SimuleringDto): BeriketSimuleringsresultat {
+        val url = UriComponentsBuilder.fromUri(uri)
+            .pathSegment("api", "simulering")
+            .toUriString()
+
+        return postForEntity<BeriketSimuleringsresultat>(url, simuleringRequest)
     }
 }

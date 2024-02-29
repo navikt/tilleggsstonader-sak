@@ -27,7 +27,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.InnvilgelseTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
@@ -326,21 +325,15 @@ class BehandlingFlytTest(
     private fun opprettVedtak(behandlingId: UUID) {
         val barn = barnService.finnBarnPåBehandling(behandlingId)
         val utgifter = barn.first().let { mapOf(it.id to listOf(utgift())) }
-        val stønadsperioder = listOf(stønadsperiode())
         tilsynBarnVedtakController.lagreVedtak(
             behandlingId,
-            InnvilgelseTilsynBarnDto(stønadsperioder, utgifter),
+            InnvilgelseTilsynBarnDto(utgifter),
         )
     }
 
-    private fun stønadsperiode() = Stønadsperiode(
-        fom = LocalDate.of(2023, 1, 1),
-        tom = LocalDate.of(2023, 1, 31),
-    )
-
     private fun utgift() = Utgift(
-        fom = YearMonth.of(2023, 1),
-        tom = YearMonth.of(2023, 1),
+        fom = YearMonth.of(2024, 1),
+        tom = YearMonth.of(2024, 1),
         utgift = 1000,
     )
 

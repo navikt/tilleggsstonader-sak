@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
-import no.nav.tilleggsstonader.sak.infrastruktur.config.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBolkResponse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentBolkResponse

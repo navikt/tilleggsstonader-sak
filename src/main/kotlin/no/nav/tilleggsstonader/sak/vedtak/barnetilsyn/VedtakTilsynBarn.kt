@@ -31,7 +31,6 @@ data class VedtakTilsynBarn(
 }
 
 data class VedtaksdataTilsynBarn(
-    val stønadsperioder: List<Stønadsperiode>,
     val utgifter: Map<UUID, List<Utgift>>,
 )
 

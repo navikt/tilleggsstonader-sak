@@ -31,7 +31,7 @@ class TilsynBarnBeregnYtelseSteg(
 ) {
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
-        val beregningsresultat = tilsynBarnBeregningService.beregn(vedtak.stønadsperioder, vedtak.utgifter)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter)
         validerBarnFinnesPåBehandling(saksbehandling, vedtak)
         vedtakRepository.insert(lagVedtak(saksbehandling, vedtak, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -59,12 +59,12 @@ class TilsynBarnBeregnYtelseSteg(
         beregningsresultat: BeregningsresultatTilsynBarnDto,
     ) {
         val andelerTilkjentYtelse = beregningsresultat.perioder.flatMap {
-            it.grunnlag.stønadsperioder.map { stønadsperiode ->
+            it.grunnlag.stønadsperioderGrunnlag.map { stønadsperiodeMedAktivitet ->
                 AndelTilkjentYtelse(
                     // TODO hvordan burde vi egentligen gjøre med decimaler?
                     beløp = it.dagsats.setScale(0, RoundingMode.HALF_UP).toInt(),
-                    fom = stønadsperiode.fom,
-                    tom = stønadsperiode.tom,
+                    fom = stønadsperiodeMedAktivitet.stønadsperiode.fom,
+                    tom = stønadsperiodeMedAktivitet.stønadsperiode.tom,
                     satstype = Satstype.DAG, // TODO
                     type = TypeAndel.TILSYN_BARN_AAP, // TODO
                     kildeBehandlingId = saksbehandling.id,
@@ -89,7 +89,6 @@ class TilsynBarnBeregnYtelseSteg(
             behandlingId = behandling.id,
             type = TypeVedtak.INNVILGET,
             vedtak = VedtaksdataTilsynBarn(
-                stønadsperioder = vedtak.stønadsperioder,
                 utgifter = vedtak.utgifter,
             ),
             beregningsresultat = VedtaksdataBeregningsresultat(beregningsresultat.perioder),
