@@ -152,6 +152,7 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
         return satsa
     }
 
+    // Kun laget til test
     private fun antallDagerIPeriode(aktivitet: PeriodeMedDager): Int {
         val antallHverdager =
             aktivitet.alleDatoer().count { it.dayOfWeek !== DayOfWeek.SATURDAY && it.dayOfWeek !== DayOfWeek.SUNDAY }
@@ -163,12 +164,14 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
         }
     }
 
+    // Kun laget til test
     fun antallHverdager(perioder: List<StønadsperiodeDto>): Int {
         return perioder.sumOf {
             it.alleDatoer().count { it.dayOfWeek !== DayOfWeek.SATURDAY && it.dayOfWeek !== DayOfWeek.SUNDAY }
         }
     }
 
+    // Kun laget til test
     fun antallDager2(
         aktiviteter: List<PeriodeMedDager>
     ): Map<YearMonth, Int> {
@@ -176,6 +179,7 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
         return aktiviteterPerMånedÅr.mapValues { (mnd, perioder) -> perioder.sumOf { antallDagerIPeriode(it) } }
     }
 
+    // Faktisk brukt
     fun antallDager(
         stønadsperioder: List<StønadsperiodeDto>, aktiviteter: List<PeriodeMedDager>?
     ): Int {
@@ -224,7 +228,7 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
         }
     }
 
-
+    // Test av annen metode
     private fun beregnAntallDager(antallHverdager: Int, aktivitetsdager: Int): Int {
         val antallUker = antallHverdager.toBigDecimal().divide(BigDecimal(5))
         val antallHeleUker = antallUker.setScale(0, RoundingMode.FLOOR)
