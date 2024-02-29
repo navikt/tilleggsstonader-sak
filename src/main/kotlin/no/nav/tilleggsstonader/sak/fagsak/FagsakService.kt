@@ -34,9 +34,6 @@ class FagsakService(
     private val personService: PersonService,
     private val behandlingService: BehandlingService,
 ) {
-    fun hentEllerOpprettFagsakMedBehandlinger(personIdent: String, stønadstype: Stønadstype): FagsakDto {
-        return fagsakTilDto(hentEllerOpprettFagsak(personIdent, stønadstype))
-    }
 
     @Transactional
     fun hentEllerOpprettFagsak(

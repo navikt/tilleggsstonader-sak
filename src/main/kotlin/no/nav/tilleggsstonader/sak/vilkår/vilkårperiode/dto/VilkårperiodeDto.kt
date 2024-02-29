@@ -89,7 +89,6 @@ data class Datoperiode(
     }
 }
 
-// TODO flytt til kontrakter
 fun Periode<LocalDate>.formattertPeriodeNorskFormat() = "${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
 
 /**
