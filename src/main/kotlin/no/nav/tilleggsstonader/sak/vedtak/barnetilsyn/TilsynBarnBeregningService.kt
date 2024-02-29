@@ -10,6 +10,11 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktivitet
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -23,7 +28,10 @@ private val DEKNINGSGRAD = BigDecimal("0.64")
 private val SNITT_ANTALL_VIRKEDAGER_PER_MÅNED = BigDecimal("21.67")
 
 @Service
-class TilsynBarnBeregningService(private val stønadsperiodeRepository: StønadsperiodeRepository) {
+class TilsynBarnBeregningService(
+    private val stønadsperiodeRepository: StønadsperiodeRepository,
+    private val vilkårperiodeRepository: VilkårperiodeRepository,
+) {
 
     // Hva burde denne ta inn? Hva burde bli sendt inn i beregningscontroller?
     fun beregn(
@@ -31,9 +39,11 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
         utgifterPerBarn: Map<UUID, List<Utgift>>,
     ): BeregningsresultatTilsynBarnDto {
         val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
-        validerPerioder(stønadsperioder, utgifterPerBarn)
+        val aktiviteter = finnAktiviteter(behandlingId)
 
-        val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, utgifterPerBarn)
+        validerPerioder(stønadsperioder, aktiviteter, utgifterPerBarn)
+
+        val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, aktiviteter, utgifterPerBarn)
         val perioder = beregn(beregningsgrunnlag)
 
         return BeregningsresultatTilsynBarnDto(perioder)
@@ -54,7 +64,7 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
         dagsats: BigDecimal,
         beregningsgrunnlag: Beregningsgrunnlag,
     ) =
-        dagsats.multiply(beregningsgrunnlag.antallDagerTotal.toBigDecimal())
+        dagsats.multiply(beregningsgrunnlag.stønadsperioderGrunnlag.sumOf { it.antallDager }.toBigDecimal())
             .setScale(0, RoundingMode.HALF_UP)
             .toInt()
 
@@ -76,22 +86,23 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
 
     private fun lagBeregningsgrunnlagPerMåned(
         stønadsperioder: List<StønadsperiodeDto>,
+        aktiviteter: List<Aktivitet>,
         utgifterPerBarn: Map<UUID, List<Utgift>>,
     ): List<Beregningsgrunnlag> {
         val stønadsperioderPerMåned = stønadsperioder.tilÅrMåneder()
-
         val utgifterPerMåned = tilUtgifterPerMåned(utgifterPerBarn)
+        val aktiviteterPerMånedPerType = aktiviteter.tilAktiviteterPerMånedPerType()
 
         return stønadsperioderPerMåned.entries.mapNotNull { (måned, stønadsperioder) ->
+            val aktiviteter = aktiviteterPerMånedPerType[måned] ?: error("Ingen aktiviteter for måned $måned")
             utgifterPerMåned[måned]?.let { utgifter ->
                 val antallBarn = utgifter.map { it.barnId }.toSet().size
                 val makssats = finnMakssats(måned, antallBarn)
                 Beregningsgrunnlag(
                     måned = måned,
                     makssats = makssats,
-                    stønadsperioder = stønadsperioder,
+                    stønadsperioderGrunnlag = finnStønadsaktiviteterMedAktiviteter(stønadsperioder, aktiviteter),
                     utgifter = utgifter,
-                    antallDagerTotal = antallDager(stønadsperioder),
                     utgifterTotal = utgifter.sumOf { it.utgift },
                     antallBarn = antallBarn,
                 )
@@ -99,10 +110,50 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
         }
     }
 
-    private fun antallDager(stønadsperioder: List<StønadsperiodeDto>): Int {
-        return stønadsperioder.sumOf { stønadsperiode ->
-            stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
+    private fun finnStønadsaktiviteterMedAktiviteter(
+        stønadsperioder: List<StønadsperiodeDto>,
+        aktiviteter: Map<AktivitetType, List<Aktivitet>>,
+    ): List<StønadsperiodeGrunnlag> {
+        return stønadsperioder.map { stønadsperiode ->
+            val relevanteAktiviteter = finnAktiviteterForStønadsperiode(stønadsperiode, aktiviteter)
+
+            StønadsperiodeGrunnlag(
+                stønadsperiode = stønadsperiode,
+                aktiviteter = relevanteAktiviteter,
+                antallDager = antallDager(stønadsperiode),
+            )
         }
+    }
+
+    private fun finnAktiviteterForStønadsperiode(
+        stønadsperiode: StønadsperiodeDto,
+        aktiviteter: Map<AktivitetType, List<Aktivitet>>,
+    ): List<Aktivitet> {
+        return aktiviteter[stønadsperiode.aktivitet]?.filter { it.overlapper(stønadsperiode) }
+            ?: error("Finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som passer med stønadsperiode")
+    }
+
+    private fun List<Aktivitet>.tilAktiviteterPerMånedPerType(): Map<YearMonth, Map<AktivitetType, List<Aktivitet>>> {
+        return this
+            .flatMap { stønadsperiode ->
+                stønadsperiode.splitPerMåned { måned, periode ->
+                    periode.copy(
+                        fom = maxOf(periode.fom, måned.atDay(1)),
+                        tom = minOf(periode.tom, måned.atEndOfMonth()),
+                    )
+                }
+            }
+            .groupBy({ it.first }, { it.second }).mapValues { it.value.groupBy { it.type } }
+    }
+
+    // TODO: Ta inn relevante aktiviteter og finn antall dager det skal utbetales for
+    private fun antallDager(stønadsperiode: StønadsperiodeDto): Int {
+        return stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
+    }
+
+    private fun finnAktiviteter(behandlingId: UUID): List<Aktivitet> {
+        return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
+            .tilAktivitet()
     }
 
     /**
@@ -141,15 +192,23 @@ class TilsynBarnBeregningService(private val stønadsperiodeRepository: Stønads
 
     private fun validerPerioder(
         stønadsperioder: List<StønadsperiodeDto>,
+        aktiviteter: List<Aktivitet>,
         utgifter: Map<UUID, List<Utgift>>,
     ) {
         validerStønadsperioder(stønadsperioder)
+        validerAktiviteter(aktiviteter)
         validerUtgifter(utgifter)
     }
 
     private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
         feilHvis(stønadsperioder.isEmpty()) {
             "Stønadsperioder mangler"
+        }
+    }
+
+    private fun validerAktiviteter(aktiviteter: List<Aktivitet>) {
+        feilHvis(aktiviteter.isEmpty()) {
+            "Aktiviteter mangler"
         }
     }
 
