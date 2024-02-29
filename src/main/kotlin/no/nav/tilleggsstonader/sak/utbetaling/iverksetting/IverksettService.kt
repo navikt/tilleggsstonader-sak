@@ -69,7 +69,7 @@ class IverksettService(
     }
 
     private fun andelerForFørsteIverksettingAvBehandling(tilkjentYtelse: TilkjentYtelse): Collection<AndelTilkjentYtelse> {
-        val nullMåned = YearMonth.now().minusMonths(1)
+        val nullMåned = YearMonth.now()
         val andelerTilIverksetting = finnAndelerTilIverksetting(tilkjentYtelse, tilkjentYtelse.behandlingId, nullMåned)
 
         return andelerTilIverksetting.ifEmpty {
@@ -89,9 +89,7 @@ class IverksettService(
      * Når man iverksetter samme behandling neste gang skal man bruke inneværende måned for å iverksette aktuell måned
      */
     @Transactional
-    fun iverksett(behandlingId: UUID, iverksettingId: UUID, måned: YearMonth = YearMonth.now()) {
-        validerIkkeFremITid(måned)
-
+    fun iverksett(behandlingId: UUID, iverksettingId: UUID, måned: YearMonth) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         if (!behandling.resultat.skalIverksettes) {
             logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
@@ -110,12 +108,6 @@ class IverksettService(
         )
         opprettHentStatusFraIverksettingTask(behandling, iverksettingId)
         iverksettClient.iverksett(dto)
-    }
-
-    private fun validerIkkeFremITid(måned: YearMonth) {
-        feilHvis(måned > YearMonth.now()) {
-            "Kan ikke iverksette for måned=$måned som er frem i tiden"
-        }
     }
 
     private fun markerAndelerFraForrieBehandlingSomUaktuelle(behandling: Saksbehandling) {

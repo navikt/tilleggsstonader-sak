@@ -34,7 +34,11 @@ class IverksettBehandlingMånedTask(
 
         validerErSisteBehandling(taskData.behandlingId)
 
-        iverksettService.iverksett(taskData.behandlingId, UUID.fromString(iverksettingId), taskData.måned)
+        val måned = taskData.måned
+        feilHvis(måned > YearMonth.now()) {
+            "Kan ikke iverksette for måned=$måned som er frem i tiden"
+        }
+        iverksettService.iverksett(taskData.behandlingId, UUID.fromString(iverksettingId), måned)
     }
 
     private fun validerErSisteBehandling(behandlingId: UUID) {
