@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringRequest
+import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -52,18 +52,18 @@ class AutomatiskJournalføringService(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @Transactional
-    fun håndterSøknad(automatiskJournalføringRequest: AutomatiskJournalføringRequest) {
-        val personIdent = automatiskJournalføringRequest.personIdent
-        val stønadstype = automatiskJournalføringRequest.stønadstype
+    fun håndterSøknad(request: HåndterSøknadRequest) {
+        val personIdent = request.personIdent
+        val stønadstype = request.stønadstype
 
         if (kanOppretteBehandling(personIdent, stønadstype)) {
             automatiskJournalførTilBehandling(
-                journalpostId = automatiskJournalføringRequest.journalpostId,
+                journalpostId = request.journalpostId,
                 personIdent = personIdent,
                 stønadstype = stønadstype,
             )
         } else {
-            håndterSøknadSomIkkeKanAutomatiskJournalføres(automatiskJournalføringRequest)
+            håndterSøknadSomIkkeKanAutomatiskJournalføres(request)
         }
     }
 
@@ -101,7 +101,7 @@ class AutomatiskJournalføringService(
         )
     }
 
-    private fun håndterSøknadSomIkkeKanAutomatiskJournalføres(request: AutomatiskJournalføringRequest) {
+    private fun håndterSøknadSomIkkeKanAutomatiskJournalføres(request: HåndterSøknadRequest) {
         val journalpost = journalpostService.hentJournalpost(request.journalpostId)
         taskService.save(
             OpprettOppgaveTask.opprettTask(
