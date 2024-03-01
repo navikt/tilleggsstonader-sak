@@ -59,6 +59,7 @@ class IverksettServiceTest : IntegrationTest() {
     val forrigeMåned = YearMonth.now().minusMonths(1)
     val nåværendeMåned = YearMonth.now()
     val nesteMåned = YearMonth.now().plusMonths(1)
+    val nestNesteMåned = YearMonth.now().plusMonths(2)
 
     val iverksettingDto = slot<IverksettDto>()
 
@@ -79,7 +80,7 @@ class IverksettServiceTest : IntegrationTest() {
         val behandling =
             testoppsettService.opprettBehandlingMedFagsak(behandling(resultat = BehandlingResultat.AVSLÅTT))
 
-        iverksettService.iverksett(behandling.id, behandling.id)
+        iverksettService.iverksett(behandling.id, behandling.id, nesteMåned)
 
         verify(exactly = 0) { iverksettClient.iverksett(any()) }
     }
@@ -91,7 +92,7 @@ class IverksettServiceTest : IntegrationTest() {
         lagreTotrinnskontroll(behandling)
         val tilkjentYtelse = tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
-        iverksettService.iverksett(behandling.id, behandling.id)
+        iverksettService.iverksett(behandling.id, behandling.id, nesteMåned)
 
         verify(exactly = 1) { iverksettClient.iverksett(any()) }
 
@@ -114,17 +115,6 @@ class IverksettServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class Validering {
-
-        @Test
-        fun `kan ikke iverksette frem i tiden`() {
-            assertThatThrownBy {
-                iverksettService.iverksett(UUID.randomUUID(), UUID.randomUUID(), YearMonth.now().plusMonths(1))
-            }.hasMessageContaining("som er frem i tiden")
-        }
-    }
-
-    @Nested
     inner class IverksettingFlyt {
 
         val fagsak = fagsak()
@@ -140,9 +130,9 @@ class IverksettServiceTest : IntegrationTest() {
             )
 
         val tilkjentYtelse =
-            tilkjentYtelse(behandlingId = behandling.id, startdato = null, andeler = lag3Andeler(behandling))
+            tilkjentYtelse(behandlingId = behandling.id, startdato = null, andeler = lagAndeler(behandling))
         val tilkjentYtelse2 =
-            tilkjentYtelse(behandlingId = behandling2.id, startdato = null, andeler = lag3Andeler(behandling2))
+            tilkjentYtelse(behandlingId = behandling2.id, startdato = null, andeler = lagAndeler(behandling2))
 
         @BeforeEach
         fun setUp() {
@@ -157,12 +147,11 @@ class IverksettServiceTest : IntegrationTest() {
             val andeler = hentAndeler(behandling)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
-
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
-
+            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+            andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
-            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned)
+            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
 
             assertThat(iverksettingDto.captured.forrigeIverksetting).isNull()
         }
@@ -171,17 +160,16 @@ class IverksettServiceTest : IntegrationTest() {
         fun `første behandling  - andre iverksetting`() {
             val iverksettingId = UUID.randomUUID()
             oppdaterAndelerTilOk(behandling)
-            iverksettService.iverksett(behandling.id, iverksettingId, nåværendeMåned)
+            iverksettService.iverksett(behandling.id, iverksettingId, nesteMåned)
 
             val andeler = hentAndeler(behandling)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
+            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
+            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
+            andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
-
-            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
-
-            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
+            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned, nesteMåned)
 
             assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId).isEqualTo(behandling.id)
             assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling.id)
@@ -198,12 +186,11 @@ class IverksettServiceTest : IntegrationTest() {
             val andeler = hentAndeler(behandling2)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
-
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
-
+            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+            andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
-            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned)
+            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
 
             assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId).isEqualTo(behandling.id)
             assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling.id)
@@ -213,7 +200,7 @@ class IverksettServiceTest : IntegrationTest() {
         fun `andre behandling - første iverksetting med 2 iverksettinger`() {
             val iverksettingIdBehandling1 = UUID.randomUUID()
             oppdaterAndelerTilOk(behandling)
-            iverksettService.iverksett(behandling.id, iverksettingIdBehandling1, nåværendeMåned)
+            iverksettService.iverksett(behandling.id, iverksettingIdBehandling1, nesteMåned)
 
             testoppsettService.lagre(behandling2)
             tilkjentYtelseRepository.insert(tilkjentYtelse2)
@@ -224,12 +211,11 @@ class IverksettServiceTest : IntegrationTest() {
             val andeler = hentAndeler(behandling2)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
-
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
-
+            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+            andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
-            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned)
+            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
 
             assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId).isEqualTo(behandling.id)
             assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(iverksettingIdBehandling1)
@@ -247,17 +233,16 @@ class IverksettServiceTest : IntegrationTest() {
 
             iverksettService.iverksettBehandlingFørsteGang(behandling2.id)
             oppdaterAndelerTilOk(behandling2)
-            iverksettService.iverksett(behandling2.id, iverksettingId)
+            iverksettService.iverksett(behandling2.id, iverksettingId, nesteMåned)
 
             val andeler = hentAndeler(behandling2)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling2.id)
+            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling2.id)
+            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
+            andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
-
-            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
-
-            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
+            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned, nesteMåned)
 
             assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId).isEqualTo(behandling2.id)
             assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling2.id)
@@ -309,8 +294,9 @@ class IverksettServiceTest : IntegrationTest() {
             val andeler = hentAndeler(behandling)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
-            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
+            andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
+            andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
         }
 
         @Test
@@ -345,7 +331,7 @@ class IverksettServiceTest : IntegrationTest() {
             val andeler = hentAndeler(behandling)
 
             assertThat(andeler).hasSize(2)
-            val andelForrigeMåned = andeler.forMåned(forrigeMåned)
+            val andelForrigeMåned = andeler.forMåned(nåværendeMåned)
             andelForrigeMåned.assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
             assertThat(andelForrigeMåned.beløp).isEqualTo(0)
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
@@ -386,10 +372,11 @@ class IverksettServiceTest : IntegrationTest() {
         andelTilkjentYtelseRepository.updateAll(oppdaterteAndeler)
     }
 
-    private fun lag3Andeler(behandling: Behandling) = arrayOf(
+    private fun lagAndeler(behandling: Behandling) = arrayOf(
         lagAndel(behandling, forrigeMåned),
         lagAndel(behandling, nåværendeMåned),
         lagAndel(behandling, nesteMåned),
+        lagAndel(behandling, nestNesteMåned),
     )
 
     private fun lagAndel(behandling: Behandling, måned: YearMonth, beløp: Int = 10) = andelTilkjentYtelse(
