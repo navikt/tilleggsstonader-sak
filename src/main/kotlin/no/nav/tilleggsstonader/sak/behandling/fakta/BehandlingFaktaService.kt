@@ -33,6 +33,7 @@ class BehandlingFaktaService(
             hovedytelse = mapHovedytelse(søknad),
             aktivitet = mapAktivitet(søknad),
             barn = mapBarn(grunnlagsdata, søknad, behandlingId),
+            dokumentasjon = søknad?.let { mapDokumentasjon(it) },
         )
     }
 
@@ -83,6 +84,18 @@ class BehandlingFaktaService(
                 },
             )
         }
+    }
+
+    private fun mapDokumentasjon(søknad: SøknadBarnetilsyn): FaktaDokumentasjon {
+        val dokumentasjon = søknad.data.dokumentasjon.map { dokumentasjon ->
+            Dokumentasjon(
+                type = dokumentasjon.type.tittel,
+                harSendtInn = dokumentasjon.harSendtInn,
+                dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
+                identBarn = dokumentasjon.identBarn,
+            )
+        }
+        return FaktaDokumentasjon(søknad.journalpostId, dokumentasjon)
     }
 
     private fun validerFinnesGrunnlagsdataForAlleBarnISøknad(

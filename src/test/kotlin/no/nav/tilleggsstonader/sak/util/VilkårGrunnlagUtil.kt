@@ -20,6 +20,7 @@ object VilkårGrunnlagUtil {
                 søknadsgrunnlag = null,
             ),
             barn = barn,
+            dokumentasjon = null,
         )
 
     fun grunnlagBarn(
