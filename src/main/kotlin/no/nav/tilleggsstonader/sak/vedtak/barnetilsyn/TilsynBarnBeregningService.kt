@@ -3,10 +3,11 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.erSortert
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
-import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.libs.utils.VirkedagerProvider
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -18,7 +19,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktivitet
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.time.YearMonth
 import java.util.UUID
 
 /**
@@ -89,8 +89,8 @@ class TilsynBarnBeregningService(
         aktiviteter: List<Aktivitet>,
         utgifterPerBarn: Map<UUID, List<Utgift>>,
     ): List<Beregningsgrunnlag> {
-        val stønadsperioderPerMåned = stønadsperioder.tilÅrMåneder()
-        val utgifterPerMåned = tilUtgifterPerMåned(utgifterPerBarn)
+        val stønadsperioderPerMåned = stønadsperioder.tilÅrMåned()
+        val utgifterPerMåned = utgifterPerBarn.tilÅrMåned()
         val aktiviteterPerMånedPerType = aktiviteter.tilAktiviteterPerMånedPerType()
 
         return stønadsperioderPerMåned.entries.mapNotNull { (måned, stønadsperioder) ->
@@ -133,19 +133,6 @@ class TilsynBarnBeregningService(
             ?: error("Finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som passer med stønadsperiode")
     }
 
-    private fun List<Aktivitet>.tilAktiviteterPerMånedPerType(): Map<YearMonth, Map<AktivitetType, List<Aktivitet>>> {
-        return this
-            .flatMap { stønadsperiode ->
-                stønadsperiode.splitPerMåned { måned, periode ->
-                    periode.copy(
-                        fom = maxOf(periode.fom, måned.atDay(1)),
-                        tom = minOf(periode.tom, måned.atEndOfMonth()),
-                    )
-                }
-            }
-            .groupBy({ it.first }, { it.second }).mapValues { it.value.groupBy { it.type } }
-    }
-
     // TODO: Ta inn relevante aktiviteter og finn antall dager det skal utbetales for
     private fun antallDager(stønadsperiode: StønadsperiodeDto): Int {
         return stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
@@ -154,40 +141,6 @@ class TilsynBarnBeregningService(
     private fun finnAktiviteter(behandlingId: UUID): List<Aktivitet> {
         return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
             .tilAktivitet()
-    }
-
-    /**
-     * Vi skal hådtere
-     * 01.08 - 08.08,
-     * 20.08 - 31.08
-     * Er det enklast å returnere List<Pair<YearMonth, AntallDager>> som man sen grupperer per årmåned ?
-     *
-     * Del opp utgiftsperioder i atomiske deler (mnd).
-     * Eksempel: 1stk UtgiftsperiodeDto fra januar til mars deles opp i 3:
-     * listOf(UtgiftsMåned(jan), UtgiftsMåned(feb), UtgiftsMåned(mars))
-     */
-    fun List<StønadsperiodeDto>.tilÅrMåneder(): Map<YearMonth, List<StønadsperiodeDto>> {
-        return this
-            .flatMap { stønadsperiode ->
-                stønadsperiode.splitPerMåned { måned, periode ->
-                    periode.copy(
-                        fom = maxOf(periode.fom, måned.atDay(1)),
-                        tom = minOf(periode.tom, måned.atEndOfMonth()),
-                    )
-                }
-            }
-            .groupBy({ it.first }, { it.second })
-    }
-
-    /**
-     * Splitter utgifter per måned
-     */
-    private fun tilUtgifterPerMåned(
-        utgifterPerBarn: Map<UUID, List<Utgift>>,
-    ): Map<YearMonth, List<UtgiftBarn>> {
-        return utgifterPerBarn.entries.flatMap { (barnId, utgifter) ->
-            utgifter.flatMap { utgift -> utgift.splitPerMåned { _, periode -> UtgiftBarn(barnId, periode.utgift) } }
-        }.groupBy({ it.first }, { it.second })
     }
 
     private fun validerPerioder(
