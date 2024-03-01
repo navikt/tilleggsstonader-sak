@@ -69,13 +69,13 @@ class IverksettService(
     }
 
     private fun andelerForFørsteIverksettingAvBehandling(tilkjentYtelse: TilkjentYtelse): Collection<AndelTilkjentYtelse> {
-        val nullMåned = YearMonth.now()
-        val andelerTilIverksetting = finnAndelerTilIverksetting(tilkjentYtelse, tilkjentYtelse.behandlingId, nullMåned)
+        val måned = YearMonth.now()
+        val andelerTilIverksetting = finnAndelerTilIverksetting(tilkjentYtelse, tilkjentYtelse.behandlingId, måned)
 
         return andelerTilIverksetting.ifEmpty {
             val iverksetting = Iverksetting(tilkjentYtelse.behandlingId, LocalDateTime.now())
 
-            listOf(tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, nullMåned))
+            listOf(tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned))
         }
     }
 
