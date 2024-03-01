@@ -13,7 +13,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaMapper
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
+import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
 import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.mockVilkårGrunnlagDto
@@ -63,14 +64,14 @@ internal class VilkårServiceTest {
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
     private val barnOver10år = FnrGenerator.generer(Year.now().minusYears(11).value, 1, 13)
 
-    private val søknad = SøknadsskjemaMapper.map(
+    private val søknad = SøknadsskjemaBarnetilsynMapper.map(
         SøknadUtil.søknadskjemaBarnetilsyn(
             barnMedBarnepass = listOf(
                 barnMedBarnepass(ident = barnUnder9år),
                 barnMedBarnepass(ident = barnOver10år),
             ),
         ),
-        "id",
+        lagJournalpost(),
     )
     private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
     private val behandling = behandling(fagsak(), BehandlingStatus.OPPRETTET, årsak = BehandlingÅrsak.PAPIRSØKNAD)
