@@ -5,15 +5,21 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariant
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.søknad.Dokument
+import no.nav.tilleggsstonader.kontrakter.søknad.DokumentasjonFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
@@ -33,6 +39,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import org.springframework.context.annotation.Profile
+import org.springframework.core.env.Environment
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -52,6 +59,7 @@ class OpprettTestBehandlingController(
     private val barnService: BarnService,
     private val søknadService: SøknadService,
     private val taskService: TaskService,
+    private val environment: Environment,
 ) {
 
     @Transactional
@@ -92,6 +100,7 @@ class OpprettTestBehandlingController(
                 årsak = null,
             )
         }
+        val dokumentasjon = dokumentasjon()
         val skjemaBarnetilsyn = SøknadsskjemaBarnetilsyn(
             hovedytelse = HovedytelseAvsnitt(
                 hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
@@ -109,7 +118,7 @@ class OpprettTestBehandlingController(
             barn = BarnAvsnitt(
                 barnMedBarnepass = barnMedBarnepass,
             ),
-            dokumentasjon = emptyList(),
+            dokumentasjon = dokumentasjon,
         )
         val skjema = Søknadsskjema(
             ident = fagsak.hentAktivIdent(),
@@ -117,10 +126,44 @@ class OpprettTestBehandlingController(
             språk = Språkkode.NB,
             skjema = skjemaBarnetilsyn,
         )
-        val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
+        val journalpost = lagJournalpost(dokumentasjon)
         val søknad = søknadService.lagreSøknad(behandling.id, journalpost, skjema)
         opprettBarn(behandling, søknad)
     }
+
+    /**
+     * Lager kun dokumentasjon for lokal kjøring for å ikke ha lenker til dokument som ikke finnes
+     */
+    private fun dokumentasjon() =
+        if (environment.activeProfiles.contains("local")) listOf(lagDokumentasjon()) else emptyList()
+
+    private fun lagJournalpost(dokumentasjon: List<DokumentasjonFelt>) = Journalpost(
+        journalpostId = "TESTJPID",
+        journalposttype = Journalposttype.I,
+        journalstatus = Journalstatus.FERDIGSTILT,
+        dokumenter = dokumentasjon.flatMap { dokumentasjonFelt ->
+            dokumentasjonFelt.opplastedeVedlegg.map {
+                DokumentInfo(
+                    // denne er brukt i mock for å kunne mocke journalpost med dokument med samme id lokalt
+                    dokumentInfoId = "0a53867a-3d6e-4947-b5de-9578ecbdf03d",
+                    tittel = dokumentasjonFelt.type.tittel,
+                    dokumentvarianter = listOf(Dokumentvariant(Dokumentvariantformat.ARKIV, it.id.toString(), true))
+                )
+            }
+        },
+    )
+
+    private fun lagDokumentasjon(): DokumentasjonFelt = DokumentasjonFelt(
+        type = Vedleggstype.UTGIFTER_PASS_ANNET,
+        harSendtInn = true,
+        opplastedeVedlegg = listOf(
+            Dokument(
+                id = UUID.randomUUID(),
+                navn = "navn.pdf",
+            ),
+        ),
+        label = "En label",
+    )
 
     // Oppretter BehandlingBarn for alle barn fra PDL for å få et vilkår per barn
     private fun opprettBarn(behandling: Behandling, søknad: SøknadBarnetilsyn) {
