@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import java.util.UUID
 
 object JournalpostUtil {
@@ -21,17 +20,9 @@ object JournalpostUtil {
 
     fun lagDokument(
         dokumentInfoId: String = UUID.randomUUID().toString(),
-        vedlegg: List<LogiskVedlegg> = emptyList(),
+        tittel: String,
     ) = DokumentInfo(
         dokumentInfoId = dokumentInfoId,
-        logiskeVedlegg = vedlegg,
-    )
-
-    fun lagVedlegg(
-        logiskVedleggId: String,
-        tittel: String,
-    ) = LogiskVedlegg(
-        logiskVedleggId = logiskVedleggId,
         tittel = tittel,
     )
 }

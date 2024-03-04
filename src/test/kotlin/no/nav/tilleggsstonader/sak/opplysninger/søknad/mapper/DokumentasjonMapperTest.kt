@@ -3,10 +3,8 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper
 import no.nav.tilleggsstonader.kontrakter.søknad.Dokument
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Vedlegg
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagDokument
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
-import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagVedlegg
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.lagDokumentasjon
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
 import org.assertj.core.api.Assertions.assertThat
@@ -28,12 +26,8 @@ class DokumentasjonMapperTest {
 
     val journalpost = lagJournalpost(
         dokumenter = listOf(
-            lagDokument(
-                vedlegg = listOf(
-                    lagVedlegg("vedlegg1", vedlegg1.id.toString()),
-                    lagVedlegg("vedlegg2", vedlegg2.id.toString()),
-                ),
-            ),
+            lagDokument("vedlegg1", vedlegg1.id.toString()),
+            lagDokument("vedlegg2", vedlegg2.id.toString()),
         ),
     )
 
@@ -44,13 +38,13 @@ class DokumentasjonMapperTest {
             Dokumentasjon(
                 type = Vedleggstype.UTGIFTER_PASS_SFO_AKS_BARNEHAGE,
                 harSendtInn = false,
-                vedlegg = listOf(Vedlegg("vedlegg1")),
+                dokumenter = listOf(no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument("vedlegg1")),
                 identBarn = null,
             ),
             Dokumentasjon(
                 type = Vedleggstype.UTGIFTER_PASS_SFO_AKS_BARNEHAGE,
                 harSendtInn = true,
-                vedlegg = listOf(Vedlegg("vedlegg2")),
+                dokumenter = listOf(no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument("vedlegg2")),
                 identBarn = "barnId",
             ),
         )
@@ -60,6 +54,6 @@ class DokumentasjonMapperTest {
     fun `skal feile hvis man ikke finner vedlegg i journalpost`() {
         assertThatThrownBy {
             DokumentasjonMapper.mapDokumentasjon(skjema, lagJournalpost())
-        }.hasMessageContaining("Finner ikke logisk vedlegg i journalpost")
+        }.hasMessageContaining("Finner ikke vedlegg i journalpost")
     }
 }

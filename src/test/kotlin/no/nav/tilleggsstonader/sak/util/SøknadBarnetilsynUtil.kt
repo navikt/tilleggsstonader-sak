@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnit
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Vedlegg
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -68,8 +68,8 @@ object SøknadBarnetilsynUtil {
     private fun lagDokumentasjon(): Dokumentasjon = Dokumentasjon(
         type = Vedleggstype.UTGIFTER_PASS_ANNET,
         harSendtInn = true,
-        vedlegg = listOf(
-            Vedlegg("688ad1dc-e35e-4ab8-a534-17c6e691463f"),
+        dokumenter = listOf(
+            Dokument("688ad1dc-e35e-4ab8-a534-17c6e691463f"),
         ),
     )
 

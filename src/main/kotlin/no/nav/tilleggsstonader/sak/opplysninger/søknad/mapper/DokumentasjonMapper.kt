@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Vedlegg
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument
 
 object DokumentasjonMapper {
     /**
@@ -17,19 +17,19 @@ object DokumentasjonMapper {
             Dokumentasjon(
                 type = it.type,
                 harSendtInn = it.harSendtInn,
-                vedlegg = it.opplastedeVedlegg.map { dokument ->
+                dokumenter = it.opplastedeVedlegg.map { dokument ->
                     val dokumentId = dokument.id
                     vedlegg[dokumentId.toString()]
-                        ?: error("Finner ikke logisk vedlegg i journalpost=${journalpost.journalpostId} med tittel=$dokumentId")
+                        ?: error("Finner ikke vedlegg i journalpost=${journalpost.journalpostId} med tittel=$dokumentId")
                 },
                 identBarn = it.barnId,
             )
         }
     }
 
-    private fun mapVedleggPåId(journalpost: Journalpost): Map<String, Vedlegg> {
-        return journalpost.dokumenter?.mapNotNull {
-            it.logiskeVedlegg?.map { it.tittel to Vedlegg(id = it.logiskVedleggId) }
-        }?.flatten()?.toMap() ?: emptyMap()
+    private fun mapVedleggPåId(journalpost: Journalpost): Map<String, Dokument> {
+        return journalpost.dokumenter?.mapNotNull { dokumentInfo ->
+            dokumentInfo.tittel?.let { it to Dokument(dokumentInfoId = dokumentInfo.dokumentInfoId) }
+        }?.toMap() ?: emptyMap()
     }
 }
