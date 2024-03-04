@@ -42,7 +42,7 @@ class VilkårperiodeDtoTest {
                 delvilkår = DelvilkårMålgruppe(
                     medlemskap = DelvilkårVilkårperiode.Vurdering(
                         svar = null,
-                        begrunnelse = null,
+                        begrunnelse = if (resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) "begrunnelse" else null,
                         resultat = resultat,
                     ),
                 ),
