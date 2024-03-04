@@ -26,7 +26,7 @@ object VilkårGrunnlagUtil {
         ident: String = "123",
         barnId: UUID = UUID.randomUUID(),
         registergrunnlag: RegistergrunnlagBarn =
-            RegistergrunnlagBarn(navn = "navn", fødselsdato = null, dødsdato = null),
+            RegistergrunnlagBarn(navn = "navn", alder = null, dødsdato = null),
         søknadgrunnlag: SøknadsgrunnlagBarn? = null,
     ) = FaktaBarn(
         ident = ident,

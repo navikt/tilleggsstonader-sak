@@ -76,7 +76,7 @@ class BehandlingFaktaService(
                 barnId = behandlingBarn.id,
                 registergrunnlag = RegistergrunnlagBarn(
                     navn = barn.navn.visningsnavn(),
-                    fødselsdato = barn.fødselsdato,
+                    alder = barn.alder,
                     dødsdato = barn.dødsdato,
                 ),
                 søknadgrunnlag = søknadBarnPåIdent[barn.ident]?.let { søknadBarn ->
