@@ -40,6 +40,7 @@ data class FaktaBarn(
 
 data class RegistergrunnlagBarn(
     val navn: String,
+    val fødselsdato: LocalDate?,
     val dødsdato: LocalDate?,
 )
 
