@@ -8,12 +8,12 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument
 import java.time.LocalDate
 import java.time.LocalDateTime
 
