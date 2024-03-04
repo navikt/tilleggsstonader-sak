@@ -1,8 +1,5 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl.dto
 
-import java.time.LocalDate
-import java.time.Period
-
 fun Navn.visningsnavn(): String {
     return if (mellomnavn == null) {
         "$fornavn $etternavn"
@@ -18,8 +15,6 @@ fun Personnavn.visningsnavn(): String {
         "$fornavn $mellomnavn $etternavn"
     }
 }
-
-fun LocalDate.tilAlder() = Period.between(this, LocalDate.now()).years
 
 fun List<Navn>.gjeldende(): Navn = this.single()
 fun List<Bostedsadresse>.gjeldende(): Bostedsadresse? = this.find { !it.metadata.historisk }

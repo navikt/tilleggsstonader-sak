@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.tilAlder
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -26,7 +25,7 @@ object GrunnlagsdataUtil {
     fun lagGrunnlagsdataBarn(
         ident: String = "1",
         navn: Navn = PdlTestdataHelper.lagNavn(),
-        alder: Int? = PdlTestdataHelper.fødsel().fødselsdato?.tilAlder(),
+        alder: Int? = antallÅrSiden(PdlTestdataHelper.fødsel().fødselsdato),
         dødsdato: LocalDate? = null,
     ) = GrunnlagsdataBarn(
         ident = ident,

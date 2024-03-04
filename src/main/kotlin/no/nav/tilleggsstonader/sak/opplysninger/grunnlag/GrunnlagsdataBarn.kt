@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonForelderBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.tilAlder
+import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import java.time.LocalDate
 
 data class GrunnlagsdataBarn(
@@ -17,7 +17,7 @@ fun Map<String, PdlPersonForelderBarn>.tilGrunnlagsdataBarn() = entries.map { (i
     GrunnlagsdataBarn(
         ident = ident,
         navn = barn.navn.gjeldende(),
-        alder = barn.fødsel.gjeldende().fødselsdato?.tilAlder(),
+        alder = antallÅrSiden(barn.fødsel.gjeldende().fødselsdato),
         dødsdato = barn.dødsfall.gjeldende()?.dødsdato,
     )
 }
