@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 @Table("vilkar_periode")
 data class Vilkårperiode(
@@ -108,7 +109,13 @@ enum class ResultatDelvilkårperiode {
 
 data class DelvilkårMålgruppe(
     val medlemskap: Vurdering,
-) : DelvilkårVilkårperiode()
+) : DelvilkårVilkårperiode() {
+    init {
+        brukerfeilHvis(medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && medlemskap.begrunnelse == null) {
+            "Mangler begrunnelse for ikke oppfylt medlemskap"
+        }
+    }
+}
 
 data class DelvilkårAktivitet(
     val lønnet: Vurdering,
