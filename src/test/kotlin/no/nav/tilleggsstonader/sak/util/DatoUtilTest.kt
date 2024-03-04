@@ -17,13 +17,13 @@ class DatoUtilTest {
     }
 
     @Test
-    fun `antallÅrSiden skal returnere 0 hvis vi sender inn dagens morgendagensdato for ett år siden`() {
+    fun `antallÅrSiden skal returnere 0 hvis vi sender inn morgendagens dato for ett år siden`() {
         val morgendagensDatoIFjor = LocalDate.now().minusYears(1).plusDays(1)
         assertThat(antallÅrSiden(morgendagensDatoIFjor)).isEqualTo(0)
     }
 
     @Test
-    fun `antallÅrSiden skal returnere 1 hvis vi sender inn gårsdagens dato minus ett år`() {
+    fun `antallÅrSiden skal returnere 1 hvis vi sender inn gårsdagens dato for ett år siden`() {
         val gårsdagensDatoIFjor = LocalDate.now().minusYears(1).minusDays(1)
         assertThat(antallÅrSiden(gårsdagensDatoIFjor)).isEqualTo(1)
     }
