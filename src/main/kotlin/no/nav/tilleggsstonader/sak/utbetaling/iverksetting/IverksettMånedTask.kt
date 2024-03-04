@@ -51,7 +51,7 @@ class IverksettMånedTask(
             }
 
             return Task(TYPE, måned.toString()).copy(metadataWrapper = PropertiesWrapper(properties))
-                .medTriggerTid(måned.atEndOfMonth().atTime(6, 4)) // TODO når skal vi iverksette
+                .medTriggerTid(måned.atDay(1).atTime(6, 4))
         }
 
         const val TYPE = "IverksettMåned"
