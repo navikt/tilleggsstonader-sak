@@ -67,12 +67,12 @@ fun LocalDate.erEttÅrEllerMer(): Boolean {
 
 fun LocalDate.er6MndEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolean {
     return this.er6MndEllerMer() &&
-            LocalDate.now() < this.plusDays(182).plusDays(numberOfDaysCutoff)
+        LocalDate.now() < this.plusDays(182).plusDays(numberOfDaysCutoff)
 }
 
 fun LocalDate.erEttÅrEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolean {
     return erEttÅrEllerMer() &&
-            LocalDate.now() <= this.plusYears(1).plusDays(numberOfDaysCutoff)
+        LocalDate.now() <= this.plusYears(1).plusDays(numberOfDaysCutoff)
 }
 
 fun LocalDateTime.harGåttAntallTimer(timer: Int) =
