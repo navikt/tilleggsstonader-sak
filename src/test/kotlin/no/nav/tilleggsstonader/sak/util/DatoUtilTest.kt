@@ -16,7 +16,6 @@ class DatoUtilTest {
         assertThat(antallÅrSiden(null)).isNull()
     }
 
-
     @Test
     fun `antallÅrSiden skal returnere 0 hvis vi sender inn dagens dato for ett år siden`() {
         val dagensDatoIFjor = LocalDate.now().minusYears(1)
