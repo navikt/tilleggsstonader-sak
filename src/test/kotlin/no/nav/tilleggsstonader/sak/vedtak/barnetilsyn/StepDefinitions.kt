@@ -62,33 +62,9 @@ class StepDefinitions {
 
     @Gitt("følgende støndsperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {
-        every { stønadsperiodeRepository.findAllByBehandlingId(behandlingId) } returns mapStønadsperioder(dataTable)
-        every {
-            vilkårperiodeRepository.findByBehandlingIdAndResultat(
-                behandlingId,
-                ResultatVilkårperiode.OPPFYLT,
-            )
-        } returns mapAktivitet(dataTable)
-    }
-
-    private fun mapStønadsperioder(dataTable: DataTable) = dataTable.mapRad { rad ->
-        Stønadsperiode(
-            behandlingId = behandlingId,
-            fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
-            tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-            målgruppe = parseValgfriEnum<MålgruppeType>(NøkkelBeregningTilsynBarn.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
-            aktivitet = parseValgfriEnum<AktivitetType>(NøkkelBeregningTilsynBarn.AKTIVITET, rad)
-                ?: AktivitetType.TILTAK,
-        )
-    }
-
-    private fun mapAktivitet(dataTable: DataTable) = dataTable.mapRad { rad ->
-        aktivitet(
-            behandlingId = behandlingId,
-            fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
-            tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-            type = parseValgfriEnum<AktivitetType>(NøkkelBeregningTilsynBarn.AKTIVITET, rad)
-                ?: AktivitetType.TILTAK,
+        every { stønadsperiodeRepository.findAllByBehandlingId(behandlingId) } returns mapStønadsperioder(
+            behandlingId,
+            dataTable,
         )
     }
 
@@ -100,7 +76,7 @@ class StepDefinitions {
             Utgift(
                 fom = parseÅrMåned(DomenenøkkelFelles.FOM, rad),
                 tom = parseÅrMåned(DomenenøkkelFelles.TOM, rad),
-                utgift = parseInt(NøkkelBeregningTilsynBarn.UTGIFT, rad),
+                utgift = parseInt(BeregningNøkler.UTGIFT, rad),
             )
         }
     }
@@ -124,14 +100,14 @@ class StepDefinitions {
         assertThat(exception).isNull()
         val forventetBeregningsresultat = dataTable.mapRad { rad ->
             ForventetBeregningsresultat(
-                dagsats = parseBigDecimal(NøkkelBeregningTilsynBarn.DAGSATS, rad),
-                månedsbeløp = parseValgfriInt(NøkkelBeregningTilsynBarn.MÅNEDSBELØP, rad),
+                dagsats = parseBigDecimal(BeregningNøkler.DAGSATS, rad),
+                månedsbeløp = parseValgfriInt(BeregningNøkler.MÅNEDSBELØP, rad),
                 grunnlag = ForventetBeregningsgrunnlag(
-                    måned = parseÅrMåned(NøkkelBeregningTilsynBarn.MÅNED, rad),
-                    makssats = parseValgfriInt(NøkkelBeregningTilsynBarn.MAKSSATS, rad),
-                    antallDagerTotal = parseValgfriInt(NøkkelBeregningTilsynBarn.ANTALL_DAGER, rad),
-                    utgifterTotal = parseValgfriInt(NøkkelBeregningTilsynBarn.UTGIFT, rad),
-                    antallBarn = parseValgfriInt(NøkkelBeregningTilsynBarn.ANTALL_BARN, rad),
+                    måned = parseÅrMåned(BeregningNøkler.MÅNED, rad),
+                    makssats = parseValgfriInt(BeregningNøkler.MAKSSATS, rad),
+                    antallDagerTotal = parseValgfriInt(BeregningNøkler.ANTALL_DAGER, rad),
+                    utgifterTotal = parseValgfriInt(BeregningNøkler.UTGIFT, rad),
+                    antallBarn = parseValgfriInt(BeregningNøkler.ANTALL_BARN, rad),
                 ),
             )
         }
