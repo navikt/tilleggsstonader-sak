@@ -6,8 +6,12 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
   Scenario: Sender inn tomme utgifter
 
     Gitt følgende støndsperioder
-      | Fom     | Tom     |
-      | 01.2023 | 02.2023 |
+      | Fom     | Tom     | Målgruppe | Aktivitet |
+      | 01.2023 | 02.2023 | AAP       | TILTAK    |
+
+    Gitt følgende aktiviteter
+      | Fom     | Tom     | Aktivitet | Aktivitetsdager |
+      | 01.2023 | 02.2023 | TILTAK    | 5               |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom | Tom | Utgift |
@@ -19,8 +23,12 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
   Scenario: Sender inn usorterte utgifter
 
     Gitt følgende støndsperioder
-      | Fom     | Tom     |
-      | 01.2023 | 02.2023 |
+      | Fom     | Tom     | Målgruppe | Aktivitet |
+      | 01.2023 | 02.2023 | AAP       | TILTAK    |
+
+    Gitt følgende aktiviteter
+      | Fom     | Tom     | Aktivitet | Aktivitetsdager |
+      | 01.2023 | 02.2023 | TILTAK    | 5               |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -34,8 +42,12 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
   Scenario: Sender inn overlappende utgiftsperioder
 
     Gitt følgende støndsperioder
-      | Fom     | Tom     |
-      | 01.2023 | 03.2023 |
+      | Fom     | Tom     | Målgruppe | Aktivitet |
+      | 01.2023 | 03.2023 | AAP       | TILTAK    |
+
+    Gitt følgende aktiviteter
+      | Fom     | Tom     | Aktivitet | Aktivitetsdager |
+      | 01.2023 | 03.2023 | TILTAK    | 5               |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -49,8 +61,12 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
   Scenario: Sender inn 0 som utgift
 
     Gitt følgende støndsperioder
-      | Fom     | Tom     |
-      | 01.2023 | 03.2023 |
+      | Fom     | Tom     | Målgruppe | Aktivitet |
+      | 01.2023 | 03.2023 | AAP       | TILTAK    |
+
+    Gitt følgende aktiviteter
+      | Fom     | Tom     | Aktivitet | Aktivitetsdager |
+      | 01.2023 | 03.2023 | TILTAK    | 5               |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -63,8 +79,12 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
   Scenario: Sender inn negativ utgift
 
     Gitt følgende støndsperioder
-      | Fom     | Tom     |
-      | 01.2023 | 03.2023 |
+      | Fom     | Tom     | Målgruppe | Aktivitet |
+      | 01.2023 | 03.2023 | AAP       | TILTAK    |
+
+    Gitt følgende aktiviteter
+      | Fom     | Tom     | Aktivitet | Aktivitetsdager |
+      | 01.2023 | 03.2023 | TILTAK    | 5               |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
