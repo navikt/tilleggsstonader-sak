@@ -7,7 +7,6 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.barnIder
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
@@ -17,11 +16,9 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -29,22 +26,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeR
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
-
-private enum class NøkkelBeregningTilsynBarn(
-    override val nøkkel: String,
-) : Domenenøkkel {
-    MÅNED("Måned"),
-    ANTALL_DAGER("Antall dager"),
-    ANTALL_BARN("Antall barn"),
-    UTGIFT("Utgift"),
-    DAGSATS("Dagsats"),
-    MÅNEDSBELØP("Månedsbeløp"),
-    MAKSSATS("Makssats"),
-    AKTIVITET("Aktivitet"),
-    MÅLGRUPPE("Målgruppe"),
-}
 
 class StepDefinitions {
 
@@ -157,13 +141,13 @@ class StepDefinitions {
     fun `forvent følgende stønadsperioder`(månedStr: String, dataTable: DataTable) {
         assertThat(exception).isNull()
         val måned = parseÅrMåned(månedStr)
-        val forventeteStønadsperioder = mapStønadsperioder(dataTable)
+        val forventeteStønadsperioder = mapStønadsperioder(behandlingId, dataTable)
 
         val perioder = beregningsresultat!!.perioder.find { it.grunnlag.måned == måned }
             ?.grunnlag?.stønadsperioderGrunnlag?.map { it.stønadsperiode }
             ?: error("Finner ikke beregningsresultat for $måned")
 
-        forventeteStønadsperioder.forEachIndexed { index, resultat ->
+        perioder.forEachIndexed { index, resultat ->
             val forventetResultat = forventeteStønadsperioder[index]
             try {
                 assertThat(resultat.fom).`as` { "fom" }.isEqualTo(forventetResultat.fom)
@@ -177,6 +161,46 @@ class StepDefinitions {
         assertThat(perioder)
             .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
             .containsExactlyElementsOf(forventeteStønadsperioder.tilSortertDto())
+    }
+
+    @Så("forvent følgende stønadsperiodeGrunnlag for: {}")
+    fun `forvent følgende stønadsperiodeGrunnlag`(månedStr: String, dataTable: DataTable) {
+        assertThat(exception).isNull()
+        val måned = parseÅrMåned(månedStr)
+        val forventeteStønadsperioder = parseForventedeStønadsperioder(dataTable)
+
+        val perioder = beregningsresultat!!.perioder.find { it.grunnlag.måned == måned }
+            ?.grunnlag?.stønadsperioderGrunnlag
+            ?: error("Finner ikke beregningsresultat for $måned")
+
+        perioder.forEachIndexed { index, resultat ->
+            val forventetResultat = forventeteStønadsperioder[index]
+            try {
+                assertThat(resultat.stønadsperiode.fom).isEqualTo(forventetResultat.fom)
+                assertThat(resultat.stønadsperiode.tom).isEqualTo(forventetResultat.tom)
+                assertThat(resultat.stønadsperiode.målgruppe).isEqualTo(forventetResultat.målgruppe)
+                assertThat(resultat.stønadsperiode.aktivitet).isEqualTo(forventetResultat.aktivitet)
+                assertThat(resultat.aktiviteter.size).isEqualTo(forventetResultat.antallAktiviteter)
+                assertThat(resultat.antallDager).isEqualTo(forventetResultat.antallDager)
+            } catch (e: Throwable) {
+                logger.error("Feilet validering av rad ${index + 1}")
+                throw e
+            }
+        }
+    }
+
+    private fun parseForventedeStønadsperioder(dataTable: DataTable): List<ForventedeStønadsperioder> {
+        return dataTable.mapRad { rad ->
+            ForventedeStønadsperioder(
+                fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
+                tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
+                målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+                aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
+                    ?: AktivitetType.TILTAK,
+                antallAktiviteter = parseInt(BeregningNøkler.ANTALL_AKTIVITETER, rad),
+                antallDager = parseInt(BeregningNøkler.ANTALL_DAGER, rad),
+            )
+        }
     }
 }
 
@@ -192,4 +216,13 @@ data class ForventetBeregningsgrunnlag(
     val antallDagerTotal: Int?,
     val utgifterTotal: Int?,
     val antallBarn: Int?,
+)
+
+data class ForventedeStønadsperioder(
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType,
+    val antallAktiviteter: Int?,
+    val antallDager: Int?,
 )
