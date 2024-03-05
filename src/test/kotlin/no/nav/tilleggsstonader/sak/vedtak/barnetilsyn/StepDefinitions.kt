@@ -52,6 +52,16 @@ class StepDefinitions {
         )
     }
 
+    @Gitt("følgende aktiviteter")
+    fun `følgende aktiviteter`(dataTable: DataTable) {
+        every {
+            vilkårperiodeRepository.findByBehandlingIdAndResultat(
+                behandlingId,
+                ResultatVilkårperiode.OPPFYLT,
+            )
+        } returns mapAktiviteter(behandlingId, dataTable)
+    }
+
     @Gitt("følgende utgifter for barn med id: {}")
     fun `følgende utgifter`(barnId: Int, dataTable: DataTable) {
         val barnUuid = barnIder[barnId]!!
