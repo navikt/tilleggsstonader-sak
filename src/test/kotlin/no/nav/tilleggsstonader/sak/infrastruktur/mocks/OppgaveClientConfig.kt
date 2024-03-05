@@ -5,6 +5,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
@@ -68,9 +69,24 @@ class OppgaveClientConfig {
         }
 
         every { oppgaveClient.oppdaterOppgave(any()) } answers {
-            val oppdaterOppgave = firstArg<Oppgave>()
+            val oppdaterOppgave = firstArg<Oppgave>().let {
+                val eksisterendeOppgave = oppgavelager[it.id]!!
+                val versjon = it.versjon!!
+                feilHvis(versjon != eksisterendeOppgave.versjon, HttpStatus.CONFLICT) {
+                    "Oppgaven har endret seg siden du sist hentet oppgaver. versjon=$versjon (${eksisterendeOppgave.versjon}) " +
+                        "For å kunne gjøre endringer må du hente oppgaver på nytt."
+                }
+                eksisterendeOppgave.copy(
+                    versjon = versjon + 1,
+                    beskrivelse = it.beskrivelse ?: eksisterendeOppgave.beskrivelse,
+                    tilordnetRessurs = it.tilordnetRessurs ?: eksisterendeOppgave.tilordnetRessurs,
+                    mappeId = it.mappeId ?: eksisterendeOppgave.mappeId,
+                    fristFerdigstillelse = it.fristFerdigstillelse ?: eksisterendeOppgave.fristFerdigstillelse,
+                )
+            }
+
             oppgavelager[oppdaterOppgave.id] = oppdaterOppgave // Forenklet, dette er ikke det som skje ri integrasjoner
-            oppdaterOppgave.id
+            OppdatertOppgaveResponse(oppdaterOppgave.id, oppdaterOppgave.versjonEllerFeil())
         }
 
         mockFordeling(oppgaveClient, oppgavelager)
