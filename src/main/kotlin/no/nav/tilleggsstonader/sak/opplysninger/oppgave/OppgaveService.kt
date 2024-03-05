@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -85,8 +86,8 @@ class OppgaveService(
         behandlingId: UUID,
     ) = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
 
-    fun oppdaterOppgave(oppgave: Oppgave) {
-        oppgaveClient.oppdaterOppgave(oppgave)
+    fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse {
+        return oppgaveClient.oppdaterOppgave(oppgave)
     }
 
     /**
