@@ -93,12 +93,21 @@ object TilsynBeregningUtil {
         return periode
     }
 
+    /**
+     * Splitter en stønadsperiode opp i uker (kun hverdager inkludert)
+     * Antall dager i uken er oppad begrenset til antall dager i stønadsperioden som er innenfor uken
+     */
     fun StønadsperiodeDto.tilUke(): Map<Uke, PeriodeMedDager> {
         return this.splitPerUke { fom, tom ->
             antallDagerIPeriodeInklusiv(fom, tom)
         }
     }
 
+    /**
+     * Splitter en liste av aktiviteter opp i uker (kun hverdager inkludert)
+     * Antall dager i uken er oppad begrenset til det lavest av antall aktivitetsdager eller antall
+     * dager i aktivitetsperioden som er innenfor uken
+     */
     fun List<Aktivitet>.tilDagerPerUke(): Map<Uke, List<PeriodeMedDager>> {
         return this.map { aktivitet ->
             aktivitet.splitPerUke { fom, tom ->
