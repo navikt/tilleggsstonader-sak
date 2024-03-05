@@ -6,9 +6,13 @@ Egenskap: Verifisering av makssats
   Scenario: Makssats for 1 barn
 
     Gitt følgende støndsperioder
-      | Fom        | Tom        |
-      | 01.01.2023 | 31.01.2023 |
-      | 03.07.2023 | 03.07.2023 |
+      | Fom        | Tom        | Aktivitet | Målgruppe       |
+      | 01.01.2023 | 31.01.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | 03.07.2023 | 03.07.2023 | UTDANNING | OVERGANGSSTØNAD |
+
+    Gitt følgende aktiviteter
+      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
+      | 01.01.2023 | 30.07.2023 | UTDANNING | 5               |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -24,9 +28,13 @@ Egenskap: Verifisering av makssats
   Scenario: Makssats for 2 barn
 
     Gitt følgende støndsperioder
-      | Fom        | Tom        |
-      | 01.01.2023 | 31.01.2023 |
-      | 03.07.2023 | 03.07.2023 |
+      | Fom        | Tom        | Aktivitet | Målgruppe       |
+      | 01.01.2023 | 31.01.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | 03.07.2023 | 03.07.2023 | UTDANNING | OVERGANGSSTØNAD |
+
+    Gitt følgende aktiviteter
+      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
+      | 01.01.2023 | 30.07.2023 | UTDANNING | 5               |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -46,9 +54,13 @@ Egenskap: Verifisering av makssats
   Scenario: Makssats for 3 barn
 
     Gitt følgende støndsperioder
-      | Fom        | Tom        |
-      | 01.01.2023 | 31.01.2023 |
-      | 03.07.2023 | 03.07.2023 |
+      | Fom        | Tom        | Aktivitet | Målgruppe       |
+      | 01.01.2023 | 31.01.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | 03.07.2023 | 03.07.2023 | UTDANNING | OVERGANGSSTØNAD |
+
+    Gitt følgende aktiviteter
+      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
+      | 01.01.2023 | 30.07.2023 | UTDANNING | 5               |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
@@ -72,9 +84,13 @@ Egenskap: Verifisering av makssats
   Scenario: Makssats for 4 barn er lik makssats for 3 barn
 
     Gitt følgende støndsperioder
-      | Fom        | Tom        |
-      | 01.01.2023 | 31.01.2023 |
-      | 03.07.2023 | 03.07.2023 |
+      | Fom        | Tom        | Aktivitet | Målgruppe       |
+      | 01.01.2023 | 31.01.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | 03.07.2023 | 03.07.2023 | UTDANNING | OVERGANGSSTØNAD |
+
+    Gitt følgende aktiviteter
+      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
+      | 01.01.2023 | 30.07.2023 | UTDANNING | 5               |
 
     Gitt følgende utgifter for barn med id: 1
       | Fom     | Tom     | Utgift |
