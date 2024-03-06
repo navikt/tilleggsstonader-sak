@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerRollerF
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,7 +23,7 @@ class StegService(
     private val behandlingService: BehandlingService,
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val rolleConfig: RolleConfig,
-    behandlingSteg: List<BehandlingSteg<*>>,
+    private val behandlingSteg: List<BehandlingSteg<*>>,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -56,6 +57,15 @@ class StegService(
             behandlingSteg,
             null,
         )
+    }
+
+    @Transactional
+    fun håndterInngangsvilkår(
+        behandlingId: UUID,
+    ): Behandling {
+        val inngangsvilkårSteg: InngangsvilkårSteg = behandlingSteg.filterIsInstance<InngangsvilkårSteg>().single()
+
+        return håndterSteg(behandlingId, inngangsvilkårSteg)
     }
 
     @Transactional
