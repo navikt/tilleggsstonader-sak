@@ -29,7 +29,9 @@ object DokumentasjonMapper {
 
     private fun mapVedleggPåId(journalpost: Journalpost): Map<String, Dokument> {
         return journalpost.dokumenter?.mapNotNull { dokumentInfo ->
-            dokumentInfo.tittel?.let { it to Dokument(dokumentInfoId = dokumentInfo.dokumentInfoId) }
-        }?.toMap() ?: emptyMap()
+            dokumentInfo.dokumentvarianter?.mapNotNull {
+                it.filnavn?.let { it to Dokument(dokumentInfoId = dokumentInfo.dokumentInfoId) }
+            }
+        }?.flatten()?.toMap() ?: emptyMap()
     }
 }

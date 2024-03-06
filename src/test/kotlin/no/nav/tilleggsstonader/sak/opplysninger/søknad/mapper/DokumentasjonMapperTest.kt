@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.util.UUID
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument as DokumentDomain
 
 class DokumentasjonMapperTest {
 
@@ -38,13 +39,13 @@ class DokumentasjonMapperTest {
             Dokumentasjon(
                 type = Vedleggstype.UTGIFTER_PASS_SFO_AKS_BARNEHAGE,
                 harSendtInn = false,
-                dokumenter = listOf(no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument("vedlegg1")),
+                dokumenter = listOf(DokumentDomain("vedlegg1")),
                 identBarn = null,
             ),
             Dokumentasjon(
                 type = Vedleggstype.UTGIFTER_PASS_SFO_AKS_BARNEHAGE,
                 harSendtInn = true,
-                dokumenter = listOf(no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument("vedlegg2")),
+                dokumenter = listOf(DokumentDomain("vedlegg2")),
                 identBarn = "barnId",
             ),
         )
