@@ -65,12 +65,16 @@ object SøknadBarnetilsynUtil {
         dokumentasjon = dokumentasjon,
     )
 
-    private fun lagDokumentasjon(): Dokumentasjon = Dokumentasjon(
+    fun lagDokumentasjon(
+        harSendtInn: Boolean = true,
+        identBarn: String? = null,
+    ): Dokumentasjon = Dokumentasjon(
         type = Vedleggstype.UTGIFTER_PASS_ANNET,
-        harSendtInn = true,
+        harSendtInn = harSendtInn,
         dokumenter = listOf(
             Dokument("688ad1dc-e35e-4ab8-a534-17c6e691463f"),
         ),
+        identBarn = identBarn,
     )
 
     fun lagAktivitet(
