@@ -66,21 +66,21 @@ class BehandlingFaktaService(
         if (søknad != null) {
             validerFinnesGrunnlagsdataForAlleBarnISøknad(grunnlagsdata, søknadBarnPåIdent)
         }
-        val barnPåBehandling = barnService.finnBarnPåBehandling(behandlingId).associateBy { it.ident }
+        val grunnlagsdataBarn = grunnlagsdata.grunnlagsdata.barn.associateBy { it.ident }
 
-        return grunnlagsdata.grunnlagsdata.barn.map { barn ->
-            val behandlingBarn = barnPåBehandling[barn.ident]
-                ?: error("Finner ikke barn med ident=${barn.ident} på behandling=$behandlingId")
+        return barnService.finnBarnPåBehandling(behandlingId).map { behandlingBarn ->
+            val barnGrunnlagsdata = grunnlagsdataBarn[behandlingBarn.ident]
+                ?: error("Finner ikke barn med ident=${behandlingBarn.ident} på behandling=$behandlingId")
 
             FaktaBarn(
-                ident = barn.ident,
+                ident = behandlingBarn.ident,
                 barnId = behandlingBarn.id,
                 registergrunnlag = RegistergrunnlagBarn(
-                    navn = barn.navn.visningsnavn(),
-                    alder = barn.alder,
-                    dødsdato = barn.dødsdato,
+                    navn = barnGrunnlagsdata.navn.visningsnavn(),
+                    alder = barnGrunnlagsdata.alder,
+                    dødsdato = barnGrunnlagsdata.dødsdato,
                 ),
-                søknadgrunnlag = søknadBarnPåIdent[barn.ident]?.let { søknadBarn ->
+                søknadgrunnlag = søknadBarnPåIdent[behandlingBarn.ident]?.let { søknadBarn ->
                     SøknadsgrunnlagBarn(
                         type = søknadBarn.data.type,
                         startetIFemte = søknadBarn.data.startetIFemte,
