@@ -1,12 +1,22 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import java.time.LocalDate
 
 data class SettPåVentDto(
     val årsaker: List<ÅrsakSettPåVent>,
     val frist: LocalDate,
     val kommentar: String?,
-)
+) {
+    init {
+        brukerfeilHvis(årsaker.any { it == ÅrsakSettPåVent.ANNET } && kommentar.isNullOrBlank()) {
+            "Mangler påkrevd begrunnelse når man valgt Annet"
+        }
+        brukerfeilHvis((kommentar?.length ?: 0) > 1000) {
+            "Kan ikke sende inn kommentar med over 1000 tegn"
+        }
+    }
+}
 
 data class OppdaterSettPåVentDto(
     val årsaker: List<ÅrsakSettPåVent>,
@@ -17,8 +27,8 @@ data class OppdaterSettPåVentDto(
 
 data class StatusPåVentDto(
     val årsaker: List<ÅrsakSettPåVent>,
+    val kommentar: String?,
     val frist: LocalDate?,
-    val oppgaveBeskrivelse: String?,
     val oppgaveVersjon: Int,
 )
 

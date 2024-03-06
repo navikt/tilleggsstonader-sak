@@ -16,6 +16,7 @@ data class SettPåVent(
     val oppgaveId: Long,
     @Column("arsaker")
     val årsaker: List<ÅrsakSettPåVent>,
+    val kommentar: String?,
     val aktiv: Boolean = true,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),

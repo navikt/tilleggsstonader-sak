@@ -178,15 +178,11 @@ class OppgaveService(
         return oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)
     }
 
-    fun lagOppgaveTekst(beskrivelse: String? = null): String {
-        return if (beskrivelse != null) {
-            beskrivelse + "\n"
-        } else {
-            ""
-        } +
-            "----- Opprettet av tilleggsstonader-sak ${
-                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
-            } ---"
+    private fun lagOppgaveTekst(beskrivelse: String? = null): String {
+        val tidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+        val prefix = "----- Opprettet av tilleggsstonader-sak $tidspunkt ---"
+        val beskrivelseMedNewLine = beskrivelse?.let { "\n$it" } ?: ""
+        return prefix + beskrivelseMedNewLine
     }
 
     private fun finnBehandlingstema(stønadstype: Stønadstype): Behandlingstema {

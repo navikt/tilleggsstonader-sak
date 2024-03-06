@@ -14,7 +14,7 @@ class SettPåVentRepositoryTest : IntegrationTest() {
     lateinit var repository: SettPåVentRepository
 
     @Test
-    fun `sasd asd`() {
+    fun `skal kunne lagre og hente settPåVent`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
         repository.insert(settPåVent(behandling, aktiv = false))
@@ -46,5 +46,6 @@ class SettPåVentRepositoryTest : IntegrationTest() {
         årsaker = listOf(ÅrsakSettPåVent.ANNET),
         oppgaveId = 1,
         aktiv = aktiv,
+        kommentar = "kommentar"
     )
 }

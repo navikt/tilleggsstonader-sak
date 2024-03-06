@@ -5,6 +5,7 @@ CREATE TABLE sett_pa_vent
     oppgave_id    BIGINT       NOT NULL,
     aktiv         BOOLEAN      NOT NULL,
     arsaker       VARCHAR[]    NOT NULL,
+    kommentar     VARCHAR,
 
     opprettet_av  VARCHAR      NOT NULL,
     opprettet_tid TIMESTAMP(3) NOT NULL,

@@ -28,10 +28,10 @@ class SettPåVentService(
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
 
         return StatusPåVentDto(
-            settPåVent.årsaker,
-            oppgave.fristFerdigstillelse,
-            oppgave.beskrivelse,
-            oppgave.versjonEllerFeil(),
+            årsaker = settPåVent.årsaker,
+            kommentar = settPåVent.kommentar,
+            frist = oppgave.fristFerdigstillelse,
+            oppgaveVersjon = oppgave.versjonEllerFeil(),
         )
     }
 
@@ -57,10 +57,16 @@ class SettPåVentService(
             behandlingId = behandlingId,
             oppgaveId = oppgave.id,
             årsaker = dto.årsaker,
+            kommentar = dto.kommentar,
         )
         settPåVentRepository.insert(settPåVent)
 
-        return StatusPåVentDto(dto.årsaker, dto.frist, oppdatertOppgave.beskrivelse, oppgaveResponse.versjon)
+        return StatusPåVentDto(
+            årsaker = dto.årsaker,
+            kommentar = dto.kommentar,
+            frist = dto.frist,
+            oppgaveVersjon = oppgaveResponse.versjon
+        )
     }
 
     @Transactional
@@ -72,7 +78,7 @@ class SettPåVentService(
         val settPåVent = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
             ?: error("Finner ikke aktiv sett på vent for behandling=$behandlingId")
 
-        settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker))
+        settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
 
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
         val oppdatertOppgave =
@@ -84,7 +90,12 @@ class SettPåVentService(
             )
         val oppgaveResponse = oppgaveService.oppdaterOppgave(oppdatertOppgave)
 
-        return StatusPåVentDto(dto.årsaker, dto.frist, oppdatertOppgave.beskrivelse, oppgaveResponse.versjon)
+        return StatusPåVentDto(
+            årsaker = dto.årsaker,
+            kommentar = dto.kommentar,
+            frist = dto.frist,
+            oppgaveVersjon = oppgaveResponse.versjon
+        )
     }
 
     private fun hentOppgave(behandlingId: UUID): Oppgave {

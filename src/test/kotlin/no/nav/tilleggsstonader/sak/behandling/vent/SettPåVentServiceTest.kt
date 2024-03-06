@@ -61,7 +61,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             with(settPåVentService.hentSettPåVent(behandling.id)) {
                 assertThat(årsaker).isEqualTo(settPåVentDto.årsaker)
                 assertThat(frist).isEqualTo(settPåVentDto.frist)
-                assertThat(oppgaveBeskrivelse).contains("ny beskrivelse")
+                assertThat(kommentar).contains("ny beskrivelse")
             }
         }
 
@@ -87,7 +87,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             with(settPåVentService.hentSettPåVent(behandling.id)) {
                 assertThat(årsaker).isEqualTo(oppdaterSettPåVentDto.årsaker)
                 assertThat(frist).isEqualTo(oppdaterSettPåVentDto.frist)
-                assertThat(oppgaveBeskrivelse).contains("oppdatert beskrivelse")
+                assertThat(kommentar).contains("oppdatert beskrivelse")
             }
         }
     }
