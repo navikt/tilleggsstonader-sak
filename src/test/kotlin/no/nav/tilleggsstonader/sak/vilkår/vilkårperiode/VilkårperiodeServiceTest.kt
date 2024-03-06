@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -354,12 +353,10 @@ class VilkårperiodeServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class InngangsvilkårSteg {
+    inner class Validering {
         @Test
-        fun `skal validere stønadsperioder og gjennomføre steg inngangsvilkår ved opprettelse av vilkårperiode - ingen stønadsperioder`() {
+        fun `skal validere stønadsperioder ved opprettelse av vilkårperiode - ingen stønadsperioder`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-
-            assertThat(behandling.steg).isEqualTo(StegType.INNGANGSVILKÅR)
 
             val periode = vilkårperiodeService.opprettVilkårperiode(
                 LagreVilkårperiode(
@@ -371,17 +368,15 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 ),
             )
 
-            val response = vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(periode)
+            val response = vilkårperiodeService.validerOgLagResponse(periode)
 
-            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
             assertThat(response.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.OK)
             assertThat(response.stønadsperiodeFeil).isNull()
         }
 
         @Test
-        fun `skal validere stønadsperioder ved oppdatering av vilkårperioder og resette steg inngangsvilkår når status ikke ok`() {
+        fun `skal validere stønadsperioder ved oppdatering av vilkårperioder`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            assertThat(behandling.steg).isEqualTo(StegType.INNGANGSVILKÅR)
 
             val fom1 = LocalDate.of(2024, 1, 1)
             val tom1 = LocalDate.of(2024, 2, 1)
@@ -398,7 +393,11 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     behandlingId = behandling.id,
                 ),
             )
-            vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(opprettetMålgruppe)
+
+            assertThat(vilkårperiodeService.validerOgLagResponse(opprettetMålgruppe).stønadsperiodeStatus).isEqualTo(
+                Stønadsperiodestatus.OK,
+            )
+
             val opprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiode(
                 LagreVilkårperiode(
                     type = AktivitetType.TILTAK,
@@ -409,11 +408,10 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     aktivitetsdager = 5,
                 ),
             )
-            vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(opprettetTiltakPeriode)
-            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
-
+            assertThat(vilkårperiodeService.validerOgLagResponse(opprettetTiltakPeriode).stønadsperiodeStatus).isEqualTo(
+                Stønadsperiodestatus.OK,
+            )
             stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyStønadsperiode(fom1, tom1)))
-            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
 
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(
                 id = opprettetTiltakPeriode.id,
@@ -426,10 +424,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     aktivitetsdager = 5,
                 ),
             )
-            vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode)
+            vilkårperiodeService.validerOgLagResponse(oppdatertPeriode)
 
-            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.INNGANGSVILKÅR)
-            assertThat(vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(
+            assertThat(vilkårperiodeService.validerOgLagResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(
                 Stønadsperiodestatus.FEIL,
             )
         }

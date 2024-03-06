@@ -2,14 +2,12 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
@@ -223,67 +221,6 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 stønadsperiodeService.lagreStønadsperioder(behandlingId = behandling.id, listOf())
             }.hasMessageContaining("Kan ikke lagre stønadsperioder når behandlingen er låst")
         }
-
-        @Test
-        fun `skal være i steg VILKÅR etter lagring av stønadsperioder`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            assertThat(behandling.steg).isEqualTo(StegType.INNGANGSVILKÅR)
-
-            val fom1 = LocalDate.of(2024, 1, 1)
-            val tom1 = LocalDate.of(2024, 2, 1)
-            val fom2 = LocalDate.of(2024, 2, 1)
-            val tom2 = LocalDate.of(2024, 3, 1)
-
-            // Opprett vilkårperioder og stønadsperioder som er gyldige
-            opprettVilkårperiode(
-                LagreVilkårperiode(
-                    type = MålgruppeType.AAP,
-                    fom = fom1,
-                    tom = tom2,
-                    delvilkår = VilkårperiodeTestUtil.delvilkårMålgruppeDto(),
-                    behandlingId = behandling.id,
-                ),
-            )
-            val oppprettetTiltakPeriode = opprettVilkårperiode(
-                LagreVilkårperiode(
-                    type = AktivitetType.TILTAK,
-                    fom = fom1,
-                    tom = tom1,
-                    delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
-                    behandlingId = behandling.id,
-                    aktivitetsdager = 5,
-                ),
-            ).periode
-            val opprettetStønadsperioder = stønadsperiodeService.lagreStønadsperioder(
-                behandling.id,
-                listOf(stønadsperiodeDto(fom = fom1, tom = tom1)),
-            )
-            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
-
-            // Oppdater med nye vilkårsperioder som gjør stønadsperioder ugyldige
-            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(
-                id = oppprettetTiltakPeriode.id,
-                vilkårperiode = LagreVilkårperiode(
-                    type = AktivitetType.TILTAK,
-                    fom = fom2,
-                    tom = tom2,
-                    delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
-                    behandlingId = behandling.id,
-                    aktivitetsdager = 5,
-                ),
-            )
-            vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode)
-
-            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.INNGANGSVILKÅR)
-
-            // Oppdater stønadsperioder som gjør stønadsperioder gyldige igjen
-            stønadsperiodeService.lagreStønadsperioder(
-                behandling.id,
-                listOf(stønadsperiodeDto(opprettetStønadsperioder.first().id, fom = fom2, tom = tom2)),
-            )
-
-            assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
-        }
     }
 
     private fun målgruppe(
@@ -333,6 +270,6 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
     private fun opprettVilkårperiode(periode: LagreVilkårperiode): LagreVilkårperiodeResponse {
         val oppdatertPeriode = vilkårperiodeService.opprettVilkårperiode(periode)
-        return vilkårperiodeService.oppdaterBehandlingstegOgLagResponse(oppdatertPeriode)
+        return vilkårperiodeService.validerOgLagResponse(oppdatertPeriode)
     }
 }
