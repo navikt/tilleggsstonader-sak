@@ -2,17 +2,20 @@ package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
+import no.nav.tilleggsstonader.kontrakter.søknad.Dokument
+import no.nav.tilleggsstonader.kontrakter.søknad.DokumentasjonFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.HovedytelseAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
@@ -25,11 +28,17 @@ object SøknadUtil {
         ident: String = "søker",
         mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
         barnMedBarnepass: List<BarnMedBarnepass> = listOf(barnMedBarnepass()),
+        dokumentasjon: List<DokumentasjonFelt> = emptyList(),
     ): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
         val skjemaBarnetilsyn = SøknadsskjemaBarnetilsyn(
             hovedytelse = HovedytelseAvsnitt(
                 hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "")), emptyList()),
-                boddSammenhengende = EnumFelt("Har du bodd sammenhengende i Norge de siste 12 månedene?", JaNei.JA, "Ja", emptyList()),
+                boddSammenhengende = EnumFelt(
+                    "Har du bodd sammenhengende i Norge de siste 12 månedene?",
+                    JaNei.JA,
+                    "Ja",
+                    emptyList(),
+                ),
                 planleggerBoINorgeNeste12mnd = EnumFelt(
                     "Planlegger du å bo i Norge de neste 12 månedene?",
                     JaNei.JA,
@@ -41,7 +50,7 @@ object SøknadUtil {
                 utdanning = EnumFelt("", JaNei.JA, "", emptyList()),
             ),
             barn = BarnAvsnitt(barnMedBarnepass = barnMedBarnepass),
-            dokumentasjon = emptyList(),
+            dokumentasjon = dokumentasjon,
         )
         return Søknadsskjema(
             ident = ident,
@@ -50,6 +59,20 @@ object SøknadUtil {
             skjema = skjemaBarnetilsyn,
         )
     }
+
+    fun lagDokumentasjon(
+        type: Vedleggstype = Vedleggstype.UTGIFTER_PASS_SFO_AKS_BARNEHAGE,
+        label: String = "Label vedlegg",
+        harSendtInn: Boolean = false,
+        vedlegg: List<Dokument> = emptyList(),
+        barnId: String? = null,
+    ): DokumentasjonFelt = DokumentasjonFelt(
+        type = type,
+        label = label,
+        harSendtInn = harSendtInn,
+        opplastedeVedlegg = vedlegg,
+        barnId = barnId,
+    )
 
     fun barnMedBarnepass(
         ident: String = FnrGenerator.generer(

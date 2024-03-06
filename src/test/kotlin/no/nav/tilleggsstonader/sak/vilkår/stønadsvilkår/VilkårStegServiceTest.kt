@@ -18,8 +18,9 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaMapper
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
+import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.grunnlagBarn
 import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.mockVilkårGrunnlagDto
@@ -89,9 +90,9 @@ internal class VilkårStegServiceTest {
         // taskService = taskService,
         behandlingshistorikkService = behandlingshistorikkService,
     )
-    private val søknad = SøknadsskjemaMapper.map(
+    private val søknad = SøknadsskjemaBarnetilsynMapper.map(
         søknadskjemaBarnetilsyn(),
-        "id",
+        lagJournalpost(),
     )
     private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
     val fagsak = fagsak()

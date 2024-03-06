@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig.Companion.barn2Fnr
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig.Companion.barnFnr
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
@@ -43,7 +44,7 @@ internal class TestSaksbehandlingServiceTest() : IntegrationTest() {
                 SøknadUtil.barnMedBarnepass(ident = barn2Fnr, navn = "navn1"),
             ),
         )
-        val søknad = søknadService.lagreSøknad(behandling.id, "journalpostId", skjema)
+        val søknad = søknadService.lagreSøknad(behandling.id, lagJournalpost(), skjema)
         barnRepository.insertAll(søknadBarnTilBehandlingBarn(søknad.barn, behandling.id))
 
         vilkårService.hentEllerOpprettVilkårsvurdering(behandling.id)

@@ -3,10 +3,13 @@ package no.nav.tilleggsstonader.sak.util
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
@@ -55,9 +58,23 @@ object SøknadBarnetilsynUtil {
     fun lagSkjemaBarnetilsyn(
         hovedytelse: HovedytelseAvsnitt = lagHovedytelse(),
         aktivitet: AktivitetAvsnitt = lagAktivitet(),
+        dokumentasjon: List<Dokumentasjon> = listOf(lagDokumentasjon()),
     ) = SkjemaBarnetilsyn(
         hovedytelse = hovedytelse,
         aktivitet = aktivitet,
+        dokumentasjon = dokumentasjon,
+    )
+
+    fun lagDokumentasjon(
+        harSendtInn: Boolean = true,
+        identBarn: String? = null,
+    ): Dokumentasjon = Dokumentasjon(
+        type = Vedleggstype.UTGIFTER_PASS_ANNET,
+        harSendtInn = harSendtInn,
+        dokumenter = listOf(
+            Dokument("688ad1dc-e35e-4ab8-a534-17c6e691463f"),
+        ),
+        identBarn = identBarn,
     )
 
     fun lagAktivitet(

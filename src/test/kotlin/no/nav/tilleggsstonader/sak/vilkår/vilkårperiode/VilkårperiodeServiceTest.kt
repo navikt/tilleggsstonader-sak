@@ -177,7 +177,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "Oppdatert begrunnelse",
-                delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.NEI)),
+                delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.NEI, "ny begrunnelse")),
             )
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
 
@@ -190,6 +190,29 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.svar).isEqualTo(SvarJaNei.NEI)
             assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.resultat)
                 .isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+        }
+
+        @Test
+        fun `skal feile dersom manglende begrunnelse når medlemskap endres til nei`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            val vilkårperiode =
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        medlemskap = VurderingDto(
+                            SvarJaNei.JA,
+                        ),
+                        behandlingId = behandling.id,
+                    ),
+                )
+
+            val oppdatering = vilkårperiode.tilOppdatering().copy(
+                begrunnelse = "Oppdatert begrunnelse",
+                delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.NEI, begrunnelse = null)),
+            )
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
+            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt medlemskap")
         }
 
         @Test

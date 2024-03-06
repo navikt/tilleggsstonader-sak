@@ -16,6 +16,7 @@
     "barnId" : "60921c76-f8ef-4000-9824-f127a50a575e",
     "registergrunnlag" : {
       "navn" : "Fornavn mellomnavn Etternavn",
+      "alder" : 6,
       "dødsdato" : null
     },
     "søknadgrunnlag" : {
@@ -23,5 +24,15 @@
       "startetIFemte" : "JA",
       "årsak" : "MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID"
     }
-  } ]
+  } ],
+  "dokumentasjon" : {
+    "journalpostId" : "testId",
+    "dokumentasjon" : [ {
+      "type" : "Dokumentasjon av utgifter for pass av barn",
+      "harSendtInn" : true,
+      "dokumenter" : [ {
+        "dokumentInfoId" : "688ad1dc-e35e-4ab8-a534-17c6e691463f"
+      } ]
+    } ]
+  }
 }

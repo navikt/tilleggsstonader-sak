@@ -83,7 +83,7 @@ class AutomatiskJournalføringService(
         val behandling = opprettBehandlingOgPopulerGrunnlagsdataForAutomatiskJournalførtSøknad(
             behandlingstype = nesteBehandlingstype,
             fagsak = fagsak,
-            søknad = journalpost,
+            journalpost = journalpost,
         )
 
         journalpostService.oppdaterOgFerdigstillJournalpostMaskinelt(
@@ -181,7 +181,7 @@ class AutomatiskJournalføringService(
     private fun opprettBehandlingOgPopulerGrunnlagsdataForAutomatiskJournalførtSøknad(
         behandlingstype: BehandlingType,
         fagsak: Fagsak,
-        søknad: Journalpost,
+        journalpost: Journalpost,
     ): Behandling {
         val behandling = behandlingService.opprettBehandling(
             behandlingType = behandlingstype,
@@ -189,8 +189,8 @@ class AutomatiskJournalføringService(
             behandlingsårsak = BehandlingÅrsak.SØKNAD,
         )
 
-        lagreSøknad(søknad, fagsak, behandling.id)
-        behandlingService.leggTilBehandlingsjournalpost(søknad.journalpostId, Journalposttype.I, behandling.id)
+        lagreSøknad(journalpost, behandling.id)
+        behandlingService.leggTilBehandlingsjournalpost(journalpost.journalpostId, Journalposttype.I, behandling.id)
 
         /* TODO: Opprett statistikkinnslag */
 
@@ -211,9 +211,9 @@ class AutomatiskJournalføringService(
         return behandling
     }
 
-    private fun lagreSøknad(søknadJournalpost: Journalpost, fagsak: Fagsak, behandlingId: UUID) {
-        val søknad = journalpostService.hentSøknadFraJournalpost(søknadJournalpost)
-        søknadService.lagreSøknad(behandlingId, søknadJournalpost.journalpostId, søknad)
+    private fun lagreSøknad(journalpost: Journalpost, behandlingId: UUID) {
+        val søknad = journalpostService.hentSøknadFraJournalpost(journalpost)
+        søknadService.lagreSøknad(behandlingId, journalpost, søknad)
     }
 
     private fun opprettBehandleSakOppgaveTask(opprettOppgaveTaskData: OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData) {

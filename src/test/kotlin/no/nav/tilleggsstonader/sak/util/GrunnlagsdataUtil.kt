@@ -25,10 +25,12 @@ object GrunnlagsdataUtil {
     fun lagGrunnlagsdataBarn(
         ident: String = "1",
         navn: Navn = PdlTestdataHelper.lagNavn(),
+        alder: Int? = 6,
         dødsdato: LocalDate? = null,
     ) = GrunnlagsdataBarn(
         ident = ident,
         navn = navn,
+        alder = alder,
         dødsdato = dødsdato,
     )
 }

@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -142,7 +143,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     private fun lagreSøknad(
         behandling: Behandling,
     ): SøknadBarnetilsyn {
-        søknadService.lagreSøknad(behandling.id, "123", SøknadUtil.søknadskjemaBarnetilsyn())
+        søknadService.lagreSøknad(behandling.id, lagJournalpost(), SøknadUtil.søknadskjemaBarnetilsyn())
         return søknadService.hentSøknadBarnetilsyn(behandling.id)!!
     }
 }

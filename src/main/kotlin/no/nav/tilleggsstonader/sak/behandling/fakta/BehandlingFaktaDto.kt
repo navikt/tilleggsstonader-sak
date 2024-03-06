@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.fakta
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
@@ -11,6 +12,7 @@ data class BehandlingFaktaDto(
     val hovedytelse: FaktaHovedytelse,
     val aktivitet: FaktaAktivtet,
     val barn: List<FaktaBarn>,
+    val dokumentasjon: FaktaDokumentasjon?,
 )
 
 data class FaktaHovedytelse(
@@ -38,8 +40,24 @@ data class FaktaBarn(
     val søknadgrunnlag: SøknadsgrunnlagBarn?,
 )
 
+data class FaktaDokumentasjon(
+    val journalpostId: String,
+    val dokumentasjon: List<Dokumentasjon>,
+)
+
+data class Dokumentasjon(
+    val type: String,
+    val harSendtInn: Boolean,
+    val dokumenter: List<Dokument>,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val identBarn: String? = null,
+)
+
+data class Dokument(val dokumentInfoId: String)
+
 data class RegistergrunnlagBarn(
     val navn: String,
+    val alder: Int?,
     val dødsdato: LocalDate?,
 )
 
