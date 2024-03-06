@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariant
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
@@ -20,9 +22,10 @@ object JournalpostUtil {
 
     fun lagDokument(
         dokumentInfoId: String = UUID.randomUUID().toString(),
-        tittel: String,
+        filnavn: String,
     ) = DokumentInfo(
         dokumentInfoId = dokumentInfoId,
-        tittel = tittel,
+        tittel = "tittel",
+        dokumentvarianter = listOf(Dokumentvariant(Dokumentvariantformat.ARKIV, filnavn, true)),
     )
 }
