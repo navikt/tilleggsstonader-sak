@@ -1,8 +1,10 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad.domain
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -53,6 +55,7 @@ data class SøknadBarnetilsyn(
 data class SkjemaBarnetilsyn(
     val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetAvsnitt,
+    val dokumentasjon: List<Dokumentasjon>,
 )
 
 data class HovedytelseAvsnitt(
@@ -64,3 +67,13 @@ data class HovedytelseAvsnitt(
 data class AktivitetAvsnitt(
     val utdanning: JaNei,
 )
+
+data class Dokumentasjon(
+    val type: Vedleggstype,
+    val harSendtInn: Boolean,
+    val dokumenter: List<Dokument>,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val identBarn: String? = null,
+)
+
+data class Dokument(val dokumentInfoId: String)
