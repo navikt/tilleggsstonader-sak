@@ -32,7 +32,7 @@ object SettPåVentBeskrivelseUtil {
     }
 
     fun taAvVent(oppgave: Oppgave, tidspunkt: LocalDateTime = LocalDateTime.now()): String {
-        return utledBeskrivelsePrefix(tidspunkt) + "Tatt av vent" + nåværendeBeskrivelse(oppgave)
+        return utledBeskrivelsePrefix(tidspunkt) + "\nTatt av vent" + nåværendeBeskrivelse(oppgave)
     }
 
     private fun String?.påNyRadEllerTomString(): String = this?.trim()?.takeIf { it.isNotBlank() }?.let { "\n$it" } ?: ""

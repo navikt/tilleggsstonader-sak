@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_PÅ_VENT
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import kotlin.jvm.optionals.getOrNull
 
 class SettPåVentServiceTest : IntegrationTest() {
 
@@ -45,7 +47,7 @@ class SettPåVentServiceTest : IntegrationTest() {
     @BeforeEach
     fun setUp() {
         testoppsettService.opprettBehandlingMedFagsak(behandling)
-        oppgaveId = oppgaveService.opprettOppgave(behandling.id, OpprettOppgave(Oppgavetype.BehandleSak))
+        oppgaveId = oppgaveService.opprettOppgave(behandling.id, OpprettOppgave(Oppgavetype.BehandleSak, tilordnetNavIdent = "123"))
     }
 
     @Nested
@@ -58,10 +60,17 @@ class SettPåVentServiceTest : IntegrationTest() {
             assertThat(testoppsettService.hentBehandling(behandling.id).status)
                 .isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
 
-            with(settPåVentService.hentSettPåVent(behandling.id)) {
+            with(settPåVentService.hentStatusSettPåVent(behandling.id)) {
                 assertThat(årsaker).isEqualTo(settPåVentDto.årsaker)
                 assertThat(frist).isEqualTo(settPåVentDto.frist)
                 assertThat(kommentar).contains("ny beskrivelse")
+            }
+
+            with(oppgaveService.hentOppgave(oppgaveId!!)) {
+                assertThat(beskrivelse).contains("ny beskrivelse")
+                assertThat(fristFerdigstillelse).isEqualTo(settPåVentDto.frist)
+                assertThat(tilordnetRessurs).isNull()
+                assertThat(mappeId?.getOrNull()).isEqualTo(MAPPE_ID_PÅ_VENT.toLong())
             }
         }
 
@@ -84,7 +93,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             assertThat(testoppsettService.hentBehandling(behandling.id).status)
                 .isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
 
-            with(settPåVentService.hentSettPåVent(behandling.id)) {
+            with(settPåVentService.hentStatusSettPåVent(behandling.id)) {
                 assertThat(årsaker).isEqualTo(oppdaterSettPåVentDto.årsaker)
                 assertThat(frist).isEqualTo(oppdaterSettPåVentDto.frist)
                 assertThat(kommentar).contains("oppdatert beskrivelse")
@@ -115,6 +124,7 @@ class SettPåVentServiceTest : IntegrationTest() {
                 assertThat(tilordnetRessurs).isEqualTo(identSaksbehandler)
                 assertThat(beskrivelse).contains("Tatt av vent")
                 assertThat(fristFerdigstillelse).isEqualTo(LocalDate.now())
+                assertThat(mappeId).isEmpty()
             }
         }
     }

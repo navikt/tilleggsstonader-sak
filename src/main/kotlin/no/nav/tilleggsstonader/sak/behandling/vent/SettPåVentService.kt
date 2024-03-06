@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -12,6 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.util.Optional
 import java.util.UUID
 
 @Service
@@ -22,7 +24,7 @@ class SettPåVentService(
     private val settPåVentRepository: SettPåVentRepository,
 ) {
 
-    fun hentSettPåVent(behandlingId: UUID): StatusPåVentDto {
+    fun hentStatusSettPåVent(behandlingId: UUID): StatusPåVentDto {
         val settPåVent = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
             ?: error("Finner ikke settPåVent for behandling=$behandlingId")
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
@@ -44,18 +46,10 @@ class SettPåVentService(
         opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, mapOf("årsaker" to dto.årsaker))
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 
-        val oppgave = hentOppgave(behandlingId)
-        val oppdatertOppgave = Oppgave(
-            id = oppgave.id,
-            versjon = oppgave.versjon,
-            tilordnetRessurs = "",
-            fristFerdigstillelse = dto.frist,
-            beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, dto),
-        )
-        val oppgaveResponse = oppgaveService.oppdaterOppgave(oppdatertOppgave)
+        val oppdatertOppgave = settOppgavePåVent(behandlingId, dto)
         val settPåVent = SettPåVent(
             behandlingId = behandlingId,
-            oppgaveId = oppgave.id,
+            oppgaveId = oppdatertOppgave.oppgaveId,
             årsaker = dto.årsaker,
             kommentar = dto.kommentar,
         )
@@ -65,7 +59,7 @@ class SettPåVentService(
             årsaker = dto.årsaker,
             kommentar = dto.kommentar,
             frist = dto.frist,
-            oppgaveVersjon = oppgaveResponse.versjon,
+            oppgaveVersjon = oppdatertOppgave.versjon,
         )
     }
 
@@ -83,15 +77,7 @@ class SettPåVentService(
         }
         settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
 
-        val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
-        val oppdatertOppgave =
-            Oppgave(
-                id = settPåVent.oppgaveId,
-                versjon = dto.oppgaveVersjon,
-                fristFerdigstillelse = dto.frist,
-                beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(oppgave, dto),
-            )
-        val oppgaveResponse = oppgaveService.oppdaterOppgave(oppdatertOppgave)
+        val oppgaveResponse = oppdaterOppgave(settPåVent, dto)
 
         // TODO vurder om man skal sende til DVH
 
@@ -119,9 +105,47 @@ class SettPåVentService(
         val settPåVent = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
             ?: error("Finner ikke aktiv sett på vent for behandling=$behandlingId")
         settPåVentRepository.update(settPåVent.copy(aktiv = false))
-        opprettHistorikkInnslag(behandling, StegUtfall.TATT_AV_VENT, null)
 
+        opprettHistorikkInnslag(behandling, StegUtfall.TATT_AV_VENT, null)
+        taOppgaveAvVent(settPåVent.oppgaveId)
+
+        // TODO statistikk
+    }
+
+    private fun settOppgavePåVent(
+        behandlingId: UUID,
+        dto: SettPåVentDto,
+    ): OppdatertOppgaveResponse {
+        val oppgave = hentOppgave(behandlingId)
+        // TODO må bruke enhet til saksbehandler, men 4462 er enheten til NAY. Enhetene til tiltak er uklart
+        val mappeId = oppgaveService.finnMapper("4462").single { it.navn == "10 På vent" }.id.toLong()
+        val oppdatertOppgave = Oppgave(
+            id = oppgave.id,
+            versjon = oppgave.versjon,
+            tilordnetRessurs = "",
+            fristFerdigstillelse = dto.frist,
+            beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, dto),
+            mappeId = Optional.of(mappeId),
+        )
+        return oppgaveService.oppdaterOppgave(oppdatertOppgave)
+    }
+
+    private fun oppdaterOppgave(
+        settPåVent: SettPåVent,
+        dto: OppdaterSettPåVentDto,
+    ): OppdatertOppgaveResponse {
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
+        val oppdatertOppgave = Oppgave(
+            id = settPåVent.oppgaveId,
+            versjon = dto.oppgaveVersjon,
+            fristFerdigstillelse = dto.frist,
+            beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(oppgave, dto),
+        )
+        return oppgaveService.oppdaterOppgave(oppdatertOppgave)
+    }
+
+    private fun taOppgaveAvVent(oppgaveId: Long) {
+        val oppgave = oppgaveService.hentOppgave(oppgaveId)
         val tilordnetRessurs = if (SikkerhetContext.erSaksbehandler()) {
             SikkerhetContext.hentSaksbehandler()
         } else {
@@ -134,10 +158,9 @@ class SettPåVentService(
                 tilordnetRessurs = tilordnetRessurs,
                 fristFerdigstillelse = LocalDate.now(),
                 beskrivelse = SettPåVentBeskrivelseUtil.taAvVent(oppgave),
+                mappeId = Optional.empty(),
             ),
         )
-
-        // TODO statistikk
     }
 
     private fun opprettHistorikkInnslag(

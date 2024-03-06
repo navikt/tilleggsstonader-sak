@@ -24,7 +24,7 @@ class SettPåVentController(
     @GetMapping("{behandlingId}")
     fun hentStatusSettPåVent(@PathVariable behandlingId: UUID): StatusPåVentDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return settPåVentService.hentSettPåVent(behandlingId)
+        return settPåVentService.hentStatusSettPåVent(behandlingId)
     }
 
     @PostMapping("{behandlingId}")
