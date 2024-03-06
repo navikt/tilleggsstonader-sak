@@ -15,7 +15,7 @@ object SettPåVentBeskrivelseUtil {
         tidspunkt: LocalDateTime = LocalDateTime.now(),
     ): String {
         return utledBeskrivelsePrefix(tidspunkt) +
-            utledOppgavefristBeskrivelse(oppgave, dto.frist) +
+            utledOppgavefristBeskrivelse(oppgave, dto.frist).påNyRadEllerTomString() +
             dto.kommentar.påNyRadEllerTomString() +
             nåværendeBeskrivelse(oppgave)
     }
@@ -26,7 +26,7 @@ object SettPåVentBeskrivelseUtil {
         tidspunkt: LocalDateTime = LocalDateTime.now(),
     ): String {
         return utledBeskrivelsePrefix(tidspunkt) +
-            utledOppgavefristBeskrivelse(oppgave, dto.frist) +
+            utledOppgavefristBeskrivelse(oppgave, dto.frist).påNyRadEllerTomString() +
             dto.kommentar.påNyRadEllerTomString() +
             nåværendeBeskrivelse(oppgave)
     }
@@ -35,7 +35,7 @@ object SettPåVentBeskrivelseUtil {
         return utledBeskrivelsePrefix(tidspunkt) + "Tatt av vent" + nåværendeBeskrivelse(oppgave)
     }
 
-    private fun String?.påNyRadEllerTomString(): String = this?.trim()?.let { "\n$it" } ?: ""
+    private fun String?.påNyRadEllerTomString(): String = this?.trim()?.takeIf { it.isNotBlank() }?.let { "\n$it" } ?: ""
 
     private fun nåværendeBeskrivelse(oppgave: Oppgave): String {
         return if (oppgave.beskrivelse.isNullOrBlank()) {
@@ -49,7 +49,7 @@ object SettPåVentBeskrivelseUtil {
         val innloggetSaksbehandlerIdent = SikkerhetContext.hentSaksbehandlerEllerSystembruker()
         val saksbehandlerNavn = SikkerhetContext.hentSaksbehandlerNavn(strict = false)
 
-        return "--- ${tidspunkt.medGosysTid()} $saksbehandlerNavn ($innloggetSaksbehandlerIdent) ---\n"
+        return "--- ${tidspunkt.medGosysTid()} $saksbehandlerNavn ($innloggetSaksbehandlerIdent) ---"
     }
 
     private fun utledOppgavefristBeskrivelse(

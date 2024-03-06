@@ -86,6 +86,24 @@ class SettPåVentBeskrivelseUtilTest {
         }
 
         @Test
+        fun `uendret frist`() {
+            val frist = LocalDate.of(2023, 1, 1)
+            val beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
+                Oppgave(id = 0, beskrivelse = "tidligere beskrivelse", fristFerdigstillelse = frist),
+                OppdaterSettPåVentDto(emptyList(), frist, "ny beskrivelse", 1),
+                tidspunkt,
+            )
+            assertThat(beskrivelse).isEqualTo(
+                """
+                --- 05.03.2024 18:00 a100 (a100) ---
+                ny beskrivelse
+
+                tidligere beskrivelse
+                """.trimIndent(),
+            )
+        }
+
+        @Test
         fun `skal håndtere tom beskrivelse`() {
             val beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
                 Oppgave(id = 0, beskrivelse = "tidligere beskrivelse"),
