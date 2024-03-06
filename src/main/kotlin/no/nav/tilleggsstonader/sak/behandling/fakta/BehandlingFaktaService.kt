@@ -56,7 +56,11 @@ class BehandlingFaktaService(
             },
         )
 
-    private fun mapBarn(grunnlagsdata: GrunnlagsdataMedMetadata, søknad: SøknadBarnetilsyn?, behandlingId: UUID): List<FaktaBarn> {
+    private fun mapBarn(
+        grunnlagsdata: GrunnlagsdataMedMetadata,
+        søknad: SøknadBarnetilsyn?,
+        behandlingId: UUID,
+    ): List<FaktaBarn> {
         val søknadBarnPåIdent = søknad?.barn?.associateBy { it.ident } ?: emptyMap()
         if (søknad != null) {
             validerFinnesGrunnlagsdataForAlleBarnISøknad(grunnlagsdata, søknadBarnPåIdent)
@@ -72,6 +76,7 @@ class BehandlingFaktaService(
                 barnId = behandlingBarn.id,
                 registergrunnlag = RegistergrunnlagBarn(
                     navn = barn.navn.visningsnavn(),
+                    alder = barn.alder,
                     dødsdato = barn.dødsdato,
                 ),
                 søknadgrunnlag = søknadBarnPåIdent[barn.ident]?.let { søknadBarn ->

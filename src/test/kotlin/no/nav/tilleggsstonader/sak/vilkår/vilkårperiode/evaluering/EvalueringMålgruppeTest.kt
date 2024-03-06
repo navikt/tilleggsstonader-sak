@@ -18,7 +18,7 @@ class EvalueringMålgruppeTest {
 
     val svarJa = DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.JA))
     val svarImplisitt = DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.JA_IMPLISITT))
-    val svarNei = DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.NEI))
+    val svarNei = DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.NEI, "begrunnelse"))
     val svarMangler = DelvilkårMålgruppeDto(VurderingDto(null))
 
     @Nested
