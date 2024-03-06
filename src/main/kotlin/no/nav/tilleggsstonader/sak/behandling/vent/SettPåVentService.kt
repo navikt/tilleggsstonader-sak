@@ -65,7 +65,7 @@ class SettPåVentService(
             årsaker = dto.årsaker,
             kommentar = dto.kommentar,
             frist = dto.frist,
-            oppgaveVersjon = oppgaveResponse.versjon
+            oppgaveVersjon = oppgaveResponse.versjon,
         )
     }
 
@@ -78,6 +78,9 @@ class SettPåVentService(
         val settPåVent = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
             ?: error("Finner ikke aktiv sett på vent for behandling=$behandlingId")
 
+        if (!settPåVent.årsaker.containsAll(dto.årsaker) || settPåVent.årsaker.size != dto.årsaker.size) {
+            opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, mapOf("årsaker" to dto.årsaker))
+        }
         settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
 
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
@@ -90,11 +93,13 @@ class SettPåVentService(
             )
         val oppgaveResponse = oppgaveService.oppdaterOppgave(oppdatertOppgave)
 
+        // TODO vurder om man skal sende til DVH
+
         return StatusPåVentDto(
             årsaker = dto.årsaker,
             kommentar = dto.kommentar,
             frist = dto.frist,
-            oppgaveVersjon = oppgaveResponse.versjon
+            oppgaveVersjon = oppgaveResponse.versjon,
         )
     }
 

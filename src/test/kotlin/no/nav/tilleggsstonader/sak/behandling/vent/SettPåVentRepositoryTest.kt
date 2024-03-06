@@ -46,6 +46,6 @@ class SettPåVentRepositoryTest : IntegrationTest() {
         årsaker = listOf(ÅrsakSettPåVent.ANNET),
         oppgaveId = 1,
         aktiv = aktiv,
-        kommentar = "kommentar"
+        kommentar = "kommentar",
     )
 }
