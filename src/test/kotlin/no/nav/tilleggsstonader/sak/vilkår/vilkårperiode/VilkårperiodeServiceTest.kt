@@ -255,7 +255,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     periode.id,
                     periode.tilOppdatering(),
                 )
-            }.hasMessageContaining("Kan ikke oppdatere vilkårperiode når behandling er låst for videre redigering")
+            }.hasMessageContaining("Kan ikke opprette eller endre vilkårperiode når behandling er låst for videre redigering")
         }
 
         private fun Vilkårperiode.tilOppdatering(): LagreVilkårperiode {
@@ -296,7 +296,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
-            }.hasMessageContaining("Kan ikke slette vilkårperiode når behandling er låst for videre redigering")
+            }.hasMessageContaining("Kan ikke opprette eller endre vilkårperiode når behandling er låst for videre redigering")
         }
 
         @Test
