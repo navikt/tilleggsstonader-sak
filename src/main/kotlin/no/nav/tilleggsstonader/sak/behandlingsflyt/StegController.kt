@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
@@ -17,11 +18,23 @@ class StegController(
     private val tilgangService: TilgangService,
 ) {
 
-    @PostMapping("behandling/{behandlingId}/inngangsvilkar")
+    @PostMapping("behandling/{behandlingId}/inngangsvilkaar")
     fun ferdigstillInngangsvilkår(@PathVariable behandlingId: UUID): UUID {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         return stegService.håndterInngangsvilkår(behandlingId).id
     }
+
+    @PostMapping("behandling/{behandlingId}/reset")
+    fun resetTilSteg(@PathVariable behandlingId: UUID, @RequestBody request: ResetStegRequest) {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        stegService.resetSteg(behandlingId, request.steg)
+    }
+
+    data class ResetStegRequest(
+        val steg: StegType,
+    )
 }
