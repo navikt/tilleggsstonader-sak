@@ -24,14 +24,12 @@ class PassBarnRegel : Vilkårsregel(
     vilkårType = VilkårType.PASS_BARN,
     regler = setOf(
         UTGIFTER_DOKUMENTERT,
-        DEKKES_UTGIFTER_ANNET_REGELVERK,
         ANNEN_FORELDER_MOTTAR_STØTTE,
         HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
         UNNTAK_ALDER,
     ),
     hovedregler = regelIder(
         UTGIFTER_DOKUMENTERT,
-        DEKKES_UTGIFTER_ANNET_REGELVERK,
         ANNEN_FORELDER_MOTTAR_STØTTE,
         HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
     ),
@@ -93,15 +91,6 @@ class PassBarnRegel : Vilkårsregel(
         private val ANNEN_FORELDER_MOTTAR_STØTTE =
             RegelSteg(
                 regelId = RegelId.ANNEN_FORELDER_MOTTAR_STØTTE,
-                jaNeiSvarRegel(
-                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
-                    hvisNei = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
-                ),
-            )
-
-        private val DEKKES_UTGIFTER_ANNET_REGELVERK =
-            RegelSteg(
-                regelId = RegelId.DEKKES_UTGIFTER_ANNET_REGELVERK,
                 jaNeiSvarRegel(
                     hvisJa = SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     hvisNei = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,

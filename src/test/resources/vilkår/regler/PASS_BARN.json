@@ -14,19 +14,6 @@
         }
       }
     },
-    "DEKKES_UTGIFTER_ANNET_REGELVERK" : {
-      "regelId" : "DEKKES_UTGIFTER_ANNET_REGELVERK",
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "PÅKREVD",
-          "regelId" : "SLUTT_NODE"
-        },
-        "NEI" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "SLUTT_NODE"
-        }
-      }
-    },
     "ANNEN_FORELDER_MOTTAR_STØTTE" : {
       "regelId" : "ANNEN_FORELDER_MOTTAR_STØTTE",
       "svarMapping" : {

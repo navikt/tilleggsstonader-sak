@@ -10,7 +10,6 @@ object PassBarnRegelTestUtil {
 
     fun oppfylteDelvilkårPassBarn() = listOf(
         delvilkårDto(VurderingDto(RegelId.HAR_ALDER_LAVERE_ENN_GRENSEVERDI, SvarId.NEI, "en begrunnelse")),
-        delvilkårDto(VurderingDto(RegelId.DEKKES_UTGIFTER_ANNET_REGELVERK, SvarId.NEI)),
         delvilkårDto(VurderingDto(RegelId.ANNEN_FORELDER_MOTTAR_STØTTE, SvarId.NEI)),
         delvilkårDto(VurderingDto(RegelId.UTGIFTER_DOKUMENTERT, SvarId.JA)),
     )
