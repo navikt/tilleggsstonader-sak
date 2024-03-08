@@ -63,6 +63,7 @@ class BehandlingFlytTest(
     @Autowired val brevmottakereRepository: BrevmottakerRepository,
     @Autowired val totrinnskontrollController: TotrinnskontrollController,
     @Autowired val taskService: TaskService,
+    @Autowired val stegService: StegService,
     @Autowired val taskWorker: TaskWorker,
     @Autowired val vilkårperiodeService: VilkårperiodeService,
     @Autowired val stønadsperiodeService: StønadsperiodeService,
@@ -238,6 +239,7 @@ class BehandlingFlytTest(
                 ),
             ),
         )
+        stegService.håndterInngangsvilkår(behandlingId)
     }
 
     private fun utfyllVilkår(behandlingId: UUID) {
