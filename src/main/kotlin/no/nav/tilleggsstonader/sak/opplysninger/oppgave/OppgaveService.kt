@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -85,8 +86,8 @@ class OppgaveService(
         behandlingId: UUID,
     ) = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
 
-    fun oppdaterOppgave(oppgave: Oppgave) {
-        oppgaveClient.oppdaterOppgave(oppgave)
+    fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse {
+        return oppgaveClient.oppdaterOppgave(oppgave)
     }
 
     /**
@@ -177,15 +178,11 @@ class OppgaveService(
         return oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)
     }
 
-    fun lagOppgaveTekst(beskrivelse: String? = null): String {
-        return if (beskrivelse != null) {
-            beskrivelse + "\n"
-        } else {
-            ""
-        } +
-            "----- Opprettet av tilleggsstonader-sak ${
-                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
-            } ---"
+    private fun lagOppgaveTekst(beskrivelse: String? = null): String {
+        val tidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+        val prefix = "----- Opprettet av tilleggsstonader-sak $tidspunkt ---"
+        val beskrivelseMedNewLine = beskrivelse?.let { "\n$it" } ?: ""
+        return prefix + beskrivelseMedNewLine
     }
 
     private fun finnBehandlingstema(stønadstype: Stønadstype): Behandlingstema {

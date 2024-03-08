@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
+import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVent
 import no.nav.tilleggsstonader.sak.brev.Vedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretBrev
@@ -122,6 +123,8 @@ abstract class IntegrationTest {
 
             SøknadBehandling::class,
             SøknadBarnetilsyn::class,
+
+            SettPåVent::class,
 
             OppgaveDomain::class,
             Totrinnskontroll::class,

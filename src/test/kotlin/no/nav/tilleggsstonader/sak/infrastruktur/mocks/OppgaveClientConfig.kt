@@ -5,6 +5,8 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
+import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
@@ -18,6 +20,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Optional
 
 @Configuration
 @Profile("mock-oppgave")
@@ -47,7 +50,8 @@ class OppgaveClientConfig {
             oppgavelager[oppgaveId] ?: error("Finner ikke oppgave=$oppgaveId")
         }
 
-        every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(0, emptyList())
+        val mapper = listOf(MappeDto(MAPPE_ID_PÅ_VENT, "10 På vent", "4462"))
+        every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(mapper.size, mapper)
 
         every { oppgaveClient.opprettOppgave(any()) } answers {
             val oppgave = opprettOppgave(firstArg<OpprettOppgaveRequest>())
@@ -68,9 +72,24 @@ class OppgaveClientConfig {
         }
 
         every { oppgaveClient.oppdaterOppgave(any()) } answers {
-            val oppdaterOppgave = firstArg<Oppgave>()
+            val oppdaterOppgave = firstArg<Oppgave>().let {
+                val eksisterendeOppgave = oppgavelager[it.id]!!
+                val versjon = it.versjon!!
+                feilHvis(versjon != eksisterendeOppgave.versjon, HttpStatus.CONFLICT) {
+                    "Oppgaven har endret seg siden du sist hentet oppgaver. versjon=$versjon (${eksisterendeOppgave.versjon}) " +
+                        "For å kunne gjøre endringer må du hente oppgaver på nytt."
+                }
+                eksisterendeOppgave.copy(
+                    versjon = versjon + 1,
+                    beskrivelse = it.beskrivelse ?: eksisterendeOppgave.beskrivelse,
+                    tilordnetRessurs = (it.tilordnetRessurs ?: eksisterendeOppgave.tilordnetRessurs)?.takeIf { it.isNotBlank() },
+                    mappeId = it.mappeId ?: eksisterendeOppgave.mappeId,
+                    fristFerdigstillelse = it.fristFerdigstillelse ?: eksisterendeOppgave.fristFerdigstillelse,
+                )
+            }
+
             oppgavelager[oppdaterOppgave.id] = oppdaterOppgave // Forenklet, dette er ikke det som skje ri integrasjoner
-            oppdaterOppgave.id
+            OppdatertOppgaveResponse(oppdaterOppgave.id, oppdaterOppgave.versjonEllerFeil())
         }
 
         mockFordeling(oppgaveClient, oppgavelager)
@@ -98,7 +117,7 @@ class OppgaveClientConfig {
             prioritet = oppgaveDto.prioritet,
             behandlingstype = oppgaveDto.behandlingstype,
             behandlesAvApplikasjon = oppgaveDto.behandlesAvApplikasjon,
-            mappeId = oppgaveDto.mappeId,
+            mappeId = oppgaveDto.mappeId?.let { Optional.of(it) },
             opprettetTidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
         )
         oppgavelager[oppgave.id] = oppgave
@@ -121,5 +140,9 @@ class OppgaveClientConfig {
             oppgaver[oppgaveId] = oppdatertOppgave
             oppdatertOppgave
         }
+    }
+
+    companion object {
+        const val MAPPE_ID_PÅ_VENT = 10
     }
 }

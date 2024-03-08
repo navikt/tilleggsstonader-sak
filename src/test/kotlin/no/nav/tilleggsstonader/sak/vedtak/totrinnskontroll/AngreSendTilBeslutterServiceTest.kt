@@ -48,7 +48,8 @@ class AngreSendTilBeslutterServiceTest {
         every { totrinnskontrollService.hentBeslutter(behandling.id) } returns null
         every { oppgaveService.hentOppgaveSomIkkeErFerdigstilt(behandling.id, Oppgavetype.GodkjenneVedtak) } returns
             oppgave(behandlingId = behandling.id)
-        every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns Oppgave(id = 123, tilordnetRessurs = null)
+        every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns
+            Oppgave(id = 123, versjon = 0, tilordnetRessurs = null)
     }
 
     @AfterEach
@@ -121,6 +122,7 @@ class AngreSendTilBeslutterServiceTest {
         fun `skal kaste feil hvis saksbehandler ikke tilordnetRessurs på oppgaven`() {
             every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns Oppgave(
                 id = 123,
+                versjon = 0,
                 tilordnetRessurs = saksbehandler2,
             )
 
