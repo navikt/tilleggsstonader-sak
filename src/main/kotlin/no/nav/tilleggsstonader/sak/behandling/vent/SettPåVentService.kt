@@ -124,7 +124,7 @@ class SettPåVentService(
             versjon = oppgave.versjon,
             tilordnetRessurs = "",
             fristFerdigstillelse = dto.frist,
-            beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, dto),
+            beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, dto.frist),
             mappeId = Optional.of(mappeId),
         )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
@@ -139,7 +139,7 @@ class SettPåVentService(
             id = settPåVent.oppgaveId,
             versjon = dto.oppgaveVersjon,
             fristFerdigstillelse = dto.frist,
-            beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(oppgave, dto),
+            beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(oppgave, dto.frist),
         )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
     }

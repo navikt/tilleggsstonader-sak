@@ -11,31 +11,42 @@ object SettPåVentBeskrivelseUtil {
 
     fun settPåVent(
         oppgave: Oppgave,
-        dto: SettPåVentDto,
+        frist: LocalDate,
         tidspunkt: LocalDateTime = LocalDateTime.now(),
     ): String {
+        val tilordnetSaksbehandlerBeskrivelse =
+            utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
         return utledBeskrivelsePrefix(tidspunkt) +
-            utledOppgavefristBeskrivelse(oppgave, dto.frist).påNyRadEllerTomString() +
-            dto.kommentar.påNyRadEllerTomString() +
+            utledOppgavefristBeskrivelse(oppgave, frist).påNyRadEllerTomString() +
+            tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
             nåværendeBeskrivelse(oppgave)
     }
 
     fun oppdaterSettPåVent(
         oppgave: Oppgave,
-        dto: OppdaterSettPåVentDto,
+        frist: LocalDate,
         tidspunkt: LocalDateTime = LocalDateTime.now(),
     ): String {
+        val fristBeskrivelse = utledOppgavefristBeskrivelse(oppgave, frist)
+        if (fristBeskrivelse.isEmpty()) {
+            return oppgave.beskrivelse ?: ""
+        }
         return utledBeskrivelsePrefix(tidspunkt) +
-            utledOppgavefristBeskrivelse(oppgave, dto.frist).påNyRadEllerTomString() +
-            dto.kommentar.påNyRadEllerTomString() +
+            fristBeskrivelse.påNyRadEllerTomString() +
             nåværendeBeskrivelse(oppgave)
     }
 
     fun taAvVent(oppgave: Oppgave, tidspunkt: LocalDateTime = LocalDateTime.now()): String {
-        return utledBeskrivelsePrefix(tidspunkt) + "\nTatt av vent" + nåværendeBeskrivelse(oppgave)
+        val tilordnetSaksbehandlerBeskrivelse =
+            utledTilordnetSaksbehandlerBeskrivelse(oppgave, SikkerhetContext.hentSaksbehandlerEllerSystembruker())
+        return utledBeskrivelsePrefix(tidspunkt) +
+            "\nTatt av vent" +
+            tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+            nåværendeBeskrivelse(oppgave)
     }
 
-    private fun String?.påNyRadEllerTomString(): String = this?.trim()?.takeIf { it.isNotBlank() }?.let { "\n$it" } ?: ""
+    private fun String?.påNyRadEllerTomString(): String =
+        this?.trim()?.takeIf { it.isNotBlank() }?.let { "\n$it" } ?: ""
 
     private fun nåværendeBeskrivelse(oppgave: Oppgave): String {
         return if (oppgave.beskrivelse.isNullOrBlank()) {
@@ -59,5 +70,19 @@ object SettPåVentBeskrivelseUtil {
         val eksisterendeFrist = oppgave.fristFerdigstillelse?.norskFormat() ?: "<ingen>"
         val fristNorskFormat = frist.norskFormat()
         return if (eksisterendeFrist == fristNorskFormat) "" else "Oppgave endret frist fra $eksisterendeFrist til $fristNorskFormat"
+    }
+
+    private fun utledTilordnetSaksbehandlerBeskrivelse(
+        oppgave: Oppgave,
+        tilordnetRessurs: String,
+    ): String {
+        val eksisterendeSaksbehandler = oppgave.tilordnetRessurs ?: "<ingen>"
+        val nySaksbehandler = if (tilordnetRessurs == "") "<ingen>" else tilordnetRessurs
+
+        return if (eksisterendeSaksbehandler == nySaksbehandler) {
+            ""
+        } else {
+            "Oppgave flyttet fra saksbehandler $eksisterendeSaksbehandler til ${nySaksbehandler}\n"
+        }
     }
 }

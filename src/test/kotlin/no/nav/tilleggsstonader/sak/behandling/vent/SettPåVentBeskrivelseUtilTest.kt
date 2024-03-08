@@ -31,32 +31,15 @@ class SettPåVentBeskrivelseUtilTest {
         @Test
         fun `skal oppdatere beskrivelse med ny info og beholde eksisterende beskrivelse`() {
             val beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(
-                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse"),
-                SettPåVentDto(emptyList(), LocalDate.of(2023, 1, 1), "ny beskrivelse"),
+                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", tilordnetRessurs = "a100"),
+                LocalDate.of(2023, 1, 1),
                 tidspunkt,
             )
             assertThat(beskrivelse).isEqualTo(
                 """
                 --- 05.03.2024 18:00 a100 (a100) ---
                 Oppgave endret frist fra <ingen> til 01.01.2023
-                ny beskrivelse
-                
-                tidligere beskrivelse
-                """.trimIndent(),
-            )
-        }
-
-        @Test
-        fun `skal håndtere tom beskrivelse`() {
-            val beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(
-                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse"),
-                SettPåVentDto(emptyList(), LocalDate.of(2023, 1, 1), null),
-                tidspunkt,
-            )
-            assertThat(beskrivelse).isEqualTo(
-                """
-                --- 05.03.2024 18:00 a100 (a100) ---
-                Oppgave endret frist fra <ingen> til 01.01.2023
+                Oppgave flyttet fra saksbehandler a100 til <ingen>
                 
                 tidligere beskrivelse
                 """.trimIndent(),
@@ -71,14 +54,13 @@ class SettPåVentBeskrivelseUtilTest {
         fun `skal oppdatere beskrivelse med ny info og appende beskrivelse fra forrige oppgave`() {
             val beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
                 Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse"),
-                OppdaterSettPåVentDto(emptyList(), LocalDate.of(2023, 1, 1), "ny beskrivelse", 1),
+                LocalDate.of(2023, 1, 1),
                 tidspunkt,
             )
             assertThat(beskrivelse).isEqualTo(
                 """
                 --- 05.03.2024 18:00 a100 (a100) ---
                 Oppgave endret frist fra <ingen> til 01.01.2023
-                ny beskrivelse
 
                 tidligere beskrivelse
                 """.trimIndent(),
@@ -90,31 +72,11 @@ class SettPåVentBeskrivelseUtilTest {
             val frist = LocalDate.of(2023, 1, 1)
             val beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
                 Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", fristFerdigstillelse = frist),
-                OppdaterSettPåVentDto(emptyList(), frist, "ny beskrivelse", 1),
+                frist,
                 tidspunkt,
             )
             assertThat(beskrivelse).isEqualTo(
                 """
-                --- 05.03.2024 18:00 a100 (a100) ---
-                ny beskrivelse
-
-                tidligere beskrivelse
-                """.trimIndent(),
-            )
-        }
-
-        @Test
-        fun `skal håndtere tom beskrivelse`() {
-            val beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
-                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse"),
-                OppdaterSettPåVentDto(emptyList(), LocalDate.of(2023, 1, 1), null, 1),
-                tidspunkt,
-            )
-            assertThat(beskrivelse).isEqualTo(
-                """
-                --- 05.03.2024 18:00 a100 (a100) ---
-                Oppgave endret frist fra <ingen> til 01.01.2023
-                
                 tidligere beskrivelse
                 """.trimIndent(),
             )
@@ -127,13 +89,14 @@ class SettPåVentBeskrivelseUtilTest {
         @Test
         fun `skal oppdatere beskrivelse med ny info og appende beskrivelse fra forrige oppgave`() {
             val beskrivelse = SettPåVentBeskrivelseUtil.taAvVent(
-                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse"),
+                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", tilordnetRessurs = null),
                 tidspunkt,
             )
             assertThat(beskrivelse).isEqualTo(
                 """
                 --- 05.03.2024 18:00 a100 (a100) ---
                 Tatt av vent
+                Oppgave flyttet fra saksbehandler <ingen> til a100
                 
                 tidligere beskrivelse
                 """.trimIndent(),
