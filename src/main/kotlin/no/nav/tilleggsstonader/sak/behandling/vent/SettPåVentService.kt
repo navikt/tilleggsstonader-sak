@@ -25,8 +25,7 @@ class SettPåVentService(
 ) {
 
     fun hentStatusSettPåVent(behandlingId: UUID): StatusPåVentDto {
-        val settPåVent = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
-            ?: error("Finner ikke settPåVent for behandling=$behandlingId")
+        val settPåVent = finnAktivSattPåVent(behandlingId)
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
 
         return StatusPåVentDto(
@@ -69,10 +68,9 @@ class SettPåVentService(
         feilHvis(behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
             "Status på behandlingen må være ${BehandlingStatus.SATT_PÅ_VENT} for å kunne oppdatere"
         }
-        val settPåVent = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
-            ?: error("Finner ikke aktiv sett på vent for behandling=$behandlingId")
+        val settPåVent = finnAktivSattPåVent(behandlingId)
 
-        if (!settPåVent.årsaker.containsAll(dto.årsaker) || settPåVent.årsaker.size != dto.årsaker.size) {
+        if (harEndretÅrsaker(settPåVent, dto)) {
             opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, mapOf("årsaker" to dto.årsaker))
         }
         settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
@@ -89,6 +87,12 @@ class SettPåVentService(
         )
     }
 
+    private fun harEndretÅrsaker(
+        settPåVent: SettPåVent,
+        dto: OppdaterSettPåVentDto,
+    ) = !settPåVent.årsaker.containsAll(dto.årsaker) ||
+        settPåVent.årsaker.size != dto.årsaker.size
+
     private fun hentOppgave(behandlingId: UUID): Oppgave {
         val oppgave = hentBehandleSakOppgave(behandlingId)
         return oppgaveService.hentOppgave(oppgave.gsakOppgaveId)
@@ -102,8 +106,7 @@ class SettPåVentService(
         }
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.UTREDES)
 
-        val settPåVent = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
-            ?: error("Finner ikke aktiv sett på vent for behandling=$behandlingId")
+        val settPåVent = finnAktivSattPåVent(behandlingId)
         settPåVentRepository.update(settPåVent.copy(aktiv = false))
 
         opprettHistorikkInnslag(behandling, StegUtfall.TATT_AV_VENT, null)
@@ -111,6 +114,10 @@ class SettPåVentService(
 
         // TODO statistikk
     }
+
+    private fun finnAktivSattPåVent(behandlingId: UUID) =
+        settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
+            ?: error("Finner ikke settPåVent for behandling=$behandlingId")
 
     private fun settOppgavePåVent(
         behandlingId: UUID,
