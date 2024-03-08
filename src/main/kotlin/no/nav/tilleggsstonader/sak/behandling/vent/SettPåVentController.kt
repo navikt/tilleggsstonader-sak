@@ -30,18 +30,21 @@ class SettPåVentController(
     @PostMapping("{behandlingId}")
     fun settPåVent(@PathVariable behandlingId: UUID, @RequestBody dto: SettPåVentDto): StatusPåVentDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
         return settPåVentService.settPåVent(behandlingId, dto)
     }
 
     @PutMapping("{behandlingId}")
     fun oppdaterSettPåVent(@PathVariable behandlingId: UUID, @RequestBody dto: OppdaterSettPåVentDto): StatusPåVentDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
         return settPåVentService.oppdaterSettPåVent(behandlingId, dto)
     }
 
     @DeleteMapping("{behandlingId}")
     fun taAvVent(@PathVariable behandlingId: UUID) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
         settPåVentService.taAvVent(behandlingId)
     }
 }
