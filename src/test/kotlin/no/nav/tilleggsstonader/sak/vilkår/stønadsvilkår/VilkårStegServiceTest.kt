@@ -13,11 +13,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
@@ -29,7 +27,6 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vilkår.VilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -54,41 +51,24 @@ import java.util.UUID
 internal class VilkårStegServiceTest {
 
     private val behandlingService = mockk<BehandlingService>()
-    private val søknadService = mockk<SøknadService>()
     private val vilkårRepository = mockk<VilkårRepository>()
     private val barnService = mockk<BarnService>()
 
-    // private val personopplysningerIntegrasjonerClient = mockk<PersonopplysningerIntegrasjonerClient>()
-    // private val blankettRepository = mockk<BlankettRepository>()
     private val behandlingFaktaService = mockk<BehandlingFaktaService>()
-
-    private val stegService = mockk<StegService>(relaxed = true)
-
-    // private val taskService = mockk<TaskService>()
-    // private val grunnlagsdataService = mockk<GrunnlagsdataService>()
     private val fagsakService = mockk<FagsakService>()
 
-    // private val featureToggleService = mockk<FeatureToggleService>()
     private val behandlingshistorikkService = mockk<BehandlingshistorikkService>()
     private val vilkårService = VilkårService(
         behandlingService,
-        søknadService,
         vilkårRepository,
         barnService,
         behandlingFaktaService,
-        // grunnlagsdataService,
         fagsakService,
-        // featureToggleService,
     )
     private val vilkårStegService = VilkårStegService(
         behandlingService = behandlingService,
         vilkårService = vilkårService,
         vilkårRepository = vilkårRepository,
-        // blankettRepository = blankettRepository,
-        stegService = stegService,
-        vilkårSteg = mockk<VilkårSteg>(relaxed = true),
-        // taskService = taskService,
-        behandlingshistorikkService = behandlingshistorikkService,
     )
     private val søknad = SøknadsskjemaBarnetilsynMapper.map(
         søknadskjemaBarnetilsyn(),
@@ -237,34 +217,6 @@ internal class VilkårStegServiceTest {
         ).isInstanceOf(ApiFeil::class.java)
             .hasMessageContaining("er låst for videre redigering")
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }
-    }
-
-    @Test
-    internal fun `skal oppdatere status fra OPPRETTET til UTREDES og lage historikkinnslag for første vilkår`() {
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling(
-            fagsak(),
-            status = BehandlingStatus.OPPRETTET,
-        )
-        val lagretVilkår = slot<Vilkår>()
-        val vilkår = initiererVilkår(lagretVilkår)
-
-        vilkårStegService.oppdaterVilkår(
-            SvarPåVilkårDto(
-                id = vilkår.id,
-                behandlingId = behandlingId,
-                delvilkårsett = oppfylteDelvilkårPassBarn(),
-            ),
-        )
-
-        verify(exactly = 1) { behandlingService.oppdaterStatusPåBehandling(any(), BehandlingStatus.UTREDES) }
-        verify(exactly = 1) {
-            behandlingshistorikkService.opprettHistorikkInnslag(
-                any(),
-                StegType.VILKÅR,
-                StegUtfall.UTREDNING_PÅBEGYNT,
-                metadata = null,
-            )
-        }
     }
 
     @Test
