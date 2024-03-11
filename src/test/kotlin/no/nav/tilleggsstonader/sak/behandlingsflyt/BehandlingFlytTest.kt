@@ -244,6 +244,7 @@ class BehandlingFlytTest(
 
     private fun utfyllVilkår(behandlingId: UUID) {
         testSaksbehandlingController.utfyllVilkår(behandlingId)
+        stegService.håndterVilkår(behandlingId)
     }
 
     private fun opprettVilkår(behandlingId: UUID) {
