@@ -166,6 +166,16 @@ class VilkårService(
         return vilkårsett.map { it.tilDto() }
     }
 
+    fun hentVilkårsresultat(behandlingId: UUID): List<Vilkårsresultat> {
+        return vilkårRepository.findByBehandlingId(behandlingId).groupBy { it.type }.map {
+            if (it.key.gjelderFlereBarn()) {
+                OppdaterVilkår.utledResultatForVilkårSomGjelderFlereBarn(it.value)
+            } else {
+                it.value.single().resultat
+            }
+        }
+    }
+
     @Transactional
     fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårsvurderingDto {
         // grunnlagsdataService.oppdaterOgHentNyGrunnlagsdata(behandlingId)
