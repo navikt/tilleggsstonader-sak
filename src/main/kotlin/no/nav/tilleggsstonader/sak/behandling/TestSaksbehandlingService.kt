@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårStegService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
@@ -22,7 +21,6 @@ import java.util.UUID
 class TestSaksbehandlingService(
     private val vilkårService: VilkårService,
     private val behandlingService: BehandlingService,
-    private val vilkårStegService: VilkårStegService,
 ) {
     fun utfyllVilkår(behandlingId: UUID): UUID {
         val vilkårsett = vilkårService.hentVilkårsett(behandlingId)
@@ -31,7 +29,7 @@ class TestSaksbehandlingService(
 
         vilkårsett.forEach { vilkår ->
             val delvilkårsett = lagDelvilkårsett(regler.getValue(vilkår.vilkårType), vilkår)
-            vilkårStegService.oppdaterVilkår(SvarPåVilkårDto(vilkår.id, behandlingId, delvilkårsett))
+            vilkårService.oppdaterVilkår(SvarPåVilkårDto(vilkår.id, behandlingId, delvilkårsett))
         }
         return behandlingId
     }
