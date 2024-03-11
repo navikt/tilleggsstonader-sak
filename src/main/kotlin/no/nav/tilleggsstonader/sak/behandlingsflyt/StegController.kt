@@ -18,12 +18,16 @@ class StegController(
     private val tilgangService: TilgangService,
 ) {
 
-    @PostMapping("behandling/{behandlingId}/inngangsvilkaar")
-    fun ferdigstillInngangsvilkår(@PathVariable behandlingId: UUID): UUID {
+    @PostMapping("behandling/{behandlingId}/ferdigstill")
+    fun ferdigstillSteg(@PathVariable behandlingId: UUID, @RequestBody request: FerdigstillStegRequest): UUID {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return stegService.håndterInngangsvilkår(behandlingId).id
+        return when (request.steg) {
+            StegType.INNGANGSVILKÅR -> stegService.håndterInngangsvilkår(behandlingId).id
+            StegType.VILKÅR -> stegService.håndterVilkår(behandlingId).id
+            else -> error("Steg $request.steg kan ikke ferdigstilles her")
+        }
     }
 
     @PostMapping("behandling/{behandlingId}/reset")
@@ -35,6 +39,10 @@ class StegController(
     }
 
     data class ResetStegRequest(
+        val steg: StegType,
+    )
+
+    data class FerdigstillStegRequest(
         val steg: StegType,
     )
 }

@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
+import no.nav.tilleggsstonader.sak.vilkår.VilkårSteg
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -66,6 +67,12 @@ class StegService(
         val inngangsvilkårSteg: InngangsvilkårSteg = behandlingSteg.filterIsInstance<InngangsvilkårSteg>().single()
 
         return håndterSteg(behandlingId, inngangsvilkårSteg)
+    }
+
+    @Transactional
+    fun håndterVilkår(behandlingId: UUID): Behandling {
+        val vilkårSteg: VilkårSteg = behandlingSteg.filterIsInstance<VilkårSteg>().single()
+        return håndterSteg(behandlingId, vilkårSteg)
     }
 
     @Transactional
