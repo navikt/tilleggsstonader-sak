@@ -24,7 +24,7 @@ class VilkårSteg(
     override fun validerSteg(saksbehandling: Saksbehandling) {
         val vilkårsresultat = vilkårService.hentVilkårsresultat(saksbehandling.id)
 
-        brukerfeilHvisIkke(OppdaterVilkår.erAlleVilkårTattStillingTil(vilkårsresultat)){
+        brukerfeilHvisIkke(OppdaterVilkår.erAlleVilkårTattStillingTil(vilkårsresultat)) {
             "Alle vilkår må være tatt stilling til"
         }
     }
