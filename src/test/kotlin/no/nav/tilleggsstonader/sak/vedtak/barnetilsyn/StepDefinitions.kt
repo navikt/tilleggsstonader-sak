@@ -46,10 +46,8 @@ class StepDefinitions {
 
     @Gitt("følgende støndsperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {
-        every { stønadsperiodeRepository.findAllByBehandlingId(behandlingId) } returns mapStønadsperioder(
-            behandlingId,
-            dataTable,
-        )
+        every { stønadsperiodeRepository.findAllByBehandlingId(behandlingId) } returns
+                mapStønadsperioder(behandlingId, dataTable)
     }
 
     @Gitt("følgende aktiviteter")
