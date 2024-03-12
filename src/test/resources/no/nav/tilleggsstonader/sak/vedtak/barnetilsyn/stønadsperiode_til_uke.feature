@@ -42,3 +42,14 @@ Egenskap: Splitt stønadsperioder til uker
     Så forvent følgende stønadsperioder per uke
       | Fom uke    | Tom uke    | Fom        | Tom        | Antall dager |
       | 30.12.2024 | 03.01.2025 | 02.01.2025 | 03.01.2025 | 2            |
+
+
+  Scenario: En stønadsperiode - kun èn helg ikke returnerer noen uker ved splitting
+    Gitt disse stønadsperiodene
+      | Fom        | Tom        |
+      | 06.01.2024 | 07.01.2024 |
+
+    Når splitter stønadsperiode per uke
+
+    Så forvent følgende stønadsperioder per uke
+      | Fom uke | Tom uke | Fom | Tom | Antall dager |
