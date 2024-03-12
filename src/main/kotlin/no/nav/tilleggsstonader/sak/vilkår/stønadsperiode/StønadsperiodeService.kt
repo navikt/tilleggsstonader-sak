@@ -1,9 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -18,8 +17,6 @@ class StønadsperiodeService(
     private val behandlingService: BehandlingService,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperiodeService: VilkårperiodeService,
-    private val stegService: StegService,
-    private val inngangsvilkårSteg: InngangsvilkårSteg,
 ) {
     fun hentStønadsperioder(behandlingId: UUID): List<StønadsperiodeDto> {
         return stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
@@ -27,12 +24,8 @@ class StønadsperiodeService(
 
     @Transactional
     fun lagreStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>): List<StønadsperiodeDto> {
-        feilHvis(behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke lagre stønadsperioder når behandlingen er låst"
-        }
+        validerBehandling(behandlingId)
         validerStønadsperioder(behandlingId, stønadsperioder)
-
-        stegService.håndterSteg(behandlingId, inngangsvilkårSteg)
 
         val tidligereStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId)
 
@@ -40,6 +33,16 @@ class StønadsperiodeService(
         val oppdaterteStønadsperioder = oppdaterEksisterendeStønadsperioder(tidligereStønadsperioder, stønadsperioder)
         val nyeStønadsperioder = leggTilNyeStønadsperioder(behandlingId, stønadsperioder, tidligereStønadsperioder)
         return (nyeStønadsperioder + oppdaterteStønadsperioder).tilSortertDto()
+    }
+
+    private fun validerBehandling(behandlingId: UUID) {
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
+            "Kan ikke lagre stønadsperioder når behandlingen er låst"
+        }
+        feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
+            "Kan ikke lagre stønadsperioder når behandlingen er på steg=${behandling.steg}"
+        }
     }
 
     private fun slettStønadsperioder(

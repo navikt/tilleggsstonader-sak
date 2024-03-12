@@ -78,4 +78,6 @@ fun LocalDate.erEttÅrEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolea
 fun LocalDateTime.harGåttAntallTimer(timer: Int) =
     this.plusHours(timer.toLong()) < LocalDateTime.now()
 
-fun dagensDatoMedTidNorskFormat(): String = dagensDatoMedTid().format(DatoFormat.GOSYS_DATE_TIME)
+fun dagensDatoMedTidNorskFormat(): String = dagensDatoMedTid().medGosysTid()
+
+fun LocalDateTime.medGosysTid(): String = this.format(DatoFormat.GOSYS_DATE_TIME)
