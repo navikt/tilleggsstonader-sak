@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktiviteter
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import java.util.UUID
 
 class BeregningUtilsStepDefinitons {
@@ -48,7 +48,7 @@ class BeregningUtilsStepDefinitons {
 
     @Så("forvent at aktivitetene ble splittet til {} uker")
     fun `forvent antall uker`(antallUker: Int) {
-        Assertions.assertThat(aktiviteterPerUke).hasSize(antallUker)
+        assertThat(aktiviteterPerUke).hasSize(antallUker)
     }
 
     @Så("forvent følgende stønadsperioder for uke med fom={} og tom={}")
@@ -56,7 +56,7 @@ class BeregningUtilsStepDefinitons {
         val uke = Uke(parseDato(fom), parseDato(tom))
         val forventedePerioder = parsePeriodeMedDager(dataTable).first()
 
-        Assertions.assertThat(stønadsperiodePerUke[uke]).isEqualTo(forventedePerioder)
+        assertThat(stønadsperiodePerUke[uke]).isEqualTo(forventedePerioder)
     }
 
     @Så("forvent følgende aktiviteter for uke med fom={} og tom={}")
@@ -64,7 +64,7 @@ class BeregningUtilsStepDefinitons {
         val uke = Uke(parseDato(fom), parseDato(tom))
         val forventedePerioder = parsePeriodeMedDager(dataTable)
 
-        Assertions.assertThat(aktiviteterPerUke[uke])
+        assertThat(aktiviteterPerUke[uke])
             .containsExactlyElementsOf(forventedePerioder)
     }
 
