@@ -8,18 +8,25 @@ import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -27,16 +34,108 @@ import java.util.UUID
 @Service
 class VilkårService(
     private val behandlingService: BehandlingService,
-    private val søknadService: SøknadService,
     private val vilkårRepository: VilkårRepository,
     private val barnService: BarnService,
     private val behandlingFaktaService: BehandlingFaktaService,
-    // private val grunnlagsdataService: GrunnlagsdataService,
     private val fagsakService: FagsakService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
+
+    @Transactional
+    fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
+        val vilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
+        val behandlingId = vilkår.behandlingId
+
+        validerLåstForVidereRedigering(behandlingId)
+        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, svarPåVilkårDto.behandlingId)
+
+        val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, svarPåVilkårDto.delvilkårsett)
+        return vilkårRepository.update(oppdatertVilkår).tilDto()
+    }
+
+    @Transactional
+    fun nullstillVilkår(oppdaterVilkårDto: OppdaterVilkårDto): VilkårDto {
+        val vilkår = vilkårRepository.findByIdOrThrow(oppdaterVilkårDto.id)
+        val behandlingId = vilkår.behandlingId
+
+        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
+        validerLåstForVidereRedigering(behandlingId)
+
+        return nullstillVilkårMedNyeHovedregler(behandlingId, vilkår)
+    }
+
+    @Transactional
+    fun settVilkårTilSkalIkkeVurderes(oppdaterVilkårDto: OppdaterVilkårDto): VilkårDto {
+        val vilkår = vilkårRepository.findByIdOrThrow(oppdaterVilkårDto.id)
+        val behandlingId = vilkår.behandlingId
+
+        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
+        validerLåstForVidereRedigering(behandlingId)
+
+        return oppdaterVilkårTilSkalIkkeVurderes(behandlingId, vilkår)
+    }
+
+    private fun nullstillVilkårMedNyeHovedregler(
+        behandlingId: UUID,
+        vilkår: Vilkår,
+    ): VilkårDto {
+        val metadata = hentHovedregelMetadata(behandlingId)
+        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkår(metadata, barnId = vilkår.barnId)
+        val delvilkårWrapper = DelvilkårWrapper(nyeDelvilkår)
+        return vilkårRepository.update(
+            vilkår.copy(
+                resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+                delvilkårwrapper = delvilkårWrapper,
+                opphavsvilkår = null,
+            ),
+        ).tilDto()
+    }
+
+    private fun oppdaterVilkårTilSkalIkkeVurderes(
+        behandlingId: UUID,
+        vilkår: Vilkår,
+    ): VilkårDto {
+        val metadata = hentHovedregelMetadata(behandlingId)
+        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkår(
+            metadata,
+            Vilkårsresultat.SKAL_IKKE_VURDERES,
+        )
+        val delvilkårWrapper = DelvilkårWrapper(nyeDelvilkår)
+        return vilkårRepository.update(
+            vilkår.copy(
+                resultat = Vilkårsresultat.SKAL_IKKE_VURDERES,
+                delvilkårwrapper = delvilkårWrapper,
+                opphavsvilkår = null,
+            ),
+        ).tilDto()
+    }
+
+    private fun hentHovedregelMetadata(behandlingId: UUID) = hentGrunnlagOgMetadata(behandlingId).second
+
+    private fun validerLåstForVidereRedigering(behandlingId: UUID) {
+        if (behandlingErLåstForVidereRedigering(behandlingId)) {
+            throw ApiFeil("Behandlingen er låst for videre redigering", HttpStatus.BAD_REQUEST)
+        }
+    }
+
+    /**
+     * Tilgangskontroll sjekker att man har tilgang til behandlingId som blir sendt inn, men det er mulig å sende inn
+     * en annen behandlingId enn den som er på vilkåret
+     */
+    private fun validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId: UUID, requestBehandlingId: UUID) {
+        if (behandlingId != requestBehandlingId) {
+            throw Feil(
+                "BehandlingId=$requestBehandlingId er ikke lik vilkårets sin behandlingId=$behandlingId",
+                "BehandlingId er feil, her har noe gått galt",
+                httpStatus = HttpStatus.BAD_REQUEST,
+            )
+        }
+    }
+
+    private fun behandlingErLåstForVidereRedigering(behandlingId: UUID) =
+        behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
 
     @Transactional
     fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
@@ -65,6 +164,16 @@ class VilkårService(
         val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
         feilHvis(vilkårsett.isEmpty()) { "Mangler vilkår for behandling=$behandlingId" }
         return vilkårsett.map { it.tilDto() }
+    }
+
+    fun hentVilkårsresultat(behandlingId: UUID): List<Vilkårsresultat> {
+        return vilkårRepository.findByBehandlingId(behandlingId).groupBy { it.type }.map {
+            if (it.key.gjelderFlereBarn()) {
+                OppdaterVilkår.utledResultatForVilkårSomGjelderFlereBarn(it.value)
+            } else {
+                it.value.single().resultat
+            }
+        }
     }
 
     @Transactional
@@ -121,9 +230,6 @@ class VilkårService(
         )
         return vilkårRepository.insertAll(nyttVilkårsett)
     }
-
-    private fun behandlingErLåstForVidereRedigering(behandlingId: UUID) =
-        behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
 
     /*private fun finnEndringerIGrunnlagsdata(behandlingId: UUID): List<GrunnlagsdataEndring> {
         val oppdaterteGrunnlagsdata = grunnlagsdataService.hentFraRegister(behandlingId)

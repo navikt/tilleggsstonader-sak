@@ -18,12 +18,12 @@ class StegController(
     private val tilgangService: TilgangService,
 ) {
 
-    @PostMapping("behandling/{behandlingId}/inngangsvilkaar")
-    fun ferdigstillInngangsvilkår(@PathVariable behandlingId: UUID): UUID {
+    @PostMapping("behandling/{behandlingId}/ferdigstill")
+    fun ferdigstillSteg(@PathVariable behandlingId: UUID, @RequestBody request: FerdigstillStegRequest): UUID {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return stegService.håndterInngangsvilkår(behandlingId).id
+        return stegService.håndterSteg(behandlingId, request.steg).id
     }
 
     @PostMapping("behandling/{behandlingId}/reset")
@@ -35,6 +35,10 @@ class StegController(
     }
 
     data class ResetStegRequest(
+        val steg: StegType,
+    )
+
+    data class FerdigstillStegRequest(
         val steg: StegType,
     )
 }
