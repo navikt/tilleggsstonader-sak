@@ -62,6 +62,12 @@ class StegService(
 
     @Transactional
     fun håndterSteg(behandlingId: UUID, steg: StegType): Behandling {
+        val behandling = behandlingService.hentBehandling(behandlingId)
+
+        feilHvis(behandling.steg != steg) {
+            "Behandling er i steg ${behandling.steg}. Steget $steg kan derfor ikke ferdigstilles."
+        }
+
         return when (steg) {
             StegType.INNGANGSVILKÅR -> håndterInngangsvilkår(behandlingId)
             StegType.VILKÅR -> håndterVilkår(behandlingId)
