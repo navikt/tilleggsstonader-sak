@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
@@ -80,8 +81,8 @@ internal class VilkårServiceTest {
         lagJournalpost(),
     )
     private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
-    val fagsak = fagsak()
-    private val behandling = behandling(fagsak, BehandlingStatus.OPPRETTET, årsak = BehandlingÅrsak.PAPIRSØKNAD)
+    private val fagsak = fagsak()
+    private val behandling = behandling(fagsak = fagsak, status = BehandlingStatus.OPPRETTET, steg = StegType.VILKÅR, årsak = BehandlingÅrsak.PAPIRSØKNAD)
     private val behandlingId = behandling.id
 
     private val grunnlag = mockVilkårGrunnlagDto(
@@ -356,6 +357,7 @@ internal class VilkårServiceTest {
         every { behandlingService.hentBehandling(behandlingId) } returns behandling(
             fagsak(),
             BehandlingStatus.FERDIGSTILT,
+            StegType.VILKÅR,
         )
         val vilkår = vilkår(
             behandlingId,
@@ -376,6 +378,35 @@ internal class VilkårServiceTest {
             },
         ).isInstanceOf(ApiFeil::class.java)
             .hasMessageContaining("er låst for videre redigering")
+        verify(exactly = 0) { vilkårRepository.insertAll(any()) }
+    }
+
+    @Test
+    internal fun `skal ikke oppdatere vilkår hvis behandlingen ikke er i steg VILKÅR`() {
+        every { behandlingService.hentBehandling(behandlingId) } returns behandling(
+            fagsak(),
+            BehandlingStatus.UTREDES,
+            StegType.INNGANGSVILKÅR,
+        )
+        val vilkår = vilkår(
+            behandlingId,
+            resultat = IKKE_TATT_STILLING_TIL,
+            VilkårType.PASS_BARN,
+        )
+        every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
+
+        assertThat(
+            Assertions.catchThrowable {
+                vilkårService.oppdaterVilkår(
+                    SvarPåVilkårDto(
+                        id = vilkår.id,
+                        behandlingId = behandlingId,
+                        listOf(),
+                    ),
+                )
+            },
+        ).isInstanceOf(ApiFeil::class.java)
+            .hasMessageContaining("Kan ikke oppdatere vilkår når behandling er på steg")
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }
     }
 

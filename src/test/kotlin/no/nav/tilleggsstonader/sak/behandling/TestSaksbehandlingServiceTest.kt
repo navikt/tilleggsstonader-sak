@@ -35,7 +35,7 @@ internal class TestSaksbehandlingServiceTest() : IntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(
             behandling(
                 status = BehandlingStatus.UTREDES,
-                steg = StegType.SEND_TIL_BESLUTTER,
+                steg = StegType.VILKÅR,
             ),
         )
         val skjema = SøknadUtil.søknadskjemaBarnetilsyn(
