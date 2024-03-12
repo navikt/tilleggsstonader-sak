@@ -65,19 +65,26 @@ object TilsynBeregningUtil {
     }
 
     /**
+     * Metoden finner mandagen i nærmeste arbeidsuke
+     * Dersom datoen er man-fre vil metoden returnere mandag samme uke
+     * Er datoen lør eller søn returneres mandagen uken etter
+     */
+    private fun LocalDate.nærmesteRelevateMandag(): LocalDate {
+        if (this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY) {
+            return this.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+        } else {
+            return this.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        }
+    }
+
+    /**
      * Splitter en periode opp i uker (kun hverdager inkludert)
      * Tar inn en funksjon for å beregne hvor mange dager man ønsker å telle i uken
      * enten alle eller begrense til antall aktivitetsdager
      */
-    fun <P : Periode<LocalDate>> P.splitPerUke(antallDager: (fom: LocalDate, tom: LocalDate) -> Int): Map<Uke, PeriodeMedDager> {
+    private fun <P : Periode<LocalDate>> P.splitPerUke(antallDager: (fom: LocalDate, tom: LocalDate) -> Int): Map<Uke, PeriodeMedDager> {
         val periode = mutableMapOf<Uke, PeriodeMedDager>()
-        var startOfWeek: LocalDate
-
-        if (this.fom.dayOfWeek == DayOfWeek.SATURDAY || this.fom.dayOfWeek == DayOfWeek.SUNDAY) {
-            startOfWeek = this.fom.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
-        } else {
-            startOfWeek = this.fom.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-        }
+        var startOfWeek = this.fom.nærmesteRelevateMandag()
 
         while (startOfWeek <= this.tom) {
             val endOfWeek = startOfWeek.plusDays(4)
