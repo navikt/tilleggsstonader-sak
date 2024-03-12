@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.util.UUID
 import kotlin.math.min
@@ -124,7 +125,7 @@ object TilsynBeregningUtil {
     }
 
     private fun antallDagerIPeriodeInklusiv(fom: LocalDate, tom: LocalDate): Int {
-        return fom.datesUntil(tom).count().toInt() + 1
+        return ChronoUnit.DAYS.between(fom, tom).toInt() + 1
     }
 }
 
