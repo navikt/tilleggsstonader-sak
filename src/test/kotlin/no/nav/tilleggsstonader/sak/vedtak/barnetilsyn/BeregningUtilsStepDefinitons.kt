@@ -51,12 +51,17 @@ class BeregningUtilsStepDefinitons {
         assertThat(aktiviteterPerUke).hasSize(antallUker)
     }
 
-    @Så("forvent følgende stønadsperioder for uke med fom={} og tom={}")
-    fun `forvent følgende stønadsperioder for uke`(fom: String, tom: String, dataTable: DataTable) {
-        val uke = Uke(parseDato(fom), parseDato(tom))
-        val forventedePerioder = parsePeriodeMedDager(dataTable).first()
+    @Så("forvent følgende stønadsperioder per uke")
+    fun `forvent følgende stønadsperioder per uke`(dataTable: DataTable) {
+        val uker = parseUke(dataTable)
+        val forventedePerioder = parsePeriodeMedDager(dataTable)
 
-        assertThat(stønadsperiodePerUke[uke]).isEqualTo(forventedePerioder)
+        uker.forEachIndexed{indeks, uke ->
+            assertThat(stønadsperiodePerUke[uke]).isEqualTo(forventedePerioder[indeks])
+        }
+
+        // Sjekk at det ikke ble laget flere uker enn forventet
+        assertThat(stønadsperiodePerUke.size).isEqualTo(uker.size)
     }
 
     @Så("forvent følgende aktiviteter for uke med fom={} og tom={}")
@@ -66,6 +71,15 @@ class BeregningUtilsStepDefinitons {
 
         assertThat(aktiviteterPerUke[uke])
             .containsExactlyElementsOf(forventedePerioder)
+    }
+
+    private fun parseUke(dataTable: DataTable): List<Uke> {
+        return dataTable.mapRad { rad ->
+            Uke(
+                fom = parseDato(BeregningNøkler.FOM_UKE, rad),
+                tom = parseDato(BeregningNøkler.TOM_UKE, rad),
+            )
+        }
     }
 
     private fun parsePeriodeMedDager(dataTable: DataTable): List<PeriodeMedDager> {

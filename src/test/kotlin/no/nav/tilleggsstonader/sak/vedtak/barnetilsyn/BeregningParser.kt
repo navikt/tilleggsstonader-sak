@@ -27,6 +27,8 @@ enum class BeregningNøkler(
     MÅLGRUPPE("Målgruppe"),
     AKTIVITETSDAGER("Aktivitetsdager"),
     ANTALL_AKTIVITETER("Antall aktiviteter"),
+    FOM_UKE("Fom uke"),
+    TOM_UKE("Tom uke"),
 }
 
 fun mapStønadsperioder(behandlingId: UUID, dataTable: DataTable) = dataTable.mapRad { rad ->
