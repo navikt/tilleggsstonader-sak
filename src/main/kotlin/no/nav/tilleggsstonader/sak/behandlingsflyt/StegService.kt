@@ -61,7 +61,15 @@ class StegService(
     }
 
     @Transactional
-    fun håndterInngangsvilkår(
+    fun håndterSteg(behandlingId: UUID, steg: StegType): Behandling {
+        return when (steg) {
+            StegType.INNGANGSVILKÅR -> håndterInngangsvilkår(behandlingId)
+            StegType.VILKÅR -> håndterVilkår(behandlingId)
+            else -> error("Steg $steg kan ikke ferdigstilles her")
+        }
+    }
+
+    private fun håndterInngangsvilkår(
         behandlingId: UUID,
     ): Behandling {
         val inngangsvilkårSteg: InngangsvilkårSteg = behandlingSteg.filterIsInstance<InngangsvilkårSteg>().single()
@@ -69,8 +77,7 @@ class StegService(
         return håndterSteg(behandlingId, inngangsvilkårSteg)
     }
 
-    @Transactional
-    fun håndterVilkår(behandlingId: UUID): Behandling {
+    private fun håndterVilkår(behandlingId: UUID): Behandling {
         val vilkårSteg: VilkårSteg = behandlingSteg.filterIsInstance<VilkårSteg>().single()
         return håndterSteg(behandlingId, vilkårSteg)
     }

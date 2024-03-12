@@ -23,11 +23,7 @@ class StegController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return when (request.steg) {
-            StegType.INNGANGSVILKÅR -> stegService.håndterInngangsvilkår(behandlingId).id
-            StegType.VILKÅR -> stegService.håndterVilkår(behandlingId).id
-            else -> error("Steg $request.steg kan ikke ferdigstilles her")
-        }
+        return stegService.håndterSteg(behandlingId, request.steg).id
     }
 
     @PostMapping("behandling/{behandlingId}/reset")
