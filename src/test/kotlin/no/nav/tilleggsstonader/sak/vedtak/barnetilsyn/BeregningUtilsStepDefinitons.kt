@@ -56,7 +56,7 @@ class BeregningUtilsStepDefinitons {
         val uker = parseUke(dataTable)
         val forventedePerioder = parsePeriodeMedDager(dataTable)
 
-        uker.forEachIndexed{indeks, uke ->
+        uker.forEachIndexed { indeks, uke ->
             assertThat(stønadsperiodePerUke[uke]).isEqualTo(forventedePerioder[indeks])
         }
 
