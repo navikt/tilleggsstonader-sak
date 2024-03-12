@@ -142,7 +142,7 @@ class TilsynBarnBeregningService(
             val maksAntallDagerIUke = periode.antallDager
 
             val aktiviteterForUke = aktiviteterUker[uke]
-            val antallDagerMedAktivitet = aktiviteterForUke?.sumOf { it.antallDager } ?: 0
+            val antallDagerMedAktivitet = aktiviteterForUke?.sumOf { it.antallDager } ?: error("Ingen aktivitet i uke fom=${uke.fom} og tom=${uke.tom}")
 
             min(antallDagerMedAktivitet, maksAntallDagerIUke)
         }
