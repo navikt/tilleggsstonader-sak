@@ -95,14 +95,14 @@ class TilsynBarnBeregningService(
         val aktiviteterPerMånedPerType = aktiviteter.tilAktiviteterPerMånedPerType()
 
         return stønadsperioderPerMåned.entries.mapNotNull { (måned, stønadsperioder) ->
-            val aktiviteter = aktiviteterPerMånedPerType[måned] ?: error("Ingen aktiviteter for måned $måned")
+            val aktiviteterForMåned = aktiviteterPerMånedPerType[måned] ?: error("Ingen aktiviteter for måned $måned")
             utgifterPerMåned[måned]?.let { utgifter ->
                 val antallBarn = utgifter.map { it.barnId }.toSet().size
                 val makssats = finnMakssats(måned, antallBarn)
                 Beregningsgrunnlag(
                     måned = måned,
                     makssats = makssats,
-                    stønadsperioderGrunnlag = finnStønadsaktiviteterMedAktiviteter(stønadsperioder, aktiviteter),
+                    stønadsperioderGrunnlag = finnStønadsperioderMedAktiviteter(stønadsperioder, aktiviteterForMåned),
                     utgifter = utgifter,
                     utgifterTotal = utgifter.sumOf { it.utgift },
                     antallBarn = antallBarn,
@@ -111,7 +111,7 @@ class TilsynBarnBeregningService(
         }
     }
 
-    private fun finnStønadsaktiviteterMedAktiviteter(
+    private fun finnStønadsperioderMedAktiviteter(
         stønadsperioder: List<StønadsperiodeDto>,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
     ): List<StønadsperiodeGrunnlag> {
