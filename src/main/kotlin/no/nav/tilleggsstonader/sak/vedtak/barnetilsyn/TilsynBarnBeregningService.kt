@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.erSortert
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
-import no.nav.tilleggsstonader.libs.utils.VirkedagerProvider
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBeregningUtil.tilDagerPerUke
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBeregningUtil.tilUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -15,11 +15,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktiviteter
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.UUID
+import kotlin.math.min
 
 /**
  * Stønaden dekker 64% av utgifterne til barnetilsyn
@@ -94,14 +95,14 @@ class TilsynBarnBeregningService(
         val aktiviteterPerMånedPerType = aktiviteter.tilAktiviteterPerMånedPerType()
 
         return stønadsperioderPerMåned.entries.mapNotNull { (måned, stønadsperioder) ->
-            val aktiviteter = aktiviteterPerMånedPerType[måned] ?: error("Ingen aktiviteter for måned $måned")
+            val aktiviteterForMåned = aktiviteterPerMånedPerType[måned] ?: error("Ingen aktiviteter for måned $måned")
             utgifterPerMåned[måned]?.let { utgifter ->
                 val antallBarn = utgifter.map { it.barnId }.toSet().size
                 val makssats = finnMakssats(måned, antallBarn)
                 Beregningsgrunnlag(
                     måned = måned,
                     makssats = makssats,
-                    stønadsperioderGrunnlag = finnStønadsaktiviteterMedAktiviteter(stønadsperioder, aktiviteter),
+                    stønadsperioderGrunnlag = finnStønadsperioderMedAktiviteter(stønadsperioder, aktiviteterForMåned),
                     utgifter = utgifter,
                     utgifterTotal = utgifter.sumOf { it.utgift },
                     antallBarn = antallBarn,
@@ -110,7 +111,7 @@ class TilsynBarnBeregningService(
         }
     }
 
-    private fun finnStønadsaktiviteterMedAktiviteter(
+    private fun finnStønadsperioderMedAktiviteter(
         stønadsperioder: List<StønadsperiodeDto>,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
     ): List<StønadsperiodeGrunnlag> {
@@ -120,7 +121,7 @@ class TilsynBarnBeregningService(
             StønadsperiodeGrunnlag(
                 stønadsperiode = stønadsperiode,
                 aktiviteter = relevanteAktiviteter,
-                antallDager = antallDager(stønadsperiode),
+                antallDager = antallDager(stønadsperiode, relevanteAktiviteter),
             )
         }
     }
@@ -130,17 +131,28 @@ class TilsynBarnBeregningService(
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
     ): List<Aktivitet> {
         return aktiviteter[stønadsperiode.aktivitet]?.filter { it.overlapper(stønadsperiode) }
-            ?: error("Finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som passer med stønadsperiode")
+            ?: error("Finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som passer med stønadsperiode med fom=${stønadsperiode.fom} og tom=${stønadsperiode.tom}")
     }
 
-    // TODO: Ta inn relevante aktiviteter og finn antall dager det skal utbetales for
-    private fun antallDager(stønadsperiode: StønadsperiodeDto): Int {
-        return stønadsperiode.alleDatoer().count { !VirkedagerProvider.erHelgEllerHelligdag(it) }
+    private fun antallDager(stønadsperiode: StønadsperiodeDto, aktiviteter: List<Aktivitet>): Int {
+        val stønadsperioderUker = stønadsperiode.tilUke()
+        val aktiviteterUker = aktiviteter.tilDagerPerUke()
+
+        val antallDagerMedAktivitetPerUke = stønadsperioderUker.map { (uke, periode) ->
+            val maksAntallDagerIUke = periode.antallDager
+
+            val aktiviteterForUke = aktiviteterUker[uke]
+            val antallDagerMedAktivitet = aktiviteterForUke?.sumOf { it.antallDager } ?: error("Ingen aktivitet i uke fom=${uke.fom} og tom=${uke.tom}")
+
+            min(antallDagerMedAktivitet, maksAntallDagerIUke)
+        }
+
+        return antallDagerMedAktivitetPerUke.sum()
     }
 
     private fun finnAktiviteter(behandlingId: UUID): List<Aktivitet> {
         return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
-            .tilAktivitet()
+            .tilAktiviteter()
     }
 
     private fun validerPerioder(

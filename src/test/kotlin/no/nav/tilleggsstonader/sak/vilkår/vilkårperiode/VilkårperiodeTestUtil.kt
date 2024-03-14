@@ -63,6 +63,7 @@ object VilkårperiodeTestUtil {
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate = LocalDate.now().plusDays(5),
         type: AktivitetType = AktivitetType.TILTAK,
+        aktivitetsdager: Int = 5,
         delvilkår: DelvilkårAktivitet = delvilkårAktivitet(),
         begrunnelse: String? = null,
         kilde: KildeVilkårsperiode = KildeVilkårsperiode.SYSTEM,
@@ -77,7 +78,7 @@ object VilkårperiodeTestUtil {
         begrunnelse = begrunnelse,
         kilde = kilde,
         resultat = resultat,
-        aktivitetsdager = 5,
+        aktivitetsdager = aktivitetsdager,
         slettetKommentar = slettetKommentar,
     )
 

@@ -1,11 +1,17 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters
 import java.util.UUID
+import kotlin.math.min
 
 object TilsynBeregningUtil {
     /**
@@ -57,5 +63,83 @@ object TilsynBeregningUtil {
                 }
             }
             .groupBy({ it.first }, { it.second }).mapValues { it.value.groupBy { it.type } }
+    }
+
+    /**
+     * Metoden finner mandagen i nærmeste arbeidsuke
+     * Dersom datoen er man-fre vil metoden returnere mandag samme uke
+     * Er datoen lør eller søn returneres mandagen uken etter
+     */
+    private fun LocalDate.nærmesteRelevateMandag(): LocalDate {
+        if (this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY) {
+            return this.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+        } else {
+            return this.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        }
+    }
+
+    /**
+     * Splitter en periode opp i uker (kun hverdager inkludert)
+     * Tar inn en funksjon for å beregne hvor mange dager man ønsker å telle i uken
+     * enten alle eller begrense til antall aktivitetsdager
+     */
+    private fun <P : Periode<LocalDate>> P.splitPerUke(antallDager: (fom: LocalDate, tom: LocalDate) -> Int): Map<Uke, PeriodeMedDager> {
+        val periode = mutableMapOf<Uke, PeriodeMedDager>()
+        var startOfWeek = this.fom.nærmesteRelevateMandag()
+
+        while (startOfWeek <= this.tom) {
+            val endOfWeek = startOfWeek.plusDays(4)
+            val uke = Uke(startOfWeek, endOfWeek)
+            val fom = maxOf(uke.fom, this.fom)
+            val tom = minOf(uke.tom, this.tom)
+
+            periode.getOrPut(uke) { PeriodeMedDager(fom, tom, antallDager(fom, tom)) }
+
+            startOfWeek = startOfWeek.plusWeeks(1)
+        }
+
+        return periode
+    }
+
+    /**
+     * Splitter en stønadsperiode opp i uker (kun hverdager inkludert)
+     * Antall dager i uken er oppad begrenset til antall dager i stønadsperioden som er innenfor uken
+     */
+    fun StønadsperiodeDto.tilUke(): Map<Uke, PeriodeMedDager> {
+        return this.splitPerUke { fom, tom ->
+            antallDagerIPeriodeInklusiv(fom, tom)
+        }
+    }
+
+    /**
+     * Splitter en liste av aktiviteter opp i uker (kun hverdager inkludert)
+     * Antall dager i uken er oppad begrenset til det lavest av antall aktivitetsdager eller antall
+     * dager i aktivitetsperioden som er innenfor uken
+     */
+    fun List<Aktivitet>.tilDagerPerUke(): Map<Uke, List<PeriodeMedDager>> {
+        return this.map { aktivitet ->
+            aktivitet.splitPerUke { fom, tom ->
+                min(aktivitet.aktivitetsdager, antallDagerIPeriodeInklusiv(fom, tom))
+            }
+        }.flatMap { it.entries }.groupBy({ it.key }, { it.value })
+    }
+
+    private fun antallDagerIPeriodeInklusiv(fom: LocalDate, tom: LocalDate): Int {
+        return ChronoUnit.DAYS.between(fom, tom).toInt() + 1
+    }
+}
+
+data class Uke(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+) : Periode<LocalDate>
+
+data class PeriodeMedDager(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val antallDager: Int,
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
     }
 }
