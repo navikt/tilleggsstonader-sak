@@ -35,12 +35,11 @@ data class VilkårJson(
     val opphavsvilkår: OpphavsvilkårDto?,
 )
 
-
 data class DelvilkårsvurderingJson(
     val svar: SvarId? = null,
     val begrunnelse: String? = null,
     val svaralternativer: Map<SvarId, SvaralternativJson>,
-    val følgerFraOverordnetValg: OverordnetValgJson?,
+    val følgerFraOverordnetValg: OverordnetValgJson? = null,
 )
 
 data class OverordnetValgJson(

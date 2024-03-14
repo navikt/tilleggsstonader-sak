@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDtoGammel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDtoGammel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
@@ -69,7 +69,7 @@ class VilkårController(
     }
 
     @GetMapping("{behandlingId}")
-    fun getVilkår(@PathVariable behandlingId: UUID): VilkårsvurderingDtoGammel {
+    fun getVilkårGammel(@PathVariable behandlingId: UUID): Vilkårsvurdering {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
     }
@@ -80,12 +80,8 @@ class VilkårController(
         return vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
     }
 
-    class VilkårsvurderingJson {
-
-    }
-
     @GetMapping("{behandlingId}/oppdater")
-    fun oppdaterRegisterdata(@PathVariable behandlingId: UUID): VilkårsvurderingDtoGammel {
+    fun oppdaterRegisterdata(@PathVariable behandlingId: UUID): Vilkårsvurdering {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId)
