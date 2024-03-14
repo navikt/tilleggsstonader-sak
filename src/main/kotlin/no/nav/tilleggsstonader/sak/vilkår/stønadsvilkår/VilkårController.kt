@@ -6,8 +6,8 @@ import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDtoGammel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDtoGammel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
@@ -38,7 +38,7 @@ class VilkårController(
     }
 
     @PostMapping
-    fun oppdaterVilkår(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
+    fun oppdaterVilkår(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDtoGammel {
         tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         try {
@@ -47,35 +47,45 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                    " svar=$delvilkårJson",
+                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
     }
 
     @PostMapping("nullstill")
-    fun nullstillVilkår(@RequestBody request: OppdaterVilkårDto): VilkårDto {
+    fun nullstillVilkår(@RequestBody request: OppdaterVilkårDto): VilkårDtoGammel {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårStegService.nullstillVilkår(request)
     }
 
     @PostMapping("ikkevurder")
-    fun settVilkårTilSkalIkkeVurderes(@RequestBody request: OppdaterVilkårDto): VilkårDto {
+    fun settVilkårTilSkalIkkeVurderes(@RequestBody request: OppdaterVilkårDto): VilkårDtoGammel {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårStegService.settVilkårTilSkalIkkeVurderes(request)
     }
 
     @GetMapping("{behandlingId}")
-    fun getVilkår(@PathVariable behandlingId: UUID): VilkårsvurderingDto {
+    fun getVilkår(@PathVariable behandlingId: UUID): VilkårsvurderingDtoGammel {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
     }
 
+    @GetMapping("{behandlingID}")
+    fun getVilkårsvurdering(@PathVariable behandlingId: UUID): VilkårsvurderingJson {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        return vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
+    }
+
+    class VilkårsvurderingJson {
+
+    }
+
     @GetMapping("{behandlingId}/oppdater")
-    fun oppdaterRegisterdata(@PathVariable behandlingId: UUID): VilkårsvurderingDto {
+    fun oppdaterRegisterdata(@PathVariable behandlingId: UUID): VilkårsvurderingDtoGammel {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId)

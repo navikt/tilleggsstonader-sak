@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
 enum class RegelId(val beskrivelse: String) {
+    // TODO: Fjerne beskrivelsen? Tror ikke det blir brukt.
+
     SLUTT_NODE("SLUTT_NODE"),
 
     // EKSEMPEL

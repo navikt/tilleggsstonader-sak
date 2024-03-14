@@ -5,12 +5,13 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.BegrunnelseType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class VilkårDto(
+data class VilkårDtoGammel(
     val id: UUID,
     val behandlingId: UUID,
     val resultat: Vilkårsresultat,
@@ -22,9 +23,39 @@ data class VilkårDto(
     val opphavsvilkår: OpphavsvilkårDto?,
 )
 
+data class VilkårJson(
+    val id: UUID,
+    val behandlingId: UUID,
+    val resultat: Vilkårsresultat,
+    val vilkårType: VilkårType,
+    val barnId: UUID? = null,
+    val endretAv: String,
+    val endretTid: LocalDateTime,
+    val vurdering: Map<RegelId, DelvilkårsvurderingJson>,
+    val opphavsvilkår: OpphavsvilkårDto?,
+)
+
+
+data class DelvilkårsvurderingJson(
+    val svar: SvarId? = null,
+    val begrunnelse: String? = null,
+    val svaralternativer: Map<SvarId, SvaralternativJson>,
+    val følgerFraOverordnetValg: OverordnetValgJson?,
+)
+
+data class OverordnetValgJson(
+    val regel: RegelId,
+    val svar: SvarId,
+)
+
+
 data class OpphavsvilkårDto(
     val behandlingId: UUID,
     val endretTid: LocalDateTime,
+)
+
+data class SvaralternativJson(
+    val begrunnelseType: BegrunnelseType,
 )
 
 data class OppdaterVilkårDto(val id: UUID, val behandlingId: UUID)
@@ -59,7 +90,7 @@ fun Vurdering.tilDto() = VurderingDto(this.regelId, this.svar, this.begrunnelse)
 fun Delvilkår.tilDto() = DelvilkårDto(this.resultat, this.vurderinger.map { it.tilDto() })
 
 fun Vilkår.tilDto() =
-    VilkårDto(
+    VilkårDtoGammel(
         id = this.id,
         behandlingId = this.behandlingId,
         resultat = this.resultat,

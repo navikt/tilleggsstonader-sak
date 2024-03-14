@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårStegService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDtoGammel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
@@ -38,7 +38,7 @@ class TestSaksbehandlingService(
 
     private fun lagDelvilkårsett(
         vilkårsregel: Vilkårsregel,
-        vilkår: VilkårDto,
+        vilkår: VilkårDtoGammel,
     ): List<DelvilkårDto> {
         return vilkår.delvilkårsett.map { delvilkår ->
             val hovedregel = delvilkår.hovedregel()

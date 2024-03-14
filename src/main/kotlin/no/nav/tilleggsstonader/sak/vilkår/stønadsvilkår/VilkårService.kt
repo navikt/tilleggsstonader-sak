@@ -13,8 +13,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDtoGammel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDtoGammel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
@@ -39,14 +39,14 @@ class VilkårService(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @Transactional
-    fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
+    fun hentEllerOpprettVilkårsvurderingGammel(behandlingId: UUID): VilkårsvurderingDtoGammel {
         val (grunnlag, metadata) = hentGrunnlagOgMetadata(behandlingId)
         val vurderinger = hentEllerOpprettVilkår(behandlingId, metadata).map(Vilkår::tilDto)
-        return VilkårsvurderingDto(vilkårsett = vurderinger, grunnlag = grunnlag)
+        return VilkårsvurderingDtoGammel(vilkårsett = vurderinger, grunnlag = grunnlag)
     }
 
     @Transactional
-    fun hentOpprettEllerOppdaterVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
+    fun hentOpprettEllerOppdaterVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDtoGammel {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
         if (behandling.harStatusOpprettet) {
@@ -58,19 +58,19 @@ class VilkårService(
                 vilkårsvurderingRepository.deleteByBehandlingId(behandlingId)
             }*/
         }
-        return hentEllerOpprettVilkårsvurdering(behandlingId)
+        return hentEllerOpprettVilkårsvurderingGammel(behandlingId)
     }
 
-    fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
+    fun hentVilkårsett(behandlingId: UUID): List<VilkårDtoGammel> {
         val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
         feilHvis(vilkårsett.isEmpty()) { "Mangler vilkår for behandling=$behandlingId" }
         return vilkårsett.map { it.tilDto() }
     }
 
     @Transactional
-    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårsvurderingDto {
+    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårsvurderingDtoGammel {
         // grunnlagsdataService.oppdaterOgHentNyGrunnlagsdata(behandlingId)
-        return hentEllerOpprettVilkårsvurdering(behandlingId)
+        return hentEllerOpprettVilkårsvurderingGammel(behandlingId)
     }
 
     /*
