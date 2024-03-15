@@ -15,6 +15,8 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.vedlegg.VedleggRequest
 import org.springframework.stereotype.Service
 
@@ -112,6 +114,18 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
         } ?: error("Kan ikke hente journalpost=$journalpostId uten bruker")
         return Pair(journalpost, personIdent)
     }
+
+    fun hentBrukersNavn(
+        journalpost: Journalpost,
+        personIdent: String,
+    ): String {
+        return journalpost.avsenderMottaker
+            ?.takeIf { it.erLikBruker }?.navn
+            ?: hentNavnFraPdl(personIdent)
+    }
+
+    private fun hentNavnFraPdl(personIdent: String) =
+        personService.hentPersonKortBolk(listOf(personIdent)).getValue(personIdent).navn.gjeldende().visningsnavn()
 
     fun hentDokument(
         journalpost: Journalpost,
