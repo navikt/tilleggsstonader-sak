@@ -168,7 +168,7 @@ data class Aktivitet(
     val aktivitetsdager: Int,
 ) : Periode<LocalDate>
 
-fun List<Vilkårperiode>.tilAktivitet(): List<Aktivitet> {
+fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
     return this.mapNotNull {
         if (it.type is AktivitetType) {
             Aktivitet(
