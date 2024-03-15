@@ -129,7 +129,7 @@ class StegServiceTest(
         }
 
         @Test
-        internal fun `skal feile håndtering av ny søknad hvis en behandling er ferdigstilt`() {
+        internal fun `skal ikke kunne beregne ytelse dersom behandling er ferdigstilt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(
                 behandling(steg = StegType.BEHANDLING_FERDIGSTILT),
             )
