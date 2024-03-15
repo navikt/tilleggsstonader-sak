@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
@@ -19,7 +20,6 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
-import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil
 import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.mockVilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -80,13 +80,9 @@ internal class VilkårServiceTest {
         lagJournalpost(),
     )
     private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
-    val fagsak = fagsak()
-    private val behandling = behandling(fagsak, BehandlingStatus.OPPRETTET, årsak = BehandlingÅrsak.PAPIRSØKNAD)
+    private val fagsak = fagsak()
+    private val behandling = behandling(fagsak = fagsak, status = BehandlingStatus.OPPRETTET, steg = StegType.VILKÅR, årsak = BehandlingÅrsak.PAPIRSØKNAD)
     private val behandlingId = behandling.id
-
-    private val grunnlag = mockVilkårGrunnlagDto(
-        barn = barn.map { VilkårGrunnlagUtil.grunnlagBarn(barnId = it.id, ident = it.ident) },
-    )
 
     @BeforeEach
     fun setUp() {
@@ -297,7 +293,7 @@ internal class VilkårServiceTest {
                 ),
             )
 
-            assertThat(lagretVilkår.captured.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+            assertThat(lagretVilkår.captured.resultat).isEqualTo(OPPFYLT)
             assertThat(lagretVilkår.captured.type).isEqualTo(vilkår.type)
             assertThat(lagretVilkår.captured.opphavsvilkår).isNull()
 
@@ -305,7 +301,7 @@ internal class VilkårServiceTest {
 
             val delvilkår = lagretVilkår.captured.delvilkårsett.last()
             assertThat(delvilkår.hovedregel).isEqualTo(RegelId.HAR_ALDER_LAVERE_ENN_GRENSEVERDI)
-            assertThat(delvilkår.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+            assertThat(delvilkår.resultat).isEqualTo(OPPFYLT)
             assertThat(delvilkår.vurderinger).hasSize(1)
             assertThat(delvilkår.vurderinger.first().svar).isEqualTo(SvarId.NEI)
             assertThat(delvilkår.vurderinger.first().begrunnelse).isEqualTo("en begrunnelse")
@@ -324,12 +320,12 @@ internal class VilkårServiceTest {
             ),
         )
 
-        assertThat(oppdatertVilkår.captured.resultat).isEqualTo(Vilkårsresultat.SKAL_IKKE_VURDERES)
+        assertThat(oppdatertVilkår.captured.resultat).isEqualTo(SKAL_IKKE_VURDERES)
         assertThat(oppdatertVilkår.captured.type).isEqualTo(vilkår.type)
         assertThat(oppdatertVilkår.captured.opphavsvilkår).isNull()
 
         val delvilkårsett = oppdatertVilkår.captured.delvilkårsett.first()
-        assertThat(delvilkårsett.resultat).isEqualTo(Vilkårsresultat.SKAL_IKKE_VURDERES)
+        assertThat(delvilkårsett.resultat).isEqualTo(SKAL_IKKE_VURDERES)
         assertThat(delvilkårsett.vurderinger).hasSize(1)
         assertThat(delvilkårsett.vurderinger.first().svar).isNull()
         assertThat(delvilkårsett.vurderinger.first().begrunnelse).isNull()
@@ -345,7 +341,7 @@ internal class VilkårServiceTest {
 
             vilkårService.nullstillVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
 
-            assertThat(oppdatertVilkår.captured.resultat).isEqualTo(Vilkårsresultat.IKKE_TATT_STILLING_TIL)
+            assertThat(oppdatertVilkår.captured.resultat).isEqualTo(IKKE_TATT_STILLING_TIL)
             assertThat(oppdatertVilkår.captured.type).isEqualTo(vilkår.type)
             assertThat(oppdatertVilkår.captured.opphavsvilkår).isNull()
         }
@@ -356,10 +352,11 @@ internal class VilkårServiceTest {
         every { behandlingService.hentBehandling(behandlingId) } returns behandling(
             fagsak(),
             BehandlingStatus.FERDIGSTILT,
+            StegType.VILKÅR,
         )
         val vilkår = vilkår(
             behandlingId,
-            resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+            resultat = IKKE_TATT_STILLING_TIL,
             VilkårType.PASS_BARN,
         )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
@@ -376,6 +373,35 @@ internal class VilkårServiceTest {
             },
         ).isInstanceOf(ApiFeil::class.java)
             .hasMessageContaining("er låst for videre redigering")
+        verify(exactly = 0) { vilkårRepository.insertAll(any()) }
+    }
+
+    @Test
+    internal fun `skal ikke oppdatere vilkår hvis behandlingen ikke er i steg VILKÅR`() {
+        every { behandlingService.hentBehandling(behandlingId) } returns behandling(
+            fagsak(),
+            BehandlingStatus.UTREDES,
+            StegType.INNGANGSVILKÅR,
+        )
+        val vilkår = vilkår(
+            behandlingId,
+            resultat = IKKE_TATT_STILLING_TIL,
+            VilkårType.PASS_BARN,
+        )
+        every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
+
+        assertThat(
+            Assertions.catchThrowable {
+                vilkårService.oppdaterVilkår(
+                    SvarPåVilkårDto(
+                        id = vilkår.id,
+                        behandlingId = behandlingId,
+                        listOf(),
+                    ),
+                )
+            },
+        ).isInstanceOf(ApiFeil::class.java)
+            .hasMessageContaining("Kan ikke oppdatere vilkår når behandling er på steg")
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }
     }
 
@@ -414,7 +440,7 @@ internal class VilkårServiceTest {
     }
 
     private fun List<Vilkår>.inneholderKunResultat(
-        resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+        resultat: Vilkårsresultat = IKKE_TATT_STILLING_TIL,
     ) {
         assertThat(
             this.map { it.resultat }.toSet(),

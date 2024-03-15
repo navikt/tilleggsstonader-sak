@@ -4,13 +4,16 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -48,7 +51,7 @@ class VilkårService(
         val vilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
         val behandlingId = vilkår.behandlingId
 
-        validerLåstForVidereRedigering(behandlingId)
+        validerBehandling(behandlingId)
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, svarPåVilkårDto.behandlingId)
 
         val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, svarPåVilkårDto.delvilkårsett)
@@ -61,7 +64,7 @@ class VilkårService(
         val behandlingId = vilkår.behandlingId
 
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
-        validerLåstForVidereRedigering(behandlingId)
+        validerBehandling(behandlingId)
 
         return nullstillVilkårMedNyeHovedregler(behandlingId, vilkår)
     }
@@ -72,7 +75,7 @@ class VilkårService(
         val behandlingId = vilkår.behandlingId
 
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
-        validerLåstForVidereRedigering(behandlingId)
+        validerBehandling(behandlingId)
 
         return oppdaterVilkårTilSkalIkkeVurderes(behandlingId, vilkår)
     }
@@ -114,8 +117,15 @@ class VilkårService(
 
     private fun hentHovedregelMetadata(behandlingId: UUID) = hentGrunnlagOgMetadata(behandlingId).second
 
-    private fun validerLåstForVidereRedigering(behandlingId: UUID) {
-        if (behandlingErLåstForVidereRedigering(behandlingId)) {
+    private fun validerBehandling(behandlingId: UUID) {
+        val behandling = behandlingService.hentBehandling(behandlingId)
+
+        validerErIVilkårSteg(behandling)
+        validerLåstForVidereRedigering(behandling)
+    }
+
+    private fun validerLåstForVidereRedigering(behandling: Behandling) {
+        if (behandling.status.behandlingErLåstForVidereRedigering()) {
             throw ApiFeil("Behandlingen er låst for videre redigering", HttpStatus.BAD_REQUEST)
         }
     }
@@ -136,6 +146,12 @@ class VilkårService(
 
     private fun behandlingErLåstForVidereRedigering(behandlingId: UUID) =
         behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
+
+    private fun validerErIVilkårSteg(behandling: Behandling) {
+        brukerfeilHvisIkke(behandling.steg == StegType.VILKÅR) {
+            "Kan ikke oppdatere vilkår når behandling er på steg=${behandling.steg}."
+        }
+    }
 
     @Transactional
     fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
