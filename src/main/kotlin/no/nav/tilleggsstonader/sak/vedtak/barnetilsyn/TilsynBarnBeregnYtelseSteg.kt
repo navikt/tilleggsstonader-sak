@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
@@ -12,6 +11,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.springframework.stereotype.Service
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -19,7 +19,7 @@ import java.time.LocalDate
 @Service
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
-    private val barnService: BarnService,
+    private val vilkårService: VilkårService,
     vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -32,7 +32,7 @@ class TilsynBarnBeregnYtelseSteg(
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
         val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter)
-        validerBarnFinnesPåBehandling(saksbehandling, vedtak)
+        validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
         vedtakRepository.insert(lagVedtak(saksbehandling, vedtak, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
         /*
@@ -46,11 +46,13 @@ class TilsynBarnBeregnYtelseSteg(
          */
     }
 
-    private fun validerBarnFinnesPåBehandling(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
-        val barnPåBehandling = barnService.finnBarnPåBehandling(saksbehandling.id).map { it.id }.toSet()
-        val barnSomIkkeFinnesPåBehandling = vedtak.utgifter.keys.filter { !barnPåBehandling.contains(it) }
-        feilHvis(barnSomIkkeFinnesPåBehandling.isNotEmpty()) {
-            "Det finnes utgifter på barn som ikke finnes på behandlingen, id=$barnSomIkkeFinnesPåBehandling"
+    private fun validerKunBarnMedOppfylteVilkår(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
+        val barnMedOppfylteVilkår =
+            vilkårService.hentOppfyltePassBarnVilkår(behandlingId = saksbehandling.id).map { it.barnId }
+        val barnUtenOppfylteVilkår = vedtak.utgifter.keys.filter { !barnMedOppfylteVilkår.contains(it) }
+
+        feilHvis(barnUtenOppfylteVilkår.isNotEmpty()) {
+            "Det finnes utgifter på barn som ikke har oppfylt vilkårsvurdering, id=$barnUtenOppfylteVilkår"
         }
     }
 
