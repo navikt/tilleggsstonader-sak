@@ -2,13 +2,16 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
+import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -18,6 +21,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Optional
@@ -33,6 +37,8 @@ class OppgaveClientConfig {
     @Primary
     fun oppgaveClient(): OppgaveClient {
         val oppgaveClient = mockk<OppgaveClient>()
+
+        opprettOppgave(journalføringsoppgaveRequest)
 
         every { oppgaveClient.hentOppgaver(any()) } answers {
             val request = firstArg<FinnOppgaveRequest>()
@@ -82,7 +88,10 @@ class OppgaveClientConfig {
                 eksisterendeOppgave.copy(
                     versjon = versjon + 1,
                     beskrivelse = it.beskrivelse ?: eksisterendeOppgave.beskrivelse,
-                    tilordnetRessurs = (it.tilordnetRessurs ?: eksisterendeOppgave.tilordnetRessurs)?.takeIf { it.isNotBlank() },
+                    tilordnetRessurs = (
+                        it.tilordnetRessurs
+                            ?: eksisterendeOppgave.tilordnetRessurs
+                        )?.takeIf { it.isNotBlank() },
                     mappeId = it.mappeId ?: eksisterendeOppgave.mappeId,
                     fristFerdigstillelse = it.fristFerdigstillelse ?: eksisterendeOppgave.fristFerdigstillelse,
                 )
@@ -141,6 +150,16 @@ class OppgaveClientConfig {
             oppdatertOppgave
         }
     }
+
+    private val journalføringsoppgaveRequest = OpprettOppgaveRequest(
+        tema = Tema.TSO,
+        oppgavetype = Oppgavetype.Journalføring,
+        fristFerdigstillelse = LocalDate.now().plusDays(14),
+        beskrivelse = "Dummy søknad",
+        behandlingstema = "",
+        enhetsnummer = "",
+        ident = OppgaveIdentV2(ident = "12345678910", gruppe = IdentGruppe.FOLKEREGISTERIDENT),
+    )
 
     companion object {
         const val MAPPE_ID_PÅ_VENT = 10
