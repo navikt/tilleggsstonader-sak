@@ -17,11 +17,14 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -34,6 +37,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 class StegServiceTest(
     @Autowired
@@ -50,7 +54,8 @@ class StegServiceTest(
     val stønadsperiodeRepository: StønadsperiodeRepository,
     @Autowired
     val vilkårperiodeRepository: VilkårperiodeRepository,
-
+    @Autowired
+    val vilkårRepository: VilkårRepository,
 ) : IntegrationTest() {
 
     val stegForBeslutter = object : BehandlingSteg<String> {
@@ -76,7 +81,10 @@ class StegServiceTest(
                 steg = StegType.SEND_TIL_BESLUTTER,
             ),
         )
-        val vedtakTilsynBarn = opprettVedtakTilsynBarn(behandling)
+        val barn = lagBarn(behandling)
+        opprettVilkårBarnetilsyn(behandlingId = behandling.id, barn = barn)
+        val vedtakTilsynBarn = opprettVedtakTilsynBarn(barn)
+
         stegService.håndterSteg(saksbehandling(behandling = behandling), tilsynBarnBeregnYtelseSteg, vedtakTilsynBarn)
 
         assertThat(behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidDesc(behandling.id).first().steg)
@@ -125,8 +133,8 @@ class StegServiceTest(
             val behandling = testoppsettService.opprettBehandlingMedFagsak(
                 behandling(steg = StegType.BEHANDLING_FERDIGSTILT),
             )
-
-            val vedtakTilsynBarn = opprettVedtakTilsynBarn(behandling)
+            val barn = lagBarn(behandling)
+            val vedtakTilsynBarn = opprettVedtakTilsynBarn(barn)
             val exception = catchThrowableOfType<Feil> {
                 stegService.håndterSteg(
                     saksbehandling(behandling = behandling),
@@ -211,12 +219,19 @@ class StegServiceTest(
         }
     }
 
-    private fun opprettVedtakTilsynBarn(behandling: Behandling): InnvilgelseTilsynBarnDto {
-        val barn = barnRepository.insert(BehandlingBarn(behandlingId = behandling.id, ident = "123"))
+    private fun lagBarn(behandling: Behandling): BehandlingBarn {
+        return barnRepository.insert(BehandlingBarn(behandlingId = behandling.id, ident = "123"))
+    }
+
+    private fun opprettVilkårBarnetilsyn(behandlingId: UUID, barn: BehandlingBarn) {
         val fom = LocalDate.of(2023, 1, 1)
         val tom = LocalDate.of(2023, 1, 31)
-        stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandling.id, fom = fom, tom = tom))
-        vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = fom, tom = tom))
+        stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandlingId, fom = fom, tom = tom))
+        vilkårperiodeRepository.insert(aktivitet(behandlingId = behandlingId, fom = fom, tom = tom))
+        vilkårRepository.insert(vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN, barnId = barn.id))
+    }
+
+    private fun opprettVedtakTilsynBarn(barn: BehandlingBarn): InnvilgelseTilsynBarnDto {
         val måned = YearMonth.of(2023, 1)
         return InnvilgelseTilsynBarnDto(
             utgifter = mapOf(barn.id to listOf(Utgift(måned, måned, 100))),
