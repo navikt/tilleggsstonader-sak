@@ -108,31 +108,40 @@ class VilkårService(
         vurdering: VurderingDto?,
         svarMapping: Map<SvarId, SvarRegel>,
     ): DelvilkårsvurderingJson {
-
         val svaralternativer = svarMapping.entries.associate {
             it.key to SvaralternativJson(it.value.begrunnelseType)
         }
 
         if (vurdering == null) {
             return DelvilkårsvurderingJson(
-                svaralternativer = svaralternativer
+                svaralternativer = svaralternativer,
             )
         }
 
-        val alleReglerSomFølgerAvOverordnedeValg = PassBarnRegel().regler
-            .flatMap { it.value.svarMapping.toList() }
-            .filter { it.second.regelId == vurdering.regelId }
+        data class OverordnetValg(
+            val regel: RegelId,
+            val svar: SvarId,
+        )
 
-        val avhengigAv = alleReglerSomFølgerAvOverordnedeValg.firstOrNull()
+        val relaterteOverordnedeValg =
+            PassBarnRegel().regler.values.flatMap { regelSteg ->
+                regelSteg.svarMapping.map {
+                    regelSteg.regelId to OverordnetValg(it.value.regelId, it.key)
+                }
+            }.filter { it.second.regel == vurdering.regelId }
+
+        val følgerFraOverordnetValg = relaterteOverordnedeValg.firstOrNull()?.let {
+            OverordnetValgJson(
+                regel = it.first,
+                svar = it.second.svar,
+            )
+        }
 
         return DelvilkårsvurderingJson(
             svar = vurdering.svar,
             begrunnelse = vurdering.begrunnelse,
             svaralternativer = svaralternativer,
-            følgerFraOverordnetValg = if (avhengigAv == null) null else OverordnetValgJson(
-                avhengigAv.second.regelId,
-                avhengigAv.first
-            )
+            følgerFraOverordnetValg = følgerFraOverordnetValg,
         )
     }
 
