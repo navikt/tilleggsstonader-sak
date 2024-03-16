@@ -72,8 +72,8 @@ class VilkårService(
         return hentEllerOpprettVilkårsvurderingGammel(behandlingId)
     }
 
-    data class VilkårsvurderingJson(
-        val vilkårssett: List<VilkårJson>,
+    data class VilkårsvurderingerJson(
+        val vilkårsett: List<VilkårJson>,
         val grunnlag: BehandlingFaktaDto,
     )
 
@@ -82,7 +82,6 @@ class VilkårService(
         vurderinger: List<VurderingDto>,
         alleRegler: Map<RegelId, RegelSteg>,
     ): VilkårJson {
-
         val vilkårsvurdering = mutableMapOf<RegelId, DelvilkårsvurderingJson>()
 
         for ((regel, regelSteg) in alleRegler) {
@@ -145,9 +144,8 @@ class VilkårService(
         )
     }
 
-
     @Transactional
-    fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): VilkårsvurderingJson {
+    fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): VilkårsvurderingerJson {
         val alleRegler = vilkårsreglerForStønad(Stønadstype.BARNETILSYN)
         val alleVurderinger = hentEllerOpprettVilkårsvurderingGammel(behandlingId)
 
@@ -164,16 +162,14 @@ class VilkårService(
                 val vilkår = vilkårMapper(
                     vilkårDtoGammel = vilkårPerBarn,
                     vurderinger = vurderinger,
-                    alleRegler = regler
+                    alleRegler = regler,
                 )
 
                 vilkårsvurderinger.add(vilkår)
             }
         }
 
-
-        return VilkårsvurderingJson(vilkårssett = vilkårsvurderinger, grunnlag = alleVurderinger.grunnlag)
-
+        return VilkårsvurderingerJson(vilkårsett = vilkårsvurderinger, grunnlag = alleVurderinger.grunnlag)
     }
 
     fun hentVilkårsett(behandlingId: UUID): List<VilkårDtoGammel> {
@@ -350,4 +346,3 @@ class VilkårService(
         }
     }
 }
-

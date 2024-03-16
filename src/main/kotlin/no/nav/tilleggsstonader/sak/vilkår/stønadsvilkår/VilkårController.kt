@@ -47,8 +47,8 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                        " svar=$delvilkårJson",
+                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                    " svar=$delvilkårJson",
             )
             throw e
         }
@@ -74,8 +74,8 @@ class VilkårController(
         return vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
     }
 
-    @GetMapping("{behandlingID}")
-    fun getVilkårsvurdering(@PathVariable behandlingId: UUID): VilkårsvurderingJson {
+    @GetMapping("{behandlingId}/vurderinger")
+    fun getVilkårsvurdering(@PathVariable behandlingId: UUID): VilkårService.VilkårsvurderingerJson {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
     }
