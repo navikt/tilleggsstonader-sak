@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårsvurderingJson
@@ -37,6 +38,7 @@ import java.util.UUID
 @Service
 class VilkårService(
     private val behandlingService: BehandlingService,
+    private val søknadService: SøknadService,
     private val vilkårRepository: VilkårRepository,
     private val barnService: BarnService,
     private val behandlingFaktaService: BehandlingFaktaService,

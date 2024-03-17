@@ -47,14 +47,13 @@ data class OverordnetValgJson(
     val svar: SvarId,
 )
 
-
 data class OpphavsvilkårDto(
     val behandlingId: UUID,
     val endretTid: LocalDateTime,
 )
 
 data class SvaralternativJson(
-    val begrunnelseType: BegrunnelseType,
+    val begrunnelsestype: BegrunnelseType,
 )
 
 data class OppdaterVilkårDto(val id: UUID, val behandlingId: UUID)
