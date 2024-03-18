@@ -11,10 +11,12 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.vilkår.VilkårSteg
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårsvurderingJson
@@ -78,6 +80,57 @@ class VilkårStegService(
         }
     }
 
+    private fun mapTilDelvilkårsett2(
+        vilkår: Vilkår,
+        oppdateringer: List<VurderingJson>,
+    ): List<DelvilkårDto> {
+
+        val resultat = mutableListOf<DelvilkårDto>()
+
+        val stønadsregler = vilkårsreglerPassBarn()
+        val delvilkårsett = vilkår.delvilkårsett
+
+        for ((regelId, regelSteg) in stønadsregler) {
+            //Bygg et nytt sett med vurderinger
+
+            val relaterteOppdateringer = oppdateringer.find { it.regel == regelId }!!
+
+            val svar = relaterteOppdateringer.svar
+            val begrunnelse = relaterteOppdateringer.begrunnelse
+
+            val svarMapping = regelSteg.svarMapping
+            val svaralternativ = svarMapping[svar]!!
+
+
+            // Anta først at vi bare har hovedregler.
+
+            // Vi kan lage nytt Delvilkår, som har resultat satt til IKKE_TATT_STILLING_TIL (som er defaulten)
+
+
+            val oppdaterteVurderinger: Vurdering = Vurdering(
+                regelId = regelId,
+                svar = relaterteOppdateringer.svar,
+                begrunnelse = relaterteOppdateringer.begrunnelse
+            )
+
+            val nyttDelvilkår =
+                Delvilkår(vurderinger = listOf(oppdaterteVurderinger)) // En liste med bare ett element, siden vi antar at vi bare har hovedregler nå.
+
+            resultat.add(nyttDelvilkår.tilDto())
+
+
+            // val relatertDelvilkår = delvilkårsett.find { it.vurderinger.map { vurdering -> vurdering.regelId }.contains(regelId) }
+
+
+            // val skalHaOppfølging = ...
+            // if (skalHaOppfølging) {
+            // ...}
+
+        }
+
+        return resultat
+    }
+
     @Transactional
     fun oppdaterVilkårsvurdering(oppdateringer: OppdaterVilkårsvurderingJson): VilkårJson {
         val vilkår = vilkårRepository.findByIdOrThrow(oppdateringer.id)
@@ -86,7 +139,7 @@ class VilkårStegService(
         validerLåstForVidereRedigering(behandlingId)
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdateringer.behandlingId)
 
-        val delvikårsettetSomErSendtInn: List<DelvilkårDto> = mapTilDelvilkårsett(vilkår, oppdateringer.vurdering)
+        val delvikårsettetSomErSendtInn = mapTilDelvilkårsett(vilkår, oppdateringer.vurdering)
 
         val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, delvikårsettetSomErSendtInn)
 
@@ -96,7 +149,6 @@ class VilkårStegService(
 
         return oppdatertVilkårDto
     }
-
 
     @Transactional
     fun nullstillVilkår(oppdaterVilkårDto: OppdaterVilkårDto): VilkårDtoGammel {
