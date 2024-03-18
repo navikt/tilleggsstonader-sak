@@ -9,8 +9,12 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -32,6 +36,8 @@ class TilsynBarnVedtakControllerTest(
     val stønadsperiodeRepository: StønadsperiodeRepository,
     @Autowired
     val vilkårperiodeRepository: VilkårperiodeRepository,
+    @Autowired
+    val vilkårRepository: VilkårRepository,
 ) : IntegrationTest() {
 
     val behandling = behandling(steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
@@ -39,6 +45,7 @@ class TilsynBarnVedtakControllerTest(
     val stønadsperiode =
         stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
     val aktivitet = aktivitet(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
+    val vilkår = vilkår(behandlingId = behandling.id, barnId = barn.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT)
 
     @BeforeEach
     fun setUp() {
@@ -47,6 +54,7 @@ class TilsynBarnVedtakControllerTest(
         barnRepository.insert(barn)
         stønadsperiodeRepository.insert(stønadsperiode)
         vilkårperiodeRepository.insert(aktivitet)
+        vilkårRepository.insert(vilkår)
     }
 
     @Test

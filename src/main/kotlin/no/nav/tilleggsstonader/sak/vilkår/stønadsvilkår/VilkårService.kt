@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
@@ -339,6 +340,10 @@ class VilkårService(
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
         val lagretVilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
         return OppdaterVilkår.erAlleVilkårOppfylt(lagretVilkårsett, stønadstype)
+    }
+
+    fun hentOppfyltePassBarnVilkår(behandlingId: UUID): List<Vilkår> {
+        return vilkårRepository.findByBehandlingId(behandlingId).filter { it.resultat == Vilkårsresultat.OPPFYLT && it.type == VilkårType.PASS_BARN }
     }
 
     companion object {

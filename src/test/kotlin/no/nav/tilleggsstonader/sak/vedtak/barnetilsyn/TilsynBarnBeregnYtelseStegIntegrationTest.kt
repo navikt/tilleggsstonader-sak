@@ -9,10 +9,14 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -38,6 +42,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     val stønadsperiodeRepository: StønadsperiodeRepository,
     @Autowired
     val vilkårperiodeRepository: VilkårperiodeRepository,
+    @Autowired
+    val vilkårRepository: VilkårRepository,
 ) : IntegrationTest() {
 
     val behandling = behandling()
@@ -57,6 +63,14 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     fun setUp() {
         testoppsettService.opprettBehandlingMedFagsak(behandling)
         barnRepository.insert(barn)
+        vilkårRepository.insert(
+            vilkår(
+                behandlingId = behandling.id,
+                barnId = barn.id,
+                type = VilkårType.PASS_BARN,
+                resultat = Vilkårsresultat.OPPFYLT,
+            ),
+        )
     }
 
     @Nested
@@ -155,7 +169,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Nested
     inner class ValideringInnvilgelse {
         @Test
-        fun `skal validere at barn finnes på behandlingen`() {
+        fun `skal validere at det kun sendes inn utgifter på barn som har oppfylte vilkår`() {
             stønadsperiodeRepository.insert(stønadsperiode)
             vilkårperiodeRepository.insert(aktivitet)
 
@@ -168,7 +182,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     saksbehandling,
                     vedtak,
                 )
-            }.hasMessageContaining("Det finnes utgifter på barn som ikke finnes på behandlingen")
+            }.hasMessageContaining("Det finnes utgifter på barn som ikke har oppfylt vilkårsvurdering")
         }
     }
 }
