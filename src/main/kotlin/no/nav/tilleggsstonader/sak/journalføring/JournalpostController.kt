@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.journalføring.dto.JournalpostResponse
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.http.MediaType
@@ -25,5 +26,17 @@ class JournalpostController(
         tilgangService.validerTilgangTilPersonMedBarn(personIdent, AuditLoggerEvent.ACCESS)
 
         return journalpostService.hentDokument(journalpost, dokumentInfoId)
+    }
+
+    @GetMapping("/{journalpostId}")
+    fun hentJournalPost(@PathVariable journalpostId: String): JournalpostResponse {
+        val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
+        tilgangService.validerTilgangTilPersonMedBarn(personIdent, AuditLoggerEvent.ACCESS)
+        return JournalpostResponse(
+            journalpost,
+            personIdent,
+            journalpostService.hentBrukersNavn(journalpost, personIdent),
+            journalpost.harStrukturertSøknad(),
+        )
     }
 }

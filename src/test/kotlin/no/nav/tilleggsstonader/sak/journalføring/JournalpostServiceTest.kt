@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
 import no.nav.tilleggsstonader.sak.util.journalpost
@@ -24,6 +26,22 @@ class JournalpostServiceTest() {
     @Nested
     inner class FinnJournalpostOgPersonIdent {
         val journalpostId = "123"
+        val aktørId = "11111111111"
+        val personIdentFraPdl = "12345678901"
+
+        @Test
+        internal fun `skal hente journalpost med personident utledet fra pdl`() {
+            every {
+                personService.hentPersonIdenter(aktørId)
+            } returns PdlIdenter(listOf(PdlIdent(personIdentFraPdl, false)))
+
+            every { journalpostClient.hentJournalpost(any()) } returns journalpost(journalpostId = journalpostId, bruker = Bruker(type = BrukerIdType.AKTOERID, id = aktørId))
+
+            val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
+
+            assertThat(personIdent).isEqualTo(personIdentFraPdl)
+            assertThat(journalpost.journalpostId).isEqualTo(journalpostId)
+        }
 
         @Test
         fun `skal kaste feil om journalpost ikke har bruker`() {
