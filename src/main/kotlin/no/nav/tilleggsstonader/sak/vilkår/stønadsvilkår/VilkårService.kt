@@ -18,12 +18,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OverordnetValgJso
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvaralternativJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDtoGammel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingGammel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
@@ -50,14 +49,14 @@ class VilkårService(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @Transactional
-    fun hentEllerOpprettVilkårsvurderingGammel(behandlingId: UUID): Vilkårsvurdering {
+    fun hentEllerOpprettVilkårsvurderingGammel(behandlingId: UUID): VilkårsvurderingGammel {
         val (grunnlag, metadata) = hentGrunnlagOgMetadata(behandlingId)
         val vurderinger = hentEllerOpprettVilkår(behandlingId, metadata).map(Vilkår::tilDto)
-        return Vilkårsvurdering(vilkårsett = vurderinger, grunnlag = grunnlag)
+        return VilkårsvurderingGammel(vilkårsett = vurderinger, grunnlag = grunnlag)
     }
 
     @Transactional
-    fun hentOpprettEllerOppdaterVilkårsvurdering(behandlingId: UUID): Vilkårsvurdering {
+    fun hentOpprettEllerOppdaterVilkårsvurdering(behandlingId: UUID): VilkårsvurderingGammel {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
         if (behandling.harStatusOpprettet) {
@@ -77,100 +76,25 @@ class VilkårService(
         val grunnlag: BehandlingFaktaDto,
     )
 
-    fun vilkårMapper(
-        vilkårDtoGammel: VilkårDtoGammel,
-        vurderinger: List<VurderingDto>,
-        alleRegler: Map<RegelId, RegelSteg>,
-    ): VilkårJson {
-        val vilkårsvurdering = mutableMapOf<RegelId, DelvilkårsvurderingJson>()
-
-        for ((regel, regelSteg) in alleRegler) {
-            val vurderingDto = vurderinger.find { it.regelId == regel }
-
-            vilkårsvurdering[regel] = delvilkårsvurderingMapper(vurderingDto, regelSteg.svarMapping)
-        }
-
-        return VilkårJson(
-            id = vilkårDtoGammel.id,
-            behandlingId = vilkårDtoGammel.behandlingId,
-            resultat = vilkårDtoGammel.resultat,
-            vilkårType = vilkårDtoGammel.vilkårType,
-            barnId = vilkårDtoGammel.barnId,
-            endretAv = vilkårDtoGammel.endretAv,
-            endretTid = vilkårDtoGammel.endretTid,
-            vurdering = vilkårsvurdering,
-            opphavsvilkår = vilkårDtoGammel.opphavsvilkår,
-        )
-    }
-
-    fun delvilkårsvurderingMapper(
-        vurdering: VurderingDto?,
-        svarMapping: Map<SvarId, SvarRegel>,
-    ): DelvilkårsvurderingJson {
-        val svaralternativer = svarMapping.entries.associate {
-            it.key to SvaralternativJson(it.value.begrunnelseType)
-        }
-
-        if (vurdering == null) {
-            return DelvilkårsvurderingJson(
-                svaralternativer = svaralternativer,
-            )
-        }
-
-        data class OverordnetValg(
-            val regel: RegelId,
-            val svar: SvarId,
-        )
-
-        val relaterteOverordnedeValg =
-            PassBarnRegel().regler.values.flatMap { regelSteg ->
-                regelSteg.svarMapping.map {
-                    regelSteg.regelId to OverordnetValg(it.value.regelId, it.key)
-                }
-            }.filter { it.second.regel == vurdering.regelId }
-
-        val følgerFraOverordnetValg = relaterteOverordnedeValg.firstOrNull()?.let {
-            OverordnetValgJson(
-                regel = it.first,
-                svar = it.second.svar,
-            )
-        }
-
-        return DelvilkårsvurderingJson(
-            svar = vurdering.svar,
-            begrunnelse = vurdering.begrunnelse,
-            svaralternativer = svaralternativer,
-            følgerFraOverordnetValg = følgerFraOverordnetValg,
-        )
-    }
-
     @Transactional
     fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): VilkårsvurderingerJson {
-        val alleRegler = vilkårsreglerForStønad(Stønadstype.BARNETILSYN)
-        val alleVurderinger = hentEllerOpprettVilkårsvurderingGammel(behandlingId)
+        val lagredeVurderinger = hentEllerOpprettVilkårsvurderingGammel(behandlingId)
 
+        val vilkårsvurderinger = mapTilVilkårJson(lagredeVurderinger)
+
+        return VilkårsvurderingerJson(vilkårsett = vilkårsvurderinger, grunnlag = lagredeVurderinger.grunnlag)
+    }
+
+    private fun mapTilVilkårJson(alleVurderinger: VilkårsvurderingGammel): List<VilkårJson> {
         val vilkårsvurderinger = mutableListOf<VilkårJson>()
 
-        for (vilkårPerBarn in alleVurderinger.vilkårsett) {
-            for (vilkårsregel in alleRegler) {
-                val regler = vilkårsregel.regler
-
-                // hent ut vurdering som tilhører denne regelId-en
-
-                val vurderinger = vilkårPerBarn.delvilkårsett.flatMap { it.vurderinger }
-
-                val vilkår = vilkårMapper(
-                    vilkårDtoGammel = vilkårPerBarn,
-                    vurderinger = vurderinger,
-                    alleRegler = regler,
-                )
-
-                vilkårsvurderinger.add(vilkår)
-            }
+        for (vilkår in alleVurderinger.vilkårsett) {
+            vilkårsvurderinger.add(vilkår.tilJson())
         }
 
-        return VilkårsvurderingerJson(vilkårsett = vilkårsvurderinger, grunnlag = alleVurderinger.grunnlag)
+        return vilkårsvurderinger.toList()
     }
+
 
     fun hentVilkårsett(behandlingId: UUID): List<VilkårDtoGammel> {
         val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
@@ -179,7 +103,7 @@ class VilkårService(
     }
 
     @Transactional
-    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): Vilkårsvurdering {
+    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårsvurderingGammel {
         // grunnlagsdataService.oppdaterOgHentNyGrunnlagsdata(behandlingId)
         return hentEllerOpprettVilkårsvurderingGammel(behandlingId)
     }
@@ -346,3 +270,68 @@ class VilkårService(
         }
     }
 }
+
+fun VilkårDtoGammel.tilJson(
+): VilkårJson {
+    val vilkårsvurdering = mutableMapOf<RegelId, DelvilkårsvurderingJson>()
+    val stønadsregler = vilkårsreglerPassBarn()
+
+    for ((regel, regelSteg) in stønadsregler) {
+
+        val vurderinger: List<VurderingDto> = this.delvilkårsett.flatMap { it.vurderinger }
+
+        val vurderingDto = vurderinger.find { it.regelId == regel }
+
+        vilkårsvurdering[regel] = delvilkårsvurderingMapper(vurderingDto, regelSteg.svarMapping)
+    }
+
+    return VilkårJson(
+        id = this.id,
+        behandlingId = this.behandlingId,
+        resultat = this.resultat,
+        vilkårType = this.vilkårType,
+        barnId = this.barnId,
+        endretAv = this.endretAv,
+        endretTid = this.endretTid,
+        vurdering = vilkårsvurdering,
+        opphavsvilkår = this.opphavsvilkår,
+    )
+}
+
+fun delvilkårsvurderingMapper(
+    vurdering: VurderingDto?,
+    svarMapping: Map<SvarId, SvarRegel>,
+): DelvilkårsvurderingJson {
+    val svaralternativer = svarMapping.entries.associate {
+        it.key to SvaralternativJson(it.value.begrunnelseType)
+    }
+
+    if (vurdering == null) {
+        return DelvilkårsvurderingJson(
+            svaralternativer = svaralternativer,
+        )
+    }
+
+    val relaterteOverordnedeValg =
+        PassBarnRegel().regler.values.flatMap { regelSteg ->
+            regelSteg.svarMapping.map {
+                regelSteg.regelId to OverordnetValgJson(it.value.regelId, it.key)
+            }
+        }.filter { it.second.regel == vurdering.regelId }
+
+    val følgerFraOverordnetValg = relaterteOverordnedeValg.firstOrNull()?.let {
+        OverordnetValgJson(
+            regel = it.first,
+            svar = it.second.svar,
+        )
+    }
+
+    return DelvilkårsvurderingJson(
+        svar = vurdering.svar,
+        begrunnelse = vurdering.begrunnelse,
+        svaralternativer = svaralternativer,
+        følgerFraOverordnetValg = følgerFraOverordnetValg,
+    )
+}
+
+fun vilkårsreglerPassBarn() = vilkårsreglerForStønad(Stønadstype.BARNETILSYN).map { it.regler }.first()

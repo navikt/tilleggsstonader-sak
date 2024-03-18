@@ -5,9 +5,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårsvurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDtoGammel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingGammel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
@@ -38,7 +40,7 @@ class VilkårController(
     }
 
     @PostMapping
-    fun oppdaterVilkår(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDtoGammel {
+    fun oppdaterVilkårGammel(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDtoGammel {
         tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         try {
@@ -47,8 +49,25 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                    " svar=$delvilkårJson",
+                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                        " svar=$delvilkårJson",
+            )
+            throw e
+        }
+    }
+
+    @PostMapping("oppdater")
+    fun oppdaterVilkårsvurdering(@RequestBody vilkårsvurdering: OppdaterVilkårsvurderingJson): VilkårJson {
+        tilgangService.validerTilgangTilBehandling(vilkårsvurdering.behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+        try {
+            return vilkårStegService.oppdaterVilkårsvurdering(vilkårsvurdering)
+        } catch (e: Exception) {
+            val delvilkårJson = objectMapper.writeValueAsString(vilkårsvurdering)
+            secureLogger.warn(
+                "id=${vilkårsvurdering.id}" +
+                        " behandlingId=${vilkårsvurdering.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
@@ -69,7 +88,7 @@ class VilkårController(
     }
 
     @GetMapping("{behandlingId}")
-    fun getVilkårGammel(@PathVariable behandlingId: UUID): Vilkårsvurdering {
+    fun getVilkårGammel(@PathVariable behandlingId: UUID): VilkårsvurderingGammel {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
     }
@@ -81,7 +100,7 @@ class VilkårController(
     }
 
     @GetMapping("{behandlingId}/oppdater")
-    fun oppdaterRegisterdata(@PathVariable behandlingId: UUID): Vilkårsvurdering {
+    fun oppdaterRegisterdata(@PathVariable behandlingId: UUID): VilkårsvurderingGammel {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId)

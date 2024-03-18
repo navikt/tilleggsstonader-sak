@@ -15,10 +15,15 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrap
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårsvurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDtoGammel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.utledResultatForVilkårSomGjelderFlereBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
@@ -53,6 +58,45 @@ class VilkårStegService(
         oppdaterStegPåBehandling(vilkår.behandlingId)
         return oppdatertVilkårDto
     }
+
+    private fun mapTilDelvilkårsett(
+        vilkår: Vilkår,
+        oppdateringer: List<VurderingJson>,
+    ): List<DelvilkårDto> {
+        return vilkår.delvilkårsett.map { delvilkår ->
+            delvilkår.copy(vurderinger = delvilkår.vurderinger.map { vurdering ->
+                val oppdatertVurdering = oppdateringer.find { it.regel == vurdering.regelId }
+                if (oppdatertVurdering != null) {
+                    vurdering.copy(
+                        svar = oppdatertVurdering.svar,
+                        begrunnelse = oppdatertVurdering.begrunnelse
+                    )
+                } else {
+                    vurdering
+                }
+            }).tilDto()
+        }
+    }
+
+    @Transactional
+    fun oppdaterVilkårsvurdering(oppdateringer: OppdaterVilkårsvurderingJson): VilkårJson {
+        val vilkår = vilkårRepository.findByIdOrThrow(oppdateringer.id)
+        val behandlingId = vilkår.behandlingId
+
+        validerLåstForVidereRedigering(behandlingId)
+        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdateringer.behandlingId)
+
+        val delvikårsettetSomErSendtInn: List<DelvilkårDto> = mapTilDelvilkårsett(vilkår, oppdateringer.vurdering)
+
+        val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, delvikårsettetSomErSendtInn)
+
+        val oppdatertVilkårDto = vilkårRepository.update(oppdatertVilkår).tilJson()
+
+        oppdaterStegPåBehandling(vilkår.behandlingId)
+
+        return oppdatertVilkårDto
+    }
+
 
     @Transactional
     fun nullstillVilkår(oppdaterVilkårDto: OppdaterVilkårDto): VilkårDtoGammel {

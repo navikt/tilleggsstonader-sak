@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.BegrunnelseType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.tilJson
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,15 +32,29 @@ data class VilkårJson(
     val barnId: UUID? = null,
     val endretAv: String,
     val endretTid: LocalDateTime,
-    val vurdering: Map<RegelId, DelvilkårsvurderingJson>,
+    val vurdering: VilkårsvurderingJson,
     val opphavsvilkår: OpphavsvilkårDto?,
 )
+
+typealias VilkårsvurderingJson = Map<RegelId, DelvilkårsvurderingJson>
 
 data class DelvilkårsvurderingJson(
     val svar: SvarId? = null,
     val begrunnelse: String? = null,
     val svaralternativer: Map<SvarId, SvaralternativJson>,
     val følgerFraOverordnetValg: OverordnetValgJson? = null,
+)
+
+data class OppdaterVilkårsvurderingJson(
+    val id: UUID,
+    val behandlingId: UUID,
+    val vurdering: List<VurderingJson>,
+)
+
+data class VurderingJson(
+    val regel: RegelId,
+    val svar: SvarId,
+    val begrunnelse: String?,
 )
 
 data class OverordnetValgJson(
@@ -99,6 +114,8 @@ fun Vilkår.tilDto() =
             .map { it.tilDto() },
         opphavsvilkår = this.opphavsvilkår?.let { OpphavsvilkårDto(it.behandlingId, it.vurderingstidspunkt) },
     )
+
+fun Vilkår.tilJson() = this.tilDto().tilJson()
 
 fun DelvilkårDto.svarTilDomene() = this.vurderinger.map { it.tilDomene() }
 fun VurderingDto.tilDomene() = Vurdering(this.regelId, this.svar, this.begrunnelse)
