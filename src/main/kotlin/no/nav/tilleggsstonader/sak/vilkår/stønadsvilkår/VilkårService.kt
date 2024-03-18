@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvaralternativJso
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDtoGammel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingGammel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
@@ -80,21 +81,10 @@ class VilkårService(
     fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): VilkårsvurderingerJson {
         val lagredeVurderinger = hentEllerOpprettVilkårsvurderingGammel(behandlingId)
 
-        val vilkårsvurderinger = mapTilVilkårJson(lagredeVurderinger)
+        val vilkårsvurderinger = lagredeVurderinger.vilkårsett.map { it.tilJson() }
 
         return VilkårsvurderingerJson(vilkårsett = vilkårsvurderinger, grunnlag = lagredeVurderinger.grunnlag)
     }
-
-    private fun mapTilVilkårJson(alleVurderinger: VilkårsvurderingGammel): List<VilkårJson> {
-        val vilkårsvurderinger = mutableListOf<VilkårJson>()
-
-        for (vilkår in alleVurderinger.vilkårsett) {
-            vilkårsvurderinger.add(vilkår.tilJson())
-        }
-
-        return vilkårsvurderinger.toList()
-    }
-
 
     fun hentVilkårsett(behandlingId: UUID): List<VilkårDtoGammel> {
         val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
@@ -271,19 +261,8 @@ class VilkårService(
     }
 }
 
-fun VilkårDtoGammel.tilJson(
-): VilkårJson {
-    val vilkårsvurdering = mutableMapOf<RegelId, DelvilkårsvurderingJson>()
-    val stønadsregler = vilkårsreglerPassBarn()
-
-    for ((regel, regelSteg) in stønadsregler) {
-
-        val vurderinger: List<VurderingDto> = this.delvilkårsett.flatMap { it.vurderinger }
-
-        val vurderingDto = vurderinger.find { it.regelId == regel }
-
-        vilkårsvurdering[regel] = delvilkårsvurderingMapper(vurderingDto, regelSteg.svarMapping)
-    }
+fun VilkårDtoGammel.tilJson(): VilkårJson {
+    val vurderinger: List<VurderingDto> = this.delvilkårsett.flatMap { it.vurderinger }
 
     return VilkårJson(
         id = this.id,
@@ -293,9 +272,21 @@ fun VilkårDtoGammel.tilJson(
         barnId = this.barnId,
         endretAv = this.endretAv,
         endretTid = this.endretTid,
-        vurdering = vilkårsvurdering,
+        vurdering = vurderinger.tilJson(),
         opphavsvilkår = this.opphavsvilkår,
     )
+}
+
+private fun List<VurderingDto>.tilJson(): VilkårsvurderingJson {
+    val vilkårsvurdering = mutableMapOf<RegelId, DelvilkårsvurderingJson>()
+    val stønadsregler = vilkårsreglerPassBarn()
+    for ((regel, regelSteg) in stønadsregler) {
+
+        val vurderingDto = this.find { it.regelId == regel }
+
+        vilkårsvurdering[regel] = delvilkårsvurderingMapper(vurderingDto, regelSteg.svarMapping)
+    }
+    return vilkårsvurdering
 }
 
 fun delvilkårsvurderingMapper(
