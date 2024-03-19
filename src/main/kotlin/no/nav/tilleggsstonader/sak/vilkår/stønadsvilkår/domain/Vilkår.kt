@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.util.ApplikasjonsVersjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.springframework.data.annotation.Id
@@ -33,6 +34,7 @@ data class Vilkår(
     val delvilkårwrapper: DelvilkårWrapper,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "opphavsvilkaar_")
     val opphavsvilkår: Opphavsvilkår?,
+    val sha: String = ApplikasjonsVersjon.versjon
 ) {
     val delvilkårsett get() = delvilkårwrapper.delvilkårsett
 

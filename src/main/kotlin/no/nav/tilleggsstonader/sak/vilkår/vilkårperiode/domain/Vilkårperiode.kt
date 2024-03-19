@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.ApplikasjonsVersjon
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -33,6 +34,7 @@ data class Vilkårperiode(
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
+    val sha: String = ApplikasjonsVersjon.versjon
 ) {
     init {
         require(tom >= fom) { "Til-og-med før fra-og-med: $fom > $tom" }

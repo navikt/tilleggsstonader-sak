@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.util.ApplikasjonsVersjon
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.data.annotation.Id
@@ -23,4 +24,5 @@ data class Stønadsperiode(
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
+    val sha: String = ApplikasjonsVersjon.versjon
 )
