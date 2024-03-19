@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilJson
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.utledResultatForVilkårSomGjelderFlereBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
@@ -62,70 +63,43 @@ class VilkårStegService(
     }
 
     private fun mapTilDelvilkårsett(
-        vilkår: Vilkår,
         oppdateringer: List<VurderingJson>,
     ): List<DelvilkårDto> {
-        return vilkår.delvilkårsett.map { delvilkår ->
-            delvilkår.copy(vurderinger = delvilkår.vurderinger.map { vurdering ->
-                val oppdatertVurdering = oppdateringer.find { it.regel == vurdering.regelId }
-                if (oppdatertVurdering != null) {
-                    vurdering.copy(
-                        svar = oppdatertVurdering.svar,
-                        begrunnelse = oppdatertVurdering.begrunnelse
-                    )
-                } else {
-                    vurdering
-                }
-            }).tilDto()
-        }
-    }
-
-    private fun mapTilDelvilkårsett2(
-        vilkår: Vilkår,
-        oppdateringer: List<VurderingJson>,
-    ): List<DelvilkårDto> {
-
         val resultat = mutableListOf<DelvilkårDto>()
 
+        val hovedregler = hovedreglerPassBarn()
         val stønadsregler = vilkårsreglerPassBarn()
-        val delvilkårsett = vilkår.delvilkårsett
 
-        for ((regelId, regelSteg) in stønadsregler) {
-            //Bygg et nytt sett med vurderinger
+        for (regelId in hovedregler) {
 
             val relaterteOppdateringer = oppdateringer.find { it.regel == regelId }!!
 
             val svar = relaterteOppdateringer.svar
             val begrunnelse = relaterteOppdateringer.begrunnelse
 
-            val svarMapping = regelSteg.svarMapping
-            val svaralternativ = svarMapping[svar]!!
-
-
-            // Anta først at vi bare har hovedregler.
-
-            // Vi kan lage nytt Delvilkår, som har resultat satt til IKKE_TATT_STILLING_TIL (som er defaulten)
-
-
-            val oppdaterteVurderinger: Vurdering = Vurdering(
+            val oppdaterteVurderinger = Vurdering(
                 regelId = regelId,
                 svar = relaterteOppdateringer.svar,
-                begrunnelse = relaterteOppdateringer.begrunnelse
+                begrunnelse = relaterteOppdateringer.begrunnelse,
             )
 
-            val nyttDelvilkår =
-                Delvilkår(vurderinger = listOf(oppdaterteVurderinger)) // En liste med bare ett element, siden vi antar at vi bare har hovedregler nå.
+            val oppfølgingsregel = stønadsregler[regelId]!!.svarMapping[svar]!!.regelId
 
-            resultat.add(nyttDelvilkår.tilDto())
+            if (oppfølgingsregel == RegelId.SLUTT_NODE) {
+                resultat.add(Delvilkår(vurderinger = listOf(oppdaterteVurderinger)).tilDto())
 
+                continue
+            } else {
+                // We got ourselves a oppfølgingsregel over here
+                val oppfølgingssvar = oppdateringer.find { it.regel == oppfølgingsregel }!!
+                val oppfølgingsvurdering = Vurdering(
+                    regelId = oppfølgingsregel,
+                    svar = oppfølgingssvar.svar,
+                    begrunnelse = oppfølgingssvar.begrunnelse,
+                )
 
-            // val relatertDelvilkår = delvilkårsett.find { it.vurderinger.map { vurdering -> vurdering.regelId }.contains(regelId) }
-
-
-            // val skalHaOppfølging = ...
-            // if (skalHaOppfølging) {
-            // ...}
-
+                resultat.add(Delvilkår(vurderinger = listOf(oppdaterteVurderinger, oppfølgingsvurdering)).tilDto())
+            }
         }
 
         return resultat
@@ -139,7 +113,7 @@ class VilkårStegService(
         validerLåstForVidereRedigering(behandlingId)
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdateringer.behandlingId)
 
-        val delvikårsettetSomErSendtInn = mapTilDelvilkårsett(vilkår, oppdateringer.vurdering)
+        val delvikårsettetSomErSendtInn = mapTilDelvilkårsett(oppdateringer.vurdering)
 
         val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, delvikårsettetSomErSendtInn)
 
