@@ -16,9 +16,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårReposit
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårsvurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OverordnetValgJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvaralternativJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDtoGammel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingGammel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
@@ -49,14 +49,14 @@ class VilkårService(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @Transactional
-    fun hentEllerOpprettVilkårsvurderingGammel(behandlingId: UUID): VilkårsvurderingGammel {
+    fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): Vilkårsvurdering {
         val (grunnlag, metadata) = hentGrunnlagOgMetadata(behandlingId)
         val vurderinger = hentEllerOpprettVilkår(behandlingId, metadata).map(Vilkår::tilDto)
-        return VilkårsvurderingGammel(vilkårsett = vurderinger, grunnlag = grunnlag)
+        return Vilkårsvurdering(vilkårsett = vurderinger, grunnlag = grunnlag)
     }
 
     @Transactional
-    fun hentOpprettEllerOppdaterVilkårsvurdering(behandlingId: UUID): VilkårsvurderingGammel {
+    fun hentOpprettEllerOppdaterVilkårsvurdering(behandlingId: UUID): Vilkårsvurdering {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
         if (behandling.harStatusOpprettet) {
@@ -68,7 +68,7 @@ class VilkårService(
                 vilkårsvurderingRepository.deleteByBehandlingId(behandlingId)
             }*/
         }
-        return hentEllerOpprettVilkårsvurderingGammel(behandlingId)
+        return hentEllerOpprettVilkårsvurdering(behandlingId)
     }
 
     data class VilkårsvurderingerJson(
@@ -76,25 +76,16 @@ class VilkårService(
         val grunnlag: BehandlingFaktaDto,
     )
 
-    @Transactional
-    fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): VilkårsvurderingerJson {
-        val lagredeVurderinger = hentEllerOpprettVilkårsvurderingGammel(behandlingId)
-
-        val vilkårsvurderinger = lagredeVurderinger.vilkårsett.map { it.tilJson() }
-
-        return VilkårsvurderingerJson(vilkårsett = vilkårsvurderinger, grunnlag = lagredeVurderinger.grunnlag)
-    }
-
-    fun hentVilkårsett(behandlingId: UUID): List<VilkårDtoGammel> {
+    fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
         val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
         feilHvis(vilkårsett.isEmpty()) { "Mangler vilkår for behandling=$behandlingId" }
         return vilkårsett.map { it.tilDto() }
     }
 
     @Transactional
-    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårsvurderingGammel {
+    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): Vilkårsvurdering {
         // grunnlagsdataService.oppdaterOgHentNyGrunnlagsdata(behandlingId)
-        return hentEllerOpprettVilkårsvurderingGammel(behandlingId)
+        return hentEllerOpprettVilkårsvurdering(behandlingId)
     }
 
     /*
@@ -260,7 +251,7 @@ class VilkårService(
     }
 }
 
-fun VilkårDtoGammel.tilJson(): VilkårJson {
+fun VilkårDto.tilJson(): VilkårJson {
     val vurderinger: List<VurderingDto> = this.delvilkårsett.flatMap { it.vurderinger }
 
     return VilkårJson(

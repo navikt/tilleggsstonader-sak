@@ -247,7 +247,7 @@ class BehandlingFlytTest(
     }
 
     private fun opprettVilkår(behandlingId: UUID) {
-        vilkårController.getVilkårGammel(behandlingId)
+        vilkårController.getVilkår(behandlingId)
     }
 
     private fun opprettBehandling(personIdent: String): UUID {

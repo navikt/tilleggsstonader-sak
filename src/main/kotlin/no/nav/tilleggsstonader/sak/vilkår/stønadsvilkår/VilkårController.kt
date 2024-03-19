@@ -7,9 +7,9 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårsvurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDtoGammel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingGammel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
@@ -35,12 +35,14 @@ class VilkårController(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @GetMapping("regler")
+    @Deprecated("Brukes ikke lenger av frontend")
     fun hentRegler(): Vilkårsregler {
         return Vilkårsregler.ALLE_VILKÅRSREGLER
     }
 
     @PostMapping
-    fun oppdaterVilkårGammel(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDtoGammel {
+    @Deprecated("Erstattet av oppdaterVilkårsvurdering")
+    fun oppdaterVilkår(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         try {
@@ -74,21 +76,22 @@ class VilkårController(
     }
 
     @PostMapping("nullstill")
-    fun nullstillVilkår(@RequestBody request: OppdaterVilkårDto): VilkårDtoGammel {
+    fun nullstillVilkår(@RequestBody request: OppdaterVilkårDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårStegService.nullstillVilkår(request)
     }
 
     @PostMapping("ikkevurder")
-    fun settVilkårTilSkalIkkeVurderes(@RequestBody request: OppdaterVilkårDto): VilkårDtoGammel {
+    fun settVilkårTilSkalIkkeVurderes(@RequestBody request: OppdaterVilkårDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårStegService.settVilkårTilSkalIkkeVurderes(request)
     }
 
     @GetMapping("{behandlingId}")
-    fun getVilkårGammel(@PathVariable behandlingId: UUID): VilkårsvurderingGammel {
+    @Deprecated("Erstattet av getVilkårsvurdering()")
+    fun getVilkår(@PathVariable behandlingId: UUID): Vilkårsvurdering {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
     }
@@ -96,11 +99,17 @@ class VilkårController(
     @GetMapping("{behandlingId}/vurderinger")
     fun getVilkårsvurdering(@PathVariable behandlingId: UUID): VilkårService.VilkårsvurderingerJson {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
+
+        val vilkårsvurderinger = vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
+
+        return VilkårService.VilkårsvurderingerJson(
+            vilkårsett = vilkårsvurderinger.vilkårsett.map { it.tilJson() },
+            grunnlag = vilkårsvurderinger.grunnlag,
+        )
     }
 
     @GetMapping("{behandlingId}/oppdater")
-    fun oppdaterRegisterdata(@PathVariable behandlingId: UUID): VilkårsvurderingGammel {
+    fun oppdaterRegisterdata(@PathVariable behandlingId: UUID): Vilkårsvurdering {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId)

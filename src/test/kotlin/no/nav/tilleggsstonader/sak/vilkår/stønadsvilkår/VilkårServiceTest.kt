@@ -106,7 +106,7 @@ internal class VilkårServiceTest {
         fun `skal opprette nye Vilkår for barnetilsyn med alle vilkår dersom ingen vurderinger finnes`() {
             val aktuelleVilkårTyper = VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN)
 
-            vilkårService.hentEllerOpprettVilkårsvurderingGammel(behandlingId)
+            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
 
             val vilkårsett = nyttVilkårsett.captured
 
@@ -120,7 +120,7 @@ internal class VilkårServiceTest {
 
         @Test
         fun `skal opprette et vilkår av type PASS_BARN per barn`() {
-            vilkårService.hentEllerOpprettVilkårsvurderingGammel(behandlingId)
+            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
 
             val vilkårPassBarn = nyttVilkårsett.captured.finnVilkårAvType(VilkårType.PASS_BARN)
             assertThat(vilkårPassBarn).hasSize(2)
@@ -128,7 +128,7 @@ internal class VilkårServiceTest {
 
         @Test
         fun `skal initiere automatisk verdi for ALDER_LAVERE_ENN_GRENSEVERDI`() {
-            vilkårService.hentEllerOpprettVilkårsvurderingGammel(behandlingId)
+            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
 
             val vilkårPassBarn = nyttVilkårsett.captured.finnVilkårAvType(VilkårType.PASS_BARN)
 
@@ -152,7 +152,7 @@ internal class VilkårServiceTest {
             ),
         )
 
-        vilkårService.hentEllerOpprettVilkårsvurderingGammel(behandlingId)
+        vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
 
         verify(exactly = 0) { vilkårRepository.updateAll(any()) }
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }
@@ -206,7 +206,7 @@ internal class VilkårServiceTest {
         )
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns eksisterendeVilkårsett
 
-        val vilkårsett = vilkårService.hentEllerOpprettVilkårsvurderingGammel(behandlingId).vilkårsett
+        val vilkårsett = vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId).vilkårsett
 
         assertThat(vilkårsett).hasSize(1)
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }

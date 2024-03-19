@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto
 
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
 
-data class VilkårsvurderingGammel(
-    val vilkårsett: List<VilkårDtoGammel>,
+data class Vilkårsvurdering(
+    val vilkårsett: List<VilkårDto>,
     val grunnlag: BehandlingFaktaDto,
 )

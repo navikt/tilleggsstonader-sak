@@ -47,7 +47,7 @@ internal class TestSaksbehandlingServiceTest() : IntegrationTest() {
         val søknad = søknadService.lagreSøknad(behandling.id, lagJournalpost(), skjema)
         barnRepository.insertAll(søknadBarnTilBehandlingBarn(søknad.barn, behandling.id))
 
-        vilkårService.hentEllerOpprettVilkårsvurderingGammel(behandling.id)
+        vilkårService.hentEllerOpprettVilkårsvurdering(behandling.id)
 
         testSaksbehandlingService.utfyllVilkår(behandlingId = behandling.id)
         assertThat(vilkårService.erAlleVilkårOppfylt(behandling.id)).isTrue

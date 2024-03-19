@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.tilJson
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class VilkårDtoGammel(
+data class VilkårDto(
     val id: UUID,
     val behandlingId: UUID,
     val resultat: Vilkårsresultat,
@@ -101,7 +101,7 @@ fun Vurdering.tilDto() = VurderingDto(this.regelId, this.svar, this.begrunnelse)
 fun Delvilkår.tilDto() = DelvilkårDto(this.resultat, this.vurderinger.map { it.tilDto() })
 
 fun Vilkår.tilDto() =
-    VilkårDtoGammel(
+    VilkårDto(
         id = this.id,
         behandlingId = this.behandlingId,
         resultat = this.resultat,
