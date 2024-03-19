@@ -28,6 +28,13 @@ class JournalpostController(
         return journalpostService.hentDokument(journalpost, dokumentInfoId)
     }
 
+    @GetMapping("/{journalpostId}/dokument/{dokumentInfoId}")
+    fun hentDokument(@PathVariable journalpostId: String, @PathVariable dokumentInfoId: String): ByteArray {
+        val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
+        tilgangService.validerTilgangTilPersonMedBarn(personIdent, AuditLoggerEvent.ACCESS)
+        return journalpostService.hentDokument(journalpost, dokumentInfoId)
+    }
+
     @GetMapping("/{journalpostId}")
     fun hentJournalPost(@PathVariable journalpostId: String): JournalpostResponse {
         val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)

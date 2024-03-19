@@ -25,7 +25,7 @@ class JournalpostClientConfig {
         val journalposter: MutableMap<Long, Journalpost> = listOf(journalpost).associateBy { it.journalpostId.toLong() }
             .toMutableMap()
 
-        every { journalpostClient.hentJournalpost(any())} answers {
+        every { journalpostClient.hentJournalpost(any()) } answers {
             val journalpostId = firstArg<String>()
             journalposter[journalpostId.toLong()] ?: error("Finner ikke journalpost med id=$journalpostId")
         }
@@ -36,6 +36,7 @@ class JournalpostClientConfig {
                 any(),
             )
         } returns ArkiverDokumentResponse(journalpostId = "journalpostId", ferdigstilt = true)
+        every { journalpostClient.hentDokument(any(), any(), any()) } returns dummyPdf
         mockFeiletDistribusjon(journalpostClient)
 
         return journalpostClient
@@ -61,7 +62,25 @@ class JournalpostClientConfig {
             bruker = Bruker("12345678910", BrukerIdType.FNR),
             avsenderMottaker = avsenderMottaker(),
             journalforendeEnhet = "tilleggsstonader-sak",
+            dokumenter = listOf(
+                DokumentInfo(
+                    dokumentInfoId = "1",
+                    tittel = "Dummy dokument 1",
+                    logiskeVedlegg = listOf(
+                        LogiskVedlegg("1", "Dokumentasjon på sykdom"),
+                        LogiskVedlegg("2", "Inntektsendring"),
+                        LogiskVedlegg("3", "Samværsmelding"),
+                    )
+                ),
+                DokumentInfo(
+                    dokumentInfoId = "2",
+                    tittel = "Dummy dokument 2",
+                )
+            )
         )
+
+
+    private val dummyPdf = this::class.java.classLoader.getResource("interntVedtak/internt_vedtak.pdf")!!.readBytes()
 
     private fun avsenderMottaker() = AvsenderMottaker(
         id = "12345678910",
