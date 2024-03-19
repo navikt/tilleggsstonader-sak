@@ -77,7 +77,6 @@ class TilsynBarnBeregnYtelseSteg(
             TilkjentYtelse(
                 behandlingId = saksbehandling.id,
                 andelerTilkjentYtelse = andelerTilkjentYtelse,
-                startdato = beregnStartdato(saksbehandling, andelerTilkjentYtelse),
             ),
         )
     }

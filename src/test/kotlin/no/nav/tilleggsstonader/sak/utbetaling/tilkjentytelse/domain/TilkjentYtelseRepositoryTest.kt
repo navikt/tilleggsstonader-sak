@@ -40,7 +40,7 @@ internal class TilkjentYtelseRepositoryTest : IntegrationTest() {
     fun `Opprett og hent andeler tilkjent ytelse`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
         val andeler = arrayOf(andelTilkjentYtelse(behandling.id), andelTilkjentYtelse(behandling.id))
-        val tilkjentYtelse = tilkjentYtelse(behandling.id, null, *andeler)
+        val tilkjentYtelse = tilkjentYtelse(behandling.id, *andeler)
 
         val tilkjentYtelseId = repository.insert(tilkjentYtelse).id
 

@@ -130,9 +130,9 @@ class IverksettServiceTest : IntegrationTest() {
             )
 
         val tilkjentYtelse =
-            tilkjentYtelse(behandlingId = behandling.id, startdato = null, andeler = lagAndeler(behandling))
+            tilkjentYtelse(behandlingId = behandling.id, andeler = lagAndeler(behandling))
         val tilkjentYtelse2 =
-            tilkjentYtelse(behandlingId = behandling2.id, startdato = null, andeler = lagAndeler(behandling2))
+            tilkjentYtelse(behandlingId = behandling2.id, andeler = lagAndeler(behandling2))
 
         @BeforeEach
         fun setUp() {
@@ -255,7 +255,6 @@ class IverksettServiceTest : IntegrationTest() {
             tilkjentYtelseRepository.insert(
                 tilkjentYtelse(
                     behandling2.id,
-                    null,
                     lagAndel(behandling2, forrigeMåned, beløp = 0),
                 ),
             )
@@ -284,7 +283,6 @@ class IverksettServiceTest : IntegrationTest() {
             tilkjentYtelseRepository.insert(
                 tilkjentYtelse(
                     behandling2.id,
-                    null,
                     lagAndel(behandling2, forrigeMåned, beløp = 100),
                 ),
             )
