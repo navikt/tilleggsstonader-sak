@@ -11,23 +11,18 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.vilkår.VilkårSteg
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårsvurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingJson
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDelvilkårDtoer
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.BegrunnelseType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.utledResultatForVilkårSomGjelderFlereBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
@@ -64,50 +59,6 @@ class VilkårStegService(
         return oppdatertVilkårDto
     }
 
-    private fun mapTilDelvilkårsett(
-        oppdateringer: List<VurderingJson>,
-    ): List<DelvilkårDto> {
-        val resultat = mutableListOf<DelvilkårDto>()
-
-        val hovedregler = hovedreglerPassBarn()
-        val stønadsregler = vilkårsreglerPassBarn()
-
-        for (regelId in hovedregler) {
-            val relaterteOppdateringer = oppdateringer.find { it.regel == regelId }!!
-
-            val svar = relaterteOppdateringer.svar!! // alle hovedregler skal ha et svar.
-            val begrunnelse = relaterteOppdateringer.begrunnelse
-
-            val skalHaBegrunnelse =
-                stønadsregler[regelId]?.svarMapping?.get(svar)?.begrunnelseType != BegrunnelseType.UTEN
-
-            val oppdaterteVurderinger = Vurdering(
-                regelId = regelId,
-                svar = svar,
-                begrunnelse = if (skalHaBegrunnelse) begrunnelse else null,
-            )
-
-            val oppfølgingsregel = stønadsregler[regelId]!!.svarMapping[svar]!!.regelId
-
-            if (oppfølgingsregel == RegelId.SLUTT_NODE) {
-                resultat.add(Delvilkår(vurderinger = listOf(oppdaterteVurderinger)).tilDto())
-
-                continue
-            } else {
-                // We got ourselves a oppfølgingsregel over here
-                val oppfølgingssvar = oppdateringer.find { it.regel == oppfølgingsregel }!!
-                val oppfølgingsvurdering = Vurdering(
-                    regelId = oppfølgingsregel,
-                    svar = oppfølgingssvar.svar,
-                    begrunnelse = oppfølgingssvar.begrunnelse,
-                )
-
-                resultat.add(Delvilkår(vurderinger = listOf(oppdaterteVurderinger, oppfølgingsvurdering)).tilDto())
-            }
-        }
-
-        return resultat
-    }
 
     @Transactional
     fun oppdaterVilkårsvurdering(oppdateringer: OppdaterVilkårsvurderingJson): VilkårJson {
@@ -117,7 +68,7 @@ class VilkårStegService(
         validerLåstForVidereRedigering(behandlingId)
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdateringer.behandlingId)
 
-        val delvikårsettetSomErSendtInn = mapTilDelvilkårsett(oppdateringer.vurdering)
+        val delvikårsettetSomErSendtInn = oppdateringer.vurdering.tilDelvilkårDtoer()
 
         val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, delvikårsettetSomErSendtInn)
 

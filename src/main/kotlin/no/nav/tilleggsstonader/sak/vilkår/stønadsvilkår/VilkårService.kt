@@ -13,19 +13,11 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårsvurderingJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OverordnetValgJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvaralternativJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
@@ -249,70 +241,6 @@ class VilkårService(
             }.associate { it.first to it.second }
         }
     }
-}
-
-fun VilkårDto.tilJson(): VilkårJson {
-    val vurderinger: List<VurderingDto> = this.delvilkårsett.flatMap { it.vurderinger }
-
-    return VilkårJson(
-        id = this.id,
-        behandlingId = this.behandlingId,
-        resultat = this.resultat,
-        vilkårType = this.vilkårType,
-        barnId = this.barnId,
-        endretAv = this.endretAv,
-        endretTid = this.endretTid,
-        vurdering = vurderinger.tilJson(),
-        opphavsvilkår = this.opphavsvilkår,
-    )
-}
-
-private fun List<VurderingDto>.tilJson(): VilkårsvurderingJson {
-    val vilkårsvurdering = mutableMapOf<RegelId, DelvilkårsvurderingJson>()
-    val stønadsregler = vilkårsreglerPassBarn()
-    for ((regel, regelSteg) in stønadsregler) {
-        val vurderingDto = this.find { it.regelId == regel }
-
-        vilkårsvurdering[regel] = delvilkårsvurderingMapper(regel, vurderingDto, regelSteg.svarMapping)
-    }
-    return vilkårsvurdering
-}
-
-fun delvilkårsvurderingMapper(
-    gjeldendeRegel: RegelId,
-    vurdering: VurderingDto?,
-    svarMapping: Map<SvarId, SvarRegel>,
-): DelvilkårsvurderingJson {
-    val svaralternativer = svarMapping.entries.associate {
-        it.key to SvaralternativJson(it.value.begrunnelseType)
-    }
-
-    data class Regelavhengighet(
-        val denneRegelen: RegelId,
-        val erAvhengigAvDenneRegelen: RegelId,
-        val ogDetteSvaret: SvarId,
-    )
-
-    val relaterteOverordnedeValg = vilkårsreglerPassBarn().values.flatMap { regelSteg ->
-        regelSteg.svarMapping.map {
-            Regelavhengighet(
-                denneRegelen = it.value.regelId,
-                erAvhengigAvDenneRegelen = regelSteg.regelId,
-                ogDetteSvaret = it.key,
-            )
-        }
-    }
-
-    val følgerFraOverordnetValg =
-        relaterteOverordnedeValg.filter { it.denneRegelen == gjeldendeRegel }
-            .map { OverordnetValgJson(it.erAvhengigAvDenneRegelen, it.ogDetteSvaret) }.firstOrNull()
-
-    return DelvilkårsvurderingJson(
-        følgerFraOverordnetValg = følgerFraOverordnetValg,
-        svar = vurdering?.svar,
-        begrunnelse = vurdering?.begrunnelse,
-        svaralternativer = svaralternativer,
-    )
 }
 
 fun vilkårsreglerPassBarn() = vilkårsreglerForStønad(Stønadstype.BARNETILSYN).map { it.regler }.first()
