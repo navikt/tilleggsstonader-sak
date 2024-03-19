@@ -53,7 +53,7 @@ data class OppdaterVilkårsvurderingJson(
 
 data class VurderingJson(
     val regel: RegelId,
-    val svar: SvarId,
+    val svar: SvarId?,
     val begrunnelse: String?,
 )
 

@@ -28,7 +28,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -281,15 +280,15 @@ private fun List<VurderingDto>.tilJson(): VilkårsvurderingJson {
     val vilkårsvurdering = mutableMapOf<RegelId, DelvilkårsvurderingJson>()
     val stønadsregler = vilkårsreglerPassBarn()
     for ((regel, regelSteg) in stønadsregler) {
-
         val vurderingDto = this.find { it.regelId == regel }
 
-        vilkårsvurdering[regel] = delvilkårsvurderingMapper(vurderingDto, regelSteg.svarMapping)
+        vilkårsvurdering[regel] = delvilkårsvurderingMapper(regel, vurderingDto, regelSteg.svarMapping)
     }
     return vilkårsvurdering
 }
 
 fun delvilkårsvurderingMapper(
+    gjeldendeRegel: RegelId,
     vurdering: VurderingDto?,
     svarMapping: Map<SvarId, SvarRegel>,
 ): DelvilkårsvurderingJson {
@@ -297,32 +296,34 @@ fun delvilkårsvurderingMapper(
         it.key to SvaralternativJson(it.value.begrunnelseType)
     }
 
-    if (vurdering == null) {
-        return DelvilkårsvurderingJson(
-            svaralternativer = svaralternativer,
-        )
+    data class Regelavhengighet(
+        val denneRegelen: RegelId,
+        val erAvhengigAvDenneRegelen: RegelId,
+        val ogDetteSvaret: SvarId,
+    )
+
+    val relaterteOverordnedeValg = vilkårsreglerPassBarn().values.flatMap { regelSteg ->
+        regelSteg.svarMapping.map {
+            Regelavhengighet(
+                denneRegelen = it.value.regelId,
+                erAvhengigAvDenneRegelen = regelSteg.regelId,
+                ogDetteSvaret = it.key,
+            )
+        }
     }
 
-    val relaterteOverordnedeValg =
-        PassBarnRegel().regler.values.flatMap { regelSteg ->
-            regelSteg.svarMapping.map {
-                regelSteg.regelId to OverordnetValgJson(it.value.regelId, it.key)
-            }
-        }.filter { it.second.regel == vurdering.regelId }
-
-    val følgerFraOverordnetValg = relaterteOverordnedeValg.firstOrNull()?.let {
-        OverordnetValgJson(
-            regel = it.first,
-            svar = it.second.svar,
-        )
-    }
+    val følgerFraOverordnetValg =
+        relaterteOverordnedeValg.filter { it.denneRegelen == gjeldendeRegel }
+            .map { OverordnetValgJson(it.erAvhengigAvDenneRegelen, it.ogDetteSvaret) }.firstOrNull()
 
     return DelvilkårsvurderingJson(
-        svar = vurdering.svar,
-        begrunnelse = vurdering.begrunnelse,
-        svaralternativer = svaralternativer,
         følgerFraOverordnetValg = følgerFraOverordnetValg,
+        svar = vurdering?.svar,
+        begrunnelse = vurdering?.begrunnelse,
+        svaralternativer = svaralternativer,
     )
 }
 
 fun vilkårsreglerPassBarn() = vilkårsreglerForStønad(Stønadstype.BARNETILSYN).map { it.regler }.first()
+
+fun hovedreglerPassBarn() = vilkårsreglerForStønad(Stønadstype.BARNETILSYN).map { it.hovedregler }.first()
