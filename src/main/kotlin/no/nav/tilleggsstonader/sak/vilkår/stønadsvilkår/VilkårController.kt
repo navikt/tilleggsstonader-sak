@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDelvilkårDtoer
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
@@ -35,13 +36,13 @@ class VilkårController(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @GetMapping("regler")
-    @Deprecated("Brukes ikke lenger av frontend")
+    @Deprecated("Brukes ikke lenger av frontend, kan fjernes.")
     fun hentRegler(): Vilkårsregler {
         return Vilkårsregler.ALLE_VILKÅRSREGLER
     }
 
     @PostMapping
-    @Deprecated("Erstattet av oppdaterVilkårsvurdering")
+    @Deprecated("Erstattet av oppdaterVilkårsvurdering", ReplaceWith("oppdaterVilkårsvurdering()"))
     fun oppdaterVilkår(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
@@ -60,10 +61,15 @@ class VilkårController(
 
     @PostMapping("oppdater")
     fun oppdaterVilkårsvurdering(@RequestBody vilkårsvurdering: OppdaterVilkårsvurderingJson): VilkårJson {
-        tilgangService.validerTilgangTilBehandling(vilkårsvurdering.behandlingId, AuditLoggerEvent.UPDATE)
+        val vilkårId = vilkårsvurdering.id
+        val behandlingId = vilkårsvurdering.behandlingId
+        val vurderinger = vilkårsvurdering.vurdering.tilDelvilkårDtoer()
+
+        tilgangService.validerTilgangTilBehandling(vilkårId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
+
         try {
-            return vilkårStegService.oppdaterVilkårsvurdering(vilkårsvurdering)
+            return vilkårService.oppdaterVilkårsvurdering(vilkårId, behandlingId, vurderinger).tilJson()
         } catch (e: Exception) {
             val delvilkårJson = objectMapper.writeValueAsString(vilkårsvurdering)
             secureLogger.warn(
