@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.opplysninger.arena
 
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
+import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusHarSakerDto
+import no.nav.tilleggsstonader.kontrakter.felles.IdenterRequest
 import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstype
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
@@ -18,6 +20,11 @@ class ArenaClient(
 
     val statusUri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "status").toUriString()
 
+    val statusHarSakerUri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "status", "har-saker").toUriString()
+
     fun hentStatus(request: IdenterStønadstype): ArenaStatusDto =
         postForEntity(statusUri, request)
+
+    fun harSaker(request: IdenterRequest): ArenaStatusHarSakerDto =
+        postForEntity(statusHarSakerUri, request)
 }

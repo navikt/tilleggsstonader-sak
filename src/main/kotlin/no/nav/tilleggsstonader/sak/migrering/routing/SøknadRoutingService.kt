@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.migrering.routing
 
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -11,9 +10,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantWithNameOrDefault
-import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -22,8 +19,7 @@ class SøknadRoutingService(
     private val søknadRoutingRepository: SøknadRoutingRepository,
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
-    private val arenaClient: ArenaClient,
-    private val personService: PersonService,
+    private val arenaService: ArenaService,
     private val unleashService: UnleashService,
 ) {
 
@@ -55,7 +51,7 @@ class SøknadRoutingService(
             lagreRouting(request, mapOf("harBehandling" to true))
             return true
         }
-        val arenaStatus = arenaClient.hentStatus(tilArenaRequest(request))
+        val arenaStatus = arenaService.hentStatus(request.ident, request.stønadstype)
         if (harGyldigStateIArena(arenaStatus)) {
             lagreRouting(request, arenaStatus)
             return true
@@ -69,12 +65,6 @@ class SøknadRoutingService(
     private fun Stønadstype.maksAntallToggle() = when (this) {
         Stønadstype.BARNETILSYN -> Toggle.SØKNAD_ROUTING_TILSYN_BARN
     }
-
-    private fun tilArenaRequest(request: IdentStønadstype) =
-        IdenterStønadstype(
-            identer = personService.hentPersonIdenter(request.ident).identer(),
-            stønadstype = request.stønadstype,
-        )
 
     private fun harGyldigStateIArena(arenaStatus: ArenaStatusDto): Boolean {
         return !arenaStatus.sak.harAktivSakUtenVedtak && !arenaStatus.vedtak.harVedtak
