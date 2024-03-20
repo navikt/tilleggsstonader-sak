@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.MappedCollection
-import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -28,7 +27,6 @@ data class TilkjentYtelse(
     val behandlingId: UUID,
     @MappedCollection(idColumn = "tilkjent_ytelse_id")
     val andelerTilkjentYtelse: Set<AndelTilkjentYtelse>,
-    val startdato: LocalDate,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 )

@@ -49,7 +49,6 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
             TilkjentYtelse(
                 behandlingId = behandling.id,
                 andelerTilkjentYtelse = setOf(andel1, andel2),
-                startdato = LocalDate.now(),
             ),
         )
 
@@ -84,7 +83,6 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
             TilkjentYtelse(
                 behandlingId = behandling.id,
                 andelerTilkjentYtelse = setOf(andel1),
-                startdato = LocalDate.now(),
             ),
         )
 
@@ -165,7 +163,6 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
                 TilkjentYtelse(
                     behandlingId = behandling.id,
                     andelerTilkjentYtelse = setOf(andel1),
-                    startdato = LocalDate.now(),
                 ),
             )
         }

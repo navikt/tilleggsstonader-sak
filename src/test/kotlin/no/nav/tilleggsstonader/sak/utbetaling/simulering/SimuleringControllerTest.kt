@@ -19,7 +19,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.exchange
-import java.time.LocalDate
 import java.util.UUID
 
 internal class SimuleringControllerTest : IntegrationTest() {
@@ -43,13 +42,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
         val personIdent = "12345678901"
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(personIdent))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
-        tilkjentYtelseRepository
-            .insert(
-                tilkjentYtelse(
-                    behandlingId = behandling.id,
-                    startdato = LocalDate.of(2021, 1, 1),
-                ),
-            )
+        tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
         val respons: ResponseEntity<Simuleringsoppsummering> = simulerForBehandling(behandling.id)
 

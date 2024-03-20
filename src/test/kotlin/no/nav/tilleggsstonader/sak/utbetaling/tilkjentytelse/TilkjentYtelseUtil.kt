@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.util.min
 import java.time.LocalDate
 import java.util.UUID
 
@@ -14,12 +13,10 @@ object TilkjentYtelseUtil {
 
     fun tilkjentYtelse(
         behandlingId: UUID,
-        startdato: LocalDate? = null,
         vararg andeler: AndelTilkjentYtelse = arrayOf(andelTilkjentYtelse(kildeBehandlingId = behandlingId)),
     ): TilkjentYtelse {
         return TilkjentYtelse(
             behandlingId = behandlingId,
-            startdato = min(startdato, andeler.minOfOrNull { it.fom }) ?: error("Må sette startdato"),
             andelerTilkjentYtelse = andeler.toSet(),
         )
     }
