@@ -3,12 +3,17 @@ package no.nav.tilleggsstonader.sak.fagsak.domain
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
-class FagsakPersonService(private val fagsakPersonRepository: FagsakPersonRepository) {
+class FagsakPersonService(
+    private val personService: PersonService,
+    private val fagsakPersonRepository: FagsakPersonRepository,
+) {
 
     fun hentPerson(personId: UUID): FagsakPerson = fagsakPersonRepository.findByIdOrThrow(personId)
 
@@ -23,6 +28,13 @@ class FagsakPersonService(private val fagsakPersonRepository: FagsakPersonReposi
     }
 
     fun hentAktivIdent(personId: UUID): String = fagsakPersonRepository.hentAktivIdent(personId)
+
+    @Transactional
+    fun hentEllerOpprettPerson(ident: String): FagsakPerson {
+        val personIdenter = personService.hentPersonIdenter(ident)
+        val gjeldendePersonIdent = personIdenter.gjeldende().ident
+        return hentEllerOpprettPerson(personIdenter.identer(), gjeldendePersonIdent)
+    }
 
     @Transactional
     fun hentEllerOpprettPerson(personIdenter: Set<String>, gjeldendePersonIdent: String): FagsakPerson {

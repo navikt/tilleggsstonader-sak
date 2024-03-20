@@ -239,11 +239,12 @@ class BehandlingFlytTest(
                 ),
             ),
         )
-        stegService.håndterInngangsvilkår(behandlingId)
+        stegService.håndterSteg(behandlingId, StegType.INNGANGSVILKÅR)
     }
 
     private fun utfyllVilkår(behandlingId: UUID) {
         testSaksbehandlingController.utfyllVilkår(behandlingId)
+        stegService.håndterSteg(behandlingId, StegType.VILKÅR)
     }
 
     private fun opprettVilkår(behandlingId: UUID) {

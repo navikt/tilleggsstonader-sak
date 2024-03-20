@@ -10,9 +10,13 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
@@ -28,13 +32,14 @@ class TilsynBarnBeregnYtelseStegTest {
     private val simuleringService = mockk<SimuleringService>(relaxed = true)
     private val stønadsperiodeService = mockk<StønadsperiodeRepository>(relaxed = true)
     private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>(relaxed = true)
+    private val vilkårService = mockk<VilkårService>(relaxed = true)
 
     val steg = TilsynBarnBeregnYtelseSteg(
         tilsynBarnBeregningService = TilsynBarnBeregningService(stønadsperiodeService, vilkårperiodeRepository),
         vedtakRepository = repository,
-        barnService = barnService,
         tilkjentytelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
+        vilkårService = vilkårService,
     )
 
     val saksbehandling = saksbehandling()
@@ -54,11 +59,25 @@ class TilsynBarnBeregnYtelseStegTest {
                 tom = tom,
             ),
         )
-        every { vilkårperiodeRepository.findByBehandlingIdAndResultat(saksbehandling.id, ResultatVilkårperiode.OPPFYLT) } returns listOf(
+        every {
+            vilkårperiodeRepository.findByBehandlingIdAndResultat(
+                saksbehandling.id,
+                ResultatVilkårperiode.OPPFYLT,
+            )
+        } returns listOf(
             aktivitet(
                 behandlingId = saksbehandling.id,
                 fom = fom,
                 tom = tom,
+            ),
+        )
+
+        every { vilkårService.hentOppfyltePassBarnVilkår(saksbehandling.id) } returns listOf(
+            vilkår(
+                behandlingId = saksbehandling.id,
+                barnId = barn.id,
+                resultat = Vilkårsresultat.OPPFYLT,
+                type = VilkårType.PASS_BARN,
             ),
         )
     }

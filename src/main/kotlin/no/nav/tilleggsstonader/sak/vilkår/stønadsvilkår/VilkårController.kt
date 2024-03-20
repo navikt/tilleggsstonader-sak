@@ -28,7 +28,6 @@ import java.util.UUID
 @Validated
 class VilkårController(
     private val vilkårService: VilkårService,
-    private val vilkårStegService: VilkårStegService,
     private val tilgangService: TilgangService,
     // private val gjenbrukVilkårService: GjenbrukVilkårService,
 ) {
@@ -47,7 +46,7 @@ class VilkårController(
         tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         try {
-            return vilkårStegService.oppdaterVilkår(svarPåVilkårDto)
+            return vilkårService.oppdaterVilkår(svarPåVilkårDto)
         } catch (e: Exception) {
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
@@ -80,14 +79,14 @@ class VilkårController(
     fun nullstillVilkår(@RequestBody request: OppdaterVilkårDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
         tilgangService.validerHarSaksbehandlerrolle()
-        return vilkårStegService.nullstillVilkår(request)
+        return vilkårService.nullstillVilkår(request)
     }
 
     @PostMapping("ikkevurder")
     fun settVilkårTilSkalIkkeVurderes(@RequestBody request: OppdaterVilkårDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
-        return vilkårStegService.settVilkårTilSkalIkkeVurderes(request)
+        return vilkårService.settVilkårTilSkalIkkeVurderes(request)
     }
 
     @GetMapping("{behandlingId}")
