@@ -97,7 +97,6 @@ class BehandlingFaktaService(
             val navnBarn = dokumentasjon.identBarn?.let { navn[it] }?.let { " - $it" } ?: ""
             Dokumentasjon(
                 type = dokumentasjon.type.tittel + navnBarn,
-                harSendtInn = dokumentasjon.harSendtInn,
                 dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
                 identBarn = dokumentasjon.identBarn,
             )
