@@ -45,7 +45,6 @@ data class SvaralternativJson(
     val begrunnelsestype: BegrunnelseType,
 )
 
-
 fun Vilkår.tilJson() = this.tilDto().tilJson()
 
 fun VilkårDto.tilJson(): VilkårJson {
@@ -80,14 +79,12 @@ private fun List<VurderingDto>.tilJson(): VilkårsvurderingJson {
     return vilkårsvurdering
 }
 
-
 private fun finnSvaralternativer(svarMapping: Map<SvarId, SvarRegel>): Map<SvarId, SvaralternativJson> {
     val svaralternativer = svarMapping.entries.associate {
         it.key to SvaralternativJson(it.value.begrunnelseType)
     }
     return svaralternativer
 }
-
 
 private fun finnOverordnetValg(gjeldendeRegel: RegelId): OverordnetValgJson? {
     data class Regelavhengighet(

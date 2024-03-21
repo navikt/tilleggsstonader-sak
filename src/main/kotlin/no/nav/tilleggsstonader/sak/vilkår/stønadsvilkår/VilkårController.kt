@@ -53,8 +53,8 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                        " svar=$delvilkårJson",
+                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                    " svar=$delvilkårJson",
             )
             throw e
         }
@@ -66,7 +66,7 @@ class VilkårController(
         val behandlingId = vilkårsvurdering.behandlingId
         val vurderinger = vilkårsvurdering.vurdering.tilDelvilkårDtoer()
 
-        tilgangService.validerTilgangTilBehandling(vilkårId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
         try {
@@ -75,8 +75,8 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(vilkårsvurdering)
             secureLogger.warn(
                 "id=${vilkårsvurdering.id}" +
-                        " behandlingId=${vilkårsvurdering.behandlingId}" +
-                        " svar=$delvilkårJson",
+                    " behandlingId=${vilkårsvurdering.behandlingId}" +
+                    " svar=$delvilkårJson",
             )
             throw e
         }
