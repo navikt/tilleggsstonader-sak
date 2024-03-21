@@ -16,7 +16,6 @@ object DokumentasjonMapper {
         return skjema.dokumentasjon.map {
             Dokumentasjon(
                 type = it.type,
-                harSendtInn = it.harSendtInn,
                 dokumenter = it.opplastedeVedlegg.map { dokument ->
                     val dokumentId = dokument.id
                     vedlegg[dokumentId.toString()]

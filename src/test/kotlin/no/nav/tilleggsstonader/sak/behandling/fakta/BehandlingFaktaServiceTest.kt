@@ -104,7 +104,7 @@ internal class BehandlingFaktaServiceTest {
 
         @Test
         fun `skal mappe dokumentasjon`() {
-            val dokumentasjon = lagDokumentasjon(harSendtInn = false)
+            val dokumentasjon = lagDokumentasjon()
             every { grunnlagsdataService.hentFraRegister(behandlingId) } returns
                 grunnlagsdataMedMetadata(grunnlagsdata = lagGrunnlagsdata(barn = emptyList()))
             every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn(
@@ -118,7 +118,6 @@ internal class BehandlingFaktaServiceTest {
             assertThat(fakta.dokumentasjon?.journalpostId).contains("journalpostId2")
             with(fakta.dokumentasjon!!.dokumentasjon.single()) {
                 assertThat(type).isEqualTo(dokumentasjon.type.tittel)
-                assertThat(harSendtInn).isFalse()
                 assertThat(dokumenter.map { it.dokumentInfoId })
                     .containsExactlyElementsOf(dokumentasjon.dokumenter.map { it.dokumentInfoId })
                 assertThat(identBarn).isNull()
@@ -144,7 +143,6 @@ internal class BehandlingFaktaServiceTest {
 
             with(fakta.dokumentasjon!!.dokumentasjon.single()) {
                 assertThat(type).isEqualTo("${dokumentasjon.type.tittel} - Fornavn barn1")
-                assertThat(harSendtInn).isTrue()
                 assertThat(identBarn).isEqualTo("1")
             }
         }
