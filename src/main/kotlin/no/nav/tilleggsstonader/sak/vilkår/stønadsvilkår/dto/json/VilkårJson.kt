@@ -23,13 +23,13 @@ data class VilkårJson(
     val barnId: UUID? = null,
     val endretAv: String,
     val endretTid: LocalDateTime,
-    val vurdering: VilkårsvurderingJson,
+    val delvilkårsett: DelvilkårsettJson,
     val opphavsvilkår: OpphavsvilkårDto?,
 )
 
-private typealias VilkårsvurderingJson = Map<RegelId, DelvilkårsvurderingJson>
+private typealias DelvilkårsettJson = Map<RegelId, DelvilkårJson>
 
-data class DelvilkårsvurderingJson(
+data class DelvilkårJson(
     val svar: SvarId? = null,
     val begrunnelse: String? = null,
     val svaralternativer: Map<SvarId, SvaralternativJson>,
@@ -48,7 +48,7 @@ data class SvaralternativJson(
 fun Vilkår.tilJson() = this.tilDto().tilJson()
 
 fun VilkårDto.tilJson(): VilkårJson {
-    val vurderinger = this.delvilkårsett.flatMap { it.vurderinger }
+    val delvilkårsett = this.delvilkårsett.flatMap { it.vurderinger }
 
     return VilkårJson(
         id = this.id,
@@ -58,18 +58,18 @@ fun VilkårDto.tilJson(): VilkårJson {
         barnId = this.barnId,
         endretAv = this.endretAv,
         endretTid = this.endretTid,
-        vurdering = vurderinger.tilJson(),
+        delvilkårsett = delvilkårsett.tilJson(),
         opphavsvilkår = this.opphavsvilkår,
     )
 }
 
-private fun List<VurderingDto>.tilJson(): VilkårsvurderingJson {
-    val vilkårsvurdering = mutableMapOf<RegelId, DelvilkårsvurderingJson>()
+private fun List<VurderingDto>.tilJson(): DelvilkårsettJson {
+    val vilkårsvurdering = mutableMapOf<RegelId, DelvilkårJson>()
     val stønadsregler = vilkårsreglerPassBarn()
     for ((regel, regelSteg) in stønadsregler) {
         val vurderingDto = this.find { it.regelId == regel }
 
-        vilkårsvurdering[regel] = DelvilkårsvurderingJson(
+        vilkårsvurdering[regel] = DelvilkårJson(
             følgerFraOverordnetValg = finnOverordnetValg(regel),
             svar = vurderingDto?.svar,
             begrunnelse = vurderingDto?.begrunnelse,
