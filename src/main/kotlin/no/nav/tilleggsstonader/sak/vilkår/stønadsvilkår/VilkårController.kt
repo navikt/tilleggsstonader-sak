@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.VilkårJson
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.VilkårsvurderingerJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.tilJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDelvilkårDtoer
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
@@ -103,12 +104,12 @@ class VilkårController(
     }
 
     @GetMapping("{behandlingId}/vurderinger")
-    fun getVilkårsvurdering(@PathVariable behandlingId: UUID): VilkårService.VilkårsvurderingerJson {
+    fun getVilkårsvurdering(@PathVariable behandlingId: UUID): VilkårsvurderingerJson {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         val vilkårsvurderinger = vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
 
-        return VilkårService.VilkårsvurderingerJson(
+        return VilkårsvurderingerJson(
             vilkårsett = vilkårsvurderinger.vilkårsett.map { it.tilJson() },
             grunnlag = vilkårsvurderinger.grunnlag,
         )

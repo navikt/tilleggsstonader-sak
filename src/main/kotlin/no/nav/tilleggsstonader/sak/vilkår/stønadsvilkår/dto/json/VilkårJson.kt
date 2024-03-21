@@ -27,12 +27,29 @@ data class VilkårJson(
     val opphavsvilkår: OpphavsvilkårDto?,
 )
 
-typealias VilkårsvurderingJson = Map<RegelId, DelvilkårsvurderingJson>
+private typealias VilkårsvurderingJson = Map<RegelId, DelvilkårsvurderingJson>
+
+data class DelvilkårsvurderingJson(
+    val svar: SvarId? = null,
+    val begrunnelse: String? = null,
+    val svaralternativer: Map<SvarId, SvaralternativJson>,
+    val følgerFraOverordnetValg: OverordnetValgJson? = null,
+)
+
+data class OverordnetValgJson(
+    val regel: RegelId,
+    val svar: SvarId,
+)
+
+data class SvaralternativJson(
+    val begrunnelsestype: BegrunnelseType,
+)
+
 
 fun Vilkår.tilJson() = this.tilDto().tilJson()
 
 fun VilkårDto.tilJson(): VilkårJson {
-    val vurderinger: List<VurderingDto> = this.delvilkårsett.flatMap { it.vurderinger }
+    val vurderinger = this.delvilkårsett.flatMap { it.vurderinger }
 
     return VilkårJson(
         id = this.id,
@@ -53,20 +70,26 @@ private fun List<VurderingDto>.tilJson(): VilkårsvurderingJson {
     for ((regel, regelSteg) in stønadsregler) {
         val vurderingDto = this.find { it.regelId == regel }
 
-        vilkårsvurdering[regel] = delvilkårsvurderingMapper(regel, vurderingDto, regelSteg.svarMapping)
+        vilkårsvurdering[regel] = DelvilkårsvurderingJson(
+            følgerFraOverordnetValg = finnOverordnetValg(regel),
+            svar = vurderingDto?.svar,
+            begrunnelse = vurderingDto?.begrunnelse,
+            svaralternativer = finnSvaralternativer(regelSteg.svarMapping),
+        )
     }
     return vilkårsvurdering
 }
 
-private fun delvilkårsvurderingMapper(
-    gjeldendeRegel: RegelId,
-    vurdering: VurderingDto?,
-    svarMapping: Map<SvarId, SvarRegel>,
-): DelvilkårsvurderingJson {
+
+private fun finnSvaralternativer(svarMapping: Map<SvarId, SvarRegel>): Map<SvarId, SvaralternativJson> {
     val svaralternativer = svarMapping.entries.associate {
         it.key to SvaralternativJson(it.value.begrunnelseType)
     }
+    return svaralternativer
+}
 
+
+private fun finnOverordnetValg(gjeldendeRegel: RegelId): OverordnetValgJson? {
     data class Regelavhengighet(
         val denneRegelen: RegelId,
         val erAvhengigAvDenneRegelen: RegelId,
@@ -87,26 +110,5 @@ private fun delvilkårsvurderingMapper(
         relaterteOverordnedeValg.filter { it.denneRegelen == gjeldendeRegel }
             .map { OverordnetValgJson(it.erAvhengigAvDenneRegelen, it.ogDetteSvaret) }.firstOrNull()
 
-    return DelvilkårsvurderingJson(
-        følgerFraOverordnetValg = følgerFraOverordnetValg,
-        svar = vurdering?.svar,
-        begrunnelse = vurdering?.begrunnelse,
-        svaralternativer = svaralternativer,
-    )
+    return følgerFraOverordnetValg
 }
-
-data class DelvilkårsvurderingJson(
-    val svar: SvarId? = null,
-    val begrunnelse: String? = null,
-    val svaralternativer: Map<SvarId, SvaralternativJson>,
-    val følgerFraOverordnetValg: OverordnetValgJson? = null,
-)
-
-data class OverordnetValgJson(
-    val regel: RegelId,
-    val svar: SvarId,
-)
-
-data class SvaralternativJson(
-    val begrunnelsestype: BegrunnelseType,
-)

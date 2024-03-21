@@ -24,7 +24,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
@@ -197,11 +196,6 @@ class VilkårService(
         }
         return hentEllerOpprettVilkårsvurdering(behandlingId)
     }
-
-    data class VilkårsvurderingerJson(
-        val vilkårsett: List<VilkårJson>,
-        val grunnlag: BehandlingFaktaDto,
-    )
 
     fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
         val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
