@@ -1,8 +1,12 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto
+package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json
 
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpphavsvilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.BegrunnelseType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId

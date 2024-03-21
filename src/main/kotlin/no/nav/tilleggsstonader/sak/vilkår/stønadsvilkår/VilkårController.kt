@@ -8,10 +8,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårsvurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.VilkårJson
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.tilJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDelvilkårDtoer
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated

@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto
 
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.hovedreglerPassBarn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.BegrunnelseType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.vilkårsreglerPassBarn
@@ -21,6 +21,12 @@ data class VurderingJson(
     val begrunnelse: String?,
 )
 
+fun VurderingJson.tilDomene(): Vurdering = Vurdering(
+    regelId = this.regel,
+    svar = this.svar,
+    begrunnelse = this.begrunnelse,
+)
+
 fun List<VurderingJson>.tilDelvilkårDtoer(): List<DelvilkårDto> {
     val resultat = mutableListOf<DelvilkårDto>()
 
@@ -28,36 +34,19 @@ fun List<VurderingJson>.tilDelvilkårDtoer(): List<DelvilkårDto> {
     val stønadsregler = vilkårsreglerPassBarn()
 
     for (regelId in hovedregler) {
-        val relaterteOppdateringer = this.find { it.regel == regelId }!!
+        val hovedregelsvar = this.find { it.regel == regelId }!!.tilDomene()
 
-        val svar = relaterteOppdateringer.svar!! // alle hovedregler skal ha et svar.
-        val begrunnelse = relaterteOppdateringer.begrunnelse
+        val svar = hovedregelsvar.svar
+        brukerfeilHvis(svar == null) { "Alle hovedregler må ha et svar." }
 
-        val skalHaBegrunnelse =
-            stønadsregler[regelId]?.svarMapping?.get(svar)?.begrunnelseType != BegrunnelseType.UTEN
-
-        val oppdaterteVurderinger = Vurdering(
-            regelId = regelId,
-            svar = svar,
-            begrunnelse = if (skalHaBegrunnelse) begrunnelse else null,
-        )
-
-        val oppfølgingsregel = stønadsregler[regelId]!!.svarMapping[svar]!!.regelId
+        val oppfølgingsregel = stønadsregler[regelId]?.svarMapping?.get(svar)?.regelId
 
         if (oppfølgingsregel == RegelId.SLUTT_NODE) {
-            resultat.add(Delvilkår(vurderinger = listOf(oppdaterteVurderinger)).tilDto())
-
-            continue
+            resultat.add(Delvilkår(vurderinger = listOf(hovedregelsvar)).tilDto())
         } else {
-            // We got ourselves a oppfølgingsregel over here
-            val oppfølgingssvar = this.find { it.regel == oppfølgingsregel }!!
-            val oppfølgingsvurdering = Vurdering(
-                regelId = oppfølgingsregel,
-                svar = oppfølgingssvar.svar,
-                begrunnelse = oppfølgingssvar.begrunnelse,
-            )
+            val oppfølgingssvar = this.find { it.regel == oppfølgingsregel }!!.tilDomene()
 
-            resultat.add(Delvilkår(vurderinger = listOf(oppdaterteVurderinger, oppfølgingsvurdering)).tilDto())
+            resultat.add(Delvilkår(vurderinger = listOf(hovedregelsvar, oppfølgingssvar)).tilDto())
         }
     }
 
