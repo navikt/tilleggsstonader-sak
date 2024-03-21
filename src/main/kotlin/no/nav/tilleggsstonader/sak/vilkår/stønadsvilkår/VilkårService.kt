@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
@@ -51,8 +51,8 @@ class VilkårService(
 
     @Transactional
     @Deprecated(
-        message = "Fjernes når vi går over til nytt endepunkt for vilkårsvalideringer",
-        replaceWith = ReplaceWith("oppdatervilkårsvurdering()"),
+        "Fjernes når vi går over til nytt endepunkt for vilkårsvalideringer",
+        ReplaceWith("oppdatervilkårsvurdering()"),
     )
     fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
         val vilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
@@ -175,14 +175,14 @@ class VilkårService(
     }
 
     @Transactional
-    fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): Vilkårsvurdering {
+    fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
         val (grunnlag, metadata) = hentGrunnlagOgMetadata(behandlingId)
         val vurderinger = hentEllerOpprettVilkår(behandlingId, metadata).map(Vilkår::tilDto)
-        return Vilkårsvurdering(vilkårsett = vurderinger, grunnlag = grunnlag)
+        return VilkårsvurderingDto(vilkårsett = vurderinger, grunnlag = grunnlag)
     }
 
     @Transactional
-    fun hentOpprettEllerOppdaterVilkårsvurdering(behandlingId: UUID): Vilkårsvurdering {
+    fun hentOpprettEllerOppdaterVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
         if (behandling.harStatusOpprettet) {
@@ -214,7 +214,7 @@ class VilkårService(
     }
 
     @Transactional
-    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): Vilkårsvurdering {
+    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårsvurderingDto {
         // grunnlagsdataService.oppdaterOgHentNyGrunnlagsdata(behandlingId)
         return hentEllerOpprettVilkårsvurdering(behandlingId)
     }
