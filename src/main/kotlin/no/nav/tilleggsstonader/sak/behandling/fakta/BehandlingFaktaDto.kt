@@ -47,7 +47,6 @@ data class FaktaDokumentasjon(
 
 data class Dokumentasjon(
     val type: String,
-    val harSendtInn: Boolean,
     val dokumenter: List<Dokument>,
     @JsonInclude(JsonInclude.Include.NON_NULL)
     val identBarn: String? = null,

@@ -70,7 +70,6 @@ data class AktivitetAvsnitt(
 
 data class Dokumentasjon(
     val type: Vedleggstype,
-    val harSendtInn: Boolean,
     val dokumenter: List<Dokument>,
     @JsonInclude(JsonInclude.Include.NON_NULL)
     val identBarn: String? = null,

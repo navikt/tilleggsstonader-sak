@@ -29,7 +29,6 @@
     "journalpostId" : "testId",
     "dokumentasjon" : [ {
       "type" : "Dokumentasjon av utgifter for pass av barn",
-      "harSendtInn" : true,
       "dokumenter" : [ {
         "dokumentInfoId" : "688ad1dc-e35e-4ab8-a534-17c6e691463f"
       } ]

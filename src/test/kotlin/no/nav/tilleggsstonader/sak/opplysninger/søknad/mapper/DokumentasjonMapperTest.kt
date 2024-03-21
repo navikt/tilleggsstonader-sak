@@ -38,13 +38,11 @@ class DokumentasjonMapperTest {
         assertThat(data).containsExactlyInAnyOrder(
             Dokumentasjon(
                 type = Vedleggstype.UTGIFTER_PASS_SFO_AKS_BARNEHAGE,
-                harSendtInn = false,
                 dokumenter = listOf(DokumentDomain("vedlegg1")),
                 identBarn = null,
             ),
             Dokumentasjon(
                 type = Vedleggstype.UTGIFTER_PASS_SFO_AKS_BARNEHAGE,
-                harSendtInn = true,
                 dokumenter = listOf(DokumentDomain("vedlegg2")),
                 identBarn = "barnId",
             ),
