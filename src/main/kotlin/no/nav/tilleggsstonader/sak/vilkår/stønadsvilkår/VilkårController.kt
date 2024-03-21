@@ -5,14 +5,14 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårsvurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.OppdaterVilkårsvurderingJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.VilkårJson
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.VilkårsvurderingerJson
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.tilDelvilkårDtoer
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.tilJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDelvilkårDtoer
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
@@ -53,8 +53,8 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                    " svar=$delvilkårJson",
+                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
@@ -75,8 +75,8 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(vilkårsvurdering)
             secureLogger.warn(
                 "id=${vilkårsvurdering.id}" +
-                    " behandlingId=${vilkårsvurdering.behandlingId}" +
-                    " svar=$delvilkårJson",
+                        " behandlingId=${vilkårsvurdering.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
