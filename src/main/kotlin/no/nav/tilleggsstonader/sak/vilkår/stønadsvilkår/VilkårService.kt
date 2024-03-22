@@ -382,4 +382,3 @@ class VilkårService(
         }
     }
 }
-

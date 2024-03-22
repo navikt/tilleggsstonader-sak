@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.BegrunnelseTyp
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarRegel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.vilkårsreglerPassBarn
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerPassBarn
 import java.time.LocalDateTime
 import java.util.UUID
 
