@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.journalføring.JournalpostDatoUtil.mestReleva
 import java.time.LocalDateTime
 
 data class DokumentInfoDto(
-    val dokumentinfoId: String,
+    val dokumentInfoId: String,
     val filnavn: String?,
     val tittel: String,
     val journalpostId: String,
@@ -32,7 +32,7 @@ fun tilDokumentInfoDto(
     journalpost: Journalpost,
 ): DokumentInfoDto {
     return DokumentInfoDto(
-        dokumentinfoId = dokumentInfo.dokumentInfoId,
+        dokumentInfoId = dokumentInfo.dokumentInfoId,
         filnavn = dokumentInfo.dokumentvarianter?.find { it.variantformat == Dokumentvariantformat.ARKIV }?.filnavn,
         tittel = dokumentInfo.tittel ?: "Tittel mangler",
         journalpostId = journalpost.journalpostId,

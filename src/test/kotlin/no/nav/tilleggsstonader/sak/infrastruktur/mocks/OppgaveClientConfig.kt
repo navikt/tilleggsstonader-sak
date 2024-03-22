@@ -31,6 +31,7 @@ import java.util.Optional
 class OppgaveClientConfig {
 
     var maxOppgaveId = 0L
+    final var journalPostId = 0L
     val oppgavelager = mutableMapOf<Long, Oppgave>()
 
     @Bean
@@ -156,9 +157,10 @@ class OppgaveClientConfig {
         oppgavetype = Oppgavetype.Journalføring,
         fristFerdigstillelse = LocalDate.now().plusDays(14),
         beskrivelse = "Dummy søknad",
-        behandlingstema = "",
+        behandlingstema = "ab0300",
         enhetsnummer = "",
         ident = OppgaveIdentV2(ident = "12345678910", gruppe = IdentGruppe.FOLKEREGISTERIDENT),
+        journalpostId = (++journalPostId).toString(),
     )
 
     companion object {
