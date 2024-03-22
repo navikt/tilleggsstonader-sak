@@ -5,10 +5,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.finnOppfølgingsregel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.hovedreglerPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnOppfølgingsregel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hovedreglerPassBarn
 import java.util.UUID
 
 data class OppdaterVilkårsvurderingJson(

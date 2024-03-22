@@ -30,7 +30,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMeta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -384,6 +383,3 @@ class VilkårService(
     }
 }
 
-fun vilkårsreglerPassBarn() = vilkårsreglerForStønad(Stønadstype.BARNETILSYN).map { it.regler }.first()
-
-fun hovedreglerPassBarn() = vilkårsreglerForStønad(Stønadstype.BARNETILSYN).map { it.hovedregler }.first()
