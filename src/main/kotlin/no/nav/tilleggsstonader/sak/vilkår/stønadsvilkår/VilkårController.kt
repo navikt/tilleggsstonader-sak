@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
@@ -53,8 +54,8 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                        " svar=$delvilkårJson",
+                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                    " svar=$delvilkårJson",
             )
             throw e
         }
@@ -64,7 +65,7 @@ class VilkårController(
     fun oppdaterVilkårsvurdering(@RequestBody vilkårsvurdering: OppdaterVilkårsvurderingRestDto): VilkårRestDto {
         val vilkårId = vilkårsvurdering.id
         val behandlingId = vilkårsvurdering.behandlingId
-        val vurderinger = vilkårsvurdering.vurdering.tilDelvilkårDtoer()
+        val vurderinger = vilkårsvurdering.vurdering.tilDelvilkårDtoer(Stønadstype.BARNETILSYN)
 
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
@@ -75,8 +76,8 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(vilkårsvurdering)
             secureLogger.warn(
                 "id=${vilkårsvurdering.id}" +
-                        " behandlingId=${vilkårsvurdering.behandlingId}" +
-                        " svar=$delvilkårJson",
+                    " behandlingId=${vilkårsvurdering.behandlingId}" +
+                    " svar=$delvilkårJson",
             )
             throw e
         }
