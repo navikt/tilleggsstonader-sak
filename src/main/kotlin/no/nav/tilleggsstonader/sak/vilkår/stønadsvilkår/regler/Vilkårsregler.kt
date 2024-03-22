@@ -29,3 +29,10 @@ fun hentVilkårsregel(vilkårType: VilkårType): Vilkårsregel {
     return Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler[vilkårType]
         ?: error("Finner ikke vilkårsregler for vilkårType=$vilkårType")
 }
+
+fun vilkårsreglerPassBarn() = vilkårsreglerForStønad(Stønadstype.BARNETILSYN).map { it.regler }.first()
+
+fun hovedreglerPassBarn() = vilkårsreglerForStønad(Stønadstype.BARNETILSYN).map { it.hovedregler }.first()
+
+fun finnOppfølgingsregel(regelId: RegelId, svar: SvarId?) =
+    vilkårsreglerPassBarn()[regelId]?.svarMapping?.get(svar)?.regelId

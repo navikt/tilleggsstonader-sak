@@ -2,12 +2,18 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest.OppdaterVilkårsvurderingRestDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest.VilkårRestDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest.VilkårsvurderingerJson
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest.tilDelvilkårDtoer
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest.tilRestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
@@ -32,11 +38,13 @@ class VilkårController(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @GetMapping("regler")
+    @Deprecated("Brukes ikke lenger av frontend, kan fjernes.")
     fun hentRegler(): Vilkårsregler {
         return Vilkårsregler.ALLE_VILKÅRSREGLER
     }
 
     @PostMapping
+    @Deprecated("Erstattet av oppdaterVilkårsvurdering", ReplaceWith("oppdaterVilkårsvurdering()"))
     fun oppdaterVilkår(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
         tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
@@ -46,8 +54,32 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                    " svar=$delvilkårJson",
+                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                        " svar=$delvilkårJson",
+            )
+            throw e
+        }
+    }
+
+    @PostMapping("oppdater")
+    fun oppdaterVilkårsvurdering(@RequestBody vilkårsvurdering: OppdaterVilkårsvurderingRestDto): VilkårRestDto {
+        tilgangService.validerHarSaksbehandlerrolle()
+        tilgangService.validerTilgangTilBehandling(vilkårsvurdering.behandlingId, AuditLoggerEvent.UPDATE)
+
+        val vurderinger = vilkårsvurdering.vurdering.tilDelvilkårDtoer(Stønadstype.BARNETILSYN)
+
+        try {
+            return vilkårService.oppdaterVilkårsvurdering(
+                vilkårsvurdering.id,
+                vilkårsvurdering.behandlingId,
+                vurderinger
+            ).tilRestDto()
+        } catch (e: Exception) {
+            val delvilkårJson = objectMapper.writeValueAsString(vilkårsvurdering)
+            secureLogger.warn(
+                "id=${vilkårsvurdering.id}" +
+                        " behandlingId=${vilkårsvurdering.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
@@ -68,9 +100,22 @@ class VilkårController(
     }
 
     @GetMapping("{behandlingId}")
+    @Deprecated("Erstattet av getVilkårsvurdering()")
     fun getVilkår(@PathVariable behandlingId: UUID): VilkårsvurderingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
+    }
+
+    @GetMapping("{behandlingId}/vurderinger")
+    fun getVilkårsvurdering(@PathVariable behandlingId: UUID): VilkårsvurderingerJson {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+
+        val vilkårsvurderinger = vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
+
+        return VilkårsvurderingerJson(
+            vilkårsett = vilkårsvurderinger.vilkårsett.map { it.tilRestDto() },
+            grunnlag = vilkårsvurderinger.grunnlag,
+        )
     }
 
     @GetMapping("{behandlingId}/oppdater")

@@ -2,8 +2,11 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnOppfølgingsregel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -118,3 +121,24 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Støn
         }
     }
 }
+
+fun List<Vurdering>.tilDelvilkårsett(stønadstype: Stønadstype) =
+    vilkårsreglerForStønad(stønadstype).map { it.hovedregler }.first().flatMap { regelId ->
+
+        val hovedregelsvar = this.find { it.regelId == regelId }
+
+        val svar = hovedregelsvar?.svar
+        brukerfeilHvis(svar == null) { "Alle hovedregler må ha et svar." }
+
+        val oppfølgingsregel = finnOppfølgingsregel(regelId, svar)
+
+        if (oppfølgingsregel == RegelId.SLUTT_NODE) {
+            listOf(Delvilkår(vurderinger = listOf(hovedregelsvar)))
+        } else {
+            val oppfølgingssvar = this.find { it.regelId == oppfølgingsregel }
+
+            brukerfeilHvis(oppfølgingssvar?.svar == null) { "$oppfølgingsregel skal ha et svar." }
+
+            listOf(Delvilkår(vurderinger = listOf(hovedregelsvar, oppfølgingssvar!!)))
+        }
+    }

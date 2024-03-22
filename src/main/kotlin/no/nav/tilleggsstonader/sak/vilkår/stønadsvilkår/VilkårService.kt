@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
@@ -48,6 +49,10 @@ class VilkårService(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @Transactional
+    @Deprecated(
+        "Fjernes når vi går over til nytt endepunkt for vilkårsvalideringer",
+        ReplaceWith("oppdatervilkårsvurdering()"),
+    )
     fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
         val vilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
         val behandlingId = vilkår.behandlingId
@@ -57,6 +62,20 @@ class VilkårService(
 
         val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, svarPåVilkårDto.delvilkårsett)
         return vilkårRepository.update(oppdatertVilkår).tilDto()
+    }
+
+    @Transactional
+    fun oppdaterVilkårsvurdering(
+        innsendtVilkårId: UUID,
+        innsendtBehandlingId: UUID,
+        oppdateringer: List<DelvilkårDto>,
+    ): Vilkår {
+        val vilkår = vilkårRepository.findByIdOrThrow(innsendtVilkårId)
+
+        validerBehandling(vilkår.behandlingId)
+        validerBehandlingIdErLikIRequestOgIVilkåret(vilkår.behandlingId, innsendtBehandlingId)
+
+        return vilkårRepository.update(OppdaterVilkår.validerOgOppdatertVilkår(vilkår, oppdateringer))
     }
 
     @Transactional
@@ -343,7 +362,8 @@ class VilkårService(
     }
 
     fun hentOppfyltePassBarnVilkår(behandlingId: UUID): List<Vilkår> {
-        return vilkårRepository.findByBehandlingId(behandlingId).filter { it.resultat == Vilkårsresultat.OPPFYLT && it.type == VilkårType.PASS_BARN }
+        return vilkårRepository.findByBehandlingId(behandlingId)
+            .filter { it.resultat == Vilkårsresultat.OPPFYLT && it.type == VilkårType.PASS_BARN }
     }
 
     companion object {
