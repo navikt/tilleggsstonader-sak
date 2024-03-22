@@ -5,10 +5,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.finnOppfølgingsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.hovedreglerPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.vilkårsreglerPassBarn
 import java.util.UUID
 
 data class OppdaterVilkårsvurderingJson(
@@ -30,27 +30,22 @@ fun VurderingJson.tilDomene(): Vurdering = Vurdering(
 )
 
 fun List<VurderingJson>.tilDelvilkårDtoer(): List<DelvilkårDto> {
-    val resultat = mutableListOf<DelvilkårDto>()
-
-    val hovedregler = hovedreglerPassBarn()
-    val stønadsregler = vilkårsreglerPassBarn()
-
-    for (regelId in hovedregler) {
+    return hovedreglerPassBarn().flatMap { regelId ->
         val hovedregelsvar = this.find { it.regel == regelId }!!.tilDomene()
 
         val svar = hovedregelsvar.svar
         brukerfeilHvis(svar == null) { "Alle hovedregler må ha et svar." }
 
-        val oppfølgingsregel = stønadsregler[regelId]?.svarMapping?.get(svar)?.regelId
+        val oppfølgingsregel = finnOppfølgingsregel(regelId, svar)
 
         if (oppfølgingsregel == RegelId.SLUTT_NODE) {
-            resultat.add(Delvilkår(vurderinger = listOf(hovedregelsvar)).tilDto())
+            listOf(Delvilkår(vurderinger = listOf(hovedregelsvar)).tilDto())
         } else {
-            val oppfølgingssvar = this.find { it.regel == oppfølgingsregel }!!.tilDomene()
+            val oppfølgingssvar = this.find { it.regel == oppfølgingsregel }?.tilDomene()
 
-            resultat.add(Delvilkår(vurderinger = listOf(hovedregelsvar, oppfølgingssvar)).tilDto())
+            brukerfeilHvis(oppfølgingssvar?.svar == null) { "$oppfølgingsregel skal ha et svar." }
+
+            listOf(Delvilkår(vurderinger = listOf(hovedregelsvar, oppfølgingssvar!!)).tilDto())
         }
     }
-
-    return resultat
 }
