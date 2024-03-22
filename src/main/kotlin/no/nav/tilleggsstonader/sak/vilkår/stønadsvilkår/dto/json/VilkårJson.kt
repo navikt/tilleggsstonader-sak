@@ -64,19 +64,16 @@ fun VilkårDto.tilJson(): VilkårJson {
 }
 
 private fun List<VurderingDto>.tilJson(): DelvilkårsettJson {
-    val vilkårsvurdering = mutableMapOf<RegelId, DelvilkårJson>()
     val stønadsregler = vilkårsreglerPassBarn()
-    for ((regel, regelSteg) in stønadsregler) {
-        val vurderingDto = this.find { it.regelId == regel }
-
-        vilkårsvurdering[regel] = DelvilkårJson(
+    return stønadsregler.entries.associate { (regel, regelSteg) ->
+        val vurderingDto = find { it.regelId == regel }
+        regel to DelvilkårJson(
             følgerFraOverordnetValg = finnOverordnetValg(regel),
             svar = vurderingDto?.svar,
             begrunnelse = vurderingDto?.begrunnelse,
             svaralternativer = finnSvaralternativer(regelSteg.svarMapping),
         )
     }
-    return vilkårsvurdering
 }
 
 private fun finnSvaralternativer(svarMapping: Map<SvarId, SvarRegel>): Map<SvarId, SvaralternativJson> {
