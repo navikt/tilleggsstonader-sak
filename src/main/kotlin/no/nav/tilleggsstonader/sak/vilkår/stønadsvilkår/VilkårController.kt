@@ -54,8 +54,8 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                    " svar=$delvilkårJson",
+                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
@@ -63,21 +63,23 @@ class VilkårController(
 
     @PostMapping("oppdater")
     fun oppdaterVilkårsvurdering(@RequestBody vilkårsvurdering: OppdaterVilkårsvurderingRestDto): VilkårRestDto {
-        val vilkårId = vilkårsvurdering.id
-        val behandlingId = vilkårsvurdering.behandlingId
+        tilgangService.validerHarSaksbehandlerrolle()
+        tilgangService.validerTilgangTilBehandling(vilkårsvurdering.behandlingId, AuditLoggerEvent.UPDATE)
+
         val vurderinger = vilkårsvurdering.vurdering.tilDelvilkårDtoer(Stønadstype.BARNETILSYN)
 
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
-
         try {
-            return vilkårService.oppdaterVilkårsvurdering(vilkårId, behandlingId, vurderinger).tilRestDto()
+            return vilkårService.oppdaterVilkårsvurdering(
+                vilkårsvurdering.id,
+                vilkårsvurdering.behandlingId,
+                vurderinger
+            ).tilRestDto()
         } catch (e: Exception) {
             val delvilkårJson = objectMapper.writeValueAsString(vilkårsvurdering)
             secureLogger.warn(
                 "id=${vilkårsvurdering.id}" +
-                    " behandlingId=${vilkårsvurdering.behandlingId}" +
-                    " svar=$delvilkårJson",
+                        " behandlingId=${vilkårsvurdering.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
