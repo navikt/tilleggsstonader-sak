@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json
+package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest
 
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsregler
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class VilkårJson(
+data class VilkårRestDto(
     val id: UUID,
     val behandlingId: UUID,
     val resultat: Vilkårsresultat,
@@ -23,34 +23,34 @@ data class VilkårJson(
     val barnId: UUID? = null,
     val endretAv: String,
     val endretTid: LocalDateTime,
-    val delvilkårsett: DelvilkårsettJson,
+    val delvilkårsett: DelvilkårsettRestDto,
     val opphavsvilkår: OpphavsvilkårDto?,
 )
 
-private typealias DelvilkårsettJson = Map<RegelId, DelvilkårJson>
+private typealias DelvilkårsettRestDto = Map<RegelId, DelvilkårRestDto>
 
-data class DelvilkårJson(
+data class DelvilkårRestDto(
     val svar: SvarId? = null,
     val begrunnelse: String? = null,
-    val svaralternativer: Map<SvarId, SvaralternativJson>,
-    val følgerFraOverordnetValg: OverordnetValgJson? = null,
+    val svaralternativer: Map<SvarId, SvaralternativRestDto>,
+    val følgerFraOverordnetValg: OverordnetValgRestDto? = null,
 )
 
-data class OverordnetValgJson(
+data class OverordnetValgRestDto(
     val regel: RegelId,
     val svar: SvarId,
 )
 
-data class SvaralternativJson(
+data class SvaralternativRestDto(
     val begrunnelsestype: BegrunnelseType,
 )
 
-fun Vilkår.tilJson() = this.tilDto().tilJson()
+fun Vilkår.tilRestDto() = this.tilDto().tilRestDto()
 
-fun VilkårDto.tilJson(): VilkårJson {
+fun VilkårDto.tilRestDto(): VilkårRestDto {
     val delvilkårsett = this.delvilkårsett.flatMap { it.vurderinger }
 
-    return VilkårJson(
+    return VilkårRestDto(
         id = this.id,
         behandlingId = this.behandlingId,
         resultat = this.resultat,
@@ -58,16 +58,16 @@ fun VilkårDto.tilJson(): VilkårJson {
         barnId = this.barnId,
         endretAv = this.endretAv,
         endretTid = this.endretTid,
-        delvilkårsett = delvilkårsett.tilJson(),
+        delvilkårsett = delvilkårsett.tilRestDto(),
         opphavsvilkår = this.opphavsvilkår,
     )
 }
 
-private fun List<VurderingDto>.tilJson(): DelvilkårsettJson {
+private fun List<VurderingDto>.tilRestDto(): DelvilkårsettRestDto {
     val stønadsregler = vilkårsreglerPassBarn()
     return stønadsregler.entries.associate { (regel, regelSteg) ->
         val vurderingDto = find { it.regelId == regel }
-        regel to DelvilkårJson(
+        regel to DelvilkårRestDto(
             følgerFraOverordnetValg = finnOverordnetValg(regel),
             svar = vurderingDto?.svar,
             begrunnelse = vurderingDto?.begrunnelse,
@@ -76,14 +76,13 @@ private fun List<VurderingDto>.tilJson(): DelvilkårsettJson {
     }
 }
 
-private fun finnSvaralternativer(svarMapping: Map<SvarId, SvarRegel>): Map<SvarId, SvaralternativJson> {
-    val svaralternativer = svarMapping.entries.associate {
-        it.key to SvaralternativJson(it.value.begrunnelseType)
+private fun finnSvaralternativer(svarMapping: Map<SvarId, SvarRegel>): Map<SvarId, SvaralternativRestDto> {
+    return svarMapping.entries.associate {
+        it.key to SvaralternativRestDto(it.value.begrunnelseType)
     }
-    return svaralternativer
 }
 
-private fun finnOverordnetValg(gjeldendeRegel: RegelId): OverordnetValgJson? {
+private fun finnOverordnetValg(gjeldendeRegel: RegelId): OverordnetValgRestDto? {
     data class Regelavhengighet(
         val denneRegelen: RegelId,
         val erAvhengigAvDenneRegelen: RegelId,
@@ -102,7 +101,7 @@ private fun finnOverordnetValg(gjeldendeRegel: RegelId): OverordnetValgJson? {
 
     val følgerFraOverordnetValg =
         relaterteOverordnedeValg.filter { it.denneRegelen == gjeldendeRegel }
-            .map { OverordnetValgJson(it.erAvhengigAvDenneRegelen, it.ogDetteSvaret) }.firstOrNull()
+            .map { OverordnetValgRestDto(it.erAvhengigAvDenneRegelen, it.ogDetteSvaret) }.firstOrNull()
 
     return følgerFraOverordnetValg
 }

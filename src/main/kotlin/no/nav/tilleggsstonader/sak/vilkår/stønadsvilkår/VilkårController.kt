@@ -8,11 +8,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.OppdaterVilkårsvurderingJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.VilkårJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.VilkårsvurderingerJson
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.tilDelvilkårDtoer
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json.tilJson
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest.OppdaterVilkårsvurderingRestDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest.VilkårRestDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest.VilkårsvurderingerJson
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest.tilDelvilkårDtoer
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest.tilRestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
@@ -53,15 +53,15 @@ class VilkårController(
             val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
-                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                    " svar=$delvilkårJson",
+                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
     }
 
     @PostMapping("oppdater")
-    fun oppdaterVilkårsvurdering(@RequestBody vilkårsvurdering: OppdaterVilkårsvurderingJson): VilkårJson {
+    fun oppdaterVilkårsvurdering(@RequestBody vilkårsvurdering: OppdaterVilkårsvurderingRestDto): VilkårRestDto {
         val vilkårId = vilkårsvurdering.id
         val behandlingId = vilkårsvurdering.behandlingId
         val vurderinger = vilkårsvurdering.vurdering.tilDelvilkårDtoer()
@@ -70,13 +70,13 @@ class VilkårController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         try {
-            return vilkårService.oppdaterVilkårsvurdering(vilkårId, behandlingId, vurderinger).tilJson()
+            return vilkårService.oppdaterVilkårsvurdering(vilkårId, behandlingId, vurderinger).tilRestDto()
         } catch (e: Exception) {
             val delvilkårJson = objectMapper.writeValueAsString(vilkårsvurdering)
             secureLogger.warn(
                 "id=${vilkårsvurdering.id}" +
-                    " behandlingId=${vilkårsvurdering.behandlingId}" +
-                    " svar=$delvilkårJson",
+                        " behandlingId=${vilkårsvurdering.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
@@ -110,7 +110,7 @@ class VilkårController(
         val vilkårsvurderinger = vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
 
         return VilkårsvurderingerJson(
-            vilkårsett = vilkårsvurderinger.vilkårsett.map { it.tilJson() },
+            vilkårsett = vilkårsvurderinger.vilkårsett.map { it.tilRestDto() },
             grunnlag = vilkårsvurderinger.grunnlag,
         )
     }

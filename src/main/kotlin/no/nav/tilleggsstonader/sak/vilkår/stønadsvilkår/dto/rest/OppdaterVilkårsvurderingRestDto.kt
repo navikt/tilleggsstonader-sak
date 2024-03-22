@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.json
+package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.rest
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
@@ -11,25 +11,25 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnOppfølgin
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hovedreglerPassBarn
 import java.util.UUID
 
-data class OppdaterVilkårsvurderingJson(
+data class OppdaterVilkårsvurderingRestDto(
     val id: UUID,
     val behandlingId: UUID,
-    val vurdering: List<VurderingJson>,
+    val vurdering: List<VurderingRestDto>,
 )
 
-data class VurderingJson(
+data class VurderingRestDto(
     val regel: RegelId,
     val svar: SvarId?,
     val begrunnelse: String?,
 )
 
-fun VurderingJson.tilDomene(): Vurdering = Vurdering(
+fun VurderingRestDto.tilDomene(): Vurdering = Vurdering(
     regelId = this.regel,
     svar = this.svar,
     begrunnelse = this.begrunnelse,
 )
 
-fun List<VurderingJson>.tilDelvilkårDtoer(): List<DelvilkårDto> {
+fun List<VurderingRestDto>.tilDelvilkårDtoer(): List<DelvilkårDto> {
     return hovedreglerPassBarn().flatMap { regelId ->
         val hovedregelsvar = this.find { it.regel == regelId }!!.tilDomene()
 
