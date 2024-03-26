@@ -20,7 +20,7 @@ class DokumentasjonMapperTest {
 
     val dokumentasjon = listOf(
         lagDokumentasjon(vedlegg = listOf(vedlegg1)),
-        lagDokumentasjon(vedlegg = listOf(vedlegg2), harSendtInn = true, barnId = "barnId"),
+        lagDokumentasjon(vedlegg = listOf(vedlegg2), barnId = "barnId"),
     )
 
     val skjema = søknadskjemaBarnetilsyn(dokumentasjon = dokumentasjon).skjema

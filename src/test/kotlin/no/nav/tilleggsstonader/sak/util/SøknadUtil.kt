@@ -63,13 +63,11 @@ object SøknadUtil {
     fun lagDokumentasjon(
         type: Vedleggstype = Vedleggstype.UTGIFTER_PASS_SFO_AKS_BARNEHAGE,
         label: String = "Label vedlegg",
-        harSendtInn: Boolean = false,
         vedlegg: List<Dokument> = emptyList(),
         barnId: String? = null,
     ): DokumentasjonFelt = DokumentasjonFelt(
         type = type,
         label = label,
-        harSendtInn = harSendtInn,
         opplastedeVedlegg = vedlegg,
         barnId = barnId,
     )
