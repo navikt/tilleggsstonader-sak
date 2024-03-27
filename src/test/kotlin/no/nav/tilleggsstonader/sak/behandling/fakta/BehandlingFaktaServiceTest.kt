@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
-import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataMedMetadata
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdataBarn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagNavn
@@ -42,7 +42,7 @@ internal class BehandlingFaktaServiceTest {
 
     @Test
     fun `skal mappe søknad og grunnlag`() {
-        every { grunnlagsdataService.hentFraRegister(behandlingId) } returns grunnlagsdataMedMetadata()
+        every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns grunnlagsdataDomain()
         every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn()
         every { barnService.finnBarnPåBehandling(any()) } returns
             listOf(behandlingBarn(personIdent = "1", id = UUID.fromString("60921c76-f8ef-4000-9824-f127a50a575e")))
@@ -56,8 +56,8 @@ internal class BehandlingFaktaServiceTest {
 
         @Test
         fun `skal mappe søknadsgrunnlag for de barn som fantes i søknaden`() {
-            every { grunnlagsdataService.hentFraRegister(behandlingId) } returns grunnlagsdataMedMetadata(
-                grunnlagsdata = lagGrunnlagsdata(
+            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns grunnlagsdataDomain(
+                grunnlag = lagGrunnlagsdata(
                     barn = listOf(lagGrunnlagsdataBarn("1"), lagGrunnlagsdataBarn("2")),
                 ),
             )
@@ -85,8 +85,8 @@ internal class BehandlingFaktaServiceTest {
 
         @Test
         fun `skal kaste feil hvis ikke alle barnen fra søknaden har grunnlagsdata`() {
-            every { grunnlagsdataService.hentFraRegister(behandlingId) } returns grunnlagsdataMedMetadata(
-                grunnlagsdata = lagGrunnlagsdata(
+            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns grunnlagsdataDomain(
+                grunnlag = lagGrunnlagsdata(
                     barn = listOf(lagGrunnlagsdataBarn("1")),
                 ),
             )
@@ -105,8 +105,8 @@ internal class BehandlingFaktaServiceTest {
         @Test
         fun `skal mappe dokumentasjon`() {
             val dokumentasjon = lagDokumentasjon()
-            every { grunnlagsdataService.hentFraRegister(behandlingId) } returns
-                grunnlagsdataMedMetadata(grunnlagsdata = lagGrunnlagsdata(barn = emptyList()))
+            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns
+                grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = emptyList()))
             every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn(
                 journalpostId = "journalpostId2",
                 barn = emptySet(),
@@ -127,8 +127,8 @@ internal class BehandlingFaktaServiceTest {
         @Test
         fun `skal returnere returnere navnet på barnet hvis barnIdent finnes`() {
             val navn = lagNavn("Fornavn barn1")
-            every { grunnlagsdataService.hentFraRegister(behandlingId) } returns grunnlagsdataMedMetadata(
-                grunnlagsdata = lagGrunnlagsdata(barn = listOf(lagGrunnlagsdataBarn("1", navn = navn))),
+            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns grunnlagsdataDomain(
+                grunnlag = lagGrunnlagsdata(barn = listOf(lagGrunnlagsdataBarn("1", navn = navn))),
             )
             val dokumentasjon = lagDokumentasjon(identBarn = "1")
             every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn(
