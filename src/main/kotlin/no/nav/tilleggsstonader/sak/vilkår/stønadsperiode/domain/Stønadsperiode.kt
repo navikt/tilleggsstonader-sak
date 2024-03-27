@@ -24,5 +24,5 @@ data class Stønadsperiode(
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
-    val sha: String = ApplikasjonsVersjon.versjon
+    val sha: String = ApplikasjonsVersjon.versjon,
 )

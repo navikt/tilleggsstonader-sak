@@ -34,7 +34,7 @@ data class Vilkår(
     val delvilkårwrapper: DelvilkårWrapper,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "opphavsvilkaar_")
     val opphavsvilkår: Opphavsvilkår?,
-    val sha: String = ApplikasjonsVersjon.versjon
+    val sha: String = ApplikasjonsVersjon.versjon,
 ) {
     val delvilkårsett get() = delvilkårwrapper.delvilkårsett
 

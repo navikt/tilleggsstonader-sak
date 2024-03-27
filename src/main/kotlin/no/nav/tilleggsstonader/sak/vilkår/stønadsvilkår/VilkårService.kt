@@ -94,7 +94,7 @@ class VilkårService(
                 resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
                 delvilkårwrapper = delvilkårWrapper,
                 opphavsvilkår = null,
-                sha = ApplikasjonsVersjon.versjon
+                sha = ApplikasjonsVersjon.versjon,
             ),
         ).tilDto()
     }
@@ -114,7 +114,7 @@ class VilkårService(
                 resultat = Vilkårsresultat.SKAL_IKKE_VURDERES,
                 delvilkårwrapper = delvilkårWrapper,
                 opphavsvilkår = null,
-                sha = ApplikasjonsVersjon.versjon
+                sha = ApplikasjonsVersjon.versjon,
             ),
         ).tilDto()
     }

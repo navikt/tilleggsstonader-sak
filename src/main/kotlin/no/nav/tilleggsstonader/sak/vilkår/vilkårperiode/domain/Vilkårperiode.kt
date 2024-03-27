@@ -34,7 +34,7 @@ data class Vilkårperiode(
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
-    val sha: String = ApplikasjonsVersjon.versjon
+    val sha: String = ApplikasjonsVersjon.versjon,
 ) {
     init {
         require(tom >= fom) { "Til-og-med før fra-og-med: $fom > $tom" }

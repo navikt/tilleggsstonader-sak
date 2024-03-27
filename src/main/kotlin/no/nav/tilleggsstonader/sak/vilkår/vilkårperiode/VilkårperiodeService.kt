@@ -139,7 +139,7 @@ class VilkårperiodeService(
                     delvilkår = resultatEvaluering.delvilkår,
                     aktivitetsdager = vilkårperiode.aktivitetsdager,
                     resultat = resultatEvaluering.resultat,
-                    sha = ApplikasjonsVersjon.versjon
+                    sha = ApplikasjonsVersjon.versjon,
                 )
             }
 
@@ -149,7 +149,7 @@ class VilkårperiodeService(
                     begrunnelse = vilkårperiode.begrunnelse,
                     delvilkår = resultatEvaluering.delvilkår,
                     resultat = resultatEvaluering.resultat,
-                    sha = ApplikasjonsVersjon.versjon
+                    sha = ApplikasjonsVersjon.versjon,
                 )
             }
         }

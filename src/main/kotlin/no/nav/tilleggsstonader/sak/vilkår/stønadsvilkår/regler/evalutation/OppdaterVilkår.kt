@@ -42,7 +42,7 @@ object OppdaterVilkår {
             resultat = vilkårsresultat.vilkår,
             delvilkårwrapper = oppdaterteDelvilkår,
             opphavsvilkår = null,
-            sha = ApplikasjonsVersjon.versjon
+            sha = ApplikasjonsVersjon.versjon,
         )
     }
 

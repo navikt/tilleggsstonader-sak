@@ -68,7 +68,7 @@ class StønadsperiodeService(
                     tom = it.tom,
                     målgruppe = it.målgruppe,
                     aktivitet = it.aktivitet,
-                    sha = ApplikasjonsVersjon.versjon
+                    sha = ApplikasjonsVersjon.versjon,
                 )
             }
         }
