@@ -23,11 +23,16 @@ class PersonService(
         return cacheManager.getValue("personService_hentsoker", ident) { pdlClient.hentSøker(ident) }
     }
 
+    fun hentPersonUtenBarn(ident: String): SøkerMedBarn {
+        val søker = hentSøker(ident)
+        return SøkerMedBarn(ident, søker, emptyMap())
+    }
+
     fun hentPersonMedBarn(ident: String): SøkerMedBarn {
         val søker = hentSøker(ident)
-        val barnIdentifikatorer =
-            søker.forelderBarnRelasjon.filter { it.relatertPersonsRolle == Familierelasjonsrolle.BARN }
-                .mapNotNull { it.relatertPersonsIdent }
+        val barnIdentifikatorer = søker.forelderBarnRelasjon
+            .filter { it.relatertPersonsRolle == Familierelasjonsrolle.BARN }
+            .mapNotNull { it.relatertPersonsIdent }
         return SøkerMedBarn(ident, søker, hentPersonForelderBarnRelasjon(barnIdentifikatorer))
     }
 
