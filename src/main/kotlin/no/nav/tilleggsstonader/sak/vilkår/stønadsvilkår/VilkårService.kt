@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.ApplikasjonsVersjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -93,6 +94,7 @@ class VilkårService(
                 resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
                 delvilkårwrapper = delvilkårWrapper,
                 opphavsvilkår = null,
+                sha = ApplikasjonsVersjon.versjon
             ),
         ).tilDto()
     }
@@ -112,6 +114,7 @@ class VilkårService(
                 resultat = Vilkårsresultat.SKAL_IKKE_VURDERES,
                 delvilkårwrapper = delvilkårWrapper,
                 opphavsvilkår = null,
+                sha = ApplikasjonsVersjon.versjon
             ),
         ).tilDto()
     }

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.ApplikasjonsVersjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -67,6 +68,7 @@ class StønadsperiodeService(
                     tom = it.tom,
                     målgruppe = it.målgruppe,
                     aktivitet = it.aktivitet,
+                    sha = ApplikasjonsVersjon.versjon
                 )
             }
         }
