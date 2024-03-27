@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeData
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
 import org.postgresql.util.PGobject
@@ -110,6 +111,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 DetaljerVilkårperiodeReader(),
                 DetaljerVilkårperiodeWriter(),
+                VilkårperiodeKildeDataReader(),
+                VilkårperiodeKildeDataWriter(),
             ),
         )
     }
@@ -220,4 +223,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class DetaljerVilkårperiodeReader : JsonReader<DelvilkårVilkårperiode>(DelvilkårVilkårperiode::class)
 
     class DetaljerVilkårperiodeWriter : JsonWriter<DelvilkårVilkårperiode>()
+
+    class VilkårperiodeKildeDataReader : JsonReader<KildeData>(KildeData::class)
+
+    class VilkårperiodeKildeDataWriter : JsonWriter<KildeData>()
 }

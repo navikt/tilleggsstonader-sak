@@ -33,6 +33,7 @@ data class Vilkårperiode(
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
+    val kildeData: KildeData? = null,
 ) {
     init {
         require(tom >= fom) { "Til-og-med før fra-og-med: $fom > $tom" }
@@ -66,9 +67,30 @@ data class Vilkårperiode(
     }
 }
 
+/**
+ * Lagrer ned data fra endepunktet for å kunne bruke det senere
+ * Denne må også håndtere Målgruppe, og ev data fra andre kilder senere.
+ * Burde man ha annen struktur?
+ * data class KildeData(val id: String?, val aktiviter: KildeDataAktivitet?).. Då kan man enklere gruppere dataen?
+ */
+data class KildeData(
+    val id: String,
+    val fom: LocalDate?,
+    val tom: LocalDate?,
+    val type: String?,
+    val typeNavn: String?,
+    val status: String?,
+    val statusArena: String?,
+    val erStønadsberettiget: Boolean?,
+    val gjelderUtdanning: Boolean?,
+    val antallDagerPerUke: Int?,
+    val arrangør: String?,
+)
+
 enum class KildeVilkårsperiode {
     MANUELL,
     SYSTEM,
+    ARENA,
 }
 
 enum class ResultatVilkårperiode {

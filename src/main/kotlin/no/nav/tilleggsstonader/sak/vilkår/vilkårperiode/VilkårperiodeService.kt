@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValide
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeUtil.finnPerioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -49,10 +50,6 @@ class VilkårperiodeService(
     fun hentVilkårperioderDto(behandlingId: UUID): VilkårperioderDto {
         return hentVilkårperioder(behandlingId).tilDto()
     }
-
-    private inline fun <reified T : VilkårperiodeType> finnPerioder(
-        vilkårsperioder: List<Vilkårperiode>,
-    ) = vilkårsperioder.filter { it.type is T }
 
     fun validerOgLagResponse(periode: Vilkårperiode): LagreVilkårperiodeResponse {
         val valideringsresultat = validerStønadsperioder(periode.behandlingId)
