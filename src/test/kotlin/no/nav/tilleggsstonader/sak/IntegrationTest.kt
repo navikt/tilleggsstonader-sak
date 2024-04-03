@@ -72,6 +72,7 @@ class DefaultRestTemplateConfiguration {
     "mock-featuretoggle",
     "mock-htmlify",
     "mock-arena",
+    "mock-aktivitet",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
