@@ -10,9 +10,9 @@ object ArbeidOgOppholdMapper {
         if (kontrakt == null) return null
         return ArbeidOgOpphold(
             jobberIAnnetLand = kontrakt.jobberIAnnetLand?.verdi,
-            jobbAnnetLand = kontrakt.jobbAnnetLand?.svarTekst,
+            jobbAnnetLand = kontrakt.jobbAnnetLand?.verdi,
             harPengestøtteAnnetLand = kontrakt.harPengestøtteAnnetLand?.verdier?.map { it.verdi },
-            pengestøtteAnnetLand = kontrakt.pengestøtteAnnetLand?.svarTekst,
+            pengestøtteAnnetLand = kontrakt.pengestøtteAnnetLand?.verdi,
             harOppholdUtenforNorgeSiste12mnd = kontrakt.harOppholdUtenforNorgeSiste12mnd?.verdi,
             oppholdUtenforNorgeSiste12mnd = kontrakt.oppholdUtenforNorgeSiste12mnd.map(::mapOpphold),
             harOppholdUtenforNorgeNeste12mnd = kontrakt.harOppholdUtenforNorgeNeste12mnd?.verdi,
@@ -21,7 +21,7 @@ object ArbeidOgOppholdMapper {
     }
 
     private fun mapOpphold(opphold: OppholdUtenforNorgeKontrakter) = OppholdUtenforNorge(
-        land = opphold.land.svarTekst,
+        land = opphold.land.verdi,
         årsak = opphold.årsak.verdier.map { it.verdi },
         fom = opphold.fom.verdi,
         tom = opphold.tom.verdi,

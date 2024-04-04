@@ -23,13 +23,13 @@ class ArbeidOgOppholdMapperTest {
         val verdi = mapArbeidOgOpphold(arbeidOgOpphold())
         val expected = ArbeidOgOpphold(
             jobberIAnnetLand = JaNei.JA,
-            jobbAnnetLand = "Sverige",
+            jobbAnnetLand = "SWE",
             harPengestøtteAnnetLand = listOf(TypePengestøtte.ANNEN_PENGESTØTTE),
-            pengestøtteAnnetLand = "Sverige",
+            pengestøtteAnnetLand = "SWE",
             harOppholdUtenforNorgeSiste12mnd = JaNei.NEI,
             oppholdUtenforNorgeSiste12mnd = listOf(
                 OppholdUtenforNorge(
-                    "Sverige",
+                    "SWE",
                     listOf(ÅrsakOppholdUtenforNorge.JOBB),
                     LocalDate.of(2024, 1, 1),
                     LocalDate.of(2024, 1, 2),
@@ -38,7 +38,7 @@ class ArbeidOgOppholdMapperTest {
             harOppholdUtenforNorgeNeste12mnd = JaNei.JA,
             oppholdUtenforNorgeNeste12mnd = listOf(
                 OppholdUtenforNorge(
-                    "Finland",
+                    "FIN",
                     listOf(ÅrsakOppholdUtenforNorge.FERIE),
                     LocalDate.of(2024, 1, 1),
                     LocalDate.of(2024, 1, 2),
