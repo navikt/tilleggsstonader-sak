@@ -62,11 +62,11 @@ class TilsynBarnBeregnYtelseSteg(
         val andelerTilkjentYtelse = beregningsresultat.perioder.flatMap {
             it.beløpsperioder.map { beløpsperiode ->
                 AndelTilkjentYtelse(
-                    type = TypeAndel.TILSYN_BARN_AAP, // TODO
                     beløp = beløpsperiode.beløp,
                     fom = beløpsperiode.dato,
                     tom = beløpsperiode.dato,
                     satstype = Satstype.ENGANGSBELØP,
+                    type = beløpsperiode.målgruppe.tilTypeAndel(),
                     kildeBehandlingId = saksbehandling.id,
                 )
             }

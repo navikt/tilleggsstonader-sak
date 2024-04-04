@@ -193,6 +193,147 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     }
 
     @Nested
+    inner class MålgruppeMapping {
+        val beløp1DagUtgift100 = 3
+        val vedtakDto = innvilgelseDto(
+            mapOf(
+                barn(
+                    barn.id,
+                    Utgift(januar, mars, 100),
+                ),
+            ),
+        )
+
+        @BeforeEach
+        fun setUp() {
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                ),
+            )
+        }
+
+        @Test
+        fun `skal mappe nedsatt arbeidsevne til riktig TypeAndel`() {
+            val stønadsperioder = listOf(
+                stønadsperiode(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(2),
+                    tom = januar.atDay(2),
+                    målgruppe = MålgruppeType.AAP,
+                ),
+                stønadsperiode(
+                    behandlingId = behandling.id,
+                    fom = februar.atDay(1),
+                    tom = februar.atDay(1),
+                    målgruppe = MålgruppeType.UFØRETRYGD,
+                ),
+                stønadsperiode(
+                    behandlingId = behandling.id,
+                    fom = mars.atDay(1),
+                    tom = mars.atDay(1),
+                    målgruppe = MålgruppeType.UFØRETRYGD,
+                ),
+            )
+
+            stønadsperiodeRepository.insertAll(stønadsperioder)
+
+            steg.utførSteg(saksbehandling, vedtakDto)
+
+            val forventedeAndeler = stønadsperioder.map {
+                andelTilkjentYtelse(
+                    fom = it.fom,
+                    tom = it.fom,
+                    beløp = beløp1DagUtgift100,
+                    kildeBehandlingId = behandling.id,
+                    type = TypeAndel.TILSYN_BARN_AAP,
+                )
+            }
+
+            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
+                .containsExactlyElementsOf(forventedeAndeler)
+        }
+
+        @Test
+        fun `skal mappe overgangsstønad til riktig TypeAndel`() {
+            val stønadsperiode = stønadsperiode(
+                behandlingId = behandling.id,
+                fom = januar.atDay(2),
+                tom = januar.atDay(2),
+                målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+            )
+
+            stønadsperiodeRepository.insert(stønadsperiode)
+
+            steg.utførSteg(saksbehandling, vedtakDto)
+
+            val forventetAndel = andelTilkjentYtelse(
+                fom = stønadsperiode.fom,
+                tom = stønadsperiode.fom,
+                beløp = beløp1DagUtgift100,
+                kildeBehandlingId = behandling.id,
+                type = TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER,
+            )
+            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
+                .containsExactlyElementsOf(listOf(forventetAndel))
+        }
+
+        @Test
+        fun `skal mappe omstillingsstønad til riktig TypeAndel`() {
+            val stønadsperiode = stønadsperiode(
+                behandlingId = behandling.id,
+                fom = januar.atDay(2),
+                tom = januar.atDay(2),
+                målgruppe = MålgruppeType.OMSTILLINGSSTØNAD,
+            )
+
+            stønadsperiodeRepository.insert(stønadsperiode)
+
+            steg.utførSteg(saksbehandling, vedtakDto)
+
+            val forventetAndel = andelTilkjentYtelse(
+                fom = stønadsperiode.fom,
+                tom = stønadsperiode.fom,
+                beløp = beløp1DagUtgift100,
+                kildeBehandlingId = behandling.id,
+                type = TypeAndel.TILSYN_BARN_ETTERLATTE,
+            )
+            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
+                .containsExactlyElementsOf(listOf(forventetAndel))
+        }
+
+        @Test
+        fun `skal mappe dagpenger til ugyldig TypeAndel`() {
+            val stønadsperiode = stønadsperiode(
+                behandlingId = behandling.id,
+                fom = januar.atDay(2),
+                tom = januar.atDay(2),
+                målgruppe = MålgruppeType.DAGPENGER,
+            )
+
+            stønadsperiodeRepository.insert(stønadsperiode)
+
+            steg.utførSteg(saksbehandling, vedtakDto)
+
+            val forventetAndel = andelTilkjentYtelse(
+                fom = stønadsperiode.fom,
+                tom = stønadsperiode.fom,
+                beløp = beløp1DagUtgift100,
+                kildeBehandlingId = behandling.id,
+                type = TypeAndel.UGYLDIG,
+            )
+            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
+                .containsExactlyElementsOf(listOf(forventetAndel))
+        }
+    }
+
+    @Nested
     inner class ValideringInnvilgelse {
         @Test
         fun `skal validere at det kun sendes inn utgifter på barn som har oppfylte vilkår`() {

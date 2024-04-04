@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
@@ -61,6 +62,15 @@ enum class TypeAndel {
     TILSYN_BARN_AAP,
     TILSYN_BARN_ETTERLATTE,
     UGYLDIG,
+}
+
+fun MålgruppeType.tilTypeAndel(): TypeAndel {
+    return when (this) {
+        MålgruppeType.AAP, MålgruppeType.UFØRETRYGD, MålgruppeType.NEDSATT_ARBEIDSEVNE -> TypeAndel.TILSYN_BARN_AAP
+        MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER
+        MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.TILSYN_BARN_ETTERLATTE
+        MålgruppeType.DAGPENGER -> TypeAndel.UGYLDIG
+    }
 }
 
 /**
