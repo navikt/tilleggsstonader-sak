@@ -3,8 +3,10 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.MottarPengestøtteTyper
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
 import java.time.LocalDate
 import java.util.UUID
 
@@ -21,8 +23,25 @@ data class FaktaHovedytelse(
 
 data class SøknadsgrunnlagHovedytelse(
     val hovedytelse: List<Hovedytelse>,
-    val boddSammenhengende: JaNei?,
-    val planleggerBoINorgeNeste12mnd: JaNei?,
+    val arbeidOgOpphold: FaktaArbeidOgOpphold?,
+)
+
+data class FaktaArbeidOgOpphold(
+    val jobberIAnnetLand: JaNei?,
+    val jobbAnnetLand: String?,
+    val harPengestøtteAnnetLand: List<MottarPengestøtteTyper>?,
+    val pengestøtteAnnetLand: String?,
+    val harOppholdUtenforNorgeSiste12mnd: JaNei?,
+    val oppholdUtenforNorgeSiste12mnd: List<FaktaOppholdUtenforNorge>,
+    val harOppholdUtenforNorgeNeste12mnd: JaNei?,
+    val oppholdUtenforNorgeNeste12mnd: List<FaktaOppholdUtenforNorge>,
+)
+
+data class FaktaOppholdUtenforNorge(
+    val land: String,
+    val årsak: List<ÅrsakOppholdUtenforNorge>,
+    val fom: LocalDate,
+    val tom: LocalDate,
 )
 
 data class FaktaAktivtet(

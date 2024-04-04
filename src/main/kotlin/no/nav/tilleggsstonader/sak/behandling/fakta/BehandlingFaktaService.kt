@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaArbeidOgOppholdMapper.mapArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.måImlementeresFørProdsetting
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
@@ -51,8 +52,7 @@ class BehandlingFaktaService(
             søknadsgrunnlag = søknad?.let {
                 SøknadsgrunnlagHovedytelse(
                     hovedytelse = it.data.hovedytelse.hovedytelse,
-                    boddSammenhengende = it.data.hovedytelse.boddSammenhengende,
-                    planleggerBoINorgeNeste12mnd = it.data.hovedytelse.planleggerBoINorgeNeste12mnd,
+                    arbeidOgOpphold = mapArbeidOgOpphold(it.data.hovedytelse.arbeidOgOpphold),
                 )
             },
         )

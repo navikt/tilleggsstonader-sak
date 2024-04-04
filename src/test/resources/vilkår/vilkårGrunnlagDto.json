@@ -2,8 +2,26 @@
   "hovedytelse" : {
     "søknadsgrunnlag" : {
       "hovedytelse" : [ "AAP" ],
-      "boddSammenhengende" : "NEI",
-      "planleggerBoINorgeNeste12mnd" : "JA"
+      "arbeidOgOpphold" : {
+        "jobberIAnnetLand" : "JA",
+        "jobbAnnetLand" : "Sverige",
+        "harPengestøtteAnnetLand" : [ "SYKEPENGER" ],
+        "pengestøtteAnnetLand" : "Sverige",
+        "harOppholdUtenforNorgeSiste12mnd" : "JA",
+        "oppholdUtenforNorgeSiste12mnd" : [ {
+          "land" : "Sverige",
+          "årsak" : [ "JOBB" ],
+          "fom" : "2024-01-01",
+          "tom" : "2024-01-01"
+        } ],
+        "harOppholdUtenforNorgeNeste12mnd" : "JA",
+        "oppholdUtenforNorgeNeste12mnd" : [ {
+          "land" : "Sverige",
+          "årsak" : [ "JOBB" ],
+          "fom" : "2024-01-01",
+          "tom" : "2024-01-01"
+        } ]
+      }
     }
   },
   "aktivitet" : {
