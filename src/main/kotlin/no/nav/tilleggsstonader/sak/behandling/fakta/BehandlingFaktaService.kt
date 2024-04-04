@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
-import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaArbeidOgOppholdMapper.mapArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.måImlementeresFørProdsetting
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataMedMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
@@ -20,6 +19,7 @@ class BehandlingFaktaService(
     private val grunnlagsdataService: GrunnlagsdataService,
     private val søknadService: SøknadService,
     private val barnService: BarnService,
+    private val faktaArbeidOgOppholdMapper: FaktaArbeidOgOppholdMapper,
 ) {
 
     fun hentFakta(
@@ -52,7 +52,7 @@ class BehandlingFaktaService(
             søknadsgrunnlag = søknad?.let {
                 SøknadsgrunnlagHovedytelse(
                     hovedytelse = it.data.hovedytelse.hovedytelse,
-                    arbeidOgOpphold = mapArbeidOgOpphold(it.data.hovedytelse.arbeidOgOpphold),
+                    arbeidOgOpphold = faktaArbeidOgOppholdMapper.mapArbeidOgOpphold(it.data.hovedytelse.arbeidOgOpphold),
                 )
             },
         )
