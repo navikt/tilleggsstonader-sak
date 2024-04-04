@@ -83,6 +83,8 @@ spec:
           namespace: teamfamilie
         - application: dp-iverksett
           namespace: teamdagpenger
+        - application: kodeverk-api
+          namespace: team-rocket
       external:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: tilleggsstonader-arena.prod-fss-pub.nais.io

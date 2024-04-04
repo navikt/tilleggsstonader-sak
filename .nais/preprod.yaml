@@ -87,6 +87,7 @@ spec:
         - host: pdl-api-q1.dev-fss-pub.nais.io
         - host: tilleggsstonader-arena.dev-fss-pub.nais.io
         - host: tilleggsstonader-unleash-api.nav.cloud.nais.io
+        - host: kodeverk-api.nav.no
 
   envFrom:
     - secret: tilleggsstonader-sak-unleash-api-token
