@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.MottarPengestøtteTyper
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.OppholdUtenforNorge
@@ -24,7 +24,7 @@ class ArbeidOgOppholdMapperTest {
         val expected = ArbeidOgOpphold(
             jobberIAnnetLand = JaNei.JA,
             jobbAnnetLand = "Sverige",
-            harPengestøtteAnnetLand = listOf(MottarPengestøtteTyper.ANNEN_PENGESTØTTE),
+            harPengestøtteAnnetLand = listOf(TypePengestøtte.ANNEN_PENGESTØTTE),
             pengestøtteAnnetLand = "Sverige",
             harOppholdUtenforNorgeSiste12mnd = JaNei.NEI,
             oppholdUtenforNorgeSiste12mnd = listOf(
@@ -87,7 +87,7 @@ class ArbeidOgOppholdMapperTest {
 
     private fun harPengestøtteAnnetLand() = EnumFlereValgFelt(
         label = "harPengestøtteAnnetLand",
-        verdier = listOf(VerdiFelt(MottarPengestøtteTyper.ANNEN_PENGESTØTTE, "Annen pengestøtte")),
+        verdier = listOf(VerdiFelt(TypePengestøtte.ANNEN_PENGESTØTTE, "Annen pengestøtte")),
         alternativer = emptyList(),
     )
 

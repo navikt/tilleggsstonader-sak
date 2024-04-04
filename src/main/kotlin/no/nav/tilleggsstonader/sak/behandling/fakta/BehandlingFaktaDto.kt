@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.MottarPengestøtteTyper
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
@@ -29,7 +29,7 @@ data class SøknadsgrunnlagHovedytelse(
 data class FaktaArbeidOgOpphold(
     val jobberIAnnetLand: JaNei?,
     val jobbAnnetLand: String?,
-    val harPengestøtteAnnetLand: List<MottarPengestøtteTyper>?,
+    val harPengestøtteAnnetLand: List<TypePengestøtte>?,
     val pengestøtteAnnetLand: String?,
     val harOppholdUtenforNorgeSiste12mnd: JaNei?,
     val oppholdUtenforNorgeSiste12mnd: List<FaktaOppholdUtenforNorge>,

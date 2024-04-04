@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.MottarPengestøtteTyper
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
@@ -69,7 +69,7 @@ data class HovedytelseAvsnitt(
 data class ArbeidOgOpphold(
     val jobberIAnnetLand: JaNei?,
     val jobbAnnetLand: String?,
-    val harPengestøtteAnnetLand: List<MottarPengestøtteTyper>?,
+    val harPengestøtteAnnetLand: List<TypePengestøtte>?,
     val pengestøtteAnnetLand: String?,
     val harOppholdUtenforNorgeSiste12mnd: JaNei?,
     val oppholdUtenforNorgeSiste12mnd: List<OppholdUtenforNorge>,

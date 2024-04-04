@@ -19,7 +19,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.HovedytelseAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.MottarPengestøtteTyper
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.OppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
@@ -63,7 +63,7 @@ object SøknadUtil {
             "Mottar du pengestøttene fra et annet land enn Norge?",
             listOf(
                 VerdiFelt(
-                    MottarPengestøtteTyper.SYKEPENGER,
+                    TypePengestøtte.SYKEPENGER,
                     "Sykepenger",
                 ),
             ),

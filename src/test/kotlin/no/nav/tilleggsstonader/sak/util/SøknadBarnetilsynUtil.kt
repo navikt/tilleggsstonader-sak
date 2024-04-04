@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.MottarPengestøtteTyper
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
@@ -95,7 +95,7 @@ object SøknadBarnetilsynUtil {
     private fun arbeidOgOpphold() = ArbeidOgOpphold(
         jobberIAnnetLand = JaNei.JA,
         jobbAnnetLand = "Sverige",
-        harPengestøtteAnnetLand = listOf(MottarPengestøtteTyper.SYKEPENGER),
+        harPengestøtteAnnetLand = listOf(TypePengestøtte.SYKEPENGER),
         pengestøtteAnnetLand = "Sverige",
         harOppholdUtenforNorgeSiste12mnd = JaNei.JA,
         oppholdUtenforNorgeSiste12mnd = listOf(oppholdUtenforNorge()),
