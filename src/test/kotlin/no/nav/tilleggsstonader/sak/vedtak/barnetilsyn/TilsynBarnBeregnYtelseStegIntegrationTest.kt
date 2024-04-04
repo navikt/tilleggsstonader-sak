@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
@@ -13,11 +14,13 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -25,6 +28,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
@@ -141,17 +146,38 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             )
             steg.utførSteg(saksbehandling, vedtakDto)
 
-            val dagsatsForUtgift100 = 3
-            val dagsatsForUtgift200 = 6
+            val dagsatsForUtgift100 = BigDecimal("2.95")
+            val dagsatsForUtgift200 = BigDecimal("5.91")
 
             val forventedeAndeler = listOf(
-                Pair(stønadsperiode1, dagsatsForUtgift100),
-                Pair(stønadsperiode2, dagsatsForUtgift100),
-                Pair(stønadsperiode3.copy(tom = januar.atEndOfMonth()), dagsatsForUtgift100),
-                Pair(stønadsperiode3.copy(fom = februar.atDay(1)), dagsatsForUtgift100),
-                Pair(stønadsperiode4.copy(tom = februar.atEndOfMonth()), dagsatsForUtgift100),
-                Pair(stønadsperiode4.copy(fom = mars.atDay(1), tom = mars.atEndOfMonth()), dagsatsForUtgift200),
-                Pair(stønadsperiode4.copy(fom = april.atDay(1)), dagsatsForUtgift200),
+                Pair(
+                    stønadsperiode1.kopierMedLikTomSomFom(),
+                    finnTotalbeløp(dagsatsForUtgift100, 5)
+                ),
+                Pair(
+                    stønadsperiode2.kopierMedLikTomSomFom(),
+                    finnTotalbeløp(dagsatsForUtgift100, 2)
+                ),
+                Pair(
+                    stønadsperiode3.kopierMedLikTomSomFom(),
+                    finnTotalbeløp(dagsatsForUtgift100, 6)
+                ),
+                Pair(
+                    stønadsperiode3.copy(fom = februar.atDay(1), tom = februar.atDay(1)),
+                    finnTotalbeløp(dagsatsForUtgift100, 3),
+                ),
+                Pair(
+                    stønadsperiode4.kopierMedLikTomSomFom(),
+                    finnTotalbeløp(dagsatsForUtgift100, 1)
+                ),
+                Pair(
+                    stønadsperiode4.copy(fom = mars.atDay(1), tom = mars.atDay(1)),
+                    finnTotalbeløp(dagsatsForUtgift200, 23),
+                ),
+                Pair(
+                    stønadsperiode4.copy(fom = april.atDay(1), tom = april.atDay(1)),
+                    finnTotalbeløp(dagsatsForUtgift200, 1),
+                ),
             ).map {
                 andelTilkjentYtelse(
                     fom = it.first.fom,
@@ -184,5 +210,14 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 )
             }.hasMessageContaining("Det finnes utgifter på barn som ikke har oppfylt vilkårsvurdering")
         }
+    }
+
+    private fun Stønadsperiode.kopierMedLikTomSomFom() = copy(tom = fom)
+
+
+    private fun finnTotalbeløp(dagsats: BigDecimal, antallDager: Int): Int {
+        return dagsats.multiply(antallDager.toBigDecimal())
+            .setScale(0, RoundingMode.HALF_UP)
+            .toInt()
     }
 }

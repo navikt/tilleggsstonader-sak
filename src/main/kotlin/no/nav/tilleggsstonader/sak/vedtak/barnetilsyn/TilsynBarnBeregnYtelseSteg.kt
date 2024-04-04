@@ -8,12 +8,11 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.tilTypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.springframework.stereotype.Service
-import java.math.RoundingMode
 import java.time.LocalDate
 
 @Service
@@ -61,18 +60,18 @@ class TilsynBarnBeregnYtelseSteg(
         beregningsresultat: BeregningsresultatTilsynBarnDto,
     ) {
         val andelerTilkjentYtelse = beregningsresultat.perioder.flatMap {
-            it.grunnlag.stønadsperioderGrunnlag.map { stønadsperiodeMedAktivitet ->
+            it.beløpsperioder.map { beløpsperiode ->
                 AndelTilkjentYtelse(
-                    // TODO hvordan burde vi egentligen gjøre med decimaler?
-                    beløp = it.dagsats.setScale(0, RoundingMode.HALF_UP).toInt(),
-                    fom = stønadsperiodeMedAktivitet.stønadsperiode.fom,
-                    tom = stønadsperiodeMedAktivitet.stønadsperiode.tom,
-                    satstype = Satstype.DAG, // TODO
                     type = TypeAndel.TILSYN_BARN_AAP, // TODO
+                    beløp = beløpsperiode.beløp,
+                    fom = beløpsperiode.dato,
+                    tom = beløpsperiode.dato,
+                    satstype = Satstype.ENGANGSBELØP,
                     kildeBehandlingId = saksbehandling.id,
                 )
             }
         }.toSet()
+
         tilkjentytelseService.opprettTilkjentYtelse(
             TilkjentYtelse(
                 behandlingId = saksbehandling.id,

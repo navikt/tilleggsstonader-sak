@@ -26,7 +26,7 @@ object TilkjentYtelseUtil {
         beløp: Int = 11554,
         fom: LocalDate = LocalDate.of(2021, 1, 1),
         tom: LocalDate = LocalDate.of(2021, 1, 31),
-        satstype: Satstype = Satstype.DAG,
+        satstype: Satstype = Satstype.ENGANGSBELØP,
         type: TypeAndel = TypeAndel.TILSYN_BARN_AAP,
         statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
         iverksetting: Iverksetting? = null,
