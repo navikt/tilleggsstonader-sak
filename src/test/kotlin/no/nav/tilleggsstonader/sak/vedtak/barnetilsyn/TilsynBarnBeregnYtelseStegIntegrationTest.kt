@@ -152,15 +152,15 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             val forventedeAndeler = listOf(
                 Pair(
                     stønadsperiode1.kopierMedLikTomSomFom(),
-                    finnTotalbeløp(dagsatsForUtgift100, 5)
+                    finnTotalbeløp(dagsatsForUtgift100, 5),
                 ),
                 Pair(
                     stønadsperiode2.kopierMedLikTomSomFom(),
-                    finnTotalbeløp(dagsatsForUtgift100, 2)
+                    finnTotalbeløp(dagsatsForUtgift100, 2),
                 ),
                 Pair(
                     stønadsperiode3.kopierMedLikTomSomFom(),
-                    finnTotalbeløp(dagsatsForUtgift100, 6)
+                    finnTotalbeløp(dagsatsForUtgift100, 6),
                 ),
                 Pair(
                     stønadsperiode3.copy(fom = februar.atDay(1), tom = februar.atDay(1)),
@@ -168,7 +168,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 ),
                 Pair(
                     stønadsperiode4.kopierMedLikTomSomFom(),
-                    finnTotalbeløp(dagsatsForUtgift100, 1)
+                    finnTotalbeløp(dagsatsForUtgift100, 1),
                 ),
                 Pair(
                     stønadsperiode4.copy(fom = mars.atDay(1), tom = mars.atDay(1)),
@@ -354,7 +354,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     }
 
     private fun Stønadsperiode.kopierMedLikTomSomFom() = copy(tom = fom)
-
 
     private fun finnTotalbeløp(dagsats: BigDecimal, antallDager: Int): Int {
         return dagsats.multiply(antallDager.toBigDecimal())
