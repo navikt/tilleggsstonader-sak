@@ -284,4 +284,9 @@ class BehandlingService(
             ),
         )
     }
+
+    fun utledNesteBehandlingstype(fagsakId: UUID): BehandlingType {
+        val behandlinger = hentBehandlinger(fagsakId)
+        return if (behandlinger.all { it.resultat == BehandlingResultat.HENLAGT }) BehandlingType.FØRSTEGANGSBEHANDLING else BehandlingType.REVURDERING
+    }
 }
