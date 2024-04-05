@@ -12,15 +12,18 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariant
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
+import no.nav.tilleggsstonader.kontrakter.journalpost.RelevantDato
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.web.client.RestClientException
+import java.time.LocalDateTime
 
 @Configuration
 @Profile("mock-journalpost")
@@ -47,6 +50,10 @@ class JournalpostClientConfig {
         } returns ArkiverDokumentResponse(journalpostId = "journalpostId", ferdigstilt = true)
         every { journalpostClient.hentDokument(any(), any(), any()) } returns dummyPdf
         mockFeiletDistribusjon(journalpostClient)
+
+        every { journalpostClient.finnJournalposterForBruker(any()) } answers {
+            journalposter.values.filter { it.bruker?.id == firstArg<JournalposterForBrukerRequest>().brukerId.id }
+        }
 
         return journalpostClient
     }
@@ -98,6 +105,7 @@ class JournalpostClientConfig {
                     ),
                 ),
             ),
+            relevanteDatoer = listOf(RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT")),
         )
 
     private val dummyPdf = this::class.java.classLoader.getResource("interntVedtak/internt_vedtak.pdf")!!.readBytes()

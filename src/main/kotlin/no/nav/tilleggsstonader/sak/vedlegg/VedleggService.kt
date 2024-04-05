@@ -15,12 +15,9 @@ class VedleggService(
         val journalposter = journalpostService.finnJournalposterForBruker(aktivIdent, vedleggRequest)
 
         return journalposter.flatMap { journalpost ->
-            journalpost.dokumenter?.map {
-                tilDokumentInfoDto(
-                    it,
-                    journalpost,
-                )
-            } ?: emptyList()
+            journalpost.dokumenter
+                ?.map { tilDokumentInfoDto(it, journalpost) }
+                ?: emptyList()
         }
     }
 }
