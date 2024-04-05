@@ -260,12 +260,7 @@ data class Fødsel(
     @JsonProperty("foedested") val fødested: String?,
     @JsonProperty("foedekommune") val fødekommune: String?,
     val metadata: Metadata,
-) {
-
-    fun erUnder18År() = this.fødselsdato?.let { LocalDate.now() < it.plusYears(18) }
-        ?: this.fødselsår?.let { LocalDate.now() < LocalDate.of(it, 1, 1).plusYears(18) }
-        ?: true
-}
+)
 
 data class Dødsfall(@JsonProperty("doedsdato") val dødsdato: LocalDate?)
 

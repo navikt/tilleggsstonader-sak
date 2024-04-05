@@ -5,16 +5,12 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 // TODO burde kanskje kun opprette grunnlag for barn som finnes i behandlingBarn?
-/**
- * Denne skal på sikt lagre og hente data fra databasen, men for å ikke begrense seg
- */
 @Service
 class GrunnlagsdataService(
     private val behandlingService: BehandlingService,
@@ -44,7 +40,7 @@ class GrunnlagsdataService(
     private fun hentGrunnlagsdataFraRegister(behandling: Saksbehandling): Grunnlag {
         val person = hentPerson(behandling)
         return Grunnlag(
-            navn = mapNavn(person),
+            navn = person.søker.navn.gjeldende().tilNavn(),
             barn = person.barn.tilGrunnlagsdataBarn(),
         )
     }
@@ -55,15 +51,4 @@ class GrunnlagsdataService(
         } else {
             personService.hentPersonUtenBarn(behandling.ident)
         }
-
-    private fun mapNavn(personMedBarn: SøkerMedBarn): Navn {
-        return personMedBarn.søker.navn.gjeldende()
-            .let {
-                Navn(
-                    fornavn = it.fornavn,
-                    mellomnavn = it.mellomnavn,
-                    etternavn = it.etternavn,
-                )
-            }
-    }
 }

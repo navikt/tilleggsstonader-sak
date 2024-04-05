@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.PropertiesWrapperTilStringConverter
 import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
@@ -90,8 +90,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 BeriketSimuleringsresultatWriter(),
                 BeriketSimuleringsresultatReader(),
 
-                GrunnlagsdataReader(),
-                GrunnlagsdataWriter(),
+                GrunnlagReader(),
+                GrunnlagWriter(),
 
                 ÅrsakerReader(),
                 ÅrsakerWriter(),
@@ -203,8 +203,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class BeriketSimuleringsresultatWriter : JsonWriter<BeriketSimuleringsresultat>()
     class BeriketSimuleringsresultatReader : JsonReader<BeriketSimuleringsresultat>(BeriketSimuleringsresultat::class)
 
-    class GrunnlagsdataWriter : JsonWriter<Grunnlagsdata>()
-    class GrunnlagsdataReader : JsonReader<Grunnlagsdata>(Grunnlagsdata::class)
+    class GrunnlagWriter : JsonWriter<Grunnlag>()
+    class GrunnlagReader : JsonReader<Grunnlag>(Grunnlag::class)
 
     class ÅrsakerReader : JsonReader<Årsaker>(Årsaker::class)
     class ÅrsakerWriter : JsonWriter<Årsaker>()

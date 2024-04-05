@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdataBarn
-import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagNavn
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagNavn
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagDokumentasjon
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagSkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagSøknadBarn
