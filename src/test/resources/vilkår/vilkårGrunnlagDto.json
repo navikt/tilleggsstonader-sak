@@ -6,7 +6,7 @@
         "jobberIAnnetLand" : "JA",
         "jobbAnnetLand" : "Sverige",
         "harPengestøtteAnnetLand" : [ "SYKEPENGER" ],
-        "pengestøtteAnnetLand" : "Sverige",
+        "pengestøtteAnnetLand" : "Finland",
         "harOppholdUtenforNorgeSiste12mnd" : "JA",
         "oppholdUtenforNorgeSiste12mnd" : [ {
           "land" : "Sverige",

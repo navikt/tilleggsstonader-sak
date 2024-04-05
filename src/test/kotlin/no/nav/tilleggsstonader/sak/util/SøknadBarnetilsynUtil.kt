@@ -94,9 +94,9 @@ object SøknadBarnetilsynUtil {
 
     private fun arbeidOgOpphold() = ArbeidOgOpphold(
         jobberIAnnetLand = JaNei.JA,
-        jobbAnnetLand = "Sverige",
+        jobbAnnetLand = "SWE",
         harPengestøtteAnnetLand = listOf(TypePengestøtte.SYKEPENGER),
-        pengestøtteAnnetLand = "Sverige",
+        pengestøtteAnnetLand = "FIN",
         harOppholdUtenforNorgeSiste12mnd = JaNei.JA,
         oppholdUtenforNorgeSiste12mnd = listOf(oppholdUtenforNorge()),
         harOppholdUtenforNorgeNeste12mnd = JaNei.JA,
@@ -104,7 +104,7 @@ object SøknadBarnetilsynUtil {
     )
 
     private fun oppholdUtenforNorge() = OppholdUtenforNorge(
-        land = "Sverige",
+        land = "SWE",
         årsak = listOf(ÅrsakOppholdUtenforNorge.JOBB),
         fom = LocalDate.of(2024, 1, 1),
         tom = LocalDate.of(2024, 1, 1),
