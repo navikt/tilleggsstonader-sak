@@ -11,9 +11,9 @@ import no.nav.tilleggsstonader.libs.log.IdUtils
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.OpprettTestBehandlingController
-import no.nav.tilleggsstonader.sak.behandling.TestBehandlingRequest
-import no.nav.tilleggsstonader.sak.behandling.TestSaksbehandlingController
+import no.nav.tilleggsstonader.sak.behandling.test.OpprettTestBehandlingController
+import no.nav.tilleggsstonader.sak.behandling.test.TestBehandlingRequest
+import no.nav.tilleggsstonader.sak.behandling.test.TestSaksbehandlingController
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.brev.BrevController

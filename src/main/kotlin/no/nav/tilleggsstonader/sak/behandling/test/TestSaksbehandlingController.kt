@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.behandling
+package no.nav.tilleggsstonader.sak.behandling.test
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.context.annotation.Profile

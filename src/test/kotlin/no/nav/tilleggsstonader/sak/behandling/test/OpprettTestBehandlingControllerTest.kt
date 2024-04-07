@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.behandling
+package no.nav.tilleggsstonader.sak.behandling.test
 
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
