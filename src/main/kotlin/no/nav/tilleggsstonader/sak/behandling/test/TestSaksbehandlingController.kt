@@ -15,6 +15,12 @@ import java.util.UUID
 class TestSaksbehandlingController(
     private val testSaksbehandlingService: TestSaksbehandlingService,
 ) {
+
+    @PostMapping("{behandlingId}/oppfyll-inngangsvilkar")
+    fun utfyllInngangsvilkår(@PathVariable behandlingId: UUID): UUID {
+        return testSaksbehandlingService.utfyllInngangsvilkår(behandlingId)
+    }
+
     @PostMapping("{behandlingId}/oppfyll-vilkar")
     fun utfyllVilkår(@PathVariable behandlingId: UUID): UUID {
         return testSaksbehandlingService.utfyllVilkår(behandlingId)

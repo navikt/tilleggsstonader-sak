@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.test
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig.Companion.barn2Fnr
@@ -11,9 +12,11 @@ import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 
 internal class TestSaksbehandlingServiceTest() : IntegrationTest() {
@@ -25,17 +28,44 @@ internal class TestSaksbehandlingServiceTest() : IntegrationTest() {
     lateinit var søknadService: SøknadService
 
     @Autowired
+    lateinit var stønadsperiodeService: StønadsperiodeService
+
+    @Autowired
     lateinit var vilkårService: VilkårService
 
     @Autowired
     lateinit var barnRepository: BarnRepository
 
     @Test
+    internal fun `skal oppfylle alle inngangsvilkår`() {
+        val behandling = opprettBehandling(StegType.INNGANGSVILKÅR)
+
+        vilkårService.hentEllerOpprettVilkårsvurdering(behandling.id)
+
+        testSaksbehandlingService.utfyllInngangsvilkår(behandlingId = behandling.id)
+        val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
+        assertThat(stønadsperioder).isNotEmpty
+
+        assertDoesNotThrow {
+            stønadsperiodeService.validerStønadsperioder(behandling.id, stønadsperioder)
+        }
+    }
+
+    @Test
     internal fun `skal oppfylle alle vilkår`() {
+        val behandling = opprettBehandling(StegType.VILKÅR)
+
+        vilkårService.hentEllerOpprettVilkårsvurdering(behandling.id)
+
+        testSaksbehandlingService.utfyllVilkår(behandlingId = behandling.id)
+        assertThat(vilkårService.erAlleVilkårOppfylt(behandling.id)).isTrue
+    }
+
+    private fun opprettBehandling(stegType: StegType): Behandling {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(
             behandling(
                 status = BehandlingStatus.UTREDES,
-                steg = StegType.VILKÅR,
+                steg = stegType,
             ),
         )
         val skjema = SøknadUtil.søknadskjemaBarnetilsyn(
@@ -46,10 +76,6 @@ internal class TestSaksbehandlingServiceTest() : IntegrationTest() {
         )
         val søknad = søknadService.lagreSøknad(behandling.id, lagJournalpost(), skjema)
         barnRepository.insertAll(søknadBarnTilBehandlingBarn(søknad.barn, behandling.id))
-
-        vilkårService.hentEllerOpprettVilkårsvurdering(behandling.id)
-
-        testSaksbehandlingService.utfyllVilkår(behandlingId = behandling.id)
-        assertThat(vilkårService.erAlleVilkårOppfylt(behandling.id)).isTrue
+        return behandling
     }
 }
