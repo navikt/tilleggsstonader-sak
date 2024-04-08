@@ -30,9 +30,4 @@ class VilkårSteg(
     }
 
     override fun stegType(): StegType = StegType.VILKÅR
-
-    /**
-     * håndteres av [VilkårStegService]
-     */
-    override fun settInnHistorikk(): Boolean = false
 }
