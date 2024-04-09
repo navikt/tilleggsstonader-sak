@@ -37,6 +37,10 @@ data class Beregningsresultat(
     val beløpsperioder: List<Beløpsperiode>,
 )
 
+/**
+ * @param dato tilsvarer fom datoen på en stønadsperiode
+ * og er den datoen hele beløpet samlet iversettes på
+ */
 data class Beløpsperiode(
     val dato: LocalDate,
     val beløp: Int,
