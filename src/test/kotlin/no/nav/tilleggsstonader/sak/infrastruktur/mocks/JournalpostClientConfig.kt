@@ -48,6 +48,9 @@ class JournalpostClientConfig {
         every { journalpostClient.hentDokument(any(), any(), any()) } returns dummyPdf
         mockFeiletDistribusjon(journalpostClient)
 
+        every { journalpostClient.ferdigstillJournalpost(any(), any(), any()) } returns mockk()
+        every { journalpostClient.oppdaterJournalpost(any(), any(), any()) } returns mockk()
+
         return journalpostClient
     }
 

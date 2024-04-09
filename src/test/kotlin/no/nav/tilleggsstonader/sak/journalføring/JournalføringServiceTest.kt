@@ -36,7 +36,6 @@ class JournalføringServiceTest {
     val fagsakService = mockk<FagsakService>()
     val journalpostService = mockk<JournalpostService>()
     val søknadService = mockk<SøknadService>()
-    val arbeidsfordelingService = mockk<ArbeidsfordelingService>()
     val taskService = mockk<TaskService>()
     val barnService = mockk<BarnService>()
 
@@ -45,7 +44,6 @@ class JournalføringServiceTest {
         fagsakService,
         journalpostService,
         søknadService,
-        arbeidsfordelingService,
         taskService,
         barnService,
     )
@@ -72,7 +70,6 @@ class JournalføringServiceTest {
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
         every { fagsakService.hentEllerOpprettFagsak(any(), any()) } returns fagsak
         every { behandlingService.utledNesteBehandlingstype(fagsak.id) } returns BehandlingType.FØRSTEGANGSBEHANDLING
-        every { arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(any()) } returns enhet
         every { taskService.save(capture(taskSlot)) } returns mockk()
     }
 
@@ -91,7 +88,9 @@ class JournalføringServiceTest {
                 journalpostId,
                 personIdent,
                 Stønadstype.BARNETILSYN,
+                BehandlingÅrsak.SØKNAD,
                 "oppgaveBeskrivelse",
+                enhet
             )
         }.hasMessageContaining("Journalposten mangler bruker")
     }
@@ -104,7 +103,6 @@ class JournalføringServiceTest {
         )
         val journalpostMedAktørId = journalpost.copy(bruker = aktørIdBruker)
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpostMedAktørId
-        every { journalpostService.oppdaterOgFerdigstillJournalpostMaskinelt(any(), any(), any()) } just Runs
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
 
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
@@ -119,7 +117,14 @@ class JournalføringServiceTest {
         every { journalpostService.hentSøknadFraJournalpost(any()) } returns mockk()
         every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
 
-        journalføringService.journalførTilNyBehandling(journalpostId, personIdent, Stønadstype.BARNETILSYN, "beskrivelse")
+        journalføringService.journalførTilNyBehandling(
+            journalpostId,
+            personIdent,
+            Stønadstype.BARNETILSYN,
+            BehandlingÅrsak.SØKNAD,
+            "beskrivelse",
+            enhet
+        )
 
         verify(exactly = 1) {
             behandlingService.opprettBehandling(

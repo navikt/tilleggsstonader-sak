@@ -4,7 +4,6 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -15,10 +14,14 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
+import no.nav.tilleggsstonader.sak.journalføring.dto.valider
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
@@ -27,35 +30,62 @@ class JournalføringService(
     private val fagsakService: FagsakService,
     private val journalpostService: JournalpostService,
     private val søknadService: SøknadService,
-    private val arbeidsfordelingService: ArbeidsfordelingService,
     private val taskService: TaskService,
     private val barnService: BarnService,
 ) {
+
+    @Transactional
+    fun fullførJournalpost(
+        journalføringRequest: JournalføringRequest,
+        journalpost: Journalpost,
+    ): String {
+        journalføringRequest.valider()
+        validerGyldigAvsender(journalpost, journalføringRequest)
+
+        if (journalføringRequest.skalJournalføreTilNyBehandling()) {
+            journalførTilNyBehandling(
+                journalpostId = journalpost.journalpostId,
+                personIdent = journalføringRequest.ident,
+                stønadstype = journalføringRequest.stønadstype,
+                behandlingÅrsak = journalføringRequest.årsak.behandlingsårsak,
+                journalførendeEnhet = journalføringRequest.journalførendeEnhet,
+                dokumentTitler = journalføringRequest.dokumentTitler,
+            )
+        } else {
+            journalførUtenNyBehandling(journalføringRequest, journalpost)
+        }
+
+        return journalpost.journalpostId
+    }
+
     fun journalførTilNyBehandling(
         journalpostId: String,
         personIdent: String,
         stønadstype: Stønadstype,
-        oppgaveBeskrivelse: String,
+        behandlingÅrsak: BehandlingÅrsak,
+        oppgaveBeskrivelse: String? = null,
+        journalførendeEnhet: String,
+        dokumentTitler: Map<String, String>? = null,
     ) {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
         val fagsak = fagsakService.hentEllerOpprettFagsak(personIdent, stønadstype)
         val nesteBehandlingstype = behandlingService.utledNesteBehandlingstype(fagsak.id)
-        val journalførendeEnhet =
-            arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(fagsak.hentAktivIdent())
 
-        validerKanOppretteBehandling(personIdent, stønadstype, journalpost)
 
-        val behandling = opprettBehandlingOgPopulerGrunnlagsdataForSøknad(
+        validerKanOppretteBehandling(journalpost)
+
+        val behandling = opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
             behandlingstype = nesteBehandlingstype,
             fagsak = fagsak,
             journalpost = journalpost,
+            behandlingÅrsak = behandlingÅrsak
         )
 
         if (journalpost.harStrukturertSøknad()) {
             lagreSøknadOgBarn(journalpost, behandling)
         }
 
-        ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak)
+        ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler)
 
         opprettBehandleSakOppgaveTask(
             OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
@@ -66,27 +96,37 @@ class JournalføringService(
         )
     }
 
+    private fun journalførUtenNyBehandling(journalføringRequest: JournalføringRequest, journalpost: Journalpost) {
+        val fagsak = fagsakService.hentEllerOpprettFagsak(journalføringRequest.ident, journalføringRequest.stønadstype)
+        ferdigstillJournalpost(journalpost, journalføringRequest.journalførendeEnhet, fagsak, journalføringRequest.dokumentTitler)
+    }
+
     private fun ferdigstillJournalpost(
         journalpost: Journalpost,
         journalførendeEnhet: String,
         fagsak: Fagsak,
+        dokumentTitler: Map<String, String>? = null,
     ) {
-        journalpostService.oppdaterOgFerdigstillJournalpostMaskinelt(
+        journalpostService.oppdaterOgFerdigstillJournalpost(
             journalpost = journalpost,
             journalførendeEnhet = journalførendeEnhet,
             fagsak = fagsak,
+            saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+            dokumenttitler = dokumentTitler,
         )
     }
 
-    private fun opprettBehandlingOgPopulerGrunnlagsdataForSøknad(
+    private fun opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
         behandlingstype: BehandlingType,
         fagsak: Fagsak,
         journalpost: Journalpost,
+        behandlingÅrsak: BehandlingÅrsak
     ): Behandling {
+
         val behandling = behandlingService.opprettBehandling(
             behandlingType = behandlingstype,
             fagsakId = fagsak.id,
-            behandlingsårsak = BehandlingÅrsak.SØKNAD,
+            behandlingsårsak = behandlingÅrsak,
         )
 
         behandlingService.leggTilBehandlingsjournalpost(journalpost.journalpostId, Journalposttype.I, behandling.id)
@@ -125,8 +165,6 @@ class JournalføringService(
     }
 
     private fun validerKanOppretteBehandling(
-        personIdent: String,
-        stønadstype: Stønadstype,
         journalpost: Journalpost,
     ) {
         feilHvis(journalpost.bruker == null) {
@@ -135,6 +173,24 @@ class JournalføringService(
 
         feilHvis(journalpost.journalstatus != Journalstatus.MOTTATT) {
             "Journalposten har ugyldig journalstatus ${journalpost.journalstatus}. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
+        }
+    }
+
+    private fun validerGyldigAvsender(journalpost: Journalpost, request: JournalføringRequest) {
+        if (journalpost.manglerAvsenderMottaker()) {
+            brukerfeilHvis(request.nyAvsender == null) {
+                "Kan ikke journalføre uten avsender"
+            }
+            brukerfeilHvis(!request.nyAvsender.erBruker && request.nyAvsender.navn.isNullOrBlank()) {
+                "Må sende inn navn på ny avsender"
+            }
+            brukerfeilHvis(request.nyAvsender.erBruker && request.nyAvsender.personIdent.isNullOrBlank()) {
+                "Må sende inn ident på ny avsender hvis det er bruker"
+            }
+        } else {
+            brukerfeilHvis(request.nyAvsender != null) {
+                "Kan ikke endre avsender på journalpost som har avsender fra før"
+            }
         }
     }
 }

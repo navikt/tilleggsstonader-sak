@@ -8,10 +8,12 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
@@ -32,6 +34,7 @@ class AutomatiskJournalføringService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val unleashService: UnleashService,
+    private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
 
     @Transactional
@@ -44,7 +47,9 @@ class AutomatiskJournalføringService(
                 journalpostId = request.journalpostId,
                 personIdent = personIdent,
                 stønadstype = stønadstype,
+                behandlingÅrsak = BehandlingÅrsak.SØKNAD,
                 oppgaveBeskrivelse = "Automatisk journalført søknad",
+                journalførendeEnhet = arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(personIdent),
             )
         } else {
             håndterSøknadSomIkkeKanAutomatiskJournalføres(request)
