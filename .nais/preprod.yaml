@@ -8,7 +8,7 @@ metadata:
 
 spec:
   port: 8080
-  image: {{ image }}
+  image: {{image}}
   ingresses:
     - https://tilleggsstonader-sak.intern.dev.nav.no
   liveness:
@@ -34,6 +34,9 @@ spec:
   gcp:
     sqlInstances:
       - type: POSTGRES_15
+        flags:
+          - name: cloudsql.logical_decoding # flagget som må settes
+            value: "on" # flagget som må settes
         diskAutoresize: true
         cascadingDelete: false
         highAvailability: false
@@ -44,6 +47,8 @@ spec:
         databases:
           - name: tilleggsstonader-sak
             envVarPrefix: DB
+            users:
+              - name: datastream # ekstra databasebruker
   secureLogs:
     enabled: true
   azure:
