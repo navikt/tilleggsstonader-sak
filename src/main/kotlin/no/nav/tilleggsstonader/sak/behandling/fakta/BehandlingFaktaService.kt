@@ -19,6 +19,7 @@ class BehandlingFaktaService(
     private val grunnlagsdataService: GrunnlagsdataService,
     private val søknadService: SøknadService,
     private val barnService: BarnService,
+    private val faktaArbeidOgOppholdMapper: FaktaArbeidOgOppholdMapper,
 ) {
 
     fun hentFakta(
@@ -51,8 +52,7 @@ class BehandlingFaktaService(
             søknadsgrunnlag = søknad?.let {
                 SøknadsgrunnlagHovedytelse(
                     hovedytelse = it.data.hovedytelse.hovedytelse,
-                    boddSammenhengende = it.data.hovedytelse.boddSammenhengende,
-                    planleggerBoINorgeNeste12mnd = it.data.hovedytelse.planleggerBoINorgeNeste12mnd,
+                    arbeidOgOpphold = faktaArbeidOgOppholdMapper.mapArbeidOgOpphold(it.data.hovedytelse.arbeidOgOpphold),
                 )
             },
         )
