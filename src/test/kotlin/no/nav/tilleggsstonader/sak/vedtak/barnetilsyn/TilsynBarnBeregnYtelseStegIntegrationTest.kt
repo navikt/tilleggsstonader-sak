@@ -308,7 +308,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         }
 
         @Test
-        fun `skal mappe dagpenger til ugyldig TypeAndel`() {
+        fun `skal kaste feil ved forsøk på å opprette andeler med ugyldig målgruppe`() {
             val stønadsperiode = stønadsperiode(
                 behandlingId = behandling.id,
                 fom = januar.atDay(2),
@@ -318,18 +318,12 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
             stønadsperiodeRepository.insert(stønadsperiode)
 
-            steg.utførSteg(saksbehandling, vedtakDto)
-
-            val forventetAndel = andelTilkjentYtelse(
-                fom = stønadsperiode.fom,
-                tom = stønadsperiode.fom,
-                beløp = beløp1DagUtgift100,
-                kildeBehandlingId = behandling.id,
-                type = TypeAndel.UGYLDIG,
-            )
-            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
-                .containsExactlyElementsOf(listOf(forventetAndel))
+            assertThatThrownBy {
+                steg.utførSteg(
+                    saksbehandling,
+                    vedtakDto
+                )
+            }.hasMessageContaining("Kan ikke opprette andel tilkjent ytelse for målgruppe")
         }
     }
 
