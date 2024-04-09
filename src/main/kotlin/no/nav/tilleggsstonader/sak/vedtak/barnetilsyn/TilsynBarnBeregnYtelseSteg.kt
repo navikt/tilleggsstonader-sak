@@ -8,10 +8,11 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.tilTypeAndel
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -106,5 +107,14 @@ class TilsynBarnBeregnYtelseSteg(
             "Når vi begynner å revurdere og opphøre må vi oppdatere denne metoden for å finne startdato"
         }
         return minOf(andelerTilkjentYtelse.minOf { it.fom })
+    }
+
+    private fun MålgruppeType.tilTypeAndel(): TypeAndel {
+        return when (this) {
+            MålgruppeType.AAP, MålgruppeType.UFØRETRYGD, MålgruppeType.NEDSATT_ARBEIDSEVNE -> TypeAndel.TILSYN_BARN_AAP
+            MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER
+            MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.TILSYN_BARN_ETTERLATTE
+            else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
+        }
     }
 }

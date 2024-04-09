@@ -64,15 +64,6 @@ enum class TypeAndel {
     UGYLDIG,
 }
 
-fun MålgruppeType.tilTypeAndel(): TypeAndel {
-    return when (this) {
-        MålgruppeType.AAP, MålgruppeType.UFØRETRYGD, MålgruppeType.NEDSATT_ARBEIDSEVNE -> TypeAndel.TILSYN_BARN_AAP
-        MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER
-        MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.TILSYN_BARN_ETTERLATTE
-        MålgruppeType.DAGPENGER -> TypeAndel.UGYLDIG
-    }
-}
-
 /**
  * [Satstype.UGYLDIG] Brukes for å lagre ned andeler med nullbeløp. Disse skal ikke iverksettes,
  * men nødvendige for å iverksette første gang og ved opphør tilbake i tid.
