@@ -66,7 +66,7 @@ class TilsynBarnBeregnYtelseSteg(
                     beløp = beløpsperiode.beløp,
                     fom = beløpsperiode.dato,
                     tom = beløpsperiode.dato,
-                    satstype = Satstype.ENGANGSBELØP,
+                    satstype = Satstype.DAG,
                     type = beløpsperiode.målgruppe.tilTypeAndel(),
                     kildeBehandlingId = saksbehandling.id,
                 )

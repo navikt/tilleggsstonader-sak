@@ -52,7 +52,7 @@ class IverksettDtoMapperTest {
                     beløp = 100,
                     fraOgMedDato = andel.fom,
                     tilOgMedDato = andel.tom,
-                    satstype = SatstypeIverksetting.ENGANGS,
+                    satstype = SatstypeIverksetting.DAGLIG,
                     stønadstype = StønadstypeIverksetting.TILSYN_BARN_AAP,
                 ),
             )
