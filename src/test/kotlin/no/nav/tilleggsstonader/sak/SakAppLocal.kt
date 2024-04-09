@@ -29,4 +29,5 @@ fun appLocal(): SpringApplicationBuilder =
             "mock-htmlify",
             "mock-arena",
             "mock-aktivitet",
+            "mock-kodeverk",
         )
