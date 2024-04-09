@@ -105,10 +105,12 @@ class IverksettServiceTest : IntegrationTest() {
 
     private fun assertHarOpprettetTaskForÅSjekkeStatus(fagsak: Fagsak, behandling: Behandling) {
         val task = taskService.finnTasksMedStatus(Status.entries, HentStatusFraIverksettingTask.TYPE).single()
+        val eksternBehandlingId = testoppsettService.hentSaksbehandling(behandling.id).eksternId
         assertThat(objectMapper.readValue<Map<String, Any>>(task.payload)).isEqualTo(
             mapOf(
                 "eksternFagsakId" to fagsak.eksternId.id.toInt(),
                 "behandlingId" to behandling.id.toString(),
+                "eksternBehandlingId" to eksternBehandlingId.toInt(),
                 "iverksettingId" to behandling.id.toString(),
             ),
         )

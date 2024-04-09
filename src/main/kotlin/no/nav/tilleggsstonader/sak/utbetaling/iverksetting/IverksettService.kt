@@ -199,6 +199,7 @@ class IverksettService(
             HentStatusFraIverksettingTask.opprettTask(
                 eksternFagsakId = behandling.eksternFagsakId,
                 behandlingId = behandling.id,
+                eksternBehandlingId = behandling.eksternId,
                 iverksettingId = iverksettingId,
             ),
         )

@@ -39,7 +39,7 @@ class IverksettDtoMapperTest {
 
         assertThat(dto.iverksettingId).isEqualTo(iverksettingId)
         assertThat(dto.sakId).isEqualTo("200")
-        assertThat(dto.behandlingId).isEqualTo(behandling.id)
+        assertThat(dto.behandlingId).isEqualTo(behandling.eksternId.toString())
         assertThat(dto.iverksettingId).isEqualTo(iverksettingId)
         assertThat(dto.personident).isEqualTo("ident1")
         assertThat(dto.forrigeIverksetting).isNull()

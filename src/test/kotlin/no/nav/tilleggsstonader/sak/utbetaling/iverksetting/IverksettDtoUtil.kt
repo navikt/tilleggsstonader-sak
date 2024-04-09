@@ -9,13 +9,14 @@ object IverksettDtoUtil {
     fun iverksettDto(
         sakId: String = "fagsakId",
         behandlingId: UUID = UUID.randomUUID(),
+        eksternBehandlingId: Long = 1,
         iverksettingId: UUID = behandlingId,
         personident: String = "123",
         vedtak: VedtaksdetaljerDto = vedtaksdetaljerDto(),
         forrigeIverksetting: ForrigeIverksettingDto? = null,
     ) = IverksettDto(
         sakId = sakId,
-        behandlingId = behandlingId,
+        behandlingId = eksternBehandlingId.toString(),
         iverksettingId = iverksettingId,
         personident = personident,
         vedtak = vedtak,
