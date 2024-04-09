@@ -103,6 +103,7 @@ class JournalføringServiceTest {
         )
         val journalpostMedAktørId = journalpost.copy(bruker = aktørIdBruker)
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpostMedAktørId
+        every { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any()) } just Runs
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
 
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
@@ -131,6 +132,15 @@ class JournalføringServiceTest {
                 behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
+            )
+        }
+        verify(exactly = 1) {
+            journalpostService.oppdaterOgFerdigstillJournalpost(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
             )
         }
 
