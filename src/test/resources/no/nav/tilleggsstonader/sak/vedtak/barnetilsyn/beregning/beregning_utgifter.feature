@@ -21,8 +21,8 @@ Egenskap: Beregning - Utgifter
     Når beregner
 
     Så forvent følgende beregningsresultat
-      | Måned   | Dagsats | Antall dager | Utgift |
-      | 01.2023 | 29.53   | 22           | 1000   |
+      | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
+      | 01.2023 | 29.53   | 22           | 1000   | 650         |
 
   Scenario: Beregning skal ikke ta med utgifter utenfor stønadsperiode
     # Mål: Beregningen skal ikke gi resultat for februar fordi det ikke er utgifter i denne perioden
@@ -42,8 +42,8 @@ Egenskap: Beregning - Utgifter
     Når beregner
 
     Så forvent følgende beregningsresultat
-      | Måned   | Dagsats | Antall dager | Utgift |
-      | 02.2023 | 29.53   | 20           | 1000   |
+      | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
+      | 02.2023 | 29.53   | 20           | 1000   | 591         |
 
   Scenario: Kun et barn har utgift i deler av perioden
     # Mål: Beregning skal kun inkludere utgifter for barn med utgift den måneden
@@ -67,9 +67,9 @@ Egenskap: Beregning - Utgifter
     Når beregner
 
     Så forvent følgende beregningsresultat
-      | Måned   | Dagsats | Antall dager | Utgift |
-      | 01.2023 | 59.07   | 22           | 2000   |
-      | 02.2023 | 29.53   | 20           | 1000   |
+      | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
+      | 01.2023 | 59.07   | 22           | 2000   | 1300        |
+      | 02.2023 | 29.53   | 20           | 1000   | 591         |
 
     Så forvent følgende stønadsperioder for: 01.2023
       | Fom        | Tom        | Aktivitet | Målgruppe       |
