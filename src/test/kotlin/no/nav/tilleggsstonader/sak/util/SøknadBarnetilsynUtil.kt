@@ -5,12 +5,16 @@ import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.OppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
@@ -85,7 +89,24 @@ object SøknadBarnetilsynUtil {
         vararg hovedytelse: Hovedytelse = arrayOf(Hovedytelse.AAP),
     ) = HovedytelseAvsnitt(
         hovedytelse = hovedytelse.toList(),
-        boddSammenhengende = JaNei.NEI,
-        planleggerBoINorgeNeste12mnd = JaNei.JA,
+        arbeidOgOpphold = arbeidOgOpphold(),
+    )
+
+    private fun arbeidOgOpphold() = ArbeidOgOpphold(
+        jobberIAnnetLand = JaNei.JA,
+        jobbAnnetLand = "SWE",
+        harPengestøtteAnnetLand = listOf(TypePengestøtte.SYKEPENGER),
+        pengestøtteAnnetLand = "FIN",
+        harOppholdUtenforNorgeSiste12mnd = JaNei.JA,
+        oppholdUtenforNorgeSiste12mnd = listOf(oppholdUtenforNorge()),
+        harOppholdUtenforNorgeNeste12mnd = JaNei.JA,
+        oppholdUtenforNorgeNeste12mnd = listOf(oppholdUtenforNorge()),
+    )
+
+    private fun oppholdUtenforNorge() = OppholdUtenforNorge(
+        land = "SWE",
+        årsak = listOf(ÅrsakOppholdUtenforNorge.JOBB),
+        fom = LocalDate.of(2024, 1, 1),
+        tom = LocalDate.of(2024, 1, 1),
     )
 }

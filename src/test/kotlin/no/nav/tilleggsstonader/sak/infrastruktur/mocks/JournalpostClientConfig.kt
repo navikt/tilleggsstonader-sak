@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariant
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
@@ -61,6 +62,9 @@ class JournalpostClientConfig {
 
         every { journalpostClient.ferdigstillJournalpost(any(), any(), any()) } returns mockk()
         every { journalpostClient.oppdaterJournalpost(any(), any(), any()) } returns mockk()
+        every { journalpostClient.finnJournalposterForBruker(any()) } answers {
+            journalposter.values.filter { it.bruker?.id == firstArg<JournalposterForBrukerRequest>().brukerId.id }
+        }
 
         return journalpostClient
     }
@@ -85,7 +89,10 @@ class JournalpostClientConfig {
             bruker = Bruker("12345678910", BrukerIdType.FNR),
             avsenderMottaker = avsenderMottaker(),
             journalforendeEnhet = "tilleggsstonader-sak",
-            relevanteDatoer = listOf(RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT")),
+            relevanteDatoer = listOf(
+                RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
+                RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT")
+            ),
             dokumenter = listOf(
                 DokumentInfo(
                     dokumentInfoId = "1",
