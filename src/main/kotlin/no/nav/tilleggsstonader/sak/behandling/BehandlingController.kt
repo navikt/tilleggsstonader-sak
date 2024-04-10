@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
+import no.nav.tilleggsstonader.sak.behandling.dto.HentBehandlingerRequest
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -35,6 +36,16 @@ class BehandlingController(
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
         return saksbehandling.tilDto()
+    }
+
+    @PostMapping("person")
+    fun hentBehandlingerForPersonOgStønadstype(@RequestBody fagsakRequest: HentBehandlingerRequest): List<BehandlingDto> {
+        tilgangService.validerTilgangTilPersonMedBarn(fagsakRequest.personIdent, AuditLoggerEvent.ACCESS)
+
+        return fagsakService.hentBehandlingerForPersonOgStønadstype(
+            fagsakRequest.personIdent,
+            fagsakRequest.stønadstype
+        )
     }
 
     @GetMapping("gamle-behandlinger")
