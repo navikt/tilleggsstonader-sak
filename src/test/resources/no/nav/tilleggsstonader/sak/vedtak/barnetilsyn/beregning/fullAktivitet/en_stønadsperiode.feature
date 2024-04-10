@@ -19,8 +19,8 @@ Egenskap: Beregning - En stønadsperiode med full aktivitet
     Når beregner
 
     Så forvent følgende beregningsresultat
-      | Måned   | Dagsats | Antall dager | Utgift |
-      | 01.2023 | 29.53   | 22           | 1000   |
+      | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
+      | 01.2023 | 29.53   | 22           | 1000   | 650         |
 
   Scenario: Stønadsperiode kun deler av måned
 
@@ -39,8 +39,8 @@ Egenskap: Beregning - En stønadsperiode med full aktivitet
     Når beregner
 
     Så forvent følgende beregningsresultat
-      | Måned   | Dagsats | Antall dager | Utgift |
-      | 01.2023 | 29.53   | 8            | 1000   |
+      | Måned   | Dagsats | Antall dager | Utgift | Månedbeløp |
+      | 01.2023 | 29.53   | 8            | 1000   | 236        |
 
     Så forvent følgende stønadsperioder for: 01.2023
       | Fom        | Tom        | Målgruppe       | Aktivitet |
@@ -64,9 +64,9 @@ Egenskap: Beregning - En stønadsperiode med full aktivitet
     Når beregner
 
     Så forvent følgende beregningsresultat
-      | Måned   | Dagsats | Antall dager | Utgift |
-      | 03.2023 | 29.53   | 15           | 1000   |
-      | 04.2023 | 29.53   | 20           | 1000   |
+      | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
+      | 03.2023 | 29.53   | 15           | 1000   | 443         |
+      | 04.2023 | 29.53   | 20           | 1000   | 591         |
 
     Så forvent følgende stønadsperioder for: 04.2023
       | Fom        | Tom        | Målgruppe       | Aktivitet |

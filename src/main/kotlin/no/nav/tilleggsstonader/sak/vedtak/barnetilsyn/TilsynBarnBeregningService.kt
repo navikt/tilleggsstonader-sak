@@ -53,19 +53,29 @@ class TilsynBarnBeregningService(
     private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<Beregningsresultat> {
         return beregningsgrunnlag.map {
             val dagsats = beregnDagsats(it)
+            val beløpsperioder = lagBeløpsperioder(dagsats, it)
+
             Beregningsresultat(
                 dagsats = dagsats,
-                månedsbeløp = månedsbeløp(dagsats, it),
+                månedsbeløp = beløpsperioder.sumOf { it.beløp },
                 grunnlag = it,
+                beløpsperioder = beløpsperioder,
             )
         }
     }
 
-    private fun månedsbeløp(
-        dagsats: BigDecimal,
-        beregningsgrunnlag: Beregningsgrunnlag,
-    ) =
-        dagsats.multiply(beregningsgrunnlag.stønadsperioderGrunnlag.sumOf { it.antallDager }.toBigDecimal())
+    private fun lagBeløpsperioder(dagsats: BigDecimal, it: Beregningsgrunnlag): List<Beløpsperiode> {
+        return it.stønadsperioderGrunnlag.map {
+            Beløpsperiode(
+                dato = it.stønadsperiode.fom,
+                beløp = beregnBeløp(dagsats, it.antallDager),
+                målgruppe = it.stønadsperiode.målgruppe,
+            )
+        }
+    }
+
+    private fun beregnBeløp(dagsats: BigDecimal, antallDager: Int) =
+        dagsats.multiply(antallDager.toBigDecimal())
             .setScale(0, RoundingMode.HALF_UP)
             .toInt()
 
@@ -142,7 +152,8 @@ class TilsynBarnBeregningService(
             val maksAntallDagerIUke = periode.antallDager
 
             val aktiviteterForUke = aktiviteterUker[uke]
-            val antallDagerMedAktivitet = aktiviteterForUke?.sumOf { it.antallDager } ?: error("Ingen aktivitet i uke fom=${uke.fom} og tom=${uke.tom}")
+            val antallDagerMedAktivitet = aktiviteterForUke?.sumOf { it.antallDager }
+                ?: error("Ingen aktivitet i uke fom=${uke.fom} og tom=${uke.tom}")
 
             min(antallDagerMedAktivitet, maksAntallDagerIUke)
         }
