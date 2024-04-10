@@ -336,6 +336,29 @@ class IverksettServiceTest : IntegrationTest() {
             assertThat(andelForrigeMåned.beløp).isEqualTo(0)
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
         }
+
+        @Test
+        fun `skal iverksette måned 2 når status er OK_UTEN_UTBETALING for første måned`() {
+            testoppsettService.opprettBehandlingMedFagsak(behandling)
+            lagreTotrinnskontroll(behandling)
+            tilkjentYtelseRepository.insert(
+                tilkjentYtelse(
+                    behandlingId = behandling.id,
+                    andeler = arrayOf(lagAndel(behandling, nesteMåned)),
+                ),
+            )
+            iverksettService.iverksettBehandlingFørsteGang(behandling.id)
+            oppdaterAndelerTilOk(behandling, StatusIverksetting.OK_UTEN_UTBETALING)
+
+            val iverksettingId = UUID.randomUUID()
+            iverksettService.iverksett(behandling.id, iverksettingId, nesteMåned)
+
+            val andeler = hentAndeler(behandling)
+            val andelForrigeMåned = andeler.forMåned(nåværendeMåned)
+            andelForrigeMåned.assertHarStatusOgId(StatusIverksetting.OK_UTEN_UTBETALING, behandling.id)
+            assertThat(andelForrigeMåned.beløp).isEqualTo(0)
+            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
+        }
     }
 
     private fun CapturingSlot<IverksettDto>.assertUtbetalingerInneholder(vararg måned: YearMonth) {
@@ -365,10 +388,13 @@ class IverksettServiceTest : IntegrationTest() {
         assertThat(this.iverksetting?.iverksettingId).isEqualTo(iverksettingId)
     }
 
-    private fun oppdaterAndelerTilOk(behandling: Behandling) {
+    private fun oppdaterAndelerTilOk(
+        behandling: Behandling,
+        statusIverksetting: StatusIverksetting = StatusIverksetting.OK,
+    ) {
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
         val oppdaterteAndeler = andeler.filter { it.statusIverksetting == StatusIverksetting.SENDT }
-            .map { it.copy(statusIverksetting = StatusIverksetting.OK) }
+            .map { it.copy(statusIverksetting = statusIverksetting) }
         andelTilkjentYtelseRepository.updateAll(oppdaterteAndeler)
     }
 
