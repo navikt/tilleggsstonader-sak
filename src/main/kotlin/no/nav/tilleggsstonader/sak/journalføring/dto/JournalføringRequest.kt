@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import java.time.LocalDate
-import java.util.UUID
 
 data class JournalføringRequest(
     val dokumentTitler: Map<String, String>? = null,
@@ -62,7 +61,7 @@ data class JournalføringRequest(
 }
 
 fun JournalføringRequest.valider() {
-    feilHvis(gjelderKlage()){
+    feilHvis(gjelderKlage()) {
         "Journalføring av klage er ikke implementert."
     }
     dokumentTitler?.let {

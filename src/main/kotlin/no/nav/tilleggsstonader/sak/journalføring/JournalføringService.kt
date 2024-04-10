@@ -71,14 +71,13 @@ class JournalføringService(
         val fagsak = fagsakService.hentEllerOpprettFagsak(personIdent, stønadstype)
         val nesteBehandlingstype = behandlingService.utledNesteBehandlingstype(fagsak.id)
 
-
         validerKanOppretteBehandling(journalpost)
 
         val behandling = opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
             behandlingstype = nesteBehandlingstype,
             fagsak = fagsak,
             journalpost = journalpost,
-            behandlingÅrsak = behandlingÅrsak
+            behandlingÅrsak = behandlingÅrsak,
         )
 
         if (journalpost.harStrukturertSøknad()) {
@@ -120,9 +119,8 @@ class JournalføringService(
         behandlingstype: BehandlingType,
         fagsak: Fagsak,
         journalpost: Journalpost,
-        behandlingÅrsak: BehandlingÅrsak
+        behandlingÅrsak: BehandlingÅrsak,
     ): Behandling {
-
         val behandling = behandlingService.opprettBehandling(
             behandlingType = behandlingstype,
             fagsakId = fagsak.id,

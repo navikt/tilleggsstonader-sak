@@ -49,11 +49,11 @@ class JournalpostClientConfig {
             )
         } returns ArkiverDokumentResponse(journalpostId = "journalpostId", ferdigstilt = true)
         every { journalpostClient.hentDokument(any(), any(), any()) } returns dummyPdf
-        every {journalpostClient.oppdaterJournalpost(any(), any(), any())} answers {
+        every { journalpostClient.oppdaterJournalpost(any(), any(), any()) } answers {
             val journalpostId = secondArg<String>()
             OppdaterJournalpostResponse(journalpostId)
         }
-        every {journalpostClient.ferdigstillJournalpost(any(), any(), any())} answers {
+        every { journalpostClient.ferdigstillJournalpost(any(), any(), any()) } answers {
             val journalpostId = firstArg<String>()
             OppdaterJournalpostResponse(journalpostId)
         }

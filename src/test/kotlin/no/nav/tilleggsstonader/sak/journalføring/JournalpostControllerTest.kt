@@ -1,13 +1,8 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
-import io.mockk.mockk
-import io.mockk.spyk
 import io.mockk.verify
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -15,20 +10,14 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
-import no.nav.tilleggsstonader.sak.journalføring.dto.JournalpostResponse
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 
-class JournalpostControllerTest: IntegrationTest() {
+class JournalpostControllerTest : IntegrationTest() {
 
     val ident = "123456789"
     val saksbehandler = "ole"
@@ -46,14 +35,11 @@ class JournalpostControllerTest: IntegrationTest() {
     @Autowired
     lateinit var journalpostClient: JournalpostClient
 
-
-
     @BeforeEach
     fun setUp() {
         headers.setBearerAuth(onBehalfOfToken(saksbehandler = saksbehandler))
         testoppsettService.opprettPerson(ident)
     }
-
 
     @Test
     fun `fullfør journalpost - skal ferdigstille journalpost, og opprette behandling og oppgave`() {
@@ -65,8 +51,8 @@ class JournalpostControllerTest: IntegrationTest() {
                 aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
                 årsak = JournalføringRequest.Journalføringsårsak.DIGITAL_SØKNAD,
                 oppgaveId = "123",
-                journalførendeEnhet = enhet
-            )
+                journalførendeEnhet = enhet,
+            ),
         )
 
         assertThat(journalpostId).isEqualTo("1")
@@ -85,16 +71,13 @@ class JournalpostControllerTest: IntegrationTest() {
         assertThat(taskService.findAll().single().type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
 
         verify(exactly = 1) { journalpostClient.ferdigstillJournalpost("1", enhet, saksbehandler) }
-
     }
-
 
     private fun fullførJournalpost(journalpostId: String, request: JournalføringRequest): String =
         restTemplate.exchange(
             localhost("api/journalpost/$journalpostId/fullfor"),
             HttpMethod.POST,
             HttpEntity(request, headers),
-            String::class.java
+            String::class.java,
         ).body!!
-
 }

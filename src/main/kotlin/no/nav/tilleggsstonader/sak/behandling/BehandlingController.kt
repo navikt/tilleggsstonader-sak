@@ -44,7 +44,7 @@ class BehandlingController(
 
         return fagsakService.hentBehandlingerForPersonOgStønadstype(
             fagsakRequest.personIdent,
-            fagsakRequest.stønadstype
+            fagsakRequest.stønadstype,
         )
     }
 

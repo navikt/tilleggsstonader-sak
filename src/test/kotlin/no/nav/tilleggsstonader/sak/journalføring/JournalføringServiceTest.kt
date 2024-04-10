@@ -90,7 +90,7 @@ class JournalføringServiceTest {
                 Stønadstype.BARNETILSYN,
                 BehandlingÅrsak.SØKNAD,
                 "oppgaveBeskrivelse",
-                enhet
+                enhet,
             )
         }.hasMessageContaining("Journalposten mangler bruker")
     }
@@ -124,7 +124,7 @@ class JournalføringServiceTest {
             Stønadstype.BARNETILSYN,
             BehandlingÅrsak.SØKNAD,
             "beskrivelse",
-            enhet
+            enhet,
         )
 
         verify(exactly = 1) {
