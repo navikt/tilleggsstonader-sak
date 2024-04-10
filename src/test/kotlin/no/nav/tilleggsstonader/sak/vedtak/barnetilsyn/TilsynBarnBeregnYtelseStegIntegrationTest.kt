@@ -234,7 +234,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     behandlingId = behandling.id,
                     fom = mars.atDay(1),
                     tom = mars.atDay(1),
-                    målgruppe = MålgruppeType.UFØRETRYGD,
+                    målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
                 ),
             )
 
