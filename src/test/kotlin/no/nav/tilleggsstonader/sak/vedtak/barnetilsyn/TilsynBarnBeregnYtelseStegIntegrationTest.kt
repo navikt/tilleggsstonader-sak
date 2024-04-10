@@ -321,7 +321,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThatThrownBy {
                 steg.utførSteg(
                     saksbehandling,
-                    vedtakDto
+                    vedtakDto,
                 )
             }.hasMessageContaining("Kan ikke opprette andel tilkjent ytelse for målgruppe")
         }
