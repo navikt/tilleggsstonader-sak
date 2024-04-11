@@ -197,6 +197,29 @@ class StepDefinitions {
         }
     }
 
+    @Så("forvent følgende beløpsperioder for: {}")
+    fun `forvent følgende beløpsperioder`(månedStr: String, dataTable: DataTable) {
+        assertThat(exception).isNull()
+        val måned = parseÅrMåned(månedStr)
+        val forventedeBeløpsperioder = parseForventedeBeløpsperioder(dataTable)
+
+        val beløpsperioder = beregningsresultat!!.perioder.find { it.grunnlag.måned == måned }
+            ?.beløpsperioder
+            ?: error("Finner ikke beregningsresultat for $måned")
+
+        beløpsperioder.forEachIndexed { index, resultat ->
+            val forventetResultat = forventedeBeløpsperioder[index]
+            try {
+                assertThat(resultat.dato).isEqualTo(forventetResultat.dato)
+                assertThat(resultat.beløp).isEqualTo(forventetResultat.beløp)
+                assertThat(resultat.målgruppe).isEqualTo(forventetResultat.målgruppe)
+            } catch (e: Throwable) {
+                logger.error("Feilet validering av rad ${index + 1}")
+                throw e
+            }
+        }
+    }
+
     private fun parseForventedeStønadsperioder(dataTable: DataTable): List<ForventedeStønadsperioder> {
         return dataTable.mapRad { rad ->
             ForventedeStønadsperioder(
@@ -207,6 +230,16 @@ class StepDefinitions {
                     ?: AktivitetType.TILTAK,
                 antallAktiviteter = parseInt(BeregningNøkler.ANTALL_AKTIVITETER, rad),
                 antallDager = parseInt(BeregningNøkler.ANTALL_DAGER, rad),
+            )
+        }
+    }
+
+    private fun parseForventedeBeløpsperioder(dataTable: DataTable): List<Beløpsperiode> {
+        return dataTable.mapRad { rad ->
+            Beløpsperiode(
+                dato = parseÅrMånedEllerDato(BeregningNøkler.DATO, rad).datoEllerFørsteDagenIMåneden(),
+                målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+                beløp = parseInt(BeregningNøkler.BELØP, rad),
             )
         }
     }

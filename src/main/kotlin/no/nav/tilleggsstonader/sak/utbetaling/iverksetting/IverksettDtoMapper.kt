@@ -22,7 +22,7 @@ object IverksettDtoMapper {
         }
         return IverksettDto(
             sakId = behandling.eksternFagsakId.toString(),
-            behandlingId = behandling.id,
+            behandlingId = behandling.eksternId.toString(),
             iverksettingId = iverksettingId,
             personident = behandling.ident,
             forrigeIverksetting = forrigeIverksetting,

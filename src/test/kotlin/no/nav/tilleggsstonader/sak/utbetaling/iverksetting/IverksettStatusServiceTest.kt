@@ -62,7 +62,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
         val andelIkkeSendt = andelTilkjentYtelse(kildeBehandlingId = behandling.id)
         val tilkjentYtelse = opprettTilkjentYtelse(behandling, iverksattAndel, andelIkkeSendt)
 
-        iverksettStatusService.hentStatusOgOppdaterAndeler(fagsak.eksternId.id, behandling.id, behandling.id)
+        hentStatusOgOppdaterAndeler()
 
         val oppdaterteAndeler = tilkjentYtelseRepository.findByIdOrThrow(tilkjentYtelse.id).andelerTilkjentYtelse
         assertThat(oppdaterteAndeler.single { it.id == iverksattAndel.id }.statusIverksetting)
@@ -76,7 +76,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
     fun `skal kaste feil hvis status ikke er OK`(status: IverksettStatus) {
         every { iverksettClient.hentStatus(any(), any(), any()) } returns status
         assertThatThrownBy {
-            iverksettStatusService.hentStatusOgOppdaterAndeler(fagsak.eksternId.id, behandling.id, behandling.id)
+            hentStatusOgOppdaterAndeler()
         }.isInstanceOf(TaskExceptionUtenStackTrace::class.java)
     }
 
@@ -88,7 +88,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
         opprettTilkjentYtelse(behandling, andel)
 
         assertThatThrownBy {
-            iverksettStatusService.hentStatusOgOppdaterAndeler(fagsak.eksternId.id, behandling.id, behandling.id)
+            hentStatusOgOppdaterAndeler()
         }.isInstanceOf(Feil::class.java)
             .hasMessageContaining("som har annen status enn SENDT")
     }
@@ -99,7 +99,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
         opprettTilkjentYtelse(behandling, andel)
 
         assertThatThrownBy {
-            iverksettStatusService.hentStatusOgOppdaterAndeler(fagsak.eksternId.id, behandling.id, behandling.id)
+            hentStatusOgOppdaterAndeler()
         }.isInstanceOf(Feil::class.java)
             .hasMessageContaining("Forventet å finne minimum en andel")
     }
@@ -117,7 +117,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
         opprettTilkjentYtelse(behandling, iverksattAndel)
 
         assertThatThrownBy {
-            iverksettStatusService.hentStatusOgOppdaterAndeler(fagsak.eksternId.id, behandling.id, behandling.id)
+            hentStatusOgOppdaterAndeler()
         }.isInstanceOf(Feil::class.java)
             .hasMessageContaining("Forventet status=OK_UTEN_UTBETALING når det finnes en 0-andel")
     }
@@ -135,9 +135,19 @@ class IverksettStatusServiceTest : IntegrationTest() {
         opprettTilkjentYtelse(behandling, iverksattAndel)
 
         assertThatThrownBy {
-            iverksettStatusService.hentStatusOgOppdaterAndeler(fagsak.eksternId.id, behandling.id, behandling.id)
+            hentStatusOgOppdaterAndeler()
         }.isInstanceOf(Feil::class.java)
             .hasMessageContaining("Forventet status=OK når det finnes andeler med beløp 0 for iverksetting")
+    }
+
+    private fun hentStatusOgOppdaterAndeler() {
+        val eksternBehandlingId = testoppsettService.hentSaksbehandling(behandling.id).eksternId
+        iverksettStatusService.hentStatusOgOppdaterAndeler(
+            eksternFagsakId = fagsak.eksternId.id,
+            behandlingId = behandling.id,
+            eksternBehandlingId = eksternBehandlingId,
+            iverksettingId = behandling.id,
+        )
     }
 
     private fun opprettTilkjentYtelse(

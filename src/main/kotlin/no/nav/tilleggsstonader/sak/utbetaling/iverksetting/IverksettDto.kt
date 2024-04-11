@@ -10,7 +10,7 @@ import java.util.UUID
  */
 data class IverksettDto(
     val sakId: String,
-    val behandlingId: UUID,
+    val behandlingId: String,
     val iverksettingId: UUID,
     val personident: String,
     val vedtak: VedtaksdetaljerDto,
