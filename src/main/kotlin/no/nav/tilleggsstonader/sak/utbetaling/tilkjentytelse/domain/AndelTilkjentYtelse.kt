@@ -86,4 +86,7 @@ enum class StatusIverksetting {
     OK,
     OK_UTEN_UTBETALING,
     UAKTUELL,
+    ;
+
+    fun erOk() = this == StatusIverksetting.OK || this == StatusIverksetting.OK_UTEN_UTBETALING
 }

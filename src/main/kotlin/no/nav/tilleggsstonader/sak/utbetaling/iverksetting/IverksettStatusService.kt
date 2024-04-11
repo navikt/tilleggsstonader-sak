@@ -21,8 +21,8 @@ class IverksettStatusService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun hentStatusOgOppdaterAndeler(eksternFagsakId: Long, behandlingId: UUID, iverksettingId: UUID) {
-        val status = iverksettClient.hentStatus(eksternFagsakId, behandlingId, iverksettingId)
+    fun hentStatusOgOppdaterAndeler(eksternFagsakId: Long, behandlingId: UUID, eksternBehandlingId: Long, iverksettingId: UUID) {
+        val status = iverksettClient.hentStatus(eksternFagsakId, eksternBehandlingId, iverksettingId)
         val statusIverksetting = when (status) {
             IverksettStatus.OK -> StatusIverksetting.OK
             IverksettStatus.OK_UTEN_UTBETALING -> StatusIverksetting.OK_UTEN_UTBETALING

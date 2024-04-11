@@ -27,20 +27,32 @@ class HentStatusFraIverksettingTask(
         iverksettStatusService.hentStatusOgOppdaterAndeler(
             eksternFagsakId = taskData.eksternFagsakId,
             behandlingId = taskData.behandlingId,
+            eksternBehandlingId = taskData.eksternBehandlingId,
             iverksettingId = taskData.iverksettingId,
         )
     }
 
     companion object {
 
-        fun opprettTask(eksternFagsakId: Long, behandlingId: UUID, iverksettingId: UUID): Task {
-            val taskData = TaskData(eksternFagsakId = eksternFagsakId, behandlingId = behandlingId, iverksettingId = iverksettingId)
+        fun opprettTask(
+            eksternFagsakId: Long,
+            behandlingId: UUID,
+            eksternBehandlingId: Long,
+            iverksettingId: UUID,
+        ): Task {
+            val taskData = TaskData(
+                eksternFagsakId = eksternFagsakId,
+                behandlingId = behandlingId,
+                eksternBehandlingId = eksternBehandlingId,
+                iverksettingId = iverksettingId,
+            )
             return Task(
                 type = TYPE,
                 payload = objectMapper.writeValueAsString(taskData),
                 properties = Properties().apply {
                     setProperty("eksternFagsakId", eksternFagsakId.toString())
                     setProperty("behandlingId", behandlingId.toString())
+                    setProperty("eksternBehandlingId", eksternBehandlingId.toString())
                     setProperty("iverksettingId", iverksettingId.toString())
                 },
             ).copy(triggerTid = LocalDateTime.now().plusSeconds(31))
@@ -52,6 +64,7 @@ class HentStatusFraIverksettingTask(
     private data class TaskData(
         val eksternFagsakId: Long,
         val behandlingId: UUID,
+        val eksternBehandlingId: Long,
         val iverksettingId: UUID,
     )
 }
