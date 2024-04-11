@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.verify
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -10,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillJournalføringsoppgaveTask
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,7 +22,7 @@ import org.springframework.http.HttpMethod
 
 class JournalpostControllerTest : IntegrationTest() {
 
-    val ident = "123456789"
+    val ident = "12345678910"
     val saksbehandler = "ole"
     val enhet = "enhet"
 
@@ -68,7 +71,17 @@ class JournalpostControllerTest : IntegrationTest() {
         assertThat(opprettetBehandling.steg).isEqualTo(StegType.INNGANGSVILKÅR)
         assertThat(opprettetBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
 
-        assertThat(taskService.findAll().single().type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+
+        val opprettedeTasks = taskService.findAll()
+        assertThat(opprettedeTasks).hasSize(2)
+
+        val bahandlesakOppgaveTask = opprettedeTasks.single { it.type == OpprettOppgaveForOpprettetBehandlingTask.TYPE }
+        val behandlesakOppgavePayload = ObjectMapperProvider.objectMapper.readValue<OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData>(
+                bahandlesakOppgaveTask.payload)
+        assertThat(behandlesakOppgavePayload.behandlingId).isEqualTo(opprettetBehandling.id)
+
+        val ferdigstillJournalføringsoppgaveTask = opprettedeTasks.single { it.type == FerdigstillJournalføringsoppgaveTask.TYPE}
+        assertThat(ferdigstillJournalføringsoppgaveTask.payload).isEqualTo("123") // oppgaveId
 
         verify(exactly = 1) { journalpostClient.ferdigstillJournalpost("1", enhet, saksbehandler) }
     }

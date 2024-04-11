@@ -53,6 +53,7 @@ class JournalføringServiceTest {
         barnService,
         TransactionHandler(),
         personService,
+
     )
 
     val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetId
