@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
-import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.fødsel
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlBarn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlSøker
@@ -18,7 +17,8 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.data.repository.findByIdOrNull
+import java.util.Optional
+import java.util.UUID
 
 class GrunnlagsdataServiceTest {
 
@@ -41,15 +41,23 @@ class GrunnlagsdataServiceTest {
         identBarn1 to pdlBarn(fødsel = fødsel()),
     )
     val søkerMedBarn = SøkerMedBarn(
-        behandling.ident,
-        pdlSøker(),
+        søkerIdent = behandling.ident,
+        søker = pdlSøker(),
         barn = pdlBarn,
     )
 
     @BeforeEach
     fun setUp() {
-        every { grunnlagsdataRepository.findByIdOrNull(any()) } returns null
-        every { grunnlagsdataRepository.insert(any()) } answers { firstArg() }
+        val repository = mutableMapOf<UUID, Grunnlagsdata>()
+        every { grunnlagsdataRepository.findById(any<UUID>()) } answers {
+            repository[firstArg()]?.let { Optional.of(it) } ?: Optional.empty()
+        }
+        every { grunnlagsdataRepository.insert(any()) } answers {
+            repository[firstArg<Grunnlagsdata>().behandlingId] = firstArg()
+            firstArg()
+        }
+        every { grunnlagsdataRepository.existsById(any()) } answers { repository.contains(firstArg()) }
+
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { barnService.finnBarnPåBehandling(behandling.id) } returns emptyList()
         every { personService.hentPersonMedBarn(behandling.ident) } returns søkerMedBarn
@@ -60,6 +68,8 @@ class GrunnlagsdataServiceTest {
 
         @Test
         fun `skal opprette grunnlag hvis det ikke finnes fra før`() {
+            service.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandling.id)
+
             val grunnlagsdata = service.hentGrunnlagsdata(behandling.id)
 
             assertThat(grunnlagsdata.grunnlag.barn).isEmpty()
@@ -69,21 +79,21 @@ class GrunnlagsdataServiceTest {
 
         @Test
         fun `skal hente direkte fra basen hvis dataen finnes fra før`() {
-            every { grunnlagsdataRepository.findByIdOrNull(behandling.id) } returns grunnlagsdataDomain()
+            every { grunnlagsdataRepository.existsById(behandling.id) } returns true
 
-            service.hentGrunnlagsdata(behandling.id)
+            service.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandling.id)
             verify(exactly = 0) { grunnlagsdataRepository.insert(any()) }
         }
     }
 
     @Nested
-    inner class BarnMapping {
+    inner class OpprettGrunnlagBarn {
 
         @Test
-        fun `skal hente grunnlag til behandlingBarn`() {
+        fun `skal opprette grunnlag til behandlingBarn`() {
             every { barnService.finnBarnPåBehandling(behandling.id) } returns listOf(behandlingBarn(personIdent = identBarn1))
 
-            service.hentGrunnlagsdata(behandling.id)
+            service.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandling.id)
 
             val grunnlagsdata = service.hentGrunnlagsdata(behandling.id)
 
@@ -95,7 +105,7 @@ class GrunnlagsdataServiceTest {
             every { barnService.finnBarnPåBehandling(behandling.id) } returns listOf(behandlingBarn())
 
             assertThatThrownBy {
-                service.hentGrunnlagsdata(behandling.id)
+                service.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandling.id)
             }.hasMessageContaining("Finner ikke grunnlag for barn")
         }
     }

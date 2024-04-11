@@ -4,12 +4,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import org.slf4j.LoggerFactory
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -24,8 +24,13 @@ class GrunnlagsdataService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun hentGrunnlagsdata(behandlingId: UUID): Grunnlagsdata {
-        return grunnlagsdataRepository.findByIdOrNull(behandlingId)
-            ?: opprettGrunnlagsdata(behandlingId)
+        return grunnlagsdataRepository.findByIdOrThrow(behandlingId)
+    }
+
+    fun opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId: UUID) {
+        if (!grunnlagsdataRepository.existsById(behandlingId)) {
+            opprettGrunnlagsdata(behandlingId)
+        }
     }
 
     private fun opprettGrunnlagsdata(behandlingId: UUID): Grunnlagsdata {
