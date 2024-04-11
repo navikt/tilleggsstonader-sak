@@ -253,6 +253,7 @@ class BehandlingFlytTest(
 
     private fun opprettBehandling(personIdent: String): UUID {
         val behandlingId = opprettTestBehandlingController.opprettBehandling(TestBehandlingRequest(personIdent))
+        testoppsettService.opprettGrunnlagsdata(behandlingId)
         kjørTasks()
         return behandlingId
     }
