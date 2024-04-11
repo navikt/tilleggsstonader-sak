@@ -127,7 +127,7 @@ class OpprettTestBehandlingController(
         jobberIAnnetLand = EnumFelt("Jobber du i et annet land enn Norge?", JaNei.JA, "Ja", emptyList()),
         jobbAnnetLand = SelectFelt("Hvilket land jobber du i?", "SWE", "Sverige"),
         harPengestøtteAnnetLand = EnumFlereValgFelt(
-            "Mottar du pengestøttene fra et annet land enn Norge?",
+            "Mottar du pengestøtte fra et annet land enn Norge?",
             listOf(
                 VerdiFelt(
                     TypePengestøtte.SYKEPENGER,
