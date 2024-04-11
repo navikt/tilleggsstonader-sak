@@ -91,7 +91,7 @@ class JournalpostClientConfig {
             journalforendeEnhet = "tilleggsstonader-sak",
             relevanteDatoer = listOf(
                 RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
-                RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT")
+                RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT"),
             ),
             dokumenter = listOf(
                 DokumentInfo(

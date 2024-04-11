@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.valider
@@ -32,6 +33,7 @@ class JournalføringService(
     private val søknadService: SøknadService,
     private val taskService: TaskService,
     private val barnService: BarnService,
+    private val transactionHandler: TransactionHandler,
 ) {
 
     @Transactional
@@ -68,7 +70,7 @@ class JournalføringService(
         dokumentTitler: Map<String, String>? = null,
     ) {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
-        val fagsak = fagsakService.hentEllerOpprettFagsak(personIdent, stønadstype)
+        val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
         val nesteBehandlingstype = behandlingService.utledNesteBehandlingstype(fagsak.id)
 
         validerKanOppretteBehandling(journalpost)
@@ -96,8 +98,21 @@ class JournalføringService(
     }
 
     private fun journalførUtenNyBehandling(journalføringRequest: JournalføringRequest, journalpost: Journalpost) {
-        val fagsak = fagsakService.hentEllerOpprettFagsak(journalføringRequest.ident, journalføringRequest.stønadstype)
-        ferdigstillJournalpost(journalpost, journalføringRequest.journalførendeEnhet, fagsak, journalføringRequest.dokumentTitler)
+        val fagsak =
+            hentEllerOpprettFagsakIEgenTransaksjon(journalføringRequest.ident, journalføringRequest.stønadstype)
+        ferdigstillJournalpost(
+            journalpost,
+            journalføringRequest.journalførendeEnhet,
+            fagsak,
+            journalføringRequest.dokumentTitler,
+        )
+    }
+
+    private fun hentEllerOpprettFagsakIEgenTransaksjon(
+        personIdent: String,
+        stønadstype: Stønadstype,
+    ) = transactionHandler.runInNewTransaction {
+        fagsakService.hentEllerOpprettFagsak(personIdent, stønadstype)
     }
 
     private fun ferdigstillJournalpost(
