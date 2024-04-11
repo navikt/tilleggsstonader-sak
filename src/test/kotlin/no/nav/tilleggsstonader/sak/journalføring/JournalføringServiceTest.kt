@@ -23,6 +23,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -39,6 +42,7 @@ class JournalføringServiceTest {
     val søknadService = mockk<SøknadService>()
     val taskService = mockk<TaskService>()
     val barnService = mockk<BarnService>()
+    val personService = mockk<PersonService>()
 
     val journalføringService = JournalføringService(
         behandlingService,
@@ -47,7 +51,8 @@ class JournalføringServiceTest {
         søknadService,
         taskService,
         barnService,
-        TransactionHandler()
+        TransactionHandler(),
+        personService,
     )
 
     val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetId
@@ -73,6 +78,7 @@ class JournalføringServiceTest {
         every { fagsakService.hentEllerOpprettFagsak(any(), any()) } returns fagsak
         every { behandlingService.utledNesteBehandlingstype(fagsak.id) } returns BehandlingType.FØRSTEGANGSBEHANDLING
         every { taskService.save(capture(taskSlot)) } returns mockk()
+        every { personService.hentPersonIdenter(personIdent) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
     }
 
     @AfterEach
@@ -99,12 +105,7 @@ class JournalføringServiceTest {
 
     @Test
     internal fun `skal kunne journalføre og opprette behandling`() {
-        val aktørIdBruker = Bruker(
-            id = aktørId,
-            type = BrukerIdType.AKTOERID,
-        )
-        val journalpostMedAktørId = journalpost.copy(bruker = aktørIdBruker)
-        every { journalpostService.hentJournalpost(journalpostId) } returns journalpostMedAktørId
+        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
         every { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any()) } just Runs
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
 

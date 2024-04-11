@@ -1,9 +1,7 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
@@ -99,17 +97,4 @@ class AutomatiskJournalføringService(
         val dokumentTittel = journalpost.dokumenter!!.firstOrNull { it.brevkode != null }?.tittel ?: ""
         return "Må behandles i ny løsning - $dokumentTittel"
     }
-
-    private fun fagsakPersonOgJournalpostBrukerErSammePerson(
-        allePersonIdenter: Set<String>,
-        gjeldendePersonIdent: String,
-        journalpostBruker: Bruker,
-    ): Boolean = when (journalpostBruker.type) {
-        BrukerIdType.FNR -> allePersonIdenter.contains(journalpostBruker.id)
-        BrukerIdType.AKTOERID -> hentAktørIderForPerson(gjeldendePersonIdent).contains(journalpostBruker.id)
-        BrukerIdType.ORGNR -> false
-    }
-
-    private fun hentAktørIderForPerson(personIdent: String) =
-        personService.hentAktørIder(personIdent).identer()
 }

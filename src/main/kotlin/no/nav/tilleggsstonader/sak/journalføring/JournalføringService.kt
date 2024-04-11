@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -16,10 +18,13 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.valider
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -34,6 +39,7 @@ class JournalføringService(
     private val taskService: TaskService,
     private val barnService: BarnService,
     private val transactionHandler: TransactionHandler,
+    private val personService: PersonService,
 ) {
 
     @Transactional
@@ -73,7 +79,7 @@ class JournalføringService(
         val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
         val nesteBehandlingstype = behandlingService.utledNesteBehandlingstype(fagsak.id)
 
-        validerKanOppretteBehandling(journalpost)
+        validerKanOppretteBehandling(journalpost, personIdent)
 
         val behandling = opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
             behandlingstype = nesteBehandlingstype,
@@ -179,6 +185,7 @@ class JournalføringService(
 
     private fun validerKanOppretteBehandling(
         journalpost: Journalpost,
+        personIdent: String,
     ) {
         feilHvis(journalpost.bruker == null) {
             "Journalposten mangler bruker. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
@@ -187,7 +194,27 @@ class JournalføringService(
         feilHvis(journalpost.journalstatus != Journalstatus.MOTTATT) {
             "Journalposten har ugyldig journalstatus ${journalpost.journalstatus}. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
         }
+
+        journalpost.bruker?.let {
+            val allePersonIdenter = personService.hentPersonIdenter(personIdent).identer()
+            feilHvisIkke(fagsakPersonOgJournalpostBrukerErSammePerson(allePersonIdenter, personIdent, it)) {
+                "Ikke samsvar mellom personident på journalposten og personen vi forsøker å opprette behandling for. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
+            }
+        }
     }
+
+    private fun fagsakPersonOgJournalpostBrukerErSammePerson(
+        allePersonIdenter: Set<String>,
+        gjeldendePersonIdent: String,
+        journalpostBruker: Bruker,
+    ): Boolean = when (journalpostBruker.type) {
+        BrukerIdType.FNR -> allePersonIdenter.contains(journalpostBruker.id)
+        BrukerIdType.AKTOERID -> hentAktørIderForPerson(gjeldendePersonIdent).contains(journalpostBruker.id)
+        BrukerIdType.ORGNR -> false
+    }
+
+    private fun hentAktørIderForPerson(personIdent: String) =
+        personService.hentAktørIder(personIdent).identer()
 
     private fun validerGyldigAvsender(journalpost: Journalpost, request: JournalføringRequest) {
         if (journalpost.manglerAvsenderMottaker()) {
