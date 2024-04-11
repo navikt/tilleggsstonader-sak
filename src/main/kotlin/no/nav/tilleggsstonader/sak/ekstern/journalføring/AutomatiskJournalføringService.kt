@@ -194,10 +194,6 @@ class AutomatiskJournalføringService(
 
         /* TODO: Opprett statistikkinnslag */
 
-        /* TODO: Opprett grunnlagsdata
-          val grunnlagsdata = grunnlagsdataService.opprettGrunlagsdata(behandling.id)
-         */
-
         val barn = søknadService.hentSøknadBarnetilsyn(behandling.id)?.barn?.map {
             BehandlingBarn(
                 behandlingId = behandling.id,
