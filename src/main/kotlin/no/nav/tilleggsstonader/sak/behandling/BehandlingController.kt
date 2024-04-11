@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
@@ -24,6 +25,7 @@ import java.util.UUID
 @RequestMapping(path = ["/api/behandling"])
 @ProtectedWithClaims(issuer = "azuread")
 class BehandlingController(
+    private val behandlingRepository: BehandlingRepository,
     private val behandlingService: BehandlingService,
     private val grunnlagsdataService: GrunnlagsdataService,
     // private val behandlingPåVentService: BehandlingPåVentService,
@@ -32,6 +34,15 @@ class BehandlingController(
     private val tilgangService: TilgangService,
     // private val gjenbrukVilkårService: GjenbrukVilkårService,
 ) {
+
+    @GetMapping("opprett-grunnlagsdata")
+    fun opprettGrunnlagsdata() {
+        behandlingRepository.findAll().forEach {
+            if (it.status != BehandlingStatus.OPPRETTET) {
+                grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(it.id)
+            }
+        }
+    }
 
     @GetMapping("{behandlingId}")
     fun hentBehandling(@PathVariable behandlingId: UUID): BehandlingDto {
