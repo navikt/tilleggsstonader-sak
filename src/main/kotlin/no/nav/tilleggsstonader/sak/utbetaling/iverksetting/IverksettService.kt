@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
@@ -153,7 +154,7 @@ class IverksettService(
                         iverksetting = iverksetting,
                     )
                 } else {
-                    feilHvis(it.statusIverksetting != StatusIverksetting.OK) {
+                    feilHvisIkke(it.statusIverksetting.erOk()) {
                         "Kan ikke iverksette behandling=${tilkjentYtelse.behandlingId} iverksetting=$iverksettingId " +
                             "når det finnes tidligere andeler med annen status enn OK/UBEHANDLET"
                     }
@@ -199,6 +200,7 @@ class IverksettService(
             HentStatusFraIverksettingTask.opprettTask(
                 eksternFagsakId = behandling.eksternFagsakId,
                 behandlingId = behandling.id,
+                eksternBehandlingId = behandling.eksternId,
                 iverksettingId = iverksettingId,
             ),
         )

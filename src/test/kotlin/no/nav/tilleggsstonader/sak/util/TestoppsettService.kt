@@ -32,6 +32,8 @@ class TestoppsettService(
 
     fun hentBehandling(behandlingId: UUID) = behandlingRepository.findByIdOrThrow(behandlingId)
 
+    fun hentSaksbehandling(behandlingId: UUID) = behandlingRepository.finnSaksbehandling(behandlingId)
+
     fun opprettBehandlingMedFagsak(
         behandling: Behandling,
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,

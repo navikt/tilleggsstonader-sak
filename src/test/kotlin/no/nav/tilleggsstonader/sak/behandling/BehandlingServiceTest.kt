@@ -225,4 +225,48 @@ internal class BehandlingServiceTest {
             ),
         )
     }
+
+    @Nested
+    inner class UtledNesteBehandlingstype {
+
+        @Test
+        internal fun `skal returnere revurdering hvis det finnes en førstegangsbehandling`() {
+            val fagsak = fagsak()
+            every {
+                behandlingRepository.findByFagsakId(fagsak.id)
+            } returns listOf(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING, resultat = BehandlingResultat.INNVILGET))
+
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
+        }
+
+        @Test
+        internal fun `skal returnere førstegangsbehandling hvis det ikke finnes en førstegangsbehandling`() {
+            val fagsak = fagsak()
+            every {
+                behandlingRepository.findByFagsakId(fagsak.id)
+            } returns emptyList()
+
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+        }
+
+        @Test
+        internal fun `skal returnere førstegangsbehandling hvis det finnes en førstegangsbehandling som er henlagt`() {
+            val fagsak = fagsak()
+            every {
+                behandlingRepository.findByFagsakId(fagsak.id)
+            } returns listOf(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING, resultat = BehandlingResultat.HENLAGT))
+
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+        }
+
+        @Test
+        internal fun `skal returnere revurdering hvis det finnes en førstegangsbehandling som ikke er ferdigstilt`() {
+            val fagsak = fagsak()
+            every {
+                behandlingRepository.findByFagsakId(fagsak.id)
+            } returns listOf(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING, status = BehandlingStatus.UTREDES, resultat = BehandlingResultat.IKKE_SATT))
+
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
+        }
+    }
 }
