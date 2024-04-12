@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
-import no.nav.tilleggsstonader.sak.behandling.dto.HentBehandlingerRequest
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -39,12 +39,12 @@ class BehandlingController(
     }
 
     @PostMapping("person")
-    fun hentBehandlingerForPersonOgStønadstype(@RequestBody fagsakRequest: HentBehandlingerRequest): List<BehandlingDto> {
-        tilgangService.validerTilgangTilPersonMedBarn(fagsakRequest.personIdent, AuditLoggerEvent.ACCESS)
+    fun hentBehandlingerForPersonOgStønadstype(@RequestBody identStønadstype: IdentStønadstype): List<BehandlingDto> {
+        tilgangService.validerTilgangTilPersonMedBarn(identStønadstype.ident, AuditLoggerEvent.ACCESS)
 
         return fagsakService.hentBehandlingerForPersonOgStønadstype(
-            fagsakRequest.personIdent,
-            fagsakRequest.stønadstype,
+            identStønadstype.ident,
+            identStønadstype.stønadstype,
         )
     }
 
