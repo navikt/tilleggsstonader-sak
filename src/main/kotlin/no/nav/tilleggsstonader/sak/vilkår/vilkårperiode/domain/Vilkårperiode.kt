@@ -109,10 +109,15 @@ enum class ResultatDelvilkårperiode {
 
 data class DelvilkårMålgruppe(
     val medlemskap: Vurdering,
+    val dekketAvAnnetRegelverk: Vurdering,
 ) : DelvilkårVilkårperiode() {
     init {
         brukerfeilHvis(medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && medlemskap.begrunnelse == null) {
             "Mangler begrunnelse for ikke oppfylt medlemskap"
+        }
+
+        brukerfeilHvis(dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && dekketAvAnnetRegelverk.begrunnelse == null) {
+            "Mangler begrunnelse for utgifter dekt av annet regelverk"
         }
     }
 }

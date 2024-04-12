@@ -17,7 +17,7 @@ class EvalueringVilkårperiodeTest {
     @Test
     fun `skal evaluere gyldig kombinasjon av målgruppe`() {
         val resultatMålgruppe =
-            evaulerVilkårperiode(MålgruppeType.OMSTILLINGSSTØNAD, DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.JA)))
+            evaulerVilkårperiode(MålgruppeType.OMSTILLINGSSTØNAD, DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.JA), dekketAvAnnetRegelverk = null))
         assertThat(resultatMålgruppe.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
     }
 
@@ -37,7 +37,7 @@ class EvalueringVilkårperiodeTest {
         }.hasMessageContaining("Ugyldig kombinasjon")
 
         assertThatThrownBy {
-            evaulerVilkårperiode(AktivitetType.TILTAK, DelvilkårMålgruppeDto(null))
+            evaulerVilkårperiode(AktivitetType.TILTAK, DelvilkårMålgruppeDto(null, null))
         }.hasMessageContaining("Ugyldig kombinasjon")
     }
 }

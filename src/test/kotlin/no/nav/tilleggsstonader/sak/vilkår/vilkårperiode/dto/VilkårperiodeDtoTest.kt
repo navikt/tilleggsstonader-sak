@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
@@ -37,7 +38,7 @@ class VilkårperiodeDtoTest {
             names = ["IKKE_AKTUELT"],
             mode = EnumSource.Mode.EXCLUDE,
         )
-        fun `skal returnere delviljår hvis resultat != IKKE_AKTUELT`(resultat: ResultatDelvilkårperiode) {
+        fun `skal returnere delvilkår hvis resultat != IKKE_AKTUELT`(resultat: ResultatDelvilkårperiode) {
             val målgruppe = målgruppe(
                 delvilkår = DelvilkårMålgruppe(
                     medlemskap = DelvilkårVilkårperiode.Vurdering(
@@ -45,10 +46,18 @@ class VilkårperiodeDtoTest {
                         begrunnelse = if (resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) "begrunnelse" else null,
                         resultat = resultat,
                     ),
+                    dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(
+                        svar = null,
+                        begrunnelse = if (resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) "begrunnelse" else null,
+                        resultat = resultat,
+                    ),
                 ),
             ).tilDto()
+
             assertThat(målgruppe.medlemskap).isNotNull()
             assertThat(målgruppe.medlemskap?.svar).isNull()
+            assertThat(målgruppe.dekketAvAnnetRegelverk).isNotNull()
+            assertThat(målgruppe.dekketAvAnnetRegelverk?.svar).isNull()
         }
 
         @Test
@@ -60,8 +69,14 @@ class VilkårperiodeDtoTest {
                         begrunnelse = null,
                         resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
                     ),
+                    dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(
+                        svar = null,
+                        begrunnelse = null,
+                        resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
+                    ),
                 ),
             ).tilDto()
+
             assertThat(målgruppe.medlemskap).isNull()
         }
     }

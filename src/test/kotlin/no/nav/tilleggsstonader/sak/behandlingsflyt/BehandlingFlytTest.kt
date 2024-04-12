@@ -41,7 +41,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.slf4j.MDC
@@ -210,12 +212,14 @@ class BehandlingFlytTest(
     private fun vurderInngangsvilkår(behandlingId: UUID) {
         val fom = LocalDate.of(2024, 1, 1)
         val tom = LocalDate.of(2024, 1, 31)
+
         vilkårperiodeService.opprettVilkårperiode(
             opprettVilkårperiodeMålgruppe(
                 behandlingId = behandlingId,
                 fom = fom,
                 tom = tom,
                 type = MålgruppeType.AAP,
+                dekkesAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.NEI),
             ),
         )
         vilkårperiodeService.opprettVilkårperiode(

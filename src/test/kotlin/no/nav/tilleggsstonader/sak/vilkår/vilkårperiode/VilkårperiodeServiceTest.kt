@@ -145,6 +145,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                         SvarJaNei.JA,
                         begrunnelse = "ny begrunnelse",
                     ),
+                    dekketAvAnnetRegelverk = null,
                 ),
             )
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
@@ -176,7 +177,10 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "Oppdatert begrunnelse",
-                delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.NEI, "ny begrunnelse")),
+                delvilkår = DelvilkårMålgruppeDto(
+                    medlemskap = VurderingDto(SvarJaNei.NEI, "ny begrunnelse"),
+                    dekketAvAnnetRegelverk = null,
+                ),
             )
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
 
@@ -207,7 +211,10 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "Oppdatert begrunnelse",
-                delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.NEI, begrunnelse = null)),
+                delvilkår = DelvilkårMålgruppeDto(
+                    medlemskap = VurderingDto(SvarJaNei.NEI, begrunnelse = null),
+                    dekketAvAnnetRegelverk = null,
+                ),
             )
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
@@ -260,8 +267,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
         private fun Vilkårperiode.tilOppdatering(): LagreVilkårperiode {
             val delvilkårDto = when (this.delvilkår) {
-                is DelvilkårMålgruppe ->
-                    DelvilkårMålgruppeDto(VurderingDto((this.delvilkår as DelvilkårMålgruppe).medlemskap.svar))
+                is DelvilkårMålgruppe -> (this.delvilkår as DelvilkårMålgruppe).let {
+                    DelvilkårMålgruppeDto(
+                        medlemskap = VurderingDto(it.medlemskap.svar),
+                        dekketAvAnnetRegelverk = VurderingDto(it.dekketAvAnnetRegelverk.svar),
+                    )
+                }
 
                 is DelvilkårAktivitet -> (this.delvilkår as DelvilkårAktivitet).let {
                     DelvilkårAktivitetDto(

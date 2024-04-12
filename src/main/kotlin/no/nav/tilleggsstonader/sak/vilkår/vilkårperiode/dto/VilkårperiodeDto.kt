@@ -123,6 +123,7 @@ sealed class DelvilkårVilkårperiodeDto
 
 data class DelvilkårMålgruppeDto(
     val medlemskap: VurderingDto?,
+    val dekketAvAnnetRegelverk: VurderingDto?,
 ) : DelvilkårVilkårperiodeDto()
 
 data class DelvilkårAktivitetDto(

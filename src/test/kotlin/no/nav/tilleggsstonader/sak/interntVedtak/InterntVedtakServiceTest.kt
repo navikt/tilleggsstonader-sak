@@ -74,15 +74,16 @@ class InterntVedtakServiceTest {
     val vilkårperioder = Vilkårperioder(
         målgrupper = listOf(
             VilkårperiodeTestUtil.målgruppe(
-                begrunnelse = "målgrupp abc",
-                delvilkår = delvilkårMålgruppe(vurdering = vurdering()),
+                type = MålgruppeType.AAP,
+                begrunnelse = "målgruppe aap",
+                delvilkår = delvilkårMålgruppe(medlemskap = vurdering(SvarJaNei.JA_IMPLISITT), dekkesAvAnnetRegelverk = vurdering(SvarJaNei.NEI)),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
             ),
             VilkårperiodeTestUtil.målgruppe(
                 type = MålgruppeType.OVERGANGSSTØNAD,
-                begrunnelse = "målgrupp os",
-                delvilkår = delvilkårMålgruppe(vurdering = vurdering()),
+                begrunnelse = "målgruppe os",
+                delvilkår = delvilkårMålgruppe(medlemskap = vurdering(SvarJaNei.JA_IMPLISITT), dekkesAvAnnetRegelverk = vurdering(svar = null)),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
             ),
@@ -217,7 +218,7 @@ class InterntVedtakServiceTest {
             assertThat(tom).isEqualTo(målgruppe.tom)
             assertThat(kilde).isEqualTo(KildeVilkårsperiode.SYSTEM)
             assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
-            assertThat(begrunnelse).isEqualTo("målgrupp abc")
+            assertThat(begrunnelse).isEqualTo("målgruppe aap")
             with(delvilkår.medlemskap!!) {
                 assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT.name)
                 assertThat(begrunnelse).isNull()

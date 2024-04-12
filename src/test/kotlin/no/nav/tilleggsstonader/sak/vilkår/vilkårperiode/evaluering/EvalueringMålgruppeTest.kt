@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering
 
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
@@ -16,16 +17,22 @@ import org.junit.jupiter.params.provider.EnumSource
 
 class EvalueringMålgruppeTest {
 
-    val svarJa = DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.JA))
-    val svarImplisitt = DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.JA_IMPLISITT))
-    val svarNei = DelvilkårMålgruppeDto(VurderingDto(SvarJaNei.NEI, "begrunnelse"))
-    val svarMangler = DelvilkårMålgruppeDto(VurderingDto(null))
+    val jaVurdering = VurderingDto(SvarJaNei.JA)
+    val implisittVurdering = VurderingDto(SvarJaNei.JA_IMPLISITT)
+    val neiVurdering = VurderingDto(SvarJaNei.NEI, "begrunnelse")
+    val svarManglerVurdering = VurderingDto(null)
 
     @Nested
-    inner class Implisitt {
+    inner class ImplisittMedlemskap {
         @ImplisittParameterizedTest
         fun `mangler svar skal mappes til oppfylt`(type: MålgruppeType) {
-            val resultat = utledResultat(type, svarMangler)
+            val resultat = utledResultat(
+                type,
+                delvilkårMålgruppeDto(
+                    medlemskap = svarManglerVurdering,
+                    dekketAvAnnetRegelverk = oppfyltDekketAvAnnetRegelverk(type),
+                ),
+            )
 
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
 
@@ -35,7 +42,13 @@ class EvalueringMålgruppeTest {
 
         @ImplisittParameterizedTest
         fun `implisitt svar skal mappes til oppfylt`(type: MålgruppeType) {
-            val resultat = utledResultat(type, svarImplisitt)
+            val resultat = utledResultat(
+                type,
+                delvilkårMålgruppeDto(
+                    medlemskap = implisittVurdering,
+                    dekketAvAnnetRegelverk = oppfyltDekketAvAnnetRegelverk(type),
+                ),
+            )
 
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
 
@@ -46,20 +59,38 @@ class EvalueringMålgruppeTest {
         @ImplisittParameterizedTest
         fun `skal kaste feil hvis man svarer ja eller nei`(type: MålgruppeType) {
             assertThatThrownBy {
-                utledResultat(type, svarJa)
+                utledResultat(
+                    type,
+                    delvilkårMålgruppeDto(
+                        medlemskap = jaVurdering,
+                        dekketAvAnnetRegelverk = oppfyltDekketAvAnnetRegelverk(type),
+                    ),
+                )
             }.hasMessageContaining("Kan ikke evaluere svar=JA på medlemskap for type=$type")
 
             assertThatThrownBy {
-                utledResultat(type, svarNei)
+                utledResultat(
+                    type,
+                    delvilkårMålgruppeDto(
+                        medlemskap = neiVurdering,
+                        dekketAvAnnetRegelverk = oppfyltDekketAvAnnetRegelverk(type),
+                    ),
+                )
             }.hasMessageContaining("Kan ikke evaluere svar=NEI på medlemskap for type=$type")
         }
     }
 
     @Nested
-    inner class IkkeImplisitt {
+    inner class IkkeImplisittMedlemskap {
         @IkkeImplisittParameterizedTest
         fun `mangler svar skal mappes til IKKE_VURDERT`(type: MålgruppeType) {
-            val resultat = utledResultat(type, svarMangler)
+            val resultat = utledResultat(
+                type,
+                delvilkårMålgruppeDto(
+                    medlemskap = svarManglerVurdering,
+                    dekketAvAnnetRegelverk = oppfyltDekketAvAnnetRegelverk(type),
+                ),
+            )
 
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
 
@@ -69,7 +100,13 @@ class EvalueringMålgruppeTest {
 
         @IkkeImplisittParameterizedTest
         fun `ja skal mappes til OPPFYLT`(type: MålgruppeType) {
-            val resultat = utledResultat(type, svarJa)
+            val resultat = utledResultat(
+                type,
+                delvilkårMålgruppeDto(
+                    medlemskap = jaVurdering,
+                    dekketAvAnnetRegelverk = oppfyltDekketAvAnnetRegelverk(type),
+                ),
+            )
 
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
 
@@ -79,7 +116,13 @@ class EvalueringMålgruppeTest {
 
         @IkkeImplisittParameterizedTest
         fun `nei skal mappes til IKKE_OPPFYLT`(type: MålgruppeType) {
-            val resultat = utledResultat(type, svarNei)
+            val resultat = utledResultat(
+                type,
+                delvilkårMålgruppeDto(
+                    medlemskap = neiVurdering,
+                    dekketAvAnnetRegelverk = oppfyltDekketAvAnnetRegelverk(type),
+                ),
+            )
 
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
 
@@ -90,9 +133,31 @@ class EvalueringMålgruppeTest {
         @IkkeImplisittParameterizedTest
         fun `implisitt svar skal kaste feil`(type: MålgruppeType) {
             assertThatThrownBy {
-                utledResultat(type, svarImplisitt)
+                utledResultat(
+                    type,
+                    delvilkårMålgruppeDto(
+                        medlemskap = implisittVurdering,
+                        dekketAvAnnetRegelverk = oppfyltDekketAvAnnetRegelverk(type),
+                    ),
+                )
             }.hasMessageContaining("Ugyldig svar=JA_IMPLISITT")
         }
+    }
+
+    private fun delvilkårMålgruppeDto(
+        medlemskap: VurderingDto,
+        dekketAvAnnetRegelverk: VurderingDto?,
+    ): DelvilkårMålgruppeDto {
+        return DelvilkårMålgruppeDto(
+            medlemskap = medlemskap,
+            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
+        )
+    }
+
+    private fun oppfyltDekketAvAnnetRegelverk(type: MålgruppeType): VurderingDto? {
+        if (!type.gjelderNedsattArbeidsevne()) return null
+
+        return VurderingDto(svar = SvarJaNei.NEI)
     }
 }
 
