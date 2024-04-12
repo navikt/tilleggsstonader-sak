@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.mottarSykepenger
@@ -76,6 +77,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(vilkårperiode.medlemskap.svar).isEqualTo(SvarJaNei.NEI)
             assertThat(vilkårperiode.medlemskap.begrunnelse).isEqualTo("begrunnelse medlemskap")
             assertThat(vilkårperiode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+            assertThat(vilkårperiode.dekketAvAnnetRegelverk.svar).isNull()
+            assertThat(vilkårperiode.dekketAvAnnetRegelverk.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
         }
 
         @Test
@@ -219,6 +222,36 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt medlemskap")
+        }
+
+        @Test
+        fun `skal feile dersom manglende begrunnelse når dekket av annet regelverk endres til ja`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            val vilkårperiode =
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                        medlemskap = VurderingDto(
+                            SvarJaNei.JA,
+                        ),
+                        dekkesAvAnnetRegelverk = VurderingDto(
+                            SvarJaNei.NEI,
+                        ),
+                        behandlingId = behandling.id,
+                    ),
+                )
+
+            val oppdatering = vilkårperiode.tilOppdatering().copy(
+                begrunnelse = "Oppdatert begrunnelse",
+                delvilkår = DelvilkårMålgruppeDto(
+                    medlemskap = VurderingDto(SvarJaNei.JA),
+                    dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.JA, begrunnelse = null),
+                ),
+            )
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
+            }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
         }
 
         @Test
