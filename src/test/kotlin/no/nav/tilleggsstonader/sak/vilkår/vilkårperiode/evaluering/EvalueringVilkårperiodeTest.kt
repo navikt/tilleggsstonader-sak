@@ -15,14 +15,14 @@ import org.junit.jupiter.api.Test
 class EvalueringVilkårperiodeTest {
 
     @Test
-    fun `skal evaluere gyldig kombinasjon av målgruppe`() {
+    fun `skal evaluere vilkårsperiode når type og delvilkår matcher`() {
         val resultatMålgruppe =
-            evaulerVilkårperiode(MålgruppeType.OMSTILLINGSSTØNAD, DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.JA), dekketAvAnnetRegelverk = null))
+            evaulerVilkårperiode(
+                MålgruppeType.OMSTILLINGSSTØNAD,
+                DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.JA), dekketAvAnnetRegelverk = null),
+            )
         assertThat(resultatMålgruppe.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
-    }
 
-    @Test
-    fun `skal evaluere gyldig kombinasjon av aktivitet`() {
         val resultatAktivitet = evaulerVilkårperiode(
             AktivitetType.TILTAK,
             DelvilkårAktivitetDto(VurderingDto(SvarJaNei.NEI), VurderingDto(SvarJaNei.NEI)),
@@ -31,7 +31,7 @@ class EvalueringVilkårperiodeTest {
     }
 
     @Test
-    fun `skal kaste feil hvis man kaller med feil type`() {
+    fun `skal kaste feil hvis delvilkår ikke matcher type`() {
         assertThatThrownBy {
             evaulerVilkårperiode(MålgruppeType.AAP, DelvilkårAktivitetDto(VurderingDto(null), VurderingDto(null)))
         }.hasMessageContaining("Ugyldig kombinasjon")
