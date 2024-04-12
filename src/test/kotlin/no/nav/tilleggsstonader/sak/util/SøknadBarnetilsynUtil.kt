@@ -72,7 +72,7 @@ object SøknadBarnetilsynUtil {
     fun lagDokumentasjon(
         identBarn: String? = null,
     ): Dokumentasjon = Dokumentasjon(
-        type = Vedleggstype.UTGIFTER_PASS_ANNET,
+        type = Vedleggstype.UTGIFTER_PASS_PRIVAT,
         dokumenter = listOf(
             Dokument("688ad1dc-e35e-4ab8-a534-17c6e691463f"),
         ),
