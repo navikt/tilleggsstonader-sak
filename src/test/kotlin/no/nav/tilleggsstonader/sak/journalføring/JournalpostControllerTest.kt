@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillJournalføringsoppgaveTask
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,6 +37,9 @@ class JournalpostControllerTest : IntegrationTest() {
 
     @Autowired
     lateinit var journalpostClient: JournalpostClient
+
+    @Autowired
+    lateinit var oppgaveClient: OppgaveClient
 
     @BeforeEach
     fun setUp() {
@@ -71,19 +74,17 @@ class JournalpostControllerTest : IntegrationTest() {
         assertThat(opprettetBehandling.steg).isEqualTo(StegType.INNGANGSVILKÅR)
         assertThat(opprettetBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
 
-
         val opprettedeTasks = taskService.findAll()
         assertThat(opprettedeTasks).hasSize(2)
 
         val bahandlesakOppgaveTask = opprettedeTasks.single { it.type == OpprettOppgaveForOpprettetBehandlingTask.TYPE }
         val behandlesakOppgavePayload = ObjectMapperProvider.objectMapper.readValue<OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData>(
-                bahandlesakOppgaveTask.payload)
+            bahandlesakOppgaveTask.payload,
+        )
         assertThat(behandlesakOppgavePayload.behandlingId).isEqualTo(opprettetBehandling.id)
 
-        val ferdigstillJournalføringsoppgaveTask = opprettedeTasks.single { it.type == FerdigstillJournalføringsoppgaveTask.TYPE}
-        assertThat(ferdigstillJournalføringsoppgaveTask.payload).isEqualTo("123") // oppgaveId
-
         verify(exactly = 1) { journalpostClient.ferdigstillJournalpost("1", enhet, saksbehandler) }
+        verify(exactly = 1) { oppgaveClient.ferdigstillOppgave("123".toLong()) }
     }
 
     private fun fullførJournalpost(journalpostId: String, request: JournalføringRequest): String =

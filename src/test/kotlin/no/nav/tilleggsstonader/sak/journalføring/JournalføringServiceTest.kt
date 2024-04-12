@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.journalføring
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -23,6 +24,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
@@ -43,6 +45,7 @@ class JournalføringServiceTest {
     val taskService = mockk<TaskService>()
     val barnService = mockk<BarnService>()
     val personService = mockk<PersonService>()
+    val oppgaveService = mockk<OppgaveService>()
 
     val journalføringService = JournalføringService(
         behandlingService,
@@ -53,7 +56,7 @@ class JournalføringServiceTest {
         barnService,
         TransactionHandler(),
         personService,
-
+        oppgaveService,
     )
 
     val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetId
@@ -80,6 +83,7 @@ class JournalføringServiceTest {
         every { behandlingService.utledNesteBehandlingstype(fagsak.id) } returns BehandlingType.FØRSTEGANGSBEHANDLING
         every { taskService.save(capture(taskSlot)) } returns mockk()
         every { personService.hentPersonIdenter(personIdent) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
+        justRun { oppgaveService.ferdigstillOppgave(any()) }
     }
 
     @AfterEach
