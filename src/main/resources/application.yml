@@ -159,8 +159,8 @@ clients:
   htmlify:
     uri: http://tilleggsstonader-htmlify
   iverksetting:
-    uri: http://dp-iverksett.teamdagpenger
-    scope: api://${CLIENT_ENV}-gcp.teamdagpenger.dp-iverksett/.default
+    uri: http://utsjekk.helved
+    scope: api://${CLIENT_ENV}-gcp.helved.utsjekk/.default
   kodeverk:
     uri: http://kodeverk-api.team-rocket
     scope: api://${CLIENT_ENV}-gcp.team-rocket.kodeverk-api/.default
