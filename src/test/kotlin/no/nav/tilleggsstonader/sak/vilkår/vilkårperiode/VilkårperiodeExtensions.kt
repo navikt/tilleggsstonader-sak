@@ -35,6 +35,9 @@ object VilkårperiodeExtensions {
     val ResultatEvaluering.medlemskap: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårMålgruppe).medlemskap
 
+    val ResultatEvaluering.dekketAvAnnetRegelverk: DelvilkårVilkårperiode.Vurdering
+        get() = (this.delvilkår as DelvilkårMålgruppe).dekketAvAnnetRegelverk
+
     val ResultatEvaluering.lønnet: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårAktivitet).lønnet
 

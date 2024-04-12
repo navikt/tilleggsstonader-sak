@@ -147,6 +147,8 @@ enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : Vilkårper
     ;
 
     override fun tilDbType(): String = this.name
+
+    fun gjelderNedsattArbeidsevne() = this == NEDSATT_ARBEIDSEVNE || this == UFØRETRYGD || this == AAP
 }
 
 enum class AktivitetType : VilkårperiodeType {

@@ -144,6 +144,131 @@ class EvalueringMålgruppeTest {
         }
     }
 
+    @Nested
+    inner class UtgifterDekketAvAnnetRegelverk {
+
+        @Nested
+        inner class NedsattArbeidsevne {
+            @NedsattArbeidsevneParameterizedTest
+            fun `svar nei skal mappes til oppfylt for nedsatt arbeidsevne`(type: MålgruppeType) {
+                val resultat = utledResultat(
+                    type,
+                    delvilkårMålgruppeDto(
+                        medlemskap = oppfyltMedlemskap(type),
+                        dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.NEI),
+                    ),
+                )
+
+                assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+                assertThat(resultat.dekketAvAnnetRegelverk.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+            }
+
+            @NedsattArbeidsevneParameterizedTest
+            fun `svar ja skal mappes til ikke oppfylt for nedsatt arbeidsevne`(type: MålgruppeType) {
+                val resultat = utledResultat(
+                    type,
+                    delvilkårMålgruppeDto(
+                        medlemskap = oppfyltMedlemskap(type),
+                        dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.JA, begrunnelse = "begrunnelse"),
+                    ),
+                )
+
+                assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+                assertThat(resultat.dekketAvAnnetRegelverk.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+            }
+
+            @NedsattArbeidsevneParameterizedTest
+            fun `skal kaste feil ved svar ja og manglende begrunnelse`(type: MålgruppeType) {
+                assertThatThrownBy {
+                    utledResultat(
+                        type,
+                        delvilkårMålgruppeDto(
+                            medlemskap = oppfyltMedlemskap(type),
+                            dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.JA),
+                        ),
+                    )
+                }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
+            }
+
+            @NedsattArbeidsevneParameterizedTest
+            fun `manglende svar skal mappes til ikke vurdert for nedsatt arbeidsevne`(type: MålgruppeType) {
+                val resultat = utledResultat(
+                    type,
+                    delvilkårMålgruppeDto(
+                        medlemskap = oppfyltMedlemskap(type),
+                        dekketAvAnnetRegelverk = VurderingDto(svar = null),
+                    ),
+                )
+
+                assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
+                assertThat(resultat.dekketAvAnnetRegelverk.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT)
+            }
+
+            @NedsattArbeidsevneParameterizedTest
+            fun `implisitt svar skal kaste feil`(type: MålgruppeType) {
+                assertThatThrownBy {
+                    utledResultat(
+                        type,
+                        delvilkårMålgruppeDto(
+                            medlemskap = oppfyltMedlemskap(type),
+                            dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.JA_IMPLISITT),
+                        ),
+                    )
+                }.hasMessageContaining("Ugyldig svar=JA_IMPLISITT for dekket av annet regelverk for $type")
+            }
+        }
+
+        @Nested
+        inner class MålgrupperUtenDekketAvAnnetRegelverk {
+            @IkkeNedsattArbeidsevneParameterizedTest
+            fun `manglende svar skal mappes til oppfylt`(type: MålgruppeType) {
+                val resultat = utledResultat(
+                    type,
+                    delvilkårMålgruppeDto(
+                        medlemskap = oppfyltMedlemskap(type),
+                        dekketAvAnnetRegelverk = VurderingDto(svar = null),
+                    ),
+                )
+
+                assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+                assertThat(resultat.dekketAvAnnetRegelverk.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
+            }
+
+            @IkkeNedsattArbeidsevneParameterizedTest
+            fun `skal kaste feil om svar er satt`(type: MålgruppeType) {
+                assertThatThrownBy {
+                    utledResultat(
+                        type,
+                        delvilkårMålgruppeDto(
+                            medlemskap = oppfyltMedlemskap(type),
+                            dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.JA),
+                        ),
+                    )
+                }.hasMessageContaining("Ugyldig svar=JA for dekket av annet regelverk for $type")
+
+                assertThatThrownBy {
+                    utledResultat(
+                        type,
+                        delvilkårMålgruppeDto(
+                            medlemskap = oppfyltMedlemskap(type),
+                            dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.NEI),
+                        ),
+                    )
+                }.hasMessageContaining("Ugyldig svar=NEI for dekket av annet regelverk for $type")
+
+                assertThatThrownBy {
+                    utledResultat(
+                        type,
+                        delvilkårMålgruppeDto(
+                            medlemskap = oppfyltMedlemskap(type),
+                            dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.JA_IMPLISITT),
+                        ),
+                    )
+                }.hasMessageContaining("Ugyldig svar=JA_IMPLISITT for dekket av annet regelverk for $type")
+            }
+        }
+    }
+
     private fun delvilkårMålgruppeDto(
         medlemskap: VurderingDto,
         dekketAvAnnetRegelverk: VurderingDto?,
@@ -158,6 +283,13 @@ class EvalueringMålgruppeTest {
         if (!type.gjelderNedsattArbeidsevne()) return null
 
         return VurderingDto(svar = SvarJaNei.NEI)
+    }
+
+    private fun oppfyltMedlemskap(type: MålgruppeType): VurderingDto {
+        if (type == MålgruppeType.AAP || type == MålgruppeType.OVERGANGSSTØNAD) {
+            return VurderingDto(svar = SvarJaNei.JA_IMPLISITT)
+        }
+        return VurderingDto(svar = SvarJaNei.JA)
     }
 }
 
@@ -176,3 +308,19 @@ private annotation class ImplisittParameterizedTest
     mode = EnumSource.Mode.EXCLUDE,
 )
 private annotation class IkkeImplisittParameterizedTest
+
+@ParameterizedTest
+@EnumSource(
+    value = MålgruppeType::class,
+    names = ["OVERGANGSSTØNAD", "OMSTILLINGSSTØNAD", "DAGPENGER"],
+    mode = EnumSource.Mode.EXCLUDE,
+)
+private annotation class NedsattArbeidsevneParameterizedTest
+
+@ParameterizedTest
+@EnumSource(
+    value = MålgruppeType::class,
+    names = ["AAP", "NEDSATT_ARBEIDSEVNE", "UFØRETRYGD"],
+    mode = EnumSource.Mode.EXCLUDE,
+)
+private annotation class IkkeNedsattArbeidsevneParameterizedTest
