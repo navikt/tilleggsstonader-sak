@@ -14,8 +14,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødsel
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kjønn
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KjønnType
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktadresseType
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Matrikkeladresse
@@ -145,7 +143,6 @@ object PdlTestdata {
                         listOf(""),
                     ),
                 ),
-                listOf(Kjønn(KjønnType.KVINNE)),
                 listOf(
                     Kontaktadresse(
                         "",

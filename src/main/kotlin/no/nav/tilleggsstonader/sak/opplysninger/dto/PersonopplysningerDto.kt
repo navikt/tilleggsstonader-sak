@@ -105,14 +105,6 @@ enum class Folkeregisterpersonstatus(private val pdlStatus: String, val visnings
     }
 }
 
-@Suppress("unused") // Kopi fra PDL
-enum class Kjønn {
-
-    KVINNE,
-    MANN,
-    UKJENT,
-}
-
 data class NavnDto(
     val fornavn: String,
     val mellomnavn: String?,

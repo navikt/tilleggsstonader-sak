@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.dto.NavnDto
-import no.nav.tilleggsstonader.sak.opplysninger.mapper.KjønnMapper
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
@@ -60,7 +59,6 @@ class SøkService(
 
         return Søkeresultat(
             personIdent = gjeldendePersonIdent,
-            kjønn = KjønnMapper.tilKjønn(person.kjønn.first().kjønn),
             visningsnavn = NavnDto.fraNavn(person.navn.gjeldende()).visningsnavn,
             fagsakPersonId = fagsakPerson?.id,
         )

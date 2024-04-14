@@ -492,7 +492,6 @@ fun søker(): Søker =
         listOf(),
         listOf(),
         listOf(),
-        KjønnType.KVINNE,
         listOf(),
         Navn("fornavn", null, "etternavn", Metadata(false)),
         listOf(),

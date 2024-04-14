@@ -10,8 +10,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødsel
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kjønn
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KjønnType
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Metadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
@@ -30,8 +28,6 @@ object PdlTestdataHelper {
 
     val metadataGjeldende = Metadata(historisk = false)
     val metadataHistorisk = Metadata(historisk = true)
-
-    fun lagKjønn(kjønnType: KjønnType = KjønnType.KVINNE) = Kjønn(kjønnType)
 
     fun lagNavn(
         fornavn: String = "Fornavn",
@@ -55,7 +51,6 @@ object PdlTestdataHelper {
         fødsel: List<Fødsel> = emptyList(),
         folkeregisterpersonstatus: List<Folkeregisterpersonstatus> = emptyList(),
         fullmakt: List<Fullmakt> = emptyList(),
-        kjønn: Kjønn? = null,
         kontaktadresse: List<Kontaktadresse> = emptyList(),
         navn: List<Navn> = listOf(lagNavn()),
         opphold: List<Opphold> = emptyList(),
@@ -75,7 +70,6 @@ object PdlTestdataHelper {
             fødsel = fødsel,
             folkeregisterpersonstatus = folkeregisterpersonstatus,
             fullmakt = fullmakt,
-            kjønn = listOfNotNull(kjønn),
             kontaktadresse = kontaktadresse,
             navn = navn,
             opphold = opphold,

@@ -90,11 +90,6 @@ data class PdlPersonKort(
     @JsonProperty("doedsfall") val dødsfall: List<Dødsfall>,
 )
 
-data class PdlSøkerKort(
-    @JsonProperty("kjoenn") val kjønn: List<Kjønn>,
-    val navn: List<Navn>,
-)
-
 data class PdlSøker(
     val adressebeskyttelse: List<Adressebeskyttelse>,
     override val bostedsadresse: List<Bostedsadresse>,
@@ -104,7 +99,6 @@ data class PdlSøker(
     @JsonProperty("foedsel") override val fødsel: List<Fødsel>,
     val folkeregisterpersonstatus: List<Folkeregisterpersonstatus>,
     val fullmakt: List<Fullmakt>,
-    @JsonProperty("kjoenn") val kjønn: List<Kjønn>,
     val kontaktadresse: List<Kontaktadresse>,
     val navn: List<Navn>,
     val opphold: List<Opphold>,
@@ -284,14 +278,6 @@ data class Fullmakt(
 enum class MotpartsRolle {
     FULLMAKTSGIVER,
     FULLMEKTIG,
-}
-
-data class Kjønn(@JsonProperty("kjoenn") val kjønn: KjønnType)
-
-enum class KjønnType {
-    KVINNE,
-    MANN,
-    UKJENT,
 }
 
 data class Navn(

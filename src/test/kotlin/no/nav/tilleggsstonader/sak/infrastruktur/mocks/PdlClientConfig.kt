@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatu
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KjønnType
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktadresseType
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.MotpartsRolle
@@ -35,7 +34,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Vegadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergeEllerFullmektig
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergemaalEllerFremtidsfullmakt
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.fødsel
-import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagKjønn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagNavn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.metadataGjeldende
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlBarn
@@ -163,7 +161,6 @@ class PdlClientConfig {
                     ),
                 ),
                 fullmakt = fullmakter(),
-                kjønn = lagKjønn(KjønnType.KVINNE),
                 kontaktadresse = kontaktadresse(),
                 navn = listOf(lagNavn()),
                 opphold = listOf(Opphold(Oppholdstillatelse.PERMANENT, startdato, null)),
