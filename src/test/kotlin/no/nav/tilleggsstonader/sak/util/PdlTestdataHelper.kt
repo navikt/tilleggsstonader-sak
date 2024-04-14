@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Bostedsadresse
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.DeltBosted
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Dødsfall
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisteridentifikator
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.FolkeregisteridentifikatorStatus
@@ -93,7 +92,6 @@ object PdlTestdataHelper {
     fun pdlBarn(
         adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
         bostedsadresse: List<Bostedsadresse> = emptyList(),
-        deltBosted: List<DeltBosted> = emptyList(),
         dødsfall: List<Dødsfall> = emptyList(),
         forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList(),
         fødsel: Fødsel? = null,
@@ -102,7 +100,6 @@ object PdlTestdataHelper {
         PdlPersonForelderBarn(
             adressebeskyttelse = adressebeskyttelse,
             bostedsadresse = bostedsadresse,
-            deltBosted = deltBosted,
             dødsfall = dødsfall,
             forelderBarnRelasjon = forelderBarnRelasjon,
             fødsel = listOfNotNull(fødsel),

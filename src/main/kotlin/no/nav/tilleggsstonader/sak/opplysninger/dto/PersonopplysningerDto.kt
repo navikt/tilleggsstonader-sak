@@ -27,20 +27,12 @@ enum class OppholdType {
     UKJENT,
 }
 
-data class DeltBostedDto(
-    val startdatoForKontrakt: LocalDate,
-    val sluttdatoForKontrakt: LocalDate?,
-    val historisk: Boolean,
-)
-
 data class BarnDto(
     val personIdent: String,
     val navn: String,
     val annenForelder: AnnenForelderMinimumDto?,
     val adresse: List<AdresseDto>,
     val borHosSøker: Boolean,
-    val deltBosted: List<DeltBostedDto>,
-    val harDeltBostedNå: Boolean,
     val fødselsdato: LocalDate?,
     val dødsdato: LocalDate?,
 )

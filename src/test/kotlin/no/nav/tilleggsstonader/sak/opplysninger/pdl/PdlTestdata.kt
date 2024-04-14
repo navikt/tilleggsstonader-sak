@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.opplysninger.pdl
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Bostedsadresse
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.DeltBosted
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Dødsfall
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisteridentifikator
@@ -202,15 +201,6 @@ object PdlTestdata {
                     PdlPersonForelderBarn(
                         adressebeskyttelse,
                         bostedsadresse,
-                        listOf(
-                            DeltBosted(
-                                LocalDate.now(),
-                                LocalDate.now(),
-                                vegadresse,
-                                UkjentBosted(""),
-                                metadataGjeldende,
-                            ),
-                        ),
                         dødsfall,
                         familierelasjon,
                         fødsel,

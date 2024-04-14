@@ -122,7 +122,6 @@ data class PdlSøker(
 data class PdlPersonForelderBarn(
     val adressebeskyttelse: List<Adressebeskyttelse>,
     override val bostedsadresse: List<Bostedsadresse>,
-    val deltBosted: List<DeltBosted>,
     @JsonProperty("doedsfall") val dødsfall: List<Dødsfall>,
     val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
     @JsonProperty("foedsel") override val fødsel: List<Fødsel>,
@@ -139,14 +138,6 @@ data class PdlAnnenForelder(
 ) : PdlPerson
 
 data class Metadata(val historisk: Boolean)
-
-data class DeltBosted(
-    val startdatoForKontrakt: LocalDate,
-    val sluttdatoForKontrakt: LocalDate?,
-    val vegadresse: Vegadresse?,
-    val ukjentBosted: UkjentBosted?,
-    val metadata: Metadata,
-)
 
 data class Folkeregistermetadata(
     val gyldighetstidspunkt: LocalDateTime?,

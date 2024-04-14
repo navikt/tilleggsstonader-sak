@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlNotFoundException
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Bostedsadresse
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.DeltBosted
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Dødsfall
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisteridentifikator
@@ -21,7 +20,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KjønnType
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktadresseType
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Metadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.MotpartsRolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Opphold
@@ -195,22 +193,6 @@ class PdlClientConfig {
             mapOf(
                 barnFnr to pdlBarn(
                     bostedsadresse = bostedsadresse(),
-                    deltBosted = listOf(
-                        DeltBosted(
-                            LocalDate.of(2023, 1, 1),
-                            LocalDate.of(2053, 1, 1),
-                            null,
-                            null,
-                            Metadata(false),
-                        ),
-                        DeltBosted(
-                            LocalDate.of(2020, 1, 1),
-                            LocalDate.of(2023, 3, 31),
-                            null,
-                            null,
-                            Metadata(true),
-                        ),
-                    ),
                     forelderBarnRelasjon = familierelasjonerBarn(),
                     fødsel = fødsel(),
                     navn = lagNavn("Barn", null, "Barnesen"),

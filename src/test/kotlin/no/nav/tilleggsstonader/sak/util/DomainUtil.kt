@@ -466,7 +466,6 @@ fun barnMedIdent(fnr: String, navn: String, fødsel: Fødsel = fødsel(LocalDate
     BarnMedIdent(
         adressebeskyttelse = emptyList(),
         bostedsadresse = emptyList(),
-        deltBosted = emptyList(),
         dødsfall = emptyList(),
         forelderBarnRelasjon = emptyList(),
         fødsel = listOf(fødsel),
