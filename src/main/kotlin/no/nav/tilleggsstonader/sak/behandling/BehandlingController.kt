@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -37,11 +38,18 @@ class BehandlingController(
 
     @GetMapping("opprett-grunnlagsdata")
     fun opprettGrunnlagsdata() {
+        var antallFeilet = 0
         behandlingRepository.findAll().forEach {
             if (it.status != BehandlingStatus.OPPRETTET) {
-                grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(it.id)
+                try {
+                    grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(it.id)
+                } catch (e: Exception) {
+                    antallFeilet++
+                    secureLogger.warn("Feilet opprettelse av grunnlagsdata til behandling=${it.id}")
+                }
             }
         }
+        secureLogger.info("Feilet $antallFeilet opprett-grunnlagsdata")
     }
 
     @GetMapping("{behandlingId}")
