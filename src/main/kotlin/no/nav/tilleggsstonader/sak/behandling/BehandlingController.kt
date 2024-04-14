@@ -45,7 +45,7 @@ class BehandlingController(
                     grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(it.id)
                 } catch (e: Exception) {
                     antallFeilet++
-                    secureLogger.warn("Feilet opprettelse av grunnlagsdata til behandling=${it.id}")
+                    secureLogger.warn("Feilet opprettelse av grunnlagsdata til behandling=${it.id}", e)
                 }
             }
         }
