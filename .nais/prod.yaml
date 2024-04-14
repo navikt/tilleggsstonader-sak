@@ -81,8 +81,8 @@ spec:
           namespace: nom
         - application: familie-dokument
           namespace: teamfamilie
-        - application: dp-iverksett
-          namespace: teamdagpenger
+        - application: utsjekk
+          namespace: helved
         - application: kodeverk-api
           namespace: team-rocket
       external:

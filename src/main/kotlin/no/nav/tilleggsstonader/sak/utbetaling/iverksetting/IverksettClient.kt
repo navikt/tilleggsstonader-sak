@@ -50,7 +50,7 @@ class IverksettClient(
         return getForEntity<IverksettStatus>(url, uriVariables = uriVariables)
     }
 
-    // TODO oppdater url når dp-iverksett har støtte for simulering
+    // TODO oppdater url når utsjekk har støtte for simulering
     fun simuler(simuleringRequest: SimuleringDto): BeriketSimuleringsresultat {
         val url = UriComponentsBuilder.fromUri(uri)
             .pathSegment("api", "simulering")

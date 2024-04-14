@@ -5,8 +5,8 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 /**
- * Kopie fra dp-kontrakt, ønsker ikke å dra inn den avhengigheten
- * https://github.com/navikt/dp-kontrakter/blob/main/iverksett/src/main/kotlin/no/nav/dagpenger/kontrakter/iverksett/IverksettTilleggsst%C3%B8naderDto.kt
+ * Kopie fra utsjekk-kontrakt, ønsker ikke å dra inn den avhengigheten
+ * https://github.com/navikt/utsjekk-kontrakter/blob/main/iverksett/src/main/kotlin/no/nav/utsjekk/kontrakter/iverksett/IverksettTilleggsst%C3%B8naderDto.kt
  */
 data class IverksettDto(
     val sakId: String,
@@ -51,7 +51,7 @@ data class BrukersNavKontor(
 
 /**
  * Hvis det legges til nye typer her.
- * Husk å se om man trenger å legge til navkontor, og at det iverksettes på riktig måte i dp-iverksett
+ * Husk å se om man trenger å legge til navkontor, og at det iverksettes på riktig måte i utsjekk
  * Eks for reise kan det finnes behov for å sende kontor på på utbetalingperiode-nivå
  */
 enum class StønadstypeIverksetting {

@@ -79,7 +79,7 @@ class SimuleringService(
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
 
         try {
-            // TODO map til riktig request når dp-iverksett har støtte for simulering
+            // TODO map til riktig request når utsjekk har støtte for simulering
             return iverksettClient.simuler(SimuleringDto(saksbehandling.id))
         } catch (e: Exception) {
             val personFinnesIkkeITps = "Personen finnes ikke i TPS"
