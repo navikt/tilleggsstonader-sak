@@ -83,8 +83,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         leggInnHistorikk(behandling, "6", LocalDateTime.now().plusDays(4), StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
         // leggInnHistorikk(behandling, "6", LocalDateTime.now().plusDays(5), StegType.LAG_SAKSBEHANDLINGSBLANKETT)
         leggInnHistorikk(behandling, "7", LocalDateTime.now().plusDays(6), StegType.FERDIGSTILLE_BEHANDLING)
-        leggInnHistorikk(behandling, "8", LocalDateTime.now().plusDays(7), StegType.PUBLISER_VEDTAKSHENDELSE)
-        leggInnHistorikk(behandling, "9", LocalDateTime.now().plusDays(8), StegType.BEHANDLING_FERDIGSTILT)
+        leggInnHistorikk(behandling, "8", LocalDateTime.now().plusDays(7), StegType.BEHANDLING_FERDIGSTILT)
         behandlingRepository.update(
             behandling.copy(
                 resultat = BehandlingResultat.INNVILGET,

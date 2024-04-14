@@ -75,11 +75,6 @@ enum class StegType(
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
-    PUBLISER_VEDTAKSHENDELSE(
-        rekkefølge = 8,
-        tillattFor = BehandlerRolle.SYSTEM,
-        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FERDIGSTILT),
-    ),
     BEHANDLING_FERDIGSTILT(
         rekkefølge = 9,
         tillattFor = BehandlerRolle.SYSTEM,
@@ -108,12 +103,7 @@ enum class StegType(
             SEND_TIL_BESLUTTER -> BESLUTTE_VEDTAK
             BESLUTTE_VEDTAK -> JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
             JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> FERDIGSTILLE_BEHANDLING
-            /*
-            VENTE_PÅ_STATUS_FRA_UTBETALING -> LAG_SAKSBEHANDLINGSBLANKETT
-            LAG_SAKSBEHANDLINGSBLANKETT -> FERDIGSTILLE_BEHANDLING
-             */
-            FERDIGSTILLE_BEHANDLING -> PUBLISER_VEDTAKSHENDELSE
-            PUBLISER_VEDTAKSHENDELSE -> BEHANDLING_FERDIGSTILT
+            FERDIGSTILLE_BEHANDLING -> BEHANDLING_FERDIGSTILT
             BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
         }
     }

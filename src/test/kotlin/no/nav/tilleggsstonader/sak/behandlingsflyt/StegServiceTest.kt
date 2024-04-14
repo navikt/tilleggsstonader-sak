@@ -56,6 +56,8 @@ class StegServiceTest(
     val vilkårperiodeRepository: VilkårperiodeRepository,
     @Autowired
     val vilkårRepository: VilkårRepository,
+    @Autowired
+    val ferdigstillBehandlingSteg: FerdigstillBehandlingSteg,
 ) : IntegrationTest() {
 
     val stegForBeslutter = object : BehandlingSteg<String> {
@@ -216,6 +218,23 @@ class StegServiceTest(
 
             stegService.resetSteg(behandling.id, steg = StegType.VILKÅR)
             assertThat(behandlingRepository.findByIdOrThrow(behandling.id).steg).isEqualTo(StegType.VILKÅR)
+        }
+    }
+
+    @Nested
+    inner class StegFlyt {
+
+        @Test
+        fun `skal endre steg til ferdigstilt etter ferdigstilling`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(
+                behandling(
+                    status = BehandlingStatus.IVERKSETTER_VEDTAK,
+                    steg = StegType.FERDIGSTILLE_BEHANDLING,
+                ),
+            )
+            val oppdatertBehandling = stegService.håndterSteg(behandlingId = behandling.id, ferdigstillBehandlingSteg)
+            assertThat(oppdatertBehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
+            assertThat(oppdatertBehandling.status).isEqualTo(BehandlingStatus.FERDIGSTILT)
         }
     }
 
