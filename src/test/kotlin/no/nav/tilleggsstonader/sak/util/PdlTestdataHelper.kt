@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Oppholdsadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonForelderBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstand
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Statsborgerskap
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UkjentBosted
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UtflyttingFraNorge
@@ -61,7 +60,6 @@ object PdlTestdataHelper {
         navn: List<Navn> = listOf(lagNavn()),
         opphold: List<Opphold> = emptyList(),
         oppholdsadresse: List<Oppholdsadresse> = emptyList(),
-        sivilstand: List<Sivilstand> = emptyList(),
         statsborgerskap: List<Statsborgerskap> = emptyList(),
         innflyttingTilNorge: List<InnflyttingTilNorge> = emptyList(),
         utflyttingFraNorge: List<UtflyttingFraNorge> = emptyList(),
@@ -82,7 +80,6 @@ object PdlTestdataHelper {
             navn = navn,
             opphold = opphold,
             oppholdsadresse = oppholdsadresse,
-            sivilstand = sivilstand,
             statsborgerskap = statsborgerskap,
             innflyttingTilNorge = innflyttingTilNorge,
             utflyttingFraNorge = utflyttingFraNorge,

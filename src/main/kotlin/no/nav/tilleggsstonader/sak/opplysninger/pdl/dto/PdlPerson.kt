@@ -109,7 +109,6 @@ data class PdlSøker(
     val navn: List<Navn>,
     val opphold: List<Opphold>,
     val oppholdsadresse: List<Oppholdsadresse>,
-    val sivilstand: List<Sivilstand>,
     val statsborgerskap: List<Statsborgerskap>,
     val innflyttingTilNorge: List<InnflyttingTilNorge>,
     val utflyttingFraNorge: List<UtflyttingFraNorge>,
@@ -326,27 +325,6 @@ enum class Oppholdstillatelse {
     MIDLERTIDIG,
     PERMANENT,
     OPPLYSNING_MANGLER,
-}
-
-data class Sivilstand(
-    val type: Sivilstandstype,
-    val gyldigFraOgMed: LocalDate?,
-    val relatertVedSivilstand: String?,
-    val bekreftelsesdato: LocalDate?,
-    val metadata: Metadata,
-)
-
-enum class Sivilstandstype {
-    UOPPGITT,
-    UGIFT,
-    GIFT,
-    ENKE_ELLER_ENKEMANN,
-    SKILT,
-    SEPARERT,
-    REGISTRERT_PARTNER,
-    SEPARERT_PARTNER,
-    SKILT_PARTNER,
-    GJENLEVENDE_PARTNER,
 }
 
 data class InnflyttingTilNorge(

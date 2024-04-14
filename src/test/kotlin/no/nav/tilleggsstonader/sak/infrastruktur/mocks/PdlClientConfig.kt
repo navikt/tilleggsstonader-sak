@@ -29,8 +29,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonForelderBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstand
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstandstype
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Statsborgerskap
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UtflyttingFraNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Vegadresse
@@ -170,7 +168,6 @@ class PdlClientConfig {
                 navn = listOf(lagNavn()),
                 opphold = listOf(Opphold(Oppholdstillatelse.PERMANENT, startdato, null)),
                 oppholdsadresse = listOf(),
-                sivilstand = sivilstand(),
                 statsborgerskap = statsborgerskap(),
                 innflyttingTilNorge = listOf(InnflyttingTilNorge("SWE", "Stockholm", folkeregistermetadata)),
                 utflyttingFraNorge = listOf(
@@ -275,17 +272,6 @@ class PdlClientConfig {
                     land = "SWE",
                     gyldigFraOgMed = startdato.minusYears(3),
                     gyldigTilOgMed = startdato,
-                ),
-            )
-
-        private fun sivilstand(): List<Sivilstand> =
-            listOf(
-                Sivilstand(
-                    type = Sivilstandstype.GIFT,
-                    gyldigFraOgMed = startdato,
-                    relatertVedSivilstand = "11111122222",
-                    bekreftelsesdato = LocalDate.of(2020, 1, 1),
-                    metadata = metadataGjeldende,
                 ),
             )
 

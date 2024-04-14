@@ -188,15 +188,6 @@ query($ident: ID!){
                 historisk
             }
         }
-        sivilstand(historikk: true) {
-            type
-            gyldigFraOgMed
-            relatertVedSivilstand
-            bekreftelsesdato
-            metadata {
-                historisk
-            }
-        }
         statsborgerskap {
             land
             gyldigFraOgMed

@@ -39,8 +39,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PersonSøkTreff
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Personnavn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PostadresseIFrittFormat
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Postboksadresse
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstand
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstandstype
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Statsborgerskap
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UkjentBosted
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UtenlandskAdresse
@@ -164,15 +162,6 @@ object PdlTestdata {
                 navn,
                 opphold,
                 oppholdsadresse,
-                listOf(
-                    Sivilstand(
-                        Sivilstandstype.GIFT,
-                        LocalDate.now(),
-                        "",
-                        LocalDate.now(),
-                        metadataGjeldende,
-                    ),
-                ),
                 statsborgerskap,
                 innflyttingTilNorge,
                 utflyttingFraNorge,

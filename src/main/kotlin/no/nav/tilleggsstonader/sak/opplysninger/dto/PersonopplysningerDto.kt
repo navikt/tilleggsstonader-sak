@@ -50,37 +50,6 @@ data class AnnenForelderMinimumDto(
     val bostedsadresse: String?,
 )
 
-data class SivilstandDto(
-    val type: Sivilstandstype,
-    val gyldigFraOgMed: LocalDate?,
-    val relatertVedSivilstand: String?,
-    val navn: String?,
-    val dødsdato: LocalDate?,
-    val erGjeldende: Boolean,
-)
-
-@Suppress("unused") // Kopi fra PDL
-enum class Sivilstandstype {
-
-    UOPPGITT,
-    UGIFT,
-    GIFT,
-    ENKE_ELLER_ENKEMANN,
-    SKILT,
-    SEPARERT,
-    REGISTRERT_PARTNER,
-    SEPARERT_PARTNER,
-    SKILT_PARTNER,
-    GJENLEVENDE_PARTNER,
-    ;
-
-    fun erGift(): Boolean = this == REGISTRERT_PARTNER || this == GIFT
-    fun erUgiftEllerUoppgitt(): Boolean = this == UGIFT || this == UOPPGITT
-    fun erSeparert(): Boolean = this == SEPARERT_PARTNER || this == SEPARERT
-    fun erEnkeEllerEnkemann(): Boolean = this == ENKE_ELLER_ENKEMANN || this == GJENLEVENDE_PARTNER
-    fun erSkilt(): Boolean = this == SKILT || this == SKILT_PARTNER
-}
-
 data class AdresseDto(
     val visningsadresse: String?,
     val type: AdresseType,
