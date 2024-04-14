@@ -46,26 +46,6 @@ query($identer: [ID!]!){
                     bostedskommune
                 }
             }
-            deltBosted (historikk: true){
-                startdatoForKontrakt
-                sluttdatoForKontrakt
-                vegadresse {
-                    husnummer
-                    husbokstav
-                    bruksenhetsnummer
-                    adressenavn
-                    kommunenummer
-                    tilleggsnavn
-                    postnummer
-                    matrikkelId
-                }
-                ukjentBosted {
-                    bostedskommune
-                }
-                metadata {
-                    historisk
-                }
-            }
             doedsfall {
                 doedsdato
             }

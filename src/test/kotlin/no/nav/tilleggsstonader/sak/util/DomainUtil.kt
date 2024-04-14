@@ -466,7 +466,6 @@ fun barnMedIdent(fnr: String, navn: String, fødsel: Fødsel = fødsel(LocalDate
     BarnMedIdent(
         adressebeskyttelse = emptyList(),
         bostedsadresse = emptyList(),
-        deltBosted = emptyList(),
         dødsfall = emptyList(),
         forelderBarnRelasjon = emptyList(),
         fødsel = listOf(fødsel),
@@ -484,7 +483,7 @@ fun barnMedIdent(fnr: String, navn: String, fødsel: Fødsel = fødsel(LocalDate
 
 /*
 
-fun søker(sivilstand: List<SivilstandMedNavn> = emptyList()): Søker =
+fun søker(): Søker =
     Søker(
         adressebeskyttelse = Adressebeskyttelse(AdressebeskyttelseGradering.UGRADERT, Metadata(false)),
         bostedsadresse = listOf(),
@@ -493,12 +492,10 @@ fun søker(sivilstand: List<SivilstandMedNavn> = emptyList()): Søker =
         listOf(),
         listOf(),
         listOf(),
-        KjønnType.KVINNE,
         listOf(),
         Navn("fornavn", null, "etternavn", Metadata(false)),
         listOf(),
         listOf(),
-        sivilstand = sivilstand,
         listOf(),
         listOf(),
         listOf(),

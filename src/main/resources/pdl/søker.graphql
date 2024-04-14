@@ -82,9 +82,6 @@ query($ident: ID!){
             motpartsRolle
             omraader
         }
-        kjoenn {
-            kjoenn
-        }
         navn {
             fornavn
             mellomnavn
@@ -184,15 +181,6 @@ query($ident: ID!){
                 matrikkelId
             }
             oppholdAnnetSted
-            metadata {
-                historisk
-            }
-        }
-        sivilstand(historikk: true) {
-            type
-            gyldigFraOgMed
-            relatertVedSivilstand
-            bekreftelsesdato
             metadata {
                 historisk
             }

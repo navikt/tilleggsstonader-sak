@@ -27,20 +27,12 @@ enum class OppholdType {
     UKJENT,
 }
 
-data class DeltBostedDto(
-    val startdatoForKontrakt: LocalDate,
-    val sluttdatoForKontrakt: LocalDate?,
-    val historisk: Boolean,
-)
-
 data class BarnDto(
     val personIdent: String,
     val navn: String,
     val annenForelder: AnnenForelderMinimumDto?,
     val adresse: List<AdresseDto>,
     val borHosSøker: Boolean,
-    val deltBosted: List<DeltBostedDto>,
-    val harDeltBostedNå: Boolean,
     val fødselsdato: LocalDate?,
     val dødsdato: LocalDate?,
 )
@@ -57,37 +49,6 @@ data class AnnenForelderMinimumDto(
     val dødsdato: LocalDate?,
     val bostedsadresse: String?,
 )
-
-data class SivilstandDto(
-    val type: Sivilstandstype,
-    val gyldigFraOgMed: LocalDate?,
-    val relatertVedSivilstand: String?,
-    val navn: String?,
-    val dødsdato: LocalDate?,
-    val erGjeldende: Boolean,
-)
-
-@Suppress("unused") // Kopi fra PDL
-enum class Sivilstandstype {
-
-    UOPPGITT,
-    UGIFT,
-    GIFT,
-    ENKE_ELLER_ENKEMANN,
-    SKILT,
-    SEPARERT,
-    REGISTRERT_PARTNER,
-    SEPARERT_PARTNER,
-    SKILT_PARTNER,
-    GJENLEVENDE_PARTNER,
-    ;
-
-    fun erGift(): Boolean = this == REGISTRERT_PARTNER || this == GIFT
-    fun erUgiftEllerUoppgitt(): Boolean = this == UGIFT || this == UOPPGITT
-    fun erSeparert(): Boolean = this == SEPARERT_PARTNER || this == SEPARERT
-    fun erEnkeEllerEnkemann(): Boolean = this == ENKE_ELLER_ENKEMANN || this == GJENLEVENDE_PARTNER
-    fun erSkilt(): Boolean = this == SKILT || this == SKILT_PARTNER
-}
 
 data class AdresseDto(
     val visningsadresse: String?,
@@ -142,14 +103,6 @@ enum class Folkeregisterpersonstatus(private val pdlStatus: String, val visnings
         fun fraPdl(status: no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatus) =
             map.getOrDefault(status.status, UKJENT)
     }
-}
-
-@Suppress("unused") // Kopi fra PDL
-enum class Kjønn {
-
-    KVINNE,
-    MANN,
-    UKJENT,
 }
 
 data class NavnDto(

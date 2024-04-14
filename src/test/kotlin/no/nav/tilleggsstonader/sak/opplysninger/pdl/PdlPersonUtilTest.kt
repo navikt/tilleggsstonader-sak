@@ -4,8 +4,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Bostedsadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Metadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Oppholdsadresse
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstand
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstandstype
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Vegadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
@@ -61,17 +59,6 @@ internal class PdlPersonUtilTest {
         assertThat(adresser.gjeldende()!!.vegadresse!!.husnummer).isEqualTo(gjeldendeAdresse.vegadresse!!.husnummer)
 
         assertThat(historiskeAdresser.gjeldende()).isNull()
-    }
-
-    @Test
-    internal fun `skal finne riktig gjeldende sivilstand`() {
-        val sivilstander = listOf(
-            Sivilstand(Sivilstandstype.UGIFT, null, null, null, Metadata(true)),
-            Sivilstand(Sivilstandstype.GIFT, null, null, null, Metadata(true)),
-            Sivilstand(Sivilstandstype.SEPARERT, null, null, null, Metadata(false)),
-        )
-
-        assertThat(sivilstander.gjeldende().type).isEqualTo(Sivilstandstype.SEPARERT)
     }
 
     private fun vegadresse(gate: String, nr: String, historisk: Boolean): Bostedsadresse {
