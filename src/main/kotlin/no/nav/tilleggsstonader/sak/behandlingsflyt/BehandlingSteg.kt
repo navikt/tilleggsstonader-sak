@@ -76,7 +76,7 @@ enum class StegType(
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
     BEHANDLING_FERDIGSTILT(
-        rekkefølge = 9,
+        rekkefølge = 8,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FERDIGSTILT),
     ),
