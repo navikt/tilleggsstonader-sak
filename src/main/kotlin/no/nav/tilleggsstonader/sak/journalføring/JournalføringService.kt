@@ -93,9 +93,6 @@ class JournalføringService(
 
         /* TODO: Opprett statistikkinnslag */
 
-        /* TODO: Opprett grunnlagsdata
-          val grunnlagsdata = grunnlagsdataService.opprettGrunlagsdata(behandling.id)
-         */
         return behandling
     }
 

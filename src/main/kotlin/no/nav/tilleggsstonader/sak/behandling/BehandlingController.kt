@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -23,6 +25,7 @@ import java.util.UUID
 @ProtectedWithClaims(issuer = "azuread")
 class BehandlingController(
     private val behandlingService: BehandlingService,
+    private val grunnlagsdataService: GrunnlagsdataService,
     // private val behandlingPåVentService: BehandlingPåVentService,
     private val fagsakService: FagsakService,
     private val henleggService: HenleggService,
@@ -34,6 +37,9 @@ class BehandlingController(
     fun hentBehandling(@PathVariable behandlingId: UUID): BehandlingDto {
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
+        if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
+            grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
+        }
         return saksbehandling.tilDto()
     }
 

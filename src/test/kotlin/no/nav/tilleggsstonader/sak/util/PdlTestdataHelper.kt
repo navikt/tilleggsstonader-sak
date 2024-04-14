@@ -59,7 +59,7 @@ object PdlTestdataHelper {
         fullmakt: List<Fullmakt> = emptyList(),
         kjønn: Kjønn? = null,
         kontaktadresse: List<Kontaktadresse> = emptyList(),
-        navn: List<Navn> = emptyList(),
+        navn: List<Navn> = listOf(lagNavn()),
         opphold: List<Opphold> = emptyList(),
         oppholdsadresse: List<Oppholdsadresse> = emptyList(),
         sivilstand: List<Sivilstand> = emptyList(),

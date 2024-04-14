@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRouting
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
@@ -116,6 +117,7 @@ abstract class IntegrationTest {
 
             SøknadRouting::class,
 
+            Grunnlagsdata::class,
             VedtakTilsynBarn::class,
             Simuleringsresultat::class,
             TilkjentYtelse::class,

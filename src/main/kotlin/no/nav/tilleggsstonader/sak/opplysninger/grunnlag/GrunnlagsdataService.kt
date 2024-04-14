@@ -1,34 +1,76 @@
 package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.UUID
 
-// TODO burde kanskje kun opprette grunnlag for barn som finnes i behandlingBarn?
-/**
- * Denne skal på sikt lagre og hente data fra databasen, men for å ikke begrense seg
- */
 @Service
 class GrunnlagsdataService(
     private val behandlingService: BehandlingService,
+    private val barnService: BarnService,
     private val personService: PersonService,
+    private val grunnlagsdataRepository: GrunnlagsdataRepository,
 ) {
 
-    fun hentFraRegister(behandlingId: UUID): GrunnlagsdataMedMetadata {
-        val ident = behandlingService.hentAktivIdent(behandlingId)
-        val grunnlagsdata = hentGrunnlagsdata(ident)
-        return GrunnlagsdataMedMetadata(
-            grunnlagsdata = grunnlagsdata,
-            opprettetTidspunkt = LocalDateTime.now(),
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+    fun hentGrunnlagsdata(behandlingId: UUID): Grunnlagsdata {
+        return grunnlagsdataRepository.findByIdOrThrow(behandlingId)
+    }
+
+    fun opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId: UUID) {
+        if (!grunnlagsdataRepository.existsById(behandlingId)) {
+            opprettGrunnlagsdata(behandlingId)
+        }
+    }
+
+    private fun opprettGrunnlagsdata(behandlingId: UUID): Grunnlagsdata {
+        // TODO historikk behandling påbegynt NAV-20376
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        logger.info("Oppretter grunnlagsdata for behandling=$behandlingId status=$behandlingId")
+
+        val grunnlag = hentGrunnlagFraRegister(behandling)
+        val grunnlagsdata = Grunnlagsdata(
+            behandlingId = behandlingId,
+            grunnlag = grunnlag,
+        )
+        grunnlagsdataRepository.insert(grunnlagsdata)
+        return grunnlagsdata
+    }
+
+    private fun hentGrunnlagFraRegister(behandling: Saksbehandling): Grunnlag {
+        val person = hentPerson(behandling)
+        return Grunnlag(
+            navn = person.søker.navn.gjeldende().tilNavn(),
+            barn = mapBarn(behandling, person),
         )
     }
 
-    private fun hentGrunnlagsdata(ident: String): Grunnlagsdata {
-        val personMedBarn = personService.hentPersonMedBarn(ident)
-        return Grunnlagsdata(
-            barn = personMedBarn.barn.tilGrunnlagsdataBarn(),
-        )
+    private fun mapBarn(
+        behandling: Saksbehandling,
+        person: SøkerMedBarn,
+    ): List<GrunnlagBarn> {
+        val barnIdenter = barnService.finnBarnPåBehandling(behandling.id).map { it.ident }.toSet()
+        val barn = person.barn.filter { (ident, _) -> barnIdenter.contains(ident) }
+
+        feilHvis(!barn.keys.containsAll(barnIdenter)) {
+            "Finner ikke grunnlag for barn. behandlingBarn=$barnIdenter pdlBarn=${barn.keys}"
+        }
+
+        return barn.tilGrunnlagsdataBarn()
+    }
+
+    private fun hentPerson(behandling: Saksbehandling) = when (behandling.stønadstype) {
+        Stønadstype.BARNETILSYN -> personService.hentPersonMedBarn(behandling.ident)
+        else -> personService.hentPersonUtenBarn(behandling.ident)
     }
 }

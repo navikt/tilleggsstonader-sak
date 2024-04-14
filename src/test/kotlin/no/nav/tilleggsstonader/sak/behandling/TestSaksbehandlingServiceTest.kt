@@ -37,6 +37,7 @@ internal class TestSaksbehandlingServiceTest() : IntegrationTest() {
                 status = BehandlingStatus.UTREDES,
                 steg = StegType.VILKÅR,
             ),
+            opprettGrunnlagsdata = false,
         )
         val skjema = SøknadUtil.søknadskjemaBarnetilsyn(
             barnMedBarnepass = listOf(
@@ -46,6 +47,7 @@ internal class TestSaksbehandlingServiceTest() : IntegrationTest() {
         )
         val søknad = søknadService.lagreSøknad(behandling.id, lagJournalpost(), skjema)
         barnRepository.insertAll(søknadBarnTilBehandlingBarn(søknad.barn, behandling.id))
+        testoppsettService.opprettGrunnlagsdata(behandling.id)
 
         vilkårService.hentEllerOpprettVilkårsvurdering(behandling.id)
 
