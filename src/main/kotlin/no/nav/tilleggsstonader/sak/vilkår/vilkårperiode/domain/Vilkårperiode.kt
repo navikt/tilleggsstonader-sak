@@ -109,10 +109,15 @@ enum class ResultatDelvilkårperiode {
 
 data class DelvilkårMålgruppe(
     val medlemskap: Vurdering,
+    val dekketAvAnnetRegelverk: Vurdering,
 ) : DelvilkårVilkårperiode() {
     init {
-        brukerfeilHvis(medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && medlemskap.begrunnelse == null) {
+        brukerfeilHvis(medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && medlemskap.begrunnelse.isNullOrBlank()) {
             "Mangler begrunnelse for ikke oppfylt medlemskap"
+        }
+
+        brukerfeilHvis(dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && dekketAvAnnetRegelverk.begrunnelse.isNullOrBlank()) {
+            "Mangler begrunnelse for utgifter dekt av annet regelverk"
         }
     }
 }
@@ -142,6 +147,8 @@ enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : Vilkårper
     ;
 
     override fun tilDbType(): String = this.name
+
+    fun gjelderNedsattArbeidsevne() = this == NEDSATT_ARBEIDSEVNE || this == UFØRETRYGD || this == AAP
 }
 
 enum class AktivitetType : VilkårperiodeType {

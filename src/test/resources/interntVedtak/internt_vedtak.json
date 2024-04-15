@@ -29,7 +29,7 @@
     },
     "kilde" : "SYSTEM",
     "resultat" : "OPPFYLT",
-    "begrunnelse" : "målgrupp abc",
+    "begrunnelse" : "målgruppe aap",
     "slettetKommentar" : null
   }, {
     "type" : "OVERGANGSSTØNAD",
@@ -46,7 +46,7 @@
     },
     "kilde" : "SYSTEM",
     "resultat" : "OPPFYLT",
-    "begrunnelse" : "målgrupp os",
+    "begrunnelse" : "målgruppe os",
     "slettetKommentar" : null
   } ],
   "aktiviteter" : [ {

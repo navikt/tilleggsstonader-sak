@@ -13,6 +13,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.ResultatEva
 object VilkårperiodeExtensions {
     val Vilkårperiode.medlemskap: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårMålgruppe).medlemskap
+    val Vilkårperiode.dekketAvAnnetRegelverk: DelvilkårVilkårperiode.Vurdering
+        get() = (this.delvilkår as DelvilkårMålgruppe).dekketAvAnnetRegelverk
 
     val Vilkårperiode.lønnet: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårAktivitet).lønnet
@@ -23,6 +25,9 @@ object VilkårperiodeExtensions {
     val VilkårperiodeDto.medlemskap: VurderingDto?
         get() = (this.delvilkår as DelvilkårMålgruppeDto).medlemskap
 
+    val VilkårperiodeDto.dekketAvAnnetRegelverk: VurderingDto?
+        get() = (this.delvilkår as DelvilkårMålgruppeDto).dekketAvAnnetRegelverk
+
     val VilkårperiodeDto.lønnet: VurderingDto?
         get() = (this.delvilkår as DelvilkårAktivitetDto).lønnet
 
@@ -31,6 +36,9 @@ object VilkårperiodeExtensions {
 
     val ResultatEvaluering.medlemskap: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårMålgruppe).medlemskap
+
+    val ResultatEvaluering.dekketAvAnnetRegelverk: DelvilkårVilkårperiode.Vurdering
+        get() = (this.delvilkår as DelvilkårMålgruppe).dekketAvAnnetRegelverk
 
     val ResultatEvaluering.lønnet: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårAktivitet).lønnet

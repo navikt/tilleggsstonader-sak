@@ -86,7 +86,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
             opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
             opprettVilkårperiode(
                 målgruppe(
-                    MålgruppeType.OVERGANGSSTØNAD,
+                    type = MålgruppeType.OVERGANGSSTØNAD,
+                    dekkesAvAnnetRegelverk = null,
                     behandlingId = behandling.id,
                 ),
             )
@@ -147,7 +148,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
             opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
             opprettVilkårperiode(
                 målgruppe(
-                    MålgruppeType.OVERGANGSSTØNAD,
+                    type = MålgruppeType.OVERGANGSSTØNAD,
+                    dekkesAvAnnetRegelverk = null,
                     behandlingId = behandling.id,
                 ),
             )
@@ -228,12 +230,13 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         fom: LocalDate = this.FOM,
         tom: LocalDate = this.TOM,
         medlemskap: SvarJaNei? = null,
+        dekkesAvAnnetRegelverk: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: UUID = UUID.randomUUID(),
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårMålgruppeDto(VurderingDto(medlemskap)),
+        delvilkår = DelvilkårMålgruppeDto(VurderingDto(medlemskap), VurderingDto(dekkesAvAnnetRegelverk)),
         behandlingId = behandlingId,
     )
 
