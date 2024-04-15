@@ -123,8 +123,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
     }
 
-    // TODO: Legg til test her i oppdatering
-
     @Nested
     inner class OppdaterVilkårPeriode {
 
