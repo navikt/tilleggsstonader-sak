@@ -125,5 +125,6 @@ object EvalueringMålgruppe {
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         )
 
-    private fun ugyldigSvarDekketAvAnnetRegelverkFeilmelding(svar: SvarJaNei?, type: MålgruppeType) = "Ugyldig svar=$svar for dekket av annet regelverk for $type"
+    private fun ugyldigSvarDekketAvAnnetRegelverkFeilmelding(svar: SvarJaNei?, type: MålgruppeType) =
+        "Ugyldig svar=$svar for dekket av annet regelverk for $type"
 }
