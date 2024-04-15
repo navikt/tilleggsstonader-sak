@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
@@ -65,6 +66,7 @@ internal class AutomatiskJournalføringServiceTest {
         fagsakService = fagsakService,
         behandlingService = behandlingService,
         unleashService = mockUnleashService(),
+        arbeidsfordelingService = arbeidsfordelingService,
     )
 
     val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetId
@@ -156,7 +158,7 @@ internal class AutomatiskJournalføringServiceTest {
     internal fun `skal kunne automatisk journalføre`() {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
 
-        justRun { journalføringService.journalførTilNyBehandling(journalpostId, personIdent, Stønadstype.BARNETILSYN, any()) }
+        justRun { journalføringService.journalførTilNyBehandling(journalpostId, personIdent, Stønadstype.BARNETILSYN, any(), any(), any()) }
 
         automatiskJournalføringService.håndterSøknad(
             HåndterSøknadRequest(
@@ -171,7 +173,9 @@ internal class AutomatiskJournalføringServiceTest {
                 journalpostId,
                 personIdent,
                 Stønadstype.BARNETILSYN,
+                BehandlingÅrsak.SØKNAD,
                 "Automatisk journalført søknad",
+                enhet,
             )
         }
     }

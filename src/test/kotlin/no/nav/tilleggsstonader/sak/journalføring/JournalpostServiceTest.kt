@@ -57,7 +57,7 @@ class JournalpostServiceTest() {
         fun `skal kaste feil om journalpost har org som bruker`() {
             val bruker = Bruker(id = UUID.randomUUID().toString(), type = BrukerIdType.ORGNR)
 
-            val journalpost = journalpost(bruker = bruker)
+            val journalpost = journalpost(journalpostId = journalpostId, bruker = bruker)
             every { journalpostClient.hentJournalpost(any()) } returns journalpost
 
             assertThatThrownBy {

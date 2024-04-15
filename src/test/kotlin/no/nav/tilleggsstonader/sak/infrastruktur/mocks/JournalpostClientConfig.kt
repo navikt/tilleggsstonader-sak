@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostResponse
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottaker
@@ -49,8 +50,18 @@ class JournalpostClientConfig {
             )
         } returns ArkiverDokumentResponse(journalpostId = "journalpostId", ferdigstilt = true)
         every { journalpostClient.hentDokument(any(), any(), any()) } returns dummyPdf
+        every { journalpostClient.oppdaterJournalpost(any(), any(), any()) } answers {
+            val journalpostId = secondArg<String>()
+            OppdaterJournalpostResponse(journalpostId)
+        }
+        every { journalpostClient.ferdigstillJournalpost(any(), any(), any()) } answers {
+            val journalpostId = firstArg<String>()
+            OppdaterJournalpostResponse(journalpostId)
+        }
         mockFeiletDistribusjon(journalpostClient)
 
+        every { journalpostClient.ferdigstillJournalpost(any(), any(), any()) } returns mockk()
+        every { journalpostClient.oppdaterJournalpost(any(), any(), any()) } returns mockk()
         every { journalpostClient.finnJournalposterForBruker(any()) } answers {
             journalposter.values.filter { it.bruker?.id == firstArg<JournalposterForBrukerRequest>().brukerId.id }
         }
@@ -78,6 +89,10 @@ class JournalpostClientConfig {
             bruker = Bruker("12345678910", BrukerIdType.FNR),
             avsenderMottaker = avsenderMottaker(),
             journalforendeEnhet = "tilleggsstonader-sak",
+            relevanteDatoer = listOf(
+                RelevantDato(LocalDateTime.now().minusDays(7), "DATO_REGISTRERT"),
+                RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT"),
+            ),
             dokumenter = listOf(
                 DokumentInfo(
                     dokumentInfoId = "1",
@@ -105,7 +120,6 @@ class JournalpostClientConfig {
                     ),
                 ),
             ),
-            relevanteDatoer = listOf(RelevantDato(LocalDateTime.now(), "DATO_JOURNALFOERT")),
         )
 
     private val dummyPdf = this::class.java.classLoader.getResource("interntVedtak/internt_vedtak.pdf")!!.readBytes()

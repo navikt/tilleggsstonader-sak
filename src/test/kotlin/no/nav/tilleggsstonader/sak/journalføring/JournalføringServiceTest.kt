@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.journalføring
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -22,6 +23,11 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -36,18 +42,21 @@ class JournalføringServiceTest {
     val fagsakService = mockk<FagsakService>()
     val journalpostService = mockk<JournalpostService>()
     val søknadService = mockk<SøknadService>()
-    val arbeidsfordelingService = mockk<ArbeidsfordelingService>()
     val taskService = mockk<TaskService>()
     val barnService = mockk<BarnService>()
+    val personService = mockk<PersonService>()
+    val oppgaveService = mockk<OppgaveService>()
 
     val journalføringService = JournalføringService(
         behandlingService,
         fagsakService,
         journalpostService,
         søknadService,
-        arbeidsfordelingService,
         taskService,
         barnService,
+        TransactionHandler(),
+        personService,
+        oppgaveService,
     )
 
     val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetId
@@ -72,8 +81,9 @@ class JournalføringServiceTest {
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
         every { fagsakService.hentEllerOpprettFagsak(any(), any()) } returns fagsak
         every { behandlingService.utledNesteBehandlingstype(fagsak.id) } returns BehandlingType.FØRSTEGANGSBEHANDLING
-        every { arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(any()) } returns enhet
         every { taskService.save(capture(taskSlot)) } returns mockk()
+        every { personService.hentPersonIdenter(personIdent) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
+        justRun { oppgaveService.ferdigstillOppgave(any()) }
     }
 
     @AfterEach
@@ -91,20 +101,17 @@ class JournalføringServiceTest {
                 journalpostId,
                 personIdent,
                 Stønadstype.BARNETILSYN,
+                BehandlingÅrsak.SØKNAD,
                 "oppgaveBeskrivelse",
+                enhet,
             )
         }.hasMessageContaining("Journalposten mangler bruker")
     }
 
     @Test
     internal fun `skal kunne journalføre og opprette behandling`() {
-        val aktørIdBruker = Bruker(
-            id = aktørId,
-            type = BrukerIdType.AKTOERID,
-        )
-        val journalpostMedAktørId = journalpost.copy(bruker = aktørIdBruker)
-        every { journalpostService.hentJournalpost(journalpostId) } returns journalpostMedAktørId
-        every { journalpostService.oppdaterOgFerdigstillJournalpostMaskinelt(any(), any(), any()) } just Runs
+        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
+        every { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any()) } just Runs
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
 
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
@@ -119,13 +126,29 @@ class JournalføringServiceTest {
         every { journalpostService.hentSøknadFraJournalpost(any()) } returns mockk()
         every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
 
-        journalføringService.journalførTilNyBehandling(journalpostId, personIdent, Stønadstype.BARNETILSYN, "beskrivelse")
+        journalføringService.journalførTilNyBehandling(
+            journalpostId,
+            personIdent,
+            Stønadstype.BARNETILSYN,
+            BehandlingÅrsak.SØKNAD,
+            "beskrivelse",
+            enhet,
+        )
 
         verify(exactly = 1) {
             behandlingService.opprettBehandling(
                 behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
+            )
+        }
+        verify(exactly = 1) {
+            journalpostService.oppdaterOgFerdigstillJournalpost(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
             )
         }
 

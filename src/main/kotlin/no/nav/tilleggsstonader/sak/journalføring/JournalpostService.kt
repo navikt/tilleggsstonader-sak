@@ -105,15 +105,19 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
 
     fun finnJournalpostOgPersonIdent(journalpostId: String): Pair<Journalpost, String> {
         val journalpost = hentJournalpost(journalpostId)
-        val personIdent = journalpost.bruker?.let {
-            when (it.type) {
-                BrukerIdType.FNR -> it.id
-                BrukerIdType.AKTOERID -> personService.hentPersonIdenter(it.id).gjeldende().ident
-                BrukerIdType.ORGNR -> error("Kan ikke hente journalpost=$journalpostId for orgnr")
-            }
-        } ?: error("Kan ikke hente journalpost=$journalpostId uten bruker")
+        val personIdent = hentIdentFraJournalpost(journalpost)
         return Pair(journalpost, personIdent)
     }
+
+    fun hentIdentFraJournalpost(
+        journalpost: Journalpost,
+    ) = journalpost.bruker?.let {
+        when (it.type) {
+            BrukerIdType.FNR -> it.id
+            BrukerIdType.AKTOERID -> personService.hentPersonIdenter(it.id).gjeldende().ident
+            BrukerIdType.ORGNR -> error("Kan ikke hente journalpost=${journalpost.journalpostId} for orgnr")
+        }
+    } ?: error("Kan ikke hente journalpost=${journalpost.journalpostId} uten bruker")
 
     fun hentBrukersNavn(
         journalpost: Journalpost,

@@ -1,17 +1,17 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
@@ -32,6 +32,7 @@ class AutomatiskJournalføringService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val unleashService: UnleashService,
+    private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
 
     @Transactional
@@ -44,7 +45,9 @@ class AutomatiskJournalføringService(
                 journalpostId = request.journalpostId,
                 personIdent = personIdent,
                 stønadstype = stønadstype,
+                behandlingÅrsak = BehandlingÅrsak.SØKNAD,
                 oppgaveBeskrivelse = "Automatisk journalført søknad",
+                journalførendeEnhet = arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(personIdent),
             )
         } else {
             håndterSøknadSomIkkeKanAutomatiskJournalføres(request)
@@ -94,17 +97,4 @@ class AutomatiskJournalføringService(
         val dokumentTittel = journalpost.dokumenter!!.firstOrNull { it.brevkode != null }?.tittel ?: ""
         return "Må behandles i ny løsning - $dokumentTittel"
     }
-
-    private fun fagsakPersonOgJournalpostBrukerErSammePerson(
-        allePersonIdenter: Set<String>,
-        gjeldendePersonIdent: String,
-        journalpostBruker: Bruker,
-    ): Boolean = when (journalpostBruker.type) {
-        BrukerIdType.FNR -> allePersonIdenter.contains(journalpostBruker.id)
-        BrukerIdType.AKTOERID -> hentAktørIderForPerson(gjeldendePersonIdent).contains(journalpostBruker.id)
-        BrukerIdType.ORGNR -> false
-    }
-
-    private fun hentAktørIderForPerson(personIdent: String) =
-        personService.hentAktørIder(personIdent).identer()
 }

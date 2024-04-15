@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -41,6 +42,16 @@ class BehandlingController(
             grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
         }
         return saksbehandling.tilDto()
+    }
+
+    @PostMapping("person")
+    fun hentBehandlingerForPersonOgStønadstype(@RequestBody identStønadstype: IdentStønadstype): List<BehandlingDto> {
+        tilgangService.validerTilgangTilPersonMedBarn(identStønadstype.ident, AuditLoggerEvent.ACCESS)
+
+        return fagsakService.hentBehandlingerForPersonOgStønadstype(
+            identStønadstype.ident,
+            identStønadstype.stønadstype,
+        )
     }
 
     @GetMapping("gamle-behandlinger")
