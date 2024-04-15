@@ -62,6 +62,7 @@ fun Vilkårperiode.tilDto() =
 fun DelvilkårVilkårperiode.tilDto() = when (this) {
     is DelvilkårMålgruppe -> DelvilkårMålgruppeDto(
         medlemskap = medlemskap.tilDto(),
+        dekketAvAnnetRegelverk = dekketAvAnnetRegelverk.tilDto(),
     )
 
     is DelvilkårAktivitet -> DelvilkårAktivitetDto(
