@@ -53,7 +53,6 @@ class JournalpostControllerTest : IntegrationTest() {
             "1",
             JournalføringRequest(
                 stønadstype = Stønadstype.BARNETILSYN,
-                ident = ident,
                 aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
                 årsak = JournalføringRequest.Journalføringsårsak.DIGITAL_SØKNAD,
                 oppgaveId = "123",

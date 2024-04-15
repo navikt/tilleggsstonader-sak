@@ -57,7 +57,7 @@ class JournalføringService(
         if (journalføringRequest.skalJournalføreTilNyBehandling()) {
             journalførTilNyBehandling(
                 journalpostId = journalpost.journalpostId,
-                personIdent = journalføringRequest.ident,
+                personIdent = journalpostService.hentIdentFraJournalpost(journalpost),
                 stønadstype = journalføringRequest.stønadstype,
                 behandlingÅrsak = journalføringRequest.årsak.behandlingsårsak,
                 journalførendeEnhet = journalføringRequest.journalførendeEnhet,
@@ -124,7 +124,10 @@ class JournalføringService(
 
     private fun journalførUtenNyBehandling(journalføringRequest: JournalføringRequest, journalpost: Journalpost) {
         val fagsak =
-            hentEllerOpprettFagsakIEgenTransaksjon(journalføringRequest.ident, journalføringRequest.stønadstype)
+            hentEllerOpprettFagsakIEgenTransaksjon(
+                journalpostService.hentIdentFraJournalpost(journalpost),
+                journalføringRequest.stønadstype,
+            )
         ferdigstillJournalpost(
             journalpost,
             journalføringRequest.journalførendeEnhet,

@@ -10,7 +10,6 @@ import java.time.LocalDate
 data class JournalføringRequest(
     val dokumentTitler: Map<String, String>? = null,
     val logiskeVedlegg: Map<String, List<LogiskVedlegg>>? = null,
-    val ident: String,
     val stønadstype: Stønadstype,
     val oppgaveId: String,
     val journalførendeEnhet: String, // TODO: Hvorfor sendes denne inn?
