@@ -112,11 +112,11 @@ data class DelvilkårMålgruppe(
     val dekketAvAnnetRegelverk: Vurdering,
 ) : DelvilkårVilkårperiode() {
     init {
-        brukerfeilHvis(medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && medlemskap.begrunnelse == null) {
+        brukerfeilHvis(medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && medlemskap.begrunnelse.isNullOrBlank()) {
             "Mangler begrunnelse for ikke oppfylt medlemskap"
         }
 
-        brukerfeilHvis(dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && dekketAvAnnetRegelverk.begrunnelse == null) {
+        brukerfeilHvis(dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && dekketAvAnnetRegelverk.begrunnelse.isNullOrBlank()) {
             "Mangler begrunnelse for utgifter dekt av annet regelverk"
         }
     }
