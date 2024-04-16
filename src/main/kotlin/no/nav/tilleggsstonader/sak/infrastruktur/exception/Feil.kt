@@ -34,6 +34,11 @@ inline fun feilHvis(
     }
 }
 
+inline fun brukerfeil(
+    feil: String,
+    httpStatus: HttpStatus = HttpStatus.BAD_REQUEST,
+): Nothing = throw ApiFeil(feil = feil, httpStatus = httpStatus)
+
 @OptIn(ExperimentalContracts::class)
 inline fun brukerfeilHvis(
     boolean: Boolean,
