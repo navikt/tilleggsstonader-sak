@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.journalføring
 
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
@@ -45,26 +47,21 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
         return journalpostClient.opprettJournalpost(arkiverDokumentRequest, saksbehandler)
     }
 
-    fun oppdaterOgFerdigstillJournalpostMaskinelt(
-        journalpost: Journalpost,
-        journalførendeEnhet: String,
-        fagsak: Fagsak,
-    ) = oppdaterOgFerdigstillJournalpost(
-        journalpost = journalpost,
-        dokumenttitler = null,
-        journalførendeEnhet = journalførendeEnhet,
-        fagsak = fagsak,
-        saksbehandler = null,
-    )
-
+    /**
+     * Oppdaterer journalposten med fagsak og dokumenttitler, og ferdigstiller journalføringen.
+     *
+     * @param logiskeVedlegg hvis logiske vedlegg ikke er null, vil de oppdateres
+     */
     fun oppdaterOgFerdigstillJournalpost(
         journalpost: Journalpost,
         dokumenttitler: Map<String, String>?,
+        logiskeVedlegg: Map<String, List<LogiskVedlegg>>?,
         journalførendeEnhet: String,
         fagsak: Fagsak,
         saksbehandler: String?,
     ) {
         if (journalpost.journalstatus != Journalstatus.JOURNALFOERT) {
+            oppdaterLogiskeVedlegg(journalpost, logiskeVedlegg)
             oppdaterJournalpostMedFagsakOgDokumenttitler(
                 journalpost = journalpost,
                 dokumenttitler = dokumenttitler,
@@ -96,6 +93,23 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
         val oppdatertJournalpost =
             JournalføringHelper.lagOppdaterJournalpostRequest(journalpost, eksternFagsakId, dokumenttitler)
         journalpostClient.oppdaterJournalpost(oppdatertJournalpost, journalpost.journalpostId, saksbehandler)
+    }
+
+    private fun oppdaterLogiskeVedlegg(journalpost: Journalpost, logiskeVedlegg: Map<String, List<LogiskVedlegg>>?) {
+        if (logiskeVedlegg == null) return
+
+        journalpost.dokumenter?.forEach { dokument ->
+            val eksisterendeLogiskeVedlegg = dokument.logiskeVedlegg ?: emptyList()
+            val logiskeVedleggForDokument = logiskeVedlegg[dokument.dokumentInfoId] ?: emptyList()
+            val harIdentiskInnhold =
+                eksisterendeLogiskeVedlegg.containsAll(logiskeVedleggForDokument) && eksisterendeLogiskeVedlegg.size == logiskeVedleggForDokument.size
+            if (!harIdentiskInnhold) {
+                journalpostClient.oppdaterLogiskeVedlegg(
+                    dokument.dokumentInfoId,
+                    BulkOppdaterLogiskVedleggRequest(titler = logiskeVedleggForDokument.map { it.tittel }),
+                )
+            }
+        }
     }
 
     fun hentSøknadFraJournalpost(søknadJournalpost: Journalpost): Søknadsskjema<SøknadsskjemaBarnetilsyn> {

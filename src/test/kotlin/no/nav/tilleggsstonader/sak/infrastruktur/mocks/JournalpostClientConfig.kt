@@ -62,6 +62,7 @@ class JournalpostClientConfig {
 
         every { journalpostClient.ferdigstillJournalpost(any(), any(), any()) } returns mockk()
         every { journalpostClient.oppdaterJournalpost(any(), any(), any()) } returns mockk()
+        every { journalpostClient.oppdaterLogiskeVedlegg(any(), any()) } answers { firstArg() }
         every { journalpostClient.finnJournalposterForBruker(any()) } answers {
             journalposter.values.filter { it.bruker?.id == firstArg<JournalposterForBrukerRequest>().brukerId.id }
         }
