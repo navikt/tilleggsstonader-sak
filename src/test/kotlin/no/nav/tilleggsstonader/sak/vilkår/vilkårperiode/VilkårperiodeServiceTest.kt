@@ -305,9 +305,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 vilkårperiodeService.opprettVilkårperiode(
                     opprettVilkårperiodeMålgruppe(
                         type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                        medlemskap = VurderingDto(
-                            SvarJaNei.JA,
-                        ),
                         dekkesAvAnnetRegelverk = VurderingDto(
                             SvarJaNei.NEI,
                         ),
@@ -318,7 +315,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "",
                 delvilkår = DelvilkårMålgruppeDto(
-                    medlemskap = VurderingDto(SvarJaNei.JA),
+                    medlemskap = null,
                     dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.JA),
                 ),
             )

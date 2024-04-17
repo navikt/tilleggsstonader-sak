@@ -42,7 +42,7 @@ data class Vilkårperiode(
         }
 
         val ugyldigTypeOgDetaljer = (type is MålgruppeType && delvilkår !is DelvilkårMålgruppe) ||
-            (type is AktivitetType && delvilkår !is DelvilkårAktivitet)
+                (type is AktivitetType && delvilkår !is DelvilkårAktivitet)
         feilHvis(ugyldigTypeOgDetaljer) {
             "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}"
         }
@@ -61,8 +61,11 @@ data class Vilkårperiode(
     }
 
     private fun validerBegrunnelserDelvilkårMålgruppe() {
-        brukerfeilHvis(delvilkår is DelvilkårMålgruppe && delvilkår.medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && begrunnelse.isNullOrBlank()) {
-            "Mangler begrunnelse for ikke oppfylt medlemskap"
+
+        val harVurdertMedlemskap =
+            delvilkår is DelvilkårMålgruppe && delvilkår.medlemskap.resultat != ResultatDelvilkårperiode.IKKE_VURDERT && delvilkår.medlemskap.svar != SvarJaNei.JA_IMPLISITT
+        brukerfeilHvis(harVurdertMedlemskap && begrunnelse.isNullOrBlank()) {
+            "Mangler begrunnelse for vurdering av medlemskap"
         }
 
         brukerfeilHvis(delvilkår is DelvilkårMålgruppe && delvilkår.dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && begrunnelse.isNullOrBlank()) {
