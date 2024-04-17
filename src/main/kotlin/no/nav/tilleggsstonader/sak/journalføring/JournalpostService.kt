@@ -102,7 +102,7 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
             val eksisterendeLogiskeVedlegg = dokument.logiskeVedlegg ?: emptyList()
             val logiskeVedleggForDokument = logiskeVedlegg[dokument.dokumentInfoId] ?: emptyList()
             val harIdentiskInnhold =
-                eksisterendeLogiskeVedlegg.containsAll(logiskeVedleggForDokument) && eksisterendeLogiskeVedlegg.size == logiskeVedleggForDokument.size
+                eksisterendeLogiskeVedlegg.size == logiskeVedleggForDokument.size && eksisterendeLogiskeVedlegg.containsAll(logiskeVedleggForDokument)
             if (!harIdentiskInnhold) {
                 journalpostClient.oppdaterLogiskeVedlegg(
                     dokument.dokumentInfoId,
