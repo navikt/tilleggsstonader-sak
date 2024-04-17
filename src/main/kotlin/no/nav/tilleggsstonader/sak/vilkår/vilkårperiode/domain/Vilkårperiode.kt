@@ -47,7 +47,27 @@ data class Vilkårperiode(
             "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}"
         }
 
+        validerBegrunnelserDelvilkår()
+
         validerSlettefelter()
+    }
+
+    fun validerBegrunnelserDelvilkår() {
+        validerBegrunnelserDelvilkårMålgruppe()
+
+        brukerfeilHvis(delvilkår is DelvilkårAktivitet && delvilkår.lønnet.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && begrunnelse.isNullOrBlank()) {
+            "Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid"
+        }
+    }
+
+    private fun validerBegrunnelserDelvilkårMålgruppe() {
+        brukerfeilHvis(delvilkår is DelvilkårMålgruppe && delvilkår.medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && begrunnelse.isNullOrBlank()) {
+            "Mangler begrunnelse for ikke oppfylt medlemskap"
+        }
+
+        brukerfeilHvis(delvilkår is DelvilkårMålgruppe && delvilkår.dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && begrunnelse.isNullOrBlank()) {
+            "Mangler begrunnelse for utgifter dekt av annet regelverk"
+        }
     }
 
     private fun validerSlettefelter() {
@@ -110,17 +130,7 @@ enum class ResultatDelvilkårperiode {
 data class DelvilkårMålgruppe(
     val medlemskap: Vurdering,
     val dekketAvAnnetRegelverk: Vurdering,
-) : DelvilkårVilkårperiode() {
-    init {
-        brukerfeilHvis(medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && medlemskap.begrunnelse.isNullOrBlank()) {
-            "Mangler begrunnelse for ikke oppfylt medlemskap"
-        }
-
-        brukerfeilHvis(dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && dekketAvAnnetRegelverk.begrunnelse.isNullOrBlank()) {
-            "Mangler begrunnelse for utgifter dekt av annet regelverk"
-        }
-    }
-}
+) : DelvilkårVilkårperiode()
 
 data class DelvilkårAktivitet(
     val lønnet: Vurdering,

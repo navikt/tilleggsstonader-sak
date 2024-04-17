@@ -178,19 +178,6 @@ class EvalueringMålgruppeTest {
             }
 
             @NedsattArbeidsevneParameterizedTest
-            fun `skal kaste feil ved svar ja og manglende begrunnelse`(type: MålgruppeType) {
-                assertThatThrownBy {
-                    utledResultat(
-                        type,
-                        delvilkårMålgruppeDto(
-                            medlemskap = oppfyltMedlemskap(type),
-                            dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.JA),
-                        ),
-                    )
-                }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
-            }
-
-            @NedsattArbeidsevneParameterizedTest
             fun `manglende svar skal mappes til ikke vurdert for nedsatt arbeidsevne`(type: MålgruppeType) {
                 val resultat = utledResultat(
                     type,

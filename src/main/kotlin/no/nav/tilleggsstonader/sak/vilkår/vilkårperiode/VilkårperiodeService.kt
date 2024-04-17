@@ -150,6 +150,9 @@ class VilkårperiodeService(
                 )
             }
         }
+
+//        oppdatert.validerBegrunnelserDelvilkår()
+
         return vilkårperiodeRepository.update(oppdatert)
     }
 

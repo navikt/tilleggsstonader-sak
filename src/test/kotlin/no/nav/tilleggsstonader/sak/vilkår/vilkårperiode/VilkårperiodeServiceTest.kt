@@ -121,6 +121,86 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiode)
             }.hasMessageContaining("målgruppe=DAGPENGER er ikke gyldig for ${Stønadstype.BARNETILSYN}")
         }
+
+        @Test
+        fun `skal kaste feil ved opprettelse av vilkårperiode hvis ikke oppfylt delvilkår mangler begrunnelse - medlemskap`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        begrunnelse = "",
+                        medlemskap = VurderingDto(SvarJaNei.NEI),
+                        behandlingId = behandling.id,
+                    ),
+                )
+            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt medlemskap")
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        type = MålgruppeType.AAP,
+                        begrunnelse = "",
+                        dekkesAvAnnetRegelverk = VurderingDto(SvarJaNei.JA),
+                        behandlingId = behandling.id,
+                    ),
+                )
+            }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeAktivitet(
+                        begrunnelse = "",
+                        lønnet = VurderingDto(SvarJaNei.JA),
+                        behandlingId = behandling.id,
+                    ),
+
+                )
+            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
+        }
+
+        @Test
+        fun `skal kaste feil ved opprettelse av vilkårperiode hvis ikke oppfylt delvilkår mangler begrunnelse - dekkes annet regelverk`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        type = MålgruppeType.AAP,
+                        begrunnelse = "",
+                        dekkesAvAnnetRegelverk = VurderingDto(SvarJaNei.JA),
+                        behandlingId = behandling.id,
+                    ),
+                )
+            }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeAktivitet(
+                        begrunnelse = "",
+                        lønnet = VurderingDto(SvarJaNei.JA),
+                        behandlingId = behandling.id,
+                    ),
+
+                )
+            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
+        }
+
+        @Test
+        fun `skal kaste feil ved opprettelse av vilkårperiode hvis ikke oppfylt delvilkår mangler begrunnelse - lønnet`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeAktivitet(
+                        begrunnelse = "",
+                        lønnet = VurderingDto(SvarJaNei.JA),
+                        behandlingId = behandling.id,
+                    ),
+
+                )
+            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
+        }
     }
 
     @Nested
@@ -213,9 +293,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 )
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
-                begrunnelse = "Oppdatert begrunnelse",
+                begrunnelse = "",
                 delvilkår = DelvilkårMålgruppeDto(
-                    medlemskap = VurderingDto(SvarJaNei.NEI, begrunnelse = null),
+                    medlemskap = VurderingDto(SvarJaNei.NEI),
                     dekketAvAnnetRegelverk = null,
                 ),
             )
@@ -243,15 +323,41 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 )
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
-                begrunnelse = "Oppdatert begrunnelse",
+                begrunnelse = "",
                 delvilkår = DelvilkårMålgruppeDto(
                     medlemskap = VurderingDto(SvarJaNei.JA),
-                    dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.JA, begrunnelse = null),
+                    dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.JA),
                 ),
             )
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
             }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
+        }
+
+        @Test
+        fun `skal feile dersom manglende begrunnelse når lønnet endres til ja`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            val vilkårperiode =
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeAktivitet(
+                        lønnet = VurderingDto(
+                            SvarJaNei.NEI,
+                        ),
+                        behandlingId = behandling.id,
+                    ),
+                )
+
+            val oppdatering = vilkårperiode.tilOppdatering().copy(
+                begrunnelse = "",
+                delvilkår = DelvilkårAktivitetDto(
+                    lønnet = VurderingDto(SvarJaNei.JA),
+                    mottarSykepenger = VurderingDto(SvarJaNei.JA),
+                ),
+            )
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
+            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
 
         @Test
@@ -321,6 +427,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 delvilkår = delvilkårDto,
                 begrunnelse = begrunnelse,
                 type = type,
+                aktivitetsdager = aktivitetsdager,
             )
         }
     }
