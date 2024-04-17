@@ -132,28 +132,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     ),
                 )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt medlemskap")
-
-            assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiode(
-                    opprettVilkårperiodeMålgruppe(
-                        type = MålgruppeType.AAP,
-                        begrunnelse = "",
-                        dekkesAvAnnetRegelverk = VurderingDto(SvarJaNei.JA),
-                        behandlingId = behandling.id,
-                    ),
-                )
-            }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
-
-            assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiode(
-                    opprettVilkårperiodeAktivitet(
-                        begrunnelse = "",
-                        lønnet = VurderingDto(SvarJaNei.JA),
-                        behandlingId = behandling.id,
-                    ),
-
-                )
-            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
 
         @Test
@@ -170,17 +148,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     ),
                 )
             }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
-
-            assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiode(
-                    opprettVilkårperiodeAktivitet(
-                        begrunnelse = "",
-                        lønnet = VurderingDto(SvarJaNei.JA),
-                        behandlingId = behandling.id,
-                    ),
-
-                )
-            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
 
         @Test

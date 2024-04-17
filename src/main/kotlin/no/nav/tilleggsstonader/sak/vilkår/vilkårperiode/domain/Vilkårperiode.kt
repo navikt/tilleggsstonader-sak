@@ -42,7 +42,7 @@ data class Vilkårperiode(
         }
 
         val ugyldigTypeOgDetaljer = (type is MålgruppeType && delvilkår !is DelvilkårMålgruppe) ||
-                (type is AktivitetType && delvilkår !is DelvilkårAktivitet)
+            (type is AktivitetType && delvilkår !is DelvilkårAktivitet)
         feilHvis(ugyldigTypeOgDetaljer) {
             "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}"
         }
@@ -61,7 +61,6 @@ data class Vilkårperiode(
     }
 
     private fun validerBegrunnelserDelvilkårMålgruppe() {
-
         val harVurdertMedlemskap =
             delvilkår is DelvilkårMålgruppe && delvilkår.medlemskap.resultat != ResultatDelvilkårperiode.IKKE_VURDERT && delvilkår.medlemskap.svar != SvarJaNei.JA_IMPLISITT
         brukerfeilHvis(harVurdertMedlemskap && begrunnelse.isNullOrBlank()) {
