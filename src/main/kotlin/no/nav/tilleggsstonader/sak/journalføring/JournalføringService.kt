@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -62,6 +63,7 @@ class JournalføringService(
                 behandlingÅrsak = journalføringRequest.årsak.behandlingsårsak,
                 journalførendeEnhet = journalføringRequest.journalførendeEnhet,
                 dokumentTitler = journalføringRequest.dokumentTitler,
+                logiskVedlegg = journalføringRequest.logiskeVedlegg,
             )
         } else {
             journalførUtenNyBehandling(journalføringRequest, journalpost)
@@ -93,6 +95,7 @@ class JournalføringService(
         oppgaveBeskrivelse: String? = null,
         journalførendeEnhet: String,
         dokumentTitler: Map<String, String>? = null,
+        logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
     ) {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
         val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
@@ -111,7 +114,7 @@ class JournalføringService(
             lagreSøknadOgBarn(journalpost, behandling)
         }
 
-        ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler)
+        ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
 
         opprettBehandleSakOppgaveTask(
             OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
@@ -133,6 +136,7 @@ class JournalføringService(
             journalføringRequest.journalførendeEnhet,
             fagsak,
             journalføringRequest.dokumentTitler,
+            journalføringRequest.logiskeVedlegg,
         )
     }
 
@@ -148,6 +152,7 @@ class JournalføringService(
         journalførendeEnhet: String,
         fagsak: Fagsak,
         dokumentTitler: Map<String, String>? = null,
+        logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
     ) {
         journalpostService.oppdaterOgFerdigstillJournalpost(
             journalpost = journalpost,
@@ -155,6 +160,7 @@ class JournalføringService(
             fagsak = fagsak,
             saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
             dokumenttitler = dokumentTitler,
+            logiskeVedlegg = logiskVedlegg,
         )
     }
 

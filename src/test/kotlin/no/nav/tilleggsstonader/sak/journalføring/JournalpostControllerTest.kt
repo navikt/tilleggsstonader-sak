@@ -3,8 +3,10 @@ package no.nav.tilleggsstonader.sak.journalføring
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.verify
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -57,6 +59,7 @@ class JournalpostControllerTest : IntegrationTest() {
                 årsak = JournalføringRequest.Journalføringsårsak.DIGITAL_SØKNAD,
                 oppgaveId = "123",
                 journalførendeEnhet = enhet,
+                logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
             ),
         )
 
@@ -77,12 +80,14 @@ class JournalpostControllerTest : IntegrationTest() {
         assertThat(opprettedeTasks).hasSize(2)
 
         val bahandlesakOppgaveTask = opprettedeTasks.single { it.type == OpprettOppgaveForOpprettetBehandlingTask.TYPE }
-        val behandlesakOppgavePayload = ObjectMapperProvider.objectMapper.readValue<OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData>(
-            bahandlesakOppgaveTask.payload,
-        )
+        val behandlesakOppgavePayload =
+            ObjectMapperProvider.objectMapper.readValue<OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData>(
+                bahandlesakOppgaveTask.payload,
+            )
         assertThat(behandlesakOppgavePayload.behandlingId).isEqualTo(opprettetBehandling.id)
 
         verify(exactly = 1) { journalpostClient.ferdigstillJournalpost("1", enhet, saksbehandler) }
+        verify(exactly = 1) { journalpostClient.oppdaterLogiskeVedlegg("1", BulkOppdaterLogiskVedleggRequest(listOf("ny tittel"))) }
         verify(exactly = 1) { oppgaveClient.ferdigstillOppgave("123".toLong()) }
     }
 

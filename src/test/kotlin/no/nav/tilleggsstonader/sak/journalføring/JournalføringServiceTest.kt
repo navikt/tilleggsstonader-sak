@@ -111,7 +111,7 @@ class JournalføringServiceTest {
     @Test
     internal fun `skal kunne journalføre og opprette behandling`() {
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
-        every { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any()) } just Runs
+        every { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any(), any()) } just Runs
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
 
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
@@ -144,6 +144,7 @@ class JournalføringServiceTest {
         }
         verify(exactly = 1) {
             journalpostService.oppdaterOgFerdigstillJournalpost(
+                any(),
                 any(),
                 any(),
                 any(),

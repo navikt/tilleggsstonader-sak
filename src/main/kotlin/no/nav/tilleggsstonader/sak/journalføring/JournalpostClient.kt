@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.journalføring
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostResponse
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
@@ -110,6 +111,17 @@ class JournalpostClient(
             .queryParam("variantFormat", dokumentVariantformat).encode().toUriString()
 
         return getForEntity<ByteArray>(uri, uriVariables = mapOf("journalpostId" to journalpostId, "dokumentInfoId" to dokumentInfoId))
+    }
+
+    fun oppdaterLogiskeVedlegg(dokumentInfoId: String, request: BulkOppdaterLogiskVedleggRequest): String {
+        val uri = UriComponentsBuilder.fromUri(dokarkivUri).pathSegment("dokument", "{dokumentInfoId}", "logiskVedlegg")
+            .encode().toUriString()
+
+        return putForEntity<String>(
+            uri,
+            request,
+            uriVariables = mapOf("dokumentInfoId" to dokumentInfoId),
+        )
     }
 
     private fun headerMedSaksbehandler(saksbehandler: String?): HttpHeaders {
