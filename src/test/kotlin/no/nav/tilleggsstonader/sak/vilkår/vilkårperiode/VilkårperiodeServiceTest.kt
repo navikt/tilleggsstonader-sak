@@ -61,7 +61,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal opprette periode for målgruppe manuelt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val opprettVilkårperiode = opprettVilkårperiodeMålgruppe(
-                medlemskap = VurderingDto(SvarJaNei.NEI, "begrunnelse medlemskap"),
+                medlemskap = VurderingDto(SvarJaNei.NEI),
                 begrunnelse = "begrunnelse målgruppe",
                 behandlingId = behandling.id,
             )
@@ -75,7 +75,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
             assertThat(vilkårperiode.medlemskap.svar).isEqualTo(SvarJaNei.NEI)
-            assertThat(vilkårperiode.medlemskap.begrunnelse).isEqualTo("begrunnelse medlemskap")
             assertThat(vilkårperiode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
             assertThat(vilkårperiode.dekketAvAnnetRegelverk.svar).isNull()
             assertThat(vilkårperiode.dekketAvAnnetRegelverk.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
@@ -85,8 +84,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal opprette periode for aktivitet manuelt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val opprettVilkårperiode = opprettVilkårperiodeAktivitet(
-                lønnet = VurderingDto(SvarJaNei.NEI, "begrunnelse lønnet"),
-                mottarSykepenger = VurderingDto(SvarJaNei.NEI, "begrunnelse sykepenger"),
+                lønnet = VurderingDto(SvarJaNei.NEI),
+                mottarSykepenger = VurderingDto(SvarJaNei.NEI),
                 begrunnelse = "begrunnelse aktivitet",
                 behandlingId = behandling.id,
             )
@@ -100,11 +99,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
             assertThat(vilkårperiode.lønnet.svar).isEqualTo(SvarJaNei.NEI)
-            assertThat(vilkårperiode.lønnet.begrunnelse).isEqualTo("begrunnelse lønnet")
             assertThat(vilkårperiode.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
 
             assertThat(vilkårperiode.mottarSykepenger.svar).isEqualTo(SvarJaNei.NEI)
-            assertThat(vilkårperiode.mottarSykepenger.begrunnelse).isEqualTo("begrunnelse sykepenger")
             assertThat(vilkårperiode.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
         }
 
@@ -224,10 +221,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 tom = nyttDato,
                 begrunnelse = "Oppdatert begrunnelse",
                 delvilkår = DelvilkårMålgruppeDto(
-                    medlemskap = VurderingDto(
-                        SvarJaNei.JA,
-                        begrunnelse = "ny begrunnelse",
-                    ),
+                    medlemskap = VurderingDto(SvarJaNei.JA),
                     dekketAvAnnetRegelverk = null,
                 ),
             )
@@ -240,7 +234,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(oppdatertPeriode.tom).isEqualTo(nyttDato)
             assertThat(oppdatertPeriode.begrunnelse).isEqualTo("Oppdatert begrunnelse")
             assertThat(oppdatertPeriode.medlemskap.svar).isEqualTo(SvarJaNei.JA)
-            assertThat(oppdatertPeriode.medlemskap.begrunnelse).isEqualTo("ny begrunnelse")
             assertThat(oppdatertPeriode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
         }
 
@@ -261,7 +254,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "Oppdatert begrunnelse",
                 delvilkår = DelvilkårMålgruppeDto(
-                    medlemskap = VurderingDto(SvarJaNei.NEI, "ny begrunnelse"),
+                    medlemskap = VurderingDto(SvarJaNei.NEI),
                     dekketAvAnnetRegelverk = null,
                 ),
             )

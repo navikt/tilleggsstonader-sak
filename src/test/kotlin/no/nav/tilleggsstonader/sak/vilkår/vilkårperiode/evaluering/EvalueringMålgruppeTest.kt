@@ -19,7 +19,7 @@ class EvalueringMålgruppeTest {
 
     val jaVurdering = VurderingDto(SvarJaNei.JA)
     val implisittVurdering = VurderingDto(SvarJaNei.JA_IMPLISITT)
-    val neiVurdering = VurderingDto(SvarJaNei.NEI, "begrunnelse")
+    val neiVurdering = VurderingDto(SvarJaNei.NEI)
     val svarManglerVurdering = VurderingDto(null)
 
     @Nested
@@ -169,7 +169,7 @@ class EvalueringMålgruppeTest {
                     type,
                     delvilkårMålgruppeDto(
                         medlemskap = oppfyltMedlemskap(type),
-                        dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.JA, begrunnelse = "begrunnelse"),
+                        dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.JA),
                     ),
                 )
 

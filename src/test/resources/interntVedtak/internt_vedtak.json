@@ -21,7 +21,6 @@
     "delvilkår" : {
       "medlemskap" : {
         "svar" : "JA_IMPLISITT",
-        "begrunnelse" : null,
         "resultat" : "OPPFYLT"
       },
       "lønnet" : null,
@@ -38,7 +37,6 @@
     "delvilkår" : {
       "medlemskap" : {
         "svar" : "JA_IMPLISITT",
-        "begrunnelse" : null,
         "resultat" : "OPPFYLT"
       },
       "lønnet" : null,
@@ -57,12 +55,10 @@
       "medlemskap" : null,
       "lønnet" : {
         "svar" : "JA",
-        "begrunnelse" : "begrunnelse lønnet",
         "resultat" : "IKKE_OPPFYLT"
       },
       "mottarSykepenger" : {
         "svar" : "NEI",
-        "begrunnelse" : null,
         "resultat" : "OPPFYLT"
       }
     },
@@ -78,12 +74,10 @@
       "medlemskap" : null,
       "lønnet" : {
         "svar" : "NEI",
-        "begrunnelse" : null,
         "resultat" : "OPPFYLT"
       },
       "mottarSykepenger" : {
         "svar" : "NEI",
-        "begrunnelse" : null,
         "resultat" : "OPPFYLT"
       }
     },

@@ -44,12 +44,10 @@ class VilkårperiodeDtoTest {
                 delvilkår = DelvilkårMålgruppe(
                     medlemskap = DelvilkårVilkårperiode.Vurdering(
                         svar = null,
-                        begrunnelse = if (resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) "begrunnelse" else null,
                         resultat = resultat,
                     ),
                     dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(
                         svar = null,
-                        begrunnelse = if (resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) "begrunnelse" else null,
                         resultat = resultat,
                     ),
                 ),
@@ -67,12 +65,10 @@ class VilkårperiodeDtoTest {
                 delvilkår = DelvilkårMålgruppe(
                     medlemskap = DelvilkårVilkårperiode.Vurdering(
                         svar = null,
-                        begrunnelse = null,
                         resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
                     ),
                     dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(
                         svar = null,
-                        begrunnelse = null,
                         resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
                     ),
                 ),

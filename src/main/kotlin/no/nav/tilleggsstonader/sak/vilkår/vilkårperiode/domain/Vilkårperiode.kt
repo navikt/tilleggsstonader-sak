@@ -106,15 +106,11 @@ enum class ResultatVilkårperiode {
 sealed class DelvilkårVilkårperiode {
     data class Vurdering(
         val svar: SvarJaNei?,
-        val begrunnelse: String? = null,
         val resultat: ResultatDelvilkårperiode,
     ) {
         init {
-            feilHvis(svar == SvarJaNei.JA_IMPLISITT && begrunnelse != null) {
-                "Kan ikke ha begrunnelse når svar=$svar"
-            }
-            feilHvis(resultat == ResultatDelvilkårperiode.IKKE_AKTUELT && (svar != null || begrunnelse != null)) {
-                "Ugyldig resultat=$resultat når svar=$svar begrunnelseErNull=${begrunnelse == null}"
+            feilHvis(resultat == ResultatDelvilkårperiode.IKKE_AKTUELT && (svar != null)) {
+                "Ugyldig resultat=$resultat når svar=$svar"
             }
         }
     }
