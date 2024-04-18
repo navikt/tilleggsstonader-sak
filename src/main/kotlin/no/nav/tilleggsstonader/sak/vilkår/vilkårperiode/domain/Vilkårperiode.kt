@@ -41,34 +41,32 @@ data class Vilkårperiode(
             require(aktivitetsdager != null) { "Aktivitetsdager må settes for aktivitet" }
         }
 
-        val ugyldigTypeOgDetaljer = (type is MålgruppeType && delvilkår !is DelvilkårMålgruppe) ||
-            (type is AktivitetType && delvilkår !is DelvilkårAktivitet)
-        feilHvis(ugyldigTypeOgDetaljer) {
-            "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}"
+        when {
+            type is MålgruppeType && delvilkår is DelvilkårMålgruppe -> delvilkår.valider()
+            type is AktivitetType && delvilkår is DelvilkårAktivitet -> delvilkår.valider()
+            else -> error("Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}")
         }
-
-        validerBegrunnelserDelvilkår()
 
         validerSlettefelter()
     }
 
-    fun validerBegrunnelserDelvilkår() {
-        validerBegrunnelserDelvilkårMålgruppe()
+    private fun DelvilkårMålgruppe.valider() {
+        brukerfeilHvis(medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
+            "Mangler begrunnelse for ikke oppfylt medlemskap"
+        }
 
-        brukerfeilHvis(delvilkår is DelvilkårAktivitet && delvilkår.lønnet.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && begrunnelse.isNullOrBlank()) {
+        brukerfeilHvis(dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
+            "Mangler begrunnelse for utgifter dekt av annet regelverk"
+        }
+    }
+
+    private fun DelvilkårAktivitet.valider() {
+        brukerfeilHvis(lønnet.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
             "Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid"
         }
     }
 
-    private fun validerBegrunnelserDelvilkårMålgruppe() {
-        brukerfeilHvis(delvilkår is DelvilkårMålgruppe && delvilkår.medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && begrunnelse.isNullOrBlank()) {
-            "Mangler begrunnelse for ikke oppfylt medlemskap"
-        }
-
-        brukerfeilHvis(delvilkår is DelvilkårMålgruppe && delvilkår.dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && begrunnelse.isNullOrBlank()) {
-            "Mangler begrunnelse for utgifter dekt av annet regelverk"
-        }
-    }
+    private fun manglerBegrunnelse() = begrunnelse.isNullOrBlank()
 
     private fun validerSlettefelter() {
         if (resultat == ResultatVilkårperiode.SLETTET) {
