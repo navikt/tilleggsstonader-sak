@@ -1,3 +1,5 @@
+import java.io.ByteArrayOutputStream
+
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20240214140223_83c31de"
 val tilleggsstønaderLibsVersion = "2024.02.12-15.54.60684ccdf789"
@@ -111,6 +113,33 @@ application {
 
 if (project.hasProperty("skipLint")) {
     gradle.startParameter.excludedTaskNames += "spotlessKotlinCheck"
+}
+
+// Oppretter version.properties med git-sha som version
+tasks {
+    fun getCheckedOutGitCommitHash(): String {
+        if (System.getenv("GITHUB_ACTIONS") == "true") {
+            return System.getenv("GITHUB_SHA")
+        }
+        val byteOut = ByteArrayOutputStream()
+        project.exec {
+            commandLine = "git rev-parse --verify HEAD".split("\\s".toRegex())
+            standardOutput = byteOut
+        }
+        return String(byteOut.toByteArray()).trim()
+    }
+
+    val projectProps by registering(WriteProperties::class) {
+        destinationFile = layout.buildDirectory.file("version.properties")
+        // Define property.
+        property("project.version", getCheckedOutGitCommitHash())
+    }
+
+    processResources {
+        // Depend on output of the task to create properties,
+        // so the properties file will be part of the Java resources.
+        from(projectProps)
+    }
 }
 
 tasks.test {
