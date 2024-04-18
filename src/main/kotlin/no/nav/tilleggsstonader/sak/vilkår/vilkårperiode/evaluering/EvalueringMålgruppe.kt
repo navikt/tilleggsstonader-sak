@@ -121,7 +121,6 @@ object EvalueringMålgruppe {
     val IMPLISITT_OPPFYLT_MÅLGRUPPE =
         Vurdering(
             svar = SvarJaNei.JA_IMPLISITT,
-            begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         )
 

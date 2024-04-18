@@ -57,7 +57,6 @@ data class DelvilkårVilkårperiode(
 
 data class VurderingVilkårperiode(
     val svar: String?,
-    val begrunnelse: String?,
     val resultat: ResultatDelvilkårperiode,
 )
 

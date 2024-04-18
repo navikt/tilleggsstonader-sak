@@ -40,15 +40,14 @@ class VilkårperiodeDtoTest {
         )
         fun `skal returnere delvilkår hvis resultat != IKKE_AKTUELT`(resultat: ResultatDelvilkårperiode) {
             val målgruppe = målgruppe(
+                begrunnelse = if (resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) "begrunnelse" else null,
                 delvilkår = DelvilkårMålgruppe(
                     medlemskap = DelvilkårVilkårperiode.Vurdering(
                         svar = null,
-                        begrunnelse = if (resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) "begrunnelse" else null,
                         resultat = resultat,
                     ),
                     dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(
                         svar = null,
-                        begrunnelse = if (resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) "begrunnelse" else null,
                         resultat = resultat,
                     ),
                 ),
@@ -66,12 +65,10 @@ class VilkårperiodeDtoTest {
                 delvilkår = DelvilkårMålgruppe(
                     medlemskap = DelvilkårVilkårperiode.Vurdering(
                         svar = null,
-                        begrunnelse = null,
                         resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
                     ),
                     dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(
                         svar = null,
-                        begrunnelse = null,
                         resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
                     ),
                 ),

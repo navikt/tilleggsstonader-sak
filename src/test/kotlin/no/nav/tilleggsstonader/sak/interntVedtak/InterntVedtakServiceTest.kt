@@ -95,7 +95,6 @@ class InterntVedtakServiceTest {
                 delvilkår = delvilkårAktivitet(
                     lønnet = vurdering(
                         SvarJaNei.JA,
-                        "begrunnelse lønnet",
                         resultat = ResultatDelvilkårperiode.IKKE_OPPFYLT,
                     ),
                 ),
@@ -159,7 +158,7 @@ class InterntVedtakServiceTest {
 
     /**
      * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
-     * Endre SKAL_SKRIVE_TIL_FIL til true
+     * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
      * Formatter htmlfil etter generering for å unngå stor diff
      */
     @Disabled
@@ -221,7 +220,6 @@ class InterntVedtakServiceTest {
             assertThat(begrunnelse).isEqualTo("målgruppe aap")
             with(delvilkår.medlemskap!!) {
                 assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT.name)
-                assertThat(begrunnelse).isNull()
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             }
             assertThat(delvilkår.lønnet).isNull()
@@ -241,12 +239,10 @@ class InterntVedtakServiceTest {
             assertThat(begrunnelse).isEqualTo("aktivitet abd")
             with(delvilkår.lønnet!!) {
                 assertThat(svar).isEqualTo(SvarJaNei.JA.name)
-                assertThat(begrunnelse).isEqualTo("begrunnelse lønnet")
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
             }
             with(delvilkår.mottarSykepenger!!) {
                 assertThat(svar).isEqualTo(SvarJaNei.NEI.name)
-                assertThat(begrunnelse).isNull()
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             }
             assertThat(delvilkår.medlemskap).isNull()

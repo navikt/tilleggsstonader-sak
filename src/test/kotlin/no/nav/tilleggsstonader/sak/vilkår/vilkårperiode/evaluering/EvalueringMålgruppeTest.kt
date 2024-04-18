@@ -19,7 +19,7 @@ class EvalueringMålgruppeTest {
 
     val jaVurdering = VurderingDto(SvarJaNei.JA)
     val implisittVurdering = VurderingDto(SvarJaNei.JA_IMPLISITT)
-    val neiVurdering = VurderingDto(SvarJaNei.NEI, "begrunnelse")
+    val neiVurdering = VurderingDto(SvarJaNei.NEI)
     val svarManglerVurdering = VurderingDto(null)
 
     @Nested
@@ -169,25 +169,12 @@ class EvalueringMålgruppeTest {
                     type,
                     delvilkårMålgruppeDto(
                         medlemskap = oppfyltMedlemskap(type),
-                        dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.JA, begrunnelse = "begrunnelse"),
+                        dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.JA),
                     ),
                 )
 
                 assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
                 assertThat(resultat.dekketAvAnnetRegelverk.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
-            }
-
-            @NedsattArbeidsevneParameterizedTest
-            fun `skal kaste feil ved svar ja og manglende begrunnelse`(type: MålgruppeType) {
-                assertThatThrownBy {
-                    utledResultat(
-                        type,
-                        delvilkårMålgruppeDto(
-                            medlemskap = oppfyltMedlemskap(type),
-                            dekketAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.JA),
-                        ),
-                    )
-                }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
             }
 
             @NedsattArbeidsevneParameterizedTest

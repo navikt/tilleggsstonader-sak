@@ -102,7 +102,6 @@ class InterntVedtakService(
         return VurderingVilkårperiode(
             svar = vurdering.svar?.name,
             resultat = vurdering.resultat,
-            begrunnelse = vurdering.begrunnelse,
         )
     }
 

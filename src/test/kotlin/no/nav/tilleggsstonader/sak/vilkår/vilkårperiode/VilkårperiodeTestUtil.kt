@@ -48,11 +48,9 @@ object VilkårperiodeTestUtil {
 
     fun vurdering(
         svar: SvarJaNei? = SvarJaNei.JA_IMPLISITT,
-        begrunnelse: String? = null,
         resultat: ResultatDelvilkårperiode = ResultatDelvilkårperiode.OPPFYLT,
     ) = Vurdering(
         svar = svar,
-        begrunnelse = begrunnelse,
         resultat = resultat,
     )
 
@@ -88,12 +86,10 @@ object VilkårperiodeTestUtil {
     fun delvilkårAktivitet(
         lønnet: Vurdering = vurdering(
             svar = SvarJaNei.NEI,
-            begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
         mottarSykepenger: Vurdering = vurdering(
             svar = SvarJaNei.NEI,
-            begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
     ) = DelvilkårAktivitet(
