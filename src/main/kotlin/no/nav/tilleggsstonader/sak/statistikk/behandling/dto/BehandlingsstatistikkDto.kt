@@ -4,11 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import java.time.ZonedDateTime
 import java.util.*
 
-//Dataklassen er lagt i sak for å ikke få sykliske byggavhengigheter mellom sak og kontrakter.
 data class BehandlingsstatistikkDto(
     val behandlingId: UUID,
     val eksternBehandlingId: Long,
@@ -32,8 +30,7 @@ data class BehandlingsstatistikkDto(
     val relatertBehandlingId: UUID?,
     val behandlingMetode: BehandlingMetode?,
     val kravMottatt: ZonedDateTime? = null,
-    val årsakRevurdering: String? = null, //revurdering er ikke implementert og settes til å være null
-    val avslagÅrsak: HenlagtÅrsak? = null,
+    val årsakRevurdering: String? = null, // TODO revurdering er ikke implementert og settes til å være null
     val kategori: BehandlingKategori? = null,
 )
 
