@@ -77,9 +77,29 @@ class AngreSendTilBeslutterService(
 
     private fun validerKanAngreSendTilBeslutter(saksbehandling: Saksbehandling) {
         validerSaksbehandlerSomAngrer(saksbehandling)
+
+        validerGodkjenneVedtakOppgaveIkkeErPlukket(saksbehandling)
         validerSteg(saksbehandling)
         validerStatus(saksbehandling)
         validerOppgave(saksbehandling)
+    }
+
+    private fun validerGodkjenneVedtakOppgaveIkkeErPlukket(saksbehandling: Saksbehandling) {
+        val oppgave = oppgaveService.hentOppgaveSomIkkeErFerdigstilt(
+            behandlingId = saksbehandling.id,
+            oppgavetype = Oppgavetype.GodkjenneVedtak,
+        )
+            ?: throw ApiFeil(
+                feil = "Systemet har ikke rukket å opprette godkjenne vedtak oppgaven enda. Prøv igjen om litt.",
+                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
+            )
+
+        val tilordnetRessurs = oppgaveService.hentOppgave(oppgave.gsakOppgaveId).tilordnetRessurs
+        val oppgaveErTilordnetEnAnnenSaksbehandler =
+            tilordnetRessurs != null && tilordnetRessurs != SikkerhetContext.hentSaksbehandler()
+        brukerfeilHvis(oppgaveErTilordnetEnAnnenSaksbehandler) {
+            "Kan ikke angre send til beslutter når oppgave er plukket av $tilordnetRessurs"
+        }
     }
 
     private fun validerSaksbehandlerSomAngrer(saksbehandling: Saksbehandling) {
