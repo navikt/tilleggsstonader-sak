@@ -55,6 +55,7 @@ class VilkårperiodeDtoTest {
 
             assertThat(målgruppe.medlemskap).isNotNull()
             assertThat(målgruppe.medlemskap?.svar).isNull()
+            assertThat(målgruppe.medlemskap?.resultat).isEqualTo(resultat)
             assertThat(målgruppe.dekketAvAnnetRegelverk).isNotNull()
             assertThat(målgruppe.dekketAvAnnetRegelverk?.svar).isNull()
         }
