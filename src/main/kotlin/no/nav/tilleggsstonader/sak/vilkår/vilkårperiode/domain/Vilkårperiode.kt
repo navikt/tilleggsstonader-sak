@@ -42,7 +42,7 @@ data class Vilkårperiode(
         }
 
         when {
-            type is MålgruppeType && delvilkår is DelvilkårMålgruppe -> delvilkår.valider()
+            type is MålgruppeType && delvilkår is DelvilkårMålgruppe -> delvilkår.valider(begrunnelse)
             type is AktivitetType && delvilkår is DelvilkårAktivitet -> delvilkår.valider()
             else -> error("Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}")
         }
@@ -50,9 +50,9 @@ data class Vilkårperiode(
         validerSlettefelter()
     }
 
-    private fun DelvilkårMålgruppe.valider() {
-        brukerfeilHvis(medlemskap.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
-            "Mangler begrunnelse for ikke oppfylt medlemskap"
+    private fun DelvilkårMålgruppe.valider(begrunnelse: String?) {
+        brukerfeilHvis((medlemskap.svar !== null && medlemskap.svar !== SvarJaNei.JA_IMPLISITT) && begrunnelse.isNullOrBlank()) {
+            "Mangler begrunnelse for vurdering av medlemskap"
         }
 
         brukerfeilHvis(dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {

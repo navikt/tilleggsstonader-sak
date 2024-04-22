@@ -120,21 +120,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `skal kaste feil ved opprettelse av vilkårperiode hvis ikke oppfylt delvilkår mangler begrunnelse - medlemskap`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-
-            assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiode(
-                    opprettVilkårperiodeMålgruppe(
-                        begrunnelse = "",
-                        medlemskap = VurderingDto(SvarJaNei.NEI),
-                        behandlingId = behandling.id,
-                    ),
-                )
-            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt medlemskap")
-        }
-
-        @Test
         fun `skal kaste feil ved opprettelse av vilkårperiode hvis ikke oppfylt delvilkår mangler begrunnelse - dekkes annet regelverk`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
@@ -164,6 +149,22 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
                 )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
+        }
+
+        @Test
+        fun `skal feile dersom manglende begrunnelse når medlemskap vurderes til`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        medlemskap = VurderingDto(
+                            SvarJaNei.JA,
+                        ),
+                        behandlingId = behandling.id,
+                    ),
+                )
+            }.hasMessageContaining("Mangler begrunnelse for vurdering av medlemskap")
         }
     }
 
@@ -215,6 +216,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                             SvarJaNei.JA,
                         ),
                         behandlingId = behandling.id,
+                        begrunnelse = "begrunnelse",
                     ),
                 )
 
@@ -239,32 +241,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `skal feile dersom manglende begrunnelse når medlemskap endres til nei`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-
-            val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(
-                    opprettVilkårperiodeMålgruppe(
-                        medlemskap = VurderingDto(
-                            SvarJaNei.JA,
-                        ),
-                        behandlingId = behandling.id,
-                    ),
-                )
-
-            val oppdatering = vilkårperiode.tilOppdatering().copy(
-                begrunnelse = "",
-                delvilkår = DelvilkårMålgruppeDto(
-                    medlemskap = VurderingDto(SvarJaNei.NEI),
-                    dekketAvAnnetRegelverk = null,
-                ),
-            )
-            assertThatThrownBy {
-                vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
-            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt medlemskap")
-        }
-
-        @Test
         fun `skal feile dersom manglende begrunnelse når dekket av annet regelverk endres til ja`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
@@ -272,9 +248,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 vilkårperiodeService.opprettVilkårperiode(
                     opprettVilkårperiodeMålgruppe(
                         type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                        medlemskap = VurderingDto(
-                            SvarJaNei.JA,
-                        ),
                         dekkesAvAnnetRegelverk = VurderingDto(
                             SvarJaNei.NEI,
                         ),
@@ -285,7 +258,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "",
                 delvilkår = DelvilkårMålgruppeDto(
-                    medlemskap = VurderingDto(SvarJaNei.JA),
+                    medlemskap = null,
                     dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.JA),
                 ),
             )
