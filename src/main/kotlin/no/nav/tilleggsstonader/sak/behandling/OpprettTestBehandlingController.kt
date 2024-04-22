@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
@@ -105,7 +106,18 @@ class OpprettTestBehandlingController(
                 arbeidOgOpphold = arbeidOgOpphold(),
             ),
             aktivitet = AktivitetAvsnitt(
-                utdanning = EnumFelt("", JaNei.JA, "", emptyList()),
+                aktiviteter = EnumFlereValgFelt(
+                    "Hvilken aktivitet søker du om støtte i forbindelse med?",
+                    listOf(VerdiFelt("ANNET", "Annet")),
+                    listOf(),
+                ),
+                annenAktivitet = EnumFelt(
+                    "Hvilken arbeidsrettet aktivitet har du? ",
+                    AnnenAktivitetType.TILTAK,
+                    "Tiltak / arbeidsrettet aktivitet",
+                    listOf(),
+                ),
+                lønnetAktivitet = EnumFelt("Mottar du lønn gjennom ett tiltak?", JaNei.NEI, "Nei", listOf()),
             ),
             barn = BarnAvsnitt(
                 barnMedBarnepass = barnMedBarnepass,
@@ -137,9 +149,19 @@ class OpprettTestBehandlingController(
             emptyList(),
         ),
         pengestøtteAnnetLand = SelectFelt("Hvilket land mottar du pengestøtte fra?", "SWE", "Sverige"),
-        harOppholdUtenforNorgeSiste12mnd = EnumFelt("Jobber du i et annet land enn Norge?", JaNei.JA, "Ja", emptyList()),
+        harOppholdUtenforNorgeSiste12mnd = EnumFelt(
+            "Jobber du i et annet land enn Norge?",
+            JaNei.JA,
+            "Ja",
+            emptyList(),
+        ),
         oppholdUtenforNorgeSiste12mnd = listOf(oppholdUtenforNorge()),
-        harOppholdUtenforNorgeNeste12mnd = EnumFelt("Jobber du i et annet land enn Norge?", JaNei.JA, "Ja", emptyList()),
+        harOppholdUtenforNorgeNeste12mnd = EnumFelt(
+            "Jobber du i et annet land enn Norge?",
+            JaNei.JA,
+            "Ja",
+            emptyList(),
+        ),
         oppholdUtenforNorgeNeste12mnd = listOf(oppholdUtenforNorge()),
     )
 

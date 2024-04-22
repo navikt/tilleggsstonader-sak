@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.OppholdUtenforNor
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -80,9 +82,13 @@ object SøknadBarnetilsynUtil {
     )
 
     fun lagAktivitet(
-        utdanning: JaNei = JaNei.JA,
+        aktiviteter: List<ValgtAktivitet> = emptyList(),
+        annenAktivitet: AnnenAktivitetType? = AnnenAktivitetType.TILTAK,
+        lønnetAktivitet: JaNei = JaNei.NEI,
     ) = AktivitetAvsnitt(
-        utdanning = utdanning,
+        aktiviteter = aktiviteter,
+        annenAktivitet = annenAktivitet,
+        lønnetAktivitet = lønnetAktivitet,
     )
 
     private fun lagHovedytelse(

@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnit
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.ArbeidOgOppholdMapper.mapArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.DokumentasjonMapper.mapDokumentasjon
 
@@ -30,7 +31,9 @@ object SøknadsskjemaBarnetilsynMapper {
                 arbeidOgOpphold = mapArbeidOgOpphold(skjema.hovedytelse.arbeidOgOpphold),
             ),
             aktivitet = AktivitetAvsnitt(
-                utdanning = skjema.aktivitet.utdanning.verdi,
+                aktiviteter = skjema.aktivitet.aktiviteter?.verdier?.map { ValgtAktivitet(id = it.verdi, label = it.label) },
+                annenAktivitet = skjema.aktivitet.annenAktivitet?.verdi,
+                lønnetAktivitet = skjema.aktivitet.lønnetAktivitet?.verdi,
             ),
             dokumentasjon = mapDokumentasjon(skjema, journalpost),
         )
