@@ -165,6 +165,21 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
+
+        @Test
+        fun `skal feile dersom manglende begrunnelse når målgruppe er nedsatt arbeidsevne`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        begrunnelse = "",
+                        type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                        behandlingId = behandling.id,
+                    ),
+                )
+            }.hasMessageContaining("Mangler begrunnelse for nedsatt arbeidsevne")
+        }
     }
 
     @Nested
@@ -271,7 +286,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val vilkårperiode =
                 vilkårperiodeService.opprettVilkårperiode(
                     opprettVilkårperiodeMålgruppe(
-                        type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                        type = MålgruppeType.UFØRETRYGD,
                         medlemskap = VurderingDto(
                             SvarJaNei.JA,
                         ),

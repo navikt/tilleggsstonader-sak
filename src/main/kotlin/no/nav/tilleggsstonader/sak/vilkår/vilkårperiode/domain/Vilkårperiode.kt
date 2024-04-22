@@ -47,7 +47,17 @@ data class Vilkårperiode(
             else -> error("Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}")
         }
 
+        validerBegrunnelseNedsattArbeidsevne()
+
         validerSlettefelter()
+    }
+
+    private fun validerBegrunnelseNedsattArbeidsevne() {
+        if (type === MålgruppeType.NEDSATT_ARBEIDSEVNE) {
+            brukerfeilHvis(begrunnelse.isNullOrBlank()) {
+                "Mangler begrunnelse for nedsatt arbeidsevne"
+            }
+        }
     }
 
     private fun DelvilkårMålgruppe.valider() {
