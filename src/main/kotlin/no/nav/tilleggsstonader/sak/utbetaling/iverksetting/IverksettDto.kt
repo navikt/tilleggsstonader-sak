@@ -25,7 +25,7 @@ data class VedtaksdetaljerDto(
 )
 
 data class ForrigeIverksettingDto(
-    val behandlingId: UUID,
+    val behandlingId: Long,
     val iverksettingId: UUID,
 )
 

@@ -236,5 +236,8 @@ class IverksettService(
             .mapNotNull { it.iverksetting }
             .maxByOrNull { it.iverksettingTidspunkt }
             ?.iverksettingId
-            ?.let { ForrigeIverksettingDto(behandlingId = behandlingId, iverksettingId = it) }
+            ?.let {
+                val eksternBehandlingId = behandlingService.hentEksternBehandlingId(behandlingId).id
+                ForrigeIverksettingDto(behandlingId = eksternBehandlingId, iverksettingId = it)
+            }
 }

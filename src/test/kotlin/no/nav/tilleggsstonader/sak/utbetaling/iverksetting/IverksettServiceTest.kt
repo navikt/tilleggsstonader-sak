@@ -131,10 +131,8 @@ class IverksettServiceTest : IntegrationTest() {
                 forrigeBehandlingId = behandling.id,
             )
 
-        val tilkjentYtelse =
-            tilkjentYtelse(behandlingId = behandling.id, andeler = lagAndeler(behandling))
-        val tilkjentYtelse2 =
-            tilkjentYtelse(behandlingId = behandling2.id, andeler = lagAndeler(behandling2))
+        val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id, andeler = lagAndeler(behandling))
+        val tilkjentYtelse2 = tilkjentYtelse(behandlingId = behandling2.id, andeler = lagAndeler(behandling2))
 
         @BeforeEach
         fun setUp() {
@@ -173,7 +171,8 @@ class IverksettServiceTest : IntegrationTest() {
 
             iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned, nesteMåned)
 
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId).isEqualTo(behandling.id)
+            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
+                .isEqualTo(hentEksternBehandlingId(behandling))
             assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling.id)
         }
 
@@ -194,7 +193,8 @@ class IverksettServiceTest : IntegrationTest() {
 
             iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
 
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId).isEqualTo(behandling.id)
+            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
+                .isEqualTo(hentEksternBehandlingId(behandling))
             assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling.id)
         }
 
@@ -219,7 +219,8 @@ class IverksettServiceTest : IntegrationTest() {
 
             iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
 
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId).isEqualTo(behandling.id)
+            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
+                .isEqualTo(hentEksternBehandlingId(behandling))
             assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(iverksettingIdBehandling1)
         }
 
@@ -246,7 +247,8 @@ class IverksettServiceTest : IntegrationTest() {
 
             iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned, nesteMåned)
 
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId).isEqualTo(behandling2.id)
+            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
+                .isEqualTo(hentEksternBehandlingId(behandling2))
             assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling2.id)
         }
 
@@ -375,6 +377,9 @@ class IverksettServiceTest : IntegrationTest() {
             ),
         )
     }
+
+    private fun hentEksternBehandlingId(behandling: Behandling) =
+        testoppsettService.hentSaksbehandling(behandling.id).eksternId
 
     private fun hentAndeler(behandling: Behandling): Set<AndelTilkjentYtelse> {
         return tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse

@@ -155,6 +155,8 @@ class BehandlingService(
     fun hentSaksbehandling(eksternBehandlingId: Long): Saksbehandling =
         behandlingRepository.finnSaksbehandling(eksternBehandlingId)
 
+    fun hentEksternBehandlingId(behandlingId: UUID) = eksternBehandlingIdRepository.findByBehandlingId(behandlingId)
+
     fun hentBehandlingPåEksternId(eksternBehandlingId: Long): Behandling = behandlingRepository.finnMedEksternId(
         eksternBehandlingId,
     ) ?: error("Kan ikke finne behandling med eksternId=$eksternBehandlingId")
