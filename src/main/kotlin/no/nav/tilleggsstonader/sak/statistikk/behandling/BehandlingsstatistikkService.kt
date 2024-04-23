@@ -23,8 +23,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
-
+import java.util.UUID
 
 @Service
 class BehandlingsstatistikkService(
@@ -33,17 +32,38 @@ class BehandlingsstatistikkService(
     private val oppgaveService: OppgaveService,
     private val personService: PersonService,
     private val totrinnskontrollService: TotrinnskontrollService,
-    private val vilkårService: VilkårService
+    private val vilkårService: VilkårService,
 ) {
     private val zoneIdOslo = ZoneId.of("Europe/Oslo")
 
     @Transactional
-    fun sendBehandlingstatistikk(behandlingId: UUID, hendelse: Hendelse, hendelseTidspunkt: LocalDateTime, gjeldendeSaksbehandler: String?, oppgaveId: Long?, behandlingMetode: BehandlingMetode?) {
-        val behandlingDVH = mapTilBehandlingDVH(behandlingId, hendelse, hendelseTidspunkt, gjeldendeSaksbehandler, oppgaveId, behandlingMetode)
+    fun sendBehandlingstatistikk(
+        behandlingId: UUID,
+        hendelse: Hendelse,
+        hendelseTidspunkt: LocalDateTime,
+        gjeldendeSaksbehandler: String?,
+        oppgaveId: Long?,
+        behandlingMetode: BehandlingMetode?,
+    ) {
+        val behandlingDVH = mapTilBehandlingDVH(
+            behandlingId,
+            hendelse,
+            hendelseTidspunkt,
+            gjeldendeSaksbehandler,
+            oppgaveId,
+            behandlingMetode,
+        )
         behandlingsstatistikkProducer.sendBehandling(behandlingDVH)
     }
 
-    private fun mapTilBehandlingDVH(behandlingId: UUID, hendelse: Hendelse, hendelseTidspunkt: LocalDateTime, gjeldendeSaksbehandler: String?, oppgaveId: Long?, behandlingMetode: BehandlingMetode?): BehandlingDVH {
+    private fun mapTilBehandlingDVH(
+        behandlingId: UUID,
+        hendelse: Hendelse,
+        hendelseTidspunkt: LocalDateTime,
+        gjeldendeSaksbehandler: String?,
+        oppgaveId: Long?,
+        behandlingMetode: BehandlingMetode?,
+    ): BehandlingDVH {
         val tekniskTid = ZonedDateTime.now(ZoneId.of("Europe/Oslo"))
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
@@ -51,7 +71,8 @@ class BehandlingsstatistikkService(
         val strengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
         val saksbehandlerId = finnSaksbehandler(hendelse, totrinnskontrollService, gjeldendeSaksbehandler, behandlingId)
         val beslutterId = settBeslutterId(hendelse, behandlingId)
-        val relatertEksternBehandlingId: String?= saksbehandling.forrigeBehandlingId?.let { behandlingService.hentSaksbehandling(it).eksternId.toString() }
+        val relatertEksternBehandlingId: String? =
+            saksbehandling.forrigeBehandlingId?.let { behandlingService.hentSaksbehandling(it).eksternId.toString() }
 
         return BehandlingDVH(
             behandlingId = saksbehandling.eksternId.toString(),
@@ -85,7 +106,7 @@ class BehandlingsstatistikkService(
             behandlingResultat = saksbehandling.resultat.name,
             resultatBegrunnelse = null, // TODO er fritekstfelt, og er ikke ønsket i statistikk før enum er implementert
             ansvarligBeslutter =
-            if (Hendelse.BESLUTTET == hendelse && beslutterId.isNotNullOrEmpty()) {
+            if (beslutterId.isNotNullOrEmpty()) {
                 maskerVerdiHvisStrengtFortrolig(
                     strengtFortroligAdresse,
                     beslutterId.toString(),
@@ -103,7 +124,7 @@ class BehandlingsstatistikkService(
             } else {
                 null
             },
-            totrinnsbehandling = sjekkSatusforToTrinn(behandlingId),
+            totrinnsbehandling = totrinnskontrollErGodkjent(behandlingId),
             sakUtland = mapTilStreng(saksbehandling.kategori),
             relatertBehandlingId = relatertEksternBehandlingId,
             versjon = Applikasjonsversjon.versjon,
@@ -124,35 +145,33 @@ class BehandlingsstatistikkService(
         }
         return beslutterId
     }
-    private fun hentVlikårsPrøving(behandlingId: UUID):List<VilkårsprøvingDVH>{
+
+    private fun hentVlikårsPrøving(behandlingId: UUID): List<VilkårsprøvingDVH> {
         val vilkår = vilkårService.hentVilkårsett(behandlingId)
 
-
-        //mapping sak-ønske
+        // mapping sak-ønske
         // to sløyfer
         val resultat = vilkår.get(0).delvilkårsett.get(0).resultat.name
-        //tre sløyfer
+        // tre sløyfer
         val regelId = vilkår.get(0).delvilkårsett.get(0).vurderinger.get(0).regelId.name
         val beskrivelse = vilkår.get(0).delvilkårsett.get(0).vurderinger.get(0).regelId.beskrivelse
 
-
-        //maping som EF
+        // maping som EF
         val resultatEF = vilkår.get(0).delvilkårsett.get(0).resultat.name
         val vurderingEF = vilkår.get(0).delvilkårsett.get(0).vurderinger
 
+        // EF modell
+        // List<"Resultat, List<vurderinger>>"
 
-        //EF modell
-       // List<"Resultat, List<vurderinger>>"
+        // Sak sitt ønske:
+        // LIST<delvilkår>
+        // Delvilåkr (Id, beskrivelse, resiltat)
 
-        //Sak sitt ønske:
-        //LIST<delvilkår>
-                    // Delvilåkr (Id, beskrivelse, resiltat)
-
-        //Settes til empty da dette kan gjenskapes senere.
+        // Settes til empty da dette kan gjenskapes senere.
         return emptyList()
     }
 
-    private fun sjekkSatusforToTrinn(behandlingId: UUID): Boolean {
+    private fun totrinnskontrollErGodkjent(behandlingId: UUID): Boolean {
         val status = totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId).status
         return when (status) {
             TotrinnkontrollStatus.GODKJENT -> true
@@ -166,13 +185,22 @@ class BehandlingsstatistikkService(
         return gsakOppgaveId?.let { oppgaveService.hentOppgave(it) }
     }
 
-    private fun Hendelse.erBesluttetEllerFerdig() = this.name == Hendelse.BESLUTTET.name || this.name == Hendelse.FERDIG.name
+    private fun Hendelse.erBesluttetEllerFerdig() =
+        this.name == Hendelse.BESLUTTET.name || this.name == Hendelse.FERDIG.name
 
-    private fun finnSaksbehandler(hendelse: Hendelse, totrinnskontrollService: TotrinnskontrollService, gjeldendeSaksbehandler: String?, behandlingId: UUID): String {
+    private fun finnSaksbehandler(
+        hendelse: Hendelse,
+        totrinnskontrollService: TotrinnskontrollService,
+        gjeldendeSaksbehandler: String?,
+        behandlingId: UUID,
+    ): String {
         return when (hendelse) {
             Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER, Hendelse.HENLAGT ->
                 gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse")
-            Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG -> totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(behandlingId)
+
+            Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG -> totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(
+                behandlingId,
+            )
         }
     }
 
@@ -182,8 +210,10 @@ class BehandlingsstatistikkService(
             BehandlingType.REVURDERING -> saksbehandling.opprettetTid
         }
     }
+
     private fun evaluerAdresseBeskyttelseStrengtFortrolig(personIdent: String): Boolean {
-        val adresseStatus = personService.hentPersonKortBolk(listOf(personIdent)).values.single().adressebeskyttelse.gradering()
+        val adresseStatus =
+            personService.hentPersonKortBolk(listOf(personIdent)).values.single().adressebeskyttelse.gradering()
         return when (adresseStatus) {
             AdressebeskyttelseGradering.STRENGT_FORTROLIG, AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND -> true
             AdressebeskyttelseGradering.FORTROLIG, AdressebeskyttelseGradering.UGRADERT -> false
