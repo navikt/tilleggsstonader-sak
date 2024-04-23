@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.statistikk.behandling
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
-import no.nav.tilleggsstonader.kontrakter.saksstatistikk.VilkårsprøvingDVH
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
@@ -128,7 +127,7 @@ class BehandlingsstatistikkService(
             sakUtland = mapTilStreng(saksbehandling.kategori),
             relatertBehandlingId = relatertEksternBehandlingId,
             versjon = Applikasjonsversjon.versjon,
-            vilkårsprøving = hentVlikårsPrøving(behandlingId),
+            vilkårsprøving = emptyList(), // TODO: Implementer dette i samarbeid med Team SAK. Ikke kritisk å ha med i starten.
             revurderingÅrsak = null, // TODO aktivere når revurdering er implementert
             revurderingOpplysningskilde = null, // TODO aktivere når revurdering er implementert
         )
@@ -144,31 +143,6 @@ class BehandlingsstatistikkService(
             null
         }
         return beslutterId
-    }
-
-    private fun hentVlikårsPrøving(behandlingId: UUID): List<VilkårsprøvingDVH> {
-        val vilkår = vilkårService.hentVilkårsett(behandlingId)
-
-        // mapping sak-ønske
-        // to sløyfer
-        val resultat = vilkår.get(0).delvilkårsett.get(0).resultat.name
-        // tre sløyfer
-        val regelId = vilkår.get(0).delvilkårsett.get(0).vurderinger.get(0).regelId.name
-        val beskrivelse = vilkår.get(0).delvilkårsett.get(0).vurderinger.get(0).regelId.beskrivelse
-
-        // maping som EF
-        val resultatEF = vilkår.get(0).delvilkårsett.get(0).resultat.name
-        val vurderingEF = vilkår.get(0).delvilkårsett.get(0).vurderinger
-
-        // EF modell
-        // List<"Resultat, List<vurderinger>>"
-
-        // Sak sitt ønske:
-        // LIST<delvilkår>
-        // Delvilåkr (Id, beskrivelse, resiltat)
-
-        // Settes til empty da dette kan gjenskapes senere.
-        return emptyList()
     }
 
     private fun totrinnskontrollErGodkjent(behandlingId: UUID): Boolean {
