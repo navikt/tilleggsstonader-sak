@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
@@ -49,7 +50,9 @@ data class FaktaAktivtet(
 )
 
 data class SøknadsgrunnlagAktivitet(
-    val utdanning: JaNei,
+    val aktiviteter: List<String>?,
+    val annenAktivitet: AnnenAktivitetType?,
+    val lønnetAktivitet: JaNei?,
 )
 
 data class FaktaBarn(

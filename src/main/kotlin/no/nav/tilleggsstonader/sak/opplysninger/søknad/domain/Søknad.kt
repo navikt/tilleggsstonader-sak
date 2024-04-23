@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -85,8 +86,17 @@ data class OppholdUtenforNorge(
 )
 
 data class AktivitetAvsnitt(
-    val utdanning: JaNei,
+    val aktiviteter: List<ValgtAktivitet>?,
+    val annenAktivitet: AnnenAktivitetType?,
+    val lønnetAktivitet: JaNei?,
 )
+
+/**
+ * ID kan også være ANNET
+ */
+data class ValgtAktivitet(val id: String, val label: String) {
+    fun erAnnet() = id == "ANNET"
+}
 
 data class Dokumentasjon(
     val type: Vedleggstype,

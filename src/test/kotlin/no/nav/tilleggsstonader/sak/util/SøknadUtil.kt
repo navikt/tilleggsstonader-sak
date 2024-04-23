@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
@@ -43,7 +44,18 @@ object SøknadUtil {
                 arbeidOgOpphold = arbeidOgOpphold(),
             ),
             aktivitet = AktivitetAvsnitt(
-                utdanning = EnumFelt("", JaNei.JA, "", emptyList()),
+                aktiviteter = EnumFlereValgFelt(
+                    "Hvilken aktivitet søker du om støtte i forbindelse med?",
+                    listOf(VerdiFelt("ANNET", "Annet")),
+                    listOf(),
+                ),
+                annenAktivitet = EnumFelt(
+                    "Hvilken arbeidsrettet aktivitet har du? ",
+                    AnnenAktivitetType.TILTAK,
+                    "Tiltak / arbeidsrettet aktivitet",
+                    listOf(),
+                ),
+                lønnetAktivitet = EnumFelt("Mottar du lønn gjennom ett tiltak?", JaNei.NEI, "Nei", listOf()),
             ),
             barn = BarnAvsnitt(barnMedBarnepass = barnMedBarnepass),
             dokumentasjon = dokumentasjon,

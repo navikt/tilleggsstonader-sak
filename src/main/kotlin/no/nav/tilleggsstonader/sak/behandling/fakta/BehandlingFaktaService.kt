@@ -42,7 +42,9 @@ class BehandlingFaktaService(
         FaktaAktivtet(
             søknadsgrunnlag = søknad?.let {
                 SøknadsgrunnlagAktivitet(
-                    utdanning = it.data.aktivitet.utdanning,
+                    aktiviteter = it.data.aktivitet.aktiviteter?.map { it.label },
+                    annenAktivitet = it.data.aktivitet.annenAktivitet,
+                    lønnetAktivitet = it.data.aktivitet.lønnetAktivitet,
                 )
             },
         )
