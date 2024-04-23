@@ -65,7 +65,7 @@ class BehandlingsstatistikkService(
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling)
         val strengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
         val saksbehandlerId = finnSaksbehandler(hendelse, totrinnskontrollService, gjeldendeSaksbehandler, behandlingId)
-        val beslutterId = settBeslutterId(hendelse, behandlingId)
+        val beslutterId = utledBeslutterId(hendelse, behandlingId)
         val relatertEksternBehandlingId: String? =
             saksbehandling.forrigeBehandlingId?.let { behandlingService.hentSaksbehandling(it).eksternId.toString() }
 
@@ -129,7 +129,7 @@ class BehandlingsstatistikkService(
         )
     }
 
-    private fun settBeslutterId(
+    private fun utledBeslutterId(
         hendelse: Hendelse,
         behandlingId: UUID,
     ): String? {
