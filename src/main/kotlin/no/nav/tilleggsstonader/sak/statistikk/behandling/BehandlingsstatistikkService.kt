@@ -133,19 +133,17 @@ class BehandlingsstatistikkService(
         hendelse: Hendelse,
         behandlingId: UUID,
     ): String? {
-        val beslutterId = if (hendelse.erBesluttetEllerFerdig()) {
+        return if (hendelse.erBesluttetEllerFerdig()) {
             totrinnskontrollService.hentBeslutter(behandlingId)
         } else {
             null
         }
-        return beslutterId
+       
     }
 
     private fun totrinnskontrollErGodkjent(behandlingId: UUID): Boolean {
         val totrinnskontrollstatus = totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId).status
-        return when (totrinnskontrollstatus) {
-            TotrinnkontrollStatus.GODKJENT -> true
-            else -> false
+        return totrinnskontrollstatus === TotrinnkontrollStatus.GODKJENT
         }
     }
 
