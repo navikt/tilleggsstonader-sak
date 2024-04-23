@@ -21,7 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollSt
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Service
 class BehandlingsstatistikkService(
@@ -185,6 +185,7 @@ class BehandlingsstatistikkService(
         }
     }
 
+   //-5 er ein kode som dvh forstår som maskert med årsak i strengtfortrolig, og behandler datasettet deretter.
     private fun maskerVerdiHvisStrengtFortrolig(
         erStrengtFortrolig: Boolean,
         verdi: String,
