@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
-import no.nav.tilleggsstonader.sak.util.europeOslo
+import no.nav.tilleggsstonader.sak.util.ZONE_ID_OSLO
 import no.nav.tilleggsstonader.sak.util.zonedNow
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
@@ -74,9 +74,9 @@ class BehandlingsstatistikkService(
             behandlingUuid = behandlingId.toString(),
             sakId = saksbehandling.eksternId.toString(),
             aktorId = saksbehandling.ident,
-            registrertTid = saksbehandling.opprettetTid.atZone(europeOslo)
-                ?: henvendelseTidspunkt.atZone(europeOslo),
-            endretTid = hendelseTidspunkt.atZone(europeOslo),
+            registrertTid = saksbehandling.opprettetTid.atZone(ZONE_ID_OSLO)
+                ?: henvendelseTidspunkt.atZone(ZONE_ID_OSLO),
+            endretTid = hendelseTidspunkt.atZone(ZONE_ID_OSLO),
             tekniskTid = zonedNow(),
             behandlingStatus = hendelse.name,
             opprettetAv = maskerVerdiHvisStrengtFortrolig(
@@ -84,7 +84,7 @@ class BehandlingsstatistikkService(
                 saksbehandlerId,
             ),
             saksnummer = saksbehandling.eksternFagsakId.toString(),
-            mottattTid = henvendelseTidspunkt.atZone(europeOslo),
+            mottattTid = henvendelseTidspunkt.atZone(ZONE_ID_OSLO),
             saksbehandler = maskerVerdiHvisStrengtFortrolig(
                 strengtFortroligAdresse,
                 saksbehandlerId,
@@ -110,12 +110,12 @@ class BehandlingsstatistikkService(
                 null
             },
             vedtakTid = if (Hendelse.VEDTATT == hendelse) {
-                hendelseTidspunkt.atZone(europeOslo)
+                hendelseTidspunkt.atZone(ZONE_ID_OSLO)
             } else {
                 null
             },
             ferdigBehandletTid = if (Hendelse.FERDIG == hendelse) {
-                hendelseTidspunkt.atZone(europeOslo)
+                hendelseTidspunkt.atZone(ZONE_ID_OSLO)
             } else {
                 null
             },
@@ -138,14 +138,13 @@ class BehandlingsstatistikkService(
         } else {
             null
         }
-       
     }
 
     private fun totrinnskontrollErGodkjent(behandlingId: UUID): Boolean {
         val totrinnskontrollstatus = totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId).status
         return totrinnskontrollstatus === TotrinnkontrollStatus.GODKJENT
-        }
     }
+
 
     private fun finnSisteOppgaveForBehandlingen(behandlingId: UUID, oppgaveId: Long?): Oppgave? {
         val gsakOppgaveId = oppgaveId ?: oppgaveService.finnSisteOppgaveForBehandling(behandlingId)?.gsakOppgaveId
