@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -61,7 +62,7 @@ class SøknadServiceTest : IntegrationTest() {
         val skjema = søknadskjemaBarnetilsyn(
             barnMedBarnepass = listOf(barnMedBarnepass(ident = "barn1", navn = "navn1")),
         )
-        val søknad = søknadService.lagreSøknad(behandling.id, "journalpostId", skjema)
+        val søknad = søknadService.lagreSøknad(behandling.id, lagJournalpost("journalpostId"), skjema)
         assertThat(søknad.journalpostId).isEqualTo("journalpostId")
         assertThat(søknad.barn).hasSize(1)
         assertThat(søknad.barn.single().ident).isEqualTo("barn1")
@@ -78,7 +79,7 @@ class SøknadServiceTest : IntegrationTest() {
     private fun lagreSøknad(
         behandling: Behandling,
     ): SøknadBarnetilsyn {
-        søknadService.lagreSøknad(behandling.id, "123", søknadskjemaBarnetilsyn())
+        søknadService.lagreSøknad(behandling.id, lagJournalpost(), søknadskjemaBarnetilsyn())
         return søknadService.hentSøknadBarnetilsyn(behandling.id)!!
     }
 }

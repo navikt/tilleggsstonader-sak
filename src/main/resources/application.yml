@@ -86,7 +86,6 @@ no.nav.security.jwt:
   issuer.azuread:
     discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
     accepted_audience: ${AZURE_APP_CLIENT_ID}
-    cookie_name: azure_token
   client.registration:
     arena-client_credentials:
       resource-url: ${clients.arena.uri}
@@ -136,14 +135,40 @@ no.nav.security.jwt:
         client-secret: ${AZURE_APP_CLIENT_SECRET}
         client-auth-method: client_secret_basic
 
-TILLEGGSTONADER_VEDTAK_TOPIC: tilleggstonader.aapen-tilleggsstonader-vedtak
+    kodeverk-client_credentials:
+      resource-url: ${clients.kodeverk.uri}
+      token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+      grant-type: client_credentials
+      scope: ${clients.kodeverk.scope}
+      authentication:
+        client-id: ${AZURE_APP_CLIENT_ID}
+        client-secret: ${AZURE_APP_CLIENT_SECRET}
+        client-auth-method: client_secret_basic
+
+    iverksetting:
+      resource-url: ${clients.iverksetting.uri}
+      token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+      grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+      scope: ${clients.iverksetting.scope}
+      authentication:
+        client-id: ${AZURE_APP_CLIENT_ID}
+        client-secret: ${AZURE_APP_CLIENT_SECRET}
+        client-auth-method: client_secret_basic
+    iverksetting-clientcredentials:
+      resource-url: ${clients.iverksetting.uri}
+      token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+      grant-type: client_credentials
+      scope: ${clients.iverksetting.scope}
+      authentication:
+        client-id: ${AZURE_APP_CLIENT_ID}
+        client-secret: ${AZURE_APP_CLIENT_SECRET}
+        client-auth-method: client_secret_basic
+
+
 TILLEGGSTONADER_BEHANDLING_TOPIC: tilleggstonader.aapen-tilleggsstonader-behandling
 
 
 clients:
-  iverksett:
-    uri: http://tilleggsstonader-iverksett
-    scope: api://${CLIENT_ENV}-gcp.tilleggsstonader.tilleggsstonader-iverksett/.default
   integrasjoner:
     uri: http://tilleggsstonader-integrasjoner
     scope: api://${CLIENT_ENV}-gcp.tilleggsstonader.tilleggsstonader-integrasjoner/.default
@@ -160,3 +185,9 @@ clients:
     scope: api://${CLIENT_ENV}-fss.tilleggsstonader.tilleggsstonader-arena/.default
   htmlify:
     uri: http://tilleggsstonader-htmlify
+  iverksetting:
+    uri: http://utsjekk.helved
+    scope: api://${CLIENT_ENV}-gcp.helved.utsjekk/.default
+  kodeverk:
+    uri: http://kodeverk-api.team-rocket
+    scope: api://${CLIENT_ENV}-gcp.team-rocket.kodeverk-api/.default

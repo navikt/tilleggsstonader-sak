@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -46,8 +47,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal feile hvis man prøver å opprette en støndsperiode med id`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             val periode = stønadsperiodeDto(UUID.randomUUID())
             assertThatThrownBy {
@@ -58,8 +59,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne opprette flere stønadsperioder`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             val lagredeStønadsperioder = testWithBrukerContext(SAKSHEH_A) {
                 stønadsperiodeService.lagreStønadsperioder(
@@ -81,10 +82,22 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `endring av perioden oppdaterer felter men ikke opprettetAv`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(MålgruppeType.OVERGANGSSTØNAD, behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(AktivitetType.UTDANNING, lønnet = null, behandlingId = behandling.id))
+            opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            opprettVilkårperiode(
+                målgruppe(
+                    type = MålgruppeType.OVERGANGSSTØNAD,
+                    dekkesAvAnnetRegelverk = null,
+                    behandlingId = behandling.id,
+                ),
+            )
+            opprettVilkårperiode(
+                aktivitet(
+                    AktivitetType.UTDANNING,
+                    lønnet = null,
+                    behandlingId = behandling.id,
+                ),
+            )
 
             val periode = stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
@@ -96,7 +109,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 målgruppe = MålgruppeType.OVERGANGSSTØNAD,
                 aktivitet = AktivitetType.UTDANNING,
             )
-            val oppdatertePerioder = testWithBrukerContext(SAKSHEH_B) {
+            val oppdatertePerioder = testWithBrukerContext(SAKSHEH_B, groups = listOf(rolleConfig.saksbehandlerRolle)) {
                 stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(oppdatertPeriode))
             }
             assertThat(oppdatertePerioder).hasSize(1)
@@ -115,8 +128,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne slette en periode`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
             stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
@@ -131,10 +144,22 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne endre, legge til og slette i en oppdatering`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(målgruppe(MålgruppeType.OVERGANGSSTØNAD, behandlingId = behandling.id))
-            vilkårperiodeService.opprettVilkårperiode(aktivitet(AktivitetType.UTDANNING, lønnet = null, behandlingId = behandling.id))
+            opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
+            opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
+            opprettVilkårperiode(
+                målgruppe(
+                    type = MålgruppeType.OVERGANGSSTØNAD,
+                    dekkesAvAnnetRegelverk = null,
+                    behandlingId = behandling.id,
+                ),
+            )
+            opprettVilkårperiode(
+                aktivitet(
+                    AktivitetType.UTDANNING,
+                    lønnet = null,
+                    behandlingId = behandling.id,
+                ),
+            )
 
             val stønadsperioder = stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
@@ -153,7 +178,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 aktivitet = AktivitetType.UTDANNING,
             )
             val nyPeriode = stønadsperiodeDto(fom = FOM.plusDays(10), tom = FOM.plusDays(10))
-            val stønadsperioder2 = testWithBrukerContext(SAKSHEH_B) {
+            val stønadsperioder2 = testWithBrukerContext(SAKSHEH_B, groups = listOf(rolleConfig.saksbehandlerRolle)) {
                 stønadsperiodeService.lagreStønadsperioder(
                     behandling.id,
                     listOf(oppdatertPeriode, nyPeriode),
@@ -205,12 +230,13 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         fom: LocalDate = this.FOM,
         tom: LocalDate = this.TOM,
         medlemskap: SvarJaNei? = null,
+        dekkesAvAnnetRegelverk: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: UUID = UUID.randomUUID(),
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårMålgruppeDto(VurderingDto(medlemskap)),
+        delvilkår = DelvilkårMålgruppeDto(VurderingDto(medlemskap), VurderingDto(dekkesAvAnnetRegelverk)),
         behandlingId = behandlingId,
     )
 
@@ -221,12 +247,14 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         lønnet: SvarJaNei? = SvarJaNei.NEI,
         mottarSykepenger: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: UUID = UUID.randomUUID(),
+        aktivitetsdager: Int = 5,
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
         delvilkår = DelvilkårAktivitetDto(VurderingDto(lønnet), VurderingDto(mottarSykepenger)),
         behandlingId = behandlingId,
+        aktivitetsdager = aktivitetsdager,
     )
 
     private fun stønadsperiodeDto(
@@ -242,4 +270,9 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         målgruppe = målgruppeType,
         aktivitet = aktivitet,
     )
+
+    private fun opprettVilkårperiode(periode: LagreVilkårperiode): LagreVilkårperiodeResponse {
+        val oppdatertPeriode = vilkårperiodeService.opprettVilkårperiode(periode)
+        return vilkårperiodeService.validerOgLagResponse(oppdatertPeriode)
+    }
 }

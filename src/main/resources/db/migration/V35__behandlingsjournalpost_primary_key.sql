@@ -1,0 +1,1 @@
+ALTER TABLE behandlingsjournalpost ADD PRIMARY KEY (behandling_id, journalpost_id);

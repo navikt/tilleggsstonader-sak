@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.mottarSykepenger
@@ -60,7 +61,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal opprette periode for målgruppe manuelt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val opprettVilkårperiode = opprettVilkårperiodeMålgruppe(
-                medlemskap = VurderingDto(SvarJaNei.NEI, "begrunnelse medlemskap"),
+                medlemskap = VurderingDto(SvarJaNei.NEI),
                 begrunnelse = "begrunnelse målgruppe",
                 behandlingId = behandling.id,
             )
@@ -74,16 +75,17 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
             assertThat(vilkårperiode.medlemskap.svar).isEqualTo(SvarJaNei.NEI)
-            assertThat(vilkårperiode.medlemskap.begrunnelse).isEqualTo("begrunnelse medlemskap")
             assertThat(vilkårperiode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+            assertThat(vilkårperiode.dekketAvAnnetRegelverk.svar).isNull()
+            assertThat(vilkårperiode.dekketAvAnnetRegelverk.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
         }
 
         @Test
         fun `skal opprette periode for aktivitet manuelt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val opprettVilkårperiode = opprettVilkårperiodeAktivitet(
-                lønnet = VurderingDto(SvarJaNei.NEI, "begrunnelse lønnet"),
-                mottarSykepenger = VurderingDto(SvarJaNei.NEI, "begrunnelse sykepenger"),
+                lønnet = VurderingDto(SvarJaNei.NEI),
+                mottarSykepenger = VurderingDto(SvarJaNei.NEI),
                 begrunnelse = "begrunnelse aktivitet",
                 behandlingId = behandling.id,
             )
@@ -97,11 +99,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
             assertThat(vilkårperiode.lønnet.svar).isEqualTo(SvarJaNei.NEI)
-            assertThat(vilkårperiode.lønnet.begrunnelse).isEqualTo("begrunnelse lønnet")
             assertThat(vilkårperiode.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
 
             assertThat(vilkårperiode.mottarSykepenger.svar).isEqualTo(SvarJaNei.NEI)
-            assertThat(vilkårperiode.mottarSykepenger.begrunnelse).isEqualTo("begrunnelse sykepenger")
             assertThat(vilkårperiode.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
         }
 
@@ -118,6 +118,68 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiode)
             }.hasMessageContaining("målgruppe=DAGPENGER er ikke gyldig for ${Stønadstype.BARNETILSYN}")
         }
+
+        @Test
+        fun `skal kaste feil ved opprettelse av vilkårperiode med vurdering av medlemskap uten begrunnelse`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        begrunnelse = "",
+                        medlemskap = VurderingDto(SvarJaNei.NEI),
+                        behandlingId = behandling.id,
+                    ),
+                )
+            }.hasMessageContaining("Mangler begrunnelse for vurdering av medlemskap")
+        }
+
+        @Test
+        fun `skal kaste feil ved opprettelse av vilkårperiode hvis ikke oppfylt delvilkår mangler begrunnelse - dekkes annet regelverk`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        type = MålgruppeType.AAP,
+                        begrunnelse = "",
+                        dekkesAvAnnetRegelverk = VurderingDto(SvarJaNei.JA),
+                        behandlingId = behandling.id,
+                    ),
+                )
+            }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
+        }
+
+        @Test
+        fun `skal kaste feil ved opprettelse av vilkårperiode hvis ikke oppfylt delvilkår mangler begrunnelse - lønnet`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeAktivitet(
+                        begrunnelse = "",
+                        lønnet = VurderingDto(SvarJaNei.JA),
+                        behandlingId = behandling.id,
+                    ),
+
+                )
+            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
+        }
+
+        @Test
+        fun `skal feile dersom manglende begrunnelse når målgruppe er nedsatt arbeidsevne`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        begrunnelse = "",
+                        type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                        behandlingId = behandling.id,
+                    ),
+                )
+            }.hasMessageContaining("Mangler begrunnelse for nedsatt arbeidsevne")
+        }
     }
 
     @Nested
@@ -128,7 +190,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiodeMålgruppe(medlemskap = null, behandlingId = behandling.id))
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        medlemskap = null,
+                        behandlingId = behandling.id,
+                    ),
+                )
 
             val nyttDato = LocalDate.of(2020, 1, 1)
             val oppdatering = vilkårperiode.tilOppdatering().copy(
@@ -136,10 +203,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 tom = nyttDato,
                 begrunnelse = "Oppdatert begrunnelse",
                 delvilkår = DelvilkårMålgruppeDto(
-                    medlemskap = VurderingDto(
-                        SvarJaNei.JA,
-                        begrunnelse = "ny begrunnelse",
-                    ),
+                    medlemskap = VurderingDto(SvarJaNei.JA),
+                    dekketAvAnnetRegelverk = null,
                 ),
             )
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
@@ -151,7 +216,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(oppdatertPeriode.tom).isEqualTo(nyttDato)
             assertThat(oppdatertPeriode.begrunnelse).isEqualTo("Oppdatert begrunnelse")
             assertThat(oppdatertPeriode.medlemskap.svar).isEqualTo(SvarJaNei.JA)
-            assertThat(oppdatertPeriode.medlemskap.begrunnelse).isEqualTo("ny begrunnelse")
             assertThat(oppdatertPeriode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
         }
 
@@ -160,11 +224,22 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiodeMålgruppe(medlemskap = VurderingDto(SvarJaNei.JA), behandlingId = behandling.id))
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        begrunnelse = "Begrunnelse",
+                        medlemskap = VurderingDto(
+                            SvarJaNei.JA,
+                        ),
+                        behandlingId = behandling.id,
+                    ),
+                )
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "Oppdatert begrunnelse",
-                delvilkår = DelvilkårMålgruppeDto(medlemskap = VurderingDto(SvarJaNei.NEI)),
+                delvilkår = DelvilkårMålgruppeDto(
+                    medlemskap = VurderingDto(SvarJaNei.NEI),
+                    dekketAvAnnetRegelverk = null,
+                ),
             )
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
 
@@ -177,6 +252,59 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.svar).isEqualTo(SvarJaNei.NEI)
             assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.resultat)
                 .isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+        }
+
+        @Test
+        fun `skal feile dersom manglende begrunnelse når dekket av annet regelverk endres til ja`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            val vilkårperiode =
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        type = MålgruppeType.UFØRETRYGD,
+                        dekkesAvAnnetRegelverk = VurderingDto(
+                            SvarJaNei.NEI,
+                        ),
+                        behandlingId = behandling.id,
+                    ),
+                )
+
+            val oppdatering = vilkårperiode.tilOppdatering().copy(
+                begrunnelse = "",
+                delvilkår = DelvilkårMålgruppeDto(
+                    medlemskap = null,
+                    dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.JA),
+                ),
+            )
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
+            }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
+        }
+
+        @Test
+        fun `skal feile dersom manglende begrunnelse når lønnet endres til ja`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            val vilkårperiode =
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeAktivitet(
+                        lønnet = VurderingDto(
+                            SvarJaNei.NEI,
+                        ),
+                        behandlingId = behandling.id,
+                    ),
+                )
+
+            val oppdatering = vilkårperiode.tilOppdatering().copy(
+                begrunnelse = "",
+                delvilkår = DelvilkårAktivitetDto(
+                    lønnet = VurderingDto(SvarJaNei.JA),
+                    mottarSykepenger = VurderingDto(SvarJaNei.JA),
+                ),
+            )
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
+            }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
 
         @Test
@@ -220,13 +348,17 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     periode.id,
                     periode.tilOppdatering(),
                 )
-            }.hasMessageContaining("Kan ikke oppdatere vilkårperiode når behandling er låst for videre redigering")
+            }.hasMessageContaining("Kan ikke opprette eller endre vilkårperiode når behandling er låst for videre redigering")
         }
 
         private fun Vilkårperiode.tilOppdatering(): LagreVilkårperiode {
             val delvilkårDto = when (this.delvilkår) {
-                is DelvilkårMålgruppe ->
-                    DelvilkårMålgruppeDto(VurderingDto((this.delvilkår as DelvilkårMålgruppe).medlemskap.svar))
+                is DelvilkårMålgruppe -> (this.delvilkår as DelvilkårMålgruppe).let {
+                    DelvilkårMålgruppeDto(
+                        medlemskap = VurderingDto(it.medlemskap.svar),
+                        dekketAvAnnetRegelverk = VurderingDto(it.dekketAvAnnetRegelverk.svar),
+                    )
+                }
 
                 is DelvilkårAktivitet -> (this.delvilkår as DelvilkårAktivitet).let {
                     DelvilkårAktivitetDto(
@@ -242,6 +374,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 delvilkår = delvilkårDto,
                 begrunnelse = begrunnelse,
                 type = type,
+                aktivitetsdager = aktivitetsdager,
             )
         }
     }
@@ -261,7 +394,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
-            }.hasMessageContaining("Kan ikke slette vilkårperiode når behandling er låst for videre redigering")
+            }.hasMessageContaining("Kan ikke opprette eller endre vilkårperiode når behandling er låst for videre redigering")
         }
 
         @Test
@@ -318,7 +451,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class ValiderStønadsperioder {
+    inner class Validering {
         @Test
         fun `skal validere stønadsperioder ved opprettelse av vilkårperiode - ingen stønadsperioder`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
@@ -349,7 +482,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val fom2 = LocalDate.of(2024, 2, 1)
             val tom2 = LocalDate.of(2024, 3, 1)
 
-            vilkårperiodeService.opprettVilkårperiode(
+            val opprettetMålgruppe = vilkårperiodeService.opprettVilkårperiode(
                 LagreVilkårperiode(
                     type = MålgruppeType.AAP,
                     fom = fom1,
@@ -358,30 +491,42 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     behandlingId = behandling.id,
                 ),
             )
-            val oppprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiode(
+
+            assertThat(vilkårperiodeService.validerOgLagResponse(opprettetMålgruppe).stønadsperiodeStatus).isEqualTo(
+                Stønadsperiodestatus.OK,
+            )
+
+            val opprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiode(
                 LagreVilkårperiode(
                     type = AktivitetType.TILTAK,
                     fom = fom1,
                     tom = tom1,
                     delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
                     behandlingId = behandling.id,
+                    aktivitetsdager = 5,
                 ),
             )
-
+            assertThat(vilkårperiodeService.validerOgLagResponse(opprettetTiltakPeriode).stønadsperiodeStatus).isEqualTo(
+                Stønadsperiodestatus.OK,
+            )
             stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyStønadsperiode(fom1, tom1)))
 
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(
-                id = oppprettetTiltakPeriode.id,
+                id = opprettetTiltakPeriode.id,
                 vilkårperiode = LagreVilkårperiode(
                     type = AktivitetType.TILTAK,
                     fom = fom2,
                     tom = tom2,
                     delvilkår = VilkårperiodeTestUtil.delvilkårAktivitetDto(),
                     behandlingId = behandling.id,
+                    aktivitetsdager = 5,
                 ),
             )
+            vilkårperiodeService.validerOgLagResponse(oppdatertPeriode)
 
-            assertThat(vilkårperiodeService.validerOgLagResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.FEIL)
+            assertThat(vilkårperiodeService.validerOgLagResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(
+                Stønadsperiodestatus.FEIL,
+            )
         }
 
         private fun nyStønadsperiode(fom: LocalDate = LocalDate.now(), tom: LocalDate = LocalDate.now()) =

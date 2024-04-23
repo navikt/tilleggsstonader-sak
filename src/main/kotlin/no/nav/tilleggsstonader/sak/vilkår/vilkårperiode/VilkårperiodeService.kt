@@ -2,7 +2,10 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
@@ -51,9 +54,7 @@ class VilkårperiodeService(
         vilkårsperioder: List<Vilkårperiode>,
     ) = vilkårsperioder.filter { it.type is T }
 
-    fun validerOgLagResponse(
-        periode: Vilkårperiode,
-    ): LagreVilkårperiodeResponse {
+    fun validerOgLagResponse(periode: Vilkårperiode): LagreVilkårperiodeResponse {
         val valideringsresultat = validerStønadsperioder(periode.behandlingId)
 
         return LagreVilkårperiodeResponse(
@@ -66,13 +67,12 @@ class VilkårperiodeService(
     @Transactional
     fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
-        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke opprette vilkår når behandling er låst for videre redigering"
-        }
+        validerBehandling(behandling)
 
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
         }
+        validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
 
         val resultatEvaluering = evaulerVilkårperiode(vilkårperiode.type, vilkårperiode.delvilkår)
 
@@ -85,9 +85,29 @@ class VilkårperiodeService(
                 delvilkår = resultatEvaluering.delvilkår,
                 begrunnelse = vilkårperiode.begrunnelse,
                 resultat = resultatEvaluering.resultat,
+                aktivitetsdager = vilkårperiode.aktivitetsdager,
                 kilde = KildeVilkårsperiode.MANUELL,
             ),
         )
+    }
+
+    private fun validerBehandling(behandling: Saksbehandling) {
+        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
+            "Kan ikke opprette eller endre vilkårperiode når behandling er låst for videre redigering"
+        }
+        feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
+            "Kan ikke opprette eller endre vilkårperiode når behandling ikke er på steg ${StegType.INNGANGSVILKÅR}"
+        }
+    }
+
+    private fun validerAktivitetsdager(vilkårPeriodeType: VilkårperiodeType, aktivitetsdager: Int?) {
+        if (vilkårPeriodeType is AktivitetType) {
+            brukerfeilHvisIkke(aktivitetsdager in 1..5) {
+                "Aktivitetsdager må være et heltall mellom 1 og 5"
+            }
+        } else if (vilkårPeriodeType is MålgruppeType) {
+            brukerfeilHvisIkke(aktivitetsdager == null) { "Kan ikke registrere aktivitetsdager på målgrupper" }
+        }
     }
 
     private fun validerStønadsperioder(behandlingId: UUID): Result<Unit> {
@@ -103,9 +123,11 @@ class VilkårperiodeService(
         val eksisterendeVilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
         validerBehandlingIdErLik(vilkårperiode.behandlingId, eksisterendeVilkårperiode.behandlingId)
-        feilHvis(behandlingErLåstForVidereRedigering(eksisterendeVilkårperiode.behandlingId)) {
-            "Kan ikke oppdatere vilkårperiode når behandling er låst for videre redigering"
-        }
+        val behandling = behandlingService.hentSaksbehandling(eksisterendeVilkårperiode.behandlingId)
+        validerBehandling(behandling)
+
+        validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
+
         val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.type, vilkårperiode.delvilkår)
         val oppdatert = when (eksisterendeVilkårperiode.kilde) {
             KildeVilkårsperiode.MANUELL -> {
@@ -114,6 +136,7 @@ class VilkårperiodeService(
                     fom = vilkårperiode.fom,
                     tom = vilkårperiode.tom,
                     delvilkår = resultatEvaluering.delvilkår,
+                    aktivitetsdager = vilkårperiode.aktivitetsdager,
                     resultat = resultatEvaluering.resultat,
                 )
             }
@@ -147,9 +170,8 @@ class VilkårperiodeService(
 
         validerBehandlingIdErLik(slettVikårperiode.behandlingId, vilkårperiode.behandlingId)
 
-        feilHvis(behandlingErLåstForVidereRedigering(vilkårperiode.behandlingId)) {
-            "Kan ikke slette vilkårperiode når behandling er låst for videre redigering"
-        }
+        val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
+        validerBehandling(behandling)
 
         return vilkårperiodeRepository.update(
             vilkårperiode.copy(

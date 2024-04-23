@@ -6,8 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Simuleringsoppsummering
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -20,7 +19,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.exchange
-import java.time.LocalDate
 import java.util.UUID
 
 internal class SimuleringControllerTest : IntegrationTest() {
@@ -44,21 +42,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
         val personIdent = "12345678901"
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(personIdent))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
-        tilkjentYtelseRepository
-            .insert(
-                TilkjentYtelse(
-                    behandlingId = behandling.id,
-                    startdato = LocalDate.of(2021, 1, 1),
-                    andelerTilkjentYtelse = listOf(
-                        AndelTilkjentYtelse(
-                            15000,
-                            LocalDate.of(2021, 1, 1),
-                            LocalDate.of(2021, 12, 31),
-                            kildeBehandlingId = behandling.id,
-                        ),
-                    ),
-                ),
-            )
+        tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
         val respons: ResponseEntity<Simuleringsoppsummering> = simulerForBehandling(behandling.id)
 

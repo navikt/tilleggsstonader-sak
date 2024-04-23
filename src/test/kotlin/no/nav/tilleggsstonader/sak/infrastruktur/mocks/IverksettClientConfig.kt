@@ -3,9 +3,11 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.clearMocks
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.iverksett.IverksettClient
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettStatus
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import org.springframework.context.annotation.Bean
@@ -33,6 +35,8 @@ class IverksettClientConfig {
 
         fun clearMock(iverksettClient: IverksettClient) {
             clearMocks(iverksettClient)
+            justRun { iverksettClient.iverksett(any()) }
+            every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK
             every { iverksettClient.simuler(any()) } returns simuleringsresultat
         }
     }

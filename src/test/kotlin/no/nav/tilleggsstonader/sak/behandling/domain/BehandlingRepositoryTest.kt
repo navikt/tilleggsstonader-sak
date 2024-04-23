@@ -158,6 +158,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         assertThat(behandlingServiceObject.henlagtÅrsak).isEqualTo(behandling.henlagtÅrsak)
         assertThat(behandlingServiceObject.ident).isEqualTo("2")
         assertThat(behandlingServiceObject.fagsakId).isEqualTo(fagsak.id)
+        assertThat(behandlingServiceObject.fagsakPersonId).isEqualTo(fagsak.fagsakPersonId)
         assertThat(behandlingServiceObject.eksternFagsakId).isEqualTo(fagsak.eksternId.id)
         assertThat(behandlingServiceObject.stønadstype).isEqualTo(fagsak.stønadstype)
         assertThat(behandlingServiceObject.opprettetAv).isEqualTo(behandling.sporbar.opprettetAv)

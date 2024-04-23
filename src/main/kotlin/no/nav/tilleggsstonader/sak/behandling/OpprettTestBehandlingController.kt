@@ -5,16 +5,27 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.søknad.DatoFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.HovedytelseAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.SøknadsskjemaBarnetilsyn
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.OppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -33,6 +44,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -89,7 +101,8 @@ class OpprettTestBehandlingController(
         }
         val skjemaBarnetilsyn = SøknadsskjemaBarnetilsyn(
             hovedytelse = HovedytelseAvsnitt(
-                hovedytelse = EnumFelt("", Hovedytelse.AAP, "", emptyList()),
+                hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
+                arbeidOgOpphold = arbeidOgOpphold(),
             ),
             aktivitet = AktivitetAvsnitt(
                 utdanning = EnumFelt("", JaNei.JA, "", emptyList()),
@@ -105,9 +118,41 @@ class OpprettTestBehandlingController(
             språk = Språkkode.NB,
             skjema = skjemaBarnetilsyn,
         )
-        val søknad = søknadService.lagreSøknad(behandling.id, "TESTJPID", skjema)
+        val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
+        val søknad = søknadService.lagreSøknad(behandling.id, journalpost, skjema)
         opprettBarn(behandling, søknad)
     }
+
+    private fun arbeidOgOpphold() = ArbeidOgOpphold(
+        jobberIAnnetLand = EnumFelt("Jobber du i et annet land enn Norge?", JaNei.JA, "Ja", emptyList()),
+        jobbAnnetLand = SelectFelt("Hvilket land jobber du i?", "SWE", "Sverige"),
+        harPengestøtteAnnetLand = EnumFlereValgFelt(
+            "Mottar du pengestøtte fra et annet land enn Norge?",
+            listOf(
+                VerdiFelt(
+                    TypePengestøtte.SYKEPENGER,
+                    "Sykepenger",
+                ),
+            ),
+            emptyList(),
+        ),
+        pengestøtteAnnetLand = SelectFelt("Hvilket land mottar du pengestøtte fra?", "SWE", "Sverige"),
+        harOppholdUtenforNorgeSiste12mnd = EnumFelt("Jobber du i et annet land enn Norge?", JaNei.JA, "Ja", emptyList()),
+        oppholdUtenforNorgeSiste12mnd = listOf(oppholdUtenforNorge()),
+        harOppholdUtenforNorgeNeste12mnd = EnumFelt("Jobber du i et annet land enn Norge?", JaNei.JA, "Ja", emptyList()),
+        oppholdUtenforNorgeNeste12mnd = listOf(oppholdUtenforNorge()),
+    )
+
+    private fun oppholdUtenforNorge() = OppholdUtenforNorge(
+        land = SelectFelt("Hvilket land har du oppholdt deg i?", "SWE", "Sverige"),
+        årsak = EnumFlereValgFelt(
+            "Hva gjorde du i dette landet?",
+            listOf(VerdiFelt(ÅrsakOppholdUtenforNorge.JOBB, "Jobb")),
+            alternativer = emptyList(),
+        ),
+        fom = DatoFelt("Fom", LocalDate.of(2024, 1, 1)),
+        tom = DatoFelt("Fom", LocalDate.of(2024, 1, 1)),
+    )
 
     // Oppretter BehandlingBarn for alle barn fra PDL for å få et vilkår per barn
     private fun opprettBarn(behandling: Behandling, søknad: SøknadBarnetilsyn) {

@@ -1,7 +1,27 @@
 {
   "hovedytelse" : {
     "søknadsgrunnlag" : {
-      "hovedytelse" : "AAP"
+      "hovedytelse" : [ "AAP" ],
+      "arbeidOgOpphold" : {
+        "jobberIAnnetLand" : "JA",
+        "jobbAnnetLand" : "Sverige",
+        "harPengestøtteAnnetLand" : [ "SYKEPENGER" ],
+        "pengestøtteAnnetLand" : "Finland",
+        "harOppholdUtenforNorgeSiste12mnd" : "JA",
+        "oppholdUtenforNorgeSiste12mnd" : [ {
+          "land" : "Sverige",
+          "årsak" : [ "JOBB" ],
+          "fom" : "2024-01-01",
+          "tom" : "2024-01-01"
+        } ],
+        "harOppholdUtenforNorgeNeste12mnd" : "JA",
+        "oppholdUtenforNorgeNeste12mnd" : [ {
+          "land" : "Sverige",
+          "årsak" : [ "JOBB" ],
+          "fom" : "2024-01-01",
+          "tom" : "2024-01-01"
+        } ]
+      }
     }
   },
   "aktivitet" : {
@@ -14,6 +34,7 @@
     "barnId" : "60921c76-f8ef-4000-9824-f127a50a575e",
     "registergrunnlag" : {
       "navn" : "Fornavn mellomnavn Etternavn",
+      "alder" : 0,
       "dødsdato" : null
     },
     "søknadgrunnlag" : {
@@ -21,5 +42,14 @@
       "startetIFemte" : "JA",
       "årsak" : "MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID"
     }
-  } ]
+  } ],
+  "dokumentasjon" : {
+    "journalpostId" : "testId",
+    "dokumentasjon" : [ {
+      "type" : "Dokumentasjon av utgifter til privat pass",
+      "dokumenter" : [ {
+        "dokumentInfoId" : "688ad1dc-e35e-4ab8-a534-17c6e691463f"
+      } ]
+    } ]
+  }
 }

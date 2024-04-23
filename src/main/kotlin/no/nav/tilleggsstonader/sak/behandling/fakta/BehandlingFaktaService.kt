@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.måImlementeresFørProdsetting
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataMedMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -19,6 +19,7 @@ class BehandlingFaktaService(
     private val grunnlagsdataService: GrunnlagsdataService,
     private val søknadService: SøknadService,
     private val barnService: BarnService,
+    private val faktaArbeidOgOppholdMapper: FaktaArbeidOgOppholdMapper,
 ) {
 
     fun hentFakta(
@@ -28,11 +29,12 @@ class BehandlingFaktaService(
             "Denne skal hente data fra databasen, og at grunnlagsdata lagres til databasen"
         }
         val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
-        val grunnlagsdata = grunnlagsdataService.hentFraRegister(behandlingId)
+        val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaDto(
             hovedytelse = mapHovedytelse(søknad),
             aktivitet = mapAktivitet(søknad),
             barn = mapBarn(grunnlagsdata, søknad, behandlingId),
+            dokumentasjon = søknad?.let { mapDokumentasjon(it, grunnlagsdata) },
         )
     }
 
@@ -50,29 +52,35 @@ class BehandlingFaktaService(
             søknadsgrunnlag = søknad?.let {
                 SøknadsgrunnlagHovedytelse(
                     hovedytelse = it.data.hovedytelse.hovedytelse,
+                    arbeidOgOpphold = faktaArbeidOgOppholdMapper.mapArbeidOgOpphold(it.data.hovedytelse.arbeidOgOpphold),
                 )
             },
         )
 
-    private fun mapBarn(grunnlagsdata: GrunnlagsdataMedMetadata, søknad: SøknadBarnetilsyn?, behandlingId: UUID): List<FaktaBarn> {
+    private fun mapBarn(
+        grunnlagsdata: Grunnlagsdata,
+        søknad: SøknadBarnetilsyn?,
+        behandlingId: UUID,
+    ): List<FaktaBarn> {
         val søknadBarnPåIdent = søknad?.barn?.associateBy { it.ident } ?: emptyMap()
         if (søknad != null) {
             validerFinnesGrunnlagsdataForAlleBarnISøknad(grunnlagsdata, søknadBarnPåIdent)
         }
-        val barnPåBehandling = barnService.finnBarnPåBehandling(behandlingId).associateBy { it.ident }
+        val grunnlagsdataBarn = grunnlagsdata.grunnlag.barn.associateBy { it.ident }
 
-        return grunnlagsdata.grunnlagsdata.barn.map { barn ->
-            val behandlingBarn = barnPåBehandling[barn.ident]
-                ?: error("Finner ikke barn med ident=${barn.ident} på behandling=$behandlingId")
+        return barnService.finnBarnPåBehandling(behandlingId).map { behandlingBarn ->
+            val barnGrunnlagsdata = grunnlagsdataBarn[behandlingBarn.ident]
+                ?: error("Finner ikke barn med ident=${behandlingBarn.ident} på behandling=$behandlingId")
 
             FaktaBarn(
-                ident = barn.ident,
+                ident = behandlingBarn.ident,
                 barnId = behandlingBarn.id,
                 registergrunnlag = RegistergrunnlagBarn(
-                    navn = barn.navn.visningsnavn(),
-                    dødsdato = barn.dødsdato,
+                    navn = barnGrunnlagsdata.navn.visningsnavn(),
+                    alder = barnGrunnlagsdata.alder,
+                    dødsdato = barnGrunnlagsdata.dødsdato,
                 ),
-                søknadgrunnlag = søknadBarnPåIdent[barn.ident]?.let { søknadBarn ->
+                søknadgrunnlag = søknadBarnPåIdent[behandlingBarn.ident]?.let { søknadBarn ->
                     SøknadsgrunnlagBarn(
                         type = søknadBarn.data.type,
                         startetIFemte = søknadBarn.data.startetIFemte,
@@ -83,11 +91,24 @@ class BehandlingFaktaService(
         }
     }
 
+    private fun mapDokumentasjon(søknad: SøknadBarnetilsyn, grunnlagsdata: Grunnlagsdata): FaktaDokumentasjon {
+        val navn = grunnlagsdata.grunnlag.barn.associate { it.ident to it.navn.fornavn }
+        val dokumentasjon = søknad.data.dokumentasjon.map { dokumentasjon ->
+            val navnBarn = dokumentasjon.identBarn?.let { navn[it] }?.let { " - $it" } ?: ""
+            Dokumentasjon(
+                type = dokumentasjon.type.tittel + navnBarn,
+                dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
+                identBarn = dokumentasjon.identBarn,
+            )
+        }
+        return FaktaDokumentasjon(søknad.journalpostId, dokumentasjon)
+    }
+
     private fun validerFinnesGrunnlagsdataForAlleBarnISøknad(
-        grunnlagsdata: GrunnlagsdataMedMetadata,
+        grunnlagsdata: Grunnlagsdata,
         søknadBarnPåIdent: Map<String, SøknadBarn>,
     ) {
-        val identerIGrunnlagsdata = grunnlagsdata.grunnlagsdata.barn.map { it.ident }.toSet()
+        val identerIGrunnlagsdata = grunnlagsdata.grunnlag.barn.map { it.ident }.toSet()
         val identerSomManglerGrunnlagsdata = søknadBarnPåIdent.keys.filterNot { identerIGrunnlagsdata.contains(it) }
         if (identerSomManglerGrunnlagsdata.isNotEmpty()) {
             val kommaseparerteIdenter = identerSomManglerGrunnlagsdata.joinToString(",")

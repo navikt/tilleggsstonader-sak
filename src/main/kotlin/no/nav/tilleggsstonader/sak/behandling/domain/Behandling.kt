@@ -78,9 +78,9 @@ enum class BehandlingType(val visningsnavn: String) {
 /**
  * Sjekkes sammen med vedtakstidspunkt i [behandling_resultat_vedtakstidspunkt_check]
  */
-enum class BehandlingResultat(val displayName: String) {
-    INNVILGET(displayName = "Innvilget"),
-    OPPHØRT(displayName = "Opphørt"),
+enum class BehandlingResultat(val displayName: String, val skalIverksettes: Boolean = false) {
+    INNVILGET(displayName = "Innvilget", true),
+    OPPHØRT(displayName = "Opphørt", true),
     AVSLÅTT(displayName = "Avslått"),
     IKKE_SATT(displayName = "Ikke satt"),
     HENLAGT(displayName = "Henlagt"),

@@ -74,15 +74,16 @@ class InterntVedtakServiceTest {
     val vilkårperioder = Vilkårperioder(
         målgrupper = listOf(
             VilkårperiodeTestUtil.målgruppe(
-                begrunnelse = "målgrupp abc",
-                delvilkår = delvilkårMålgruppe(vurdering = vurdering()),
+                type = MålgruppeType.AAP,
+                begrunnelse = "målgruppe aap",
+                delvilkår = delvilkårMålgruppe(medlemskap = vurdering(SvarJaNei.JA_IMPLISITT), dekkesAvAnnetRegelverk = vurdering(SvarJaNei.NEI)),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
             ),
             VilkårperiodeTestUtil.målgruppe(
                 type = MålgruppeType.OVERGANGSSTØNAD,
-                begrunnelse = "målgrupp os",
-                delvilkår = delvilkårMålgruppe(vurdering = vurdering()),
+                begrunnelse = "målgruppe os",
+                delvilkår = delvilkårMålgruppe(medlemskap = vurdering(SvarJaNei.JA_IMPLISITT), dekkesAvAnnetRegelverk = vurdering(svar = null)),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
             ),
@@ -94,7 +95,6 @@ class InterntVedtakServiceTest {
                 delvilkår = delvilkårAktivitet(
                     lønnet = vurdering(
                         SvarJaNei.JA,
-                        "begrunnelse lønnet",
                         resultat = ResultatDelvilkårperiode.IKKE_OPPFYLT,
                     ),
                 ),
@@ -158,7 +158,7 @@ class InterntVedtakServiceTest {
 
     /**
      * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
-     * Endre SKAL_SKRIVE_TIL_FIL til true
+     * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
      * Formatter htmlfil etter generering for å unngå stor diff
      */
     @Disabled
@@ -217,10 +217,9 @@ class InterntVedtakServiceTest {
             assertThat(tom).isEqualTo(målgruppe.tom)
             assertThat(kilde).isEqualTo(KildeVilkårsperiode.SYSTEM)
             assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
-            assertThat(begrunnelse).isEqualTo("målgrupp abc")
+            assertThat(begrunnelse).isEqualTo("målgruppe aap")
             with(delvilkår.medlemskap!!) {
                 assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT.name)
-                assertThat(begrunnelse).isNull()
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             }
             assertThat(delvilkår.lønnet).isNull()
@@ -240,12 +239,10 @@ class InterntVedtakServiceTest {
             assertThat(begrunnelse).isEqualTo("aktivitet abd")
             with(delvilkår.lønnet!!) {
                 assertThat(svar).isEqualTo(SvarJaNei.JA.name)
-                assertThat(begrunnelse).isEqualTo("begrunnelse lønnet")
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
             }
             with(delvilkår.mottarSykepenger!!) {
                 assertThat(svar).isEqualTo(SvarJaNei.NEI.name)
-                assertThat(begrunnelse).isNull()
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             }
             assertThat(delvilkår.medlemskap).isNull()

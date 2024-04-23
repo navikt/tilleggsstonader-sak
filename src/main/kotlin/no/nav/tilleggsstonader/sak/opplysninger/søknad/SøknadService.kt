@@ -1,12 +1,13 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad
 
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.SøknadsskjemaBarnetilsyn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaMapper
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -27,10 +28,10 @@ class SøknadService(
 
     fun lagreSøknad(
         behandlingId: UUID,
-        journalpostId: String,
+        journalpost: Journalpost,
         skjema: Søknadsskjema<SøknadsskjemaBarnetilsyn>,
     ): SøknadBarnetilsyn {
-        val søknad = SøknadsskjemaMapper.map(skjema, journalpostId)
+        val søknad = SøknadsskjemaBarnetilsynMapper.map(skjema, journalpost)
         val søknadBarnetilsyn = søknadBarnetilsynRepository.insert(søknad)
         søknadBehandlingRepository.insert(SøknadBehandling(behandlingId, søknad.id))
         return søknadBarnetilsyn

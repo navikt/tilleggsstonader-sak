@@ -7,7 +7,10 @@ import java.util.Properties
  */
 fun main(args: Array<String>) {
     appLocal()
-        .profiles("opprett-oppgave")
+        .profiles(
+            "opprett-oppgave",
+            "opprett-grunnlagsdata",
+        )
         .properties(Properties().medDatabase())
         .run(*args)
 }

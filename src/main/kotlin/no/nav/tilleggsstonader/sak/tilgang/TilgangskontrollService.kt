@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
 import no.nav.security.token.support.core.jwt.JwtToken
-import no.nav.tilleggsstonader.sak.infrastruktur.config.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.AdRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
@@ -97,7 +97,7 @@ class TilgangskontrollService(
             return Tilgang(true)
         }
         secureLogger.info(
-            "${jwtToken.jwtTokenClaims["preferred_username"]} " +
+            "${jwtToken.jwtTokenClaims.get("preferred_username")} " +
                 "har ikke tilgang ${adRolle?.beskrivelse} for $personIdent",
         )
         return Tilgang(harTilgang = false, begrunnelse = adRolle?.beskrivelse)

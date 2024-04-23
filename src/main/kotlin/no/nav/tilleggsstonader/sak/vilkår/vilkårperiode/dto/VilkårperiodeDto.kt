@@ -37,6 +37,7 @@ data class VilkårperiodeDto(
     val kilde: KildeVilkårsperiode,
     val slettetKommentar: String?,
     val sistEndret: LocalDateTime,
+    val aktivitetsdager: Int? = null,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -53,6 +54,7 @@ fun Vilkårperiode.tilDto() =
         resultat = this.resultat,
         begrunnelse = this.begrunnelse,
         kilde = this.kilde,
+        aktivitetsdager = this.aktivitetsdager,
         slettetKommentar = this.slettetKommentar,
         sistEndret = this.sporbar.endret.endretTid,
     )
@@ -60,6 +62,7 @@ fun Vilkårperiode.tilDto() =
 fun DelvilkårVilkårperiode.tilDto() = when (this) {
     is DelvilkårMålgruppe -> DelvilkårMålgruppeDto(
         medlemskap = medlemskap.tilDto(),
+        dekketAvAnnetRegelverk = dekketAvAnnetRegelverk.tilDto(),
     )
 
     is DelvilkårAktivitet -> DelvilkårAktivitetDto(
@@ -72,10 +75,7 @@ fun DelvilkårVilkårperiode.tilDto() = when (this) {
 fun DelvilkårVilkårperiode.Vurdering.tilDto() =
     this.takeIf { resultat != ResultatDelvilkårperiode.IKKE_AKTUELT }
         ?.let {
-            VurderingDto(
-                svar = svar,
-                begrunnelse = begrunnelse,
-            )
+            VurderingDto(svar = svar)
         }
 
 data class Datoperiode(
@@ -83,19 +83,23 @@ data class Datoperiode(
     override val tom: LocalDate,
 ) : Periode<LocalDate>, Mergeable<LocalDate, Datoperiode> {
     override fun merge(other: Datoperiode): Datoperiode {
-        return this.copy(tom = other.tom)
+        return this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
     }
 }
 
-// TODO flytt til kontrakter
 fun Periode<LocalDate>.formattertPeriodeNorskFormat() = "${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
 
-fun List<VilkårperiodeDto>.mergeSammenhengendeVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> =
-    this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
+/**
+ *  @return En sortert map kategorisert på periodetype med de oppfylte vilkårsperiodene. Periodene slåes sammen dersom
+ *  de er sammenhengende, også selv om de har overlapp.
+ */
+fun List<VilkårperiodeDto>.mergeSammenhengendeOppfylteVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> {
+    return this.sorted().filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
         .mapValues {
             it.value.map { Datoperiode(it.fom, it.tom) }
-                .mergeSammenhengende { a, b -> a.tom.plusDays(1) == b.fom }
+                .mergeSammenhengende { a, b -> a.overlapper(b) || a.tom.plusDays(1) == b.fom }
         }
+}
 
 data class LagreVilkårperiode(
     val behandlingId: UUID,
@@ -103,6 +107,7 @@ data class LagreVilkårperiode(
     val type: VilkårperiodeType,
     val fom: LocalDate,
     val tom: LocalDate,
+    val aktivitetsdager: Int? = null,
     val delvilkår: DelvilkårVilkårperiodeDto,
     val begrunnelse: String? = null,
 )
@@ -116,6 +121,7 @@ sealed class DelvilkårVilkårperiodeDto
 
 data class DelvilkårMålgruppeDto(
     val medlemskap: VurderingDto?,
+    val dekketAvAnnetRegelverk: VurderingDto?,
 ) : DelvilkårVilkårperiodeDto()
 
 data class DelvilkårAktivitetDto(
@@ -125,7 +131,6 @@ data class DelvilkårAktivitetDto(
 
 data class VurderingDto(
     val svar: SvarJaNei? = null,
-    val begrunnelse: String? = null,
 )
 
 data class SlettVikårperiode(

@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.opplysninger.pdl
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Bostedsadresse
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.DeltBosted
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Dødsfall
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisteridentifikator
@@ -15,8 +14,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødsel
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kjønn
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KjønnType
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktadresseType
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Matrikkeladresse
@@ -40,8 +37,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PersonSøkTreff
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Personnavn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PostadresseIFrittFormat
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Postboksadresse
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstand
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstandstype
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Statsborgerskap
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UkjentBosted
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UtenlandskAdresse
@@ -148,7 +143,6 @@ object PdlTestdata {
                         listOf(""),
                     ),
                 ),
-                listOf(Kjønn(KjønnType.KVINNE)),
                 listOf(
                     Kontaktadresse(
                         "",
@@ -165,15 +159,6 @@ object PdlTestdata {
                 navn,
                 opphold,
                 oppholdsadresse,
-                listOf(
-                    Sivilstand(
-                        Sivilstandstype.GIFT,
-                        LocalDate.now(),
-                        "",
-                        LocalDate.now(),
-                        metadataGjeldende,
-                    ),
-                ),
                 statsborgerskap,
                 innflyttingTilNorge,
                 utflyttingFraNorge,
@@ -202,15 +187,6 @@ object PdlTestdata {
                     PdlPersonForelderBarn(
                         adressebeskyttelse,
                         bostedsadresse,
-                        listOf(
-                            DeltBosted(
-                                LocalDate.now(),
-                                LocalDate.now(),
-                                vegadresse,
-                                UkjentBosted(""),
-                                metadataGjeldende,
-                            ),
-                        ),
                         dødsfall,
                         familierelasjon,
                         fødsel,

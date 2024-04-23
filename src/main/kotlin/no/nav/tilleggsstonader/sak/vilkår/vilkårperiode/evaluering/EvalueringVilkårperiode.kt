@@ -32,7 +32,6 @@ object EvalueringVilkårperiode {
     fun VurderingDto?.tilVurdering(resultat: ResultatDelvilkårperiode) =
         DelvilkårVilkårperiode.Vurdering(
             svar = this?.svar,
-            begrunnelse = this?.begrunnelse,
             resultat = resultat,
         )
 }

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.fagsak
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakIdRepository
@@ -34,9 +35,6 @@ class FagsakService(
     private val personService: PersonService,
     private val behandlingService: BehandlingService,
 ) {
-    fun hentEllerOpprettFagsakMedBehandlinger(personIdent: String, stønadstype: Stønadstype): FagsakDto {
-        return fagsakTilDto(hentEllerOpprettFagsak(personIdent, stønadstype))
-    }
 
     @Transactional
     fun hentEllerOpprettFagsak(
@@ -52,6 +50,13 @@ class FagsakService(
 
         return fagsak.tilFagsakMedPerson(oppdatertPerson.identer)
     }
+
+    fun hentBehandlingerForPersonOgStønadstype(personIdent: String, stønadstype: Stønadstype): List<BehandlingDto> =
+        finnFagsak(setOf(personIdent), stønadstype)?.let { fagsak ->
+            behandlingService.hentBehandlinger(fagsak.id).map {
+                it.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId)
+            }
+        } ?: emptyList()
 
     fun harFagsak(personIdenter: Set<String>) = fagsakRepository.findBySøkerIdent(personIdenter).isNotEmpty()
 
@@ -70,7 +75,7 @@ class FagsakService(
         val erLøpende = erLøpende(fagsak)
         return fagsak.tilDto(
             behandlinger = behandlinger.map {
-                it.tilDto(fagsak.stønadstype)
+                it.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId)
             },
             erLøpende = erLøpende,
         )

@@ -1,6 +1,32 @@
 {
   "vilkårType" : "PASS_BARN",
   "regler" : {
+    "UTGIFTER_DOKUMENTERT" : {
+      "regelId" : "UTGIFTER_DOKUMENTERT",
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    },
+    "ANNEN_FORELDER_MOTTAR_STØTTE" : {
+      "regelId" : "ANNEN_FORELDER_MOTTAR_STØTTE",
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "PÅKREVD",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    },
     "HAR_ALDER_LAVERE_ENN_GRENSEVERDI" : {
       "regelId" : "HAR_ALDER_LAVERE_ENN_GRENSEVERDI",
       "svarMapping" : {
@@ -18,54 +44,15 @@
       "regelId" : "UNNTAK_ALDER",
       "svarMapping" : {
         "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE" : {
-          "begrunnelseType" : "PÅKREVD",
+          "begrunnelseType" : "VALGFRI",
           "regelId" : "SLUTT_NODE"
         },
         "FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID" : {
+          "begrunnelseType" : "VALGFRI",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
           "begrunnelseType" : "PÅKREVD",
-          "regelId" : "SLUTT_NODE"
-        },
-        "NEI" : {
-          "begrunnelseType" : "PÅKREVD",
-          "regelId" : "SLUTT_NODE"
-        }
-      }
-    },
-    "DEKKES_UTGIFTER_ANNET_REGELVERK" : {
-      "regelId" : "DEKKES_UTGIFTER_ANNET_REGELVERK",
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "SLUTT_NODE"
-        },
-        "NEI" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "SLUTT_NODE"
-        }
-      }
-    },
-    "ANNEN_FORELDER_MOTTAR_STØTTE" : {
-      "regelId" : "ANNEN_FORELDER_MOTTAR_STØTTE",
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "SLUTT_NODE"
-        },
-        "NEI" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "SLUTT_NODE"
-        }
-      }
-    },
-    "UTGIFTER_DOKUMENTERT" : {
-      "regelId" : "UTGIFTER_DOKUMENTERT",
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "SLUTT_NODE"
-        },
-        "NEI" : {
-          "begrunnelseType" : "VALGFRI",
           "regelId" : "SLUTT_NODE"
         }
       }

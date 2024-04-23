@@ -40,30 +40,30 @@ enum class StegType(
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.OPPRETTET, BehandlingStatus.UTREDES),
     ),
-    VILKÅR(
+    INNGANGSVILKÅR(
         rekkefølge = 1,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.OPPRETTET, BehandlingStatus.UTREDES),
     ),
-    BEREGNE_YTELSE(
+    VILKÅR(
         rekkefølge = 2,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    SEND_TIL_BESLUTTER(
+    BEREGNE_YTELSE(
         rekkefølge = 3,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    BESLUTTE_VEDTAK(
+    SEND_TIL_BESLUTTER(
         rekkefølge = 4,
+        tillattFor = BehandlerRolle.SAKSBEHANDLER,
+        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
+    ),
+    BESLUTTE_VEDTAK(
+        rekkefølge = 5,
         tillattFor = BehandlerRolle.BESLUTTER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FATTER_VEDTAK),
-    ),
-    VENTE_PÅ_STATUS_FRA_UTBETALING(
-        rekkefølge = 5,
-        tillattFor = BehandlerRolle.SYSTEM,
-        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
     JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV(
         rekkefølge = 6,
@@ -75,13 +75,8 @@ enum class StegType(
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
-    PUBLISER_VEDTAKSHENDELSE(
-        rekkefølge = 8,
-        tillattFor = BehandlerRolle.SYSTEM,
-        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FERDIGSTILT),
-    ),
     BEHANDLING_FERDIGSTILT(
-        rekkefølge = 9,
+        rekkefølge = 8,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FERDIGSTILT),
     ),
@@ -101,19 +96,14 @@ enum class StegType(
 
     fun hentNesteSteg(): StegType {
         return when (this) {
-            REVURDERING_ÅRSAK -> VILKÅR
+            REVURDERING_ÅRSAK -> INNGANGSVILKÅR
+            INNGANGSVILKÅR -> VILKÅR
             VILKÅR -> BEREGNE_YTELSE
             BEREGNE_YTELSE -> SEND_TIL_BESLUTTER
             SEND_TIL_BESLUTTER -> BESLUTTE_VEDTAK
-            BESLUTTE_VEDTAK -> VENTE_PÅ_STATUS_FRA_UTBETALING
-            VENTE_PÅ_STATUS_FRA_UTBETALING -> JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
+            BESLUTTE_VEDTAK -> JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
             JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> FERDIGSTILLE_BEHANDLING
-            /*
-            VENTE_PÅ_STATUS_FRA_UTBETALING -> LAG_SAKSBEHANDLINGSBLANKETT
-            LAG_SAKSBEHANDLINGSBLANKETT -> FERDIGSTILLE_BEHANDLING
-             */
-            FERDIGSTILLE_BEHANDLING -> PUBLISER_VEDTAKSHENDELSE
-            PUBLISER_VEDTAKSHENDELSE -> BEHANDLING_FERDIGSTILT
+            FERDIGSTILLE_BEHANDLING -> BEHANDLING_FERDIGSTILT
             BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
         }
     }

@@ -18,7 +18,7 @@ class TaskProsesseringConfig(
     @Bean
     fun prosesseringInfoProvider() = object : ProsesseringInfoProvider {
         override fun hentBrukernavn(): String = try {
-            SpringTokenValidationContextHolder().tokenValidationContext.getClaims("azuread")
+            SpringTokenValidationContextHolder().getTokenValidationContext().getClaims("azuread")
                 .getStringClaim("preferred_username")
         } catch (e: Exception) {
             throw Feil("Mangler preferred_username på request")

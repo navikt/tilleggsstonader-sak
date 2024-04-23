@@ -90,11 +90,6 @@ data class PdlPersonKort(
     @JsonProperty("doedsfall") val dødsfall: List<Dødsfall>,
 )
 
-data class PdlSøkerKort(
-    @JsonProperty("kjoenn") val kjønn: List<Kjønn>,
-    val navn: List<Navn>,
-)
-
 data class PdlSøker(
     val adressebeskyttelse: List<Adressebeskyttelse>,
     override val bostedsadresse: List<Bostedsadresse>,
@@ -104,12 +99,10 @@ data class PdlSøker(
     @JsonProperty("foedsel") override val fødsel: List<Fødsel>,
     val folkeregisterpersonstatus: List<Folkeregisterpersonstatus>,
     val fullmakt: List<Fullmakt>,
-    @JsonProperty("kjoenn") val kjønn: List<Kjønn>,
     val kontaktadresse: List<Kontaktadresse>,
     val navn: List<Navn>,
     val opphold: List<Opphold>,
     val oppholdsadresse: List<Oppholdsadresse>,
-    val sivilstand: List<Sivilstand>,
     val statsborgerskap: List<Statsborgerskap>,
     val innflyttingTilNorge: List<InnflyttingTilNorge>,
     val utflyttingFraNorge: List<UtflyttingFraNorge>,
@@ -122,7 +115,6 @@ data class PdlSøker(
 data class PdlPersonForelderBarn(
     val adressebeskyttelse: List<Adressebeskyttelse>,
     override val bostedsadresse: List<Bostedsadresse>,
-    val deltBosted: List<DeltBosted>,
     @JsonProperty("doedsfall") val dødsfall: List<Dødsfall>,
     val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
     @JsonProperty("foedsel") override val fødsel: List<Fødsel>,
@@ -139,14 +131,6 @@ data class PdlAnnenForelder(
 ) : PdlPerson
 
 data class Metadata(val historisk: Boolean)
-
-data class DeltBosted(
-    val startdatoForKontrakt: LocalDate,
-    val sluttdatoForKontrakt: LocalDate?,
-    val vegadresse: Vegadresse?,
-    val ukjentBosted: UkjentBosted?,
-    val metadata: Metadata,
-)
 
 data class Folkeregistermetadata(
     val gyldighetstidspunkt: LocalDateTime?,
@@ -260,12 +244,7 @@ data class Fødsel(
     @JsonProperty("foedested") val fødested: String?,
     @JsonProperty("foedekommune") val fødekommune: String?,
     val metadata: Metadata,
-) {
-
-    fun erUnder18År() = this.fødselsdato?.let { LocalDate.now() < it.plusYears(18) }
-        ?: this.fødselsår?.let { LocalDate.now() < LocalDate.of(it, 1, 1).plusYears(18) }
-        ?: true
-}
+)
 
 data class Dødsfall(@JsonProperty("doedsdato") val dødsdato: LocalDate?)
 
@@ -301,14 +280,6 @@ enum class MotpartsRolle {
     FULLMEKTIG,
 }
 
-data class Kjønn(@JsonProperty("kjoenn") val kjønn: KjønnType)
-
-enum class KjønnType {
-    KVINNE,
-    MANN,
-    UKJENT,
-}
-
 data class Navn(
     val fornavn: String,
     val mellomnavn: String?,
@@ -340,27 +311,6 @@ enum class Oppholdstillatelse {
     MIDLERTIDIG,
     PERMANENT,
     OPPLYSNING_MANGLER,
-}
-
-data class Sivilstand(
-    val type: Sivilstandstype,
-    val gyldigFraOgMed: LocalDate?,
-    val relatertVedSivilstand: String?,
-    val bekreftelsesdato: LocalDate?,
-    val metadata: Metadata,
-)
-
-enum class Sivilstandstype {
-    UOPPGITT,
-    UGIFT,
-    GIFT,
-    ENKE_ELLER_ENKEMANN,
-    SKILT,
-    SEPARERT,
-    REGISTRERT_PARTNER,
-    SEPARERT_PARTNER,
-    SKILT_PARTNER,
-    GJENLEVENDE_PARTNER,
 }
 
 data class InnflyttingTilNorge(

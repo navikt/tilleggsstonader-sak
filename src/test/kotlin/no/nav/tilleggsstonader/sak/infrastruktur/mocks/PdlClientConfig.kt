@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlNotFoundException
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Bostedsadresse
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.DeltBosted
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Dødsfall
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisteridentifikator
@@ -18,10 +17,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatu
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KjønnType
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktadresseType
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Metadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.MotpartsRolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Opphold
@@ -31,15 +28,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonForelderBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstand
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Sivilstandstype
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Statsborgerskap
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UtflyttingFraNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Vegadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergeEllerFullmektig
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergemaalEllerFremtidsfullmakt
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.fødsel
-import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagKjønn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagNavn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.metadataGjeldende
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlBarn
@@ -167,12 +161,10 @@ class PdlClientConfig {
                     ),
                 ),
                 fullmakt = fullmakter(),
-                kjønn = lagKjønn(KjønnType.KVINNE),
                 kontaktadresse = kontaktadresse(),
                 navn = listOf(lagNavn()),
                 opphold = listOf(Opphold(Oppholdstillatelse.PERMANENT, startdato, null)),
                 oppholdsadresse = listOf(),
-                sivilstand = sivilstand(),
                 statsborgerskap = statsborgerskap(),
                 innflyttingTilNorge = listOf(InnflyttingTilNorge("SWE", "Stockholm", folkeregistermetadata)),
                 utflyttingFraNorge = listOf(
@@ -195,22 +187,6 @@ class PdlClientConfig {
             mapOf(
                 barnFnr to pdlBarn(
                     bostedsadresse = bostedsadresse(),
-                    deltBosted = listOf(
-                        DeltBosted(
-                            LocalDate.of(2023, 1, 1),
-                            LocalDate.of(2053, 1, 1),
-                            null,
-                            null,
-                            Metadata(false),
-                        ),
-                        DeltBosted(
-                            LocalDate.of(2020, 1, 1),
-                            LocalDate.of(2023, 3, 31),
-                            null,
-                            null,
-                            Metadata(true),
-                        ),
-                    ),
                     forelderBarnRelasjon = familierelasjonerBarn(),
                     fødsel = fødsel(),
                     navn = lagNavn("Barn", null, "Barnesen"),
@@ -293,17 +269,6 @@ class PdlClientConfig {
                     land = "SWE",
                     gyldigFraOgMed = startdato.minusYears(3),
                     gyldigTilOgMed = startdato,
-                ),
-            )
-
-        private fun sivilstand(): List<Sivilstand> =
-            listOf(
-                Sivilstand(
-                    type = Sivilstandstype.GIFT,
-                    gyldigFraOgMed = startdato,
-                    relatertVedSivilstand = "11111122222",
-                    bekreftelsesdato = LocalDate.of(2020, 1, 1),
-                    metadata = metadataGjeldende,
                 ),
             )
 

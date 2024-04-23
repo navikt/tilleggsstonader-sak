@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -28,13 +29,17 @@ class TestoppsettService(
     private val eksternFagsakIdRepository: EksternFagsakIdRepository,
     private val behandlingRepository: BehandlingRepository,
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
+    private val grunnlagsdataService: GrunnlagsdataService,
 ) {
 
     fun hentBehandling(behandlingId: UUID) = behandlingRepository.findByIdOrThrow(behandlingId)
 
+    fun hentSaksbehandling(behandlingId: UUID) = behandlingRepository.finnSaksbehandling(behandlingId)
+
     fun opprettBehandlingMedFagsak(
         behandling: Behandling,
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
+        opprettGrunnlagsdata: Boolean = true,
     ): Behandling {
         val person = opprettPerson(fagsak())
         lagreFagsak(
@@ -44,7 +49,7 @@ class TestoppsettService(
                 fagsakPersonId = person.id,
             ),
         )
-        return lagre(behandling)
+        return lagre(behandling, opprettGrunnlagsdata)
     }
 
     fun opprettPerson(ident: String) = fagsakPersonRepository.insert(FagsakPerson(identer = setOf(PersonIdent(ident))))
@@ -55,10 +60,19 @@ class TestoppsettService(
         behandling.forEach(this::lagre)
     }
 
-    fun lagre(behandling: Behandling): Behandling {
+    fun lagre(behandling: Behandling, opprettGrunnlagsdata: Boolean = true): Behandling {
         val dbBehandling = behandlingRepository.insert(behandling)
         eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = dbBehandling.id))
+
+        if (opprettGrunnlagsdata) {
+            opprettGrunnlagsdata(behandling.id)
+        }
+
         return dbBehandling
+    }
+
+    fun opprettGrunnlagsdata(behandlingId: UUID) {
+        grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
     }
 
     fun lagreFagsak(fagsak: Fagsak): Fagsak {

@@ -32,14 +32,15 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -66,7 +67,7 @@ fun oppgave(
 fun behandling(
     fagsak: Fagsak = fagsak(),
     status: BehandlingStatus = BehandlingStatus.OPPRETTET,
-    steg: StegType = StegType.VILKÅR,
+    steg: StegType = StegType.INNGANGSVILKÅR,
     kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
     id: UUID = UUID.randomUUID(),
     type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
@@ -140,6 +141,7 @@ fun saksbehandling(
     henlagtÅrsak = behandling.henlagtÅrsak,
     ident = fagsak.hentAktivIdent(),
     fagsakId = fagsak.id,
+    fagsakPersonId = fagsak.fagsakPersonId,
     eksternFagsakId = fagsak.eksternId.id,
     stønadstype = fagsak.stønadstype,
     opprettetAv = behandling.sporbar.opprettetAv,
@@ -217,6 +219,20 @@ fun Fagsak.tilFagsakDomain() = FagsakDomain(
     sporbar = sporbar,
 )
 
+fun stønadsperiode(
+    behandlingId: UUID,
+    fom: LocalDate,
+    tom: LocalDate,
+    målgruppe: MålgruppeType = MålgruppeType.AAP,
+    aktivitet: AktivitetType = AktivitetType.TILTAK,
+): Stønadsperiode = Stønadsperiode(
+    behandlingId = behandlingId,
+    fom = fom,
+    tom = tom,
+    målgruppe = målgruppe,
+    aktivitet = aktivitet,
+)
+
 fun vilkår(
     behandlingId: UUID,
     resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
@@ -265,27 +281,6 @@ fun revurderingsinformasjon() = RevurderingsinformasjonDto(
     ÅrsakRevurderingDto(Opplysningskilde.MELDING_MODIA, Revurderingsårsak.ANNET, "beskrivelse"),
 )
  */
-
-fun tilkjentYtelse(
-    behandlingId: UUID,
-    stønadsår: Int = 2021,
-    startdato: LocalDate? = null,
-    beløp: Int = 11554,
-): TilkjentYtelse {
-    val andeler = listOf(
-        AndelTilkjentYtelse(
-            beløp = beløp,
-            stønadFom = LocalDate.of(stønadsår, 1, 1),
-            stønadTom = LocalDate.of(stønadsår, 12, 31),
-            kildeBehandlingId = behandlingId,
-        ),
-    )
-    return TilkjentYtelse(
-        behandlingId = behandlingId,
-        startdato = min(startdato, andeler.minOfOrNull { it.stønadFom }) ?: error("Må sette startdato"),
-        andelerTilkjentYtelse = andeler,
-    )
-}
 
 fun vedtaksbrev(
     behandlingId: UUID = UUID.randomUUID(),
@@ -471,7 +466,6 @@ fun barnMedIdent(fnr: String, navn: String, fødsel: Fødsel = fødsel(LocalDate
     BarnMedIdent(
         adressebeskyttelse = emptyList(),
         bostedsadresse = emptyList(),
-        deltBosted = emptyList(),
         dødsfall = emptyList(),
         forelderBarnRelasjon = emptyList(),
         fødsel = listOf(fødsel),
@@ -489,7 +483,7 @@ fun barnMedIdent(fnr: String, navn: String, fødsel: Fødsel = fødsel(LocalDate
 
 /*
 
-fun søker(sivilstand: List<SivilstandMedNavn> = emptyList()): Søker =
+fun søker(): Søker =
     Søker(
         adressebeskyttelse = Adressebeskyttelse(AdressebeskyttelseGradering.UGRADERT, Metadata(false)),
         bostedsadresse = listOf(),
@@ -498,12 +492,10 @@ fun søker(sivilstand: List<SivilstandMedNavn> = emptyList()): Søker =
         listOf(),
         listOf(),
         listOf(),
-        KjønnType.KVINNE,
         listOf(),
         Navn("fornavn", null, "etternavn", Metadata(false)),
         listOf(),
         listOf(),
-        sivilstand = sivilstand,
         listOf(),
         listOf(),
         listOf(),

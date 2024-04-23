@@ -1,23 +1,25 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
-import java.math.RoundingMode
 import java.time.LocalDate
 
 @Service
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
-    private val barnService: BarnService,
+    private val vilkårService: VilkårService,
     vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -29,8 +31,8 @@ class TilsynBarnBeregnYtelseSteg(
 ) {
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
-        val beregningsresultat = tilsynBarnBeregningService.beregn(vedtak.stønadsperioder, vedtak.utgifter)
-        validerBarnFinnesPåBehandling(saksbehandling, vedtak)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter)
+        validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
         vedtakRepository.insert(lagVedtak(saksbehandling, vedtak, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
         /*
@@ -44,11 +46,13 @@ class TilsynBarnBeregnYtelseSteg(
          */
     }
 
-    private fun validerBarnFinnesPåBehandling(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
-        val barnPåBehandling = barnService.finnBarnPåBehandling(saksbehandling.id).map { it.id }.toSet()
-        val barnSomIkkeFinnesPåBehandling = vedtak.utgifter.keys.filter { !barnPåBehandling.contains(it) }
-        feilHvis(barnSomIkkeFinnesPåBehandling.isNotEmpty()) {
-            "Det finnes utgifter på barn som ikke finnes på behandlingen, id=$barnSomIkkeFinnesPåBehandling"
+    private fun validerKunBarnMedOppfylteVilkår(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
+        val barnMedOppfylteVilkår =
+            vilkårService.hentOppfyltePassBarnVilkår(behandlingId = saksbehandling.id).map { it.barnId }
+        val barnUtenOppfylteVilkår = vedtak.utgifter.keys.filter { !barnMedOppfylteVilkår.contains(it) }
+
+        feilHvis(barnUtenOppfylteVilkår.isNotEmpty()) {
+            "Det finnes utgifter på barn som ikke har oppfylt vilkårsvurdering, id=$barnUtenOppfylteVilkår"
         }
     }
 
@@ -57,21 +61,22 @@ class TilsynBarnBeregnYtelseSteg(
         beregningsresultat: BeregningsresultatTilsynBarnDto,
     ) {
         val andelerTilkjentYtelse = beregningsresultat.perioder.flatMap {
-            it.grunnlag.stønadsperioder.map { stønadsperiode ->
+            it.beløpsperioder.map { beløpsperiode ->
                 AndelTilkjentYtelse(
-                    // TODO hvordan burde vi egentligen gjøre med decimaler?
-                    beløp = it.dagsats.setScale(0, RoundingMode.HALF_UP).toInt(),
-                    stønadFom = stønadsperiode.fom,
-                    stønadTom = stønadsperiode.tom,
+                    beløp = beløpsperiode.beløp,
+                    fom = beløpsperiode.dato,
+                    tom = beløpsperiode.dato,
+                    satstype = Satstype.DAG,
+                    type = beløpsperiode.målgruppe.tilTypeAndel(),
                     kildeBehandlingId = saksbehandling.id,
                 )
             }
-        }
+        }.toSet()
+
         tilkjentytelseService.opprettTilkjentYtelse(
             TilkjentYtelse(
                 behandlingId = saksbehandling.id,
                 andelerTilkjentYtelse = andelerTilkjentYtelse,
-                startdato = beregnStartdato(saksbehandling, andelerTilkjentYtelse),
             ),
         )
     }
@@ -85,7 +90,6 @@ class TilsynBarnBeregnYtelseSteg(
             behandlingId = behandling.id,
             type = TypeVedtak.INNVILGET,
             vedtak = VedtaksdataTilsynBarn(
-                stønadsperioder = vedtak.stønadsperioder,
                 utgifter = vedtak.utgifter,
             ),
             beregningsresultat = VedtaksdataBeregningsresultat(beregningsresultat.perioder),
@@ -97,11 +101,20 @@ class TilsynBarnBeregnYtelseSteg(
      */
     private fun beregnStartdato(
         saksbehandling: Saksbehandling,
-        andelerTilkjentYtelse: List<AndelTilkjentYtelse>,
+        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
     ): LocalDate {
         feilHvis(saksbehandling.forrigeBehandlingId != null) {
             "Når vi begynner å revurdere og opphøre må vi oppdatere denne metoden for å finne startdato"
         }
-        return minOf(andelerTilkjentYtelse.minOf { it.stønadFom })
+        return minOf(andelerTilkjentYtelse.minOf { it.fom })
+    }
+
+    private fun MålgruppeType.tilTypeAndel(): TypeAndel {
+        return when (this) {
+            MålgruppeType.AAP, MålgruppeType.UFØRETRYGD, MålgruppeType.NEDSATT_ARBEIDSEVNE -> TypeAndel.TILSYN_BARN_AAP
+            MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER
+            MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.TILSYN_BARN_ETTERLATTE
+            else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
+        }
     }
 }

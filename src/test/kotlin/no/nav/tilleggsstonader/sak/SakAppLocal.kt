@@ -27,4 +27,7 @@ fun appLocal(): SpringApplicationBuilder =
             "mock-featuretoggle",
             "mock-journalpost",
             "mock-htmlify",
+            "mock-arena",
+            "mock-aktivitet",
+            "mock-kodeverk",
         )

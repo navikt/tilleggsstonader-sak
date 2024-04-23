@@ -1,16 +1,21 @@
 package no.nav.tilleggsstonader.sak.fagsak.søk
 
+import io.mockk.every
+import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusHarSakerDto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.PersonIdentDto
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.ArenaClientConfig
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
@@ -19,9 +24,18 @@ import org.springframework.web.client.exchange
 
 internal class SøkControllerTest : IntegrationTest() {
 
+    @Autowired
+    lateinit var arenaClient: ArenaClient
+
     @BeforeEach
     fun setUp() {
         headers.setBearerAuth(onBehalfOfToken())
+    }
+
+    @AfterEach
+    override fun tearDown() {
+        super.tearDown()
+        ArenaClientConfig.resetMock(arenaClient)
     }
 
     @Test
@@ -36,12 +50,22 @@ internal class SøkControllerTest : IntegrationTest() {
     }
 
     @Test
-    internal fun `Gitt person uten fagsak når søk på personensident kallas skal det returneres ProblemDetail`() {
+    internal fun `person uten fagsak men finnes i arena skal svare med fagsakPersonId=null`() {
+        val response = søkPerson("01010199999")
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body?.fagsakPersonId).isNull()
+        assertThat(response.body?.personIdent).isEqualTo("01010199999")
+    }
+
+    @Test
+    internal fun `person uten fagsak og ikke finnes i arena skal svare med BAD_REQUEST`() {
+        every { arenaClient.harSaker(any()) } returns ArenaStatusHarSakerDto(false)
         val response = catchProblemDetailException { søkPerson("01010166666") }
 
         assertThat(response.responseException.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
         assertThat(response.detail.status).isEqualTo(HttpStatus.BAD_REQUEST.value())
-        assertThat(response.detail.detail).isEqualTo("Finner ikke fagsak for søkte personen")
+        assertThat(response.detail.detail).isEqualTo("Personen har ikke fagsak eller sak i arena")
     }
 
     @Test
@@ -72,7 +96,6 @@ internal class SøkControllerTest : IntegrationTest() {
     inner class SøkPersonForEksternFagsak {
 
         @Test
-        @Disabled // TODO har ikke implementert andel_tilkjent_ytelse ennå
         internal fun `skal finne person hvis fagsaken eksisterer`() {
             val personIdent = "123"
             val fagsakPerson = testoppsettService.opprettPerson(personIdent)

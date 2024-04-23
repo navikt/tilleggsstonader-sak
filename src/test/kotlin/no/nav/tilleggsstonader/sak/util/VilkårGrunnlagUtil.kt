@@ -20,12 +20,14 @@ object VilkårGrunnlagUtil {
                 søknadsgrunnlag = null,
             ),
             barn = barn,
+            dokumentasjon = null,
         )
 
     fun grunnlagBarn(
         ident: String = "123",
         barnId: UUID = UUID.randomUUID(),
-        registergrunnlag: RegistergrunnlagBarn = RegistergrunnlagBarn("navn", null),
+        registergrunnlag: RegistergrunnlagBarn =
+            RegistergrunnlagBarn(navn = "navn", alder = null, dødsdato = null),
         søknadgrunnlag: SøknadsgrunnlagBarn? = null,
     ) = FaktaBarn(
         ident = ident,

@@ -1,9 +1,8 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -19,7 +18,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.kontrakter.sak.journalføring.AutomatiskJournalføringRequest
+import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -27,8 +26,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
+import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -41,7 +41,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsy
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -57,17 +56,17 @@ internal class AutomatiskJournalføringServiceTest {
     val søknadService: SøknadService = mockk()
     val taskService: TaskService = mockk()
     val barnService: BarnService = mockk()
+    val journalføringService: JournalføringService = mockk()
 
     val automatiskJournalføringService = AutomatiskJournalføringService(
-        behandlingService = behandlingService,
-        fagsakService = fagsakService,
         personService = personService,
-        arbeidsfordelingService = arbeidsfordelingService,
         journalpostService = journalpostService,
-        grunnlagsdataService = grunnlagsdataService,
-        søknadService = søknadService,
-        barnService = barnService,
         taskService = taskService,
+        journalføringService = journalføringService,
+        fagsakService = fagsakService,
+        behandlingService = behandlingService,
+        unleashService = mockUnleashService(),
+        arbeidsfordelingService = arbeidsfordelingService,
     )
 
     val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetId
@@ -109,13 +108,14 @@ internal class AutomatiskJournalføringServiceTest {
         every { barnService.opprettBarn(any()) } returns mockk()
         every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(aktørId, false)))
         every { taskService.save(capture(taskSlot)) } returns mockk()
+        every { behandlingService.utledNesteBehandlingstype(fagsak.id) } returns BehandlingType.FØRSTEGANGSBEHANDLING
     }
 
     @Test
     internal fun `kan ikke opprette behandling hvis det eksisterer en åpen behandling i ny løsning`() {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling(status = BehandlingStatus.UTREDES))
         val kanOppretteBehandling =
-            automatiskJournalføringService.kanOppretteBehandling(personIdent, Stønadstype.BARNETILSYN)
+            automatiskJournalføringService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isFalse
     }
 
@@ -123,7 +123,7 @@ internal class AutomatiskJournalføringServiceTest {
     internal fun `kan opprette behandling hvis det ikke finnes innslag i ny løsning`() {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf()
         val kanOppretteBehandling =
-            automatiskJournalføringService.kanOppretteBehandling(personIdent, Stønadstype.BARNETILSYN)
+            automatiskJournalføringService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isTrue
     }
 
@@ -136,7 +136,7 @@ internal class AutomatiskJournalføringServiceTest {
             ),
         )
         val kanOppretteBehandling =
-            automatiskJournalføringService.kanOppretteBehandling(personIdent, Stønadstype.BARNETILSYN)
+            automatiskJournalføringService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isTrue
     }
 
@@ -150,51 +150,18 @@ internal class AutomatiskJournalføringServiceTest {
             behandling(resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
         )
         val kanOppretteBehandling =
-            automatiskJournalføringService.kanOppretteBehandling(personIdent, Stønadstype.BARNETILSYN)
+            automatiskJournalføringService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isTrue
     }
 
     @Test
-    internal fun `skal ikke kunne automatisk journalføre hvis journalpostens bruker mangler`() {
-        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost.copy(bruker = null)
-        every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
-
-        assertThatThrownBy {
-            automatiskJournalføringService.håndterSøknad(
-                AutomatiskJournalføringRequest(
-                    personIdent,
-                    journalpostId,
-                    Stønadstype.BARNETILSYN,
-                ),
-            )
-        }.hasMessageContaining("Journalposten mangler bruker")
-    }
-
-    @Test
     internal fun `skal kunne automatisk journalføre`() {
-        val aktørIdBruker = Bruker(
-            id = aktørId,
-            type = BrukerIdType.AKTOERID,
-        )
-        val journalpostMedAktørId = journalpost.copy(bruker = aktørIdBruker)
-        every { journalpostService.hentJournalpost(journalpostId) } returns journalpostMedAktørId
-        every { journalpostService.oppdaterOgFerdigstillJournalpostMaskinelt(any(), any(), any()) } just Runs
-        every { fagsakService.finnFagsak(any(), any()) } returns fagsak
-
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
-        every { behandlingService.leggTilBehandlingsjournalpost(any(), any(), any()) } just Runs
-        every {
-            behandlingService.opprettBehandling(
-                behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
-                fagsakId = fagsak.id,
-                behandlingsårsak = BehandlingÅrsak.SØKNAD,
-            )
-        } returns behandling(fagsak = fagsak)
-        every { journalpostService.hentSøknadFraJournalpost(any()) } returns mockk()
-        every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
+
+        justRun { journalføringService.journalførTilNyBehandling(journalpostId, personIdent, Stønadstype.BARNETILSYN, any(), any(), any()) }
 
         automatiskJournalføringService.håndterSøknad(
-            AutomatiskJournalføringRequest(
+            HåndterSøknadRequest(
                 personIdent = personIdent,
                 journalpostId = journalpostId,
                 stønadstype = Stønadstype.BARNETILSYN,
@@ -202,14 +169,15 @@ internal class AutomatiskJournalføringServiceTest {
         )
 
         verify(exactly = 1) {
-            behandlingService.opprettBehandling(
-                behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
-                fagsakId = fagsak.id,
-                behandlingsårsak = BehandlingÅrsak.SØKNAD,
+            journalføringService.journalførTilNyBehandling(
+                journalpostId,
+                personIdent,
+                Stønadstype.BARNETILSYN,
+                BehandlingÅrsak.SØKNAD,
+                "Automatisk journalført søknad",
+                enhet,
             )
         }
-
-        assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
     }
 
     @Test
@@ -218,7 +186,7 @@ internal class AutomatiskJournalføringServiceTest {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling())
 
         automatiskJournalføringService.håndterSøknad(
-            AutomatiskJournalføringRequest(
+            HåndterSøknadRequest(
                 personIdent,
                 journalpostId,
                 Stønadstype.BARNETILSYN,

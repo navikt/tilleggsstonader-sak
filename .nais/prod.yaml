@@ -70,6 +70,9 @@ spec:
         - application: tilleggsstonader-sak-frontend
         - application: tilleggsstonader-prosessering
         - application: tilleggsstonader-soknad-api
+        - application: arena
+          namespace: teamarenanais
+          cluster: prod-fss
     outbound:
       rules:
         - application: tilleggsstonader-integrasjoner
@@ -80,6 +83,10 @@ spec:
           namespace: nom
         - application: familie-dokument
           namespace: teamfamilie
+        - application: utsjekk
+          namespace: helved
+        - application: kodeverk-api
+          namespace: team-rocket
       external:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: tilleggsstonader-arena.prod-fss-pub.nais.io

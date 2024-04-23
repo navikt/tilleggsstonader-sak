@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.sak.util.DatoFormat.DATE_FORMAT_NORSK
+import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDato
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDatoMedTid
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Period
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
@@ -24,6 +26,8 @@ object DatoUtil {
 }
 
 val YEAR_MONTH_MAX = YearMonth.from(LocalDate.MAX)
+
+fun antallÅrSiden(dato: LocalDate?) = dato?.let { Period.between(it, dagensDato()).years }
 
 fun LocalDate.norskFormat() = this.format(DATE_FORMAT_NORSK)
 
@@ -74,4 +78,6 @@ fun LocalDate.erEttÅrEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolea
 fun LocalDateTime.harGåttAntallTimer(timer: Int) =
     this.plusHours(timer.toLong()) < LocalDateTime.now()
 
-fun dagensDatoMedTidNorskFormat(): String = dagensDatoMedTid().format(DatoFormat.GOSYS_DATE_TIME)
+fun dagensDatoMedTidNorskFormat(): String = dagensDatoMedTid().medGosysTid()
+
+fun LocalDateTime.medGosysTid(): String = this.format(DatoFormat.GOSYS_DATE_TIME)

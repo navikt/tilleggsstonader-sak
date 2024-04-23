@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
+import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVent
 import no.nav.tilleggsstonader.sak.brev.Vedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretBrev
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRouting
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
@@ -70,6 +72,9 @@ class DefaultRestTemplateConfiguration {
     "mock-journalpost",
     "mock-featuretoggle",
     "mock-htmlify",
+    "mock-arena",
+    "mock-aktivitet",
+    "mock-kodeverk",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
@@ -112,6 +117,7 @@ abstract class IntegrationTest {
 
             SøknadRouting::class,
 
+            Grunnlagsdata::class,
             VedtakTilsynBarn::class,
             Simuleringsresultat::class,
             TilkjentYtelse::class,
@@ -122,6 +128,8 @@ abstract class IntegrationTest {
 
             SøknadBehandling::class,
             SøknadBarnetilsyn::class,
+
+            SettPåVent::class,
 
             OppgaveDomain::class,
             Totrinnskontroll::class,
@@ -152,6 +160,13 @@ abstract class IntegrationTest {
         saksbehandler: String = "julenissen",
     ): String {
         return TokenUtil.onBehalfOfToken(mockOAuth2Server, role, saksbehandler)
+    }
+
+    protected fun clientCredential(
+        clientId: String,
+        accessAsApplication: Boolean,
+    ): String {
+        return TokenUtil.clientToken(mockOAuth2Server, clientId, accessAsApplication)
     }
 
     companion object {

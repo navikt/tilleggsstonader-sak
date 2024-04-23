@@ -48,7 +48,8 @@ class AngreSendTilBeslutterServiceTest {
         every { totrinnskontrollService.hentBeslutter(behandling.id) } returns null
         every { oppgaveService.hentOppgaveSomIkkeErFerdigstilt(behandling.id, Oppgavetype.GodkjenneVedtak) } returns
             oppgave(behandlingId = behandling.id)
-        every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns Oppgave(id = 123, tilordnetRessurs = null)
+        every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns
+            Oppgave(id = 123, versjon = 0, tilordnetRessurs = null)
     }
 
     @AfterEach
@@ -95,7 +96,7 @@ class AngreSendTilBeslutterServiceTest {
         @Test
         fun `skal validere at steget ikke er etter beslutte vedtak`() {
             every { behandlingService.hentSaksbehandling(behandling.id) } returns
-                behandling.copy(steg = StegType.VENTE_PÅ_STATUS_FRA_UTBETALING)
+                behandling.copy(steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
 
             assertThat(
                 catchThrowableOfType<Feil> {
@@ -121,6 +122,7 @@ class AngreSendTilBeslutterServiceTest {
         fun `skal kaste feil hvis saksbehandler ikke tilordnetRessurs på oppgaven`() {
             every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns Oppgave(
                 id = 123,
+                versjon = 0,
                 tilordnetRessurs = saksbehandler2,
             )
 

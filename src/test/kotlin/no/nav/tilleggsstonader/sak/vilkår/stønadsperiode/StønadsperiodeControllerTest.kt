@@ -63,6 +63,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
                 tom = dagensDato,
                 delvilkår = DelvilkårMålgruppeDto(
                     medlemskap = null,
+                    dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.NEI),
                 ),
                 behandlingId = behandling.id,
             ),
@@ -79,6 +80,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
                     mottarSykepenger = VurderingDto(SvarJaNei.NEI),
                 ),
                 behandlingId = behandling.id,
+                aktivitetsdager = 5,
             ),
         )
 

@@ -27,6 +27,7 @@ data class Saksbehandling(
     val henlagtÅrsak: HenlagtÅrsak? = null,
     val ident: String,
     val fagsakId: UUID,
+    val fagsakPersonId: UUID,
     val eksternFagsakId: Long,
     @Column("stonadstype")
     val stønadstype: Stønadstype,

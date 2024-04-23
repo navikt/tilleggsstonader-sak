@@ -17,6 +17,7 @@ data class BehandlingDto(
     val id: UUID,
     val forrigeBehandlingId: UUID?,
     val fagsakId: UUID,
+    val fagsakPersonId: UUID,
     val steg: StegType,
     val kategori: BehandlingKategori,
     val type: BehandlingType,
@@ -31,11 +32,12 @@ data class BehandlingDto(
     val henlagtÅrsak: HenlagtÅrsak? = null,
 )
 
-fun Behandling.tilDto(stønadstype: Stønadstype): BehandlingDto =
+fun Behandling.tilDto(stønadstype: Stønadstype, fagsakPersonId: UUID): BehandlingDto =
     BehandlingDto(
         id = this.id,
         forrigeBehandlingId = this.forrigeBehandlingId,
         fagsakId = this.fagsakId,
+        fagsakPersonId = fagsakPersonId,
         steg = this.steg,
         kategori = this.kategori,
         type = this.type,
@@ -55,6 +57,7 @@ fun Saksbehandling.tilDto(): BehandlingDto =
         id = this.id,
         forrigeBehandlingId = this.forrigeBehandlingId,
         fagsakId = this.fagsakId,
+        fagsakPersonId = this.fagsakPersonId,
         steg = this.steg,
         kategori = this.kategori,
         type = this.type,

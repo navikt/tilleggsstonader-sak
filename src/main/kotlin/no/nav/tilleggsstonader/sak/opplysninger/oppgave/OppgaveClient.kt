@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
@@ -91,16 +92,16 @@ class OppgaveClient(
         patchForEntity<OppgaveResponse>(uri, "", uriVariables = oppgaveIdUriVariables(oppgaveId))
     }
 
-    fun oppdaterOppgave(oppgave: Oppgave): Long {
+    fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse {
         val uri = UriComponentsBuilder.fromUri(oppgaveUri).pathSegment("{id}", "oppdater").encode().toUriString()
         try {
-            val response = patchForEntity<OppgaveResponse>(
+            val response = patchForEntity<OppdatertOppgaveResponse>(
                 uri,
                 oppgave,
                 HttpHeaders().medContentTypeJsonUTF8(),
                 oppgaveIdUriVariables(oppgave.id),
             )
-            return response.oppgaveId
+            return response
         } catch (e: ProblemDetailException) {
             if (e.httpStatus == HttpStatus.CONFLICT) {
                 throw ApiFeil(

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunktEllerEndretTid
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingUtil.validerKanOppretteNyBehandling
@@ -31,7 +32,9 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -47,6 +50,7 @@ class BehandlingService(
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
     private val behandlingshistorikkService: BehandlingshistorikkService,
     // private val taskService: TaskService,
+    private val unleashService: UnleashService,
 ) {
 
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
@@ -103,7 +107,7 @@ class BehandlingService(
         behandlingType: BehandlingType,
         fagsakId: UUID,
         status: BehandlingStatus = BehandlingStatus.OPPRETTET,
-        stegType: StegType = StegType.VILKÅR,
+        stegType: StegType = StegType.INNGANGSVILKÅR,
         behandlingsårsak: BehandlingÅrsak,
         kravMottatt: LocalDate? = null,
         erMigrering: Boolean = false,
@@ -111,13 +115,10 @@ class BehandlingService(
         brukerfeilHvis(kravMottatt != null && kravMottatt.isAfter(LocalDate.now())) {
             "Kan ikke sette krav mottattdato frem i tid"
         }
-        /* TODO skal denne featuretoggles?
-        feilHvis(
-            behandlingsårsak == BehandlingÅrsak.KORRIGERING_UTEN_BREV &&
-                !featureToggleService.isEnabled(Toggle.BEHANDLING_KORRIGERING),
-        ) {
-            "Feature toggle for korrigering er ikke skrudd på for bruker"
-        }*/
+        feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_BEHANDLING)) {
+            "Feature toggle for å opprette behandling er slått av"
+        }
+
         val tidligereBehandlinger = behandlingRepository.findByFagsakId(fagsakId)
         val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
         validerKanOppretteNyBehandling(behandlingType, tidligereBehandlinger, erMigrering)
@@ -140,7 +141,7 @@ class BehandlingService(
         behandlingshistorikkService.opprettHistorikkInnslag(
             behandlingshistorikk = Behandlingshistorikk(
                 behandlingId = behandling.id,
-                steg = StegType.VILKÅR, // TODO se over dette ping Sara
+                steg = stegType,
             ),
         )
 
@@ -153,6 +154,8 @@ class BehandlingService(
 
     fun hentSaksbehandling(eksternBehandlingId: Long): Saksbehandling =
         behandlingRepository.finnSaksbehandling(eksternBehandlingId)
+
+    fun hentEksternBehandlingId(behandlingId: UUID) = eksternBehandlingIdRepository.findByBehandlingId(behandlingId)
 
     fun hentBehandlingPåEksternId(eksternBehandlingId: Long): Behandling = behandlingRepository.finnMedEksternId(
         eksternBehandlingId,
@@ -282,5 +285,10 @@ class BehandlingService(
                 vedtakstidspunkt = SporbarUtils.now(),
             ),
         )
+    }
+
+    fun utledNesteBehandlingstype(fagsakId: UUID): BehandlingType {
+        val behandlinger = hentBehandlinger(fagsakId)
+        return if (behandlinger.all { it.resultat == BehandlingResultat.HENLAGT }) BehandlingType.FØRSTEGANGSBEHANDLING else BehandlingType.REVURDERING
     }
 }

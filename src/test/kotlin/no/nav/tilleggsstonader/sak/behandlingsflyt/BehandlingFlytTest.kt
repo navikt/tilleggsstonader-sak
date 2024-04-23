@@ -18,19 +18,32 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.brev.BrevController
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.InnvilgelseTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårController
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.slf4j.MDC
@@ -49,9 +62,13 @@ class BehandlingFlytTest(
     @Autowired val vilkårController: VilkårController,
     @Autowired val tilsynBarnVedtakController: TilsynBarnVedtakController,
     @Autowired val brevController: BrevController,
+    @Autowired val brevmottakereRepository: BrevmottakerRepository,
     @Autowired val totrinnskontrollController: TotrinnskontrollController,
     @Autowired val taskService: TaskService,
+    @Autowired val stegService: StegService,
     @Autowired val taskWorker: TaskWorker,
+    @Autowired val vilkårperiodeService: VilkårperiodeService,
+    @Autowired val stønadsperiodeService: StønadsperiodeService,
 ) : IntegrationTest() {
 
     val personIdent = FnrGenerator.generer(år = 2000)
@@ -155,7 +172,7 @@ class BehandlingFlytTest(
 
     private fun newTransaction() {
         if (TestTransaction.isActive()) {
-            TestTransaction.flagForCommit(); // need this, otherwise the next line does a rollback
+            TestTransaction.flagForCommit() // need this, otherwise the next line does a rollback
             TestTransaction.end()
             TestTransaction.start()
         }
@@ -181,17 +198,57 @@ class BehandlingFlytTest(
 
     private fun opprettBehandlingOgSendTilBeslutter(personIdent: String): UUID {
         val behandlingId = opprettBehandling(personIdent)
+        vurderInngangsvilkår(behandlingId)
         opprettVilkår(behandlingId)
         utfyllVilkår(behandlingId)
 
         opprettVedtak(behandlingId)
         genererSaksbehandlerBrev(behandlingId)
+        lagreBrevmottakere(behandlingId)
         sendTilBeslutter(behandlingId)
         return behandlingId
     }
 
+    private fun vurderInngangsvilkår(behandlingId: UUID) {
+        val fom = LocalDate.of(2024, 1, 1)
+        val tom = LocalDate.of(2024, 1, 31)
+
+        vilkårperiodeService.opprettVilkårperiode(
+            opprettVilkårperiodeMålgruppe(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                type = MålgruppeType.AAP,
+                dekkesAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.NEI),
+            ),
+        )
+        vilkårperiodeService.opprettVilkårperiode(
+            LagreVilkårperiode(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                type = AktivitetType.TILTAK,
+                delvilkår = delvilkårAktivitetDto(),
+                aktivitetsdager = 5,
+            ),
+        )
+        stønadsperiodeService.lagreStønadsperioder(
+            behandlingId,
+            listOf(
+                StønadsperiodeDto(
+                    fom = fom,
+                    tom = tom,
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                ),
+            ),
+        )
+        stegService.håndterSteg(behandlingId, StegType.INNGANGSVILKÅR)
+    }
+
     private fun utfyllVilkår(behandlingId: UUID) {
         testSaksbehandlingController.utfyllVilkår(behandlingId)
+        stegService.håndterSteg(behandlingId, StegType.VILKÅR)
     }
 
     private fun opprettVilkår(behandlingId: UUID) {
@@ -200,6 +257,7 @@ class BehandlingFlytTest(
 
     private fun opprettBehandling(personIdent: String): UUID {
         val behandlingId = opprettTestBehandlingController.opprettBehandling(TestBehandlingRequest(personIdent))
+        testoppsettService.opprettGrunnlagsdata(behandlingId)
         kjørTasks()
         return behandlingId
     }
@@ -234,7 +292,7 @@ class BehandlingFlytTest(
     private fun verifiserBehandlingIverksettes(behandlingId: UUID) {
         with(testoppsettService.hentBehandling(behandlingId)) {
             assertThat(status).isEqualTo(BehandlingStatus.IVERKSETTER_VEDTAK)
-            assertThat(steg).isEqualTo(StegType.VENTE_PÅ_STATUS_FRA_UTBETALING)
+            assertThat(steg).isEqualTo(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
         }
     }
 
@@ -261,24 +319,29 @@ class BehandlingFlytTest(
         brevController.genererPdf(GenererPdfRequest(html), behandlingId)
     }
 
-    private fun opprettVedtak(behandlingId: UUID) {
-        val barn = barnService.finnBarnPåBehandling(behandlingId)
-        val utgifter = barn.first().let { mapOf(it.id to listOf(utgift())) }
-        val stønadsperioder = listOf(stønadsperiode())
-        tilsynBarnVedtakController.lagreVedtak(
-            behandlingId,
-            InnvilgelseTilsynBarnDto(stønadsperioder, utgifter),
+    private fun lagreBrevmottakere(behandlingId: UUID) {
+        brevmottakereRepository.insert(
+            Brevmottaker(
+                behandlingId = behandlingId,
+                mottakerRolle = MottakerRolle.BRUKER,
+                mottakerType = MottakerType.PERSON,
+                ident = "ident",
+            ),
         )
     }
 
-    private fun stønadsperiode() = Stønadsperiode(
-        fom = LocalDate.of(2023, 1, 1),
-        tom = LocalDate.of(2023, 1, 31),
-    )
+    private fun opprettVedtak(behandlingId: UUID) {
+        val barn = barnService.finnBarnPåBehandling(behandlingId)
+        val utgifter = barn.first().let { mapOf(it.id to listOf(utgift())) }
+        tilsynBarnVedtakController.lagreVedtak(
+            behandlingId,
+            InnvilgelseTilsynBarnDto(utgifter),
+        )
+    }
 
     private fun utgift() = Utgift(
-        fom = YearMonth.of(2023, 1),
-        tom = YearMonth.of(2023, 1),
+        fom = YearMonth.of(2024, 1),
+        tom = YearMonth.of(2024, 1),
         utgift = 1000,
     )
 
@@ -294,7 +357,10 @@ class BehandlingFlytTest(
 
     private fun <T> somBeslutter(preferredUsername: String = "beslutter", fn: () -> T): T {
         kjørTasks()
-        return testWithBrukerContext(preferredUsername = preferredUsername, groups = listOf(rolleConfig.beslutterRolle)) {
+        return testWithBrukerContext(
+            preferredUsername = preferredUsername,
+            groups = listOf(rolleConfig.beslutterRolle),
+        ) {
             withCallId(fn)
         }
     }

@@ -17,3 +17,5 @@ clients:
   pdl:
     uri: https://pdl-api-q1.${CLIENT_ENV}-fss-pub.nais.io
     scope: api://${CLIENT_ENV}-fss.pdl.pdl-api-q1/.default
+  kodeverk:
+    uri: https://kodeverk-api.nav.no

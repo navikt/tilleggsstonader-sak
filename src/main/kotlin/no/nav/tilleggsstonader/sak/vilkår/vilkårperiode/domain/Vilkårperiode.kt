@@ -2,14 +2,16 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 @Table("vilkar_periode")
 data class Vilkårperiode(
@@ -25,6 +27,7 @@ data class Vilkårperiode(
     val delvilkår: DelvilkårVilkårperiode,
     val begrunnelse: String?,
     val resultat: ResultatVilkårperiode,
+    val aktivitetsdager: Int?,
 
     val slettetKommentar: String? = null,
 
@@ -34,14 +37,46 @@ data class Vilkårperiode(
     init {
         require(tom >= fom) { "Til-og-med før fra-og-med: $fom > $tom" }
 
-        val ugyldigTypeOgDetaljer = (type is MålgruppeType && delvilkår !is DelvilkårMålgruppe) ||
-            (type is AktivitetType && delvilkår !is DelvilkårAktivitet)
-        feilHvis(ugyldigTypeOgDetaljer) {
-            "Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}"
+        if (type is AktivitetType) {
+            require(aktivitetsdager != null) { "Aktivitetsdager må settes for aktivitet" }
         }
+
+        when {
+            type is MålgruppeType && delvilkår is DelvilkårMålgruppe -> delvilkår.valider(begrunnelse)
+            type is AktivitetType && delvilkår is DelvilkårAktivitet -> delvilkår.valider()
+            else -> error("Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}")
+        }
+
+        validerBegrunnelseNedsattArbeidsevne()
 
         validerSlettefelter()
     }
+
+    private fun validerBegrunnelseNedsattArbeidsevne() {
+        if (type === MålgruppeType.NEDSATT_ARBEIDSEVNE) {
+            brukerfeilHvis(begrunnelse.isNullOrBlank()) {
+                "Mangler begrunnelse for nedsatt arbeidsevne"
+            }
+        }
+    }
+
+    private fun DelvilkårMålgruppe.valider(begrunnelse: String?) {
+        brukerfeilHvis((medlemskap.svar !== null && medlemskap.svar !== SvarJaNei.JA_IMPLISITT) && begrunnelse.isNullOrBlank()) {
+            "Mangler begrunnelse for vurdering av medlemskap"
+        }
+
+        brukerfeilHvis(dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
+            "Mangler begrunnelse for utgifter dekt av annet regelverk"
+        }
+    }
+
+    private fun DelvilkårAktivitet.valider() {
+        brukerfeilHvis(lønnet.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
+            "Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid"
+        }
+    }
+
+    private fun manglerBegrunnelse() = begrunnelse.isNullOrBlank()
 
     private fun validerSlettefelter() {
         if (resultat == ResultatVilkårperiode.SLETTET) {
@@ -79,15 +114,11 @@ enum class ResultatVilkårperiode {
 sealed class DelvilkårVilkårperiode {
     data class Vurdering(
         val svar: SvarJaNei?,
-        val begrunnelse: String? = null,
         val resultat: ResultatDelvilkårperiode,
     ) {
         init {
-            feilHvis(svar == SvarJaNei.JA_IMPLISITT && begrunnelse != null) {
-                "Kan ikke ha begrunnelse når svar=$svar"
-            }
-            feilHvis(resultat == ResultatDelvilkårperiode.IKKE_AKTUELT && (svar != null || begrunnelse != null)) {
-                "Ugyldig resultat=$resultat når svar=$svar begrunnelseErNull=${begrunnelse == null}"
+            feilHvis(resultat == ResultatDelvilkårperiode.IKKE_AKTUELT && (svar != null)) {
+                "Ugyldig resultat=$resultat når svar=$svar"
             }
         }
     }
@@ -102,6 +133,7 @@ enum class ResultatDelvilkårperiode {
 
 data class DelvilkårMålgruppe(
     val medlemskap: Vurdering,
+    val dekketAvAnnetRegelverk: Vurdering,
 ) : DelvilkårVilkårperiode()
 
 data class DelvilkårAktivitet(
@@ -129,6 +161,8 @@ enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : Vilkårper
     ;
 
     override fun tilDbType(): String = this.name
+
+    fun gjelderNedsattArbeidsevne() = this == NEDSATT_ARBEIDSEVNE || this == UFØRETRYGD || this == AAP
 }
 
 enum class AktivitetType : VilkårperiodeType {
@@ -147,3 +181,25 @@ data class Vilkårperioder(
     val målgrupper: List<Vilkårperiode>,
     val aktiviteter: List<Vilkårperiode>,
 )
+
+data class Aktivitet(
+    val type: AktivitetType,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val aktivitetsdager: Int,
+) : Periode<LocalDate>
+
+fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
+    return this.mapNotNull {
+        if (it.type is AktivitetType) {
+            Aktivitet(
+                type = it.type,
+                fom = it.fom,
+                tom = it.tom,
+                aktivitetsdager = it.aktivitetsdager ?: error("Aktivitetsdager mangler på periode ${it.id}"),
+            )
+        } else {
+            null
+        }
+    }
+}

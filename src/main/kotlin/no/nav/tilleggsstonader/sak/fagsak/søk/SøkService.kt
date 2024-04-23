@@ -5,9 +5,8 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.dto.NavnDto
-import no.nav.tilleggsstonader.sak.opplysninger.mapper.KjønnMapper
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
@@ -25,6 +24,7 @@ class SøkService(
     private val fagsakPersonService: FagsakPersonService,
     private val personService: PersonService,
     private val fagsakService: FagsakService,
+    private val arenaService: ArenaService,
 ) {
 
     fun søkPersonForEksternFagsak(eksternFagsakId: Long): Søkeresultat {
@@ -39,13 +39,16 @@ class SøkService(
             "Finner ingen personer for valgt personident"
         }
         val gjeldendePersonIdent = personIdenter.gjeldende().ident
-        // TODO opprett fagsak hvis personen finnes i Arena? (finnFagsakEllerOpprettHvisPersonFinnesIInfotrygd)
-        brukerfeilHvisIkke(fagsakService.harFagsak(personIdenter.identer())) {
-            "Finner ikke fagsak for søkte personen"
-        }
-        val fagsakPerson = fagsakPersonService.finnPerson(personIdenter.identer())
 
-        return tilSøkeresultat(gjeldendePersonIdent, fagsakPerson)
+        val fagsakPerson = fagsakPersonService.finnPerson(personIdenter.identer())
+        if (fagsakPerson != null) {
+            return tilSøkeresultat(gjeldendePersonIdent, fagsakPerson)
+        }
+        if (arenaService.harSaker(gjeldendePersonIdent)) {
+            return tilSøkeresultat(gjeldendePersonIdent, null)
+        }
+
+        throw ApiFeil("Personen har ikke fagsak eller sak i arena", HttpStatus.BAD_REQUEST)
     }
 
     private fun tilSøkeresultat(
@@ -56,7 +59,6 @@ class SøkService(
 
         return Søkeresultat(
             personIdent = gjeldendePersonIdent,
-            kjønn = KjønnMapper.tilKjønn(person.kjønn.first().kjønn),
             visningsnavn = NavnDto.fraNavn(person.navn.gjeldende()).visningsnavn,
             fagsakPersonId = fagsakPerson?.id,
         )

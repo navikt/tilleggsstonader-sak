@@ -37,24 +37,26 @@ object VilkårperiodeTestUtil {
         begrunnelse = begrunnelse,
         kilde = kilde,
         resultat = resultat,
+        aktivitetsdager = null,
     )
 
-    fun delvilkårMålgruppe(vurdering: Vurdering = vurdering()) = DelvilkårMålgruppe(
-        medlemskap = vurdering,
-    )
+    fun delvilkårMålgruppe(medlemskap: Vurdering = vurdering(), dekkesAvAnnetRegelverk: Vurdering = vurdering(svar = SvarJaNei.NEI)) =
+        DelvilkårMålgruppe(
+            medlemskap = medlemskap,
+            dekketAvAnnetRegelverk = dekkesAvAnnetRegelverk,
+        )
 
     fun vurdering(
-        svar: SvarJaNei = SvarJaNei.JA_IMPLISITT,
-        begrunnelse: String? = null,
+        svar: SvarJaNei? = SvarJaNei.JA_IMPLISITT,
         resultat: ResultatDelvilkårperiode = ResultatDelvilkårperiode.OPPFYLT,
     ) = Vurdering(
         svar = svar,
-        begrunnelse = begrunnelse,
         resultat = resultat,
     )
 
     fun delvilkårMålgruppeDto() = DelvilkårMålgruppeDto(
         medlemskap = VurderingDto(SvarJaNei.JA_IMPLISITT),
+        dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.NEI),
     )
 
     fun aktivitet(
@@ -62,6 +64,7 @@ object VilkårperiodeTestUtil {
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate = LocalDate.now().plusDays(5),
         type: AktivitetType = AktivitetType.TILTAK,
+        aktivitetsdager: Int = 5,
         delvilkår: DelvilkårAktivitet = delvilkårAktivitet(),
         begrunnelse: String? = null,
         kilde: KildeVilkårsperiode = KildeVilkårsperiode.SYSTEM,
@@ -76,18 +79,17 @@ object VilkårperiodeTestUtil {
         begrunnelse = begrunnelse,
         kilde = kilde,
         resultat = resultat,
+        aktivitetsdager = aktivitetsdager,
         slettetKommentar = slettetKommentar,
     )
 
     fun delvilkårAktivitet(
         lønnet: Vurdering = vurdering(
             svar = SvarJaNei.NEI,
-            begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
         mottarSykepenger: Vurdering = vurdering(
             svar = SvarJaNei.NEI,
-            begrunnelse = null,
             resultat = ResultatDelvilkårperiode.OPPFYLT,
         ),
     ) = DelvilkårAktivitet(
@@ -105,13 +107,14 @@ object VilkårperiodeTestUtil {
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate = LocalDate.now(),
         medlemskap: VurderingDto? = null,
+        dekkesAvAnnetRegelverk: VurderingDto? = null,
         begrunnelse: String? = null,
         behandlingId: UUID = UUID.randomUUID(),
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårMålgruppeDto(medlemskap = medlemskap),
+        delvilkår = DelvilkårMålgruppeDto(medlemskap = medlemskap, dekketAvAnnetRegelverk = dekkesAvAnnetRegelverk),
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,
     )
@@ -124,6 +127,7 @@ object VilkårperiodeTestUtil {
         mottarSykepenger: VurderingDto? = null,
         begrunnelse: String? = null,
         behandlingId: UUID = UUID.randomUUID(),
+        aktivitetsdager: Int = 5,
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
@@ -131,5 +135,6 @@ object VilkårperiodeTestUtil {
         delvilkår = DelvilkårAktivitetDto(lønnet, mottarSykepenger),
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,
+        aktivitetsdager = aktivitetsdager,
     )
 }

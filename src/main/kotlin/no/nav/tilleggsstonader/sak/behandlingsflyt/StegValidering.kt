@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.config.SecureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -22,7 +22,7 @@ object StegValidering {
         val harTilgangTilSteg = SikkerhetContext.harTilgangTilGittRolle(rolleConfig, rolleForSteg)
 
         logger.info("Starter håndtering av $stegType på behandling ${saksbehandling.id}")
-        SecureLogger.secureLogger.info(
+        secureLogger.info(
             "Starter håndtering av $stegType på behandling " +
                 "${saksbehandling.id} med saksbehandler=[$saksbehandlerIdent]",
         )

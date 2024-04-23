@@ -1,11 +1,13 @@
+import java.io.ByteArrayOutputStream
+
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20240110093731_0eda75e"
-val tilleggsstønaderLibsVersion = "2024.01.31-13.14.525870bbcf52"
-val tilleggsstønaderKontrakterVersion = "2024.02.01-16.47.d4589a911198"
-val tokenSupportVersion = "3.2.0"
-val wiremockVersion = "3.3.1"
-val mockkVersion = "1.13.8"
-val testcontainerVersion = "1.19.3"
+val familieProsesseringVersion = "2.20240214140223_83c31de"
+val tilleggsstønaderLibsVersion = "2024.04.02-08.44.ef5242ac90bc"
+val tilleggsstønaderKontrakterVersion = "2024.04.15-14.00.c37cd4f5e87d"
+val tokenSupportVersion = "4.1.4"
+val wiremockVersion = "3.5.2"
+val mockkVersion = "1.13.10"
+val testcontainerVersion = "1.19.7"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -13,16 +15,16 @@ version = "1.0.0"
 plugins {
     application
 
-    kotlin("jvm") version "1.9.22"
-    id("com.diffplug.spotless") version "6.23.3"
-    id("com.github.ben-manes.versions") version "0.50.0"
+    kotlin("jvm") version "1.9.23"
+    id("com.diffplug.spotless") version "6.25.0"
+    id("com.github.ben-manes.versions") version "0.51.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
-    id("org.springframework.boot") version "3.2.1"
+    id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
-    kotlin("plugin.spring") version "1.9.22"
+    kotlin("plugin.spring") version "1.9.23"
 
-    id("org.cyclonedx.bom") version "1.8.1"
+    id("org.cyclonedx.bom") version "1.8.2"
 }
 
 repositories {
@@ -95,7 +97,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.15.0"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.16.1"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 }
@@ -114,6 +116,33 @@ application {
 
 if (project.hasProperty("skipLint")) {
     gradle.startParameter.excludedTaskNames += "spotlessKotlinCheck"
+}
+
+// Oppretter version.properties med git-sha som version
+tasks {
+    fun getCheckedOutGitCommitHash(): String {
+        if (System.getenv("GITHUB_ACTIONS") == "true") {
+            return System.getenv("GITHUB_SHA")
+        }
+        val byteOut = ByteArrayOutputStream()
+        project.exec {
+            commandLine = "git rev-parse --verify HEAD".split("\\s".toRegex())
+            standardOutput = byteOut
+        }
+        return String(byteOut.toByteArray()).trim()
+    }
+
+    val projectProps by registering(WriteProperties::class) {
+        destinationFile = layout.buildDirectory.file("version.properties")
+        // Define property.
+        property("project.version", getCheckedOutGitCommitHash())
+    }
+
+    processResources {
+        // Depend on output of the task to create properties,
+        // so the properties file will be part of the Java resources.
+        from(projectProps)
+    }
 }
 
 tasks.test {

@@ -19,7 +19,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockGetVariant
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.søknadRoutingVariant
-import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
@@ -39,7 +39,7 @@ class SøknadRoutingServiceTest {
     val søknadRoutingRepository = mockk<SøknadRoutingRepository>()
     val fagsakService = mockk<FagsakService>()
     val behandlingService = mockk<BehandlingService>()
-    val arenaClient = mockk<ArenaClient>()
+    val arenaService = mockk<ArenaService>()
     val personService = mockk<PersonService>()
     val unleashService = mockUnleashService().apply {
         mockGetVariant(Toggle.SØKNAD_ROUTING_TILSYN_BARN, søknadRoutingVariant())
@@ -49,8 +49,7 @@ class SøknadRoutingServiceTest {
         søknadRoutingRepository,
         fagsakService,
         behandlingService,
-        arenaClient,
-        personService,
+        arenaService,
         unleashService,
     )
 
@@ -70,7 +69,7 @@ class SøknadRoutingServiceTest {
         every { søknadRoutingRepository.insert(any()) } answers { firstArg() }
         every { fagsakService.finnFagsak(any(), any()) } returns null
         every { behandlingService.hentBehandlinger(any<UUID>()) } returns emptyList()
-        every { arenaClient.hentStatus(any()) } returns arenaStatusKanIkkeRoutes()
+        every { arenaService.hentStatus(any(), any()) } returns arenaStatusKanIkkeRoutes()
         every { personService.hentPersonIdenter(any()) } answers { PdlIdenter(listOf(PdlIdent(firstArg(), false))) }
     }
 
@@ -91,7 +90,7 @@ class SøknadRoutingServiceTest {
 
             fagsakService wasNot called
             behandlingService wasNot called
-            arenaClient wasNot called
+            arenaService wasNot called
         }
     }
 
@@ -108,7 +107,7 @@ class SøknadRoutingServiceTest {
 
                 fagsakService wasNot called
                 behandlingService wasNot called
-                arenaClient wasNot called
+                arenaService wasNot called
             }
         }
 
@@ -123,7 +122,7 @@ class SøknadRoutingServiceTest {
 
                 fagsakService wasNot called
                 behandlingService wasNot called
-                arenaClient wasNot called
+                arenaService wasNot called
             }
         }
 
@@ -163,7 +162,7 @@ class SøknadRoutingServiceTest {
                 fagsakService.finnFagsak(any(), any())
                 behandlingService.hentBehandlinger(any<UUID>())
                 søknadRoutingRepository.insert(any())
-                arenaClient wasNot called
+                arenaService wasNot called
             }
         }
     }
@@ -176,20 +175,20 @@ class SøknadRoutingServiceTest {
             assertThat(skalBehandlesINyLøsning()).isFalse()
 
             verify {
-                arenaClient.hentStatus(any())
+                arenaService.hentStatus(any(), any())
                 søknadRoutingRepository.insert(any()) wasNot called
             }
         }
 
         @Test
         fun `skal oppdatere databasen hvis statusen i arena tilsier sånn`() {
-            every { arenaClient.hentStatus(any()) } returns arenaStatusKanRoutes()
+            every { arenaService.hentStatus(any(), any()) } returns arenaStatusKanRoutes()
 
             assertThat(skalBehandlesINyLøsning()).isTrue()
 
             verify {
                 fagsakService.finnFagsak(any(), any())
-                arenaClient.hentStatus(any())
+                arenaService.hentStatus(any(), any())
                 søknadRoutingRepository.insert(any())
                 behandlingService wasNot called
             }

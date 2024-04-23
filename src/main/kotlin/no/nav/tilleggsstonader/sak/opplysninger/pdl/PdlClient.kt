@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
-import no.nav.tilleggsstonader.sak.infrastruktur.config.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBolkResponse

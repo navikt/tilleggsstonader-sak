@@ -16,11 +16,17 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.InnvilgelseTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchIllegalStateException
 import org.junit.jupiter.api.AfterEach
@@ -29,7 +35,9 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 class StegServiceTest(
     @Autowired
@@ -42,6 +50,14 @@ class StegServiceTest(
     val barnRepository: BarnRepository,
     @Autowired
     val tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
+    @Autowired
+    val stønadsperiodeRepository: StønadsperiodeRepository,
+    @Autowired
+    val vilkårperiodeRepository: VilkårperiodeRepository,
+    @Autowired
+    val vilkårRepository: VilkårRepository,
+    @Autowired
+    val ferdigstillBehandlingSteg: FerdigstillBehandlingSteg,
 ) : IntegrationTest() {
 
     val stegForBeslutter = object : BehandlingSteg<String> {
@@ -49,6 +65,7 @@ class StegServiceTest(
             val behandling = behandlingRepository.findByIdOrThrow(saksbehandling.id)
             behandlingRepository.update(behandling.copy(status = BehandlingStatus.IVERKSETTER_VEDTAK))
         }
+
         override fun stegType(): StegType = StegType.BESLUTTE_VEDTAK
     }
 
@@ -66,7 +83,10 @@ class StegServiceTest(
                 steg = StegType.SEND_TIL_BESLUTTER,
             ),
         )
-        val vedtakTilsynBarn = opprettVedtakTilsynBarn(behandling)
+        val barn = lagBarn(behandling)
+        opprettVilkårBarnetilsyn(behandlingId = behandling.id, barn = barn)
+        val vedtakTilsynBarn = opprettVedtakTilsynBarn(barn)
+
         stegService.håndterSteg(saksbehandling(behandling = behandling), tilsynBarnBeregnYtelseSteg, vedtakTilsynBarn)
 
         assertThat(behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidDesc(behandling.id).first().steg)
@@ -111,12 +131,12 @@ class StegServiceTest(
         }
 
         @Test
-        internal fun `skal feile håndtering av ny søknad hvis en behandling er ferdigstilt`() {
+        internal fun `skal ikke kunne beregne ytelse dersom behandling er ferdigstilt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(
                 behandling(steg = StegType.BEHANDLING_FERDIGSTILT),
             )
-
-            val vedtakTilsynBarn = opprettVedtakTilsynBarn(behandling)
+            val barn = lagBarn(behandling)
+            val vedtakTilsynBarn = opprettVedtakTilsynBarn(barn)
             val exception = catchThrowableOfType<Feil> {
                 stegService.håndterSteg(
                     saksbehandling(behandling = behandling),
@@ -150,7 +170,7 @@ class StegServiceTest(
             val behandling = testoppsettService.opprettBehandlingMedFagsak(
                 behandling(
                     status = BehandlingStatus.IVERKSETTER_VEDTAK,
-                    steg = StegType.VENTE_PÅ_STATUS_FRA_UTBETALING,
+                    steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV,
                 ),
             )
             val exception = catchIllegalStateException {
@@ -201,19 +221,48 @@ class StegServiceTest(
         }
     }
 
-    private fun opprettVedtakTilsynBarn(behandling: Behandling): InnvilgelseTilsynBarnDto {
-        val barn = barnRepository.insert(BehandlingBarn(behandlingId = behandling.id, ident = "123"))
+    @Nested
+    inner class StegFlyt {
 
+        @Test
+        fun `skal endre steg til ferdigstilt etter ferdigstilling`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(
+                behandling(
+                    status = BehandlingStatus.IVERKSETTER_VEDTAK,
+                    steg = StegType.FERDIGSTILLE_BEHANDLING,
+                ),
+            )
+            val oppdatertBehandling = stegService.håndterSteg(behandlingId = behandling.id, ferdigstillBehandlingSteg)
+            assertThat(oppdatertBehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
+            assertThat(oppdatertBehandling.status).isEqualTo(BehandlingStatus.FERDIGSTILT)
+        }
+    }
+
+    private fun lagBarn(behandling: Behandling): BehandlingBarn {
+        return barnRepository.insert(BehandlingBarn(behandlingId = behandling.id, ident = "123"))
+    }
+
+    private fun opprettVilkårBarnetilsyn(behandlingId: UUID, barn: BehandlingBarn) {
+        val fom = LocalDate.of(2023, 1, 1)
+        val tom = LocalDate.of(2023, 1, 31)
+        stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandlingId, fom = fom, tom = tom))
+        vilkårperiodeRepository.insert(aktivitet(behandlingId = behandlingId, fom = fom, tom = tom))
+        vilkårRepository.insert(vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN, barnId = barn.id))
+    }
+
+    private fun opprettVedtakTilsynBarn(barn: BehandlingBarn): InnvilgelseTilsynBarnDto {
         val måned = YearMonth.of(2023, 1)
         return InnvilgelseTilsynBarnDto(
-            stønadsperioder = listOf(Stønadsperiode(måned.atDay(2), måned.atDay(2))),
             utgifter = mapOf(barn.id to listOf(Utgift(måned, måned, 100))),
         )
     }
 
     private fun behandlingSomIverksettes(): Behandling {
         val nyBehandling =
-            behandling(status = BehandlingStatus.IVERKSETTER_VEDTAK, steg = StegType.VENTE_PÅ_STATUS_FRA_UTBETALING)
+            behandling(
+                status = BehandlingStatus.IVERKSETTER_VEDTAK,
+                steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV,
+            )
         return testoppsettService.opprettBehandlingMedFagsak(nyBehandling)
     }
 }

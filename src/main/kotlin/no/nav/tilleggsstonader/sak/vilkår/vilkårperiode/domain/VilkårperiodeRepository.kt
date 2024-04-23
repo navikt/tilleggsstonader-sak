@@ -9,4 +9,6 @@ import java.util.UUID
 interface VilkårperiodeRepository : RepositoryInterface<Vilkårperiode, UUID>, InsertUpdateRepository<Vilkårperiode> {
 
     fun findByBehandlingId(behandlingId: UUID): List<Vilkårperiode>
+
+    fun findByBehandlingIdAndResultat(behandlingId: UUID, resultat: ResultatVilkårperiode): List<Vilkårperiode>
 }

@@ -1,11 +1,9 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.DataGenerator
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,12 +14,10 @@ internal class TilkjentYtelseRepositoryTest : IntegrationTest() {
     @Autowired
     private lateinit var repository: TilkjentYtelseRepository
 
-    @Autowired
-    private lateinit var behandlingRepository: BehandlingRepository
-
     @Test
     fun `Opprett og hent tilkjent ytelse`() {
-        val tilkjentYtelse = DataGenerator.tilfeldigTilkjentYtelse(opprettBehandling())
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+        val tilkjentYtelse = tilkjentYtelse(behandling.id)
         val tilkjentYtelseId = repository.insert(tilkjentYtelse).id
 
         val hentetTilkjentYtelse = repository.findByIdOrNull(tilkjentYtelseId)!!
@@ -31,8 +27,20 @@ internal class TilkjentYtelseRepositoryTest : IntegrationTest() {
     }
 
     @Test
+    fun `Skal kunne oppdatere tilkjent ytelse med nye andeler`() {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+        val tilkjentYtelse = repository.insert(tilkjentYtelse(behandling.id))
+
+        repository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = setOf()))
+        val tilkjentYtelseUtenAndeler = repository.findByBehandlingId(behandling.id)!!
+        assertThat(tilkjentYtelseUtenAndeler.andelerTilkjentYtelse).isEmpty()
+    }
+
+    @Test
     fun `Opprett og hent andeler tilkjent ytelse`() {
-        val tilkjentYtelse = DataGenerator.tilfeldigTilkjentYtelse(opprettBehandling(), 2)
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+        val andeler = arrayOf(andelTilkjentYtelse(behandling.id), andelTilkjentYtelse(behandling.id))
+        val tilkjentYtelse = tilkjentYtelse(behandling.id, *andeler)
 
         val tilkjentYtelseId = repository.insert(tilkjentYtelse).id
 
@@ -42,18 +50,12 @@ internal class TilkjentYtelseRepositoryTest : IntegrationTest() {
 
     @Test
     fun `Finn tilkjent ytelse på behandlingId`() {
-        val behandling = opprettBehandling()
-        val tilkjentYtelse = DataGenerator.tilfeldigTilkjentYtelse(behandling)
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+        val tilkjentYtelse = tilkjentYtelse(behandling.id)
         val lagretTilkjentYtelse = repository.insert(tilkjentYtelse)
 
         val hentetTilkjentYtelse = repository.findByBehandlingId(behandling.id)
 
         assertThat(hentetTilkjentYtelse).isEqualTo(lagretTilkjentYtelse)
-    }
-
-    private fun opprettBehandling(): Behandling {
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-
-        return testoppsettService.lagre(behandling(fagsak))
     }
 }
