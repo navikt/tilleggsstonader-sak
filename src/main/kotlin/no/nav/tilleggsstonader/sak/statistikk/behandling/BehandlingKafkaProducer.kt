@@ -12,7 +12,7 @@ class BehandlingKafkaProducer(
     private val kafkaProducerService: KafkaProducerService,
 
 ) {
-    @Value("\${TILLEGGSTONAD_BEHANDLING_TOPIC}")
+    @Value("\${TILLEGGSTONADER_BEHANDLING_TOPIC}")
     lateinit var topic: String
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
