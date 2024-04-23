@@ -145,7 +145,6 @@ class BehandlingsstatistikkService(
         return totrinnskontrollstatus === TotrinnkontrollStatus.GODKJENT
     }
 
-
     private fun finnSisteOppgaveForBehandlingen(behandlingId: UUID, oppgaveId: Long?): Oppgave? {
         val gsakOppgaveId = oppgaveId ?: oppgaveService.finnSisteOppgaveForBehandling(behandlingId)?.gsakOppgaveId
 

@@ -31,9 +31,9 @@ val YEAR_MONTH_MAX = YearMonth.from(LocalDate.MAX)
 
 fun antallÅrSiden(dato: LocalDate?) = dato?.let { Period.between(it, dagensDato()).years }
 
-val europeOslo: ZoneId = ZoneId.of("Europe/Oslo")
+val ZONE_ID_OSLO: ZoneId = ZoneId.of("Europe/Oslo")
 
-fun zonedNow(): ZonedDateTime = ZonedDateTime.now(europeOslo)
+fun zonedNow(): ZonedDateTime = ZonedDateTime.now(ZONE_ID_OSLO)
 
 fun LocalDate.norskFormat() = this.format(DATE_FORMAT_NORSK)
 
