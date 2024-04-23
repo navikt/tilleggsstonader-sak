@@ -14,14 +14,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.europeOslo
+import no.nav.tilleggsstonader.sak.util.zonedNow
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.UUID
 
 @Service
@@ -31,9 +30,7 @@ class BehandlingsstatistikkService(
     private val oppgaveService: OppgaveService,
     private val personService: PersonService,
     private val totrinnskontrollService: TotrinnskontrollService,
-    private val vilkårService: VilkårService,
 ) {
-    private val zoneIdOslo = ZoneId.of("Europe/Oslo")
 
     @Transactional
     fun sendBehandlingstatistikk(
@@ -63,7 +60,6 @@ class BehandlingsstatistikkService(
         oppgaveId: Long?,
         behandlingMetode: BehandlingMetode?,
     ): BehandlingDVH {
-        val tekniskTid = ZonedDateTime.now(ZoneId.of("Europe/Oslo"))
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling)
@@ -78,17 +74,17 @@ class BehandlingsstatistikkService(
             behandlingUuid = behandlingId.toString(),
             sakId = saksbehandling.eksternId.toString(),
             aktorId = saksbehandling.ident,
-            registrertTid = saksbehandling.opprettetTid.atZone(zoneIdOslo)
-                ?: henvendelseTidspunkt.atZone(zoneIdOslo),
-            endretTid = hendelseTidspunkt.atZone(zoneIdOslo),
-            tekniskTid = tekniskTid,
+            registrertTid = saksbehandling.opprettetTid.atZone(europeOslo)
+                ?: henvendelseTidspunkt.atZone(europeOslo),
+            endretTid = hendelseTidspunkt.atZone(europeOslo),
+            tekniskTid = zonedNow(),
             behandlingStatus = hendelse.name,
             opprettetAv = maskerVerdiHvisStrengtFortrolig(
                 strengtFortroligAdresse,
                 saksbehandlerId,
             ),
             saksnummer = saksbehandling.eksternFagsakId.toString(),
-            mottattTid = henvendelseTidspunkt.atZone(zoneIdOslo),
+            mottattTid = henvendelseTidspunkt.atZone(europeOslo),
             saksbehandler = maskerVerdiHvisStrengtFortrolig(
                 strengtFortroligAdresse,
                 saksbehandlerId,
@@ -105,7 +101,7 @@ class BehandlingsstatistikkService(
             behandlingResultat = saksbehandling.resultat.name,
             resultatBegrunnelse = null, // TODO er fritekstfelt, og er ikke ønsket i statistikk før enum er implementert
             ansvarligBeslutter =
-            if (beslutterId.isNotNullOrEmpty()) {
+            if (!beslutterId.isNullOrEmpty()) {
                 maskerVerdiHvisStrengtFortrolig(
                     strengtFortroligAdresse,
                     beslutterId.toString(),
@@ -114,12 +110,12 @@ class BehandlingsstatistikkService(
                 null
             },
             vedtakTid = if (Hendelse.VEDTATT == hendelse) {
-                hendelseTidspunkt.atZone(zoneIdOslo)
+                hendelseTidspunkt.atZone(europeOslo)
             } else {
                 null
             },
             ferdigBehandletTid = if (Hendelse.FERDIG == hendelse) {
-                hendelseTidspunkt.atZone(zoneIdOslo)
+                hendelseTidspunkt.atZone(europeOslo)
             } else {
                 null
             },
@@ -128,8 +124,8 @@ class BehandlingsstatistikkService(
             relatertBehandlingId = relatertEksternBehandlingId,
             versjon = Applikasjonsversjon.versjon,
             vilkårsprøving = emptyList(), // TODO: Implementer dette i samarbeid med Team SAK. Ikke kritisk å ha med i starten.
-            revurderingÅrsak = null, // TODO aktivere når revurdering er implementert
-            revurderingOpplysningskilde = null, // TODO aktivere når revurdering er implementert
+            revurderingÅrsak = null, // TODO aktiver når revurdering er implementert
+            revurderingOpplysningskilde = null, // TODO aktiver når revurdering er implementert
         )
     }
 
@@ -146,8 +142,8 @@ class BehandlingsstatistikkService(
     }
 
     private fun totrinnskontrollErGodkjent(behandlingId: UUID): Boolean {
-        val status = totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId).status
-        return when (status) {
+        val totrinnskontrollstatus = totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId).status
+        return when (totrinnskontrollstatus) {
             TotrinnkontrollStatus.GODKJENT -> true
             else -> false
         }
@@ -172,9 +168,8 @@ class BehandlingsstatistikkService(
             Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER, Hendelse.HENLAGT ->
                 gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse")
 
-            Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG -> totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(
-                behandlingId,
-            )
+            Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG ->
+                totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(behandlingId)
         }
     }
 
@@ -193,8 +188,6 @@ class BehandlingsstatistikkService(
             AdressebeskyttelseGradering.FORTROLIG, AdressebeskyttelseGradering.UGRADERT -> false
         }
     }
-
-    fun String?.isNotNullOrEmpty() = this != null && this.isNotEmpty()
 
     private fun maskerVerdiHvisStrengtFortrolig(
         erStrengtFortrolig: Boolean,

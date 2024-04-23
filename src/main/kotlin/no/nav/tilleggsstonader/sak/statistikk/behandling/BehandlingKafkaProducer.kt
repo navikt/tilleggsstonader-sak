@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 class BehandlingKafkaProducer(
     private val kafkaProducerService: KafkaProducerService,
 
-) {
+    ) {
     @Value("\${TILLEGGSTONADER_BEHANDLING_TOPIC}")
     lateinit var topic: String
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -21,10 +21,10 @@ class BehandlingKafkaProducer(
         logger.info("Sending to Kafka topic: {}", topic)
         secureLogger.debug("Sending to Kafka topic: {}\nBehandlingstatistikk: {}", topic, behandlingDVH)
         runCatching {
-            kafkaProducerService.send(topic, behandlingDVH.behandlingId.toString(), behandlingDVH.toJson())
+            kafkaProducerService.send(topic, behandlingDVH.behandlingId, behandlingDVH.toJson())
             logger.info(
                 "Behandlingstatistikk for behandling=${behandlingDVH.behandlingId} " +
-                    "behandlingStatus=${behandlingDVH.behandlingStatus} sent til Kafka",
+                        "behandlingStatus=${behandlingDVH.behandlingStatus} sent til Kafka",
             )
         }.onFailure {
             val errorMessage = "Could not send behandling to Kafka. Check secure logs for more information."

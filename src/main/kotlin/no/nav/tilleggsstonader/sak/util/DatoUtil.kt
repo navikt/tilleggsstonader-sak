@@ -7,6 +7,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
 import java.time.YearMonth
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 object DatoFormat {
@@ -28,6 +30,10 @@ object DatoUtil {
 val YEAR_MONTH_MAX = YearMonth.from(LocalDate.MAX)
 
 fun antallÅrSiden(dato: LocalDate?) = dato?.let { Period.between(it, dagensDato()).years }
+
+val europeOslo: ZoneId = ZoneId.of("Europe/Oslo")
+
+fun zonedNow(): ZonedDateTime = ZonedDateTime.now(europeOslo)
 
 fun LocalDate.norskFormat() = this.format(DATE_FORMAT_NORSK)
 
@@ -67,12 +73,12 @@ fun LocalDate.erEttÅrEllerMer(): Boolean {
 
 fun LocalDate.er6MndEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolean {
     return this.er6MndEllerMer() &&
-        LocalDate.now() < this.plusDays(182).plusDays(numberOfDaysCutoff)
+            LocalDate.now() < this.plusDays(182).plusDays(numberOfDaysCutoff)
 }
 
 fun LocalDate.erEttÅrEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolean {
     return erEttÅrEllerMer() &&
-        LocalDate.now() <= this.plusYears(1).plusDays(numberOfDaysCutoff)
+            LocalDate.now() <= this.plusYears(1).plusDays(numberOfDaysCutoff)
 }
 
 fun LocalDateTime.harGåttAntallTimer(timer: Int) =
