@@ -83,6 +83,17 @@ class TilsynBarnVedtakControllerTest(
         assertThat(lagretDto).isEqualTo(vedtak)
     }
 
+    @Test
+    fun `skal returnere lagret beregningsresultat som er likt beregnet`() {
+        val vedtak = lagVedtak()
+        val beregnet = beregn(behandling.id, vedtak).body!!
+        lagreVedtak(behandling, vedtak)
+
+        val lagretBeregning = hentLagretBeregningsresultat(behandling.id).body!!
+
+        assertThat(lagretBeregning).isEqualTo(beregnet)
+    }
+
     private fun lagVedtak() = InnvilgelseTilsynBarnDto(
         utgifter = mapOf(
             barn(barn.id, Utgift(YearMonth.of(2023, 1), YearMonth.of(2023, 1), 100)),
@@ -103,6 +114,20 @@ class TilsynBarnVedtakControllerTest(
     private fun hentVedtak(behandlingId: UUID) =
         restTemplate.exchange<InnvilgelseTilsynBarnDto>(
             localhost("api/vedtak/tilsyn-barn/$behandlingId"),
+            HttpMethod.GET,
+            HttpEntity(null, headers),
+        )
+
+    private fun beregn(behandlingId: UUID, vedtak: InnvilgelseTilsynBarnDto) =
+        restTemplate.exchange<BeregningsresultatTilsynBarnDto>(
+            localhost("api/vedtak/tilsyn-barn/$behandlingId/beregn"),
+            HttpMethod.POST,
+            HttpEntity(vedtak, headers),
+        )
+
+    private fun hentLagretBeregningsresultat(behandlingId: UUID) =
+        restTemplate.exchange<BeregningsresultatTilsynBarnDto>(
+            localhost("api/vedtak/tilsyn-barn/$behandlingId/resultat"),
             HttpMethod.GET,
             HttpEntity(null, headers),
         )

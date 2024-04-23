@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakController
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -13,8 +15,8 @@ import java.util.UUID
 @RequestMapping("/api/vedtak/tilsyn-barn")
 class TilsynBarnVedtakController(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
-    tilgangService: TilgangService,
-    tilsynBarnVedtakService: TilsynBarnVedtakService,
+    private val tilgangService: TilgangService,
+    private val tilsynBarnVedtakService: TilsynBarnVedtakService,
 ) : VedtakController<InnvilgelseTilsynBarnDto, VedtakTilsynBarn>(
     tilgangService,
     tilsynBarnVedtakService,
@@ -25,6 +27,14 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: UUID,
         @RequestBody vedtak: InnvilgelseTilsynBarnDto,
     ): BeregningsresultatTilsynBarnDto {
+        return tilsynBarnBeregningService.beregn(behandlingId, vedtak.utgifter)
+    }
+
+    @GetMapping("{behandlingId}/resultat")
+    fun hentLagretBeregningsresultat(@PathVariable behandlingId: UUID): BeregningsresultatTilsynBarnDto {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        val vedtak = tilsynBarnVedtakService.hentVedtakDto(behandlingId) ?: error("Vedtak mangler")
+
         return tilsynBarnBeregningService.beregn(behandlingId, vedtak.utgifter)
     }
 }
