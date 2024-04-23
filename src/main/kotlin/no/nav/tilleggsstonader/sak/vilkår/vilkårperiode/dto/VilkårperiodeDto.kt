@@ -75,7 +75,7 @@ fun DelvilkårVilkårperiode.tilDto() = when (this) {
 fun DelvilkårVilkårperiode.Vurdering.tilDto() =
     this.takeIf { resultat != ResultatDelvilkårperiode.IKKE_AKTUELT }
         ?.let {
-            VurderingDto(svar = svar)
+            VurderingDto(svar = svar, resultat = resultat)
         }
 
 data class Datoperiode(
@@ -131,6 +131,7 @@ data class DelvilkårAktivitetDto(
 
 data class VurderingDto(
     val svar: SvarJaNei? = null,
+    val resultat: ResultatDelvilkårperiode? = null,
 )
 
 data class SlettVikårperiode(
