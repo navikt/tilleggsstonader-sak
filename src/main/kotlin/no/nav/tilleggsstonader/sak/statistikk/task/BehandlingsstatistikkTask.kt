@@ -14,7 +14,6 @@ import java.time.LocalDateTime
 import java.util.Properties
 import java.util.UUID
 
-// TODO refactorer mappingkode fra Task til BehandlingsstatistikkService
 @Service
 @TaskStepBeskrivelse(
     taskStepType = BehandlingsstatistikkTask.TYPE,
