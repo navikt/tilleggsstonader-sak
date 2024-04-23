@@ -185,7 +185,7 @@ class BehandlingsstatistikkService(
         }
     }
 
-   //-5 er ein kode som dvh forstår som maskert med årsak i strengtfortrolig, og behandler datasettet deretter.
+    // -5 er ein kode som dvh forstår som maskert med årsak i strengtfortrolig, og behandler datasettet deretter.
     private fun maskerVerdiHvisStrengtFortrolig(
         erStrengtFortrolig: Boolean,
         verdi: String,
