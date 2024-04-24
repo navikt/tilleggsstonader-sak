@@ -80,7 +80,7 @@ class BehandlingsstatistikkService(
         return BehandlingDVH(
             behandlingId = saksbehandling.eksternId.toString(),
             behandlingUuid = behandlingId.toString(),
-            sakId = saksbehandling.eksternId.toString(),
+            sakId = saksbehandling.eksternFagsakId.toString(),
             aktorId = saksbehandling.ident,
             registrertTid = henvendelseTidspunkt,
             endretTid = hendelseTidspunkt.atZone(ZONE_ID_OSLO),
