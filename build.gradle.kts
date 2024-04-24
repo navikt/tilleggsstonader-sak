@@ -5,7 +5,7 @@ val familieProsesseringVersion = "2.20240214140223_83c31de"
 val tilleggsstønaderLibsVersion = "2024.04.02-08.44.ef5242ac90bc"
 val tilleggsstønaderKontrakterVersion = "2024.04.24-14.08.6d447de5b4f0"
 val tokenSupportVersion = "4.1.4"
-val wiremockVersion = "3.5.2"
+val wiremockVersion = "3.5.4"
 val mockkVersion = "1.13.10"
 val testcontainerVersion = "1.19.7"
 
@@ -20,7 +20,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.51.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
-    id("org.springframework.boot") version "3.2.3"
+    id("org.springframework.boot") version "3.2.5"
     id("io.spring.dependency-management") version "1.1.4"
     kotlin("plugin.spring") version "1.9.23"
 
@@ -97,7 +97,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.16.1"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.17.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 }
