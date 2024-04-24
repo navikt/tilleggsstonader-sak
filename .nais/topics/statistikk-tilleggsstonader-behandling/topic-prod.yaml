@@ -1,7 +1,7 @@
 apiVersion: kafka.nais.io/v1
 kind: Topic
 metadata:
-  name: aapen-tilleggsstonader-behandling
+  name: aapen-tilleggsstonader-dvh-behandling
   namespace: tilleggstonader
   labels:
     team: tilleggsstonader
