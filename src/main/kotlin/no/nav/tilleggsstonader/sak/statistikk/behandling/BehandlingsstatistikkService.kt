@@ -69,8 +69,8 @@ class BehandlingsstatistikkService(
         val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling).atZone(ZONE_ID_OSLO)
         val søkerHarStrengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
-        val saksbehandlerId = finnSaksbehandler(hendelse, gjeldendeSaksbehandler, behandlingId)
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandlingId)
+        val saksbehandlerId = finnSaksbehandler(hendelse, gjeldendeSaksbehandler, totrinnskontroll)
         val beslutterId = totrinnskontroll?.beslutter
         val relatertEksternBehandlingId: String? =
             saksbehandling.forrigeBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).id.toString() }
@@ -153,14 +153,14 @@ class BehandlingsstatistikkService(
     private fun finnSaksbehandler(
         hendelse: Hendelse,
         gjeldendeSaksbehandler: String?,
-        behandlingId: UUID,
+        totrinnskontroll: Totrinnskontroll?,
     ): String {
         return when (hendelse) {
             Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER, Hendelse.HENLAGT ->
-                gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse")
+                gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse=$hendelse")
 
             Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG ->
-                totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(behandlingId)
+                totrinnskontroll?.saksbehandler ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
         }
     }
 
