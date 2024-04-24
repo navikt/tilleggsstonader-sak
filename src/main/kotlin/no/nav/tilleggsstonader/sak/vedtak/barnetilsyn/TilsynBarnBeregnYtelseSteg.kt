@@ -31,6 +31,9 @@ class TilsynBarnBeregnYtelseSteg(
 ) {
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
+        feilHvis(vedtak.beregningsresultat != null) {
+            "Kan ikke sende inn beregningsresultat" // Burde splitte request og response for vedtak
+        }
         val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter)
         validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
         vedtakRepository.insert(lagVedtak(saksbehandling, vedtak, beregningsresultat))

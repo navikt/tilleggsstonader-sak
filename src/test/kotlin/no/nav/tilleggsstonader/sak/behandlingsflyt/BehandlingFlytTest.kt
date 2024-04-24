@@ -26,7 +26,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.Utgift
@@ -336,7 +335,7 @@ class BehandlingFlytTest(
         val utgifter = barn.first().let { mapOf(it.id to listOf(utgift())) }
         tilsynBarnVedtakController.lagreVedtak(
             behandlingId,
-            InnvilgelseTilsynBarnDto(utgifter, BeregningsresultatTilsynBarnDto(emptyList())),
+            InnvilgelseTilsynBarnDto(utgifter, null),
         )
     }
 
