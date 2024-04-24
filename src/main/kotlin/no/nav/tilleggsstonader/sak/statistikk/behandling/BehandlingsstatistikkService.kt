@@ -18,7 +18,8 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.ZONE_ID_OSLO
 import no.nav.tilleggsstonader.sak.util.zonedNow
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -66,9 +67,10 @@ class BehandlingsstatistikkService(
         val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling).atZone(ZONE_ID_OSLO)
         val søkerHarStrengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
-        val saksbehandlerId = finnSaksbehandler(hendelse, totrinnskontrollService, gjeldendeSaksbehandler, behandlingId)
+        val saksbehandlerId = finnSaksbehandler(hendelse, gjeldendeSaksbehandler, behandlingId)
         val opprettetAv = behandlingService.hentBehandling(behandlingId).sporbar.opprettetAv
-        val beslutterId = utledBeslutterId(hendelse, behandlingId)
+        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandlingId)
+        val beslutterId = totrinnskontroll?.beslutter
         val relatertEksternBehandlingId: String? =
             saksbehandling.forrigeBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).toString() }
 
@@ -121,7 +123,7 @@ class BehandlingsstatistikkService(
             } else {
                 null
             },
-            totrinnsbehandling = totrinnskontrollErGodkjent(behandlingId),
+            totrinnsbehandling = totrinnskontrollErGodkjent(totrinnskontroll),
             sakUtland = mapTilStreng(saksbehandling.kategori),
             relatertBehandlingId = relatertEksternBehandlingId,
             versjon = Applikasjonsversjon.versjon,
@@ -131,20 +133,8 @@ class BehandlingsstatistikkService(
         )
     }
 
-    private fun utledBeslutterId(
-        hendelse: Hendelse,
-        behandlingId: UUID,
-    ): String? {
-        return if (hendelse.erBesluttetEllerFerdig()) {
-            totrinnskontrollService.hentBeslutter(behandlingId)
-        } else {
-            null
-        }
-    }
-
-    private fun totrinnskontrollErGodkjent(behandlingId: UUID): Boolean {
-        val totrinnskontrollstatus = totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId).status
-        return totrinnskontrollstatus === TotrinnkontrollStatus.GODKJENT
+    private fun totrinnskontrollErGodkjent(totrinnskontroll: Totrinnskontroll?): Boolean {
+        return totrinnskontroll?.status == TotrinnInternStatus.GODKJENT
     }
 
     private fun finnSisteOppgaveForBehandlingen(behandlingId: UUID, oppgaveId: Long?): Oppgave? {
@@ -153,12 +143,8 @@ class BehandlingsstatistikkService(
         return gsakOppgaveId?.let { oppgaveService.hentOppgave(it) }
     }
 
-    private fun Hendelse.erBesluttetEllerFerdig() =
-        this.name == Hendelse.BESLUTTET.name || this.name == Hendelse.FERDIG.name
-
     private fun finnSaksbehandler(
         hendelse: Hendelse,
-        totrinnskontrollService: TotrinnskontrollService,
         gjeldendeSaksbehandler: String?,
         behandlingId: UUID,
     ): String {
