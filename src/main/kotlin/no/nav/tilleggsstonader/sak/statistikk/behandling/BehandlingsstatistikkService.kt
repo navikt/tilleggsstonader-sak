@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.statistikk.behandling
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
+import no.nav.tilleggsstonader.kontrakter.saksstatistikk.TotrinnsbehandlingStatusDvh
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -125,7 +126,7 @@ class BehandlingsstatistikkService(
             } else {
                 null
             },
-            totrinnsbehandling = totrinnskontrollErGodkjent(totrinnskontroll),
+            totrinnsbehandling = utledTotrinnskontrollStatus(totrinnskontroll),
             sakUtland = mapTilStreng(saksbehandling.kategori),
             relatertBehandlingId = relatertEksternBehandlingId,
             versjon = Applikasjonsversjon.versjon,
@@ -135,8 +136,14 @@ class BehandlingsstatistikkService(
         )
     }
 
-    private fun totrinnskontrollErGodkjent(totrinnskontroll: Totrinnskontroll?): Boolean {
-        return totrinnskontroll?.status == TotrinnInternStatus.GODKJENT
+    private fun utledTotrinnskontrollStatus(totrinnskontroll: Totrinnskontroll?): TotrinnsbehandlingStatusDvh {
+        return when (totrinnskontroll?.status) {
+            TotrinnInternStatus.UNDERKJENT -> TotrinnsbehandlingStatusDvh.UNDERKJENT
+            TotrinnInternStatus.GODKJENT -> TotrinnsbehandlingStatusDvh.GODKJENT
+
+            TotrinnInternStatus.ANGRET, TotrinnInternStatus.KAN_FATTE_VEDTAK, null,
+            -> TotrinnsbehandlingStatusDvh.IKKE_GJENNOMFØRT
+        }
     }
 
     private fun finnSisteOppgaveForBehandlingen(behandlingId: UUID, oppgaveId: Long?): Oppgave? {
@@ -184,7 +191,6 @@ class BehandlingsstatistikkService(
     ): String {
         if (erStrengtFortrolig) {
             return "-5" // -5 er ein kode som dvh forstår som maskert med årsak i strengtfortrolig, og behandler datasettet deretter.
-
         }
         return verdi
     }
