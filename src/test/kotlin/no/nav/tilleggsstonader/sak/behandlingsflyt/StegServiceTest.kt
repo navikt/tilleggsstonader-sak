@@ -254,6 +254,7 @@ class StegServiceTest(
         val måned = YearMonth.of(2023, 1)
         return InnvilgelseTilsynBarnDto(
             utgifter = mapOf(barn.id to listOf(Utgift(måned, måned, 100))),
+            beregningsresultat = null,
         )
     }
 
