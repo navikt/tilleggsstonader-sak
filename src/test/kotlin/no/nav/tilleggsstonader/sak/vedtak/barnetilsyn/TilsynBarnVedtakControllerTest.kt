@@ -74,19 +74,20 @@ class TilsynBarnVedtakControllerTest(
     }
 
     @Test
-    fun `vedtaket skal være likt det man sender inn`() {
+    fun `utgifter på vedtaket skal være likt det man sender inn`() {
         val vedtak = lagVedtak()
         lagreVedtak(behandling, vedtak)
 
         val lagretDto = hentVedtak(behandling.id).body!!
 
-        assertThat(lagretDto).isEqualTo(vedtak)
+        assertThat(lagretDto.utgifter).isEqualTo(vedtak.utgifter)
     }
 
     private fun lagVedtak() = InnvilgelseTilsynBarnDto(
         utgifter = mapOf(
             barn(barn.id, Utgift(YearMonth.of(2023, 1), YearMonth.of(2023, 1), 100)),
         ),
+        beregningsresultat = null,
     )
 
     private fun lagreVedtak(

@@ -14,6 +14,7 @@ import java.util.UUID
  */
 data class InnvilgelseTilsynBarnDto(
     val utgifter: Map<UUID, List<Utgift>>,
+    val beregningsresultat: BeregningsresultatTilsynBarnDto?,
 )
 
 data class Utgift(
