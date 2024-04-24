@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -30,6 +31,7 @@ class BehandlingsstatistikkService(
     private val oppgaveService: OppgaveService,
     private val personService: PersonService,
     private val totrinnskontrollService: TotrinnskontrollService,
+    private val søknadService: SøknadService,
 ) {
 
     @Transactional
@@ -62,7 +64,7 @@ class BehandlingsstatistikkService(
     ): BehandlingDVH {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
-        val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling)
+        val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling).atZone(ZONE_ID_OSLO)
         val strengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
         val saksbehandlerId = finnSaksbehandler(hendelse, totrinnskontrollService, gjeldendeSaksbehandler, behandlingId)
         val beslutterId = utledBeslutterId(hendelse, behandlingId)
@@ -74,8 +76,7 @@ class BehandlingsstatistikkService(
             behandlingUuid = behandlingId.toString(),
             sakId = saksbehandling.eksternId.toString(),
             aktorId = saksbehandling.ident,
-            registrertTid = saksbehandling.opprettetTid.atZone(ZONE_ID_OSLO)
-                ?: henvendelseTidspunkt.atZone(ZONE_ID_OSLO),
+            registrertTid = henvendelseTidspunkt,
             endretTid = hendelseTidspunkt.atZone(ZONE_ID_OSLO),
             tekniskTid = zonedNow(),
             behandlingStatus = hendelse.name,
@@ -84,7 +85,7 @@ class BehandlingsstatistikkService(
                 saksbehandlerId,
             ),
             saksnummer = saksbehandling.eksternFagsakId.toString(),
-            mottattTid = henvendelseTidspunkt.atZone(ZONE_ID_OSLO),
+            mottattTid = henvendelseTidspunkt,
             saksbehandler = maskerVerdiHvisStrengtFortrolig(
                 strengtFortroligAdresse,
                 saksbehandlerId,
@@ -171,7 +172,10 @@ class BehandlingsstatistikkService(
 
     private fun finnHenvendelsestidspunkt(saksbehandling: Saksbehandling): LocalDateTime {
         return when (saksbehandling.type) {
-            BehandlingType.FØRSTEGANGSBEHANDLING -> saksbehandling.opprettetTid
+            BehandlingType.FØRSTEGANGSBEHANDLING ->
+                søknadService.hentSøknadBarnetilsyn(saksbehandling.id)?.mottattTidspunkt
+                    ?: saksbehandling.opprettetTid
+
             BehandlingType.REVURDERING -> saksbehandling.opprettetTid
         }
     }
