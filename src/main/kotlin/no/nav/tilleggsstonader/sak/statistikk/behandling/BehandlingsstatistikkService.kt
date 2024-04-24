@@ -103,7 +103,7 @@ class BehandlingsstatistikkService(
             behandlingMetode = behandlingMetode?.name ?: "MANUELL",
             behandlingÅrsak = saksbehandling.årsak.name,
             avsender = "NAV Tilleggstønader",
-            behandlingType = BehandlingType.valueOf(saksbehandling.type.name).toString(),
+            behandlingType = saksbehandling.type.name,
             sakYtelse = saksbehandling.stønadstype.name,
             behandlingResultat = saksbehandling.resultat.name,
             resultatBegrunnelse = utledResultatBegrunnelse(behandling),
