@@ -17,7 +17,7 @@ class BehandlingKafkaProducer(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     fun sendBehandling(behandlingDVH: BehandlingDVH) {
-        logger.info("Sending to Kafka topic: {}", topic)
+        logger.info("Sending to Kafka topic: ${topic}")
         secureLogger.debug("Sending to Kafka topic: {}\nBehandlingstatistikk: {}", topic, behandlingDVH)
         runCatching {
             kafkaProducerService.send(topic, behandlingDVH.behandlingId, behandlingDVH.toJson())
