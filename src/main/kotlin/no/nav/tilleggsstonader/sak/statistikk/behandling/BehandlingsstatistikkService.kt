@@ -65,8 +65,9 @@ class BehandlingsstatistikkService(
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling).atZone(ZONE_ID_OSLO)
-        val strengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
+        val søkerHarStrengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
         val saksbehandlerId = finnSaksbehandler(hendelse, totrinnskontrollService, gjeldendeSaksbehandler, behandlingId)
+        val opprettetAv = behandlingService.hentBehandling(behandlingId).sporbar.opprettetAv
         val beslutterId = utledBeslutterId(hendelse, behandlingId)
         val relatertEksternBehandlingId: String? =
             saksbehandling.forrigeBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).toString() }
@@ -81,18 +82,18 @@ class BehandlingsstatistikkService(
             tekniskTid = zonedNow(),
             behandlingStatus = hendelse.name,
             opprettetAv = maskerVerdiHvisStrengtFortrolig(
-                strengtFortroligAdresse,
-                saksbehandlerId,
+                erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                verdi = opprettetAv,
             ),
             saksnummer = saksbehandling.eksternFagsakId.toString(),
             mottattTid = henvendelseTidspunkt,
             saksbehandler = maskerVerdiHvisStrengtFortrolig(
-                strengtFortroligAdresse,
-                saksbehandlerId,
+                erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                verdi = saksbehandlerId,
             ),
             ansvarligEnhet = maskerVerdiHvisStrengtFortrolig(
-                strengtFortroligAdresse,
-                sisteOppgaveForBehandling?.tildeltEnhetsnr ?: MASKINELL_JOURNALFOERENDE_ENHET,
+                erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                verdi = sisteOppgaveForBehandling?.tildeltEnhetsnr ?: MASKINELL_JOURNALFOERENDE_ENHET,
             ),
             behandlingMetode = behandlingMetode?.name ?: "MANUELL",
             behandlingÅrsak = saksbehandling.årsak.name,
@@ -104,8 +105,8 @@ class BehandlingsstatistikkService(
             ansvarligBeslutter =
             if (!beslutterId.isNullOrEmpty()) {
                 maskerVerdiHvisStrengtFortrolig(
-                    strengtFortroligAdresse,
-                    beslutterId.toString(),
+                    erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                    verdi = beslutterId.toString(),
                 )
             } else {
                 null
