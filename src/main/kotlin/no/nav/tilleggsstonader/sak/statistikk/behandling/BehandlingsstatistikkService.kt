@@ -73,7 +73,7 @@ class BehandlingsstatistikkService(
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandlingId)
         val beslutterId = totrinnskontroll?.beslutter
         val relatertEksternBehandlingId: String? =
-            saksbehandling.forrigeBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).toString() }
+            saksbehandling.forrigeBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).id.toString() }
 
         return BehandlingDVH(
             behandlingId = saksbehandling.eksternId.toString(),
