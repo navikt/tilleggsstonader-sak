@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 class BehandlingKafkaProducer(
     private val kafkaProducerService: KafkaProducerService,
 ) {
-    @Value("\${TILLEGGSTONADER_BEHANDLING_TOPIC}")
+    @Value("\${DVH_BEHANDLING_TOPIC}")
     lateinit var topic: String
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLogger = LoggerFactory.getLogger("secureLogger")

@@ -165,7 +165,7 @@ no.nav.security.jwt:
         client-auth-method: client_secret_basic
 
 
-TILLEGGSTONADER_BEHANDLING_TOPIC: tilleggstonader.aapen-tilleggsstonader-behandling
+DVH_BEHANDLING_TOPIC: tilleggstonader.aapen-tilleggsstonader-behandling
 
 
 clients:
