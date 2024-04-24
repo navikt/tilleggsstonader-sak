@@ -159,11 +159,12 @@ class BehandlingsstatistikkService(
         totrinnskontroll: Totrinnskontroll?,
     ): String {
         return when (hendelse) {
-            Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER, Hendelse.HENLAGT ->
+            Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER ->
                 gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse=$hendelse")
 
             Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG ->
-                totrinnskontroll?.saksbehandler ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
+                totrinnskontroll?.saksbehandler ?: gjeldendeSaksbehandler
+                    ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
         }
     }
 
