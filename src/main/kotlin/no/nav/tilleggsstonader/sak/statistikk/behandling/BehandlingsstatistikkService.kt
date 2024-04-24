@@ -90,6 +90,7 @@ class BehandlingsstatistikkService(
             ),
             saksnummer = saksbehandling.eksternFagsakId.toString(),
             mottattTid = henvendelseTidspunkt,
+            kravMottatt = null, // TODO ?
             saksbehandler = maskerVerdiHvisStrengtFortrolig(
                 erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
                 verdi = saksbehandlerId,
@@ -131,6 +132,8 @@ class BehandlingsstatistikkService(
             vilkårsprøving = emptyList(), // TODO: Implementer dette i samarbeid med Team SAK. Ikke kritisk å ha med i starten.
             revurderingÅrsak = null, // TODO aktiver når revurdering er implementert
             revurderingOpplysningskilde = null, // TODO aktiver når revurdering er implementert
+            venteAarsak = null, // TODO?
+            papirSøknad = null, // TODO?
         )
     }
 
