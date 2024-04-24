@@ -27,8 +27,8 @@
         }
       }
     },
-    "HAR_ALDER_LAVERE_ENN_GRENSEVERDI" : {
-      "regelId" : "HAR_ALDER_LAVERE_ENN_GRENSEVERDI",
+    "HAR_FULLFØRT_FJERDEKLASSE" : {
+      "regelId" : "HAR_FULLFØRT_FJERDEKLASSE",
       "svarMapping" : {
         "JA" : {
           "regelId" : "UNNTAK_ALDER",
