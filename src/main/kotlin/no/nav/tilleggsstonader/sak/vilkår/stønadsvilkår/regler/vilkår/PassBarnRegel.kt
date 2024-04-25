@@ -25,13 +25,13 @@ class PassBarnRegel : Vilkårsregel(
     regler = setOf(
         UTGIFTER_DOKUMENTERT,
         ANNEN_FORELDER_MOTTAR_STØTTE,
-        HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
+        HAR_FULLFØRT_FJERDEKLASSE,
         UNNTAK_ALDER,
     ),
     hovedregler = regelIder(
         UTGIFTER_DOKUMENTERT,
         ANNEN_FORELDER_MOTTAR_STØTTE,
-        HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
+        HAR_FULLFØRT_FJERDEKLASSE,
     ),
 ) {
 
@@ -45,7 +45,7 @@ class PassBarnRegel : Vilkårsregel(
         }
 
         return hovedregler.map {
-            if (it == RegelId.HAR_ALDER_LAVERE_ENN_GRENSEVERDI && !harFullførtFjerdetrinn(barnId, metadata)) {
+            if (it == RegelId.HAR_FULLFØRT_FJERDEKLASSE && !harFullførtFjerdetrinn(barnId, metadata)) {
                 automatiskVurderAlderLavereEnnGrenseverdi()
             } else {
                 Delvilkår(resultat, vurderinger = listOf(Vurdering(it)))
@@ -70,9 +70,9 @@ class PassBarnRegel : Vilkårsregel(
                 svarMapping = unntakAlderMapping,
             )
 
-        private val HAR_ALDER_LAVERE_ENN_GRENSEVERDI =
+        private val HAR_FULLFØRT_FJERDEKLASSE =
             RegelSteg(
-                regelId = RegelId.HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
+                regelId = RegelId.HAR_FULLFØRT_FJERDEKLASSE,
                 svarMapping = jaNeiSvarRegel(
                     hvisJa = NesteRegel(UNNTAK_ALDER.regelId),
                     hvisNei = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
@@ -107,7 +107,7 @@ class PassBarnRegel : Vilkårsregel(
             resultat = Vilkårsresultat.AUTOMATISK_OPPFYLT,
             listOf(
                 Vurdering(
-                    regelId = RegelId.HAR_ALDER_LAVERE_ENN_GRENSEVERDI,
+                    regelId = RegelId.HAR_FULLFØRT_FJERDEKLASSE,
                     svar = SvarId.NEI,
                     begrunnelse = begrunnelse,
                 ),
