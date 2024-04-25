@@ -26,7 +26,9 @@ class SøknadRoutingService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun sjekkRoutingForPerson(request: IdentStønadstype): SøknadRoutingResponse {
-        return SøknadRoutingResponse(skalBehandlesINyLøsning = skalBehandlesINyLøsning(request))
+        val skalBehandlesINyLøsning = skalBehandlesINyLøsning(request)
+        logger.info("routing - skalBehandlesINyLøsning=$skalBehandlesINyLøsning")
+        return SøknadRoutingResponse(skalBehandlesINyLøsning = skalBehandlesINyLøsning)
     }
 
     fun harLagretRouting(request: IdentStønadstype): Boolean {
@@ -37,13 +39,14 @@ class SøknadRoutingService(
     // TODO burde vi sjekke om det finnes oppgave i arena/gosys?
     private fun skalBehandlesINyLøsning(request: IdentStønadstype): Boolean {
         if (harLagretRouting(request)) {
+            logger.info("routing - harLagretRouting=true")
             return true
         }
 
         val maksAntall = maksAntall(request.stønadstype)
         val antall = søknadRoutingRepository.countByType(request.stønadstype)
         if (antall >= maksAntall) {
-            logger.info("skalBehandlesINyLøsning antall=$antall maksAntall=$maksAntall")
+            logger.info("routing - antallIDatabase=$antall toggleMaksAntall=$maksAntall")
             return false
         }
 
@@ -67,7 +70,12 @@ class SøknadRoutingService(
     }
 
     private fun harGyldigStateIArena(arenaStatus: ArenaStatusDto): Boolean {
-        return !arenaStatus.sak.harAktivSakUtenVedtak && !arenaStatus.vedtak.harVedtak
+        val harAktivSakUtenVedtak = arenaStatus.sak.harAktivSakUtenVedtak
+        val harVedtak = arenaStatus.vedtak.harVedtak
+
+        val harGyldigStatus = !harAktivSakUtenVedtak && !harVedtak
+        logger.info("routing - harGyldigStatusArena=$harGyldigStatus - harAktivSakUtenVedtak=$harAktivSakUtenVedtak harVedtak=$harVedtak")
+        return harGyldigStatus
     }
 
     private fun lagreRouting(request: IdentStønadstype, detaljer: Any) {
@@ -82,7 +90,13 @@ class SøknadRoutingService(
 
     private fun harBehandling(
         request: IdentStønadstype,
-    ): Boolean = fagsakService.finnFagsak(setOf(request.ident), request.stønadstype)
-        ?.let { behandlingService.hentBehandlinger(it.id).isNotEmpty() }
-        ?: false
+    ): Boolean {
+        val harBehandling = (
+            fagsakService.finnFagsak(setOf(request.ident), request.stønadstype)
+                ?.let { behandlingService.hentBehandlinger(it.id).isNotEmpty() }
+                ?: false
+            )
+        logger.info("routing - harBehandling=$harBehandling")
+        return harBehandling
+    }
 }
