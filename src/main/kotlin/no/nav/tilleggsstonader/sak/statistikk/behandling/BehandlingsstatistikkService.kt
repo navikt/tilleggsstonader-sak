@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.TotrinnsbehandlingStatusDvh
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -70,12 +69,11 @@ class BehandlingsstatistikkService(
         val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling).atZone(ZONE_ID_OSLO)
         val søkerHarStrengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
-        val saksbehandlerId = finnSaksbehandler(hendelse, gjeldendeSaksbehandler, behandlingId)
-        val behandling = behandlingService.hentBehandling(behandlingId)
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandlingId)
+        val saksbehandlerId = finnSaksbehandler(hendelse, gjeldendeSaksbehandler, totrinnskontroll)
         val beslutterId = totrinnskontroll?.beslutter
         val relatertEksternBehandlingId: String? =
-            saksbehandling.forrigeBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).toString() }
+            saksbehandling.forrigeBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).id.toString() }
 
         return BehandlingDVH(
             behandlingId = saksbehandling.eksternId.toString(),
@@ -88,10 +86,11 @@ class BehandlingsstatistikkService(
             behandlingStatus = hendelse.name,
             opprettetAv = maskerVerdiHvisStrengtFortrolig(
                 erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
-                verdi = behandling.sporbar.opprettetAv,
+                verdi = saksbehandling.opprettetAv,
             ),
             saksnummer = saksbehandling.eksternFagsakId.toString(),
             mottattTid = henvendelseTidspunkt,
+            kravMottatt = null, // TODO ?
             saksbehandler = maskerVerdiHvisStrengtFortrolig(
                 erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
                 verdi = saksbehandlerId,
@@ -106,7 +105,7 @@ class BehandlingsstatistikkService(
             behandlingType = saksbehandling.type.name,
             sakYtelse = saksbehandling.stønadstype.name,
             behandlingResultat = saksbehandling.resultat.name,
-            resultatBegrunnelse = utledResultatBegrunnelse(behandling),
+            resultatBegrunnelse = utledResultatBegrunnelse(saksbehandling),
             ansvarligBeslutter =
             if (!beslutterId.isNullOrEmpty()) {
                 maskerVerdiHvisStrengtFortrolig(
@@ -133,6 +132,8 @@ class BehandlingsstatistikkService(
             vilkårsprøving = emptyList(), // TODO: Implementer dette i samarbeid med Team SAK. Ikke kritisk å ha med i starten.
             revurderingÅrsak = null, // TODO aktiver når revurdering er implementert
             revurderingOpplysningskilde = null, // TODO aktiver når revurdering er implementert
+            venteAarsak = null, // TODO?
+            papirSøknad = null, // TODO?
         )
     }
 
@@ -155,14 +156,15 @@ class BehandlingsstatistikkService(
     private fun finnSaksbehandler(
         hendelse: Hendelse,
         gjeldendeSaksbehandler: String?,
-        behandlingId: UUID,
+        totrinnskontroll: Totrinnskontroll?,
     ): String {
         return when (hendelse) {
-            Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER, Hendelse.HENLAGT ->
-                gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse")
+            Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER ->
+                gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse=$hendelse")
 
             Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG ->
-                totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(behandlingId)
+                totrinnskontroll?.saksbehandler ?: gjeldendeSaksbehandler
+                    ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
         }
     }
 
@@ -201,7 +203,7 @@ class BehandlingsstatistikkService(
         null -> "Nasjonal"
     }
 
-    private fun utledResultatBegrunnelse(behandling: Behandling): String? =
+    private fun utledResultatBegrunnelse(behandling: Saksbehandling): String? =
         when (behandling.resultat) {
             BehandlingResultat.HENLAGT -> behandling.henlagtÅrsak?.name
             BehandlingResultat.AVSLÅTT -> TODO() // Implementer når vi har lagt inn støtte for avslag

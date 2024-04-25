@@ -6,7 +6,6 @@ enum class Hendelse {
     VENTER,
     VEDTATT,
     BESLUTTET,
-    HENLAGT,
     FERDIG,
 }
 

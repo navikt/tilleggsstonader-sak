@@ -112,7 +112,7 @@ class BehandlingsstatistikkTask(
             hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
             gjeldendeSaksbehandler: String? = null,
             oppgaveId: Long? = null,
-            behandlingMetode: BehandlingMetode? = null,
+            behandlingMetode: BehandlingMetode? = BehandlingMetode.MANUELL,
         ): Task =
             Task(
                 type = TYPE,
