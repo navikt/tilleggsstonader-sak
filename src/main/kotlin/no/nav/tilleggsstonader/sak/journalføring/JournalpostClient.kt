@@ -1,18 +1,14 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostResponse
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
-import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.log.NavHttpHeaders
 import org.springframework.beans.factory.annotation.Qualifier
@@ -87,11 +83,6 @@ class JournalpostClient(
         )
     }
 
-    fun hentSøknadTilsynBarn(journalpostId: String, dokumentId: String): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
-        val data = getForEntity<ByteArray>(jsonDokumentUri(journalpostId, dokumentId).toString())
-        return objectMapper.readValue(data)
-    }
-
     fun distribuerJournalpost(request: DistribuerJournalpostRequest, saksbehandler: String? = null): String {
         return postForEntity<String>(
             dokdistUri.toString(),
@@ -130,11 +121,6 @@ class JournalpostClient(
             httpHeaders.set(NavHttpHeaders.NAV_USER_ID.asString(), saksbehandler)
         }
         return httpHeaders
-    }
-
-    private fun jsonDokumentUri(journalpostId: String, dokumentInfoId: String): URI {
-        return UriComponentsBuilder.fromUri(journalpostUri).pathSegment("hentdokument", journalpostId, dokumentInfoId)
-            .queryParam("variantFormat", Dokumentvariantformat.ORIGINAL).build().toUri()
     }
 
     private fun journalpostIdUriVariables(journalpostId: String): Map<String, String> =

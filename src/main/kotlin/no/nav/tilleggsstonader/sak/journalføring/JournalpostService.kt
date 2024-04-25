@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
@@ -114,7 +116,12 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
 
     fun hentSøknadFraJournalpost(søknadJournalpost: Journalpost): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
         val dokumentinfo = JournalføringHelper.plukkUtOriginaldokument(søknadJournalpost, DokumentBrevkode.BARNETILSYN)
-        return journalpostClient.hentSøknadTilsynBarn(søknadJournalpost.journalpostId, dokumentinfo.dokumentInfoId)
+        val data = journalpostClient.hentDokument(
+            journalpostId = søknadJournalpost.journalpostId,
+            dokumentInfoId = dokumentinfo.dokumentInfoId,
+            Dokumentvariantformat.ORIGINAL,
+        )
+        return objectMapper.readValue(data)
     }
 
     fun finnJournalpostOgPersonIdent(journalpostId: String): Pair<Journalpost, String> {
