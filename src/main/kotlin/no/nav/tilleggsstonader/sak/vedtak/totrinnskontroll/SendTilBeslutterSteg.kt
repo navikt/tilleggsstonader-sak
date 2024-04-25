@@ -109,7 +109,7 @@ class SendTilBeslutterSteg(
             "Oppgaven for behandlingen er ikke tilgjengelig. Prøv igjen om litt."
         }
         brukerfeilHvis(oppgaveService.hentOppgaveSomIkkeErFerdigstilt(saksbehandling.id, Oppgavetype.GodkjenneVedtak) != null) {
-            "Systemet har ikke rukket å ferdigstille godkjenne vedtak-oppgaven. Prøv igjen om litt."
+            "Det finnes en Godkjenne Vedtak oppgave systemet må ferdigstille før behandlingen kan sendes til beslutter. Prøv igjen om litt"
         }
     }
 

@@ -170,7 +170,7 @@ class SendTilBeslutterStegTest {
 
         val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(behandling) }
         assertThat(feil.feil)
-            .contains("Systemet har ikke rukket å ferdigstille godkjenne vedtak-oppgaven.")
+            .contains("Det finnes en Godkjenne Vedtak oppgave systemet må ferdigstille før behandlingen kan sendes til beslutter.")
     }
 
     @Test

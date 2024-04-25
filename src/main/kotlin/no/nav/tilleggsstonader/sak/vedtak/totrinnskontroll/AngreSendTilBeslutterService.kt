@@ -119,7 +119,7 @@ class AngreSendTilBeslutterService(
             behandlingId = saksbehandling.id,
             oppgavetype = Oppgavetype.GodkjenneVedtak,
         ) ?: throw ApiFeil(
-            feil = "Systemet har ikke rukket å opprette godkjenne vedtak oppgaven enda. Prøv igjen om litt.",
+            feil = "Systemet har ikke rukket å opprette Godkjenne Vedtak oppgaven enda. Prøv igjen om litt.",
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
         )
 

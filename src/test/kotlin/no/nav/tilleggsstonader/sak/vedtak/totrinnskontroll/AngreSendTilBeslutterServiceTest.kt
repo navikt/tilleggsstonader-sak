@@ -144,7 +144,7 @@ class AngreSendTilBeslutterServiceTest {
                 catchThrowableOfType<ApiFeil> {
                     service.angreSendTilBeslutter(behandling.id)
                 },
-            ).hasMessageContaining("Systemet har ikke rukket å opprette godkjenne vedtak oppgaven enda.")
+            ).hasMessageContaining("Systemet har ikke rukket å opprette Godkjenne Vedtak oppgaven enda")
         }
 
         @Test
