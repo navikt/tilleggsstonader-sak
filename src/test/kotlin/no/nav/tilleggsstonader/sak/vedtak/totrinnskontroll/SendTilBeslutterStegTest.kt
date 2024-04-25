@@ -8,6 +8,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -21,7 +22,6 @@ import no.nav.tilleggsstonader.sak.brev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.clearBrukerContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.oppgave
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
@@ -106,7 +107,9 @@ class SendTilBeslutterStegTest {
         every { vilkårService.erAlleVilkårOppfylt(any()) } returns true
 
         every { vedtaksbrevRepository.existsById(any()) } returns true
-        every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(any()) } returns mockk()
+        every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(any()) } returns oppgave(behandling.id)
+        every { oppgaveService.hentOppgaveSomIkkeErFerdigstilt(any(), any()) } returns null
+        every { oppgaveService.hentOppgave(any()) } returns Oppgave(id = 123, versjon = 0)
 
         // TODO tilbakekreving
         // every { simuleringService.hentLagretSimuleringsoppsummering(any()) } returns simuleringsoppsummering
@@ -155,9 +158,34 @@ class SendTilBeslutterStegTest {
     @Test
     internal fun `Skal kaste feil hvis oppgave med type BehandleUnderkjentVedtak eller BehandleSak ikke finnes`() {
         every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(any()) } returns null
-        val feil = catchThrowableOfType<Feil> { beslutteVedtakSteg.validerSteg(behandling) }
-        assertThat(feil.frontendFeilmelding)
-            .contains("Oppgaven for behandlingen er ikke tilgjengelig. Vennligst vent og prøv igjen om litt.")
+
+        val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(behandling) }
+        assertThat(feil.feil)
+            .contains("Oppgaven for behandlingen er ikke tilgjengelig.")
+    }
+
+    @Test
+    internal fun `Skal kaste feil hvis BehandleSak-oppgaven er tilordnet en annen saksbehandler`() {
+        val oppgaveId = 10099L
+        val oppgaveDomain = oppgave(behandling.id, gsakOppgaveId = oppgaveId)
+        val oppgave = Oppgave(id = oppgaveId, versjon = 0, tilordnetRessurs = "annenSaksbehandler")
+        every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(any()) } returns oppgaveDomain
+        every { oppgaveService.hentOppgave(oppgaveDomain.gsakOppgaveId) } returns oppgave
+
+        val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(behandling) }
+        assertThat(feil.feil)
+            .contains("Kan ikke sende til beslutter. Oppgaven for behandlingen er plukket av annenSaksbehandler")
+    }
+
+    @Test
+    internal fun `Skal kaste feil hvis godkjenne vedtak-oppgaven ikke er ferdigstilt`() {
+        every {
+            oppgaveService.hentOppgaveSomIkkeErFerdigstilt(behandling.id, Oppgavetype.GodkjenneVedtak)
+        } returns oppgave(behandling.id)
+
+        val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(behandling) }
+        assertThat(feil.feil)
+            .contains("Det finnes en Godkjenne Vedtak oppgave systemet må ferdigstille før behandlingen kan sendes til beslutter.")
     }
 
     @Test
