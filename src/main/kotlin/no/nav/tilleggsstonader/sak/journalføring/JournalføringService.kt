@@ -30,6 +30,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -64,8 +65,10 @@ class JournalføringService(
                 journalførendeEnhet = journalføringRequest.journalførendeEnhet,
                 dokumentTitler = journalføringRequest.dokumentTitler,
                 logiskVedlegg = journalføringRequest.logiskeVedlegg,
+                oppgaveId = journalføringRequest.oppgaveId,
             )
         } else {
+            // TODO: Skal vi sende behandlingsstatistikk også her?
             journalførUtenNyBehandling(journalføringRequest, journalpost)
         }
 
@@ -96,6 +99,7 @@ class JournalføringService(
         journalførendeEnhet: String,
         dokumentTitler: Map<String, String>? = null,
         logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
+        oppgaveId: String? = null,
     ) {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
         val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
@@ -108,6 +112,7 @@ class JournalføringService(
             fagsak = fagsak,
             journalpost = journalpost,
             behandlingÅrsak = behandlingÅrsak,
+            oppgaveId = oppgaveId,
         )
 
         if (journalpost.harStrukturertSøknad()) {
@@ -169,6 +174,7 @@ class JournalføringService(
         fagsak: Fagsak,
         journalpost: Journalpost,
         behandlingÅrsak: BehandlingÅrsak,
+        oppgaveId: String? = null,
     ): Behandling {
         val behandling = behandlingService.opprettBehandling(
             behandlingType = behandlingstype,
@@ -178,7 +184,13 @@ class JournalføringService(
 
         behandlingService.leggTilBehandlingsjournalpost(journalpost.journalpostId, Journalposttype.I, behandling.id)
 
-        /* TODO: Opprett statistikkinnslag */
+        taskService.save(
+            BehandlingsstatistikkTask.opprettMottattTask(
+                behandlingId = behandling.id,
+                saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                oppgaveId = oppgaveId?.toLong()
+            )
+        )
 
         return behandling
     }
