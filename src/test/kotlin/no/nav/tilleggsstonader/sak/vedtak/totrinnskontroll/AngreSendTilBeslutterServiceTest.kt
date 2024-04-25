@@ -50,6 +50,7 @@ class AngreSendTilBeslutterServiceTest {
             oppgave(behandlingId = behandling.id)
         every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns
             Oppgave(id = 123, versjon = 0, tilordnetRessurs = null)
+        every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandling.id) } returns null
     }
 
     @AfterEach
@@ -131,6 +132,32 @@ class AngreSendTilBeslutterServiceTest {
                     service.angreSendTilBeslutter(behandling.id)
                 },
             ).hasMessageContaining("Kan ikke angre send til beslutter når oppgave er plukket av $saksbehandler2")
+        }
+
+        @Test
+        fun `skal kaste feil hvis godkjenne vedtak oppgaven`() {
+            every {
+                oppgaveService.hentOppgaveSomIkkeErFerdigstilt(behandling.id, Oppgavetype.GodkjenneVedtak)
+            } returns null
+
+            assertThat(
+                catchThrowableOfType<ApiFeil> {
+                    service.angreSendTilBeslutter(behandling.id)
+                },
+            ).hasMessageContaining("Systemet har ikke rukket å opprette godkjenne vedtak oppgaven enda.")
+        }
+
+        @Test
+        fun `skal kaste feil hvis behandle sak oppgaven ikke er ferdigstilt`() {
+            every {
+                oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandling.id)
+            } returns oppgave(behandling.id)
+
+            assertThat(
+                catchThrowableOfType<ApiFeil> {
+                    service.angreSendTilBeslutter(behandling.id)
+                },
+            ).hasMessageContaining("Systemet har ikke rukket å ferdigstille forrige behandle sak oppgave")
         }
     }
 }

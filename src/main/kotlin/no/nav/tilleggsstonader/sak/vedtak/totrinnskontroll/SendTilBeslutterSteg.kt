@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.brev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
@@ -46,7 +45,7 @@ class SendTilBeslutterSteg(
          */
         validerRiktigTilstandVedInvilgelse(saksbehandling)
         validerSaksbehandlersignatur(saksbehandling)
-        validerAtDetFinnesOppgave(saksbehandling)
+        validerOppgaver(saksbehandling)
     }
 
     override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
@@ -105,9 +104,12 @@ class SendTilBeslutterSteg(
         }
     }
 
-    private fun validerAtDetFinnesOppgave(saksbehandling: Saksbehandling) {
-        feilHvis(oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id) == null) {
-            "Oppgaven for behandlingen er ikke tilgjengelig. Vennligst vent og prøv igjen om litt."
+    private fun validerOppgaver(saksbehandling: Saksbehandling) {
+        brukerfeilHvis(oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id) == null) {
+            "Oppgaven for behandlingen er ikke tilgjengelig. Prøv igjen om litt."
+        }
+        brukerfeilHvis(oppgaveService.hentOppgaveSomIkkeErFerdigstilt(saksbehandling.id, Oppgavetype.GodkjenneVedtak) != null) {
+            "Systemet har ikke rukket å ferdigstille godkjenne vedtak-oppgaven. Prøv igjen om litt."
         }
     }
 

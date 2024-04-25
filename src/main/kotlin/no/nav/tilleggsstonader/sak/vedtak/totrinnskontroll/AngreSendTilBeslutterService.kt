@@ -111,6 +111,10 @@ class AngreSendTilBeslutterService(
     private fun validerOppgave(
         saksbehandling: Saksbehandling,
     ) {
+        brukerfeilHvis(oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id) != null) {
+            "Systemet har ikke rukket å ferdigstille forrige behandle sak oppgave. Prøv igjen om litt."
+        }
+
         val oppgave = oppgaveService.hentOppgaveSomIkkeErFerdigstilt(
             behandlingId = saksbehandling.id,
             oppgavetype = Oppgavetype.GodkjenneVedtak,

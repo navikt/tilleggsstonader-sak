@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.brev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -29,6 +28,7 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.clearBrukerContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.oppgave
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
@@ -107,6 +107,7 @@ class SendTilBeslutterStegTest {
 
         every { vedtaksbrevRepository.existsById(any()) } returns true
         every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(any()) } returns mockk()
+        every { oppgaveService.hentOppgaveSomIkkeErFerdigstilt(any(), any()) } returns null
 
         // TODO tilbakekreving
         // every { simuleringService.hentLagretSimuleringsoppsummering(any()) } returns simuleringsoppsummering
@@ -155,9 +156,21 @@ class SendTilBeslutterStegTest {
     @Test
     internal fun `Skal kaste feil hvis oppgave med type BehandleUnderkjentVedtak eller BehandleSak ikke finnes`() {
         every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(any()) } returns null
-        val feil = catchThrowableOfType<Feil> { beslutteVedtakSteg.validerSteg(behandling) }
-        assertThat(feil.frontendFeilmelding)
-            .contains("Oppgaven for behandlingen er ikke tilgjengelig. Vennligst vent og prøv igjen om litt.")
+
+        val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(behandling) }
+        assertThat(feil.feil)
+            .contains("Oppgaven for behandlingen er ikke tilgjengelig.")
+    }
+
+    @Test
+    internal fun `Skal kaste feil hvis godkjenne vedtak-oppgaven ikke er ferdigstilt`() {
+        every {
+            oppgaveService.hentOppgaveSomIkkeErFerdigstilt(behandling.id, Oppgavetype.GodkjenneVedtak)
+        } returns oppgave(behandling.id)
+
+        val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(behandling) }
+        assertThat(feil.feil)
+            .contains("Systemet har ikke rukket å ferdigstille godkjenne vedtak-oppgaven.")
     }
 
     @Test
