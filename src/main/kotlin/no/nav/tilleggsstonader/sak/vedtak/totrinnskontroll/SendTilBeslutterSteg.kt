@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
@@ -105,11 +106,21 @@ class SendTilBeslutterSteg(
     }
 
     private fun validerOppgaver(saksbehandling: Saksbehandling) {
-        brukerfeilHvis(oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id) == null) {
+        val behandleSakOppgave = oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id)
+        brukerfeilHvis(behandleSakOppgave == null) {
             "Oppgaven for behandlingen er ikke tilgjengelig. Prøv igjen om litt."
         }
+        validerAtOppgaveIkkeErPlukketAvAnnenSaksbehandler(behandleSakOppgave)
+
         brukerfeilHvis(oppgaveService.hentOppgaveSomIkkeErFerdigstilt(saksbehandling.id, Oppgavetype.GodkjenneVedtak) != null) {
             "Det finnes en Godkjenne Vedtak oppgave systemet må ferdigstille før behandlingen kan sendes til beslutter. Prøv igjen om litt"
+        }
+    }
+
+    private fun validerAtOppgaveIkkeErPlukketAvAnnenSaksbehandler(behandleSakOppgave: OppgaveDomain) {
+        val tilordnetRessurs = oppgaveService.hentOppgave(behandleSakOppgave.gsakOppgaveId).tilordnetRessurs
+        brukerfeilHvis(tilordnetRessurs != null && tilordnetRessurs != SikkerhetContext.hentSaksbehandler()) {
+            "Kan ikke sende til beslutter. Oppgaven for behandlingen er plukket av $tilordnetRessurs"
         }
     }
 

@@ -8,6 +8,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -106,8 +107,9 @@ class SendTilBeslutterStegTest {
         every { vilkårService.erAlleVilkårOppfylt(any()) } returns true
 
         every { vedtaksbrevRepository.existsById(any()) } returns true
-        every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(any()) } returns mockk()
+        every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(any()) } returns oppgave(behandling.id)
         every { oppgaveService.hentOppgaveSomIkkeErFerdigstilt(any(), any()) } returns null
+        every { oppgaveService.hentOppgave(any()) } returns Oppgave(id = 123, versjon = 0)
 
         // TODO tilbakekreving
         // every { simuleringService.hentLagretSimuleringsoppsummering(any()) } returns simuleringsoppsummering
@@ -160,6 +162,19 @@ class SendTilBeslutterStegTest {
         val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(behandling) }
         assertThat(feil.feil)
             .contains("Oppgaven for behandlingen er ikke tilgjengelig.")
+    }
+
+    @Test
+    internal fun `Skal kaste feil hvis BehandleSak-oppgaven er tilordnet en annen saksbehandler`() {
+        val oppgaveId = 10099L
+        val oppgaveDomain = oppgave(behandling.id, gsakOppgaveId = oppgaveId)
+        val oppgave = Oppgave(id = oppgaveId, versjon = 0, tilordnetRessurs = "annenSaksbehandler")
+        every { oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(any()) } returns oppgaveDomain
+        every { oppgaveService.hentOppgave(oppgaveDomain.gsakOppgaveId) } returns oppgave
+
+        val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(behandling) }
+        assertThat(feil.feil)
+            .contains("Kan ikke sende til beslutter. Oppgaven for behandlingen er plukket av annenSaksbehandler")
     }
 
     @Test
