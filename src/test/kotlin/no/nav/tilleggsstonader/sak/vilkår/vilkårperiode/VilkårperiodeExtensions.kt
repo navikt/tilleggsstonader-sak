@@ -19,9 +19,6 @@ object VilkårperiodeExtensions {
     val Vilkårperiode.lønnet: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårAktivitet).lønnet
 
-    val Vilkårperiode.mottarSykepenger: DelvilkårVilkårperiode.Vurdering
-        get() = (this.delvilkår as DelvilkårAktivitet).mottarSykepenger
-
     val VilkårperiodeDto.medlemskap: VurderingDto?
         get() = (this.delvilkår as DelvilkårMålgruppeDto).medlemskap
 
@@ -31,9 +28,6 @@ object VilkårperiodeExtensions {
     val VilkårperiodeDto.lønnet: VurderingDto?
         get() = (this.delvilkår as DelvilkårAktivitetDto).lønnet
 
-    val VilkårperiodeDto.mottarSykepenger: VurderingDto?
-        get() = (this.delvilkår as DelvilkårAktivitetDto).mottarSykepenger
-
     val ResultatEvaluering.medlemskap: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårMålgruppe).medlemskap
 
@@ -42,7 +36,4 @@ object VilkårperiodeExtensions {
 
     val ResultatEvaluering.lønnet: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårAktivitet).lønnet
-
-    val ResultatEvaluering.mottarSykepenger: DelvilkårVilkårperiode.Vurdering
-        get() = (this.delvilkår as DelvilkårAktivitet).mottarSykepenger
 }

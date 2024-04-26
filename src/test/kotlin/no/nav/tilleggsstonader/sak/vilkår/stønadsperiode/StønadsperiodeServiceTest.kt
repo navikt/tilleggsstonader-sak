@@ -245,14 +245,13 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         fom: LocalDate = this.FOM,
         tom: LocalDate = this.TOM,
         lønnet: SvarJaNei? = SvarJaNei.NEI,
-        mottarSykepenger: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: UUID = UUID.randomUUID(),
         aktivitetsdager: Int = 5,
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårAktivitetDto(VurderingDto(lønnet), VurderingDto(mottarSykepenger)),
+        delvilkår = DelvilkårAktivitetDto(VurderingDto(lønnet)),
         behandlingId = behandlingId,
         aktivitetsdager = aktivitetsdager,
     )

@@ -87,11 +87,9 @@ class InterntVedtakService(
     private fun mapDelvilkår(delvilkår: DelvilkårVilkårperiodeDomain): DelvilkårVilkårperiode {
         val medlemskap = if (delvilkår is DelvilkårMålgruppe) mapVurdering(delvilkår.medlemskap) else null
         val lønnet = if (delvilkår is DelvilkårAktivitet) mapVurdering(delvilkår.lønnet) else null
-        val mottarSykepenger = if (delvilkår is DelvilkårAktivitet) mapVurdering(delvilkår.mottarSykepenger) else null
         return DelvilkårVilkårperiode(
             medlemskap = medlemskap,
             lønnet = lønnet,
-            mottarSykepenger = mottarSykepenger,
         )
     }
 

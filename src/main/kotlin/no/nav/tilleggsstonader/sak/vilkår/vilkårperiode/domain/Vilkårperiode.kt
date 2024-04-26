@@ -138,7 +138,6 @@ data class DelvilkårMålgruppe(
 
 data class DelvilkårAktivitet(
     val lønnet: Vurdering,
-    val mottarSykepenger: Vurdering,
 ) : DelvilkårVilkårperiode()
 
 enum class SvarJaNei {
