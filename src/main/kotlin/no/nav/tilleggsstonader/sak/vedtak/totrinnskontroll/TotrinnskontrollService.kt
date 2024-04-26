@@ -119,8 +119,10 @@ class TotrinnskontrollService(
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, nyStatus)
         if (nyTotrinnsKontrollStatus == TotrinnInternStatus.UNDERKJENT) {
             oppdaterUtfallogÅrsakPåTotrinnskontroll(beslutteVedtak, sisteTotrinnskontroll, nyTotrinnsKontrollStatus)
+            // TODO: Vurder om vi skal sende behandlingsstatistikk her
         } else {
             oppdaterStatusPåTotrinnskontroll(nyTotrinnsKontrollStatus, sisteTotrinnskontroll)
+            taskService.save(BehandlingsstatistikkTask.opprettBesluttetTask(behandlingId = saksbehandling.id))
         }
 
         return sisteTotrinnskontroll.saksbehandler

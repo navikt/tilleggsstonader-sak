@@ -78,13 +78,11 @@ class BehandlingsstatistikkTask(
 
         fun opprettBesluttetTask(
             behandlingId: UUID,
-            oppgaveId: Long?,
         ): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.BESLUTTET,
                 hendelseTidspunkt = LocalDateTime.now(),
-                oppgaveId = oppgaveId,
             )
 
         fun opprettFerdigTask(behandlingId: UUID): Task =
