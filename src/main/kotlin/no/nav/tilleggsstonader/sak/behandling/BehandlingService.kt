@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
@@ -35,6 +36,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -49,7 +51,7 @@ class BehandlingService(
     private val behandlingRepository: BehandlingRepository,
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
     private val behandlingshistorikkService: BehandlingshistorikkService,
-    // private val taskService: TaskService,
+    private val taskService: TaskService,
     private val unleashService: UnleashService,
 ) {
 
@@ -168,8 +170,13 @@ class BehandlingService(
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer status på behandling $behandlingId " +
-                "fra ${behandling.status} til $status",
+                    "fra ${behandling.status} til $status",
         )
+
+        if (BehandlingStatus.UTREDES == status) {
+            taskService.save(BehandlingsstatistikkTask.opprettPåbegyntTask(behandlingId))
+        }
+
         return behandlingRepository.update(behandling.copy(status = status))
     }
 
@@ -178,7 +185,7 @@ class BehandlingService(
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer kategori på behandling $behandlingId " +
-                "fra ${behandling.kategori} til $kategori",
+                    "fra ${behandling.kategori} til $kategori",
         )
         return behandlingRepository.update(behandling.copy(kategori = kategori))
     }
@@ -190,7 +197,7 @@ class BehandlingService(
         }
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer forrigeBehandlingId på behandling $behandlingId " +
-                "fra ${behandling.forrigeBehandlingId} til $forrigeBehandlingId",
+                    "fra ${behandling.forrigeBehandlingId} til $forrigeBehandlingId",
         )
         return behandlingRepository.update(behandling.copy(forrigeBehandlingId = forrigeBehandlingId))
     }
@@ -199,7 +206,7 @@ class BehandlingService(
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer steg på behandling $behandlingId " +
-                "fra ${behandling.steg} til $steg",
+                    "fra ${behandling.steg} til $steg",
         )
         return behandlingRepository.update(behandling.copy(steg = steg))
     }

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -21,6 +23,7 @@ class SettPåVentService(
     private val behandlingService: BehandlingService,
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val oppgaveService: OppgaveService,
+    private val taskService: TaskService,
     private val settPåVentRepository: SettPåVentRepository,
 ) {
 
@@ -91,7 +94,7 @@ class SettPåVentService(
         settPåVent: SettPåVent,
         dto: OppdaterSettPåVentDto,
     ) = !settPåVent.årsaker.containsAll(dto.årsaker) ||
-        settPåVent.årsaker.size != dto.årsaker.size
+            settPåVent.årsaker.size != dto.årsaker.size
 
     private fun hentOppgave(behandlingId: UUID): Oppgave {
         val oppgave = hentBehandleSakOppgave(behandlingId)
@@ -112,7 +115,9 @@ class SettPåVentService(
         opprettHistorikkInnslag(behandling, StegUtfall.TATT_AV_VENT, null)
         taOppgaveAvVent(settPåVent.oppgaveId)
 
-        // TODO statistikk
+        taskService.save(
+            BehandlingsstatistikkTask.opprettPåbegyntTask(behandlingId)
+        )
     }
 
     private fun finnAktivSattPåVent(behandlingId: UUID) =

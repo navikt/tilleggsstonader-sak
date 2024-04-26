@@ -68,7 +68,6 @@ class JournalføringService(
                 oppgaveId = journalføringRequest.oppgaveId,
             )
         } else {
-            // TODO: Skal vi sende behandlingsstatistikk også her?
             journalførUtenNyBehandling(journalføringRequest, journalpost)
         }
 
@@ -188,8 +187,8 @@ class JournalføringService(
             BehandlingsstatistikkTask.opprettMottattTask(
                 behandlingId = behandling.id,
                 saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-                oppgaveId = oppgaveId?.toLong()
-            )
+                oppgaveId = oppgaveId?.toLong(),
+            ),
         )
 
         return behandling
