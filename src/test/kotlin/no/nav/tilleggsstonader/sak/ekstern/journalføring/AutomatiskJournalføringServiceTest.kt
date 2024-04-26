@@ -174,7 +174,7 @@ internal class AutomatiskJournalføringServiceTest {
                 personIdent,
                 Stønadstype.BARNETILSYN,
                 BehandlingÅrsak.SØKNAD,
-                "Automatisk journalført søknad",
+                "Automatisk journalført søknad. Skal saksbehandles i ny løsning.",
                 enhet,
             )
         }
