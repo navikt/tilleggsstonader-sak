@@ -335,7 +335,7 @@ class BehandlingFlytTest(
         val utgifter = barn.first().let { mapOf(it.id to listOf(utgift())) }
         tilsynBarnVedtakController.lagreVedtak(
             behandlingId,
-            InnvilgelseTilsynBarnDto(utgifter),
+            InnvilgelseTilsynBarnDto(utgifter, null),
         )
     }
 

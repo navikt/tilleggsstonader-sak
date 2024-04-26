@@ -81,7 +81,12 @@ internal class VilkårServiceTest {
     )
     private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
     private val fagsak = fagsak()
-    private val behandling = behandling(fagsak = fagsak, status = BehandlingStatus.OPPRETTET, steg = StegType.VILKÅR, årsak = BehandlingÅrsak.PAPIRSØKNAD)
+    private val behandling = behandling(
+        fagsak = fagsak,
+        status = BehandlingStatus.OPPRETTET,
+        steg = StegType.VILKÅR,
+        årsak = BehandlingÅrsak.PAPIRSØKNAD,
+    )
     private val behandlingId = behandling.id
 
     @BeforeEach
@@ -300,7 +305,7 @@ internal class VilkårServiceTest {
             assertThat(lagretVilkår.captured.delvilkårsett).hasSize(3)
 
             val delvilkår = lagretVilkår.captured.delvilkårsett.last()
-            assertThat(delvilkår.hovedregel).isEqualTo(RegelId.HAR_ALDER_LAVERE_ENN_GRENSEVERDI)
+            assertThat(delvilkår.hovedregel).isEqualTo(RegelId.HAR_FULLFØRT_FJERDEKLASSE)
             assertThat(delvilkår.resultat).isEqualTo(OPPFYLT)
             assertThat(delvilkår.vurderinger).hasSize(1)
             assertThat(delvilkår.vurderinger.first().svar).isEqualTo(SvarId.NEI)
