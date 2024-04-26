@@ -77,7 +77,6 @@ class StønadsperiodeControllerTest : IntegrationTest() {
                 tom = dagensDato,
                 delvilkår = DelvilkårAktivitetDto(
                     lønnet = VurderingDto(SvarJaNei.NEI),
-                    mottarSykepenger = VurderingDto(SvarJaNei.NEI),
                 ),
                 behandlingId = behandling.id,
                 aktivitetsdager = 5,

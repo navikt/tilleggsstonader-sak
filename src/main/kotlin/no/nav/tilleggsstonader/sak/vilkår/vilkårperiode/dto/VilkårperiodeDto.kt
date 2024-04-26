@@ -67,7 +67,6 @@ fun DelvilkårVilkårperiode.tilDto() = when (this) {
 
     is DelvilkårAktivitet -> DelvilkårAktivitetDto(
         lønnet = lønnet.tilDto(),
-        mottarSykepenger = mottarSykepenger.tilDto(),
     )
 }
 
@@ -126,7 +125,6 @@ data class DelvilkårMålgruppeDto(
 
 data class DelvilkårAktivitetDto(
     val lønnet: VurderingDto?,
-    val mottarSykepenger: VurderingDto?,
 ) : DelvilkårVilkårperiodeDto()
 
 data class VurderingDto(

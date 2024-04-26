@@ -22,113 +22,53 @@ class EvalueringAktivitetTest {
     inner class Tiltak {
 
         @Test
-        fun `hvis ikke lønnet og ikke mottar sykepenger så er resultatet oppfylt`() {
+        fun `hvis tiltak ikke er lønnet skal resultatet være oppfylt`() {
             val resultat = utledResultat(
                 AktivitetType.TILTAK,
-                delvilkårAktivitetDto(lønnet = SvarJaNei.NEI, mottarSykepenger = SvarJaNei.NEI),
+                delvilkårAktivitetDto(lønnet = SvarJaNei.NEI),
             )
             assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             assertThat(resultat.lønnet.svar).isEqualTo(SvarJaNei.NEI)
-
-            assertThat(resultat.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
-            assertThat(resultat.mottarSykepenger.svar).isEqualTo(SvarJaNei.NEI)
 
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
         }
 
         @Test
-        fun `hvis både lønnet og mottar sykepener mangler vurdering så blir resultatet IKKE_VURDERT`() {
+        fun `hvis tiltak er lønnet skal resultat være ikke oppfylt`() {
             val resultat = utledResultat(
                 AktivitetType.TILTAK,
-                delvilkårAktivitetDto(lønnet = null, mottarSykepenger = null),
+                delvilkårAktivitetDto(lønnet = SvarJaNei.JA),
+            )
+            assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+            assertThat(resultat.lønnet.svar).isEqualTo(SvarJaNei.JA)
+
+            assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+        }
+
+        @Test
+        fun `hvis svar på lønnet mangler blir resultatet IKKE_VURDERT`() {
+            val resultat = utledResultat(
+                AktivitetType.TILTAK,
+                delvilkårAktivitetDto(lønnet = null),
             )
             assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT)
             assertThat(resultat.lønnet.svar).isNull()
 
-            assertThat(resultat.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT)
-            assertThat(resultat.mottarSykepenger.svar).isNull()
-
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
-        }
-
-        @Test
-        fun `skal vurdere lønnet alene`() {
-            val resultat = utledResultat(
-                AktivitetType.TILTAK,
-                delvilkårAktivitetDto(lønnet = SvarJaNei.NEI, mottarSykepenger = null),
-            )
-            assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
-            assertThat(resultat.lønnet.svar).isEqualTo(SvarJaNei.NEI)
-
-            assertThat(resultat.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT)
-            assertThat(resultat.mottarSykepenger.svar).isNull()
-
-            assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
-        }
-
-        @Test
-        fun `skal vurdere mottar sykepenger alene`() {
-            val resultat = utledResultat(
-                AktivitetType.TILTAK,
-                delvilkårAktivitetDto(lønnet = null, mottarSykepenger = SvarJaNei.JA),
-            )
-            assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_VURDERT)
-            assertThat(resultat.lønnet.svar).isEqualTo(null)
-
-            assertThat(resultat.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
-            assertThat(resultat.mottarSykepenger.svar).isEqualTo(SvarJaNei.JA)
-            assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
-        }
-
-        @Test
-        fun `hvis en ikke er oppfylt så er resultatet ikke oppfylt`() {
-            val gyldigeSvarForAktivitet = SvarJaNei.entries.filter { it != SvarJaNei.JA_IMPLISITT }
-            gyldigeSvarForAktivitet.forEach {
-                assertThat(
-                    utledResultat(
-                        AktivitetType.TILTAK,
-                        delvilkårAktivitetDto(lønnet = SvarJaNei.JA, mottarSykepenger = it),
-                    ).resultat,
-                ).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
-
-                assertThat(
-                    utledResultat(
-                        AktivitetType.TILTAK,
-                        delvilkårAktivitetDto(lønnet = it, mottarSykepenger = SvarJaNei.JA),
-                    ).resultat,
-                ).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
-            }
         }
     }
 
     @Nested
     inner class UtdanningEllerReellArbeidssøker {
         @ReellArbeidssøkerEllerUtdanningParameterizedTest
-        fun `mottar sykepenger skal mappes til IKKE_OPPFYLT`(type: AktivitetType) {
-            val delvilkår = delvilkårAktivitetDto(mottarSykepenger = SvarJaNei.JA)
-            val resultat = utledResultat(type, delvilkår)
-
-            assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
-
-            assertThat(resultat.lønnet.svar).isEqualTo(null)
-            assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
-
-            assertThat(resultat.mottarSykepenger.svar).isEqualTo(SvarJaNei.JA)
-            assertThat(resultat.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
-        }
-
-        @ReellArbeidssøkerEllerUtdanningParameterizedTest
-        fun `mottar ikke sykepenger skal mappes til OPPFYLT`(type: AktivitetType) {
-            val delvilkår = delvilkårAktivitetDto(mottarSykepenger = SvarJaNei.NEI)
+        fun `skal bli oppfylt uten svar på lønnet `(type: AktivitetType) {
+            val delvilkår = delvilkårAktivitetDto()
             val resultat = utledResultat(type, delvilkår)
 
             assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
 
             assertThat(resultat.lønnet.svar).isEqualTo(null)
             assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
-
-            assertThat(resultat.mottarSykepenger.svar).isEqualTo(SvarJaNei.NEI)
-            assertThat(resultat.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
         }
 
         @ParameterizedTest
@@ -150,37 +90,18 @@ class EvalueringAktivitetTest {
                     type = AktivitetType.TILTAK,
                     delvilkår = DelvilkårAktivitetDto(
                         lønnet = VurderingDto(SvarJaNei.JA_IMPLISITT),
-                        mottarSykepenger = null,
                     ),
                 )
             }.hasMessageContaining("Svar=JA_IMPLISITT er ikke gyldig svar for lønnet")
-        }
-
-        @ParameterizedTest
-        @EnumSource(value = AktivitetType::class)
-        fun `ja implisitt er ikke et gyldig svar for mottar sykepenger`(type: AktivitetType) {
-            assertThatThrownBy {
-                utledResultat(
-                    type = type,
-                    delvilkår = DelvilkårAktivitetDto(
-                        lønnet = null,
-                        mottarSykepenger = VurderingDto(SvarJaNei.JA_IMPLISITT),
-                    ),
-                )
-            }.hasMessageContaining("Svar=JA_IMPLISITT er ikke gyldig svar for mottarSykepenger")
         }
     }
 
     private fun delvilkårAktivitetDto(
         lønnet: SvarJaNei? = null,
-        mottarSykepenger: SvarJaNei? = null,
-    ) = DelvilkårAktivitetDto(lønnet = VurderingDto(lønnet), mottarSykepenger = VurderingDto(mottarSykepenger))
+    ) = DelvilkårAktivitetDto(lønnet = VurderingDto(lønnet))
 
     private val ResultatEvaluering.lønnet: DelvilkårVilkårperiode.Vurdering
         get() = (this.delvilkår as DelvilkårAktivitet).lønnet
-
-    private val ResultatEvaluering.mottarSykepenger: DelvilkårVilkårperiode.Vurdering
-        get() = (this.delvilkår as DelvilkårAktivitet).mottarSykepenger
 }
 
 @ParameterizedTest

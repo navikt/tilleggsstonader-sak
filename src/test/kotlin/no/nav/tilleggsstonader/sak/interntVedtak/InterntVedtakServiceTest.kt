@@ -223,7 +223,6 @@ class InterntVedtakServiceTest {
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             }
             assertThat(delvilkår.lønnet).isNull()
-            assertThat(delvilkår.mottarSykepenger).isNull()
         }
     }
 
@@ -240,10 +239,6 @@ class InterntVedtakServiceTest {
             with(delvilkår.lønnet!!) {
                 assertThat(svar).isEqualTo(SvarJaNei.JA.name)
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
-            }
-            with(delvilkår.mottarSykepenger!!) {
-                assertThat(svar).isEqualTo(SvarJaNei.NEI.name)
-                assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             }
             assertThat(delvilkår.medlemskap).isNull()
         }

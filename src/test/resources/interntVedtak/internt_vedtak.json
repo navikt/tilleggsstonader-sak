@@ -23,8 +23,7 @@
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
       },
-      "lønnet" : null,
-      "mottarSykepenger" : null
+      "lønnet" : null
     },
     "kilde" : "SYSTEM",
     "resultat" : "OPPFYLT",
@@ -39,8 +38,7 @@
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
       },
-      "lønnet" : null,
-      "mottarSykepenger" : null
+      "lønnet" : null
     },
     "kilde" : "SYSTEM",
     "resultat" : "OPPFYLT",
@@ -56,10 +54,6 @@
       "lønnet" : {
         "svar" : "JA",
         "resultat" : "IKKE_OPPFYLT"
-      },
-      "mottarSykepenger" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
       }
     },
     "kilde" : "SYSTEM",
@@ -73,10 +67,6 @@
     "delvilkår" : {
       "medlemskap" : null,
       "lønnet" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
-      },
-      "mottarSykepenger" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
       }

@@ -25,7 +25,7 @@ class EvalueringVilkårperiodeTest {
 
         val resultatAktivitet = evaulerVilkårperiode(
             AktivitetType.TILTAK,
-            DelvilkårAktivitetDto(VurderingDto(SvarJaNei.NEI), VurderingDto(SvarJaNei.NEI)),
+            DelvilkårAktivitetDto(VurderingDto(SvarJaNei.NEI)),
         )
         assertThat(resultatAktivitet.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
     }
@@ -33,7 +33,7 @@ class EvalueringVilkårperiodeTest {
     @Test
     fun `skal kaste feil hvis delvilkår ikke matcher type`() {
         assertThatThrownBy {
-            evaulerVilkårperiode(MålgruppeType.AAP, DelvilkårAktivitetDto(VurderingDto(null), VurderingDto(null)))
+            evaulerVilkårperiode(MålgruppeType.AAP, DelvilkårAktivitetDto(VurderingDto(null)))
         }.hasMessageContaining("Ugyldig kombinasjon")
 
         assertThatThrownBy {

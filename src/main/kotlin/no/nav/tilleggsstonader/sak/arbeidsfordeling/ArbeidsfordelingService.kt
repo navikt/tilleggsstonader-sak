@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.arbeidsfordeling
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.util.EnvUtil
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Component
@@ -24,11 +22,7 @@ class ArbeidsfordelingService(
     }
 
     fun hentNavEnhet(ident: String): Arbeidsfordelingsenhet? {
-        feilHvis(EnvUtil.erIProd()) {
-            "Teknisk feil. Arbeidsfordeling er ikke implementert"
-        }
-
-        return ENHET_NASJONAL_NAY
+        return ENHET_NASJONAL_NAY // TODO: Implementer arbeidsfordeling
         /*
         return cacheManager.getNullable("navEnhet", ident) {
             arbeidsfordelingClient.hentNavEnhetForPersonMedRelasjoner(ident).firstOrNull()
@@ -37,11 +31,7 @@ class ArbeidsfordelingService(
     }
 
     fun hentNavEnhetForOppfølging(ident: String, oppgavetype: Oppgavetype): Arbeidsfordelingsenhet? {
-        feilHvis(EnvUtil.erIProd()) {
-            "Teknisk feil. Arbeidsfordeling er ikke implementert"
-        }
-
-        return ENHET_NASJONAL_NAY
+        return ENHET_NASJONAL_NAY // TODO: Implementer arbeidsfordeling
     }
         /*
         cacheManager.getNullable("navEnhetForOppfølging", ident) {

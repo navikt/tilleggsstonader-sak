@@ -46,7 +46,7 @@ class AutomatiskJournalføringService(
                 personIdent = personIdent,
                 stønadstype = stønadstype,
                 behandlingÅrsak = BehandlingÅrsak.SØKNAD,
-                oppgaveBeskrivelse = "Automatisk journalført søknad",
+                oppgaveBeskrivelse = "Automatisk journalført søknad. Skal saksbehandles i ny løsning.",
                 journalførendeEnhet = arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(personIdent),
             )
         } else {

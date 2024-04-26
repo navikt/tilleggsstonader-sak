@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.mottarSykepenger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
@@ -85,7 +84,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val opprettVilkårperiode = opprettVilkårperiodeAktivitet(
                 lønnet = VurderingDto(SvarJaNei.NEI),
-                mottarSykepenger = VurderingDto(SvarJaNei.NEI),
                 begrunnelse = "begrunnelse aktivitet",
                 behandlingId = behandling.id,
             )
@@ -100,9 +98,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
             assertThat(vilkårperiode.lønnet.svar).isEqualTo(SvarJaNei.NEI)
             assertThat(vilkårperiode.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
-
-            assertThat(vilkårperiode.mottarSykepenger.svar).isEqualTo(SvarJaNei.NEI)
-            assertThat(vilkårperiode.mottarSykepenger.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
         }
 
         @Test
@@ -299,7 +294,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 begrunnelse = "",
                 delvilkår = DelvilkårAktivitetDto(
                     lønnet = VurderingDto(SvarJaNei.JA),
-                    mottarSykepenger = VurderingDto(SvarJaNei.JA),
                 ),
             )
             assertThatThrownBy {
@@ -363,7 +357,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 is DelvilkårAktivitet -> (this.delvilkår as DelvilkårAktivitet).let {
                     DelvilkårAktivitetDto(
                         lønnet = VurderingDto(it.lønnet.svar),
-                        mottarSykepenger = VurderingDto(it.mottarSykepenger.svar),
                     )
                 }
             }
