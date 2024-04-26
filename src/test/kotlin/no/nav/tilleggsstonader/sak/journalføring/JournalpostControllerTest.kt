@@ -77,7 +77,7 @@ class JournalpostControllerTest : IntegrationTest() {
         assertThat(opprettetBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
 
         val opprettedeTasks = taskService.findAll()
-        assertThat(opprettedeTasks).hasSize(2)
+        assertThat(opprettedeTasks).hasSize(3)
 
         val bahandlesakOppgaveTask = opprettedeTasks.single { it.type == OpprettOppgaveForOpprettetBehandlingTask.TYPE }
         val behandlesakOppgavePayload =
@@ -87,7 +87,12 @@ class JournalpostControllerTest : IntegrationTest() {
         assertThat(behandlesakOppgavePayload.behandlingId).isEqualTo(opprettetBehandling.id)
 
         verify(exactly = 1) { journalpostClient.ferdigstillJournalpost("1", enhet, saksbehandler) }
-        verify(exactly = 1) { journalpostClient.oppdaterLogiskeVedlegg("1", BulkOppdaterLogiskVedleggRequest(listOf("ny tittel"))) }
+        verify(exactly = 1) {
+            journalpostClient.oppdaterLogiskeVedlegg(
+                "1",
+                BulkOppdaterLogiskVedleggRequest(listOf("ny tittel"))
+            )
+        }
         verify(exactly = 1) { oppgaveClient.ferdigstillOppgave("123".toLong()) }
     }
 
