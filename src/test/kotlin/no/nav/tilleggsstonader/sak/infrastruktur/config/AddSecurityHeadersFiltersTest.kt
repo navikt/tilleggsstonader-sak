@@ -22,14 +22,14 @@ class AddSecurityHeadersFiltersTest : IntegrationTest() {
     }
 
     @Test
-    fun `headers har riktig cache-control`() {
+    fun `mime-type sniffing er deaktivert i header`() {
         val response = restTemplate.getForEntity<String>(localhost("api/ping"))
 
         assertThat(response.headers["X-Content-Type-Options"]).contains("nosniff")
     }
 
     @Test
-    fun `mime-type sniffing er deaktivert i header`() {
+    fun `headers har riktig cache-control`() {
         val response = restTemplate.getForEntity<String>(localhost("api/ping"))
 
         assertThat(response.headers["Cache-Control"]).contains("private, max-age=0, no-cache, no-store")
