@@ -183,10 +183,10 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `skal returnere TOTRINNSKONTROLL_UNDERKJENT når behandlingen UTREDES og vedtak er underkjent`() {
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
-                totrinnskontrollMedbeslutterAArsakogBegrunnelse(
-                    opprettetAv = saksbehandler,
-                    beslutter = beslutter,
-                )
+            totrinnskontrollMedbeslutterAArsakogBegrunnelse(
+                opprettetAv = saksbehandler,
+                beslutter = beslutter,
+            )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
 
@@ -198,10 +198,10 @@ internal class TotrinnskontrollServiceTest {
     internal fun `skal returnere KAN_FATTE_VEDTAK når behandlingen FATTER_VEDTAK og saksbehandler er utreder og ikke er den som sendte behandlingen til fatte vedtak`() {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FATTER_VEDTAK)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
-                totrinnskontroll(
-                    opprettetAv = "Annen saksbehandler",
-                    status = TotrinnInternStatus.GODKJENT,
-                )
+            totrinnskontroll(
+                opprettetAv = "Annen saksbehandler",
+                status = TotrinnInternStatus.GODKJENT,
+            )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
 
@@ -213,7 +213,7 @@ internal class TotrinnskontrollServiceTest {
     internal fun `skal returnere IKKE_AUTORISERT når behandlingen FATTER_VEDTAK og saksbehandler er utreder, men er den som sendte behandlingen til fatte vedtak`() {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FATTER_VEDTAK)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
-                totrinnskontroll(opprettetAv = beslutter)
+            totrinnskontroll(opprettetAv = beslutter)
 
         val totrinnskontroll = testWithBrukerContext(beslutter) {
             totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
@@ -228,10 +228,10 @@ internal class TotrinnskontrollServiceTest {
         every { tilgangService.harTilgangTilRolle(any()) } returns false
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FATTER_VEDTAK)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
-                totrinnskontroll(
-                    status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
-                    opprettetAv = "Annen saksbehandler",
-                )
+            totrinnskontroll(
+                status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
+                opprettetAv = "Annen saksbehandler",
+            )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
 
@@ -243,10 +243,10 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `skal kaste feil når behandlingstatus er UTREDES og utfall er GODKJENT`() {
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
-                totrinnskontroll(
-                    opprettetAv = "Annen saksbehandler",
-                    status = TotrinnInternStatus.GODKJENT,
-                )
+            totrinnskontroll(
+                opprettetAv = "Annen saksbehandler",
+                status = TotrinnInternStatus.GODKJENT,
+            )
 
         Assertions.assertThat(
             Assertions.catchThrowable {
@@ -261,10 +261,10 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `skal returnere begrunnelse og årsaker underkjent når vedtak er underkjent`() {
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
-                totrinnskontrollMedbeslutterAArsakogBegrunnelse(
-                    opprettetAv = "Noe",
-                    beslutter = "Noen annen",
-                )
+            totrinnskontrollMedbeslutterAArsakogBegrunnelse(
+                opprettetAv = "Noe",
+                beslutter = "Noen annen",
+            )
 
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
 
@@ -307,7 +307,7 @@ internal class TotrinnskontrollServiceTest {
         opprettetAv: String,
         beslutter: String,
 
-        ) =
+    ) =
         Totrinnskontroll(
             behandlingId = UUID.randomUUID(),
             sporbar = Sporbar(opprettetAv),

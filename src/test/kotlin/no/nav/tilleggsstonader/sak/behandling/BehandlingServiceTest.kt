@@ -240,8 +240,8 @@ internal class BehandlingServiceTest {
                 behandling(
                     fagsak,
                     type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                    resultat = BehandlingResultat.INNVILGET
-                )
+                    resultat = BehandlingResultat.INNVILGET,
+                ),
             )
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
@@ -266,8 +266,8 @@ internal class BehandlingServiceTest {
                 behandling(
                     fagsak,
                     type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                    resultat = BehandlingResultat.HENLAGT
-                )
+                    resultat = BehandlingResultat.HENLAGT,
+                ),
             )
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
@@ -283,8 +283,8 @@ internal class BehandlingServiceTest {
                     fagsak,
                     type = BehandlingType.FØRSTEGANGSBEHANDLING,
                     status = BehandlingStatus.UTREDES,
-                    resultat = BehandlingResultat.IKKE_SATT
-                )
+                    resultat = BehandlingResultat.IKKE_SATT,
+                ),
             )
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)

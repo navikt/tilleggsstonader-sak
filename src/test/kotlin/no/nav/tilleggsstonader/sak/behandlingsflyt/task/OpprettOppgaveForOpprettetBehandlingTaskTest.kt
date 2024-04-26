@@ -24,7 +24,7 @@ internal class OpprettOppgaveForOpprettetBehandlingTaskTest {
         OpprettOppgaveForOpprettetBehandlingTask(
             behandlingService = behandlingService,
             oppgaveService = oppgaveService,
-            taskService = taskService
+            taskService = taskService,
         )
 
     val oppgaveId = 1L
