@@ -40,7 +40,7 @@ internal class TotrinnskontrollServiceTest {
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val tilgangService = mockk<TilgangService>()
     private val tilkjentYtelseRepository = mockk<TilkjentYtelseRepository>()
-    private val taskService = mockk<TaskService>()
+    private val taskService = mockk<TaskService>(relaxed = true)
     private val totrinnskontrollRepository = mockk<TotrinnskontrollRepository>()
 
     private val totrinnskontrollService =
