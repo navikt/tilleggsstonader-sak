@@ -92,18 +92,6 @@ class BehandlingsstatistikkTask(
                 hendelseTidspunkt = LocalDateTime.now(),
             )
 
-        fun opprettHenlagtTask(
-            behandlingId: UUID,
-            hendelseTidspunkt: LocalDateTime,
-            gjeldendeSaksbehandler: String,
-        ): Task =
-            opprettTask(
-                behandlingId = behandlingId,
-                hendelse = Hendelse.FERDIG,
-                hendelseTidspunkt = hendelseTidspunkt,
-                gjeldendeSaksbehandler = gjeldendeSaksbehandler,
-            )
-
         private fun opprettTask(
             behandlingId: UUID,
             hendelse: Hendelse,
