@@ -170,7 +170,7 @@ class BehandlingService(
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer status på behandling $behandlingId " +
-                    "fra ${behandling.status} til $status",
+                "fra ${behandling.status} til $status",
         )
 
         if (BehandlingStatus.UTREDES == status) {
@@ -185,7 +185,7 @@ class BehandlingService(
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer kategori på behandling $behandlingId " +
-                    "fra ${behandling.kategori} til $kategori",
+                "fra ${behandling.kategori} til $kategori",
         )
         return behandlingRepository.update(behandling.copy(kategori = kategori))
     }
@@ -197,7 +197,7 @@ class BehandlingService(
         }
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer forrigeBehandlingId på behandling $behandlingId " +
-                    "fra ${behandling.forrigeBehandlingId} til $forrigeBehandlingId",
+                "fra ${behandling.forrigeBehandlingId} til $forrigeBehandlingId",
         )
         return behandlingRepository.update(behandling.copy(forrigeBehandlingId = forrigeBehandlingId))
     }
@@ -206,7 +206,7 @@ class BehandlingService(
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer steg på behandling $behandlingId " +
-                    "fra ${behandling.steg} til $steg",
+                "fra ${behandling.steg} til $steg",
         )
         return behandlingRepository.update(behandling.copy(steg = steg))
     }

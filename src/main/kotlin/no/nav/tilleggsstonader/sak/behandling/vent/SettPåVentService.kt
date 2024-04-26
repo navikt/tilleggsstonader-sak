@@ -58,7 +58,7 @@ class SettPåVentService(
         settPåVentRepository.insert(settPåVent)
 
         taskService.save(
-            BehandlingsstatistikkTask.opprettVenterTask(behandlingId)
+            BehandlingsstatistikkTask.opprettVenterTask(behandlingId),
         )
 
         return StatusPåVentDto(
@@ -96,7 +96,7 @@ class SettPåVentService(
         settPåVent: SettPåVent,
         dto: OppdaterSettPåVentDto,
     ) = !settPåVent.årsaker.containsAll(dto.årsaker) ||
-            settPåVent.årsaker.size != dto.årsaker.size
+        settPåVent.årsaker.size != dto.årsaker.size
 
     private fun hentOppgave(behandlingId: UUID): Oppgave {
         val oppgave = hentBehandleSakOppgave(behandlingId)
@@ -118,7 +118,7 @@ class SettPåVentService(
         taOppgaveAvVent(settPåVent.oppgaveId)
 
         taskService.save(
-            BehandlingsstatistikkTask.opprettPåbegyntTask(behandlingId)
+            BehandlingsstatistikkTask.opprettPåbegyntTask(behandlingId),
         )
     }
 
