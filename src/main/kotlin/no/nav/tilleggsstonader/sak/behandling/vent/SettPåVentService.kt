@@ -96,7 +96,7 @@ class SettPåVentService(
         settPåVent: SettPåVent,
         dto: OppdaterSettPåVentDto,
     ) = !settPåVent.årsaker.containsAll(dto.årsaker) ||
-            settPåVent.årsaker.size != dto.årsaker.size
+        settPåVent.årsaker.size != dto.årsaker.size
 
     private fun hentOppgave(behandlingId: UUID): Oppgave {
         val oppgave = hentBehandleSakOppgave(behandlingId)
