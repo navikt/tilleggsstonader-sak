@@ -57,6 +57,10 @@ class SettPåVentService(
         )
         settPåVentRepository.insert(settPåVent)
 
+        taskService.save(
+            BehandlingsstatistikkTask.opprettVenterTask(behandlingId)
+        )
+
         return StatusPåVentDto(
             årsaker = dto.årsaker,
             kommentar = dto.kommentar,
@@ -79,8 +83,6 @@ class SettPåVentService(
         settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
 
         val oppgaveResponse = oppdaterOppgave(settPåVent, dto)
-
-        // TODO vurder om man skal sende til DVH
 
         return StatusPåVentDto(
             årsaker = dto.årsaker,
