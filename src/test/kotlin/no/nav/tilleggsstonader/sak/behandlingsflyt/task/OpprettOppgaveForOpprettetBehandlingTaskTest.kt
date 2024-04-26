@@ -21,7 +21,11 @@ internal class OpprettOppgaveForOpprettetBehandlingTaskTest {
     val oppgaveService = mockk<OppgaveService>()
     val taskService = mockk<TaskService>()
     val opprettOppgaveForOpprettetBehandlingTask =
-        OpprettOppgaveForOpprettetBehandlingTask(behandlingService, oppgaveService)
+        OpprettOppgaveForOpprettetBehandlingTask(
+            behandlingService = behandlingService,
+            oppgaveService = oppgaveService,
+            taskService = taskService
+        )
 
     val oppgaveId = 1L
 
