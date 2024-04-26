@@ -1,10 +1,8 @@
 package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.måImlementeresFørProdsetting
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
@@ -25,9 +23,6 @@ class BehandlingFaktaService(
     fun hentFakta(
         behandlingId: UUID,
     ): BehandlingFaktaDto {
-        måImlementeresFørProdsetting {
-            "Denne skal hente data fra databasen, og at grunnlagsdata lagres til databasen"
-        }
         val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
         val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaDto(
