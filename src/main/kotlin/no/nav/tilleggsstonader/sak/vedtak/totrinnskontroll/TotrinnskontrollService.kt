@@ -44,9 +44,9 @@ class TotrinnskontrollService(
         if (eksisterandeTotrinnskontroll != null) {
             feilHvis(
                 (
-                        eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET &&
-                                eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
-                        ),
+                    eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET &&
+                        eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
+                    ),
             ) {
                 "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=${eksisterandeTotrinnskontroll.status}"
             }
@@ -84,7 +84,7 @@ class TotrinnskontrollService(
         saksbehandling: Saksbehandling,
         beslutteVedtak: BeslutteVedtakDto,
 
-        ): String {
+    ): String {
         settBeslutter(saksbehandling.id)
         val sisteTotrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId = saksbehandling.id)
@@ -94,7 +94,7 @@ class TotrinnskontrollService(
                 message = "Status for totrinnskontoll er ikke korrekt, status =  ${sisteTotrinnskontroll.status} ",
                 frontendFeilmelding = "Status for totrinnskontoll er ikke korrekt, vennligst last side på nytt ",
 
-                )
+            )
         }
 
         if (beslutterErLikBehandler(sisteTotrinnskontroll)) {
@@ -179,9 +179,9 @@ class TotrinnskontrollService(
 
     private fun behandlingErGodkjentEllerOpprettet(behandlingStatus: BehandlingStatus) =
         behandlingStatus == BehandlingStatus.FERDIGSTILT ||
-                behandlingStatus == BehandlingStatus.IVERKSETTER_VEDTAK ||
-                behandlingStatus == BehandlingStatus.SATT_PÅ_VENT ||
-                behandlingStatus == BehandlingStatus.OPPRETTET
+            behandlingStatus == BehandlingStatus.IVERKSETTER_VEDTAK ||
+            behandlingStatus == BehandlingStatus.SATT_PÅ_VENT ||
+            behandlingStatus == BehandlingStatus.OPPRETTET
 
     private fun finnStatusForVedtakSomSkalFattes(behandling: Behandling): StatusTotrinnskontrollDto {
         val behandlingId = behandling.id
@@ -235,7 +235,7 @@ class TotrinnskontrollService(
             TotrinnInternStatus.ANGRET -> StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
             else -> error(
                 "Skal ikke kunne være annen status enn UNDERKJENT når " +
-                        "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",
+                    "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",
             )
         }
     }
@@ -251,8 +251,8 @@ class TotrinnskontrollService(
         // generisk metode for å logge endringene som er utført
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
-                    "endrer på totrinnskontroll knyttet til behandlingId $gjeldeneTotrinnskontroll.id" +
-                    "til $status",
+                "endrer på totrinnskontroll knyttet til behandlingId $gjeldeneTotrinnskontroll.id" +
+                "til $status",
         )
         return totrinnskontrollRepository.update(gjeldeneTotrinnskontroll.copy(status = status))
     }
