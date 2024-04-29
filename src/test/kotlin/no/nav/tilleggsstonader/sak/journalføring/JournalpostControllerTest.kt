@@ -77,7 +77,7 @@ class JournalpostControllerTest : IntegrationTest() {
         assertThat(opprettetBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
 
         val opprettedeTasks = taskService.findAll()
-        assertThat(opprettedeTasks).hasSize(3)
+        assertThat(opprettedeTasks).hasSize(2)
 
         val bahandlesakOppgaveTask = opprettedeTasks.single { it.type == OpprettOppgaveForOpprettetBehandlingTask.TYPE }
         val behandlesakOppgavePayload =

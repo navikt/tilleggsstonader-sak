@@ -30,13 +30,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
+import java.util.UUID
 
 @Service
-class JournalføringService(
+open class JournalføringService(
     private val behandlingService: BehandlingService,
     private val fagsakService: FagsakService,
     private val journalpostService: JournalpostService,
@@ -65,7 +64,6 @@ class JournalføringService(
                 journalførendeEnhet = journalføringRequest.journalførendeEnhet,
                 dokumentTitler = journalføringRequest.dokumentTitler,
                 logiskVedlegg = journalføringRequest.logiskeVedlegg,
-                oppgaveId = journalføringRequest.oppgaveId,
             )
         } else {
             journalførUtenNyBehandling(journalføringRequest, journalpost)
@@ -98,7 +96,6 @@ class JournalføringService(
         journalførendeEnhet: String,
         dokumentTitler: Map<String, String>? = null,
         logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
-        oppgaveId: String? = null,
     ) {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
         val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
@@ -111,7 +108,6 @@ class JournalføringService(
             fagsak = fagsak,
             journalpost = journalpost,
             behandlingÅrsak = behandlingÅrsak,
-            oppgaveId = oppgaveId,
         )
 
         if (journalpost.harStrukturertSøknad()) {
@@ -120,12 +116,14 @@ class JournalføringService(
 
         ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
 
-        opprettBehandleSakOppgaveTask(
-            OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                behandlingId = behandling.id,
-                saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-                beskrivelse = oppgaveBeskrivelse,
-            ),
+        taskService.save(
+            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                    behandlingId = behandling.id,
+                    saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                    beskrivelse = oppgaveBeskrivelse,
+                )
+            )
         )
     }
 
@@ -173,7 +171,6 @@ class JournalføringService(
         fagsak: Fagsak,
         journalpost: Journalpost,
         behandlingÅrsak: BehandlingÅrsak,
-        oppgaveId: String? = null,
     ): Behandling {
         val behandling = behandlingService.opprettBehandling(
             behandlingType = behandlingstype,
@@ -182,14 +179,6 @@ class JournalføringService(
         )
 
         behandlingService.leggTilBehandlingsjournalpost(journalpost.journalpostId, Journalposttype.I, behandling.id)
-
-        taskService.save(
-            BehandlingsstatistikkTask.opprettMottattTask(
-                behandlingId = behandling.id,
-                saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-                oppgaveId = oppgaveId?.toLong(),
-            ),
-        )
 
         return behandling
     }
@@ -213,10 +202,6 @@ class JournalføringService(
     private fun lagreSøknad(journalpost: Journalpost, behandlingId: UUID) {
         val søknad = journalpostService.hentSøknadFraJournalpost(journalpost)
         søknadService.lagreSøknad(behandlingId, journalpost, søknad)
-    }
-
-    private fun opprettBehandleSakOppgaveTask(opprettOppgaveTaskData: OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData) {
-        taskService.save(OpprettOppgaveForOpprettetBehandlingTask.opprettTask(opprettOppgaveTaskData))
     }
 
     private fun validerKanOppretteBehandling(
