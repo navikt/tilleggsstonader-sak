@@ -53,3 +53,4 @@ jobs:
           CLUSTER: dev-gcp
           RESOURCE: .nais/preprod.yaml
           IMAGE: ${{ needs.build.outputs.image }}
+

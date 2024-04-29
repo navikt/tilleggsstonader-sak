@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
@@ -35,6 +36,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -49,7 +51,7 @@ class BehandlingService(
     private val behandlingRepository: BehandlingRepository,
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
     private val behandlingshistorikkService: BehandlingshistorikkService,
-    // private val taskService: TaskService,
+    private val taskService: TaskService,
     private val unleashService: UnleashService,
 ) {
 
@@ -170,6 +172,11 @@ class BehandlingService(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer status på behandling $behandlingId " +
                 "fra ${behandling.status} til $status",
         )
+
+        if (BehandlingStatus.UTREDES == status) {
+            taskService.save(BehandlingsstatistikkTask.opprettPåbegyntTask(behandlingId))
+        }
+
         return behandlingRepository.update(behandling.copy(status = status))
     }
 
@@ -243,21 +250,14 @@ class BehandlingService(
             utfall = StegUtfall.HENLAGT,
             metadata = henlagt,
         )
-        // opprettStatistikkTask(henlagtBehandling)
-        return behandlingRepository.update(henlagtBehandling)
-    }
 
-    /* FIX-SENERE
-    private fun opprettStatistikkTask(behandling: Behandling) {
         taskService.save(
-            BehandlingsstatistikkTask.opprettHenlagtTask(
-                behandlingId = behandling.id,
-                hendelseTidspunkt = LocalDateTime.now(),
-                gjeldendeSaksbehandler = SikkerhetContext.hentSaksbehandler(),
+            BehandlingsstatistikkTask.opprettFerdigTask(
+                behandlingId = henlagtBehandling.id,
             ),
         )
+        return behandlingRepository.update(henlagtBehandling)
     }
-     */
 
     private fun validerAtBehandlingenKanHenlegges(behandling: Behandling) {
         if (!behandling.kanHenlegges()) {

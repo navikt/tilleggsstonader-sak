@@ -32,10 +32,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
+import java.util.UUID
 
 @Service
-class JournalføringService(
+open class JournalføringService(
     private val behandlingService: BehandlingService,
     private val fagsakService: FagsakService,
     private val journalpostService: JournalpostService,
@@ -116,11 +116,13 @@ class JournalføringService(
 
         ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
 
-        opprettBehandleSakOppgaveTask(
-            OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                behandlingId = behandling.id,
-                saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-                beskrivelse = oppgaveBeskrivelse,
+        taskService.save(
+            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                    behandlingId = behandling.id,
+                    saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                    beskrivelse = oppgaveBeskrivelse,
+                ),
             ),
         )
     }
@@ -178,8 +180,6 @@ class JournalføringService(
 
         behandlingService.leggTilBehandlingsjournalpost(journalpost.journalpostId, Journalposttype.I, behandling.id)
 
-        /* TODO: Opprett statistikkinnslag */
-
         return behandling
     }
 
@@ -202,10 +202,6 @@ class JournalføringService(
     private fun lagreSøknad(journalpost: Journalpost, behandlingId: UUID) {
         val søknad = journalpostService.hentSøknadFraJournalpost(journalpost)
         søknadService.lagreSøknad(behandlingId, journalpost, søknad)
-    }
-
-    private fun opprettBehandleSakOppgaveTask(opprettOppgaveTaskData: OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData) {
-        taskService.save(OpprettOppgaveForOpprettetBehandlingTask.opprettTask(opprettOppgaveTaskData))
     }
 
     private fun validerKanOppretteBehandling(
