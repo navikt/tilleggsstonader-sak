@@ -53,3 +53,16 @@ jobs:
           CLUSTER: dev-gcp
           RESOURCE: .nais/preprod.yaml
           IMAGE: ${{ needs.build.outputs.image }}
+
+  deploy-kafka-topic:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/topics/statistikk-tilleggsstonader-behandling/topic-dev.yaml
+          IMAGE: ${{ needs.build.outputs.image }}
+
