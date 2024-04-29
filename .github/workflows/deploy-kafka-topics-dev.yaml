@@ -1,0 +1,21 @@
+name: Deploy Kafka topics to dev-gcp
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  id-token: "write"
+
+jobs:
+  deploy-kafka-topic:
+    name: Deploy Kafka topics to dev-gcp
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/topics/statistikk-tilleggsstonader-behandling/topic-dev.yaml
+          IMAGE: ${{ needs.build.outputs.image }}
