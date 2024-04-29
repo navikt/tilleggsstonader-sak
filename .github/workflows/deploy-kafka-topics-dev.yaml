@@ -17,4 +17,3 @@ jobs:
         env:
           CLUSTER: dev-gcp
           RESOURCE: .nais/topics/statistikk-tilleggsstonader-behandling/topic-dev.yaml
-          IMAGE: ${{ needs.build.outputs.image }}
