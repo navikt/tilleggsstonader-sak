@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet
 import no.nav.security.token.support.core.context.TokenValidationContext
 import no.nav.security.token.support.core.exceptions.JwtTokenMissingException
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.getClaim
 import org.slf4j.LoggerFactory
 
 object SikkerhetContext {

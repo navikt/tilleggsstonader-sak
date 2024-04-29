@@ -52,7 +52,6 @@ class OpprettOppgaveForOpprettetBehandlingTask(
                 behandlingId = data.behandlingId,
                 hendelseTidspunkt = data.hendelseTidspunkt,
                 oppgaveId = oppgaveId,
-                saksbehandler = data.saksbehandler,
             ),
         )
     }
