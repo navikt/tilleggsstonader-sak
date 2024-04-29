@@ -15,6 +15,6 @@ spec:
     retentionBytes: -1
     retentionHours: 2016
   acl:
-    - team: teamtilleggsstonader
+    - team: tilleggsstonader
       application: tilleggsstonader-sak
       access: readwrite
