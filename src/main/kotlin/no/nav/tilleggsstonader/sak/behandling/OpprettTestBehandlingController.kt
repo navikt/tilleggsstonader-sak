@@ -108,8 +108,8 @@ class OpprettTestBehandlingController(
             aktivitet = AktivitetAvsnitt(
                 aktiviteter = EnumFlereValgFelt(
                     "Hvilken aktivitet søker du om støtte i forbindelse med?",
-                    listOf(VerdiFelt("ANNET", "Annet")),
-                    listOf(),
+                    listOf(VerdiFelt("ANNET", "Annet"), VerdiFelt("1", "Arbeidstrening: 25. februar 2024 - 25. juli 2024")),
+                    listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
                 ),
                 annenAktivitet = EnumFelt(
                     "Hvilken arbeidsrettet aktivitet har du? ",
