@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
@@ -39,13 +40,16 @@ internal class TotrinnskontrollServiceTest {
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val tilgangService = mockk<TilgangService>()
     private val tilkjentYtelseRepository = mockk<TilkjentYtelseRepository>()
+    private val taskService = mockk<TaskService>(relaxed = true)
     private val totrinnskontrollRepository = mockk<TotrinnskontrollRepository>()
+
     private val totrinnskontrollService =
         TotrinnskontrollService(
-            behandlingshistorikkService,
-            behandlingService,
-            tilgangService,
-            totrinnskontrollRepository,
+            behandlingshistorikkService = behandlingshistorikkService,
+            behandlingService = behandlingService,
+            tilgangService = tilgangService,
+            taskService = taskService,
+            totrinnskontrollRepository = totrinnskontrollRepository,
         )
 
     val saksbehandler = "Behandler"

@@ -87,7 +87,12 @@ class JournalpostControllerTest : IntegrationTest() {
         assertThat(behandlesakOppgavePayload.behandlingId).isEqualTo(opprettetBehandling.id)
 
         verify(exactly = 1) { journalpostClient.ferdigstillJournalpost("1", enhet, saksbehandler) }
-        verify(exactly = 1) { journalpostClient.oppdaterLogiskeVedlegg("1", BulkOppdaterLogiskVedleggRequest(listOf("ny tittel"))) }
+        verify(exactly = 1) {
+            journalpostClient.oppdaterLogiskeVedlegg(
+                "1",
+                BulkOppdaterLogiskVedleggRequest(listOf("ny tittel")),
+            )
+        }
         verify(exactly = 1) { oppgaveClient.ferdigstillOppgave("123".toLong()) }
     }
 

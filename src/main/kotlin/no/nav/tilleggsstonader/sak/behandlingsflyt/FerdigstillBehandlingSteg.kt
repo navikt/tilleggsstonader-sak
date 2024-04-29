@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -23,7 +24,9 @@ class FerdigstillBehandlingSteg(
 
         taskService.save(InterntVedtakTask.lagTask(saksbehandling.id))
 
-        // TODO publiser vedtakshendelser, behandlingsstatistikk
+        taskService.save(BehandlingsstatistikkTask.opprettFerdigTask(behandlingId = saksbehandling.id))
+
+        // TODO publiser vedtakshendelser
     }
 
     override fun stegType(): StegType {
