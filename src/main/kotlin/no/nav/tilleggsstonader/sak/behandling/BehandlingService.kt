@@ -250,21 +250,14 @@ class BehandlingService(
             utfall = StegUtfall.HENLAGT,
             metadata = henlagt,
         )
-        // opprettStatistikkTask(henlagtBehandling)
-        return behandlingRepository.update(henlagtBehandling)
-    }
 
-    /* FIX-SENERE
-    private fun opprettStatistikkTask(behandling: Behandling) {
         taskService.save(
-            BehandlingsstatistikkTask.opprettHenlagtTask(
-                behandlingId = behandling.id,
-                hendelseTidspunkt = LocalDateTime.now(),
-                gjeldendeSaksbehandler = SikkerhetContext.hentSaksbehandler(),
+            BehandlingsstatistikkTask.opprettFerdigTask(
+                behandlingId = henlagtBehandling.id,
             ),
         )
+        return behandlingRepository.update(henlagtBehandling)
     }
-     */
 
     private fun validerAtBehandlingenKanHenlegges(behandling: Behandling) {
         if (!behandling.kanHenlegges()) {
