@@ -122,8 +122,8 @@ open class JournalføringService(
                     behandlingId = behandling.id,
                     saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
                     beskrivelse = oppgaveBeskrivelse,
-                )
-            )
+                ),
+            ),
         )
     }
 
