@@ -18,7 +18,7 @@ import java.util.UUID
  * For migrerte saker er startdato en viktig indikator på når dette systemet har overtatt utbetalingsansvaret.
  * All utbetaling før startdato vil i så fall finnes i andre systemer.
  *
- * Startdato brukes også når vi skal slå sammen perioder tvers Arena og tilleggstonader,
+ * Startdato brukes også når vi skal slå sammen perioder tvers Arena og tilleggsstonader,
  * der vi bruker startdato for å avkorte perioder fra Arena, spesielt i de tilfelle der startdato er før laveste fom-dato for en andel
  */
 data class TilkjentYtelse(
