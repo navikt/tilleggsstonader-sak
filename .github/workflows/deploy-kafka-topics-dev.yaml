@@ -9,7 +9,6 @@ permissions:
 jobs:
   deploy-kafka-topic:
     name: Deploy Kafka topics to dev-gcp
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
