@@ -81,9 +81,13 @@ class BehandlingsstatistikkService(
             sakId = saksbehandling.eksternFagsakId.toString(),
             aktorId = saksbehandling.ident,
             registrertTid = henvendelseTidspunkt,
-            endretTid = if (Hendelse.MOTTATT == hendelse) henvendelseTidspunkt else hendelseTidspunkt.atZone(
-                ZONE_ID_OSLO
-            ),
+            endretTid = if (Hendelse.MOTTATT == hendelse) {
+                henvendelseTidspunkt
+            } else {
+                hendelseTidspunkt.atZone(
+                    ZONE_ID_OSLO,
+                )
+            },
             tekniskTid = zonedNow(),
             behandlingStatus = hendelse.name,
             opprettetAv = maskerVerdiHvisStrengtFortrolig(
@@ -166,7 +170,7 @@ class BehandlingsstatistikkService(
 
             Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG ->
                 totrinnskontroll?.saksbehandler ?: gjeldendeSaksbehandler
-                ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
+                    ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
         }
     }
 
