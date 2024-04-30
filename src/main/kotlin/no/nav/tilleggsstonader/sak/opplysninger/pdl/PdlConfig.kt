@@ -20,6 +20,8 @@ object PdlConfig {
 
     val søkPersonQuery = graphqlQuery("/pdl/søk_person.graphql")
 
+    val hentGeografiskTilknytningQuery = graphqlQuery("/pdl/geografisk_tilknytning.graphql")
+
     private fun graphqlQuery(path: String) = PdlConfig::class.java.getResource(path)!!
         .readText()
         .graphqlCompatible()

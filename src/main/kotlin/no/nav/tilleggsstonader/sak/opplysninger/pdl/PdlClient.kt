@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
+import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
+import no.nav.tilleggsstonader.kontrakter.pdl.PdlGeografiskTilknytningRequest
+import no.nav.tilleggsstonader.kontrakter.pdl.PdlGeografiskTilknytningVariables
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -128,6 +131,17 @@ class PdlClient(
         val pdlResponse = postForEntity<PdlIdentBolkResponse>(pdlUri, request, PdlUtil.httpHeaders)
 
         return feilmeldOgReturnerData(pdlResponse)
+    }
+
+    fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto {
+        val request = PdlGeografiskTilknytningRequest(
+            variables = PdlGeografiskTilknytningVariables(ident),
+            query = PdlConfig.hentGeografiskTilknytningQuery,
+        )
+
+        val response = postForEntity<PdlResponse<GeografiskTilknytningDto>>(pdlUri, request, PdlUtil.httpHeaders)
+
+        return feilsjekkOgReturnerData(ident, response) { it }
     }
 
     companion object {
