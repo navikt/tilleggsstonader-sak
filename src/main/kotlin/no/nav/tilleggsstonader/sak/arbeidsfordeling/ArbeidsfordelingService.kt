@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getNullable
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.tilDiskresjonskode
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Component
@@ -54,7 +55,7 @@ class ArbeidsfordelingService(
     ): ArbeidsfordelingKriterie {
         val personinfo = personService.hentSøker(personIdent)
         val geografiskTilknytning = utledGeografiskTilknytningKode(personService.hentGeografiskTilknytning(personIdent))
-        val diskresjonskode = personinfo.adressebeskyttelse.singleOrNull()?.gradering?.diskresjonskode
+        val diskresjonskode = personinfo.adressebeskyttelse.singleOrNull()?.gradering?.tilDiskresjonskode()
 
         return ArbeidsfordelingKriterie(
             tema = arbeidsfordelingstema.name,
