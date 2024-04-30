@@ -54,7 +54,7 @@ class ArbeidsfordelingService(
     ): ArbeidsfordelingKriterie {
         val personinfo = personService.hentSøker(personIdent)
         val geografiskTilknytning = utledGeografiskTilknytningKode(personService.hentGeografiskTilknytning(personIdent))
-        val diskresjonskode = personinfo.adressebeskyttelse.singleOrNull()?.gradering?.name
+        val diskresjonskode = personinfo.adressebeskyttelse.singleOrNull()?.gradering?.diskresjonskode
 
         return ArbeidsfordelingKriterie(
             tema = arbeidsfordelingstema.name,

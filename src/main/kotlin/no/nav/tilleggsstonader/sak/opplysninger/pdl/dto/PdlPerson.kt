@@ -230,11 +230,11 @@ data class Adressebeskyttelse(val gradering: AdressebeskyttelseGradering, val me
         this.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
 }
 
-enum class AdressebeskyttelseGradering {
-    STRENGT_FORTROLIG,
-    STRENGT_FORTROLIG_UTLAND,
-    FORTROLIG,
-    UGRADERT,
+enum class AdressebeskyttelseGradering(val diskresjonskode: String?) {
+    STRENGT_FORTROLIG("SPSF"), // Kode 6
+    STRENGT_FORTROLIG_UTLAND("SPSF"), // Kode 19
+    FORTROLIG("SPFO"), // Kode 7
+    UGRADERT(null),
 }
 
 data class Fødsel(
