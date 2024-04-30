@@ -2,7 +2,7 @@ apiVersion: kafka.nais.io/v1
 kind: Topic
 metadata:
   name: aapen-tilleggsstonader-dvh-behandling-test
-  namespace: tilleggstonader
+  namespace: tilleggsstonader
   labels:
     team: tilleggsstonader
 spec:
@@ -15,6 +15,6 @@ spec:
     retentionBytes: -1
     retentionHours: 2016
   acl:
-    - team: teamtilleggsstonader
+    - team: tilleggsstonader
       application: tilleggsstonader-sak
       access: readwrite

@@ -42,14 +42,12 @@ class BehandlingsstatistikkTask(
         fun opprettMottattTask(
             behandlingId: UUID,
             hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
-            saksbehandler: String = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
             oppgaveId: Long?,
         ): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.MOTTATT,
                 hendelseTidspunkt = hendelseTidspunkt,
-                gjeldendeSaksbehandler = saksbehandler,
                 oppgaveId = oppgaveId,
             )
 
@@ -58,7 +56,6 @@ class BehandlingsstatistikkTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.PÅBEGYNT,
                 hendelseTidspunkt = LocalDateTime.now(),
-                gjeldendeSaksbehandler = SikkerhetContext.hentSaksbehandler(),
             )
 
         fun opprettVenterTask(behandlingId: UUID): Task =
@@ -66,7 +63,6 @@ class BehandlingsstatistikkTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.VENTER,
                 hendelseTidspunkt = LocalDateTime.now(),
-                gjeldendeSaksbehandler = SikkerhetContext.hentSaksbehandler(),
             )
 
         fun opprettVedtattTask(behandlingId: UUID): Task =
@@ -78,13 +74,11 @@ class BehandlingsstatistikkTask(
 
         fun opprettBesluttetTask(
             behandlingId: UUID,
-            oppgaveId: Long?,
         ): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.BESLUTTET,
                 hendelseTidspunkt = LocalDateTime.now(),
-                oppgaveId = oppgaveId,
             )
 
         fun opprettFerdigTask(behandlingId: UUID): Task =
@@ -94,24 +88,12 @@ class BehandlingsstatistikkTask(
                 hendelseTidspunkt = LocalDateTime.now(),
             )
 
-        fun opprettHenlagtTask(
-            behandlingId: UUID,
-            hendelseTidspunkt: LocalDateTime,
-            gjeldendeSaksbehandler: String,
-        ): Task =
-            opprettTask(
-                behandlingId = behandlingId,
-                hendelse = Hendelse.FERDIG,
-                hendelseTidspunkt = hendelseTidspunkt,
-                gjeldendeSaksbehandler = gjeldendeSaksbehandler,
-            )
-
         private fun opprettTask(
             behandlingId: UUID,
             hendelse: Hendelse,
-            hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
-            gjeldendeSaksbehandler: String? = null,
             oppgaveId: Long? = null,
+            hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
+            gjeldendeSaksbehandler: String? = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
             behandlingMetode: BehandlingMetode? = BehandlingMetode.MANUELL,
         ): Task =
             Task(

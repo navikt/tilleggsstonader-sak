@@ -6,6 +6,7 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkObject
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -45,17 +46,18 @@ internal class BehandlingServiceTest {
 
     private val behandlingRepository: BehandlingRepository = mockk()
     private val behandlingshistorikkService: BehandlingshistorikkService = mockk(relaxed = true)
+    private val taskService: TaskService = mockk(relaxed = true)
 
-    // private val taskService: TaskService = mockk(relaxed = true)
     private val behandlingService =
         BehandlingService(
-            mockk(),
-            behandlingRepository,
-            mockk(),
-            behandlingshistorikkService,
-            // taskService,
-            mockUnleashService(),
+            behandlingsjournalpostRepository = mockk(),
+            behandlingRepository = behandlingRepository,
+            eksternBehandlingIdRepository = mockk(),
+            behandlingshistorikkService = behandlingshistorikkService,
+            taskService = taskService,
+            unleashService = mockUnleashService(),
         )
+
     private val behandlingSlot = slot<Behandling>()
 
     @BeforeAll
@@ -234,7 +236,13 @@ internal class BehandlingServiceTest {
             val fagsak = fagsak()
             every {
                 behandlingRepository.findByFagsakId(fagsak.id)
-            } returns listOf(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING, resultat = BehandlingResultat.INNVILGET))
+            } returns listOf(
+                behandling(
+                    fagsak,
+                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    resultat = BehandlingResultat.INNVILGET,
+                ),
+            )
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
         }
@@ -254,7 +262,13 @@ internal class BehandlingServiceTest {
             val fagsak = fagsak()
             every {
                 behandlingRepository.findByFagsakId(fagsak.id)
-            } returns listOf(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING, resultat = BehandlingResultat.HENLAGT))
+            } returns listOf(
+                behandling(
+                    fagsak,
+                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    resultat = BehandlingResultat.HENLAGT,
+                ),
+            )
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
@@ -264,7 +278,14 @@ internal class BehandlingServiceTest {
             val fagsak = fagsak()
             every {
                 behandlingRepository.findByFagsakId(fagsak.id)
-            } returns listOf(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING, status = BehandlingStatus.UTREDES, resultat = BehandlingResultat.IKKE_SATT))
+            } returns listOf(
+                behandling(
+                    fagsak,
+                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    status = BehandlingStatus.UTREDES,
+                    resultat = BehandlingResultat.IKKE_SATT,
+                ),
+            )
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
         }

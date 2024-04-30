@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -21,6 +23,7 @@ class SettPåVentService(
     private val behandlingService: BehandlingService,
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val oppgaveService: OppgaveService,
+    private val taskService: TaskService,
     private val settPåVentRepository: SettPåVentRepository,
 ) {
 
@@ -54,6 +57,10 @@ class SettPåVentService(
         )
         settPåVentRepository.insert(settPåVent)
 
+        taskService.save(
+            BehandlingsstatistikkTask.opprettVenterTask(behandlingId),
+        )
+
         return StatusPåVentDto(
             årsaker = dto.årsaker,
             kommentar = dto.kommentar,
@@ -76,8 +83,6 @@ class SettPåVentService(
         settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
 
         val oppgaveResponse = oppdaterOppgave(settPåVent, dto)
-
-        // TODO vurder om man skal sende til DVH
 
         return StatusPåVentDto(
             årsaker = dto.årsaker,
@@ -111,8 +116,6 @@ class SettPåVentService(
 
         opprettHistorikkInnslag(behandling, StegUtfall.TATT_AV_VENT, null)
         taOppgaveAvVent(settPåVent.oppgaveId)
-
-        // TODO statistikk
     }
 
     private fun finnAktivSattPåVent(behandlingId: UUID) =

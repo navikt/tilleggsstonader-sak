@@ -54,7 +54,6 @@ class SendTilBeslutterSteg(
         ferdigstillOppgave(saksbehandling)
         totrinnskontrollService.sendtilBeslutter(saksbehandling)
         opprettGodkjennVedtakOppgave(saksbehandling)
-        // opprettTaskForBehandlingsstatistikk(saksbehandling.id) TODO DVH
     }
 
     private fun opprettGodkjennVedtakOppgave(saksbehandling: Saksbehandling) {
@@ -112,7 +111,12 @@ class SendTilBeslutterSteg(
         }
         validerAtOppgaveIkkeErPlukketAvAnnenSaksbehandler(behandleSakOppgave)
 
-        brukerfeilHvis(oppgaveService.hentOppgaveSomIkkeErFerdigstilt(saksbehandling.id, Oppgavetype.GodkjenneVedtak) != null) {
+        brukerfeilHvis(
+            oppgaveService.hentOppgaveSomIkkeErFerdigstilt(
+                saksbehandling.id,
+                Oppgavetype.GodkjenneVedtak,
+            ) != null,
+        ) {
             "Det finnes en Godkjenne Vedtak oppgave systemet må ferdigstille før behandlingen kan sendes til beslutter. Prøv igjen om litt"
         }
     }

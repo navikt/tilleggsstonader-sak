@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -13,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.NAVIDENT_REGEX
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
@@ -31,11 +33,13 @@ class TotrinnskontrollService(
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val behandlingService: BehandlingService,
     private val tilgangService: TilgangService,
+    private val taskService: TaskService,
     private val totrinnskontrollRepository: TotrinnskontrollRepository,
 ) {
     @Transactional
     fun sendtilBeslutter(saksbehandling: Saksbehandling) {
-        val eksisterandeTotrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(saksbehandling.id)
+        val eksisterandeTotrinnskontroll =
+            totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(saksbehandling.id)
 
         if (eksisterandeTotrinnskontroll != null) {
             feilHvis(
@@ -54,16 +58,21 @@ class TotrinnskontrollService(
                 status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
             ),
         )
+
+        taskService.save(BehandlingsstatistikkTask.opprettVedtattTask(behandlingId = saksbehandling.id))
     }
 
     @Transactional
     fun angreSendTilBeslutter(behandlingId: UUID) {
-        val eksisterandeTotrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+        val eksisterandeTotrinnskontroll =
+            totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
 
         feilHvis((eksisterandeTotrinnskontroll == null || eksisterandeTotrinnskontroll.status != TotrinnInternStatus.KAN_FATTE_VEDTAK)) {
             "Kan ikke angre når status=${eksisterandeTotrinnskontroll?.status}"
         }
         oppdaterStatusPåTotrinnskontroll(TotrinnInternStatus.ANGRET, eksisterandeTotrinnskontroll)
+
+        // TODO: Vurder om denne endringen skal trigge behandlingsstatistikk til DVH (med status PÅBEGYNT)
     }
 
     /**
@@ -95,8 +104,10 @@ class TotrinnskontrollService(
             )
         }
         val nyStatus = if (beslutteVedtak.godkjent) BehandlingStatus.IVERKSETTER_VEDTAK else BehandlingStatus.UTREDES
-        val nyTotrinnsKontrollStatus = if (beslutteVedtak.godkjent) TotrinnInternStatus.GODKJENT else TotrinnInternStatus.UNDERKJENT
-        val utfall = if (beslutteVedtak.godkjent) StegUtfall.BESLUTTE_VEDTAK_GODKJENT else StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT
+        val nyTotrinnsKontrollStatus =
+            if (beslutteVedtak.godkjent) TotrinnInternStatus.GODKJENT else TotrinnInternStatus.UNDERKJENT
+        val utfall =
+            if (beslutteVedtak.godkjent) StegUtfall.BESLUTTE_VEDTAK_GODKJENT else StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT
 
         behandlingshistorikkService.opprettHistorikkInnslag(
             behandlingId = saksbehandling.id,
@@ -108,16 +119,19 @@ class TotrinnskontrollService(
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, nyStatus)
         if (nyTotrinnsKontrollStatus == TotrinnInternStatus.UNDERKJENT) {
             oppdaterUtfallogÅrsakPåTotrinnskontroll(beslutteVedtak, sisteTotrinnskontroll, nyTotrinnsKontrollStatus)
+            // TODO: Vurder om vi skal sende behandlingsstatistikk her
         } else {
             oppdaterStatusPåTotrinnskontroll(nyTotrinnsKontrollStatus, sisteTotrinnskontroll)
+            taskService.save(BehandlingsstatistikkTask.opprettBesluttetTask(behandlingId = saksbehandling.id))
         }
 
         return sisteTotrinnskontroll.saksbehandler
     }
 
     fun hentSaksbehandlerSomSendteTilBeslutter(behandlingId: UUID): String {
-        val totrinnskontrollSaksbehandler = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
-            ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
+        val totrinnskontrollSaksbehandler =
+            totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+                ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
         return totrinnskontrollSaksbehandler.saksbehandler
     }
 
@@ -178,8 +192,9 @@ class TotrinnskontrollService(
                 frontendFeilmelding = "Feil i steg, kontakt brukerstøtte id=$behandlingId",
             )
         }
-        val totrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
-            ?: error("mangler totrinnskontroll på behandling id=$behandlingId")
+        val totrinnskontroll =
+            totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+                ?: error("mangler totrinnskontroll på behandling id=$behandlingId")
         return if (beslutterErLikBehandler(totrinnskontroll) || !tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)
         ) {
             StatusTotrinnskontrollDto(
@@ -195,8 +210,9 @@ class TotrinnskontrollService(
      * Hvis behandlingen utredes sjekkes det for om det finnes ett tidligere beslutt, som då kun kan være underkjent
      */
     private fun finnStatusForVedtakSomErFattet(behandlingId: UUID): StatusTotrinnskontrollDto {
-        val totrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
-            ?: return StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
+        val totrinnskontroll =
+            totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+                ?: return StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
         return when (totrinnskontroll.status) {
             TotrinnInternStatus.UNDERKJENT -> {
                 val beslutter = totrinnskontroll.beslutter
@@ -215,6 +231,7 @@ class TotrinnskontrollService(
                     ),
                 )
             }
+
             TotrinnInternStatus.ANGRET -> StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
             else -> error(
                 "Skal ikke kunne være annen status enn UNDERKJENT når " +
@@ -227,7 +244,10 @@ class TotrinnskontrollService(
         return SikkerhetContext.hentSaksbehandler() == beslutteTotrinnskontroll.saksbehandler
     }
 
-    private fun oppdaterStatusPåTotrinnskontroll(status: TotrinnInternStatus, gjeldeneTotrinnskontroll: Totrinnskontroll): Totrinnskontroll {
+    private fun oppdaterStatusPåTotrinnskontroll(
+        status: TotrinnInternStatus,
+        gjeldeneTotrinnskontroll: Totrinnskontroll,
+    ): Totrinnskontroll {
         // generisk metode for å logge endringene som er utført
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
@@ -236,8 +256,10 @@ class TotrinnskontrollService(
         )
         return totrinnskontrollRepository.update(gjeldeneTotrinnskontroll.copy(status = status))
     }
+
     private fun settBeslutter(behandlingId: UUID) {
-        val totrinnskontroll = totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+        val totrinnskontroll =
+            totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
         if (totrinnskontroll != null) {
             totrinnskontrollRepository.update(totrinnskontroll.copy(beslutter = SikkerhetContext.hentSaksbehandlerEllerSystembruker()))
         }

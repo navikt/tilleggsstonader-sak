@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
+import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
@@ -271,11 +272,13 @@ class BehandlingFlytTest(
     private fun kjørTasks() {
         newTransaction()
         logger.info("Kjører tasks")
-        taskService.finnAlleTasksKlareForProsessering(Pageable.unpaged()).forEach {
-            taskWorker.markerPlukket(it.id)
-            logger.info("Kjører task ${it.id} type=${it.type} msg=${taskMsg(it)}")
-            taskWorker.doActualWork(it.id)
-        }
+        taskService.finnAlleTasksKlareForProsessering(Pageable.unpaged())
+            .filterNot { it.type == BehandlingsstatistikkTask.TYPE } // Tester ikke statistikkutsendelse her
+            .forEach {
+                taskWorker.markerPlukket(it.id)
+                logger.info("Kjører task ${it.id} type=${it.type} msg=${taskMsg(it)}")
+                taskWorker.doActualWork(it.id)
+            }
         logger.info("Tasks kjørt OK")
     }
 
