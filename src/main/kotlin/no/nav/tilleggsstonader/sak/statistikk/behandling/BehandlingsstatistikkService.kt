@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 class BehandlingsstatistikkService(
@@ -81,7 +81,9 @@ class BehandlingsstatistikkService(
             sakId = saksbehandling.eksternFagsakId.toString(),
             aktorId = saksbehandling.ident,
             registrertTid = henvendelseTidspunkt,
-            endretTid = hendelseTidspunkt.atZone(ZONE_ID_OSLO),
+            endretTid = if (Hendelse.MOTTATT == hendelse) henvendelseTidspunkt else hendelseTidspunkt.atZone(
+                ZONE_ID_OSLO
+            ),
             tekniskTid = zonedNow(),
             behandlingStatus = hendelse.name,
             opprettetAv = maskerVerdiHvisStrengtFortrolig(
@@ -164,7 +166,7 @@ class BehandlingsstatistikkService(
 
             Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG ->
                 totrinnskontroll?.saksbehandler ?: gjeldendeSaksbehandler
-                    ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
+                ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
         }
     }
 
