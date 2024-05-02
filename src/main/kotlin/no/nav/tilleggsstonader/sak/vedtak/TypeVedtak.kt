@@ -7,7 +7,7 @@ enum class TypeVedtak {
     AVSLAG,
 }
 
-fun TypeVedtak.tilBehandlingResult(): BehandlingResultat = when(this) {
+fun TypeVedtak.tilBehandlingResult(): BehandlingResultat = when (this) {
     TypeVedtak.INNVILGELSE -> BehandlingResultat.INNVILGET
     TypeVedtak.AVSLAG -> BehandlingResultat.AVSLÅTT
 }
