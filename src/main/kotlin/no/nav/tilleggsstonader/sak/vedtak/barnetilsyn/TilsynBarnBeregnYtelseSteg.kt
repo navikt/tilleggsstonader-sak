@@ -36,23 +36,8 @@ class TilsynBarnBeregnYtelseSteg(
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakTilsynBarnDto) {
         when (vedtak) {
-            is InnvilgelseTilsynBarnDto -> {
-                val beregningsresultat =
-                    tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter)
-                validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
-                vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, vedtak, beregningsresultat))
-                lagreAndeler(saksbehandling, beregningsresultat)
-            }
-
-            is AvslagTilsynBarnDto -> {
-                vedtakRepository.insert(
-                    VedtakTilsynBarn(
-                        behandlingId = saksbehandling.id,
-                        type = TypeVedtak.AVSLAG,
-                        avslagBegrunnelse = vedtak.begrunnelse,
-                    ),
-                )
-            }
+            is InnvilgelseTilsynBarnDto -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
+            is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
         }
         /*
         Funksjonalitet som mangler:
@@ -62,6 +47,30 @@ class TilsynBarnBeregnYtelseSteg(
          Simulering burde kanskje kun gjøres når man går inn på fanen for simulering,
          og ikke i dette steget for å unngå feil fra simulering
          */
+    }
+
+    private fun beregnOgLagreInnvilgelse(
+        saksbehandling: Saksbehandling,
+        vedtak: InnvilgelseTilsynBarnDto,
+    ) {
+        val beregningsresultat =
+            tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter)
+        validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
+        vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, vedtak, beregningsresultat))
+        lagreAndeler(saksbehandling, beregningsresultat)
+    }
+
+    private fun lagreAvslag(
+        saksbehandling: Saksbehandling,
+        vedtak: AvslagTilsynBarnDto,
+    ) {
+        vedtakRepository.insert(
+            VedtakTilsynBarn(
+                behandlingId = saksbehandling.id,
+                type = TypeVedtak.AVSLAG,
+                avslagBegrunnelse = vedtak.begrunnelse,
+            ),
+        )
     }
 
     private fun validerKunBarnMedOppfylteVilkår(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
