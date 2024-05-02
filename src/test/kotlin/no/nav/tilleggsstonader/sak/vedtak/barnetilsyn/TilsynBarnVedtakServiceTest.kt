@@ -32,7 +32,7 @@ class TilsynBarnVedtakServiceTest {
 
     @Test
     fun `skal mappe avslått vedtak til dto`() {
-        val vedtak = VedtakTilsynBarn(behandlingId = UUID.randomUUID(), type = TypeVedtak.AVSLÅTT, avslagBegrunnelse = "begrunnelse")
+        val vedtak = VedtakTilsynBarn(behandlingId = UUID.randomUUID(), type = TypeVedtak.AVSLAG, avslagBegrunnelse = "begrunnelse")
 
         val dto = tilsynBarnVedtakService.mapTilDto(vedtak) as AvslagTilsynBarnDto
 
@@ -42,7 +42,7 @@ class TilsynBarnVedtakServiceTest {
 
     private fun vedtak() = VedtakTilsynBarn(
         behandlingId = UUID.randomUUID(),
-        type = TypeVedtak.INNVILGET,
+        type = TypeVedtak.INNVILGELSE,
         vedtak = VedtaksdataTilsynBarn(
             utgifter = mapOf(
                 TilsynBarnTestUtil.barn(

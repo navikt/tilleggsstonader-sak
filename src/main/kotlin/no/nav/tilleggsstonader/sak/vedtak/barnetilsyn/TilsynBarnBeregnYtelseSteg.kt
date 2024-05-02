@@ -48,7 +48,7 @@ class TilsynBarnBeregnYtelseSteg(
                 vedtakRepository.insert(
                     VedtakTilsynBarn(
                         behandlingId = saksbehandling.id,
-                        type = TypeVedtak.AVSLÅTT,
+                        type = TypeVedtak.AVSLAG,
                         avslagBegrunnelse = vedtak.begrunnelse,
                     ),
                 )
@@ -106,7 +106,7 @@ class TilsynBarnBeregnYtelseSteg(
     ): VedtakTilsynBarn {
         return VedtakTilsynBarn(
             behandlingId = behandling.id,
-            type = TypeVedtak.INNVILGET,
+            type = TypeVedtak.INNVILGELSE,
             vedtak = VedtaksdataTilsynBarn(
                 utgifter = vedtak.utgifter,
             ),

@@ -81,14 +81,14 @@ class BeslutteVedtakSteg(
         val behandlingId = saksbehandling.id
         val resultat = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
         when (resultat) {
-            TypeVedtak.INNVILGET -> {
+            TypeVedtak.INNVILGELSE -> {
                 behandlingService.oppdaterResultatPåBehandling(
                     behandlingId,
                     BehandlingResultat.INNVILGET,
                 )
             }
 
-            TypeVedtak.AVSLÅTT -> behandlingService.oppdaterResultatPåBehandling(
+            TypeVedtak.AVSLAG -> behandlingService.oppdaterResultatPåBehandling(
                 behandlingId,
                 BehandlingResultat.AVSLÅTT,
             )

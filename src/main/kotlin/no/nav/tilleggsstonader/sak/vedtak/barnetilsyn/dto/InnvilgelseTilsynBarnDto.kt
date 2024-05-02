@@ -16,7 +16,7 @@ import java.util.UUID
 data class InnvilgelseTilsynBarnDto(
     val utgifter: Map<UUID, List<Utgift>>,
     val beregningsresultat: BeregningsresultatTilsynBarnDto?,
-) : VedtakTilsynBarnDto(TypeVedtak.INNVILGET)
+) : VedtakTilsynBarnDto(TypeVedtak.INNVILGELSE)
 
 data class InnvilgelseTilsynBarnRequest(
     val utgifter: Map<UUID, List<Utgift>>,

@@ -88,7 +88,7 @@ class TilsynBarnVedtakControllerTest(
         val lagretDto = hentVedtak(behandling.id).body!!
 
         assertThat((lagretDto as InnvilgelseTilsynBarnDto).utgifter).isEqualTo(vedtak.utgifter)
-        assertThat(lagretDto.type).isEqualTo(TypeVedtak.INNVILGET)
+        assertThat(lagretDto.type).isEqualTo(TypeVedtak.INNVILGELSE)
     }
 
     @Test
@@ -102,7 +102,7 @@ class TilsynBarnVedtakControllerTest(
         val lagretDto = hentVedtak(behandling.id).body!!
 
         assertThat((lagretDto as AvslagTilsynBarnDto).begrunnelse).isEqualTo(vedtak.begrunnelse)
-        assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLÅTT)
+        assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLAG)
     }
 
     private fun lagInnvilgeVedtak() = InnvilgelseTilsynBarnRequest(

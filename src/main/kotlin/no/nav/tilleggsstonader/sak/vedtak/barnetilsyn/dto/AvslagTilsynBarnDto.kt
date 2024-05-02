@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 
 data class AvslagTilsynBarnDto(
     val begrunnelse: String,
-) : VedtakTilsynBarnDto(TypeVedtak.AVSLÅTT)
+) : VedtakTilsynBarnDto(TypeVedtak.AVSLAG)
 
 data class AvslagRequest(
     val begrunnelse: String,

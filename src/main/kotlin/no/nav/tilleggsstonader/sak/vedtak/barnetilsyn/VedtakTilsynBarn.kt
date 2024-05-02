@@ -26,11 +26,11 @@ data class VedtakTilsynBarn(
 ) {
     init {
         when (type) {
-            TypeVedtak.INNVILGET -> {
+            TypeVedtak.INNVILGELSE -> {
                 require(beregningsresultat != null) { "Mangler beregningsresultat for type=$type" }
                 require(vedtak != null) { "Mangler vedtak for type=$type" }
             }
-            TypeVedtak.AVSLÅTT -> {
+            TypeVedtak.AVSLAG -> {
                 require(avslagBegrunnelse != null) { "Avslag må begrunnes" }
             }
         }
