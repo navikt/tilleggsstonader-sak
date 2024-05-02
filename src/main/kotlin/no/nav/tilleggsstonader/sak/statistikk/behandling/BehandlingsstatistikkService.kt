@@ -146,7 +146,7 @@ class BehandlingsstatistikkService(
 
             Hendelse.VEDTATT, Hendelse.BESLUTTET, Hendelse.FERDIG ->
                 totrinnskontroll?.saksbehandler ?: gjeldendeSaksbehandler
-                ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
+                    ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
         }
     }
 
