@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.StønadstypeDvh.BARNETILSYN
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -72,6 +73,18 @@ enum class BehandlingÅrsakDvh {
     SØKNAD,
     PAPIRSØKNAD,
     MANUELT_OPPRETTET,
+    ;
+
+    companion object {
+        fun fraDomene(årsak: BehandlingÅrsak) = when (årsak) {
+            BehandlingÅrsak.KLAGE -> KLAGE
+            BehandlingÅrsak.NYE_OPPLYSNINGER -> NYE_OPPLYSNINGER
+            BehandlingÅrsak.SØKNAD -> SØKNAD
+            BehandlingÅrsak.PAPIRSØKNAD -> PAPIRSØKNAD
+            BehandlingÅrsak.MANUELT_OPPRETTET -> MANUELT_OPPRETTET
+            BehandlingÅrsak.MIGRERING, BehandlingÅrsak.KORRIGERING_UTEN_BREV, BehandlingÅrsak.SATSENDRING -> TODO()
+        }
+    }
 }
 
 enum class BehandlingTypeDvh {
