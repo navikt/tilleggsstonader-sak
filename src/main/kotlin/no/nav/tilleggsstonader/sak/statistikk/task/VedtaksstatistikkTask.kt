@@ -16,7 +16,7 @@ import java.util.UUID
 @TaskStepBeskrivelse(
     taskStepType = VedtaksstatistikkTask.TYPE,
     beskrivelse = "Lagrer vedtaksstatistikk i vedtaksstatistikk-tabell",
-    )
+)
 class VedtaksstatistikkTask(
     private val vedtaksstatistikkService: VedtaksstatistikkService,
 ) : AsyncTaskStep {
@@ -24,7 +24,9 @@ class VedtaksstatistikkTask(
         val (behandlingId, fagsakId, hendelseTidspunkt) = objectMapper.readValue<VedtaksstatistikkTaskPayload>(task.payload)
 
         vedtaksstatistikkService.lagreVedtaksstatistikk(
-            behandlingId, fagsakId, hendelseTidspunkt
+            behandlingId,
+            fagsakId,
+            hendelseTidspunkt,
         )
     }
 
@@ -46,11 +48,11 @@ class VedtaksstatistikkTask(
                     ),
                 ),
                 properties = Properties().apply {
-                    this["behandlingId"] = behandlingId.toString(),
-                    this["fagsakId"] = fagsakId.toString(),
-                    this["hendelseTidspunkt"] = hendelseTidspunkt.toString(),
+                    this["behandlingId"] = behandlingId.toString()
+                    this["fagsakId"] = fagsakId.toString()
+                    this["hendelseTidspunkt"] = hendelseTidspunkt.toString()
                     this["stønadstype"] = stønadstype.toString()
-                }
+                },
             )
 
         const val TYPE = "vedtaksstatistikkTask"

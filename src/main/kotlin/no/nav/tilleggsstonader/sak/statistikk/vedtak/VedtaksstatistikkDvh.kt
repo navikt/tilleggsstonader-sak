@@ -37,7 +37,7 @@ class VedtaksstatistikkDvh(
     val årsakRevurdering: ÅrsakRevurderingDvh? = null,
     val avslagÅrsak: AvslagÅrsakDvh? = null,
 
-    )
+)
 
 enum class StønadstypeDvh {
     BARNETILSYN,
@@ -50,9 +50,8 @@ data class UtbetalingDvh(
     val satstype: SatstypeDvh = SatstypeDvh.DAGLIG,
 )
 
-
 enum class SatstypeDvh {
-    DAGLIG
+    DAGLIG,
 }
 
 data class VedtaksperioderDvh(
@@ -98,7 +97,6 @@ data class MålgruppeDvh(
 ) {
     companion object {
         fun fraDomene(vilkårsperioder: List<Vilkårperiode>): List<MålgruppeDvh> {
-
             return vilkårsperioder
                 .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
                 .map {
@@ -109,7 +107,6 @@ data class MålgruppeDvh(
                 }
         }
     }
-
 }
 
 enum class ResultatDvh {
@@ -118,7 +115,8 @@ enum class ResultatDvh {
     IKKE_OPPFYLT,
     IKKE_AKTUELL,
     IKKE_TATT_STILLING_TIL,
-    SKAL_IKKE_VURDERES;
+    SKAL_IKKE_VURDERES,
+    ;
 
     companion object {
         fun fraDomene(resultat: ResultatVilkårperiode) = when (resultat) {
@@ -129,13 +127,13 @@ enum class ResultatDvh {
                 throw IllegalArgumentException("Slettede vedtak er ikke relevant, og skal ha blitt filtrert bort.")
         }
     }
-
 }
 
 enum class AktivitetTypeDvh {
     TILTAK,
     UTDANNING,
-    REELL_ARBEIDSSØKER;
+    REELL_ARBEIDSSØKER,
+    ;
 
     companion object {
         fun fraDomene(vilkårsperiodeType: VilkårperiodeType) = when (vilkårsperiodeType) {
@@ -155,7 +153,8 @@ enum class MålgruppeTypeDvh {
     OMSTILLINGSSTØNAD,
     OVERGANGSSTØNAD,
     NEDSATT_ARBEIDSEVNE,
-    UFØRETRYGD;
+    UFØRETRYGD,
+    ;
 
     companion object {
         fun fraDomene(vilkårsperiodeType: VilkårperiodeType) = when (vilkårsperiodeType) {
@@ -179,12 +178,12 @@ data class VilkårsvurderingDvh(
     // TODO: Mapping fra VilkårDto
 )
 
-
 enum class AdressebeskyttelseDvh {
     STRENGT_FORTROLIG,
     STRENGT_FORTROLIG_UTLAND,
     FORTROLIG,
-    UGRADERT;
+    UGRADERT,
+    ;
 
     companion object {
         fun fraDomene(adressebeskyttelse: AdressebeskyttelseGradering) =
@@ -196,7 +195,6 @@ enum class AdressebeskyttelseDvh {
             }
     }
 }
-
 
 enum class AvslagÅrsakDvh {
     // TODO når vi får avslag i løsningen
