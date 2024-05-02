@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.statistikk.behandling
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
-import no.nav.tilleggsstonader.kontrakter.saksstatistikk.TotrinnsbehandlingStatusDvh
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
@@ -17,10 +16,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
-import no.nav.tilleggsstonader.sak.util.ZONE_ID_OSLO
-import no.nav.tilleggsstonader.sak.util.zonedNow
+import no.nav.tilleggsstonader.sak.util.osloNow
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -67,13 +64,11 @@ class BehandlingsstatistikkService(
     ): BehandlingDVH {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
-        val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling).atZone(ZONE_ID_OSLO)
+        val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling)
         val søkerHarStrengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandlingId)
         val saksbehandlerId = finnSaksbehandler(hendelse, gjeldendeSaksbehandler, totrinnskontroll)
         val beslutterId = totrinnskontroll?.beslutter
-        val relatertEksternBehandlingId: String? =
-            saksbehandling.forrigeBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).id.toString() }
 
         return BehandlingDVH(
             behandlingId = saksbehandling.eksternId.toString(),
@@ -81,14 +76,8 @@ class BehandlingsstatistikkService(
             sakId = saksbehandling.eksternFagsakId.toString(),
             aktorId = saksbehandling.ident,
             registrertTid = henvendelseTidspunkt,
-            endretTid = if (Hendelse.MOTTATT == hendelse) {
-                henvendelseTidspunkt
-            } else {
-                hendelseTidspunkt.atZone(
-                    ZONE_ID_OSLO,
-                )
-            },
-            tekniskTid = zonedNow(),
+            endretTid = if (Hendelse.MOTTATT == hendelse) henvendelseTidspunkt else hendelseTidspunkt,
+            tekniskTid = osloNow(),
             behandlingStatus = hendelse.name,
             opprettetAv = maskerVerdiHvisStrengtFortrolig(
                 erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
@@ -96,7 +85,7 @@ class BehandlingsstatistikkService(
             ),
             saksnummer = saksbehandling.eksternFagsakId.toString(),
             mottattTid = henvendelseTidspunkt,
-            kravMottatt = null, // TODO ?
+            kravMottatt = saksbehandling.kravMottatt,
             saksbehandler = maskerVerdiHvisStrengtFortrolig(
                 erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
                 verdi = saksbehandlerId,
@@ -112,28 +101,12 @@ class BehandlingsstatistikkService(
             sakYtelse = saksbehandling.stønadstype.name,
             behandlingResultat = saksbehandling.resultat.name,
             resultatBegrunnelse = utledResultatBegrunnelse(saksbehandling),
-            ansvarligBeslutter =
-            if (!beslutterId.isNullOrEmpty()) {
-                maskerVerdiHvisStrengtFortrolig(
-                    erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
-                    verdi = beslutterId.toString(),
-                )
-            } else {
-                null
-            },
-            vedtakTid = if (Hendelse.VEDTATT == hendelse) {
-                hendelseTidspunkt.atZone(ZONE_ID_OSLO)
-            } else {
-                null
-            },
-            ferdigBehandletTid = if (Hendelse.FERDIG == hendelse) {
-                hendelseTidspunkt.atZone(ZONE_ID_OSLO)
-            } else {
-                null
-            },
-            totrinnsbehandling = utledTotrinnskontrollStatus(totrinnskontroll),
+            ansvarligBeslutter = finnAnsvarligBeslutter(beslutterId, søkerHarStrengtFortroligAdresse),
+            vedtakTid = if (Hendelse.VEDTATT == hendelse) hendelseTidspunkt else null,
+            ferdigBehandletTid = if (Hendelse.FERDIG == hendelse) hendelseTidspunkt else null,
+            totrinnsbehandling = beslutterId != null,
             sakUtland = mapTilStreng(saksbehandling.kategori),
-            relatertBehandlingId = relatertEksternBehandlingId,
+            relatertBehandlingId = utledRelatertBehandling(saksbehandling),
             versjon = Applikasjonsversjon.versjon,
             vilkårsprøving = emptyList(), // TODO: Implementer dette i samarbeid med Team SAK. Ikke kritisk å ha med i starten.
             revurderingÅrsak = null, // TODO aktiver når revurdering er implementert
@@ -143,15 +116,18 @@ class BehandlingsstatistikkService(
         )
     }
 
-    private fun utledTotrinnskontrollStatus(totrinnskontroll: Totrinnskontroll?): TotrinnsbehandlingStatusDvh {
-        return when (totrinnskontroll?.status) {
-            TotrinnInternStatus.UNDERKJENT -> TotrinnsbehandlingStatusDvh.UNDERKJENT
-            TotrinnInternStatus.GODKJENT -> TotrinnsbehandlingStatusDvh.GODKJENT
+    private fun utledRelatertBehandling(saksbehandling: Saksbehandling) =
+        saksbehandling.forrigeBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).id.toString() }
 
-            TotrinnInternStatus.ANGRET, TotrinnInternStatus.KAN_FATTE_VEDTAK, null,
-            -> TotrinnsbehandlingStatusDvh.IKKE_GJENNOMFØRT
+    private fun finnAnsvarligBeslutter(beslutterId: String?, søkerHarStrengtFortroligAdresse: Boolean) =
+        if (!beslutterId.isNullOrEmpty()) {
+            maskerVerdiHvisStrengtFortrolig(
+                erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                verdi = beslutterId.toString(),
+            )
+        } else {
+            null
         }
-    }
 
     private fun finnSisteOppgaveForBehandlingen(behandlingId: UUID, oppgaveId: Long?): Oppgave? {
         val gsakOppgaveId = oppgaveId ?: oppgaveService.finnSisteOppgaveForBehandling(behandlingId)?.gsakOppgaveId
@@ -193,15 +169,8 @@ class BehandlingsstatistikkService(
         }
     }
 
-    private fun maskerVerdiHvisStrengtFortrolig(
-        erStrengtFortrolig: Boolean,
-        verdi: String,
-    ): String {
-        if (erStrengtFortrolig) {
-            return "-5" // -5 er ein kode som dvh forstår som maskert med årsak i strengtfortrolig, og behandler datasettet deretter.
-        }
-        return verdi
-    }
+    private fun maskerVerdiHvisStrengtFortrolig(erStrengtFortrolig: Boolean, verdi: String) =
+        if (erStrengtFortrolig) "-5" else verdi // -5 er ein kode som dvh forstår som maskert med årsak i strengtfortrolig, og behandler datasettet deretter.
 
     private fun mapTilStreng(kategori: BehandlingKategori?) = when (kategori) {
         BehandlingKategori.EØS -> "Utland"
