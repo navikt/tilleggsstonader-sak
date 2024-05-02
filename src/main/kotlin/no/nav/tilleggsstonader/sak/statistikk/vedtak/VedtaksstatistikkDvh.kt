@@ -97,14 +97,14 @@ data class MålgruppeDvh(
     val resultat: ResultatDvh,
 ) {
     companion object {
-        fun mapFraVilkårsperioder(vilkårsperioder: List<Vilkårperiode>): List<MålgruppeDvh> {
+        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): List<MålgruppeDvh> {
 
             return vilkårsperioder
                 .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
                 .map {
                     MålgruppeDvh(
-                        type = MålgruppeTypeDvh.fraVilkårsperiodeType(it.type),
-                        resultat = ResultatDvh.fraResultatVilkårsperiode(it.resultat),
+                        type = MålgruppeTypeDvh.fraDomene(it.type),
+                        resultat = ResultatDvh.fraDomene(it.resultat),
                     )
                 }
         }
@@ -121,7 +121,7 @@ enum class ResultatDvh {
     SKAL_IKKE_VURDERES;
 
     companion object {
-        fun fraResultatVilkårsperiode(resultat: ResultatVilkårperiode) = when (resultat) {
+        fun fraDomene(resultat: ResultatVilkårperiode) = when (resultat) {
             ResultatVilkårperiode.OPPFYLT -> OPPFYLT
             ResultatVilkårperiode.IKKE_OPPFYLT -> IKKE_OPPFYLT
             ResultatVilkårperiode.IKKE_VURDERT -> IKKE_TATT_STILLING_TIL
@@ -138,7 +138,7 @@ enum class AktivitetTypeDvh {
     REELL_ARBEIDSSØKER;
 
     companion object {
-        fun fraVilkårsperiodeType(vilkårsperiodeType: VilkårperiodeType) = when (vilkårsperiodeType) {
+        fun fraDomene(vilkårsperiodeType: VilkårperiodeType) = when (vilkårsperiodeType) {
             AktivitetType.TILTAK -> TILTAK
             AktivitetType.UTDANNING -> UTDANNING
             AktivitetType.REELL_ARBEIDSSØKER -> REELL_ARBEIDSSØKER
@@ -158,7 +158,7 @@ enum class MålgruppeTypeDvh {
     UFØRETRYGD;
 
     companion object {
-        fun fraVilkårsperiodeType(vilkårsperiodeType: VilkårperiodeType) = when (vilkårsperiodeType) {
+        fun fraDomene(vilkårsperiodeType: VilkårperiodeType) = when (vilkårsperiodeType) {
             MålgruppeType.AAP -> AAP
             MålgruppeType.DAGPENGER -> DAGPENGER
             MålgruppeType.OMSTILLINGSSTØNAD -> OMSTILLINGSSTØNAD
@@ -187,8 +187,8 @@ enum class AdressebeskyttelseDvh {
     UGRADERT;
 
     companion object {
-        fun fraAdressebeskyttelseGradering(adressebeskyttelseGradering: AdressebeskyttelseGradering) =
-            when (adressebeskyttelseGradering) {
+        fun fraDomene(adressebeskyttelse: AdressebeskyttelseGradering) =
+            when (adressebeskyttelse) {
                 AdressebeskyttelseGradering.STRENGT_FORTROLIG -> STRENGT_FORTROLIG
                 AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND -> STRENGT_FORTROLIG_UTLAND
                 AdressebeskyttelseGradering.FORTROLIG -> FORTROLIG
