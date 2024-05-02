@@ -24,7 +24,7 @@ class BehandlingKafkaProducer(
                 topic,
                 Stønadstype.BARNETILSYN,
                 behandlingDVH.behandlingId,
-                behandlingDVH.toJson()
+                behandlingDVH.toJson(),
             )
             logger.info(
                 "Behandlingstatistikk for behandling=${behandlingDVH.behandlingId} " + "behandlingStatus=${behandlingDVH.behandlingStatus} sent til Kafka",
