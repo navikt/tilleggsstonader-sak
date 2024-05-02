@@ -66,9 +66,9 @@ class ArbeidsfordelingService(
         )
     }
 
-    private fun utledGeografiskTilknytningKode(geografiskTilknytning: GeografiskTilknytningDto): String? {
-        geografiskTilknytning.let {
-            return when (it.gtType) {
+    private fun utledGeografiskTilknytningKode(geografiskTilknytning: GeografiskTilknytningDto?): String? {
+        return geografiskTilknytning?.let {
+            when (it.gtType) {
                 GeografiskTilknytningType.BYDEL -> it.gtBydel
                 GeografiskTilknytningType.KOMMUNE -> it.gtKommune
                 GeografiskTilknytningType.UTLAND -> null

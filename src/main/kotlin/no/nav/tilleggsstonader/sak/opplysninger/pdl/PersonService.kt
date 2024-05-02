@@ -62,5 +62,5 @@ class PersonService(
 
     fun hentAktørIder(ident: String): PdlIdenter = pdlClient.hentAktørIder(ident)
 
-    fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto = pdlClient.hentGeografiskTilknytning(ident)
+    fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto? = pdlClient.hentGeografiskTilknytning(ident)
 }
