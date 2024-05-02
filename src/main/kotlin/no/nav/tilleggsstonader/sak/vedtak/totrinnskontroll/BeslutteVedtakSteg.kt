@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
+import no.nav.tilleggsstonader.sak.vedtak.tilBehandlingResult
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import org.springframework.stereotype.Service
 
@@ -80,19 +81,10 @@ class BeslutteVedtakSteg(
     private fun oppdaterResultatPåBehandling(saksbehandling: Saksbehandling) {
         val behandlingId = saksbehandling.id
         val resultat = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
-        when (resultat) {
-            TypeVedtak.INNVILGELSE -> {
-                behandlingService.oppdaterResultatPåBehandling(
-                    behandlingId,
-                    BehandlingResultat.INNVILGET,
-                )
-            }
-
-            TypeVedtak.AVSLAG -> behandlingService.oppdaterResultatPåBehandling(
-                behandlingId,
-                BehandlingResultat.AVSLÅTT,
-            )
-        }
+        behandlingService.oppdaterResultatPåBehandling(
+            behandlingId = behandlingId,
+            behandlingResultat = resultat.tilBehandlingResult(),
+        )
     }
 
     private fun opprettBehandleUnderkjentVedtakOppgave(saksbehandling: Saksbehandling, navIdent: String) {
