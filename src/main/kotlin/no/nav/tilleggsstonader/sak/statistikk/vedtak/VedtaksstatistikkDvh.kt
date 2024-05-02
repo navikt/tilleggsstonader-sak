@@ -70,10 +70,7 @@ enum class BehandlingÅrsakDvh {
     KLAGE,
     NYE_OPPLYSNINGER,
     SØKNAD,
-    MIGRERING,
-    KORRIGERING_UTEN_BREV,
     PAPIRSØKNAD,
-    SATSENDRING,
     MANUELT_OPPRETTET,
 }
 
