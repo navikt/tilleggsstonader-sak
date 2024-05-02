@@ -22,14 +22,14 @@ class TilsynBarnVedtakRepositoryTest : IntegrationTest() {
         tilsynBarnVedtakRepository.insert(
             VedtakTilsynBarn(
                 behandlingId = behandling.id,
-                type = TypeVedtak.INNVILGET,
+                type = TypeVedtak.INNVILGELSE,
                 vedtak = vedtak,
                 beregningsresultat = beregningsresultat,
             ),
         )
 
         val lagretVedtak = tilsynBarnVedtakRepository.findByIdOrThrow(behandling.id)
-        assertThat(lagretVedtak.type).isEqualTo(TypeVedtak.INNVILGET)
+        assertThat(lagretVedtak.type).isEqualTo(TypeVedtak.INNVILGELSE)
         assertThat(lagretVedtak.vedtak).isEqualTo(vedtak)
         assertThat(lagretVedtak.beregningsresultat).isEqualTo(beregningsresultat)
     }

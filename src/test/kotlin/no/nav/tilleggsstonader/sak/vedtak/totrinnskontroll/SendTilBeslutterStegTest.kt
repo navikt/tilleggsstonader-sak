@@ -116,7 +116,7 @@ class SendTilBeslutterStegTest {
         // every { tilbakekrevingService.harSaksbehandlerTattStillingTilTilbakekreving(any()) } returns true
         // every { tilbakekrevingService.finnesÅpenTilbakekrevingsBehandling(any()) } returns true
 
-        every { vedtaksresultatService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGET
+        every { vedtaksresultatService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGELSE
         mockBrukerContext(saksbehandlerNavn)
     }
 
@@ -199,7 +199,7 @@ class SendTilBeslutterStegTest {
 
     @Test
     internal fun `skal ikke hente brev når man håndterer behandling med årsak korrigering uten brev`() {
-        every { vedtaksresultatService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGET
+        every { vedtaksresultatService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGELSE
         val behandling = behandling.copy(årsak = BehandlingÅrsak.KORRIGERING_UTEN_BREV)
 
         beslutteVedtakSteg.validerSteg(behandling)

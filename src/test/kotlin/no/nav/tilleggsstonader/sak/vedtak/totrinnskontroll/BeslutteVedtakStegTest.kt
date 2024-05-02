@@ -97,7 +97,7 @@ class BeslutteVedtakStegTest {
         // every { iverksettingDtoMapper.tilDto(any(), any()) } returns mockk()
         // every { iverksett.iverksett(any(), any()) } just Runs
         // every { iverksett.iverksettUtenBrev(any()) } just Runs
-        every { vedtaksresultatService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGET
+        every { vedtaksresultatService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGELSE
         // every { vedtaksresultatService.oppdaterBeslutter(any(), any()) } just Runs
         every { behandlingService.oppdaterResultatPåBehandling(any(), any()) } answers {
             behandling(fagsak, id = behandlingId, resultat = secondArg())
