@@ -2,6 +2,12 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -15,13 +21,23 @@ class TilsynBarnVedtakServiceTest {
     private val tilsynBarnVedtakService = TilsynBarnVedtakService(mockk(), mockk(), mockk())
 
     @Test
-    fun `skal mappe vedtak til dto`() {
+    fun `skal mappe innvilget vedtak til dto`() {
         val vedtak = vedtak()
 
-        val dto = tilsynBarnVedtakService.mapTilDto(vedtak)
+        val dto = tilsynBarnVedtakService.mapTilDto(vedtak) as InnvilgelseTilsynBarnDto
 
-        assertThat(dto.utgifter).isEqualTo(vedtak.vedtak.utgifter)
+        assertThat(dto.utgifter).isEqualTo(vedtak.vedtak?.utgifter)
         assertThat(dto.beregningsresultat!!.perioder).isEqualTo(vedtak.beregningsresultat!!.perioder)
+    }
+
+    @Test
+    fun `skal mappe avslått vedtak til dto`() {
+        val vedtak = VedtakTilsynBarn(behandlingId = UUID.randomUUID(), type = TypeVedtak.AVSLÅTT, avslagBegrunnelse = "begrunnelse")
+
+        val dto = tilsynBarnVedtakService.mapTilDto(vedtak) as AvslagTilsynBarnDto
+
+        assertThat(dto.begrunnelse).isEqualTo(vedtak.avslagBegrunnelse)
+        assertThat(dto.type).isEqualTo(vedtak.type)
     }
 
     private fun vedtak() = VedtakTilsynBarn(

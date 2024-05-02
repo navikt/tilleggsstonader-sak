@@ -87,6 +87,11 @@ class BeslutteVedtakSteg(
                     BehandlingResultat.INNVILGET,
                 )
             }
+
+            TypeVedtak.AVSLÅTT -> behandlingService.oppdaterResultatPåBehandling(
+                behandlingId,
+                BehandlingResultat.AVSLÅTT,
+            )
         }
     }
 

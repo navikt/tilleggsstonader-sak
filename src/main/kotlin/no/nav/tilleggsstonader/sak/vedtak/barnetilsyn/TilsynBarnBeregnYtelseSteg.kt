@@ -11,6 +11,10 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
@@ -23,24 +27,35 @@ class TilsynBarnBeregnYtelseSteg(
     vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-) : BeregnYtelseSteg<InnvilgelseTilsynBarnDto, VedtakTilsynBarn>(
+) : BeregnYtelseSteg<VedtakTilsynBarnDto, VedtakTilsynBarn>(
     stønadstype = Stønadstype.BARNETILSYN,
     vedtakRepository = vedtakRepository,
     tilkjentytelseService = tilkjentytelseService,
     simuleringService = simuleringService,
 ) {
 
-    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
-        feilHvis(vedtak.beregningsresultat != null) {
-            "Kan ikke sende inn beregningsresultat" // Burde splitte request og response for vedtak
+    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakTilsynBarnDto) {
+        when (vedtak) {
+            is InnvilgelseTilsynBarnDto -> {
+                val beregningsresultat =
+                    tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter)
+                validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
+                vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, vedtak, beregningsresultat))
+                lagreAndeler(saksbehandling, beregningsresultat)
+            }
+
+            is AvslagTilsynBarnDto -> {
+                vedtakRepository.insert(
+                    VedtakTilsynBarn(
+                        behandlingId = saksbehandling.id,
+                        type = TypeVedtak.AVSLÅTT,
+                        avslagBegrunnelse = vedtak.begrunnelse,
+                    ),
+                )
+            }
         }
-        val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter)
-        validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
-        vedtakRepository.insert(lagVedtak(saksbehandling, vedtak, beregningsresultat))
-        lagreAndeler(saksbehandling, beregningsresultat)
         /*
         Funksjonalitet som mangler:
-         * Avslag
          * Revurdering
          * Opphør
 
@@ -84,7 +99,7 @@ class TilsynBarnBeregnYtelseSteg(
         )
     }
 
-    private fun lagVedtak(
+    private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
         vedtak: InnvilgelseTilsynBarnDto,
         beregningsresultat: BeregningsresultatTilsynBarnDto,
