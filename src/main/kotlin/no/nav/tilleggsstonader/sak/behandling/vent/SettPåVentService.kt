@@ -34,6 +34,7 @@ class SettPåVentService(
         return StatusPåVentDto(
             årsaker = settPåVent.årsaker,
             kommentar = settPåVent.kommentar,
+            datoSattPåVent = settPåVent.sporbar.opprettetTid.toLocalDate(),
             frist = oppgave.fristFerdigstillelse,
             oppgaveVersjon = oppgave.versjonEllerFeil(),
         )
@@ -64,6 +65,7 @@ class SettPåVentService(
         return StatusPåVentDto(
             årsaker = dto.årsaker,
             kommentar = dto.kommentar,
+            datoSattPåVent = settPåVent.sporbar.opprettetTid.toLocalDate(),
             frist = dto.frist,
             oppgaveVersjon = oppdatertOppgave.versjon,
         )
@@ -87,6 +89,7 @@ class SettPåVentService(
         return StatusPåVentDto(
             årsaker = dto.årsaker,
             kommentar = dto.kommentar,
+            datoSattPåVent = settPåVent.sporbar.opprettetTid.toLocalDate(),
             frist = dto.frist,
             oppgaveVersjon = oppgaveResponse.versjon,
         )
