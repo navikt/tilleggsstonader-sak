@@ -73,6 +73,8 @@ enum class BehandlingÅrsakDvh {
     SØKNAD,
     PAPIRSØKNAD,
     MANUELT_OPPRETTET,
+    KORRIGERING_UTEN_BREV,
+    SATSENDRING,
     ;
 
     companion object {
@@ -82,7 +84,8 @@ enum class BehandlingÅrsakDvh {
             BehandlingÅrsak.SØKNAD -> SØKNAD
             BehandlingÅrsak.PAPIRSØKNAD -> PAPIRSØKNAD
             BehandlingÅrsak.MANUELT_OPPRETTET -> MANUELT_OPPRETTET
-            BehandlingÅrsak.MIGRERING, BehandlingÅrsak.KORRIGERING_UTEN_BREV, BehandlingÅrsak.SATSENDRING -> TODO()
+            BehandlingÅrsak.KORRIGERING_UTEN_BREV -> KORRIGERING_UTEN_BREV
+            BehandlingÅrsak.SATSENDRING -> SATSENDRING
         }
     }
 }

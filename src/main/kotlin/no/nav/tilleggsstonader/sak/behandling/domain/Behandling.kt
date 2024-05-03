@@ -40,8 +40,6 @@ data class Behandling(
 
     fun kanHenlegges(): Boolean = !status.behandlingErLåstForVidereRedigering()
 
-    fun erMigrering(): Boolean = årsak == BehandlingÅrsak.MIGRERING
-
     fun erAvsluttet(): Boolean = status == BehandlingStatus.FERDIGSTILT
 
     fun vedtakstidspunktEllerFeil(): LocalDateTime =
@@ -63,7 +61,6 @@ enum class BehandlingÅrsak {
     KLAGE,
     NYE_OPPLYSNINGER,
     SØKNAD,
-    MIGRERING,
     KORRIGERING_UTEN_BREV,
     PAPIRSØKNAD,
     SATSENDRING,
