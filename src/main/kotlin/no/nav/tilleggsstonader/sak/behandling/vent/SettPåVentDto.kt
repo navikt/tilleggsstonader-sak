@@ -28,6 +28,7 @@ data class OppdaterSettPåVentDto(
 data class StatusPåVentDto(
     val årsaker: List<ÅrsakSettPåVent>,
     val kommentar: String?,
+    val datoSattPåVent: LocalDate?,
     val frist: LocalDate?,
     val oppgaveVersjon: Int,
 )
