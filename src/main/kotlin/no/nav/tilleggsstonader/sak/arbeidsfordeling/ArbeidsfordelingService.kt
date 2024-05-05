@@ -33,13 +33,13 @@ class ArbeidsfordelingService(
 
     fun hentNavEnhet(ident: String, tema: Tema = Tema.TSO): Arbeidsfordelingsenhet? {
         return cacheManager.getNullable("navEnhet", ident) {
-            arbeidsfordelingClient.finnArberidsfordelingsenhet(lagArbeidsfordelingKritierieForPerson(ident, tema)).firstOrNull()
+            arbeidsfordelingClient.finnArbeidsfordelingsenhet(lagArbeidsfordelingKritierieForPerson(ident, tema)).firstOrNull()
         }
     }
 
     fun hentNavEnhetForOppfølging(ident: String, oppgavetype: Oppgavetype, tema: Tema = Tema.TSO): Arbeidsfordelingsenhet? {
         return cacheManager.getNullable("navEnhetForOppfølging", ident) {
-            arbeidsfordelingClient.finnArberidsfordelingsenhet(lagArbeidsfordelingKritierieForPerson(ident, tema, oppgavetype)).firstOrNull()
+            arbeidsfordelingClient.finnArbeidsfordelingsenhet(lagArbeidsfordelingKritierieForPerson(ident, tema, oppgavetype)).firstOrNull()
                 ?: error("Fant ikke NAV-enhet for oppgave av type $oppgavetype")
         }
     }

@@ -16,12 +16,17 @@ class ArbeidsfordelingClient(
 ) :
     AbstractRestClient(restTemplate) {
 
-    fun finnArberidsfordelingsenhet(arbeidsfordelingskriterie: ArbeidsfordelingKriterie): List<Arbeidsfordelingsenhet> {
-        return postForEntity(arbeidsfordelingUri, arbeidsfordelingskriterie)
+    fun finnArbeidsfordelingsenhet(arbeidsfordelingskriterie: ArbeidsfordelingKriterie): List<Arbeidsfordelingsenhet> {
+        val bestMatchUri = UriComponentsBuilder.fromUri(arbeidsfordelingUri)
+            .pathSegment("enheter/bestmatch")
+            .build()
+            .toUriString()
+
+        return postForEntity(bestMatchUri, arbeidsfordelingskriterie)
     }
 
     private val arbeidsfordelingUri = UriComponentsBuilder.fromUri(uri)
         .pathSegment("api/v1/arbeidsfordeling")
         .build()
-        .toUriString()
+        .toUri()
 }

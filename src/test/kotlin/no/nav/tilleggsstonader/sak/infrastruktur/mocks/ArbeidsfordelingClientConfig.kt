@@ -18,7 +18,7 @@ class ArbeidsfordelingClientConfig {
     fun arbedisfordelingClient(): ArbeidsfordelingClient {
         val client = mockk<ArbeidsfordelingClient>()
 
-        every { client.finnArberidsfordelingsenhet(any()) } returns listOf(Arbeidsfordelingsenhet("4462", "NAY Nasjonal"))
+        every { client.finnArbeidsfordelingsenhet(any()) } returns listOf(Arbeidsfordelingsenhet("4462", "NAY Nasjonal"))
 
         return client
     }
