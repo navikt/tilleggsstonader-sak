@@ -69,7 +69,7 @@ internal class AutomatiskJournalføringServiceTest {
         arbeidsfordelingService = arbeidsfordelingService,
     )
 
-    val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetId
+    val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetNr
     val personIdent = "123456789"
     val aktørId = "9876543210127"
     val tidligerePersonIdent = "9123456789"

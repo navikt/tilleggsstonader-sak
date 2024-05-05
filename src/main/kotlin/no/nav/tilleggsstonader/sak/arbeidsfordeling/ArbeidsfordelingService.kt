@@ -27,8 +27,8 @@ class ArbeidsfordelingService(
     }
 
     fun hentNavEnhetId(ident: String, oppgavetype: Oppgavetype, tema: Tema = Tema.TSO) = when (oppgavetype) {
-        Oppgavetype.VurderHenvendelse -> hentNavEnhetForOppfølging(ident, oppgavetype)?.enhetId
-        else -> hentNavEnhet(ident, tema)?.enhetId
+        Oppgavetype.VurderHenvendelse -> hentNavEnhetForOppfølging(ident, oppgavetype)?.enhetNr
+        else -> hentNavEnhet(ident, tema)?.enhetNr
     }
 
     fun hentNavEnhet(ident: String, tema: Tema = Tema.TSO): Arbeidsfordelingsenhet? {
@@ -45,7 +45,7 @@ class ArbeidsfordelingService(
     }
 
     fun hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(personIdent: String): String {
-        return hentNavEnhet(personIdent)?.enhetId ?: MASKINELL_JOURNALFOERENDE_ENHET
+        return hentNavEnhet(personIdent)?.enhetNr ?: MASKINELL_JOURNALFOERENDE_ENHET
     }
 
     private fun lagArbeidsfordelingKritierieForPerson(

@@ -67,7 +67,7 @@ class JournalførVedtaksbrevTask(
             forsøkFerdigstill = true,
             hoveddokumentvarianter = listOf(dokument),
             fagsakId = saksbehandling.eksternFagsakId.toString(),
-            journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(saksbehandling.ident)?.enhetId
+            journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(saksbehandling.ident)?.enhetNr
                 ?: error("Fant ikke arbeidsfordelingsenhet"),
             eksternReferanseId = eksternReferanseId,
             avsenderMottaker = lagAvsenderMottaker(brevmottaker),

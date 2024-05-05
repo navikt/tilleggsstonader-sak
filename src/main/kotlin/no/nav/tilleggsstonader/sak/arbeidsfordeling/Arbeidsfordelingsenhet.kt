@@ -1,3 +1,3 @@
 package no.nav.tilleggsstonader.sak.arbeidsfordeling
 
-data class Arbeidsfordelingsenhet(val enhetId: String, val enhetNavn: String)
+data class Arbeidsfordelingsenhet(val enhetNr: String, val navn: String)

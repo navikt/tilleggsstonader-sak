@@ -73,7 +73,7 @@ class FrittståendeBrevService(
             forsøkFerdigstill = true,
             hoveddokumentvarianter = listOf(dokument),
             fagsakId = fagsak.eksternId.id.toString(),
-            journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(ident)?.enhetId
+            journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(ident)?.enhetNr
                 ?: error("Fant ikke arbeidsfordelingsenhet"),
             avsenderMottaker = AvsenderMottaker(id = ident, idType = BrukerIdType.FNR, navn = null),
         )
