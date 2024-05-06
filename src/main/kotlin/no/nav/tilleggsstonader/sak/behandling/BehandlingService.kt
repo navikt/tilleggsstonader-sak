@@ -95,16 +95,6 @@ class BehandlingService(
     }
 
     @Transactional
-    fun opprettMigrering(fagsakId: UUID): Behandling {
-        return opprettBehandling(
-            behandlingType = BehandlingType.REVURDERING,
-            fagsakId = fagsakId,
-            behandlingsårsak = BehandlingÅrsak.MIGRERING,
-            erMigrering = true,
-        )
-    }
-
-    @Transactional
     fun opprettBehandling(
         behandlingType: BehandlingType,
         fagsakId: UUID,

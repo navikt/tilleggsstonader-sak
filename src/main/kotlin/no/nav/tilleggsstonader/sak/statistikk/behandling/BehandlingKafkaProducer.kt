@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.behandling
 
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.sak.infrastruktur.KafkaProducerService
 import org.slf4j.LoggerFactory
@@ -19,7 +20,12 @@ class BehandlingKafkaProducer(
         logger.info("Sending to Kafka topic: $topic")
         secureLogger.debug("Sending to Kafka topic: {}\nBehandlingstatistikk: {}", topic, behandlingDVH)
         runCatching {
-            kafkaProducerService.send(topic, behandlingDVH.behandlingId, behandlingDVH.toJson())
+            kafkaProducerService.sendMedStønadstypeIHeader(
+                topic,
+                Stønadstype.BARNETILSYN,
+                behandlingDVH.behandlingId,
+                behandlingDVH.toJson(),
+            )
             logger.info(
                 "Behandlingstatistikk for behandling=${behandlingDVH.behandlingId} " + "behandlingStatus=${behandlingDVH.behandlingStatus} sent til Kafka",
             )

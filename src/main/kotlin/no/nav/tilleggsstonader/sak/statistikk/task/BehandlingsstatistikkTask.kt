@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.statistikk.behandling.BehandlingsstatistikkService
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
+import no.nav.tilleggsstonader.sak.util.osloNow
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Properties
@@ -41,7 +42,7 @@ class BehandlingsstatistikkTask(
 
         fun opprettMottattTask(
             behandlingId: UUID,
-            hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
+            hendelseTidspunkt: LocalDateTime = osloNow(),
             oppgaveId: Long?,
         ): Task =
             opprettTask(
@@ -55,21 +56,21 @@ class BehandlingsstatistikkTask(
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.PÅBEGYNT,
-                hendelseTidspunkt = LocalDateTime.now(),
+                hendelseTidspunkt = osloNow(),
             )
 
         fun opprettVenterTask(behandlingId: UUID): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.VENTER,
-                hendelseTidspunkt = LocalDateTime.now(),
+                hendelseTidspunkt = osloNow(),
             )
 
         fun opprettVedtattTask(behandlingId: UUID): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.VEDTATT,
-                hendelseTidspunkt = LocalDateTime.now(),
+                hendelseTidspunkt = osloNow(),
             )
 
         fun opprettBesluttetTask(
@@ -78,21 +79,21 @@ class BehandlingsstatistikkTask(
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.BESLUTTET,
-                hendelseTidspunkt = LocalDateTime.now(),
+                hendelseTidspunkt = osloNow(),
             )
 
         fun opprettFerdigTask(behandlingId: UUID): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.FERDIG,
-                hendelseTidspunkt = LocalDateTime.now(),
+                hendelseTidspunkt = osloNow(),
             )
 
         private fun opprettTask(
             behandlingId: UUID,
             hendelse: Hendelse,
             oppgaveId: Long? = null,
-            hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
+            hendelseTidspunkt: LocalDateTime = osloNow(),
             gjeldendeSaksbehandler: String? = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
             behandlingMetode: BehandlingMetode? = BehandlingMetode.MANUELL,
         ): Task =

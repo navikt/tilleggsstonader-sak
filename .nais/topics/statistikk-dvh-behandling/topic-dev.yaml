@@ -18,3 +18,9 @@ spec:
     - team: tilleggsstonader
       application: tilleggsstonader-sak
       access: readwrite
+    - team: ptsak
+      application: pt-sak-tilleggsstonader-dev
+      access: read
+    - team: ptsak
+      application: pt-sak-tilleggsstonader-preprod
+      access: read

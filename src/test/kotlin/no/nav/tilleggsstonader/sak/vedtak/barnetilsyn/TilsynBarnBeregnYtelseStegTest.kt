@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -20,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -101,16 +101,5 @@ class TilsynBarnBeregnYtelseStegTest {
         verify(exactly = 0) {
             simuleringService.hentOgLagreSimuleringsresultat(any())
         }
-    }
-
-    @Test
-    fun `skal kaste feil hvis vedtaket inneholder beregningsresultat`() {
-        val vedtak = innvilgelseDto(
-            utgifter = mapOf(barn(barn.id, Utgift(måned, måned, 100))),
-            beregningsresultat = BeregningsresultatTilsynBarnDto(emptyList()),
-        )
-        assertThatThrownBy {
-            steg.utførSteg(saksbehandling, vedtak)
-        }.hasMessageContaining("Kan ikke sende inn beregningsresultat")
     }
 }

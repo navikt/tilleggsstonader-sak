@@ -10,7 +10,14 @@ import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailExce
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -74,25 +81,40 @@ class TilsynBarnVedtakControllerTest(
     }
 
     @Test
-    fun `utgifter på vedtaket skal være likt det man sender inn`() {
-        val vedtak = lagVedtak()
-        lagreVedtak(behandling, vedtak)
+    fun `Ved innvilgelse skal utgifter på vedtaket være likt det man sender inn`() {
+        val vedtak = lagInnvilgeVedtak()
+        innvilgeVedtak(behandling, vedtak)
 
         val lagretDto = hentVedtak(behandling.id).body!!
 
-        assertThat(lagretDto.utgifter).isEqualTo(vedtak.utgifter)
+        assertThat((lagretDto as InnvilgelseTilsynBarnDto).utgifter).isEqualTo(vedtak.utgifter)
+        assertThat(lagretDto.type).isEqualTo(TypeVedtak.INNVILGELSE)
     }
 
-    private fun lagVedtak() = InnvilgelseTilsynBarnDto(
+    @Test
+    fun `skal lagre og hente avslag`() {
+        val vedtak = AvslagRequest(
+            begrunnelse = "begrunnelse",
+        )
+
+        avslåVedtak(behandling, vedtak)
+
+        val lagretDto = hentVedtak(behandling.id).body!!
+
+        assertThat((lagretDto as AvslagTilsynBarnDto).begrunnelse).isEqualTo(vedtak.begrunnelse)
+        assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLAG)
+    }
+
+    private fun lagInnvilgeVedtak() = InnvilgelseTilsynBarnRequest(
         utgifter = mapOf(
             barn(barn.id, Utgift(YearMonth.of(2023, 1), YearMonth.of(2023, 1), 100)),
         ),
         beregningsresultat = null,
     )
 
-    private fun lagreVedtak(
+    private fun innvilgeVedtak(
         behandling: Behandling,
-        vedtak: InnvilgelseTilsynBarnDto,
+        vedtak: InnvilgelseTilsynBarnRequest,
     ) {
         restTemplate.exchange<Map<String, Any>?>(
             localhost("api/vedtak/tilsyn-barn/${behandling.id}"),
@@ -101,8 +123,19 @@ class TilsynBarnVedtakControllerTest(
         )
     }
 
+    private fun avslåVedtak(
+        behandling: Behandling,
+        vedtak: AvslagRequest,
+    ) {
+        restTemplate.exchange<Map<String, Any>?>(
+            localhost("api/vedtak/tilsyn-barn/${behandling.id}/avslag"),
+            HttpMethod.POST,
+            HttpEntity(vedtak, headers),
+        )
+    }
+
     private fun hentVedtak(behandlingId: UUID) =
-        restTemplate.exchange<InnvilgelseTilsynBarnDto>(
+        restTemplate.exchange<VedtakTilsynBarnDto>(
             localhost("api/vedtak/tilsyn-barn/$behandlingId"),
             HttpMethod.GET,
             HttpEntity(null, headers),

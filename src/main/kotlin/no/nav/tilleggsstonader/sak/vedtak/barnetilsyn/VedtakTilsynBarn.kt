@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import java.util.UUID
@@ -15,16 +17,21 @@ data class VedtakTilsynBarn(
     @Id
     val behandlingId: UUID,
     val type: TypeVedtak,
-    val vedtak: VedtaksdataTilsynBarn,
-    val beregningsresultat: VedtaksdataBeregningsresultat?,
+    val vedtak: VedtaksdataTilsynBarn? = null,
+    val beregningsresultat: VedtaksdataBeregningsresultat? = null,
+    val avslagBegrunnelse: String? = null,
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 ) {
     init {
         when (type) {
-            TypeVedtak.INNVILGET -> {
+            TypeVedtak.INNVILGELSE -> {
                 require(beregningsresultat != null) { "Mangler beregningsresultat for type=$type" }
+                require(vedtak != null) { "Mangler vedtak for type=$type" }
+            }
+            TypeVedtak.AVSLAG -> {
+                require(avslagBegrunnelse != null) { "Avslag må begrunnes" }
             }
         }
     }
