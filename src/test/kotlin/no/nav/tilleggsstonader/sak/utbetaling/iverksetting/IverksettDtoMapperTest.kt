@@ -18,8 +18,8 @@ class IverksettDtoMapperTest {
 
     val iverksettingId = UUID.randomUUID()
     val fagsak = fagsak(identer = setOf(PersonIdent("ident1")), eksternId = EksternFagsakId(200, UUID.randomUUID()))
-    val behandling = saksbehandling(fagsak = fagsak, behandling = behandling(vedtakstidspunkt = LocalDateTime.now()))
-    val iverksetting = Iverksetting(iverksettingId, LocalDateTime.now())
+    val behandling = saksbehandling(fagsak = fagsak, behandling = behandling(vedtakstidspunkt = osloNow()))
+    val iverksetting = Iverksetting(iverksettingId, osloNow())
     val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = 100, iverksetting = iverksetting)
     val totrinnskontroll = totrinnskontroll(
         status = TotrinnInternStatus.GODKJENT,

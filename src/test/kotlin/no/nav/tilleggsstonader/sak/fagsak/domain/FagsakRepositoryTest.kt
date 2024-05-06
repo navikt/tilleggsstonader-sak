@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -275,7 +276,7 @@ class FagsakRepositoryTest : IntegrationTest() {
     }
 
     private fun opprettFagsakMedFlereIdenter(ident: String = "1", ident2: String = "2", ident3: String = "3"): Fagsak {
-        val endret2DagerSiden = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2)))
+        val endret2DagerSiden = Sporbar(endret = Endret(endretTid = osloNow().plusDays(2)))
         return fagsak(
             setOf(
                 PersonIdent(ident = ident),

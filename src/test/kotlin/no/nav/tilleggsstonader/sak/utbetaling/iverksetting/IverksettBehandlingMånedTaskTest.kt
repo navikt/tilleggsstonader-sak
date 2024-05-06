@@ -21,8 +21,8 @@ class IverksettBehandlingMånedTaskTest {
     private val taskStep = IverksettBehandlingMånedTask(behandlingService, iverksettService)
 
     val fagsak = fagsak()
-    val behandling = behandling(fagsak, vedtakstidspunkt = LocalDateTime.now().minusDays(1))
-    val behandling2 = behandling(fagsak, forrigeBehandlingId = behandling.id, vedtakstidspunkt = LocalDateTime.now())
+    val behandling = behandling(fagsak, vedtakstidspunkt = osloNow().minusDays(1))
+    val behandling2 = behandling(fagsak, forrigeBehandlingId = behandling.id, vedtakstidspunkt = osloNow())
     val måned = YearMonth.now()
 
     @BeforeEach

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.util.DatoFormat.DATE_FORMAT_NORSK
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDato
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDatoMedTid
@@ -20,7 +21,7 @@ object DatoFormat {
 
 object DatoUtil {
 
-    fun dagensDatoMedTid(): LocalDateTime = LocalDateTime.now()
+    fun dagensDatoMedTid(): LocalDateTime = osloNow()
     fun dagensDato(): LocalDate = LocalDate.now()
     fun inneværendeÅr() = LocalDate.now().year
     fun årMånedNå() = YearMonth.now()
@@ -29,10 +30,6 @@ object DatoUtil {
 val YEAR_MONTH_MAX = YearMonth.from(LocalDate.MAX)
 
 fun antallÅrSiden(dato: LocalDate?) = dato?.let { Period.between(it, dagensDato()).years }
-
-val ZONE_ID_OSLO: ZoneId = ZoneId.of("Europe/Oslo")
-
-fun osloNow(): LocalDateTime = LocalDateTime.now(ZONE_ID_OSLO)
 
 fun LocalDate.norskFormat() = this.format(DATE_FORMAT_NORSK)
 
@@ -81,7 +78,7 @@ fun LocalDate.erEttÅrEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolea
 }
 
 fun LocalDateTime.harGåttAntallTimer(timer: Int) =
-    this.plusHours(timer.toLong()) < LocalDateTime.now()
+    this.plusHours(timer.toLong()) < osloNow()
 
 fun dagensDatoMedTidNorskFormat(): String = dagensDatoMedTid().medGosysTid()
 

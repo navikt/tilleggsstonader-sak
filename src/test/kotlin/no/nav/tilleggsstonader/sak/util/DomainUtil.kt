@@ -352,7 +352,7 @@ fun vedtak(
         inntekter = inntekter,
         saksbehandlerIdent = "VL",
         opprettetAv = "VL",
-        opprettetTid = LocalDateTime.now(),
+        opprettetTid = osloNow(),
     )
  */
 /*
@@ -372,7 +372,7 @@ fun vedtakBarnetilsyn(
     tilleggsstønad = TilleggsstønadWrapper(false, emptyList(), null),
     saksbehandlerIdent = "VL",
     opprettetAv = "VL",
-    opprettetTid = LocalDateTime.now(),
+    opprettetTid = osloNow(),
 )
  */
 /*

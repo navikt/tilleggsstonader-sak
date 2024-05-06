@@ -20,7 +20,7 @@ object BehandlingOppsettUtil {
             status = BehandlingStatus.FERDIGSTILT,
             resultat = BehandlingResultat.HENLAGT,
             vedtakstidspunkt = SporbarUtils.now(),
-            sporbar = Sporbar(opprettetTid = LocalDateTime.now().minusDays(4)),
+            sporbar = Sporbar(opprettetTid = osloNow().minusDays(4)),
         )
 
     val iverksattFørstegangsbehandling = behandling(fagsak)
@@ -29,7 +29,7 @@ object BehandlingOppsettUtil {
             status = BehandlingStatus.FERDIGSTILT,
             resultat = BehandlingResultat.INNVILGET,
             vedtakstidspunkt = SporbarUtils.now(),
-            sporbar = Sporbar(opprettetTid = LocalDateTime.now().minusDays(3)),
+            sporbar = Sporbar(opprettetTid = osloNow().minusDays(3)),
         )
 
     val henlagtRevurdering = behandling(fagsak)
@@ -38,7 +38,7 @@ object BehandlingOppsettUtil {
             status = BehandlingStatus.FERDIGSTILT,
             resultat = BehandlingResultat.HENLAGT,
             vedtakstidspunkt = SporbarUtils.now(),
-            sporbar = Sporbar(opprettetTid = LocalDateTime.now().minusDays(1)),
+            sporbar = Sporbar(opprettetTid = osloNow().minusDays(1)),
         )
 
     private val revurderingUnderArbeid = behandling(fagsak)

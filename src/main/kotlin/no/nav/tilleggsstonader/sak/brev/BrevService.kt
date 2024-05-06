@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.brev
 
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -87,7 +88,7 @@ class BrevService(
             besluttersignatur = beslutterSignatur,
             beslutterIdent = beslutterIdent,
             beslutterPdf = beslutterPdf,
-            besluttetTid = LocalDateTime.now(),
+            besluttetTid = osloNow(),
         )
         vedtaksbrevRepository.update(besluttervedtaksbrev)
         return Fil(bytes = beslutterPdf.bytes)

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -74,7 +75,7 @@ class IverksettService(
         val andelerTilIverksetting = finnAndelerTilIverksetting(tilkjentYtelse, tilkjentYtelse.behandlingId, måned)
 
         return andelerTilIverksetting.ifEmpty {
-            val iverksetting = Iverksetting(tilkjentYtelse.behandlingId, LocalDateTime.now())
+            val iverksetting = Iverksetting(tilkjentYtelse.behandlingId, osloNow())
 
             listOf(tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned))
         }
@@ -144,7 +145,7 @@ class IverksettService(
         måned: YearMonth,
     ): List<AndelTilkjentYtelse> {
         val sisteDagenIMåneden = måned.atEndOfMonth()
-        val iverksetting = Iverksetting(iverksettingId, LocalDateTime.now())
+        val iverksetting = Iverksetting(iverksettingId, osloNow())
         val aktuelleAndeler = tilkjentYtelse.andelerTilkjentYtelse
             .filter { it.tom <= sisteDagenIMåneden }
             .map {

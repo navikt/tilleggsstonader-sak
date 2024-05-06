@@ -5,6 +5,7 @@ import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Properties
@@ -55,7 +56,7 @@ class HentStatusFraIverksettingTask(
                     setProperty("eksternBehandlingId", eksternBehandlingId.toString())
                     setProperty("iverksettingId", iverksettingId.toString())
                 },
-            ).copy(triggerTid = LocalDateTime.now().plusSeconds(31))
+            ).copy(triggerTid = osloNow().plusSeconds(31))
         }
 
         const val TYPE = "statusFraIverksetting"

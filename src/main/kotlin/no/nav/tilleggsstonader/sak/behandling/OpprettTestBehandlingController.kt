@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.OppholdUtenforNorg
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -126,7 +127,7 @@ class OpprettTestBehandlingController(
         )
         val skjema = Søknadsskjema(
             ident = fagsak.hentAktivIdent(),
-            mottattTidspunkt = LocalDateTime.now(),
+            mottattTidspunkt = osloNow(),
             språk = Språkkode.NB,
             skjema = skjemaBarnetilsyn,
         )

@@ -34,7 +34,7 @@ object SøknadUtil {
 
     fun søknadskjemaBarnetilsyn(
         ident: String = "søker",
-        mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
+        mottattTidspunkt: LocalDateTime = osloNow(),
         barnMedBarnepass: List<BarnMedBarnepass> = listOf(barnMedBarnepass()),
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
     ): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
