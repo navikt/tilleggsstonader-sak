@@ -35,14 +35,14 @@ class VedtaksstatistikkDvh(
     val behandlingType: BehandlingTypeDvh,
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
-    val vedtaksperioder: `List<VedtaksperiodeDvh>`,
+    val vedtaksperioder: List<VedtaksperiodeDvh>,
     val utbetalinger: List<UtbetalingDvh>,
     val stønadstype: StønadstypeDvh = BARNETILSYN,
-    val kravMottatt: LocalDate,
+    val kravMottatt: LocalDate?,
     val årsakRevurdering: ÅrsakRevurderingDvh? = null,
     val avslagÅrsak: AvslagÅrsakDvh? = null,
 
-    )
+)
 
 enum class StønadstypeDvh {
     BARNETILSYN,
@@ -51,7 +51,13 @@ enum class StønadstypeDvh {
 data class UtbetalingDvh(
     val utbetalingsdato: LocalDate,
     val beløp: Int,
-)
+) {
+    companion object {
+        fun fraDomene(hentAndelTilkjentYtelse: List<AndelTilkjentYtelse>): List<UtbetalingDvh> = hentAndelTilkjentYtelse.map {
+            UtbetalingDvh(utbetalingsdato = it.fom, beløp = it.beløp)
+        }
+    }
+}
 
 enum class SatstypeDvh {
     DAGLIG,
@@ -70,7 +76,6 @@ data class VedtaksperiodeDvh(
         }
     }
 }
-
 
 enum class VedtakResultatDvh {
     INNVILGET,
@@ -128,7 +133,6 @@ data class BarnDvh(
         fun fraDomene(behandlingBarn: List<BehandlingBarn>): List<BarnDvh> {
             return behandlingBarn.map { BarnDvh(fnr = it.ident) }
         }
-
     }
 }
 
@@ -167,7 +171,6 @@ data class MålgruppeDvh(
         }
     }
 }
-
 
 enum class ResultatVilkårperiodeDvh {
     OPPFYLT,
@@ -257,7 +260,7 @@ data class VilkårsvurderingDvh(
     companion object {
         fun fraDomene(delvilkår: List<DelvilkårDto>, resultat: Vilkårsresultat) = VilkårsvurderingDvh(
             resultat = VilkårsresultatDvh.fraDomene(resultat),
-            vilkår = DelvilkårDvh.fraDomene(delvilkår)
+            vilkår = DelvilkårDvh.fraDomene(delvilkår),
         )
     }
 }
@@ -271,7 +274,8 @@ data class DelvilkårDvh(
             return delvilkår.map {
                 DelvilkårDvh(
                     resultat = it.resultat,
-                    vurderinger = it.vurderinger.map { vurdering -> vurdering.regelId })
+                    vurderinger = it.vurderinger.map { vurdering -> vurdering.regelId },
+                )
             }
         }
     }

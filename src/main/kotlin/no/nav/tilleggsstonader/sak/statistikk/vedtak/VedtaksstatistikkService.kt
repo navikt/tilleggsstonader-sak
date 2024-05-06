@@ -23,18 +23,14 @@ class VedtaksstatistikkService(
     private val behandlingBarnService: BarnService,
     private val iverksettService: IverksettService,
 
-
-    ) {
+) {
     fun lagreVedtaksstatistikk(behandlingId: UUID, fagsakId: UUID, hendelseTidspunkt: LocalDateTime) {
-
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId)
 
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
 
         val vilkårsvurderinger = vilkårService.hentVilkårsett(behandlingId)
-
-
 
         vedtaksstatistikkRepository.lagreVedtaksstatistikk(
             VedtaksstatistikkDvh(
@@ -53,25 +49,28 @@ class VedtaksstatistikkService(
                     )
                 },
                 person = personIdent,
-                barn = BarnDvh.fraDomene(behandlingBarnService.finnBarnPåBehandling(behandlingId)) ,
-                behandlingType = BehandlingTypeDvh.FØRSTEGANGSBEHANDLING, //TODO legge til revurdering når den er klar
+                barn = BarnDvh.fraDomene(behandlingBarnService.finnBarnPåBehandling(behandlingId)),
+                behandlingType = BehandlingTypeDvh.FØRSTEGANGSBEHANDLING, // TODO legge til revurdering når den er klar
                 behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandlingService.hentBehandling(behandlingId).årsak),
                 vedtakResultat = VedtakResultatDvh.fraDomene(behandlingService.hentBehandling(behandlingId).resultat),
                 vedtaksperioder = VedtaksperiodeDvh.fraDomene(iverksettService.hentAndelTilkjentYtelse(behandlingId)),
-                utbetalinger =
-            )
+                utbetalinger = UtbetalingDvh.fraDomene(iverksettService.hentAndelTilkjentYtelse(behandlingId)),
+                kravMottatt = behandlingService.hentBehandling(behandlingId).kravMottatt,
+                årsakRevurdering = null, // TODO implementer når revurdering er på plass.
+                avslagÅrsak = null, // TODO implementert når avslag er satt opp i saksbehandling
+            ),
 
+        )
     }
 
     private fun hentAdressebeskyttelse(personIdent: String) = AdressebeskyttelseDvh.fraDomene(
         personService.hentPersonKortBolk(
-            listOf(personIdent)
-        ).values.single().adressebeskyttelse.gradering()
+            listOf(personIdent),
+        ).values.single().adressebeskyttelse.gradering(),
     )
 
     private fun hentRelatertBehandlingId(behandlingId: UUID) =
         behandlingService.hentSaksbehandling(behandlingId).forrigeBehandlingId?.let {
             behandlingService.hentEksternBehandlingId(it)
         }?.id
-
 }

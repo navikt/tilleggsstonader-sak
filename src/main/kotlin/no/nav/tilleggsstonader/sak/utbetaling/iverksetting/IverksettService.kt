@@ -159,7 +159,7 @@ class IverksettService(
                 } else {
                     feilHvisIkke(it.statusIverksetting.erOk()) {
                         "Kan ikke iverksette behandling=${tilkjentYtelse.behandlingId} iverksetting=$iverksettingId " +
-                                "når det finnes tidligere andeler med annen status enn OK/UBEHANDLET"
+                            "når det finnes tidligere andeler med annen status enn OK/UBEHANDLET"
                     }
                     it
                 }
