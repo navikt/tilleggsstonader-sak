@@ -23,14 +23,13 @@ class VedtaksstatistikkService(
     private val behandlingBarnService: BarnService,
     private val iverksettService: IverksettService,
 
-) {
+    ) {
     fun lagreVedtaksstatistikk(behandlingId: UUID, fagsakId: UUID, hendelseTidspunkt: LocalDateTime) {
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
-        val vedtak = vedtakService.hentVedtak(behandlingId)
-
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
-
         val vilkårsvurderinger = vilkårService.hentVilkårsett(behandlingId)
+        val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
+        val behandling = behandlingService.hentBehandling(behandlingId)
 
         vedtaksstatistikkRepository.lagreVedtaksstatistikk(
             VedtaksstatistikkDvh(
@@ -51,15 +50,14 @@ class VedtaksstatistikkService(
                 person = personIdent,
                 barn = BarnDvh.fraDomene(behandlingBarnService.finnBarnPåBehandling(behandlingId)),
                 behandlingType = BehandlingTypeDvh.FØRSTEGANGSBEHANDLING, // TODO legge til revurdering når den er klar
-                behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandlingService.hentBehandling(behandlingId).årsak),
-                vedtakResultat = VedtakResultatDvh.fraDomene(behandlingService.hentBehandling(behandlingId).resultat),
-                vedtaksperioder = VedtaksperiodeDvh.fraDomene(iverksettService.hentAndelTilkjentYtelse(behandlingId)),
-                utbetalinger = UtbetalingDvh.fraDomene(iverksettService.hentAndelTilkjentYtelse(behandlingId)),
-                kravMottatt = behandlingService.hentBehandling(behandlingId).kravMottatt,
+                behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
+                vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
+                vedtaksperioder = VedtaksperiodeDvh.fraDomene(andelTilkjentYtelse),
+                utbetalinger = UtbetalingDvh.fraDomene(andelTilkjentYtelse),
+                kravMottatt = behandling.kravMottatt,
                 årsakRevurdering = null, // TODO implementer når revurdering er på plass.
                 avslagÅrsak = null, // TODO implementert når avslag er satt opp i saksbehandling
             ),
-
         )
     }
 

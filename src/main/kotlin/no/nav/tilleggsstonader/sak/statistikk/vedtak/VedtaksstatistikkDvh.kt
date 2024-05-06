@@ -16,7 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 // TODO: Vurder om dette bør flyttes til kontrakter
 
@@ -42,7 +42,7 @@ class VedtaksstatistikkDvh(
     val årsakRevurdering: ÅrsakRevurderingDvh? = null,
     val avslagÅrsak: AvslagÅrsakDvh? = null,
 
-)
+    )
 
 enum class StønadstypeDvh {
     BARNETILSYN,
@@ -53,7 +53,7 @@ data class UtbetalingDvh(
     val beløp: Int,
 ) {
     companion object {
-        fun fraDomene(hentAndelTilkjentYtelse: List<AndelTilkjentYtelse>): List<UtbetalingDvh> = hentAndelTilkjentYtelse.map {
+        fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = ytelser.map {
             UtbetalingDvh(utbetalingsdato = it.fom, beløp = it.beløp)
         }
     }
