@@ -14,7 +14,7 @@ import java.util.UUID
 
 @Service
 class VedtaksstatistikkService(
-    private val vedtaksstatistikkRepository: error.NonExistentClass,
+    private val vedtaksstatistikkRepository: VedtakstatistikkRepository,
     private val behandlingService: BehandlingService,
     private val personService: PersonService,
     private val vedtakService: TilsynBarnVedtakService,
