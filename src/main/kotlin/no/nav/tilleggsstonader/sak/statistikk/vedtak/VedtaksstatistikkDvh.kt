@@ -42,7 +42,7 @@ class VedtaksstatistikkDvh(
     val årsakRevurdering: ÅrsakRevurderingDvh? = null,
     val avslagÅrsak: AvslagÅrsakDvh? = null,
 
-    )
+)
 
 enum class StønadstypeDvh {
     BARNETILSYN,
