@@ -67,8 +67,8 @@ class VedtaksstatistikkService(
         ).values.single().adressebeskyttelse.gradering(),
     )
 
-    private fun hentRelatertBehandlingId(behandlingId: UUID) =
-        behandlingService.hentSaksbehandling(behandlingId).forrigeBehandlingId?.let {
+    private fun hentRelatertBehandlingId(behandling: Behandling) =
+        behandling.forrigeBehandlingId?.let {
             behandlingService.hentEksternBehandlingId(it)
         }?.id
 }
