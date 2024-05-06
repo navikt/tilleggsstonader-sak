@@ -42,7 +42,7 @@ class VedtaksstatistikkDvh(
     val årsakRevurdering: ÅrsakRevurderingDvh? = null,
     val avslagÅrsak: AvslagÅrsakDvh? = null,
 
-)
+    )
 
 enum class StønadstypeDvh {
     BARNETILSYN,
@@ -81,8 +81,6 @@ enum class VedtakResultatDvh {
     INNVILGET,
     AVSLÅTT,
     OPPHØRT,
-    IKKE_SATT,
-    HENLAGT,
     ;
 
     companion object {
@@ -91,8 +89,8 @@ enum class VedtakResultatDvh {
                 BehandlingResultat.INNVILGET -> INNVILGET
                 BehandlingResultat.OPPHØRT -> OPPHØRT
                 BehandlingResultat.AVSLÅTT -> AVSLÅTT
-                BehandlingResultat.IKKE_SATT -> IKKE_SATT
-                BehandlingResultat.HENLAGT -> HENLAGT
+                BehandlingResultat.IKKE_SATT, BehandlingResultat.HENLAGT ->
+                    throw IllegalStateException("Skal ikke sende vedtaksstatistikk i disse tilfellene.")
             }
         }
     }
