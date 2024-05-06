@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.StønadstypeDvh.BARNETILSYN
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -34,7 +35,7 @@ class VedtaksstatistikkDvh(
     val behandlingType: BehandlingTypeDvh,
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
-    val vedtaksperioder: VedtaksperioderDvh,
+    val vedtaksperioder: `List<VedtaksperiodeDvh>`,
     val utbetalinger: List<UtbetalingDvh>,
     val stønadstype: StønadstypeDvh = BARNETILSYN,
     val kravMottatt: LocalDate,
@@ -48,21 +49,28 @@ enum class StønadstypeDvh {
 }
 
 data class UtbetalingDvh(
-    val gyldigFom: LocalDate,
-    val gyldigTom: LocalDate,
+    val utbetalingsdato: LocalDate,
     val beløp: Int,
-    val satstype: SatstypeDvh = SatstypeDvh.DAGLIG,
 )
 
 enum class SatstypeDvh {
     DAGLIG,
 }
 
-data class VedtaksperioderDvh(
+data class VedtaksperiodeDvh(
     val fomDato: LocalDate,
     val tomDato: LocalDate,
     val utgifter: Int,
-)
+) {
+    companion object {
+        // TODO: Map fra faktiske vedtaksperioder når vi har det (også relatert til revurdering)
+
+        fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = ytelser.map {
+            VedtaksperiodeDvh(fomDato = it.fom, tomDato = it.tom, utgifter = it.beløp)
+        }
+    }
+}
+
 
 enum class VedtakResultatDvh {
     INNVILGET,
@@ -71,15 +79,16 @@ enum class VedtakResultatDvh {
     IKKE_SATT,
     HENLAGT,
     ;
+
     companion object {
         fun fraDomene(behandlingResultat: BehandlingResultat): VedtakResultatDvh {
-         return when (behandlingResultat)  {
-             BehandlingResultat.INNVILGET -> INNVILGET
-             BehandlingResultat.OPPHØRT -> OPPHØRT
-             BehandlingResultat.AVSLÅTT -> AVSLÅTT
-             BehandlingResultat.IKKE_SATT -> IKKE_SATT
-             BehandlingResultat.HENLAGT -> HENLAGT
-         }
+            return when (behandlingResultat) {
+                BehandlingResultat.INNVILGET -> INNVILGET
+                BehandlingResultat.OPPHØRT -> OPPHØRT
+                BehandlingResultat.AVSLÅTT -> AVSLÅTT
+                BehandlingResultat.IKKE_SATT -> IKKE_SATT
+                BehandlingResultat.HENLAGT -> HENLAGT
+            }
         }
     }
 }
@@ -114,12 +123,14 @@ enum class BehandlingTypeDvh {
 
 data class BarnDvh(
     val fnr: String,
-) { companion object {
-    fun fraDomene(behandlingBarn: List<BehandlingBarn>): List<BarnDvh>  {
-     return behandlingBarn.map{ BarnDvh(fnr = it.ident) }
-    }
+) {
+    companion object {
+        fun fraDomene(behandlingBarn: List<BehandlingBarn>): List<BarnDvh> {
+            return behandlingBarn.map { BarnDvh(fnr = it.ident) }
+        }
 
-}}
+    }
+}
 
 data class AktivitetDvh(
     val type: AktivitetTypeDvh,

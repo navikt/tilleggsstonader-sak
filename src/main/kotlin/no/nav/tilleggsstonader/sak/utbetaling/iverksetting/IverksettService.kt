@@ -69,6 +69,9 @@ class IverksettService(
         iverksettClient.iverksett(dto)
     }
 
+    fun hentAndelTilkjentYtelse(behandlingId: UUID) =
+        andelTilkjentYtelseRepository.findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId)
+
     private fun andelerForFørsteIverksettingAvBehandling(tilkjentYtelse: TilkjentYtelse): Collection<AndelTilkjentYtelse> {
         val måned = YearMonth.now()
         val andelerTilIverksetting = finnAndelerTilIverksetting(tilkjentYtelse, tilkjentYtelse.behandlingId, måned)
@@ -156,7 +159,7 @@ class IverksettService(
                 } else {
                     feilHvisIkke(it.statusIverksetting.erOk()) {
                         "Kan ikke iverksette behandling=${tilkjentYtelse.behandlingId} iverksetting=$iverksettingId " +
-                            "når det finnes tidligere andeler med annen status enn OK/UBEHANDLET"
+                                "når det finnes tidligere andeler med annen status enn OK/UBEHANDLET"
                     }
                     it
                 }
