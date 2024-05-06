@@ -7,6 +7,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksstatistikkService
+import no.nav.tilleggsstonader.sak.util.osloNow
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Properties
@@ -35,8 +36,8 @@ class VedtaksstatistikkTask(
         fun opprettVedtaksstatistikkTask(
             behandlingId: UUID,
             fagsakId: UUID,
-            hendelseTidspunkt: LocalDateTime,
-            stønadstype: Stønadstype,
+            hendelseTidspunkt: LocalDateTime = osloNow(),
+            stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
         ): Task =
             Task(
                 type = TYPE,
