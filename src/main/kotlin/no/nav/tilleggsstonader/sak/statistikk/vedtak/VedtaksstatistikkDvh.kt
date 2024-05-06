@@ -2,10 +2,12 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.StønadstypeDvh.BARNETILSYN
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -40,39 +42,35 @@ class VedtaksstatistikkDvh(
     val stønadstype: StønadstypeDvh = BARNETILSYN,
     val kravMottatt: LocalDate?,
     val årsakRevurdering: ÅrsakRevurderingDvh? = null,
-    val avslagÅrsak: AvslagÅrsakDvh? = null,
+    val avslagÅrsak: String? = null,
 
-    )
+)
 
 enum class StønadstypeDvh {
     BARNETILSYN,
 }
 
 data class UtbetalingDvh(
-    val utbetalingsdato: LocalDate,
+    val fraOgMed: LocalDate,
+    val tilOgMed: LocalDate,
     val beløp: Int,
 ) {
     companion object {
         fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = ytelser.map {
-            UtbetalingDvh(utbetalingsdato = it.fom, beløp = it.beløp)
+            UtbetalingDvh(fraOgMed = it.fom, tilOgMed = it.tom, beløp = it.beløp)
         }
     }
 }
 
-enum class SatstypeDvh {
-    DAGLIG,
-}
-
 data class VedtaksperiodeDvh(
-    val fomDato: LocalDate,
-    val tomDato: LocalDate,
-    val utgifter: Int,
+    val fraOgMed: LocalDate,
+    val tilOgMed: LocalDate,
 ) {
     companion object {
         // TODO: Map fra faktiske vedtaksperioder når vi har det (også relatert til revurdering)
 
-        fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = ytelser.map {
-            VedtaksperiodeDvh(fomDato = it.fom, tomDato = it.tom, utgifter = it.beløp)
+        fun fraDomene(ytelser: List<StønadsperiodeDto>) = ytelser.map {
+            VedtaksperiodeDvh(fraOgMed = it.fom, tilOgMed = it.tom)
         }
     }
 }
@@ -122,6 +120,14 @@ enum class BehandlingÅrsakDvh {
 enum class BehandlingTypeDvh {
     FØRSTEGANGSBEHANDLING,
     REVURDERING,
+    ;
+
+    companion object {
+        fun fraDomene(type: BehandlingType) = when (type) {
+            BehandlingType.FØRSTEGANGSBEHANDLING -> FØRSTEGANGSBEHANDLING
+            BehandlingType.REVURDERING -> REVURDERING
+        }
+    }
 }
 
 data class BarnDvh(
@@ -295,10 +301,6 @@ enum class AdressebeskyttelseDvh {
                 AdressebeskyttelseGradering.UGRADERT -> UGRADERT
             }
     }
-}
-
-enum class AvslagÅrsakDvh {
-    // TODO når vi får avslag i løsningen
 }
 
 enum class ÅrsakRevurderingDvh {
