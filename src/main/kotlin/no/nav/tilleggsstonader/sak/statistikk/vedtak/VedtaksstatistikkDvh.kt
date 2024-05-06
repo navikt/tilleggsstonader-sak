@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import org.springframework.data.annotation.Id
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -23,8 +24,11 @@ import java.util.UUID
 // TODO: Vurder om dette bør flyttes til kontrakter
 
 class VedtaksstatistikkDvh(
+    @Id
+    val id: UUID = UUID.randomUUID(),
     val fagsakId: UUID,
     val behandlingId: UUID,
+    val eksternFagsakId: Long,
     val eksternBehandlingId: Long,
     val relatertBehandlingId: Long?, // Ekstern behandlingsid på relatert behandling
     val adressebeskyttelse: AdressebeskyttelseDvh,
@@ -43,7 +47,6 @@ class VedtaksstatistikkDvh(
     val kravMottatt: LocalDate?,
     val årsakRevurdering: ÅrsakRevurderingDvh? = null,
     val avslagÅrsak: String? = null,
-
 )
 
 enum class StønadstypeDvh {

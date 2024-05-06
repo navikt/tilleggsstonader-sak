@@ -27,21 +27,23 @@ class VedtaksstatistikkService(
     private val iverksettService: IverksettService,
     private val stønadsperiodeService: StønadsperiodeService,
 
-) {
+    ) {
     fun lagreVedtaksstatistikk(behandlingId: UUID, fagsakId: UUID, hendelseTidspunkt: LocalDateTime) {
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         val vilkårsvurderinger = vilkårService.hentVilkårsett(behandlingId)
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
         val behandling = behandlingService.hentBehandling(behandlingId)
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val avslagÅrsak = utledAvslagÅrsak(behandlingId)
         val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
 
-        vedtaksstatistikkRepository.lagreVedtaksstatistikk(
+        vedtaksstatistikkRepository.insert(
             VedtaksstatistikkDvh(
                 fagsakId = fagsakId,
                 behandlingId = behandlingId,
-                eksternBehandlingId = behandlingService.hentEksternBehandlingId(behandlingId).id,
+                eksternFagsakId = saksbehandling.eksternFagsakId,
+                eksternBehandlingId = saksbehandling.eksternId,
                 relatertBehandlingId = hentRelatertBehandlingId(behandling),
                 adressebeskyttelse = hentAdressebeskyttelse(personIdent),
                 tidspunktVedtak = hendelseTidspunkt,

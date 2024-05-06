@@ -1,0 +1,25 @@
+CREATE TABLE vedtaksstatistikk
+(
+    id                   UUID PRIMARY KEY,
+    fagsakId             UUID    NOT NULL,
+    behandlingId         UUID    NOT NULL,
+    eksternFagsakId      VARCHAR,
+    eksternBehandlingId  VARCHAR,
+    relatertBehandlingId VARCHAR,
+    adressebeskyttelse   VARCHAR,
+    tidspunktVedtak      TIMESTAMP,
+    målgruppe            JSON,
+    aktivitet            JSON,
+    vilkårsvurderinger   JSON,
+    person               VARCHAR NOT NULL,
+    barn                 JSON,
+    behandlingType       VARCHAR,
+    behandlingÅrsak      VARCHAR,
+    vedtakResultat       VARCHAR,
+    vedtaksperioder      JSON    NOT NULL,
+    utbetalinger         JSON    NOT NULL,
+    stønadstype          VARCHAR,
+    kravMottatt          DATE,
+    årsakRevurdering     VARCHAR,
+    avslagÅrsak          VARCHAR
+);
