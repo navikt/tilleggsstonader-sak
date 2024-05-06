@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryI
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 @Repository
 interface AndelTilkjentYtelseRepository :
@@ -21,4 +21,6 @@ interface AndelTilkjentYtelseRepository :
         """,
     )
     fun finnBehandlingerForIverksetting(sisteDatoIMåned: LocalDate): List<UUID>
+
+    fun findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId: UUID): List<AndelTilkjentYtelse>
 }
