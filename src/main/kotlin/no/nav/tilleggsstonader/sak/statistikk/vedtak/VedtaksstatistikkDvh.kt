@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
+import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.StønadstypeDvh.BARNETILSYN
@@ -13,7 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 // TODO: Vurder om dette bør flyttes til kontrakter
 
@@ -66,6 +68,20 @@ enum class VedtakResultatDvh {
     INNVILGET,
     AVSLÅTT,
     OPPHØRT,
+    IKKE_SATT,
+    HENLAGT,
+    ;
+    companion object {
+        fun fraDomene(behandlingResultat: BehandlingResultat): VedtakResultatDvh {
+         return when (behandlingResultat)  {
+             BehandlingResultat.INNVILGET -> INNVILGET
+             BehandlingResultat.OPPHØRT -> OPPHØRT
+             BehandlingResultat.AVSLÅTT -> AVSLÅTT
+             BehandlingResultat.IKKE_SATT -> IKKE_SATT
+             BehandlingResultat.HENLAGT -> HENLAGT
+         }
+        }
+    }
 }
 
 enum class BehandlingÅrsakDvh {
@@ -98,7 +114,12 @@ enum class BehandlingTypeDvh {
 
 data class BarnDvh(
     val fnr: String,
-)
+) { companion object {
+    fun fraDomene(behandlingBarn: List<BehandlingBarn>): List<BarnDvh>  {
+     return behandlingBarn.map{ BarnDvh(fnr = it.ident) }
+    }
+
+}}
 
 data class AktivitetDvh(
     val type: AktivitetTypeDvh,
@@ -135,6 +156,7 @@ data class MålgruppeDvh(
         }
     }
 }
+
 
 enum class ResultatVilkårperiodeDvh {
     OPPFYLT,

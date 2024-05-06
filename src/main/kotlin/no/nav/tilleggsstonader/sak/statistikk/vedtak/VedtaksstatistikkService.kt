@@ -2,9 +2,12 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
@@ -20,6 +23,7 @@ class VedtaksstatistikkService(
     private val vilkårService: VilkårService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val behandlingBarnService: BarnService,
+    private val iverksettService: IverksettService,
 
 
     ) {
@@ -31,6 +35,7 @@ class VedtaksstatistikkService(
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
 
         val vilkårsvurderinger = vilkårService.hentVilkårsett(behandlingId)
+
 
 
         vedtaksstatistikkRepository.lagreVedtaksstatistikk(
@@ -49,7 +54,12 @@ class VedtaksstatistikkService(
                         delvilkår = it.delvilkårsett,
                     )
                 },
-                person =
+                person = personIdent,
+                barn = BarnDvh.fraDomene(behandlingBarnService.finnBarnPåBehandling(behandlingId)) ,
+                behandlingType = BehandlingTypeDvh.FØRSTEGANGSBEHANDLING, //TODO legge til revurdering når den er klar
+                behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandlingService.hentBehandling(behandlingId).årsak),
+                vedtakResultat = VedtakResultatDvh.fraDomene(behandlingService.hentBehandling(behandlingId).resultat),
+                vedtaksperioder = TODO(),
             )
 
     }
