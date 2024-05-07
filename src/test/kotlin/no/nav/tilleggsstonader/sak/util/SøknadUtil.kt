@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year

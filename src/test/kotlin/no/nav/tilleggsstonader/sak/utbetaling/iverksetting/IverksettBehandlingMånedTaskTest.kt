@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.util.behandling
