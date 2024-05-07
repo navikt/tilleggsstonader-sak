@@ -51,8 +51,8 @@ data class Vilkårperiode(
         validerSlettefelter()
     }
 
-    private fun validerAktivitetsdager(){
-        if(type is AktivitetType) {
+    private fun validerAktivitetsdager() {
+        if (type is AktivitetType) {
             if (type === AktivitetType.INGEN_AKTIVITET) {
                 brukerfeilHvis(aktivitetsdager != null) { "Kan ikke registrere aktivitetsdager på ingen aktivitet" }
             } else {
@@ -62,7 +62,7 @@ data class Vilkårperiode(
             }
         }
 
-        if(type is MålgruppeType) {
+        if (type is MålgruppeType) {
             brukerfeilHvis(aktivitetsdager !== null) { "Kan ikke registrere aktivitetsdager på målgruppe" }
         }
     }
@@ -76,13 +76,13 @@ data class Vilkårperiode(
     }
 
     private fun validerBegrunnelseIngenAktivitetEllerMålgruppe() {
-        if (type === AktivitetType.INGEN_AKTIVITET){
+        if (type === AktivitetType.INGEN_AKTIVITET) {
             brukerfeilHvis(begrunnelse.isNullOrBlank()) {
                 "Mangler begrunnelse for ingen aktivitet"
             }
         }
 
-        if (type === MålgruppeType.INGEN_MÅLGRUPPE){
+        if (type === MålgruppeType.INGEN_MÅLGRUPPE) {
             brukerfeilHvis(begrunnelse.isNullOrBlank()) {
                 "Mangler begrunnelse for ingen målgruppe"
             }

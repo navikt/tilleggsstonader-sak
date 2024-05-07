@@ -188,7 +188,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                             begrunnelse = "",
                             type = AktivitetType.INGEN_AKTIVITET,
                             behandlingId = behandling.id,
-                            aktivitetsdager = null
+                            aktivitetsdager = null,
                         ),
                     )
                 }.hasMessageContaining("Mangler begrunnelse for ingen aktivitet")
@@ -199,7 +199,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                             begrunnelse = null,
                             type = AktivitetType.INGEN_AKTIVITET,
                             behandlingId = behandling.id,
-                            aktivitetsdager = null
+                            aktivitetsdager = null,
                         ),
                     )
                 }.hasMessageContaining("Mangler begrunnelse for ingen aktivitet")
@@ -235,7 +235,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                             begrunnelse = "Begrunnelse",
                             type = AktivitetType.INGEN_AKTIVITET,
                             behandlingId = behandling.id,
-                            aktivitetsdager = 5
+                            aktivitetsdager = 5,
                         ),
                     )
                 }.hasMessageContaining("Kan ikke registrere aktivitetsdager på ingen aktivitet")

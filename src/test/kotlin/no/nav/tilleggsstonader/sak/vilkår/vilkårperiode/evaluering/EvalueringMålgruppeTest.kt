@@ -145,7 +145,7 @@ class EvalueringMålgruppeTest {
         }
 
         @Test
-        fun `ingen målgruppe skal mappes til ikke oppfylt`(){
+        fun `ingen målgruppe skal mappes til ikke oppfylt`() {
             val resultat = utledResultat(
                 MålgruppeType.INGEN_MÅLGRUPPE,
                 delvilkårMålgruppeDto(

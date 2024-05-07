@@ -34,7 +34,7 @@ object EvalueringMålgruppe {
         type: MålgruppeType,
         delvilkår: DelvilkårMålgruppe,
     ): ResultatVilkårperiode {
-        if(type == MålgruppeType.INGEN_MÅLGRUPPE) {
+        if (type == MålgruppeType.INGEN_MÅLGRUPPE) {
             return ResultatVilkårperiode.IKKE_OPPFYLT
         }
 

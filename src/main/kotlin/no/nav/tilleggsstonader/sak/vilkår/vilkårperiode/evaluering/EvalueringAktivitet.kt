@@ -61,10 +61,10 @@ object EvalueringAktivitet {
         delvilkår = DelvilkårAktivitet(
             lønnet = DelvilkårVilkårperiode.Vurdering(
                 svar = null,
-                resultat = ResultatDelvilkårperiode.IKKE_AKTUELT
+                resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
             ),
         ),
-        resultat = ResultatVilkårperiode.IKKE_OPPFYLT
+        resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
     )
 
     private fun utledResultatLønnet(svar: SvarJaNei?) = when (svar) {
