@@ -27,7 +27,7 @@ class VedtaksstatistikkService(
     private val iverksettService: IverksettService,
     private val stønadsperiodeService: StønadsperiodeService,
 
-    ) {
+) {
     fun lagreVedtaksstatistikk(behandlingId: UUID, fagsakId: UUID, hendelseTidspunkt: LocalDateTime) {
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
