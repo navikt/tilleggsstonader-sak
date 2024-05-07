@@ -15,7 +15,7 @@ object EvalueringMålgruppe {
 
     fun utledResultat(type: MålgruppeType, delvilkår: DelvilkårMålgruppeDto): ResultatEvaluering {
         val oppdatertDelvilkår = utledVurderingerDelvilkår(type, delvilkår)
-        val resultatMålgruppe = utledResultatVilkårperiode(oppdatertDelvilkår)
+        val resultatMålgruppe = utledResultatVilkårperiode(type, oppdatertDelvilkår)
 
         return ResultatEvaluering(delvilkår = oppdatertDelvilkår, resultat = resultatMålgruppe)
     }
@@ -31,8 +31,13 @@ object EvalueringMålgruppe {
     }
 
     private fun utledResultatVilkårperiode(
+        type: MålgruppeType,
         delvilkår: DelvilkårMålgruppe,
     ): ResultatVilkårperiode {
+        if(type == MålgruppeType.INGEN_MÅLGRUPPE) {
+            return ResultatVilkårperiode.IKKE_OPPFYLT
+        }
+
         val vurderingMedlemskap = delvilkår.medlemskap
         val vurderingDekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk
 
@@ -68,6 +73,8 @@ object EvalueringMålgruppe {
             -> vurdering.tilVurdering(utledResultatMedlemskap(vurdering?.svar))
 
             MålgruppeType.DAGPENGER -> vurdering.tilVurdering(utledResultatMedlemskap(vurdering?.svar)) // Trenger denne egt å være egen?
+
+            MålgruppeType.INGEN_MÅLGRUPPE -> Vurdering(svar = null, resultat = ResultatDelvilkårperiode.IKKE_AKTUELT)
         }
     }
 
