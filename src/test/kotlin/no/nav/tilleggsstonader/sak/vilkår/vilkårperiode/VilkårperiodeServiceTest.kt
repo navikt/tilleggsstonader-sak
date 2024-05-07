@@ -175,6 +175,31 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 )
             }.hasMessageContaining("Mangler begrunnelse for nedsatt arbeidsevne")
         }
+
+        @Test
+        fun `skal kaste feil ved manglende begrunnelse på ingen aktivitet og ingen målgruppe`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeAktivitet(
+                        begrunnelse = "",
+                        type = AktivitetType.INGEN_AKTIVITET,
+                        behandlingId = behandling.id,
+                    ),
+                )
+            }.hasMessageContaining("Mangler begrunnelse for ingen aktivitet")
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeMålgruppe(
+                        begrunnelse = "",
+                        type = MålgruppeType.INGEN_MÅLGRUPPE,
+                        behandlingId = behandling.id,
+                    ),
+                )
+            }.hasMessageContaining("Mangler begrunnelse for ingen målgruppe")
+        }
     }
 
     @Nested

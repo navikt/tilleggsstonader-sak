@@ -48,6 +48,7 @@ data class Vilkårperiode(
         }
 
         validerBegrunnelseNedsattArbeidsevne()
+        validerBegrunnelseIngenAktivitetEllerMålgruppe()
 
         validerSlettefelter()
     }
@@ -56,6 +57,20 @@ data class Vilkårperiode(
         if (type === MålgruppeType.NEDSATT_ARBEIDSEVNE) {
             brukerfeilHvis(begrunnelse.isNullOrBlank()) {
                 "Mangler begrunnelse for nedsatt arbeidsevne"
+            }
+        }
+    }
+
+    private fun validerBegrunnelseIngenAktivitetEllerMålgruppe() {
+        if (type === AktivitetType.INGEN_AKTIVITET){
+            brukerfeilHvis(begrunnelse.isNullOrBlank()) {
+                "Mangler begrunnelse for ingen aktivitet"
+            }
+        }
+
+        if (type === MålgruppeType.INGEN_MÅLGRUPPE){
+            brukerfeilHvis(begrunnelse.isNullOrBlank()) {
+                "Mangler begrunnelse for ingen målgruppe"
             }
         }
     }
@@ -157,6 +172,7 @@ enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : Vilkårper
     OVERGANGSSTØNAD(setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
     NEDSATT_ARBEIDSEVNE(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
     UFØRETRYGD(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
+    INGEN_MÅLGRUPPE(emptySet()),
     ;
 
     override fun tilDbType(): String = this.name
@@ -168,6 +184,7 @@ enum class AktivitetType : VilkårperiodeType {
     TILTAK,
     UTDANNING,
     REELL_ARBEIDSSØKER,
+    INGEN_AKTIVITET,
     ;
 
     override fun tilDbType(): String = this.name
