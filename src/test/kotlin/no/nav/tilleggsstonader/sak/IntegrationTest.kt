@@ -75,11 +75,11 @@ class DefaultRestTemplateConfiguration {
     "mock-arena",
     "mock-aktivitet",
     "mock-kodeverk",
+    "mock-kafka",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
 
-    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     protected lateinit var restTemplate: RestTemplate
     protected val headers = HttpHeaders()
@@ -87,7 +87,6 @@ abstract class IntegrationTest {
     @LocalServerPort
     private var port: Int? = 0
 
-    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private lateinit var mockOAuth2Server: MockOAuth2Server
 
@@ -97,7 +96,6 @@ abstract class IntegrationTest {
     @Autowired
     protected lateinit var rolleConfig: RolleConfig
 
-    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     protected lateinit var testoppsettService: TestoppsettService
 

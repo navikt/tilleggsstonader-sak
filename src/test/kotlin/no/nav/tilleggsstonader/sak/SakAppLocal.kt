@@ -30,4 +30,6 @@ fun appLocal(): SpringApplicationBuilder =
             "mock-arena",
             "mock-aktivitet",
             "mock-kodeverk",
+            "mock-kafka",
+            "mock-familie-dokument",
         )
