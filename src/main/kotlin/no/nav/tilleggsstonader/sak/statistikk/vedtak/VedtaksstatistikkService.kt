@@ -27,7 +27,7 @@ class VedtaksstatistikkService(
     private val iverksettService: IverksettService,
     private val stønadsperiodeService: StønadsperiodeService,
 
-) {
+    ) {
     fun lagreVedtaksstatistikk(behandlingId: UUID, fagsakId: UUID, hendelseTidspunkt: LocalDateTime) {
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
@@ -49,18 +49,13 @@ class VedtaksstatistikkService(
                 tidspunktVedtak = hendelseTidspunkt,
                 målgruppe = MålgruppeDvh.fraDomene(vilkårsperioder.målgrupper),
                 aktivitet = AktivitetDvh.fraDomene(vilkårsperioder.aktiviteter),
-                vilkårsvurderinger = vilkårsvurderinger.map {
-                    VilkårsvurderingDvh.fraDomene(
-                        resultat = it.resultat,
-                        delvilkår = it.delvilkårsett,
-                    )
-                },
+                vilkårsvurderinger = VilkårsvurderingDvh.fraDomene(vilkårsvurderinger),
                 person = personIdent,
                 barn = BarnDvh.fraDomene(behandlingBarnService.finnBarnPåBehandling(behandlingId)),
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
                 behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
                 vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
-                vedtaksperioder = VedtaksperiodeDvh.fraDomene(stønadsperioder),
+                vedtaksperioder = VedtaksperioderDvh.fraDomene(stønadsperioder),
                 utbetalinger = UtbetalingDvh.fraDomene(andelTilkjentYtelse),
                 kravMottatt = behandling.kravMottatt,
                 årsakRevurdering = null, // TODO implementer når revurdering er på plass.

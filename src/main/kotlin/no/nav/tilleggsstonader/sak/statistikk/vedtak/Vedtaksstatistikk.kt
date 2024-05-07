@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -35,16 +36,17 @@ class Vedtaksstatistikk(
     val adressebeskyttelse: AdressebeskyttelseDvh,
     val tidspunktVedtak: LocalDateTime,
     @Column("målgruppe")
-    val målgruppe: List<MålgruppeDvh>,
-    val aktivitet: List<AktivitetDvh>,
-    val vilkårsvurderinger: List<VilkårsvurderingDvh>,
+    val målgruppe: MålgruppeDvh.Wrapper,
+    val aktivitet: AktivitetDvh.Wrapper,
+    @Column("vilkårsvurderinger")
+    val vilkårsvurderinger: VilkårsvurderingDvh.Wrapper,
     val person: String,
-    val barn: List<BarnDvh>,
+    val barn: BarnDvh.Wrapper,
     val behandlingType: BehandlingTypeDvh,
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
-    val vedtaksperioder: List<VedtaksperiodeDvh>,
-    val utbetalinger: List<UtbetalingDvh>,
+    val vedtaksperioder: VedtaksperioderDvh.Wrapper,
+    val utbetalinger: UtbetalingDvh.Wrapper,
     @Column("stønadstype")
     val stønadstype: StønadstypeDvh = BARNETILSYN,
     val kravMottatt: LocalDate?,
@@ -61,23 +63,35 @@ data class UtbetalingDvh(
     val tilOgMed: LocalDate,
     val beløp: Int,
 ) {
+    data class Wrapper(
+        val utbetalinger: List<UtbetalingDvh>,
+    )
+
     companion object {
-        fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = ytelser.map {
-            UtbetalingDvh(fraOgMed = it.fom, tilOgMed = it.tom, beløp = it.beløp)
-        }
+        fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = Wrapper(
+            ytelser.map {
+                UtbetalingDvh(fraOgMed = it.fom, tilOgMed = it.tom, beløp = it.beløp)
+            },
+        )
     }
 }
 
-data class VedtaksperiodeDvh(
+data class VedtaksperioderDvh(
     val fraOgMed: LocalDate,
     val tilOgMed: LocalDate,
 ) {
+    data class Wrapper(
+        val vedtaksperioder: List<VedtaksperioderDvh>,
+    )
+
     companion object {
         // TODO: Map fra faktiske vedtaksperioder når vi har det (også relatert til revurdering)
 
-        fun fraDomene(ytelser: List<StønadsperiodeDto>) = ytelser.map {
-            VedtaksperiodeDvh(fraOgMed = it.fom, tilOgMed = it.tom)
-        }
+        fun fraDomene(ytelser: List<StønadsperiodeDto>) = Wrapper(
+            ytelser.map {
+                VedtaksperioderDvh(fraOgMed = it.fom, tilOgMed = it.tom)
+            },
+        )
     }
 }
 
@@ -139,10 +153,16 @@ enum class BehandlingTypeDvh {
 data class BarnDvh(
     val fnr: String,
 ) {
+    data class Wrapper(
+        val barn: List<BarnDvh>,
+    )
+
     companion object {
-        fun fraDomene(behandlingBarn: List<BehandlingBarn>): List<BarnDvh> {
-            return behandlingBarn.map { BarnDvh(fnr = it.ident) }
-        }
+        fun fraDomene(behandlingBarn: List<BehandlingBarn>) = Wrapper(
+            behandlingBarn.map {
+                BarnDvh(fnr = it.ident)
+            },
+        )
     }
 }
 
@@ -150,16 +170,22 @@ data class AktivitetDvh(
     val type: AktivitetTypeDvh,
     val resultat: ResultatVilkårperiodeDvh,
 ) {
+    data class Wrapper(
+        val aktivitet: List<AktivitetDvh>,
+    )
+
     companion object {
-        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): List<AktivitetDvh> {
-            return vilkårsperioder
-                .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
-                .map {
-                    AktivitetDvh(
-                        type = AktivitetTypeDvh.fraDomene(it.type),
-                        resultat = ResultatVilkårperiodeDvh.fraDomene(it.resultat),
-                    )
-                }
+        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): Wrapper {
+            return Wrapper(
+                vilkårsperioder
+                    .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
+                    .map {
+                        AktivitetDvh(
+                            type = AktivitetTypeDvh.fraDomene(it.type),
+                            resultat = ResultatVilkårperiodeDvh.fraDomene(it.resultat),
+                        )
+                    },
+            )
         }
     }
 }
@@ -168,16 +194,22 @@ data class MålgruppeDvh(
     val type: MålgruppeTypeDvh,
     val resultat: ResultatVilkårperiodeDvh,
 ) {
+    data class Wrapper(
+        val målgruppe: List<MålgruppeDvh>,
+    )
+
     companion object {
-        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): List<MålgruppeDvh> {
-            return vilkårsperioder
-                .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
-                .map {
-                    MålgruppeDvh(
-                        type = MålgruppeTypeDvh.fraDomene(it.type),
-                        resultat = ResultatVilkårperiodeDvh.fraDomene(it.resultat),
-                    )
-                }
+        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): Wrapper {
+            return Wrapper(
+                vilkårsperioder
+                    .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
+                    .map {
+                        MålgruppeDvh(
+                            type = MålgruppeTypeDvh.fraDomene(it.type),
+                            resultat = ResultatVilkårperiodeDvh.fraDomene(it.resultat),
+                        )
+                    },
+            )
         }
     }
 }
@@ -267,10 +299,18 @@ data class VilkårsvurderingDvh(
     val resultat: VilkårsresultatDvh,
     val vilkår: List<DelvilkårDvh>,
 ) {
+    data class Wrapper(
+        val vilkårsvurderinger: List<VilkårsvurderingDvh>,
+    )
+
     companion object {
-        fun fraDomene(delvilkår: List<DelvilkårDto>, resultat: Vilkårsresultat) = VilkårsvurderingDvh(
-            resultat = VilkårsresultatDvh.fraDomene(resultat),
-            vilkår = DelvilkårDvh.fraDomene(delvilkår),
+        fun fraDomene(vilkår: List<VilkårDto>) = Wrapper(
+            vilkår.map {
+                VilkårsvurderingDvh(
+                    resultat = VilkårsresultatDvh.fraDomene(it.resultat),
+                    vilkår = DelvilkårDvh.fraDomene(it.delvilkårsett),
+                )
+            },
         )
     }
 }
