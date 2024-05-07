@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -33,6 +34,7 @@ class Vedtaksstatistikk(
     val relatertBehandlingId: Long?, // Ekstern behandlingsid på relatert behandling
     val adressebeskyttelse: AdressebeskyttelseDvh,
     val tidspunktVedtak: LocalDateTime,
+    @Column("målgruppe")
     val målgruppe: List<MålgruppeDvh>,
     val aktivitet: List<AktivitetDvh>,
     val vilkårsvurderinger: List<VilkårsvurderingDvh>,
@@ -43,6 +45,7 @@ class Vedtaksstatistikk(
     val vedtakResultat: VedtakResultatDvh,
     val vedtaksperioder: List<VedtaksperiodeDvh>,
     val utbetalinger: List<UtbetalingDvh>,
+    @Column("stønadstype")
     val stønadstype: StønadstypeDvh = BARNETILSYN,
     val kravMottatt: LocalDate?,
     val årsakRevurdering: ÅrsakRevurderingDvh? = null,
