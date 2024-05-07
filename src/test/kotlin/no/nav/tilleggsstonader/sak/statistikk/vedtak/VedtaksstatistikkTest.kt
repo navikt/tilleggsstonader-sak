@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
@@ -48,13 +50,32 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     @Test
     fun `kan skrive vedtaksstatistikk med flere aktiviteter til tabell`() {
-        val nøstedeAktiviteter = AktivitetDvh.JsonWrapper(
+        val flereAktiviteter = AktivitetDvh.JsonWrapper(
             listOf(
                 AktivitetDvh(type = AktivitetTypeDvh.REELL_ARBEIDSSØKER, resultat = ResultatVilkårperiodeDvh.OPPFYLT),
                 AktivitetDvh(type = AktivitetTypeDvh.UTDANNING, resultat = ResultatVilkårperiodeDvh.IKKE_OPPFYLT),
             ),
         )
 
-        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(aktivitet = nøstedeAktiviteter))
+        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(aktivitet = flereAktiviteter))
+    }
+
+    @Test
+    fun `kan skrive vedtaksstatistikk med ikke-tom vilkårsvurdering til tabell`() {
+        val dummyVilkår = listOf(
+            DelvilkårDvh(
+                resultat = Vilkårsresultat.OPPFYLT,
+                vurderinger = listOf(RegelId.HAR_FULLFØRT_FJERDEKLASSE, RegelId.UNNTAK_ALDER)
+            )
+        )
+        val nøstetVilkårsvurdering = VilkårsvurderingDvh.JsonWrapper(
+            listOf(
+                VilkårsvurderingDvh(
+                    resultat = VilkårsresultatDvh.OPPFYLT, vilkår = dummyVilkår
+                ),
+            ),
+        )
+
+        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(vilkårsvurderinger = nøstetVilkårsvurdering))
     }
 }
