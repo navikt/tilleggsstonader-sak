@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -36,18 +38,18 @@ class Vedtaksstatistikk(
     val adressebeskyttelse: AdressebeskyttelseDvh,
     val tidspunktVedtak: LocalDateTime,
     @Column("målgruppe")
-    val målgruppe: MålgruppeDvh.Wrapper,
-    val aktivitet: AktivitetDvh.Wrapper,
+    val målgruppe: MålgruppeDvh.JsonWrapper,
+    val aktivitet: AktivitetDvh.JsonWrapper,
     @Column("vilkårsvurderinger")
-    val vilkårsvurderinger: VilkårsvurderingDvh.Wrapper,
+    val vilkårsvurderinger: VilkårsvurderingDvh.JsonWrapper,
     val person: String,
-    val barn: BarnDvh.Wrapper,
+    val barn: BarnDvh.JsonWrapper,
     val behandlingType: BehandlingTypeDvh,
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
     @Column("vedtaksperioder")
-    val jubalong: VedtaksperioderDvh.Wrapper,
-    val utbetalinger: UtbetalingDvh.Wrapper,
+    val vedtaksperioder: VedtaksperioderDvh.JsonWrapper,
+    val utbetalinger: UtbetalingDvh.JsonWrapper,
     @Column("stønadstype")
     val stønadstype: StønadstypeDvh = BARNETILSYN,
     val kravMottatt: LocalDate?,
@@ -64,12 +66,12 @@ data class UtbetalingDvh(
     val tilOgMed: LocalDate,
     val beløp: Int,
 ) {
-    data class Wrapper(
+    data class JsonWrapper(
         val utbetalinger: List<UtbetalingDvh>,
     )
 
     companion object {
-        fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = Wrapper(
+        fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = JsonWrapper(
             ytelser.map {
                 UtbetalingDvh(fraOgMed = it.fom, tilOgMed = it.tom, beløp = it.beløp)
             },
@@ -81,14 +83,14 @@ data class VedtaksperioderDvh(
     val fraOgMed: LocalDate,
     val tilOgMed: LocalDate,
 ) {
-    data class Wrapper(
-        val idefix: List<VedtaksperioderDvh>,
+    data class JsonWrapper(
+        val vedtaksperioder: List<VedtaksperioderDvh>,
     )
 
     companion object {
         // TODO: Map fra faktiske vedtaksperioder når vi har det (også relatert til revurdering)
 
-        fun fraDomene(ytelser: List<StønadsperiodeDto>) = Wrapper(
+        fun fraDomene(ytelser: List<StønadsperiodeDto>) = JsonWrapper(
             ytelser.map {
                 VedtaksperioderDvh(fraOgMed = it.fom, tilOgMed = it.tom)
             },
@@ -154,12 +156,12 @@ enum class BehandlingTypeDvh {
 data class BarnDvh(
     val fnr: String,
 ) {
-    data class Wrapper(
+    data class JsonWrapper(
         val barn: List<BarnDvh>,
     )
 
     companion object {
-        fun fraDomene(behandlingBarn: List<BehandlingBarn>) = Wrapper(
+        fun fraDomene(behandlingBarn: List<BehandlingBarn>) = JsonWrapper(
             behandlingBarn.map {
                 BarnDvh(fnr = it.ident)
             },
@@ -171,13 +173,13 @@ data class AktivitetDvh(
     val type: AktivitetTypeDvh,
     val resultat: ResultatVilkårperiodeDvh,
 ) {
-    data class Wrapper(
+    data class JsonWrapper(
         val aktivitet: List<AktivitetDvh>,
     )
 
     companion object {
-        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): Wrapper {
-            return Wrapper(
+        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): JsonWrapper {
+            return JsonWrapper(
                 vilkårsperioder
                     .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
                     .map {
@@ -195,13 +197,13 @@ data class MålgruppeDvh(
     val type: MålgruppeTypeDvh,
     val resultat: ResultatVilkårperiodeDvh,
 ) {
-    data class Wrapper(
+    data class JsonWrapper(
         val målgruppe: List<MålgruppeDvh>,
     )
 
     companion object {
-        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): Wrapper {
-            return Wrapper(
+        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): JsonWrapper {
+            return JsonWrapper(
                 vilkårsperioder
                     .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
                     .map {
@@ -300,12 +302,12 @@ data class VilkårsvurderingDvh(
     val resultat: VilkårsresultatDvh,
     val vilkår: List<DelvilkårDvh>,
 ) {
-    data class Wrapper(
+    data class JsonWrapper(
         val vilkårsvurderinger: List<VilkårsvurderingDvh>,
     )
 
     companion object {
-        fun fraDomene(vilkår: List<VilkårDto>) = Wrapper(
+        fun fraDomene(vilkår: List<VilkårDto>) = JsonWrapper(
             vilkår.map {
                 VilkårsvurderingDvh(
                     resultat = VilkårsresultatDvh.fraDomene(it.resultat),
