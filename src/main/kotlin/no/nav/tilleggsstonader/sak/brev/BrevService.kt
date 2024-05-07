@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.util.norskFormat
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 
 @Service

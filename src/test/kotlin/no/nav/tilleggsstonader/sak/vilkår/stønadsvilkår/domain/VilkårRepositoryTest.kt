@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 

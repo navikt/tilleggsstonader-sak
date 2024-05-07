@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
-import java.time.LocalDateTime
 import java.util.UUID
 
 class BehandlingRepositoryTest : IntegrationTest() {

@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternS
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 import java.util.UUID
 
 class IverksettDtoMapperTest {

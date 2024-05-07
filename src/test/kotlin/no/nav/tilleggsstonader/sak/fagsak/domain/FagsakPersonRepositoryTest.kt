@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.IncorrectResultSizeDataAccessException
-import java.time.LocalDateTime
 
 internal class FagsakPersonRepositoryTest : IntegrationTest() {
 

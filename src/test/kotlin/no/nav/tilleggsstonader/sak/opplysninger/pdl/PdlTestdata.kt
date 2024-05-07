@@ -46,7 +46,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Vegadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergeEllerFullmektig
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergemaalEllerFremtidsfullmakt
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 object PdlTestdata {
 

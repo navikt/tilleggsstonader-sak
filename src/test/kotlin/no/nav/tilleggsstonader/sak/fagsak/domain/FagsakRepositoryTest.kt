@@ -25,7 +25,6 @@ import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 class FagsakRepositoryTest : IntegrationTest() {
 

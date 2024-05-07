@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 import java.util.UUID
 
 internal class VilkårTest {
