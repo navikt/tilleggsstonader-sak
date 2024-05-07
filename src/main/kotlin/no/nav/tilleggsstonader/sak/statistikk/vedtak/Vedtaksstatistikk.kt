@@ -45,7 +45,8 @@ class Vedtaksstatistikk(
     val behandlingType: BehandlingTypeDvh,
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
-    val vedtaksperioder: VedtaksperioderDvh.Wrapper,
+    @Column("vedtaksperioder")
+    val jubalong: VedtaksperioderDvh.Wrapper,
     val utbetalinger: UtbetalingDvh.Wrapper,
     @Column("stønadstype")
     val stønadstype: StønadstypeDvh = BARNETILSYN,
@@ -81,7 +82,7 @@ data class VedtaksperioderDvh(
     val tilOgMed: LocalDate,
 ) {
     data class Wrapper(
-        val vedtaksperioder: List<VedtaksperioderDvh>,
+        val idefix: List<VedtaksperioderDvh>,
     )
 
     companion object {

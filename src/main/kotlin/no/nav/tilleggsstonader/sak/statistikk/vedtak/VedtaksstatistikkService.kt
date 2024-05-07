@@ -55,7 +55,7 @@ class VedtaksstatistikkService(
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
                 behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
                 vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
-                vedtaksperioder = VedtaksperioderDvh.fraDomene(stønadsperioder),
+                jubalong = VedtaksperioderDvh.fraDomene(stønadsperioder),
                 utbetalinger = UtbetalingDvh.fraDomene(andelTilkjentYtelse),
                 kravMottatt = behandling.kravMottatt,
                 årsakRevurdering = null, // TODO implementer når revurdering er på plass.
