@@ -176,29 +176,70 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             }.hasMessageContaining("Mangler begrunnelse for nedsatt arbeidsevne")
         }
 
-        @Test
-        fun `skal kaste feil ved manglende begrunnelse på ingen aktivitet og ingen målgruppe`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+        @Nested
+        inner class IngenAktivitetMålgruppe {
+            @Test
+            fun `skal kaste feil ved tom og null begrunnelse på ingen aktivitet og ingen målgruppe`() {
+                val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiode(
-                    opprettVilkårperiodeAktivitet(
-                        begrunnelse = "",
-                        type = AktivitetType.INGEN_AKTIVITET,
-                        behandlingId = behandling.id,
-                    ),
-                )
-            }.hasMessageContaining("Mangler begrunnelse for ingen aktivitet")
+                assertThatThrownBy {
+                    vilkårperiodeService.opprettVilkårperiode(
+                        opprettVilkårperiodeAktivitet(
+                            begrunnelse = "",
+                            type = AktivitetType.INGEN_AKTIVITET,
+                            behandlingId = behandling.id,
+                            aktivitetsdager = null
+                        ),
+                    )
+                }.hasMessageContaining("Mangler begrunnelse for ingen aktivitet")
 
-            assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiode(
-                    opprettVilkårperiodeMålgruppe(
-                        begrunnelse = "",
-                        type = MålgruppeType.INGEN_MÅLGRUPPE,
-                        behandlingId = behandling.id,
-                    ),
-                )
-            }.hasMessageContaining("Mangler begrunnelse for ingen målgruppe")
+                assertThatThrownBy {
+                    vilkårperiodeService.opprettVilkårperiode(
+                        opprettVilkårperiodeAktivitet(
+                            begrunnelse = null,
+                            type = AktivitetType.INGEN_AKTIVITET,
+                            behandlingId = behandling.id,
+                            aktivitetsdager = null
+                        ),
+                    )
+                }.hasMessageContaining("Mangler begrunnelse for ingen aktivitet")
+
+                assertThatThrownBy {
+                    vilkårperiodeService.opprettVilkårperiode(
+                        opprettVilkårperiodeMålgruppe(
+                            begrunnelse = "",
+                            type = MålgruppeType.INGEN_MÅLGRUPPE,
+                            behandlingId = behandling.id,
+                        ),
+                    )
+                }.hasMessageContaining("Mangler begrunnelse for ingen målgruppe")
+
+                assertThatThrownBy {
+                    vilkårperiodeService.opprettVilkårperiode(
+                        opprettVilkårperiodeMålgruppe(
+                            begrunnelse = null,
+                            type = MålgruppeType.INGEN_MÅLGRUPPE,
+                            behandlingId = behandling.id,
+                        ),
+                    )
+                }.hasMessageContaining("Mangler begrunnelse for ingen målgruppe")
+            }
+
+            @Test
+            fun `skal kaste feil dersom aktivitetsdager registreres på aktivitet med type ingen aktivitet`() {
+                val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+                assertThatThrownBy {
+                    vilkårperiodeService.opprettVilkårperiode(
+                        opprettVilkårperiodeAktivitet(
+                            begrunnelse = "Begrunnelse",
+                            type = AktivitetType.INGEN_AKTIVITET,
+                            behandlingId = behandling.id,
+                            aktivitetsdager = 5
+                        ),
+                    )
+                }.hasMessageContaining("Kan ikke registrere aktivitetsdager på ingen aktivitet")
+            }
         }
     }
 

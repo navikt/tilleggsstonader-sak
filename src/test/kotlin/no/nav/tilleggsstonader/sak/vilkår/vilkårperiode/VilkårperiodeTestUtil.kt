@@ -123,7 +123,7 @@ object VilkårperiodeTestUtil {
         lønnet: VurderingDto? = null,
         begrunnelse: String? = null,
         behandlingId: UUID = UUID.randomUUID(),
-        aktivitetsdager: Int = 5,
+        aktivitetsdager: Int? = 5,
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,

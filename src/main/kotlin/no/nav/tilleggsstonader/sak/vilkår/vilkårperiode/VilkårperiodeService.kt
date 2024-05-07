@@ -101,7 +101,7 @@ class VilkårperiodeService(
     }
 
     private fun validerAktivitetsdager(vilkårPeriodeType: VilkårperiodeType, aktivitetsdager: Int?) {
-        if (vilkårPeriodeType is AktivitetType) {
+        if (vilkårPeriodeType is AktivitetType && vilkårPeriodeType !== AktivitetType.INGEN_AKTIVITET) {
             brukerfeilHvisIkke(aktivitetsdager in 1..5) {
                 "Aktivitetsdager må være et heltall mellom 1 og 5"
             }

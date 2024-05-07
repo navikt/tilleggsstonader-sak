@@ -37,9 +37,7 @@ data class Vilkårperiode(
     init {
         require(tom >= fom) { "Til-og-med før fra-og-med: $fom > $tom" }
 
-        if (type is AktivitetType) {
-            require(aktivitetsdager != null) { "Aktivitetsdager må settes for aktivitet" }
-        }
+        validerAktivitetsdager()
 
         when {
             type is MålgruppeType && delvilkår is DelvilkårMålgruppe -> delvilkår.valider(begrunnelse)
@@ -51,6 +49,22 @@ data class Vilkårperiode(
         validerBegrunnelseIngenAktivitetEllerMålgruppe()
 
         validerSlettefelter()
+    }
+
+    private fun validerAktivitetsdager(){
+        if(type is AktivitetType) {
+            if (type === AktivitetType.INGEN_AKTIVITET) {
+                brukerfeilHvis(aktivitetsdager != null) { "Kan ikke registrere aktivitetsdager på ingen aktivitet" }
+            } else {
+                brukerfeilHvis(aktivitetsdager !in 1..5) {
+                    "Aktivitetsdager må være et heltall mellom 1 og 5"
+                }
+            }
+        }
+
+        if(type is MålgruppeType) {
+            brukerfeilHvis(aktivitetsdager !== null) { "Kan ikke registrere aktivitetsdager på målgruppe" }
+        }
     }
 
     private fun validerBegrunnelseNedsattArbeidsevne() {
