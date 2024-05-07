@@ -62,16 +62,16 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     @Test
     fun `kan skrive vedtaksstatistikk med ikke-tom vilkårsvurdering til tabell`() {
-        val dummyVilkår = listOf(
-            DelvilkårDvh(
-                resultat = Vilkårsresultat.OPPFYLT,
-                vurderinger = listOf(RegelId.HAR_FULLFØRT_FJERDEKLASSE, RegelId.UNNTAK_ALDER)
-            )
-        )
         val nøstetVilkårsvurdering = VilkårsvurderingDvh.JsonWrapper(
             listOf(
                 VilkårsvurderingDvh(
-                    resultat = VilkårsresultatDvh.OPPFYLT, vilkår = dummyVilkår
+                    resultat = VilkårsresultatDvh.OPPFYLT,
+                    vilkår = listOf(
+                        DelvilkårDvh(
+                            resultat = Vilkårsresultat.OPPFYLT,
+                            vurderinger = listOf(RegelId.HAR_FULLFØRT_FJERDEKLASSE, RegelId.UNNTAK_ALDER),
+                        ),
+                    ),
                 ),
             ),
         )
