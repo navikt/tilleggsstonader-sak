@@ -23,7 +23,7 @@ import java.util.UUID
 
 // TODO: Vurder om dette bør flyttes til kontrakter
 
-class VedtaksstatistikkDvh(
+class Vedtaksstatistikk(
     @Id
     val id: UUID = UUID.randomUUID(),
     val fagsakId: UUID,

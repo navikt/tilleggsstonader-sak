@@ -7,8 +7,8 @@ import java.util.UUID
 
 @Repository
 interface VedtakstatistikkRepository :
-    RepositoryInterface<VedtaksstatistikkDvh, UUID>,
-    InsertUpdateRepository<VedtaksstatistikkDvh> {
+    RepositoryInterface<Vedtaksstatistikk, UUID>,
+    InsertUpdateRepository<Vedtaksstatistikk> {
 
-    override fun insert(t: VedtaksstatistikkDvh): VedtaksstatistikkDvh
+    override fun insert(t: Vedtaksstatistikk): Vedtaksstatistikk
 }
