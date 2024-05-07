@@ -34,7 +34,7 @@ import java.util.UUID
     JsonSubTypes.Type(UtbetalingerDvh.JsonWrapper::class, name = "utbetalinger"),
     JsonSubTypes.Type(VedtaksperioderDvh.JsonWrapper::class, name = "vedtaksperioder"),
 )
-class Vedtaksstatistikk(
+data class Vedtaksstatistikk(
     @Id
     val id: UUID = UUID.randomUUID(),
     val fagsakId: UUID,
