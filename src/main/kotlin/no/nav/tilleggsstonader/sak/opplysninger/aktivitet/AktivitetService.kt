@@ -17,6 +17,6 @@ class AktivitetService(
             ident = ident,
             fom = LocalDate.now().minusYears(3),
             tom = LocalDate.now().plusYears(1),
-        ).sortedBy { it.fom }
+        ).sortedByDescending { it.fom }
     }
 }
