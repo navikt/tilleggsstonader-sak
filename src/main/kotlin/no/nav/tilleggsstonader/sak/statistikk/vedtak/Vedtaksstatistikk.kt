@@ -25,8 +25,15 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-// TODO: Vurder om dette bør flyttes til kontrakter
-
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes(
+    JsonSubTypes.Type(MålgruppeDvh.JsonWrapper::class, name = "målgruppe"),
+    JsonSubTypes.Type(AktivitetDvh.JsonWrapper::class, name = "aktivitet"),
+    JsonSubTypes.Type(VilkårsvurderingDvh.JsonWrapper::class, name = "vilkårsvurderinger"),
+    JsonSubTypes.Type(BarnDvh.JsonWrapper::class, name = "barn"),
+    JsonSubTypes.Type(UtbetalingerDvh.JsonWrapper::class, name = "utbetalinger"),
+    JsonSubTypes.Type(VedtaksperioderDvh.JsonWrapper::class, name = "vedtaksperioder"),
+)
 class Vedtaksstatistikk(
     @Id
     val id: UUID = UUID.randomUUID(),
@@ -37,43 +44,58 @@ class Vedtaksstatistikk(
     val relatertBehandlingId: Long?, // Ekstern behandlingsid på relatert behandling
     val adressebeskyttelse: AdressebeskyttelseDvh,
     val tidspunktVedtak: LocalDateTime,
+
     @Column("målgruppe")
     val målgruppe: MålgruppeDvh.JsonWrapper,
+
+    @Column("aktivitet")
     val aktivitet: AktivitetDvh.JsonWrapper,
+
     @Column("vilkårsvurderinger")
     val vilkårsvurderinger: VilkårsvurderingDvh.JsonWrapper,
+
     val person: String,
+
+    @Column("barn")
     val barn: BarnDvh.JsonWrapper,
+
     val behandlingType: BehandlingTypeDvh,
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
+
     @Column("vedtaksperioder")
     val vedtaksperioder: VedtaksperioderDvh.JsonWrapper,
-    val utbetalinger: UtbetalingDvh.JsonWrapper,
+
+    @Column("utbetalinger")
+    val utbetalinger: UtbetalingerDvh.JsonWrapper,
+
     @Column("stønadstype")
     val stønadstype: StønadstypeDvh = BARNETILSYN,
+
     val kravMottatt: LocalDate?,
     val årsakRevurdering: ÅrsakRevurderingDvh? = null,
     val avslagÅrsak: String? = null,
 )
 
+// TODO: Vurder om dette bør flyttes til kontrakter
+
 enum class StønadstypeDvh {
     BARNETILSYN,
 }
 
-data class UtbetalingDvh(
+data class UtbetalingerDvh(
     val fraOgMed: LocalDate,
     val tilOgMed: LocalDate,
     val beløp: Int,
 ) {
     data class JsonWrapper(
-        val utbetalinger: List<UtbetalingDvh>,
+        val utbetalinger: List<UtbetalingerDvh>,
     )
 
     companion object {
         fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = JsonWrapper(
             ytelser.map {
-                UtbetalingDvh(fraOgMed = it.fom, tilOgMed = it.tom, beløp = it.beløp)
+                UtbetalingerDvh(fraOgMed = it.fom, tilOgMed = it.tom, beløp = it.beløp)
             },
         )
     }
