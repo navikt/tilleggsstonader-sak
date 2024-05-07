@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -25,15 +23,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
-@JsonSubTypes(
-    JsonSubTypes.Type(MålgruppeDvh.JsonWrapper::class, name = "målgruppe"),
-    JsonSubTypes.Type(AktivitetDvh.JsonWrapper::class, name = "aktivitet"),
-    JsonSubTypes.Type(VilkårsvurderingDvh.JsonWrapper::class, name = "vilkårsvurderinger"),
-    JsonSubTypes.Type(BarnDvh.JsonWrapper::class, name = "barn"),
-    JsonSubTypes.Type(UtbetalingerDvh.JsonWrapper::class, name = "utbetalinger"),
-    JsonSubTypes.Type(VedtaksperioderDvh.JsonWrapper::class, name = "vedtaksperioder"),
-)
 data class Vedtaksstatistikk(
     @Id
     val id: UUID = UUID.randomUUID(),
@@ -44,34 +33,20 @@ data class Vedtaksstatistikk(
     val relatertBehandlingId: Long?, // Ekstern behandlingsid på relatert behandling
     val adressebeskyttelse: AdressebeskyttelseDvh,
     val tidspunktVedtak: LocalDateTime,
-
     @Column("målgruppe")
     val målgruppe: MålgruppeDvh.JsonWrapper,
-
-    @Column("aktivitet")
     val aktivitet: AktivitetDvh.JsonWrapper,
-
     @Column("vilkårsvurderinger")
     val vilkårsvurderinger: VilkårsvurderingDvh.JsonWrapper,
-
     val person: String,
-
-    @Column("barn")
     val barn: BarnDvh.JsonWrapper,
-
     val behandlingType: BehandlingTypeDvh,
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
-
-    @Column("vedtaksperioder")
     val vedtaksperioder: VedtaksperioderDvh.JsonWrapper,
-
-    @Column("utbetalinger")
     val utbetalinger: UtbetalingerDvh.JsonWrapper,
-
     @Column("stønadstype")
     val stønadstype: StønadstypeDvh = BARNETILSYN,
-
     val kravMottatt: LocalDate?,
     val årsakRevurdering: ÅrsakRevurderingDvh? = null,
     val avslagÅrsak: String? = null,
