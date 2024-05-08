@@ -10,68 +10,89 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
 // TODO: Vurder om dette bør flyttes til kontrakter
 
-class VedtaksstatistikkDvh(
+data class Vedtaksstatistikk(
+    @Id
+    val id: UUID = UUID.randomUUID(),
     val fagsakId: UUID,
     val behandlingId: UUID,
+    val eksternFagsakId: Long,
     val eksternBehandlingId: Long,
     val relatertBehandlingId: Long?, // Ekstern behandlingsid på relatert behandling
     val adressebeskyttelse: AdressebeskyttelseDvh,
     val tidspunktVedtak: LocalDateTime,
-    val målgruppe: List<MålgruppeDvh>,
-    val aktivitet: List<AktivitetDvh>,
-    val vilkårsvurderinger: List<VilkårsvurderingDvh>,
+    @Column("malgrupper")
+    val målgrupper: MålgrupperDvh.JsonWrapper,
+    val aktiviteter: AktiviteterDvh.JsonWrapper,
+    @Column("vilkarsvurderinger")
+    val vilkårsvurderinger: VilkårsvurderingerDvh.JsonWrapper,
     val person: String,
-    val barn: List<BarnDvh>,
+    val barn: BarnDvh.JsonWrapper,
     val behandlingType: BehandlingTypeDvh,
+    @Column("behandling_arsak")
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
-    val vedtaksperioder: List<VedtaksperiodeDvh>,
-    val utbetalinger: List<UtbetalingDvh>,
+    val vedtaksperioder: VedtaksperioderDvh.JsonWrapper,
+    val utbetalinger: UtbetalingerDvh.JsonWrapper,
+    @Column("stonadstype")
     val stønadstype: StønadstypeDvh = BARNETILSYN,
     val kravMottatt: LocalDate?,
-    val årsakRevurdering: ÅrsakRevurderingDvh? = null,
-    val avslagÅrsak: String? = null,
-
+    // TODO: Legg inn årsak til revurdering når revurdering kommer i løsningen
+    // TODO: Legg inn årsak for avslag når avslag kommer i løsningen
 )
 
 enum class StønadstypeDvh {
     BARNETILSYN,
 }
 
-data class UtbetalingDvh(
+data class UtbetalingerDvh(
     val fraOgMed: LocalDate,
     val tilOgMed: LocalDate,
     val beløp: Int,
 ) {
+    data class JsonWrapper(
+        val utbetalinger: List<UtbetalingerDvh>,
+    )
+
     companion object {
-        fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = ytelser.map {
-            UtbetalingDvh(fraOgMed = it.fom, tilOgMed = it.tom, beløp = it.beløp)
-        }
+        fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = JsonWrapper(
+            ytelser.map {
+                UtbetalingerDvh(fraOgMed = it.fom, tilOgMed = it.tom, beløp = it.beløp)
+            },
+        )
     }
 }
 
-data class VedtaksperiodeDvh(
+data class VedtaksperioderDvh(
     val fraOgMed: LocalDate,
     val tilOgMed: LocalDate,
 ) {
+    data class JsonWrapper(
+        val vedtaksperioder: List<VedtaksperioderDvh>,
+    )
+
     companion object {
         // TODO: Map fra faktiske vedtaksperioder når vi har det (også relatert til revurdering)
 
-        fun fraDomene(ytelser: List<StønadsperiodeDto>) = ytelser.map {
-            VedtaksperiodeDvh(fraOgMed = it.fom, tilOgMed = it.tom)
-        }
+        fun fraDomene(ytelser: List<StønadsperiodeDto>) = JsonWrapper(
+            ytelser.map {
+                VedtaksperioderDvh(fraOgMed = it.fom, tilOgMed = it.tom)
+            },
+        )
     }
 }
 
@@ -133,45 +154,63 @@ enum class BehandlingTypeDvh {
 data class BarnDvh(
     val fnr: String,
 ) {
+    data class JsonWrapper(
+        val barn: List<BarnDvh>,
+    )
+
     companion object {
-        fun fraDomene(behandlingBarn: List<BehandlingBarn>): List<BarnDvh> {
-            return behandlingBarn.map { BarnDvh(fnr = it.ident) }
-        }
+        fun fraDomene(behandlingBarn: List<BehandlingBarn>) = JsonWrapper(
+            behandlingBarn.map {
+                BarnDvh(fnr = it.ident)
+            },
+        )
     }
 }
 
-data class AktivitetDvh(
+data class AktiviteterDvh(
     val type: AktivitetTypeDvh,
     val resultat: ResultatVilkårperiodeDvh,
 ) {
+    data class JsonWrapper(
+        val aktivitet: List<AktiviteterDvh>,
+    )
+
     companion object {
-        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): List<AktivitetDvh> {
-            return vilkårsperioder
-                .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
-                .map {
-                    AktivitetDvh(
-                        type = AktivitetTypeDvh.fraDomene(it.type),
-                        resultat = ResultatVilkårperiodeDvh.fraDomene(it.resultat),
-                    )
-                }
+        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): JsonWrapper {
+            return JsonWrapper(
+                vilkårsperioder
+                    .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
+                    .map {
+                        AktiviteterDvh(
+                            type = AktivitetTypeDvh.fraDomene(it.type),
+                            resultat = ResultatVilkårperiodeDvh.fraDomene(it.resultat),
+                        )
+                    },
+            )
         }
     }
 }
 
-data class MålgruppeDvh(
+data class MålgrupperDvh(
     val type: MålgruppeTypeDvh,
     val resultat: ResultatVilkårperiodeDvh,
 ) {
+    data class JsonWrapper(
+        val målgrupper: List<MålgrupperDvh>,
+    )
+
     companion object {
-        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): List<MålgruppeDvh> {
-            return vilkårsperioder
-                .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
-                .map {
-                    MålgruppeDvh(
-                        type = MålgruppeTypeDvh.fraDomene(it.type),
-                        resultat = ResultatVilkårperiodeDvh.fraDomene(it.resultat),
-                    )
-                }
+        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): JsonWrapper {
+            return JsonWrapper(
+                vilkårsperioder
+                    .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
+                    .map {
+                        MålgrupperDvh(
+                            type = MålgruppeTypeDvh.fraDomene(it.type),
+                            resultat = ResultatVilkårperiodeDvh.fraDomene(it.resultat),
+                        )
+                    },
+            )
         }
     }
 }
@@ -257,14 +296,22 @@ enum class MålgruppeTypeDvh {
     }
 }
 
-data class VilkårsvurderingDvh(
+data class VilkårsvurderingerDvh(
     val resultat: VilkårsresultatDvh,
     val vilkår: List<DelvilkårDvh>,
 ) {
+    data class JsonWrapper(
+        val vilkårsvurderinger: List<VilkårsvurderingerDvh>,
+    )
+
     companion object {
-        fun fraDomene(delvilkår: List<DelvilkårDto>, resultat: Vilkårsresultat) = VilkårsvurderingDvh(
-            resultat = VilkårsresultatDvh.fraDomene(resultat),
-            vilkår = DelvilkårDvh.fraDomene(delvilkår),
+        fun fraDomene(vilkår: List<VilkårDto>) = JsonWrapper(
+            vilkår.map {
+                VilkårsvurderingerDvh(
+                    resultat = VilkårsresultatDvh.fraDomene(it.resultat),
+                    vilkår = DelvilkårDvh.fraDomene(it.delvilkårsett),
+                )
+            },
         )
     }
 }
@@ -301,8 +348,4 @@ enum class AdressebeskyttelseDvh {
                 AdressebeskyttelseGradering.UGRADERT -> UGRADERT
             }
     }
-}
-
-enum class ÅrsakRevurderingDvh {
-    // TODO når vi får revurdering i løsningen
 }
