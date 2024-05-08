@@ -8,9 +8,10 @@ metadata:
 
 spec:
   port: 8080
-  image: {{ image }}
+  image: { { image } }
   ingresses:
     - https://tilleggsstonader-sak.intern.nav.no
+    - https://tilleggsstonader-sak.ansatt.nav.no
   liveness:
     path: /internal/status/isAlive
     initialDelay: 30

@@ -11,6 +11,7 @@ spec:
   image: {{image}}
   ingresses:
     - https://tilleggsstonader-sak.intern.dev.nav.no
+    - https://tilleggsstonader-sak.ansatt.dev.nav.no
   liveness:
     path: /internal/status/isAlive
     initialDelay: 30
