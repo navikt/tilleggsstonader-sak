@@ -25,4 +25,12 @@ class AktivitetController(
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         return aktivitetService.hentAktiviteter(fagsakPersonId)
     }
+
+    @GetMapping("/behandling/{behandlingId}")
+    fun hentAktivitetForBehandling(
+        @PathVariable behandlingId: UUID,
+    ): List<AktivitetArenaDto> {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        return aktivitetService.hentAktivitetForBehandling(behandlingId)
+    }
 }
