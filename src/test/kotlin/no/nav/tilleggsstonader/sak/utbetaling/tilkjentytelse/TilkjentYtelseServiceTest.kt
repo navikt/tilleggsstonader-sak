@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
@@ -11,7 +12,6 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 import java.util.UUID
 
 class TilkjentYtelseServiceTest {
@@ -32,8 +32,8 @@ class TilkjentYtelseServiceTest {
             val andelTilkjentYtelse = andelTilkjentYtelse(
                 kildeBehandlingId = UUID.randomUUID(),
                 beløp = 1,
-                fom = LocalDate.now().plusDays(1),
-                tom = LocalDate.now().plusDays(1),
+                fom = osloDateNow().plusDays(1),
+                tom = osloDateNow().plusDays(1),
             )
             val tilkjentYtelse = tilkjentYtelse(behandling.id)
                 .copy(andelerTilkjentYtelse = setOf(andelTilkjentYtelse))
@@ -46,8 +46,8 @@ class TilkjentYtelseServiceTest {
             val andelTilkjentYtelse = andelTilkjentYtelse(
                 kildeBehandlingId = UUID.randomUUID(),
                 beløp = 1,
-                fom = LocalDate.now().minusDays(1),
-                tom = LocalDate.now().minusDays(1),
+                fom = osloDateNow().minusDays(1),
+                tom = osloDateNow().minusDays(1),
             )
             val tilkjentYtelse = tilkjentYtelse(behandling.id)
                 .copy(andelerTilkjentYtelse = setOf(andelTilkjentYtelse))

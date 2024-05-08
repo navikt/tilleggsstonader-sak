@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -20,14 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.web.client.exchange
-import java.time.LocalDate
 
 class StønadsperiodeControllerTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårperiodeService: VilkårperiodeService
 
-    private val dagensDato = LocalDate.now()
+    private val dagensDato = osloDateNow()
 
     @BeforeEach
     fun setUp() {

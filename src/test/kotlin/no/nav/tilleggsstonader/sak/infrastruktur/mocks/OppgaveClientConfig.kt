@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import org.springframework.context.annotation.Bean
@@ -22,7 +23,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Optional
 
@@ -155,7 +155,7 @@ class OppgaveClientConfig {
     private val journalføringsoppgaveRequest = OpprettOppgaveRequest(
         tema = Tema.TSO,
         oppgavetype = Oppgavetype.Journalføring,
-        fristFerdigstillelse = LocalDate.now().plusDays(14),
+        fristFerdigstillelse = osloDateNow().plusDays(14),
         beskrivelse = "Dummy søknad",
         behandlingstema = "ab0300",
         enhetsnummer = "",

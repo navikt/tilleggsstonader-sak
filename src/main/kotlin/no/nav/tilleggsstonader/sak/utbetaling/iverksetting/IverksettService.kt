@@ -69,6 +69,9 @@ class IverksettService(
         iverksettClient.iverksett(dto)
     }
 
+    fun hentAndelTilkjentYtelse(behandlingId: UUID) =
+        andelTilkjentYtelseRepository.findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId)
+
     private fun andelerForFørsteIverksettingAvBehandling(tilkjentYtelse: TilkjentYtelse): Collection<AndelTilkjentYtelse> {
         val måned = YearMonth.now()
         val andelerTilIverksetting = finnAndelerTilIverksetting(tilkjentYtelse, tilkjentYtelse.behandlingId, måned)

@@ -5,12 +5,12 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
-import java.time.LocalDate
 
 @Configuration
 @Profile("mock-aktivitet")
@@ -25,8 +25,8 @@ class AktivitetClientConfig {
             listOf(
                 AktivitetArenaDto(
                     id = "123",
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now().plusMonths(1),
+                    fom = osloDateNow(),
+                    tom = osloDateNow().plusMonths(1),
                     type = "TYPE",
                     typeNavn = "Type navn",
                     status = StatusAktivitet.AKTUELL,

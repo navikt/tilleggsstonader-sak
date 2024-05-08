@@ -277,7 +277,7 @@ fun årsakRevurdering(
 */
 /*
 fun revurderingsinformasjon() = RevurderingsinformasjonDto(
-    LocalDate.now(),
+    osloDateNow(),
     ÅrsakRevurderingDto(Opplysningskilde.MELDING_MODIA, Revurderingsårsak.ANNET, "beskrivelse"),
 )
  */
@@ -462,7 +462,7 @@ fun behandlingBarn(
  */
 
 /*
-fun barnMedIdent(fnr: String, navn: String, fødsel: Fødsel = fødsel(LocalDate.now())): BarnMedIdent =
+fun barnMedIdent(fnr: String, navn: String, fødsel: Fødsel = fødsel(osloDateNow())): BarnMedIdent =
     BarnMedIdent(
         adressebeskyttelse = emptyList(),
         bostedsadresse = emptyList(),

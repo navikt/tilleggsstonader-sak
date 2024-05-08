@@ -44,12 +44,12 @@ class BehandlingsstatistikkService(
         behandlingMetode: BehandlingMetode?,
     ) {
         val behandlingDVH = mapTilBehandlingDVH(
-            behandlingId,
-            hendelse,
-            hendelseTidspunkt,
-            gjeldendeSaksbehandler,
-            oppgaveId,
-            behandlingMetode,
+            behandlingId = behandlingId,
+            hendelse = hendelse,
+            hendelseTidspunkt = hendelseTidspunkt,
+            gjeldendeSaksbehandler = gjeldendeSaksbehandler,
+            oppgaveId = oppgaveId,
+            behandlingMetode = behandlingMetode,
         )
         behandlingsstatistikkProducer.sendBehandling(behandlingDVH)
     }
@@ -181,7 +181,7 @@ class BehandlingsstatistikkService(
     private fun utledResultatBegrunnelse(behandling: Saksbehandling): String? =
         when (behandling.resultat) {
             BehandlingResultat.HENLAGT -> behandling.henlagtÅrsak?.name
-            BehandlingResultat.AVSLÅTT -> TODO() // Implementer når vi har lagt inn støtte for avslag
+            BehandlingResultat.AVSLÅTT -> "UKJENT" // TODO: Send riktig verdier når vi får en liste over avslagsårsaker
 
             else -> null
         }

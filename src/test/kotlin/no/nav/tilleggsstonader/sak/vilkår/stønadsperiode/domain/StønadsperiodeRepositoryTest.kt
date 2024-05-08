@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain
 
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -8,7 +9,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
 
 internal class StønadsperiodeRepositoryTest : IntegrationTest() {
     @Autowired
@@ -19,8 +19,8 @@ internal class StønadsperiodeRepositoryTest : IntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
         val stønadsperiode = stønadsperiodeRepository.insert(
             Stønadsperiode(
-                fom = LocalDate.now(),
-                tom = LocalDate.now().plusDays(5),
+                fom = osloDateNow(),
+                tom = osloDateNow().plusDays(5),
                 behandlingId = behandling.id,
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
@@ -36,8 +36,8 @@ internal class StønadsperiodeRepositoryTest : IntegrationTest() {
 
         val stønadsperiode1 = stønadsperiodeRepository.insert(
             Stønadsperiode(
-                fom = LocalDate.now(),
-                tom = LocalDate.now().plusDays(5),
+                fom = osloDateNow(),
+                tom = osloDateNow().plusDays(5),
                 behandlingId = behandling.id,
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
@@ -46,8 +46,8 @@ internal class StønadsperiodeRepositoryTest : IntegrationTest() {
 
         val stønadsperiode2 = stønadsperiodeRepository.insert(
             Stønadsperiode(
-                fom = LocalDate.now(),
-                tom = LocalDate.now().plusDays(5),
+                fom = osloDateNow(),
+                tom = osloDateNow().plusDays(5),
                 behandlingId = behandling.id,
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
