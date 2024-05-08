@@ -15,7 +15,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
     @Autowired
     lateinit var vedtakstatistikkRepository: VedtakstatistikkRepository
 
-    final val id = UUID.randomUUID()
+    final val id: UUID = UUID.randomUUID()
 
     val dummyVedtaksstatistikk = Vedtaksstatistikk(
         id = id,
@@ -26,9 +26,9 @@ class VedtaksstatistikkTest : IntegrationTest() {
         relatertBehandlingId = null,
         adressebeskyttelse = AdressebeskyttelseDvh.UGRADERT,
         tidspunktVedtak = LocalDateTime.of(2024, Month.MAY, 7, 20, 30),
-        målgruppe = MålgruppeDvh.JsonWrapper(målgruppe = listOf()),
-        aktivitet = AktivitetDvh.JsonWrapper(aktivitet = listOf()),
-        vilkårsvurderinger = VilkårsvurderingDvh.JsonWrapper(
+        målgrupper = MålgrupperDvh.JsonWrapper(målgrupper = listOf()),
+        aktiviteter = AktiviteterDvh.JsonWrapper(aktivitet = listOf()),
+        vilkårsvurderinger = VilkårsvurderingerDvh.JsonWrapper(
             vilkårsvurderinger = listOf(),
         ),
         person = "Pelle",
@@ -40,8 +40,6 @@ class VedtaksstatistikkTest : IntegrationTest() {
         utbetalinger = UtbetalingerDvh.JsonWrapper(utbetalinger = listOf()),
         stønadstype = StønadstypeDvh.BARNETILSYN,
         kravMottatt = null,
-        årsakRevurdering = null,
-        avslagÅrsak = null,
     )
 
     @Test
@@ -51,25 +49,25 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     @Test
     fun `kan skrive og lese vedtaksstatistikk med flere aktiviteter`() {
-        val flereAktiviteter = AktivitetDvh.JsonWrapper(
+        val flereAktiviteter = AktiviteterDvh.JsonWrapper(
             listOf(
-                AktivitetDvh(type = AktivitetTypeDvh.REELL_ARBEIDSSØKER, resultat = ResultatVilkårperiodeDvh.OPPFYLT),
-                AktivitetDvh(type = AktivitetTypeDvh.UTDANNING, resultat = ResultatVilkårperiodeDvh.IKKE_OPPFYLT),
+                AktiviteterDvh(type = AktivitetTypeDvh.REELL_ARBEIDSSØKER, resultat = ResultatVilkårperiodeDvh.OPPFYLT),
+                AktiviteterDvh(type = AktivitetTypeDvh.UTDANNING, resultat = ResultatVilkårperiodeDvh.IKKE_OPPFYLT),
             ),
         )
 
-        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(aktivitet = flereAktiviteter))
+        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(aktiviteter = flereAktiviteter))
 
         val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
 
-        assertThat(vedtaksstatistikkFraDb.aktivitet).isEqualTo(flereAktiviteter)
+        assertThat(vedtaksstatistikkFraDb.aktiviteter).isEqualTo(flereAktiviteter)
     }
 
     @Test
     fun `kan skrive og lese vedtaksstatistikk med ikke-tom vilkårsvurdering`() {
-        val nøstetVilkårsvurdering = VilkårsvurderingDvh.JsonWrapper(
+        val nøstetVilkårsvurdering = VilkårsvurderingerDvh.JsonWrapper(
             listOf(
-                VilkårsvurderingDvh(
+                VilkårsvurderingerDvh(
                     resultat = VilkårsresultatDvh.OPPFYLT,
                     vilkår = listOf(
                         DelvilkårDvh(
@@ -90,17 +88,17 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     @Test
     fun `målgrupper kan hentes ut og blir parset til riktig type`() {
-        val målgrupper = MålgruppeDvh.JsonWrapper(
+        val målgrupper = MålgrupperDvh.JsonWrapper(
             listOf(
-                MålgruppeDvh(type = MålgruppeTypeDvh.DAGPENGER, resultat = ResultatVilkårperiodeDvh.OPPFYLT),
-                MålgruppeDvh(type = MålgruppeTypeDvh.AAP, resultat = ResultatVilkårperiodeDvh.IKKE_OPPFYLT),
+                MålgrupperDvh(type = MålgruppeTypeDvh.DAGPENGER, resultat = ResultatVilkårperiodeDvh.OPPFYLT),
+                MålgrupperDvh(type = MålgruppeTypeDvh.AAP, resultat = ResultatVilkårperiodeDvh.IKKE_OPPFYLT),
             ),
         )
 
-        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(målgruppe = målgrupper))
+        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(målgrupper = målgrupper))
 
         val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
 
-        assertThat(vedtaksstatistikkFraDb.målgruppe).isEqualTo(målgrupper)
+        assertThat(vedtaksstatistikkFraDb.målgrupper).isEqualTo(målgrupper)
     }
 }

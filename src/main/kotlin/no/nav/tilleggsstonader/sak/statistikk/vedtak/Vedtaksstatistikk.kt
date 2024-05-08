@@ -23,6 +23,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
+// TODO: Vurder om dette bør flyttes til kontrakter
+
 data class Vedtaksstatistikk(
     @Id
     val id: UUID = UUID.randomUUID(),
@@ -33,26 +35,25 @@ data class Vedtaksstatistikk(
     val relatertBehandlingId: Long?, // Ekstern behandlingsid på relatert behandling
     val adressebeskyttelse: AdressebeskyttelseDvh,
     val tidspunktVedtak: LocalDateTime,
-    @Column("målgruppe")
-    val målgruppe: MålgruppeDvh.JsonWrapper,
-    val aktivitet: AktivitetDvh.JsonWrapper,
-    @Column("vilkårsvurderinger")
-    val vilkårsvurderinger: VilkårsvurderingDvh.JsonWrapper,
+    @Column("malgrupper")
+    val målgrupper: MålgrupperDvh.JsonWrapper,
+    val aktiviteter: AktiviteterDvh.JsonWrapper,
+    @Column("vilkarsvurderinger")
+    val vilkårsvurderinger: VilkårsvurderingerDvh.JsonWrapper,
     val person: String,
     val barn: BarnDvh.JsonWrapper,
     val behandlingType: BehandlingTypeDvh,
+    @Column("behandling_arsak")
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
     val vedtaksperioder: VedtaksperioderDvh.JsonWrapper,
     val utbetalinger: UtbetalingerDvh.JsonWrapper,
-    @Column("stønadstype")
+    @Column("stonadstype")
     val stønadstype: StønadstypeDvh = BARNETILSYN,
     val kravMottatt: LocalDate?,
-    val årsakRevurdering: ÅrsakRevurderingDvh? = null,
-    val avslagÅrsak: String? = null,
+    // TODO: Legg inn årsak til revurdering når revurdering kommer i løsningen
+    // TODO: Legg inn årsak for avslag når avslag kommer i løsningen
 )
-
-// TODO: Vurder om dette bør flyttes til kontrakter
 
 enum class StønadstypeDvh {
     BARNETILSYN,
@@ -166,12 +167,12 @@ data class BarnDvh(
     }
 }
 
-data class AktivitetDvh(
+data class AktiviteterDvh(
     val type: AktivitetTypeDvh,
     val resultat: ResultatVilkårperiodeDvh,
 ) {
     data class JsonWrapper(
-        val aktivitet: List<AktivitetDvh>,
+        val aktivitet: List<AktiviteterDvh>,
     )
 
     companion object {
@@ -180,7 +181,7 @@ data class AktivitetDvh(
                 vilkårsperioder
                     .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
                     .map {
-                        AktivitetDvh(
+                        AktiviteterDvh(
                             type = AktivitetTypeDvh.fraDomene(it.type),
                             resultat = ResultatVilkårperiodeDvh.fraDomene(it.resultat),
                         )
@@ -190,12 +191,12 @@ data class AktivitetDvh(
     }
 }
 
-data class MålgruppeDvh(
+data class MålgrupperDvh(
     val type: MålgruppeTypeDvh,
     val resultat: ResultatVilkårperiodeDvh,
 ) {
     data class JsonWrapper(
-        val målgruppe: List<MålgruppeDvh>,
+        val målgrupper: List<MålgrupperDvh>,
     )
 
     companion object {
@@ -204,7 +205,7 @@ data class MålgruppeDvh(
                 vilkårsperioder
                     .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
                     .map {
-                        MålgruppeDvh(
+                        MålgrupperDvh(
                             type = MålgruppeTypeDvh.fraDomene(it.type),
                             resultat = ResultatVilkårperiodeDvh.fraDomene(it.resultat),
                         )
@@ -295,18 +296,18 @@ enum class MålgruppeTypeDvh {
     }
 }
 
-data class VilkårsvurderingDvh(
+data class VilkårsvurderingerDvh(
     val resultat: VilkårsresultatDvh,
     val vilkår: List<DelvilkårDvh>,
 ) {
     data class JsonWrapper(
-        val vilkårsvurderinger: List<VilkårsvurderingDvh>,
+        val vilkårsvurderinger: List<VilkårsvurderingerDvh>,
     )
 
     companion object {
         fun fraDomene(vilkår: List<VilkårDto>) = JsonWrapper(
             vilkår.map {
-                VilkårsvurderingDvh(
+                VilkårsvurderingerDvh(
                     resultat = VilkårsresultatDvh.fraDomene(it.resultat),
                     vilkår = DelvilkårDvh.fraDomene(it.delvilkårsett),
                 )
@@ -347,8 +348,4 @@ enum class AdressebeskyttelseDvh {
                 AdressebeskyttelseGradering.UGRADERT -> UGRADERT
             }
     }
-}
-
-enum class ÅrsakRevurderingDvh {
-    // TODO når vi får revurdering i løsningen
 }
