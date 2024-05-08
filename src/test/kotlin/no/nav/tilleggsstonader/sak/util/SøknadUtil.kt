@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
@@ -34,7 +35,7 @@ object SøknadUtil {
 
     fun søknadskjemaBarnetilsyn(
         ident: String = "søker",
-        mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
+        mottattTidspunkt: LocalDateTime = osloNow(),
         barnMedBarnepass: List<BarnMedBarnepass> = listOf(barnMedBarnepass()),
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
     ): Søknadsskjema<SøknadsskjemaBarnetilsyn> {

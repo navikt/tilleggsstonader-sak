@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto
 
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 import java.util.UUID
 
 class StønadsperiodeDtoTest {
@@ -14,8 +14,8 @@ class StønadsperiodeDtoTest {
         assertThatThrownBy {
             StønadsperiodeDto(
                 id = UUID.randomUUID(),
-                fom = LocalDate.now(),
-                tom = LocalDate.now().minusDays(1),
+                fom = osloDateNow(),
+                tom = osloDateNow().minusDays(1),
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
             )

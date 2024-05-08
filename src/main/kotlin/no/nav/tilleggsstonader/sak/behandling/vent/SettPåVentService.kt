@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -14,7 +15,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 import java.util.Optional
 import java.util.UUID
 
@@ -169,7 +169,7 @@ class SettPåVentService(
                 id = oppgave.id,
                 versjon = oppgave.versjon,
                 tilordnetRessurs = tilordnetRessurs,
-                fristFerdigstillelse = LocalDate.now(),
+                fristFerdigstillelse = osloDateNow(),
                 beskrivelse = SettPåVentBeskrivelseUtil.taAvVent(oppgave),
                 mappeId = Optional.empty(),
             ),

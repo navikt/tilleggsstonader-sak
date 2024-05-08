@@ -277,7 +277,7 @@ fun årsakRevurdering(
 */
 /*
 fun revurderingsinformasjon() = RevurderingsinformasjonDto(
-    LocalDate.now(),
+    osloDateNow(),
     ÅrsakRevurderingDto(Opplysningskilde.MELDING_MODIA, Revurderingsårsak.ANNET, "beskrivelse"),
 )
  */
@@ -352,7 +352,7 @@ fun vedtak(
         inntekter = inntekter,
         saksbehandlerIdent = "VL",
         opprettetAv = "VL",
-        opprettetTid = LocalDateTime.now(),
+        opprettetTid = osloNow(),
     )
  */
 /*
@@ -372,7 +372,7 @@ fun vedtakBarnetilsyn(
     tilleggsstønad = TilleggsstønadWrapper(false, emptyList(), null),
     saksbehandlerIdent = "VL",
     opprettetAv = "VL",
-    opprettetTid = LocalDateTime.now(),
+    opprettetTid = osloNow(),
 )
  */
 /*
@@ -462,7 +462,7 @@ fun behandlingBarn(
  */
 
 /*
-fun barnMedIdent(fnr: String, navn: String, fødsel: Fødsel = fødsel(LocalDate.now())): BarnMedIdent =
+fun barnMedIdent(fnr: String, navn: String, fødsel: Fødsel = fødsel(osloDateNow())): BarnMedIdent =
     BarnMedIdent(
         adressebeskyttelse = emptyList(),
         bostedsadresse = emptyList(),

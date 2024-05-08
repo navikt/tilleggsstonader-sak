@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -10,7 +11,6 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.UUID
 
@@ -21,8 +21,8 @@ class IverksettBehandlingMånedTaskTest {
     private val taskStep = IverksettBehandlingMånedTask(behandlingService, iverksettService)
 
     val fagsak = fagsak()
-    val behandling = behandling(fagsak, vedtakstidspunkt = LocalDateTime.now().minusDays(1))
-    val behandling2 = behandling(fagsak, forrigeBehandlingId = behandling.id, vedtakstidspunkt = LocalDateTime.now())
+    val behandling = behandling(fagsak, vedtakstidspunkt = osloNow().minusDays(1))
+    val behandling2 = behandling(fagsak, forrigeBehandlingId = behandling.id, vedtakstidspunkt = osloNow())
     val måned = YearMonth.now()
 
     @BeforeEach
