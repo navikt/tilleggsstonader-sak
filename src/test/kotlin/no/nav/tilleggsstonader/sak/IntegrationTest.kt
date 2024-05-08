@@ -145,7 +145,7 @@ abstract class IntegrationTest {
             PersonIdent::class,
             FagsakPerson::class,
 
-            Vedtaksstatistikk::class
+            Vedtaksstatistikk::class,
         ).forEach { jdbcAggregateOperations.deleteAll(it.java) }
     }
 

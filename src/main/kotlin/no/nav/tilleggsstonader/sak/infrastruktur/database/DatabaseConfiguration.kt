@@ -227,5 +227,4 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class DetaljerVilkårperiodeReader : JsonReader<DelvilkårVilkårperiode>(DelvilkårVilkårperiode::class)
 
     class DetaljerVilkårperiodeWriter : JsonWriter<DelvilkårVilkårperiode>()
-
 }
