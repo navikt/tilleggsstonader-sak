@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
@@ -49,7 +50,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
     }
 
     @Test
-    fun `kan skrive vedtaksstatistikk med flere aktiviteter til tabell`() {
+    fun `kan skrive og lese vedtaksstatistikk med flere aktiviteter`() {
         val flereAktiviteter = AktivitetDvh.JsonWrapper(
             listOf(
                 AktivitetDvh(type = AktivitetTypeDvh.REELL_ARBEIDSSØKER, resultat = ResultatVilkårperiodeDvh.OPPFYLT),
@@ -58,10 +59,14 @@ class VedtaksstatistikkTest : IntegrationTest() {
         )
 
         vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(aktivitet = flereAktiviteter))
+
+        val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
+
+        assertThat(vedtaksstatistikkFraDb.aktivitet).isEqualTo(flereAktiviteter)
     }
 
     @Test
-    fun `kan skrive vedtaksstatistikk med ikke-tom vilkårsvurdering til tabell`() {
+    fun `kan skrive og lese vedtaksstatistikk med ikke-tom vilkårsvurdering`() {
         val nøstetVilkårsvurdering = VilkårsvurderingDvh.JsonWrapper(
             listOf(
                 VilkårsvurderingDvh(
@@ -77,5 +82,25 @@ class VedtaksstatistikkTest : IntegrationTest() {
         )
 
         vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(vilkårsvurderinger = nøstetVilkårsvurdering))
+
+        val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
+
+        assertThat(vedtaksstatistikkFraDb.vilkårsvurderinger).isEqualTo(nøstetVilkårsvurdering)
+    }
+
+    @Test
+    fun `målgrupper kan hentes ut og blir parset til riktig type`() {
+        val målgrupper = MålgruppeDvh.JsonWrapper(
+            listOf(
+                MålgruppeDvh(type = MålgruppeTypeDvh.DAGPENGER, resultat = ResultatVilkårperiodeDvh.OPPFYLT),
+                MålgruppeDvh(type = MålgruppeTypeDvh.AAP, resultat = ResultatVilkårperiodeDvh.IKKE_OPPFYLT),
+            ),
+        )
+
+        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(målgruppe = målgrupper))
+
+        val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
+
+        assertThat(vedtaksstatistikkFraDb.målgruppe).isEqualTo(målgrupper)
     }
 }
