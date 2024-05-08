@@ -34,6 +34,27 @@ class SettPåVentBeskrivelseUtilTest {
                 Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", tilordnetRessurs = "a100"),
                 LocalDate.of(2023, 1, 1),
                 tidspunkt,
+                "Kommentar fra saksbehandler",
+            )
+            assertThat(beskrivelse).isEqualTo(
+                """
+                --- 05.03.2024 18:00 a100 (a100) ---
+                Oppgave endret frist fra <ingen> til 01.01.2023
+                Oppgave flyttet fra saksbehandler a100 til <ingen>
+                Kommentar fra saksbehandler
+                
+                tidligere beskrivelse
+                """.trimIndent(),
+            )
+        }
+
+        @Test
+        fun `skal oppdatere beskrivelse med ny info og beholde eksisterende beskrivelse - uten kommentar`() {
+            val beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(
+                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", tilordnetRessurs = "a100"),
+                LocalDate.of(2023, 1, 1),
+                tidspunkt,
+                null,
             )
             assertThat(beskrivelse).isEqualTo(
                 """
@@ -56,11 +77,13 @@ class SettPåVentBeskrivelseUtilTest {
                 Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse"),
                 LocalDate.of(2023, 1, 1),
                 tidspunkt,
+                "Endret kommentar fra saksbehandler",
             )
             assertThat(beskrivelse).isEqualTo(
                 """
                 --- 05.03.2024 18:00 a100 (a100) ---
                 Oppgave endret frist fra <ingen> til 01.01.2023
+                Endret kommentar fra saksbehandler
 
                 tidligere beskrivelse
                 """.trimIndent(),
@@ -68,12 +91,32 @@ class SettPåVentBeskrivelseUtilTest {
         }
 
         @Test
-        fun `uendret frist`() {
+        fun `uendret frist - endret kommentar`() {
             val frist = LocalDate.of(2023, 1, 1)
             val beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
                 Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", fristFerdigstillelse = frist),
                 frist,
                 tidspunkt,
+                "Ny kommentar",
+            )
+            assertThat(beskrivelse).isEqualTo(
+                """
+                --- 05.03.2024 18:00 a100 (a100) ---
+                Ny kommentar
+                
+                tidligere beskrivelse
+                """.trimIndent(),
+            )
+        }
+
+        @Test
+        fun `uendret frist og kommentar`() {
+            val frist = LocalDate.of(2023, 1, 1)
+            val beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
+                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", fristFerdigstillelse = frist),
+                frist,
+                tidspunkt,
+                null,
             )
             assertThat(beskrivelse).isEqualTo(
                 """

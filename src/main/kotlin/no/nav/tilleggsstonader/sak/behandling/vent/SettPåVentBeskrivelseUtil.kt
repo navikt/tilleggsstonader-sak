@@ -13,12 +13,14 @@ object SettPåVentBeskrivelseUtil {
         oppgave: Oppgave,
         frist: LocalDate,
         tidspunkt: LocalDateTime = LocalDateTime.now(),
+        kommentar: String?,
     ): String {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
         return utledBeskrivelsePrefix(tidspunkt) +
             utledOppgavefristBeskrivelse(oppgave, frist).påNyRadEllerTomString() +
             tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+            kommentar.påNyRadEllerTomString() +
             nåværendeBeskrivelse(oppgave)
     }
 
@@ -26,13 +28,15 @@ object SettPåVentBeskrivelseUtil {
         oppgave: Oppgave,
         frist: LocalDate,
         tidspunkt: LocalDateTime = LocalDateTime.now(),
+        endretKommentar: String?,
     ): String {
         val fristBeskrivelse = utledOppgavefristBeskrivelse(oppgave, frist)
-        if (fristBeskrivelse.isEmpty()) {
+        if (fristBeskrivelse.isEmpty() && endretKommentar.isNullOrBlank()) {
             return oppgave.beskrivelse ?: ""
         }
         return utledBeskrivelsePrefix(tidspunkt) +
             fristBeskrivelse.påNyRadEllerTomString() +
+            endretKommentar.påNyRadEllerTomString() +
             nåværendeBeskrivelse(oppgave)
     }
 

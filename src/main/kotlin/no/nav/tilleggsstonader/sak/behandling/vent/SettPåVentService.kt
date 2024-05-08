@@ -82,6 +82,7 @@ class SettPåVentService(
         if (harEndretÅrsaker(settPåVent, dto)) {
             opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, mapOf("årsaker" to dto.årsaker))
         }
+
         settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
 
         val oppgaveResponse = oppdaterOppgave(settPåVent, dto)
@@ -100,6 +101,9 @@ class SettPåVentService(
         dto: OppdaterSettPåVentDto,
     ) = !settPåVent.årsaker.containsAll(dto.årsaker) ||
         settPåVent.årsaker.size != dto.årsaker.size
+
+    private fun harEndretKommentar(settPåVent: SettPåVent, dto: OppdaterSettPåVentDto) =
+        settPåVent.kommentar != dto.kommentar
 
     private fun hentOppgave(behandlingId: UUID): Oppgave {
         val oppgave = hentBehandleSakOppgave(behandlingId)
@@ -137,7 +141,11 @@ class SettPåVentService(
             versjon = oppgave.versjon,
             tilordnetRessurs = "",
             fristFerdigstillelse = dto.frist,
-            beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, dto.frist),
+            beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(
+                oppgave = oppgave,
+                frist = dto.frist,
+                kommentar = dto.kommentar,
+            ),
             mappeId = Optional.of(mappeId),
         )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
@@ -152,7 +160,11 @@ class SettPåVentService(
             id = settPåVent.oppgaveId,
             versjon = dto.oppgaveVersjon,
             fristFerdigstillelse = dto.frist,
-            beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(oppgave, dto.frist),
+            beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
+                oppgave,
+                dto.frist,
+                endretKommentar = if (harEndretKommentar(settPåVent, dto)) dto.kommentar else null,
+            ),
         )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
     }
