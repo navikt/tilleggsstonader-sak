@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.OppholdUtenforNorg
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -46,7 +47,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 @RestController
@@ -126,7 +126,7 @@ class OpprettTestBehandlingController(
         )
         val skjema = Søknadsskjema(
             ident = fagsak.hentAktivIdent(),
-            mottattTidspunkt = LocalDateTime.now(),
+            mottattTidspunkt = osloNow(),
             språk = Språkkode.NB,
             skjema = skjemaBarnetilsyn,
         )

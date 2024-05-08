@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_SIGNATUR_PLACEHOLDER
@@ -27,7 +28,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.BAD_REQUEST
-import java.time.LocalDate
 
 internal class BrevServiceTest {
 
@@ -204,7 +204,7 @@ internal class BrevServiceTest {
 
         brevService.forhåndsvisBeslutterBrev(saksbehandling(fagsak, behandlingForBeslutter))
 
-        val vedtaksdato = LocalDate.now().norskFormat()
+        val vedtaksdato = osloDateNow().norskFormat()
 
         assertThat(htmlSlot.captured).isEqualTo("html med placeholder $beslutterNavn, vedtaksdato $vedtaksdato og en liten avslutning")
     }

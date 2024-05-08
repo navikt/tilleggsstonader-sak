@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
@@ -17,7 +18,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandl
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
-import java.time.LocalDate
 
 /**
  * Oppretter oppgaver ut fra de som finnes i oppgaveRepository, for å populere oppgavebenken
@@ -71,7 +71,7 @@ class OpprettOppgaveConfig(
                 behandlingstema = mapBehandlingstema(behandling.stønadstype).value,
                 behandlingstype = Behandlingstype.NASJONAL.value,
                 enhetsnummer = mapEnhet(),
-                fristFerdigstillelse = LocalDate.now().plusDays(14),
+                fristFerdigstillelse = osloDateNow().plusDays(14),
                 beskrivelse = mapBeskrivelse(oppgavetype),
                 behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgavetype),
             ),
