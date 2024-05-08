@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -23,7 +24,6 @@ import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 class FagsakRepositoryTest : IntegrationTest() {
@@ -53,7 +53,7 @@ class FagsakRepositoryTest : IntegrationTest() {
                 status = BehandlingStatus.FERDIGSTILT,
             ),
         )
-        val andel = andelTilkjentYtelse(behandling.id, fom = LocalDate.now(), tom = LocalDate.now())
+        val andel = andelTilkjentYtelse(behandling.id, fom = osloDateNow(), tom = osloDateNow())
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andeler = arrayOf(andel)))
 
         val harLøpendeUtbetaling = fagsakRepository.harLøpendeUtbetaling(fagsak.id)
@@ -72,8 +72,8 @@ class FagsakRepositoryTest : IntegrationTest() {
                 status = BehandlingStatus.FERDIGSTILT,
             ),
         )
-        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, "321", LocalDate.now().year))
-        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, "321", LocalDate.now().year))
+        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, "321", osloDateNow().year))
+        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, "321", osloDateNow().year))
 
         val harLøpendeUtbetaling = fagsakRepository.harLøpendeUtbetaling(fagsak.id)
 

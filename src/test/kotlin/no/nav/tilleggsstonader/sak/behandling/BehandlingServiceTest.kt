@@ -7,6 +7,7 @@ import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkObject
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -37,7 +38,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -88,7 +88,7 @@ internal class BehandlingServiceTest {
                 status = BehandlingStatus.OPPRETTET,
                 stegType = StegType.VILKÅR,
                 behandlingsårsak = BehandlingÅrsak.PAPIRSØKNAD,
-                kravMottatt = LocalDate.now().plusDays(1),
+                kravMottatt = osloDateNow().plusDays(1),
                 erMigrering = false,
                 behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
                 fagsakId = UUID.randomUUID(),
