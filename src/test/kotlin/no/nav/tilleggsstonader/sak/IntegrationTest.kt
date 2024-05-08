@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.Vedtaksstatistikk
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
@@ -143,6 +144,8 @@ abstract class IntegrationTest {
             FagsakDomain::class,
             PersonIdent::class,
             FagsakPerson::class,
+
+            Vedtaksstatistikk::class
         ).forEach { jdbcAggregateOperations.deleteAll(it.java) }
     }
 
