@@ -127,6 +127,13 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 MålgruppeDvhTilPgobjektConverter(),
                 AktivitetDvhTilPgobjektConverter(),
                 VilkårsvurderingDvhTilPgobjektConverter(),
+
+                MålgruppeDvhReader(),
+                AktivitetDvhReader(),
+                VilkårsvurderingDvhReader(),
+                BarnDvhReader(),
+                UtbetalingerDvhReader(),
+                VedtaksperioderDvhReader(),
             ),
         )
     }
@@ -249,6 +256,44 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             }
     }
 
+    @ReadingConverter
+    class MålgruppeDvhReader : Converter<PGobject, MålgruppeDvh.JsonWrapper> {
+        override fun convert(pgObject: PGobject) =
+            MålgruppeDvh.JsonWrapper(pgObject.value?.let { objectMapper.readValue(it) } ?: emptyList())
+    }
+
+    @ReadingConverter
+    class AktivitetDvhReader : Converter<PGobject, AktivitetDvh.JsonWrapper> {
+        override fun convert(pgObject: PGobject) =
+            AktivitetDvh.JsonWrapper(pgObject.value?.let { objectMapper.readValue(it) } ?: emptyList())
+    }
+
+    @ReadingConverter
+    class VilkårsvurderingDvhReader : Converter<PGobject, VilkårsvurderingDvh.JsonWrapper> {
+        override fun convert(pgObject: PGobject) =
+            VilkårsvurderingDvh.JsonWrapper(pgObject.value?.let { objectMapper.readValue(it) } ?: emptyList())
+    }
+
+    @ReadingConverter
+    class BarnDvhReader : Converter<PGobject, BarnDvh.JsonWrapper> {
+        override fun convert(pgObject: PGobject) =
+            BarnDvh.JsonWrapper(pgObject.value?.let { objectMapper.readValue(it) } ?: emptyList())
+    }
+
+    @ReadingConverter
+    class UtbetalingerDvhReader : Converter<PGobject, UtbetalingerDvh.JsonWrapper> {
+        override fun convert(pgObject: PGobject) =
+            UtbetalingerDvh.JsonWrapper(pgObject.value?.let { objectMapper.readValue(it) } ?: emptyList())
+    }
+
+
+    @ReadingConverter
+    class VedtaksperioderDvhReader : Converter<PGobject, VedtaksperioderDvh.JsonWrapper> {
+        override fun convert(pgObject: PGobject) =
+            VedtaksperioderDvh.JsonWrapper(pgObject.value?.let { objectMapper.readValue(it) } ?: emptyList())
+    }
+
+
     @WritingConverter
     class AktivitetDvhTilPgobjektConverter : Converter<AktivitetDvh.JsonWrapper, PGobject> {
         override fun convert(data: AktivitetDvh.JsonWrapper) =
@@ -294,4 +339,5 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class DetaljerVilkårperiodeReader : JsonReader<DelvilkårVilkårperiode>(DelvilkårVilkårperiode::class)
 
     class DetaljerVilkårperiodeWriter : JsonWriter<DelvilkårVilkårperiode>()
+
 }
