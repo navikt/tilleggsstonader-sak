@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
@@ -106,7 +107,7 @@ class OppgaveService(
             tema = Tema.TSO,
             journalpostId = oppgave.journalpostId,
             oppgavetype = oppgave.oppgavetype,
-            fristFerdigstillelse = oppgave.fristFerdigstillelse ?: lagFristForOppgave(LocalDateTime.now()),
+            fristFerdigstillelse = oppgave.fristFerdigstillelse ?: lagFristForOppgave(osloNow()),
             beskrivelse = lagOppgaveTekst(oppgave.beskrivelse),
             enhetsnummer = enhetsnummer,
             behandlingstema = finnBehandlingstema(stønadstype).value,
@@ -179,7 +180,7 @@ class OppgaveService(
     }
 
     private fun lagOppgaveTekst(beskrivelse: String? = null): String {
-        val tidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+        val tidspunkt = osloNow().format(DateTimeFormatter.ISO_DATE_TIME)
         val prefix = "----- Opprettet av tilleggsstonader-sak $tidspunkt ---"
         val beskrivelseMedNewLine = beskrivelse?.let { "\n$it" } ?: ""
         return prefix + beskrivelseMedNewLine

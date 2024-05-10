@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.medGosysTid
 import no.nav.tilleggsstonader.sak.util.norskFormat
@@ -12,7 +13,7 @@ object SettPåVentBeskrivelseUtil {
     fun settPåVent(
         oppgave: Oppgave,
         frist: LocalDate,
-        tidspunkt: LocalDateTime = LocalDateTime.now(),
+        tidspunkt: LocalDateTime = osloNow(),
     ): String {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
@@ -25,7 +26,7 @@ object SettPåVentBeskrivelseUtil {
     fun oppdaterSettPåVent(
         oppgave: Oppgave,
         frist: LocalDate,
-        tidspunkt: LocalDateTime = LocalDateTime.now(),
+        tidspunkt: LocalDateTime = osloNow(),
     ): String {
         val fristBeskrivelse = utledOppgavefristBeskrivelse(oppgave, frist)
         if (fristBeskrivelse.isEmpty()) {
@@ -36,7 +37,7 @@ object SettPåVentBeskrivelseUtil {
             nåværendeBeskrivelse(oppgave)
     }
 
-    fun taAvVent(oppgave: Oppgave, tidspunkt: LocalDateTime = LocalDateTime.now()): String {
+    fun taAvVent(oppgave: Oppgave, tidspunkt: LocalDateTime = osloNow()): String {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, SikkerhetContext.hentSaksbehandlerEllerSystembruker())
         return utledBeskrivelsePrefix(tidspunkt) +

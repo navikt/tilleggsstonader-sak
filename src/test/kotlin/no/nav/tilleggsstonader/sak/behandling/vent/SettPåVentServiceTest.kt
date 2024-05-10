@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 import io.mockk.every
 import io.mockk.mockkObject
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_PÅ_VENT
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
 import kotlin.jvm.optionals.getOrNull
 
 class SettPåVentServiceTest : IntegrationTest() {
@@ -36,13 +36,13 @@ class SettPåVentServiceTest : IntegrationTest() {
 
     val settPåVentDto = SettPåVentDto(
         årsaker = listOf(ÅrsakSettPåVent.ANNET),
-        frist = LocalDate.now().plusDays(3),
+        frist = osloDateNow().plusDays(3),
         kommentar = "ny beskrivelse",
     )
 
     val oppdaterSettPåVentDto = OppdaterSettPåVentDto(
         årsaker = listOf(ÅrsakSettPåVent.ANTALL_DAGER_PÅ_TILTAK),
-        frist = LocalDate.now().plusDays(5),
+        frist = osloDateNow().plusDays(5),
         kommentar = "oppdatert beskrivelse",
         oppgaveVersjon = 1,
     )
@@ -136,7 +136,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             with(oppgaveService.hentOppgave(oppgaveId!!)) {
                 assertThat(tilordnetRessurs).isEqualTo(dummySaksbehandler)
                 assertThat(beskrivelse).contains("Tatt av vent")
-                assertThat(fristFerdigstillelse).isEqualTo(LocalDate.now())
+                assertThat(fristFerdigstillelse).isEqualTo(osloDateNow())
                 assertThat(mappeId).isEmpty()
             }
         }

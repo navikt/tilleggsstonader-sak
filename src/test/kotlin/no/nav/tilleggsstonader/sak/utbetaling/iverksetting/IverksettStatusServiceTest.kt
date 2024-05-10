@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import io.mockk.every
 import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -24,7 +25,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDateTime
 
 class IverksettStatusServiceTest : IntegrationTest() {
 
@@ -57,7 +57,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
         val iverksattAndel = andelTilkjentYtelse(
             kildeBehandlingId = behandling.id,
             statusIverksetting = StatusIverksetting.SENDT,
-            iverksetting = Iverksetting(behandling.id, LocalDateTime.now()),
+            iverksetting = Iverksetting(behandling.id, osloNow()),
         )
         val andelIkkeSendt = andelTilkjentYtelse(kildeBehandlingId = behandling.id)
         val tilkjentYtelse = opprettTilkjentYtelse(behandling, iverksattAndel, andelIkkeSendt)
@@ -82,7 +82,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
 
     @Test
     fun `skal kaste feil hvis andel for iverksetting har annen status enn SENDT`() {
-        val iverksetting = Iverksetting(behandling.id, LocalDateTime.now())
+        val iverksetting = Iverksetting(behandling.id, osloNow())
         val andel =
             andelTilkjentYtelse(behandling.id, statusIverksetting = StatusIverksetting.OK, iverksetting = iverksetting)
         opprettTilkjentYtelse(behandling, andel)
@@ -111,7 +111,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
         val iverksattAndel = andelTilkjentYtelse(
             kildeBehandlingId = behandling.id,
             statusIverksetting = StatusIverksetting.SENDT,
-            iverksetting = Iverksetting(behandling.id, LocalDateTime.now()),
+            iverksetting = Iverksetting(behandling.id, osloNow()),
             beløp = 100,
         )
         opprettTilkjentYtelse(behandling, iverksattAndel)
@@ -129,7 +129,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
         val iverksattAndel = andelTilkjentYtelse(
             kildeBehandlingId = behandling.id,
             statusIverksetting = StatusIverksetting.SENDT,
-            iverksetting = Iverksetting(behandling.id, LocalDateTime.now()),
+            iverksetting = Iverksetting(behandling.id, osloNow()),
             beløp = 0,
         )
         opprettTilkjentYtelse(behandling, iverksattAndel)

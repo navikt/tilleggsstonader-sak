@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.util.DatoFormat.DATE_FORMAT_NORSK
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDato
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDatoMedTid
@@ -7,7 +9,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
 import java.time.YearMonth
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 object DatoFormat {
@@ -20,9 +21,9 @@ object DatoFormat {
 
 object DatoUtil {
 
-    fun dagensDatoMedTid(): LocalDateTime = LocalDateTime.now()
-    fun dagensDato(): LocalDate = LocalDate.now()
-    fun inneværendeÅr() = LocalDate.now().year
+    fun dagensDatoMedTid(): LocalDateTime = osloNow()
+    fun dagensDato(): LocalDate = osloDateNow()
+    fun inneværendeÅr() = osloDateNow().year
     fun årMånedNå() = YearMonth.now()
 }
 
@@ -30,13 +31,9 @@ val YEAR_MONTH_MAX = YearMonth.from(LocalDate.MAX)
 
 fun antallÅrSiden(dato: LocalDate?) = dato?.let { Period.between(it, dagensDato()).years }
 
-val ZONE_ID_OSLO: ZoneId = ZoneId.of("Europe/Oslo")
-
-fun osloNow(): LocalDateTime = LocalDateTime.now(ZONE_ID_OSLO)
-
 fun LocalDate.norskFormat() = this.format(DATE_FORMAT_NORSK)
 
-fun datoEllerIdag(localDate: LocalDate?): LocalDate = localDate ?: LocalDate.now()
+fun datoEllerIdag(localDate: LocalDate?): LocalDate = localDate ?: osloDateNow()
 
 fun min(first: LocalDateTime?, second: LocalDateTime?): LocalDateTime? {
     return when {
@@ -63,25 +60,25 @@ fun LocalDate.harPåfølgendeMåned(påfølgende: LocalDate): Boolean =
 fun YearMonth.erPåfølgende(påfølgende: YearMonth): Boolean = this.plusMonths(1) == påfølgende
 
 fun LocalDate.er6MndEllerMer(): Boolean {
-    return this.plusDays(183) <= LocalDate.now()
+    return this.plusDays(183) <= osloDateNow()
 }
 
 fun LocalDate.erEttÅrEllerMer(): Boolean {
-    return this.plusYears(1) <= LocalDate.now()
+    return this.plusYears(1) <= osloDateNow()
 }
 
 fun LocalDate.er6MndEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolean {
     return this.er6MndEllerMer() &&
-        LocalDate.now() < this.plusDays(182).plusDays(numberOfDaysCutoff)
+        osloDateNow() < this.plusDays(182).plusDays(numberOfDaysCutoff)
 }
 
 fun LocalDate.erEttÅrEllerMerOgInnenforCutoff(numberOfDaysCutoff: Long): Boolean {
     return erEttÅrEllerMer() &&
-        LocalDate.now() <= this.plusYears(1).plusDays(numberOfDaysCutoff)
+        osloDateNow() <= this.plusYears(1).plusDays(numberOfDaysCutoff)
 }
 
 fun LocalDateTime.harGåttAntallTimer(timer: Int) =
-    this.plusHours(timer.toLong()) < LocalDateTime.now()
+    this.plusHours(timer.toLong()) < osloNow()
 
 fun dagensDatoMedTidNorskFormat(): String = dagensDatoMedTid().medGosysTid()
 

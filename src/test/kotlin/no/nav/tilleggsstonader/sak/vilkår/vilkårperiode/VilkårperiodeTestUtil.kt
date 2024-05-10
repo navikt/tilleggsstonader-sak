@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
@@ -21,8 +22,8 @@ object VilkårperiodeTestUtil {
 
     fun målgruppe(
         behandlingId: UUID = UUID.randomUUID(),
-        fom: LocalDate = LocalDate.now(),
-        tom: LocalDate = LocalDate.now().plusDays(5),
+        fom: LocalDate = osloDateNow(),
+        tom: LocalDate = osloDateNow().plusDays(5),
         type: MålgruppeType = MålgruppeType.AAP,
         delvilkår: DelvilkårMålgruppe = delvilkårMålgruppe(),
         begrunnelse: String? = null,
@@ -64,8 +65,8 @@ object VilkårperiodeTestUtil {
 
     fun aktivitet(
         behandlingId: UUID = UUID.randomUUID(),
-        fom: LocalDate = LocalDate.now(),
-        tom: LocalDate = LocalDate.now().plusDays(5),
+        fom: LocalDate = osloDateNow(),
+        tom: LocalDate = osloDateNow().plusDays(5),
         type: AktivitetType = AktivitetType.TILTAK,
         aktivitetsdager: Int = 5,
         delvilkår: DelvilkårAktivitet = delvilkårAktivitet(),
@@ -101,8 +102,8 @@ object VilkårperiodeTestUtil {
 
     fun opprettVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,
-        fom: LocalDate = LocalDate.now(),
-        tom: LocalDate = LocalDate.now(),
+        fom: LocalDate = osloDateNow(),
+        tom: LocalDate = osloDateNow(),
         medlemskap: VurderingDto? = null,
         dekkesAvAnnetRegelverk: VurderingDto? = null,
         begrunnelse: String? = null,
@@ -118,8 +119,8 @@ object VilkårperiodeTestUtil {
 
     fun opprettVilkårperiodeAktivitet(
         type: AktivitetType = AktivitetType.TILTAK,
-        fom: LocalDate = LocalDate.now(),
-        tom: LocalDate = LocalDate.now(),
+        fom: LocalDate = osloDateNow(),
+        tom: LocalDate = osloDateNow(),
         lønnet: VurderingDto? = null,
         begrunnelse: String? = null,
         behandlingId: UUID = UUID.randomUUID(),

@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.behandling
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunktEllerEndretTid
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingUtil.validerKanOppretteNyBehandling
@@ -67,7 +69,7 @@ class BehandlingService(
 
     fun hentUferdigeBehandlingerOpprettetFørDato(
         stønadtype: Stønadstype,
-        opprettetFørDato: LocalDateTime = LocalDateTime.now().minusMonths(1),
+        opprettetFørDato: LocalDateTime = osloNow().minusMonths(1),
     ): List<Behandling> {
         return behandlingRepository.hentUferdigeBehandlingerOpprettetFørDato(stønadtype, opprettetFørDato)
     }
@@ -104,7 +106,7 @@ class BehandlingService(
         kravMottatt: LocalDate? = null,
         erMigrering: Boolean = false,
     ): Behandling {
-        brukerfeilHvis(kravMottatt != null && kravMottatt.isAfter(LocalDate.now())) {
+        brukerfeilHvis(kravMottatt != null && kravMottatt.isAfter(osloDateNow())) {
             "Kan ikke sette krav mottattdato frem i tid"
         }
         feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_BEHANDLING)) {

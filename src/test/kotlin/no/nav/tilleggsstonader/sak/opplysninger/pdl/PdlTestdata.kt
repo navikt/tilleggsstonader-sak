@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Bostedsadresse
@@ -45,8 +47,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UtflyttingFraNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Vegadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergeEllerFullmektig
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergemaalEllerFremtidsfullmakt
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 object PdlTestdata {
 
@@ -66,7 +66,7 @@ object PdlTestdata {
     private val matrikkeladresse = Matrikkeladresse(1L, "", "", "")
     private val utenlandskAdresse = UtenlandskAdresse("", "", "", "", "", "", "")
 
-    private val folkeregistermetadata = Folkeregistermetadata(LocalDateTime.now(), LocalDateTime.now())
+    private val folkeregistermetadata = Folkeregistermetadata(osloNow(), osloNow())
 
     private val navn = listOf(Navn("", "", "", metadataGjeldende))
 
@@ -75,9 +75,9 @@ object PdlTestdata {
 
     private val bostedsadresse = listOf(
         Bostedsadresse(
-            LocalDate.now().minusDays(10),
-            LocalDate.now(),
-            LocalDate.now(),
+            osloDateNow().minusDays(10),
+            osloDateNow(),
+            osloDateNow(),
             "",
             utenlandskAdresse,
             vegadresse,
@@ -87,18 +87,18 @@ object PdlTestdata {
         ),
     )
 
-    private val dødsfall = listOf(Dødsfall(LocalDate.now()))
+    private val dødsfall = listOf(Dødsfall(osloDateNow()))
 
     private val familierelasjon =
         listOf(ForelderBarnRelasjon("", Familierelasjonsrolle.BARN, Familierelasjonsrolle.FAR))
 
-    private val fødsel = listOf(Fødsel(1, LocalDate.now(), "", "", "", metadataGjeldende))
+    private val fødsel = listOf(Fødsel(1, osloDateNow(), "", "", "", metadataGjeldende))
 
-    private val opphold = listOf(Opphold(Oppholdstillatelse.MIDLERTIDIG, LocalDate.now(), LocalDate.now()))
+    private val opphold = listOf(Opphold(Oppholdstillatelse.MIDLERTIDIG, osloDateNow(), osloDateNow()))
 
     private val oppholdsadresse = listOf(
         Oppholdsadresse(
-            LocalDate.now(),
+            osloDateNow(),
             null,
             "",
             utenlandskAdresse,
@@ -108,11 +108,11 @@ object PdlTestdata {
         ),
     )
 
-    private val statsborgerskap = listOf(Statsborgerskap("", LocalDate.now(), LocalDate.now()))
+    private val statsborgerskap = listOf(Statsborgerskap("", osloDateNow(), osloDateNow()))
 
     private val innflyttingTilNorge = listOf(InnflyttingTilNorge("", "", folkeregistermetadata))
 
-    private val utflyttingFraNorge = listOf(UtflyttingFraNorge("", "", LocalDate.now(), folkeregistermetadata))
+    private val utflyttingFraNorge = listOf(UtflyttingFraNorge("", "", osloDateNow(), folkeregistermetadata))
 
     val søkerIdentifikator = "1"
 
@@ -136,8 +136,8 @@ object PdlTestdata {
                 listOf(Folkeregisterpersonstatus("", "", metadataGjeldende)),
                 listOf(
                     Fullmakt(
-                        LocalDate.now(),
-                        LocalDate.now(),
+                        osloDateNow(),
+                        osloDateNow(),
                         "",
                         MotpartsRolle.FULLMAKTSGIVER,
                         listOf(""),
@@ -146,8 +146,8 @@ object PdlTestdata {
                 listOf(
                     Kontaktadresse(
                         "",
-                        LocalDate.now(),
-                        LocalDate.now(),
+                        osloDateNow(),
+                        osloDateNow(),
                         PostadresseIFrittFormat("", "", "", ""),
                         Postboksadresse("", "", ""),
                         KontaktadresseType.INNLAND,

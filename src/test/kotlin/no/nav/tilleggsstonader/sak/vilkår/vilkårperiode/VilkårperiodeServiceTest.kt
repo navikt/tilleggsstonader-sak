@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -380,14 +381,14 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(
                     periode.id,
-                    periode.tilOppdatering().copy(fom = LocalDate.now().minusYears(32)),
+                    periode.tilOppdatering().copy(fom = osloDateNow().minusYears(32)),
                 )
             }.hasMessageContaining("Kan ikke oppdatere fom")
 
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(
                     periode.id,
-                    periode.tilOppdatering().copy(tom = LocalDate.now().plusYears(32)),
+                    periode.tilOppdatering().copy(tom = osloDateNow().plusYears(32)),
                 )
             }.hasMessageContaining("Kan ikke oppdatere tom")
         }
@@ -518,8 +519,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val periode = vilkårperiodeService.opprettVilkårperiode(
                 LagreVilkårperiode(
                     type = MålgruppeType.AAP,
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now(),
+                    fom = osloDateNow(),
+                    tom = osloDateNow(),
                     delvilkår = VilkårperiodeTestUtil.delvilkårMålgruppeDto(),
                     behandlingId = behandling.id,
                 ),
@@ -588,7 +589,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             )
         }
 
-        private fun nyStønadsperiode(fom: LocalDate = LocalDate.now(), tom: LocalDate = LocalDate.now()) =
+        private fun nyStønadsperiode(fom: LocalDate = osloDateNow(), tom: LocalDate = osloDateNow()) =
             StønadsperiodeDto(
                 id = null,
                 fom = fom,

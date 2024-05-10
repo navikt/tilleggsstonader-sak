@@ -14,6 +14,8 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import org.springframework.context.annotation.Bean
@@ -21,8 +23,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Optional
 
@@ -73,7 +73,7 @@ class OppgaveClientConfig {
             val oppdatertOppgave = oppgave.copy(
                 versjon = oppgave.versjon!! + 1,
                 status = StatusEnum.FERDIGSTILT,
-                ferdigstiltTidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
+                ferdigstiltTidspunkt = osloNow().format(DateTimeFormatter.ISO_DATE_TIME),
             )
             oppgavelager[oppgave.id] = oppdatertOppgave
         }
@@ -128,7 +128,7 @@ class OppgaveClientConfig {
             behandlingstype = oppgaveDto.behandlingstype,
             behandlesAvApplikasjon = oppgaveDto.behandlesAvApplikasjon,
             mappeId = oppgaveDto.mappeId?.let { Optional.of(it) },
-            opprettetTidspunkt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
+            opprettetTidspunkt = osloNow().format(DateTimeFormatter.ISO_DATE_TIME),
         )
         oppgavelager[oppgave.id] = oppgave
         return oppgave
@@ -155,7 +155,7 @@ class OppgaveClientConfig {
     private val journalføringsoppgaveRequest = OpprettOppgaveRequest(
         tema = Tema.TSO,
         oppgavetype = Oppgavetype.Journalføring,
-        fristFerdigstillelse = LocalDate.now().plusDays(14),
+        fristFerdigstillelse = osloDateNow().plusDays(14),
         beskrivelse = "Dummy søknad",
         behandlingstema = "ab0300",
         enhetsnummer = "",

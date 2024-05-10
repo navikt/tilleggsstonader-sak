@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.web.client.exchange
-import java.time.LocalDate
 import java.util.UUID
 
 class VilkårperiodeControllerTest : IntegrationTest() {
@@ -35,8 +35,8 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         opprettVilkårperiode(
             LagreVilkårperiode(
                 type = MålgruppeType.AAP,
-                fom = LocalDate.now(),
-                tom = LocalDate.now(),
+                fom = osloDateNow(),
+                tom = osloDateNow(),
                 delvilkår = delvilkårMålgruppeDto(),
                 behandlingId = behandling.id,
             ),
@@ -61,8 +61,8 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         val response = opprettVilkårperiode(
             LagreVilkårperiode(
                 type = MålgruppeType.AAP,
-                fom = LocalDate.now(),
-                tom = LocalDate.now(),
+                fom = osloDateNow(),
+                tom = osloDateNow(),
                 delvilkår = delvilkårMålgruppeDto(),
                 behandlingId = behandling.id,
             ),

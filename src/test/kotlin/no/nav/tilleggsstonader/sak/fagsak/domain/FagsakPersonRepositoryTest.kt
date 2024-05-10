@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -10,7 +11,6 @@ import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.IncorrectResultSizeDataAccessException
-import java.time.LocalDateTime
 
 internal class FagsakPersonRepositoryTest : IntegrationTest() {
 
@@ -64,7 +64,7 @@ internal class FagsakPersonRepositoryTest : IntegrationTest() {
 
     @Test
     internal fun `hentAktivIdent - skal returnere identen som har siste endretTid`() {
-        val sporbarEnDagSiden = Sporbar(endret = Endret(endretTid = LocalDateTime.now().minusDays(1)))
+        val sporbarEnDagSiden = Sporbar(endret = Endret(endretTid = osloNow().minusDays(1)))
         val person = fagsakPersonRepository.insert(
             FagsakPerson(
                 identer = setOf(
