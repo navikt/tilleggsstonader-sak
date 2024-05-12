@@ -1,13 +1,13 @@
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20240214140223_83c31de"
+val familieProsesseringVersion = "2.20240426120029_490d299"
 val tilleggsstønaderLibsVersion = "2024.05.08-08.38.544e65c0c5a6"
-val tilleggsstønaderKontrakterVersion = "2024.05.02-13.49.f79b7b6e20d8"
+val tilleggsstønaderKontrakterVersion = "2024.05.08-11.31.7ef34699f59a"
 val tokenSupportVersion = "4.1.4"
-val wiremockVersion = "3.5.2"
+val wiremockVersion = "3.5.4"
 val mockkVersion = "1.13.10"
-val testcontainerVersion = "1.19.7"
+val testcontainerVersion = "1.19.8"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -15,14 +15,14 @@ version = "1.0.0"
 plugins {
     application
 
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "1.9.24"
     id("com.diffplug.spotless") version "6.25.0"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
-    id("org.springframework.boot") version "3.2.3"
-    id("io.spring.dependency-management") version "1.1.4"
-    kotlin("plugin.spring") version "1.9.23"
+    id("org.springframework.boot") version "3.2.5"
+    id("io.spring.dependency-management") version "1.1.5"
+    kotlin("plugin.spring") version "1.9.24"
 
     id("org.cyclonedx.bom") version "1.8.2"
 }
@@ -97,7 +97,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.16.1"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.17.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 }
