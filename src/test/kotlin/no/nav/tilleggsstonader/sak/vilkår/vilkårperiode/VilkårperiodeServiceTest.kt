@@ -158,7 +158,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                         behandlingId = behandling.id,
                     ),
 
-                )
+                    )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
 
@@ -180,7 +180,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         @Nested
         inner class IngenAktivitetMålgruppe {
             @Test
-            fun `skal kaste feil ved tom og null begrunnelse på ingen aktivitet og ingen målgruppe`() {
+            fun `skal kaste feil ved tom og null begrunnelse på ingen aktivitet`() {
                 val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
                 assertThatThrownBy {
@@ -204,6 +204,11 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                         ),
                     )
                 }.hasMessageContaining("Mangler begrunnelse for ingen aktivitet")
+            }
+
+            @Test
+            fun `skal kaste feil ved tom og null begrunnelse på ingen målgruppe`() {
+                val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
                 assertThatThrownBy {
                     vilkårperiodeService.opprettVilkårperiode(
