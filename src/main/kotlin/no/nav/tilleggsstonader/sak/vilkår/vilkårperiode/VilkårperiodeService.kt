@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
@@ -101,8 +102,8 @@ class VilkårperiodeService(
     }
 
     private fun validerAktivitetsdager(vilkårPeriodeType: VilkårperiodeType, aktivitetsdager: Int?) {
-        if (vilkårPeriodeType is AktivitetType && vilkårPeriodeType !== AktivitetType.INGEN_AKTIVITET) {
-            brukerfeilHvisIkke(aktivitetsdager in 1..5) {
+        if (vilkårPeriodeType is AktivitetType) {
+            brukerfeilHvis(vilkårPeriodeType != AktivitetType.INGEN_AKTIVITET && aktivitetsdager !in 1..5) {
                 "Aktivitetsdager må være et heltall mellom 1 og 5"
             }
         } else if (vilkårPeriodeType is MålgruppeType) {

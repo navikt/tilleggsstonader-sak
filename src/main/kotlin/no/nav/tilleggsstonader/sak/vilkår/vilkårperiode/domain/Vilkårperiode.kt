@@ -53,7 +53,7 @@ data class Vilkårperiode(
 
     private fun validerAktivitetsdager() {
         if (type is AktivitetType) {
-            if (type === AktivitetType.INGEN_AKTIVITET) {
+            if (type == AktivitetType.INGEN_AKTIVITET) {
                 brukerfeilHvis(aktivitetsdager != null) { "Kan ikke registrere aktivitetsdager på ingen aktivitet" }
             } else {
                 brukerfeilHvis(aktivitetsdager !in 1..5) {
@@ -63,12 +63,12 @@ data class Vilkårperiode(
         }
 
         if (type is MålgruppeType) {
-            brukerfeilHvis(aktivitetsdager !== null) { "Kan ikke registrere aktivitetsdager på målgruppe" }
+            brukerfeilHvis(aktivitetsdager != null) { "Kan ikke registrere aktivitetsdager på målgruppe" }
         }
     }
 
     private fun validerBegrunnelseNedsattArbeidsevne() {
-        if (type === MålgruppeType.NEDSATT_ARBEIDSEVNE) {
+        if (type == MålgruppeType.NEDSATT_ARBEIDSEVNE) {
             brukerfeilHvis(begrunnelse.isNullOrBlank()) {
                 "Mangler begrunnelse for nedsatt arbeidsevne"
             }
@@ -76,13 +76,13 @@ data class Vilkårperiode(
     }
 
     private fun validerBegrunnelseIngenAktivitetEllerMålgruppe() {
-        if (type === AktivitetType.INGEN_AKTIVITET) {
+        if (type == AktivitetType.INGEN_AKTIVITET) {
             brukerfeilHvis(begrunnelse.isNullOrBlank()) {
                 "Mangler begrunnelse for ingen aktivitet"
             }
         }
 
-        if (type === MålgruppeType.INGEN_MÅLGRUPPE) {
+        if (type == MålgruppeType.INGEN_MÅLGRUPPE) {
             brukerfeilHvis(begrunnelse.isNullOrBlank()) {
                 "Mangler begrunnelse for ingen målgruppe"
             }
@@ -90,7 +90,7 @@ data class Vilkårperiode(
     }
 
     private fun DelvilkårMålgruppe.valider(begrunnelse: String?) {
-        brukerfeilHvis((medlemskap.svar !== null && medlemskap.svar !== SvarJaNei.JA_IMPLISITT) && begrunnelse.isNullOrBlank()) {
+        brukerfeilHvis((medlemskap.svar != null && medlemskap.svar != SvarJaNei.JA_IMPLISITT) && begrunnelse.isNullOrBlank()) {
             "Mangler begrunnelse for vurdering av medlemskap"
         }
 
