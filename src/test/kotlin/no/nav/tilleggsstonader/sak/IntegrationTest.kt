@@ -76,6 +76,7 @@ class DefaultRestTemplateConfiguration {
     "mock-arena",
     "mock-aktivitet",
     "mock-kodeverk",
+    "mock-arbeidsfordeling",
     "mock-kafka",
 )
 @EnableMockOAuth2Server

@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
+import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlNotFoundException
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
@@ -108,6 +110,13 @@ class PdlClientConfig {
                     "222" to PdlIdent("222", false),
                 ),
             )
+
+        every { pdlClient.hentGeografiskTilknytning(any()) } returns GeografiskTilknytningDto(
+            gtBydel = "030103",
+            gtKommune = "0301",
+            gtType = GeografiskTilknytningType.BYDEL,
+            gtLand = "NOR",
+        )
 
         return pdlClient
     }

@@ -66,15 +66,16 @@ class FrittståendeBrevService(
             tittel = request.tittel,
         )
 
+        val ident = fagsak.hentAktivIdent()
         val arkiverDokumentRequest = ArkiverDokumentRequest(
-            fnr = fagsak.hentAktivIdent(),
+            fnr = ident,
             eksternReferanseId = MDC.get(MDCConstants.MDC_CALL_ID) ?: throw IllegalStateException("Mangler callId"),
             forsøkFerdigstill = true,
             hoveddokumentvarianter = listOf(dokument),
             fagsakId = fagsak.eksternId.id.toString(),
-            journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(saksbehandler)?.enhetId
+            journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(ident)?.enhetNr
                 ?: error("Fant ikke arbeidsfordelingsenhet"),
-            avsenderMottaker = AvsenderMottaker(id = fagsak.hentAktivIdent(), idType = BrukerIdType.FNR, navn = null),
+            avsenderMottaker = AvsenderMottaker(id = ident, idType = BrukerIdType.FNR, navn = null),
         )
 
         val journalpost = journalpostService.opprettJournalpost(arkiverDokumentRequest, saksbehandler)
