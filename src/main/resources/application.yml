@@ -192,4 +192,4 @@ clients:
     uri: http://kodeverk-api.team-rocket
     scope: api://${CLIENT_ENV}-gcp.team-rocket.kodeverk-api/.default
   norg2:
-    uri: https://norg2.prod-fss-pub.nais.io/norg2
+    uri: https://norg2.${CLIENT_ENV}-fss-pub.nais.io/norg2
