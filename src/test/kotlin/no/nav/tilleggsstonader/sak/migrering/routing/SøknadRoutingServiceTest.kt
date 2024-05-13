@@ -193,6 +193,20 @@ class SøknadRoutingServiceTest {
                 behandlingService wasNot called
             }
         }
+
+        @Test
+        fun `skal route hvis det ikke er aktivt vedtak`() {
+            every { arenaService.hentStatus(any(), any()) } returns arenaStatusUtenAktivtVedtak()
+
+            assertThat(skalBehandlesINyLøsning()).isTrue()
+
+            verify {
+                fagsakService.finnFagsak(any(), any())
+                arenaService.hentStatus(any(), any())
+                søknadRoutingRepository.insert(any())
+                behandlingService wasNot called
+            }
+        }
     }
 
     private fun arenaStatusKanIkkeRoutes() = ArenaStatusDto(
@@ -203,6 +217,11 @@ class SøknadRoutingServiceTest {
     private fun arenaStatusKanRoutes() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = false),
         VedtakStatus(harVedtak = false, harAktivtVedtak = false),
+    )
+
+    private fun arenaStatusUtenAktivtVedtak() = ArenaStatusDto(
+        SakStatus(harAktivSakUtenVedtak = false),
+        VedtakStatus(harVedtak = true, harAktivtVedtak = false),
     )
 
     private fun skalBehandlesINyLøsning() = service.sjekkRoutingForPerson(request).skalBehandlesINyLøsning
