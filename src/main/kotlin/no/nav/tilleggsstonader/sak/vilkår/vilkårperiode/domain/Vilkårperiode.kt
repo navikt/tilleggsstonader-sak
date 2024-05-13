@@ -37,9 +37,7 @@ data class Vilkårperiode(
     init {
         require(tom >= fom) { "Til-og-med før fra-og-med: $fom > $tom" }
 
-        if (type is AktivitetType) {
-            require(aktivitetsdager != null) { "Aktivitetsdager må settes for aktivitet" }
-        }
+        validerAktivitetsdager()
 
         when {
             type is MålgruppeType && delvilkår is DelvilkårMålgruppe -> delvilkår.valider(begrunnelse)
@@ -48,20 +46,51 @@ data class Vilkårperiode(
         }
 
         validerBegrunnelseNedsattArbeidsevne()
+        validerBegrunnelseIngenAktivitetEllerMålgruppe()
 
         validerSlettefelter()
     }
 
+    private fun validerAktivitetsdager() {
+        if (type is AktivitetType) {
+            if (type == AktivitetType.INGEN_AKTIVITET) {
+                brukerfeilHvis(aktivitetsdager != null) { "Kan ikke registrere aktivitetsdager på ingen aktivitet" }
+            } else {
+                brukerfeilHvis(aktivitetsdager !in 1..5) {
+                    "Aktivitetsdager må være et heltall mellom 1 og 5"
+                }
+            }
+        }
+
+        if (type is MålgruppeType) {
+            brukerfeilHvis(aktivitetsdager != null) { "Kan ikke registrere aktivitetsdager på målgruppe" }
+        }
+    }
+
     private fun validerBegrunnelseNedsattArbeidsevne() {
-        if (type === MålgruppeType.NEDSATT_ARBEIDSEVNE) {
+        if (type == MålgruppeType.NEDSATT_ARBEIDSEVNE) {
             brukerfeilHvis(begrunnelse.isNullOrBlank()) {
                 "Mangler begrunnelse for nedsatt arbeidsevne"
             }
         }
     }
 
+    private fun validerBegrunnelseIngenAktivitetEllerMålgruppe() {
+        if (type == AktivitetType.INGEN_AKTIVITET) {
+            brukerfeilHvis(begrunnelse.isNullOrBlank()) {
+                "Mangler begrunnelse for ingen aktivitet"
+            }
+        }
+
+        if (type == MålgruppeType.INGEN_MÅLGRUPPE) {
+            brukerfeilHvis(begrunnelse.isNullOrBlank()) {
+                "Mangler begrunnelse for ingen målgruppe"
+            }
+        }
+    }
+
     private fun DelvilkårMålgruppe.valider(begrunnelse: String?) {
-        brukerfeilHvis((medlemskap.svar !== null && medlemskap.svar !== SvarJaNei.JA_IMPLISITT) && begrunnelse.isNullOrBlank()) {
+        brukerfeilHvis((medlemskap.svar != null && medlemskap.svar != SvarJaNei.JA_IMPLISITT) && begrunnelse.isNullOrBlank()) {
             "Mangler begrunnelse for vurdering av medlemskap"
         }
 
@@ -157,6 +186,7 @@ enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : Vilkårper
     OVERGANGSSTØNAD(setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
     NEDSATT_ARBEIDSEVNE(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
     UFØRETRYGD(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
+    INGEN_MÅLGRUPPE(emptySet()),
     ;
 
     override fun tilDbType(): String = this.name
@@ -168,6 +198,7 @@ enum class AktivitetType : VilkårperiodeType {
     TILTAK,
     UTDANNING,
     REELL_ARBEIDSSØKER,
+    INGEN_AKTIVITET,
     ;
 
     override fun tilDbType(): String = this.name
