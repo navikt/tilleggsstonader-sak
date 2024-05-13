@@ -114,7 +114,7 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 DetaljerVilkårperiodeReader(),
                 DetaljerVilkårperiodeWriter(),
-            ),
+            ) + alleVedtaksstatistikkJsonConverters,
         )
     }
 

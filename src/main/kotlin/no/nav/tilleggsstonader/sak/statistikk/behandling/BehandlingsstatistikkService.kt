@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.statistikk.behandling
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
@@ -16,7 +17,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
-import no.nav.tilleggsstonader.sak.util.osloNow
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
@@ -44,12 +44,12 @@ class BehandlingsstatistikkService(
         behandlingMetode: BehandlingMetode?,
     ) {
         val behandlingDVH = mapTilBehandlingDVH(
-            behandlingId,
-            hendelse,
-            hendelseTidspunkt,
-            gjeldendeSaksbehandler,
-            oppgaveId,
-            behandlingMetode,
+            behandlingId = behandlingId,
+            hendelse = hendelse,
+            hendelseTidspunkt = hendelseTidspunkt,
+            gjeldendeSaksbehandler = gjeldendeSaksbehandler,
+            oppgaveId = oppgaveId,
+            behandlingMetode = behandlingMetode,
         )
         behandlingsstatistikkProducer.sendBehandling(behandlingDVH)
     }
@@ -181,7 +181,7 @@ class BehandlingsstatistikkService(
     private fun utledResultatBegrunnelse(behandling: Saksbehandling): String? =
         when (behandling.resultat) {
             BehandlingResultat.HENLAGT -> behandling.henlagtÅrsak?.name
-            BehandlingResultat.AVSLÅTT -> TODO() // Implementer når vi har lagt inn støtte for avslag
+            BehandlingResultat.AVSLÅTT -> "UKJENT" // TODO: Send riktig verdier når vi får en liste over avslagsårsaker
 
             else -> null
         }

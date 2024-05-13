@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.Vedtaksstatistikk
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
@@ -76,11 +77,11 @@ class DefaultRestTemplateConfiguration {
     "mock-aktivitet",
     "mock-kodeverk",
     "mock-arbeidsfordeling",
+    "mock-kafka",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
 
-    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     protected lateinit var restTemplate: RestTemplate
     protected val headers = HttpHeaders()
@@ -88,7 +89,6 @@ abstract class IntegrationTest {
     @LocalServerPort
     private var port: Int? = 0
 
-    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private lateinit var mockOAuth2Server: MockOAuth2Server
 
@@ -98,7 +98,6 @@ abstract class IntegrationTest {
     @Autowired
     protected lateinit var rolleConfig: RolleConfig
 
-    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     protected lateinit var testoppsettService: TestoppsettService
 
@@ -146,6 +145,8 @@ abstract class IntegrationTest {
             FagsakDomain::class,
             PersonIdent::class,
             FagsakPerson::class,
+
+            Vedtaksstatistikk::class,
         ).forEach { jdbcAggregateOperations.deleteAll(it.java) }
     }
 

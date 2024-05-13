@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
@@ -12,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
-import java.time.LocalDate
 import java.time.YearMonth
 import java.util.*
 
@@ -65,8 +65,8 @@ class TilsynBarnVedtakServiceTest {
                         antallBarn = 1,
                     ),
                     beløpsperioder = listOf(
-                        Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = MålgruppeType.AAP),
-                        Beløpsperiode(dato = LocalDate.now().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
+                        Beløpsperiode(dato = osloDateNow(), beløp = 1000, målgruppe = MålgruppeType.AAP),
+                        Beløpsperiode(dato = osloDateNow().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
                     ),
                 ),
             ),

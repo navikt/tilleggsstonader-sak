@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 import java.util.UUID
 
 internal class VilkårTest {
@@ -29,7 +29,7 @@ internal class VilkårTest {
 
     @Test
     internal fun `opprettOpphavsvilkår - skal bruke opphavsvilkår hvis den finnes og ikke lage en ny, for å peke til den opprinnelige behandlingen`() {
-        val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, LocalDateTime.now())
+        val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, osloNow())
         val vilkår = Vilkår(
             behandlingId = behandlingIdRevurdering,
             delvilkårwrapper = DelvilkårWrapper(emptyList()),

@@ -6,6 +6,7 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import org.springframework.stereotype.Service
@@ -27,7 +28,7 @@ class FerdigstillOppgaveTask(private val oppgaveService: OppgaveService) : Async
     data class FerdigstillOppgaveTaskData(
         val behandlingId: UUID,
         val oppgavetype: Oppgavetype,
-        val unik: LocalDateTime? = LocalDateTime.now(),
+        val unik: LocalDateTime? = osloNow(),
     )
 
     override fun doTask(task: Task) {

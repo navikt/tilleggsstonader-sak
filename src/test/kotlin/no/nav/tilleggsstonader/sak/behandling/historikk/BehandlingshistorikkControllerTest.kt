@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.historikk
 
 import no.nav.security.mock.oauth2.http.objectMapper
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -56,9 +57,9 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(""))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        leggInnHistorikk(behandling, "1", LocalDateTime.now(), StegType.INNGANGSVILKÅR)
-        leggInnHistorikk(behandling, "2", LocalDateTime.now().minusDays(1), StegType.INNGANGSVILKÅR)
-        leggInnHistorikk(behandling, "3", LocalDateTime.now().plusDays(1), StegType.INNGANGSVILKÅR)
+        leggInnHistorikk(behandling, "1", osloNow(), StegType.INNGANGSVILKÅR)
+        leggInnHistorikk(behandling, "2", osloNow().minusDays(1), StegType.INNGANGSVILKÅR)
+        leggInnHistorikk(behandling, "3", osloNow().plusDays(1), StegType.INNGANGSVILKÅR)
 
         val respons = hentHistorikk(behandling.id)
         assertThat(respons.body!!.map { it.endretAvNavn }).containsExactly("2")
@@ -69,21 +70,21 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(""))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        leggInnHistorikk(behandling, "1", LocalDateTime.now(), StegType.INNGANGSVILKÅR)
-        leggInnHistorikk(behandling, "2", LocalDateTime.now(), StegType.VILKÅR)
-        leggInnHistorikk(behandling, "3", LocalDateTime.now().plusDays(1), StegType.BEREGNE_YTELSE)
-        leggInnHistorikk(behandling, "4", LocalDateTime.now().plusDays(2), StegType.SEND_TIL_BESLUTTER)
+        leggInnHistorikk(behandling, "1", osloNow(), StegType.INNGANGSVILKÅR)
+        leggInnHistorikk(behandling, "2", osloNow(), StegType.VILKÅR)
+        leggInnHistorikk(behandling, "3", osloNow().plusDays(1), StegType.BEREGNE_YTELSE)
+        leggInnHistorikk(behandling, "4", osloNow().plusDays(2), StegType.SEND_TIL_BESLUTTER)
         leggInnHistorikk(
             behandling,
             "5",
-            LocalDateTime.now().plusDays(3),
+            osloNow().plusDays(3),
             StegType.BESLUTTE_VEDTAK,
             stegUtfall = StegUtfall.BESLUTTE_VEDTAK_GODKJENT,
         )
-        leggInnHistorikk(behandling, "6", LocalDateTime.now().plusDays(4), StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
-        // leggInnHistorikk(behandling, "6", LocalDateTime.now().plusDays(5), StegType.LAG_SAKSBEHANDLINGSBLANKETT)
-        leggInnHistorikk(behandling, "7", LocalDateTime.now().plusDays(6), StegType.FERDIGSTILLE_BEHANDLING)
-        leggInnHistorikk(behandling, "8", LocalDateTime.now().plusDays(7), StegType.BEHANDLING_FERDIGSTILT)
+        leggInnHistorikk(behandling, "6", osloNow().plusDays(4), StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
+        // leggInnHistorikk(behandling, "6", osloNow().plusDays(5), StegType.LAG_SAKSBEHANDLINGSBLANKETT)
+        leggInnHistorikk(behandling, "7", osloNow().plusDays(6), StegType.FERDIGSTILLE_BEHANDLING)
+        leggInnHistorikk(behandling, "8", osloNow().plusDays(7), StegType.BEHANDLING_FERDIGSTILT)
         behandlingRepository.update(
             behandling.copy(
                 resultat = BehandlingResultat.INNVILGET,
@@ -99,19 +100,19 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(""))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        leggInnHistorikk(behandling, "1", LocalDateTime.now(), StegType.INNGANGSVILKÅR)
-        leggInnHistorikk(behandling, "2", LocalDateTime.now(), StegType.VILKÅR)
-        leggInnHistorikk(behandling, "3", LocalDateTime.now().plusDays(1), StegType.BEREGNE_YTELSE)
-        leggInnHistorikk(behandling, "4", LocalDateTime.now().plusDays(2), StegType.SEND_TIL_BESLUTTER)
+        leggInnHistorikk(behandling, "1", osloNow(), StegType.INNGANGSVILKÅR)
+        leggInnHistorikk(behandling, "2", osloNow(), StegType.VILKÅR)
+        leggInnHistorikk(behandling, "3", osloNow().plusDays(1), StegType.BEREGNE_YTELSE)
+        leggInnHistorikk(behandling, "4", osloNow().plusDays(2), StegType.SEND_TIL_BESLUTTER)
         leggInnHistorikk(
             behandling,
             "5",
-            LocalDateTime.now().plusDays(3),
+            osloNow().plusDays(3),
             StegType.BESLUTTE_VEDTAK,
             stegUtfall = StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT,
         )
-        leggInnHistorikk(behandling, "6", LocalDateTime.now().plusDays(6), StegType.FERDIGSTILLE_BEHANDLING)
-        leggInnHistorikk(behandling, "7", LocalDateTime.now().plusDays(8), StegType.BEHANDLING_FERDIGSTILT)
+        leggInnHistorikk(behandling, "6", osloNow().plusDays(6), StegType.FERDIGSTILLE_BEHANDLING)
+        leggInnHistorikk(behandling, "7", osloNow().plusDays(8), StegType.BEHANDLING_FERDIGSTILT)
         behandlingRepository.update(
             behandling.copy(
                 resultat = BehandlingResultat.HENLAGT,
@@ -127,22 +128,22 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(""))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        leggInnHistorikk(behandling, "1", LocalDateTime.now(), StegType.INNGANGSVILKÅR)
-        leggInnHistorikk(behandling, "2", LocalDateTime.now(), StegType.VILKÅR)
-        leggInnHistorikk(behandling, "3", LocalDateTime.now().plusDays(1), StegType.BEREGNE_YTELSE)
-        leggInnHistorikk(behandling, "4", LocalDateTime.now().plusDays(2), StegType.SEND_TIL_BESLUTTER)
+        leggInnHistorikk(behandling, "1", osloNow(), StegType.INNGANGSVILKÅR)
+        leggInnHistorikk(behandling, "2", osloNow(), StegType.VILKÅR)
+        leggInnHistorikk(behandling, "3", osloNow().plusDays(1), StegType.BEREGNE_YTELSE)
+        leggInnHistorikk(behandling, "4", osloNow().plusDays(2), StegType.SEND_TIL_BESLUTTER)
         leggInnHistorikk(
             behandling,
             "5",
-            LocalDateTime.now().plusDays(3),
+            osloNow().plusDays(3),
             StegType.BESLUTTE_VEDTAK,
             stegUtfall = StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT,
         )
-        leggInnHistorikk(behandling, "6", LocalDateTime.now().plusDays(4), StegType.SEND_TIL_BESLUTTER)
+        leggInnHistorikk(behandling, "6", osloNow().plusDays(4), StegType.SEND_TIL_BESLUTTER)
         leggInnHistorikk(
             behandling,
             "7",
-            LocalDateTime.now().plusDays(5),
+            osloNow().plusDays(5),
             StegType.BESLUTTE_VEDTAK,
             stegUtfall = StegUtfall.BESLUTTE_VEDTAK_GODKJENT,
         )

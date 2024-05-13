@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -96,7 +97,7 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
         val andelEtterOppdatering = andelTilkjentYtelseRepository.findByIdOrThrow(andel1.id)
 
         assertThat(andel.endretTid.toLocalDate()).isEqualTo(LocalDate.of(2023, 1, 1))
-        assertThat(andelEtterOppdatering.endretTid.toLocalDate()).isEqualTo(LocalDate.now())
+        assertThat(andelEtterOppdatering.endretTid.toLocalDate()).isEqualTo(osloDateNow())
     }
 
     @Nested
@@ -107,7 +108,7 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             opprettTilkjentYtelseMedEnAndel(behandling)
 
-            val behandlinger = andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(LocalDate.now())
+            val behandlinger = andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(osloDateNow())
 
             assertThat(behandlinger).isEmpty()
         }
@@ -118,7 +119,7 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling1)
             opprettTilkjentYtelseMedEnAndel(behandling, StatusIverksetting.OK)
 
-            val behandlinger = andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(LocalDate.now())
+            val behandlinger = andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(osloDateNow())
 
             assertThat(behandlinger).isEmpty()
         }
@@ -143,7 +144,7 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
             opprettTilkjentYtelseMedEnAndel(behandling)
             opprettTilkjentYtelseMedEnAndel(behandling2)
 
-            val behandlinger = andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(LocalDate.now())
+            val behandlinger = andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(osloDateNow())
 
             assertThat(behandlinger).containsExactlyInAnyOrder(behandling.id, behandling2.id)
         }

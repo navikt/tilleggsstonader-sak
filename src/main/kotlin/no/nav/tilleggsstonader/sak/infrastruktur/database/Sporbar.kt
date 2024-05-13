@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.relational.core.mapping.Embedded
@@ -21,5 +22,5 @@ data class Endret(
 
 object SporbarUtils {
 
-    fun now(): LocalDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS)
+    fun now(): LocalDateTime = osloNow().truncatedTo(ChronoUnit.MILLIS)
 }

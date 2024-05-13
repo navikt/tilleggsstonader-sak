@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -14,7 +15,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
@@ -74,7 +74,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
                 VilkårType.EKSEMPEL,
             ),
         )
-        val nyttTidspunkt = LocalDateTime.now().minusDays(1).truncatedTo(ChronoUnit.MILLIS)
+        val nyttTidspunkt = osloNow().minusDays(1).truncatedTo(ChronoUnit.MILLIS)
 
         vilkårRepository.oppdaterEndretTid(vilkår.id, nyttTidspunkt)
 

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.IKKE_SATT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.INNVILGET
@@ -30,7 +31,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
-import java.time.LocalDateTime
 import java.util.UUID
 
 class BehandlingRepositoryTest : IntegrationTest() {
@@ -71,14 +71,14 @@ class BehandlingRepositoryTest : IntegrationTest() {
     Har ikke oppgave ennå
     @Test
     fun `hentUferdigeBehandlingerFørDato skal bare hente behandlinger før en gitt dato`() {
-        val enMånedSiden = LocalDateTime.now().minusMonths(1)
+        val enMånedSiden = osloNow().minusMonths(1)
 
         val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = BARNETILSYN))
-        val behandling = behandling(fagsak, opprettetTid = LocalDateTime.now().minusMonths(2))
+        val behandling = behandling(fagsak, opprettetTid = osloNow().minusMonths(2))
         testoppsettService.lagre(behandling)
         val annenFagsak =
             testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")), stønadstype = BARNETILSYN))
-        testoppsettService.lagre(behandling(annenFagsak, opprettetTid = LocalDateTime.now().minusWeeks(1)))
+        testoppsettService.lagre(behandling(annenFagsak, opprettetTid = osloNow().minusWeeks(1)))
         val sporbar = Sporbar("saksbh", enMånedSiden.minusDays(1))
         val oppgave = Oppgave(sporbar = sporbar, behandlingId = behandling.id, gsakOppgaveId = 1, type = Oppgavetype.BehandleSak, erFerdigstilt = false)
         oppgaveRepository.insert(oppgave)
@@ -96,14 +96,14 @@ class BehandlingRepositoryTest : IntegrationTest() {
     Har ikke oppgave ennå
     @Test
     fun `hentUferdigeBehandlingerFørDato skal ikke hente behandling dersom oppgave er endret etter frist`() {
-        val enMånedSiden = LocalDateTime.now().minusMonths(1)
+        val enMånedSiden = osloNow().minusMonths(1)
 
         val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = BARNETILSYN))
-        val behandling = behandling(fagsak, opprettetTid = LocalDateTime.now().minusMonths(2))
+        val behandling = behandling(fagsak, opprettetTid = osloNow().minusMonths(2))
         testoppsettService.lagre(behandling)
         val annenFagsak =
             testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")), stønadstype = BARNETILSYN))
-        testoppsettService.lagre(behandling(annenFagsak, opprettetTid = LocalDateTime.now().minusWeeks(1)))
+        testoppsettService.lagre(behandling(annenFagsak, opprettetTid = osloNow().minusWeeks(1)))
         val sporbar = Sporbar("saksbh", enMånedSiden.plusDays(1))
         val oppgave = Oppgave(sporbar = sporbar, behandlingId = behandling.id, gsakOppgaveId = 1, type = Oppgavetype.BehandleSak, erFerdigstilt = false)
         oppgaveRepository.insert(oppgave)
@@ -136,7 +136,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
                         PersonIdent(ident = "1"),
                         PersonIdent(
                             ident = "2",
-                            sporbar = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2))),
+                            sporbar = Sporbar(endret = Endret(endretTid = osloNow().plusDays(2))),
                         ),
                         PersonIdent(ident = "3"),
                     ),
@@ -188,7 +188,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
                     PersonIdent(ident = "1"),
                     PersonIdent(
                         ident = "2",
-                        sporbar = Sporbar(endret = Endret(endretTid = LocalDateTime.now().plusDays(2))),
+                        sporbar = Sporbar(endret = Endret(endretTid = osloNow().plusDays(2))),
                     ),
                     PersonIdent(ident = "3"),
                 ),
@@ -212,7 +212,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
             behandling(
                 fagsak,
                 status = UTREDES,
-                opprettetTid = LocalDateTime.now().minusDays(2),
+                opprettetTid = osloNow().minusDays(2),
             ),
         )
         assertThat(behandlingRepository.finnSisteIverksatteBehandling(fagsak.id)).isNull()

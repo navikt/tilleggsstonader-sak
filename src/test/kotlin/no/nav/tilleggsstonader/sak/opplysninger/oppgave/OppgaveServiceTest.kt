@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
@@ -97,8 +98,8 @@ internal class OppgaveServiceTest {
         assertThat(slot.captured.enhetsnummer).isEqualTo(ENHETSNUMMER)
         assertThat(slot.captured.ident).isEqualTo(OppgaveIdentV2(ident = FNR, gruppe = IdentGruppe.FOLKEREGISTERIDENT))
         assertThat(slot.captured.behandlingstema).isEqualTo(Behandlingstema.TilsynBarn.value)
-        assertThat(slot.captured.fristFerdigstillelse).isAfterOrEqualTo(LocalDate.now().plusDays(1))
-        assertThat(slot.captured.aktivFra).isEqualTo(LocalDate.now())
+        assertThat(slot.captured.fristFerdigstillelse).isAfterOrEqualTo(osloDateNow().plusDays(1))
+        assertThat(slot.captured.aktivFra).isEqualTo(osloDateNow())
         assertThat(slot.captured.tema).isEqualTo(Tema.TSO)
         assertThat(opprettOppgaveDomainSlot.captured.behandlingId).isEqualTo(BEHANDLING_ID)
     }
