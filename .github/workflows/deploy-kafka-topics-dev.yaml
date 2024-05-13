@@ -16,4 +16,4 @@ jobs:
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
-          RESOURCE: .nais/topics/statistikk-tilleggsstonader-behandling/topic-dev.yaml
+          RESOURCE: .nais/topics/statistikk-dvh-behandling/topic-dev.yaml
