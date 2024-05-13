@@ -158,7 +158,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                         behandlingId = behandling.id,
                     ),
 
-                    )
+                )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
 
