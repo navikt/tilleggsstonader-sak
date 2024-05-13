@@ -2,10 +2,19 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
@@ -18,22 +27,44 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode 
 @Service
 class InterntVedtakService(
     private val behandlingService: BehandlingService,
+    private val barnService: BarnService,
+    private val grunnlagsdataService: GrunnlagsdataService,
     private val totrinnskontrollService: TotrinnskontrollService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val stønadsperiodeService: StønadsperiodeService,
     private val søknadService: SøknadService,
+    private val vilkårService: VilkårService,
+    private val tilsynBarnVedtakService: TilsynBarnVedtakService,
 ) {
 
     fun lagInterntVedtak(behandlingId: UUID): InterntVedtak {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
+        val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag
+        val behandlingbarn = mapBarnPåBarnId(behandlingId, grunnlag)
+        val vedtak = tilsynBarnVedtakService.hentVedtak(behandlingId)
         return InterntVedtak(
             behandling = mapBehandlingsinformasjon(behandling),
             søknad = mapSøknadsinformasjon(behandling),
             målgrupper = mapVilkårperioder(vilkårsperioder.målgrupper),
             aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
             stønadsperioder = mapStønadsperioder(behandlingId),
+            vilkår = mapVilkår(behandlingId, behandlingbarn),
+            vedtak = mapVedtak(vedtak),
+            utgifter = mapUtgifter(vedtak)
         )
+    }
+
+    private fun mapBarnPåBarnId(
+        behandlingId: UUID,
+        grunnlag: Grunnlag,
+    ): Map<UUID, GrunnlagBarn> {
+        val behandlingbarn = barnService.finnBarnPåBehandling(behandlingId).associateBy { it.ident }
+        return grunnlag.barn.associateBy {
+            val barn =
+                behandlingbarn[it.ident] ?: error("Finner ikke barn med ident=${it.ident} på behandling=$behandlingId")
+            barn.id
+        }
     }
 
     private fun mapBehandlingsinformasjon(
@@ -113,5 +144,39 @@ class InterntVedtakService(
                 tom = it.tom,
             )
         }
+    }
+
+    private fun mapVilkår(behandlingId: UUID, barn: Map<UUID, GrunnlagBarn>): List<VilkårInternt> {
+        return vilkårService.hentVilkårsett(behandlingId).map { vilkår ->
+            val fødselsdatoBarn = vilkår.barnId
+                ?.let { barnId -> barn[barnId] ?: error("Finner ikke barn=$barnId for behandling=$behandlingId") }
+                ?.fødselsdato
+            VilkårInternt(
+                resultat = vilkår.resultat,
+                fødselsdatoBarn = fødselsdatoBarn,
+                delvilkår = vilkår.delvilkårsett.map { mapDelvilkår(it) },
+            )
+        }
+    }
+
+    private fun mapDelvilkår(delvilkår: DelvilkårDto) =
+        DelvilkårInternt(
+            resultat = delvilkår.resultat,
+            vurderinger = delvilkår.vurderinger.map { vurdering ->
+                VurderingInternt(
+                    regel = vurdering.regelId.beskrivelse,
+                    svar = vurdering.svar?.beskrivelse,
+                    begrunnelse = vurdering.begrunnelse,
+                )
+            },
+        )
+
+    private fun mapVedtak(vedtak: VedtakTilsynBarn?): VedtakInternt? {
+        return vedtak?.let { VedtakInternt(
+            type = it.type.beskrivelse,
+            avslagBegrunnelse = it.avslagBegrunnelse,
+            // TODO hvordan ønsker vi å vise utgifter? Med barnIdent? Samlet per måned?
+            utgifter = null // it.vedtak?.utgifter?.let { it.map { UtgiftInternt(beløp = it.) } }
+        ) }
     }
 }

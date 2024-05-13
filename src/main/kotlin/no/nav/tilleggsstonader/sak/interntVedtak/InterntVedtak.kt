@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -19,6 +21,8 @@ data class InterntVedtak(
     val målgrupper: List<Vilkårperiode>,
     val aktiviteter: List<Vilkårperiode>,
     val stønadsperioder: List<Stønadsperiode>,
+    val vilkår: List<VilkårInternt>,
+    val vedtak: VedtakInternt?,
 )
 
 data class Behandlinginfo(
@@ -36,6 +40,12 @@ data class Behandlinginfo(
 
 data class Søknadsinformasjon(
     val mottattTidspunkt: LocalDateTime,
+)
+
+data class VedtakInternt(
+    val type: String,
+    val avslagBegrunnelse: String?,
+    val utgifter: List<UtgiftInternt>?
 )
 
 data class Vilkårperiode(
@@ -64,4 +74,27 @@ data class Stønadsperiode(
     val aktivitet: AktivitetType,
     val fom: LocalDate,
     val tom: LocalDate,
+)
+
+data class VilkårInternt(
+    val resultat: Vilkårsresultat,
+    val delvilkår: List<DelvilkårInternt>,
+    val fødselsdatoBarn: LocalDate?,
+)
+
+data class DelvilkårInternt(
+    val resultat: Vilkårsresultat,
+    val vurderinger: List<VurderingInternt>,
+)
+
+data class VurderingInternt(
+    val regel: String,
+    val svar: String?,
+    val begrunnelse: String?,
+)
+
+data class UtgiftInternt(
+    val beløp: Int,
+    val fom: String,
+    val tom: String,
 )

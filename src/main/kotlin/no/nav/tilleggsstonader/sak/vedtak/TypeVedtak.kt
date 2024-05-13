@@ -2,9 +2,9 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 
-enum class TypeVedtak {
-    INNVILGELSE,
-    AVSLAG,
+enum class TypeVedtak(val beskrivelse: String) {
+    INNVILGELSE("Innvilgelse"),
+    AVSLAG("Avslag"),
 }
 
 fun TypeVedtak.tilBehandlingResult(): BehandlingResultat = when (this) {
