@@ -30,7 +30,7 @@ class ArenaClientConfig {
             clearMocks(client)
             every { client.hentStatus(any()) } returns ArenaStatusDto(
                 SakStatus(harAktivSakUtenVedtak = false),
-                VedtakStatus(harVedtak = false, harAktivtVedtak = false),
+                VedtakStatus(harVedtak = false, harAktivtVedtak = false, harVedtakUtenUtfall = false),
             )
             every { client.harSaker(any()) } returns ArenaStatusHarSakerDto(true)
         }
