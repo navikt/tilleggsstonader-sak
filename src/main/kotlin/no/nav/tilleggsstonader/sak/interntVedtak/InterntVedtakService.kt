@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
@@ -20,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktiv
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode.Vurdering
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.util.UUID
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode as DelvilkårVilkårperiodeDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode as VilkårperiodeDomain
@@ -50,8 +50,7 @@ class InterntVedtakService(
             aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
             stønadsperioder = mapStønadsperioder(behandlingId),
             vilkår = mapVilkår(behandlingId, behandlingbarn),
-            vedtak = mapVedtak(vedtak),
-            utgifter = mapUtgifter(vedtak)
+            vedtak = mapVedtak(vedtak, behandlingbarn),
         )
     }
 
@@ -146,14 +145,11 @@ class InterntVedtakService(
         }
     }
 
-    private fun mapVilkår(behandlingId: UUID, barn: Map<UUID, GrunnlagBarn>): List<VilkårInternt> {
+    private fun mapVilkår(behandlingId: UUID, behandlingBarn: Map<UUID, GrunnlagBarn>): List<VilkårInternt> {
         return vilkårService.hentVilkårsett(behandlingId).map { vilkår ->
-            val fødselsdatoBarn = vilkår.barnId
-                ?.let { barnId -> barn[barnId] ?: error("Finner ikke barn=$barnId for behandling=$behandlingId") }
-                ?.fødselsdato
             VilkårInternt(
                 resultat = vilkår.resultat,
-                fødselsdatoBarn = fødselsdatoBarn,
+                fødselsdatoBarn = vilkår.barnId?.let { behandlingBarn.finnFødselsdato(it) },
                 delvilkår = vilkår.delvilkårsett.map { mapDelvilkår(it) },
             )
         }
@@ -171,12 +167,29 @@ class InterntVedtakService(
             },
         )
 
-    private fun mapVedtak(vedtak: VedtakTilsynBarn?): VedtakInternt? {
-        return vedtak?.let { VedtakInternt(
-            type = it.type.beskrivelse,
-            avslagBegrunnelse = it.avslagBegrunnelse,
-            // TODO hvordan ønsker vi å vise utgifter? Med barnIdent? Samlet per måned?
-            utgifter = null // it.vedtak?.utgifter?.let { it.map { UtgiftInternt(beløp = it.) } }
-        ) }
+    private fun mapVedtak(vedtak: VedtakTilsynBarn?, behandlingbarn: Map<UUID, GrunnlagBarn>): VedtakInternt? {
+        return vedtak?.let {
+            VedtakInternt(
+                type = it.type.beskrivelse,
+                avslagBegrunnelse = it.avslagBegrunnelse,
+                utgifterBarn = it.vedtak?.utgifter?.entries?.map { (barnId, utgifter) ->
+                    UtgiftBarn(
+                        fødselsdatoBarn = behandlingbarn.finnFødselsdato(barnId),
+                        utgifter = utgifter.map {
+                            Utgift(
+                                beløp = it.utgift,
+                                fom = it.fom.atDay(1),
+                                tom = it.fom.atEndOfMonth(),
+                            )
+                        },
+                    )
+                },
+            )
+        }
+    }
+
+    private fun Map<UUID, GrunnlagBarn>.finnFødselsdato(barnId: UUID): LocalDate {
+        val barn = this[barnId] ?: error("Finner ikke barn=$barnId")
+        return barn.fødselsdato ?: error("Mangler fødselsdato for barn=$barnId")
     }
 }

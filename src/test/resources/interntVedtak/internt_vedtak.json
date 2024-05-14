@@ -86,5 +86,43 @@
     "aktivitet" : "REELL_ARBEIDSSØKER",
     "fom" : "2024-02-01",
     "tom" : "2024-03-31"
-  } ]
+  } ],
+  "vilkår" : [ {
+    "resultat" : "OPPFYLT",
+    "delvilkår" : [ {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Er barnet ferdig med 4. skoleår?",
+        "svar" : "Nei",
+        "begrunnelse" : "en begrunnelse"
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Mottar den andre forelderen støtte til pass av barnet?",
+        "svar" : "Nei",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Er utgiftene tilfredstillende dokumentert?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    } ],
+    "fødselsdatoBarn" : "2024-05-14"
+  } ],
+  "vedtak" : {
+    "type" : "Innvilgelse",
+    "avslagBegrunnelse" : null,
+    "utgifterBarn" : [ {
+      "fødselsdatoBarn" : "2024-05-14",
+      "utgifter" : [ {
+        "beløp" : 1399,
+        "fom" : "2024-01-01",
+        "tom" : "2024-01-31"
+      } ]
+    } ]
+  }
 }

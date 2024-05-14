@@ -197,12 +197,12 @@ class SøknadRoutingServiceTest {
 
     private fun arenaStatusKanIkkeRoutes() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = true),
-        VedtakStatus(harVedtak = true, harAktivtVedtak = true),
+        VedtakStatus(harVedtak = true, harAktivtVedtak = true, harVedtakUtenUtfall = false),
     )
 
     private fun arenaStatusKanRoutes() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = false),
-        VedtakStatus(harVedtak = false, harAktivtVedtak = false),
+        VedtakStatus(harVedtak = false, harAktivtVedtak = false, harVedtakUtenUtfall = false),
     )
 
     private fun skalBehandlesINyLøsning() = service.sjekkRoutingForPerson(request).skalBehandlesINyLøsning

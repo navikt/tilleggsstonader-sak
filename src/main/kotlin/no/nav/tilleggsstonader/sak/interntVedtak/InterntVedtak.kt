@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
@@ -15,6 +14,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
+/**
+ * Vurder å ta med fakta
+ */
 data class InterntVedtak(
     val behandling: Behandlinginfo,
     val søknad: Søknadsinformasjon?,
@@ -45,7 +47,18 @@ data class Søknadsinformasjon(
 data class VedtakInternt(
     val type: String,
     val avslagBegrunnelse: String?,
-    val utgifter: List<UtgiftInternt>?
+    val utgifterBarn: List<UtgiftBarn>?,
+)
+
+data class UtgiftBarn(
+    val fødselsdatoBarn: LocalDate,
+    val utgifter: List<Utgift>,
+)
+
+data class Utgift(
+    val beløp: Int,
+    val fom: LocalDate,
+    val tom: LocalDate,
 )
 
 data class Vilkårperiode(
