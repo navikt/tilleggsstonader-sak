@@ -70,12 +70,13 @@ class SøknadRoutingService(
     }
 
     private fun harGyldigStateIArena(arenaStatus: ArenaStatusDto): Boolean {
-        val harAktivSakUtenVedtak = arenaStatus.sak.harAktivSakUtenVedtak
         val harAktivtVedtak = arenaStatus.vedtak.harAktivtVedtak
-        val harVedtak = arenaStatus.vedtak.harVedtak
+        val harVedtakUtenUtfall = arenaStatus.vedtak.harVedtakUtenUtfall
+        val harGyldigStatus = !harVedtakUtenUtfall && !harAktivtVedtak
 
-        val harGyldigStatus = !harAktivSakUtenVedtak && !harAktivtVedtak
-        logger.info("routing - harGyldigStatusArena=$harGyldigStatus - harAktivSakUtenVedtak=$harAktivSakUtenVedtak harVedtak=$harVedtak harAktivtVedtak=$harAktivtVedtak")
+        val harAktivSakUtenVedtak = arenaStatus.sak.harAktivSakUtenVedtak
+        val harVedtak = arenaStatus.vedtak.harVedtak
+        logger.info("routing - harGyldigStatusArena=$harGyldigStatus - harAktivSakUtenVedtak=$harAktivSakUtenVedtak harVedtak=$harVedtak harAktivtVedtak=$harAktivtVedtak harVedtakUtenUtfall=$harVedtakUtenUtfall")
         return harGyldigStatus
     }
 

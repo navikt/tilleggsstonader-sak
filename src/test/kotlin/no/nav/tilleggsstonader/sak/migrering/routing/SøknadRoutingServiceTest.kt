@@ -207,21 +207,37 @@ class SøknadRoutingServiceTest {
                 behandlingService wasNot called
             }
         }
+
+        @Test
+        fun `skal ikke route hvis det er vedtak uten utfall`() {
+            every { arenaService.hentStatus(any(), any()) } returns arenaStatusVedtakUtenUtfall()
+
+            assertThat(skalBehandlesINyLøsning()).isFalse()
+
+            verify {
+                søknadRoutingRepository.insert(any()) wasNot called
+            }
+        }
     }
 
     private fun arenaStatusKanIkkeRoutes() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = true),
-        VedtakStatus(harVedtak = true, harAktivtVedtak = true),
+        VedtakStatus(harVedtak = true, harAktivtVedtak = true, harVedtakUtenUtfall = false),
     )
 
     private fun arenaStatusKanRoutes() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = false),
-        VedtakStatus(harVedtak = false, harAktivtVedtak = false),
+        VedtakStatus(harVedtak = false, harAktivtVedtak = false, harVedtakUtenUtfall = false),
     )
 
     private fun arenaStatusUtenAktivtVedtak() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = false),
-        VedtakStatus(harVedtak = true, harAktivtVedtak = false),
+        VedtakStatus(harVedtak = true, harAktivtVedtak = false, harVedtakUtenUtfall = false),
+    )
+
+    private fun arenaStatusVedtakUtenUtfall() = ArenaStatusDto(
+        SakStatus(harAktivSakUtenVedtak = false),
+        VedtakStatus(harVedtak = true, harAktivtVedtak = false, harVedtakUtenUtfall = true),
     )
 
     private fun skalBehandlesINyLøsning() = service.sjekkRoutingForPerson(request).skalBehandlesINyLøsning
