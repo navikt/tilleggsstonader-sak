@@ -23,6 +23,10 @@
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
       },
+      "dekketAvAnnetRegelverk" : {
+        "svar" : "NEI",
+        "resultat" : "OPPFYLT"
+      },
       "lønnet" : null
     },
     "kilde" : "SYSTEM",
@@ -39,6 +43,10 @@
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
       },
+      "dekketAvAnnetRegelverk" : {
+        "svar" : null,
+        "resultat" : "OPPFYLT"
+      },
       "lønnet" : null
     },
     "kilde" : "SYSTEM",
@@ -53,6 +61,7 @@
     "tom" : "2024-02-10",
     "delvilkår" : {
       "medlemskap" : null,
+      "dekketAvAnnetRegelverk" : null,
       "lønnet" : {
         "svar" : "JA",
         "resultat" : "IKKE_OPPFYLT"
@@ -69,6 +78,7 @@
     "tom" : "2024-02-10",
     "delvilkår" : {
       "medlemskap" : null,
+      "dekketAvAnnetRegelverk" : null,
       "lønnet" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"

@@ -77,6 +77,7 @@ data class Vilkårperiode(
 
 data class DelvilkårVilkårperiode(
     val medlemskap: VurderingVilkårperiode?,
+    val dekketAvAnnetRegelverk: VurderingVilkårperiode?,
     val lønnet: VurderingVilkårperiode?,
 )
 
