@@ -110,6 +110,7 @@ class InterntVedtakService(
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
+                aktivitetsdager = it.aktivitetsdager,
             )
         }
     }

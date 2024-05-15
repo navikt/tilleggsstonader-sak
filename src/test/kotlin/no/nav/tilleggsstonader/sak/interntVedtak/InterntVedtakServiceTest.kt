@@ -93,7 +93,7 @@ class InterntVedtakServiceTest {
             vedtakstidspunkt = vedtakstidspunkt,
             opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
             fagsak = fagsak,
-            resultat = BehandlingResultat.INNVILGET
+            resultat = BehandlingResultat.INNVILGET,
         ),
         fagsak = fagsak,
     )
@@ -224,7 +224,7 @@ class InterntVedtakServiceTest {
      * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
      * Formatter htmlfil etter generering for å unngå stor diff
      */
-    //@Disabled
+    @Disabled
     @Test
     fun `lager html og pdf`() {
         val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
