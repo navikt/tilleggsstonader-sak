@@ -110,9 +110,3 @@ data class VurderingInternt(
     val svar: String?,
     val begrunnelse: String?,
 )
-
-data class UtgiftInternt(
-    val beløp: Int,
-    val fom: String,
-    val tom: String,
-)
