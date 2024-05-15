@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 /**
- * Vurder å ta med fakta
+ * TODO: Vurder å ta med fakta
  */
 data class InterntVedtak(
     val behandling: Behandlinginfo,
