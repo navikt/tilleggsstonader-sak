@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -92,6 +93,7 @@ class InterntVedtakServiceTest {
             vedtakstidspunkt = vedtakstidspunkt,
             opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
             fagsak = fagsak,
+            resultat = BehandlingResultat.INNVILGET
         ),
         fagsak = fagsak,
     )
@@ -222,7 +224,7 @@ class InterntVedtakServiceTest {
      * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
      * Formatter htmlfil etter generering for å unngå stor diff
      */
-    @Disabled
+    //@Disabled
     @Test
     fun `lager html og pdf`() {
         val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)

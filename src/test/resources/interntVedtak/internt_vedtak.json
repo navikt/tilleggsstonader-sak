@@ -6,7 +6,7 @@
     "årsak" : "SØKNAD",
     "ident" : "15",
     "opprettetTidspunkt" : "2024-02-05T00:00:00",
-    "resultat" : "IKKE_SATT",
+    "resultat" : "INNVILGET",
     "vedtakstidspunkt" : "2024-01-01T00:00:00",
     "saksbehandler" : "saksbehandler",
     "beslutter" : "saksbeh2"
@@ -88,6 +88,7 @@
     "tom" : "2024-03-31"
   } ],
   "vilkår" : [ {
+    "type" : "PASS_BARN",
     "resultat" : "OPPFYLT",
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
@@ -111,13 +112,13 @@
         "begrunnelse" : null
       } ]
     } ],
-    "fødselsdatoBarn" : "2024-05-14"
+    "fødselsdatoBarn" : "2024-05-15"
   } ],
   "vedtak" : {
-    "type" : "Innvilgelse",
+    "type" : "INNVILGELSE",
     "avslagBegrunnelse" : null,
     "utgifterBarn" : [ {
-      "fødselsdatoBarn" : "2024-05-14",
+      "fødselsdatoBarn" : "2024-05-15",
       "utgifter" : [ {
         "beløp" : 1399,
         "fom" : "2024-01-01",

@@ -148,6 +148,7 @@ class InterntVedtakService(
     private fun mapVilkår(behandlingId: UUID, behandlingBarn: Map<UUID, GrunnlagBarn>): List<VilkårInternt> {
         return vilkårService.hentVilkårsett(behandlingId).map { vilkår ->
             VilkårInternt(
+                type = vilkår.vilkårType,
                 resultat = vilkår.resultat,
                 fødselsdatoBarn = vilkår.barnId?.let { behandlingBarn.finnFødselsdato(it) },
                 delvilkår = vilkår.delvilkårsett.map { mapDelvilkår(it) },
@@ -170,7 +171,7 @@ class InterntVedtakService(
     private fun mapVedtak(vedtak: VedtakTilsynBarn?, behandlingbarn: Map<UUID, GrunnlagBarn>): VedtakInternt? {
         return vedtak?.let {
             VedtakInternt(
-                type = it.type.beskrivelse,
+                type = it.type,
                 avslagBegrunnelse = it.avslagBegrunnelse,
                 utgifterBarn = it.vedtak?.utgifter?.entries?.map { (barnId, utgifter) ->
                     UtgiftBarn(

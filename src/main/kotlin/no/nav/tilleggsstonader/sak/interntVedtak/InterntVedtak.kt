@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
@@ -45,7 +47,7 @@ data class Søknadsinformasjon(
 )
 
 data class VedtakInternt(
-    val type: String,
+    val type: TypeVedtak,
     val avslagBegrunnelse: String?,
     val utgifterBarn: List<UtgiftBarn>?,
 )
@@ -90,6 +92,7 @@ data class Stønadsperiode(
 )
 
 data class VilkårInternt(
+    val type: VilkårType,
     val resultat: Vilkårsresultat,
     val delvilkår: List<DelvilkårInternt>,
     val fødselsdatoBarn: LocalDate?,
