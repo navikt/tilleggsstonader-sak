@@ -6,7 +6,7 @@
     "årsak" : "SØKNAD",
     "ident" : "15",
     "opprettetTidspunkt" : "2024-02-05T00:00:00",
-    "resultat" : "IKKE_SATT",
+    "resultat" : "INNVILGET",
     "vedtakstidspunkt" : "2024-01-01T00:00:00",
     "saksbehandler" : "saksbehandler",
     "beslutter" : "saksbeh2"
@@ -23,12 +23,17 @@
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
       },
+      "dekketAvAnnetRegelverk" : {
+        "svar" : "NEI",
+        "resultat" : "OPPFYLT"
+      },
       "lønnet" : null
     },
     "kilde" : "SYSTEM",
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe aap",
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "aktivitetsdager" : null
   }, {
     "type" : "OVERGANGSSTØNAD",
     "fom" : "2024-02-05",
@@ -38,12 +43,17 @@
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
       },
+      "dekketAvAnnetRegelverk" : {
+        "svar" : null,
+        "resultat" : "OPPFYLT"
+      },
       "lønnet" : null
     },
     "kilde" : "SYSTEM",
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe os",
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "aktivitetsdager" : null
   } ],
   "aktiviteter" : [ {
     "type" : "TILTAK",
@@ -51,6 +61,7 @@
     "tom" : "2024-02-10",
     "delvilkår" : {
       "medlemskap" : null,
+      "dekketAvAnnetRegelverk" : null,
       "lønnet" : {
         "svar" : "JA",
         "resultat" : "IKKE_OPPFYLT"
@@ -59,13 +70,15 @@
     "kilde" : "SYSTEM",
     "resultat" : "IKKE_OPPFYLT",
     "begrunnelse" : "aktivitet abd",
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "aktivitetsdager" : 5
   }, {
     "type" : "TILTAK",
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
     "delvilkår" : {
       "medlemskap" : null,
+      "dekketAvAnnetRegelverk" : null,
       "lønnet" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
@@ -74,7 +87,8 @@
     "kilde" : "MANUELL",
     "resultat" : "SLETTET",
     "begrunnelse" : null,
-    "slettetKommentar" : "kommentar slettet"
+    "slettetKommentar" : "kommentar slettet",
+    "aktivitetsdager" : 5
   } ],
   "stønadsperioder" : [ {
     "målgruppe" : "AAP",
@@ -86,5 +100,44 @@
     "aktivitet" : "REELL_ARBEIDSSØKER",
     "fom" : "2024-02-01",
     "tom" : "2024-03-31"
-  } ]
+  } ],
+  "vilkår" : [ {
+    "type" : "PASS_BARN",
+    "resultat" : "OPPFYLT",
+    "delvilkår" : [ {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Er barnet ferdig med 4. skoleår?",
+        "svar" : "Nei",
+        "begrunnelse" : "en begrunnelse"
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Mottar den andre forelderen støtte til pass av barnet?",
+        "svar" : "Nei",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Er utgiftene tilfredstillende dokumentert?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    } ],
+    "fødselsdatoBarn" : "2024-05-15"
+  } ],
+  "vedtak" : {
+    "type" : "INNVILGELSE",
+    "avslagBegrunnelse" : null,
+    "utgifterBarn" : [ {
+      "fødselsdatoBarn" : "2024-05-15",
+      "utgifter" : [ {
+        "beløp" : 1399,
+        "fom" : "2024-01-01",
+        "tom" : "2024-01-31"
+      } ]
+    } ]
+  }
 }

@@ -5,19 +5,35 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import no.nav.tilleggsstonader.sak.util.FileUtil.skrivTilFil
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitet
@@ -42,6 +58,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import java.net.URI
 import java.time.LocalDate
+import java.time.YearMonth
 import java.util.UUID
 
 class InterntVedtakServiceTest {
@@ -51,6 +68,10 @@ class InterntVedtakServiceTest {
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
     private val stønadsperiodeService = mockk<StønadsperiodeService>()
     private val søknadService = mockk<SøknadService>()
+    private val grunnlagsdataService = mockk<GrunnlagsdataService>()
+    private val barnService = mockk<BarnService>()
+    private val vilkårService = mockk<VilkårService>()
+    private val tilsynBarnVedtakService = mockk<TilsynBarnVedtakService>()
 
     val service = InterntVedtakService(
         behandlingService = behandlingService,
@@ -58,6 +79,10 @@ class InterntVedtakServiceTest {
         vilkårperiodeService = vilkårperiodeService,
         stønadsperiodeService = stønadsperiodeService,
         søknadService = søknadService,
+        grunnlagsdataService = grunnlagsdataService,
+        barnService = barnService,
+        vilkårService = vilkårService,
+        tilsynBarnVedtakService = tilsynBarnVedtakService,
     )
 
     val vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay()
@@ -68,6 +93,7 @@ class InterntVedtakServiceTest {
             vedtakstidspunkt = vedtakstidspunkt,
             opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
             fagsak = fagsak,
+            resultat = BehandlingResultat.INNVILGET,
         ),
         fagsak = fagsak,
     )
@@ -76,14 +102,20 @@ class InterntVedtakServiceTest {
             VilkårperiodeTestUtil.målgruppe(
                 type = MålgruppeType.AAP,
                 begrunnelse = "målgruppe aap",
-                delvilkår = delvilkårMålgruppe(medlemskap = vurdering(SvarJaNei.JA_IMPLISITT), dekkesAvAnnetRegelverk = vurdering(SvarJaNei.NEI)),
+                delvilkår = delvilkårMålgruppe(
+                    medlemskap = vurdering(SvarJaNei.JA_IMPLISITT),
+                    dekkesAvAnnetRegelverk = vurdering(SvarJaNei.NEI),
+                ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
             ),
             VilkårperiodeTestUtil.målgruppe(
                 type = MålgruppeType.OVERGANGSSTØNAD,
                 begrunnelse = "målgruppe os",
-                delvilkår = delvilkårMålgruppe(medlemskap = vurdering(SvarJaNei.JA_IMPLISITT), dekkesAvAnnetRegelverk = vurdering(svar = null)),
+                delvilkår = delvilkårMålgruppe(
+                    medlemskap = vurdering(SvarJaNei.JA_IMPLISITT),
+                    dekkesAvAnnetRegelverk = vurdering(svar = null),
+                ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
             ),
@@ -126,10 +158,37 @@ class InterntVedtakServiceTest {
             aktivitet = AktivitetType.REELL_ARBEIDSSØKER,
         ),
     )
+    val behandlingId = behandling.id
     val totrinnskontroll = TotrinnskontrollUtil.totrinnskontroll(TotrinnInternStatus.GODKJENT, beslutter = "saksbeh2")
     val søknad = SøknadBarnetilsynUtil.søknadBarnetilsyn()
+    val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain()
+    val behandlingBarn = listOf(behandlingBarn(personIdent = grunnlagsdata.grunnlag.barn.single().ident))
+    val barnId = behandlingBarn[0].id
+    val vilkår = listOf(
+        vilkår(
+            behandlingId = behandlingId,
+            type = VilkårType.PASS_BARN,
+            delvilkår = oppfylteDelvilkårPassBarn(),
+            barnId = barnId,
+        ).tilDto(),
+    )
 
-    val behandlingId = behandling.id
+    val vedtak = VedtakTilsynBarn(
+        behandlingId = behandlingId,
+        type = TypeVedtak.INNVILGELSE,
+        vedtak = VedtaksdataTilsynBarn(
+            utgifter = mapOf(
+                barnId to listOf(
+                    Utgift(
+                        fom = YearMonth.of(2024, 1),
+                        tom = YearMonth.of(2024, 2),
+                        utgift = 1399,
+                    ),
+                ),
+            ),
+        ),
+        beregningsresultat = VedtaksdataBeregningsresultat(emptyList()),
+    )
 
     @BeforeEach
     fun setUp() {
@@ -138,6 +197,10 @@ class InterntVedtakServiceTest {
         every { stønadsperiodeService.hentStønadsperioder(behandlingId) } returns stønadsperioder
         every { totrinnskontrollService.hentTotrinnskontroll(behandlingId) } returns totrinnskontroll
         every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknad
+        every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns behandlingBarn
+        every { vilkårService.hentVilkårsett(behandlingId) } returns vilkår
+        every { tilsynBarnVedtakService.hentVedtak(behandlingId) } returns vedtak
     }
 
     @Test
