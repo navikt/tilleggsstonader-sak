@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import no.nav.tilleggsstonader.sak.util.FileUtil.skrivTilFil
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
@@ -161,7 +162,8 @@ class InterntVedtakServiceTest {
     val behandlingId = behandling.id
     val totrinnskontroll = TotrinnskontrollUtil.totrinnskontroll(TotrinnInternStatus.GODKJENT, beslutter = "saksbeh2")
     val søknad = SøknadBarnetilsynUtil.søknadBarnetilsyn()
-    val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain()
+    val barn = listOf(GrunnlagsdataUtil.lagGrunnlagsdataBarn(fødselsdato = LocalDate.of(2024, 5, 15)))
+    val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = barn))
     val behandlingBarn = listOf(behandlingBarn(personIdent = grunnlagsdata.grunnlag.barn.single().ident))
     val barnId = behandlingBarn[0].id
     val vilkår = listOf(
