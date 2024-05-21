@@ -22,6 +22,8 @@ data class FinnOppgaveRequestDto(
     val mappeId: Long? = null,
     val erUtenMappe: Boolean? = null,
     val ident: String?,
+    val limit: Long = 150, // TODO slett når frontend implementert limit og offset
+    val offset: Long = 0, // TODO slett når frontend implementert limit og offset
 ) {
 
     fun tilFinnOppgaveRequest(aktørid: String? = null): FinnOppgaveRequest =
@@ -51,7 +53,7 @@ data class FinnOppgaveRequestDto(
             aktivFomDato = null,
             aktivTomDato = null,
             mappeId = this.mappeId,
-            limit = 150,
-            offset = 0,
+            limit = this.limit,
+            offset = this.offset,
         )
 }
