@@ -48,7 +48,7 @@ object PdlTestdataHelper {
         bostedsadresse: List<Bostedsadresse> = emptyList(),
         dødsfall: List<Dødsfall> = emptyList(),
         forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList(),
-        fødsel: List<Fødsel> = emptyList(),
+        fødsel: List<Fødsel> = listOf(fødsel(år = 2000)),
         folkeregisterpersonstatus: List<Folkeregisterpersonstatus> = emptyList(),
         fullmakt: List<Fullmakt> = emptyList(),
         kontaktadresse: List<Kontaktadresse> = emptyList(),
