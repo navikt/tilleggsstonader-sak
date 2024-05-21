@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
@@ -17,6 +18,7 @@ object EvalueringAktivitet {
         return when (type) {
             AktivitetType.UTDANNING, AktivitetType.REELL_ARBEIDSSØKER -> ikkeVurdertLønnet(type, delvilkår)
             AktivitetType.TILTAK -> utledResultat(delvilkår)
+            AktivitetType.INGEN_AKTIVITET -> ikkeOppfyltUtenVurdering()
         }
     }
 
@@ -54,6 +56,16 @@ object EvalueringAktivitet {
             resultat = ResultatVilkårperiode.OPPFYLT,
         )
     }
+
+    private fun ikkeOppfyltUtenVurdering() = ResultatEvaluering(
+        delvilkår = DelvilkårAktivitet(
+            lønnet = DelvilkårVilkårperiode.Vurdering(
+                svar = null,
+                resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
+            ),
+        ),
+        resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
+    )
 
     private fun utledResultatLønnet(svar: SvarJaNei?) = when (svar) {
         SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT

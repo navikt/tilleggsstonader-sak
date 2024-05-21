@@ -21,6 +21,7 @@ object VilkårGrunnlagUtil {
             ),
             barn = barn,
             dokumentasjon = null,
+            søknadMottattTidspunkt = null,
         )
 
     fun grunnlagBarn(

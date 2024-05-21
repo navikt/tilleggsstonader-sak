@@ -96,6 +96,11 @@ class StønadsperiodeService(
         return stønadsperiodeRepository.insertAll(nyeStønadsperioder)
     }
 
+    fun validerStønadsperioder(behandlingId: UUID) {
+        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
+        validerStønadsperioder(behandlingId, stønadsperioder)
+    }
+
     fun validerStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>) {
         val vilkårperioder = vilkårperiodeService.hentVilkårperioderDto(behandlingId)
 

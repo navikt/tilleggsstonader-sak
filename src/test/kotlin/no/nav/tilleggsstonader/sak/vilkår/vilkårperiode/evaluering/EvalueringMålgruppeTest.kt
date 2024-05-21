@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringM
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 
@@ -141,6 +142,23 @@ class EvalueringMålgruppeTest {
                     ),
                 )
             }.hasMessageContaining("Ugyldig svar=JA_IMPLISITT")
+        }
+
+        @Test
+        fun `ingen målgruppe skal mappes til ikke oppfylt`() {
+            val resultat = utledResultat(
+                MålgruppeType.INGEN_MÅLGRUPPE,
+                delvilkårMålgruppeDto(
+                    medlemskap = VurderingDto(svar = null),
+                    dekketAvAnnetRegelverk = VurderingDto(svar = null),
+                ),
+            )
+
+            assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+            assertThat(resultat.medlemskap.svar).isNull()
+            assertThat(resultat.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
+            assertThat(resultat.dekketAvAnnetRegelverk.svar).isNull()
+            assertThat(resultat.dekketAvAnnetRegelverk.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
         }
     }
 
@@ -283,7 +301,7 @@ class EvalueringMålgruppeTest {
 @ParameterizedTest
 @EnumSource(
     value = MålgruppeType::class,
-    names = ["NEDSATT_ARBEIDSEVNE", "OMSTILLINGSSTØNAD", "DAGPENGER", "UFØRETRYGD"],
+    names = ["NEDSATT_ARBEIDSEVNE", "OMSTILLINGSSTØNAD", "DAGPENGER", "UFØRETRYGD", "INGEN_MÅLGRUPPE"],
     mode = EnumSource.Mode.EXCLUDE,
 )
 private annotation class ImplisittParameterizedTest
@@ -291,7 +309,7 @@ private annotation class ImplisittParameterizedTest
 @ParameterizedTest
 @EnumSource(
     value = MålgruppeType::class,
-    names = ["AAP", "OVERGANGSSTØNAD"],
+    names = ["AAP", "OVERGANGSSTØNAD", "INGEN_MÅLGRUPPE"],
     mode = EnumSource.Mode.EXCLUDE,
 )
 private annotation class IkkeImplisittParameterizedTest
@@ -299,7 +317,7 @@ private annotation class IkkeImplisittParameterizedTest
 @ParameterizedTest
 @EnumSource(
     value = MålgruppeType::class,
-    names = ["OVERGANGSSTØNAD", "OMSTILLINGSSTØNAD", "DAGPENGER"],
+    names = ["OVERGANGSSTØNAD", "OMSTILLINGSSTØNAD", "DAGPENGER", "INGEN_MÅLGRUPPE"],
     mode = EnumSource.Mode.EXCLUDE,
 )
 private annotation class NedsattArbeidsevneParameterizedTest
@@ -307,7 +325,7 @@ private annotation class NedsattArbeidsevneParameterizedTest
 @ParameterizedTest
 @EnumSource(
     value = MålgruppeType::class,
-    names = ["AAP", "NEDSATT_ARBEIDSEVNE", "UFØRETRYGD"],
+    names = ["AAP", "NEDSATT_ARBEIDSEVNE", "UFØRETRYGD", "INGEN_MÅLGRUPPE"],
     mode = EnumSource.Mode.EXCLUDE,
 )
 private annotation class IkkeNedsattArbeidsevneParameterizedTest

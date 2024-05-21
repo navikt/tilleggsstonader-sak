@@ -66,6 +66,16 @@
             margin-left: 5px;
         }
 
+        .vilkårsresultat-ikon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            position: relative;
+            top: 5px;
+            margin: 0;
+            padding: 0;
+        }
+
         @page {
             @bottom-right {
                 content: 'Side ' counter(page) ' av ' counter(pages);
@@ -179,7 +189,7 @@
             </tr>
             <tr>
                 <th>Årsak</th>
-                <td>SØKNAD</td>
+                <td>Søknad</td>
             </tr>
             <tr>
                 <th>Saksbehandler</th>
@@ -191,7 +201,7 @@
             </tr>
             <tr>
                 <th>Resultat</th>
-                <td>IKKE_SATT</td>
+                <td>Innvilget</td>
             </tr>
             <tr>
                 <th>Vedtakstidspunkt</th>
@@ -221,16 +231,20 @@
         </div>
         <div class="vilkaarperiode-rad-content">
             <div>Periode: 05.02.2024 - 10.02.2024</div>
-            <div>Kilde: SYSTEM</div>
-            <p style="white-space:pre-wrap">Begrunnelse: <br/>målgrupp abc</p>
+            <div>Kilde: System</div>
+            <p style="white-space:pre-wrap">Begrunnelse: <br/>målgruppe aap</p>
             <div class="internt-vedtak-page-break ">
-                <div><strong>Medlemskap</strong> (OPPFYLT)</div>
-                <div>Svar: JA_IMPLISITT</div>
+                <div><strong>Medlemskap</strong> (Oppfylt)</div>
+                <div>Svar: Ja, implisitt</div>
+            </div>
+            <div class="internt-vedtak-page-break ">
+                <div><strong>Dekkes av annet regelverk</strong> (Oppfylt)</div>
+                <div>Svar: Nei</div>
             </div>
         </div>
     </div>
     <div class="internt-vedtak-page-break vilkaarperiode-rad">
-        <div class="vilkaarperiode-type"><strong>OVERGANGSSTØNAD</strong>
+        <div class="vilkaarperiode-type"><strong>Overgangsstønad</strong>
             <div class="vilkaarperiode-resultat">
                 <svg aria-labelledby="oppfylt" height="24" width="24" viewBox="0 0 24 24"
                      xmlns="http://www.w3.org/2000/svg"><title id="oppfylt">Oppfylt</title>
@@ -245,18 +259,22 @@
         </div>
         <div class="vilkaarperiode-rad-content">
             <div>Periode: 05.02.2024 - 10.02.2024</div>
-            <div>Kilde: SYSTEM</div>
-            <p style="white-space:pre-wrap">Begrunnelse: <br/>målgrupp os</p>
+            <div>Kilde: System</div>
+            <p style="white-space:pre-wrap">Begrunnelse: <br/>målgruppe os</p>
             <div class="internt-vedtak-page-break ">
-                <div><strong>Medlemskap</strong> (OPPFYLT)</div>
-                <div>Svar: JA_IMPLISITT</div>
+                <div><strong>Medlemskap</strong> (Oppfylt)</div>
+                <div>Svar: Ja, implisitt</div>
+            </div>
+            <div class="internt-vedtak-page-break ">
+                <div><strong>Dekkes av annet regelverk</strong> (Oppfylt)</div>
+                <div>Svar:</div>
             </div>
         </div>
     </div>
 </div>
 <div class="internt-vedtak-page-break vilkaarperiode"><h2>Aktiviteter</h2>
     <div class="internt-vedtak-page-break vilkaarperiode-rad">
-        <div class="vilkaarperiode-type"><strong>TILTAK</strong>
+        <div class="vilkaarperiode-type"><strong>Tiltak</strong>
             <div class="vilkaarperiode-resultat">
                 <svg aria-labelledby="ikkeOppfylt" height="24" width="24" viewBox="0 0 24 24"
                      xmlns="http://www.w3.org/2000/svg"><title id="ikkeOppfylt">Ikke oppfylt</title>
@@ -271,20 +289,17 @@
         </div>
         <div class="vilkaarperiode-rad-content">
             <div>Periode: 05.02.2024 - 10.02.2024</div>
-            <div>Kilde: SYSTEM</div>
+            <div>Aktivitetsdager: 5</div>
+            <div>Kilde: System</div>
             <p style="white-space:pre-wrap">Begrunnelse: <br/>aktivitet abd</p>
             <div class="internt-vedtak-page-break ">
-                <div><strong>Lønnet</strong> (IKKE_OPPFYLT)</div>
-                <div>Svar: JA</div>
-                <p style="white-space:pre-wrap">Begrunnelse: <br/>begrunnelse lønnet</p></div>
-            <div class="internt-vedtak-page-break ">
-                <div><strong>Mottar sykepenger</strong> (OPPFYLT)</div>
-                <div>Svar: NEI</div>
+                <div><strong>Lønnet</strong> (Ikke oppfylt)</div>
+                <div>Svar: Ja</div>
             </div>
         </div>
     </div>
     <div class="internt-vedtak-page-break vilkaarperiode-rad">
-        <div class="vilkaarperiode-type"><strong>TILTAK</strong>
+        <div class="vilkaarperiode-type"><strong>Tiltak</strong>
             <div class="vilkaarperiode-resultat">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                      focusable="false" role="img">
@@ -296,15 +311,12 @@
         </div>
         <div class="vilkaarperiode-rad-content">
             <div>Periode: 05.02.2024 - 10.02.2024</div>
-            <div>Kilde: MANUELL</div>
+            <div>Aktivitetsdager: 5</div>
+            <div>Kilde: Manuell</div>
             <p style="white-space:pre-wrap">Kommentar slettet: <br/>kommentar slettet</p>
             <div class="internt-vedtak-page-break ">
-                <div><strong>Lønnet</strong> (OPPFYLT)</div>
-                <div>Svar: NEI</div>
-            </div>
-            <div class="internt-vedtak-page-break ">
-                <div><strong>Mottar sykepenger</strong> (OPPFYLT)</div>
-                <div>Svar: NEI</div>
+                <div><strong>Lønnet</strong> (Oppfylt)</div>
+                <div>Svar: Nei</div>
             </div>
         </div>
     </div>
@@ -335,7 +347,77 @@
         </tbody>
     </table>
 </div>
-<h2>Stønadsvilkår</h2>
-<h2>Vedtak</h2>
-<h2>Utbetalingsperioder</h2></body>
+<div class="internt-vedtak-page-break stonadsperioder">
+    <div class="internt-vedtak-page-break "><h2>Vilkår om pass av barn</h2>
+        <div>Barn med fødselsdato:15.05.2024</div>
+        <h4>Vilkårsvurdering: Oppfylt</h4>
+        <div class="internt-vedtak-page-break "><strong>Delvilkår</strong>: Ikke tatt stilling til
+            <div class="vilkårsresultat-ikon"><span style="padding-bottom:20%"><svg aria-labelledby="ikke vurdert"
+                                                                                    viewBox="0 0 24 24"
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    height="24" width="24"><title
+                    id="ikke vurdert">Ikke vurdert</title><path fill="#FFA733"
+                                                                d="M12.205.996l-.214.002a12.226 12.226 0 00-8.517 3.658c-2.295 2.32-3.527 5.355-3.472 8.55.115 6.611 5.296 11.79 11.795 11.79l.212-.002c6.726-.116 12.105-5.593 11.99-12.207-.115-6.61-5.296-11.79-11.794-11.79z"></path><path
+                    fill="#3E3832" fill-rule="evenodd"
+                    d="M13 6.8a1 1 0 10-2 0v7a1 1 0 102 0v-7zm-1 13h.027a1.5 1.5 0 00-.027-3l-.013.002h-.014A1.498 1.498 0 0012 19.801z"
+                    clip-rule="evenodd"></path></svg></span></div>
+        </div>
+        <div class="internt-vedtak-page-break ">
+            <div>Er barnet ferdig med 4. skoleår? Nei</div>
+            <div>Begrunnelse: <p style="white-space:pre-wrap">en begrunnelse</p></div>
+        </div>
+        <div class="internt-vedtak-page-break "><strong>Delvilkår</strong>: Ikke tatt stilling til
+            <div class="vilkårsresultat-ikon"><span style="padding-bottom:20%"><svg aria-labelledby="ikke vurdert"
+                                                                                    viewBox="0 0 24 24"
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    height="24" width="24"><title
+                    id="ikke vurdert">Ikke vurdert</title><path fill="#FFA733"
+                                                                d="M12.205.996l-.214.002a12.226 12.226 0 00-8.517 3.658c-2.295 2.32-3.527 5.355-3.472 8.55.115 6.611 5.296 11.79 11.795 11.79l.212-.002c6.726-.116 12.105-5.593 11.99-12.207-.115-6.61-5.296-11.79-11.794-11.79z"></path><path
+                    fill="#3E3832" fill-rule="evenodd"
+                    d="M13 6.8a1 1 0 10-2 0v7a1 1 0 102 0v-7zm-1 13h.027a1.5 1.5 0 00-.027-3l-.013.002h-.014A1.498 1.498 0 0012 19.801z"
+                    clip-rule="evenodd"></path></svg></span></div>
+        </div>
+        <div class="internt-vedtak-page-break ">
+            <div>Mottar den andre forelderen støtte til pass av barnet? Nei</div>
+        </div>
+        <div class="internt-vedtak-page-break "><strong>Delvilkår</strong>: Ikke tatt stilling til
+            <div class="vilkårsresultat-ikon"><span style="padding-bottom:20%"><svg aria-labelledby="ikke vurdert"
+                                                                                    viewBox="0 0 24 24"
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    height="24" width="24"><title
+                    id="ikke vurdert">Ikke vurdert</title><path fill="#FFA733"
+                                                                d="M12.205.996l-.214.002a12.226 12.226 0 00-8.517 3.658c-2.295 2.32-3.527 5.355-3.472 8.55.115 6.611 5.296 11.79 11.795 11.79l.212-.002c6.726-.116 12.105-5.593 11.99-12.207-.115-6.61-5.296-11.79-11.794-11.79z"></path><path
+                    fill="#3E3832" fill-rule="evenodd"
+                    d="M13 6.8a1 1 0 10-2 0v7a1 1 0 102 0v-7zm-1 13h.027a1.5 1.5 0 00-.027-3l-.013.002h-.014A1.498 1.498 0 0012 19.801z"
+                    clip-rule="evenodd"></path></svg></span></div>
+        </div>
+        <div class="internt-vedtak-page-break ">
+            <div>Er utgiftene tilfredstillende dokumentert? Ja</div>
+        </div>
+    </div>
+</div>
+<div class="internt-vedtak-page-break "><h2>Vedtak</h2>
+    <div><strong>Resultat: </strong>Innvilget</div>
+    <div class="internt-vedtak-page-break "><h3>Utgifter</h3>
+        <div class="internt-vedtak-page-break "><h4>Barn med fødselsdato:15.05.2024</h4>
+            <table>
+                <thead>
+                <tr>
+                    <th>Fra</th>
+                    <th>Til</th>
+                    <th>Beløp</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>01.01.2024</td>
+                    <td>31.01.2024</td>
+                    <td>1399</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
 </html>

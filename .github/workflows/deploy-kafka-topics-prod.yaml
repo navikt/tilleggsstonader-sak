@@ -16,4 +16,4 @@ jobs:
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: prod-gcp
-          RESOURCE: .nais/topics/statistikk-tilleggsstonader-behandling/topic-prod.yaml
+          RESOURCE: .nais/topics/statistikk-dvh-behandling/topic-prod.yaml

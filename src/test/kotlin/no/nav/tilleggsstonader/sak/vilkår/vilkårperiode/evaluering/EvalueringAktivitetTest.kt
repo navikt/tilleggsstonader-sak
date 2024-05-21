@@ -96,6 +96,22 @@ class EvalueringAktivitetTest {
         }
     }
 
+    @Nested
+    inner class IngenAktivitet {
+
+        @Test
+        fun `Ingen aktivitet skal mappes til ikke oppfylt`() {
+            val resultat = utledResultat(
+                AktivitetType.INGEN_AKTIVITET,
+                delvilkårAktivitetDto(),
+            )
+
+            assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+            assertThat(resultat.lønnet.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
+            assertThat(resultat.lønnet.svar).isNull()
+        }
+    }
+
     private fun delvilkårAktivitetDto(
         lønnet: SvarJaNei? = null,
     ) = DelvilkårAktivitetDto(lønnet = VurderingDto(lønnet))
@@ -107,7 +123,7 @@ class EvalueringAktivitetTest {
 @ParameterizedTest
 @EnumSource(
     value = AktivitetType::class,
-    names = ["TILTAK"],
+    names = ["TILTAK", "INGEN_AKTIVITET"],
     mode = EnumSource.Mode.EXCLUDE,
 )
 private annotation class ReellArbeidssøkerEllerUtdanningParameterizedTest

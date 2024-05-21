@@ -26,6 +26,7 @@ class BehandlingFaktaService(
         val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
         val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaDto(
+            søknadMottattTidspunkt = søknad?.mottattTidspunkt,
             hovedytelse = mapHovedytelse(søknad),
             aktivitet = mapAktivitet(søknad),
             barn = mapBarn(grunnlagsdata, søknad, behandlingId),

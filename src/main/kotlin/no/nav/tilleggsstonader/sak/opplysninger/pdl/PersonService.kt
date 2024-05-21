@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.pdl
 
+import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
@@ -60,4 +61,6 @@ class PersonService(
     }
 
     fun hentAktørIder(ident: String): PdlIdenter = pdlClient.hentAktørIder(ident)
+
+    fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto? = pdlClient.hentGeografiskTilknytning(ident)
 }

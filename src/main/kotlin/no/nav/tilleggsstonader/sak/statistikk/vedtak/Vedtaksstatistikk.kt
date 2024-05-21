@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.StønadstypeDvh.BARNETILSYN
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
@@ -53,6 +54,7 @@ data class Vedtaksstatistikk(
     val kravMottatt: LocalDate?,
     // TODO: Legg inn årsak til revurdering når revurdering kommer i løsningen
     // TODO: Legg inn årsak for avslag når avslag kommer i løsningen
+    // TODO: EØS-informasjon når det kommer støtte for det i løsningen
 )
 
 enum class StønadstypeDvh {
@@ -62,6 +64,7 @@ enum class StønadstypeDvh {
 data class UtbetalingerDvh(
     val fraOgMed: LocalDate,
     val tilOgMed: LocalDate,
+    val type: AndelstypeDvh,
     val beløp: Int,
 ) {
     data class JsonWrapper(
@@ -70,10 +73,31 @@ data class UtbetalingerDvh(
 
     companion object {
         fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = JsonWrapper(
-            ytelser.map {
-                UtbetalingerDvh(fraOgMed = it.fom, tilOgMed = it.tom, beløp = it.beløp)
+            ytelser.filterNot { it.type == TypeAndel.UGYLDIG }.map {
+                UtbetalingerDvh(
+                    fraOgMed = it.fom,
+                    tilOgMed = it.tom,
+                    type = AndelstypeDvh.fraDomene(it.type),
+                    beløp = it.beløp,
+                )
             },
         )
+    }
+}
+
+enum class AndelstypeDvh {
+    TILSYN_BARN_ENSLIG_FORSØRGER,
+    TILSYN_BARN_AAP,
+    TILSYN_BARN_ETTERLATTE,
+    ;
+
+    companion object {
+        fun fraDomene(typeAndel: TypeAndel) = when (typeAndel) {
+            TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> TILSYN_BARN_ENSLIG_FORSØRGER
+            TypeAndel.TILSYN_BARN_AAP -> TILSYN_BARN_AAP
+            TypeAndel.TILSYN_BARN_ETTERLATTE -> TILSYN_BARN_ETTERLATTE
+            TypeAndel.UGYLDIG -> throw Error("Trenger ikke statistikk på ugyldige betalinger")
+        }
     }
 }
 
@@ -258,6 +282,7 @@ enum class AktivitetTypeDvh {
     TILTAK,
     UTDANNING,
     REELL_ARBEIDSSØKER,
+    INGEN_AKTIVITET,
     ;
 
     companion object {
@@ -265,9 +290,10 @@ enum class AktivitetTypeDvh {
             AktivitetType.TILTAK -> TILTAK
             AktivitetType.UTDANNING -> UTDANNING
             AktivitetType.REELL_ARBEIDSSØKER -> REELL_ARBEIDSSØKER
-            else -> {
-                throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type aktivitet.")
-            }
+            AktivitetType.INGEN_AKTIVITET -> INGEN_AKTIVITET
+            MålgruppeType.AAP, MålgruppeType.DAGPENGER, MålgruppeType.OMSTILLINGSSTØNAD, MålgruppeType.OVERGANGSSTØNAD, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD, MålgruppeType.INGEN_MÅLGRUPPE -> throw IllegalArgumentException(
+                "$vilkårsperiodeType er ikke en gyldig type aktivitet.",
+            )
         }
     }
 }
@@ -279,6 +305,7 @@ enum class MålgruppeTypeDvh {
     OVERGANGSSTØNAD,
     NEDSATT_ARBEIDSEVNE,
     UFØRETRYGD,
+    INGEN_MÅLGRUPPE,
     ;
 
     companion object {
@@ -289,9 +316,10 @@ enum class MålgruppeTypeDvh {
             MålgruppeType.OVERGANGSSTØNAD -> OVERGANGSSTØNAD
             MålgruppeType.NEDSATT_ARBEIDSEVNE -> NEDSATT_ARBEIDSEVNE
             MålgruppeType.UFØRETRYGD -> UFØRETRYGD
-            else -> {
-                throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type målgruppe.")
-            }
+            MålgruppeType.INGEN_MÅLGRUPPE -> INGEN_MÅLGRUPPE
+            AktivitetType.TILTAK, AktivitetType.UTDANNING, AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.INGEN_AKTIVITET -> throw IllegalArgumentException(
+                "$vilkårsperiodeType er ikke en gyldig type målgruppe.",
+            )
         }
     }
 }

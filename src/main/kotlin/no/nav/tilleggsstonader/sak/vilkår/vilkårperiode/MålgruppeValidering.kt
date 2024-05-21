@@ -15,6 +15,7 @@ object MålgruppeValidering {
                 MålgruppeType.OMSTILLINGSSTØNAD -> true
                 MålgruppeType.OVERGANGSSTØNAD -> true
                 MålgruppeType.UFØRETRYGD -> true
+                MålgruppeType.INGEN_MÅLGRUPPE -> true
             }
         }
         feilHvisIkke(gyldig) {

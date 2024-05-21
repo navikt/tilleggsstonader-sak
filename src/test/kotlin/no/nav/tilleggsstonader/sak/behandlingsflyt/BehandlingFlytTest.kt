@@ -44,8 +44,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
@@ -168,6 +170,24 @@ class BehandlingFlytTest(
         somBeslutter {
             godkjennTotrinnskontroll(behandlingId)
             assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
+        }
+    }
+
+    @Test
+    fun `skal ikke kunne gå videre til vilkår-steg dersom inngangsvilkåren ikke validerer`() {
+        somSaksbehandler {
+            val behandlingId = opprettBehandling(personIdent)
+            vurderInngangsvilkår(behandlingId)
+            stegService.resetSteg(behandlingId, StegType.INNGANGSVILKÅR)
+            with(vilkårperiodeService.hentVilkårperioder(behandlingId)) {
+                val slettVikårperiode = SlettVikårperiode(behandlingId, "kommentar")
+                (målgrupper + aktiviteter).forEach {
+                    vilkårperiodeService.slettVilkårperiode(it.id, slettVikårperiode)
+                }
+            }
+            assertThatThrownBy {
+                stegService.håndterSteg(behandlingId, StegType.INNGANGSVILKÅR)
+            }.hasMessageContaining("Finner ingen perioder hvor vilkår for AAP er oppfylt")
         }
     }
 

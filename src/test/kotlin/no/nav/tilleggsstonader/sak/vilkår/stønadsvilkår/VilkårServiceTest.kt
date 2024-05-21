@@ -294,7 +294,7 @@ internal class VilkårServiceTest {
                 SvarPåVilkårDto(
                     id = vilkår.id,
                     behandlingId = behandlingId,
-                    delvilkårsett = PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn(),
+                    delvilkårsett = PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto(),
                 ),
             )
 

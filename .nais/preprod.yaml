@@ -35,8 +35,8 @@ spec:
     sqlInstances:
       - type: POSTGRES_15
         flags:
-          - name: cloudsql.logical_decoding # flagget som må settes
-            value: "on" # flagget som må settes
+          - name: cloudsql.logical_decoding  # trengs for å bruke replication slots i databasen.
+            value: "on"
         diskAutoresize: true
         cascadingDelete: false
         highAvailability: false
@@ -95,6 +95,7 @@ spec:
         - host: tilleggsstonader-arena.dev-fss-pub.nais.io
         - host: tilleggsstonader-unleash-api.nav.cloud.nais.io
         - host: kodeverk-api.nav.no
+        - host: norg2.dev-fss-pub.nais.io
 
   envFrom:
     - secret: tilleggsstonader-sak-unleash-api-token

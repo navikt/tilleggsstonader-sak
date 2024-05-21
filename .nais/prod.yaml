@@ -35,6 +35,9 @@ spec:
     sqlInstances:
       - type: POSTGRES_15
         tier: db-custom-1-3840
+        flags:
+          - name: cloudsql.logical_decoding # trengs for å bruke replication slots i databasen.
+            value: "on"
         diskAutoresize: true
         cascadingDelete: false
         highAvailability: true
@@ -45,6 +48,8 @@ spec:
         databases:
           - name: tilleggsstonader-sak
             envVarPrefix: DB
+            users:
+              - name: datastream # ekstra databasebruker
   kafka:
     pool: nav-prod
   secureLogs:
@@ -91,6 +96,7 @@ spec:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: tilleggsstonader-arena.prod-fss-pub.nais.io
         - host: tilleggsstonader-unleash-api.nav.cloud.nais.io
+        - host: norg2.prod-fss-pub.nais.io
   envFrom:
     - secret: tilleggsstonader-sak-unleash-api-token
   env:

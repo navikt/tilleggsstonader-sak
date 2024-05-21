@@ -237,6 +237,13 @@ enum class AdressebeskyttelseGradering {
     UGRADERT,
 }
 
+fun AdressebeskyttelseGradering.tilDiskresjonskode(): String? = when (this) {
+    AdressebeskyttelseGradering.STRENGT_FORTROLIG -> "SPSF" // Kode 6
+    AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND -> "SPSF" // Kode 19
+    AdressebeskyttelseGradering.FORTROLIG -> "SPFO" // Kode 7
+    AdressebeskyttelseGradering.UGRADERT -> null
+}
+
 data class Fødsel(
     @JsonProperty("foedselsaar") val fødselsår: Int?,
     @JsonProperty("foedselsdato") val fødselsdato: LocalDate?,
