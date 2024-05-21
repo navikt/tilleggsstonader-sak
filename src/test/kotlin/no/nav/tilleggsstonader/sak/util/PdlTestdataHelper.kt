@@ -48,7 +48,7 @@ object PdlTestdataHelper {
         bostedsadresse: List<Bostedsadresse> = emptyList(),
         dødsfall: List<Dødsfall> = emptyList(),
         forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList(),
-        fødsel: List<Fødsel> = emptyList(),
+        fødsel: List<Fødsel> = listOf(fødsel(år = 2000)),
         folkeregisterpersonstatus: List<Folkeregisterpersonstatus> = emptyList(),
         fullmakt: List<Fullmakt> = emptyList(),
         kontaktadresse: List<Kontaktadresse> = emptyList(),
@@ -107,7 +107,7 @@ object PdlTestdataHelper {
         dødsfall = dødsfall,
     )
 
-    fun fødsel(år: Int = 2018, måned: Int = 1, dag: Int = 1): Fødsel =
+    fun fødsel(år: Int = 2000, måned: Int = 1, dag: Int = 1): Fødsel =
         fødsel(LocalDate.of(år, måned, dag))
 
     fun fødsel(fødselsdato: LocalDate) =

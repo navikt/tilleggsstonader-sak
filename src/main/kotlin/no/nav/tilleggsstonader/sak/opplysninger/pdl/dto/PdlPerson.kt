@@ -244,6 +244,9 @@ fun AdressebeskyttelseGradering.tilDiskresjonskode(): String? = when (this) {
     AdressebeskyttelseGradering.UGRADERT -> null
 }
 
+/**
+ * @param [fødselsår] skal finnes på alle brukere, men er definiert som nullable i skjema
+ */
 data class Fødsel(
     @JsonProperty("foedselsaar") val fødselsår: Int?,
     @JsonProperty("foedselsdato") val fødselsdato: LocalDate?,

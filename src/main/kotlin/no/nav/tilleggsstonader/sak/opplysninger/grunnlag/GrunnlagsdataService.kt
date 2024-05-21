@@ -51,7 +51,16 @@ class GrunnlagsdataService(
         val person = hentPerson(behandling)
         return Grunnlag(
             navn = person.søker.navn.gjeldende().tilNavn(),
+            fødsel = mapFødsel(person),
             barn = mapBarn(behandling, person),
+        )
+    }
+
+    private fun mapFødsel(person: SøkerMedBarn): Fødsel {
+        val fødsel = person.søker.fødsel.gjeldende()
+        return Fødsel(
+            fødselsdato = fødsel.fødselsdato,
+            fødselsår = fødsel.fødselsår ?: error("Forventer at fødselsår skal finnes på alle brukere"),
         )
     }
 
