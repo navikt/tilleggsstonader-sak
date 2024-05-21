@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -17,6 +18,7 @@ class StønadsperiodeService(
     private val behandlingService: BehandlingService,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperiodeService: VilkårperiodeService,
+    private val grunnlagsdataService: GrunnlagsdataService,
 ) {
     fun hentStønadsperioder(behandlingId: UUID): List<StønadsperiodeDto> {
         return stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
@@ -103,7 +105,9 @@ class StønadsperiodeService(
 
     fun validerStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>) {
         val vilkårperioder = vilkårperiodeService.hentVilkårperioderDto(behandlingId)
+        val fødselsdato = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag.fødsel
+            ?.fødselsdatoEller1JanForFødselsår()
 
-        StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder)
+        StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato)
     }
 }

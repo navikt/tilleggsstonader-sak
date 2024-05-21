@@ -107,7 +107,7 @@ object PdlTestdataHelper {
         dødsfall = dødsfall,
     )
 
-    fun fødsel(år: Int = 2018, måned: Int = 1, dag: Int = 1): Fødsel =
+    fun fødsel(år: Int = 2000, måned: Int = 1, dag: Int = 1): Fødsel =
         fødsel(LocalDate.of(år, måned, dag))
 
     fun fødsel(fødselsdato: LocalDate) =

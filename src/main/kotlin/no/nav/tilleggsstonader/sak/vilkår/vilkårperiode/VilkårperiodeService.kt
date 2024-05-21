@@ -116,7 +116,10 @@ class VilkårperiodeService(
         val vilkårperioder = hentVilkårperioder(behandlingId)
 
         return kotlin.runCatching {
-            StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder.tilDto())
+            StønadsperiodeValideringUtil.validerStønadsperioderVedEndringAvVilkårperiode(
+                stønadsperioder,
+                vilkårperioder.tilDto(),
+            )
         }
     }
 
