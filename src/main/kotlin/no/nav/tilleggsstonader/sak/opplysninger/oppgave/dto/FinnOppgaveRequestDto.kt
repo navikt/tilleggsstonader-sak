@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.kontrakter.oppgave.Sorteringsfelt
+import no.nav.tilleggsstonader.kontrakter.oppgave.Sorteringsrekkefølge
 import java.time.LocalDate
 
 data class FinnOppgaveRequestDto(
@@ -24,6 +26,8 @@ data class FinnOppgaveRequestDto(
     val ident: String?,
     val limit: Long = 150, // TODO slett når frontend implementert limit og offset
     val offset: Long = 0, // TODO slett når frontend implementert limit og offset
+    val orderBy: Sorteringsfelt = Sorteringsfelt.OPPRETTET_TIDSPUNKT, // TODO slett når frontend implementert
+    val order: Sorteringsrekkefølge = Sorteringsrekkefølge.ASC, // TODO slett når frontend implementert
 ) {
 
     fun tilFinnOppgaveRequest(aktørid: String? = null): FinnOppgaveRequest =
@@ -55,5 +59,7 @@ data class FinnOppgaveRequestDto(
             mappeId = this.mappeId,
             limit = this.limit,
             offset = this.offset,
+            sorteringsrekkefolge = order,
+            sorteringsfelt = orderBy,
         )
 }

@@ -49,7 +49,9 @@ class OppgaveClientConfig {
                 .filter { oppgave -> request.oppgavetype?.let { oppgave.oppgavetype == it.value } ?: true }
                 .filter { oppgave -> request.behandlingstype?.let { oppgave.behandlingstype == it.value } ?: true }
                 .toList()
-            FinnOppgaveResponseDto(antallTreffTotalt = oppgavelager.size.toLong(), oppgaver = oppgaver)
+            val toIndex = minOf((request.offset + request.limit).toInt(), oppgaver.size)
+            val paginerteOppgaver = oppgaver.subList(request.offset.toInt(), toIndex)
+            FinnOppgaveResponseDto(antallTreffTotalt = oppgaver.size.toLong(), oppgaver = paginerteOppgaver)
         }
 
         every { oppgaveClient.finnOppgaveMedId(any()) } answers {
