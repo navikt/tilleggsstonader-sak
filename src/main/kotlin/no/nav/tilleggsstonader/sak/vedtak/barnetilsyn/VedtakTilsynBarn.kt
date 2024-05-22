@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import java.util.UUID
 
@@ -19,6 +20,8 @@ data class VedtakTilsynBarn(
     val type: TypeVedtak,
     val vedtak: VedtaksdataTilsynBarn? = null,
     val beregningsresultat: VedtaksdataBeregningsresultat? = null,
+    @Column("arsaker_avslag")
+    val årsakAvslag: ÅrsakAvslag.Wrapper? = null,
     val avslagBegrunnelse: String? = null,
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
@@ -30,7 +33,9 @@ data class VedtakTilsynBarn(
                 require(beregningsresultat != null) { "Mangler beregningsresultat for type=$type" }
                 require(vedtak != null) { "Mangler vedtak for type=$type" }
             }
+
             TypeVedtak.AVSLAG -> {
+                require(årsakAvslag != null && årsakAvslag.årsaker.isNotEmpty()) { "Må velge minst en årsak for avslag" }
                 require(avslagBegrunnelse != null) { "Avslag må begrunnes" }
             }
         }

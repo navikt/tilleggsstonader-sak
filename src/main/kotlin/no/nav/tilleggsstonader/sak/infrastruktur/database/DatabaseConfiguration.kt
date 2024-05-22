@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
@@ -108,6 +109,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 VedtaksdataTilsynBarnWriter(),
                 VedtaksdataBeregningsresultatReader(),
                 VedtaksdataBeregningsresultatWriter(),
+                ÅrsakAvslagReader(),
+                ÅrsakAvslagWriter(),
 
                 TilVilkårperiodeTypeConverter(),
                 VilkårperiodeTypeTilStringConverter(),
@@ -223,6 +226,11 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         JsonReader<VedtaksdataBeregningsresultat>(VedtaksdataBeregningsresultat::class)
 
     class VedtaksdataBeregningsresultatWriter : JsonWriter<VedtaksdataBeregningsresultat>()
+
+    class ÅrsakAvslagReader :
+        JsonReader<ÅrsakAvslag.Wrapper>(ÅrsakAvslag.Wrapper::class)
+
+    class ÅrsakAvslagWriter : JsonWriter<ÅrsakAvslag.Wrapper>()
 
     class DetaljerVilkårperiodeReader : JsonReader<DelvilkårVilkårperiode>(DelvilkårVilkårperiode::class)
 

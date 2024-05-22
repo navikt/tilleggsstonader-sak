@@ -32,7 +32,12 @@ class TilsynBarnVedtakServiceTest {
 
     @Test
     fun `skal mappe avslått vedtak til dto`() {
-        val vedtak = VedtakTilsynBarn(behandlingId = UUID.randomUUID(), type = TypeVedtak.AVSLAG, avslagBegrunnelse = "begrunnelse")
+        val vedtak = VedtakTilsynBarn(
+            behandlingId = UUID.randomUUID(),
+            type = TypeVedtak.AVSLAG,
+            avslagBegrunnelse = "begrunnelse",
+            årsakAvslag = ÅrsakAvslag.Wrapper(årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET)),
+        )
 
         val dto = tilsynBarnVedtakService.mapTilDto(vedtak) as AvslagTilsynBarnDto
 

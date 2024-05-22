@@ -94,6 +94,7 @@ class TilsynBarnVedtakControllerTest(
     @Test
     fun `skal lagre og hente avslag`() {
         val vedtak = AvslagRequest(
+            årsakerAvslag = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
             begrunnelse = "begrunnelse",
         )
 
