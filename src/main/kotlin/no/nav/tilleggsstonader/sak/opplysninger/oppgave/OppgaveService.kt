@@ -253,6 +253,7 @@ class OppgaveService(
                 tema = Tema.TSO,
                 oppgavetype = Oppgavetype.BehandleSak,
                 limit = limit,
+                offset = 0,
                 opprettetTomTidspunkt = opprettetTomTidspunktPåBehandleSakOppgave,
             ),
         )
@@ -262,6 +263,7 @@ class OppgaveService(
                 tema = Tema.TSO,
                 oppgavetype = Oppgavetype.BehandleUnderkjentVedtak,
                 limit = limit,
+                offset = 0,
             ),
         )
 
@@ -270,6 +272,7 @@ class OppgaveService(
                 tema = Tema.TSO,
                 oppgavetype = Oppgavetype.GodkjenneVedtak,
                 limit = limit,
+                offset = 0,
             ),
         )
 
