@@ -65,7 +65,7 @@ class OppgaveService(
     private fun finnBehandlingId(oppgaveResponse: no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto): Map<Long, UUID> {
         val oppgaveIder = oppgaveResponse.oppgaver.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveBehandlingId", oppgaveIder) {
-            oppgaveRepository.finnBehandlingIdFor(oppgaveIder).associate { it.first to it.second }
+            oppgaveRepository.finnBehandlingIdForGsakOppgaveId(oppgaveIder).associate { it.first to it.second }
         }
     }
 

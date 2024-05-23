@@ -149,7 +149,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                 gsakOppgaveId = 2,
             ),
         )
-        assertThat(oppgaveRepository.finnBehandlingIdFor(listOf(1, 2, 3)))
+        assertThat(oppgaveRepository.finnBehandlingIdForGsakOppgaveId(listOf(1, 2, 3)))
             .containsExactlyInAnyOrder(Pair(1, behandling.id), Pair(2, behandling2.id))
     }
 }

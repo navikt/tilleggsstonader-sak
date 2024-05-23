@@ -65,7 +65,7 @@ internal class OppgaveServiceTest {
         every { oppgaveClient.finnOppgaveMedId(any()) } returns lagEksternTestOppgave()
         every { oppgaveRepository.insert(capture(opprettOppgaveDomainSlot)) } returns lagTestOppgave()
         every { oppgaveRepository.update(any()) } answers { firstArg() }
-        every { oppgaveRepository.finnBehandlingIdFor(any()) } returns emptyList()
+        every { oppgaveRepository.finnBehandlingIdForGsakOppgaveId(any()) } returns emptyList()
     }
 
     @Test
@@ -268,7 +268,7 @@ internal class OppgaveServiceTest {
                 lagEksternTestOppgave().copy(id = 2),
             ),
         )
-        every { oppgaveRepository.finnBehandlingIdFor(any()) } answers {
+        every { oppgaveRepository.finnBehandlingIdForGsakOppgaveId(any()) } answers {
             firstArg<List<Long>>().filter { it == oppgaveIdMedBehandling }.map { it to behandlingId }
         }
 

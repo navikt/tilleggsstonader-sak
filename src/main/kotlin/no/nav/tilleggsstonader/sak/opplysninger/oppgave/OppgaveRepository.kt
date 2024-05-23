@@ -30,5 +30,5 @@ interface OppgaveRepository : RepositoryInterface<OppgaveDomain, UUID>, InsertUp
         SELECT gsak_oppgave_id as first, behandling_id as second FROM oppgave WHERE gsak_oppgave_id IN (:oppgaveIder)
         """,
     )
-    fun finnBehandlingIdFor(oppgaveIder: Collection<Long>): List<Pair<Long, UUID>>
+    fun finnBehandlingIdForGsakOppgaveId(oppgaveIder: Collection<Long>): List<Pair<Long, UUID>>
 }
