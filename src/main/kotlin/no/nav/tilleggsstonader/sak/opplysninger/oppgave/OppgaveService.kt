@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
@@ -46,6 +47,7 @@ class OppgaveService(
     fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequest): FinnOppgaveResponseDto {
         val oppgaveResponse = oppgaveClient.hentOppgaver(finnOppgaveRequest)
         val personer = personService.hentPersonKortBolk(oppgaveResponse.oppgaver.mapNotNull { it.ident }.distinct())
+        val behandlingIdPåOppgaveId = finnBehandlingId(oppgaveResponse)
 
         return FinnOppgaveResponseDto(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
@@ -54,9 +56,17 @@ class OppgaveService(
                 OppgaveDto(
                     oppgave = oppgave,
                     navn = navn,
+                    behandlingId = behandlingIdPåOppgaveId[oppgave.id],
                 )
             },
         )
+    }
+
+    private fun finnBehandlingId(oppgaveResponse: no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto): Map<Long, UUID> {
+        val oppgaveIder = oppgaveResponse.oppgaver.map { it.id }
+        return cacheManager.getCachedOrLoad("oppgaveBehandlingId", oppgaveIder) {
+            oppgaveRepository.finnBehandlingIdFor(oppgaveIder).associate { it.first to it.second }
+        }
     }
 
     private val Oppgave.ident: String?
