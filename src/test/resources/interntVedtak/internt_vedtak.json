@@ -130,6 +130,7 @@
   } ],
   "vedtak" : {
     "type" : "INNVILGELSE",
+    "årsakerAvslag" : null,
     "avslagBegrunnelse" : null,
     "utgifterBarn" : [ {
       "fødselsdatoBarn" : "2024-05-15",

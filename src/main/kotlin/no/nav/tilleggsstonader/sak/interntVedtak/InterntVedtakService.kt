@@ -117,7 +117,8 @@ class InterntVedtakService(
 
     private fun mapDelvilkår(delvilkår: DelvilkårVilkårperiodeDomain): DelvilkårVilkårperiode {
         val medlemskap = if (delvilkår is DelvilkårMålgruppe) mapVurdering(delvilkår.medlemskap) else null
-        val dekketAvAnnetRegelverk = if (delvilkår is DelvilkårMålgruppe) mapVurdering(delvilkår.dekketAvAnnetRegelverk) else null
+        val dekketAvAnnetRegelverk =
+            if (delvilkår is DelvilkårMålgruppe) mapVurdering(delvilkår.dekketAvAnnetRegelverk) else null
         val lønnet = if (delvilkår is DelvilkårAktivitet) mapVurdering(delvilkår.lønnet) else null
         return DelvilkårVilkårperiode(
             medlemskap = medlemskap,
@@ -175,6 +176,7 @@ class InterntVedtakService(
         return vedtak?.let {
             VedtakInternt(
                 type = it.type,
+                årsakerAvslag = it.årsakerAvslag?.årsaker,
                 avslagBegrunnelse = it.avslagBegrunnelse,
                 utgifterBarn = it.vedtak?.utgifter?.entries?.map { (barnId, utgifter) ->
                     UtgiftBarn(
