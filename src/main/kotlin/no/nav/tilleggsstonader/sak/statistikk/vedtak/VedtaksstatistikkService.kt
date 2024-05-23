@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -23,6 +24,7 @@ class VedtaksstatistikkService(
     private val behandlingBarnService: BarnService,
     private val iverksettService: IverksettService,
     private val stønadsperiodeService: StønadsperiodeService,
+    private val tilsynBarnVedtakService: TilsynBarnVedtakService,
 
 ) {
     fun lagreVedtaksstatistikk(behandlingId: UUID, fagsakId: UUID, hendelseTidspunkt: LocalDateTime) {
@@ -33,6 +35,7 @@ class VedtaksstatistikkService(
         val behandling = behandlingService.hentBehandling(behandlingId)
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
+        val vedtak = tilsynBarnVedtakService.hentVedtak(behandlingId)
 
         vedtaksstatistikkRepository.insert(
             Vedtaksstatistikk(
@@ -54,6 +57,7 @@ class VedtaksstatistikkService(
                 vedtaksperioder = VedtaksperioderDvh.fraDomene(stønadsperioder),
                 utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse),
                 kravMottatt = behandling.kravMottatt,
+                årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak?.årsakerAvslag),
             ),
         )
     }
