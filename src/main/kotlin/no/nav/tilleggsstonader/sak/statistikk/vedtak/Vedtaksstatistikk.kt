@@ -399,7 +399,7 @@ enum class ÅrsakAvslagDvh {
             }
 
             return JsonWrapper(
-                årsaker = årsaker.årsaker.map { typeFraDomene(it) }
+                årsaker = årsaker.årsaker.map { typeFraDomene(it) },
             )
         }
 
