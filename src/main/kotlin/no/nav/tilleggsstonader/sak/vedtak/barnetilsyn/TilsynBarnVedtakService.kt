@@ -26,7 +26,7 @@ class TilsynBarnVedtakService(
             )
 
             TypeVedtak.AVSLAG -> return AvslagTilsynBarnDto(
-                årsakerAvslag = vedtak.årsakAvslag?.årsaker ?: error("Mangler årsak for avslag"),
+                årsakerAvslag = vedtak.årsakerAvslag?.årsaker ?: error("Mangler årsak for avslag"),
                 begrunnelse = vedtak.avslagBegrunnelse ?: error("Mangler begrunnelse i avslag"),
             )
         }

@@ -29,7 +29,7 @@ class TilsynBarnVedtakServiceTest {
             behandlingId = UUID.randomUUID(),
             type = TypeVedtak.AVSLAG,
             avslagBegrunnelse = "begrunnelse",
-            årsakAvslag = ÅrsakAvslag.Wrapper(årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET)),
+            årsakerAvslag = ÅrsakAvslag.Wrapper(årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET)),
         )
 
         val dto = tilsynBarnVedtakService.mapTilDto(vedtak) as AvslagTilsynBarnDto

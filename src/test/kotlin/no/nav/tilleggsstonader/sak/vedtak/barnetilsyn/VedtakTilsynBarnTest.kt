@@ -45,7 +45,7 @@ class VedtakTilsynBarnTest {
                 VedtakTilsynBarn(
                     behandlingId = UUID.randomUUID(),
                     type = TypeVedtak.AVSLAG,
-                    årsakAvslag = ÅrsakAvslag.Wrapper(listOf(ÅrsakAvslag.INGEN_AKTIVITET)),
+                    årsakerAvslag = ÅrsakAvslag.Wrapper(listOf(ÅrsakAvslag.INGEN_AKTIVITET)),
                 )
             }
                 .hasMessage("Avslag må begrunnes")

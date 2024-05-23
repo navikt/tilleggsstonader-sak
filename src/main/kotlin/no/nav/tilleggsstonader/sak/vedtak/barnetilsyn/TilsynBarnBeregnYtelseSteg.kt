@@ -69,7 +69,7 @@ class TilsynBarnBeregnYtelseSteg(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.AVSLAG,
                 avslagBegrunnelse = vedtak.begrunnelse,
-                årsakAvslag = ÅrsakAvslag.Wrapper(årsaker = vedtak.årsakerAvslag),
+                årsakerAvslag = ÅrsakAvslag.Wrapper(årsaker = vedtak.årsakerAvslag),
             ),
         )
     }
