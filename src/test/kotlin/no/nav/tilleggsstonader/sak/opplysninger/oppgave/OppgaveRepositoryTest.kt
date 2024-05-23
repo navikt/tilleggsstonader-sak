@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -126,5 +127,29 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
         assertThat(oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandling.id)).isNull()
+    }
+
+    @Test
+    fun `skal finne behandlingId til oppgaver`() {
+        val fagsak = testoppsettService.lagreFagsak(fagsak())
+        val fagsak2 = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("2"))))
+        val behandling = testoppsettService.lagre(behandling(fagsak))
+        val behandling2 = testoppsettService.lagre(behandling(fagsak2))
+        oppgaveRepository.insert(
+            OppgaveDomain(
+                behandlingId = behandling.id,
+                type = Oppgavetype.BehandleSak,
+                gsakOppgaveId = 1,
+            ),
+        )
+        oppgaveRepository.insert(
+            OppgaveDomain(
+                behandlingId = behandling2.id,
+                type = Oppgavetype.BehandleSak,
+                gsakOppgaveId = 2,
+            ),
+        )
+        assertThat(oppgaveRepository.finnBehandlingIdForGsakOppgaveId(listOf(1, 2, 3)))
+            .containsExactlyInAnyOrder(Pair(1, behandling.id), Pair(2, behandling2.id))
     }
 }

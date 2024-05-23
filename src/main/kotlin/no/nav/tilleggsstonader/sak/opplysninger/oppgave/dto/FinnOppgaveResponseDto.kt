@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import java.time.LocalDate
 import java.util.Optional
+import java.util.UUID
 
 data class FinnOppgaveResponseDto(
     val antallTreffTotalt: Long,
@@ -59,10 +60,12 @@ data class OppgaveDto(
      * Ekstra felter
      */
     val navn: String?,
+    val behandlingId: UUID?,
 ) {
     constructor(
         oppgave: Oppgave,
         navn: String?,
+        behandlingId: UUID?,
     ) : this(
         id = oppgave.id,
         versjon = oppgave.versjon,
@@ -98,5 +101,6 @@ data class OppgaveDto(
         status = oppgave.status,
 
         navn = navn,
+        behandlingId = behandlingId,
     )
 }
