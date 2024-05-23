@@ -24,6 +24,9 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagNavn
+import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlPersonKort
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -42,14 +45,16 @@ internal class OppgaveServiceTest {
     private val fagsakService = mockk<FagsakService>()
     private val oppgaveRepository = mockk<OppgaveRepository>()
     private val cacheManager = ConcurrentMapCacheManager()
+    private val personService = mockk<PersonService>(relaxed = true)
 
     private val oppgaveService =
         OppgaveService(
-            oppgaveClient,
-            fagsakService,
-            oppgaveRepository,
-            arbeidsfordelingService,
-            cacheManager,
+            oppgaveClient = oppgaveClient,
+            fagsakService = fagsakService,
+            oppgaveRepository = oppgaveRepository,
+            arbeidsfordelingService = arbeidsfordelingService,
+            cacheManager = cacheManager,
+            personService = personService,
         )
 
     val opprettOppgaveDomainSlot = slot<OppgaveDomain>()
@@ -224,6 +229,30 @@ internal class OppgaveServiceTest {
         frister.forEach {
             assertThat(oppgaveService.lagFristForOppgave(it.first)).isEqualTo(it.second)
         }
+    }
+
+    @Test
+    fun `skal legge til navn på oppgave hvis oppgaven har folkeregisterident`() {
+        val oppgaveIdMedNavn = 1L
+        every { personService.hentPersonKortBolk(any()) } answers {
+            firstArg<List<String>>().associateWith { pdlPersonKort(navn = lagNavn(fornavn = "fornavn$it")) }
+        }
+        every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(
+            2,
+            listOf(
+                lagEksternTestOppgave().copy(
+                    id = oppgaveIdMedNavn,
+                    identer = listOf(OppgaveIdentV2("1", gruppe = IdentGruppe.FOLKEREGISTERIDENT)),
+                ),
+                lagEksternTestOppgave().copy(id = 2, identer = listOf(OppgaveIdentV2("2", gruppe = IdentGruppe.ORGNR))),
+                lagEksternTestOppgave().copy(id = 3),
+            ),
+        )
+        val oppgaver = oppgaveService.hentOppgaver(mockk()).oppgaver
+
+        verify(exactly = 1) { personService.hentPersonKortBolk(eq(listOf("1"))) }
+        assertThat(oppgaver.single { it.id == oppgaveIdMedNavn }.navn).contains("fornavn1 ")
+        assertThat(oppgaver.filterNot { it.id == oppgaveIdMedNavn }.map { it.navn }).containsOnly("Mangler navn")
     }
 
     private fun mockOpprettOppgave(slot: CapturingSlot<OpprettOppgaveRequest>) {

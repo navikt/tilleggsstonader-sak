@@ -16,7 +16,7 @@ fun Personnavn.visningsnavn(): String {
     }
 }
 
-fun List<Navn>.gjeldende(): Navn = this.single()
+fun List<Navn>.gjeldende(): Navn = this.singleOrNull() ?: Navn("", null, "", Metadata(false))
 fun List<Bostedsadresse>.gjeldende(): Bostedsadresse? = this.find { !it.metadata.historisk }
 fun List<Oppholdsadresse>.gjeldende(): Oppholdsadresse? = this.find { !it.metadata.historisk }
 fun List<Fødsel>.gjeldende(): Fødsel = this.first()

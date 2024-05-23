@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
@@ -9,7 +8,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_EGEN_ANSATT
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveMedBehandlingIdDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.util.FnrUtil.validerOptionalIdent
@@ -43,10 +43,10 @@ class OppgaveController(
     }
 
     @GetMapping("/{oppgaveId}")
-    fun hentOppgave(@PathVariable oppgaveId: Long): OppgaveDto {
+    fun hentOppgave(@PathVariable oppgaveId: Long): OppgaveMedBehandlingIdDto {
         tilgangService.validerHarSaksbehandlerrolle()
         return oppgaveService.hentOppgaveDomain(oppgaveId)?.let {
-            OppgaveDto(
+            OppgaveMedBehandlingIdDto(
                 behandlingId = it.behandlingId,
                 gsakOppgaveId = it.gsakOppgaveId,
             )

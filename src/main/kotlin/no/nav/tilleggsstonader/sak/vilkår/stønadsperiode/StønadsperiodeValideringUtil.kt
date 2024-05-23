@@ -10,18 +10,32 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Datoperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.formattertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.mergeSammenhengendeOppfylteVilkårperioder
+import java.time.LocalDate
 
 object StønadsperiodeValideringUtil {
 
+    /**
+     * Validering av stønadsperioder som kjøres når man endrer vilkårperiode trenger ikke å validere fødselsdatoet.
+     * Det er tilstrekkelig at det gjøres vid validering av stønadsperioder.
+     */
+    fun validerStønadsperioderVedEndringAvVilkårperiode(
+        stønadsperioder: List<StønadsperiodeDto>,
+        vilkårperioder: VilkårperioderDto,
+    ) = validerStønadsperioder(stønadsperioder, vilkårperioder, null)
+
+    /**
+     * @param fødselsdato er nullable då alle behandlinger ikke har [fødselsdato] i grunnlagsdata fra før
+     */
     fun validerStønadsperioder(
         stønadsperioder: List<StønadsperiodeDto>,
         vilkårperioder: VilkårperioderDto,
+        fødselsdato: LocalDate?,
     ) {
         validerIkkeOverlappendeStønadsperioder(stønadsperioder)
         val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
         val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
 
-        stønadsperioder.forEach { validerStønadsperiode(it, målgrupper, aktiviteter) }
+        stønadsperioder.forEach { validerStønadsperiode(it, målgrupper, aktiviteter, fødselsdato) }
     }
 
     private fun validerIkkeOverlappendeStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
@@ -40,6 +54,7 @@ object StønadsperiodeValideringUtil {
         stønadsperiode: StønadsperiodeDto,
         målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
+        fødselsdato: LocalDate?,
     ) {
         brukerfeilHvisIkke(stønadsperiode.målgruppe.gyldigeAktiviter.contains(stønadsperiode.aktivitet)) {
             "Kombinasjonen av ${stønadsperiode.målgruppe} og ${stønadsperiode.aktivitet} er ikke gyldig"
@@ -54,5 +69,23 @@ object StønadsperiodeValideringUtil {
             ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.målgruppe} i perioden ${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}")
         aktiviteter.firstOrNull { it.inneholder(stønadsperiode) }
             ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.aktivitet} i perioden ${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}")
+
+        validerStønadsperiodeErInnenfor18og67år(fødselsdato, stønadsperiode)
+    }
+
+    private fun validerStønadsperiodeErInnenfor18og67år(
+        fødselsdato: LocalDate?,
+        stønadsperiode: StønadsperiodeDto,
+    ) {
+        if (fødselsdato != null && stønadsperiode.målgruppe.gjelderNedsattArbeidsevne()) {
+            val dato18år = fødselsdato.plusYears(18)
+            brukerfeilHvis(stønadsperiode.fom < dato18år) {
+                "Periode kan ikke begynne før søker fyller 18 år (${dato18år.norskFormat()})"
+            }
+            val dato67år = fødselsdato.plusYears(67)
+            brukerfeilHvis(stønadsperiode.tom >= dato67år) {
+                "Periode kan ikke slutte etter søker fylt 67 år (${dato67år.norskFormat()})"
+            }
+        }
     }
 }

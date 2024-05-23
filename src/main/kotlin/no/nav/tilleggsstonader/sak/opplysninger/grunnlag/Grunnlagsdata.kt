@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
+import java.time.LocalDate
 import java.util.UUID
 
 data class Grunnlagsdata(
@@ -15,8 +16,18 @@ data class Grunnlagsdata(
 
 data class Grunnlag(
     val navn: Navn,
+    val fødsel: Fødsel?,
     val barn: List<GrunnlagBarn>,
 )
+
+data class Fødsel(
+    val fødselsdato: LocalDate?,
+    val fødselsår: Int,
+) {
+    fun fødselsdatoEller1JanForFødselsår() =
+        fødselsdato
+            ?: LocalDate.of(fødselsår, 1, 1)
+}
 
 data class Navn(
     val fornavn: String,

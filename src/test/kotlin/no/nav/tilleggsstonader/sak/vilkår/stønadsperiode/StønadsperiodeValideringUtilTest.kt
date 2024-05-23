@@ -2,8 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil.validerStønadsperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil.validerStønadsperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitetDto
@@ -185,6 +183,70 @@ internal class StønadsperiodeValideringUtilTest {
     }
 
     @Nested
+    inner class ValideringAvFødselsdato {
+
+        val fom = LocalDate.of(2024, 1, 1)
+        val tom = LocalDate.of(2025, 12, 31)
+        val stønadsperioder = listOf(
+            lagStønadsperiode(målgruppe = MålgruppeType.AAP, aktivitet = AktivitetType.TILTAK, fom = fom, tom = tom),
+        )
+        val målgrupper = listOf(målgruppe(type = MålgruppeType.AAP, fom = fom, tom = tom).tilDto())
+        val aktiviteter = listOf(aktivitet(type = AktivitetType.TILTAK, fom = fom, tom = tom).tilDto())
+        val vilkårperioder = VilkårperioderDto(målgrupper, aktiviteter)
+
+        val dato18årGammel = fom.minusYears(18)
+        val dato67årGammel = tom.minusYears(67)
+
+        @Test
+        fun `skal kaste feil dersom nedsatt arbeidsevne og personen er under 18 år`() {
+            assertThatThrownBy {
+                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.plusDays(1))
+            }.hasMessageContaining("Periode kan ikke begynne før søker fyller 18 år")
+        }
+
+        @Test
+        fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er over 18 år`() {
+            assertThatCode {
+                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel)
+                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.minusDays(1))
+            }.doesNotThrowAnyException()
+        }
+
+        @Test
+        fun `skal kaste feil dersom nedsatt arbeidsevne og personen er over 67 år`() {
+            assertThatThrownBy {
+                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel)
+            }.hasMessageContaining("Periode kan ikke slutte etter søker fylt 67 år")
+            assertThatThrownBy {
+                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.minusDays(1))
+            }.hasMessageContaining("Periode kan ikke slutte etter søker fylt 67 år")
+        }
+
+        @Test
+        fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er under 67 år`() {
+            assertThatCode {
+                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.plusDays(1))
+            }.doesNotThrowAnyException()
+        }
+
+        @Test
+        fun `skal ikke kaste feil dersom overgangsstønad og under 18 år eller over 67 år`() {
+            val stønadsperioder = stønadsperioder.map {
+                it.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.UTDANNING)
+            }
+            val vilkårperioder = vilkårperioder.copy(
+                målgrupper = målgrupper.map { it.copy(type = MålgruppeType.OVERGANGSSTØNAD) },
+                aktiviteter = målgrupper.map { it.copy(type = AktivitetType.UTDANNING) },
+            )
+
+            assertThatCode {
+                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.minusYears(1))
+                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.plusYears(1))
+            }.doesNotThrowAnyException()
+        }
+    }
+
+    @Nested
     inner class ValiderStønadsperioderOverlapper {
         val fom = LocalDate.of(2023, 1, 1)
         val tom = LocalDate.of(2023, 1, 7)
@@ -321,6 +383,28 @@ internal class StønadsperiodeValideringUtilTest {
             }.hasMessageContaining(feilmeldingIkkeOverlappendePeriode(stønadsperiode, stønadsperiode.målgruppe))
         }
     }
+
+    fun validerStønadsperioder(
+        stønadsperioder: List<StønadsperiodeDto>,
+        vilkårperioder: VilkårperioderDto,
+        fødselsdato: LocalDate? = null,
+    ) = StønadsperiodeValideringUtil.validerStønadsperioder(
+        stønadsperioder = stønadsperioder,
+        vilkårperioder = vilkårperioder,
+        fødselsdato = fødselsdato,
+    )
+
+    fun validerStønadsperiode(
+        stønadsperiode: StønadsperiodeDto,
+        målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
+        aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
+        fødselsdato: LocalDate? = null,
+    ) = StønadsperiodeValideringUtil.validerStønadsperiode(
+        stønadsperiode = stønadsperiode,
+        målgruppePerioderPerType = målgruppePerioderPerType,
+        aktivitetPerioderPerType = aktivitetPerioderPerType,
+        fødselsdato = fødselsdato,
+    )
 
     private fun feilmeldingIkkeOverlappendePeriode(stønadsperiode: StønadsperiodeDto, type: VilkårperiodeType) =
         "Finnes ingen periode med oppfylte vilkår for $type i perioden " +
