@@ -1,4 +1,4 @@
-name: Build
+name: Build, test and lint
 on:
   workflow_dispatch:
   pull_request:
@@ -7,13 +7,14 @@ jobs:
   ktlint:
     name: Ktlint
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -24,12 +25,13 @@ jobs:
   build:
     name: Build and test
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0 # brukes for å unngå feil i differ i sonar
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
