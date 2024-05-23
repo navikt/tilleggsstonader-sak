@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsgrunnlag
@@ -10,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnD
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
@@ -37,8 +37,8 @@ object TilsynBarnTestUtil {
                     antallBarn = 1,
                 ),
                 beløpsperioder = listOf(
-                    Beløpsperiode(dato = osloDateNow(), beløp = 1000, målgruppe = MålgruppeType.AAP),
-                    Beløpsperiode(dato = osloDateNow().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
+                    Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = MålgruppeType.AAP),
+                    Beløpsperiode(dato = LocalDate.now().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
                 ),
             ),
         ),
