@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
-import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
@@ -18,6 +17,11 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
@@ -34,13 +38,29 @@ class OppgaveService(
     private val oppgaveRepository: OppgaveRepository,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val cacheManager: CacheManager,
+    private val personService: PersonService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequest): FinnOppgaveResponseDto {
-        return oppgaveClient.hentOppgaver(finnOppgaveRequest)
+        val oppgaveResponse = oppgaveClient.hentOppgaver(finnOppgaveRequest)
+        val personer = personService.hentPersonKortBolk(oppgaveResponse.oppgaver.mapNotNull { it.ident }.distinct())
+
+        return FinnOppgaveResponseDto(
+            antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
+            oppgaver = oppgaveResponse.oppgaver.map { oppgave ->
+                val navn = oppgave.ident?.let { personer[it] }?.navn?.gjeldende()?.visningsnavn() ?: "Mangler navn"
+                OppgaveDto(
+                    oppgave = oppgave,
+                    navn = navn,
+                )
+            },
+        )
     }
+
+    private val Oppgave.ident: String?
+        get() = this.identer?.firstOrNull { it.gruppe == IdentGruppe.FOLKEREGISTERIDENT }?.ident
 
     fun fordelOppgave(gsakOppgaveId: Long, saksbehandler: String?, versjon: Int): Oppgave {
         return oppgaveClient.fordelOppgave(
@@ -241,47 +261,5 @@ class OppgaveService(
         } else {
             gjeldendeTid.plusDays(1).toLocalDate()
         }
-    }
-
-    fun finnBehandleSakOppgaver(
-        opprettetTomTidspunktPåBehandleSakOppgave: LocalDateTime,
-    ): List<FinnOppgaveResponseDto> {
-        val limit: Long = 2000
-
-        val behandleSakOppgaver = oppgaveClient.hentOppgaver(
-            finnOppgaveRequest = FinnOppgaveRequest(
-                tema = Tema.TSO,
-                oppgavetype = Oppgavetype.BehandleSak,
-                limit = limit,
-                offset = 0,
-                opprettetTomTidspunkt = opprettetTomTidspunktPåBehandleSakOppgave,
-            ),
-        )
-
-        val behandleUnderkjent = oppgaveClient.hentOppgaver(
-            finnOppgaveRequest = FinnOppgaveRequest(
-                tema = Tema.TSO,
-                oppgavetype = Oppgavetype.BehandleUnderkjentVedtak,
-                limit = limit,
-                offset = 0,
-            ),
-        )
-
-        val godkjenne = oppgaveClient.hentOppgaver(
-            finnOppgaveRequest = FinnOppgaveRequest(
-                tema = Tema.TSO,
-                oppgavetype = Oppgavetype.GodkjenneVedtak,
-                limit = limit,
-                offset = 0,
-            ),
-        )
-
-        logger.info("Hentet oppgaver:  ${behandleSakOppgaver.antallTreffTotalt}, ${behandleUnderkjent.antallTreffTotalt}, ${godkjenne.antallTreffTotalt}")
-
-        feilHvis(behandleSakOppgaver.antallTreffTotalt >= limit) { "For mange behandleSakOppgaver - limit truffet: + $limit " }
-        feilHvis(behandleUnderkjent.antallTreffTotalt >= limit) { "For mange behandleUnderkjent - limit truffet: + $limit " }
-        feilHvis(godkjenne.antallTreffTotalt >= limit) { "For mange godkjenne - limit truffet: + $limit " }
-
-        return listOf(behandleSakOppgaver, behandleUnderkjent, godkjenne)
     }
 }
