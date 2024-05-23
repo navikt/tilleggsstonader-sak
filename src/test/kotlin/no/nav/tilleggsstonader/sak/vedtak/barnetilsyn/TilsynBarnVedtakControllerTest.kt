@@ -94,6 +94,7 @@ class TilsynBarnVedtakControllerTest(
     @Test
     fun `skal lagre og hente avslag`() {
         val vedtak = AvslagRequest(
+            årsakerAvslag = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
             begrunnelse = "begrunnelse",
         )
 
@@ -101,7 +102,8 @@ class TilsynBarnVedtakControllerTest(
 
         val lagretDto = hentVedtak(behandling.id).body!!
 
-        assertThat((lagretDto as AvslagTilsynBarnDto).begrunnelse).isEqualTo(vedtak.begrunnelse)
+        assertThat((lagretDto as AvslagTilsynBarnDto).årsakerAvslag).isEqualTo(vedtak.årsakerAvslag)
+        assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLAG)
     }
 
