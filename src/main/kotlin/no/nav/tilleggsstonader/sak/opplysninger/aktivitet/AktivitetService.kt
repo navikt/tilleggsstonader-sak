@@ -28,7 +28,7 @@ class AktivitetService(
         return aktivitetClient.hentAktiviteter(
             ident = ident,
             fom = osloDateNow().minusMonths(3),
-            tom = null,
+            tom = osloDateNow().plusYears(1),
         ).sortedByDescending { it.fom }
     }
 }

@@ -17,25 +17,14 @@ class AktivitetClient(
     @Qualifier("azureClientCredential") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
 
-    /**
-     * @param tom Default: 60 dager frem i tid.
-     */
-    fun hentAktiviteter(ident: String, fom: LocalDate, tom: LocalDate?): List<AktivitetArenaDto> {
-        val uriVariables = mutableMapOf<String, Any>("fom" to fom)
+    val uriAktiviteter = UriComponentsBuilder.fromUri(baseUrl)
+        .pathSegment("api", "aktivitet", "finn")
+        .queryParam("fom", "{fom}")
+        .queryParam("tom", "{tom}")
+        .encode().toUriString()
 
-        val uriBuilder = UriComponentsBuilder.fromUri(baseUrl)
-            .pathSegment("api", "aktivitet", "finn")
-            .queryParam("fom", "{fom}")
-
-        if (tom != null) {
-            uriBuilder.queryParam("tom", "{tom}")
-            uriVariables["tom"] = tom
-        }
-
-        return postForEntity(
-            uriBuilder.encode().toUriString(),
-            IdentRequest(ident),
-            uriVariables = uriVariables,
-        )
+    fun hentAktiviteter(ident: String, fom: LocalDate, tom: LocalDate): List<AktivitetArenaDto> {
+        val uriVariables = mutableMapOf<String, Any>("fom" to fom, "tom" to tom)
+        return postForEntity(uriAktiviteter, IdentRequest(ident), uriVariables = uriVariables)
     }
 }
