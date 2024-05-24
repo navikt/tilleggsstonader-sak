@@ -1,6 +1,11 @@
 name: Build-Deploy dev uten tester
+
 on:
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
