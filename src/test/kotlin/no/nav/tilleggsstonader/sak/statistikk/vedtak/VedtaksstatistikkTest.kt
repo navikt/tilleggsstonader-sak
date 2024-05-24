@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import org.assertj.core.api.Assertions.assertThat
@@ -40,6 +41,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
         utbetalinger = UtbetalingerDvh.JsonWrapper(utbetalinger = listOf()),
         stønadstype = StønadstypeDvh.BARNETILSYN,
         kravMottatt = null,
+        årsakerAvslag = null,
     )
 
     @Test
@@ -100,5 +102,20 @@ class VedtaksstatistikkTest : IntegrationTest() {
         val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
 
         assertThat(vedtaksstatistikkFraDb.målgrupper).isEqualTo(målgrupper)
+    }
+
+    @Test
+    fun `årsakAvslag kan mappes mellom databaseobjekt og domeneobjekt`() {
+        val årsakerAvslag = ÅrsakAvslagDvh.fraDomene(listOf(ÅrsakAvslag.INGEN_AKTIVITET))
+
+        vedtakstatistikkRepository.insert(
+            dummyVedtaksstatistikk.copy(
+                årsakerAvslag = årsakerAvslag,
+            ),
+        )
+
+        val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
+
+        assertThat(vedtaksstatistikkFraDb.årsakerAvslag).isEqualTo(årsakerAvslag)
     }
 }
