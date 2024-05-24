@@ -57,7 +57,7 @@ class VedtaksstatistikkService(
                 vedtaksperioder = VedtaksperioderDvh.fraDomene(stønadsperioder),
                 utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse),
                 kravMottatt = behandling.kravMottatt,
-                årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak?.årsakerAvslag),
+                årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak?.årsakerAvslag?.årsaker),
             ),
         )
     }
