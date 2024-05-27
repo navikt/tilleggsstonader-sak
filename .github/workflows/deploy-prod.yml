@@ -45,7 +45,7 @@ jobs:
           team: tilleggsstonader
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          byosbom: build/reports/bom.json
+          byosbom: build/reports/application.cdx.json
 
       - name: Post build failures to Slack
         if: failure()
