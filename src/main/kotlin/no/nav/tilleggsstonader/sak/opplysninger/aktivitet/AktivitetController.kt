@@ -31,6 +31,6 @@ class AktivitetController(
         @PathVariable behandlingId: UUID,
     ): List<AktivitetArenaDto> {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return aktivitetService.hentAktivitetForBehandling(behandlingId)
+        return aktivitetService.hentAktiviteter(behandlingId)
     }
 }

@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -140,6 +141,11 @@ data class SlettVikårperiode(
 data class VilkårperioderDto(
     val målgrupper: List<VilkårperiodeDto>,
     val aktiviteter: List<VilkårperiodeDto>,
+)
+
+data class VilkårperioderResponse(
+    val vilkårperioder: VilkårperioderDto,
+    val grunnlag: VilkårperioderGrunnlag,
 )
 
 fun Vilkårperioder.tilDto() = VilkårperioderDto(
