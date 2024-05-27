@@ -86,11 +86,13 @@ class SøknadRoutingServiceTest {
 
         verify {
             søknadRoutingRepository.findByIdentAndType(ident, stønadstype)
-            søknadRoutingRepository.insert(any()) wasNot called
 
             fagsakService wasNot called
             behandlingService wasNot called
             arenaService wasNot called
+        }
+        verify(exactly = 0) {
+            søknadRoutingRepository.insert(any())
         }
     }
 
@@ -103,11 +105,12 @@ class SøknadRoutingServiceTest {
             assertThat(skalBehandlesINyLøsning()).isFalse()
 
             verify {
-                søknadRoutingRepository.insert(any()) wasNot called
-
                 fagsakService wasNot called
                 behandlingService wasNot called
                 arenaService wasNot called
+            }
+            verify(exactly = 0) {
+                søknadRoutingRepository.insert(any())
             }
         }
 
@@ -118,11 +121,12 @@ class SøknadRoutingServiceTest {
             assertThat(skalBehandlesINyLøsning()).isFalse()
 
             verify {
-                søknadRoutingRepository.insert(any()) wasNot called
-
                 fagsakService wasNot called
                 behandlingService wasNot called
                 arenaService wasNot called
+            }
+            verify(exactly = 0) {
+                søknadRoutingRepository.insert(any())
             }
         }
 
@@ -145,8 +149,10 @@ class SøknadRoutingServiceTest {
 
             verify {
                 fagsakService.finnFagsak(any(), any())
-                søknadRoutingRepository.insert(any()) wasNot called
                 behandlingService wasNot called
+            }
+            verify(exactly = 0) {
+                søknadRoutingRepository.insert(any())
             }
         }
 
@@ -176,7 +182,9 @@ class SøknadRoutingServiceTest {
 
             verify {
                 arenaService.hentStatus(any(), any())
-                søknadRoutingRepository.insert(any()) wasNot called
+            }
+            verify(exactly = 0) {
+                søknadRoutingRepository.insert(any())
             }
         }
 
@@ -214,8 +222,8 @@ class SøknadRoutingServiceTest {
 
             assertThat(skalBehandlesINyLøsning()).isFalse()
 
-            verify {
-                søknadRoutingRepository.insert(any()) wasNot called
+            verify(exactly = 0) {
+                søknadRoutingRepository.insert(any())
             }
         }
     }
