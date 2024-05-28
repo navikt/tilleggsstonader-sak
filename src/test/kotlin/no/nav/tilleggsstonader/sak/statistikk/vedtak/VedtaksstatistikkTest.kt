@@ -96,11 +96,11 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     @Test
     fun `skal sette opprettet_tid til nå`() {
-        val tidNå = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
+        val tidNå = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS)
         vedtakstatistikkRepository.insert(vedtaksstatistikk())
         val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
 
-        assertThat(vedtaksstatistikkFraDb.opprettetTid).isStrictlyBetween(tidNå, tidNå.plusSeconds(1))
+        assertThat(vedtaksstatistikkFraDb.opprettetTid).isBetween(tidNå, tidNå.plusSeconds(1))
     }
 
     private fun vedtaksstatistikk() = Vedtaksstatistikk(
