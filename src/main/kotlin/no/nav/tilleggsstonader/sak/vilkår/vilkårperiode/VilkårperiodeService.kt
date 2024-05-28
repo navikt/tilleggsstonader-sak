@@ -66,10 +66,16 @@ class VilkårperiodeService(
         )
     }
 
-    private fun hentEllerOpprettGrunnlag(behandlingId: UUID): VilkårperioderGrunnlag {
-        val grunnlagsdataAktiviteter =
-            vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId) ?: opprettGrunnlagsdata(behandlingId)
-        return grunnlagsdataAktiviteter.grunnlag
+    private fun hentEllerOpprettGrunnlag(behandlingId: UUID): VilkårperioderGrunnlag? {
+        val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)?.grunnlag
+
+        return if (grunnlag != null) {
+            grunnlag
+        } else if (behandlingErLåstForVidereRedigering(behandlingId)) {
+            null
+        } else {
+            opprettGrunnlagsdata(behandlingId).grunnlag
+        }
     }
 
     private fun opprettGrunnlagsdata(behandlingId: UUID) = vilkårperioderGrunnlagRepository.insert(

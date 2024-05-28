@@ -145,7 +145,7 @@ data class VilkårperioderDto(
 
 data class VilkårperioderResponse(
     val vilkårperioder: VilkårperioderDto,
-    val grunnlag: VilkårperioderGrunnlag,
+    val grunnlag: VilkårperioderGrunnlag?,
 )
 
 fun Vilkårperioder.tilDto() = VilkårperioderDto(

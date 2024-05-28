@@ -621,5 +621,14 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)!!.grunnlag).isEqualTo(response.grunnlag)
         }
+
+        @Test
+        internal fun `skal ikke lagre ned grunnlagsadata for behandling som ikke er redigerbar`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
+
+            vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
+
+            assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)).isNull()
+        }
     }
 }
