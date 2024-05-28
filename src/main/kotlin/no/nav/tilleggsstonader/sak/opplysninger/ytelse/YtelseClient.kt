@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
-import no.nav.tilleggsstonader.kontrakter.felles.IdentRequest
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
-import java.time.LocalDate
 
 @Service
 class YtelseClient(
@@ -24,12 +23,13 @@ class YtelseClient(
         .encode()
         .toUriString()
 
-    fun hentYtelser(ident: String, fom: LocalDate, tom: LocalDate): YtelsePerioderDto {
+    fun hentYtelser(request: YtelsePerioderRequest): YtelsePerioderDto {
+        // TODO slett urivariables når integrasjoner tatt i bruk ny request
         val uriVariables = mapOf<String, Any>(
-            "fom" to fom,
-            "tom" to tom,
+            "fom" to request.fom,
+            "tom" to request.tom,
         )
 
-        return postForEntity(uri, IdentRequest(ident), uriVariables = uriVariables)
+        return postForEntity(uri, request, uriVariables = uriVariables)
     }
 }
