@@ -1,6 +1,11 @@
 name: Build-Deploy dev
+
 on:
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
@@ -13,12 +18,13 @@ jobs:
   build:
     name: Build, push and deploy to dev-gcp
     runs-on: ubuntu-latest
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -37,7 +43,7 @@ jobs:
           team: tilleggsstonader
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          byosbom: build/reports/bom.json
+          byosbom: build/reports/application.cdx.json
     outputs:
       image: ${{ steps.docker-push.outputs.image }}
 
@@ -45,6 +51,7 @@ jobs:
     name: Deploy to GCP
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 

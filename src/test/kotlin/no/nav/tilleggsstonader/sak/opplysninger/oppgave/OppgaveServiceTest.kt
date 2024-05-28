@@ -65,6 +65,7 @@ internal class OppgaveServiceTest {
         every { oppgaveClient.finnOppgaveMedId(any()) } returns lagEksternTestOppgave()
         every { oppgaveRepository.insert(capture(opprettOppgaveDomainSlot)) } returns lagTestOppgave()
         every { oppgaveRepository.update(any()) } answers { firstArg() }
+        every { oppgaveRepository.finnBehandlingIdForGsakOppgaveId(any()) } returns emptyList()
     }
 
     @Test
@@ -253,6 +254,28 @@ internal class OppgaveServiceTest {
         verify(exactly = 1) { personService.hentPersonKortBolk(eq(listOf("1"))) }
         assertThat(oppgaver.single { it.id == oppgaveIdMedNavn }.navn).contains("fornavn1 ")
         assertThat(oppgaver.filterNot { it.id == oppgaveIdMedNavn }.map { it.navn }).containsOnly("Mangler navn")
+    }
+
+    @Test
+    fun `skal legge til behandlingId på oppgaver for å enklere kunne gå til behandling fra frontend`() {
+        val oppgaveIdMedBehandling = 1L
+        val behandlingId = UUID.randomUUID()
+
+        every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(
+            2,
+            listOf(
+                lagEksternTestOppgave().copy(id = oppgaveIdMedBehandling),
+                lagEksternTestOppgave().copy(id = 2),
+            ),
+        )
+        every { oppgaveRepository.finnBehandlingIdForGsakOppgaveId(any()) } answers {
+            firstArg<List<Long>>().filter { it == oppgaveIdMedBehandling }.map { it to behandlingId }
+        }
+
+        val oppgaver = oppgaveService.hentOppgaver(mockk()).oppgaver
+
+        assertThat(oppgaver.single { it.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingId)
+        assertThat(oppgaver.single { it.id != oppgaveIdMedBehandling }.behandlingId).isNull()
     }
 
     private fun mockOpprettOppgave(slot: CapturingSlot<OpprettOppgaveRequest>) {
