@@ -55,6 +55,7 @@ data class Vedtaksstatistikk(
     val kravMottatt: LocalDate?,
     @Column("arsaker_avslag")
     val årsakerAvslag: ÅrsakAvslagDvh.JsonWrapper? = null,
+    val opprettetTid: LocalDateTime = LocalDateTime.now(),
     // TODO: Legg inn årsak til revurdering når revurdering kommer i løsningen
     // TODO: EØS-informasjon når det kommer støtte for det i løsningen
 )
