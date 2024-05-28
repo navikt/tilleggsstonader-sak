@@ -2,13 +2,13 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
-import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_EGEN_ANSATT
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveMedBehandlingIdDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -58,7 +58,7 @@ class OppgaveController(
         @PathVariable(name = "oppgaveId") oppgaveId: Long,
         @RequestParam("versjon") versjon: Int,
         @RequestParam("tilbakestill") tilbakestill: Boolean,
-    ): Oppgave {
+    ): OppgaveDto {
         tilgangService.validerHarSaksbehandlerrolle()
         val tildeltSaksbehandler = if (tilbakestill) null else SikkerhetContext.hentSaksbehandler()
         return oppgaveService.fordelOppgave(oppgaveId, tildeltSaksbehandler, versjon)

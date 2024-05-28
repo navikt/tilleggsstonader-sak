@@ -193,7 +193,9 @@ internal class OppgaveServiceTest {
         val oppgaveSlot = slot<Long>()
         val saksbehandlerSlot = slot<String>()
 
-        every { oppgaveClient.fordelOppgave(capture(oppgaveSlot), capture(saksbehandlerSlot), any()) } returns mockk()
+        every { oppgaveClient.fordelOppgave(capture(oppgaveSlot), capture(saksbehandlerSlot), any()) } answers {
+            lagEksternTestOppgave().copy(tilordnetRessurs = secondArg(), versjon = thirdArg<Int>() + 1)
+        }
 
         oppgaveService.fordelOppgave(GSAK_OPPGAVE_ID, SAKSBEHANDLER_ID, 1)
 
