@@ -22,12 +22,18 @@ class YtelserRegisterDtoMapperTest {
             tom = now(),
         )
         val aapPeriode2 = periodeAAP(fom = now().plusDays(1), tom = now().plusYears(1))
+
+        val aapNullTom1 = periodeAAP(fom = now().plusDays(1), tom = null)
+        val aapNullTom2 = periodeAAP(fom = now().plusDays(2), tom = null)
+
         val efPeriode = periodeEnsligForsørger(fom = now().plusDays(10), tom = now().plusDays(10))
         val perioder = ytelsePerioderDto(
-            perioder = listOf(aapPeriode1, aapPeriode2, efPeriode),
+            perioder = listOf(aapNullTom2, aapPeriode1, aapNullTom1, aapPeriode2, efPeriode),
         ).tilDto().perioder
 
         assertThat(perioder).containsExactly(
+            YtelsePeriodeRegisterDto(TypeYtelsePeriode.AAP, fom = aapNullTom2.fom, tom = aapNullTom2.tom),
+            YtelsePeriodeRegisterDto(TypeYtelsePeriode.AAP, fom = aapNullTom1.fom, tom = aapNullTom1.tom),
             YtelsePeriodeRegisterDto(TypeYtelsePeriode.AAP, fom = aapPeriode2.fom, tom = aapPeriode2.tom),
             YtelsePeriodeRegisterDto(TypeYtelsePeriode.ENSLIG_FORSØRGER, fom = efPeriode.fom, tom = efPeriode.tom),
             YtelsePeriodeRegisterDto(TypeYtelsePeriode.AAP, fom = aapPeriode1.fom, tom = aapPeriode1.tom),

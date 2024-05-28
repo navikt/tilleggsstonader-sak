@@ -26,11 +26,11 @@ object YtelsePerioderUtil {
 
     fun periodeAAP(
         fom: LocalDate = LocalDate.now(),
-        tom: LocalDate = LocalDate.now(),
+        tom: LocalDate? = LocalDate.now(),
     ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.AAP, fom = fom, tom = tom)
 
     fun periodeEnsligForsørger(
         fom: LocalDate = LocalDate.now(),
-        tom: LocalDate = LocalDate.now(),
+        tom: LocalDate? = LocalDate.now(),
     ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, fom = fom, tom = tom)
 }

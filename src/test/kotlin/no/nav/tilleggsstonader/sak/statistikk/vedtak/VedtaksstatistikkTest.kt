@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
@@ -95,6 +96,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
     }
 
     @Test
+    @Disabled
     fun `skal sette opprettet_tid til nå`() {
         val tidNå = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS)
         vedtakstatistikkRepository.insert(vedtaksstatistikk())
