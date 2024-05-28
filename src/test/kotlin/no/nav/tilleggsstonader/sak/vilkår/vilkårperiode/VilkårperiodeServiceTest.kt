@@ -250,7 +250,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class OppdaterVilkårPeriode {
+    inner class OppdaterVilkårYtelsePeriode {
 
         @Test
         fun `skal oppdatere alle felter hvis periode er lagt til manuelt`() {

@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -21,7 +20,7 @@ class YtelseController(
     @GetMapping("{fagsakPersonId}")
     fun hentYtelser(
         @PathVariable fagsakPersonId: UUID,
-    ): YtelsePerioderDto {
+    ): YtelserRegisterDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         return aktivitetService.hentYtelser(fagsakPersonId)
     }
@@ -29,7 +28,7 @@ class YtelseController(
     @GetMapping("/behandling/{behandlingId}")
     fun hentYtelserForBehandling(
         @PathVariable behandlingId: UUID,
-    ): YtelsePerioderDto {
+    ): YtelserRegisterDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return aktivitetService.hentYtelserForBehandling(behandlingId)
     }

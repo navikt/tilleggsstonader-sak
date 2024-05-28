@@ -18,18 +18,10 @@ class YtelseClient(
 
     val uri = UriComponentsBuilder.fromUri(baseUrl)
         .pathSegment("api", "ytelse", "finn")
-        .queryParam("fom", "{fom}")
-        .queryParam("tom", "{tom}")
         .encode()
         .toUriString()
 
     fun hentYtelser(request: YtelsePerioderRequest): YtelsePerioderDto {
-        // TODO slett urivariables når integrasjoner tatt i bruk ny request
-        val uriVariables = mapOf<String, Any>(
-            "fom" to request.fom,
-            "tom" to request.tom,
-        )
-
-        return postForEntity(uri, request, uriVariables = uriVariables)
+        return postForEntity(uri, request)
     }
 }
