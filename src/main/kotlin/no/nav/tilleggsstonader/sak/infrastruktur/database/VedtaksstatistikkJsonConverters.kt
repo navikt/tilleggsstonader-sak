@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgrupperDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.UtbetalingerDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VilkårsvurderingerDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.ÅrsakAvslagDvh
 import org.postgresql.util.PGobject
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
@@ -20,6 +21,7 @@ val alleVedtaksstatistikkJsonConverters = listOf(
     BarnDvhReader(),
     UtbetalingerDvhReader(),
     VedtaksperioderDvhReader(),
+    ÅrsakerAvslagDvhReader(),
 
     VedtaksperioderDvhWriter(),
     UtbetalingerDvhWriter(),
@@ -27,6 +29,7 @@ val alleVedtaksstatistikkJsonConverters = listOf(
     MålgruppeDvhWriter(),
     AktivitetDvhWriter(),
     VilkårsvurderingDvhWriter(),
+    ÅrsakerAvslagDvhWriter(),
 )
 
 @WritingConverter
@@ -83,6 +86,8 @@ private class VilkårsvurderingDvhWriter : Converter<VilkårsvurderingerDvh.Json
         }
 }
 
+private class ÅrsakerAvslagDvhWriter : DatabaseConfiguration.JsonWriter<ÅrsakAvslagDvh.JsonWrapper>()
+
 @ReadingConverter
 private class MålgruppeDvhReader : Converter<PGobject, MålgrupperDvh.JsonWrapper> {
     override fun convert(pgObject: PGobject) =
@@ -118,3 +123,6 @@ private class VedtaksperioderDvhReader : Converter<PGobject, VedtaksperioderDvh.
     override fun convert(pgObject: PGobject) =
         VedtaksperioderDvh.JsonWrapper(pgObject.value?.let { objectMapper.readValue(it) } ?: emptyList())
 }
+
+private class ÅrsakerAvslagDvhReader :
+    DatabaseConfiguration.JsonReader<ÅrsakAvslagDvh.JsonWrapper>(ÅrsakAvslagDvh.JsonWrapper::class)

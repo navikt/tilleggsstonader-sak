@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import org.assertj.core.api.Assertions.assertThat
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 import java.time.Month
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class VedtaksstatistikkTest : IntegrationTest() {
@@ -17,34 +19,9 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     final val id: UUID = UUID.randomUUID()
 
-    val dummyVedtaksstatistikk = Vedtaksstatistikk(
-        id = id,
-        fagsakId = id,
-        behandlingId = id,
-        eksternFagsakId = 1722,
-        eksternBehandlingId = 4005,
-        relatertBehandlingId = null,
-        adressebeskyttelse = AdressebeskyttelseDvh.UGRADERT,
-        tidspunktVedtak = LocalDateTime.of(2024, Month.MAY, 7, 20, 30),
-        målgrupper = MålgrupperDvh.JsonWrapper(målgrupper = listOf()),
-        aktiviteter = AktiviteterDvh.JsonWrapper(aktivitet = listOf()),
-        vilkårsvurderinger = VilkårsvurderingerDvh.JsonWrapper(
-            vilkårsvurderinger = listOf(),
-        ),
-        person = "Pelle",
-        barn = BarnDvh.JsonWrapper(barn = listOf()),
-        behandlingType = BehandlingTypeDvh.FØRSTEGANGSBEHANDLING,
-        behandlingÅrsak = BehandlingÅrsakDvh.MANUELT_OPPRETTET,
-        vedtakResultat = VedtakResultatDvh.INNVILGET,
-        vedtaksperioder = VedtaksperioderDvh.JsonWrapper(vedtaksperioder = listOf()),
-        utbetalinger = UtbetalingerDvh.JsonWrapper(utbetalinger = listOf()),
-        stønadstype = StønadstypeDvh.BARNETILSYN,
-        kravMottatt = null,
-    )
-
     @Test
     fun `kan skrive vedtaksstatistikk til tabell når alle JSON-objekter er tomme lister`() {
-        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk)
+        vedtakstatistikkRepository.insert(vedtaksstatistikk())
     }
 
     @Test
@@ -56,7 +33,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
             ),
         )
 
-        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(aktiviteter = flereAktiviteter))
+        vedtakstatistikkRepository.insert(vedtaksstatistikk().copy(aktiviteter = flereAktiviteter))
 
         val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
 
@@ -79,7 +56,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
             ),
         )
 
-        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(vilkårsvurderinger = nøstetVilkårsvurdering))
+        vedtakstatistikkRepository.insert(vedtaksstatistikk().copy(vilkårsvurderinger = nøstetVilkårsvurdering))
 
         val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
 
@@ -95,10 +72,60 @@ class VedtaksstatistikkTest : IntegrationTest() {
             ),
         )
 
-        vedtakstatistikkRepository.insert(dummyVedtaksstatistikk.copy(målgrupper = målgrupper))
+        vedtakstatistikkRepository.insert(vedtaksstatistikk().copy(målgrupper = målgrupper))
 
         val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
 
         assertThat(vedtaksstatistikkFraDb.målgrupper).isEqualTo(målgrupper)
     }
+
+    @Test
+    fun `årsakAvslag kan mappes mellom databaseobjekt og domeneobjekt`() {
+        val årsakerAvslag = ÅrsakAvslagDvh.fraDomene(listOf(ÅrsakAvslag.INGEN_AKTIVITET))
+
+        vedtakstatistikkRepository.insert(
+            vedtaksstatistikk().copy(
+                årsakerAvslag = årsakerAvslag,
+            ),
+        )
+
+        val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
+
+        assertThat(vedtaksstatistikkFraDb.årsakerAvslag).isEqualTo(årsakerAvslag)
+    }
+
+    @Test
+    fun `skal sette opprettet_tid til nå`() {
+        val tidNå = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS)
+        vedtakstatistikkRepository.insert(vedtaksstatistikk())
+        val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
+
+        assertThat(vedtaksstatistikkFraDb.opprettetTid).isStrictlyBetween(tidNå, tidNå.plusSeconds(1))
+    }
+
+    private fun vedtaksstatistikk() = Vedtaksstatistikk(
+        id = id,
+        fagsakId = id,
+        behandlingId = id,
+        eksternFagsakId = 1722,
+        eksternBehandlingId = 4005,
+        relatertBehandlingId = null,
+        adressebeskyttelse = AdressebeskyttelseDvh.UGRADERT,
+        tidspunktVedtak = LocalDateTime.of(2024, Month.MAY, 7, 20, 30),
+        målgrupper = MålgrupperDvh.JsonWrapper(målgrupper = listOf()),
+        aktiviteter = AktiviteterDvh.JsonWrapper(aktivitet = listOf()),
+        vilkårsvurderinger = VilkårsvurderingerDvh.JsonWrapper(
+            vilkårsvurderinger = listOf(),
+        ),
+        person = "Pelle",
+        barn = BarnDvh.JsonWrapper(barn = listOf()),
+        behandlingType = BehandlingTypeDvh.FØRSTEGANGSBEHANDLING,
+        behandlingÅrsak = BehandlingÅrsakDvh.MANUELT_OPPRETTET,
+        vedtakResultat = VedtakResultatDvh.INNVILGET,
+        vedtaksperioder = VedtaksperioderDvh.JsonWrapper(vedtaksperioder = listOf()),
+        utbetalinger = UtbetalingerDvh.JsonWrapper(utbetalinger = listOf()),
+        stønadstype = StønadstypeDvh.BARNETILSYN,
+        kravMottatt = null,
+        årsakerAvslag = null,
+    )
 }

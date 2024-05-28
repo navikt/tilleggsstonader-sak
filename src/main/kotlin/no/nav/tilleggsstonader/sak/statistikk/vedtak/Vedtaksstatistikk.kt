@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGrader
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.StønadstypeDvh.BARNETILSYN
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
@@ -52,8 +53,10 @@ data class Vedtaksstatistikk(
     @Column("stonadstype")
     val stønadstype: StønadstypeDvh = BARNETILSYN,
     val kravMottatt: LocalDate?,
+    @Column("arsaker_avslag")
+    val årsakerAvslag: ÅrsakAvslagDvh.JsonWrapper? = null,
+    val opprettetTid: LocalDateTime = LocalDateTime.now(),
     // TODO: Legg inn årsak til revurdering når revurdering kommer i løsningen
-    // TODO: Legg inn årsak for avslag når avslag kommer i løsningen
     // TODO: EØS-informasjon når det kommer støtte for det i løsningen
 )
 
@@ -375,5 +378,36 @@ enum class AdressebeskyttelseDvh {
                 AdressebeskyttelseGradering.FORTROLIG -> FORTROLIG
                 AdressebeskyttelseGradering.UGRADERT -> UGRADERT
             }
+    }
+}
+
+enum class ÅrsakAvslagDvh {
+    INGEN_AKTIVITET,
+    IKKE_I_MÅLGRUPPE,
+    INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE,
+    MANGELFULL_DOKUMENTASJON,
+    ANNET,
+    ;
+
+    data class JsonWrapper(
+        val årsaker: List<ÅrsakAvslagDvh>,
+    )
+
+    companion object {
+        fun fraDomene(årsaker: List<ÅrsakAvslag>?): JsonWrapper? {
+            return årsaker?.let {
+                JsonWrapper(
+                    årsaker.map { typeFraDomene(it) },
+                )
+            }
+        }
+
+        private fun typeFraDomene(årsak: ÅrsakAvslag) = when (årsak) {
+            ÅrsakAvslag.INGEN_AKTIVITET -> INGEN_AKTIVITET
+            ÅrsakAvslag.IKKE_I_MÅLGRUPPE -> IKKE_I_MÅLGRUPPE
+            ÅrsakAvslag.INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE -> INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE
+            ÅrsakAvslag.MANGELFULL_DOKUMENTASJON -> MANGELFULL_DOKUMENTASJON
+            ÅrsakAvslag.ANNET -> ANNET
+        }
     }
 }
