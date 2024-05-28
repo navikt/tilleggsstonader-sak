@@ -26,6 +26,7 @@ class AktivitetController(
         return aktivitetService.hentAktiviteter(fagsakPersonId)
     }
 
+    @Deprecated("Skal fjernes. aktivitet skal hentes med vilkårperioder") // TODO: Fjern når aktivitet hentes med vilkårperioder
     @GetMapping("/behandling/{behandlingId}")
     fun hentAktivitetForBehandling(
         @PathVariable behandlingId: UUID,
