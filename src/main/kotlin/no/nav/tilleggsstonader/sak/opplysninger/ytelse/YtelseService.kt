@@ -17,25 +17,36 @@ class YtelseService(
 ) {
     fun hentYtelser(fagsakPersonId: UUID): YtelserRegisterDto {
         val ident = fagsakPersonService.hentAktivIdent(fagsakPersonId)
+        val typer = listOf(
+            TypeYtelsePeriode.AAP,
+            TypeYtelsePeriode.ENSLIG_FORSØRGER,
+            TypeYtelsePeriode.OMSTILLINGSSTØNAD,
+        )
+
         return ytelseClient.hentYtelser(
             YtelsePerioderRequest(
                 ident = ident,
                 fom = osloDateNow().minusYears(3),
                 tom = osloDateNow().plusYears(1),
-                typer = listOf(TypeYtelsePeriode.AAP, TypeYtelsePeriode.ENSLIG_FORSØRGER),
+                typer = typer,
             ),
         ).tilDto()
     }
 
     fun hentYtelserForBehandling(behandlingId: UUID): YtelserRegisterDto {
         val ident = behandlingService.hentSaksbehandling(behandlingId).ident
+        val typer = listOf(
+            TypeYtelsePeriode.AAP,
+            TypeYtelsePeriode.ENSLIG_FORSØRGER,
+            TypeYtelsePeriode.OMSTILLINGSSTØNAD,
+        )
 
         return ytelseClient.hentYtelser(
             YtelsePerioderRequest(
                 ident = ident,
                 fom = osloDateNow().minusMonths(3),
                 tom = osloDateNow().plusYears(1),
-                typer = listOf(TypeYtelsePeriode.AAP, TypeYtelsePeriode.ENSLIG_FORSØRGER),
+                typer = typer,
             ),
         ).tilDto()
     }
