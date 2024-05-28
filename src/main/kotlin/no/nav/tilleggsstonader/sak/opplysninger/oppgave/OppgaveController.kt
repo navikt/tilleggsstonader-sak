@@ -2,14 +2,12 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_EGEN_ANSATT
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveMedBehandlingIdDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.util.FnrUtil.validerOptionalIdent
@@ -40,17 +38,6 @@ class OppgaveController(
             ?.let { personService.hentAktørIder(it).identer.first().ident }
 
         return oppgaveService.hentOppgaver(finnOppgaveRequest.tilFinnOppgaveRequest(aktørId))
-    }
-
-    @GetMapping("/{oppgaveId}")
-    fun hentOppgave(@PathVariable oppgaveId: Long): OppgaveMedBehandlingIdDto {
-        tilgangService.validerHarSaksbehandlerrolle()
-        return oppgaveService.hentOppgaveDomain(oppgaveId)?.let {
-            OppgaveMedBehandlingIdDto(
-                behandlingId = it.behandlingId,
-                gsakOppgaveId = it.gsakOppgaveId,
-            )
-        } ?: throw Feil("Oppgave=$oppgaveId må behandles i gosys")
     }
 
     @PostMapping(path = ["/{oppgaveId}/fordel"])
