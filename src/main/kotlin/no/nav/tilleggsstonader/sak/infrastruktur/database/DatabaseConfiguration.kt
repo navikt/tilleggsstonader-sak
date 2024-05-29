@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import org.postgresql.util.PGobject
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer
@@ -117,6 +118,10 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 DetaljerVilkårperiodeReader(),
                 DetaljerVilkårperiodeWriter(),
+
+                VilkårperioderGrunnlagReader(),
+                VilkårperioderGrunnlagWriter(),
+
             ) + alleVedtaksstatistikkJsonConverters,
         )
     }
@@ -235,4 +240,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class DetaljerVilkårperiodeReader : JsonReader<DelvilkårVilkårperiode>(DelvilkårVilkårperiode::class)
 
     class DetaljerVilkårperiodeWriter : JsonWriter<DelvilkårVilkårperiode>()
+
+    class VilkårperioderGrunnlagReader : JsonReader<VilkårperioderGrunnlag>(VilkårperioderGrunnlag::class)
+
+    class VilkårperioderGrunnlagWriter : JsonWriter<VilkårperioderGrunnlag>()
 }

@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -25,10 +26,18 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.evaulerVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -36,6 +45,8 @@ class VilkårperiodeService(
     private val behandlingService: BehandlingService,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
+    private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
+    private val aktivitetService: AktivitetService,
 ) {
 
     fun hentVilkårperioder(behandlingId: UUID): Vilkårperioder {
@@ -46,6 +57,43 @@ class VilkårperiodeService(
             aktiviteter = finnPerioder<AktivitetType>(vilkårsperioder),
         )
     }
+
+    fun hentVilkårperioderResponse(behandlingId: UUID): VilkårperioderResponse {
+        val grunnlagsdataVilkårsperioder = hentEllerOpprettGrunnlag(behandlingId)
+
+        return VilkårperioderResponse(
+            vilkårperioder = hentVilkårperioderDto(behandlingId),
+            grunnlag = grunnlagsdataVilkårsperioder?.tilDto(),
+        )
+    }
+
+    private fun hentEllerOpprettGrunnlag(behandlingId: UUID): VilkårperioderGrunnlag? {
+        val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)?.grunnlag
+
+        return if (grunnlag != null) {
+            grunnlag
+        } else if (behandlingErLåstForVidereRedigering(behandlingId)) {
+            null
+        } else {
+            opprettGrunnlagsdata(behandlingId).grunnlag
+        }
+    }
+
+    private fun opprettGrunnlagsdata(behandlingId: UUID) = vilkårperioderGrunnlagRepository.insert(
+        VilkårperioderGrunnlagDomain(
+            behandlingId = behandlingId,
+            grunnlag = VilkårperioderGrunnlag(
+                aktivitet = GrunnlagAktivitet(
+                    aktivitetService.hentAktiviteterForGrunnlagsdata(
+                        behandlingService.hentSaksbehandling(behandlingId).fagsakPersonId,
+                        fom = LocalDate.now().minusMonths(3),
+                        tom = LocalDate.now().plusYears(1),
+                    ),
+                    tidspunktHentet = LocalDateTime.now(),
+                ),
+            ),
+        ),
+    )
 
     fun hentVilkårperioderDto(behandlingId: UUID): VilkårperioderDto {
         return hentVilkårperioder(behandlingId).tilDto()

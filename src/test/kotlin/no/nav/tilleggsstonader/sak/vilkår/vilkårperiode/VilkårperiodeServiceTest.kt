@@ -33,6 +33,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -53,6 +55,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var stønadsperiodeService: StønadsperiodeService
+
+    @Autowired
+    lateinit var vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository
 
     @Nested
     inner class OpprettVilkårperiode {
@@ -602,5 +607,29 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
             )
+    }
+
+    @Nested
+    inner class Grunnlag {
+
+        @Test
+        internal fun `skal lagre ned grunnlagsadata på aktiviteter når man henter vilkårsperioder`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)).isNull()
+
+            val response = vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
+
+            assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)!!.grunnlag.tilDto()).isEqualTo(response.grunnlag)
+        }
+
+        @Test
+        internal fun `skal ikke lagre ned grunnlagsadata for behandling som ikke er redigerbar`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
+
+            vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
+
+            assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)).isNull()
+        }
     }
 }

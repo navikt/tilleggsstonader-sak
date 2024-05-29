@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.LoggerFactory
@@ -138,6 +139,7 @@ abstract class IntegrationTest {
             Brevmottaker::class,
             MellomlagretFrittståendeBrev::class,
             MellomlagretBrev::class,
+            VilkårperioderGrunnlagDomain::class,
             Behandlingshistorikk::class,
             Behandlingsjournalpost::class,
             EksternBehandlingId::class,
