@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktiv
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -62,7 +63,7 @@ class VilkårperiodeService(
 
         return VilkårperioderResponse(
             vilkårperioder = hentVilkårperioderDto(behandlingId),
-            grunnlag = grunnlagsdataVilkårsperioder,
+            grunnlag = grunnlagsdataVilkårsperioder?.tilDto(),
         )
     }
 

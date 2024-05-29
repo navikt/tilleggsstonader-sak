@@ -21,7 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -145,7 +145,7 @@ data class VilkårperioderDto(
 
 data class VilkårperioderResponse(
     val vilkårperioder: VilkårperioderDto,
-    val grunnlag: VilkårperioderGrunnlag?,
+    val grunnlag: VilkårperioderGrunnlagDto?,
 )
 
 fun Vilkårperioder.tilDto() = VilkårperioderDto(

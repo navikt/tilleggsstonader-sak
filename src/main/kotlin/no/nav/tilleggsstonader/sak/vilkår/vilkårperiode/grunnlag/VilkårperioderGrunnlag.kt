@@ -25,3 +25,23 @@ data class GrunnlagAktivitet(
     val aktiviteter: List<AktivitetArenaDto>,
     val tidspunktHentet: LocalDateTime,
 )
+
+data class VilkårperioderGrunnlagDto(
+    val aktivitet: GrunnlagAktivitetDto,
+)
+
+data class GrunnlagAktivitetDto(
+    val aktiviteter: List<AktivitetArenaDto>,
+    val tidspunktHentet: LocalDateTime,
+)
+
+fun VilkårperioderGrunnlag.tilDto() =
+    VilkårperioderGrunnlagDto(
+        aktivitet = this.aktivitet.tilDto(),
+    )
+
+fun GrunnlagAktivitet.tilDto() =
+    GrunnlagAktivitetDto(
+        aktiviteter = this.aktiviteter,
+        tidspunktHentet = this.tidspunktHentet,
+    )
