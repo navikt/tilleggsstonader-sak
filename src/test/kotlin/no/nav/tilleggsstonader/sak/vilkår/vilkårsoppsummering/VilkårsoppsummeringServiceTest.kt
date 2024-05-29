@@ -44,7 +44,7 @@ class VilkårsoppsummeringServiceTest : IntegrationTest() {
         resultat = ResultatVilkårperiode.OPPFYLT,
         fom = fom,
         tom = tom,
-        type = AktivitetType.TILTAK
+        type = AktivitetType.TILTAK,
     )
 
     val målgruppe =
@@ -54,29 +54,29 @@ class VilkårsoppsummeringServiceTest : IntegrationTest() {
         fom = fom,
         tom = tom,
         aktivitet = AktivitetType.TILTAK,
-        målgruppe = MålgruppeType.AAP
+        målgruppe = MålgruppeType.AAP,
     )
 
     val vilkårPassBarn = vilkår(
         behandlingId = UUID.randomUUID(),
         resultat = Vilkårsresultat.OPPFYLT,
         type = VilkårType.PASS_BARN,
-        barnId = barnId
+        barnId = barnId,
     )
 
     val behandlingFakta = mockVilkårGrunnlagDto(
         barn = listOf(
-            grunnlagBarn(barnId = barnId)
-        )
+            grunnlagBarn(barnId = barnId),
+        ),
     )
 
     @Nested
-    inner class oppfylteVilkårperioderOgStønadsperiode {
+    inner class OppfylteVilkårperioderOgStønadsperiode {
         @BeforeEach
         fun setUp() {
             every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(
                 målgrupper = listOf(målgruppe),
-                aktiviteter = listOf(aktivitet)
+                aktiviteter = listOf(aktivitet),
             )
             every { stønadsperiodeService.hentStønadsperioder(any()) } returns listOf(stønadsperiode)
             every { vilkårService.hentPassBarnVilkår(any()) } returns listOf(vilkårPassBarn)
@@ -102,8 +102,8 @@ class VilkårsoppsummeringServiceTest : IntegrationTest() {
         fun `skal kaste feil dersom vilkår id ikke matcher`() {
             every { behandlingFaktaService.hentFakta(any()) } returns mockVilkårGrunnlagDto(
                 barn = listOf(
-                    grunnlagBarn(barnId = UUID.randomUUID())
-                )
+                    grunnlagBarn(barnId = UUID.randomUUID()),
+                ),
             )
 
             assertThatThrownBy {
@@ -116,7 +116,7 @@ class VilkårsoppsummeringServiceTest : IntegrationTest() {
     fun `ikke oppfylte perioder og vilkår skal gi negative resultater`() {
         every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(
             målgrupper = listOf(målgruppe.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT)),
-            aktiviteter = listOf(aktivitet.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT))
+            aktiviteter = listOf(aktivitet.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT)),
         )
         every { stønadsperiodeService.hentStønadsperioder(any()) } returns emptyList()
         every { vilkårService.hentPassBarnVilkår(any()) } returns listOf(vilkårPassBarn.copy(resultat = Vilkårsresultat.IKKE_OPPFYLT))

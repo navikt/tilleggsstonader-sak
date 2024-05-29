@@ -16,7 +16,7 @@ import java.util.UUID
 @Validated
 class VilkårsoppsummeringController(
     private val tilgangService: TilgangService,
-    private val vilkårsoppsummeringService: VilkårsoppsummeringService
+    private val vilkårsoppsummeringService: VilkårsoppsummeringService,
 ) {
 
     @GetMapping("{behandlingId}")
