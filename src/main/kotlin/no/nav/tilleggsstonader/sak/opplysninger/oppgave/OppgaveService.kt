@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandl
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import org.slf4j.LoggerFactory
@@ -47,23 +48,22 @@ class OppgaveService(
     fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequest): FinnOppgaveResponseDto {
         val oppgaveResponse = oppgaveClient.hentOppgaver(finnOppgaveRequest)
         val personer = personService.hentPersonKortBolk(oppgaveResponse.oppgaver.mapNotNull { it.ident }.distinct())
-        val behandlingIdPåOppgaveId = finnBehandlingId(oppgaveResponse)
+        val behandlingIdPåOppgaveId = finnBehandlingId(oppgaveResponse.oppgaver)
 
         return FinnOppgaveResponseDto(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
             oppgaver = oppgaveResponse.oppgaver.map { oppgave ->
-                val navn = oppgave.ident?.let { personer[it] }?.navn?.gjeldende()?.visningsnavn() ?: "Mangler navn"
                 OppgaveDto(
                     oppgave = oppgave,
-                    navn = navn,
+                    navn = personer.visningsnavnFor(oppgave),
                     behandlingId = behandlingIdPåOppgaveId[oppgave.id],
                 )
             },
         )
     }
 
-    private fun finnBehandlingId(oppgaveResponse: no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto): Map<Long, UUID> {
-        val oppgaveIder = oppgaveResponse.oppgaver.map { it.id }
+    private fun finnBehandlingId(oppgaver: List<Oppgave>): Map<Long, UUID> {
+        val oppgaveIder = oppgaver.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveBehandlingId", oppgaveIder) {
             oppgaveRepository.finnBehandlingIdForGsakOppgaveId(oppgaveIder).associate { it.first to it.second }
         }
@@ -72,11 +72,17 @@ class OppgaveService(
     private val Oppgave.ident: String?
         get() = this.identer?.firstOrNull { it.gruppe == IdentGruppe.FOLKEREGISTERIDENT }?.ident
 
-    fun fordelOppgave(gsakOppgaveId: Long, saksbehandler: String?, versjon: Int): Oppgave {
-        return oppgaveClient.fordelOppgave(
-            gsakOppgaveId,
-            saksbehandler,
-            versjon,
+    fun fordelOppgave(gsakOppgaveId: Long, saksbehandler: String?, versjon: Int): OppgaveDto {
+        val oppdatertOppgave = oppgaveClient.fordelOppgave(
+            oppgaveId = gsakOppgaveId,
+            saksbehandler = saksbehandler,
+            versjon = versjon,
+        )
+        val personer = personService.hentPersonKortBolk(listOfNotNull(oppdatertOppgave.ident))
+        return OppgaveDto(
+            oppgave = oppdatertOppgave,
+            navn = personer.visningsnavnFor(oppdatertOppgave),
+            behandlingId = finnBehandlingId(listOf(oppdatertOppgave))[oppdatertOppgave.id],
         )
     }
 
@@ -272,4 +278,7 @@ class OppgaveService(
             gjeldendeTid.plusDays(1).toLocalDate()
         }
     }
+
+    private fun Map<String, PdlPersonKort>.visningsnavnFor(oppgave: Oppgave) =
+        oppgave.ident?.let { this[it] }?.navn?.gjeldende()?.visningsnavn() ?: "Mangler navn"
 }
