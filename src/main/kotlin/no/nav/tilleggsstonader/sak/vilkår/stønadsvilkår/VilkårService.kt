@@ -343,7 +343,13 @@ class VilkårService(
     }
 
     fun hentOppfyltePassBarnVilkår(behandlingId: UUID): List<Vilkår> {
-        return vilkårRepository.findByBehandlingId(behandlingId).filter { it.resultat == Vilkårsresultat.OPPFYLT && it.type == VilkårType.PASS_BARN }
+        return hentPassBarnVilkår(behandlingId)
+            .filter { it.resultat == Vilkårsresultat.OPPFYLT }
+    }
+
+    fun hentPassBarnVilkår(behandlingId: UUID): List<Vilkår> {
+        return vilkårRepository.findByBehandlingId(behandlingId)
+            .filter { it.type == VilkårType.PASS_BARN }
     }
 
     companion object {
