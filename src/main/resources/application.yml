@@ -191,5 +191,8 @@ clients:
   kodeverk:
     uri: http://kodeverk-api.team-rocket
     scope: api://${CLIENT_ENV}-gcp.team-rocket.kodeverk-api/.default
+  klage:
+    uri: http://tilleggsstonader-klage
+    scope: api://${CLIENT_ENV}-gcp.tilleggsstonader.tilleggsstonader-sak/.default
   norg2:
     uri: https://norg2.${CLIENT_ENV}-fss-pub.nais.io/norg2
