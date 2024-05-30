@@ -30,7 +30,8 @@ Egenskap: Beregning - Flere stønadsperioder med full aktivitet
 
     Så forvent følgende beløpsperioder for: 01.2023
       | Dato       | Beløp | Målgruppe       |
-      | 01.01.2023 | 236   | OVERGANGSSTØNAD |
+      # dato skal egentligen være 01.01.2023 men er en søndag
+      | 02.01.2023 | 236   | OVERGANGSSTØNAD |
       | 12.01.2023 | 413   | AAP             |
 
   Scenario: Flere stønadsperioder innenfor samme måned - ulike aktiviteter:
@@ -63,5 +64,5 @@ Egenskap: Beregning - Flere stønadsperioder med full aktivitet
 
     Så forvent følgende beløpsperioder for: 01.2023
       | Dato       | Beløp | Målgruppe       |
-      | 01.01.2023 | 236   | OVERGANGSSTØNAD |
+      | 02.01.2023 | 236   | OVERGANGSSTØNAD |
       | 12.01.2023 | 413   | AAP             |

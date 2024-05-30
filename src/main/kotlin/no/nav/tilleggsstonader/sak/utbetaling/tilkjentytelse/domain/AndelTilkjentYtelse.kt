@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.erLørdagEllerSøndag
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
@@ -41,6 +42,9 @@ data class AndelTilkjentYtelse(
     init {
         feilHvis(YearMonth.from(fom) != YearMonth.from(tom)) {
             "For å unngå at man iverksetter frem i tiden skal perioder kun løpe over 1 måned"
+        }
+        feilHvis(satstype == Satstype.DAG && fom.erLørdagEllerSøndag()) {
+            "Dagsats som begynner en lørdag eller søndag vil ikke bli utbetalt"
         }
     }
 }
