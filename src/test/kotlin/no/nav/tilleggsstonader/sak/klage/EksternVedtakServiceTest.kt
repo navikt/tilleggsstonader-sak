@@ -31,13 +31,13 @@ class EksternVedtakServiceTest {
     private val fagsak = fagsak(id = fagsakId)
     private val eksternFagsakId = fagsak.eksternId.id
 
-    private val eksternBehandlingId = 100L
+    private val eksternBehandlingId = "100"
 
     @BeforeEach
     internal fun setUp() {
         every { fagsakService.hentFagsakPåEksternId(eksternFagsakId) } returns fagsak
         every { behandlingService.hentEksternBehandlingId(any<UUID>()) } returns EksternBehandlingId(
-            eksternBehandlingId,
+            eksternBehandlingId.toLong(),
             UUID.randomUUID(),
         )
     }
@@ -53,7 +53,7 @@ class EksternVedtakServiceTest {
         assertThat(vedtak).hasSize(1)
         assertThat(vedtak[0].resultat).isEqualTo("Avslått")
         assertThat(vedtak[0].behandlingstype).isEqualTo("Førstegangsbehandling")
-//        assertThat(vedtak[0].eksternBehandlingId).isEqualTo(eksternBehandlingId.)
+        assertThat(vedtak[0].eksternBehandlingId).isEqualTo(eksternBehandlingId)
         assertThat(vedtak[0].vedtakstidspunkt).isEqualTo(vedtakstidspunkt)
     }
 

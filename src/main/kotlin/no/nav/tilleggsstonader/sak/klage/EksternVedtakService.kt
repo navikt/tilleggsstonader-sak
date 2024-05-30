@@ -26,7 +26,7 @@ class EksternVedtakService(
     }
 
     private fun tilFagsystemVedtak(behandling: Behandling) = FagsystemVedtak(
-        eksternBehandlingId = behandlingService.hentEksternBehandlingId(behandling.id).toString(),
+        eksternBehandlingId = behandlingService.hentEksternBehandlingId(behandling.id).id.toString(),
         behandlingstype = behandling.type.visningsnavn,
         resultat = behandling.resultat.displayName,
         vedtakstidspunkt = behandling.vedtakstidspunkt
