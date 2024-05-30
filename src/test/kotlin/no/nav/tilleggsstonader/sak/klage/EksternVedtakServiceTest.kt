@@ -38,7 +38,7 @@ class EksternVedtakServiceTest {
         every { fagsakService.hentFagsakPåEksternId(eksternFagsakId) } returns fagsak
         every { behandlingService.hentEksternBehandlingId(any<UUID>()) } returns EksternBehandlingId(
             eksternBehandlingId,
-            UUID.randomUUID()
+            UUID.randomUUID(),
         )
     }
 
