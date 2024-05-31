@@ -20,7 +20,7 @@ class KlageClient(
     AbstractRestClient(restTemplate) {
 
     private val opprettKlage =
-        UriComponentsBuilder.fromUri(klageUri).pathSegment("api/behandling/opprett").build().toUriString()
+        UriComponentsBuilder.fromUri(klageUri).pathSegment("api/ekstern/behandling/opprett").build().toUriString()
 
     private val hentKlagebehandlinger =
         UriComponentsBuilder.fromUri(klageUri).pathSegment(
@@ -28,7 +28,7 @@ class KlageClient(
         ).build().toUri()
 
     fun opprettKlage(opprettKlagebehandlingRequest: OpprettKlagebehandlingRequest) {
-        return postForEntity(opprettKlage, opprettKlagebehandlingRequest)
+        postForEntityNullable<Void>(opprettKlage, opprettKlagebehandlingRequest)
     }
 
     fun hentKlagebehandlinger(eksternIder: Set<Long>): Map<Long, List<KlagebehandlingDto>> {
