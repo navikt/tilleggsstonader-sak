@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.grunnlagBarn
 import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.mockVilkårGrunnlagDto
@@ -27,7 +26,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.UUID
 
-class VilkårsoppsummeringServiceTest : IntegrationTest() {
+class VilkårsoppsummeringServiceTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
     val stønadsperiodeService = mockk<StønadsperiodeService>()
     val vilkårService = mockk<VilkårService>()
