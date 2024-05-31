@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.StønadstypeDvh.BARNETILSYN
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -56,9 +57,16 @@ data class Vedtaksstatistikk(
     @Column("arsaker_avslag")
     val årsakerAvslag: ÅrsakAvslagDvh.JsonWrapper? = null,
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
+    val endretTid: LocalDateTime = opprettetTid,
     // TODO: Legg inn årsak til revurdering når revurdering kommer i løsningen
     // TODO: EØS-informasjon når det kommer støtte for det i løsningen
-)
+) {
+    init {
+        feilHvis(endretTid < opprettetTid) {
+            "EndretTid=$endretTid kan ikke være før opprettetTid=$opprettetTid"
+        }
+    }
+}
 
 enum class StønadstypeDvh {
     BARNETILSYN,
