@@ -1,12 +1,15 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.temporal.ChronoUnit
@@ -16,6 +19,9 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     @Autowired
     lateinit var vedtakstatistikkRepository: VedtakstatistikkRepository
+
+    @Autowired
+    lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     final val id: UUID = UUID.randomUUID()
 
@@ -101,6 +107,29 @@ class VedtaksstatistikkTest : IntegrationTest() {
         val vedtaksstatistikkFraDb = vedtakstatistikkRepository.findAll().first()
 
         assertThat(vedtaksstatistikkFraDb.opprettetTid).isBetween(tidNå, tidNå.plusSeconds(1))
+    }
+
+    @Test
+    fun `skal oppdatere endret_tid automatisk hvis man kjører en update`() {
+        val datoIgår = LocalDate.now().minusDays(1)
+        val obj = vedtakstatistikkRepository.insert(vedtaksstatistikk()).let {
+            jdbcTemplate.update(
+                "UPDATE vedtaksstatistikk SET opprettet_tid=:ny_tid, endret_tid=:ny_tid",
+                mapOf("ny_tid" to datoIgår.atTime(8, 0)),
+            )
+            vedtakstatistikkRepository.findByIdOrThrow(it.id)
+        }
+
+        // endretTid er tagget med @LastModifiedDate og oppdateres automatisk
+        vedtakstatistikkRepository.update(obj)
+        val oppdatert = vedtakstatistikkRepository.findByIdOrThrow(obj.id)
+        // opprettetTid har ikke endret seg
+        assertThat(oppdatert.opprettetTid).isEqualTo(obj.opprettetTid)
+
+        // endret tid på forrige objekt er igår
+        assertThat(obj.endretTid.toLocalDate()).isEqualTo(datoIgår)
+        // endret tid på oppdatert objekt er idag
+        assertThat(oppdatert.endretTid.toLocalDate()).isEqualTo(LocalDate.now())
     }
 
     private fun vedtaksstatistikk() = Vedtaksstatistikk(
