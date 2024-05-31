@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.UUID
 
-class VilkårsoppsummeringServiceTest {
+class VilkårsoppsummeringDtoServiceTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
     val stønadsperiodeService = mockk<StønadsperiodeService>()
     val vilkårService = mockk<VilkårService>()

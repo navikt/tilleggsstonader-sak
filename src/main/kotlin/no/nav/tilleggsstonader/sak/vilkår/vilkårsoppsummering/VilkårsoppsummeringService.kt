@@ -18,10 +18,10 @@ class VilkårsoppsummeringService(
     private val behandlingFaktaService: BehandlingFaktaService,
 ) {
 
-    fun hentVilkårsoppsummering(behandlingId: UUID): Vilkårsoppsummering {
+    fun hentVilkårsoppsummering(behandlingId: UUID): VilkårsoppsummeringDto {
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
 
-        return Vilkårsoppsummering(
+        return VilkårsoppsummeringDto(
             aktivitet = vilkårperioder.aktiviteter.any { it.resultat == ResultatVilkårperiode.OPPFYLT },
             målgruppe = vilkårperioder.målgrupper.any { it.resultat == ResultatVilkårperiode.OPPFYLT },
             stønadsperiode = oppsummerStønadsperioder(behandlingId),

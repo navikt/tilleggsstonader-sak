@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering
 
 import java.util.UUID
 
-data class Vilkårsoppsummering(
+data class VilkårsoppsummeringDto(
     val aktivitet: Boolean,
     val målgruppe: Boolean,
     val stønadsperiode: Boolean,

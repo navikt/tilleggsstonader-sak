@@ -20,7 +20,7 @@ class VilkårsoppsummeringController(
 ) {
 
     @GetMapping("{behandlingId}")
-    fun hentVilkårsoppsummering(@PathVariable behandlingId: UUID): Vilkårsoppsummering {
+    fun hentVilkårsoppsummering(@PathVariable behandlingId: UUID): VilkårsoppsummeringDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return vilkårsoppsummeringService.hentVilkårsoppsummering(behandlingId)
