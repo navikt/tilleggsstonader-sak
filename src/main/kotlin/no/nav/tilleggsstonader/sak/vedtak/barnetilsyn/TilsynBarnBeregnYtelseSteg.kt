@@ -92,8 +92,8 @@ class TilsynBarnBeregnYtelseSteg(
         val andelerTilkjentYtelse = beregningsresultat.perioder.flatMap {
             it.beløpsperioder.map { beløpsperiode ->
                 val satstype = Satstype.DAG
-                val day = beløpsperiode.dato.dayOfWeek
-                feilHvis(day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
+                val ukedag = beløpsperiode.dato.dayOfWeek
+                feilHvis(ukedag == DayOfWeek.SATURDAY || ukedag == DayOfWeek.SUNDAY) {
                     "Skal ikke opprette perioder som begynner på en helgdag for satstype=$satstype"
                 }
                 AndelTilkjentYtelse(

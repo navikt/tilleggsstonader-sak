@@ -73,8 +73,10 @@ class TilsynBarnBeregningService(
 
     private fun lagBeløpsperioder(dagsats: BigDecimal, it: Beregningsgrunnlag): List<Beløpsperiode> {
         return it.stønadsperioderGrunnlag.map {
+            // Datoer som treffer helger må endres til neste mandag fordi andeler med type dagsats betales ikke ut i helger
+            val dato = it.stønadsperiode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
             Beløpsperiode(
-                dato = it.stønadsperiode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                dato = dato,
                 beløp = beregnBeløp(dagsats, it.antallDager),
                 målgruppe = it.stønadsperiode.målgruppe,
             )
