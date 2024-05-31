@@ -18,6 +18,9 @@ spec:
     - application: tilleggsstonader-sak-frontend-lokal
       cluster: dev-gcp
       namespace: tilleggsstonader
+    - application: tilleggsstonader-klage-lokal
+      cluster: dev-gcp
+      namespace: teamfamilie
   secretName: azuread-tilleggsstonader-sak-lokal
   claims:
     extra:
