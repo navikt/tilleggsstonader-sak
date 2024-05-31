@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.relational.core.mapping.Column
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -28,6 +29,10 @@ import java.util.UUID
 
 // TODO: Vurder om dette bør flyttes til kontrakter
 
+/**
+ * @param endretTid skal oppdateres i tilfelle man må patche data på en behandling.
+ * Man skal då beholde den samme raden for å beholde opprettet_tid, men oppdatere felter og oppdatere
+ */
 data class Vedtaksstatistikk(
     @Id
     val id: UUID = UUID.randomUUID(),
@@ -57,6 +62,7 @@ data class Vedtaksstatistikk(
     @Column("arsaker_avslag")
     val årsakerAvslag: ÅrsakAvslagDvh.JsonWrapper? = null,
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
+    @LastModifiedDate
     val endretTid: LocalDateTime = opprettetTid,
     // TODO: Legg inn årsak til revurdering når revurdering kommer i løsningen
     // TODO: EØS-informasjon når det kommer støtte for det i løsningen
