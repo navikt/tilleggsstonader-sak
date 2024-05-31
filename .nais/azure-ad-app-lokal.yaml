@@ -4,7 +4,7 @@
 # secret kan hentes fra cluster med "kubectl -n tilleggsstonader get secret azuread-tilleggsstonader-sak-lokal -o json | jq '.data | map_values(@base64d)'"
 #
 # Kjøres en gang eller ved endringer med
-# kubectl apply -f .deploy/azure-ad-app-lokal.yaml
+# kubectl apply -f .nais/azure-ad-app-lokal.yaml
 ###
 apiVersion: nais.io/v1
 kind: AzureAdApplication
@@ -20,7 +20,7 @@ spec:
       namespace: tilleggsstonader
     - application: tilleggsstonader-klage-lokal
       cluster: dev-gcp
-      namespace: teamfamilie
+      namespace: tilleggsstonader
   secretName: azuread-tilleggsstonader-sak-lokal
   claims:
     extra:
