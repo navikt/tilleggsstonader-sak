@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
@@ -386,7 +387,7 @@ class IverksettServiceTest : IntegrationTest() {
     }
 
     private fun Collection<AndelTilkjentYtelse>.forMåned(yearMonth: YearMonth) =
-        this.single { it.fom == yearMonth.atDay(1) }
+        this.single { it.fom == yearMonth.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag() }
 
     fun AndelTilkjentYtelse.assertHarStatusOgId(statusIverksetting: StatusIverksetting, iverksettingId: UUID? = null) {
         assertThat(this.statusIverksetting).isEqualTo(statusIverksetting)
@@ -412,7 +413,7 @@ class IverksettServiceTest : IntegrationTest() {
 
     private fun lagAndel(behandling: Behandling, måned: YearMonth, beløp: Int = 10) = andelTilkjentYtelse(
         kildeBehandlingId = behandling.id,
-        fom = måned.atDay(1),
+        fom = måned.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
         tom = måned.atEndOfMonth(),
         beløp = beløp,
     )

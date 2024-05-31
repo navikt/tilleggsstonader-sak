@@ -5,11 +5,13 @@ import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.util.DatoFormat.DATE_FORMAT_NORSK
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDato
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDatoMedTid
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
 
 object DatoFormat {
 
@@ -83,3 +85,11 @@ fun LocalDateTime.harGåttAntallTimer(timer: Int) =
 fun dagensDatoMedTidNorskFormat(): String = dagensDatoMedTid().medGosysTid()
 
 fun LocalDateTime.medGosysTid(): String = this.format(DatoFormat.GOSYS_DATE_TIME)
+
+fun LocalDate.erLørdagEllerSøndag() = this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY
+
+fun LocalDate.datoEllerNesteMandagHvisLørdagEllerSøndag() = if (this.erLørdagEllerSøndag()) {
+    with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+} else {
+    this
+}

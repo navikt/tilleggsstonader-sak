@@ -50,6 +50,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     val vilkårperiodeRepository: VilkårperiodeRepository,
     @Autowired
     val vilkårRepository: VilkårRepository,
+    @Autowired
+    val tilsynBarnVedtakService: TilsynBarnVedtakService,
 ) : IntegrationTest() {
 
     val behandling = behandling()
@@ -176,7 +178,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     finnTotalbeløp(dagsatsForUtgift200, 23),
                 ),
                 Pair(
-                    stønadsperiode4.copy(fom = april.atDay(1), tom = april.atDay(1)),
+                    stønadsperiode4.copy(fom = april.atDay(3), tom = april.atDay(3)),
                     finnTotalbeløp(dagsatsForUtgift200, 1),
                 ),
             ).map {
@@ -190,6 +192,40 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
                 .containsExactlyElementsOf(forventedeAndeler)
+        }
+
+        @Test
+        fun `hvis en stønadsperiode begynner en helgdag skal man opprette stønadsperioder og andeler som begynner neste mandag`() {
+            val juni = YearMonth.of(2024, 6)
+
+            val stønadsperiode1 = stønadsperiode(
+                behandlingId = behandling.id,
+                fom = juni.atDay(1),
+                tom = juni.atEndOfMonth(),
+            )
+            stønadsperiodeRepository.insert(stønadsperiode1)
+            vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = juni.atDay(1), tom = juni.atEndOfMonth()))
+            val vedtakDto = innvilgelseDto(
+                mapOf(barn(barn.id, Utgift(juni, juni, 100))),
+            )
+            steg.utførSteg(saksbehandling, vedtakDto)
+
+            with(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.single()) {
+                assertThat(this.fom).isEqualTo(juni.atDay(3))
+                assertThat(this.tom).isEqualTo(juni.atDay(3))
+            }
+
+            val beregningsresultat = tilsynBarnVedtakService.hentVedtak(behandling.id)!!.beregningsresultat
+            with(beregningsresultat!!.perioder.single()) {
+                with(this.grunnlag.stønadsperioderGrunnlag.single()) {
+                    assertThat(this.stønadsperiode.fom).isEqualTo(juni.atDay(1))
+                    assertThat(this.stønadsperiode.tom).isEqualTo(juni.atEndOfMonth())
+                }
+
+                with(this.beløpsperioder.single()) {
+                    assertThat(this.dato).isEqualTo(juni.atDay(3))
+                }
+            }
         }
     }
 

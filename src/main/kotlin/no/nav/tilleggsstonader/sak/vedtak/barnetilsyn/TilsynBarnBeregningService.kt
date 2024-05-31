@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.erSortert
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBeregningUtil.tilDagerPerUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBeregningUtil.tilUke
@@ -72,8 +73,10 @@ class TilsynBarnBeregningService(
 
     private fun lagBeløpsperioder(dagsats: BigDecimal, it: Beregningsgrunnlag): List<Beløpsperiode> {
         return it.stønadsperioderGrunnlag.map {
+            // Datoer som treffer helger må endres til neste mandag fordi andeler med type dagsats betales ikke ut i helger
+            val dato = it.stønadsperiode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
             Beløpsperiode(
-                dato = it.stønadsperiode.fom,
+                dato = dato,
                 beløp = beregnBeløp(dagsats, it.antallDager),
                 målgruppe = it.stønadsperiode.målgruppe,
             )

@@ -37,14 +37,14 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
         val andel1 = andelTilkjentYtelse(
             kildeBehandlingId = behandling.id,
             beløp = 100,
-            fom = LocalDate.of(2023, 1, 1),
-            tom = LocalDate.of(2023, 1, 1),
+            fom = LocalDate.of(2023, 1, 2),
+            tom = LocalDate.of(2023, 1, 2),
         )
         val andel2 = andelTilkjentYtelse(
             kildeBehandlingId = behandling.id,
             beløp = 200,
-            fom = LocalDate.of(2023, 1, 1),
-            tom = LocalDate.of(2023, 1, 1),
+            fom = LocalDate.of(2023, 1, 2),
+            tom = LocalDate.of(2023, 1, 2),
         )
         tilkjentYtelseRepository.insert(
             TilkjentYtelse(
@@ -77,8 +77,8 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
         val andel1 = andelTilkjentYtelse(
             kildeBehandlingId = behandling.id,
             beløp = 100,
-            fom = LocalDate.of(2023, 1, 1),
-            tom = LocalDate.of(2023, 1, 1),
+            fom = LocalDate.of(2023, 1, 2),
+            tom = LocalDate.of(2023, 1, 2),
         )
         tilkjentYtelseRepository.insert(
             TilkjentYtelse(
@@ -156,8 +156,8 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
             val andel1 = andelTilkjentYtelse(
                 kildeBehandlingId = behandling.id,
                 beløp = 100,
-                fom = LocalDate.of(2023, 1, 1),
-                tom = LocalDate.of(2023, 1, 1),
+                fom = LocalDate.of(2023, 1, 2),
+                tom = LocalDate.of(2023, 1, 2),
                 statusIverksetting = statusIverksetting,
             )
             tilkjentYtelseRepository.insert(

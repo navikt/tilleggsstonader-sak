@@ -45,7 +45,7 @@ Egenskap: Beregning - Komplisert scenario
 
     Så forvent følgende beløpsperioder for: 01.2023
       | Dato       | Beløp | Målgruppe |
-      | 01.01.2023 | 413   | AAP       |
+      | 02.01.2023 | 413   | AAP       |
 
     Så forvent følgende stønadsperiodeGrunnlag for: 02.2023
       | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
@@ -71,7 +71,7 @@ Egenskap: Beregning - Komplisert scenario
 
     Så forvent følgende beløpsperioder for: 04.2023
       | Dato       | Beløp | Målgruppe       |
-      | 01.04.2023 | 1181  | OVERGANGSSTØNAD |
+      | 03.04.2023 | 1181  | OVERGANGSSTØNAD |
 
     Så forvent følgende stønadsperiodeGrunnlag for: 05.2023
       | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
