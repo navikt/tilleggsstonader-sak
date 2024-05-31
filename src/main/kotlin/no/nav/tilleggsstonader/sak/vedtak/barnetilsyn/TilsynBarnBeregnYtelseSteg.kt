@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 @Service
@@ -90,11 +91,16 @@ class TilsynBarnBeregnYtelseSteg(
     ) {
         val andelerTilkjentYtelse = beregningsresultat.perioder.flatMap {
             it.beløpsperioder.map { beløpsperiode ->
+                val satstype = Satstype.DAG
+                val ukedag = beløpsperiode.dato.dayOfWeek
+                feilHvis(ukedag == DayOfWeek.SATURDAY || ukedag == DayOfWeek.SUNDAY) {
+                    "Skal ikke opprette perioder som begynner på en helgdag for satstype=$satstype"
+                }
                 AndelTilkjentYtelse(
                     beløp = beløpsperiode.beløp,
                     fom = beløpsperiode.dato,
                     tom = beløpsperiode.dato,
-                    satstype = Satstype.DAG,
+                    satstype = satstype,
                     type = beløpsperiode.målgruppe.tilTypeAndel(),
                     kildeBehandlingId = saksbehandling.id,
                 )

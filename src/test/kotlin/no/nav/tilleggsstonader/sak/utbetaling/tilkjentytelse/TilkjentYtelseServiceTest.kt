@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -32,8 +33,8 @@ class TilkjentYtelseServiceTest {
             val andelTilkjentYtelse = andelTilkjentYtelse(
                 kildeBehandlingId = UUID.randomUUID(),
                 beløp = 1,
-                fom = osloDateNow().plusDays(1),
-                tom = osloDateNow().plusDays(1),
+                fom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                tom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
             )
             val tilkjentYtelse = tilkjentYtelse(behandling.id)
                 .copy(andelerTilkjentYtelse = setOf(andelTilkjentYtelse))
