@@ -36,7 +36,7 @@ class VedtaksstatistikkTask(
             behandlingId: UUID,
             fagsakId: UUID,
             hendelseTidspunkt: LocalDateTime = osloNow(),
-            stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
+            stønadstype: Stønadstype,
         ): Task =
             Task(
                 type = TYPE,

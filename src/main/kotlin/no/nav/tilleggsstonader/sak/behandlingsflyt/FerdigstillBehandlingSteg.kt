@@ -31,6 +31,7 @@ class FerdigstillBehandlingSteg(
             VedtaksstatistikkTask.opprettVedtaksstatistikkTask(
                 behandlingId = saksbehandling.id,
                 fagsakId = saksbehandling.fagsakId,
+                stønadstype = saksbehandling.stønadstype
             ),
         )
     }
