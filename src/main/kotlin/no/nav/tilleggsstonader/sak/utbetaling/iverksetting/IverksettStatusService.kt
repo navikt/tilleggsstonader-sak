@@ -31,21 +31,8 @@ class IverksettStatusService(
 
         val andeler = hentAndelerForIverksettingId(behandlingId, iverksettingId)
         logger.info("Oppdaterer ${andeler.size} andeler med iverksettingId=$iverksettingId")
-        validerStatus(status, andeler)
 
         andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(statusIverksetting = statusIverksetting) })
-    }
-
-    private fun validerStatus(
-        status: IverksettStatus,
-        andeler: List<AndelTilkjentYtelse>,
-    ) {
-        feilHvis(status == IverksettStatus.OK_UTEN_UTBETALING && (andeler.size != 1 || andeler.single().beløp != 0)) {
-            "Forventet status=$status når det finnes en 0-andel"
-        }
-        feilHvis(status == IverksettStatus.OK && andeler.any { it.beløp == 0 }) {
-            "Forventet status=$status når det finnes andeler med beløp 0 for iverksetting"
-        }
     }
 
     private fun hentAndelerForIverksettingId(

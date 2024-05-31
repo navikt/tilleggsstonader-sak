@@ -104,42 +104,6 @@ class IverksettStatusServiceTest : IntegrationTest() {
             .hasMessageContaining("Forventet å finne minimum en andel")
     }
 
-    @Test
-    fun `skal kaste feil hvis det finnes andeler med annet beløp enn 0 når status er OK_UTEN_UTBETALING`() {
-        every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK_UTEN_UTBETALING
-
-        val iverksattAndel = andelTilkjentYtelse(
-            kildeBehandlingId = behandling.id,
-            statusIverksetting = StatusIverksetting.SENDT,
-            iverksetting = Iverksetting(behandling.id, osloNow()),
-            beløp = 100,
-        )
-        opprettTilkjentYtelse(behandling, iverksattAndel)
-
-        assertThatThrownBy {
-            hentStatusOgOppdaterAndeler()
-        }.isInstanceOf(Feil::class.java)
-            .hasMessageContaining("Forventet status=OK_UTEN_UTBETALING når det finnes en 0-andel")
-    }
-
-    @Test
-    fun `skal kaste feil hvis det finnes andeler med 0-beløp når status er OK`() {
-        every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK
-
-        val iverksattAndel = andelTilkjentYtelse(
-            kildeBehandlingId = behandling.id,
-            statusIverksetting = StatusIverksetting.SENDT,
-            iverksetting = Iverksetting(behandling.id, osloNow()),
-            beløp = 0,
-        )
-        opprettTilkjentYtelse(behandling, iverksattAndel)
-
-        assertThatThrownBy {
-            hentStatusOgOppdaterAndeler()
-        }.isInstanceOf(Feil::class.java)
-            .hasMessageContaining("Forventet status=OK når det finnes andeler med beløp 0 for iverksetting")
-    }
-
     private fun hentStatusOgOppdaterAndeler() {
         val eksternBehandlingId = testoppsettService.hentSaksbehandling(behandling.id).eksternId
         iverksettStatusService.hentStatusOgOppdaterAndeler(
