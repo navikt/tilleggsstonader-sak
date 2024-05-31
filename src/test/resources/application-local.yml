@@ -34,7 +34,7 @@ clients:
   familie-dokument:
     uri: http://localhost:8082
   klage:
-    url: http://localhost:8090
+    uri: http://localhost:8090
 
 unleash:
   enabled: false
