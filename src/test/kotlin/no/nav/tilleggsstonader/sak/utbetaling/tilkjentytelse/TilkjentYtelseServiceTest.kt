@@ -43,12 +43,12 @@ class TilkjentYtelseServiceTest {
         }
 
         @Test
-        internal fun `skal returnere false hvis det finnes andel mer sluttdato før idag`() {
+        internal fun `skal returnere false hvis det finnes andel med sluttdato før idag`() {
             val andelTilkjentYtelse = andelTilkjentYtelse(
                 kildeBehandlingId = UUID.randomUUID(),
                 beløp = 1,
-                fom = osloDateNow().minusDays(1),
-                tom = osloDateNow().minusDays(1),
+                fom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                tom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
             )
             val tilkjentYtelse = tilkjentYtelse(behandling.id)
                 .copy(andelerTilkjentYtelse = setOf(andelTilkjentYtelse))

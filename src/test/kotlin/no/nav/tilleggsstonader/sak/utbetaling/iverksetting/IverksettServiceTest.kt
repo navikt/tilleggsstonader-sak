@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -386,8 +387,14 @@ class IverksettServiceTest : IntegrationTest() {
         return tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
     }
 
-    private fun Collection<AndelTilkjentYtelse>.forMåned(yearMonth: YearMonth) =
-        this.single { it.fom == yearMonth.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag() }
+    private fun Collection<AndelTilkjentYtelse>.forMåned(yearMonth: YearMonth): AndelTilkjentYtelse {
+        val dato = yearMonth.atDay(1)
+        return this.single {
+            val datoEllerNesteMandag =
+                if (it.satstype == Satstype.DAG) dato.datoEllerNesteMandagHvisLørdagEllerSøndag() else dato
+            it.fom == datoEllerNesteMandag
+        }
+    }
 
     fun AndelTilkjentYtelse.assertHarStatusOgId(statusIverksetting: StatusIverksetting, iverksettingId: UUID? = null) {
         assertThat(this.statusIverksetting).isEqualTo(statusIverksetting)
