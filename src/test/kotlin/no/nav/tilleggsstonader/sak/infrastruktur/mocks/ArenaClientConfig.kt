@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
+import java.time.LocalDate
 
 @Configuration
 @Profile("mock-arena")
@@ -30,7 +31,12 @@ class ArenaClientConfig {
             clearMocks(client)
             every { client.hentStatus(any()) } returns ArenaStatusDto(
                 SakStatus(harAktivSakUtenVedtak = false),
-                VedtakStatus(harVedtak = false, harAktivtVedtak = false, harVedtakUtenUtfall = false),
+                VedtakStatus(
+                    harVedtak = false,
+                    harAktivtVedtak = false,
+                    harVedtakUtenUtfall = false,
+                    vedtakTom = LocalDate.now().minusDays(10),
+                ),
             )
             every { client.harSaker(any()) } returns ArenaStatusHarSakerDto(true)
         }

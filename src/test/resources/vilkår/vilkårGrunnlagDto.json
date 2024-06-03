@@ -54,5 +54,9 @@
         "dokumentInfoId" : "688ad1dc-e35e-4ab8-a534-17c6e691463f"
       } ]
     } ]
+  },
+  "arena" : {
+    "finnesVedtak" : false,
+    "vedtakTom" : null
   }
 }
