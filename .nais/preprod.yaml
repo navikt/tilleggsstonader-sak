@@ -75,12 +75,14 @@ spec:
         - application: tilleggsstonader-sak-frontend-lokal
         - application: tilleggsstonader-prosessering
         - application: tilleggsstonader-soknad-api
+        - application: tilleggsstonader-klage
         - application: arena
           namespace: teamarenanais
           cluster: dev-fss
     outbound:
       rules:
         - application: tilleggsstonader-integrasjoner
+        - application: tilleggsstonader-klage
         - application: tilleggsstonader-htmlify
         - application: tilleggsstonader-arena
           cluster: dev-fss
