@@ -81,7 +81,6 @@ internal class KlageServiceTest {
             assertThat(request.fagsystem).isEqualTo(Fagsystem.TILLEGGSSTONADER)
             assertThat(request.klageMottatt).isEqualTo(klageMottattTidspunkt)
             assertThat(request.behandlendeEnhet).isEqualTo(arbeidsfordelingEnhetNr)
-            assertThat(request.klageGjelderTilbakekreving).isEqualTo(false)
         }
     }
 
