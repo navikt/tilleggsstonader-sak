@@ -18,5 +18,3 @@ clients:
     scope: api://${CLIENT_ENV}-fss.pdl.pdl-api-q1/.default
   kodeverk:
     uri: https://kodeverk-api.nav.no
-  klage:
-    uri: http://tilleggsstonader-klage
