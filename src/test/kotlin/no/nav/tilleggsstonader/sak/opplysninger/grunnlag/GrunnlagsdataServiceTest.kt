@@ -5,6 +5,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaStatusDtoUtil.arenaStatusDto
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.fødsel
@@ -26,12 +28,14 @@ class GrunnlagsdataServiceTest {
     val barnService = mockk<BarnService>()
     val personService = mockk<PersonService>()
     val grunnlagsdataRepository = mockk<GrunnlagsdataRepository>()
+    val arenaService = mockk<ArenaService>()
 
     val service = GrunnlagsdataService(
         behandlingService = behandlingService,
         barnService = barnService,
         personService = personService,
         grunnlagsdataRepository = grunnlagsdataRepository,
+        arenaService = arenaService,
     )
 
     val behandling = saksbehandling()
@@ -61,6 +65,7 @@ class GrunnlagsdataServiceTest {
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { barnService.finnBarnPåBehandling(behandling.id) } returns emptyList()
         every { personService.hentPersonMedBarn(behandling.ident) } returns søkerMedBarn
+        every { arenaService.hentStatus(any(), any()) } returns arenaStatusDto()
     }
 
     @Nested
