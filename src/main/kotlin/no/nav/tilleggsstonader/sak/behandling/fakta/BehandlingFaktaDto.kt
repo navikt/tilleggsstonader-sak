@@ -18,6 +18,7 @@ data class BehandlingFaktaDto(
     val aktivitet: FaktaAktivtet,
     val barn: List<FaktaBarn>,
     val dokumentasjon: FaktaDokumentasjon?,
+    val arena: ArenaFakta?,
 )
 
 data class FaktaHovedytelse(
@@ -88,4 +89,8 @@ data class SøknadsgrunnlagBarn(
     val type: TypeBarnepass,
     val startetIFemte: JaNei?,
     val årsak: ÅrsakBarnepass?,
+)
+
+data class ArenaFakta(
+    val vedtakTom: LocalDate?,
 )

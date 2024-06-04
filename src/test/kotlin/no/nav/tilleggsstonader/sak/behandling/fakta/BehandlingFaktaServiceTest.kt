@@ -4,6 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KodeverkServiceUtil.mockedKodeverkService
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaStatusDtoUtil.arenaStatusDto
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
@@ -29,11 +31,14 @@ internal class BehandlingFaktaServiceTest {
     val søknadService = mockk<SøknadService>()
     val barnService = mockk<BarnService>()
     val faktaArbeidOgOppholdMapper = FaktaArbeidOgOppholdMapper(mockedKodeverkService())
+    val arenaService = mockk<ArenaService>()
+
     val service = BehandlingFaktaService(
         grunnlagsdataService,
         søknadService,
         barnService,
         faktaArbeidOgOppholdMapper,
+        arenaService,
     )
 
     val behandlingId = UUID.randomUUID()
@@ -41,6 +46,7 @@ internal class BehandlingFaktaServiceTest {
     @BeforeEach
     fun setUp() {
         every { barnService.finnBarnPåBehandling(any()) } returns emptyList()
+        every { arenaService.hentStatus(any()) } returns arenaStatusDto()
     }
 
     @Test
