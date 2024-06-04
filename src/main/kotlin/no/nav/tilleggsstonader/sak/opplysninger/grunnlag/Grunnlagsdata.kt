@@ -18,6 +18,11 @@ data class Grunnlag(
     val navn: Navn,
     val fødsel: Fødsel?,
     val barn: List<GrunnlagBarn>,
+    val arena: GrunnlagArena? = null,
+)
+
+data class GrunnlagArena(
+    val vedtakTom: LocalDate?,
 )
 
 data class Fødsel(
