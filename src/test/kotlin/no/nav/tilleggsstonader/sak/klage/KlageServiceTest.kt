@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.klage
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
 import no.nav.tilleggsstonader.kontrakter.klage.BehandlingEventType
 import no.nav.tilleggsstonader.kontrakter.klage.BehandlingResultat
 import no.nav.tilleggsstonader.kontrakter.klage.BehandlingStatus
@@ -15,7 +15,11 @@ import no.nav.tilleggsstonader.kontrakter.klage.KlageinstansResultatDto
 import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.Arbeidsfordelingsenhet
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
+import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -57,7 +61,7 @@ internal class KlageServiceTest {
         every { fagsakService.hentAktivIdent(fagsak.id) } returns personIdent
         every { arbeidsfordelingService.hentNavEnhet(any()) } returns Arbeidsfordelingsenhet(
             arbeidsfordelingEnhetNr,
-            "NAV arbeid og ytelser"
+            "NAV arbeid og ytelser",
         )
         justRun { klageClient.opprettKlage(capture(opprettKlageSlot)) }
     }
@@ -167,8 +171,8 @@ internal class KlageServiceTest {
             every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns fagsaker
             every { klageClient.hentKlagebehandlinger(any()) } returns mapOf(
                 eksternFagsakId.id to listOf(
-                    klagebehandlingAvsluttetKabal
-                )
+                    klagebehandlingAvsluttetKabal,
+                ),
             )
 
             val klager = klageService.hentBehandlinger(UUID.randomUUID())
@@ -190,7 +194,7 @@ internal class KlageServiceTest {
 
             every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns fagsaker
             every { klageClient.hentKlagebehandlinger(any()) } returns
-                    mapOf(eksternFagsakId.id to listOf(klagebehandlingIkkeAvsluttetKabal))
+                mapOf(eksternFagsakId.id to listOf(klagebehandlingIkkeAvsluttetKabal))
 
             val klager = klageService.hentBehandlinger(UUID.randomUUID())
 
@@ -204,16 +208,16 @@ internal class KlageServiceTest {
 
             every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns fagsaker
             every { klageClient.hentKlagebehandlinger(any()) } returns
-                    mapOf(
-                        eksternFagsakId.id to
-                                listOf(
-                                    klageBehandlingDto(
-                                        resultat = BehandlingResultat.IKKE_MEDHOLD_FORMKRAV_AVVIST,
-                                        klageinstansResultat = emptyList(),
-                                        vedtaksdato = tidspunktAvsluttetFamilieKlage,
-                                    ),
-                                ),
-                    )
+                mapOf(
+                    eksternFagsakId.id to
+                        listOf(
+                            klageBehandlingDto(
+                                resultat = BehandlingResultat.IKKE_MEDHOLD_FORMKRAV_AVVIST,
+                                klageinstansResultat = emptyList(),
+                                vedtaksdato = tidspunktAvsluttetFamilieKlage,
+                            ),
+                        ),
+                )
 
             val klager = klageService.hentBehandlinger(UUID.randomUUID())
 
@@ -246,13 +250,13 @@ internal class KlageServiceTest {
 
             every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns fagsaker
             every { klageClient.hentKlagebehandlinger(any()) } returns
-                    mapOf(eksternFagsakId.id to listOf(klagebehandlingAvsluttetKabal))
+                mapOf(eksternFagsakId.id to listOf(klagebehandlingAvsluttetKabal))
 
             val klager = klageService.hentBehandlinger(UUID.randomUUID())
 
             assertThat(klager.barnetilsyn.first().vedtaksdato).isEqualTo(tidsPunktAvsluttetIKabal)
             assertThat(klager.barnetilsyn.first().klageinstansResultat.first().årsakFeilregistrert).isEqualTo(
-                årsakFeilregistrert
+                årsakFeilregistrert,
             )
         }
 
@@ -276,7 +280,7 @@ internal class KlageServiceTest {
 
         private fun klageBehandlingerDto() =
             mapOf(
-                eksternFagsakId.id to listOf(klageBehandlingDto())
+                eksternFagsakId.id to listOf(klageBehandlingDto()),
             )
     }
 }
