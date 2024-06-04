@@ -40,7 +40,11 @@ internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
                         kilde = Kilde.ARENA,
                     ),
                 ),
-                tidspunktHentet = LocalDateTime.now(),
+                hentetInformasjon = HentetInformasjon(
+                    fom = LocalDate.now().minusMonths(3),
+                    tom = LocalDate.now().plusYears(1),
+                    tidspunktHentet = LocalDateTime.now(),
+                )
             ),
         )
 

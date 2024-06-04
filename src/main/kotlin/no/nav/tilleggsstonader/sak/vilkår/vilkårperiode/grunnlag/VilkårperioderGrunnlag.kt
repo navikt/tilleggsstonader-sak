@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -23,5 +24,11 @@ data class VilkårperioderGrunnlagDomain(
 
 data class GrunnlagAktivitet(
     val aktiviteter: List<AktivitetArenaDto>,
+    val hentetInformasjon: HentetInformasjon,
+)
+
+data class HentetInformasjon(
+    val fom: LocalDate,
+    val tom: LocalDate,
     val tidspunktHentet: LocalDateTime,
 )

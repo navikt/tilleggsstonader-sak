@@ -30,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderRes
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.evaulerVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
@@ -79,21 +80,29 @@ class VilkårperiodeService(
         }
     }
 
-    private fun opprettGrunnlagsdata(behandlingId: UUID) = vilkårperioderGrunnlagRepository.insert(
-        VilkårperioderGrunnlagDomain(
-            behandlingId = behandlingId,
-            grunnlag = VilkårperioderGrunnlag(
-                aktivitet = GrunnlagAktivitet(
-                    aktivitetService.hentAktiviteterForGrunnlagsdata(
-                        behandlingService.hentSaksbehandling(behandlingId).fagsakPersonId,
-                        fom = LocalDate.now().minusMonths(3),
-                        tom = LocalDate.now().plusYears(1),
+    private fun opprettGrunnlagsdata(behandlingId: UUID): VilkårperioderGrunnlagDomain {
+        val fom = LocalDate.now().minusMonths(3)
+        val tom = LocalDate.now().plusYears(1)
+        return vilkårperioderGrunnlagRepository.insert(
+            VilkårperioderGrunnlagDomain(
+                behandlingId = behandlingId,
+                grunnlag = VilkårperioderGrunnlag(
+                    aktivitet = GrunnlagAktivitet(
+                        aktiviteter = aktivitetService.hentAktiviteterForGrunnlagsdata(
+                            behandlingService.hentSaksbehandling(behandlingId).fagsakPersonId,
+                            fom = fom,
+                            tom = tom,
+                        ),
+                        hentetInformasjon = HentetInformasjon(
+                            fom = fom,
+                            tom = tom,
+                            tidspunktHentet = LocalDateTime.now(),
+                        ),
                     ),
-                    tidspunktHentet = LocalDateTime.now(),
                 ),
             ),
-        ),
-    )
+        )
+    }
 
     fun hentVilkårperioderDto(behandlingId: UUID): VilkårperioderDto {
         return hentVilkårperioder(behandlingId).tilDto()

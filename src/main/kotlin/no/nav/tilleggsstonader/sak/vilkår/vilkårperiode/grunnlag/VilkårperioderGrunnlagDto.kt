@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class VilkårperioderGrunnlagDto(
@@ -9,7 +10,7 @@ data class VilkårperioderGrunnlagDto(
 
 data class GrunnlagAktivitetDto(
     val aktiviteter: List<AktivitetArenaDto>,
-    val tidspunktHentet: LocalDateTime,
+    val hentetInformasjon: HentetInformasjonDto,
 )
 
 fun VilkårperioderGrunnlag.tilDto() =
@@ -20,5 +21,17 @@ fun VilkårperioderGrunnlag.tilDto() =
 fun GrunnlagAktivitet.tilDto() =
     GrunnlagAktivitetDto(
         aktiviteter = this.aktiviteter,
-        tidspunktHentet = this.tidspunktHentet,
+        hentetInformasjon = this.hentetInformasjon.tilDto(),
     )
+
+data class HentetInformasjonDto(
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val tidspunktHentet: LocalDateTime,
+)
+
+fun HentetInformasjon.tilDto() = HentetInformasjonDto(
+    fom = this.fom,
+    tom = this.tom,
+    tidspunktHentet = this.tidspunktHentet,
+)
