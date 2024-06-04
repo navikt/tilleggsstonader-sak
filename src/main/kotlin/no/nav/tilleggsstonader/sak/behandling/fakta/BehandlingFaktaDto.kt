@@ -91,11 +91,6 @@ data class SøknadsgrunnlagBarn(
     val årsak: ÅrsakBarnepass?,
 )
 
-/**
- * @param finnesVedtak true hvis man har vedtak for gitt stønadstype med eller uten utfall.
- * I tillfelle man ennå ikke vedtatt vedtaket så er ikke utfall satt
- */
 data class ArenaFakta(
-    val finnesVedtak: Boolean,
     val vedtakTom: LocalDate?,
 )

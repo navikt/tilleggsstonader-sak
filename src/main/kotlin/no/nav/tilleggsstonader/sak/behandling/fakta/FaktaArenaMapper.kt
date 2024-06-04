@@ -8,7 +8,6 @@ object FaktaArenaMapper {
 
     fun mapFaktaArena(status: ArenaStatusDto): ArenaFakta = with(status.vedtak) {
         ArenaFakta(
-            finnesVedtak = harVedtak || harVedtakUtenUtfall,
             vedtakTom = vedtakTom?.takeIf { it.isEqualOrAfter(LocalDate.now().minusMonths(3)) },
         )
     }

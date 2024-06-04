@@ -11,27 +11,6 @@ import java.time.LocalDate
 class FaktaArenaMapperTest {
 
     @Nested
-    inner class FinnesVedtak {
-
-        @Test
-        fun `finnes ikke vedtak hvis harVedtak=false og harVedtakUtenUtfall=false`() {
-            assertThat(mapFaktaArena(arenaStatusDto()).finnesVedtak).isFalse
-        }
-
-        @Test
-        fun `finnes vedtak hvis harVedtak eller harVedtakUtenUtfall er true`() {
-            listOf(
-                Pair(true, false),
-                Pair(false, true),
-                Pair(true, true),
-            ).forEach {
-                val vedtakStatus = vedtakStatus(harVedtak = it.first, harVedtakUtenUtfall = it.second)
-                assertThat(mapFaktaArena(arenaStatusDto(vedtakStatus)).finnesVedtak).isTrue
-            }
-        }
-    }
-
-    @Nested
     inner class VedtakTom {
         @Test
         fun `skal mappe vedtakTom fra vedtakStatus`() {

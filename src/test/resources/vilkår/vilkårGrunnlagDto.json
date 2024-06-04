@@ -56,7 +56,6 @@
     } ]
   },
   "arena" : {
-    "finnesVedtak" : false,
     "vedtakTom" : null
   }
 }
