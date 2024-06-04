@@ -19,4 +19,4 @@ clients:
   kodeverk:
     uri: https://kodeverk-api.nav.no
   klage:
-    uri: http://localhost:8090
+    uri: http://tilleggsstonader-klage
