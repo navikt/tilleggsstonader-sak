@@ -22,6 +22,7 @@ object VilkårGrunnlagUtil {
             barn = barn,
             dokumentasjon = null,
             søknadMottattTidspunkt = null,
+            arena = null,
         )
 
     fun grunnlagBarn(

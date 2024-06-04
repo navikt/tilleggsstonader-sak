@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -18,6 +19,7 @@ class BehandlingFaktaService(
     private val søknadService: SøknadService,
     private val barnService: BarnService,
     private val faktaArbeidOgOppholdMapper: FaktaArbeidOgOppholdMapper,
+    private val arenaService: ArenaService,
 ) {
 
     fun hentFakta(
@@ -31,7 +33,13 @@ class BehandlingFaktaService(
             aktivitet = mapAktivitet(søknad),
             barn = mapBarn(grunnlagsdata, søknad, behandlingId),
             dokumentasjon = søknad?.let { mapDokumentasjon(it, grunnlagsdata) },
+            arena = arenaFakta(behandlingId),
         )
+    }
+
+    // TODO flytte til grunnlag - dette skal kun være her for å teste at det vises riktig i frontend
+    private fun arenaFakta(behandlingId: UUID): ArenaFakta {
+        return FaktaArenaMapper.mapFaktaArena(arenaService.hentStatus(behandlingId))
     }
 
     private fun mapAktivitet(søknad: SøknadBarnetilsyn?) =
