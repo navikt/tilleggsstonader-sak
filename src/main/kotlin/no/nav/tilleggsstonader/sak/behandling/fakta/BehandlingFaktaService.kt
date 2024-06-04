@@ -83,6 +83,7 @@ class BehandlingFaktaService(
                 barnId = behandlingBarn.id,
                 registergrunnlag = RegistergrunnlagBarn(
                     navn = barnGrunnlagsdata.navn.visningsnavn(),
+                    fødselsdato = barnGrunnlagsdata.fødselsdato,
                     alder = barnGrunnlagsdata.alder,
                     dødsdato = barnGrunnlagsdata.dødsdato,
                 ),
