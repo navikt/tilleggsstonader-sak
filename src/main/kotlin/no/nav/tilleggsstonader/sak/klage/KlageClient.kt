@@ -24,7 +24,7 @@ class KlageClient(
 
     private val hentKlagebehandlinger =
         UriComponentsBuilder.fromUri(klageUri).pathSegment(
-            "api/behandling/${Fagsystem.TILLEGGSSTONADER}",
+            "api/ekstern/behandling/${Fagsystem.TILLEGGSSTONADER}",
         ).build().toUri()
 
     fun opprettKlage(opprettKlagebehandlingRequest: OpprettKlagebehandlingRequest) {
