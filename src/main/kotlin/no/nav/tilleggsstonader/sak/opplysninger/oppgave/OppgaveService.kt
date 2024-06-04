@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
@@ -18,12 +17,14 @@ import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
+import no.nav.tilleggsstonader.sak.util.FnrUtil
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
@@ -45,13 +46,28 @@ class OppgaveService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequest): FinnOppgaveResponseDto {
-        val oppgaveResponse = oppgaveClient.hentOppgaver(finnOppgaveRequest)
+    fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequestDto): FinnOppgaveResponseDto {
+        FnrUtil.validerOptionalIdent(finnOppgaveRequest.ident)
+
+        val aktørId = finnOppgaveRequest.ident.takeUnless { it.isNullOrBlank() }
+            ?.let { personService.hentAktørIder(it).identer.first().ident }
+
+        val oppgaveResponse =
+            oppgaveClient.hentOppgaver(finnOppgaveRequest.tilFinnOppgaveRequest(aktørId, finnVentemappe()))
+
         val personer = personService.hentPersonKortBolk(oppgaveResponse.oppgaver.mapNotNull { it.ident }.distinct())
         val behandlingIdPåOppgaveId = finnBehandlingId(oppgaveResponse.oppgaver)
 
+        val oppgaver = if (finnOppgaveRequest.oppgaverPåVent) {
+            oppgaveResponse.oppgaver.filter { it.mappeId?.get().let { it == finnVentemappe().id.toLong() } }
+        } else {
+            oppgaveResponse.oppgaver.filterNot { it.mappeId?.get().let { it == finnVentemappe().id.toLong() } }
+        }
+
+        val antallBortfiltrerteOppgaver = oppgaveResponse.oppgaver.size - oppgaver.size
+
         return FinnOppgaveResponseDto(
-            antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
+            antallTreffTotalt = oppgaveResponse.antallTreffTotalt - antallBortfiltrerteOppgaver,
             oppgaver = oppgaveResponse.oppgaver.map { oppgave ->
                 OppgaveDto(
                     oppgave = oppgave,
@@ -61,6 +77,9 @@ class OppgaveService(
             },
         )
     }
+
+    // TODO: Bruk enhet fra saksbehandler
+    fun finnVentemappe() = finnMapper("4462").single { it.navn == "10 På vent" }
 
     private fun finnBehandlingId(oppgaver: List<Oppgave>): Map<Long, UUID> {
         val oppgaveIder = oppgaver.map { it.id }

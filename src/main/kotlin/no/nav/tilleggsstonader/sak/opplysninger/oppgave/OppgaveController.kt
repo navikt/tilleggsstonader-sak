@@ -8,9 +8,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.util.FnrUtil.validerOptionalIdent
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -26,18 +24,12 @@ import org.springframework.web.bind.annotation.RestController
 @Validated
 class OppgaveController(
     private val oppgaveService: OppgaveService,
-    private val personService: PersonService,
     private val tilgangService: TilgangService,
 ) {
 
     @PostMapping("/soek")
     fun hentOppgaver(@RequestBody finnOppgaveRequest: FinnOppgaveRequestDto): FinnOppgaveResponseDto {
-        validerOptionalIdent(finnOppgaveRequest.ident)
-
-        val aktørId = finnOppgaveRequest.ident.takeUnless { it.isNullOrBlank() }
-            ?.let { personService.hentAktørIder(it).identer.first().ident }
-
-        return oppgaveService.hentOppgaver(finnOppgaveRequest.tilFinnOppgaveRequest(aktørId))
+        return oppgaveService.hentOppgaver(finnOppgaveRequest)
     }
 
     @PostMapping(path = ["/{oppgaveId}/fordel"])
