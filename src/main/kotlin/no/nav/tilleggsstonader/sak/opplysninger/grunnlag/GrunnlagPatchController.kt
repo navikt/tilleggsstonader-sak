@@ -4,8 +4,8 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -28,8 +28,9 @@ class GrunnlagPatchController(
         behandlingRepository.findAll()
             .filter { setOf(BehandlingStatus.UTREDES, BehandlingStatus.OPPRETTET, BehandlingStatus.SATT_PÅ_VENT).contains(it.status) }
             .forEach {
-                val grunnlag = grunnlagsdataRepository.findByIdOrThrow(it.id)
-                if (grunnlag.grunnlag.arena == null) {
+                val grunnlag = grunnlagsdataRepository.findByIdOrNull(it.id)
+
+                if (grunnlag != null && grunnlag.grunnlag.arena == null) {
                     val saksbehandling = behandlingRepository.finnSaksbehandling(it.id)
                     val statusArena = arenaService.hentStatus(saksbehandling.ident, saksbehandling.stønadstype)
                     val grunnlagArena = GrunnlagArenaMapper.mapFaktaArena(statusArena)
