@@ -25,7 +25,6 @@ data class FinnOppgaveRequestDto(
     val fristFom: LocalDate? = null,
     val fristTom: LocalDate? = null,
     val enhetsmappe: Long? = null,
-    val erUtenMappe: Boolean? = null,
     val ident: String?,
     val limit: Long = 150, // TODO slett når frontend implementert limit og offset
     val offset: Long = 0, // TODO slett når frontend implementert limit og offset
@@ -48,7 +47,7 @@ data class FinnOppgaveRequestDto(
                 null
             },
             enhet = this.enhet,
-            erUtenMappe = this.erUtenMappe,
+            erUtenMappe = !this.oppgaverPåVent,
             saksbehandler = this.saksbehandler,
             aktørId = aktørid,
             journalpostId = this.journalpostId,

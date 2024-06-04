@@ -58,16 +58,8 @@ class OppgaveService(
         val personer = personService.hentPersonKortBolk(oppgaveResponse.oppgaver.mapNotNull { it.ident }.distinct())
         val behandlingIdPåOppgaveId = finnBehandlingId(oppgaveResponse.oppgaver)
 
-        val oppgaver = if (finnOppgaveRequest.oppgaverPåVent) {
-            oppgaveResponse.oppgaver.filter { it.mappeId?.get().let { it == finnVentemappe().id.toLong() } }
-        } else {
-            oppgaveResponse.oppgaver.filterNot { it.mappeId?.get().let { it == finnVentemappe().id.toLong() } }
-        }
-
-        val antallBortfiltrerteOppgaver = oppgaveResponse.oppgaver.size - oppgaver.size
-
         return FinnOppgaveResponseDto(
-            antallTreffTotalt = oppgaveResponse.antallTreffTotalt - antallBortfiltrerteOppgaver,
+            antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
             oppgaver = oppgaveResponse.oppgaver.map { oppgave ->
                 OppgaveDto(
                     oppgave = oppgave,

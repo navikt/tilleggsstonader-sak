@@ -297,7 +297,7 @@ internal class OppgaveServiceTest {
 
         oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, oppgaverPåVent = true))
 
-        verify { oppgaveClient.hentOppgaver(match { it.mappeId == OppgaveClientConfig.MAPPE_ID_PÅ_VENT.toLong() }) }
+        verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == false && it.mappeId == OppgaveClientConfig.MAPPE_ID_PÅ_VENT.toLong() }) }
     }
 
     @Test
@@ -306,7 +306,7 @@ internal class OppgaveServiceTest {
 
         oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, oppgaverPåVent = false))
 
-        verify { oppgaveClient.hentOppgaver(match { it.mappeId == null }) }
+        verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == true }) }
     }
 
     private fun mockOpprettOppgave(slot: CapturingSlot<OpprettOppgaveRequest>) {
