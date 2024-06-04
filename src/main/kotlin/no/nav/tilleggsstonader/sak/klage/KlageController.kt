@@ -34,9 +34,9 @@ class KlageController(
     }
 
     @GetMapping("/fagsak-person/{fagsakPersonId}")
-    fun hentKlagebehandlinger(@PathVariable fagsakPersonId: UUID): Ressurs<KlagebehandlingerDto> {
+    fun hentKlagebehandlinger(@PathVariable fagsakPersonId: UUID): KlagebehandlingerDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
-        return Ressurs.success(klageService.hentBehandlinger(fagsakPersonId))
+        return klageService.hentBehandlinger(fagsakPersonId)
     }
 
     @GetMapping("/ekstern-fagsak/{eksternFagsakId}/vedtak")
