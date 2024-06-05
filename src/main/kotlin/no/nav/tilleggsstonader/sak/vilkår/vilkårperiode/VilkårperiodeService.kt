@@ -129,7 +129,7 @@ class VilkårperiodeService(
         fom: LocalDate,
         tom: LocalDate,
     ): GrunnlagYtelse {
-        val ytelserFraRegister = ytelseService.hentYtelseForGrunnlag(behandlingId, fom, tom)
+        val ytelserFraRegister = ytelseService.hentYtelseForGrunnlag(behandlingId = behandlingId, fom = fom, tom = tom)
 
         return GrunnlagYtelse(
             perioder = ytelserFraRegister.perioder.map {
