@@ -10,9 +10,10 @@ import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
+import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -24,7 +25,11 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagNavn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlPersonKort
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -66,6 +71,10 @@ internal class OppgaveServiceTest {
         every { oppgaveRepository.insert(capture(opprettOppgaveDomainSlot)) } returns lagTestOppgave()
         every { oppgaveRepository.update(any()) } answers { firstArg() }
         every { oppgaveRepository.finnBehandlingIdForGsakOppgaveId(any()) } returns emptyList()
+        every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(
+            1,
+            listOf(MappeDto(OppgaveClientConfig.MAPPE_ID_PÅ_VENT, "10 På vent", "4462")),
+        )
     }
 
     @Test
@@ -131,7 +140,7 @@ internal class OppgaveServiceTest {
     @Test
     fun `Skal hente oppgaver gitt en filtrering`() {
         every { oppgaveClient.hentOppgaver(any()) } returns lagFinnOppgaveResponseDto()
-        val respons = oppgaveService.hentOppgaver(FinnOppgaveRequest(tema = Tema.TSO))
+        val respons = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null))
 
         assertThat(respons.antallTreffTotalt).isEqualTo(1)
         assertThat(respons.oppgaver.first().id).isEqualTo(GSAK_OPPGAVE_ID)
@@ -237,6 +246,8 @@ internal class OppgaveServiceTest {
     @Test
     fun `skal legge til navn på oppgave hvis oppgaven har folkeregisterident`() {
         val oppgaveIdMedNavn = 1L
+
+        every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent("1", false)))
         every { personService.hentPersonKortBolk(any()) } answers {
             firstArg<List<String>>().associateWith { pdlPersonKort(navn = lagNavn(fornavn = "fornavn$it")) }
         }
@@ -251,7 +262,7 @@ internal class OppgaveServiceTest {
                 lagEksternTestOppgave().copy(id = 3),
             ),
         )
-        val oppgaver = oppgaveService.hentOppgaver(mockk()).oppgaver
+        val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = "01010172272")).oppgaver
 
         verify(exactly = 1) { personService.hentPersonKortBolk(eq(listOf("1"))) }
         assertThat(oppgaver.single { it.id == oppgaveIdMedNavn }.navn).contains("fornavn1 ")
@@ -274,10 +285,28 @@ internal class OppgaveServiceTest {
             firstArg<List<Long>>().filter { it == oppgaveIdMedBehandling }.map { it to behandlingId }
         }
 
-        val oppgaver = oppgaveService.hentOppgaver(mockk()).oppgaver
+        val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null)).oppgaver
 
         assertThat(oppgaver.single { it.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingId)
         assertThat(oppgaver.single { it.id != oppgaveIdMedBehandling }.behandlingId).isNull()
+    }
+
+    @Test
+    fun `skal finne oppgaver på vent når`() {
+        every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(0, emptyList())
+
+        oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, oppgaverPåVent = true))
+
+        verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == false && it.mappeId == OppgaveClientConfig.MAPPE_ID_PÅ_VENT.toLong() }) }
+    }
+
+    @Test
+    fun `skal ikke sette mappe når oppgaverPåVent er false`() {
+        every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(0, emptyList())
+
+        oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, oppgaverPåVent = false))
+
+        verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == true }) }
     }
 
     private fun mockOpprettOppgave(slot: CapturingSlot<OpprettOppgaveRequest>) {
