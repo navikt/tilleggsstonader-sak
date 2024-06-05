@@ -21,8 +21,7 @@ class AktivitetService(
         ).sortedByDescending { it.fom }
     }
 
-    fun hentAktiviteterForGrunnlagsdata(fagsakPersonId: UUID, fom: LocalDate, tom: LocalDate): List<AktivitetArenaDto> {
-        val ident = fagsakPersonService.hentAktivIdent(fagsakPersonId)
+    fun hentAktiviteterForGrunnlagsdata(ident: String, fom: LocalDate, tom: LocalDate): List<AktivitetArenaDto> {
         return aktivitetClient.hentAktiviteter(
             ident = ident,
             fom = fom,
