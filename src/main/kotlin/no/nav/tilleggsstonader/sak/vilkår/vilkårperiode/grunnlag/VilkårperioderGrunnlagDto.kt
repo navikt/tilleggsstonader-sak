@@ -13,7 +13,6 @@ data class VilkårperioderGrunnlagDto(
 
 data class GrunnlagAktivitetDto(
     val aktiviteter: List<AktivitetArenaDto>,
-    val tidspunktHentet: LocalDateTime,
 )
 
 data class GrunnlagYtelseDto(
@@ -35,14 +34,13 @@ data class HentetInformasjonDto(
 fun VilkårperioderGrunnlag.tilDto() =
     VilkårperioderGrunnlagDto(
         aktivitet = this.aktivitet.tilDto(),
-        ytelse = this.ytelse?.tilDto(),
-        hentetInformasjon = this.hentetInformasjon?.tilDto(),
+        ytelse = this.ytelse.tilDto(),
+        hentetInformasjon = this.hentetInformasjon.tilDto(),
     )
 
 fun GrunnlagAktivitet.tilDto() =
     GrunnlagAktivitetDto(
         aktiviteter = this.aktiviteter,
-        tidspunktHentet = LocalDateTime.now(), // TODO: Fjern felt etter patching. Kun lagt til for å ikke knekke frontend midletidig
     )
 
 fun GrunnlagYtelse.tilDto() =

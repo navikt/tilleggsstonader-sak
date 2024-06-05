@@ -12,8 +12,8 @@ import java.util.UUID
 
 data class VilkårperioderGrunnlag(
     val aktivitet: GrunnlagAktivitet,
-    val ytelse: GrunnlagYtelse?,
-    val hentetInformasjon: HentetInformasjon?,
+    val ytelse: GrunnlagYtelse,
+    val hentetInformasjon: HentetInformasjon,
 )
 
 @Table("vilkarperioder_grunnlag")
