@@ -9,6 +9,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetService
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -30,7 +32,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderRes
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.evaulerVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
@@ -39,6 +43,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 import java.util.UUID
 
 @Service
@@ -48,6 +53,8 @@ class VilkårperiodeService(
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val aktivitetService: AktivitetService,
+    private val ytelseService: YtelseService,
+    private val søknadService: SøknadService,
 ) {
 
     fun hentVilkårperioder(behandlingId: UUID): Vilkårperioder {
@@ -81,8 +88,22 @@ class VilkårperiodeService(
     }
 
     private fun opprettGrunnlagsdata(behandlingId: UUID): VilkårperioderGrunnlagDomain {
-        val fom = LocalDate.now().minusMonths(3)
-        val tom = LocalDate.now().plusYears(1)
+        val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
+        val utgangspunktDato = søknad?.mottattTidspunkt ?: LocalDateTime.now()
+
+        val fom = YearMonth.from(utgangspunktDato).minusMonths(3).atDay(1)
+        val tom = YearMonth.from(utgangspunktDato).plusYears(1).atEndOfMonth()
+
+        val grunnlag = VilkårperioderGrunnlag(
+            aktivitet = hentGrunnlagAktvititet(behandlingId, fom, tom),
+            ytelse = hentGrunnlagYtelse(behandlingId, fom, tom),
+            hentetInformasjon = HentetInformasjon(
+                fom = fom,
+                tom = tom,
+                tidspunktHentet = LocalDateTime.now(),
+            ),
+        )
+
         return vilkårperioderGrunnlagRepository.insert(
             VilkårperioderGrunnlagDomain(
                 behandlingId = behandlingId,
