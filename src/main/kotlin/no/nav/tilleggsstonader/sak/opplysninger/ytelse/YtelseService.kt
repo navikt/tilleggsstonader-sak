@@ -47,19 +47,18 @@ class YtelseService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val typer = finnRelevanteYtelsesTyper(behandling.stønadstype)
 
-        val resultat =
-            ytelseClient.hentYtelser(
-                YtelsePerioderRequest(
-                    ident = behandling.ident,
-                    fom = fom,
-                    tom = tom,
-                    typer = typer,
-                ),
-            )
+        val ytelsePerioder = ytelseClient.hentYtelser(
+            YtelsePerioderRequest(
+                ident = behandling.ident,
+                fom = fom,
+                tom = tom,
+                typer = typer,
+            ),
+        )
 
-        validerResultat(resultat.hentetInformasjon)
+        validerResultat(ytelsePerioder.hentetInformasjon)
 
-        return resultat
+        return ytelsePerioder
     }
 
     private fun validerResultat(hentetInformasjon: List<HentetInformasjon>) {
