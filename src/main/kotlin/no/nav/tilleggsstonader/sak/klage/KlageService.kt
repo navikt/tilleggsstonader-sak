@@ -2,6 +2,9 @@ package no.nav.tilleggsstonader.sak.klage
 
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.klage.BehandlingEventType
+import no.nav.tilleggsstonader.kontrakter.klage.BehandlingResultat
+import no.nav.tilleggsstonader.kontrakter.klage.KlagebehandlingDto
 import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -21,13 +24,20 @@ class KlageService(
 ) {
     fun hentBehandlinger(fagsakPersonId: UUID): KlagebehandlingerDto {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
-        val eksterneFagsakIder = listOfNotNull(fagsaker.barnetilsyn)
+        val eksterneFagsakIder = listOfNotNull(fagsaker.barnetilsyn?.eksternId?.id)
 
         if (eksterneFagsakIder.isEmpty()) {
-            return KlagebehandlingerDto(emptyList(), emptyList(), emptyList())
+            return KlagebehandlingerDto(emptyList())
         }
 
-        TODO()
+        val klagebehandlingerPåEksternId =
+            klageClient.hentKlagebehandlinger(eksterneFagsakIder.toSet()).mapValues { klagebehandlingerPåEksternId ->
+                klagebehandlingerPåEksternId.value.map { brukVedtaksdatoFraKlageinstansHvisOversendt(it) }
+            }
+
+        return KlagebehandlingerDto(
+            barnetilsyn = klagebehandlingerPåEksternId[fagsaker.barnetilsyn?.eksternId?.id] ?: emptyList(),
+        )
     }
 
     fun opprettKlage(fagsakId: UUID, opprettKlageDto: OpprettKlageDto) {
@@ -40,7 +50,7 @@ class KlageService(
         opprettKlage(fagsakService.hentFagsak(fagsakId), opprettKlageDto.mottattDato)
     }
 
-    fun opprettKlage(fagsak: Fagsak, klageMottatt: LocalDate) {
+    private fun opprettKlage(fagsak: Fagsak, klageMottatt: LocalDate) {
         val aktivIdent = fagsak.hentAktivIdent()
         val enhetId = arbeidsfordelingService.hentNavEnhet(aktivIdent)?.enhetNr
         brukerfeilHvis(enhetId == null) {
@@ -50,11 +60,22 @@ class KlageService(
             OpprettKlagebehandlingRequest(
                 ident = aktivIdent,
                 stønadstype = Stønadstype.BARNETILSYN,
-                eksternFagsakId = fagsak.eksternId.toString(),
+                eksternFagsakId = fagsak.eksternId.id.toString(),
                 fagsystem = Fagsystem.TILLEGGSSTONADER,
                 klageMottatt = klageMottatt,
                 behandlendeEnhet = enhetId,
             ),
         )
+    }
+
+    private fun brukVedtaksdatoFraKlageinstansHvisOversendt(klagebehandling: KlagebehandlingDto): KlagebehandlingDto {
+        val erOversendtTilKlageinstans = klagebehandling.resultat == BehandlingResultat.IKKE_MEDHOLD
+        val vedtaksdato =
+            if (erOversendtTilKlageinstans) {
+                klagebehandling.klageinstansResultat.singleOrNull { klageinnstansResultat -> klageinnstansResultat.type == BehandlingEventType.KLAGEBEHANDLING_AVSLUTTET || klageinnstansResultat.type == BehandlingEventType.BEHANDLING_FEILREGISTRERT }?.mottattEllerAvsluttetTidspunkt
+            } else {
+                klagebehandling.vedtaksdato
+            }
+        return klagebehandling.copy(vedtaksdato = vedtaksdato)
     }
 }

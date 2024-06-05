@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
@@ -147,6 +148,9 @@ tasks {
 
 tasks.test {
     useJUnitPlatform()
+    testLogging {
+        events = setOf(TestLogEvent.FAILED)
+    }
     // Work around. Gradle does not include enough information to disambiguate
     // between different examples and scenarios.
     systemProperty("cucumber.junit-platform.naming-strategy", "long")

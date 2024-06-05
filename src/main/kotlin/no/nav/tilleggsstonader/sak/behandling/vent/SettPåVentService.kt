@@ -130,8 +130,8 @@ class SettPåVentService(
         dto: SettPåVentDto,
     ): OppdatertOppgaveResponse {
         val oppgave = hentOppgave(behandlingId)
-        // TODO må bruke enhet til saksbehandler, men 4462 er enheten til NAY. Enhetene til tiltak er uklart
-        val mappeId = oppgaveService.finnMapper("4462").single { it.navn == "10 På vent" }.id.toLong()
+
+        val mappeId = oppgaveService.finnVentemappe().id.toLong()
         val oppdatertOppgave = Oppgave(
             id = oppgave.id,
             versjon = oppgave.versjon,

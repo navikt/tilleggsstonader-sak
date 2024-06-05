@@ -14,5 +14,6 @@ data class BarnOppsummering(
     val ident: String,
     val navn: String,
     val alder: Int?,
+    val alderNårStønadsperiodeBegynner: Int?,
     val oppfyllerAlleVilkår: Boolean,
 )

@@ -1,14 +1,14 @@
-package no.nav.tilleggsstonader.sak.behandling.fakta
+package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
-import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaArenaMapper.mapFaktaArena
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaStatusDtoUtil.arenaStatusDto
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaStatusDtoUtil.vedtakStatus
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagArenaMapper.mapFaktaArena
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class FaktaArenaMapperTest {
+class GrunnlagArenaMapperTest {
 
     @Nested
     inner class VedtakTom {

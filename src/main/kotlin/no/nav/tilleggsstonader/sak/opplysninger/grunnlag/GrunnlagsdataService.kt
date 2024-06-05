@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
@@ -19,6 +20,7 @@ class GrunnlagsdataService(
     private val barnService: BarnService,
     private val personService: PersonService,
     private val grunnlagsdataRepository: GrunnlagsdataRepository,
+    private val arenaService: ArenaService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -53,7 +55,13 @@ class GrunnlagsdataService(
             navn = person.søker.navn.gjeldende().tilNavn(),
             fødsel = mapFødsel(person),
             barn = mapBarn(behandling, person),
+            arena = hentGrunnlagArena(behandling),
         )
+    }
+
+    private fun hentGrunnlagArena(behandling: Saksbehandling): GrunnlagArena {
+        val statusArena = arenaService.hentStatus(behandling.ident, behandling.stønadstype)
+        return GrunnlagArenaMapper.mapFaktaArena(statusArena)
     }
 
     private fun mapFødsel(person: SøkerMedBarn): Fødsel {
