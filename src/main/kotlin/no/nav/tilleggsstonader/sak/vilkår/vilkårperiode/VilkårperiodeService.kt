@@ -121,7 +121,7 @@ class VilkårperiodeService(
             ident = behandlingService.hentSaksbehandling(behandlingId).ident,
             fom = fom,
             tom = tom,
-        ),
+        ).filter { it.erStønadsberettiget == true },
     )
 
     private fun hentGrunnlagYtelse(

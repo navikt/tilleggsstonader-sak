@@ -1,12 +1,16 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.AktivitetClientConfig.Companion.resetMock
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetClient
+import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -37,6 +41,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.Vilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -58,6 +63,15 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository
+
+    @Autowired
+    lateinit var aktivitetClient: AktivitetClient
+
+    @AfterEach
+    override fun tearDown() {
+        super.tearDown()
+        resetMock(aktivitetClient)
+    }
 
     @Nested
     inner class OpprettVilkårperiode {
@@ -635,6 +649,25 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
 
             assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)).isNull()
+        }
+
+        @Test
+        fun `skal kun ta med aktiviteter som er stønadsberettiget i grunnlaget`() {
+            val idStønadsberettiget = "1"
+            every {
+                aktivitetClient.hentAktiviteter(any(), any(), any())
+            } returns listOf(
+                aktivitetArenaDto(id = idStønadsberettiget, erStønadsberettiget = true),
+                aktivitetArenaDto(id = "2", erStønadsberettiget = false),
+            )
+
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
+
+            val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
+            assertThat(grunnlag!!.grunnlag.aktivitet.aktiviteter.map { it.id })
+                .hasSize(1)
+                .contains(idStønadsberettiget)
         }
     }
 }
