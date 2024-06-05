@@ -86,21 +86,38 @@ class VilkårperiodeService(
         return vilkårperioderGrunnlagRepository.insert(
             VilkårperioderGrunnlagDomain(
                 behandlingId = behandlingId,
-                grunnlag = VilkårperioderGrunnlag(
-                    aktivitet = GrunnlagAktivitet(
-                        aktiviteter = aktivitetService.hentAktiviteterForGrunnlagsdata(
-                            behandlingService.hentSaksbehandling(behandlingId).fagsakPersonId,
-                            fom = fom,
-                            tom = tom,
-                        ),
-                        hentetInformasjon = HentetInformasjon(
-                            fom = fom,
-                            tom = tom,
-                            tidspunktHentet = LocalDateTime.now(),
-                        ),
-                    ),
-                ),
+                grunnlag = grunnlag,
             ),
+        )
+    }
+
+    private fun hentGrunnlagAktvititet(
+        behandlingId: UUID,
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = GrunnlagAktivitet(
+        aktiviteter = aktivitetService.hentAktiviteterForGrunnlagsdata(
+            ident = behandlingService.hentSaksbehandling(behandlingId).ident,
+            fom = fom,
+            tom = tom,
+        ),
+    )
+
+    private fun hentGrunnlagYtelse(
+        behandlingId: UUID,
+        fom: LocalDate,
+        tom: LocalDate,
+    ): GrunnlagYtelse {
+        val ytelserFraRegister = ytelseService.hentYtelseForGrunnlag(behandlingId, fom, tom)
+
+        return GrunnlagYtelse(
+            perioder = ytelserFraRegister.perioder.map {
+                PeriodeGrunnlagYtelse(
+                    type = it.type,
+                    fom = it.fom,
+                    tom = it.tom,
+                )
+            },
         )
     }
 

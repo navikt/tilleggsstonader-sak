@@ -24,12 +24,4 @@ class YtelseController(
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         return aktivitetService.hentYtelser(fagsakPersonId)
     }
-
-    @GetMapping("/behandling/{behandlingId}")
-    fun hentYtelserForBehandling(
-        @PathVariable behandlingId: UUID,
-    ): YtelserRegisterDto {
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return aktivitetService.hentYtelserForBehandling(behandlingId)
-    }
 }

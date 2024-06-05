@@ -620,7 +620,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val response = vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
 
-            assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)!!.grunnlag.tilDto()).isEqualTo(response.grunnlag)
+            assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)!!.grunnlag.tilDto())
+                .usingRecursiveComparison()
+                .ignoringFields("aktivitet.tidspunktHentet") // TODO: Fjern når tidspunktHentet er fjernet
+                .isEqualTo(response.grunnlag)
+            assertThat(response.grunnlag!!.aktivitet.aktiviteter).isNotEmpty
+            assertThat(response.grunnlag!!.ytelse?.perioder).isNotEmpty
         }
 
         @Test
