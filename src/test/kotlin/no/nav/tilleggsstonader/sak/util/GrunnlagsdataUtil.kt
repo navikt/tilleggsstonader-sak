@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.util
 
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Fødsel
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagArena
@@ -34,7 +33,7 @@ object GrunnlagsdataUtil {
     fun lagGrunnlagsdataBarn(
         ident: String = "1",
         navn: Navn = lagNavn(),
-        fødselsdato: LocalDate = osloDateNow(),
+        fødselsdato: LocalDate = LocalDate.of(2024, 6, 4),
         dødsdato: LocalDate? = null,
     ) = GrunnlagBarn(
         ident = ident,
