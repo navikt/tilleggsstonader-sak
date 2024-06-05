@@ -23,7 +23,11 @@ class YtelseService(
 ) {
     fun hentYtelser(fagsakPersonId: UUID): YtelserRegisterDto {
         val ident = fagsakPersonService.hentAktivIdent(fagsakPersonId)
-        val typer = finnRelevanteYtelsesTyper(Stønadstype.BARNETILSYN)
+        val typer = listOf(
+            TypeYtelsePeriode.AAP,
+            TypeYtelsePeriode.ENSLIG_FORSØRGER,
+            TypeYtelsePeriode.OMSTILLINGSSTØNAD,
+        )
 
         return ytelseClient.hentYtelser(
             YtelsePerioderRequest(
