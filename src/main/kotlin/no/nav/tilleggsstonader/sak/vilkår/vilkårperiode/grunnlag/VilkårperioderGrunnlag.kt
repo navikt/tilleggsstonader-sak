@@ -12,7 +12,6 @@ import java.util.UUID
 
 data class VilkårperioderGrunnlag(
     val aktivitet: GrunnlagAktivitet,
-    // TODO: Burde hete målgruppegrunnlag? Selv om det er ytelser inni er det grunnlaget for målgruppe
     val ytelse: GrunnlagYtelse?,
     val hentetInformasjon: HentetInformasjon?,
 )
