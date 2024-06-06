@@ -8,9 +8,12 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
+import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -55,6 +58,7 @@ class VilkårperiodeService(
     private val aktivitetService: AktivitetService,
     private val ytelseService: YtelseService,
     private val søknadService: SøknadService,
+    private val tilgangService: TilgangService,
 ) {
 
     fun hentVilkårperioder(behandlingId: UUID): Vilkårperioder {
@@ -88,6 +92,10 @@ class VilkårperiodeService(
     }
 
     private fun opprettGrunnlagsdata(behandlingId: UUID): VilkårperioderGrunnlagDomain {
+        feilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
+            "Behandlingen er ikke påbegynt. Kan ikke opprette vilkårperiode hvis man ikke er saksbehandler"
+        }
+
         val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
         val utgangspunktDato = søknad?.mottattTidspunkt ?: LocalDateTime.now()
 

@@ -71,6 +71,10 @@ class TestoppsettService(
         return dbBehandling
     }
 
+    fun oppdater(behandling: Behandling): Behandling {
+        return behandlingRepository.update(behandling)
+    }
+
     fun opprettGrunnlagsdata(behandlingId: UUID) {
         grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
     }

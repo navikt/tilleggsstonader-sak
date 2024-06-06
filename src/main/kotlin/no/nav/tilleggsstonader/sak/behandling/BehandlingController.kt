@@ -10,6 +10,8 @@ import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -36,9 +38,12 @@ class BehandlingController(
 
     @GetMapping("{behandlingId}")
     fun hentBehandling(@PathVariable behandlingId: UUID): BehandlingDto {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
+            feilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
+                "Behandlingen er ikke påbegynt. En saksbehandler må påbegynne behandlingen før du kan gå inn."
+            }
             grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
         }
         return saksbehandling.tilDto()
