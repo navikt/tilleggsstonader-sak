@@ -30,6 +30,8 @@ class PersonopplysningerService(
         return PersonopplysningerDto(
             personIdent = ident,
             navn = pdlSøker.navn.gjeldende().let { NavnDto.fraNavn(it) },
+            harVergemål = pdlSøker.vergemaalEllerFremtidsfullmakt
+                .any { it.type != "stadfestetFremtidsfullmakt" }, // fremtidsfullmakt gjelder frem i tiden
         )
     }
 }

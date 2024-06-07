@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Bostedsadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Dødsfall
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisteridentifikator
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.FolkeregisteridentifikatorStatus
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregistermetadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatus
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
@@ -18,9 +19,11 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Oppholdsadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonForelderBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Personnavn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Statsborgerskap
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UkjentBosted
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.UtflyttingFraNorge
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergeEllerFullmektig
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergemaalEllerFremtidsfullmakt
 import java.time.LocalDate
 
@@ -144,5 +147,29 @@ object PdlTestdataHelper {
         ident = ident,
         status = status,
         metadata = if (gjeldende) metadataGjeldende else metadataHistorisk,
+    )
+
+    fun vergemaalEllerFremtidsfullmakt(
+        embete: String? = null,
+        folkeregistermetadata: Folkeregistermetadata? = null,
+        type: String? = "voksen",
+        vergeEllerFullmektig: VergeEllerFullmektig = vergeEllerFullmektig(),
+    ) = VergemaalEllerFremtidsfullmakt(
+        embete = embete,
+        folkeregistermetadata = folkeregistermetadata,
+        type = type,
+        vergeEllerFullmektig = vergeEllerFullmektig,
+    )
+
+    fun vergeEllerFullmektig(
+        motpartsPersonident: String? = "1",
+        navn: Personnavn? = null,
+        omfang: String? = "personligeOgOekonomiskeInteresser",
+        omfangetErInnenPersonligOmraade: Boolean = false,
+    ) = VergeEllerFullmektig(
+        motpartsPersonident = motpartsPersonident,
+        navn = navn,
+        omfang = omfang,
+        omfangetErInnenPersonligOmraade = omfangetErInnenPersonligOmraade,
     )
 }

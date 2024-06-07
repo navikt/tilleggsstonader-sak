@@ -7,6 +7,7 @@ import java.time.LocalDate
 data class PersonopplysningerDto(
     val personIdent: String,
     val navn: NavnDto,
+    val harVergemål: Boolean,
 )
 
 data class StatsborgerskapDto(
