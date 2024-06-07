@@ -87,6 +87,11 @@ data class Vilkårperiode(
                 "Mangler begrunnelse for ingen målgruppe"
             }
         }
+        if (type == MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING) {
+            brukerfeilHvis(begrunnelse.isNullOrBlank()) {
+                "Mangler begrunnelse for 100% sykepenger"
+            }
+        }
     }
 
     private fun DelvilkårMålgruppe.valider(begrunnelse: String?) {
@@ -177,6 +182,8 @@ enum class SvarJaNei {
 
 sealed interface VilkårperiodeType {
     fun tilDbType(): String
+
+    fun girIkkeRettPåStønadsperiode(): Boolean
 }
 
 enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : VilkårperiodeType {
@@ -186,12 +193,17 @@ enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : Vilkårper
     OVERGANGSSTØNAD(setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
     NEDSATT_ARBEIDSEVNE(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
     UFØRETRYGD(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
+    SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING(emptySet()),
     INGEN_MÅLGRUPPE(emptySet()),
     ;
 
     override fun tilDbType(): String = this.name
 
     fun gjelderNedsattArbeidsevne() = this == NEDSATT_ARBEIDSEVNE || this == UFØRETRYGD || this == AAP
+
+    override fun girIkkeRettPåStønadsperiode() =
+        this == INGEN_MÅLGRUPPE ||
+            this == SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING
 }
 
 enum class AktivitetType : VilkårperiodeType {
@@ -202,6 +214,9 @@ enum class AktivitetType : VilkårperiodeType {
     ;
 
     override fun tilDbType(): String = this.name
+
+    override fun girIkkeRettPåStønadsperiode() =
+        this == INGEN_AKTIVITET
 }
 
 val vilkårperiodetyper: Map<String, VilkårperiodeType> =

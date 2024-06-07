@@ -74,6 +74,7 @@ object EvalueringMålgruppe {
 
             MålgruppeType.DAGPENGER -> vurdering.tilVurdering(utledResultatMedlemskap(vurdering?.svar)) // Trenger denne egt å være egen?
 
+            MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING -> Vurdering(svar = null, resultat = ResultatDelvilkårperiode.IKKE_AKTUELT)
             MålgruppeType.INGEN_MÅLGRUPPE -> Vurdering(svar = null, resultat = ResultatDelvilkårperiode.IKKE_AKTUELT)
         }
     }

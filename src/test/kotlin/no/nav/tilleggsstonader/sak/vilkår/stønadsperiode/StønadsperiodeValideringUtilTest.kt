@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.util.norskFormat
+import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitetDto
@@ -19,6 +20,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.YearMonth
 import java.util.UUID
 
 internal class StønadsperiodeValideringUtilTest {
@@ -381,6 +383,100 @@ internal class StønadsperiodeValideringUtilTest {
                     VilkårperioderDto(målgrupper, aktiviteter),
                 )
             }.hasMessageContaining(feilmeldingIkkeOverlappendePeriode(stønadsperiode, stønadsperiode.målgruppe))
+        }
+    }
+
+    @Nested
+    inner class OverlappMedPeriodeSomIkkeGirRettPåStønad {
+
+        val jan = YearMonth.of(2024, 1)
+        val fom = jan.atDay(10)
+        val tom = jan.atDay(20)
+
+        @Test
+        fun `kan ha stønadsperiode før og etter periode som ikke gir rett på stønad`() {
+            val målgrupper = listOf(
+                målgruppe(
+                    type = MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING,
+                    fom = fom,
+                    tom = tom,
+                    begrunnelse = "asd",
+                ),
+                målgruppe(type = MålgruppeType.INGEN_MÅLGRUPPE, fom = fom, tom = tom, begrunnelse = "asd"),
+                målgruppe(type = MålgruppeType.AAP, fom = jan.atDay(1), tom = jan.atDay(9)),
+                målgruppe(type = MålgruppeType.AAP, fom = jan.atDay(21), tom = jan.atDay(31)),
+            ).map { it.tilDto() }
+
+            val aktiviteter = listOf(
+                aktivitet(type = AktivitetType.INGEN_AKTIVITET, fom = fom, tom = tom, aktivitetsdager = null, begrunnelse = "asd"),
+                aktivitet(type = AktivitetType.TILTAK, fom = jan.atDay(1), tom = jan.atDay(9)),
+                aktivitet(type = AktivitetType.TILTAK, fom = jan.atDay(21), tom = jan.atDay(31)),
+            ).map { it.tilDto() }
+
+            assertThatCode {
+                validerStønadsperioder(
+                    listOf(
+                        lagStønadsperiode(fom = jan.atDay(1), tom = jan.atDay(9)),
+                        lagStønadsperiode(fom = jan.atDay(21), tom = jan.atDay(31)),
+                    ),
+                    VilkårperioderDto(målgrupper, aktiviteter),
+                )
+            }.doesNotThrowAnyException()
+        }
+
+        @Test
+        fun `skal kaste feil hvis en stønadsperiode overlapper med 100 prosent sykemelding`() {
+            val målgrupper: Map<VilkårperiodeType, List<Datoperiode>> = mapOf(
+                MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING to listOf(
+                    Datoperiode(fom = fom, tom = tom),
+                ),
+            )
+
+            assertThatThrownBy {
+                validerStønadsperiode(
+                    stønadsperiode = lagStønadsperiode(fom = jan.atDay(1), tom = jan.atEndOfMonth()),
+                    målgruppePerioderPerType = målgrupper,
+                    aktivitetPerioderPerType = emptyMap(),
+                )
+            }.hasMessage(
+                "Stønadsperiode 01.01.2024 - 31.01.2024 overlapper med SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
+            )
+        }
+
+        @Test
+        fun `skal kaste feil hvis en stønadsperiode overlapper med INGEN_MÅLGRUPPE`() {
+            val målgrupper: Map<VilkårperiodeType, List<Datoperiode>> = mapOf(
+                MålgruppeType.INGEN_MÅLGRUPPE to listOf(
+                    Datoperiode(fom = fom, tom = tom),
+                ),
+            )
+            assertThatThrownBy {
+                validerStønadsperiode(
+                    stønadsperiode = lagStønadsperiode(fom = jan.atDay(1), tom = jan.atDay(15)),
+                    målgruppePerioderPerType = målgrupper,
+                    aktivitetPerioderPerType = emptyMap(),
+                )
+            }.hasMessage(
+                "Stønadsperiode 01.01.2024 - 15.01.2024 overlapper med INGEN_MÅLGRUPPE(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
+            )
+        }
+
+        @Test
+        fun `skal kaste feil hvis en stønadsperiode overlapper med INGEN_AKTIVITET`() {
+            val aktiviteter: Map<VilkårperiodeType, List<Datoperiode>> = mapOf(
+                AktivitetType.INGEN_AKTIVITET to listOf(
+                    Datoperiode(fom = fom, tom = tom),
+                ),
+            )
+            assertThatThrownBy {
+                validerStønadsperiode(
+                    stønadsperiode = lagStønadsperiode(fom = jan.atDay(15), tom = jan.atDay(15)),
+                    målgruppePerioderPerType = emptyMap(),
+                    aktivitetPerioderPerType = aktiviteter,
+                )
+            }.hasMessage(
+                "Stønadsperiode 15.01.2024 - 15.01.2024 overlapper med INGEN_AKTIVITET(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
+            )
         }
     }
 

@@ -60,17 +60,38 @@ object StønadsperiodeValideringUtil {
             "Kombinasjonen av ${stønadsperiode.målgruppe} og ${stønadsperiode.aktivitet} er ikke gyldig"
         }
 
+        validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(
+            målgruppePerioderPerType + aktivitetPerioderPerType,
+            stønadsperiode,
+        )
+
         val målgrupper = målgruppePerioderPerType[stønadsperiode.målgruppe]
             ?: brukerfeil("Finner ingen perioder hvor vilkår for ${stønadsperiode.målgruppe} er oppfylt")
         val aktiviteter = aktivitetPerioderPerType[stønadsperiode.aktivitet]
             ?: brukerfeil("Finner ingen perioder hvor vilkår for ${stønadsperiode.aktivitet} er oppfylt")
 
         målgrupper.firstOrNull { it.inneholder(stønadsperiode) }
-            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.målgruppe} i perioden ${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}")
+            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.målgruppe} i perioden ${stønadsperiode.formattertPeriodeNorskFormat()}")
         aktiviteter.firstOrNull { it.inneholder(stønadsperiode) }
-            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.aktivitet} i perioden ${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}")
+            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.aktivitet} i perioden ${stønadsperiode.formattertPeriodeNorskFormat()}")
 
         validerStønadsperiodeErInnenfor18og67år(fødselsdato, stønadsperiode)
+    }
+
+    private fun validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(
+        målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
+        stønadsperiode: StønadsperiodeDto,
+    ) {
+        målgruppePerioderPerType.entries
+            .filter { it.key.girIkkeRettPåStønadsperiode() }
+            .forEach { (type, perioder) ->
+                perioder.firstOrNull { it.overlapper(stønadsperiode) }?.let {
+                    brukerfeil(
+                        "Stønadsperiode ${stønadsperiode.formattertPeriodeNorskFormat()} overlapper " +
+                            "med $type(${it.formattertPeriodeNorskFormat()}) som ikke gir rett på stønad",
+                    )
+                }
+            }
     }
 
     private fun validerStønadsperiodeErInnenfor18og67år(

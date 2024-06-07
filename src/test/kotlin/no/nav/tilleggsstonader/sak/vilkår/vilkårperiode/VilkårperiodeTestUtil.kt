@@ -68,7 +68,7 @@ object VilkårperiodeTestUtil {
         fom: LocalDate = osloDateNow(),
         tom: LocalDate = osloDateNow().plusDays(5),
         type: AktivitetType = AktivitetType.TILTAK,
-        aktivitetsdager: Int = 5,
+        aktivitetsdager: Int? = 5,
         delvilkår: DelvilkårAktivitet = delvilkårAktivitet(),
         begrunnelse: String? = null,
         kilde: KildeVilkårsperiode = KildeVilkårsperiode.SYSTEM,
