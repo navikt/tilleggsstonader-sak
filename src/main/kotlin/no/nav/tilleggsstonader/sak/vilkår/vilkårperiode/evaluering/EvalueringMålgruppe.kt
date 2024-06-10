@@ -34,10 +34,7 @@ object EvalueringMålgruppe {
         type: MålgruppeType,
         delvilkår: DelvilkårMålgruppe,
     ): ResultatVilkårperiode {
-        if (
-            type == MålgruppeType.INGEN_MÅLGRUPPE ||
-            type == MålgruppeType.SYKEPENGER_100_PROSENT
-        ) {
+        if (type.girIkkeRettPåStønadsperiode()) {
             return ResultatVilkårperiode.IKKE_OPPFYLT
         }
 

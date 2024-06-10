@@ -396,6 +396,7 @@ internal class StønadsperiodeValideringUtilTest {
         @Test
         fun `kan ha stønadsperiode før og etter periode som ikke gir rett på stønad`() {
             val målgrupper = listOf(
+                målgruppe(type = MålgruppeType.AAP, fom = jan.atDay(1), tom = jan.atDay(9)),
                 målgruppe(
                     type = MålgruppeType.SYKEPENGER_100_PROSENT,
                     fom = fom,
@@ -410,11 +411,11 @@ internal class StønadsperiodeValideringUtilTest {
                     begrunnelse = "asd",
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                 ),
-                målgruppe(type = MålgruppeType.AAP, fom = jan.atDay(1), tom = jan.atDay(9)),
                 målgruppe(type = MålgruppeType.AAP, fom = jan.atDay(21), tom = jan.atDay(31)),
             ).map { it.tilDto() }
 
             val aktiviteter = listOf(
+                aktivitet(type = AktivitetType.TILTAK, fom = jan.atDay(1), tom = jan.atDay(9)),
                 aktivitet(
                     type = AktivitetType.INGEN_AKTIVITET,
                     fom = fom,
@@ -423,7 +424,6 @@ internal class StønadsperiodeValideringUtilTest {
                     begrunnelse = "asd",
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                 ),
-                aktivitet(type = AktivitetType.TILTAK, fom = jan.atDay(1), tom = jan.atDay(9)),
                 aktivitet(type = AktivitetType.TILTAK, fom = jan.atDay(21), tom = jan.atDay(31)),
             ).map { it.tilDto() }
 
