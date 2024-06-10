@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
+import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -28,6 +29,7 @@ import java.util.UUID
 @ProtectedWithClaims(issuer = "azuread")
 class BehandlingController(
     private val behandlingService: BehandlingService,
+    private val opprettRevurderingBehandlingService: OpprettRevurderingBehandlingService,
     private val grunnlagsdataService: GrunnlagsdataService,
     // private val behandlingPåVentService: BehandlingPåVentService,
     private val fagsakService: FagsakService,
@@ -47,6 +49,14 @@ class BehandlingController(
             grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
         }
         return saksbehandling.tilDto()
+    }
+
+    @PostMapping()
+    fun opprettBehandling(@RequestBody request: OpprettBehandlingDto): UUID {
+        tilgangService.validerTilgangTilFagsak(request.fagsakId, AuditLoggerEvent.CREATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return opprettRevurderingBehandlingService.opprettBehandling(request)
     }
 
     @PostMapping("person")
