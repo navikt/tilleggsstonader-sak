@@ -322,7 +322,7 @@ enum class MålgruppeTypeDvh {
     NEDSATT_ARBEIDSEVNE,
     UFØRETRYGD,
     INGEN_MÅLGRUPPE,
-    SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING,
+    SYKEPENGER_100_PROSENT,
     ;
 
     companion object {
@@ -334,7 +334,7 @@ enum class MålgruppeTypeDvh {
             MålgruppeType.NEDSATT_ARBEIDSEVNE -> NEDSATT_ARBEIDSEVNE
             MålgruppeType.UFØRETRYGD -> UFØRETRYGD
             MålgruppeType.INGEN_MÅLGRUPPE -> INGEN_MÅLGRUPPE
-            MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING -> SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING
+            MålgruppeType.SYKEPENGER_100_PROSENT -> SYKEPENGER_100_PROSENT
 
             is AktivitetType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type målgruppe.")
         }

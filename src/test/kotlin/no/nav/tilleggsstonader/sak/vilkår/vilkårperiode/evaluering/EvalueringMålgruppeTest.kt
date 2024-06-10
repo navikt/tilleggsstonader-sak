@@ -280,7 +280,7 @@ class EvalueringMålgruppeTest {
         @Test
         fun `100 prosent sykepenger skal mappes til ikke oppfylt`() {
             val resultat = utledResultat(
-                MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING,
+                MålgruppeType.SYKEPENGER_100_PROSENT,
                 delvilkårMålgruppeDto(
                     medlemskap = VurderingDto(svar = null),
                     dekketAvAnnetRegelverk = VurderingDto(svar = null),
@@ -327,7 +327,7 @@ class EvalueringMålgruppeTest {
         "OMSTILLINGSSTØNAD",
         "DAGPENGER",
         "UFØRETRYGD",
-        "SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING",
+        "SYKEPENGER_100_PROSENT",
         "INGEN_MÅLGRUPPE",
     ],
     mode = EnumSource.Mode.EXCLUDE,
@@ -340,7 +340,7 @@ private annotation class ImplisittParameterizedTest
     names = [
         "AAP",
         "OVERGANGSSTØNAD",
-        "SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING",
+        "SYKEPENGER_100_PROSENT",
         "INGEN_MÅLGRUPPE",
     ],
     mode = EnumSource.Mode.EXCLUDE,
@@ -354,7 +354,7 @@ private annotation class IkkeImplisittParameterizedTest
         "OVERGANGSSTØNAD",
         "OMSTILLINGSSTØNAD",
         "DAGPENGER",
-        "SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING",
+        "SYKEPENGER_100_PROSENT",
         "INGEN_MÅLGRUPPE",
     ],
     mode = EnumSource.Mode.EXCLUDE,
@@ -368,7 +368,7 @@ private annotation class NedsattArbeidsevneParameterizedTest
         "AAP",
         "NEDSATT_ARBEIDSEVNE",
         "UFØRETRYGD",
-        "SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING",
+        "SYKEPENGER_100_PROSENT",
         "INGEN_MÅLGRUPPE",
     ],
     mode = EnumSource.Mode.EXCLUDE,

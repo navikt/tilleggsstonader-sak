@@ -36,7 +36,7 @@ object EvalueringMålgruppe {
     ): ResultatVilkårperiode {
         if (
             type == MålgruppeType.INGEN_MÅLGRUPPE ||
-            type == MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING
+            type == MålgruppeType.SYKEPENGER_100_PROSENT
         ) {
             return ResultatVilkårperiode.IKKE_OPPFYLT
         }
@@ -77,7 +77,7 @@ object EvalueringMålgruppe {
 
             MålgruppeType.DAGPENGER -> vurdering.tilVurdering(utledResultatMedlemskap(vurdering?.svar)) // Trenger denne egt å være egen?
 
-            MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING -> Vurdering(
+            MålgruppeType.SYKEPENGER_100_PROSENT -> Vurdering(
                 svar = null,
                 resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
             )

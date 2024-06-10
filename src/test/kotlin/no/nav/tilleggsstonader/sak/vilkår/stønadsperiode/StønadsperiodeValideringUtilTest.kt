@@ -397,7 +397,7 @@ internal class StønadsperiodeValideringUtilTest {
         fun `kan ha stønadsperiode før og etter periode som ikke gir rett på stønad`() {
             val målgrupper = listOf(
                 målgruppe(
-                    type = MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING,
+                    type = MålgruppeType.SYKEPENGER_100_PROSENT,
                     fom = fom,
                     tom = tom,
                     begrunnelse = "asd",
@@ -427,7 +427,7 @@ internal class StønadsperiodeValideringUtilTest {
         @Test
         fun `skal kaste feil hvis en stønadsperiode overlapper med 100 prosent sykemelding`() {
             val målgrupper: Map<VilkårperiodeType, List<Datoperiode>> = mapOf(
-                MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING to listOf(
+                MålgruppeType.SYKEPENGER_100_PROSENT to listOf(
                     Datoperiode(fom = fom, tom = tom),
                 ),
             )
@@ -439,7 +439,7 @@ internal class StønadsperiodeValideringUtilTest {
                     aktivitetPerioderPerType = emptyMap(),
                 )
             }.hasMessage(
-                "Stønadsperiode 01.01.2024 - 31.01.2024 overlapper med SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
+                "Stønadsperiode 01.01.2024 - 31.01.2024 overlapper med SYKEPENGER_100_PROSENT(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
             )
         }
 

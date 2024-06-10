@@ -15,7 +15,7 @@ object MålgruppeValidering {
                 MålgruppeType.OMSTILLINGSSTØNAD -> true
                 MålgruppeType.OVERGANGSSTØNAD -> true
                 MålgruppeType.UFØRETRYGD -> true
-                MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING -> true
+                MålgruppeType.SYKEPENGER_100_PROSENT -> true
                 MålgruppeType.INGEN_MÅLGRUPPE -> true
             }
         }

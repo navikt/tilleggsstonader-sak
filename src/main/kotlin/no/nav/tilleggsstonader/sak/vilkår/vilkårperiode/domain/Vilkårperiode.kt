@@ -87,7 +87,7 @@ data class Vilkårperiode(
                 "Mangler begrunnelse for ingen målgruppe"
             }
         }
-        if (type == MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING) {
+        if (type == MålgruppeType.SYKEPENGER_100_PROSENT) {
             brukerfeilHvis(begrunnelse.isNullOrBlank()) {
                 "Mangler begrunnelse for 100% sykepenger"
             }
@@ -193,7 +193,7 @@ enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : Vilkårper
     OVERGANGSSTØNAD(setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
     NEDSATT_ARBEIDSEVNE(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
     UFØRETRYGD(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
-    SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING(emptySet()),
+    SYKEPENGER_100_PROSENT(emptySet()),
     INGEN_MÅLGRUPPE(emptySet()),
     ;
 
@@ -203,7 +203,7 @@ enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : Vilkårper
 
     override fun girIkkeRettPåStønadsperiode() =
         this == INGEN_MÅLGRUPPE ||
-            this == SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING
+            this == SYKEPENGER_100_PROSENT
 }
 
 enum class AktivitetType : VilkårperiodeType {

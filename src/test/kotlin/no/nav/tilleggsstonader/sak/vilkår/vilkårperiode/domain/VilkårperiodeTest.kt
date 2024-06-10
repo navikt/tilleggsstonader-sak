@@ -76,7 +76,7 @@ class VilkårperiodeTest {
         @Test
         fun `100 prosent sykepenger må inneholde begrunnelse`() {
             assertThatThrownBy {
-                målgruppe(type = MålgruppeType.SYKEPENGER_100_PROSENT_FOR_FULLTIDSSTILLING, kilde = KildeVilkårsperiode.MANUELL)
+                målgruppe(type = MålgruppeType.SYKEPENGER_100_PROSENT, kilde = KildeVilkårsperiode.MANUELL)
             }.hasMessageContaining("Mangler begrunnelse for 100% sykepenger")
         }
     }
