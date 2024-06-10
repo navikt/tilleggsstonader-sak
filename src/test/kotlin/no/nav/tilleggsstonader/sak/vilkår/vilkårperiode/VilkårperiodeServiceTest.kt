@@ -2,16 +2,19 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.AktivitetClientConfig.Companion.resetMock
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetClient
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
+import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -666,6 +669,39 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(grunnlag!!.grunnlag.aktivitet.aktiviteter.map { it.id })
                 .hasSize(1)
                 .contains(idStønadsberettiget)
+        }
+
+        @Test
+        fun `veileder skal ikke hentes då det opprettes grunnlag når behandlingStatus=OPPRETTET`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            val exception = catchThrowableOfType<Feil> {
+                testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
+                    vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
+                }
+            }
+            assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
+        }
+
+        @Test
+        fun `veileder skal ikke kunne hente behandlingen hvis statusen er annet enn UTREDES`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
+
+            val exception = catchThrowableOfType<Feil> {
+                testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
+                    vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
+                }
+            }
+            assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
+        }
+
+        @Test
+        fun `saksbehandler skal kunne opprette grunnlag hvis behandlingStatus=OPPRETTET`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            testWithBrukerContext(groups = listOf(rolleConfig.saksbehandlerRolle)) {
+                vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
+            }
         }
     }
 }
