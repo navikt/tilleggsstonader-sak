@@ -97,7 +97,7 @@ object StønadsperiodeValideringUtil {
             ?.let {
                 brukerfeil(
                     "Stønadsperiode ${stønadsperiode.formattertPeriodeNorskFormat()} overlapper " +
-                            "med ${it.type}(${it.formattertPeriodeNorskFormat()}) som ikke gir rett på stønad",
+                        "med ${it.type}(${it.formattertPeriodeNorskFormat()}) som ikke gir rett på stønad",
                 )
             }
     }
