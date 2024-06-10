@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Datoperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.formattertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.mergeSammenhengendeOppfylteVilkårperioder
@@ -35,6 +36,7 @@ object StønadsperiodeValideringUtil {
         val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
         val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
 
+        validerAtStønadsperioderIkkeOverlapperMedVilkårPeriodeUtenRett(vilkårperioder, stønadsperioder)
         stønadsperioder.forEach { validerStønadsperiode(it, målgrupper, aktiviteter, fødselsdato) }
     }
 
@@ -60,11 +62,6 @@ object StønadsperiodeValideringUtil {
             "Kombinasjonen av ${stønadsperiode.målgruppe} og ${stønadsperiode.aktivitet} er ikke gyldig"
         }
 
-        validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(
-            målgruppePerioderPerType + aktivitetPerioderPerType,
-            stønadsperiode,
-        )
-
         val målgrupper = målgruppePerioderPerType[stønadsperiode.målgruppe]
             ?: brukerfeil("Finner ingen perioder hvor vilkår for ${stønadsperiode.målgruppe} er oppfylt")
         val aktiviteter = aktivitetPerioderPerType[stønadsperiode.aktivitet]
@@ -78,19 +75,30 @@ object StønadsperiodeValideringUtil {
         validerStønadsperiodeErInnenfor18og67år(fødselsdato, stønadsperiode)
     }
 
+    /**
+     * Stønadsperioder kan ikke overlappe med stønadsperiode som ikke gir rett på stønadsperiode,
+     * eks 100% sykepenger eller INGEN_MÅLGRUPPE
+     */
+    private fun validerAtStønadsperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
+        vilkårperioder: VilkårperioderDto,
+        stønadsperioder: List<StønadsperiodeDto>,
+    ) {
+        val perioderSomIkkeGirRett = (vilkårperioder.målgrupper + vilkårperioder.aktiviteter)
+            .filter { it.type.girIkkeRettPåStønadsperiode() }
+        stønadsperioder.forEach { validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(perioderSomIkkeGirRett, it) }
+    }
+
     private fun validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(
-        målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
+        vilkårperioder: List<VilkårperiodeDto>,
         stønadsperiode: StønadsperiodeDto,
     ) {
-        målgruppePerioderPerType.entries
-            .filter { it.key.girIkkeRettPåStønadsperiode() }
-            .forEach { (type, perioder) ->
-                perioder.firstOrNull { it.overlapper(stønadsperiode) }?.let {
-                    brukerfeil(
-                        "Stønadsperiode ${stønadsperiode.formattertPeriodeNorskFormat()} overlapper " +
-                            "med $type(${it.formattertPeriodeNorskFormat()}) som ikke gir rett på stønad",
-                    )
-                }
+        vilkårperioder
+            .firstOrNull { vilkårperiode -> vilkårperiode.overlapper(stønadsperiode) }
+            ?.let {
+                brukerfeil(
+                    "Stønadsperiode ${stønadsperiode.formattertPeriodeNorskFormat()} overlapper " +
+                            "med ${it.type}(${it.formattertPeriodeNorskFormat()}) som ikke gir rett på stønad",
+                )
             }
     }
 

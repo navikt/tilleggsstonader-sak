@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
@@ -45,9 +46,7 @@ data class Vilkårperiode(
             else -> error("Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}")
         }
 
-        validerBegrunnelseNedsattArbeidsevne()
-        validerBegrunnelseIngenAktivitetEllerMålgruppe()
-
+        validerPåkrevdBegrunnelse()
         validerSlettefelter()
     }
 
@@ -67,31 +66,17 @@ data class Vilkårperiode(
         }
     }
 
-    private fun validerBegrunnelseNedsattArbeidsevne() {
-        if (type == MålgruppeType.NEDSATT_ARBEIDSEVNE) {
-            brukerfeilHvis(begrunnelse.isNullOrBlank()) {
-                "Mangler begrunnelse for nedsatt arbeidsevne"
-            }
+    private fun validerPåkrevdBegrunnelse() {
+        if (!begrunnelse.isNullOrBlank()) {
+            return
         }
-    }
-
-    private fun validerBegrunnelseIngenAktivitetEllerMålgruppe() {
-        if (type == AktivitetType.INGEN_AKTIVITET) {
-            brukerfeilHvis(begrunnelse.isNullOrBlank()) {
-                "Mangler begrunnelse for ingen aktivitet"
-            }
-        }
-
-        if (type == MålgruppeType.INGEN_MÅLGRUPPE) {
-            brukerfeilHvis(begrunnelse.isNullOrBlank()) {
-                "Mangler begrunnelse for ingen målgruppe"
-            }
-        }
-        if (type == MålgruppeType.SYKEPENGER_100_PROSENT) {
-            brukerfeilHvis(begrunnelse.isNullOrBlank()) {
-                "Mangler begrunnelse for 100% sykepenger"
-            }
-        }
+        when (type) {
+            MålgruppeType.NEDSATT_ARBEIDSEVNE -> "Mangler begrunnelse for nedsatt arbeidsevne"
+            MålgruppeType.INGEN_MÅLGRUPPE -> "Mangler begrunnelse for ingen målgruppe"
+            MålgruppeType.SYKEPENGER_100_PROSENT -> "Mangler begrunnelse for 100% sykepenger"
+            AktivitetType.INGEN_AKTIVITET -> "Mangler begrunnelse for ingen aktivitet"
+            else -> null
+        }?.let { brukerfeil(it) }
     }
 
     private fun DelvilkårMålgruppe.valider(begrunnelse: String?) {
