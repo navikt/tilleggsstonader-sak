@@ -20,24 +20,16 @@ object OpprettBehandlingUtil {
     fun validerKanOppretteNyBehandling(
         behandlingType: BehandlingType,
         tidligereBehandlinger: List<Behandling>,
-        erMigrering: Boolean = false,
     ) {
         val sisteBehandling = tidligereBehandlinger
             .filter { it.resultat != BehandlingResultat.HENLAGT }
             .sisteFerdigstilteBehandling()
 
         validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger)
-        validerMigreringErRevurdering(behandlingType, erMigrering)
 
         when (behandlingType) {
             FØRSTEGANGSBEHANDLING -> validerKanOppretteFørstegangsbehandling(sisteBehandling)
-            REVURDERING -> validerKanOppretteRevurdering(sisteBehandling, erMigrering)
-        }
-    }
-
-    private fun validerMigreringErRevurdering(behandlingType: BehandlingType, erMigrering: Boolean) {
-        feilHvis(erMigrering && behandlingType != REVURDERING) {
-            "Det er ikke mulig å lage en migrering av annet enn revurdering"
+            REVURDERING -> validerKanOppretteRevurdering(sisteBehandling)
         }
     }
 
@@ -60,15 +52,9 @@ object OpprettBehandlingUtil {
         }
     }
 
-    private fun validerKanOppretteRevurdering(sisteBehandling: Behandling?, erMigrering: Boolean) {
-        if (sisteBehandling == null && !erMigrering) {
+    private fun validerKanOppretteRevurdering(sisteBehandling: Behandling?) {
+        if (sisteBehandling == null) {
             throw ApiFeil("Det finnes ikke en tidligere behandling på fagsaken", HttpStatus.BAD_REQUEST)
-        }
-        if (erMigrering && sisteBehandling != null) {
-            throw ApiFeil(
-                "Det er ikke mulig å opprette en migrering når det finnes en behandling fra før",
-                HttpStatus.BAD_REQUEST,
-            )
         }
     }
 }

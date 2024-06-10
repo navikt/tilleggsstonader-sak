@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunktEllerEndretTid
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingUtil.validerKanOppretteNyBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
@@ -98,13 +99,11 @@ class BehandlingService(
 
     @Transactional
     fun opprettBehandling(
-        behandlingType: BehandlingType,
         fagsakId: UUID,
         status: BehandlingStatus = BehandlingStatus.OPPRETTET,
         stegType: StegType = StegType.INNGANGSVILKÅR,
         behandlingsårsak: BehandlingÅrsak,
         kravMottatt: LocalDate? = null,
-        erMigrering: Boolean = false,
     ): Behandling {
         brukerfeilHvis(kravMottatt != null && kravMottatt.isAfter(osloDateNow())) {
             "Kan ikke sette krav mottattdato frem i tid"
@@ -115,7 +114,9 @@ class BehandlingService(
 
         val tidligereBehandlinger = behandlingRepository.findByFagsakId(fagsakId)
         val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
-        validerKanOppretteNyBehandling(behandlingType, tidligereBehandlinger, erMigrering)
+        val behandlingType = utledBehandlingType(tidligereBehandlinger)
+
+        validerKanOppretteNyBehandling(behandlingType, tidligereBehandlinger)
 
         val behandling = behandlingRepository.insert(
             Behandling(
@@ -281,6 +282,6 @@ class BehandlingService(
 
     fun utledNesteBehandlingstype(fagsakId: UUID): BehandlingType {
         val behandlinger = hentBehandlinger(fagsakId)
-        return if (behandlinger.all { it.resultat == BehandlingResultat.HENLAGT }) BehandlingType.FØRSTEGANGSBEHANDLING else BehandlingType.REVURDERING
+        return utledBehandlingType(behandlinger)
     }
 }

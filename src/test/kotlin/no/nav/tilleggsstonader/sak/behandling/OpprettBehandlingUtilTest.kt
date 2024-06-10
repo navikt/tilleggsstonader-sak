@@ -1,21 +1,62 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingUtil.validerKanOppretteNyBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.util.BehandlingOppsettUtil.henlagtFørstegangsbehandling
-import no.nav.tilleggsstonader.sak.util.BehandlingOppsettUtil.iverksattFørstegangsbehandling
-import no.nav.tilleggsstonader.sak.util.BehandlingOppsettUtil.iverksattRevurdering
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 internal class OpprettBehandlingUtilTest {
 
     private val fagsak = fagsak()
+
+    @Nested
+    inner class UtledBehandlingType {
+
+        @Test
+        fun `hvis man kun har henlagte så skal neste type være førstegangsbehandling`() {
+            assertThat(utledBehandlingType(listOf(behandling(resultat = BehandlingResultat.HENLAGT))))
+                .isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+
+            val behandlinger = listOf(
+                behandling(resultat = BehandlingResultat.HENLAGT),
+                behandling(resultat = BehandlingResultat.HENLAGT),
+            )
+            assertThat(utledBehandlingType(behandlinger)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+        }
+
+        @Test
+        fun `hvis man har en behandling som ikke er henlagt så blir neste behandling revurdering`() {
+            assertThat(utledBehandlingType(listOf(behandling(resultat = BehandlingResultat.IKKE_SATT))))
+                .isEqualTo(BehandlingType.REVURDERING)
+            assertThat(utledBehandlingType(listOf(behandling(resultat = BehandlingResultat.AVSLÅTT))))
+                .isEqualTo(BehandlingType.REVURDERING)
+            assertThat(utledBehandlingType(listOf(behandling(resultat = BehandlingResultat.INNVILGET))))
+                .isEqualTo(BehandlingType.REVURDERING)
+        }
+
+        @Test
+        fun `hvis man har en innvilget og sen en henlagt er det fortsatt revurdering`() {
+            assertThat(
+                utledBehandlingType(
+                    listOf(
+                        behandling(
+                            resultat = BehandlingResultat.INNVILGET,
+                            vedtakstidspunkt = LocalDateTime.now().minusDays(1),
+                        ),
+                        behandling(resultat = BehandlingResultat.HENLAGT),
+                    ),
+                ),
+            ).isEqualTo(BehandlingType.REVURDERING)
+        }
+    }
 
     @Nested
     inner class Førstegangsbehandling {
@@ -153,37 +194,6 @@ internal class OpprettBehandlingUtilTest {
             assertThatThrownBy {
                 validerKanOppretteNyBehandling(BehandlingType.REVURDERING, listOf())
             }.hasMessage("Det finnes ikke en tidligere behandling på fagsaken")
-        }
-    }
-
-    @Nested
-    inner class Migrering {
-
-        @Test
-        internal fun `skal kunne opprette en migrering uten tidligere behandlinger`() {
-            validerKanOppretteNyBehandling(BehandlingType.REVURDERING, listOf(), erMigrering = true)
-        }
-
-        @Test
-        internal fun `skal kunne migrere når det kun finnes henlagte behandlinger`() {
-            validerKanOppretteNyBehandling(
-                BehandlingType.REVURDERING,
-                listOf(henlagtFørstegangsbehandling),
-                erMigrering = true,
-            )
-        }
-
-        @Test
-        internal fun `kan ikke opprette en migrering når tidligere behanding ikke er blankett`() {
-            listOf(iverksattFørstegangsbehandling, iverksattRevurdering).forEach {
-                assertThatThrownBy {
-                    validerKanOppretteNyBehandling(
-                        BehandlingType.REVURDERING,
-                        listOf(it),
-                        erMigrering = true,
-                    )
-                }.hasMessage("Det er ikke mulig å opprette en migrering når det finnes en behandling fra før")
-            }
         }
     }
 }

@@ -31,7 +31,6 @@ import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -75,7 +74,6 @@ class OpprettTestBehandlingController(
 
     private fun lagBehandling(fagsak: Fagsak): Behandling =
         behandlingService.opprettBehandling(
-            behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
             fagsakId = fagsak.id,
             behandlingsårsak = BehandlingÅrsak.SØKNAD,
         )

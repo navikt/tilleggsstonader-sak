@@ -90,8 +90,6 @@ internal class BehandlingServiceTest {
                 stegType = StegType.VILKÅR,
                 behandlingsårsak = BehandlingÅrsak.PAPIRSØKNAD,
                 kravMottatt = osloDateNow().plusDays(1),
-                erMigrering = false,
-                behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
                 fagsakId = UUID.randomUUID(),
             )
         }

@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -80,7 +79,6 @@ class JournalføringServiceTest {
     fun setUp() {
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
         every { fagsakService.hentEllerOpprettFagsak(any(), any()) } returns fagsak
-        every { behandlingService.utledNesteBehandlingstype(fagsak.id) } returns BehandlingType.FØRSTEGANGSBEHANDLING
         every { taskService.save(capture(taskSlot)) } returns mockk()
         every { personService.hentPersonIdenter(personIdent) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
         justRun { oppgaveService.ferdigstillOppgave(any()) }
@@ -118,7 +116,6 @@ class JournalføringServiceTest {
         every { behandlingService.leggTilBehandlingsjournalpost(any(), any(), any()) } just Runs
         every {
             behandlingService.opprettBehandling(
-                behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
             )
@@ -137,7 +134,6 @@ class JournalføringServiceTest {
 
         verify(exactly = 1) {
             behandlingService.opprettBehandling(
-                behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
             )

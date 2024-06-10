@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
@@ -35,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
-open class JournalføringService(
+class JournalføringService(
     private val behandlingService: BehandlingService,
     private val fagsakService: FagsakService,
     private val journalpostService: JournalpostService,
@@ -99,12 +98,10 @@ open class JournalføringService(
     ) {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
         val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
-        val nesteBehandlingstype = behandlingService.utledNesteBehandlingstype(fagsak.id)
 
         validerKanOppretteBehandling(journalpost, personIdent)
 
         val behandling = opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
-            behandlingstype = nesteBehandlingstype,
             fagsak = fagsak,
             journalpost = journalpost,
             behandlingÅrsak = behandlingÅrsak,
@@ -167,13 +164,11 @@ open class JournalføringService(
     }
 
     private fun opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
-        behandlingstype: BehandlingType,
         fagsak: Fagsak,
         journalpost: Journalpost,
         behandlingÅrsak: BehandlingÅrsak,
     ): Behandling {
         val behandling = behandlingService.opprettBehandling(
-            behandlingType = behandlingstype,
             fagsakId = fagsak.id,
             behandlingsårsak = behandlingÅrsak,
         )
