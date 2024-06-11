@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Datoperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.formattertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.mergeSammenhengendeOppfylteVilkårperioder
@@ -35,6 +36,7 @@ object StønadsperiodeValideringUtil {
         val målgrupper = vilkårperioder.målgrupper.mergeSammenhengendeOppfylteVilkårperioder()
         val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
 
+        validerAtStønadsperioderIkkeOverlapperMedVilkårPeriodeUtenRett(vilkårperioder, stønadsperioder)
         stønadsperioder.forEach { validerStønadsperiode(it, målgrupper, aktiviteter, fødselsdato) }
     }
 
@@ -66,11 +68,38 @@ object StønadsperiodeValideringUtil {
             ?: brukerfeil("Finner ingen perioder hvor vilkår for ${stønadsperiode.aktivitet} er oppfylt")
 
         målgrupper.firstOrNull { it.inneholder(stønadsperiode) }
-            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.målgruppe} i perioden ${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}")
+            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.målgruppe} i perioden ${stønadsperiode.formattertPeriodeNorskFormat()}")
         aktiviteter.firstOrNull { it.inneholder(stønadsperiode) }
-            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.aktivitet} i perioden ${stønadsperiode.fom.norskFormat()} - ${stønadsperiode.tom.norskFormat()}")
+            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.aktivitet} i perioden ${stønadsperiode.formattertPeriodeNorskFormat()}")
 
         validerStønadsperiodeErInnenfor18og67år(fødselsdato, stønadsperiode)
+    }
+
+    /**
+     * Stønadsperioder kan ikke overlappe med stønadsperiode som ikke gir rett på stønadsperiode,
+     * eks 100% sykepenger eller INGEN_MÅLGRUPPE
+     */
+    private fun validerAtStønadsperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
+        vilkårperioder: VilkårperioderDto,
+        stønadsperioder: List<StønadsperiodeDto>,
+    ) {
+        val perioderSomIkkeGirRett = (vilkårperioder.målgrupper + vilkårperioder.aktiviteter)
+            .filter { it.type.girIkkeRettPåStønadsperiode() }
+        stønadsperioder.forEach { validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(perioderSomIkkeGirRett, it) }
+    }
+
+    private fun validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(
+        vilkårperioder: List<VilkårperiodeDto>,
+        stønadsperiode: StønadsperiodeDto,
+    ) {
+        vilkårperioder
+            .firstOrNull { vilkårperiode -> vilkårperiode.overlapper(stønadsperiode) }
+            ?.let {
+                brukerfeil(
+                    "Stønadsperiode ${stønadsperiode.formattertPeriodeNorskFormat()} overlapper " +
+                        "med ${it.type}(${it.formattertPeriodeNorskFormat()}) som ikke gir rett på stønad",
+                )
+            }
     }
 
     private fun validerStønadsperiodeErInnenfor18og67år(

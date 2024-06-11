@@ -308,9 +308,8 @@ enum class AktivitetTypeDvh {
             AktivitetType.UTDANNING -> UTDANNING
             AktivitetType.REELL_ARBEIDSSØKER -> REELL_ARBEIDSSØKER
             AktivitetType.INGEN_AKTIVITET -> INGEN_AKTIVITET
-            MålgruppeType.AAP, MålgruppeType.DAGPENGER, MålgruppeType.OMSTILLINGSSTØNAD, MålgruppeType.OVERGANGSSTØNAD, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD, MålgruppeType.INGEN_MÅLGRUPPE -> throw IllegalArgumentException(
-                "$vilkårsperiodeType er ikke en gyldig type aktivitet.",
-            )
+
+            is MålgruppeType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type aktivitet.")
         }
     }
 }
@@ -323,6 +322,7 @@ enum class MålgruppeTypeDvh {
     NEDSATT_ARBEIDSEVNE,
     UFØRETRYGD,
     INGEN_MÅLGRUPPE,
+    SYKEPENGER_100_PROSENT,
     ;
 
     companion object {
@@ -334,9 +334,9 @@ enum class MålgruppeTypeDvh {
             MålgruppeType.NEDSATT_ARBEIDSEVNE -> NEDSATT_ARBEIDSEVNE
             MålgruppeType.UFØRETRYGD -> UFØRETRYGD
             MålgruppeType.INGEN_MÅLGRUPPE -> INGEN_MÅLGRUPPE
-            AktivitetType.TILTAK, AktivitetType.UTDANNING, AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.INGEN_AKTIVITET -> throw IllegalArgumentException(
-                "$vilkårsperiodeType er ikke en gyldig type målgruppe.",
-            )
+            MålgruppeType.SYKEPENGER_100_PROSENT -> SYKEPENGER_100_PROSENT
+
+            is AktivitetType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type målgruppe.")
         }
     }
 }

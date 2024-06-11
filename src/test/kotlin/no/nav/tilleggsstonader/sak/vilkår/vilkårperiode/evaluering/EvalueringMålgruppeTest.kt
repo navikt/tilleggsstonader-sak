@@ -274,6 +274,27 @@ class EvalueringMålgruppeTest {
         }
     }
 
+    @Nested
+    inner class Sykepenger {
+
+        @Test
+        fun `100 prosent sykepenger skal mappes til ikke oppfylt`() {
+            val resultat = utledResultat(
+                MålgruppeType.SYKEPENGER_100_PROSENT,
+                delvilkårMålgruppeDto(
+                    medlemskap = VurderingDto(svar = null),
+                    dekketAvAnnetRegelverk = VurderingDto(svar = null),
+                ),
+            )
+
+            assertThat(resultat.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+            assertThat(resultat.medlemskap.svar).isNull()
+            assertThat(resultat.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
+            assertThat(resultat.dekketAvAnnetRegelverk.svar).isNull()
+            assertThat(resultat.dekketAvAnnetRegelverk.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
+        }
+    }
+
     private fun delvilkårMålgruppeDto(
         medlemskap: VurderingDto,
         dekketAvAnnetRegelverk: VurderingDto?,
@@ -301,7 +322,14 @@ class EvalueringMålgruppeTest {
 @ParameterizedTest
 @EnumSource(
     value = MålgruppeType::class,
-    names = ["NEDSATT_ARBEIDSEVNE", "OMSTILLINGSSTØNAD", "DAGPENGER", "UFØRETRYGD", "INGEN_MÅLGRUPPE"],
+    names = [
+        "NEDSATT_ARBEIDSEVNE",
+        "OMSTILLINGSSTØNAD",
+        "DAGPENGER",
+        "UFØRETRYGD",
+        "SYKEPENGER_100_PROSENT",
+        "INGEN_MÅLGRUPPE",
+    ],
     mode = EnumSource.Mode.EXCLUDE,
 )
 private annotation class ImplisittParameterizedTest
@@ -309,7 +337,12 @@ private annotation class ImplisittParameterizedTest
 @ParameterizedTest
 @EnumSource(
     value = MålgruppeType::class,
-    names = ["AAP", "OVERGANGSSTØNAD", "INGEN_MÅLGRUPPE"],
+    names = [
+        "AAP",
+        "OVERGANGSSTØNAD",
+        "SYKEPENGER_100_PROSENT",
+        "INGEN_MÅLGRUPPE",
+    ],
     mode = EnumSource.Mode.EXCLUDE,
 )
 private annotation class IkkeImplisittParameterizedTest
@@ -317,7 +350,13 @@ private annotation class IkkeImplisittParameterizedTest
 @ParameterizedTest
 @EnumSource(
     value = MålgruppeType::class,
-    names = ["OVERGANGSSTØNAD", "OMSTILLINGSSTØNAD", "DAGPENGER", "INGEN_MÅLGRUPPE"],
+    names = [
+        "OVERGANGSSTØNAD",
+        "OMSTILLINGSSTØNAD",
+        "DAGPENGER",
+        "SYKEPENGER_100_PROSENT",
+        "INGEN_MÅLGRUPPE",
+    ],
     mode = EnumSource.Mode.EXCLUDE,
 )
 private annotation class NedsattArbeidsevneParameterizedTest
@@ -325,7 +364,13 @@ private annotation class NedsattArbeidsevneParameterizedTest
 @ParameterizedTest
 @EnumSource(
     value = MålgruppeType::class,
-    names = ["AAP", "NEDSATT_ARBEIDSEVNE", "UFØRETRYGD", "INGEN_MÅLGRUPPE"],
+    names = [
+        "AAP",
+        "NEDSATT_ARBEIDSEVNE",
+        "UFØRETRYGD",
+        "SYKEPENGER_100_PROSENT",
+        "INGEN_MÅLGRUPPE",
+    ],
     mode = EnumSource.Mode.EXCLUDE,
 )
 private annotation class IkkeNedsattArbeidsevneParameterizedTest
