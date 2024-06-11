@@ -1,10 +1,22 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.FØRSTEGANGSBEHANDLING
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.REVURDERING
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import java.util.UUID
 
 object BehandlingUtil {
+
+    fun utledBehandlingType(tidligereBehandlinger: List<Behandling>): BehandlingType {
+        return if (tidligereBehandlinger.any { it.resultat != BehandlingResultat.HENLAGT }) {
+            REVURDERING
+        } else {
+            FØRSTEGANGSBEHANDLING
+        }
+    }
 
     fun validerBehandlingIdErLik(behandlingIdParam: UUID, behandlingIdRequest: UUID) =
         feilHvis(behandlingIdParam != behandlingIdRequest) {

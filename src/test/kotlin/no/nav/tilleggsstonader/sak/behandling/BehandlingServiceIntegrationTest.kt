@@ -35,23 +35,10 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
         )
         assertThatThrownBy {
             behandlingService.opprettBehandling(
-                BehandlingType.REVURDERING,
                 fagsak.id,
                 behandlingsårsak = behandlingÅrsak,
             )
         }.hasMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
-    }
-
-    @Test
-    internal fun `opprettBehandling - skal ikke være mulig å opprette en revurdering om det ikke finnes en behandling fra før`() {
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        assertThatThrownBy {
-            behandlingService.opprettBehandling(
-                BehandlingType.REVURDERING,
-                fagsak.id,
-                behandlingsårsak = behandlingÅrsak,
-            )
-        }.hasMessage("Det finnes ikke en tidligere behandling på fagsaken")
     }
 
     @Test
@@ -159,7 +146,6 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT))
             assertThatThrownBy {
                 behandlingService.opprettBehandling(
-                    BehandlingType.FØRSTEGANGSBEHANDLING,
                     fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
                 )
@@ -172,7 +158,6 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT))
             assertThatThrownBy {
                 behandlingService.opprettBehandling(
-                    BehandlingType.REVURDERING,
                     fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
                 )
@@ -187,7 +172,6 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
                 behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT, type = BehandlingType.REVURDERING),
             )
             behandlingService.opprettBehandling(
-                BehandlingType.REVURDERING,
                 fagsak.id,
                 behandlingsårsak = behandlingÅrsak,
             )
