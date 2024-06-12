@@ -16,7 +16,11 @@ import java.util.UUID
 @RestController
 @RequestMapping("/api/brev")
 @ProtectedWithClaims(issuer = "azuread")
-class BrevController(private val tilgangService: TilgangService, private val behandlingService: BehandlingService, private val brevService: BrevService) {
+class BrevController(
+    private val tilgangService: TilgangService,
+    private val behandlingService: BehandlingService,
+    private val brevService: BrevService,
+) {
 
     @PostMapping("/{behandlingId}")
     fun genererPdf(@RequestBody request: GenererPdfRequest, @PathVariable behandlingId: UUID): ByteArray {
@@ -30,9 +34,7 @@ class BrevController(private val tilgangService: TilgangService, private val beh
 
     @GetMapping("/{behandlingId}")
     fun hentBrev(@PathVariable behandlingId: UUID): ByteArray {
-        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-
-        tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.UPDATE)
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
 
         return Base64.getEncoder().encode(brevService.hentBeslutterbrevEllerRekonstruerSaksbehandlerBrev(behandlingId))
     }
@@ -41,7 +43,7 @@ class BrevController(private val tilgangService: TilgangService, private val beh
     fun forhåndsvisBeslutterbrev(@PathVariable behandlingId: UUID): ByteArray {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.ACCESS)
-        tilgangService.validerHarBeslutterrolle()
+
         return Base64.getEncoder().encode(brevService.forhåndsvisBeslutterBrev(saksbehandling))
     }
 }
