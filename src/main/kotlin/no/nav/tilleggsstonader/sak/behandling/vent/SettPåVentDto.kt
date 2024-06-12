@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class SettPåVentDto(
     val årsaker: List<ÅrsakSettPåVent>,
@@ -29,6 +30,9 @@ data class StatusPåVentDto(
     val årsaker: List<ÅrsakSettPåVent>,
     val kommentar: String?,
     val datoSattPåVent: LocalDate,
+    val opprettetAv: String,
+    val endretAv: String?,
+    val endretTid: LocalDateTime?,
     val frist: LocalDate?,
     val oppgaveVersjon: Int,
 )
