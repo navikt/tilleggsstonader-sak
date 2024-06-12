@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.temporal.ChronoUnit
 import java.util.Optional
 import java.util.UUID
 
@@ -31,10 +32,15 @@ class SettPåVentService(
         val settPåVent = finnAktivSattPåVent(behandlingId)
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
 
+        val endret = utledEndretInformasjon(settPåVent)
+
         return StatusPåVentDto(
             årsaker = settPåVent.årsaker,
             kommentar = settPåVent.kommentar,
             datoSattPåVent = settPåVent.sporbar.opprettetTid.toLocalDate(),
+            opprettetAv = settPåVent.sporbar.opprettetAv,
+            endretAv = endret?.endretAv,
+            endretTid = endret?.endretTid,
             frist = oppgave.fristFerdigstillelse,
             oppgaveVersjon = oppgave.versjonEllerFeil(),
         )
@@ -61,11 +67,15 @@ class SettPåVentService(
         taskService.save(
             BehandlingsstatistikkTask.opprettVenterTask(behandlingId),
         )
+        val endret = utledEndretInformasjon(settPåVent)
 
         return StatusPåVentDto(
             årsaker = dto.årsaker,
             kommentar = dto.kommentar,
             datoSattPåVent = settPåVent.sporbar.opprettetTid.toLocalDate(),
+            opprettetAv = settPåVent.sporbar.opprettetAv,
+            endretAv = endret?.endretAv,
+            endretTid = endret?.endretTid,
             frist = dto.frist,
             oppgaveVersjon = oppdatertOppgave.versjon,
         )
@@ -82,18 +92,33 @@ class SettPåVentService(
         if (harEndretÅrsaker(settPåVent, dto)) {
             opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, mapOf("årsaker" to dto.årsaker))
         }
-        settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
+        val oppdatertSettPåVent =
+            settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
 
         val oppgaveResponse = oppdaterOppgave(settPåVent, dto)
 
+        val endret = utledEndretInformasjon(oppdatertSettPåVent)
+
         return StatusPåVentDto(
-            årsaker = dto.årsaker,
-            kommentar = dto.kommentar,
-            datoSattPåVent = settPåVent.sporbar.opprettetTid.toLocalDate(),
+            årsaker = oppdatertSettPåVent.årsaker,
+            kommentar = oppdatertSettPåVent.kommentar,
+            datoSattPåVent = oppdatertSettPåVent.sporbar.opprettetTid.toLocalDate(),
+            opprettetAv = oppdatertSettPåVent.sporbar.opprettetAv,
+            endretAv = endret?.endretAv,
+            endretTid = endret?.endretTid,
             frist = dto.frist,
             oppgaveVersjon = oppgaveResponse.versjon,
         )
     }
+
+    /**
+     * Det er ønskelig å vise om det ble endring på en SettPåVent. For å finne ut av det sjekkes det om tidspunktene er ulike.
+     * Pga at opprettetTid og endretTid ikke helt er den samme er vi nøtt for å sjekke om den har blitt endret innen noen sekunder
+     */
+    private fun utledEndretInformasjon(oppdatertSettPåVent: SettPåVent) =
+        oppdatertSettPåVent.sporbar.takeIf {
+            ChronoUnit.SECONDS.between(it.opprettetTid, it.endret.endretTid) > 5
+        }?.endret
 
     private fun harEndretÅrsaker(
         settPåVent: SettPåVent,
