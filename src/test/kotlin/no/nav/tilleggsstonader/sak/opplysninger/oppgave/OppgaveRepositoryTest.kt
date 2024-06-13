@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -11,7 +10,12 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.oppgave
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil.totrinnskontroll
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
@@ -22,7 +26,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
     private lateinit var oppgaveRepository: OppgaveRepository
 
     @Autowired
-    private lateinit var behandlingRepository: BehandlingRepository
+    private lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
 
     @Test
     fun `skal kunne opprette oppgave uten kobling til behandling`() {
@@ -37,9 +41,19 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak))
         val oppgave = oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true))
 
-        assertThat(oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(UUID.randomUUID(), Oppgavetype.BehandleSak))
+        assertThat(
+            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(
+                UUID.randomUUID(),
+                Oppgavetype.BehandleSak,
+            ),
+        )
             .isNull()
-        assertThat(oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandling.id, Oppgavetype.BehandleSak))
+        assertThat(
+            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(
+                behandling.id,
+                Oppgavetype.BehandleSak,
+            ),
+        )
             .isNull()
         assertThat(oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandling.id, oppgave.type))
             .isNull()
@@ -55,7 +69,13 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak))
         oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = false, type = Oppgavetype.Journalføring))
         oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = true, type = Oppgavetype.BehandleSak))
-        oppgaveRepository.insert(oppgave(behandling, erFerdigstilt = false, type = Oppgavetype.BehandleUnderkjentVedtak))
+        oppgaveRepository.insert(
+            oppgave(
+                behandling,
+                erFerdigstilt = false,
+                type = Oppgavetype.BehandleUnderkjentVedtak,
+            ),
+        )
 
         val oppgave =
             oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
@@ -129,27 +149,78 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
         assertThat(oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandling.id)).isNull()
     }
 
-    @Test
-    fun `skal finne behandlingId til oppgaver`() {
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val fagsak2 = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("2"))))
-        val behandling = testoppsettService.lagre(behandling(fagsak))
-        val behandling2 = testoppsettService.lagre(behandling(fagsak2))
-        oppgaveRepository.insert(
-            OppgaveDomain(
-                behandlingId = behandling.id,
-                type = Oppgavetype.BehandleSak,
-                gsakOppgaveId = 1,
-            ),
-        )
-        oppgaveRepository.insert(
-            OppgaveDomain(
-                behandlingId = behandling2.id,
-                type = Oppgavetype.BehandleSak,
-                gsakOppgaveId = 2,
-            ),
-        )
-        assertThat(oppgaveRepository.finnBehandlingIdForGsakOppgaveId(listOf(1, 2, 3)))
-            .containsExactlyInAnyOrder(Pair(1, behandling.id), Pair(2, behandling2.id))
+    @Nested
+    inner class FinnOppgaveMetadata {
+
+        val fagsak1 = fagsak()
+        val fagsak2 = fagsak(identer = setOf(PersonIdent("2")))
+        val behandling1 = behandling(fagsak1)
+        val behandling2 = behandling(fagsak2)
+
+        @BeforeEach
+        fun setUp() {
+            testoppsettService.lagreFagsak(fagsak1)
+            testoppsettService.lagreFagsak(fagsak2)
+            testoppsettService.lagre(behandling1)
+            testoppsettService.lagre(behandling2)
+
+            oppgaveRepository.insert(
+                OppgaveDomain(
+                    behandlingId = behandling1.id,
+                    type = Oppgavetype.BehandleSak,
+                    gsakOppgaveId = 1,
+                ),
+            )
+            oppgaveRepository.insert(
+                OppgaveDomain(
+                    behandlingId = behandling2.id,
+                    type = Oppgavetype.BehandleSak,
+                    gsakOppgaveId = 2,
+                ),
+            )
+        }
+
+        @Test
+        fun `skal finne behandlingId til oppgaver`() {
+            val metadata = oppgaveRepository.finnOppgaveMetadata(listOf(1, 2, 3))
+
+            assertThat(metadata.map { it.gsakOppgaveId to it.behandlingId })
+                .containsExactlyInAnyOrder(Pair(1, behandling1.id), Pair(2, behandling2.id))
+        }
+
+        @Test
+        fun `skal finne hvem som sendt oppgaven til totrinnskontroll`() {
+            totrinnskontrollRepository.insert(
+                totrinnskontroll(
+                    status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
+                    behandlingId = behandling1.id,
+                    saksbehandler = "sak001",
+                ),
+            )
+
+            val metadata = oppgaveRepository.finnOppgaveMetadata(listOf(1, 2, 3))
+
+            assertThat(metadata.map { it.gsakOppgaveId to it.sendtTilTotrinnskontrollAv })
+                .containsExactlyInAnyOrder(Pair(1, "sak001"), Pair(2, null))
+        }
+
+        @Test
+        fun `sendtTilTotrinnskontrollAv er null hvis TotrinnInternStatus ikke er KAN_FATTE_VEDTAK`() {
+            TotrinnInternStatus.entries
+                .filter { it != TotrinnInternStatus.KAN_FATTE_VEDTAK }
+                .forEach {
+                    totrinnskontrollRepository.insert(
+                        totrinnskontroll(
+                            status = it,
+                            behandlingId = behandling1.id,
+                            saksbehandler = "sak002",
+                        ),
+                    )
+                }
+            val metadata = oppgaveRepository.finnOppgaveMetadata(listOf(1, 2, 3))
+
+            assertThat(metadata.map { it.gsakOppgaveId to it.sendtTilTotrinnskontrollAv })
+                .containsExactlyInAnyOrder(Pair(1, null), Pair(2, null))
+        }
     }
 }

@@ -70,7 +70,7 @@ internal class OppgaveServiceTest {
         every { oppgaveClient.finnOppgaveMedId(any()) } returns lagEksternTestOppgave()
         every { oppgaveRepository.insert(capture(opprettOppgaveDomainSlot)) } returns lagTestOppgave()
         every { oppgaveRepository.update(any()) } answers { firstArg() }
-        every { oppgaveRepository.finnBehandlingIdForGsakOppgaveId(any()) } returns emptyList()
+        every { oppgaveRepository.finnOppgaveMetadata(any()) } returns emptyList()
         every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(
             1,
             listOf(MappeDto(OppgaveClientConfig.MAPPE_ID_PÅ_VENT, "10 På vent", "4462")),
@@ -281,8 +281,10 @@ internal class OppgaveServiceTest {
                 lagEksternTestOppgave().copy(id = 2),
             ),
         )
-        every { oppgaveRepository.finnBehandlingIdForGsakOppgaveId(any()) } answers {
-            firstArg<List<Long>>().filter { it == oppgaveIdMedBehandling }.map { it to behandlingId }
+        every { oppgaveRepository.finnOppgaveMetadata(any()) } answers {
+            firstArg<List<Long>>()
+                .filter { it == oppgaveIdMedBehandling }
+                .map { OppgaveMetadata(it, behandlingId, null) }
         }
 
         val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null)).oppgaver

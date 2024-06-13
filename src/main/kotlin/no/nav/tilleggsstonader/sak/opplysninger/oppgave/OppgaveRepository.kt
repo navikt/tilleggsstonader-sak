@@ -27,8 +27,12 @@ interface OppgaveRepository : RepositoryInterface<OppgaveDomain, UUID>, InsertUp
 
     @Query(
         """
-        SELECT gsak_oppgave_id as first, behandling_id as second FROM oppgave WHERE gsak_oppgave_id IN (:oppgaveIder)
+        SELECT gsak_oppgave_id, o.behandling_id, 
+        t.saksbehandler AS sendt_til_totrinnskontroll_av 
+        FROM oppgave o
+        LEFT JOIN totrinnskontroll t ON t.behandling_id = o.behandling_id AND t.status = 'KAN_FATTE_VEDTAK'
+        WHERE gsak_oppgave_id IN (:oppgaveIder)
         """,
     )
-    fun finnBehandlingIdForGsakOppgaveId(oppgaveIder: Collection<Long>): List<Pair<Long, UUID>>
+    fun finnOppgaveMetadata(oppgaveIder: Collection<Long>): List<OppgaveMetadata>
 }

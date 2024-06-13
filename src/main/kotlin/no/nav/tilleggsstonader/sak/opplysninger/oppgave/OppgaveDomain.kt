@@ -18,3 +18,16 @@ data class OppgaveDomain(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 )
+
+/**
+ *
+ * @param sendtTilTotrinnskontrollAv brukes for at saksbehandler ikke skal plukke behandlinger man selv sendt til totrinnskontroll
+
+ * !!NOTER: Denne blir cachet i [OppgaveService.finnOppgaveMetadata]
+ * så hvis noe legges til som kan endre seg, eks en status, så må cache fjernes
+ */
+data class OppgaveMetadata(
+    val gsakOppgaveId: Long,
+    val behandlingId: UUID,
+    val sendtTilTotrinnskontrollAv: String?,
+)
