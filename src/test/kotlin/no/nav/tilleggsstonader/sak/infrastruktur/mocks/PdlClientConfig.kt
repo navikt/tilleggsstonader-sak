@@ -69,12 +69,12 @@ class PdlClientConfig {
 
         every { pdlClient.hentAndreForeldre(any()) } returns mapOf(annenForelderFnr to annenForelder())
 
-        val personIdentAktør = slot<String>()
-        every { pdlClient.hentAktørIder(capture(personIdentAktør)) } answers {
-            if (personIdentAktør.captured == "19117313797") {
+        every { pdlClient.hentAktørIder(any()) } answers {
+            val ident = firstArg<String>()
+            if (ident == "19117313797") {
                 throw PdlNotFoundException()
             } else {
-                PdlIdenter(listOf(PdlIdent("12345678901232", false)))
+                PdlIdenter(listOf(PdlIdent("00$ident", false)))
             }
         }
 
