@@ -29,22 +29,19 @@ class EksternVedtakService(
     }
 
     private fun tilFagsystemVedtak(behandling: Behandling): FagsystemVedtak {
-        val (resultat, fagsystemType) = utledReultatOgFagsystemType(behandling)
+
 
         return FagsystemVedtak(
             eksternBehandlingId = behandlingService.hentEksternBehandlingId(behandling.id).id.toString(),
             behandlingstype = behandling.type.visningsnavn,
-            resultat = resultat,
+            resultat = behandling.resultat.name,
             vedtakstidspunkt = behandling.vedtakstidspunkt
                 ?: error("Mangler vedtakstidspunkt for behandling=${behandling.id}"),
-            fagsystemType = fagsystemType,
+            fagsystemType = FagsystemType.ORDNIÆR,
             regelverk = mapTilRegelverk(behandling.kategori),
         )
     }
-    private fun utledReultatOgFagsystemType(behandling: Behandling): Pair<String, FagsystemType> {
-        // Når tilbakekrevning blir implementert så trenger denne å utvides med FagsystemType.TILBAKEKREVING
-        return Pair(behandling.resultat.displayName, FagsystemType.ORDNIÆR)
-    }
+
     private fun mapTilRegelverk(kategori: BehandlingKategori) = when (kategori) {
         BehandlingKategori.EØS -> Regelverk.EØS
         BehandlingKategori.NASJONAL -> Regelverk.NASJONAL
