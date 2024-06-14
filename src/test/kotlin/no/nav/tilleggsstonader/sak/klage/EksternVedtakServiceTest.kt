@@ -57,7 +57,6 @@ class EksternVedtakServiceTest {
         assertThat(vedtak[0].eksternBehandlingId).isEqualTo(eksternBehandlingId)
         assertThat(vedtak[0].vedtakstidspunkt).isEqualTo(vedtakstidspunkt)
         assertThat(vedtak[0].fagsystemType).isEqualTo(FagsystemType.ORDNIÆR)
-
     }
 
     @Test
