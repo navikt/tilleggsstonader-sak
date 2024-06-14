@@ -32,6 +32,7 @@ interface OppgaveRepository : RepositoryInterface<OppgaveDomain, UUID>, InsertUp
         FROM oppgave o
         LEFT JOIN totrinnskontroll t ON t.behandling_id = o.behandling_id AND t.status = 'KAN_FATTE_VEDTAK'
         WHERE gsak_oppgave_id IN (:oppgaveIder)
+        AND o.behandling_id IS NOT NULL
         """,
     )
     fun finnOppgaveMetadata(oppgaveIder: Collection<Long>): List<OppgaveMetadata>

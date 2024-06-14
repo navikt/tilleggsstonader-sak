@@ -163,25 +163,24 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
             testoppsettService.lagreFagsak(fagsak2)
             testoppsettService.lagre(behandling1)
             testoppsettService.lagre(behandling2)
+        }
 
+        @Test
+        fun `skal ikke hente ut informasjon til de oppgaver som ikke har behandlingId`() {
             oppgaveRepository.insert(
                 OppgaveDomain(
-                    behandlingId = behandling1.id,
-                    type = Oppgavetype.BehandleSak,
+                    behandlingId = null,
+                    type = Oppgavetype.Journalføring,
                     gsakOppgaveId = 1,
                 ),
             )
-            oppgaveRepository.insert(
-                OppgaveDomain(
-                    behandlingId = behandling2.id,
-                    type = Oppgavetype.BehandleSak,
-                    gsakOppgaveId = 2,
-                ),
-            )
+
+            assertThat(oppgaveRepository.finnOppgaveMetadata(listOf(1))).isEmpty()
         }
 
         @Test
         fun `skal finne behandlingId til oppgaver`() {
+            opprettOppgaver()
             val metadata = oppgaveRepository.finnOppgaveMetadata(listOf(1, 2, 3))
 
             assertThat(metadata.map { it.gsakOppgaveId to it.behandlingId })
@@ -190,6 +189,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
 
         @Test
         fun `skal finne hvem som sendt oppgaven til totrinnskontroll`() {
+            opprettOppgaver()
             totrinnskontrollRepository.insert(
                 totrinnskontroll(
                     status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
@@ -206,6 +206,8 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
 
         @Test
         fun `sendtTilTotrinnskontrollAv er null hvis TotrinnInternStatus ikke er KAN_FATTE_VEDTAK`() {
+            opprettOppgaver()
+
             TotrinnInternStatus.entries
                 .filter { it != TotrinnInternStatus.KAN_FATTE_VEDTAK }
                 .forEach {
@@ -221,6 +223,23 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
 
             assertThat(metadata.map { it.gsakOppgaveId to it.sendtTilTotrinnskontrollAv })
                 .containsExactlyInAnyOrder(Pair(1, null), Pair(2, null))
+        }
+
+        private fun opprettOppgaver() {
+            oppgaveRepository.insert(
+                OppgaveDomain(
+                    behandlingId = behandling1.id,
+                    type = Oppgavetype.BehandleSak,
+                    gsakOppgaveId = 1,
+                ),
+            )
+            oppgaveRepository.insert(
+                OppgaveDomain(
+                    behandlingId = behandling2.id,
+                    type = Oppgavetype.BehandleSak,
+                    gsakOppgaveId = 2,
+                ),
+            )
         }
     }
 }
