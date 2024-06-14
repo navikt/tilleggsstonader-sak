@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sisteFerdigstilteBehandling
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -8,8 +9,10 @@ import no.nav.tilleggsstonader.sak.behandling.barn.TidligereBarnId
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
+import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,6 +20,7 @@ import java.util.UUID
 
 @Service
 class OpprettRevurderingBehandlingService(
+    val taskService: TaskService,
     val behandlingService: BehandlingService,
     val barnService: BarnService,
     val unleashService: UnleashService,
@@ -35,6 +39,15 @@ class OpprettRevurderingBehandlingService(
         )
 
         gjenbrukData(behandling)
+        taskService.save(
+            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                    behandlingId = behandling.id,
+                    saksbehandler = SikkerhetContext.hentSaksbehandler(),
+                    beskrivelse = "Revurdering. Skal saksbehandles i ny løsning.", // TODO tekst
+                ),
+            ),
+        )
 
         return behandling.id
     }

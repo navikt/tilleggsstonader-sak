@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
 import java.time.format.DateTimeFormatter
 import java.util.Optional
+import kotlin.jvm.optionals.getOrNull
 
 @Configuration
 @Profile("mock-oppgave")
@@ -48,6 +49,14 @@ class OppgaveClientConfig {
                 .filter { oppgave -> request.behandlingstema?.let { oppgave.behandlingstema == it.value } ?: true }
                 .filter { oppgave -> request.oppgavetype?.let { oppgave.oppgavetype == it.value } ?: true }
                 .filter { oppgave -> request.behandlingstype?.let { oppgave.behandlingstype == it.value } ?: true }
+                .filter { oppgave -> request.erUtenMappe?.takeIf { it }?.let { oppgave.mappeId == null } ?: true }
+                .filter { oppgave -> request.mappeId?.let { oppgave.mappeId?.getOrNull() == it } ?: true }
+                .filter { oppgave ->
+                    request.aktørId?.let { aktørId ->
+                        // [PdlClientConfig] legger til prefix "00" på aktørId lokalt
+                        oppgave.identer?.any { it.ident == aktørId || "00${it.ident}" == aktørId } ?: false
+                    } ?: true
+                }
                 .toList()
             val toIndex = minOf((request.offset + request.limit).toInt(), oppgaver.size)
             val paginerteOppgaver = oppgaver.subList(request.offset.toInt(), toIndex)

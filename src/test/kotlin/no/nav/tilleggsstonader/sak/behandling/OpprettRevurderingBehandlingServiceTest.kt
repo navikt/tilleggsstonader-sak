@@ -5,10 +5,13 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
+import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +24,17 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var barnService: BarnService
+
+    @BeforeEach
+    fun setUp() {
+        BrukerContextUtil.mockBrukerContext()
+    }
+
+    @AfterEach
+    override fun tearDown() {
+        super.tearDown()
+        BrukerContextUtil.clearBrukerContext()
+    }
 
     @Nested
     inner class OpprettBehandling {
