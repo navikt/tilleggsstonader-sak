@@ -32,7 +32,7 @@ class EksternVedtakService(
         return FagsystemVedtak(
             eksternBehandlingId = behandlingService.hentEksternBehandlingId(behandling.id).id.toString(),
             behandlingstype = behandling.type.visningsnavn,
-            resultat = behandling.resultat.name,
+            resultat = behandling.resultat.displayName,
             vedtakstidspunkt = behandling.vedtakstidspunkt
                 ?: error("Mangler vedtakstidspunkt for behandling=${behandling.id}"),
             fagsystemType = FagsystemType.ORDNIÆR,
