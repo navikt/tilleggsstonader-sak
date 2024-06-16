@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakDomain
 import no.nav.tilleggsstonader.sak.util.fagsakpersoner
@@ -53,7 +54,11 @@ class FagsakRepositoryTest : IntegrationTest() {
                 status = BehandlingStatus.FERDIGSTILT,
             ),
         )
-        val andel = andelTilkjentYtelse(behandling.id, fom = osloDateNow(), tom = osloDateNow())
+        val andel = andelTilkjentYtelse(
+            behandling.id,
+            fom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+            tom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+        )
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andeler = arrayOf(andel)))
 
         val harLøpendeUtbetaling = fagsakRepository.harLøpendeUtbetaling(fagsak.id)
