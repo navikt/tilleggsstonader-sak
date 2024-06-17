@@ -13,16 +13,19 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class BrevService(
     private val vedtaksbrevRepository: VedtaksbrevRepository,
     private val familieDokumentClient: FamilieDokumentClient,
+    private val tilgangService: TilgangService,
 ) {
 
     fun lagSaksbehandlerBrev(saksbehandling: Saksbehandling, html: String): ByteArray {
@@ -70,7 +73,11 @@ class BrevService(
     fun forhåndsvisBeslutterBrev(saksbehandling: Saksbehandling): ByteArray {
         val vedtaksbrev = vedtaksbrevRepository.findByIdOrThrow(saksbehandling.id)
 
-        val beslutterSignatur = SikkerhetContext.hentSaksbehandlerNavn(strict = true)
+        val beslutterSignatur = if (tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)) {
+            SikkerhetContext.hentSaksbehandlerNavn(strict = true)
+        } else {
+            ""
+        }
 
         return lagBeslutterPdfMedSignatur(vedtaksbrev.saksbehandlerHtml, beslutterSignatur).bytes
     }

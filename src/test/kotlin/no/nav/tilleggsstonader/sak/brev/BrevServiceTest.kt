@@ -15,17 +15,21 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.clearBrukerContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
+import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.BAD_REQUEST
 
@@ -36,15 +40,20 @@ internal class BrevServiceTest {
 
     private val vedtaksbrevRepository = mockk<VedtaksbrevRepository>()
     private val familieDokumentClient = mockk<FamilieDokumentClient>()
+    private val tilgangService = mockk<TilgangService>()
 
-    private val brevService = BrevService(vedtaksbrevRepository, familieDokumentClient)
+    private val brevService = BrevService(vedtaksbrevRepository, familieDokumentClient, tilgangService)
 
     private val vedtaksbrev: Vedtaksbrev = lagVedtaksbrev("malnavn")
     private val beslutterNavn = "456"
+    private val pdfHtmlSlot = slot<String>()
 
     @BeforeEach
     fun setUp() {
         mockBrukerContext(beslutterNavn)
+        pdfHtmlSlot.clear()
+        every { tilgangService.harTilgangTilRolle(any()) } returns true
+        every { familieDokumentClient.genererPdf(capture(pdfHtmlSlot)) } returns "brev".toByteArray()
     }
 
     @AfterEach
@@ -119,7 +128,6 @@ internal class BrevServiceTest {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(beslutterIdent = "tilfeldigvisFeilIdent")
         val brevSlot = slot<Vedtaksbrev>()
         every { vedtaksbrevRepository.update(capture(brevSlot)) } returns mockk()
-        every { familieDokumentClient.genererPdf(any()) } returns "brev".toByteArray()
 
         // Når
         brevService.lagEndeligBeslutterbrev(saksbehandling(fagsak, behandlingForBeslutter))
@@ -176,10 +184,41 @@ internal class BrevServiceTest {
         beslutterIdent = null,
     )
 
+    @Nested
+    inner class ForhåndsvisBeslutterBrev {
+
+        @Test
+        fun `skal generere brev med tom besluttersignatur hvis man ikke har beslutterrolle - man skal kunne se brevet som saksbehandler opprettet`() {
+            every { tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER) } returns false
+            every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev
+
+            testWithBrukerContext("sak001") {
+                brevService.forhåndsvisBeslutterBrev(saksbehandling())
+            }
+
+            assertThat(pdfHtmlSlot.captured).doesNotContain("sak001")
+        }
+
+        @Test
+        fun `skal generere brev besluttersignatur hvis man har beslutterrolle`() {
+            every { tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER) } returns true
+            every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev
+
+            testWithBrukerContext("sak001") {
+                brevService.forhåndsvisBeslutterBrev(saksbehandling())
+            }
+
+            assertThat(pdfHtmlSlot.captured).contains("sak001")
+        }
+    }
+
     @Test
     fun `skal kaste feil hvis saksbehandlerHtml ikke inneholder placeholder for saksbehandlersignatur`() {
         val feilmelding = catchThrowableOfType<Feil> {
-            brevService.lagSaksbehandlerBrev(saksbehandling(fagsak, behandlingForSaksbehandler), "html uten placeholder")
+            brevService.lagSaksbehandlerBrev(
+                saksbehandling(fagsak, behandlingForSaksbehandler),
+                "html uten placeholder",
+            )
         }.message
         assertThat(feilmelding).isEqualTo("Brev-HTML mangler placeholder for saksbehandlersignatur")
     }
@@ -196,17 +235,15 @@ internal class BrevServiceTest {
 
     @Test
     fun `Skal erstatte placeholder med besluttersignatur`() {
-        val htmlSlot = slot<String>()
-
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(saksbehandlerHtml = "html med placeholder $BESLUTTER_SIGNATUR_PLACEHOLDER, vedtaksdato $BREVDATO_PLACEHOLDER og en liten avslutning")
         every { vedtaksbrevRepository.update(any()) } returns vedtaksbrev
-        every { familieDokumentClient.genererPdf(capture(htmlSlot)) } returns "123".toByteArray()
 
         brevService.forhåndsvisBeslutterBrev(saksbehandling(fagsak, behandlingForBeslutter))
 
         val vedtaksdato = osloDateNow().norskFormat()
 
-        assertThat(htmlSlot.captured).isEqualTo("html med placeholder $beslutterNavn, vedtaksdato $vedtaksdato og en liten avslutning")
+        assertThat(pdfHtmlSlot.captured)
+            .isEqualTo("html med placeholder $beslutterNavn, vedtaksdato $vedtaksdato og en liten avslutning")
     }
 
     @Test
@@ -214,10 +251,12 @@ internal class BrevServiceTest {
         val vedtaksbrevSlot = slot<Vedtaksbrev>()
         every { vedtaksbrevRepository.existsById(any()) } returns true
         every { vedtaksbrevRepository.update(capture(vedtaksbrevSlot)) } answers { firstArg() }
-        every { familieDokumentClient.genererPdf(any()) } returns "123".toByteArray()
 
         val now = SporbarUtils.now()
-        brevService.lagSaksbehandlerBrev(saksbehandling(fagsak, behandling), "html med $SAKSBEHANDLER_SIGNATUR_PLACEHOLDER")
+        brevService.lagSaksbehandlerBrev(
+            saksbehandling(fagsak, behandling),
+            "html med $SAKSBEHANDLER_SIGNATUR_PLACEHOLDER",
+        )
         assertThat(vedtaksbrevSlot.captured.opprettetTid).isAfterOrEqualTo(now)
     }
 }
