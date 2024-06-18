@@ -38,7 +38,7 @@ class GrunnlagsdataService(
     private fun opprettGrunnlagsdata(behandlingId: UUID): Grunnlagsdata {
         // TODO historikk behandling påbegynt NAV-20376
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        logger.info("Oppretter grunnlagsdata for behandling=$behandlingId status=$behandlingId")
+        logger.info("Oppretter grunnlagsdata for behandling=$behandlingId status=${behandling.status}")
 
         val grunnlag = hentGrunnlagFraRegister(behandling)
         val grunnlagsdata = Grunnlagsdata(
