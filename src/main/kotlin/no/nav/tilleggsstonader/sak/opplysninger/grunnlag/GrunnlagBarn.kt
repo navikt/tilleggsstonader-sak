@@ -17,8 +17,8 @@ fun Map<String, PdlPersonForelderBarn>.tilGrunnlagsdataBarn() = entries.map { (i
     GrunnlagBarn(
         ident = ident,
         navn = barn.navn.gjeldende().tilNavn(),
-        fødselsdato = barn.fødsel.gjeldende().fødselsdato,
-        alder = antallÅrSiden(barn.fødsel.gjeldende().fødselsdato),
+        fødselsdato = barn.fødselsdato.gjeldende().fødselsdato,
+        alder = antallÅrSiden(barn.fødselsdato.gjeldende().fødselsdato),
         dødsdato = barn.dødsfall.gjeldende()?.dødsdato,
     )
 }

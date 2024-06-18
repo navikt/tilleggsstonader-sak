@@ -50,7 +50,7 @@ data class PersonBolk<T>(val personBolk: List<PersonDataBolk<T>>)
 
 interface PdlPerson {
 
-    val fødsel: List<Fødsel>
+    val fødselsdato: List<Fødselsdato>
     val bostedsadresse: List<Bostedsadresse>
 }
 
@@ -96,7 +96,7 @@ data class PdlSøker(
     @JsonProperty("doedsfall") val dødsfall: List<Dødsfall>,
     val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
     val folkeregisteridentifikator: List<Folkeregisteridentifikator>,
-    @JsonProperty("foedsel") override val fødsel: List<Fødsel>,
+    @JsonProperty("foedselsdato") override val fødselsdato: List<Fødselsdato>,
     val folkeregisterpersonstatus: List<Folkeregisterpersonstatus>,
     val fullmakt: List<Fullmakt>,
     val kontaktadresse: List<Kontaktadresse>,
@@ -117,7 +117,7 @@ data class PdlPersonForelderBarn(
     override val bostedsadresse: List<Bostedsadresse>,
     @JsonProperty("doedsfall") val dødsfall: List<Dødsfall>,
     val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
-    @JsonProperty("foedsel") override val fødsel: List<Fødsel>,
+    @JsonProperty("foedselsdato") override val fødselsdato: List<Fødselsdato>,
     val navn: List<Navn>,
 ) : PdlPerson
 
@@ -125,7 +125,7 @@ data class PdlAnnenForelder(
     val adressebeskyttelse: List<Adressebeskyttelse>,
     override val bostedsadresse: List<Bostedsadresse>,
     @JsonProperty("doedsfall") val dødsfall: List<Dødsfall>,
-    @JsonProperty("foedsel") override val fødsel: List<Fødsel>,
+    @JsonProperty("foedselsdato") override val fødselsdato: List<Fødselsdato>,
     val folkeregisteridentifikator: List<Folkeregisteridentifikator>,
     val navn: List<Navn>,
 ) : PdlPerson
@@ -247,12 +247,9 @@ fun AdressebeskyttelseGradering.tilDiskresjonskode(): String? = when (this) {
 /**
  * @param [fødselsår] skal finnes på alle brukere, men er definiert som nullable i skjema
  */
-data class Fødsel(
+data class Fødselsdato(
     @JsonProperty("foedselsaar") val fødselsår: Int?,
     @JsonProperty("foedselsdato") val fødselsdato: LocalDate?,
-    @JsonProperty("foedeland") val fødeland: String?,
-    @JsonProperty("foedested") val fødested: String?,
-    @JsonProperty("foedekommune") val fødekommune: String?,
     val metadata: Metadata,
 )
 

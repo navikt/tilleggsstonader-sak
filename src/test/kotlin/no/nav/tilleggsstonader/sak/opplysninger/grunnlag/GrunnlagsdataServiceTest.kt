@@ -42,7 +42,7 @@ class GrunnlagsdataServiceTest {
     val identBarn1 = "identBarn1"
 
     val pdlBarn = mapOf(
-        identBarn1 to pdlBarn(fødsel = fødsel()),
+        identBarn1 to pdlBarn(fødselsdato = fødsel()),
     )
     val søkerMedBarn = SøkerMedBarn(
         søkerIdent = behandling.ident,

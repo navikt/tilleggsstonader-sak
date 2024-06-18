@@ -49,12 +49,9 @@ query($identer: [ID!]!){
             doedsfall {
                 doedsdato
             }
-            foedsel {
+            foedselsdato {
                 foedselsaar
                 foedselsdato
-                foedeland
-                foedested
-                foedekommune
                 metadata {
                     historisk
                 }

@@ -161,7 +161,7 @@ class PdlClientConfig {
                 dødsfall = listOf(),
                 forelderBarnRelasjon = forelderBarnRelasjoner(),
                 folkeregisteridentifikator = listOf(folkeregisteridentifikatorSøker),
-                fødsel = listOf(fødsel()),
+                fødselsdato = listOf(fødsel()),
                 folkeregisterpersonstatus = listOf(
                     Folkeregisterpersonstatus(
                         "bosatt",
@@ -197,13 +197,13 @@ class PdlClientConfig {
                 barnFnr to pdlBarn(
                     bostedsadresse = bostedsadresse(),
                     forelderBarnRelasjon = familierelasjonerBarn(),
-                    fødsel = fødsel(),
+                    fødselsdato = fødsel(),
                     navn = lagNavn("Barn", null, "Barnesen"),
                 ),
                 barn2Fnr to pdlBarn(
                     bostedsadresse = bostedsadresse(),
                     forelderBarnRelasjon = familierelasjonerBarn(),
-                    fødsel = fødsel(),
+                    fødselsdato = fødsel(),
                     navn = lagNavn("Barn2", null, "Barnesen"),
                 ),
             )
@@ -213,7 +213,7 @@ class PdlClientConfig {
                 adressebeskyttelse = emptyList(),
                 bostedsadresse = bostedsadresse(),
                 dødsfall = listOf(Dødsfall(LocalDate.of(2021, 9, 22))),
-                fødsel = listOf(fødsel(1994, 11, 1)),
+                fødselsdato = listOf(fødsel(1994, 11, 1)),
                 navn = listOf(Navn("Bob", "", "Burger", metadataGjeldende)),
                 folkeregisteridentifikator = listOf(
                     Folkeregisteridentifikator(

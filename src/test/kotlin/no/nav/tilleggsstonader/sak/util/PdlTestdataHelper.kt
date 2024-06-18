@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregistermetadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatus
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødsel
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødselsdato
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Metadata
@@ -51,7 +51,7 @@ object PdlTestdataHelper {
         bostedsadresse: List<Bostedsadresse> = emptyList(),
         dødsfall: List<Dødsfall> = emptyList(),
         forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList(),
-        fødsel: List<Fødsel> = listOf(fødsel(år = 2000)),
+        fødselsdato: List<Fødselsdato> = listOf(fødsel(år = 2000)),
         folkeregisterpersonstatus: List<Folkeregisterpersonstatus> = emptyList(),
         fullmakt: List<Fullmakt> = emptyList(),
         kontaktadresse: List<Kontaktadresse> = emptyList(),
@@ -70,7 +70,7 @@ object PdlTestdataHelper {
             dødsfall = dødsfall,
             forelderBarnRelasjon = forelderBarnRelasjon,
             folkeregisteridentifikator = folkeregisteridentifikator,
-            fødsel = fødsel,
+            fødselsdato = fødselsdato,
             folkeregisterpersonstatus = folkeregisterpersonstatus,
             fullmakt = fullmakt,
             kontaktadresse = kontaktadresse,
@@ -88,7 +88,7 @@ object PdlTestdataHelper {
         bostedsadresse: List<Bostedsadresse> = emptyList(),
         dødsfall: List<Dødsfall> = emptyList(),
         forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList(),
-        fødsel: Fødsel? = null,
+        fødselsdato: Fødselsdato? = null,
         navn: Navn = lagNavn(),
     ) =
         PdlPersonForelderBarn(
@@ -96,7 +96,7 @@ object PdlTestdataHelper {
             bostedsadresse = bostedsadresse,
             dødsfall = dødsfall,
             forelderBarnRelasjon = forelderBarnRelasjon,
-            fødsel = listOfNotNull(fødsel),
+            fødselsdato = listOfNotNull(fødselsdato),
             navn = listOfNotNull(navn),
         )
 
@@ -110,17 +110,14 @@ object PdlTestdataHelper {
         dødsfall = dødsfall,
     )
 
-    fun fødsel(år: Int = 2000, måned: Int = 1, dag: Int = 1): Fødsel =
+    fun fødsel(år: Int = 2000, måned: Int = 1, dag: Int = 1): Fødselsdato =
         fødsel(LocalDate.of(år, måned, dag))
 
     fun fødsel(fødselsdato: LocalDate) =
-        Fødsel(
+        Fødselsdato(
             fødselsår = fødselsdato.year,
             fødselsdato = fødselsdato,
             metadata = metadataGjeldende,
-            fødested = null,
-            fødekommune = null,
-            fødeland = null,
         )
 
     fun ukjentBostedsadresse(
