@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatu
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødselsdato
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.IdentifiserendeInformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Metadata
@@ -165,7 +166,7 @@ object PdlTestdataHelper {
         omfangetErInnenPersonligOmraade: Boolean = false,
     ) = VergeEllerFullmektig(
         motpartsPersonident = motpartsPersonident,
-        navn = navn,
+        identifiserendeInformasjon = IdentifiserendeInformasjon(navn = navn),
         omfang = omfang,
         omfangetErInnenPersonligOmraade = omfangetErInnenPersonligOmraade,
     )

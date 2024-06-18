@@ -360,10 +360,14 @@ data class UtenlandskAdresseIFrittFormat(
 )
 
 data class VergeEllerFullmektig(
+    val identifiserendeInformasjon: IdentifiserendeInformasjon?,
     val motpartsPersonident: String?,
-    val navn: Personnavn?,
     val omfang: String?,
     val omfangetErInnenPersonligOmraade: Boolean,
+)
+
+data class IdentifiserendeInformasjon(
+    val navn: Personnavn?,
 )
 
 data class VergemaalEllerFremtidsfullmakt(

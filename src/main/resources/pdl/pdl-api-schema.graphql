@@ -714,10 +714,12 @@ type VegadresseResult {
 }
 
 type VergeEllerFullmektig {
+    identifiserendeInformasjon: IdentifiserendeInformasjon
     motpartsPersonident: String
-    navn: Personnavn
+    navn: Personnavn @deprecated(reason: "Erstattes av navn iidentifiserendeInformasjon")
     omfang: String
-    omfangetErInnenPersonligOmraade: Boolean!
+    omfangetErInnenPersonligOmraade: Boolean
+    tjenesteomraade: [Tjenesteomraade!]
 }
 
 type VergemaalEllerFremtidsfullmakt {

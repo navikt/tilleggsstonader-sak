@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregistermetadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatus
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.IdentifiserendeInformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktadresseType
@@ -328,7 +329,7 @@ class PdlClientConfig {
                     vergeEllerFullmektig =
                     VergeEllerFullmektig(
                         motpartsPersonident = annenForelderFnr,
-                        navn = null,
+                        identifiserendeInformasjon = IdentifiserendeInformasjon(navn = null),
                         omfang = "personligeOgOekonomiskeInteresser",
                         omfangetErInnenPersonligOmraade = false,
                     ),
@@ -340,7 +341,7 @@ class PdlClientConfig {
                     vergeEllerFullmektig =
                     VergeEllerFullmektig(
                         motpartsPersonident = annenForelderFnr,
-                        navn = null,
+                        identifiserendeInformasjon = IdentifiserendeInformasjon(navn = null),
                         omfang = "personligeOgOekonomiskeInteresser",
                         omfangetErInnenPersonligOmraade = false,
                     ),

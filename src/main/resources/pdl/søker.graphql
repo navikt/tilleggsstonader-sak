@@ -100,12 +100,14 @@ query($ident: ID!){
             }
             type
             vergeEllerFullmektig {
-                motpartsPersonident
-                navn {
-                    fornavn
-                    mellomnavn
-                    etternavn
+                identifiserendeInformasjon {
+                    navn {
+                        fornavn
+                        mellomnavn
+                        etternavn
+                    }
                 }
+                motpartsPersonident
                 omfang
                 omfangetErInnenPersonligOmraade
             }

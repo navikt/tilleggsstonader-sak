@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatu
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødselsdato
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.IdentifiserendeInformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktadresseType
@@ -168,8 +169,8 @@ object PdlTestdata {
                         folkeregistermetadata,
                         "",
                         VergeEllerFullmektig(
+                            IdentifiserendeInformasjon(Personnavn("", "", "")),
                             "",
-                            Personnavn("", "", ""),
                             "",
                             true,
                         ),
