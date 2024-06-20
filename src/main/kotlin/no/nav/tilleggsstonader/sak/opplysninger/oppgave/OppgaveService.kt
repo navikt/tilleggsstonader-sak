@@ -56,7 +56,7 @@ class OppgaveService(
             oppgaveClient.hentOppgaver(finnOppgaveRequest.tilFinnOppgaveRequest(aktørId, finnVentemappe()))
 
         val personer = personService.hentPersonKortBolk(oppgaveResponse.oppgaver.mapNotNull { it.ident }.distinct())
-        val behandlingIdPåOppgaveId = finnBehandlingId(oppgaveResponse.oppgaver)
+        val oppgaveMetadata = finnOppgaveMetadata(oppgaveResponse.oppgaver)
 
         return FinnOppgaveResponseDto(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
@@ -64,7 +64,7 @@ class OppgaveService(
                 OppgaveDto(
                     oppgave = oppgave,
                     navn = personer.visningsnavnFor(oppgave),
-                    behandlingId = behandlingIdPåOppgaveId[oppgave.id],
+                    oppgaveMetadata = oppgaveMetadata[oppgave.id],
                 )
             },
         )
@@ -73,10 +73,10 @@ class OppgaveService(
     // TODO: Bruk enhet fra saksbehandler
     fun finnVentemappe() = finnMapper("4462").single { it.navn == "10 På vent" }
 
-    private fun finnBehandlingId(oppgaver: List<Oppgave>): Map<Long, UUID> {
+    private fun finnOppgaveMetadata(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
         val oppgaveIder = oppgaver.map { it.id }
-        return cacheManager.getCachedOrLoad("oppgaveBehandlingId", oppgaveIder) {
-            oppgaveRepository.finnBehandlingIdForGsakOppgaveId(oppgaveIder).associate { it.first to it.second }
+        return cacheManager.getCachedOrLoad("oppgaveMetadata", oppgaveIder) {
+            oppgaveRepository.finnOppgaveMetadata(oppgaveIder).associateBy { it.gsakOppgaveId }
         }
     }
 
@@ -93,7 +93,7 @@ class OppgaveService(
         return OppgaveDto(
             oppgave = oppdatertOppgave,
             navn = personer.visningsnavnFor(oppdatertOppgave),
-            behandlingId = finnBehandlingId(listOf(oppdatertOppgave))[oppdatertOppgave.id],
+            oppgaveMetadata = finnOppgaveMetadata(listOf(oppdatertOppgave))[oppdatertOppgave.id],
         )
     }
 

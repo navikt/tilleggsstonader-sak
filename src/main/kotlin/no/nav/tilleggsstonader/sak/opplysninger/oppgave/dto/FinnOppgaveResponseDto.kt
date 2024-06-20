@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveMetadata
 import java.time.LocalDate
 import java.util.Optional
 import java.util.UUID
@@ -61,11 +62,12 @@ data class OppgaveDto(
      */
     val navn: String?,
     val behandlingId: UUID?,
+    val sendtTilTotrinnskontrollAv: String?,
 ) {
     constructor(
         oppgave: Oppgave,
         navn: String?,
-        behandlingId: UUID?,
+        oppgaveMetadata: OppgaveMetadata?,
     ) : this(
         id = oppgave.id,
         versjon = oppgave.versjon,
@@ -101,6 +103,7 @@ data class OppgaveDto(
         status = oppgave.status,
 
         navn = navn,
-        behandlingId = behandlingId,
+        behandlingId = oppgaveMetadata?.behandlingId,
+        sendtTilTotrinnskontrollAv = oppgaveMetadata?.sendtTilTotrinnskontrollAv,
     )
 }
