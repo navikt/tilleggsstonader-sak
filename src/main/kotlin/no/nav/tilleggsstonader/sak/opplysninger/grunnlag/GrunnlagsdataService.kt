@@ -65,7 +65,7 @@ class GrunnlagsdataService(
     }
 
     private fun mapFødsel(person: SøkerMedBarn): Fødsel {
-        val fødsel = person.søker.fødsel.gjeldende()
+        val fødsel = person.søker.fødselsdato.gjeldende()
         return Fødsel(
             fødselsdato = fødsel.fødselsdato,
             fødselsår = fødsel.fødselsår ?: error("Forventer at fødselsår skal finnes på alle brukere"),

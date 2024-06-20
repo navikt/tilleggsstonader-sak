@@ -51,12 +51,9 @@ query($ident: ID!){
             relatertPersonsRolle
             minRolleForPerson
         }
-        foedsel {
+        foedselsdato {
             foedselsaar
             foedselsdato
-            foedeland
-            foedested
-            foedekommune
             metadata {
                 historisk
             }
@@ -103,12 +100,14 @@ query($ident: ID!){
             }
             type
             vergeEllerFullmektig {
-                motpartsPersonident
-                navn {
-                    fornavn
-                    mellomnavn
-                    etternavn
+                identifiserendeInformasjon {
+                    navn {
+                        fornavn
+                        mellomnavn
+                        etternavn
+                    }
                 }
+                motpartsPersonident
                 omfang
                 omfangetErInnenPersonligOmraade
             }

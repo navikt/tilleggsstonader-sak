@@ -43,13 +43,10 @@
           "deltBosted": [],
           "doedsfall": [],
           "forelderBarnRelasjon": [],
-          "foedsel": [
+          "foedselsdato": [
             {
               "foedselsaar": null,
               "foedselsdato": "1966-11-18",
-              "foedeland": null,
-              "foedested": null,
-              "foedekommune": null,
               "metadata": {
                 "historisk": false
               }

@@ -14,7 +14,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregistermetadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatus
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødsel
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødselsdato
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.IdentifiserendeInformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktadresseType
@@ -92,7 +93,7 @@ object PdlTestdata {
     private val familierelasjon =
         listOf(ForelderBarnRelasjon("", Familierelasjonsrolle.BARN, Familierelasjonsrolle.FAR))
 
-    private val fødsel = listOf(Fødsel(1, osloDateNow(), "", "", "", metadataGjeldende))
+    private val fødselsdato = listOf(Fødselsdato(1, osloDateNow(), metadataGjeldende))
 
     private val opphold = listOf(Opphold(Oppholdstillatelse.MIDLERTIDIG, osloDateNow(), osloDateNow()))
 
@@ -132,7 +133,7 @@ object PdlTestdata {
                 dødsfall,
                 familierelasjon,
                 folkeregisteridentifikatorSøker,
-                fødsel,
+                fødselsdato,
                 listOf(Folkeregisterpersonstatus("", "", metadataGjeldende)),
                 listOf(
                     Fullmakt(
@@ -168,8 +169,8 @@ object PdlTestdata {
                         folkeregistermetadata,
                         "",
                         VergeEllerFullmektig(
+                            IdentifiserendeInformasjon(Personnavn("", "", "")),
                             "",
-                            Personnavn("", "", ""),
                             "",
                             true,
                         ),
@@ -189,7 +190,7 @@ object PdlTestdata {
                         bostedsadresse,
                         dødsfall,
                         familierelasjon,
-                        fødsel,
+                        fødselsdato,
                         navn,
                     ),
                 ),
@@ -216,7 +217,7 @@ object PdlTestdata {
                         adressebeskyttelse,
                         bostedsadresse,
                         dødsfall,
-                        fødsel,
+                        fødselsdato,
                         folkeregisteridentifikatorAnnenForelder,
                         navn,
                     ),
