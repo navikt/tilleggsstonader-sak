@@ -713,41 +713,43 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
     @Nested
     inner class GjenbrukVilkårperioder {
-        val forrigeBehandlingId = UUID.randomUUID()
-        val nyBehandlingId = UUID.randomUUID()
-
-        @BeforeEach
-        fun setUp() {
-            val fagsak = testoppsettService.lagreFagsak(fagsak())
-            testoppsettService.lagre(
-                behandling(
-                    fagsak = fagsak,
-                    id = forrigeBehandlingId,
-                    status = BehandlingStatus.FERDIGSTILT,
-                ),
-            )
-            testoppsettService.lagre(
-                behandling(
-                    fagsak = fagsak,
-                    id = nyBehandlingId,
-                    status = BehandlingStatus.UTREDES,
-                    forrigeBehandlingId = forrigeBehandlingId,
-                ),
-            )
-        }
+//        val forrigeBehandlingId = UUID.randomUUID()
+//        val nyBehandlingId = UUID.randomUUID()
+//
+//        @BeforeEach
+//        fun setUp() {
+//            val fagsak = testoppsettService.lagreFagsak(fagsak())
+//            testoppsettService.lagre(
+//                behandling(
+//                    fagsak = fagsak,
+//                    id = forrigeBehandlingId,
+//                    status = BehandlingStatus.FERDIGSTILT,
+//                ),
+//            )
+//            testoppsettService.lagre(
+//                behandling(
+//                    fagsak = fagsak,
+//                    id = nyBehandlingId,
+//                    status = BehandlingStatus.UTREDES,
+//                    forrigeBehandlingId = forrigeBehandlingId,
+//                ),
+//            )
+//        }
 
         @Test
         fun `skal gjenbruke vilkår fra forrige behandling`() {
+            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
             val eksisterendeVilkårperioder = listOf(
-                målgruppe(behandlingId = forrigeBehandlingId),
-                aktivitet(behandlingId = forrigeBehandlingId),
+                målgruppe(behandlingId = revurdering.forrigeBehandlingId!!),
+                aktivitet(behandlingId = revurdering.forrigeBehandlingId!!),
             )
 
             vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
 
-            vilkårperiodeService.gjenbrukVilkårperioder(forrigeBehandlingId, nyBehandlingId)
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
 
-            val res = vilkårperiodeRepository.findByBehandlingId(nyBehandlingId)
+            val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(2)
 
             res.forEachIndexed { index, vilkårperiode ->
@@ -762,17 +764,19 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `skal ikke gjenbruke slettede vilkår fra forrige behandling`() {
+            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
             val eksisterendeVilkårperioder = listOf(
-                målgruppe(behandlingId = forrigeBehandlingId),
+                målgruppe(behandlingId = revurdering.forrigeBehandlingId!!),
                 målgruppe(
-                    behandlingId = forrigeBehandlingId,
+                    behandlingId = revurdering.forrigeBehandlingId!!,
                     resultat = ResultatVilkårperiode.SLETTET,
                     kilde = KildeVilkårsperiode.MANUELL,
                     slettetKommentar = "slettet",
                 ),
-                aktivitet(behandlingId = forrigeBehandlingId),
+                aktivitet(behandlingId = revurdering.forrigeBehandlingId!!),
                 aktivitet(
-                    behandlingId = forrigeBehandlingId,
+                    behandlingId = revurdering.forrigeBehandlingId!!,
                     resultat = ResultatVilkårperiode.SLETTET,
                     kilde = KildeVilkårsperiode.MANUELL,
                     slettetKommentar = "slettet",
@@ -781,9 +785,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
 
-            vilkårperiodeService.gjenbrukVilkårperioder(forrigeBehandlingId, nyBehandlingId)
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
 
-            val res = vilkårperiodeRepository.findByBehandlingId(nyBehandlingId)
+            val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(2)
             res.map { assertThat(it.resultat).isNotEqualTo(ResultatVilkårperiode.SLETTET) }
         }
