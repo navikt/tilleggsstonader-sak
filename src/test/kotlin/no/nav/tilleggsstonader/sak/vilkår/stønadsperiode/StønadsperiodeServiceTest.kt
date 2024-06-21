@@ -240,16 +240,16 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 behandling(
                     fagsak = fagsak,
                     id = forrigeBehandlingId,
-                    status = BehandlingStatus.FERDIGSTILT
-                )
+                    status = BehandlingStatus.FERDIGSTILT,
+                ),
             )
             testoppsettService.lagre(
                 behandling(
                     fagsak = fagsak,
                     id = nyBehandlingId,
                     status = BehandlingStatus.UTREDES,
-                    forrigeBehandlingId = forrigeBehandlingId
-                )
+                    forrigeBehandlingId = forrigeBehandlingId,
+                ),
             )
         }
 
@@ -261,21 +261,21 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     målgruppe = MålgruppeType.AAP,
-                    aktivitet = AktivitetType.TILTAK
+                    aktivitet = AktivitetType.TILTAK,
                 ),
                 stønadsperiode(
                     behandlingId = forrigeBehandlingId,
                     fom = LocalDate.of(2024, 2, 1),
                     tom = LocalDate.of(2024, 1, 10),
                     målgruppe = MålgruppeType.OVERGANGSSTØNAD,
-                    aktivitet = AktivitetType.UTDANNING
+                    aktivitet = AktivitetType.UTDANNING,
                 ),
             )
             stønadsperiodeRepository.insertAll(eksisterendeStønadsperidoder)
 
             stønadsperiodeService.gjenbrukStønadsperioder(
                 forrigeBehandlingId = forrigeBehandlingId,
-                nyBehandlingId = nyBehandlingId
+                nyBehandlingId = nyBehandlingId,
             )
 
             val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(nyBehandlingId)

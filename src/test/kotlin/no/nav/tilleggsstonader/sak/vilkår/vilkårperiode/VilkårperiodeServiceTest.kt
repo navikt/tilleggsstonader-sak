@@ -184,7 +184,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                         behandlingId = behandling.id,
                     ),
 
-                    )
+                )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
 
@@ -723,16 +723,16 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 behandling(
                     fagsak = fagsak,
                     id = forrigeBehandlingId,
-                    status = BehandlingStatus.FERDIGSTILT
-                )
+                    status = BehandlingStatus.FERDIGSTILT,
+                ),
             )
             testoppsettService.lagre(
                 behandling(
                     fagsak = fagsak,
                     id = nyBehandlingId,
                     status = BehandlingStatus.UTREDES,
-                    forrigeBehandlingId = forrigeBehandlingId
-                )
+                    forrigeBehandlingId = forrigeBehandlingId,
+                ),
             )
         }
 
@@ -768,14 +768,14 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     behandlingId = forrigeBehandlingId,
                     resultat = ResultatVilkårperiode.SLETTET,
                     kilde = KildeVilkårsperiode.MANUELL,
-                    slettetKommentar = "slettet"
+                    slettetKommentar = "slettet",
                 ),
                 aktivitet(behandlingId = forrigeBehandlingId),
                 aktivitet(
                     behandlingId = forrigeBehandlingId,
                     resultat = ResultatVilkårperiode.SLETTET,
                     kilde = KildeVilkårsperiode.MANUELL,
-                    slettetKommentar = "slettet"
+                    slettetKommentar = "slettet",
                 ),
             )
 

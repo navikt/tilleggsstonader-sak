@@ -300,7 +300,7 @@ class VilkårperiodeService(
                     behandlingId = nyBehandlingId,
                     forrigeVilkårperiodeId = it.id,
 
-                    )
+                )
             }
         vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)
     }

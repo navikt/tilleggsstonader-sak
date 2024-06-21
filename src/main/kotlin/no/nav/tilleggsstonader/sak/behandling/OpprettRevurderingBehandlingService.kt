@@ -65,12 +65,12 @@ class OpprettRevurderingBehandlingService(
 
         vilkårperiodeService.gjenbrukVilkårperioder(
             forrigeBehandlingId = forrigeBehandlingId,
-            nyBehandlingId = behandling.id
+            nyBehandlingId = behandling.id,
         )
 
         stønadsperiodeService.gjenbrukStønadsperioder(
             forrigeBehandlingId = forrigeBehandlingId,
-            nyBehandlingId = behandling.id
+            nyBehandlingId = behandling.id,
         )
 
         // TODO kopier vilkår
