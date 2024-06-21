@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -18,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -222,6 +225,67 @@ class StønadsperiodeServiceTest : IntegrationTest() {
             assertThatThrownBy {
                 stønadsperiodeService.lagreStønadsperioder(behandlingId = behandling.id, listOf())
             }.hasMessageContaining("Kan ikke lagre stønadsperioder når behandlingen er låst")
+        }
+    }
+
+    @Nested
+    inner class GjenbrukStønadsperioder() {
+        val forrigeBehandlingId = UUID.randomUUID()
+        val nyBehandlingId = UUID.randomUUID()
+
+        @BeforeEach
+        fun setup() {
+            val fagsak = testoppsettService.lagreFagsak(fagsak())
+            testoppsettService.lagre(
+                behandling(
+                    fagsak = fagsak,
+                    id = forrigeBehandlingId,
+                    status = BehandlingStatus.FERDIGSTILT
+                )
+            )
+            testoppsettService.lagre(
+                behandling(
+                    fagsak = fagsak,
+                    id = nyBehandlingId,
+                    status = BehandlingStatus.UTREDES,
+                    forrigeBehandlingId = forrigeBehandlingId
+                )
+            )
+        }
+
+        @Test
+        fun `skal gjenbruke stønadsperioder fra forrige behandlingen`() {
+            val eksisterendeStønadsperidoder = listOf(
+                stønadsperiode(
+                    behandlingId = forrigeBehandlingId,
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 1, 31),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK
+                ),
+                stønadsperiode(
+                    behandlingId = forrigeBehandlingId,
+                    fom = LocalDate.of(2024, 2, 1),
+                    tom = LocalDate.of(2024, 1, 10),
+                    målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                    aktivitet = AktivitetType.UTDANNING
+                ),
+            )
+            stønadsperiodeRepository.insertAll(eksisterendeStønadsperidoder)
+
+            stønadsperiodeService.gjenbrukStønadsperioder(
+                forrigeBehandlingId = forrigeBehandlingId,
+                nyBehandlingId = nyBehandlingId
+            )
+
+            val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(nyBehandlingId)
+
+            assertThat(stønadsperioder).hasSize(2)
+
+            stønadsperioder.forEachIndexed { index, stønadsperiode ->
+                assertThat(stønadsperiode).usingRecursiveComparison().ignoringFields("id", "sporbar", "behandlingId")
+                    .isEqualTo(eksisterendeStønadsperidoder[index])
+            }
         }
     }
 

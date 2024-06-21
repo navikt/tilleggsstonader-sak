@@ -110,4 +110,15 @@ class StønadsperiodeService(
 
         StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato)
     }
+
+    fun gjenbrukStønadsperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
+        val eksisterendeStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeBehandlingId)
+        val nyeStønadsperioder = eksisterendeStønadsperioder.map {
+            it.copy(
+                id = UUID.randomUUID(),
+                behandlingId = nyBehandlingId,
+            )
+        }
+        stønadsperiodeRepository.insertAll(nyeStønadsperioder)
+    }
 }

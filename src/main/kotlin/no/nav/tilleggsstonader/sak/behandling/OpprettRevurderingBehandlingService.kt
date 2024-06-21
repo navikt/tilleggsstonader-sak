@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,6 +26,7 @@ class OpprettRevurderingBehandlingService(
     val behandlingService: BehandlingService,
     val barnService: BarnService,
     val vilkårperiodeService: VilkårperiodeService,
+    val stønadsperiodeService: StønadsperiodeService,
     val unleashService: UnleashService,
 ) {
 
@@ -65,7 +67,12 @@ class OpprettRevurderingBehandlingService(
             forrigeBehandlingId = forrigeBehandlingId,
             nyBehandlingId = behandling.id
         )
-        // TODO kopier stønadsperioder
+
+        stønadsperiodeService.gjenbrukStønadsperioder(
+            forrigeBehandlingId = forrigeBehandlingId,
+            nyBehandlingId = behandling.id
+        )
+
         // TODO kopier vilkår
     }
 
