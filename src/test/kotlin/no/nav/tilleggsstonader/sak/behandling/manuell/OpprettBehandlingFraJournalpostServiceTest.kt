@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.manuell
 
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.familie.prosessering.internal.TaskService
@@ -21,11 +22,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.journalpost
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.Test
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.util.UUID
 
 class OpprettBehandlingFraJournalpostServiceTest {
@@ -54,11 +56,11 @@ class OpprettBehandlingFraJournalpostServiceTest {
 
     val opprettedeBarnSlot = slot<List<BehandlingBarn>>()
 
+    val fagsak = fagsak()
     val behandling = behandling()
 
     @BeforeEach
     fun setUp() {
-        every { }
         every { journalpostService.hentJournalpost("1") } returns
             journalpost(
                 journalpostId = "1",
@@ -72,9 +74,11 @@ class OpprettBehandlingFraJournalpostServiceTest {
         every { personService.hentPersonMedBarn(ident) } returns
             SøkerMedBarn(ident, mockk(), barn = mapOf(identBarn to mockk()))
 
-        every { fagsakService.finnFagsak(any(), Stønadstype.BARNETILSYN) } returns null
+        every { fagsakService.finnFagsak(any(), Stønadstype.BARNETILSYN) } returns fagsak
+        every { fagsakService.hentEllerOpprettFagsak(personIdent = ident, Stønadstype.BARNETILSYN) } returns fagsak
         every { behandlingService.hentBehandlinger(any<UUID>()) } returns emptyList()
-        every { behandlingService.opprettBehandling(any(), any(), any(), any(), any()) } returns behandling
+        every { behandlingService.opprettBehandling(fagsak.id, any(), any(), any(), any()) } returns behandling
+        justRun { behandlingService.leggTilBehandlingsjournalpost(any(), any(), any()) }
         every { barnService.opprettBarn(capture(opprettedeBarnSlot)) } answers { firstArg() }
     }
 
@@ -94,6 +98,6 @@ class OpprettBehandlingFraJournalpostServiceTest {
 
         assertThatThrownBy {
             service.opprettBehandlingFraJournalpost("1")
-        }.hasMessageContaining("asdasd")
+        }.hasMessageContaining("Det finnes allerede en behandling på personen")
     }
 }

@@ -93,7 +93,7 @@ class OpprettBehandlingFraJournalpostService(
     private fun hentSøknadsinformasjon(
         journalpost: Journalpost,
     ): Søknadsinformasjon {
-        val brevkode = "${DokumentBrevkode.BARNETILSYN}B"
+        val brevkode = "${DokumentBrevkode.BARNETILSYN.verdi}B"
         val dokumentJournalpost = journalpost.dokumenter?.singleOrNull { it.brevkode == brevkode }
             ?: error("Finner ikke dokument med brevkode=$brevkode i journalpost=${journalpost.journalpostId}")
         val dokument = journalpostService.hentDokument(
