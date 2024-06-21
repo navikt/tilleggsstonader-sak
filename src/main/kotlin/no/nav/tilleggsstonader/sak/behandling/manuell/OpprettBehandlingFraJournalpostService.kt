@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.manuell
 
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
@@ -69,8 +68,7 @@ class OpprettBehandlingFraJournalpostService(
     fun hentInformasjon(journalpostId: String): OpprettBehandlingFraJournalpostStatus {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
 
-        val ident = journalpost.bruker?.takeIf { it.type == BrukerIdType.FNR }?.id
-            ?: error("Finner ikke ident på journalpost=$journalpostId")
+        val ident = journalpostService.hentIdentFraJournalpost(journalpost)
         tilgangService.validerTilgangTilPerson(ident, AuditLoggerEvent.CREATE)
 
         val søknadsinformasjon = hentSøknadsinformasjon(journalpost)

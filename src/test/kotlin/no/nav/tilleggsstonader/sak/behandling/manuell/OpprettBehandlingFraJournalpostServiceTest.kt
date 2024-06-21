@@ -67,6 +67,7 @@ class OpprettBehandlingFraJournalpostServiceTest {
                 bruker = Bruker(ident, BrukerIdType.FNR),
                 dokumenter = listOf(DokumentInfo("2", brevkode = "NAV 11-12.15B")),
             )
+        every { journalpostService.hentIdentFraJournalpost(any()) } returns ident
         every { journalpostService.hentDokument(any(), "2", any()) } returns
             FileUtil.readFile("fyllut-sendinn/søknad-1-barn.xml").toByteArray()
 
