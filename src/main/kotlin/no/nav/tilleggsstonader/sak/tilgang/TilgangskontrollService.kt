@@ -85,7 +85,7 @@ class TilgangskontrollService(
     /**
      * Trenger ikke å sjekke barn, men muligens andre forelderen
      */
-    private fun erEgenAnsatt(personMedRelasjoner: PersonMedRelasjoner): Boolean {
+    fun erEgenAnsatt(personMedRelasjoner: PersonMedRelasjoner): Boolean {
         val relevanteIdenter = setOf(personMedRelasjoner.personIdent)
 
         return egenAnsattService.erEgenAnsatt(relevanteIdenter).any { it.value }

@@ -81,6 +81,22 @@ class SettPåVentBeskrivelseUtilTest {
                 """.trimIndent(),
             )
         }
+
+        @Test
+        fun `skal fjerne saksbehandler på oppgaven når man oppdaterer sett på vent`() {
+            val beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
+                Oppgave(id = 0, versjon = 0, tilordnetRessurs = "a100"),
+                LocalDate.of(2023, 1, 1),
+                tidspunkt,
+            )
+            assertThat(beskrivelse).isEqualTo(
+                """
+                --- 05.03.2024 18:00 a100 (a100) ---
+                Oppgave endret frist fra <ingen> til 01.01.2023
+                Oppgave flyttet fra saksbehandler a100 til <ingen>
+                """.trimIndent(),
+            )
+        }
     }
 
     @Nested
