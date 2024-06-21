@@ -18,8 +18,8 @@ class TilgangController(
     private val egenAnsattService: EgenAnsattService,
 ) {
     @PostMapping("/person/erEgenAnsatt")
-    fun erEgenAnsatt(@RequestBody identRequest: IdentRequest): Boolean {
-        return egenAnsattService.erEgenAnsatt(identRequest.ident)
+    fun erEgenAnsatt(@RequestBody identRequest: IdentRequest): EgenAnsattResponse {
+        return EgenAnsattResponse(erEgenAnsatt = egenAnsattService.erEgenAnsatt(identRequest.ident))
     }
 
     @PostMapping("person/sjekkTilgangTilPersonMedRelasjoner")
@@ -30,3 +30,5 @@ class TilgangController(
         )
     }
 }
+
+data class EgenAnsattResponse(val erEgenAnsatt: Boolean)
