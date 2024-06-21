@@ -32,8 +32,11 @@ object SettPåVentBeskrivelseUtil {
         if (fristBeskrivelse.isEmpty()) {
             return oppgave.beskrivelse ?: ""
         }
+        val tilordnetSaksbehandlerBeskrivelse =
+            utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
         return utledBeskrivelsePrefix(tidspunkt) +
             fristBeskrivelse.påNyRadEllerTomString() +
+            tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
             nåværendeBeskrivelse(oppgave)
     }
 

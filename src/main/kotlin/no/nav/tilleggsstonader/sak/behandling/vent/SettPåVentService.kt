@@ -178,6 +178,7 @@ class SettPåVentService(
             versjon = dto.oppgaveVersjon,
             fristFerdigstillelse = dto.frist,
             beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(oppgave, dto.frist),
+            tilordnetRessurs = "",
         )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
     }
