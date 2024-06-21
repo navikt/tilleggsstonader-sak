@@ -288,6 +288,23 @@ class VilkårperiodeService(
         )
     }
 
+    @Transactional
+    fun gjenbrukVilkårperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
+        val eksisterendeVilkårperioder = vilkårperiodeRepository.findByBehandlingId(forrigeBehandlingId)
+
+        val kopiertePerioderMedReferanse = eksisterendeVilkårperioder
+            .filter { it.resultat !== ResultatVilkårperiode.SLETTET }
+            .map {
+                it.copy(
+                    id = UUID.randomUUID(),
+                    behandlingId = nyBehandlingId,
+                    forrigeVilkårperiodeId = it.id,
+
+                    )
+            }
+        vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)
+    }
+
     private fun behandlingErLåstForVidereRedigering(behandlingId: UUID) =
         behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
 }

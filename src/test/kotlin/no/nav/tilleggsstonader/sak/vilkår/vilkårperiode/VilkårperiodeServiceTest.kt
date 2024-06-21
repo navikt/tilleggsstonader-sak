@@ -16,11 +16,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.akti
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
@@ -45,10 +47,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.util.UUID
 
 class VilkårperiodeServiceTest : IntegrationTest() {
 
@@ -180,7 +184,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                         behandlingId = behandling.id,
                     ),
 
-                )
+                    )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
 
@@ -645,7 +649,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
         @Test
         internal fun `skal ikke lagre ned grunnlagsadata for behandling som ikke er redigerbar`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
 
             vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
 
@@ -685,7 +690,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `veileder skal ikke kunne hente behandlingen hvis statusen er annet enn UTREDES`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
 
             val exception = catchThrowableOfType<Feil> {
                 testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
@@ -702,6 +708,84 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             testWithBrukerContext(groups = listOf(rolleConfig.saksbehandlerRolle)) {
                 vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
             }
+        }
+    }
+
+    @Nested
+    inner class GjenbrukVilkårperioder {
+        val forrigeBehandlingId = UUID.randomUUID()
+        val nyBehandlingId = UUID.randomUUID()
+
+        @BeforeEach
+        fun setUp() {
+            val fagsak = testoppsettService.lagreFagsak(fagsak())
+            testoppsettService.lagre(
+                behandling(
+                    fagsak = fagsak,
+                    id = forrigeBehandlingId,
+                    status = BehandlingStatus.FERDIGSTILT
+                )
+            )
+            testoppsettService.lagre(
+                behandling(
+                    fagsak = fagsak,
+                    id = nyBehandlingId,
+                    status = BehandlingStatus.UTREDES,
+                    forrigeBehandlingId = forrigeBehandlingId
+                )
+            )
+        }
+
+        @Test
+        fun `skal gjenbruke vilkår fra forrige behandling`() {
+            val eksisterendeVilkårperioder = listOf(
+                målgruppe(behandlingId = forrigeBehandlingId),
+                aktivitet(behandlingId = forrigeBehandlingId),
+            )
+
+            vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
+
+            vilkårperiodeService.gjenbrukVilkårperioder(forrigeBehandlingId, nyBehandlingId)
+
+            val res = vilkårperiodeRepository.findByBehandlingId(nyBehandlingId)
+            assertThat(res).hasSize(2)
+
+            res.forEachIndexed { index, vilkårperiode ->
+                assertThat(vilkårperiode)
+                    .usingRecursiveComparison()
+                    .ignoringFields("id", "forrigeVilkårperiodeId", "behandlingId", "sporbar")
+                    .isEqualTo(eksisterendeVilkårperioder[index])
+
+                assertThat(vilkårperiode.forrigeVilkårperiodeId).isEqualTo(eksisterendeVilkårperioder[index].id)
+            }
+        }
+
+        @Test
+        fun `skal ikke gjenbruke slettede vilkår fra forrige behandling`() {
+            val eksisterendeVilkårperioder = listOf(
+                målgruppe(behandlingId = forrigeBehandlingId),
+                målgruppe(
+                    behandlingId = forrigeBehandlingId,
+                    resultat = ResultatVilkårperiode.SLETTET,
+                    kilde = KildeVilkårsperiode.MANUELL,
+                    slettetKommentar = "slettet"
+                ),
+                aktivitet(behandlingId = forrigeBehandlingId),
+                aktivitet(
+                    behandlingId = forrigeBehandlingId,
+                    resultat = ResultatVilkårperiode.SLETTET,
+                    kilde = KildeVilkårsperiode.MANUELL,
+                    slettetKommentar = "slettet"
+                ),
+            )
+
+            vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
+
+            vilkårperiodeService.gjenbrukVilkårperioder(forrigeBehandlingId, nyBehandlingId)
+
+            val res = vilkårperiodeRepository.findByBehandlingId(nyBehandlingId)
+            assertThat(res).hasSize(2)
+            res.map { assertThat(it.resultat).isNotEqualTo(ResultatVilkårperiode.SLETTET) }
         }
     }
 }
