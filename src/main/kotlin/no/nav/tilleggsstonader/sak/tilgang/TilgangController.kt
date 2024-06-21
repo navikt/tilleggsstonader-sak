@@ -1,11 +1,12 @@
 package no.nav.tilleggsstonader.sak.tilgang
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.IdentRequest
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -16,15 +17,15 @@ class TilgangController(
     private val tilgangskontrollService: TilgangskontrollService,
     private val egenAnsattService: EgenAnsattService,
 ) {
-    @GetMapping("/person/{ident}/erEgenAnsatt")
-    fun erEgenAnsatt(@PathVariable ident: String): Boolean {
-        return egenAnsattService.erEgenAnsatt(ident)
+    @PostMapping("/person/erEgenAnsatt")
+    fun erEgenAnsatt(@RequestBody identRequest: IdentRequest): Boolean {
+        return egenAnsattService.erEgenAnsatt(identRequest.ident)
     }
 
-    @GetMapping("/person/{ident}/sjekkTilgangTilPersonMedRelasjoner")
-    fun sjekkTilgangTilPersonMedRelasjoner(@PathVariable ident: String): Tilgang {
+    @PostMapping("person/sjekkTilgangTilPersonMedRelasjoner")
+    fun sjekkTilgangTilPersonMedRelasjoner(@RequestBody identRequest: IdentRequest): Tilgang {
         return tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
-            personIdent = ident,
+            personIdent = identRequest.ident,
             jwtToken = SikkerhetContext.hentToken(),
         )
     }
