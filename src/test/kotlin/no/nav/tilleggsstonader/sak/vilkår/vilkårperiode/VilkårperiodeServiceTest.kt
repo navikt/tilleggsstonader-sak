@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
@@ -645,7 +646,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
         @Test
         internal fun `skal ikke lagre ned grunnlagsadata for behandling som ikke er redigerbar`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
 
             vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
 
@@ -685,7 +687,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `veileder skal ikke kunne hente behandlingen hvis statusen er annet enn UTREDES`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
 
             val exception = catchThrowableOfType<Feil> {
                 testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
@@ -702,6 +705,65 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             testWithBrukerContext(groups = listOf(rolleConfig.saksbehandlerRolle)) {
                 vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
             }
+        }
+    }
+
+    @Nested
+    inner class GjenbrukVilkårperioder {
+        @Test
+        fun `skal gjenbruke vilkår fra forrige behandling`() {
+            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
+            val eksisterendeVilkårperioder = listOf(
+                målgruppe(behandlingId = revurdering.forrigeBehandlingId!!),
+                aktivitet(behandlingId = revurdering.forrigeBehandlingId!!),
+            )
+
+            vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
+
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
+
+            val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
+            assertThat(res).hasSize(2)
+
+            assertThat(res)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                    "id",
+                    "sporbar",
+                    "behandlingId",
+                    "forrigeVilkårperiodeId",
+                )
+                .containsExactlyInAnyOrderElementsOf(eksisterendeVilkårperioder)
+        }
+
+        @Test
+        fun `skal ikke gjenbruke slettede vilkår fra forrige behandling`() {
+            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
+            val eksisterendeVilkårperioder = listOf(
+                målgruppe(behandlingId = revurdering.forrigeBehandlingId!!),
+                målgruppe(
+                    behandlingId = revurdering.forrigeBehandlingId!!,
+                    resultat = ResultatVilkårperiode.SLETTET,
+                    kilde = KildeVilkårsperiode.MANUELL,
+                    slettetKommentar = "slettet",
+                ),
+                aktivitet(behandlingId = revurdering.forrigeBehandlingId!!),
+                aktivitet(
+                    behandlingId = revurdering.forrigeBehandlingId!!,
+                    resultat = ResultatVilkårperiode.SLETTET,
+                    kilde = KildeVilkårsperiode.MANUELL,
+                    slettetKommentar = "slettet",
+                ),
+            )
+
+            vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
+
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
+
+            val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
+            assertThat(res).hasSize(2)
+            res.map { assertThat(it.resultat).isNotEqualTo(ResultatVilkårperiode.SLETTET) }
         }
     }
 }

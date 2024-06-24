@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
@@ -286,6 +287,21 @@ class VilkårperiodeService(
                 slettetKommentar = slettVikårperiode.kommentar,
             ),
         )
+    }
+
+    fun gjenbrukVilkårperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
+        val eksisterendeVilkårperioder = vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
+
+        val kopiertePerioderMedReferanse = eksisterendeVilkårperioder
+            .map {
+                it.copy(
+                    id = UUID.randomUUID(),
+                    behandlingId = nyBehandlingId,
+                    forrigeVilkårperiodeId = it.id,
+                    sporbar = Sporbar(),
+                )
+            }
+        vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)
     }
 
     private fun behandlingErLåstForVidereRedigering(behandlingId: UUID) =

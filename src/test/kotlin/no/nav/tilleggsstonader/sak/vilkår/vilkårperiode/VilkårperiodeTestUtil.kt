@@ -29,6 +29,7 @@ object VilkårperiodeTestUtil {
         begrunnelse: String? = null,
         kilde: KildeVilkårsperiode = KildeVilkårsperiode.SYSTEM,
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
+        slettetKommentar: String? = null,
     ) = Vilkårperiode(
         behandlingId = behandlingId,
         fom = fom,
@@ -39,6 +40,7 @@ object VilkårperiodeTestUtil {
         kilde = kilde,
         resultat = resultat,
         aktivitetsdager = null,
+        slettetKommentar = slettetKommentar,
     )
 
     fun delvilkårMålgruppe(

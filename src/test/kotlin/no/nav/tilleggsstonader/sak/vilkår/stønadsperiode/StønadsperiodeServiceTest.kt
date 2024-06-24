@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -222,6 +223,49 @@ class StønadsperiodeServiceTest : IntegrationTest() {
             assertThatThrownBy {
                 stønadsperiodeService.lagreStønadsperioder(behandlingId = behandling.id, listOf())
             }.hasMessageContaining("Kan ikke lagre stønadsperioder når behandlingen er låst")
+        }
+    }
+
+    @Nested
+    inner class GjenbrukStønadsperioder() {
+        @Test
+        fun `skal gjenbruke stønadsperioder fra forrige behandlingen`() {
+            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
+            val eksisterendeStønadsperidoder = listOf(
+                stønadsperiode(
+                    behandlingId = revurdering.forrigeBehandlingId!!,
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 1, 31),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                ),
+                stønadsperiode(
+                    behandlingId = revurdering.forrigeBehandlingId!!,
+                    fom = LocalDate.of(2024, 2, 1),
+                    tom = LocalDate.of(2024, 1, 10),
+                    målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                    aktivitet = AktivitetType.UTDANNING,
+                ),
+            )
+            stønadsperiodeRepository.insertAll(eksisterendeStønadsperidoder)
+
+            stønadsperiodeService.gjenbrukStønadsperioder(
+                forrigeBehandlingId = revurdering.forrigeBehandlingId!!,
+                nyBehandlingId = revurdering.id,
+            )
+
+            val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(revurdering.id)
+
+            assertThat(stønadsperioder).hasSize(2)
+
+            assertThat(stønadsperioder)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                    "id",
+                    "sporbar",
+                    "behandlingId",
+                )
+                .containsExactlyInAnyOrderElementsOf(eksisterendeStønadsperidoder)
         }
     }
 

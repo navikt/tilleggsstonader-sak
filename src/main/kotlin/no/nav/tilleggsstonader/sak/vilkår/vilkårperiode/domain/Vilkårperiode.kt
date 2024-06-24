@@ -20,6 +20,8 @@ data class Vilkårperiode(
     val id: UUID = UUID.randomUUID(),
     val behandlingId: UUID,
     val kilde: KildeVilkårsperiode,
+    @Column("forrige_vilkarperiode_id")
+    val forrigeVilkårperiodeId: UUID? = null,
 
     val fom: LocalDate,
     val tom: LocalDate,
