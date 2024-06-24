@@ -22,7 +22,7 @@ class TilgangController(
         return EgenAnsattResponse(erEgenAnsatt = egenAnsattService.erEgenAnsatt(identRequest.ident))
     }
 
-    @PostMapping("person/sjekkTilgangTilPersonMedRelasjoner")
+    @PostMapping("/person/sjekkTilgangTilPersonMedRelasjoner")
     fun sjekkTilgangTilPersonMedRelasjoner(@RequestBody identRequest: IdentRequest): Tilgang {
         return tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
             personIdent = identRequest.ident,
