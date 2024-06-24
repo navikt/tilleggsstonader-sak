@@ -118,7 +118,7 @@ class StønadsperiodeService(
             it.copy(
                 id = UUID.randomUUID(),
                 behandlingId = nyBehandlingId,
-                sporbar = Sporbar()
+                sporbar = Sporbar(),
             )
         }
         stønadsperiodeRepository.insertAll(nyeStønadsperioder)

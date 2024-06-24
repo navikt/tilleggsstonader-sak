@@ -300,7 +300,7 @@ class VilkårperiodeService(
                     id = UUID.randomUUID(),
                     behandlingId = nyBehandlingId,
                     forrigeVilkårperiodeId = it.id,
-                    sporbar = Sporbar()
+                    sporbar = Sporbar(),
                 )
             }
         vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)

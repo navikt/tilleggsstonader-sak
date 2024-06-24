@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.akti
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
@@ -47,12 +46,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.util.UUID
 
 class VilkårperiodeServiceTest : IntegrationTest() {
 
@@ -184,7 +181,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                         behandlingId = behandling.id,
                     ),
 
-                    )
+                )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
 
@@ -734,7 +731,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     "id",
                     "sporbar",
                     "behandlingId",
-                    "forrigeVilkårperiodeId"
+                    "forrigeVilkårperiodeId",
                 )
                 .containsExactlyInAnyOrderElementsOf(eksisterendeVilkårperioder)
         }
