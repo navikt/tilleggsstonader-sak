@@ -8,6 +8,11 @@ import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
+import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
@@ -15,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 import java.util.UUID
 
 class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
@@ -24,6 +30,12 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var barnService: BarnService
+
+    @Autowired
+    lateinit var vilkårperiodeRepository: VilkårperiodeRepository
+
+    @Autowired
+    lateinit var stønadsperiodeRepository: StønadsperiodeRepository
 
     @BeforeEach
     fun setUp() {
@@ -129,6 +141,33 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         }
 
         // TODO gjenbruke barn fra henlagt/avslått behandling?
+    }
+
+    @Test
+    fun `skal gjenbruke informasjon fra forrige behandling`() {
+        val fom = LocalDate.of(2024, 1, 1)
+        val tom = LocalDate.of(2024, 1, 31)
+
+        val behandling1 = testoppsettService.opprettBehandlingMedFagsak(
+            behandling(
+                status = BehandlingStatus.FERDIGSTILT,
+                resultat = BehandlingResultat.INNVILGET,
+            ),
+            opprettGrunnlagsdata = false,
+        )
+
+        vilkårperiodeRepository.insertAll(
+            listOf(
+                målgruppe(behandlingId = behandling1.id, fom = fom, tom = tom),
+                aktivitet(behandlingId = behandling1.id, fom = fom, tom = tom),
+            ),
+        )
+        stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandling1.id, fom = fom, tom = tom))
+
+        val revurderingId = service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling1.fagsakId))
+
+        assertThat(vilkårperiodeRepository.findByBehandlingId(revurderingId)).hasSize(2)
+        assertThat(stønadsperiodeRepository.findAllByBehandlingId(revurderingId)).hasSize(1)
     }
 
     private fun opprettBehandlingDto(
