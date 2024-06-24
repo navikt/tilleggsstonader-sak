@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tilleggsstoenadsskjema>
+    <personidentifikator>13518741815</personidentifikator>
+    <maalgruppeinformasjon>
+        <periode>
+            <fom>2024-06-01+02:00</fom>
+            <tom>2024-08-20+02:00</tom>
+        </periode>
+        <kilde>BRUKERREGISTRERT</kilde>
+        <maalgruppetype kodeverksRef="ARBSOKERE">ARBSOKERE</maalgruppetype>
+    </maalgruppeinformasjon>
+    <rettighetstype>
+        <tilsynsutgifter>
+            <tilsynsutgifterBarn>
+                <periode>
+                    <fom>2024-06-12+02:00</fom>
+                    <tom>2024-06-21+02:00</tom>
+                </periode>
+                <barn>
+                    <personidentifikator>02501961038</personidentifikator>
+                    <tilsynskategori>KOM</tilsynskategori>
+                    <navn>A A</navn>
+                    <harFullfoertFjerdeSkoleaar>false</harFullfoertFjerdeSkoleaar>
+                    <maanedligUtgiftTilsynBarn>1000</maanedligUtgiftTilsynBarn>
+                </barn>
+                <barn>
+                    <personidentifikator>27412174017</personidentifikator>
+                    <tilsynskategori>KOM</tilsynskategori>
+                    <navn>B B</navn>
+                    <harFullfoertFjerdeSkoleaar>false</harFullfoertFjerdeSkoleaar>
+                    <maanedligUtgiftTilsynBarn>500</maanedligUtgiftTilsynBarn>
+                </barn>
+            </tilsynsutgifterBarn>
+        </tilsynsutgifter>
+    </rettighetstype>
+</tilleggsstoenadsskjema>
