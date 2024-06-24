@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -41,8 +42,10 @@ class OpprettBehandlingFraJournalpostService(
     private val barnService: BarnService,
     private val unleashService: UnleashService,
 ) {
+
     @Transactional
     fun opprettBehandlingFraJournalpost(journalpostId: String): UUID {
+        // TODO valider at journalpost er ferdigstilt
         brukerfeilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_BEHANDLING_FRA_JOURNALPOST)) {
             "Feature toggle for å kunne opprette behandling fra journalpost er slått av"
         }
@@ -67,6 +70,10 @@ class OpprettBehandlingFraJournalpostService(
 
     fun hentInformasjon(journalpostId: String): OpprettBehandlingFraJournalpostStatus {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
+
+        feilHvisIkke(journalpost.journalstatus == Journalstatus.FERDIGSTILT) {
+            "Journalpost har status=${journalpost.journalstatus}, forventer at den skal være ferdigstilt"
+        }
 
         val ident = journalpostService.hentIdentFraJournalpost(journalpost)
         tilgangService.validerTilgangTilPerson(ident, AuditLoggerEvent.CREATE)
