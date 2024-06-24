@@ -230,41 +230,20 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
     @Nested
     inner class GjenbrukStønadsperioder() {
-        val forrigeBehandlingId = UUID.randomUUID()
-        val nyBehandlingId = UUID.randomUUID()
-
-        @BeforeEach
-        fun setup() {
-            val fagsak = testoppsettService.lagreFagsak(fagsak())
-            testoppsettService.lagre(
-                behandling(
-                    fagsak = fagsak,
-                    id = forrigeBehandlingId,
-                    status = BehandlingStatus.FERDIGSTILT,
-                ),
-            )
-            testoppsettService.lagre(
-                behandling(
-                    fagsak = fagsak,
-                    id = nyBehandlingId,
-                    status = BehandlingStatus.UTREDES,
-                    forrigeBehandlingId = forrigeBehandlingId,
-                ),
-            )
-        }
-
         @Test
         fun `skal gjenbruke stønadsperioder fra forrige behandlingen`() {
+            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
             val eksisterendeStønadsperidoder = listOf(
                 stønadsperiode(
-                    behandlingId = forrigeBehandlingId,
+                behandlingId = revurdering.forrigeBehandlingId!!,
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     målgruppe = MålgruppeType.AAP,
                     aktivitet = AktivitetType.TILTAK,
                 ),
                 stønadsperiode(
-                    behandlingId = forrigeBehandlingId,
+                    behandlingId = revurdering.forrigeBehandlingId!!,
                     fom = LocalDate.of(2024, 2, 1),
                     tom = LocalDate.of(2024, 1, 10),
                     målgruppe = MålgruppeType.OVERGANGSSTØNAD,
@@ -274,11 +253,11 @@ class StønadsperiodeServiceTest : IntegrationTest() {
             stønadsperiodeRepository.insertAll(eksisterendeStønadsperidoder)
 
             stønadsperiodeService.gjenbrukStønadsperioder(
-                forrigeBehandlingId = forrigeBehandlingId,
-                nyBehandlingId = nyBehandlingId,
+                forrigeBehandlingId = revurdering.forrigeBehandlingId!!,
+                nyBehandlingId = revurdering.id,
             )
 
-            val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(nyBehandlingId)
+            val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(revurdering.id)
 
             assertThat(stønadsperioder).hasSize(2)
 
