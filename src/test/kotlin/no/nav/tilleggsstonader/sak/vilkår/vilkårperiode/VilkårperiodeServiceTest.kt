@@ -184,7 +184,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                         behandlingId = behandling.id,
                     ),
 
-                )
+                    )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
 
@@ -713,29 +713,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
     @Nested
     inner class GjenbrukVilkårperioder {
-//        val forrigeBehandlingId = UUID.randomUUID()
-//        val nyBehandlingId = UUID.randomUUID()
-//
-//        @BeforeEach
-//        fun setUp() {
-//            val fagsak = testoppsettService.lagreFagsak(fagsak())
-//            testoppsettService.lagre(
-//                behandling(
-//                    fagsak = fagsak,
-//                    id = forrigeBehandlingId,
-//                    status = BehandlingStatus.FERDIGSTILT,
-//                ),
-//            )
-//            testoppsettService.lagre(
-//                behandling(
-//                    fagsak = fagsak,
-//                    id = nyBehandlingId,
-//                    status = BehandlingStatus.UTREDES,
-//                    forrigeBehandlingId = forrigeBehandlingId,
-//                ),
-//            )
-//        }
-
         @Test
         fun `skal gjenbruke vilkår fra forrige behandling`() {
             val revurdering = testoppsettService.lagBehandlingOgRevurdering()
@@ -752,14 +729,14 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(2)
 
-            res.forEachIndexed { index, vilkårperiode ->
-                assertThat(vilkårperiode)
-                    .usingRecursiveComparison()
-                    .ignoringFields("id", "forrigeVilkårperiodeId", "behandlingId", "sporbar")
-                    .isEqualTo(eksisterendeVilkårperioder[index])
-
-                assertThat(vilkårperiode.forrigeVilkårperiodeId).isEqualTo(eksisterendeVilkårperioder[index].id)
-            }
+            assertThat(res)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                    "id",
+                    "sporbar",
+                    "behandlingId",
+                    "forrigeVilkårperiodeId"
+                )
+                .containsExactlyInAnyOrderElementsOf(eksisterendeVilkårperioder)
         }
 
         @Test

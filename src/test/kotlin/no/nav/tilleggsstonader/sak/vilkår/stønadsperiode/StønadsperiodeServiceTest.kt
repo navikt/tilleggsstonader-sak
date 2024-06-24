@@ -236,7 +236,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
             val eksisterendeStønadsperidoder = listOf(
                 stønadsperiode(
-                behandlingId = revurdering.forrigeBehandlingId!!,
+                    behandlingId = revurdering.forrigeBehandlingId!!,
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     målgruppe = MålgruppeType.AAP,
@@ -261,10 +261,13 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
             assertThat(stønadsperioder).hasSize(2)
 
-            stønadsperioder.forEachIndexed { index, stønadsperiode ->
-                assertThat(stønadsperiode).usingRecursiveComparison().ignoringFields("id", "sporbar", "behandlingId")
-                    .isEqualTo(eksisterendeStønadsperidoder[index])
-            }
+            assertThat(stønadsperioder)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                    "id",
+                    "sporbar",
+                    "behandlingId"
+                )
+                .containsExactlyInAnyOrderElementsOf(eksisterendeStønadsperidoder)
         }
     }
 
