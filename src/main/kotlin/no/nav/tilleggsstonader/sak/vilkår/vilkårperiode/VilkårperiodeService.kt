@@ -289,7 +289,6 @@ class VilkårperiodeService(
         )
     }
 
-    @Transactional
     fun gjenbrukVilkårperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
         val eksisterendeVilkårperioder = vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
 
