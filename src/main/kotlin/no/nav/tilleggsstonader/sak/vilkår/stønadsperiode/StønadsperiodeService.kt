@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
@@ -117,6 +118,7 @@ class StønadsperiodeService(
             it.copy(
                 id = UUID.randomUUID(),
                 behandlingId = nyBehandlingId,
+                sporbar = Sporbar()
             )
         }
         stønadsperiodeRepository.insertAll(nyeStønadsperioder)
