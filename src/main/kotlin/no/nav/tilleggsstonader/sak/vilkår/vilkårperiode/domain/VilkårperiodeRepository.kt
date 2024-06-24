@@ -11,4 +11,6 @@ interface VilkårperiodeRepository : RepositoryInterface<Vilkårperiode, UUID>, 
     fun findByBehandlingId(behandlingId: UUID): List<Vilkårperiode>
 
     fun findByBehandlingIdAndResultat(behandlingId: UUID, resultat: ResultatVilkårperiode): List<Vilkårperiode>
+
+    fun findByBehandlingIdAndResultatNot(behandlingId: UUID, resultat: ResultatVilkårperiode): List<Vilkårperiode>
 }

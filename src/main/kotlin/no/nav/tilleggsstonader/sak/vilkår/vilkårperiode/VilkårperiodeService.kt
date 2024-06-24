@@ -291,10 +291,9 @@ class VilkårperiodeService(
 
     @Transactional
     fun gjenbrukVilkårperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
-        val eksisterendeVilkårperioder = vilkårperiodeRepository.findByBehandlingId(forrigeBehandlingId)
+        val eksisterendeVilkårperioder = vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
 
         val kopiertePerioderMedReferanse = eksisterendeVilkårperioder
-            .filter { it.resultat !== ResultatVilkårperiode.SLETTET }
             .map {
                 it.copy(
                     id = UUID.randomUUID(),
