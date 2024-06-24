@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.klage
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.klage.FagsystemType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -55,6 +56,7 @@ class EksternVedtakServiceTest {
         assertThat(vedtak[0].behandlingstype).isEqualTo("Førstegangsbehandling")
         assertThat(vedtak[0].eksternBehandlingId).isEqualTo(eksternBehandlingId)
         assertThat(vedtak[0].vedtakstidspunkt).isEqualTo(vedtakstidspunkt)
+        assertThat(vedtak[0].fagsystemType).isEqualTo(FagsystemType.ORDNIÆR)
     }
 
     @Test
