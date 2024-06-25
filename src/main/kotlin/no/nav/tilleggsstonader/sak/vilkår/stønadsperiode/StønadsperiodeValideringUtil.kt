@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Datoperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
@@ -84,7 +85,7 @@ object StønadsperiodeValideringUtil {
         stønadsperioder: List<StønadsperiodeDto>,
     ) {
         val perioderSomIkkeGirRett = (vilkårperioder.målgrupper + vilkårperioder.aktiviteter)
-            .filter { it.type.girIkkeRettPåStønadsperiode() }
+            .filter { it.type.girIkkeRettPåStønadsperiode() && it.resultat != ResultatVilkårperiode.SLETTET }
         stønadsperioder.forEach { validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(perioderSomIkkeGirRett, it) }
     }
 

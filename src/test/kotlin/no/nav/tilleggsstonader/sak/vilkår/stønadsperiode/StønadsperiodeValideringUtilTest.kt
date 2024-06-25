@@ -4,10 +4,12 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -489,6 +491,56 @@ internal class StønadsperiodeValideringUtilTest {
             }.hasMessage(
                 "Stønadsperiode 15.01.2024 - 15.01.2024 overlapper med INGEN_AKTIVITET(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
             )
+        }
+
+        @Test
+        fun `skal ikke kaste feil om stønadsperiode overlapper med slettet vilkårperiode uten rett til stønad`() {
+            val behandlingId = UUID.randomUUID()
+
+            val målgrupper = listOf(
+                målgruppe(
+                    behandlingId = behandlingId,
+                    type = MålgruppeType.INGEN_MÅLGRUPPE,
+                    fom = fom,
+                    tom = tom,
+                    begrunnelse = "a",
+                    resultat = ResultatVilkårperiode.SLETTET,
+                    kilde = KildeVilkårsperiode.MANUELL,
+                    slettetKommentar = "slettet",
+                ),
+                målgruppe(
+                    behandlingId = behandlingId,
+                    type = MålgruppeType.AAP,
+                    fom = fom,
+                    tom = tom,
+                ),
+            ).map { it.tilDto() }
+
+            val aktiviteter = listOf(
+                aktivitet(
+                    behandlingId = behandlingId,
+                    type = AktivitetType.TILTAK,
+                    fom = fom,
+                    tom = tom,
+                ),
+            ).map { it.tilDto() }
+
+            val stønadsperioder = listOf(
+                stønadsperiode(
+                    behandlingId = behandlingId,
+                    aktivitet = AktivitetType.TILTAK,
+                    målgruppe = MålgruppeType.AAP,
+                    fom = fom,
+                    tom = tom,
+                ).tilDto(),
+            )
+
+            assertThatCode {
+                validerStønadsperioder(
+                    stønadsperioder = stønadsperioder,
+                    vilkårperioder = VilkårperioderDto(aktiviteter = aktiviteter, målgrupper = målgrupper),
+                )
+            }.doesNotThrowAnyException()
         }
     }
 
