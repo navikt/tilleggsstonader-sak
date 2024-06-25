@@ -10,6 +10,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -63,4 +65,12 @@ class PersonService(
     fun hentAktørIder(ident: String): PdlIdenter = pdlClient.hentAktørIder(ident)
 
     fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto? = pdlClient.hentGeografiskTilknytning(ident)
+
+    fun hentVisningsnavnForPerson(personIdent: String): String {
+        val person = hentPersonKortBolk(listOf(personIdent))
+        return person.visningsnavnFor(personIdent)
+    }
+
+    private fun Map<String, PdlPersonKort>.visningsnavnFor(personIdent: String) =
+        personIdent.let { this[it] }?.navn?.gjeldende()?.visningsnavn() ?: "Mangler navn"
 }
