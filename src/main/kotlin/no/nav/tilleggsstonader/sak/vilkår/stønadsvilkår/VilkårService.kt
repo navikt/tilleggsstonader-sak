@@ -271,7 +271,6 @@ class VilkårService(
 
         val kopiAvVurderinger: Map<UUID, Vilkår> = lagKopiAvTidligereVurderinger(
             tidligereVurderinger,
-            metadata.barn,
             nyBehandlingsId,
             barnIdMap,
         )
@@ -293,12 +292,10 @@ class VilkårService(
 
     private fun lagKopiAvTidligereVurderinger(
         tidligereVilkår: Map<UUID, Vilkår>,
-        barnPåGjeldendeBehandling: List<BehandlingBarn>,
         nyBehandlingsId: UUID,
         barnIdMap: Map<UUID, BehandlingBarn>,
     ): Map<UUID, Vilkår> =
         tidligereVilkår.values
-            .filter { skalKopiereVilkår(it, barnPåGjeldendeBehandling.isNotEmpty()) }
             .associate { vilkår ->
                 vilkår.id to vilkår.copy(
                     id = UUID.randomUUID(),
@@ -325,16 +322,6 @@ class VilkårService(
             barnIdMap[it]?.id ?: error("Fant ikke barn=$it på gjeldende behandling med barnIdMapping=$barnIdMapping")
         }
     }
-
-    private fun skalKopiereVilkår(
-        it: Vilkår,
-        harNyeBarnForVilkår: Boolean,
-    ) =
-        if (it.type.gjelderFlereBarn() && it.barnId == null) {
-            !harNyeBarnForVilkår
-        } else {
-            true
-        }
 
     fun erAlleVilkårOppfylt(behandlingId: UUID): Boolean {
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
