@@ -260,13 +260,12 @@ class VilkårService(
     fun kopierVilkårsettTilNyBehandling(
         eksisterendeBehandlingId: UUID,
         nyBehandling: Behandling,
-        metadata: HovedregelMetadata,
+        barnIdMap: Map<TidligereBarnId, NyttBarnId>,
         stønadstype: Stønadstype,
     ) {
         val tidligereVurderinger =
             vilkårRepository.findByBehandlingId(eksisterendeBehandlingId).associateBy { it.id }
-        val barnPåForrigeBehandling = barnService.finnBarnPåBehandling(eksisterendeBehandlingId)
-        val barnIdMap = byggBarnMapFraTidligereTilNyId(barnPåForrigeBehandling, metadata.barn)
+
         validerAtVurderingerKanKopieres(tidligereVurderinger, eksisterendeBehandlingId)
 
         val kopiAvVurderinger: Map<UUID, Vilkår> = lagKopiAvTidligereVurderinger(
@@ -297,7 +296,7 @@ class VilkårService(
     private fun lagKopiAvTidligereVurderinger(
         tidligereVilkår: Map<UUID, Vilkår>,
         nyBehandlingsId: UUID,
-        barnIdMap: Map<UUID, BehandlingBarn>,
+        barnIdMap: Map<UUID, UUID>,
     ): Map<UUID, Vilkår> =
         tidligereVilkår.values
             .associate { vilkår ->
@@ -330,12 +329,12 @@ class VilkårService(
             .flatten()
     }
 
-    private fun finnBarnId(barnId: UUID?, barnIdMap: Map<UUID, BehandlingBarn>): UUID? {
-        return barnId?.let {
-            val barnIdMapping = barnIdMap.map { it.key to it.value.id }.toMap()
-            barnIdMap[it]?.id ?: error("Fant ikke barn=$it på gjeldende behandling med barnIdMapping=$barnIdMapping")
+    private fun finnBarnId(barnId: UUID?, barnIdMap: Map<UUID, UUID>): UUID? =
+        barnId?.let {
+            barnIdMap[it]
+                ?: error("Fant ikke barn=$it på gjeldende behandling med barnIdMapping=$barnIdMap")
+
         }
-    }
 
     fun erAlleVilkårOppfylt(behandlingId: UUID): Boolean {
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype

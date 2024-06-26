@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sisteFerdigstilteBehandling
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -15,6 +16,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,6 +29,7 @@ class OpprettRevurderingBehandlingService(
     val barnService: BarnService,
     val vilkårperiodeService: VilkårperiodeService,
     val stønadsperiodeService: StønadsperiodeService,
+    val vilkårService: VilkårService,
     val unleashService: UnleashService,
 ) {
 
@@ -73,7 +76,12 @@ class OpprettRevurderingBehandlingService(
             nyBehandlingId = behandling.id,
         )
 
-        // TODO kopier vilkår
+        vilkårService.kopierVilkårsettTilNyBehandling(
+            eksisterendeBehandlingId = forrigeBehandlingId,
+            nyBehandling = behandling,
+            barnIdMap = barnIder,
+            stønadstype = Stønadstype.BARNETILSYN,
+        )
     }
 
     private fun sisteAvsluttetBehandlingId(behandling: Behandling): UUID {
