@@ -259,7 +259,7 @@ class VilkårService(
      */
     fun kopierVilkårsettTilNyBehandling(
         eksisterendeBehandlingId: UUID,
-        nyBehandlingsId: UUID,
+        nyBehandling: Behandling,
         metadata: HovedregelMetadata,
         stønadstype: Stønadstype,
     ) {
@@ -271,11 +271,15 @@ class VilkårService(
 
         val kopiAvVurderinger: Map<UUID, Vilkår> = lagKopiAvTidligereVurderinger(
             tidligereVurderinger,
-            nyBehandlingsId,
+            nyBehandling.id,
             barnIdMap,
         )
 
-        val nyeBarnVurderinger = opprettVilkårForNyeBarn(kopiAvVurderinger, metadata, stønadstype)
+        val nyeBarnVurderinger = opprettVilkårForNyeBarn(
+            vilkårKopi = kopiAvVurderinger,
+            nyBehandling = nyBehandling,
+            stønadstype = stønadstype
+        )
 
         vilkårRepository.insertAll(kopiAvVurderinger.values.toList() + nyeBarnVurderinger)
     }
@@ -308,13 +312,23 @@ class VilkårService(
 
     private fun opprettVilkårForNyeBarn(
         vilkårKopi: Map<UUID, Vilkår>,
-        metadata: HovedregelMetadata,
+        nyBehandling: Behandling,
         stønadstype: Stønadstype,
-    ) =
-        metadata.barn
+    ): List<Vilkår> {
+        val alleBarn = barnService.finnBarnPåBehandling(nyBehandling.id)
+
+        return alleBarn
             .filter { barn -> vilkårKopi.none { it.value.barnId == barn.id } }
-            .map { OppdaterVilkår.lagVilkårForNyttBarn(metadata, it.behandlingId, it.id, stønadstype) }
+            .map {
+                OppdaterVilkår.lagVilkårForNyttBarn(
+                    HovedregelMetadata(barn = alleBarn, behandling = nyBehandling),
+                    it.behandlingId,
+                    it.id,
+                    stønadstype,
+                )
+            }
             .flatten()
+    }
 
     private fun finnBarnId(barnId: UUID?, barnIdMap: Map<UUID, BehandlingBarn>): UUID? {
         return barnId?.let {
