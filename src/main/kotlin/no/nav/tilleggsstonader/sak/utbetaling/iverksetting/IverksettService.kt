@@ -13,8 +13,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -56,7 +54,7 @@ class IverksettService(
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
         val andeler = andelerForFørsteIverksettingAvBehandling(tilkjentYtelse)
 
-        val totrinnskontroll = hentTotrinnskontroll(behandlingId)
+        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollForIverksetting(behandlingId)
 
         val dto = IverksettDtoMapper.map(
             behandling = behandling,
@@ -101,7 +99,7 @@ class IverksettService(
         }
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
 
-        val totrinnskontroll = hentTotrinnskontroll(behandlingId)
+        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollForIverksetting(behandlingId)
 
         val dto = IverksettDtoMapper.map(
             behandling = behandling,
@@ -187,15 +185,6 @@ class IverksettService(
             "Forventet å oppdatere noen andeler"
         }
         andelTilkjentYtelseRepository.updateAll(andelerSomSkalOppdateres)
-    }
-
-    private fun hentTotrinnskontroll(behandlingId: UUID): Totrinnskontroll {
-        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandlingId)
-            ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
-        feilHvis(totrinnskontroll.status != TotrinnInternStatus.GODKJENT) {
-            "Totrinnskontroll må være godkjent for å kunne iverksette"
-        }
-        return totrinnskontroll
     }
 
     private fun opprettHentStatusFraIverksettingTask(behandling: Saksbehandling, iverksettingId: UUID) {

@@ -160,6 +160,15 @@ class TotrinnskontrollService(
         }
     }
 
+    fun hentTotrinnskontrollForIverksetting(behandlingId: UUID): Totrinnskontroll {
+        val totrinnskontroll = hentTotrinnskontroll(behandlingId)
+            ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
+        feilHvis(totrinnskontroll.status != TotrinnInternStatus.GODKJENT) {
+            "Totrinnskontroll må være godkjent for å kunne iverksette"
+        }
+        return totrinnskontroll
+    }
+
     private fun oppdaterUtfallogÅrsakPåTotrinnskontroll(
         beslutteVedtak: BeslutteVedtakDto,
         sisteTotrinnskontroll: Totrinnskontroll,

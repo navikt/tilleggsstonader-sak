@@ -30,6 +30,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import java.util.UUID
@@ -290,6 +291,45 @@ internal class TotrinnskontrollServiceTest {
             )
         }
         assertThat(oppdaterSlot.captured.årsakerUnderkjent?.årsaker!!).containsExactly(ÅrsakUnderkjent.AKTIVITET)
+    }
+
+    @Nested
+    inner class HentTotrinnskontrollForIverksetting {
+
+        @Test
+        internal fun `skal returnere totrinnskontroll dersom godkjent`() {
+            val totrinnskontroll = totrinnskontroll(
+                opprettetAv = "Noe",
+                status = TotrinnInternStatus.GODKJENT,
+            )
+            every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns totrinnskontroll
+
+            val hentetTotrinnskontroll = totrinnskontrollService.hentTotrinnskontrollForIverksetting(BEHANDLING_ID)
+
+            assertThat(hentetTotrinnskontroll).isEqualTo(totrinnskontroll)
+        }
+
+        @Test
+        internal fun `skal feile dersom underkjent`() {
+            every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
+                totrinnskontroll(
+                    opprettetAv = "Noe",
+                    status = TotrinnInternStatus.UNDERKJENT,
+                )
+
+            assertThatThrownBy {
+                totrinnskontrollService.hentTotrinnskontrollForIverksetting(BEHANDLING_ID)
+            }.hasMessageContaining("Totrinnskontroll må være godkjent for å kunne iverksette")
+        }
+
+        @Test
+        internal fun `skal feile dersom totrinns ikke eksisterer`() {
+            every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns null
+
+            assertThatThrownBy {
+                totrinnskontrollService.hentTotrinnskontrollForIverksetting(BEHANDLING_ID)
+            }.hasMessageContaining("Finner ikke totrinnskontroll for behandling=$BEHANDLING_ID")
+        }
     }
 
     private fun totrinnskontroll(
