@@ -77,7 +77,7 @@ class OpprettRevurderingBehandlingService(
         )
 
         vilkårService.kopierVilkårsettTilNyBehandling(
-            eksisterendeBehandlingId = forrigeBehandlingId,
+            tidligereBehandlingId = forrigeBehandlingId,
             nyBehandling = behandling,
             barnIdMap = barnIder,
             stønadstype = Stønadstype.BARNETILSYN,
