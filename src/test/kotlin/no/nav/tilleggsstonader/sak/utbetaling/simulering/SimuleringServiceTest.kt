@@ -44,7 +44,6 @@ internal class SimuleringServiceTest {
         tilkjentYtelseService = tilkjentYtelseService,
         tilgangService = tilgangService,
         mockk(),
-        mockk(),
     )
 
     private val personIdent = "12345678901"

@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettDtoMapper
@@ -12,7 +13,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.OppsummeringFo
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,7 +24,6 @@ class SimuleringService(
     private val simuleringsresultatRepository: SimuleringsresultatRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val tilgangService: TilgangService,
-    private val totrinnskontrollService: TotrinnskontrollService,
     private val iverksettService: IverksettService,
 ) {
 
@@ -78,7 +77,6 @@ class SimuleringService(
     }
 
     private fun simulerMedTilkjentYtelse(saksbehandling: Saksbehandling): SimuleringResponseDto {
-        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontrollForIverksetting(saksbehandling.id)
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
         val forrigeIverksettingDto = iverksettService.forrigeIverksetting(saksbehandling, tilkjentYtelse)
 
@@ -87,7 +85,7 @@ class SimuleringService(
                 sakId = saksbehandling.eksternFagsakId.toString(),
                 behandlingId = saksbehandling.eksternId.toString(),
                 personident = saksbehandling.ident,
-                saksbehandler = totrinnskontroll.saksbehandler,
+                saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
                 vedtakstidspunkt = saksbehandling.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt for behandling=${saksbehandling.id}"),
                 utbetalinger = IverksettDtoMapper.mapUtbetalinger(tilkjentYtelse.andelerTilkjentYtelse),
                 forrigeIverksetting = forrigeIverksettingDto,
