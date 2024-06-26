@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDto
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -51,11 +53,19 @@ class IverksettClient(
     }
 
     // TODO oppdater url når utsjekk har støtte for simulering
-    fun simuler(simuleringRequest: SimuleringDto): BeriketSimuleringsresultat {
+    fun simulerGammel(simuleringRequest: SimuleringDto): BeriketSimuleringsresultat {
         val url = UriComponentsBuilder.fromUri(uri)
             .pathSegment("api", "simulering")
             .toUriString()
 
         return postForEntity<BeriketSimuleringsresultat>(url, simuleringRequest)
+    }
+
+    fun simuler(simuleringRequest: SimuleringRequestDto): SimuleringResponseDto {
+        val url = UriComponentsBuilder.fromUri(uri)
+            .pathSegment("api", "simulering", "tilleggsstonader")
+            .toUriString()
+
+        return postForEntity<SimuleringResponseDto>(url, simuleringRequest)
     }
 }
