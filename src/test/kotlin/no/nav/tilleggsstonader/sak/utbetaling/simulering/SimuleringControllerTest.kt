@@ -37,9 +37,6 @@ internal class SimuleringControllerTest : IntegrationTest() {
     @Autowired
     private lateinit var simuleringsresultatRepository: SimuleringsresultatRepository
 
-    @Autowired
-    private lateinit var totrinnskontrollRepository: TotrinnskontrollRepository
-
     @BeforeEach
     fun setUp() {
         headers.setBearerAuth(onBehalfOfToken())
@@ -49,21 +46,8 @@ internal class SimuleringControllerTest : IntegrationTest() {
     internal fun `Skal returnere 200 OK for simulering av behandling`() {
         val personIdent = "12345678901"
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(personIdent))))
-        val behandling = testoppsettService.lagre(
-            behandling(
-                fagsak,
-                resultat = BehandlingResultat.INNVILGET,
-                vedtakstidspunkt = LocalDateTime.now(),
-            ),
-        )
+        val behandling = testoppsettService.lagre(behandling(fagsak, resultat = BehandlingResultat.INNVILGET))
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
-        totrinnskontrollRepository.insert(
-            TotrinnskontrollUtil.totrinnskontroll(
-                status = TotrinnInternStatus.GODKJENT,
-                behandlingId = behandling.id,
-                saksbehandler = "sb",
-            ),
-        )
 
         val respons: ResponseEntity<List<OppsummeringForPeriode>> = simulerForBehandling(behandling.id)
 

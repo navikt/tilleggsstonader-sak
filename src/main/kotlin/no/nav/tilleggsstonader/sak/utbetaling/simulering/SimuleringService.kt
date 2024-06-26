@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -86,7 +87,7 @@ class SimuleringService(
                 behandlingId = saksbehandling.eksternId.toString(),
                 personident = saksbehandling.ident,
                 saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-                vedtakstidspunkt = saksbehandling.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt for behandling=${saksbehandling.id}"),
+                vedtakstidspunkt = LocalDateTime.now(),
                 utbetalinger = IverksettDtoMapper.mapUtbetalinger(tilkjentYtelse.andelerTilkjentYtelse),
                 forrigeIverksetting = forrigeIverksettingDto,
             ),
