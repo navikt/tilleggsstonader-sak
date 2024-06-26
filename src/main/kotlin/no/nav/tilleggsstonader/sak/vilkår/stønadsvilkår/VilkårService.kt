@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.barn.NyttBarnId
+import no.nav.tilleggsstonader.sak.behandling.barn.TidligereBarnId
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
@@ -296,7 +298,7 @@ class VilkårService(
     private fun lagKopiAvTidligereVurderinger(
         tidligereVilkår: Map<UUID, Vilkår>,
         nyBehandlingsId: UUID,
-        barnIdMap: Map<UUID, UUID>,
+        barnIdMap: Map<TidligereBarnId, NyttBarnId>,
     ): Map<UUID, Vilkår> =
         tidligereVilkår.values
             .associate { vilkår ->
