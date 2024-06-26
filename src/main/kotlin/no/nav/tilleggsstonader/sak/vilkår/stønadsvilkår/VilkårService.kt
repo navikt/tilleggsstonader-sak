@@ -279,7 +279,7 @@ class VilkårService(
         val nyeBarnVurderinger = opprettVilkårForNyeBarn(
             vilkårKopi = kopiAvVurderinger,
             nyBehandling = nyBehandling,
-            stønadstype = stønadstype
+            stønadstype = stønadstype,
         )
 
         vilkårRepository.insertAll(kopiAvVurderinger.values.toList() + nyeBarnVurderinger)
@@ -335,7 +335,6 @@ class VilkårService(
         barnId?.let {
             barnIdMap[it]
                 ?: error("Fant ikke barn=$it på gjeldende behandling med barnIdMapping=$barnIdMap")
-
         }
 
     fun erAlleVilkårOppfylt(behandlingId: UUID): Boolean {

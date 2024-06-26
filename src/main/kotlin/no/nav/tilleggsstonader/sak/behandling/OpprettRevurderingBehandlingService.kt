@@ -46,6 +46,7 @@ class OpprettRevurderingBehandlingService(
         )
 
         gjenbrukData(behandling)
+
         taskService.save(
             OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
                 OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
