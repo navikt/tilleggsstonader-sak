@@ -105,7 +105,7 @@ abstract class IntegrationTest {
 
     val logger = LoggerFactory.getLogger(javaClass)
 
-    @AfterEach
+    //@AfterEach
     fun tearDown() {
         headers.clear()
         clearClientMocks()

@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.journalpost.RelevantDato
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import org.springframework.context.annotation.Bean
@@ -158,11 +159,11 @@ class JournalpostClientConfig {
         Journalpost(
             "1",
             Journalposttype.I,
-            journalstatus = Journalstatus.MOTTATT,
+            journalstatus = Journalstatus.FERDIGSTILT,
             tema = Tema.TSO.toString(),
             behandlingstema = "ab0300",
             tittel = "Søknad om barnetilsyn",
-            bruker = Bruker("12345678910", BrukerIdType.FNR),
+            bruker = Bruker("25518735813", BrukerIdType.FNR),
             avsenderMottaker = avsenderMottaker(),
             journalforendeEnhet = "tilleggsstonader-sak",
             relevanteDatoer = listOf(
@@ -172,6 +173,7 @@ class JournalpostClientConfig {
             dokumenter = listOf(
                 DokumentInfo(
                     dokumentInfoId = "1",
+                    brevkode = DokumentBrevkode.BARNETILSYN.verdi + "B",
                     tittel = "Dummy dokument 1",
                     logiskeVedlegg = listOf(
                         LogiskVedlegg("1", "Dokumentasjon på sykdom"),
@@ -195,13 +197,24 @@ class JournalpostClientConfig {
                         ),
                     ),
                 ),
+                DokumentInfo(
+                    dokumentInfoId = "2",
+                    tittel = "Dummy dokument 2",
+                    dokumentvarianter = listOf(
+                        Dokumentvariant(
+                            variantformat = Dokumentvariantformat.ARKIV,
+                            saksbehandlerHarTilgang = true,
+                        ),
+                    ),
+                ),
             ),
         )
 
-    private val dummyPdf = this::class.java.classLoader.getResource("interntVedtak/internt_vedtak.pdf")!!.readBytes()
+    //private val dummyPdf = this::class.java.classLoader.getResource("interntVedtak/internt_vedtak.pdf")!!.readBytes()
+    private val dummyPdf = this::class.java.classLoader.getResource("fyllut-sendinn/søknad-1-barn.xml")!!.readBytes()
 
     private fun avsenderMottaker() = AvsenderMottaker(
-        id = "12345678910",
+        id = "25518735813",
         type = AvsenderMottakerIdType.FNR,
         navn = "Ola Nordmann",
         land = "NOR",

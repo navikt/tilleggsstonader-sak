@@ -43,12 +43,18 @@ class OpprettBehandlingFraJournalpostService(
     private val unleashService: UnleashService,
 ) {
 
+    /**
+     * Barnen står i venstrekolonnen, som søknadsinformasjon.
+     * Det er egentligen bare behandlingBarn, og ikke nødvendigvis barn fra søknaden
+     */
     @Transactional
     fun opprettBehandlingFraJournalpost(journalpostId: String): UUID {
-        // TODO valider at journalpost er ferdigstilt
         brukerfeilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_BEHANDLING_FRA_JOURNALPOST)) {
             "Feature toggle for å kunne opprette behandling fra journalpost er slått av"
         }
+
+        // TODO oppgaven skal ha dato i forhold til når journalposten ble opprettet
+        // TOOD skal vi populere mottattdato i behandling?
 
         val info = hentInformasjon(journalpostId)
 
@@ -64,6 +70,7 @@ class OpprettBehandlingFraJournalpostService(
 
         behandlingService.leggTilBehandlingsjournalpost(journalpostId, Journalposttype.I, behandling.id)
 
+        // TODO hvem skal stå på oppgaven?
         opprettBehandleSakOppgave(behandling)
         return behandling.id
     }
