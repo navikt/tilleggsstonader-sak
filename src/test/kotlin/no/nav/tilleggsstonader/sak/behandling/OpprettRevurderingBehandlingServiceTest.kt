@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
@@ -9,7 +10,10 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
@@ -36,6 +40,9 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var stønadsperiodeRepository: StønadsperiodeRepository
+
+    @Autowired
+    lateinit var vilkårRepository: VilkårRepository
 
     @BeforeEach
     fun setUp() {
@@ -70,6 +77,8 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 opprettGrunnlagsdata = false,
             )
 
+            vilkårRepository.insert(vilkår(behandlingId = behandling.id))
+
             val nyBehandlingId =
                 service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
 
@@ -86,6 +95,8 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 ),
                 opprettGrunnlagsdata = false,
             )
+
+            vilkårRepository.insert(vilkår(behandlingId = behandling.id))
 
             val nyBehandlingId =
                 service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
@@ -104,6 +115,8 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 opprettGrunnlagsdata = false,
             )
 
+            vilkårRepository.insert(vilkår(behandlingId = behandling.id))
+
             val nyBehandlingId =
                 service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
 
@@ -113,24 +126,57 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class GjenbrukBarn {
+    inner class GjenbrukDataFraForrigeBehandling {
+        var tidligereBehandling: Behandling? = null
+        val barnIdent = "barn1"
+        val fom = LocalDate.of(2024, 1, 1)
+        val tom = LocalDate.of(2024, 1, 31)
 
-        @Test
-        fun `skal gjenbruke barn fra forrige behandlingen`() {
-            val barnIdent = "barn1"
-            val behandling1 = testoppsettService.opprettBehandlingMedFagsak(
+        @BeforeEach
+        fun setUp() {
+            tidligereBehandling = testoppsettService.opprettBehandlingMedFagsak(
                 behandling(
                     status = BehandlingStatus.FERDIGSTILT,
                     resultat = BehandlingResultat.INNVILGET,
                 ),
                 opprettGrunnlagsdata = false,
             )
-            barnService.opprettBarn(listOf(behandlingBarn(behandlingId = behandling1.id, personIdent = barnIdent)))
 
+            val barn = barnService.opprettBarn(
+                listOf(
+                    behandlingBarn(
+                        behandlingId = tidligereBehandling!!.id,
+                        personIdent = barnIdent,
+                    ),
+                ),
+            )
+
+            vilkårperiodeRepository.insertAll(
+                listOf(
+                    målgruppe(behandlingId = tidligereBehandling!!.id, fom = fom, tom = tom),
+                    aktivitet(behandlingId = tidligereBehandling!!.id, fom = fom, tom = tom),
+                ),
+            )
+
+            stønadsperiodeRepository.insert(stønadsperiode(behandlingId = tidligereBehandling!!.id, fom = fom, tom = tom))
+
+            vilkårRepository.insertAll(
+                barn.map {
+                    vilkår(
+                        behandlingId = tidligereBehandling!!.id,
+                        barnId = it.id,
+                        type = VilkårType.PASS_BARN,
+                    )
+                },
+            )
+        }
+
+        @Test
+        fun `skal gjenbruke barn fra forrige behandlingen`() {
             val nyBehandlingId =
-                service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling1.fagsakId))
+                service.opprettBehandling(opprettBehandlingDto(fagsakId = tidligereBehandling!!.fagsakId))
 
-            with(barnService.finnBarnPåBehandling(behandling1.id)) {
+            with(barnService.finnBarnPåBehandling(tidligereBehandling!!.id)) {
                 assertThat(this).hasSize(1)
             }
 
@@ -141,33 +187,15 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         }
 
         // TODO gjenbruke barn fra henlagt/avslått behandling?
-    }
 
-    @Test
-    fun `skal gjenbruke informasjon fra forrige behandling`() {
-        val fom = LocalDate.of(2024, 1, 1)
-        val tom = LocalDate.of(2024, 1, 31)
+        @Test
+        fun `skal gjenbruke informasjon fra forrige behandling`() {
+            val revurderingId = service.opprettBehandling(opprettBehandlingDto(fagsakId = tidligereBehandling!!.fagsakId))
 
-        val behandling1 = testoppsettService.opprettBehandlingMedFagsak(
-            behandling(
-                status = BehandlingStatus.FERDIGSTILT,
-                resultat = BehandlingResultat.INNVILGET,
-            ),
-            opprettGrunnlagsdata = false,
-        )
-
-        vilkårperiodeRepository.insertAll(
-            listOf(
-                målgruppe(behandlingId = behandling1.id, fom = fom, tom = tom),
-                aktivitet(behandlingId = behandling1.id, fom = fom, tom = tom),
-            ),
-        )
-        stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandling1.id, fom = fom, tom = tom))
-
-        val revurderingId = service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling1.fagsakId))
-
-        assertThat(vilkårperiodeRepository.findByBehandlingId(revurderingId)).hasSize(2)
-        assertThat(stønadsperiodeRepository.findAllByBehandlingId(revurderingId)).hasSize(1)
+            assertThat(vilkårperiodeRepository.findByBehandlingId(revurderingId)).hasSize(2)
+            assertThat(stønadsperiodeRepository.findAllByBehandlingId(revurderingId)).hasSize(1)
+            assertThat(vilkårRepository.findByBehandlingId(revurderingId)).hasSize(1)
+        }
     }
 
     private fun opprettBehandlingDto(
