@@ -260,15 +260,15 @@ class VilkårService(
      * Når en revurdering opprettes skal den kopiere de tidligere vilkårene for samme stønad.
      */
     fun kopierVilkårsettTilNyBehandling(
-        tidligereBehandlingId: UUID,
+        forrigeBehandlingId: UUID,
         nyBehandling: Behandling,
         barnIdMap: Map<TidligereBarnId, NyttBarnId>,
         stønadstype: Stønadstype,
     ) {
         val tidligereVurderinger =
-            vilkårRepository.findByBehandlingId(tidligereBehandlingId).associateBy { it.id }
+            vilkårRepository.findByBehandlingId(forrigeBehandlingId).associateBy { it.id }
 
-        validerAtVurderingerKanKopieres(tidligereVurderinger, tidligereBehandlingId)
+        validerAtVurderingerKanKopieres(tidligereVurderinger, forrigeBehandlingId)
 
         val kopiAvVurderinger: Map<UUID, Vilkår> = lagKopiAvTidligereVurderinger(
             tidligereVurderinger,
@@ -287,10 +287,10 @@ class VilkårService(
 
     private fun validerAtVurderingerKanKopieres(
         tidligereVurderinger: Map<UUID, Vilkår>,
-        tidligereBehandlingId: UUID,
+        forrigeBehandlingId: UUID,
     ) {
         if (tidligereVurderinger.isEmpty()) {
-            val melding = "Tidligere behandling=$tidligereBehandlingId har ikke noen vilkår"
+            val melding = "Tidligere behandling=$forrigeBehandlingId har ikke noen vilkår"
             throw Feil(melding, melding)
         }
     }

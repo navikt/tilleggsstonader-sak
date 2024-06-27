@@ -63,7 +63,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         val vilkårForBehandling = opprettVilkårsvurderinger(søknadskjema, behandling, barnPåFørsteSøknad).first()
 
         vilkårService.kopierVilkårsettTilNyBehandling(
-            tidligereBehandlingId = behandling.id,
+            forrigeBehandlingId = behandling.id,
             nyBehandling = revurdering,
             barnIdMap = barnIdMap,
             stønadstype = Stønadstype.BARNETILSYN,
