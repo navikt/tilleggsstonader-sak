@@ -2,10 +2,13 @@ package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
 import no.nav.familie.prosessering.rest.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.PersonIdentDto
+import no.nav.tilleggsstonader.sak.opplysninger.ereg.EregService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -21,6 +24,7 @@ class BrevmottakereController(
     private val tilgangService: TilgangService,
     private val brevmottakereService: BrevmottakereService,
     private val personService: PersonService,
+    private val eregService: EregService,
 ) {
 
     @GetMapping("/{behandlingId}")
@@ -51,5 +55,23 @@ class BrevmottakereController(
         return Ressurs.success(result)
     }
 
+    @GetMapping("organisasjon/{organisasjonsnummer}")
+    fun søkOrganisasjon(
+        @PathVariable organisasjonsnummer: String,
+    ): Ressurs<IOrganisasjonDto> {
+        if (!ORGNR_REGEX.matches(organisasjonsnummer)) {
+            throw ApiFeil("Ugyldig organisasjonsnummer", HttpStatus.BAD_REQUEST)
+        }
+        val organisasjonsNavnDto = eregService.hentOrganisasjon(organisasjonsnummer)
+        return Ressurs.success(IOrganisasjonDto(organisasjonsNavnDto.navn.navnelinje1, organisasjonsNavnDto.organisasjonsnummer))
+    }
+
+    companion object {
+
+        private val ORGNR_REGEX = """\d{9}""".toRegex()
+    }
+
     data class PersonTreffDto(val ident: String, val navn: String)
+
+    data class IOrganisasjonDto(val navn: String?, val organisasjonsnummer: String)
 }

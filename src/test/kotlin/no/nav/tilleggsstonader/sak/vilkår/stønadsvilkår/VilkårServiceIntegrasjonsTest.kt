@@ -4,6 +4,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -47,6 +48,9 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     @Autowired
     lateinit var barnRepository: BarnRepository
 
+    @Autowired
+    lateinit var barnService: BarnService
+
     @Test
     internal fun `kopierVilkårsettTilNyBehandling - skal kopiere vilkår til ny behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
@@ -54,18 +58,15 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         val revurdering = testoppsettService.lagre(behandling(fagsak))
         val søknadskjema = lagreSøknad(behandling)
         val barnPåFørsteSøknad = barnRepository.insertAll(søknadBarnTilBehandlingBarn(søknadskjema.barn, behandling.id))
-        val barnPåRevurdering = barnRepository.insertAll(søknadBarnTilBehandlingBarn(søknadskjema.barn, revurdering.id))
+        val barnIdMap = barnService.gjenbrukBarn(behandling.id, revurdering.id)
 
         val vilkårForBehandling = opprettVilkårsvurderinger(søknadskjema, behandling, barnPåFørsteSøknad).first()
-        val metadata = HovedregelMetadata(
-            barnPåRevurdering,
-            mockk(),
-        )
+
         vilkårService.kopierVilkårsettTilNyBehandling(
-            behandling.id,
-            revurdering.id,
-            metadata,
-            Stønadstype.BARNETILSYN,
+            forrigeBehandlingId = behandling.id,
+            nyBehandling = revurdering,
+            barnIdMap = barnIdMap,
+            stønadstype = Stønadstype.BARNETILSYN,
         )
 
         val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id).first()
@@ -77,7 +78,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         assertThat(vilkårForBehandling.barnId).isNotEqualTo(vilkårForRevurdering.barnId)
         assertThat(vilkårForBehandling.barnId).isEqualTo(barnPåFørsteSøknad.first().id)
         assertThat(vilkårForBehandling.opphavsvilkår).isNull()
-        assertThat(vilkårForRevurdering.barnId).isEqualTo(barnPåRevurdering.first().id)
+        assertThat(vilkårForRevurdering.barnId).isEqualTo(barnIdMap[barnPåFørsteSøknad.first().id])
         assertThat(vilkårForRevurdering.opphavsvilkår)
             .isEqualTo(Opphavsvilkår(behandling.id, vilkårForBehandling.sporbar.endret.endretTid))
 
@@ -100,16 +101,13 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         val tidligereBehandlingId = UUID.randomUUID()
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val revurdering = testoppsettService.lagre(behandling(fagsak))
-        val metadata = HovedregelMetadata(
-            emptyList(),
-            mockk(),
-        )
+
         assertThat(
             catchThrowable {
                 vilkårService.kopierVilkårsettTilNyBehandling(
                     tidligereBehandlingId,
-                    revurdering.id,
-                    metadata,
+                    revurdering,
+                    emptyMap(),
                     Stønadstype.BARNETILSYN,
                 )
             },
