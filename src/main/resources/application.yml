@@ -81,6 +81,7 @@ rolle:
 
 
 CLIENT_ENV: prod
+EREG_URL: https://ereg-services.intern.nav.no/api/v1
 
 no.nav.security.jwt:
   issuer.azuread:
