@@ -98,6 +98,7 @@ spec:
         - host: tilleggsstonader-unleash-api.nav.cloud.nais.io
         - host: kodeverk-api.nav.no
         - host: norg2.dev-fss-pub.nais.io
+        - host: ereg-services.intern.dev.nav.no
 
   envFrom:
     - secret: tilleggsstonader-sak-unleash-api-token
