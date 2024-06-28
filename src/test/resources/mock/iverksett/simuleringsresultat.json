@@ -1,0 +1,152 @@
+{
+  "oppsummeringer": [
+    {
+      "fom": "2024-05-02",
+      "tom": "2024-05-02",
+      "tidligereUtbetalt": 1624,
+      "nyUtbetaling": 65,
+      "totalEtterbetaling": 0,
+      "totalFeilutbetaling": 1559
+    },
+    {
+      "fom": "2024-06-03",
+      "tom": "2024-06-03",
+      "tidligereUtbetalt": 1477,
+      "nyUtbetaling": 118,
+      "totalEtterbetaling": 0,
+      "totalFeilutbetaling": 1359
+    },
+    {
+      "fom": "2024-07-01",
+      "tom": "2024-07-01",
+      "tidligereUtbetalt": 0,
+      "nyUtbetaling": 136,
+      "totalEtterbetaling": 0,
+      "totalFeilutbetaling": 0
+    }
+  ],
+  "detaljer": {
+    "gjelderId": "22448843487",
+    "datoBeregnet": "2024-06-27",
+    "totalBeløp": 136,
+    "perioder": [
+      {
+        "fom": "2024-05-02",
+        "tom": "2024-05-02",
+        "posteringer": [
+          {
+            "fagområde": "TILLEGGSSTØNADER",
+            "sakId": "200000269",
+            "fom": "2024-05-02",
+            "tom": "2024-05-02",
+            "beløp": 1559,
+            "type": "YTELSE",
+            "klassekode": "TSTBASISP4-OP"
+          },
+          {
+            "fagområde": "TILLEGGSSTØNADER",
+            "sakId": "200000269",
+            "fom": "2024-05-02",
+            "tom": "2024-05-02",
+            "beløp": 65,
+            "type": "YTELSE",
+            "klassekode": "TSTBASISP4-OP"
+          },
+          {
+            "fagområde": "TILLEGGSSTØNADER",
+            "sakId": "200000269",
+            "fom": "2024-05-02",
+            "tom": "2024-05-02",
+            "beløp": 1559,
+            "type": "FEILUTBETALING",
+            "klassekode": "KL_KODE_FEIL_ARBYT"
+          },
+          {
+            "fagområde": "TILLEGGSSTØNADER",
+            "sakId": "200000269",
+            "fom": "2024-05-02",
+            "tom": "2024-05-02",
+            "beløp": -1559,
+            "type": "MOTPOSTERING",
+            "klassekode": "TBMOTOBS"
+          },
+          {
+            "fagområde": "TILLEGGSSTØNADER",
+            "sakId": "200000269",
+            "fom": "2024-05-02",
+            "tom": "2024-05-02",
+            "beløp": -1624,
+            "type": "YTELSE",
+            "klassekode": "TSTBASISP4-OP"
+          }
+        ]
+      },
+      {
+        "fom": "2024-06-03",
+        "tom": "2024-06-03",
+        "posteringer": [
+          {
+            "fagområde": "TILLEGGSSTØNADER",
+            "sakId": "200000269",
+            "fom": "2024-06-03",
+            "tom": "2024-06-03",
+            "beløp": 1359,
+            "type": "YTELSE",
+            "klassekode": "TSTBASISP4-OP"
+          },
+          {
+            "fagområde": "TILLEGGSSTØNADER",
+            "sakId": "200000269",
+            "fom": "2024-06-03",
+            "tom": "2024-06-03",
+            "beløp": 118,
+            "type": "YTELSE",
+            "klassekode": "TSTBASISP4-OP"
+          },
+          {
+            "fagområde": "TILLEGGSSTØNADER",
+            "sakId": "200000269",
+            "fom": "2024-06-03",
+            "tom": "2024-06-03",
+            "beløp": 1359,
+            "type": "FEILUTBETALING",
+            "klassekode": "KL_KODE_FEIL_ARBYT"
+          },
+          {
+            "fagområde": "TILLEGGSSTØNADER",
+            "sakId": "200000269",
+            "fom": "2024-06-03",
+            "tom": "2024-06-03",
+            "beløp": -1359,
+            "type": "MOTPOSTERING",
+            "klassekode": "TBMOTOBS"
+          },
+          {
+            "fagområde": "TILLEGGSSTØNADER",
+            "sakId": "200000269",
+            "fom": "2024-06-03",
+            "tom": "2024-06-03",
+            "beløp": -1477,
+            "type": "YTELSE",
+            "klassekode": "TSTBASISP4-OP"
+          }
+        ]
+      },
+      {
+        "fom": "2024-07-01",
+        "tom": "2024-07-01",
+        "posteringer": [
+          {
+            "fagområde": "TILLEGGSSTØNADER",
+            "sakId": "200000269",
+            "fom": "2024-07-01",
+            "tom": "2024-07-01",
+            "beløp": 136,
+            "type": "YTELSE",
+            "klassekode": "TSTBASISP4-OP"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -37,13 +38,14 @@ internal class SimuleringServiceTest {
     private val simuleringsresultatRepository = mockk<SimuleringsresultatRepository>()
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>()
     private val tilgangService = mockk<TilgangService>()
+    private val iverksettService = mockk<IverksettService>()
 
     private val simuleringService = SimuleringService(
         iverksettClient = iverksettClient,
         simuleringsresultatRepository = simuleringsresultatRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         tilgangService = tilgangService,
-        mockk(),
+        iverksettService = iverksettService,
     )
 
     private val personIdent = "12345678901"
@@ -55,6 +57,7 @@ internal class SimuleringServiceTest {
         every { fagsakService.fagsakMedOppdatertPersonIdent(any()) } returns fagsak
         every { tilgangService.validerHarSaksbehandlerrolle() } just Runs
         every { tilgangService.harTilgangTilRolle(any()) } returns true
+        every { iverksettService.forrigeIverksetting(any(), any()) } returns null
     }
 
     @Test
@@ -137,8 +140,8 @@ internal class SimuleringServiceTest {
 
         val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id)
 
-        every { iverksettClient.simulerGammel(any()) } returns
-            objectMapper.readValue(readFile("mock/iverksett/simuleringsresultat_beriket.json"))
+        every { iverksettClient.simuler(any()) } returns
+            objectMapper.readValue(readFile("mock/iverksett/simuleringsresultat.json"))
 
         every { behandlingService.hentBehandling(any()) } returns behandling
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse

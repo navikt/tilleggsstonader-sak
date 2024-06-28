@@ -11,9 +11,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollRepository
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,7 +20,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.exchange
-import java.time.LocalDateTime
 import java.util.UUID
 
 internal class SimuleringControllerTest : IntegrationTest() {
@@ -52,13 +48,11 @@ internal class SimuleringControllerTest : IntegrationTest() {
         val respons: ResponseEntity<List<OppsummeringForPeriode>> = simulerForBehandling(behandling.id)
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(respons.body!!).hasSize(8)
+        assertThat(respons.body!!).hasSize(3)
         val simuleringsresultat = simuleringsresultatRepository.findByIdOrThrow(behandling.id)
 
         // Verifiser at simuleringsresultatet er lagret
-//        assertThat(simuleringsresultat.data.detaljer.simuleringMottaker).hasSize(1)
-//        assertThat(simuleringsresultat.data.detaljer.simuleringMottaker.first().simulertPostering)
-//            .hasSizeGreaterThan(1)
+        assertThat(simuleringsresultat.data.detaljer.perioder).hasSize(3)
     }
 
     private fun simulerForBehandling(behandlingId: UUID): ResponseEntity<List<OppsummeringForPeriode>> {
