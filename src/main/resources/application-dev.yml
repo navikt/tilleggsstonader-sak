@@ -1,5 +1,5 @@
 CLIENT_ENV: dev
-EREG_URL: https://ereg-services.dev.intern.nav.no/api/v1
+EREG_URL: https://ereg-services.intern.dev.nav.no
 
 rolle:
   veileder: "3611981f-eda7-46ab-b8f2-50c3159e101c"

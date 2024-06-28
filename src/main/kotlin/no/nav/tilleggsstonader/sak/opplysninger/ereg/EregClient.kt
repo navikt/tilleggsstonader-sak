@@ -18,7 +18,7 @@ class EregClient(
 
     fun hentOrganisasjoner(organisasjonsnumre: List<String>): OrganisasjonsNavnDto? {
         val uriBuilder = UriComponentsBuilder.fromUri(eregUrl)
-            .pathSegment("organisasjon")
+            .pathSegment("api/v1/organisasjon")
             .pathSegment(organisasjonsnumre.firstOrNull())
         return try {
             getForEntity<OrganisasjonsNavnDto>(uriBuilder.build().toUri().toString())
