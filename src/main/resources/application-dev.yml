@@ -1,5 +1,4 @@
 CLIENT_ENV: dev
-EREG_URL: https://ereg-services.dev.intern.nav.no/api/v1
 
 rolle:
   veileder: "3611981f-eda7-46ab-b8f2-50c3159e101c"
@@ -19,3 +18,6 @@ clients:
     scope: api://${CLIENT_ENV}-fss.pdl.pdl-api-q1/.default
   kodeverk:
     uri: https://kodeverk-api.nav.no
+  ereg:
+    uri: https://ereg-services.intern.dev.nav.no
+    scope: api://${CLIENT_ENV}-fss.team-rocket.ereg-services/.default

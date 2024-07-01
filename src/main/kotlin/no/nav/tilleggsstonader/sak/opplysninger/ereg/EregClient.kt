@@ -11,14 +11,14 @@ import java.net.URI
 
 @Service
 class EregClient(
-    @Value("\${EREG_URL}")
+    @Value("\${clients.ereg.uri}")
     private val eregUrl: URI,
-    @Qualifier("utenAuth") restTemplate: RestTemplate,
+    @Qualifier("azure") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
 
     fun hentOrganisasjoner(organisasjonsnumre: List<String>): OrganisasjonsNavnDto? {
         val uriBuilder = UriComponentsBuilder.fromUri(eregUrl)
-            .pathSegment("organisasjon")
+            .pathSegment("api/v1/organisasjon")
             .pathSegment(organisasjonsnumre.firstOrNull())
         return try {
             getForEntity<OrganisasjonsNavnDto>(uriBuilder.build().toUri().toString())
