@@ -11,9 +11,9 @@ import java.net.URI
 
 @Service
 class EregClient(
-    @Value("\${EREG_URL}")
+    @Value("\${clients.ereg.uri}")
     private val eregUrl: URI,
-    @Qualifier("utenAuth") restTemplate: RestTemplate,
+    @Qualifier("azure") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
 
     fun hentOrganisasjoner(organisasjonsnumre: List<String>): OrganisasjonsNavnDto? {
