@@ -31,14 +31,14 @@ class SimuleringService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun simuler(saksbehandling: Saksbehandling): List<OppsummeringForPeriode> {
+    fun simuler(saksbehandling: Saksbehandling): SimuleringResponse {
         if (saksbehandling.status.behandlingErLåstForVidereRedigering() ||
             !tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)
         ) {
-            return hentLagretSimuleringsoppsummering(saksbehandling.id)
+//            return hentLagretSimuleringsoppsummering(saksbehandling.id)
         }
         val simuleringsresultat = hentOgLagreSimuleringsresultat(saksbehandling)
-        return simuleringsresultat.data.oppsummeringer
+        return simuleringsresultat.data
     }
 
     fun hentLagretSimuleringsoppsummering(behandlingId: UUID): List<OppsummeringForPeriode> {
