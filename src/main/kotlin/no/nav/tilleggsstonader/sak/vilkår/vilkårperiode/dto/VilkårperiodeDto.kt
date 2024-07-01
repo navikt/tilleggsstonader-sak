@@ -39,6 +39,7 @@ data class VilkårperiodeDto(
     val slettetKommentar: String?,
     val sistEndret: LocalDateTime,
     val aktivitetsdager: Int? = null,
+    val forrigeVilkårperiodeId: UUID?,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -58,6 +59,7 @@ fun Vilkårperiode.tilDto() =
         aktivitetsdager = this.aktivitetsdager,
         slettetKommentar = this.slettetKommentar,
         sistEndret = this.sporbar.endret.endretTid,
+        forrigeVilkårperiodeId = this.forrigeVilkårperiodeId,
     )
 
 fun DelvilkårVilkårperiode.tilDto() = when (this) {

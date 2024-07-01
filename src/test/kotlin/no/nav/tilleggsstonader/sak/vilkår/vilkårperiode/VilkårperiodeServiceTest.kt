@@ -542,11 +542,10 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             )
             val periode = vilkårperiodeRepository.insert(målgruppe)
 
-            val res = vilkårperiodeService.slettVilkårperiodePermanent(periode.id)
+            vilkårperiodeService.slettVilkårperiodePermanent(periode.id, forrigeVilkårperiodeId = null)
 
             assertThatThrownBy { vilkårperiodeRepository.findByIdOrThrow(periode.id) }.hasMessageContaining("Finner ikke Vilkårperiode med id=")
             assertThat(vilkårperiodeRepository.findByBehandlingId(behandling.id).size).isEqualTo(0)
-            assertThat(res).isEqualTo(behandling.id)
         }
 
         @Test
@@ -567,7 +566,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             vilkårperiodeRepository.insert(originalMålgruppe)
             val periode = vilkårperiodeRepository.insert(revurderingMålgruppe)
 
-            assertThatThrownBy { vilkårperiodeService.slettVilkårperiodePermanent(periode.id) }.hasMessageContaining("Skal ikke permanent slette vilkårsperiode fra tidligere behandling")
+            assertThatThrownBy { vilkårperiodeService.slettVilkårperiodePermanent(periode.id, forrigeVilkårperiodeId = revurderingMålgruppe.forrigeVilkårperiodeId) }.hasMessageContaining("Skal ikke permanent slette vilkårsperiode fra tidligere behandling")
             assertThat(vilkårperiodeRepository.findByBehandlingId(revurdering.id).size).isEqualTo(1)
         }
     }

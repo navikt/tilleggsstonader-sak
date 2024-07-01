@@ -80,10 +80,11 @@ class VilkårperiodeController(
     fun slettPeriodePermanent(
         @PathVariable("id") id: UUID,
     ): LagreVilkårperiodeResponse {
-        tilgangService.validerTilgangTilBehandling(id, AuditLoggerEvent.UPDATE)
+        val vilkårperiode = vilkårperiodeService.hentVilkårperiode(id)
+        tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        val behandlingId = vilkårperiodeService.slettVilkårperiodePermanent(id)
-        return vilkårperiodeService.validerOgLagResponse(behandlingId = behandlingId)
+        vilkårperiodeService.slettVilkårperiodePermanent(vilkårperiodeId = id, forrigeVilkårperiodeId = vilkårperiode.forrigeVilkårperiodeId)
+        return vilkårperiodeService.validerOgLagResponse(behandlingId = vilkårperiode.behandlingId)
     }
 }

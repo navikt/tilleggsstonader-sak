@@ -71,6 +71,10 @@ class VilkårperiodeService(
         )
     }
 
+    fun hentVilkårperiode(id: UUID): Vilkårperiode {
+        return vilkårperiodeRepository.findByIdOrThrow(id)
+    }
+
     fun hentVilkårperioderResponse(behandlingId: UUID): VilkårperioderResponse {
         val grunnlagsdataVilkårsperioder = hentEllerOpprettGrunnlag(behandlingId)
 
@@ -289,14 +293,10 @@ class VilkårperiodeService(
         )
     }
 
-    fun slettVilkårperiodePermanent(id: UUID): UUID {
-        val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
+    fun slettVilkårperiodePermanent(vilkårperiodeId: UUID, forrigeVilkårperiodeId: UUID?) {
+        feilHvis(forrigeVilkårperiodeId != null) { "Skal ikke permanent slette vilkårsperiode fra tidligere behandling. Teknisk feil. Ta kontakt med utviklerteamet." }
 
-        feilHvis(vilkårperiode.forrigeVilkårperiodeId != null) { "Skal ikke permanent slette vilkårsperiode fra tidligere behandling. Teknisk feil. Ta kontakt med utviklerteamet." }
-
-        vilkårperiodeRepository.deleteById(id)
-
-        return vilkårperiode.behandlingId
+        return vilkårperiodeRepository.deleteById(vilkårperiodeId)
     }
 
     fun gjenbrukVilkårperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
