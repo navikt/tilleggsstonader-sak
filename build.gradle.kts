@@ -2,11 +2,11 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20240522090805_0e9c7a6"
-val tilleggsstønaderLibsVersion = "2024.05.27-10.56.b9a67bfd6080"
+val familieProsesseringVersion = "2.20240603145215_c56e179"
+val tilleggsstønaderLibsVersion = "2024.05.30-12.20.051501b667a0"
 val tilleggsstønaderKontrakterVersion = "2024.06.28-14.11.bcc1cd2d189d"
-val tokenSupportVersion = "4.1.7"
-val wiremockVersion = "3.6.0"
+val tokenSupportVersion = "5.0.1"
+val wiremockVersion = "3.8.0"
 val mockkVersion = "1.13.11"
 val testcontainerVersion = "1.19.8"
 
@@ -16,14 +16,14 @@ version = "1.0.0"
 plugins {
     application
 
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm") version "2.0.0"
     id("com.diffplug.spotless") version "6.25.0"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
-    id("org.springframework.boot") version "3.3.0"
+    id("org.springframework.boot") version "3.3.1"
     id("io.spring.dependency-management") version "1.1.5"
-    kotlin("plugin.spring") version "1.9.24"
+    kotlin("plugin.spring") version "2.0.0"
 
     id("org.cyclonedx.bom") version "1.8.2"
 }
