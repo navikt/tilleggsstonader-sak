@@ -84,7 +84,7 @@ class VilkårperiodeController(
         tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        vilkårperiodeService.slettVilkårperiodePermanent(vilkårperiodeId = id, forrigeVilkårperiodeId = vilkårperiode.forrigeVilkårperiodeId)
+        vilkårperiodeService.slettVilkårperiodePermanent(vilkårperiode)
         return vilkårperiodeService.validerOgLagResponse(behandlingId = vilkårperiode.behandlingId)
     }
 }

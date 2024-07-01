@@ -542,7 +542,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             )
             val periode = vilkårperiodeRepository.insert(målgruppe)
 
-            vilkårperiodeService.slettVilkårperiodePermanent(periode.id, forrigeVilkårperiodeId = null)
+            vilkårperiodeService.slettVilkårperiodePermanent(periode)
 
             assertThatThrownBy { vilkårperiodeRepository.findByIdOrThrow(periode.id) }.hasMessageContaining("Finner ikke Vilkårperiode med id=")
             assertThat(vilkårperiodeRepository.findByBehandlingId(behandling.id).size).isEqualTo(0)
@@ -566,7 +566,22 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             vilkårperiodeRepository.insert(originalMålgruppe)
             val periode = vilkårperiodeRepository.insert(revurderingMålgruppe)
 
-            assertThatThrownBy { vilkårperiodeService.slettVilkårperiodePermanent(periode.id, forrigeVilkårperiodeId = revurderingMålgruppe.forrigeVilkårperiodeId) }.hasMessageContaining("Skal ikke permanent slette vilkårsperiode fra tidligere behandling")
+            assertThatThrownBy { vilkårperiodeService.slettVilkårperiodePermanent(periode) }.hasMessageContaining("Skal ikke permanent slette vilkårsperiode fra tidligere behandling")
+            assertThat(vilkårperiodeRepository.findByBehandlingId(revurdering.id).size).isEqualTo(1)
+        }
+
+        @Test
+        fun `skal kaste feil ved forsøk på permanent sletting dersom vilkårperioder er opprettet av system`() {
+            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
+            val målgruppe = målgruppe(
+                behandlingId = revurdering.id,
+                kilde = KildeVilkårsperiode.SYSTEM,
+            )
+
+            val periode = vilkårperiodeRepository.insert(målgruppe)
+
+            assertThatThrownBy { vilkårperiodeService.slettVilkårperiodePermanent(periode) }.hasMessageContaining("Kan ikke slette vilkårperioder som er opprettet av system")
             assertThat(vilkårperiodeRepository.findByBehandlingId(revurdering.id).size).isEqualTo(1)
         }
     }

@@ -293,10 +293,11 @@ class VilkårperiodeService(
         )
     }
 
-    fun slettVilkårperiodePermanent(vilkårperiodeId: UUID, forrigeVilkårperiodeId: UUID?) {
-        feilHvis(forrigeVilkårperiodeId != null) { "Skal ikke permanent slette vilkårsperiode fra tidligere behandling. Teknisk feil. Ta kontakt med utviklerteamet." }
+    fun slettVilkårperiodePermanent(vilkårperiode: Vilkårperiode) {
+        feilHvis(vilkårperiode.forrigeVilkårperiodeId != null) { "Skal ikke permanent slette vilkårsperiode fra tidligere behandling. Teknisk feil. Ta kontakt med utviklerteamet." }
+        feilHvis(vilkårperiode.kilde == KildeVilkårsperiode.SYSTEM) {"Kan ikke slette vilkårperioder som er opprettet av system"}
 
-        return vilkårperiodeRepository.deleteById(vilkårperiodeId)
+        return vilkårperiodeRepository.deleteById(vilkårperiode.id)
     }
 
     fun gjenbrukVilkårperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
