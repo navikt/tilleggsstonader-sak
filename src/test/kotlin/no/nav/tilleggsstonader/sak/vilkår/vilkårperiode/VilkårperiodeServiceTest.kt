@@ -50,6 +50,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.util.UUID
 
 class VilkårperiodeServiceTest : IntegrationTest() {
 
@@ -180,7 +181,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                         lønnet = VurderingDto(SvarJaNei.JA),
                         behandlingId = behandling.id,
                     ),
-
                 )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
@@ -529,12 +529,53 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(periode.sporbar.endret.endretAv).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
 
             BrukerContextUtil.testWithBrukerContext(saksbehandler) {
-                vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
+                vilkårperiodeService.slettVilkårperiode(
+                    periode.id,
+                    SlettVikårperiode(behandling.id, "kommentar"),
+                )
             }
 
             val oppdatertPeriode = vilkårperiodeRepository.findByIdOrThrow(periode.id)
             assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
             assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
+        }
+
+        @Test
+        fun `skal permanent slette vilkårperioder uten referanse til forrige vilkårperiode`() {
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val målgruppe = målgruppe(
+                behandlingId = behandling.id,
+                kilde = KildeVilkårsperiode.MANUELL,
+            )
+            val periode = vilkårperiodeRepository.insert(målgruppe)
+
+            vilkårperiodeService.slettVilkårperiodePermanent(periode.id)
+
+            assertThatThrownBy { vilkårperiodeRepository.findByIdOrThrow(periode.id) }.hasMessageContaining("Finner ikke Vilkårperiode med id=")
+            assertThat(vilkårperiodeRepository.findByBehandlingId(behandling.id).size).isEqualTo(0)
+        }
+
+        @Test
+        fun `skal kaste feil ved forsøk på permanent sletting dersom vilkårperioder har referanse til forrige vilkårperiode`() {
+            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
+            val originalMålgruppe = målgruppe(
+                behandlingId = revurdering.id,
+                kilde = KildeVilkårsperiode.MANUELL,
+            )
+
+            val revurderingMålgruppe = originalMålgruppe.copy(
+                id = UUID.randomUUID(),
+                behandlingId = revurdering.forrigeBehandlingId!!,
+                forrigeVilkårperiodeId = originalMålgruppe.id,
+            )
+
+            vilkårperiodeRepository.insert(originalMålgruppe)
+            val periode = vilkårperiodeRepository.insert(revurderingMålgruppe)
+
+            assertThatThrownBy { vilkårperiodeService.slettVilkårperiodePermanent(periode.id) }.hasMessageContaining("Skal ikke permanent slette vilkårsperiode fra tidligere behandling")
+            assertThat(vilkårperiodeRepository.findByBehandlingId(revurdering.id).size).isEqualTo(1)
         }
     }
 

@@ -75,4 +75,14 @@ class VilkårperiodeController(
         val periode = vilkårperiodeService.slettVilkårperiode(id, slettVikårperiode)
         return vilkårperiodeService.validerOgLagResponse(periode)
     }
+
+    @DeleteMapping("{id}/ny-periode")
+    fun slettPeriodePermanent(
+        @PathVariable("id") id: UUID,
+    ) {
+        tilgangService.validerTilgangTilBehandling(id, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return vilkårperiodeService.slettVilkårperiodePermanent(id)
+    }
 }

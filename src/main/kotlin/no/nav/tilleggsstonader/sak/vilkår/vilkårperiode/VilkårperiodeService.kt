@@ -289,6 +289,14 @@ class VilkårperiodeService(
         )
     }
 
+    fun slettVilkårperiodePermanent(id: UUID) {
+        val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
+
+        feilHvis(vilkårperiode.forrigeVilkårperiodeId != null) { "Skal ikke permanent slette vilkårsperiode fra tidligere behandling. Teknisk feil. Ta kontakt med utviklerteamet." }
+
+        return vilkårperiodeRepository.deleteById(id)
+    }
+
     fun gjenbrukVilkårperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
         val eksisterendeVilkårperioder = vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
 
