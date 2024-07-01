@@ -76,7 +76,7 @@ class VilkårperiodeController(
         return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.id, periode = periode)
     }
 
-    @DeleteMapping("{id}/ny-periode")
+    @DeleteMapping("{id}/permanent")
     fun slettPeriodePermanent(
         @PathVariable("id") id: UUID,
     ): LagreVilkårperiodeResponse {
