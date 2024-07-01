@@ -49,7 +49,7 @@ class VilkårperiodeController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.opprettVilkårperiode(vilkårperiode)
-        return vilkårperiodeService.validerOgLagResponse(periode)
+        return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.id, periode = periode)
     }
 
     @PostMapping("{id}")
@@ -61,7 +61,7 @@ class VilkårperiodeController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.oppdaterVilkårperiode(id, vilkårperiode)
-        return vilkårperiodeService.validerOgLagResponse(periode)
+        return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.id, periode = periode)
     }
 
     @DeleteMapping("{id}")
@@ -73,16 +73,17 @@ class VilkårperiodeController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.slettVilkårperiode(id, slettVikårperiode)
-        return vilkårperiodeService.validerOgLagResponse(periode)
+        return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.id, periode = periode)
     }
 
     @DeleteMapping("{id}/ny-periode")
     fun slettPeriodePermanent(
         @PathVariable("id") id: UUID,
-    ) {
+    ): LagreVilkårperiodeResponse {
         tilgangService.validerTilgangTilBehandling(id, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return vilkårperiodeService.slettVilkårperiodePermanent(id)
+        val behandlingId = vilkårperiodeService.slettVilkårperiodePermanent(id)
+        return vilkårperiodeService.validerOgLagResponse(behandlingId = behandlingId)
     }
 }

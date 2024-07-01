@@ -159,11 +159,11 @@ class VilkårperiodeService(
         vilkårsperioder: List<Vilkårperiode>,
     ) = vilkårsperioder.filter { it.type is T }
 
-    fun validerOgLagResponse(periode: Vilkårperiode): LagreVilkårperiodeResponse {
-        val valideringsresultat = validerStønadsperioder(periode.behandlingId)
+    fun validerOgLagResponse(behandlingId: UUID, periode: Vilkårperiode? = null): LagreVilkårperiodeResponse {
+        val valideringsresultat = validerStønadsperioder(behandlingId)
 
         return LagreVilkårperiodeResponse(
-            periode.tilDto(),
+            periode = periode?.tilDto(),
             stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
             stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
         )
@@ -289,16 +289,19 @@ class VilkårperiodeService(
         )
     }
 
-    fun slettVilkårperiodePermanent(id: UUID) {
+    fun slettVilkårperiodePermanent(id: UUID): UUID {
         val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
         feilHvis(vilkårperiode.forrigeVilkårperiodeId != null) { "Skal ikke permanent slette vilkårsperiode fra tidligere behandling. Teknisk feil. Ta kontakt med utviklerteamet." }
 
-        return vilkårperiodeRepository.deleteById(id)
+        vilkårperiodeRepository.deleteById(id)
+
+        return vilkårperiode.behandlingId
     }
 
     fun gjenbrukVilkårperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
-        val eksisterendeVilkårperioder = vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
+        val eksisterendeVilkårperioder =
+            vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
 
         val kopiertePerioderMedReferanse = eksisterendeVilkårperioder
             .map {

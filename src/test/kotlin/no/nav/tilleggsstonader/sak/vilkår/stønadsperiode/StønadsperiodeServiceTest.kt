@@ -316,6 +316,6 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
     private fun opprettVilkårperiode(periode: LagreVilkårperiode): LagreVilkårperiodeResponse {
         val oppdatertPeriode = vilkårperiodeService.opprettVilkårperiode(periode)
-        return vilkårperiodeService.validerOgLagResponse(oppdatertPeriode)
+        return vilkårperiodeService.validerOgLagResponse(behandlingId = oppdatertPeriode.id, periode = oppdatertPeriode)
     }
 }
