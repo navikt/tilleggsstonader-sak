@@ -49,7 +49,7 @@ class VilkårperiodeController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.opprettVilkårperiode(vilkårperiode)
-        return vilkårperiodeService.validerOgLagResponse(periode)
+        return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.behandlingId, periode = periode)
     }
 
     @PostMapping("{id}")
@@ -61,7 +61,7 @@ class VilkårperiodeController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.oppdaterVilkårperiode(id, vilkårperiode)
-        return vilkårperiodeService.validerOgLagResponse(periode)
+        return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.behandlingId, periode = periode)
     }
 
     @DeleteMapping("{id}")
@@ -73,6 +73,7 @@ class VilkårperiodeController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.slettVilkårperiode(id, slettVikårperiode)
-        return vilkårperiodeService.validerOgLagResponse(periode)
+
+        return vilkårperiodeService.validerOgLagResponse(behandlingId = slettVikårperiode.behandlingId, periode = periode)
     }
 }

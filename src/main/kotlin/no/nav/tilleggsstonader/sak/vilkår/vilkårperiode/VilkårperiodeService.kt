@@ -71,6 +71,10 @@ class VilkårperiodeService(
         )
     }
 
+    fun hentVilkårperiode(id: UUID): Vilkårperiode {
+        return vilkårperiodeRepository.findByIdOrThrow(id)
+    }
+
     fun hentVilkårperioderResponse(behandlingId: UUID): VilkårperioderResponse {
         val grunnlagsdataVilkårsperioder = hentEllerOpprettGrunnlag(behandlingId)
 
@@ -159,11 +163,11 @@ class VilkårperiodeService(
         vilkårsperioder: List<Vilkårperiode>,
     ) = vilkårsperioder.filter { it.type is T }
 
-    fun validerOgLagResponse(periode: Vilkårperiode): LagreVilkårperiodeResponse {
-        val valideringsresultat = validerStønadsperioder(periode.behandlingId)
+    fun validerOgLagResponse(behandlingId: UUID, periode: Vilkårperiode? = null): LagreVilkårperiodeResponse {
+        val valideringsresultat = validerStønadsperioder(behandlingId)
 
         return LagreVilkårperiodeResponse(
-            periode.tilDto(),
+            periode = periode?.tilDto(),
             stønadsperiodeStatus = if (valideringsresultat.isSuccess) Stønadsperiodestatus.OK else Stønadsperiodestatus.FEIL,
             stønadsperiodeFeil = valideringsresultat.exceptionOrNull()?.message,
         )
@@ -273,7 +277,7 @@ class VilkårperiodeService(
         }
     }
 
-    fun slettVilkårperiode(id: UUID, slettVikårperiode: SlettVikårperiode): Vilkårperiode {
+    fun slettVilkårperiode(id: UUID, slettVikårperiode: SlettVikårperiode): Vilkårperiode? {
         val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
         validerBehandlingIdErLik(slettVikårperiode.behandlingId, vilkårperiode.behandlingId)
@@ -281,16 +285,22 @@ class VilkårperiodeService(
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
 
-        return vilkårperiodeRepository.update(
-            vilkårperiode.copy(
-                resultat = ResultatVilkårperiode.SLETTET,
-                slettetKommentar = slettVikårperiode.kommentar,
-            ),
-        )
+        if (vilkårperiode.kanSlettesPermanent()) {
+            vilkårperiodeRepository.deleteById(vilkårperiode.id)
+            return null
+        } else {
+            return vilkårperiodeRepository.update(
+                vilkårperiode.copy(
+                    resultat = ResultatVilkårperiode.SLETTET,
+                    slettetKommentar = slettVikårperiode.kommentar,
+                ),
+            )
+        }
     }
 
     fun gjenbrukVilkårperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
-        val eksisterendeVilkårperioder = vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
+        val eksisterendeVilkårperioder =
+            vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
 
         val kopiertePerioderMedReferanse = eksisterendeVilkårperioder
             .map {
