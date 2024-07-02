@@ -223,4 +223,4 @@ clients:
     uri: https://norg2.${CLIENT_ENV}-fss-pub.nais.io/norg2
   ereg:
     uri: https://ereg-services.intern.nav.no
-    scope: api://${CLIENT_ENV}-fss.team-rocket.ereg-services/.default
+    scope: api://${CLIENT_ENV}-fss.arbeidsforhold.ereg-services/.default

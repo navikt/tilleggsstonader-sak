@@ -19,5 +19,5 @@ clients:
   kodeverk:
     uri: https://kodeverk-api.nav.no
   ereg:
-    uri: https://ereg-services.intern.dev.nav.no
-    scope: api://${CLIENT_ENV}-fss.team-rocket.ereg-services/.default
+    uri: https://ereg-services.dev.intern.nav.no
+    scope: api://${CLIENT_ENV}-fss.arbeidsforhold.ereg-services/.default

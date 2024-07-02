@@ -13,7 +13,7 @@ import java.net.URI
 class EregClient(
     @Value("\${clients.ereg.uri}")
     private val eregUrl: URI,
-    @Qualifier("azure") restTemplate: RestTemplate,
+    @Qualifier("azureClientCredential") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
 
     fun hentOrganisasjoner(organisasjonsnumre: List<String>): OrganisasjonsNavnDto? {
