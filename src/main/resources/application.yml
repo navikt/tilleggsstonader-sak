@@ -67,7 +67,7 @@ management:
 
 prosessering:
   continuousRunning.enabled: true
-  fixedDelayString.in.milliseconds: 15000
+  fixedDelayString.in.milliseconds: 2000
   delete.after.weeks: 16
 
 rolle:
