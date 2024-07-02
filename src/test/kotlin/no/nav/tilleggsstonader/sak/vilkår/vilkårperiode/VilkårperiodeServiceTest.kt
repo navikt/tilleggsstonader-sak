@@ -5,12 +5,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.AktivitetClientConfig.Companion.resetMock
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetClient
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
@@ -45,6 +45,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -465,124 +466,106 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
     @Nested
     inner class SlettVilkårperiode {
-
         @Test
-        fun `skal ikke kunne slette kommentar hvis behandlingen ikke er under behandling`() {
+        fun `skal ikke kunne slette vilkårperiode hvis behandlingen ikke er under behandling`() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
+
             val målgruppe = målgruppe(
                 behandlingId = behandling.id,
                 kilde = KildeVilkårsperiode.MANUELL,
             )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
+
+            val lagretPeriode = vilkårperiodeRepository.insert(målgruppe)
 
             assertThatThrownBy {
-                vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
+                vilkårperiodeService.slettVilkårperiode(lagretPeriode.id, SlettVikårperiode(behandling.id))
             }.hasMessageContaining("Kan ikke opprette eller endre vilkårperiode når behandling er låst for videre redigering")
         }
 
-        @Test
-        fun `skal ikke kunne slette kommentar hvis man mangler kommentar`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.MANUELL,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
+        @Nested
+        inner class SlettVilkårperiodePermanent {
+            lateinit var behandling: Behandling
+            lateinit var lagretPeriode: Vilkårperiode
 
-            assertThatThrownBy {
-                vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "    "))
-            }.hasMessageContaining("Mangler kommentar")
-        }
+            @BeforeEach
+            fun setUp() {
+                behandling =
+                    testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
 
-        @Test
-        fun `skal ikke kunne slette kommentar hvis kilden er system`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.SYSTEM,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
-
-            assertThatThrownBy {
-                vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
-            }.hasMessageContaining("Kan ikke slette når kilde=")
-        }
-
-        @Test
-        fun `skal kunne slette kommentar som er manuellt opprettet`() {
-            val saksbehandler = "saksbehandlerX"
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.MANUELL,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
-
-            assertThat(periode.sporbar.endret.endretAv).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
-
-            testWithBrukerContext(saksbehandler) {
-                vilkårperiodeService.slettVilkårperiode(
-                    periode.id,
-                    SlettVikårperiode(behandling.id, "kommentar"),
+                val målgruppe = målgruppe(
+                    behandlingId = behandling.id,
+                    kilde = KildeVilkårsperiode.MANUELL,
                 )
+
+                lagretPeriode = vilkårperiodeRepository.insert(målgruppe)
             }
 
-            val oppdatertPeriode = vilkårperiodeRepository.findByIdOrThrow(periode.id)
-            assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
-            assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
+            @Test
+            fun `skal ikke kunne slette kommentar hvis kilden er system`() {
+                val målgruppe = målgruppe(
+                    behandlingId = behandling.id,
+                    kilde = KildeVilkårsperiode.SYSTEM,
+                )
+                val periode = vilkårperiodeRepository.insert(målgruppe)
+
+                assertThatThrownBy {
+                    vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
+                }.hasMessageContaining("Kan ikke slette når kilde=")
+            }
         }
 
-        @Test
-        fun `skal permanent slette vilkårperioder uten referanse til forrige vilkårperiode`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.MANUELL,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
+        @Nested
+        inner class SlettGjenbruktVilkårperiode {
+            lateinit var revurdering: Behandling
+            lateinit var lagretPeriode: Vilkårperiode
 
-            vilkårperiodeService.slettVilkårperiodePermanent(periode)
+            @BeforeEach
+            fun setUp() {
+                revurdering = testoppsettService.lagBehandlingOgRevurdering()
 
-            assertThatThrownBy { vilkårperiodeRepository.findByIdOrThrow(periode.id) }.hasMessageContaining("Finner ikke Vilkårperiode med id=")
-            assertThat(vilkårperiodeRepository.findByBehandlingId(behandling.id).size).isEqualTo(0)
-        }
+                val originalMålgruppe = målgruppe(
+                    behandlingId = revurdering.forrigeBehandlingId!!,
+                    kilde = KildeVilkårsperiode.MANUELL,
+                )
 
-        @Test
-        fun `skal kaste feil ved forsøk på permanent sletting dersom vilkårperioder har referanse til forrige vilkårperiode`() {
-            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+                vilkårperiodeRepository.insert(originalMålgruppe)
 
-            val originalMålgruppe = målgruppe(
-                behandlingId = revurdering.id,
-                kilde = KildeVilkårsperiode.MANUELL,
-            )
+                val revurderingMålgruppe = originalMålgruppe.copy(
+                    id = UUID.randomUUID(),
+                    behandlingId = revurdering.id,
+                    forrigeVilkårperiodeId = originalMålgruppe.id,
+                )
 
-            val revurderingMålgruppe = originalMålgruppe.copy(
-                id = UUID.randomUUID(),
-                behandlingId = revurdering.forrigeBehandlingId!!,
-                forrigeVilkårperiodeId = originalMålgruppe.id,
-            )
+                lagretPeriode = vilkårperiodeRepository.insert(revurderingMålgruppe)
+            }
 
-            vilkårperiodeRepository.insert(originalMålgruppe)
-            val periode = vilkårperiodeRepository.insert(revurderingMålgruppe)
+            @Test
+            fun `skal ikke kunne slette gjenbrukt periode uten kommentar`() {
+                assertThatThrownBy {
+                    vilkårperiodeService.slettVilkårperiode(lagretPeriode.id, SlettVikårperiode(revurdering.id, ""))
+                }.hasMessageContaining("Mangler kommentar")
 
-            assertThatThrownBy { vilkårperiodeService.slettVilkårperiodePermanent(periode) }.hasMessageContaining("Skal ikke permanent slette vilkårsperiode fra tidligere behandling")
-            assertThat(vilkårperiodeRepository.findByBehandlingId(revurdering.id).size).isEqualTo(1)
-        }
+                assertThatThrownBy {
+                    vilkårperiodeService.slettVilkårperiode(lagretPeriode.id, SlettVikårperiode(revurdering.id))
+                }.hasMessageContaining("Mangler kommentar")
+            }
 
-        @Test
-        fun `skal kaste feil ved forsøk på permanent sletting dersom vilkårperioder er opprettet av system`() {
-            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+            @Test
+            fun `skal slettemarkere gjenbrukt periode om kommentar er sendt med`() {
+                val saksbehandler = "saksbehandlerX"
 
-            val målgruppe = målgruppe(
-                behandlingId = revurdering.id,
-                kilde = KildeVilkårsperiode.SYSTEM,
-            )
+                testWithBrukerContext(saksbehandler) {
+                    vilkårperiodeService.slettVilkårperiode(
+                        lagretPeriode.id,
+                        SlettVikårperiode(revurdering.id, "kommentar"),
+                    )
+                }
 
-            val periode = vilkårperiodeRepository.insert(målgruppe)
-
-            assertThatThrownBy { vilkårperiodeService.slettVilkårperiodePermanent(periode) }.hasMessageContaining("Kan ikke slette vilkårperioder som er opprettet av system")
-            assertThat(vilkårperiodeRepository.findByBehandlingId(revurdering.id).size).isEqualTo(1)
+                val oppdatertPeriode = vilkårperiodeRepository.findByIdOrThrow(lagretPeriode.id)
+                assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
+                assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
+            }
         }
     }
 
@@ -602,7 +585,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 ),
             )
 
-            val response = vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = periode)
+            val response =
+                vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = periode)
 
             assertThat(response.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.OK)
             assertThat(response.stønadsperiodeFeil).isNull()
@@ -628,7 +612,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 ),
             )
 
-            assertThat(vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = opprettetMålgruppe).stønadsperiodeStatus).isEqualTo(
+            assertThat(
+                vilkårperiodeService.validerOgLagResponse(
+                    behandlingId = behandling.id,
+                    periode = opprettetMålgruppe,
+                ).stønadsperiodeStatus,
+            ).isEqualTo(
                 Stønadsperiodestatus.OK,
             )
 
@@ -642,7 +631,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     aktivitetsdager = 5,
                 ),
             )
-            assertThat(vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = opprettetTiltakPeriode).stønadsperiodeStatus).isEqualTo(
+            assertThat(
+                vilkårperiodeService.validerOgLagResponse(
+                    behandlingId = behandling.id,
+                    periode = opprettetTiltakPeriode,
+                ).stønadsperiodeStatus,
+            ).isEqualTo(
                 Stønadsperiodestatus.OK,
             )
             stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyStønadsperiode(fom1, tom1)))
@@ -660,7 +654,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             )
             vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = opprettetMålgruppe)
 
-            assertThat(vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = opprettetMålgruppe).stønadsperiodeStatus).isEqualTo(
+            assertThat(
+                vilkårperiodeService.validerOgLagResponse(
+                    behandlingId = behandling.id,
+                    periode = opprettetMålgruppe,
+                ).stønadsperiodeStatus,
+            ).isEqualTo(
                 Stønadsperiodestatus.FEIL,
             )
         }
@@ -717,7 +716,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
 
             val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
-            assertThat(grunnlag!!.grunnlag.aktivitet.aktiviteter.map { it.id }).hasSize(1).contains(idStønadsberettiget)
+            assertThat(grunnlag!!.grunnlag.aktivitet.aktiviteter.map { it.id }).hasSize(1)
+                .contains(idStønadsberettiget)
         }
 
         @Test

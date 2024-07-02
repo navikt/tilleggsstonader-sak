@@ -137,7 +137,7 @@ data class VurderingDto(
 
 data class SlettVikårperiode(
     val behandlingId: UUID,
-    val kommentar: String,
+    val kommentar: String? = null,
 )
 
 data class VilkårperioderDto(

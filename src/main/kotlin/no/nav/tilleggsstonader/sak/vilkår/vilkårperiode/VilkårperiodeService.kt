@@ -277,7 +277,7 @@ class VilkårperiodeService(
         }
     }
 
-    fun slettVilkårperiode(id: UUID, slettVikårperiode: SlettVikårperiode): Vilkårperiode {
+    fun slettVilkårperiode(id: UUID, slettVikårperiode: SlettVikårperiode): Vilkårperiode? {
         val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
         validerBehandlingIdErLik(slettVikårperiode.behandlingId, vilkårperiode.behandlingId)
@@ -285,19 +285,17 @@ class VilkårperiodeService(
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
 
-        return vilkårperiodeRepository.update(
-            vilkårperiode.copy(
-                resultat = ResultatVilkårperiode.SLETTET,
-                slettetKommentar = slettVikårperiode.kommentar,
-            ),
-        )
-    }
-
-    fun slettVilkårperiodePermanent(vilkårperiode: Vilkårperiode) {
-        feilHvis(vilkårperiode.forrigeVilkårperiodeId != null) { "Skal ikke permanent slette vilkårsperiode fra tidligere behandling. Teknisk feil. Ta kontakt med utviklerteamet." }
-        feilHvis(vilkårperiode.kilde == KildeVilkårsperiode.SYSTEM) { "Kan ikke slette vilkårperioder som er opprettet av system" }
-
-        return vilkårperiodeRepository.deleteById(vilkårperiode.id)
+        if (vilkårperiode.kanSlettesPermanent()) {
+            vilkårperiodeRepository.deleteById(vilkårperiode.id)
+            return null
+        } else {
+            return vilkårperiodeRepository.update(
+                vilkårperiode.copy(
+                    resultat = ResultatVilkårperiode.SLETTET,
+                    slettetKommentar = slettVikårperiode.kommentar,
+                ),
+            )
+        }
     }
 
     fun gjenbrukVilkårperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {

@@ -73,18 +73,7 @@ class VilkårperiodeController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.slettVilkårperiode(id, slettVikårperiode)
-        return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.id, periode = periode)
-    }
 
-    @DeleteMapping("{id}/permanent")
-    fun slettPeriodePermanent(
-        @PathVariable("id") id: UUID,
-    ): LagreVilkårperiodeResponse {
-        val vilkårperiode = vilkårperiodeService.hentVilkårperiode(id)
-        tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
-
-        vilkårperiodeService.slettVilkårperiodePermanent(vilkårperiode)
-        return vilkårperiodeService.validerOgLagResponse(behandlingId = vilkårperiode.behandlingId)
+        return vilkårperiodeService.validerOgLagResponse(behandlingId = slettVikårperiode.behandlingId, periode = periode)
     }
 }
