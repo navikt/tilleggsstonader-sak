@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ereg
 
-import java.net.URI
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
+import java.net.URI
 
 @Component
 class EregClient(
@@ -31,7 +31,7 @@ class EregClient(
     }
 
     private val eregUri = UriComponentsBuilder.fromUri(uri)
-        .pathSegment("api/v1/organisasjon")
+        .pathSegment("v1/organisasjon")
         .build()
         .toUri()
 }
