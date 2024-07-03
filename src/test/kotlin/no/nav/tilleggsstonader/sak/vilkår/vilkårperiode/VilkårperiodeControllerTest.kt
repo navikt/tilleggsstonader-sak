@@ -69,7 +69,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         )
         val exception = catchProblemDetailException {
             slettVilkårperiode(
-                vilkårperiodeId = response.periode.id,
+                vilkårperiodeId = response.periode!!.id,
                 SlettVikårperiode(behandlingForAnnenFagsak.id, "test"),
             )
         }

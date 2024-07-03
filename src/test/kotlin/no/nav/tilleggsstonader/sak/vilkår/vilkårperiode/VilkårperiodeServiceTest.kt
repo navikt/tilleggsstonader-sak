@@ -5,15 +5,14 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.AktivitetClientConfig.Companion.resetMock
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetClient
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
-import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -46,10 +45,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.util.UUID
 
 class VilkårperiodeServiceTest : IntegrationTest() {
 
@@ -180,7 +181,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                         lønnet = VurderingDto(SvarJaNei.JA),
                         behandlingId = behandling.id,
                     ),
-
                 )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
@@ -279,13 +279,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal oppdatere alle felter hvis periode er lagt til manuelt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(
-                    opprettVilkårperiodeMålgruppe(
-                        medlemskap = null,
-                        behandlingId = behandling.id,
-                    ),
-                )
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(
+                opprettVilkårperiodeMålgruppe(
+                    medlemskap = null,
+                    behandlingId = behandling.id,
+                ),
+            )
 
             val nyttDato = LocalDate.of(2020, 1, 1)
             val oppdatering = vilkårperiode.tilOppdatering().copy(
@@ -313,16 +312,15 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal oppdatere felter for periode som er lagt til av system`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(
-                    opprettVilkårperiodeMålgruppe(
-                        begrunnelse = "Begrunnelse",
-                        medlemskap = VurderingDto(
-                            SvarJaNei.JA,
-                        ),
-                        behandlingId = behandling.id,
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(
+                opprettVilkårperiodeMålgruppe(
+                    begrunnelse = "Begrunnelse",
+                    medlemskap = VurderingDto(
+                        SvarJaNei.JA,
                     ),
-                )
+                    behandlingId = behandling.id,
+                ),
+            )
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "Oppdatert begrunnelse",
@@ -340,24 +338,24 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(oppdatertPeriode.tom).isEqualTo(vilkårperiode.tom)
             assertThat(oppdatertPeriode.begrunnelse).isEqualTo("Oppdatert begrunnelse")
             assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.svar).isEqualTo(SvarJaNei.NEI)
-            assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.resultat)
-                .isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+            assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.resultat).isEqualTo(
+                ResultatDelvilkårperiode.IKKE_OPPFYLT,
+            )
         }
 
         @Test
         fun `skal feile dersom manglende begrunnelse når dekket av annet regelverk endres til ja`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(
-                    opprettVilkårperiodeMålgruppe(
-                        type = MålgruppeType.UFØRETRYGD,
-                        dekkesAvAnnetRegelverk = VurderingDto(
-                            SvarJaNei.NEI,
-                        ),
-                        behandlingId = behandling.id,
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(
+                opprettVilkårperiodeMålgruppe(
+                    type = MålgruppeType.UFØRETRYGD,
+                    dekkesAvAnnetRegelverk = VurderingDto(
+                        SvarJaNei.NEI,
                     ),
-                )
+                    behandlingId = behandling.id,
+                ),
+            )
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "",
@@ -375,15 +373,14 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal feile dersom manglende begrunnelse når lønnet endres til ja`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val vilkårperiode =
-                vilkårperiodeService.opprettVilkårperiode(
-                    opprettVilkårperiodeAktivitet(
-                        lønnet = VurderingDto(
-                            SvarJaNei.NEI,
-                        ),
-                        behandlingId = behandling.id,
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(
+                opprettVilkårperiodeAktivitet(
+                    lønnet = VurderingDto(
+                        SvarJaNei.NEI,
                     ),
-                )
+                    behandlingId = behandling.id,
+                ),
+            )
 
             val oppdatering = vilkårperiode.tilOppdatering().copy(
                 begrunnelse = "",
@@ -469,72 +466,106 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
     @Nested
     inner class SlettVilkårperiode {
-
         @Test
-        fun `skal ikke kunne slette kommentar hvis behandlingen ikke er under behandling`() {
+        fun `skal ikke kunne slette vilkårperiode hvis behandlingen ikke er under behandling`() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
+
             val målgruppe = målgruppe(
                 behandlingId = behandling.id,
                 kilde = KildeVilkårsperiode.MANUELL,
             )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
+
+            val lagretPeriode = vilkårperiodeRepository.insert(målgruppe)
 
             assertThatThrownBy {
-                vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
+                vilkårperiodeService.slettVilkårperiode(lagretPeriode.id, SlettVikårperiode(behandling.id))
             }.hasMessageContaining("Kan ikke opprette eller endre vilkårperiode når behandling er låst for videre redigering")
         }
 
-        @Test
-        fun `skal ikke kunne slette kommentar hvis man mangler kommentar`() {
-            val behandling =
-                testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.MANUELL,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
+        @Nested
+        inner class SlettVilkårperiodePermanent {
+            lateinit var behandling: Behandling
+            lateinit var lagretPeriode: Vilkårperiode
 
-            assertThatThrownBy {
-                vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "    "))
-            }.hasMessageContaining("Mangler kommentar")
-        }
+            @BeforeEach
+            fun setUp() {
+                behandling =
+                    testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
 
-        @Test
-        fun `skal ikke kunne slette kommentar hvis kilden er system`() {
-            val behandling =
-                testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.SYSTEM,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
+                val målgruppe = målgruppe(
+                    behandlingId = behandling.id,
+                    kilde = KildeVilkårsperiode.MANUELL,
+                )
 
-            assertThatThrownBy {
-                vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
-            }.hasMessageContaining("Kan ikke slette når kilde=")
-        }
-
-        @Test
-        fun `skal kunne slette kommentar som er manuellt opprettet`() {
-            val saksbehandler = "saksbehandlerX"
-            val behandling =
-                testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.MANUELL,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
-
-            assertThat(periode.sporbar.endret.endretAv).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
-
-            BrukerContextUtil.testWithBrukerContext(saksbehandler) {
-                vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
+                lagretPeriode = vilkårperiodeRepository.insert(målgruppe)
             }
 
-            val oppdatertPeriode = vilkårperiodeRepository.findByIdOrThrow(periode.id)
-            assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
-            assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
+            @Test
+            fun `skal ikke kunne slette kommentar hvis kilden er system`() {
+                val målgruppe = målgruppe(
+                    behandlingId = behandling.id,
+                    kilde = KildeVilkårsperiode.SYSTEM,
+                )
+                val periode = vilkårperiodeRepository.insert(målgruppe)
+
+                assertThatThrownBy {
+                    vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
+                }.hasMessageContaining("Kan ikke slette når kilde=")
+            }
+        }
+
+        @Nested
+        inner class SlettGjenbruktVilkårperiode {
+            lateinit var revurdering: Behandling
+            lateinit var lagretPeriode: Vilkårperiode
+
+            @BeforeEach
+            fun setUp() {
+                revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
+                val originalMålgruppe = målgruppe(
+                    behandlingId = revurdering.forrigeBehandlingId!!,
+                    kilde = KildeVilkårsperiode.MANUELL,
+                )
+
+                vilkårperiodeRepository.insert(originalMålgruppe)
+
+                val revurderingMålgruppe = originalMålgruppe.copy(
+                    id = UUID.randomUUID(),
+                    behandlingId = revurdering.id,
+                    forrigeVilkårperiodeId = originalMålgruppe.id,
+                )
+
+                lagretPeriode = vilkårperiodeRepository.insert(revurderingMålgruppe)
+            }
+
+            @Test
+            fun `skal ikke kunne slette gjenbrukt periode uten kommentar`() {
+                assertThatThrownBy {
+                    vilkårperiodeService.slettVilkårperiode(lagretPeriode.id, SlettVikårperiode(revurdering.id, ""))
+                }.hasMessageContaining("Mangler kommentar")
+
+                assertThatThrownBy {
+                    vilkårperiodeService.slettVilkårperiode(lagretPeriode.id, SlettVikårperiode(revurdering.id))
+                }.hasMessageContaining("Mangler kommentar")
+            }
+
+            @Test
+            fun `skal slettemarkere gjenbrukt periode om kommentar er sendt med`() {
+                val saksbehandler = "saksbehandlerX"
+
+                testWithBrukerContext(saksbehandler) {
+                    vilkårperiodeService.slettVilkårperiode(
+                        lagretPeriode.id,
+                        SlettVikårperiode(revurdering.id, "kommentar"),
+                    )
+                }
+
+                val oppdatertPeriode = vilkårperiodeRepository.findByIdOrThrow(lagretPeriode.id)
+                assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
+                assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
+            }
         }
     }
 
@@ -554,7 +585,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 ),
             )
 
-            val response = vilkårperiodeService.validerOgLagResponse(periode)
+            val response =
+                vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = periode)
 
             assertThat(response.stønadsperiodeStatus).isEqualTo(Stønadsperiodestatus.OK)
             assertThat(response.stønadsperiodeFeil).isNull()
@@ -580,7 +612,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 ),
             )
 
-            assertThat(vilkårperiodeService.validerOgLagResponse(opprettetMålgruppe).stønadsperiodeStatus).isEqualTo(
+            assertThat(
+                vilkårperiodeService.validerOgLagResponse(
+                    behandlingId = behandling.id,
+                    periode = opprettetMålgruppe,
+                ).stønadsperiodeStatus,
+            ).isEqualTo(
                 Stønadsperiodestatus.OK,
             )
 
@@ -594,7 +631,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     aktivitetsdager = 5,
                 ),
             )
-            assertThat(vilkårperiodeService.validerOgLagResponse(opprettetTiltakPeriode).stønadsperiodeStatus).isEqualTo(
+            assertThat(
+                vilkårperiodeService.validerOgLagResponse(
+                    behandlingId = behandling.id,
+                    periode = opprettetTiltakPeriode,
+                ).stønadsperiodeStatus,
+            ).isEqualTo(
                 Stønadsperiodestatus.OK,
             )
             stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyStønadsperiode(fom1, tom1)))
@@ -610,9 +652,14 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     aktivitetsdager = 5,
                 ),
             )
-            vilkårperiodeService.validerOgLagResponse(oppdatertPeriode)
+            vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = opprettetMålgruppe)
 
-            assertThat(vilkårperiodeService.validerOgLagResponse(oppdatertPeriode).stønadsperiodeStatus).isEqualTo(
+            assertThat(
+                vilkårperiodeService.validerOgLagResponse(
+                    behandlingId = behandling.id,
+                    periode = opprettetMålgruppe,
+                ).stønadsperiodeStatus,
+            ).isEqualTo(
                 Stønadsperiodestatus.FEIL,
             )
         }
@@ -638,8 +685,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val response = vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
 
-            assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)!!.grunnlag.tilDto())
-                .isEqualTo(response.grunnlag)
+            assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)!!.grunnlag.tilDto()).isEqualTo(
+                response.grunnlag,
+            )
             assertThat(response.grunnlag!!.aktivitet.aktiviteter).isNotEmpty
             assertThat(response.grunnlag!!.ytelse?.perioder).isNotEmpty
         }
@@ -668,8 +716,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
 
             val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
-            assertThat(grunnlag!!.grunnlag.aktivitet.aktiviteter.map { it.id })
-                .hasSize(1)
+            assertThat(grunnlag!!.grunnlag.aktivitet.aktiviteter.map { it.id }).hasSize(1)
                 .contains(idStønadsberettiget)
         }
 
@@ -726,14 +773,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(2)
 
-            assertThat(res)
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields(
-                    "id",
-                    "sporbar",
-                    "behandlingId",
-                    "forrigeVilkårperiodeId",
-                )
-                .containsExactlyInAnyOrderElementsOf(eksisterendeVilkårperioder)
+            assertThat(res).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "id",
+                "sporbar",
+                "behandlingId",
+                "forrigeVilkårperiodeId",
+            ).containsExactlyInAnyOrderElementsOf(eksisterendeVilkårperioder)
         }
 
         @Test
