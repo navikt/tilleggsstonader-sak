@@ -36,7 +36,7 @@ class OppgaveController(
         return oppgaveService.hentOppgaver(finnOppgaveRequest)
     }
 
-    @PostMapping("/soek/person/{fagsakPersonId}")
+    @GetMapping("/soek/person/{fagsakPersonId}")
     fun hentOppgaverForPerson(@PathVariable fagsakPersonId: UUID): FinnOppgaveResponseDto {
         val personIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
         tilgangService.validerTilgangTilPerson(personIdent, AuditLoggerEvent.ACCESS)
