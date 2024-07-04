@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
+import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_EGEN_ANSATT
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
+import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/oppgave")
@@ -25,11 +28,20 @@ import org.springframework.web.bind.annotation.RestController
 class OppgaveController(
     private val oppgaveService: OppgaveService,
     private val tilgangService: TilgangService,
+    private val fagsakPersonService: FagsakPersonService,
 ) {
 
     @PostMapping("/soek")
     fun hentOppgaver(@RequestBody finnOppgaveRequest: FinnOppgaveRequestDto): FinnOppgaveResponseDto {
         return oppgaveService.hentOppgaver(finnOppgaveRequest)
+    }
+
+    @PostMapping("/soek/person/{fagsakPersonId}")
+    fun hentOppgaverForPerson(@PathVariable fagsakPersonId: UUID): FinnOppgaveResponseDto {
+        val personIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
+        tilgangService.validerTilgangTilPerson(personIdent, AuditLoggerEvent.ACCESS)
+
+        return oppgaveService.hentOppgaverForPerson(personIdent)
     }
 
     @PostMapping(path = ["/{oppgaveId}/fordel"])
