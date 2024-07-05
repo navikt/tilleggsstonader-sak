@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -129,7 +130,7 @@ fun saksbehandling(
     behandling: Behandling = behandling(),
 ): Saksbehandling = Saksbehandling(
     id = behandling.id,
-    eksternId = 0,
+    eksternId = EksternBehandlingId(behandlingId = behandling.id).id,
     forrigeBehandlingId = behandling.forrigeBehandlingId,
     type = behandling.type,
     status = behandling.status,
