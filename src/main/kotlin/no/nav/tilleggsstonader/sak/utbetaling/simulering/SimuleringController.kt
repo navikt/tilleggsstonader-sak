@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.validation.annotation.Validated
@@ -20,10 +23,15 @@ class SimuleringController(
     private val tilgangService: TilgangService,
     private val behandlingService: BehandlingService,
     private val simuleringService: SimuleringService,
+    private val unleashService: UnleashService,
 ) {
 
     @GetMapping("/{behandlingId}")
     fun simulerForBehandling(@PathVariable behandlingId: UUID): SimuleringDto {
+        feilHvisIkke(unleashService.isEnabled(Toggle.SIMULERING)) {
+            "Toggle for simulering er skrudd av"
+        }
+
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.UPDATE)
         return SimuleringDto(
@@ -35,8 +43,7 @@ class SimuleringController(
                 etterbetaling = 0,
                 feilutbetaling = 2724,
                 nesteUtbetaling = null,
-            )
+            ),
         )
     }
 }
-
