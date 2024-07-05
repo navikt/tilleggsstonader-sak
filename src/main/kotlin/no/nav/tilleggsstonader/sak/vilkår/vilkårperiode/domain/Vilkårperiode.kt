@@ -104,7 +104,7 @@ data class Vilkårperiode(
             feilHvis(kilde != KildeVilkårsperiode.MANUELL) {
                 "Kan ikke slette når kilde=$kilde"
             }
-            feilHvis(slettetKommentar.isNullOrBlank()) {
+            feilHvis(slettetKommentar.isNullOrBlank() && forrigeVilkårperiodeId != null) {
                 "Mangler kommentar for resultat=$resultat"
             }
         } else {
@@ -113,6 +113,8 @@ data class Vilkårperiode(
             }
         }
     }
+    fun kanSlettesPermanent() =
+        this.forrigeVilkårperiodeId == null && this.kilde != KildeVilkårsperiode.SYSTEM
 }
 
 enum class KildeVilkårsperiode {

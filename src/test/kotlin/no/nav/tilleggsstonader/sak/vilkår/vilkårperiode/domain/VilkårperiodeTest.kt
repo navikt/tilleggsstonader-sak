@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class VilkårperiodeTest {
 
@@ -55,9 +56,9 @@ class VilkårperiodeTest {
         }
 
         @Test
-        fun `feiler hvis man mangler kommentar når resultat er slettet`() {
+        fun `feiler hvis man mangler kommentar når resultat er slettet og perioden er gjenbrukt`() {
             assertThatThrownBy {
-                målgruppe(kilde = KildeVilkårsperiode.MANUELL)
+                målgruppe(kilde = KildeVilkårsperiode.MANUELL, forrigeVilkårperiodeId = UUID.randomUUID())
                     .copy(resultat = ResultatVilkårperiode.SLETTET)
             }.hasMessageContaining("Mangler kommentar for resultat=")
         }

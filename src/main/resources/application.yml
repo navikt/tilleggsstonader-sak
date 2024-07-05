@@ -67,7 +67,7 @@ management:
 
 prosessering:
   continuousRunning.enabled: true
-  fixedDelayString.in.milliseconds: 15000
+  fixedDelayString.in.milliseconds: 2000
   delete.after.weeks: 16
 
 rolle:
@@ -222,5 +222,5 @@ clients:
   norg2:
     uri: https://norg2.${CLIENT_ENV}-fss-pub.nais.io/norg2
   ereg:
-    uri: https://ereg-services.intern.nav.no
-    scope: api://${CLIENT_ENV}-fss.team-rocket.ereg-services/.default
+    uri: https://ereg-services.${CLIENT_ENV}-fss-pub.nais.io
+    scope: api://${CLIENT_ENV}-fss.arbeidsforhold.ereg-services/.default

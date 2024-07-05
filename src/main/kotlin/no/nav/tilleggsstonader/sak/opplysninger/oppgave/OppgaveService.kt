@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
@@ -65,6 +66,25 @@ class OppgaveService(
                     oppgave = oppgave,
                     navn = personer.visningsnavnFor(oppgave),
                     oppgaveMetadata = oppgaveMetadata[oppgave.id],
+                )
+            },
+        )
+    }
+
+    fun hentOppgaverForPerson(personIdent: String): FinnOppgaveResponseDto {
+        val oppgaveRequest = FinnOppgaveRequest(aktørId = personIdent, tema = Tema.TSO)
+
+        val oppgaveResponse = oppgaveClient.hentOppgaver(oppgaveRequest)
+
+        val navn = personService.hentVisningsnavnForPerson(personIdent)
+
+        return FinnOppgaveResponseDto(
+            antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
+            oppgaver = oppgaveResponse.oppgaver.map { oppgave ->
+                OppgaveDto(
+                    oppgave = oppgave,
+                    navn = navn,
+                    oppgaveMetadata = finnOppgaveMetadata(listOf(oppgave))[oppgave.id],
                 )
             },
         )
