@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -14,6 +13,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequ
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import org.slf4j.LoggerFactory
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -31,7 +31,7 @@ class SimuleringService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun simuler(saksbehandling: Saksbehandling): List<OppsummeringForPeriode> {
+    fun simuler(saksbehandling: Saksbehandling): List<OppsummeringForPeriode>? {
         if (saksbehandling.status.behandlingErLåstForVidereRedigering() ||
             !tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)
         ) {
@@ -41,12 +41,12 @@ class SimuleringService(
         return simuleringsresultat.data.oppsummeringer
     }
 
-    fun hentLagretSimuleringsoppsummering(behandlingId: UUID): List<OppsummeringForPeriode> {
-        return hentLagretSimmuleringsresultat(behandlingId).oppsummeringer
+    fun hentLagretSimuleringsoppsummering(behandlingId: UUID): List<OppsummeringForPeriode>? {
+        return hentLagretSimmuleringsresultat(behandlingId)?.oppsummeringer
     }
 
-    fun hentLagretSimmuleringsresultat(behandlingId: UUID): SimuleringResponse {
-        return simuleringsresultatRepository.findByIdOrThrow(behandlingId).data
+    fun hentLagretSimmuleringsresultat(behandlingId: UUID): SimuleringResponse? {
+        return simuleringsresultatRepository.findByIdOrNull(behandlingId)?.data
     }
 
     fun slettSimuleringForBehandling(saksbehandling: Saksbehandling) {

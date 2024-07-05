@@ -27,23 +27,30 @@ class SimuleringController(
 ) {
 
     @GetMapping("/{behandlingId}")
-    fun simulerForBehandling(@PathVariable behandlingId: UUID): SimuleringDto {
+    fun simulerForBehandling(@PathVariable behandlingId: UUID): SimuleringDto? {
         feilHvisIkke(unleashService.isEnabled(Toggle.SIMULERING)) {
             "Toggle for simulering er skrudd av"
         }
 
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.UPDATE)
-        return SimuleringDto(
-            perioder = simuleringService.simuler(saksbehandling),
-            // Mocker oppsummering da det ikke er bestemt om vi eller utsjekk skal lage
-            oppsummering = SimuleringOppsummering(
-                fom = LocalDate.of(2023, 7, 1),
-                tom = LocalDate.of(2024, 7, 31),
-                etterbetaling = 0,
-                feilutbetaling = 2724,
-                nesteUtbetaling = null,
-            ),
-        )
+
+        val perioder = simuleringService.simuler(saksbehandling)
+
+        return if (perioder.isNullOrEmpty()) {
+            null
+        } else {
+            SimuleringDto(
+                perioder = perioder,
+                // Mocker oppsummering da det ikke er bestemt om vi eller utsjekk skal lage
+                oppsummering = SimuleringOppsummering(
+                    fom = LocalDate.of(2023, 7, 1),
+                    tom = LocalDate.of(2024, 7, 31),
+                    etterbetaling = 0,
+                    feilutbetaling = 2724,
+                    nesteUtbetaling = null,
+                ),
+            )
+        }
     }
 }
