@@ -29,7 +29,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.data.repository.findByIdOrNull
-import java.util.UUID
 
 internal class SimuleringServiceTest {
 
@@ -130,7 +129,6 @@ internal class SimuleringServiceTest {
 
     @Test
     internal fun `skal berike simlueringsresultat`() {
-
         val forrigeBehandling = behandling(fagsak)
         val behandling = behandling(
             fagsak = fagsak,
@@ -141,7 +139,7 @@ internal class SimuleringServiceTest {
         val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id)
 
         every { iverksettClient.simuler(any()) } returns
-                objectMapper.readValue(readFile("mock/iverksett/simuleringsresultat.json"))
+            objectMapper.readValue(readFile("mock/iverksett/simuleringsresultat.json"))
 
         every { behandlingService.hentBehandling(any()) } returns behandling
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
