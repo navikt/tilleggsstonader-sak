@@ -1,12 +1,10 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.OppsummeringForPeriode
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -23,9 +21,6 @@ import org.springframework.web.client.exchange
 import java.util.UUID
 
 internal class SimuleringControllerTest : IntegrationTest() {
-
-    @Autowired
-    private lateinit var behandlingRepository: BehandlingRepository
 
     @Autowired
     private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
@@ -45,17 +40,17 @@ internal class SimuleringControllerTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak, resultat = BehandlingResultat.INNVILGET))
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
-        val respons: ResponseEntity<List<OppsummeringForPeriode>> = simulerForBehandling(behandling.id)
+        val respons: ResponseEntity<SimuleringDto> = simulerForBehandling(behandling.id)
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(respons.body!!).hasSize(3)
+        assertThat(respons.body!!.perioder).hasSize(16)
         val simuleringsresultat = simuleringsresultatRepository.findByIdOrThrow(behandling.id)
 
         // Verifiser at simuleringsresultatet er lagret
-        assertThat(simuleringsresultat.data.detaljer.perioder).hasSize(3)
+        assertThat(simuleringsresultat.data.detaljer.perioder).hasSize(16)
     }
 
-    private fun simulerForBehandling(behandlingId: UUID): ResponseEntity<List<OppsummeringForPeriode>> {
+    private fun simulerForBehandling(behandlingId: UUID): ResponseEntity<SimuleringDto> {
         return restTemplate.exchange(
             localhost("/api/simulering/$behandlingId"),
             HttpMethod.GET,
