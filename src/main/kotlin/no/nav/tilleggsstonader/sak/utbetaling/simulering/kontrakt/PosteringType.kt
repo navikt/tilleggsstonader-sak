@@ -6,7 +6,7 @@ enum class PosteringType(val kode: String) {
     FORSKUDSSKATT("SKAT"),
     JUSTERING("JUST"),
     TREKK("TREK"),
-    MOTP("MOTP"),
+    MOTPOSTERING("MOTP"),
     ;
 
     companion object {

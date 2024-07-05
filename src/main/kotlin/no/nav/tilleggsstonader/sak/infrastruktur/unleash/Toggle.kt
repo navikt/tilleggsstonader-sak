@@ -10,4 +10,6 @@ enum class Toggle(override val toggleId: String) : ToggleId {
     KAN_OPPRETTE_REVURDERING("sak.kan-opprette-revurdering"),
 
     AUTOMATISK_JOURNALFORING_REVURDERING("sak.automatisk-jfr-revurdering"),
+
+    SIMULERING("sak.simulering"),
 }

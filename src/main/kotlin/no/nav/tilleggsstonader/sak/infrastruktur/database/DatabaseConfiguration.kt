@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
@@ -89,8 +89,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 PGobjectTilDelvilkårConverter(),
                 DelvilkårTilPGobjectConverter(),
 
-                BeriketSimuleringsresultatWriter(),
-                BeriketSimuleringsresultatReader(),
+                SimuleringResponseWriter(),
+                SimuleringResponseReader(),
 
                 GrunnlagReader(),
                 GrunnlagWriter(),
@@ -208,8 +208,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         override fun convert(data: VilkårperiodeType): String = data.tilDbType()
     }
 
-    class BeriketSimuleringsresultatWriter : JsonWriter<BeriketSimuleringsresultat>()
-    class BeriketSimuleringsresultatReader : JsonReader<BeriketSimuleringsresultat>(BeriketSimuleringsresultat::class)
+    class SimuleringResponseWriter : JsonWriter<SimuleringResponse>()
+    class SimuleringResponseReader : JsonReader<SimuleringResponse>(SimuleringResponse::class)
 
     class GrunnlagWriter : JsonWriter<Grunnlag>()
     class GrunnlagReader : JsonReader<Grunnlag>(Grunnlag::class)

@@ -216,7 +216,7 @@ class IverksettService(
      * Når man iverksetter behandling 2 første gang: (behandling1, siste iverksetting for behandling 1)
      * Når man iverksetter behandling 2 andre gang: (behandling2, forrigeIverksettingId for behandling 2)
      */
-    private fun forrigeIverksetting(
+    fun forrigeIverksetting(
         behandling: Saksbehandling,
         tilkjentYtelse: TilkjentYtelse,
     ): ForrigeIverksettingDto? {

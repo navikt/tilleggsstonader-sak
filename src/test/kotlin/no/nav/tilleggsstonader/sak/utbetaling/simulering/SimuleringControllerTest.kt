@@ -1,11 +1,10 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Simuleringsoppsummering
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -24,9 +23,6 @@ import java.util.UUID
 internal class SimuleringControllerTest : IntegrationTest() {
 
     @Autowired
-    private lateinit var behandlingRepository: BehandlingRepository
-
-    @Autowired
     private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
     @Autowired
@@ -41,22 +37,20 @@ internal class SimuleringControllerTest : IntegrationTest() {
     internal fun `Skal returnere 200 OK for simulering av behandling`() {
         val personIdent = "12345678901"
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(personIdent))))
-        val behandling = testoppsettService.lagre(behandling(fagsak))
+        val behandling = testoppsettService.lagre(behandling(fagsak, resultat = BehandlingResultat.INNVILGET))
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
-        val respons: ResponseEntity<Simuleringsoppsummering> = simulerForBehandling(behandling.id)
+        val respons: ResponseEntity<SimuleringDto> = simulerForBehandling(behandling.id)
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(respons.body!!.perioder).hasSize(8)
+        assertThat(respons.body!!.perioder).hasSize(16)
         val simuleringsresultat = simuleringsresultatRepository.findByIdOrThrow(behandling.id)
 
         // Verifiser at simuleringsresultatet er lagret
-        assertThat(simuleringsresultat.data.detaljer.simuleringMottaker).hasSize(1)
-        assertThat(simuleringsresultat.data.detaljer.simuleringMottaker.first().simulertPostering)
-            .hasSizeGreaterThan(1)
+        assertThat(simuleringsresultat.data.detaljer.perioder).hasSize(16)
     }
 
-    private fun simulerForBehandling(behandlingId: UUID): ResponseEntity<Simuleringsoppsummering> {
+    private fun simulerForBehandling(behandlingId: UUID): ResponseEntity<SimuleringDto> {
         return restTemplate.exchange(
             localhost("/api/simulering/$behandlingId"),
             HttpMethod.GET,

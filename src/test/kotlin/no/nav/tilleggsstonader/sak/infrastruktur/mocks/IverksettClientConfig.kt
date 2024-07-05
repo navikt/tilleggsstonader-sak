@@ -8,7 +8,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettStatus
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.BeriketSimuleringsresultat
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -29,8 +29,8 @@ class IverksettClientConfig {
 
     companion object {
 
-        private val simuleringsresultat = objectMapper.readValue<BeriketSimuleringsresultat>(
-            readFile("mock/iverksett/simuleringsresultat_beriket.json"),
+        private val simuleringsresultat = objectMapper.readValue<SimuleringResponseDto>(
+            readFile("mock/iverksett/simuleringsresultat.json"),
         )
 
         fun clearMock(iverksettClient: IverksettClient) {
