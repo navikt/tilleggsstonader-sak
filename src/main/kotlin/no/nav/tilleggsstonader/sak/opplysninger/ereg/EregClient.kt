@@ -17,14 +17,14 @@ class EregClient(
 ) :
     AbstractRestClient(restTemplate) {
 
-    fun hentOrganisasjoner(organisasjonsnumre: List<String>): OrganisasjonsNavnDto? {
+    fun hentOrganisasjoner(organisasjonsnummer: String): OrganisasjonDto? {
         val uriBuilder = UriComponentsBuilder.fromUri(eregUri)
-            .pathSegment(organisasjonsnumre.firstOrNull())
+            .pathSegment(organisasjonsnummer)
             .build()
             .toUriString()
 
         return try {
-            getForEntity<OrganisasjonsNavnDto>(uriBuilder)
+            getForEntity<OrganisasjonDto>(uriBuilder)
         } catch (e: HttpClientErrorException.NotFound) {
             return null
         }

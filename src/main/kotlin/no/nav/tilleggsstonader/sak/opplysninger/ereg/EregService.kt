@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service
 class EregService(private val eregClient: EregClient) {
 
     @Cacheable("hentOrganisasjon", cacheManager = "shortCache")
-    fun hentOrganisasjon(organisasjonsnummer: String): OrganisasjonsNavnDto {
-        val organisasjon = eregClient.hentOrganisasjoner(listOf(organisasjonsnummer))
+    fun hentOrganisasjon(organisasjonsnummer: String): OrganisasjonDto {
+        val organisasjon = eregClient.hentOrganisasjoner(organisasjonsnummer)
 
         return organisasjon ?: throw ApiFeil(
             "Finner ingen organisasjon for søket",

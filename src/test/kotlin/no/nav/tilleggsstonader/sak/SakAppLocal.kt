@@ -21,6 +21,7 @@ fun appLocal(): SpringApplicationBuilder =
         .profiles(
             "local",
             "mock-pdl",
+            "mock-ereg",
             "mock-egen-ansatt",
             "mock-iverksett",
             "mock-oppgave",

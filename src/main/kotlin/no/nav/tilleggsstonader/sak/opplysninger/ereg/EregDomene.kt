@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ereg
 
-data class OrganisasjonsNavnDto(
+data class OrganisasjonDto(
     val organisasjonsnummer: String,
     val navn: Navn,
 )
