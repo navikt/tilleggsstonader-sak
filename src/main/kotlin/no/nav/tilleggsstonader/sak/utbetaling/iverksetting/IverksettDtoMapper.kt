@@ -44,7 +44,7 @@ object IverksettDtoMapper {
         )
     }
 
-    private fun mapUtbetalinger(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>) =
+    fun mapUtbetalinger(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>) =
         andelerTilkjentYtelse
             .filter { it.beløp != 0 }
             .map {
