@@ -27,7 +27,7 @@ class FagsakPersonController(
 ) {
 
     @PostMapping
-    fun opprettFagsakPerson(@RequestBody identRequest: IdentRequest): UUID {
+    fun hentEllerOpprettFagsakPerson(@RequestBody identRequest: IdentRequest): UUID {
         tilgangService.validerTilgangTilPersonMedBarn(identRequest.ident, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
 
