@@ -37,6 +37,11 @@ data class StatusPåVentDto(
     val oppgaveVersjon: Int,
 )
 
+data class TaAvVentDto(
+    val skalTilordnesRessurs: Boolean,
+    val kommentar: String?,
+)
+
 enum class ÅrsakSettPåVent {
     DOKUMENTASJON_FRA_BRUKER,
     REGISTRERING_AV_TILTAK,

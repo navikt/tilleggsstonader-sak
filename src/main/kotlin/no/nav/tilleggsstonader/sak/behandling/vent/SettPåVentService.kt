@@ -132,7 +132,7 @@ class SettPåVentService(
     }
 
     @Transactional
-    fun taAvVent(behandlingId: UUID) {
+    fun taAvVent(behandlingId: UUID, taAvVentDto: TaAvVentDto?) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
             "Kan ikke ta behandling av vent når status=${behandling.status}"
@@ -140,10 +140,10 @@ class SettPåVentService(
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.UTREDES)
 
         val settPåVent = finnAktivSattPåVent(behandlingId)
-        settPåVentRepository.update(settPåVent.copy(aktiv = false))
+        settPåVentRepository.update(settPåVent.copy(aktiv = false, taAvVentKommentar = taAvVentDto?.kommentar))
 
-        opprettHistorikkInnslag(behandling, StegUtfall.TATT_AV_VENT, null)
-        taOppgaveAvVent(settPåVent.oppgaveId)
+        opprettHistorikkInnslagTaAvVent(behandling, taAvVentDto?.kommentar)
+        taOppgaveAvVent(settPåVent.oppgaveId, skalTilordnesRessurs = taAvVentDto?.skalTilordnesRessurs ?: true)
     }
 
     private fun finnAktivSattPåVent(behandlingId: UUID) =
@@ -183,9 +183,9 @@ class SettPåVentService(
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
     }
 
-    private fun taOppgaveAvVent(oppgaveId: Long) {
+    private fun taOppgaveAvVent(oppgaveId: Long, skalTilordnesRessurs: Boolean) {
         val oppgave = oppgaveService.hentOppgave(oppgaveId)
-        val tilordnetRessurs = if (SikkerhetContext.erSaksbehandler()) {
+        val tilordnetRessurs = if (SikkerhetContext.erSaksbehandler() && skalTilordnesRessurs) {
             SikkerhetContext.hentSaksbehandler()
         } else {
             ""
@@ -212,6 +212,18 @@ class SettPåVentService(
             stegtype = behandling.steg,
             utfall = utfall,
             metadata = metadata,
+        )
+    }
+
+    private fun opprettHistorikkInnslagTaAvVent(
+        behandling: Behandling,
+        kommentar: String?,
+    ) {
+        behandlingshistorikkService.opprettHistorikkInnslag(
+            behandlingId = behandling.id,
+            stegtype = behandling.steg,
+            utfall = StegUtfall.TATT_AV_VENT,
+            metadata = kommentar?.takeIf { it.isNotEmpty() }?.let { mapOf("kommentar" to it) },
         )
     }
 
