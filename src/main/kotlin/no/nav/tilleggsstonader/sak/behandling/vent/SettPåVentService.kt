@@ -52,7 +52,7 @@ class SettPåVentService(
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke sette behandling på vent når status=${behandling.status}"
         }
-        opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, mapOf("årsaker" to dto.årsaker))
+        opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, årsaker = dto.årsaker, kommentar = dto.kommentar)
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 
         val oppdatertOppgave = settOppgavePåVent(behandlingId, dto)
@@ -90,7 +90,12 @@ class SettPåVentService(
         val settPåVent = finnAktivSattPåVent(behandlingId)
 
         if (harEndretÅrsaker(settPåVent, dto)) {
-            opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, mapOf("årsaker" to dto.årsaker))
+            opprettHistorikkInnslag(
+                behandling,
+                StegUtfall.SATT_PÅ_VENT,
+                årsaker = dto.årsaker,
+                kommentar = dto.kommentar,
+            )
         }
         val oppdatertSettPåVent =
             settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
@@ -205,8 +210,14 @@ class SettPåVentService(
     private fun opprettHistorikkInnslag(
         behandling: Behandling,
         utfall: StegUtfall,
-        metadata: Map<String, List<ÅrsakSettPåVent>>?,
+        kommentar: String?,
+        årsaker: List<ÅrsakSettPåVent>,
     ) {
+        val metadata: MutableMap<String, Any> = mutableMapOf(
+            "årsaker" to årsaker,
+        )
+        kommentar?.let { metadata["kommentarSettPåVent"] = it }
+
         behandlingshistorikkService.opprettHistorikkInnslag(
             behandlingId = behandling.id,
             stegtype = behandling.steg,
