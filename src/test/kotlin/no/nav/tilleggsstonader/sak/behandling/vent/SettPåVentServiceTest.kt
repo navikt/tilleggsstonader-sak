@@ -89,6 +89,11 @@ class SettPåVentServiceTest : IntegrationTest() {
                     assertThat(tilordnetRessurs).isNull()
                     assertThat(mappeId?.getOrNull()).isEqualTo(MAPPE_ID_PÅ_VENT.toLong())
                 }
+
+                with(behandlingshistorikkService.finnSisteBehandlingshistorikk(behandling.id)) {
+                    assertThat(utfall).isEqualTo(StegUtfall.SATT_PÅ_VENT)
+                    assertThat(metadata).isNotNull()
+                }
             }
         }
 
