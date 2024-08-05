@@ -3,13 +3,9 @@ package no.nav.tilleggsstonader.sak.migrering.routing
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantWithNameOrDefault
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -20,7 +16,6 @@ class SøknadRoutingService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val arenaService: ArenaService,
-    private val unleashService: UnleashService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -43,13 +38,6 @@ class SøknadRoutingService(
             return true
         }
 
-        val maksAntall = maksAntall(request.stønadstype)
-        val antall = søknadRoutingRepository.countByType(request.stønadstype)
-        if (antall >= maksAntall) {
-            logger.info("routing - antallIDatabase=$antall toggleMaksAntall=$maksAntall")
-            return false
-        }
-
         if (harBehandling(request)) {
             lagreRouting(request, mapOf("harBehandling" to true))
             return true
@@ -60,13 +48,6 @@ class SøknadRoutingService(
             return true
         }
         return false
-    }
-
-    private fun maksAntall(stønadstype: Stønadstype) =
-        unleashService.getVariantWithNameOrDefault(stønadstype.maksAntallToggle(), "antall", 0)
-
-    private fun Stønadstype.maksAntallToggle() = when (this) {
-        Stønadstype.BARNETILSYN -> Toggle.SØKNAD_ROUTING_TILSYN_BARN
     }
 
     private fun harGyldigStateIArena(arenaStatus: ArenaStatusDto): Boolean {
