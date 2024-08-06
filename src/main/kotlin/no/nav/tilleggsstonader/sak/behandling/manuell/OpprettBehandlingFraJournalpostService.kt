@@ -45,7 +45,6 @@ class OpprettBehandlingFraJournalpostService(
 
     @Transactional
     fun opprettBehandlingFraJournalpost(journalpostId: String): UUID {
-        // TODO valider at journalpost er ferdigstilt
         brukerfeilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_BEHANDLING_FRA_JOURNALPOST)) {
             "Feature toggle for å kunne opprette behandling fra journalpost er slått av"
         }
