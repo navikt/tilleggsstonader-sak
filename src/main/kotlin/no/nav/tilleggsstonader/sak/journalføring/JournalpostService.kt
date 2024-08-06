@@ -16,12 +16,14 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.vedlegg.VedleggRequest
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
@@ -169,11 +171,14 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
         feilHvis(dokument == null) {
             "Finner ikke dokument med id=$dokumentInfoId for journalpost med id=${journalpost.journalpostId}"
         }
-        brukerfeilHvisIkke(
-            dokument.dokumentvarianter?.any { it.variantformat == Dokumentvariantformat.ARKIV }
-                ?: false,
-        ) {
+        val arkivdokument = dokument.dokumentvarianter
+            ?.filter { it.variantformat == Dokumentvariantformat.ARKIV }
+            ?: emptyList()
+        brukerfeilHvis(arkivdokument.isEmpty()) {
             "Vedlegget er sannsynligvis under arbeid, må åpnes i gosys"
+        }
+        brukerfeilHvisIkke(arkivdokument.any { it.saksbehandlerHarTilgang }, httpStatus = HttpStatus.FORBIDDEN) {
+            "Har ikke tilgang til dokumentet"
         }
     }
 }
