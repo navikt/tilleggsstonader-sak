@@ -11,7 +11,8 @@ fun mockUnleashService(isEnabled: Boolean = true): UnleashService {
     every { mockk.isEnabled(any(), any<Boolean>()) } returns isEnabled
 
     // Variants må konfigureres en og en då de kan ha ulike navn som er relevant å konfigurere
-    mockk.mockGetVariant(Toggle.SØKNAD_ROUTING_TILSYN_BARN, søknadRoutingVariant())
+    // eks
+    // mockk.mockGetVariant(Toggle.SØKNAD_ROUTING_TILSYN_BARN, søknadRoutingVariant())
     return mockk
 }
 
@@ -28,6 +29,3 @@ fun UnleashService.mockGetVariant(toggle: Toggle, variant: Variant): UnleashServ
     every { service.getVariant(toggle, any()) } returns variant
     return this
 }
-
-fun søknadRoutingVariant(antall: Int = 1000, enabled: Boolean = true): Variant =
-    Variant("antall", antall.toString(), enabled)

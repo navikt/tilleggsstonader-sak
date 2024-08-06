@@ -36,7 +36,7 @@ class UnleashUtilTest {
         @Test
         fun `skal kaste feil hvis varianten er enabled men navnet er feil`() {
             mockVariant(name = "feilNavn")
-            val feil = "Fant variant med annet navn for SØKNAD_ROUTING_TILSYN_BARN forventet=antall faktisk=feilNavn"
+            val feil = "Fant variant med annet navn for ${toggle.name} forventet=antall faktisk=feilNavn"
 
             assertThatThrownBy {
                 getVariant()
@@ -59,7 +59,7 @@ class UnleashUtilTest {
 
         private val variantName = "antall"
         private val variantDefaultValue = 1
-        private val toggle = Toggle.SØKNAD_ROUTING_TILSYN_BARN
+        private val toggle = Toggle.entries.first()
 
         private fun getVariant() = unleashService.getVariantWithNameOrDefault(toggle, variantName, variantDefaultValue)
     }
