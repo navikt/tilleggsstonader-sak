@@ -14,7 +14,7 @@ class ByUserIdStrategy : Strategy {
     override fun isEnabled(map: MutableMap<String, String>): Boolean {
         return map["userIds"]
             ?.split(',')
-            ?.any { SikkerhetContext.hentSaksbehandler() == it }
+            ?.any { SikkerhetContext.hentSaksbehandler().equals(it, ignoreCase = true) }
             ?: false
     }
 }
