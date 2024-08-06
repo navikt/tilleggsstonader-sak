@@ -70,8 +70,9 @@ class OpprettBehandlingFraJournalpostService(
     fun hentInformasjon(journalpostId: String): OpprettBehandlingFraJournalpostStatus {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
 
-        feilHvisIkke(journalpost.journalstatus == Journalstatus.FERDIGSTILT) {
-            "Journalpost har status=${journalpost.journalstatus}, forventer at den skal være ferdigstilt"
+        val journalstatus = journalpost.journalstatus
+        feilHvisIkke(journalstatus == Journalstatus.FERDIGSTILT || journalstatus == Journalstatus.JOURNALFOERT) {
+            "Journalpost har status=$journalstatus, forventer at den skal være ferdigstilt"
         }
 
         val ident = journalpostService.hentIdentFraJournalpost(journalpost)
