@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 
 private val xmlMapper = XmlMapper()
     .registerKotlinModule()
@@ -14,12 +15,21 @@ object SøknadTilsynBarnSendInnFyllUtUtil {
 
     fun parseInfoFraSøknad(data: ByteArray): Søknadsinformasjon {
         val søknad = xmlMapper.readValue<Tilleggsstoenadsskjema>(data)
+        validerHarMinimumEtBarn(søknad)
+
         val identerBarn = søknad.rettighetstype.tilsynsutgifter
             .flatMap { it.tilsynsutgifterBarn }
             .flatMap { it.barn }
             .map { it.personidentifikator }
             .toSet()
         return Søknadsinformasjon(ident = søknad.personidentifikator, identerBarn = identerBarn)
+    }
+
+    private fun validerHarMinimumEtBarn(søknad: Tilleggsstoenadsskjema) {
+        val barn = søknad.rettighetstype.tilsynsutgifter.flatMap { it.tilsynsutgifterBarn }.flatMap { it.barn }
+        brukerfeilHvis(barn.isEmpty()) {
+            "Søknaden inneholder ikke noen barn"
+        }
     }
 }
 

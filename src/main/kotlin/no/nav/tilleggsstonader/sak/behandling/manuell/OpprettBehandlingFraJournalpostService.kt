@@ -95,12 +95,15 @@ class OpprettBehandlingFraJournalpostService(
         )
     }
 
+    private val BREVKODE_1 = "${DokumentBrevkode.BARNETILSYN.verdi}B"
+    private val BREVKODE_2 = "NAV 11-12.12" // Tidligere skjema for tilleggsstønader
     private fun hentSøknadsinformasjon(
         journalpost: Journalpost,
     ): Søknadsinformasjon {
-        val brevkode = "${DokumentBrevkode.BARNETILSYN.verdi}B"
-        val dokumentJournalpost = journalpost.dokumenter?.singleOrNull { it.brevkode == brevkode }
-            ?: error("Finner ikke dokument med brevkode=$brevkode i journalpost=${journalpost.journalpostId}")
+        val brevkoder = journalpost.dokumenter?.mapNotNull { it.brevkode }
+        val dokumentJournalpost = journalpost.dokumenter
+            ?.singleOrNull { it.brevkode == BREVKODE_1 || it.brevkode == BREVKODE_2 }
+            ?: error("Journalpost=${journalpost.journalpostId} ($brevkoder) inneholder ikke gyldig brevkode")
         val dokument = journalpostService.hentDokument(
             journalpost = journalpost,
             dokumentInfoId = dokumentJournalpost.dokumentInfoId,
