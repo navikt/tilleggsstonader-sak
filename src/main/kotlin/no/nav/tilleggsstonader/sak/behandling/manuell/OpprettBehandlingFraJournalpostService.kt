@@ -71,7 +71,7 @@ class OpprettBehandlingFraJournalpostService(
         val journalpost = journalpostService.hentJournalpost(journalpostId)
 
         val journalstatus = journalpost.journalstatus
-        feilHvisIkke(journalstatus == Journalstatus.FERDIGSTILT || journalstatus == Journalstatus.JOURNALFOERT) {
+        brukerfeilHvisIkke(journalstatus == Journalstatus.FERDIGSTILT || journalstatus == Journalstatus.JOURNALFOERT) {
             "Journalpost har status=$journalstatus, forventer at den skal være ferdigstilt"
         }
 
