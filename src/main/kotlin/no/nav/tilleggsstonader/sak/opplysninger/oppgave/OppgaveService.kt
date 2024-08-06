@@ -26,13 +26,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.util.FnrUtil
+import no.nav.tilleggsstonader.sak.util.medGosysTid
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @Service
@@ -247,7 +247,7 @@ class OppgaveService(
     }
 
     private fun lagOppgaveTekst(beskrivelse: String? = null): String {
-        val tidspunkt = osloNow().format(DateTimeFormatter.ISO_DATE_TIME)
+        val tidspunkt = osloNow().medGosysTid()
         val prefix = "----- Opprettet av tilleggsstonader-sak $tidspunkt ---"
         val beskrivelseMedNewLine = beskrivelse?.let { "\n$it" } ?: ""
         return prefix + beskrivelseMedNewLine
