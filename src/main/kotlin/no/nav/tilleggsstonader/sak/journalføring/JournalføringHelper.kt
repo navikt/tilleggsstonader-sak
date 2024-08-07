@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.DokarkivBruker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostRequest
@@ -8,11 +9,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import org.springframework.http.HttpStatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo as DokumentInfoJournalpost
 
@@ -47,7 +50,9 @@ object JournalføringHelper {
         journalpost: Journalpost,
         eksternFagsakId: Long,
         dokumenttitler: Map<String, String>?,
+        nyAvsender: AvsenderMottaker?,
     ) = OppdaterJournalpostRequest(
+        avsenderMottaker = nyAvsender,
         bruker = journalpost.bruker?.let {
             DokarkivBruker(idType = BrukerIdType.valueOf(it.type.toString()), id = it.id)
         },
@@ -71,4 +76,11 @@ object JournalføringHelper {
             }
         },
     )
+
+    fun utledNyAvsender(nyAvsender: JournalføringRequest.NyAvsender?, bruker: Bruker?): AvsenderMottaker? =
+        when (nyAvsender?.erBruker) {
+            null -> null
+            true -> AvsenderMottaker(id = nyAvsender.personIdent, idType = BrukerIdType.FNR, navn = nyAvsender.navn ?: error("Mangler navn på bruker"))
+            false -> AvsenderMottaker(id = null, idType = null, navn = nyAvsender.navn!!)
+        }
 }

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.journalføring
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
@@ -61,6 +62,7 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
         journalførendeEnhet: String,
         fagsak: Fagsak,
         saksbehandler: String?,
+        avsender: AvsenderMottaker? = null,
     ) {
         if (journalpost.journalstatus != Journalstatus.JOURNALFOERT) {
             oppdaterLogiskeVedlegg(journalpost, logiskeVedlegg)
@@ -69,6 +71,7 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
                 dokumenttitler = dokumenttitler,
                 eksternFagsakId = fagsak.eksternId.id,
                 saksbehandler = saksbehandler,
+                avsender = avsender,
             )
             ferdigstillJournalføring(
                 journalpostId = journalpost.journalpostId,
@@ -91,9 +94,10 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
         dokumenttitler: Map<String, String>? = null,
         eksternFagsakId: Long,
         saksbehandler: String? = null,
+        avsender: AvsenderMottaker?,
     ) {
         val oppdatertJournalpost =
-            JournalføringHelper.lagOppdaterJournalpostRequest(journalpost, eksternFagsakId, dokumenttitler)
+            JournalføringHelper.lagOppdaterJournalpostRequest(journalpost, eksternFagsakId, dokumenttitler, avsender)
         journalpostClient.oppdaterJournalpost(oppdatertJournalpost, journalpost.journalpostId, saksbehandler)
     }
 

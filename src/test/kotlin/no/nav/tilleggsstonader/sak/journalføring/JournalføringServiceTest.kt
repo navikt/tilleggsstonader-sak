@@ -9,6 +9,7 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
@@ -23,6 +24,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
+import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
@@ -82,6 +84,7 @@ class JournalføringServiceTest {
         every { taskService.save(capture(taskSlot)) } returns mockk()
         every { personService.hentPersonIdenter(personIdent) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
         justRun { oppgaveService.ferdigstillOppgave(any()) }
+        every { journalpostService.hentIdentFraJournalpost(journalpost) } returns personIdent
     }
 
     @AfterEach
@@ -150,5 +153,29 @@ class JournalføringServiceTest {
         }
 
         Assertions.assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+    }
+
+    @Test
+    fun `skal oppdatere journalpost med avsender fra journalføringsrequest`() {
+        val nyAvsender = JournalføringRequest.NyAvsender(true, "navn", personIdent)
+
+        val journalføringRequest = JournalføringRequest(
+            stønadstype = Stønadstype.BARNETILSYN,
+            oppgaveId = "1",
+            journalførendeEnhet = "123",
+            årsak = JournalføringRequest.Journalføringsårsak.PAPIRSØKNAD,
+            aksjon = JournalføringRequest.Journalføringsaksjon.JOURNALFØR_PÅ_FAGSAK,
+            nyAvsender = nyAvsender,
+        )
+
+        val nyAvsenderSlot = slot<AvsenderMottaker?>()
+
+        every { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any(), any(), captureNullable(nyAvsenderSlot)) } just Runs
+
+        journalføringService.fullførJournalpost(journalføringRequest, journalpost)
+
+        Assertions.assertThat(nyAvsenderSlot.captured!!.navn).isEqualTo(nyAvsender.navn)
+        Assertions.assertThat(nyAvsenderSlot.captured!!.id).isEqualTo(nyAvsender.personIdent)
+        Assertions.assertThat(nyAvsenderSlot.captured!!.idType).isEqualTo(BrukerIdType.FNR)
     }
 }
