@@ -29,9 +29,8 @@ class OppdaterMappePåVåreOppgaverController(
     }
 
     @GetMapping("/sjekkEnheter")
-    fun sjekkEnheterIProd() {
+    fun sjekkEnheterIProd(): Map<String?, Map<String?, Int>> {
         utførEndringSomSystem()
-
         val response = oppgaveClient.hentOppgaver(
             FinnOppgaveRequestDto(
                 behandlingstema = Behandlingstema.TilsynBarn.name,
@@ -40,9 +39,8 @@ class OppdaterMappePåVåreOppgaverController(
                 limit = 1000,
             ).tilFinnOppgaveRequest(null, oppgaveService.finnVentemappe()),
         )
-        response.oppgaver
-            .groupBy { it.tildeltEnhetsnr }
-            .mapValues { it.value.size }
-            .let { logger.info("Oppgaver er fordelt på enheter=$it") }
+        return response.oppgaver
+            .groupBy { it.oppgavetype }
+            .mapValues { it.value.groupBy { it.tildeltEnhetsnr }.mapValues { it.value.size } }
     }
 }
