@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 @ProtectedWithClaims(issuer = "azuread")
 @Validated
 class OppdaterMappePåVåreOppgaverController(
+    private val oppgaveClient: OppgaveClient,
     private val oppgaveService: OppgaveService,
     private val behandlingRepository: BehandlingRepository,
     private val oppgaveRepository: OppgaveRepository,
@@ -31,13 +32,13 @@ class OppdaterMappePåVåreOppgaverController(
     fun sjekkEnheterIProd() {
         utførEndringSomSystem()
 
-        val response = oppgaveService.hentOppgaver(
+        val response = oppgaveClient.hentOppgaver(
             FinnOppgaveRequestDto(
                 behandlingstema = Behandlingstema.TilsynBarn.name,
                 ident = null,
                 oppgaverPåVent = false,
                 limit = 1000,
-            ),
+            ).tilFinnOppgaveRequest(null, oppgaveService.finnVentemappe()),
         )
         response.oppgaver
             .groupBy { it.tildeltEnhetsnr }
