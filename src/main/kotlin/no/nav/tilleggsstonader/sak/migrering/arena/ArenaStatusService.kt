@@ -10,6 +10,11 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
+/**
+ * Arena kaller på oss for å sjekke om personen finnes i ny løsning.
+ * Hvis personen finnes i ny løsning skal man ikke kunne utvide perioder i Arena.
+ * De kan fortsatt stanse, og håndtere klager i Arena.
+ */
 @Service
 class ArenaStatusService(
     private val personService: PersonService,
@@ -26,6 +31,10 @@ class ArenaStatusService(
 
     private fun finnesPerson(request: ArenaFinnesPersonRequest): Boolean {
         val identer = personService.hentPersonIdenter(request.ident).identer().toSet()
+        if (skalBehandlesITsSak(request.stønadstype)) {
+            logger.info("Skal ikke behandle ${request.stønadstype} i Arena")
+            return true
+        }
         if (harBehandling(identer, request.stønadstype)) {
             logger.info("Sjekker om person finnes i ny løsning finnes=true harBehandling")
             return true
@@ -35,6 +44,15 @@ class ArenaStatusService(
             return true
         }
         return false
+    }
+
+    /**
+     * Denne håndterer at gitt stønadstype alltid svarer med at personen finnes i ny løsning.
+     * Eks for Barnetilsyn er det ønskelig at personen skal håndteres i ny løsning og at det ikke fattes nye vedtak i Arena
+     */
+    private fun skalBehandlesITsSak(stønadstype: Stønadstype): Boolean = when (stønadstype) {
+        Stønadstype.BARNETILSYN -> true
+        else -> false
     }
 
     private fun harBehandling(

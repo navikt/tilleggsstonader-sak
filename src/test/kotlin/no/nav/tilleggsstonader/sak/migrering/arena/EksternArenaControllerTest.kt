@@ -21,7 +21,7 @@ class EksternArenaControllerTest : IntegrationTest() {
     @Test
     fun `skal kunne sende inn rettighetstype som er mappet`() {
         val response = hentStatus("ident", Rettighet.TILSYN_BARN)
-        assertThat(response.finnes).isFalse()
+        assertThat(response.finnes).isTrue()
     }
 
     @Test
