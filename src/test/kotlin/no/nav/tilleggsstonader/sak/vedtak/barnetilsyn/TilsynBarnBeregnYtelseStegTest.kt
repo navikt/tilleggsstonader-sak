@@ -6,6 +6,7 @@ import io.mockk.verify
 import io.mockk.verifyOrder
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -41,6 +42,7 @@ class TilsynBarnBeregnYtelseStegTest {
         tilkjentytelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
         vilkårService = vilkårService,
+        unleashService = mockUnleashService(),
     )
 
     val saksbehandling = saksbehandling()

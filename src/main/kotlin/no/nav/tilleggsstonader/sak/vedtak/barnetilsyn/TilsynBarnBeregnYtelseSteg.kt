@@ -1,8 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -25,6 +28,7 @@ import java.time.LocalDate
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     private val vilkårService: VilkårService,
+    private val unleashService: UnleashService,
     vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -54,6 +58,13 @@ class TilsynBarnBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseTilsynBarnDto,
     ) {
+        brukerfeilHvis(
+            saksbehandling.forrigeBehandlingId != null &&
+                !unleashService.isEnabled(Toggle.REVURDERING_INNVILGE_TIDLIGERE_INNVILGET),
+        ) {
+            "Funksjonalitet mangler for å kunne innvilge revurdering når tidligere behandling er innvilget. Sett saken på vent."
+        }
+
         val beregningsresultat =
             tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter)
         validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
