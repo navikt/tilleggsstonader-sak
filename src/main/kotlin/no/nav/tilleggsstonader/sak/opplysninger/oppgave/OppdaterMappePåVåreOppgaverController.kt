@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import kotlin.jvm.optionals.getOrNull
 
 @RestController
 @RequestMapping("/api/oppgave/admin")
@@ -52,13 +51,10 @@ class OppdaterMappePåVåreOppgaverController(
             .oppgaver
             .filter { oppgave -> oppgave.oppgavetype in gyldigeOppgaveTyper }
 
-        val mapper = oppgaveService.finnMapper(oppgaver.mapNotNull { it.tildeltEnhetsnr }.distinct()).map { it.id to it }
-
         val oppdateinfo = oppgaver
             .groupBy { it.oppgavetype }
-            .mapValues { it.value.groupBy { it.mappeId?.getOrNull() ?: "null" }.mapValues { it.value.size } }
+            .mapValues { it.value.groupBy { it.tildeltEnhetsnr ?: "null" }.mapValues { it.value.size } }
         return mapOf(
-            "mapper" to mapper,
             "oppgaver" to oppdateinfo,
         )
     }
