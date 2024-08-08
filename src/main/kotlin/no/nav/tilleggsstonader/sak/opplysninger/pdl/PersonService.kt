@@ -62,6 +62,8 @@ class PersonService(
         }
     }
 
+    fun hentAktørId(ident: String): String = hentAktørIder(ident).gjeldende().ident
+
     fun hentAktørIder(ident: String): PdlIdenter = cacheManager.getValue("pdl-aktørId", ident) {
         pdlClient.hentAktørIder(ident)
     }

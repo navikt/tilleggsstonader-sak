@@ -51,14 +51,15 @@ class OppgaveService(
         FnrUtil.validerOptionalIdent(finnOppgaveRequest.ident)
 
         val aktørId = finnOppgaveRequest.ident.takeUnless { it.isNullOrBlank() }
-            ?.let { personService.hentAktørIder(it).identer.first().ident }
+            ?.let { personService.hentAktørId(it) }
 
         val request = finnOppgaveRequest.tilFinnOppgaveRequest(aktørId, finnVentemappe())
         return finnOppgaver(request)
     }
 
     fun hentOppgaverForPerson(personIdent: String): FinnOppgaveResponseDto {
-        val oppgaveRequest = FinnOppgaveRequest(aktørId = personIdent, tema = Tema.TSO)
+        val aktørId = personService.hentAktørId(personIdent)
+        val oppgaveRequest = FinnOppgaveRequest(aktørId = aktørId, tema = Tema.TSO)
 
         return finnOppgaver(oppgaveRequest)
     }
