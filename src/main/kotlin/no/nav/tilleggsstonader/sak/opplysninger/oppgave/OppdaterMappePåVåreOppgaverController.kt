@@ -56,7 +56,7 @@ class OppdaterMappePåVåreOppgaverController(
 
         val oppdateinfo = oppgaver
             .groupBy { it.oppgavetype }
-            .mapValues { it.value.groupBy { it.mappeId?.getOrNull() }.mapValues { it.value.size } }
+            .mapValues { it.value.groupBy { it.mappeId?.getOrNull() ?: "null" }.mapValues { it.value.size } }
         return mapOf(
             "mapper" to mapper,
             "oppgaver" to oppdateinfo,
