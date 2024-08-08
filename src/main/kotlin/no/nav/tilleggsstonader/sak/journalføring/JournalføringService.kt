@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
@@ -21,6 +22,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.journalføring.JournalføringHelper.tilAvsenderMottaker
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.valider
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -130,12 +132,14 @@ class JournalføringService(
                 journalpostService.hentIdentFraJournalpost(journalpost),
                 journalføringRequest.stønadstype,
             )
+
         ferdigstillJournalpost(
             journalpost,
             journalføringRequest.journalførendeEnhet,
             fagsak,
             journalføringRequest.dokumentTitler,
             journalføringRequest.logiskeVedlegg,
+            journalføringRequest.nyAvsender?.tilAvsenderMottaker(),
         )
     }
 
@@ -152,6 +156,7 @@ class JournalføringService(
         fagsak: Fagsak,
         dokumentTitler: Map<String, String>? = null,
         logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
+        avsenderMottaker: AvsenderMottaker? = null,
     ) {
         journalpostService.oppdaterOgFerdigstillJournalpost(
             journalpost = journalpost,
@@ -160,6 +165,7 @@ class JournalføringService(
             saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
             dokumenttitler = dokumentTitler,
             logiskeVedlegg = logiskVedlegg,
+            avsender = avsenderMottaker,
         )
     }
 
