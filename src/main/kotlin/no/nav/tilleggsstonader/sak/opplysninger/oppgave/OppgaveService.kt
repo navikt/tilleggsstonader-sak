@@ -58,7 +58,8 @@ class OppgaveService(
         val aktørId = finnOppgaveRequest.ident.takeUnless { it.isNullOrBlank() }
             ?.let { personService.hentAktørId(it) }
 
-        val request = finnOppgaveRequest.tilFinnOppgaveRequest(aktørId, finnVentemappe())
+        val enhet = finnOppgaveRequest.enhet ?: error("Enhet er påkrevd når man søker etter oppgaver")
+        val request = finnOppgaveRequest.tilFinnOppgaveRequest(aktørId, finnMappe(enhet, OppgaveMappe.PÅ_VENT))
         return finnOppgaver(request)
     }
 
@@ -195,7 +196,7 @@ class OppgaveService(
         if (enhetsnummer == null) {
             error("Mangler enhetsnummer for oppgave for ident=$ident oppgavetype=$oppgave.oppgavetype")
         }
-        return finnMappe(enhetsnummer, OppgaveMappe.KLAR)
+        return finnMappe(enhetsnummer, OppgaveMappe.KLAR).id
     }
 
     fun tilbakestillFordelingPåOppgave(gsakOppgaveId: Long, versjon: Int): Oppgave {
@@ -292,14 +293,6 @@ class OppgaveService(
         }
     }
 
-    // TODO: Bruk enhet fra saksbehandler
-    // TODO: Bruk finnMappe når På-vent-mappen endret navn
-    fun finnVentemappe(): MappeDto {
-        val mapper = finnMapper("4462")
-        return mapper.singleOrNull { it.navn == OppgaveMappe.PÅ_VENT.navn }
-            ?: mapper.single { it.navn == "10 På vent" }
-    }
-
     fun finnMappe(enhet: String, oppgaveMappe: OppgaveMappe) = finnMapper(enhet)
         .filter { it.navn.endsWith(oppgaveMappe.navn, ignoreCase = true) }
         .let {
@@ -309,7 +302,6 @@ class OppgaveService(
             }
             it.single()
         }
-        .id
 
     fun finnMapper(enheter: List<String>): List<MappeDto> {
         return enheter.flatMap { finnMapper(it) }

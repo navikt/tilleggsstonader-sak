@@ -166,14 +166,14 @@ class SettPåVentService(
         val oppgave = hentOppgave(behandlingId)
 
         val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
-        val mappeId = oppgaveService.finnMappe(enhet, OppgaveMappe.PÅ_VENT)
+        val mappe = oppgaveService.finnMappe(enhet, OppgaveMappe.PÅ_VENT)
         val oppdatertOppgave = Oppgave(
             id = oppgave.id,
             versjon = oppgave.versjon,
             tilordnetRessurs = "",
             fristFerdigstillelse = dto.frist,
             beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, dto.frist),
-            mappeId = Optional.of(mappeId),
+            mappeId = Optional.of(mappe.id),
         )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
     }
@@ -202,7 +202,7 @@ class SettPåVentService(
         }
         val mappeId = if (unleashService.isEnabled(Toggle.OPPGAVE_BRUK_KLAR_MAPPE)) {
             val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
-            oppgaveService.finnMappe(enhet, OppgaveMappe.KLAR)
+            oppgaveService.finnMappe(enhet, OppgaveMappe.KLAR).id
         } else {
             null
         }
