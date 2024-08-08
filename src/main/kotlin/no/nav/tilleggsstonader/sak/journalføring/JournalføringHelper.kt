@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
@@ -77,10 +76,17 @@ object JournalføringHelper {
         },
     )
 
-    fun utledNyAvsender(nyAvsender: JournalføringRequest.NyAvsender?, bruker: Bruker?): AvsenderMottaker? =
-        when (nyAvsender?.erBruker) {
-            null -> null
-            true -> AvsenderMottaker(id = nyAvsender.personIdent, idType = BrukerIdType.FNR, navn = nyAvsender.navn ?: error("Mangler navn på bruker"))
-            false -> AvsenderMottaker(id = null, idType = null, navn = nyAvsender.navn!!)
-        }
+    /**
+     * Frontend sender inn avsenderMottaker som en del av journalføringsrequesten.
+     *
+     * Dersom avsender er lik bruker populeres id, idType og navn i nyAvsender fra frontend.
+     *
+     * Dersom det er en annen avsender enn bruker, oppgis bare navn.
+     */
+    fun JournalføringRequest.NyAvsender.tilAvsenderMottaker(): AvsenderMottaker =
+        AvsenderMottaker(
+            id = personIdent ?: if (erBruker) error("Mangler personident") else null,
+            idType = if (personIdent != null) BrukerIdType.FNR else null,
+            navn = navn ?: error("Mangler navn på avsender"),
+        )
 }

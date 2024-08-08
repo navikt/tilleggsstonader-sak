@@ -22,7 +22,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.journalføring.JournalføringHelper.utledNyAvsender
+import no.nav.tilleggsstonader.sak.journalføring.JournalføringHelper.tilAvsenderMottaker
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.valider
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -132,14 +132,14 @@ class JournalføringService(
                 journalpostService.hentIdentFraJournalpost(journalpost),
                 journalføringRequest.stønadstype,
             )
-        val nyAvsender = utledNyAvsender(journalføringRequest.nyAvsender, journalpost.bruker)
+
         ferdigstillJournalpost(
             journalpost,
             journalføringRequest.journalførendeEnhet,
             fagsak,
             journalføringRequest.dokumentTitler,
             journalføringRequest.logiskeVedlegg,
-            nyAvsender,
+            journalføringRequest.nyAvsender?.tilAvsenderMottaker(),
         )
     }
 
