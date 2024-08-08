@@ -49,20 +49,12 @@ class OppdaterMappePåVåreOppgaverController(
             ).tilFinnOppgaveRequest(null, oppgaveService.finnVentemappe()),
         )
             .oppgaver
-            .filter { oppgave -> oppgave.oppgavetype == Oppgavetype.Journalføring.value }
+            .filter { oppgave -> oppgave.oppgavetype !in gyldigeOppgaveTyper }
 
         val oppgaveInfo = oppgaver
             .filter { it.tildeltEnhetsnr != "4462" }
-            .map {
-                mapOf(
-                    "id" to it.id,
-                    "tildeltEnhetsnr" to it.tildeltEnhetsnr,
-                    "opprettetAv" to it.opprettetAv,
-                    "opprettetTidspunkt" to it.opprettetTidspunkt,
-                    "opprettetAvEnhetsnr" to it.opprettetAvEnhetsnr,
-                    "journalpost" to it.journalpostId,
-                )
-            }
+            .groupBy { it.oppgavetype }
+            .mapValues { it.value.groupBy { it.tildeltEnhetsnr }.mapValues { it.value.size } }
         return mapOf(
             "oppgaver" to oppgaveInfo,
         )
