@@ -47,7 +47,7 @@ class OppdaterMappePåVåreOppgaverController(
                 ident = null,
                 oppgaverPåVent = false,
                 limit = 1000,
-            ).tilFinnOppgaveRequest(null, oppgaveService.finnVentemappe()),
+            ).tilFinnOppgaveRequest(null, oppgaveService.finnVentemappe("4462")),
         )
             .oppgaver
             .filter { oppgave -> oppgave.oppgavetype in gyldigeOppgaveTyper }

@@ -54,7 +54,7 @@ class OppgaveService(
             ?.let { personService.hentAktørIder(it).identer.first().ident }
 
         val oppgaveResponse =
-            oppgaveClient.hentOppgaver(finnOppgaveRequest.tilFinnOppgaveRequest(aktørId, finnVentemappe()))
+            oppgaveClient.hentOppgaver(finnOppgaveRequest.tilFinnOppgaveRequest(aktørId, finnVentemappe(finnOppgaveRequest.enhetsmappe)))
 
         val personer = personService.hentPersonKortBolk(oppgaveResponse.oppgaver.mapNotNull { it.ident }.distinct())
         val oppgaveMetadata = finnOppgaveMetadata(oppgaveResponse.oppgaver)
@@ -89,9 +89,6 @@ class OppgaveService(
             },
         )
     }
-
-    // TODO: Bruk enhet fra saksbehandler
-    fun finnVentemappe() = finnMapper("4462").single { it.navn == "10 På vent" }
 
     private fun finnOppgaveMetadata(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
         val oppgaveIder = oppgaver.map { it.id }
@@ -280,6 +277,8 @@ class OppgaveService(
             else -> frist
         }
     }
+
+    fun finnVentemappe(enhet: String) = finnMapper(enhet).single { it.navn == "10 På vent" }
 
     fun finnMapper(enheter: List<String>): List<MappeDto> {
         return enheter.flatMap { finnMapper(it) }
