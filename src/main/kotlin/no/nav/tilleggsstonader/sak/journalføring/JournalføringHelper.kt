@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import org.springframework.http.HttpStatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo as DokumentInfoJournalpost
@@ -83,10 +84,17 @@ object JournalføringHelper {
      *
      * Dersom det er en annen avsender enn bruker, oppgis bare navn.
      */
-    fun JournalføringRequest.NyAvsender.tilAvsenderMottaker(): AvsenderMottaker =
-        AvsenderMottaker(
-            id = personIdent ?: if (erBruker) error("Mangler personident") else null,
+    fun JournalføringRequest.NyAvsender.tilAvsenderMottaker(): AvsenderMottaker {
+        feilHvis(erBruker && personIdent.isNullOrBlank()) {
+            "Mangler personident på avsender"
+        }
+        feilHvis(navn.isNullOrBlank()) {
+            "Mangler navn på avsender"
+        }
+        return AvsenderMottaker(
+            id = personIdent,
             idType = if (personIdent != null) BrukerIdType.FNR else null,
-            navn = navn ?: error("Mangler navn på avsender"),
+            navn = navn,
         )
+    }
 }
