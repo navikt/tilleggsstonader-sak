@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import kotlin.jvm.optionals.getOrNull
 
 @RestController
 @RequestMapping("/api/oppgave/admin")
@@ -28,9 +29,10 @@ class OppdaterMappePåVåreOppgaverController(
         SpringTokenValidationContextHolder().setTokenValidationContext(null)
     }
 
-    @GetMapping("/sjekkEnheter")
-    fun sjekkEnheterIProd(): Map<String?, Map<String?, Int>> {
+    @GetMapping("/kontroller")
+    fun kontroller(): Map<String, Any> {
         utførEndringSomSystem()
+
         val response = oppgaveClient.hentOppgaver(
             FinnOppgaveRequestDto(
                 behandlingstema = Behandlingstema.TilsynBarn.name,
@@ -39,8 +41,15 @@ class OppdaterMappePåVåreOppgaverController(
                 limit = 1000,
             ).tilFinnOppgaveRequest(null, oppgaveService.finnVentemappe()),
         )
-        return response.oppgaver
+
+        val mapper = oppgaveService.finnMapper(response.oppgaver.mapNotNull { it.tildeltEnhetsnr }.distinct()).map { it.id to it }
+
+        val oppgaver = response.oppgaver
             .groupBy { it.oppgavetype }
-            .mapValues { it.value.groupBy { it.tildeltEnhetsnr }.mapValues { it.value.size } }
+            .mapValues { it.value.groupBy { it.mappeId?.getOrNull() }.mapValues { it.value.size } }
+        return mapOf(
+            "mapper" to mapper,
+            "oppgaver" to oppgaver,
+        )
     }
 }
