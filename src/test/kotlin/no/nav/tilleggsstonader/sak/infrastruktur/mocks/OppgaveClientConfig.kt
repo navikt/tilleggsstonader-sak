@@ -68,7 +68,11 @@ class OppgaveClientConfig {
             oppgavelager[oppgaveId] ?: error("Finner ikke oppgave=$oppgaveId")
         }
 
-        val mapper = listOf(MappeDto(MAPPE_ID_PÅ_VENT, "10 På vent", "4462"))
+        val mapper = listOf(
+            MappeDto(MAPPE_ID_PÅ_VENT, "10 På vent", "4462"),
+            MappeDto(MAPPE_ID_PÅ_VENT, "20 TS-sak Klar", "4462"),
+
+        )
         every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(mapper.size, mapper)
 
         every { oppgaveClient.opprettOppgave(any()) } answers {
@@ -176,5 +180,6 @@ class OppgaveClientConfig {
 
     companion object {
         const val MAPPE_ID_PÅ_VENT = 10
+        const val MAPPE_ID_TS_SAK_KLAR = 20
     }
 }

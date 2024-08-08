@@ -294,6 +294,11 @@ class OppgaveService(
         }
     }
 
+    fun finnKlarMappe(enhet: String) =
+        finnMapper(enhet)
+            .single { it.navn.endsWith(OppgaveUtil.MAPPE_TS_SAK_KLAR) }
+            .id.toLong()
+
     private fun fristBasertPåKlokkeslett(gjeldendeTid: LocalDateTime): LocalDate {
         return if (gjeldendeTid.hour >= 12) {
             return gjeldendeTid.plusDays(2).toLocalDate()

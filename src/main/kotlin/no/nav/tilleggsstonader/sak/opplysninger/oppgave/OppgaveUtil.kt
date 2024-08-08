@@ -16,6 +16,10 @@ object OppgaveUtil {
     val ENHET_NR_NAY = "4462"
     val ENHET_NR_EGEN_ANSATT = "4483"
 
+    // Tar ikke med prefix då det kan være ulikt for ulike enheter, eks "41 TS-sak Klar"
+    val MAPPE_TS_SAK_KLAR = " TS-sak Klar"
+    val MAPPE_TS_SAK_PÅ_VENT = " TS-sak På vent"
+
     fun sekunderSidenEndret(oppgave: Oppgave): Long? {
         val endretTidspunkt = oppgave.endretTidspunkt
         return if (!endretTidspunkt.isNullOrBlank()) {
