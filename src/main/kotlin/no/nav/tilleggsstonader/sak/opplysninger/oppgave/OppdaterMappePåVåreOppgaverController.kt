@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import org.slf4j.LoggerFactory
@@ -29,11 +30,18 @@ class OppdaterMappePåVåreOppgaverController(
         SpringTokenValidationContextHolder().setTokenValidationContext(null)
     }
 
+    val gyldigeOppgaveTyper = setOf(
+        Oppgavetype.Journalføring,
+        Oppgavetype.BehandleSak,
+        Oppgavetype.BehandleUnderkjentVedtak,
+        Oppgavetype.GodkjenneVedtak,
+    ).map { it.value }.toSet()
+
     @GetMapping("/kontroller")
     fun kontroller(): Map<String, Any> {
         utførEndringSomSystem()
 
-        val response = oppgaveClient.hentOppgaver(
+        val oppgaver = oppgaveClient.hentOppgaver(
             FinnOppgaveRequestDto(
                 behandlingstema = Behandlingstema.TilsynBarn.name,
                 ident = null,
@@ -41,15 +49,17 @@ class OppdaterMappePåVåreOppgaverController(
                 limit = 1000,
             ).tilFinnOppgaveRequest(null, oppgaveService.finnVentemappe()),
         )
+            .oppgaver
+            .filter { oppgave -> oppgave.oppgavetype in gyldigeOppgaveTyper }
 
-        val mapper = oppgaveService.finnMapper(response.oppgaver.mapNotNull { it.tildeltEnhetsnr }.distinct()).map { it.id to it }
+        val mapper = oppgaveService.finnMapper(oppgaver.mapNotNull { it.tildeltEnhetsnr }.distinct()).map { it.id to it }
 
-        val oppgaver = response.oppgaver
+        val oppdateinfo = oppgaver
             .groupBy { it.oppgavetype }
             .mapValues { it.value.groupBy { it.mappeId?.getOrNull() }.mapValues { it.value.size } }
         return mapOf(
             "mapper" to mapper,
-            "oppgaver" to oppgaver,
+            "oppgaver" to oppdateinfo,
         )
     }
 }
