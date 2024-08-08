@@ -62,7 +62,11 @@ class PersonService(
         }
     }
 
-    fun hentAktørIder(ident: String): PdlIdenter = pdlClient.hentAktørIder(ident)
+    fun hentAktørId(ident: String): String = hentAktørIder(ident).gjeldende().ident
+
+    fun hentAktørIder(ident: String): PdlIdenter = cacheManager.getValue("pdl-aktørId", ident) {
+        pdlClient.hentAktørIder(ident)
+    }
 
     fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto? = pdlClient.hentGeografiskTilknytning(ident)
 
