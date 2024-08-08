@@ -53,8 +53,18 @@ class OppgaveService(
         val aktørId = finnOppgaveRequest.ident.takeUnless { it.isNullOrBlank() }
             ?.let { personService.hentAktørIder(it).identer.first().ident }
 
-        val oppgaveResponse =
-            oppgaveClient.hentOppgaver(finnOppgaveRequest.tilFinnOppgaveRequest(aktørId, finnVentemappe()))
+        val request = finnOppgaveRequest.tilFinnOppgaveRequest(aktørId, finnVentemappe())
+        return finnOppgaver(request)
+    }
+
+    fun hentOppgaverForPerson(personIdent: String): FinnOppgaveResponseDto {
+        val oppgaveRequest = FinnOppgaveRequest(aktørId = personIdent, tema = Tema.TSO)
+
+        return finnOppgaver(oppgaveRequest)
+    }
+
+    private fun finnOppgaver(request: FinnOppgaveRequest): FinnOppgaveResponseDto {
+        val oppgaveResponse = oppgaveClient.hentOppgaver(request)
 
         val personer = personService.hentPersonKortBolk(oppgaveResponse.oppgaver.mapNotNull { it.ident }.distinct())
         val oppgaveMetadata = finnOppgaveMetadata(oppgaveResponse.oppgaver)
@@ -66,25 +76,6 @@ class OppgaveService(
                     oppgave = oppgave,
                     navn = personer.visningsnavnFor(oppgave),
                     oppgaveMetadata = oppgaveMetadata[oppgave.id],
-                )
-            },
-        )
-    }
-
-    fun hentOppgaverForPerson(personIdent: String): FinnOppgaveResponseDto {
-        val oppgaveRequest = FinnOppgaveRequest(aktørId = personIdent, tema = Tema.TSO)
-
-        val oppgaveResponse = oppgaveClient.hentOppgaver(oppgaveRequest)
-
-        val navn = personService.hentVisningsnavnForPerson(personIdent)
-
-        return FinnOppgaveResponseDto(
-            antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
-            oppgaver = oppgaveResponse.oppgaver.map { oppgave ->
-                OppgaveDto(
-                    oppgave = oppgave,
-                    navn = navn,
-                    oppgaveMetadata = finnOppgaveMetadata(listOf(oppgave))[oppgave.id],
                 )
             },
         )
