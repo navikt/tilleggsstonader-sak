@@ -53,8 +53,10 @@ object IverksettDtoMapper {
                     satstype = it.satstype.tilSatstype(),
                     fraOgMedDato = it.fom,
                     tilOgMedDato = it.tom,
-                    stønadstype = it.type.tilStønadstype(),
-                    brukersNavKontor = null, // TODO denne skal settes for reise?
+                    stønadsdata = StønadsdataDto(
+                        stønadstype = it.type.tilStønadstype(),
+                        brukersNavKontor = null, // TODO denne skal settes for reise?
+                    ),
                 )
             }
 
