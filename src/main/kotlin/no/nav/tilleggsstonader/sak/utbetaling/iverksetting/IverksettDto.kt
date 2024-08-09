@@ -6,7 +6,7 @@ import java.util.UUID
 
 /**
  * Kopie fra utsjekk-kontrakt, ønsker ikke å dra inn den avhengigheten
- * https://github.com/navikt/utsjekk-kontrakter/blob/main/iverksett/src/main/kotlin/no/nav/utsjekk/kontrakter/iverksett/IverksettTilleggsst%C3%B8naderDto.kt
+ * https://github.com/navikt/utsjekk-kontrakter/blob/main/iverksett/src/main/kotlin/no/nav/utsjekk/kontrakter/iverksett/IverksettV2Dto.kt
  */
 data class IverksettDto(
     val sakId: String,
@@ -34,8 +34,12 @@ data class UtbetalingDto(
     val satstype: SatstypeIverksetting,
     val fraOgMedDato: LocalDate,
     val tilOgMedDato: LocalDate,
+    val stønadsdata: StønadsdataDto,
+)
+
+data class StønadsdataDto(
     val stønadstype: StønadstypeIverksetting,
-    val brukersNavKontor: BrukersNavKontor? = null, // denne gjelder kun tiltak?
+    val brukersNavKontor: String? = null, // denne gjelder kun tiltak?
 )
 
 enum class SatstypeIverksetting {
@@ -43,11 +47,6 @@ enum class SatstypeIverksetting {
     MÅNEDLIG,
     ENGANGS,
 }
-
-data class BrukersNavKontor(
-    val enhet: String,
-    val gjelderFom: LocalDate,
-)
 
 /**
  * Hvis det legges til nye typer her.
@@ -60,6 +59,7 @@ enum class StønadstypeIverksetting {
     TILSYN_BARN_ETTERLATTE,
 }
 
+@Suppress("unused")
 enum class IverksettStatus {
     SENDT_TIL_OPPDRAG,
     FEILET_MOT_OPPDRAG,

@@ -42,13 +42,15 @@ object IverksettDtoUtil {
         fraOgMedDato: LocalDate = LocalDate.of(2023, 1, 1),
         tilOgMedDato: LocalDate = LocalDate.of(2023, 1, 31),
         stønadstype: StønadstypeIverksetting = StønadstypeIverksetting.TILSYN_BARN_AAP,
-        brukersNavKontor: BrukersNavKontor? = null,
+        brukersNavKontor: String? = null,
     ) = UtbetalingDto(
         beløp = beløp,
         satstype = satstype,
         fraOgMedDato = fraOgMedDato,
         tilOgMedDato = tilOgMedDato,
-        stønadstype = stønadstype,
-        brukersNavKontor = brukersNavKontor,
+        stønadsdata = StønadsdataDto(
+            stønadstype = stønadstype,
+            brukersNavKontor = brukersNavKontor,
+        ),
     )
 }

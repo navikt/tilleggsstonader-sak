@@ -23,7 +23,7 @@ class IverksettClient(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private val iverksettingUrl = UriComponentsBuilder.fromUri(uri)
-        .pathSegment("api", "iverksetting", "tilleggsstonader")
+        .pathSegment("api", "iverksetting", "v2")
         .encode().toUriString()
 
     fun iverksett(dto: IverksettDto) {
@@ -52,7 +52,7 @@ class IverksettClient(
 
     fun simuler(simuleringRequest: SimuleringRequestDto): SimuleringResponseDto {
         val url = UriComponentsBuilder.fromUri(uri)
-            .pathSegment("api", "simulering", "tilleggsstonader")
+            .pathSegment("api", "simulering", "v2")
             .toUriString()
 
         return postForEntity<SimuleringResponseDto>(url, simuleringRequest)

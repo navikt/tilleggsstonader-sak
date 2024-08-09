@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -86,8 +85,7 @@ class SimuleringService(
                 sakId = saksbehandling.eksternFagsakId.toString(),
                 behandlingId = saksbehandling.eksternId.toString(),
                 personident = saksbehandling.ident,
-                saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-                vedtakstidspunkt = LocalDateTime.now(),
+                saksbehandlerId = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
                 utbetalinger = IverksettDtoMapper.mapUtbetalinger(tilkjentYtelse.andelerTilkjentYtelse),
                 forrigeIverksetting = forrigeIverksettingDto,
             ),

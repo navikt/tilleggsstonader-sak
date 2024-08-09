@@ -53,7 +53,9 @@ class IverksettDtoMapperTest {
                     fraOgMedDato = andel.fom,
                     tilOgMedDato = andel.tom,
                     satstype = SatstypeIverksetting.DAGLIG,
-                    stønadstype = StønadstypeIverksetting.TILSYN_BARN_AAP,
+                    stønadsdata = StønadsdataDto(
+                        stønadstype = StønadstypeIverksetting.TILSYN_BARN_AAP,
+                    ),
                 ),
             )
         }
