@@ -79,8 +79,11 @@ class GrunnlagsdataService(
         val barnIdenter = barnService.finnBarnPåBehandling(behandling.id).map { it.ident }.toSet()
         val barn = person.barn.filter { (ident, _) -> barnIdenter.contains(ident) }
 
-        feilHvis(!barn.keys.containsAll(barnIdenter)) {
-            "Finner ikke grunnlag for barn. behandlingBarn=$barnIdenter pdlBarn=${barn.keys}"
+        feilHvis(
+            !barn.keys.containsAll(barnIdenter),
+            sensitivFeilmelding = { "Finner ikke grunnlag for barn. behandlingBarn=$barnIdenter pdlBarn=${barn.keys}" },
+        ) {
+            "Finner ikke grunnlag for barn. Se securelogs for detaljer."
         }
 
         return barn.tilGrunnlagsdataBarn()

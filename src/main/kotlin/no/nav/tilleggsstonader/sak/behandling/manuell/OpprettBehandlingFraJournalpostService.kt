@@ -144,9 +144,12 @@ class OpprettBehandlingFraJournalpostService(
             "Søknaden mangler identer på barn - kan ikke opprette behandling manuelt uten barn"
         }
         val søker = personService.hentPersonMedBarn(gjeldendeIdent)
-        barnIdenterFraSøknad.forEach { it ->
-            feilHvisIkke(søker.barn.containsKey(it)) {
-                "Søknaden inneholder barn $it som ikke finnes på personen=$gjeldendeIdent"
+        barnIdenterFraSøknad.forEach {
+            feilHvisIkke(
+                søker.barn.containsKey(it),
+                sensitivFeilmelding = { "Søknaden inneholder barn $it som ikke finnes på personen=$gjeldendeIdent" },
+            ) {
+                "Søknaden inneholder barn som ikke finnes på personen"
             }
         }
     }

@@ -122,7 +122,9 @@ class PassBarnRegel : Vilkårsregel(
         datoForBeregning: LocalDate = osloDateNow(),
     ): Boolean {
         val ident = metadata.barn.firstOrNull { it.id == barnId }?.ident
-        feilHvis(ident == null) { "Fant ikke barn med id=$barnId i metadata" }
+        feilHvis(ident == null, sensitivFeilmelding = { "Fant ikke barn med id=$barnId i metadata" }) {
+            "Fant ikke barn i metadata"
+        }
 
         return harFullførtFjerdetrinn(Fødselsnummer(ident).fødselsdato, datoForBeregning)
     }
