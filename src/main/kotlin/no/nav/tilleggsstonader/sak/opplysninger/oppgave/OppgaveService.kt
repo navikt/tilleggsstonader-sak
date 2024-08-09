@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -295,9 +296,18 @@ class OppgaveService(
     }
 
     fun finnKlarMappe(enhet: String) =
-        finnMapper(enhet)
-            .single { it.navn.endsWith(OppgaveUtil.MAPPE_TS_SAK_KLAR) }
-            .id.toLong()
+        finnMappe(enhet, OppgaveUtil.MAPPE_TS_SAK_KLAR)
+
+    private fun OppgaveService.finnMappe(enhet: String, navnMappe: String) = finnMapper(enhet)
+        .filter { it.navn.endsWith(navnMappe, ignoreCase = false) }
+        .let {
+            if (it.size != 1) {
+                secureLogger.error("Finner ${it.size} mapper for enhet=$enhet navn=$navnMappe - mapper=$it")
+                error("Finner ikke mapper for enhet=$enhet navn=$navnMappe. Se secure logs for mer info")
+            }
+            it.single()
+        }
+        .id.toLong()
 
     private fun fristBasertPåKlokkeslett(gjeldendeTid: LocalDateTime): LocalDate {
         return if (gjeldendeTid.hour >= 12) {
