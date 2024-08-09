@@ -26,8 +26,7 @@ class VilkårperiodeController(
     private val vilkårperiodeService: VilkårperiodeService,
 ) {
 
-    // TODO fjern v2 når uten v2 er tatt i bruk av frontend
-    @GetMapping("behandling/{behandlingId}/v2", "behandling/{behandlingId}")
+    @GetMapping("behandling/{behandlingId}")
     fun hentVilkårperioder(@PathVariable behandlingId: UUID): VilkårperioderResponse {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
