@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -47,6 +48,7 @@ class JournalføringServiceTest {
     val barnService = mockk<BarnService>()
     val personService = mockk<PersonService>()
     val oppgaveService = mockk<OppgaveService>()
+    val unleashService = mockk<UnleashService>()
 
     val journalføringService = JournalføringService(
         behandlingService,
@@ -58,6 +60,7 @@ class JournalføringServiceTest {
         TransactionHandler(),
         personService,
         oppgaveService,
+        unleashService,
     )
 
     val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetNr
@@ -85,6 +88,7 @@ class JournalføringServiceTest {
         every { personService.hentPersonIdenter(personIdent) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
         justRun { oppgaveService.ferdigstillOppgave(any()) }
         every { journalpostService.hentIdentFraJournalpost(journalpost) } returns personIdent
+        every { unleashService.isEnabled(any()) } returns true
     }
 
     @AfterEach
@@ -125,6 +129,7 @@ class JournalføringServiceTest {
         } returns behandling(fagsak = fagsak)
         every { journalpostService.hentSøknadFraJournalpost(any()) } returns mockk()
         every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
+        every { behandlingService.finnSisteIverksatteBehandling(any()) } returns mockk()
 
         journalføringService.journalførTilNyBehandling(
             journalpostId,

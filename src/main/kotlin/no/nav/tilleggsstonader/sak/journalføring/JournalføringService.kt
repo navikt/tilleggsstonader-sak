@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -22,6 +23,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringHelper.tilAvsenderMottaker
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.valider
@@ -46,6 +48,7 @@ class JournalføringService(
     private val transactionHandler: TransactionHandler,
     private val personService: PersonService,
     private val oppgaveService: OppgaveService,
+    private val unleashService: UnleashService,
 ) {
 
     @Transactional
@@ -174,6 +177,11 @@ class JournalføringService(
         journalpost: Journalpost,
         behandlingÅrsak: BehandlingÅrsak,
     ): Behandling {
+        val harInnvilgetBehandling = behandlingService.finnSisteIverksatteBehandling(fagsak.id) != null
+        feilHvis(harInnvilgetBehandling && !unleashService.isEnabled(Toggle.MANUELL_JOURNALFØRING_TIDLIGERE_INNVILGET)) {
+            "Kan ikke opprette en ny behandling da det finnes en tidligere innvilget behandling. Ta kontakt med teamet på teams"
+        }
+
         val behandling = behandlingService.opprettBehandling(
             fagsakId = fagsak.id,
             behandlingsårsak = behandlingÅrsak,
