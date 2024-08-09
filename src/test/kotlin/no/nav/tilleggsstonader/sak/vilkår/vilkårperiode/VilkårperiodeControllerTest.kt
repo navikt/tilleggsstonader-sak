@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -77,11 +77,11 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     }
 
     private fun hentVilkårperioder(behandling: Behandling) =
-        restTemplate.exchange<VilkårperioderDto>(
+        restTemplate.exchange<VilkårperioderResponse>(
             localhost("api/vilkarperiode/behandling/${behandling.id}"),
             HttpMethod.GET,
             HttpEntity(null, headers),
-        ).body!!
+        ).body!!.vilkårperioder
 
     private fun opprettVilkårperiode(
         lagreVilkårperiode: LagreVilkårperiode,

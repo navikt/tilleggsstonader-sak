@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -27,14 +26,8 @@ class VilkårperiodeController(
     private val vilkårperiodeService: VilkårperiodeService,
 ) {
 
-    @GetMapping("behandling/{behandlingId}")
-    fun hentMålgrupper(@PathVariable behandlingId: UUID): VilkårperioderDto {
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-
-        return vilkårperiodeService.hentVilkårperioderDto(behandlingId)
-    }
-
-    @GetMapping("behandling/{behandlingId}/v2")
+    // TODO fjern v2 når uten v2 er tatt i bruk av frontend
+    @GetMapping("behandling/{behandlingId}/v2", "behandling/{behandlingId}")
     fun hentVilkårperioder(@PathVariable behandlingId: UUID): VilkårperioderResponse {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
