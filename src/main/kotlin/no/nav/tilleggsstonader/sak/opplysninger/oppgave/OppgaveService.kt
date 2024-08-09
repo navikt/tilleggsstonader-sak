@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -81,9 +82,6 @@ class OppgaveService(
             },
         )
     }
-
-    // TODO: Bruk enhet fra saksbehandler
-    fun finnVentemappe() = finnMapper("4462").single { it.navn == "10 På vent" }
 
     private fun finnOppgaveMetadata(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
         val oppgaveIder = oppgaver.map { it.id }
@@ -272,6 +270,25 @@ class OppgaveService(
             else -> frist
         }
     }
+
+    // TODO: Bruk enhet fra saksbehandler
+    // TODO: Bruk finnMappe når På-vent-mappen endret navn
+    fun finnVentemappe(): MappeDto {
+        val mapper = finnMapper("4462")
+        return mapper.singleOrNull { it.navn == OppgaveMappe.PÅ_VENT.navn }
+            ?: mapper.single { it.navn == "10 På vent" }
+    }
+
+    fun finnMappe(enhet: String, oppgaveMappe: OppgaveMappe) = finnMapper(enhet)
+        .filter { it.navn.endsWith(oppgaveMappe.navn, ignoreCase = true) }
+        .let {
+            if (it.size != 1) {
+                secureLogger.error("Finner ${it.size} mapper for enhet=$enhet navn=$oppgaveMappe - mapper=$it")
+                error("Finner ikke mapper for enhet=$enhet navn=$oppgaveMappe. Se secure logs for mer info")
+            }
+            it.single()
+        }
+        .id.toLong()
 
     fun finnMapper(enheter: List<String>): List<MappeDto> {
         return enheter.flatMap { finnMapper(it) }
