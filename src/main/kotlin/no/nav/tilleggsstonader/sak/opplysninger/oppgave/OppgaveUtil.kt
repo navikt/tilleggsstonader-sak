@@ -43,6 +43,16 @@ object OppgaveUtil {
         else -> error("Håndterer ikke behandlesAvApplikasjon for $oppgavetype")
     }
 
+    fun skalPlasseresIKlarMappe(oppgavetype: Oppgavetype) = when (oppgavetype) {
+        Oppgavetype.Journalføring,
+        Oppgavetype.BehandleSak,
+        Oppgavetype.BehandleUnderkjentVedtak,
+        Oppgavetype.GodkjenneVedtak,
+        -> true
+
+        else -> error("Håndterer ikke klar-mappe-håndtering for $oppgavetype")
+    }
+
     /**
      * Skal ikke opprette oppgave når en behandling har feil status for gitt oppgavetype
      * Eks i en behandling som sendes til beslutter, så opprettes det en task for GodkjenneVedtak

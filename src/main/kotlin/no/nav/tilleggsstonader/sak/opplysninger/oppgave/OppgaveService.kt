@@ -12,12 +12,15 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
@@ -44,6 +47,7 @@ class OppgaveService(
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val cacheManager: CacheManager,
     private val personService: PersonService,
+    private val unleashService: UnleashService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -169,12 +173,29 @@ class OppgaveService(
             enhetsnummer = enhetsnummer,
             behandlingstema = finnBehandlingstema(stønadstype).value,
             tilordnetRessurs = oppgave.tilordnetNavIdent,
-            mappeId = oppgave.mappeId,
+            mappeId = utledMappeId(personIdent, oppgave, enhetsnummer),
             prioritet = oppgave.prioritet,
             behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgave.oppgavetype),
         )
 
         return oppgaveClient.opprettOppgave(opprettOppgave)
+    }
+
+    /**
+     * Skal plassere oppgaver vi oppretter som skal håndteres i ny saksbehandling i egen mappe
+     * for at de ikke skal blandes med uplasserte som håndteres dagligen i gosys
+     */
+    private fun utledMappeId(ident: String, oppgave: OpprettOppgave, enhetsnummer: String?): Long? {
+        if (!unleashService.isEnabled(Toggle.OPPGAVE_BRUK_KLAR_MAPPE)) {
+            return null
+        }
+        if (!skalPlasseresIKlarMappe(oppgave.oppgavetype)) {
+            return null
+        }
+        if (enhetsnummer == null) {
+            error("Mangler enhetsnummer for oppgave for ident=$ident oppgavetype=$oppgave.oppgavetype")
+        }
+        return finnMappe(enhetsnummer, OppgaveMappe.KLAR)
     }
 
     fun tilbakestillFordelingPåOppgave(gsakOppgaveId: Long, versjon: Int): Oppgave {

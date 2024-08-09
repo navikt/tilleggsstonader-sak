@@ -71,6 +71,7 @@ class OppgaveClientConfig {
 
         val mapper = listOf(
             MappeDto(MAPPE_ID_PÅ_VENT, OppgaveMappe.PÅ_VENT.navn, "4462"),
+            MappeDto(MAPPE_ID_KLAR, OppgaveMappe.KLAR.navn, "4462"),
         )
         every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(mapper.size, mapper)
 
@@ -179,5 +180,6 @@ class OppgaveClientConfig {
 
     companion object {
         const val MAPPE_ID_PÅ_VENT = 10
+        const val MAPPE_ID_KLAR = 20
     }
 }
