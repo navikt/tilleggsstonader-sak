@@ -84,6 +84,15 @@ class VilkårperiodeService(
         )
     }
 
+    @Transactional
+    fun hentVilkårperioderResponseMedOppdatertGrunnlag(behandlingId: UUID): VilkårperioderResponse {
+        feilHvis(behandlingErLåstForVidereRedigering(behandlingId)) {
+            "Kan ikke oppdatere grunnlag når behandlingen er låst"
+        }
+        vilkårperioderGrunnlagRepository.deleteById(behandlingId)
+        return hentVilkårperioderResponse(behandlingId)
+    }
+
     private fun hentEllerOpprettGrunnlag(behandlingId: UUID): VilkårperioderGrunnlag? {
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)?.grunnlag
 
