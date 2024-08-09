@@ -84,6 +84,20 @@ class VilkårperiodeService(
         )
     }
 
+    @Transactional
+    fun oppdaterGrunnlag(behandlingId: UUID) {
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
+            "Kan ikke oppdatere grunnlag når behandlingen er låst"
+        }
+        feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
+            "Kan ikke oppdatere grunnlag når behandlingen er i annet steg enn vilkår."
+        }
+
+        vilkårperioderGrunnlagRepository.deleteById(behandlingId)
+        opprettGrunnlagsdata(behandlingId)
+    }
+
     private fun hentEllerOpprettGrunnlag(behandlingId: UUID): VilkårperioderGrunnlag? {
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)?.grunnlag
 
