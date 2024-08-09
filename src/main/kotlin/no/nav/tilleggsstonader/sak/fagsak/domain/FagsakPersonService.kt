@@ -23,7 +23,9 @@ class FagsakPersonService(
 
     fun hentIdenter(personId: UUID): Set<PersonIdent> {
         val personIdenter = fagsakPersonRepository.findPersonIdenter(personId)
-        feilHvis(personIdenter.isEmpty()) { "Finner ikke personidenter til person=$personId" }
+        feilHvis(personIdenter.isEmpty(), sensitivFeilmelding = { "Finner ikke personidenter til person=$personId" }) {
+            "Finner ikke personidenter til person"
+        }
         return personIdenter
     }
 

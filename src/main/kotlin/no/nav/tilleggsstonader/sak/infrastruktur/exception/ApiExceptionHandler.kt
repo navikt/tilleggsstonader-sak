@@ -55,12 +55,12 @@ class ApiExceptionHandler {
     @ExceptionHandler(ApiFeil::class)
     fun handleThrowable(feil: ApiFeil): ProblemDetail {
         val metodeSomFeiler = finnMetodeSomFeiler(feil)
-        secureLogger.info("En håndtert feil har oppstått(${feil.httpStatus}): ${feil.feil}", feil)
+        secureLogger.info("En håndtert feil har oppstått(${feil.httpStatus}): ${feil.frontendFeilmelding}", feil)
         logger.info(
             "En håndtert feil har oppstått(${feil.httpStatus}) " +
                 "metode=$metodeSomFeiler exception=${rootCause(feil)}: ${feil.message} ",
         )
-        return ProblemDetail.forStatusAndDetail(feil.httpStatus, feil.feil)
+        return ProblemDetail.forStatusAndDetail(feil.httpStatus, feil.frontendFeilmelding)
     }
 
     @ExceptionHandler(Feil::class)
