@@ -4,8 +4,10 @@ import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkObject
 import io.mockk.runs
 import io.mockk.slot
+import io.mockk.unmockkObject
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -26,6 +28,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
@@ -35,7 +38,9 @@ import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlPersonKort
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
@@ -60,6 +65,7 @@ internal class OppgaveServiceTest {
             arbeidsfordelingService = arbeidsfordelingService,
             cacheManager = cacheManager,
             personService = personService,
+            unleashService = mockUnleashService(),
         )
 
     val opprettOppgaveDomainSlot = slot<OppgaveDomain>()
@@ -72,9 +78,20 @@ internal class OppgaveServiceTest {
         every { oppgaveRepository.update(any()) } answers { firstArg() }
         every { oppgaveRepository.finnOppgaveMetadata(any()) } returns emptyList()
         every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(
-            1,
-            listOf(MappeDto(OppgaveClientConfig.MAPPE_ID_PÅ_VENT, "10 På vent", "4462")),
+            2,
+            listOf(
+                MappeDto(OppgaveClientConfig.MAPPE_ID_KLAR, OppgaveMappe.KLAR.navn, "4462"),
+                MappeDto(OppgaveClientConfig.MAPPE_ID_PÅ_VENT, OppgaveMappe.PÅ_VENT.navn, "4462"),
+            ),
         )
+        mockkObject(OppgaveUtil)
+        every { OppgaveUtil.utledBehandlesAvApplikasjon(any<Oppgavetype>()) } answers { callOriginal() }
+        every { OppgaveUtil.skalPlasseresIKlarMappe(any<Oppgavetype>()) } answers { callOriginal() }
+    }
+
+    @AfterEach
+    fun tearDown() {
+        unmockkObject(OppgaveUtil)
     }
 
     @Test
@@ -126,6 +143,32 @@ internal class OppgaveServiceTest {
         every { oppgaveClient.opprettOppgave(any()) } throws IntegrasjonException("En merkelig feil vi ikke kjenner til")
         assertThrows<IntegrasjonException> {
             oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
+        }
+    }
+
+    @Nested
+    inner class OpprettOppgaveIMappe {
+
+        @Test
+        fun `Skal opprette behandle-sak-oppgave i Klar-mappe`() {
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
+
+            assertThat(slot.captured.mappeId).isEqualTo(OppgaveClientConfig.MAPPE_ID_KLAR.toLong())
+        }
+
+        @Test
+        fun `Skal opprette vurder henvendelse-oppgave uten mappe`() {
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot)
+            every { OppgaveUtil.utledBehandlesAvApplikasjon(Oppgavetype.VurderHenvendelse) } returns ""
+            every { OppgaveUtil.skalPlasseresIKlarMappe(Oppgavetype.VurderHenvendelse) } returns false
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.VurderHenvendelse))
+
+            assertThat(slot.captured.mappeId).isNull()
         }
     }
 
