@@ -23,7 +23,6 @@ class ArbeidsfordelingService(
 
     companion object {
         const val MASKINELL_JOURNALFOERENDE_ENHET = "9999"
-        val ENHET_NASJONAL_NAY = Arbeidsfordelingsenhet("4462", "Tilleggsstønad INN")
     }
 
     fun hentNavEnhetId(ident: String, oppgavetype: Oppgavetype, tema: Tema = Tema.TSO) = when (oppgavetype) {
