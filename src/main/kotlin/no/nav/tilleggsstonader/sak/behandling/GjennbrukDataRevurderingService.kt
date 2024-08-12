@@ -25,24 +25,24 @@ class GjennbrukDataRevurderingService(
 ) {
 
     @Transactional
-    fun gjenbrukData(behandling: Behandling, forrigeBehandlingId: UUID) {
+    fun gjenbrukData(behandling: Behandling, gjennbrukDataFraBehandlingId: UUID) {
         // TODO skal vi kopiere fra forrige henlagte/avslåtte? Hva hvis behandlingen før er innvilget.
 
         val barnIder: Map<TidligereBarnId, NyttBarnId> =
-            barnService.gjenbrukBarn(forrigeBehandlingId = forrigeBehandlingId, nyBehandlingId = behandling.id)
+            barnService.gjenbrukBarn(forrigeBehandlingId = gjennbrukDataFraBehandlingId, nyBehandlingId = behandling.id)
 
         vilkårperiodeService.gjenbrukVilkårperioder(
-            forrigeBehandlingId = forrigeBehandlingId,
+            forrigeBehandlingId = gjennbrukDataFraBehandlingId,
             nyBehandlingId = behandling.id,
         )
 
         stønadsperiodeService.gjenbrukStønadsperioder(
-            forrigeBehandlingId = forrigeBehandlingId,
+            forrigeBehandlingId = gjennbrukDataFraBehandlingId,
             nyBehandlingId = behandling.id,
         )
 
         vilkårService.kopierVilkårsettTilNyBehandling(
-            forrigeBehandlingId = forrigeBehandlingId,
+            forrigeBehandlingId = gjennbrukDataFraBehandlingId,
             nyBehandling = behandling,
             barnIdMap = barnIder,
             stønadstype = Stønadstype.BARNETILSYN,
