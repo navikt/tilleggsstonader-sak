@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -69,7 +70,7 @@ internal class AutomatiskJournalføringServiceTest {
         arbeidsfordelingService = arbeidsfordelingService,
     )
 
-    val enhet = ArbeidsfordelingService.ENHET_NASJONAL_NAY.enhetNr
+    val enhet = ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY.enhetNr
     val personIdent = "123456789"
     val aktørId = "9876543210127"
     val tidligerePersonIdent = "9123456789"

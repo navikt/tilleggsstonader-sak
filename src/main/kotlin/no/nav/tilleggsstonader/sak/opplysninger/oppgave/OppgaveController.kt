@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_EGEN_ANSATT
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_STRENGT_FORTROLIG
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.OppgaveDto
@@ -60,6 +61,9 @@ class OppgaveController(
         val enheter = mutableListOf(ENHET_NR_NAY)
         if (tilgangService.harEgenAnsattRolle()) {
             enheter += ENHET_NR_EGEN_ANSATT
+        }
+        if (tilgangService.harStrengtFortroligRolle()) {
+            enheter += ENHET_NR_STRENGT_FORTROLIG
         }
         return oppgaveService.finnMapper(enheter = enheter)
     }

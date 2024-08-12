@@ -13,8 +13,9 @@ object OppgaveUtil {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    val ENHET_NR_NAY = "4462"
-    val ENHET_NR_EGEN_ANSATT = "4483"
+    val ENHET_NR_NAY = "4462" // Tilleggsstønad INN
+    val ENHET_NR_EGEN_ANSATT = "4483" // NAV Arbeid og ytelser Egne ansatte
+    val ENHET_NR_STRENGT_FORTROLIG = "2103" // NAV Vikafossen
 
     fun sekunderSidenEndret(oppgave: Oppgave): Long? {
         val endretTidspunkt = oppgave.endretTidspunkt

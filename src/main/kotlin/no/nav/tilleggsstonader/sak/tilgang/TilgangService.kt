@@ -169,6 +169,9 @@ class TilgangService(
     fun harEgenAnsattRolle(): Boolean =
         hentGrupperFraToken().contains(rolleConfig.egenAnsatt)
 
+    fun harStrengtFortroligRolle(): Boolean =
+        hentGrupperFraToken().contains(rolleConfig.kode6)
+
     /**
      * Filtrerer data basert på om man har tilgang til den eller ikke
      * Filtrer ikke på egen ansatt
