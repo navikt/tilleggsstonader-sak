@@ -45,7 +45,7 @@ class GjennbrukDataRevurderingService(
             forrigeBehandlingId = gjennbrukDataFraBehandlingId,
             nyBehandling = behandling,
             barnIdMap = barnIder,
-            stønadstype = Stønadstype.BARNETILSYN,
+            stønadstype = Stønadstype.BARNETILSYN, // TODO: Hent stønadstype fra behandling
         )
     }
 }
