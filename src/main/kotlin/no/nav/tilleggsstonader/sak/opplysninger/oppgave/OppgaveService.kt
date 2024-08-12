@@ -59,7 +59,17 @@ class OppgaveService(
             ?.let { personService.hentAktørId(it) }
 
         val enhet = finnOppgaveRequest.enhet ?: error("Enhet er påkrevd når man søker etter oppgaver")
-        val request = finnOppgaveRequest.tilFinnOppgaveRequest(aktørId, finnMappe(enhet, OppgaveMappe.PÅ_VENT))
+        // TODO fiks tilFinnOppgaveRequest til å ikke håndtere nullable når toggle fjernes
+        val klarmappe = if (unleashService.isEnabled(Toggle.OPPGAVE_BRUK_KLAR_MAPPE)) {
+            finnMappe(enhet, OppgaveMappe.KLAR)
+        } else {
+            null
+        }
+        val request = finnOppgaveRequest.tilFinnOppgaveRequest(
+            aktørId,
+            klarmappe = klarmappe,
+            ventemappe = finnMappe(enhet, OppgaveMappe.PÅ_VENT),
+        )
         return finnOppgaver(request)
     }
 

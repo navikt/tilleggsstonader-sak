@@ -347,12 +347,12 @@ internal class OppgaveServiceTest {
     }
 
     @Test
-    fun `skal ikke sette mappe når oppgaverPåVent er false`() {
+    fun `skal bruke klarmappe når oppgaverPåVent er false`() {
         every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(0, emptyList())
 
         oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, oppgaverPåVent = false, enhet = ENHET_NR_NAY))
 
-        verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == true }) }
+        verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == false }) }
     }
 
     private fun mockOpprettOppgave(slot: CapturingSlot<OpprettOppgaveRequest>) {
