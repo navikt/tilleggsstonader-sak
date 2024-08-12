@@ -47,8 +47,9 @@ class OppdaterMappePåVåreOppgaverController(
                 oppgaverPåVent = false,
                 limit = 1000,
             ).tilFinnOppgaveRequest(
-                aktørid = null,
-                ventemappe = oppgaveService.finnMappe(OppgaveUtil.ENHET_NR_NAY, OppgaveMappe.PÅ_VENT),
+                null,
+                oppgaveService.finnMappe(OppgaveUtil.ENHET_NR_NAY, OppgaveMappe.KLAR),
+                oppgaveService.finnMappe(OppgaveUtil.ENHET_NR_NAY, OppgaveMappe.PÅ_VENT),
             ),
         )
             .oppgaver
