@@ -179,7 +179,7 @@ class OppgaveClientConfig {
     )
 
     companion object {
-        const val MAPPE_ID_PÅ_VENT = 10
-        const val MAPPE_ID_KLAR = 20
+        const val MAPPE_ID_PÅ_VENT = 10L
+        const val MAPPE_ID_KLAR = 20L
     }
 }

@@ -59,7 +59,7 @@ data class FinnOppgaveRequestDto(
             fristTomDato = this.fristTom,
             aktivFomDato = null,
             aktivTomDato = null,
-            mappeId = if (this.oppgaverPåVent) ventemappe.id.toLong() else null,
+            mappeId = if (this.oppgaverPåVent) ventemappe.id else null,
             limit = this.limit,
             offset = this.offset,
             sorteringsrekkefolge = order,

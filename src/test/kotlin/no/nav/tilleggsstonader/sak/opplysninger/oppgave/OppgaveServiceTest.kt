@@ -156,7 +156,7 @@ internal class OppgaveServiceTest {
 
             oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
 
-            assertThat(slot.captured.mappeId).isEqualTo(OppgaveClientConfig.MAPPE_ID_KLAR.toLong())
+            assertThat(slot.captured.mappeId).isEqualTo(OppgaveClientConfig.MAPPE_ID_KLAR)
         }
 
         @Test
@@ -342,7 +342,7 @@ internal class OppgaveServiceTest {
 
         oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, oppgaverPåVent = true))
 
-        verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == false && it.mappeId == OppgaveClientConfig.MAPPE_ID_PÅ_VENT.toLong() }) }
+        verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == false && it.mappeId == OppgaveClientConfig.MAPPE_ID_PÅ_VENT }) }
     }
 
     @Test

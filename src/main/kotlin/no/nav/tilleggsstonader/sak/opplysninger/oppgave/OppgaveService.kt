@@ -309,7 +309,7 @@ class OppgaveService(
             }
             it.single()
         }
-        .id.toLong()
+        .id
 
     fun finnMapper(enheter: List<String>): List<MappeDto> {
         return enheter.flatMap { finnMapper(it) }

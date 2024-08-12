@@ -161,7 +161,7 @@ class SettPåVentService(
     ): OppdatertOppgaveResponse {
         val oppgave = hentOppgave(behandlingId)
 
-        val mappeId = oppgaveService.finnVentemappe().id.toLong()
+        val mappeId = oppgaveService.finnVentemappe().id
         val oppdatertOppgave = Oppgave(
             id = oppgave.id,
             versjon = oppgave.versjon,

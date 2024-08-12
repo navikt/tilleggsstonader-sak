@@ -87,7 +87,7 @@ class SettPåVentServiceTest : IntegrationTest() {
                     assertThat(beskrivelse).doesNotContain("ny beskrivelse")
                     assertThat(fristFerdigstillelse).isEqualTo(settPåVentDto.frist)
                     assertThat(tilordnetRessurs).isNull()
-                    assertThat(mappeId?.getOrNull()).isEqualTo(MAPPE_ID_PÅ_VENT.toLong())
+                    assertThat(mappeId?.getOrNull()).isEqualTo(MAPPE_ID_PÅ_VENT)
                 }
 
                 with(behandlingshistorikkService.finnSisteBehandlingshistorikk(behandling.id)) {
