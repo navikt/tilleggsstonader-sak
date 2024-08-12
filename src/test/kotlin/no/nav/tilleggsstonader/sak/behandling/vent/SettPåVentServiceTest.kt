@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_KLAR
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_PÅ_VENT
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.util.Optional
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
@@ -203,7 +205,7 @@ class SettPåVentServiceTest : IntegrationTest() {
                 assertThat(tilordnetRessurs).isEqualTo(tilordnetRessurs)
                 assertThat(beskrivelse).contains("Tatt av vent")
                 assertThat(fristFerdigstillelse).isEqualTo(osloDateNow())
-                assertThat(mappeId).isEmpty()
+                assertThat(mappeId).isEqualTo(Optional.of(MAPPE_ID_KLAR))
             }
         }
 
