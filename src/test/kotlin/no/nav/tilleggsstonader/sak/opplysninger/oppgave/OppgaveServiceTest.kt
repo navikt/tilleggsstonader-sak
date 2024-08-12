@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
@@ -183,7 +184,7 @@ internal class OppgaveServiceTest {
     @Test
     fun `Skal hente oppgaver gitt en filtrering`() {
         every { oppgaveClient.hentOppgaver(any()) } returns lagFinnOppgaveResponseDto()
-        val respons = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null))
+        val respons = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, enhet = ENHET_NR_NAY))
 
         assertThat(respons.antallTreffTotalt).isEqualTo(1)
         assertThat(respons.oppgaver.first().id).isEqualTo(GSAK_OPPGAVE_ID)
@@ -305,7 +306,7 @@ internal class OppgaveServiceTest {
                 lagEksternTestOppgave().copy(id = 3),
             ),
         )
-        val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = "01010172272")).oppgaver
+        val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = "01010172272", enhet = ENHET_NR_NAY)).oppgaver
 
         verify(exactly = 1) { personService.hentPersonKortBolk(eq(listOf("1"))) }
         assertThat(oppgaver.single { it.id == oppgaveIdMedNavn }.navn).contains("fornavn1 ")
@@ -330,7 +331,7 @@ internal class OppgaveServiceTest {
                 .map { OppgaveMetadata(it, behandlingId, null) }
         }
 
-        val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null)).oppgaver
+        val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, enhet = ENHET_NR_NAY)).oppgaver
 
         assertThat(oppgaver.single { it.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingId)
         assertThat(oppgaver.single { it.id != oppgaveIdMedBehandling }.behandlingId).isNull()
@@ -340,7 +341,7 @@ internal class OppgaveServiceTest {
     fun `skal finne oppgaver på vent når`() {
         every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(0, emptyList())
 
-        oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, oppgaverPåVent = true))
+        oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, oppgaverPåVent = true, enhet = ENHET_NR_NAY))
 
         verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == false && it.mappeId == OppgaveClientConfig.MAPPE_ID_PÅ_VENT }) }
     }
@@ -349,7 +350,7 @@ internal class OppgaveServiceTest {
     fun `skal ikke sette mappe når oppgaverPåVent er false`() {
         every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(0, emptyList())
 
-        oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, oppgaverPåVent = false))
+        oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, oppgaverPåVent = false, enhet = ENHET_NR_NAY))
 
         verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == true }) }
     }
