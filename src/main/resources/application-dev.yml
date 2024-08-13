@@ -14,7 +14,7 @@ DVH_BEHANDLING_TOPIC: tilleggsstonader.aapen-tilleggsstonader-dvh-behandling-tes
 
 clients:
   pdl:
-    uri: https://pdl-api-q1.${CLIENT_ENV}-fss-pub.nais.io
-    scope: api://${CLIENT_ENV}-fss.pdl.pdl-api-q1/.default
+    uri: https://pdl-api.${CLIENT_ENV}-fss-pub.nais.io
+    scope: api://${CLIENT_ENV}-fss.pdl.pdl-api/.default
   kodeverk:
     uri: https://kodeverk-api.nav.no
