@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdat
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
 import java.util.UUID
 
 /**
@@ -173,23 +172,4 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
         personidenter: Collection<String>,
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     ): List<Pair<String, UUID>>
-
-    // language=PostgreSQL
-    @Query(
-        """
-        SELECT b.*, f.stonadstype
-        FROM behandling b
-        JOIN fagsak f ON f.id = b.fagsak_id
-        JOIN oppgave o on b.id = o.behandling_id
-        WHERE NOT b.status = 'FERDIGSTILT'
-        AND o.ferdigstilt = false
-        AND o.type in ('BehandleSak', 'GodkjenneVedtak', 'BehandleUnderkjentVedtak')
-        AND o.opprettet_tid < :opprettetTidFør
-        AND f.stonadstype=:stønadstype
-        """,
-    )
-    fun hentUferdigeBehandlingerOpprettetFørDato(
-        stønadstype: Stønadstype,
-        opprettetTidFør: LocalDateTime,
-    ): List<Behandling>
 }

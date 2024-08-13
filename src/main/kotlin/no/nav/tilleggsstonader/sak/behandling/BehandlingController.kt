@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
@@ -67,18 +66,6 @@ class BehandlingController(
             identStønadstype.ident,
             identStønadstype.stønadstype,
         )
-    }
-
-    @GetMapping("gamle-behandlinger")
-    fun hentGamleUferdigeBehandlinger(): List<BehandlingDto> {
-        val stønadstyper = Stønadstype.values()
-        val gamleBehandlinger = stønadstyper.flatMap { stønadstype ->
-            behandlingService.hentUferdigeBehandlingerOpprettetFørDato(stønadstype).map {
-                val fagsak = fagsakService.hentFagsak(it.fagsakId)
-                it.tilDto(stønadstype, fagsak.fagsakPersonId)
-            }
-        }
-        return gamleBehandlinger
     }
 
     /*@PostMapping("{behandlingId}/vent")
