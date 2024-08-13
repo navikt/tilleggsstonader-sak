@@ -28,7 +28,6 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -66,7 +65,6 @@ internal class OppgaveServiceTest {
             arbeidsfordelingService = arbeidsfordelingService,
             cacheManager = cacheManager,
             personService = personService,
-            unleashService = mockUnleashService(),
         )
 
     val opprettOppgaveDomainSlot = slot<OppgaveDomain>()
