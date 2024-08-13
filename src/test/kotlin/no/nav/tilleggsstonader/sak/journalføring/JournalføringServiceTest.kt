@@ -14,13 +14,20 @@ import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariant
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -31,12 +38,15 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class JournalføringServiceTest {
 
@@ -49,6 +59,7 @@ class JournalføringServiceTest {
     val personService = mockk<PersonService>()
     val oppgaveService = mockk<OppgaveService>()
     val unleashService = mockk<UnleashService>()
+    val gjennbrukDataRevurderingService = mockk<GjennbrukDataRevurderingService>(relaxed = true)
 
     val journalføringService = JournalføringService(
         behandlingService,
@@ -61,6 +72,7 @@ class JournalføringServiceTest {
         personService,
         oppgaveService,
         unleashService,
+        gjennbrukDataRevurderingService,
     )
 
     val enhet = ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY.enhetNr
@@ -116,7 +128,16 @@ class JournalføringServiceTest {
     @Test
     internal fun `skal kunne journalføre og opprette behandling`() {
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
-        every { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any(), any()) } just Runs
+        every {
+            journalpostService.oppdaterOgFerdigstillJournalpost(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        } just Runs
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
 
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
@@ -175,12 +196,120 @@ class JournalføringServiceTest {
 
         val nyAvsenderSlot = slot<AvsenderMottaker?>()
 
-        every { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any(), any(), captureNullable(nyAvsenderSlot)) } just Runs
+        every {
+            journalpostService.oppdaterOgFerdigstillJournalpost(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                captureNullable(nyAvsenderSlot),
+            )
+        } just Runs
 
         journalføringService.fullførJournalpost(journalføringRequest, journalpost)
 
         Assertions.assertThat(nyAvsenderSlot.captured!!.navn).isEqualTo(nyAvsender.navn)
         Assertions.assertThat(nyAvsenderSlot.captured!!.id).isEqualTo(nyAvsender.personIdent)
         Assertions.assertThat(nyAvsenderSlot.captured!!.idType).isEqualTo(BrukerIdType.FNR)
+    }
+
+    @Nested
+    inner class GjennbrukRevudering {
+
+        val forrigeBehandling =
+            behandling(
+                fagsak = fagsak,
+                resultat = BehandlingResultat.INNVILGET,
+                status = BehandlingStatus.FERDIGSTILT,
+            )
+        val nyBehandling = behandling(fagsak = fagsak)
+        val barn1 = SøknadBarn(ident = "123456789", data = mockk())
+        val barn2 = SøknadBarn(ident = "987654321", data = mockk())
+        val eksisterendeBarn = listOf(barn1, barn2)
+
+        @BeforeEach
+        fun setUp() {
+            every { journalpostService.hentJournalpost(journalpostId) } returns journalpost.copy(
+                dokumenter = listOf(
+                    DokumentInfo(
+                        "",
+                        brevkode = DokumentBrevkode.BARNETILSYN.verdi,
+                        dokumentvarianter = listOf(Dokumentvariant(variantformat = Dokumentvariantformat.ORIGINAL, null, true)),
+                    ),
+                ),
+            )
+            every { personService.hentPersonIdenter(any()) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
+            every { behandlingService.finnSisteIverksatteBehandling(any()) } returns forrigeBehandling
+            every { behandlingService.opprettBehandling(any(), any(), any(), any()) } returns nyBehandling
+            every { behandlingService.leggTilBehandlingsjournalpost(any(), any(), any()) } just Runs
+            every {
+                journalpostService.oppdaterOgFerdigstillJournalpost(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                )
+            } just Runs
+            every { behandlingService.hentBehandlinger(any<UUID>()) } returns listOf(forrigeBehandling)
+            every { journalpostService.hentSøknadFraJournalpost(any()) } returns mockk()
+            every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
+            every { barnService.finnBarnPåBehandling(nyBehandling.id) } returns eksisterendeBarn.map { it.tilBehandlingBarn() }
+            every { søknadService.hentSøknadBarnetilsyn(nyBehandling.id) } returns mockk() {
+                every { barn } returns setOf(barn1, barn2)
+            }
+            every { barnService.opprettBarn(any()) } returns mockk()
+        }
+
+        @Test
+        fun `skal gjennbruke data fra tidligere behandling`() {
+            journalføringService.journalførTilNyBehandling(
+                journalpost.journalpostId,
+                personIdent,
+                Stønadstype.BARNETILSYN,
+                BehandlingÅrsak.NYE_OPPLYSNINGER,
+                "",
+                "4462",
+            )
+
+            verify(exactly = 1) {
+                gjennbrukDataRevurderingService.gjenbrukData(
+                    nyBehandling,
+                    forrigeBehandling.id,
+                )
+            }
+        }
+
+        @Test
+        fun `skal ta med nye barn fra søknad`() {
+            val barn3 = SøknadBarn(ident = "nyttBarn", data = mockk())
+
+            every { søknadService.hentSøknadBarnetilsyn(nyBehandling.id) } returns mockk() {
+                every { barn } returns setOf(barn1, barn2, barn3)
+            }
+
+            val barnSlot = slot<List<BehandlingBarn>>()
+            every { barnService.opprettBarn(capture(barnSlot)) } returns mockk()
+
+            journalføringService.journalførTilNyBehandling(
+                journalpost.journalpostId,
+                personIdent,
+                Stønadstype.BARNETILSYN,
+                BehandlingÅrsak.NYE_OPPLYSNINGER,
+                "",
+                "4462",
+            )
+
+            Assertions.assertThat(barnSlot.captured).size().isEqualTo(1)
+            Assertions.assertThat(barnSlot.captured.first().ident).isEqualTo(barn3.ident)
+        }
+
+        private fun SøknadBarn.tilBehandlingBarn() = BehandlingBarn(
+            ident = ident,
+            behandlingId = nyBehandling.id,
+        )
     }
 }

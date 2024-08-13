@@ -180,7 +180,6 @@ class OpprettTestBehandlingController(
             BehandlingBarn(
                 behandlingId = behandling.id,
                 ident = barn.ident,
-                søknadBarnId = barn.id,
             )
         }
         barnService.opprettBarn(behandlingBarn)

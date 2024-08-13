@@ -11,7 +11,6 @@ fun søknadBarnTilBehandlingBarn(barn: Collection<SøknadBarn>, behandlingId: UU
 
 fun SøknadBarn.tilBehandlingBarn(behandlingId: UUID) = BehandlingBarn(
     behandlingId = behandlingId,
-    søknadBarnId = this.id,
     ident = this.ident,
 )
 /*
