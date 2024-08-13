@@ -229,17 +229,17 @@ class JournalføringService(
         personIdent: String,
     ) {
         feilHvis(journalpost.bruker == null) {
-            "Journalposten mangler bruker. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
+            "Journalposten mangler bruker. Kan ikke journalføre ${journalpost.journalpostId}"
         }
 
         feilHvis(journalpost.journalstatus != Journalstatus.MOTTATT) {
-            "Journalposten har ugyldig journalstatus ${journalpost.journalstatus}. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
+            "Journalposten har ugyldig journalstatus ${journalpost.journalstatus}. Kan ikke journalføre ${journalpost.journalpostId}"
         }
 
         journalpost.bruker?.let {
             val allePersonIdenter = personService.hentPersonIdenter(personIdent).identer()
             feilHvisIkke(fagsakPersonOgJournalpostBrukerErSammePerson(allePersonIdenter, personIdent, it)) {
-                "Ikke samsvar mellom personident på journalposten og personen vi forsøker å opprette behandling for. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
+                "Ikke samsvar mellom personident på journalposten og personen vi forsøker å opprette behandling for. Kan ikke journalføre ${journalpost.journalpostId}"
             }
         }
     }
