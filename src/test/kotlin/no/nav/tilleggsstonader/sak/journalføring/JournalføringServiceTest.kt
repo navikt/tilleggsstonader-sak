@@ -20,7 +20,10 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -33,10 +36,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.journalpost
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class JournalføringServiceTest {
 
@@ -49,6 +55,7 @@ class JournalføringServiceTest {
     val personService = mockk<PersonService>()
     val oppgaveService = mockk<OppgaveService>()
     val unleashService = mockk<UnleashService>()
+    val gjennbrukDataRevurderingService = mockk<GjennbrukDataRevurderingService>(relaxed = true)
 
     val journalføringService = JournalføringService(
         behandlingService,
@@ -61,6 +68,7 @@ class JournalføringServiceTest {
         personService,
         oppgaveService,
         unleashService,
+        gjennbrukDataRevurderingService,
     )
 
     val enhet = ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY.enhetNr
@@ -116,7 +124,16 @@ class JournalføringServiceTest {
     @Test
     internal fun `skal kunne journalføre og opprette behandling`() {
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
-        every { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any(), any()) } just Runs
+        every {
+            journalpostService.oppdaterOgFerdigstillJournalpost(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        } just Runs
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
 
         every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
@@ -175,7 +192,17 @@ class JournalføringServiceTest {
 
         val nyAvsenderSlot = slot<AvsenderMottaker?>()
 
-        every { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any(), any(), captureNullable(nyAvsenderSlot)) } just Runs
+        every {
+            journalpostService.oppdaterOgFerdigstillJournalpost(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                captureNullable(nyAvsenderSlot)
+            )
+        } just Runs
 
         journalføringService.fullførJournalpost(journalføringRequest, journalpost)
 
@@ -183,4 +210,42 @@ class JournalføringServiceTest {
         Assertions.assertThat(nyAvsenderSlot.captured!!.id).isEqualTo(nyAvsender.personIdent)
         Assertions.assertThat(nyAvsenderSlot.captured!!.idType).isEqualTo(BrukerIdType.FNR)
     }
+
+    @Test
+    fun `skal gjennbruke data fra tidligere behandling`() {
+
+        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
+        every { personService.hentPersonIdenter(any()) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
+        val forrigeBehandling =
+            behandling(fagsak = fagsak, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT)
+        every { behandlingService.finnSisteIverksatteBehandling(any()) } returns forrigeBehandling
+        val nyBehandling = behandling(fagsak = fagsak)
+        every { behandlingService.opprettBehandling(any(), any(), any(), any()) } returns nyBehandling
+        every { behandlingService.leggTilBehandlingsjournalpost(any(), any(), any()) } just Runs
+        every { behandlingService.hentBehandlinger(any<UUID>()) } returns listOf(forrigeBehandling)
+        every { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any(), any()) } just Runs
+
+        val journalpost = journalpost(journalpostId = "1")
+        val saksbehandling = saksbehandling()
+
+
+        journalføringService.journalførTilNyBehandling(
+            journalpost.journalpostId,
+            saksbehandling.ident,
+            saksbehandling.stønadstype,
+            BehandlingÅrsak.NYE_OPPLYSNINGER,
+            "",
+            "4462"
+        )
+
+        verify(exactly = 1) {
+            gjennbrukDataRevurderingService.gjenbrukData(
+                nyBehandling,
+                forrigeBehandling.id,
+            )
+        }
+
+
+    }
+
 }

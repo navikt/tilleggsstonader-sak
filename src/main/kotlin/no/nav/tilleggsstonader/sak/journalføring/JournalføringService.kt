@@ -10,6 +10,8 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sisteFerdigstilteBehandling
+import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -49,6 +51,7 @@ class JournalføringService(
     private val personService: PersonService,
     private val oppgaveService: OppgaveService,
     private val unleashService: UnleashService,
+    private val gjennbrukDataRevurderingService: GjennbrukDataRevurderingService,
 ) {
 
     @Transactional
@@ -115,6 +118,14 @@ class JournalføringService(
         if (journalpost.harStrukturertSøknad()) {
             lagreSøknadOgBarn(journalpost, behandling)
         }
+
+        val forrigeBehandling = behandlingService.hentBehandlinger(behandling.fagsakId).sisteFerdigstilteBehandling()
+
+        if (forrigeBehandling != null) {
+            gjennbrukDataRevurderingService.gjenbrukData(behandling, forrigeBehandling.id)
+        }
+
+
 
         ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
 
