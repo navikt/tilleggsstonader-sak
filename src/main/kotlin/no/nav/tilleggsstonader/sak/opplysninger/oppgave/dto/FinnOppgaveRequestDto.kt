@@ -24,12 +24,11 @@ data class FinnOppgaveRequestDto(
     val opprettetTom: LocalDate? = null,
     val fristFom: LocalDate? = null,
     val fristTom: LocalDate? = null,
-    val enhetsmappe: Long? = null, // TODO slett?
     val ident: String?,
-    val limit: Long = 150, // TODO slett når frontend implementert limit og offset
-    val offset: Long = 0, // TODO slett når frontend implementert limit og offset
-    val orderBy: Sorteringsfelt = Sorteringsfelt.OPPRETTET_TIDSPUNKT, // TODO slett når frontend implementert
-    val order: Sorteringsrekkefølge = Sorteringsrekkefølge.ASC, // TODO slett når frontend implementert
+    val limit: Long = 150,
+    val offset: Long = 0,
+    val orderBy: Sorteringsfelt = Sorteringsfelt.OPPRETTET_TIDSPUNKT,
+    val order: Sorteringsrekkefølge = Sorteringsrekkefølge.ASC,
     val oppgaverPåVent: Boolean = false,
 ) {
 
