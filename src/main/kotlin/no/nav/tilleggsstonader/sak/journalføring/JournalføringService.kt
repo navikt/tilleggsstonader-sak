@@ -115,14 +115,14 @@ class JournalføringService(
             behandlingÅrsak = behandlingÅrsak,
         )
 
-        if (journalpost.harStrukturertSøknad()) {
-            lagreSøknadOgBarn(journalpost, behandling)
-        }
-
         val forrigeBehandling = behandlingService.hentBehandlinger(behandling.fagsakId).sisteFerdigstilteBehandling()
 
         if (forrigeBehandling != null) {
             gjennbrukDataRevurderingService.gjenbrukData(behandling, forrigeBehandling.id)
+        }
+
+        if (journalpost.harStrukturertSøknad()) {
+            lagreSøknadOgNyeBarn(journalpost, behandling)
         }
 
         ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
@@ -201,19 +201,26 @@ class JournalføringService(
         return behandling
     }
 
-    private fun lagreSøknadOgBarn(
+    private fun lagreSøknadOgNyeBarn(
         journalpost: Journalpost,
         behandling: Behandling,
     ) {
         lagreSøknad(journalpost, behandling.id)
-        val barn = søknadService.hentSøknadBarnetilsyn(behandling.id)?.barn?.map {
-            BehandlingBarn(
-                behandlingId = behandling.id,
-                ident = it.ident,
-            )
-        } ?: error("Søknad mangler barn")
+        val eksisterendeBarn = barnService.finnBarnPåBehandling(behandling.id)
 
-        barnService.opprettBarn(barn)
+        val nyeBarn = søknadService.hentSøknadBarnetilsyn(behandling.id)?.barn
+            ?.filterNot { barn -> eksisterendeBarn.any { it.ident == barn.ident } }?.map {
+                BehandlingBarn(
+                    behandlingId = behandling.id,
+                    ident = it.ident,
+                )
+            } ?: emptyList()
+
+        feilHvis(nyeBarn.isEmpty() && eksisterendeBarn.isEmpty()) {
+            "Kan ikke opprette behandling uten barn"
+        }
+
+        barnService.opprettBarn(nyeBarn)
     }
 
     private fun lagreSøknad(journalpost: Journalpost, behandlingId: UUID) {
