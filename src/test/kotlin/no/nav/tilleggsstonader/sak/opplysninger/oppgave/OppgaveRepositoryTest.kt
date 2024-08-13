@@ -242,4 +242,41 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
             )
         }
     }
+
+    @Test
+    fun `finnOppgaverSomIkkeErFerdigstilte skal hente oppgaver som ikke er ferdigstilte`() {
+        val fagsak1 = testoppsettService.lagreFagsak(fagsak())
+        val fagsak2 = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("2"))))
+        val behandling1 = testoppsettService.lagre(behandling(fagsak1), opprettGrunnlagsdata = false)
+        val behandling2 = testoppsettService.lagre(behandling(fagsak2), opprettGrunnlagsdata = false)
+
+        oppgaveRepository.insert(
+            OppgaveDomain(
+                behandlingId = behandling1.id,
+                type = Oppgavetype.BehandleSak,
+                gsakOppgaveId = 1,
+            ),
+        )
+        oppgaveRepository.insert(
+            OppgaveDomain(
+                behandlingId = behandling2.id,
+                type = Oppgavetype.BehandleUnderkjentVedtak,
+                gsakOppgaveId = 2,
+                erFerdigstilt = true,
+            ),
+        )
+        oppgaveRepository.insert(
+            OppgaveDomain(
+                gsakOppgaveId = 3,
+                type = Oppgavetype.Journalføring,
+                behandlingId = null,
+            ),
+        )
+
+        assertThat(oppgaveRepository.finnOppgaverSomIkkeErFerdigstilte())
+            .containsExactlyInAnyOrder(
+                Pair(1, behandling1.id),
+                Pair(3, null),
+            )
+    }
 }

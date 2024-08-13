@@ -3,14 +3,12 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDateTime
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
@@ -29,7 +26,6 @@ import kotlin.jvm.optionals.getOrNull
 class OppdaterMappePåVåreOppgaverController(
     private val oppgaveClient: OppgaveClient,
     private val oppgaveService: OppgaveService,
-    private val behandlingRepository: BehandlingRepository,
     private val oppgaveRepository: OppgaveRepository,
 ) {
 
@@ -100,28 +96,18 @@ class OppdaterMappePåVåreOppgaverController(
     fun oppdaterAlle(): Map<Long, Boolean> {
         utførEndringSomSystem() // Skal patche oppgaver som systembruker
 
-        return behandlingRepository.hentUferdigeBehandlingerOpprettetFørDato(
-            Stønadstype.BARNETILSYN,
-            LocalDateTime.now(),
-        )
-            .mapNotNull {
-                val oppgaveDomain = oppgaveService.finnSisteOppgaveForBehandling(it.id)
-                if (oppgaveDomain == null) {
-                    logger.warn("Finner ikke oppgave for behandling=${it.id}")
-                }
-                oppgaveDomain
-            }.associate {
-                try {
-                    val oppgave = oppgaveService.hentOppgave(it.gsakOppgaveId)
-                    it.gsakOppgaveId to oppdaterMappe(oppgave)
-                } catch (e: Exception) {
-                    val feilmelding =
-                        "Feilet oppdatering av oppgave for behandling=${it.behandlingId} oppgave=${it.gsakOppgaveId}"
-                    logger.warn(feilmelding)
-                    secureLogger.warn(feilmelding, e)
-                    it.gsakOppgaveId to false
-                }
+        return oppgaveRepository.finnOppgaverSomIkkeErFerdigstilte().associate { (oppgaveId, behandlingId) ->
+            try {
+                val oppgave = oppgaveService.hentOppgave(oppgaveId)
+                oppgaveId to oppdaterMappe(oppgave)
+            } catch (e: Exception) {
+                val feilmelding =
+                    "Feilet oppdatering av oppgave for behandling=$behandlingId oppgave=$oppgaveId"
+                logger.warn(feilmelding)
+                secureLogger.warn(feilmelding, e)
+                oppgaveId to false
             }
+        }
     }
 
     private fun oppdaterMappe(oppgave: Oppgave): Boolean {

@@ -36,4 +36,13 @@ interface OppgaveRepository : RepositoryInterface<OppgaveDomain, UUID>, InsertUp
         """,
     )
     fun finnOppgaveMetadata(oppgaveIder: Collection<Long>): List<OppgaveMetadata>
+
+    @Query(
+        """
+        SELECT gsak_oppgave_id AS first, behandling_id AS second
+         FROM oppgave 
+         WHERE er_ferdigstilt = false;
+    """,
+    )
+    fun finnOppgaverSomIkkeErFerdigstilte(): List<Pair<Long, UUID?>>
 }
