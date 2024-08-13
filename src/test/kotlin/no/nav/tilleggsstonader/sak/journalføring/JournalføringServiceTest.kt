@@ -131,7 +131,7 @@ class JournalføringServiceTest {
                 any(),
                 any(),
                 any(),
-                any()
+                any(),
             )
         } just Runs
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
@@ -200,7 +200,7 @@ class JournalføringServiceTest {
                 any(),
                 any(),
                 any(),
-                captureNullable(nyAvsenderSlot)
+                captureNullable(nyAvsenderSlot),
             )
         } just Runs
 
@@ -213,7 +213,6 @@ class JournalføringServiceTest {
 
     @Test
     fun `skal gjennbruke data fra tidligere behandling`() {
-
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
         every { personService.hentPersonIdenter(any()) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
         val forrigeBehandling =
@@ -228,14 +227,13 @@ class JournalføringServiceTest {
         val journalpost = journalpost(journalpostId = "1")
         val saksbehandling = saksbehandling()
 
-
         journalføringService.journalførTilNyBehandling(
             journalpost.journalpostId,
             saksbehandling.ident,
             saksbehandling.stønadstype,
             BehandlingÅrsak.NYE_OPPLYSNINGER,
             "",
-            "4462"
+            "4462",
         )
 
         verify(exactly = 1) {
@@ -244,8 +242,5 @@ class JournalføringServiceTest {
                 forrigeBehandling.id,
             )
         }
-
-
     }
-
 }

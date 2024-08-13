@@ -125,8 +125,6 @@ class JournalføringService(
             gjennbrukDataRevurderingService.gjenbrukData(behandling, forrigeBehandling.id)
         }
 
-
-
         ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
 
         taskService.save(
