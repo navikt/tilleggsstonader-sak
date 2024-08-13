@@ -14,8 +14,6 @@ data class BehandlingBarn(
     val id: UUID = UUID.randomUUID(),
     val behandlingId: UUID,
     val ident: String,
-    @Column("soknad_barn_id")
-    val søknadBarnId: UUID? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 ) {

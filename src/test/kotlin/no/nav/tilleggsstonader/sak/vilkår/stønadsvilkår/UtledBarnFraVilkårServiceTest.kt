@@ -9,9 +9,8 @@ internal class UtledBarnFraVilkårServiceTest {
 
     @Test
     internal fun `skal finne ny barnId for barn for barn fra søknaden`() {
-        val søknadBarnId = UUID.randomUUID()
-        val tidligereBarn = opprettBarn(søknadBarnId = søknadBarnId)
-        val nyttBarn = opprettBarn(søknadBarnId = søknadBarnId)
+        val tidligereBarn = opprettBarn()
+        val nyttBarn = opprettBarn()
         val alleBarnPåForrigeBehandling = listOf(tidligereBarn)
         val alleBarnPåGjeldendeBehandling = listOf(nyttBarn)
         val utledetBarnIdMap = VilkårService.byggBarnMapFraTidligereTilNyId(
@@ -24,10 +23,9 @@ internal class UtledBarnFraVilkårServiceTest {
 
     @Test
     internal fun `skal finne ny barnId for barn for barn fra søknaden og ikke for nytt barn`() {
-        val søknadBarnId = UUID.randomUUID()
-        val tidligereBarn = opprettBarn(søknadBarnId = søknadBarnId)
-        val nyttBarnA = opprettBarn(søknadBarnId = søknadBarnId)
-        val nyttBarnB = opprettBarn(søknadBarnId = søknadBarnId)
+        val tidligereBarn = opprettBarn()
+        val nyttBarnA = opprettBarn()
+        val nyttBarnB = opprettBarn()
         val alleBarnPåForrigeBehandling = listOf(tidligereBarn)
         val alleBarnPåGjeldendeBehandling = listOf(nyttBarnA, nyttBarnB)
         val utledetBarnIdMap = VilkårService.byggBarnMapFraTidligereTilNyId(
@@ -59,12 +57,10 @@ internal class UtledBarnFraVilkårServiceTest {
     }
 
     private fun opprettBarn(
-        søknadBarnId: UUID? = null,
         navn: String = "navn",
         personIdent: String = "barnid",
     ): BehandlingBarn = BehandlingBarn(
         behandlingId = UUID.randomUUID(),
-        søknadBarnId = søknadBarnId,
         ident = personIdent,
     )
 }
