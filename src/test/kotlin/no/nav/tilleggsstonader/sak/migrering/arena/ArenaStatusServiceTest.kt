@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
@@ -29,8 +30,10 @@ class ArenaStatusServiceTest {
     val arenaStatusService = ArenaStatusService(
         personService = personService,
         fagsakService = fagsakService,
+        fagsakPersonService = mockk(),
         behandlingService = behandlingService,
         søknadRoutingService = søknadRoutingService,
+        unleashService = mockUnleashService(),
     )
 
     val ident = "ident"

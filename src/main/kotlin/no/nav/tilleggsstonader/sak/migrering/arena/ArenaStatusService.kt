@@ -2,8 +2,11 @@ package no.nav.tilleggsstonader.sak.migrering.arena
 
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
@@ -19,8 +22,10 @@ import org.springframework.stereotype.Service
 class ArenaStatusService(
     private val personService: PersonService,
     private val fagsakService: FagsakService,
+    private val fagsakPersonService: FagsakPersonService,
     private val behandlingService: BehandlingService,
     private val søknadRoutingService: SøknadRoutingService,
+    private val unleashService: UnleashService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -39,11 +44,22 @@ class ArenaStatusService(
             logger.info("Sjekker om person finnes i ny løsning finnes=true harBehandling")
             return true
         }
+        if (skalKunneOppretteSakIArenaForPerson(identer)) {
+            return false
+        }
         if (harRouting(identer, request.stønadstype)) {
             logger.info("Sjekker om person finnes i ny løsning finnes=true harRouting")
             return true
         }
         return false
+    }
+
+    private fun skalKunneOppretteSakIArenaForPerson(identer: Set<String>): Boolean {
+        val fagsakPersonId = fagsakPersonService.finnPerson(identer)?.id
+        return fagsakPersonId != null && unleashService.isEnabled(
+            Toggle.ARENA_STATUS_FAGSAK_PERSON,
+            mapOf("fagsakPersonId" to fagsakPersonId.toString()),
+        )
     }
 
     /**
