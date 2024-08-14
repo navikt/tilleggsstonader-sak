@@ -36,16 +36,17 @@ class ArenaStatusService(
 
     private fun finnesPerson(request: ArenaFinnesPersonRequest): Boolean {
         val identer = personService.hentPersonIdenter(request.ident).identer().toSet()
-        if (skalBehandlesITsSak(request.stønadstype)) {
-            logger.info("Skal ikke behandle ${request.stønadstype} i Arena")
-            return true
-        }
+
         if (harBehandling(identer, request.stønadstype)) {
             logger.info("Sjekker om person finnes i ny løsning finnes=true harBehandling")
             return true
         }
         if (skalKunneOppretteSakIArenaForPerson(identer)) {
             return false
+        }
+        if (skalBehandlesITsSak(request.stønadstype)) {
+            logger.info("Skal ikke behandle ${request.stønadstype} i Arena")
+            return true
         }
         if (harRouting(identer, request.stønadstype)) {
             logger.info("Sjekker om person finnes i ny løsning finnes=true harRouting")
