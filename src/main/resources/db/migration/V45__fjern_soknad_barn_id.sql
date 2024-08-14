@@ -1,0 +1,1 @@
+ALTER TABLE behandling_barn DROP COLUMN soknad_barn_id;

@@ -166,7 +166,6 @@ fun behandlingBarn(
 ) = BehandlingBarn(
     id = id,
     behandlingId = behandlingId,
-    søknadBarnId = søknadBarnId,
     ident = personIdent,
 )
 
