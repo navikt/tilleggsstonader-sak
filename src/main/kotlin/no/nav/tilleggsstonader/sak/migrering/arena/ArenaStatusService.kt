@@ -2,16 +2,15 @@ package no.nav.tilleggsstonader.sak.migrering.arena
 
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 /**
  * Arena kaller på oss for å sjekke om personen finnes i ny løsning.
@@ -25,7 +24,6 @@ class ArenaStatusService(
     private val fagsakPersonService: FagsakPersonService,
     private val behandlingService: BehandlingService,
     private val søknadRoutingService: SøknadRoutingService,
-    private val unleashService: UnleashService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -57,9 +55,8 @@ class ArenaStatusService(
 
     private fun skalKunneOppretteSakIArenaForPerson(identer: Set<String>): Boolean {
         val fagsakPersonId = fagsakPersonService.finnPerson(identer)?.id
-        return fagsakPersonId != null && unleashService.isEnabled(
-            Toggle.ARENA_STATUS_FAGSAK_PERSON,
-            mapOf("fagsakPersonId" to fagsakPersonId.toString()),
+        return fagsakPersonId in setOf(
+            UUID.fromString("8eb563de-9035-4390-8993-42ebfa5a5aa7"),
         )
     }
 
