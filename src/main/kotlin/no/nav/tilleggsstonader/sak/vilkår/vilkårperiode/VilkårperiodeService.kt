@@ -146,7 +146,7 @@ class VilkårperiodeService(
 
         return GrunnlagYtelse(
             perioder = ytelserFraRegister.perioder
-                .filter { it.aapAktivitetsfase != "Ferdig avklart" }
+                .filter { it.aapErFerdigAvklart != true }
                 .map {
                     PeriodeGrunnlagYtelse(
                         type = it.type,

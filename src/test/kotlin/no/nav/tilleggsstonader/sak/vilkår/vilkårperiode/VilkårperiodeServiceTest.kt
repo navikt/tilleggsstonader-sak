@@ -2,6 +2,9 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
@@ -13,6 +16,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.AktivitetClientConfig.Companion.resetMock
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetClient
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -40,6 +44,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.assertj.core.api.Assertions.assertThat
@@ -50,6 +55,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.time.LocalDate.now
 import java.util.UUID
 
 class VilkårperiodeServiceTest : IntegrationTest() {
@@ -71,6 +77,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var aktivitetClient: AktivitetClient
+
+    @Autowired
+    lateinit var ytelseClient: YtelseClient
 
     @AfterEach
     override fun tearDown() {
@@ -752,6 +761,31 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             testWithBrukerContext(groups = listOf(rolleConfig.saksbehandlerRolle)) {
                 vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
             }
+        }
+
+        @Test
+        fun `skal ikke ta ta med ferdig avklarte perioder fra AAP som grunnlag`() {
+            val nesteDag = now().plusDays(1) // for å få 2 ulike AAP-perioder
+            every {
+                ytelseClient.hentYtelser(any())
+            } returns YtelsePerioderDto(
+                perioder = listOf(
+                    YtelsePeriode(TypeYtelsePeriode.AAP, now(), now(), aapErFerdigAvklart = false),
+                    YtelsePeriode(TypeYtelsePeriode.AAP, nesteDag, nesteDag, aapErFerdigAvklart = true),
+                    YtelsePeriode(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), aapErFerdigAvklart = null),
+                ),
+                hentetInformasjon = emptyList(),
+            )
+
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
+
+            val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
+            val perioder = grunnlag!!.grunnlag.ytelse.perioder
+            assertThat(perioder).containsExactlyInAnyOrder(
+                PeriodeGrunnlagYtelse(TypeYtelsePeriode.AAP, now(), now()),
+                PeriodeGrunnlagYtelse(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now()),
+            )
         }
     }
 

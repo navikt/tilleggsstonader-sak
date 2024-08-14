@@ -29,7 +29,15 @@ class YtelseClientConfig {
 
             val perioder = request.typer.map {
                 YtelsePeriode(type = it, fom = LocalDate.now(), tom = LocalDate.now())
-            } + YtelsePeriode(type = TypeYtelsePeriode.AAP, fom = LocalDate.now(), tom = LocalDate.now(), aapAktivitetsfase = "Ferdig avklart")
+            }.toMutableList()
+            if (request.typer.contains(TypeYtelsePeriode.AAP)) {
+                perioder += YtelsePeriode(
+                    type = TypeYtelsePeriode.AAP,
+                    fom = LocalDate.now().plusDays(1),
+                    tom = LocalDate.now().plusDays(1),
+                    aapErFerdigAvklart = true,
+                )
+            }
             val hentetInformasjon = request.typer.map {
                 HentetInformasjon(type = it, status = StatusHentetInformasjon.OK)
             }
