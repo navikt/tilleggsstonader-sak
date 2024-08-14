@@ -34,7 +34,7 @@ data class FinnOppgaveRequestDto(
 
     fun tilFinnOppgaveRequest(
         aktørid: String? = null,
-        klarmappe: MappeDto?,
+        klarmappe: MappeDto,
         ventemappe: MappeDto,
     ): FinnOppgaveRequest {
         return FinnOppgaveRequest(
@@ -50,7 +50,7 @@ data class FinnOppgaveRequestDto(
                 null
             },
             enhet = this.enhet,
-            erUtenMappe = if (klarmappe != null) false else !this.oppgaverPåVent,
+            erUtenMappe = false,
             saksbehandler = this.saksbehandler,
             aktørId = aktørid,
             journalpostId = this.journalpostId,
@@ -62,7 +62,7 @@ data class FinnOppgaveRequestDto(
             fristTomDato = this.fristTom,
             aktivFomDato = null,
             aktivTomDato = null,
-            mappeId = if (this.oppgaverPåVent) ventemappe.id else klarmappe?.id,
+            mappeId = if (this.oppgaverPåVent) ventemappe.id else klarmappe.id,
             limit = this.limit,
             offset = this.offset,
             sorteringsrekkefolge = order,

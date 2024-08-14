@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -12,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
@@ -29,7 +27,6 @@ class SettPåVentService(
     private val oppgaveService: OppgaveService,
     private val taskService: TaskService,
     private val settPåVentRepository: SettPåVentRepository,
-    private val unleashService: UnleashService,
 ) {
 
     fun hentStatusSettPåVent(behandlingId: UUID): StatusPåVentDto {
@@ -200,12 +197,9 @@ class SettPåVentService(
         } else {
             ""
         }
-        val mappeId = if (unleashService.isEnabled(Toggle.OPPGAVE_BRUK_KLAR_MAPPE)) {
-            val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
-            oppgaveService.finnMappe(enhet, OppgaveMappe.KLAR).id
-        } else {
-            null
-        }
+
+        val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
+        val mappeId = oppgaveService.finnMappe(enhet, OppgaveMappe.KLAR).id
         oppgaveService.oppdaterOppgave(
             Oppgave(
                 id = oppgave.id,

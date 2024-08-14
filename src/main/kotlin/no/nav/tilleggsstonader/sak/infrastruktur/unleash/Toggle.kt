@@ -11,7 +11,7 @@ enum class Toggle(override val toggleId: String) : ToggleId {
     AUTOMATISK_JOURNALFORING_REVURDERING("sak.automatisk-jfr-revurdering"),
     MANUELL_JOURNALFØRING_TIDLIGERE_INNVILGET("sak.manuell-jfr-tidligere-innvilget-behandling"),
 
-    OPPGAVE_BRUK_KLAR_MAPPE("sak.oppgave-bruk-klar-mappe"),
-
     SIMULERING("sak.simulering"),
+
+    ARENA_STATUS_FAGSAK_PERSON("sak.arena-status-fagsak-person"),
 }
