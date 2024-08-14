@@ -145,13 +145,15 @@ class VilkårperiodeService(
         val ytelserFraRegister = ytelseService.hentYtelseForGrunnlag(behandlingId = behandlingId, fom = fom, tom = tom)
 
         return GrunnlagYtelse(
-            perioder = ytelserFraRegister.perioder.map {
-                PeriodeGrunnlagYtelse(
-                    type = it.type,
-                    fom = it.fom,
-                    tom = it.tom,
-                )
-            },
+            perioder = ytelserFraRegister.perioder
+                .filter { it.aapAktivitetsfase != "Ferdig avklart" }
+                .map {
+                    PeriodeGrunnlagYtelse(
+                        type = it.type,
+                        fom = it.fom,
+                        tom = it.tom,
+                    )
+                },
         )
     }
 

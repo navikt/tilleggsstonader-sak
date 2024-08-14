@@ -15,6 +15,7 @@ data class YtelsePeriodeRegisterDto(
     val type: TypeYtelsePeriode,
     val fom: LocalDate,
     val tom: LocalDate?,
+    val aapAktivitetsfase: String? = null,
 )
 
 data class HentetInformasjonDto(

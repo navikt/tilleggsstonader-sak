@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.ytelse.HentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
+import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
@@ -28,7 +29,7 @@ class YtelseClientConfig {
 
             val perioder = request.typer.map {
                 YtelsePeriode(type = it, fom = LocalDate.now(), tom = LocalDate.now())
-            }
+            } + YtelsePeriode(type = TypeYtelsePeriode.AAP, fom = LocalDate.now(), tom = LocalDate.now(), aapAktivitetsfase = "Ferdig avklart")
             val hentetInformasjon = request.typer.map {
                 HentetInformasjon(type = it, status = StatusHentetInformasjon.OK)
             }
