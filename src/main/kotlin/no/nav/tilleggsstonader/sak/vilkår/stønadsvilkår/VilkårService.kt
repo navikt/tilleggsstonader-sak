@@ -224,7 +224,7 @@ class VilkårService(
         return Pair(grunnlag, HovedregelMetadata(barn, behandling))
     }
 
-    private fun hentEllerOpprettVilkår(
+    fun hentEllerOpprettVilkår(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
     ): List<Vilkår> {
