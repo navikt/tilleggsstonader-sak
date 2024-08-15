@@ -49,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @Service
@@ -104,7 +105,9 @@ class VilkårperiodeService(
 
         val nyGrunnlagsdata = hentGrunnlagsdata(behandlingId, eksisterendeHentetFom, tom)
         vilkårperioderGrunnlagRepository.update(eksisterendeGrunnlag.copy(grunnlag = nyGrunnlagsdata))
-        logger.info("Oppdatert grunnlagsdata for behandling=$behandlingId")
+        val tidSidenForrigeHenting =
+            ChronoUnit.HOURS.between(nyGrunnlagsdata.hentetInformasjon.tidspunktHentet, LocalDateTime.now())
+        logger.info("Oppdatert grunnlagsdata for behandling=$behandlingId timerSidenForrige=$tidSidenForrigeHenting")
     }
 
     private fun hentEllerOpprettGrunnlag(behandlingId: UUID): VilkårperioderGrunnlag? {
