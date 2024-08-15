@@ -93,6 +93,9 @@ class VilkårperiodeService(
         feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
             "Kan ikke oppdatere grunnlag når behandlingen er i annet steg enn vilkår."
         }
+        feilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
+            "Kan ikke oppdatere vilkårperiode hvis man ikke er saksbehandler"
+        }
 
         vilkårperioderGrunnlagRepository.deleteById(behandlingId)
         opprettGrunnlagsdata(behandlingId)
