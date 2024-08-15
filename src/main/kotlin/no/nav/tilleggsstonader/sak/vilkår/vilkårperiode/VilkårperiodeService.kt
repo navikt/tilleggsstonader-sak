@@ -43,6 +43,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.Vilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -61,6 +62,8 @@ class VilkårperiodeService(
     private val søknadService: SøknadService,
     private val tilgangService: TilgangService,
 ) {
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     fun hentVilkårperioder(behandlingId: UUID): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId)
@@ -97,8 +100,14 @@ class VilkårperiodeService(
             "Kan ikke oppdatere vilkårperiode hvis man ikke er saksbehandler"
         }
 
-        vilkårperioderGrunnlagRepository.deleteById(behandlingId)
-        opprettGrunnlagsdata(behandlingId)
+        val eksisterendeGrunnlag = vilkårperioderGrunnlagRepository.findByIdOrThrow(behandlingId)
+
+        val eksisterendeHentetFom = eksisterendeGrunnlag.grunnlag.hentetInformasjon.fom
+        val tom = YearMonth.now().plusYears(1).atEndOfMonth()
+
+        val nyGrunnlagsdata = hentGrunnlagsdata(behandlingId, eksisterendeHentetFom, tom)
+        vilkårperioderGrunnlagRepository.update(eksisterendeGrunnlag.copy(grunnlag = nyGrunnlagsdata))
+        logger.info("Oppdatert grunnlagsdata for behandling=$behandlingId")
     }
 
     private fun hentEllerOpprettGrunnlag(behandlingId: UUID): VilkårperioderGrunnlag? {
@@ -119,25 +128,32 @@ class VilkårperiodeService(
         }
 
         val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
-        val utgangspunktDato = søknad?.mottattTidspunkt ?: LocalDateTime.now()
+        val utgangspunktDato = søknad?.mottattTidspunkt?.toLocalDate() ?: LocalDate.now()
 
         val fom = YearMonth.from(utgangspunktDato).minusMonths(3).atDay(1)
         val tom = YearMonth.from(utgangspunktDato).plusYears(1).atEndOfMonth()
 
-        val grunnlag = VilkårperioderGrunnlag(
+        val grunnlag = hentGrunnlagsdata(behandlingId, fom, tom)
+        return vilkårperioderGrunnlagRepository.insert(
+            VilkårperioderGrunnlagDomain(
+                behandlingId = behandlingId,
+                grunnlag = grunnlag,
+            ),
+        )
+    }
+
+    private fun hentGrunnlagsdata(
+        behandlingId: UUID,
+        fom: LocalDate,
+        tom: LocalDate,
+    ): VilkårperioderGrunnlag {
+        return VilkårperioderGrunnlag(
             aktivitet = hentGrunnlagAktvititet(behandlingId, fom, tom),
             ytelse = hentGrunnlagYtelse(behandlingId, fom, tom),
             hentetInformasjon = HentetInformasjon(
                 fom = fom,
                 tom = tom,
                 tidspunktHentet = LocalDateTime.now(),
-            ),
-        )
-
-        return vilkårperioderGrunnlagRepository.insert(
-            VilkårperioderGrunnlagDomain(
-                behandlingId = behandlingId,
-                grunnlag = grunnlag,
             ),
         )
     }

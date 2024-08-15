@@ -45,7 +45,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.assertj.core.api.Assertions.assertThat
@@ -58,6 +63,8 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDate.now
+import java.time.LocalDateTime
+import java.time.YearMonth
 import java.util.UUID
 
 class VilkårperiodeServiceTest : IntegrationTest() {
@@ -876,6 +883,29 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             // Oppdatert grunnlag inneholder kun id=2
             assertThat(grunnlag3.aktivitet.aktiviteter.map { it.id }).containsExactly("2")
+        }
+
+        @Test
+        fun `skal bruke tidligere hentet informasjon sin fom og bruke tom fra dagens dato`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.INNGANGSVILKÅR))
+            val fomFørsteGangHentet = now().minusYears(3).minusDays(1)
+            behandling.let {
+                val hentetInformasjon =
+                    HentetInformasjon(fom = fomFørsteGangHentet, tom = now(), LocalDateTime.now())
+                val aktivitet = GrunnlagAktivitet(emptyList())
+                val grunnlag = VilkårperioderGrunnlag(aktivitet, GrunnlagYtelse(emptyList()), hentetInformasjon)
+                vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(it.id, grunnlag))
+            }
+            testWithBrukerContext("beh1", listOf(rolleConfig.saksbehandlerRolle)) {
+                vilkårperiodeService.oppdaterGrunnlag(behandling.id)
+            }
+            with(vilkårperioderGrunnlagRepository.findByIdOrThrow(behandling.id)) {
+                assertThat(sporbar.opprettetAv).isEqualTo("VL")
+                assertThat(sporbar.endret.endretAv).isEqualTo("beh1")
+                assertThat(grunnlag.hentetInformasjon.fom).isEqualTo(fomFørsteGangHentet)
+                assertThat(grunnlag.hentetInformasjon.tom)
+                    .isEqualTo(YearMonth.now().plusYears(1).atEndOfMonth())
+            }
         }
 
         @Test
