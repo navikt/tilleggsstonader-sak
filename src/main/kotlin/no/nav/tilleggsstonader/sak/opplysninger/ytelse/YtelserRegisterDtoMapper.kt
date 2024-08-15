@@ -12,8 +12,14 @@ object YtelserRegisterDtoMapper {
 
     fun YtelsePerioderDto.tilDto(): YtelserRegisterDto {
         return YtelserRegisterDto(
-            perioder = this.perioder.map { YtelsePeriodeRegisterDto(type = it.type, fom = it.fom, tom = it.tom) }
-                .sortedWith(sorteringTomDesc),
+            perioder = this.perioder.map {
+                YtelsePeriodeRegisterDto(
+                    type = it.type,
+                    fom = it.fom,
+                    tom = it.tom,
+                    aapErFerdigAvklart = it.aapErFerdigAvklart,
+                )
+            }.sortedWith(sorteringTomDesc),
             hentetInformasjon = hentetInformasjon.map { HentetInformasjonDto(type = it.type, status = it.status) },
             tidspunktHentet = LocalDateTime.now(),
         )
