@@ -12,14 +12,12 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
@@ -47,7 +45,6 @@ class OppgaveService(
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val cacheManager: CacheManager,
     private val personService: PersonService,
-    private val unleashService: UnleashService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -59,15 +56,9 @@ class OppgaveService(
             ?.let { personService.hentAktørId(it) }
 
         val enhet = finnOppgaveRequest.enhet ?: error("Enhet er påkrevd når man søker etter oppgaver")
-        // TODO fiks tilFinnOppgaveRequest til å ikke håndtere nullable når toggle fjernes
-        val klarmappe = if (unleashService.isEnabled(Toggle.OPPGAVE_BRUK_KLAR_MAPPE)) {
-            finnMappe(enhet, OppgaveMappe.KLAR)
-        } else {
-            null
-        }
         val request = finnOppgaveRequest.tilFinnOppgaveRequest(
             aktørId,
-            klarmappe = klarmappe,
+            klarmappe = finnMappe(enhet, OppgaveMappe.KLAR),
             ventemappe = finnMappe(enhet, OppgaveMappe.PÅ_VENT),
         )
         return finnOppgaver(request)
@@ -197,9 +188,6 @@ class OppgaveService(
      * for at de ikke skal blandes med uplasserte som håndteres dagligen i gosys
      */
     private fun utledMappeId(ident: String, oppgave: OpprettOppgave, enhetsnummer: String?): Long? {
-        if (!unleashService.isEnabled(Toggle.OPPGAVE_BRUK_KLAR_MAPPE)) {
-            return null
-        }
         if (!skalPlasseresIKlarMappe(oppgave.oppgavetype)) {
             return null
         }
