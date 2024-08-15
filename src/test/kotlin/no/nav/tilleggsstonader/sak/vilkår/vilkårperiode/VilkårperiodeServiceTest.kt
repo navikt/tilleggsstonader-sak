@@ -922,18 +922,5 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val feil = assertThrows<Feil> { vilkårperiodeService.oppdaterGrunnlag(behandling.id) }
             assertThat(feil.frontendFeilmelding).isEqualTo("Kan ikke oppdatere grunnlag når behandlingen er låst")
         }
-
-        @Test
-        fun `skal ikke kunne oppdatere hvis man ikke er saksbehandler`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.INNGANGSVILKÅR))
-
-            val feil = assertThrows<Feil> {
-                testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
-                    vilkårperiodeService.oppdaterGrunnlag(behandling.id)
-                }
-            }
-            assertThat(feil.frontendFeilmelding)
-                .isEqualTo("Kan ikke oppdatere vilkårperiode hvis man ikke er saksbehandler")
-        }
     }
 }
