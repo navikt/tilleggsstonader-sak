@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMeta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.EksempelRegel
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -118,6 +119,16 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     @Nested
     inner class OpprettelseAvNyeBarnVidHentingAvVilkår {
 
+        val barn1Ident = FnrGenerator.generer(LocalDate.now().minusYears(3))
+        val barn2Ident = FnrGenerator.generer(LocalDate.now().minusYears(7))
+
+        val fagsak = fagsak()
+
+        @BeforeEach
+        fun setUp() {
+            testoppsettService.lagreFagsak(fagsak)
+        }
+
         /**
          * Søknad 1: Barn1
          *
@@ -125,10 +136,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
          */
         @Test
         internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og kopiere vilkår for eksisterende barn på fagsak`() {
-            val fagsak = testoppsettService.lagreFagsak(fagsak())
-            val barn1Ident = FnrGenerator.generer(LocalDate.now().minusYears(3))
-            val barn2Ident = FnrGenerator.generer(LocalDate.now().minusYears(7))
-
             val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
             val barnPåFørsteBehandling = barnRepository.insertAll(listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling))
             opprettVilkårsvurderinger(førstegangsbehandling, barnPåFørsteBehandling)
@@ -178,11 +185,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
          */
         @Test
         internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og gjennbruke eksisterende vilkår for barn`() {
-            val fagsak = testoppsettService.lagreFagsak(fagsak())
-
-            val barn1Ident = FnrGenerator.generer(LocalDate.now().minusYears(3))
-            val barn2Ident = FnrGenerator.generer(LocalDate.now().minusYears(10))
-
             val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
             val barnFørsteBehandling = barnService.opprettBarn(listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling))
             opprettVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling)
