@@ -146,6 +146,8 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             // barn 2 må opprettes manuellt fordi den ikke opprettes i gjenbruk
             opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
+            oprettVilkårForNyeBarnVidHentingAvVilkår()
+
             assertHarBeholdtBarn1OgOpprettetVilkårForNyttBarn()
         }
 
@@ -162,6 +164,8 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
             // barn 2 må opprettes manuellt fordi den ikke opprettes i gjenbruk
             opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
+
+            oprettVilkårForNyeBarnVidHentingAvVilkår()
 
             assertHarBeholdtBarn1OgOpprettetVilkårForNyttBarn()
         }
@@ -197,10 +201,14 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
             // barn som ikke var med i første behandling må opprettes manuellt
             barnService.opprettBarn(barn)
+        }
+
+        private fun oprettVilkårForNyeBarnVidHentingAvVilkår() {
             val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
             // Oppretter vilkår for nye barn
             vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
         }
+
     }
 
     private fun opprettVilkårsvurderinger(
