@@ -141,13 +141,10 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og kopiere vilkår for eksisterende barn på fagsak`() {
             val barnPåFørsteBehandling = listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling)
 
-            testoppsettService.lagre(førstegangsbehandling)
-            barnRepository.insertAll(barnPåFørsteBehandling)
-            opprettVilkårsvurderinger(førstegangsbehandling, barnPåFørsteBehandling)
+            opprettFørstegangsbehandling(barnPåFørsteBehandling)
 
-            testoppsettService.lagre(revurdering)
-            gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
-            barnService.opprettBarn(listOf(barn2Ident).tilBehandlingBarn(revurdering))
+            // barn 2 må opprettes manuellt fordi den ikke opprettes i gjenbruk
+            opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
             val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
             vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
@@ -197,13 +194,10 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og gjennbruke eksisterende vilkår for barn`() {
             val barnFørsteBehandling = listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling)
 
-            testoppsettService.lagre(førstegangsbehandling)
-            barnRepository.insertAll(barnFørsteBehandling)
-            opprettVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling)
+            opprettFørstegangsbehandling(barnFørsteBehandling)
 
-            testoppsettService.lagre(revurdering)
-            gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
-            barnService.opprettBarn(listOf(barn2Ident).tilBehandlingBarn(revurdering))
+            // barn 2 må opprettes manuellt fordi den ikke opprettes i gjenbruk
+            opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
             val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
             vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
@@ -242,6 +236,19 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             assertThat(vilkårBarn2.barnId).isEqualTo(barn2Id)
             assertThat(vilkårBarn2.behandlingId).isEqualTo(revurdering.id)
             assertThat(vilkårBarn2.opphavsvilkår).isNull()
+        }
+
+        private fun opprettFørstegangsbehandling(barn: List<BehandlingBarn>) {
+            testoppsettService.lagre(førstegangsbehandling)
+            barnRepository.insertAll(barn)
+            opprettVilkårsvurderinger(førstegangsbehandling, barn)
+        }
+
+        private fun opprettRevurdering(barn: List<BehandlingBarn>) {
+            testoppsettService.lagre(revurdering)
+            gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
+            // barn som ikke var med i første behandling må opprettes manuellt
+            barnService.opprettBarn(barn)
         }
     }
 
