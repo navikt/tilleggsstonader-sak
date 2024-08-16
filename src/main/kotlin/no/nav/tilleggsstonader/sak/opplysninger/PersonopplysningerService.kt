@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.opplysninger.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.dto.NavnDto
 import no.nav.tilleggsstonader.sak.opplysninger.dto.PersonopplysningerDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -32,6 +33,7 @@ class PersonopplysningerService(
             navn = pdlSøker.navn.gjeldende().let { NavnDto.fraNavn(it) },
             harVergemål = pdlSøker.vergemaalEllerFremtidsfullmakt
                 .any { it.type != "stadfestetFremtidsfullmakt" }, // fremtidsfullmakt gjelder frem i tiden
+            adressebeskyttelse = Adressebeskyttelse.STRENGT_FORTROLIG, // , Adressebeskyttelse.fraPdl(pdlSøker.adressebeskyttelse.gradering()),
         )
     }
 }
