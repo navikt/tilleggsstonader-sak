@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
+import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
@@ -11,13 +11,9 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
-import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
-import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -31,6 +27,7 @@ import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 import java.util.UUID
 
 internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
@@ -43,9 +40,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårService: VilkårService
-
-    @Autowired
-    lateinit var søknadService: SøknadService
 
     @Autowired
     lateinit var barnRepository: BarnRepository
@@ -61,11 +55,11 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
         val revurdering = testoppsettService.lagre(behandling(fagsak))
-        val søknadskjema = lagreSøknad(behandling)
-        val barnPåFørsteSøknad = barnRepository.insertAll(søknadBarnTilBehandlingBarn(søknadskjema.barn, behandling.id))
+        val barn1Ident = FnrGenerator.generer(LocalDate.now().minusYears(3))
+        val barnFørsteBehandling = barnRepository.insertAll(listOf(barn1Ident).tilBehandlingBarn(behandling))
         val barnIdMap = barnService.gjenbrukBarn(behandling.id, revurdering.id)
 
-        val vilkårForBehandling = opprettVilkårsvurderinger(søknadskjema, behandling, barnPåFørsteSøknad).first()
+        val vilkårForBehandling = opprettVilkårsvurderinger(behandling, barnFørsteBehandling).first()
 
         vilkårService.kopierVilkårsettTilNyBehandling(
             forrigeBehandlingId = behandling.id,
@@ -81,9 +75,9 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         assertThat(vilkårForBehandling.sporbar.opprettetTid).isNotEqualTo(vilkårForRevurdering.sporbar.opprettetTid)
         assertThat(vilkårForBehandling.sporbar.endret.endretTid).isNotEqualTo(vilkårForRevurdering.sporbar.endret.endretTid)
         assertThat(vilkårForBehandling.barnId).isNotEqualTo(vilkårForRevurdering.barnId)
-        assertThat(vilkårForBehandling.barnId).isEqualTo(barnPåFørsteSøknad.first().id)
+        assertThat(vilkårForBehandling.barnId).isEqualTo(barnFørsteBehandling.first().id)
         assertThat(vilkårForBehandling.opphavsvilkår).isNull()
-        assertThat(vilkårForRevurdering.barnId).isEqualTo(barnIdMap[barnPåFørsteSøknad.first().id])
+        assertThat(vilkårForRevurdering.barnId).isEqualTo(barnIdMap[barnFørsteBehandling.first().id])
         assertThat(vilkårForRevurdering.opphavsvilkår)
             .isEqualTo(Opphavsvilkår(behandling.id, vilkårForBehandling.sporbar.endret.endretTid))
 
@@ -128,29 +122,27 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     @Test
     internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og kopiere vilkår for eksisterende barn på fagsak`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
+        val barn1Ident = FnrGenerator.generer(LocalDate.now().minusYears(3))
+        val barn2Ident = FnrGenerator.generer(LocalDate.now().minusYears(7))
 
-        val barn1 = SøknadUtil.barnMedBarnepass()
         val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        val førsteSøknad = lagreSøknad(førstegangsbehandling, listOf(barn1))
-        val barnPåFørsteSøknad = barnService.opprettBarn(søknadBarnTilBehandlingBarn(førsteSøknad.barn, førstegangsbehandling.id))
-        opprettVilkårsvurderinger(førsteSøknad, førstegangsbehandling, barnPåFørsteSøknad)
+        val barnPåFørsteBehandling = barnRepository.insertAll(listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling))
+        opprettVilkårsvurderinger(førstegangsbehandling, barnPåFørsteBehandling)
 
-        val barn2 = SøknadUtil.barnMedBarnepass()
         val revurdering = testoppsettService.lagre(behandling(fagsak))
-        val revurderingSøknad = lagreSøknad(revurdering, listOf(barn2))
         gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
-        barnService.opprettBarn(søknadBarnTilBehandlingBarn(revurderingSøknad.barn, revurdering.id))
+        barnService.opprettBarn(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
         val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
         vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
 
         val vilkårFørstegangsbehandling = vilkårRepository.findByBehandlingId(førstegangsbehandling.id).single()
-        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteSøknad.single().id)
+        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteBehandling.single().id)
 
         val vilkårRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
         assertThat(vilkårRevurdering.size).isEqualTo(2)
 
-        val barn1Id = barnRevurdering.single { it.ident == barn1.ident.verdi }.id
+        val barn1Id = barnRevurdering.single { it.ident == barn1Ident }.id
         val vilkårBarn1 = vilkårRevurdering.single { it.barnId == barn1Id }
 
         assertThat(vilkårFørstegangsbehandling.id).isNotEqualTo(vilkårBarn1.id)
@@ -158,7 +150,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         assertThat(vilkårFørstegangsbehandling.sporbar.opprettetTid).isNotEqualTo(vilkårBarn1.sporbar.opprettetTid)
         assertThat(vilkårFørstegangsbehandling.sporbar.endret.endretTid).isNotEqualTo(vilkårBarn1.sporbar.endret.endretTid)
         assertThat(vilkårFørstegangsbehandling.barnId).isNotEqualTo(vilkårBarn1.barnId)
-        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteSøknad.first().id)
+        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteBehandling.first().id)
         assertThat(vilkårFørstegangsbehandling.opphavsvilkår).isNull()
         assertThat(vilkårBarn1.opphavsvilkår)
             .isEqualTo(Opphavsvilkår(førstegangsbehandling.id, vilkårFørstegangsbehandling.sporbar.endret.endretTid))
@@ -167,7 +159,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
             .isEqualTo(vilkårBarn1)
 
-        val barn2Id = barnRevurdering.single { it.ident == barn2.ident.verdi }.id
+        val barn2Id = barnRevurdering.single { it.ident == barn2Ident }.id
         val vilkårBarn2 = vilkårRevurdering.single { it.barnId == barn2Id }
 
         assertThat(vilkårBarn2.barnId).isEqualTo(barn2Id)
@@ -184,28 +176,27 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og gjennbruke eksisterende vilkår for barn`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
 
-        val barn1 = SøknadUtil.barnMedBarnepass()
-        val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        val førsteSøknad = lagreSøknad(førstegangsbehandling, listOf(barn1))
-        val barnPåFørsteSøknad = barnService.opprettBarn(søknadBarnTilBehandlingBarn(førsteSøknad.barn, førstegangsbehandling.id))
-        opprettVilkårsvurderinger(førsteSøknad, førstegangsbehandling, barnPåFørsteSøknad)
+        val barn1Ident = FnrGenerator.generer(LocalDate.now().minusYears(3))
+        val barn2Ident = FnrGenerator.generer(LocalDate.now().minusYears(10))
 
-        val barn2 = SøknadUtil.barnMedBarnepass()
+        val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
+        val barnFørsteBehandling = barnService.opprettBarn(listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling))
+        opprettVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling)
+
         val revurdering = testoppsettService.lagre(behandling(fagsak))
-        val revurderingSøknad = lagreSøknad(revurdering, listOf(barn1, barn2))
         gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
-        barnService.opprettBarn(søknadBarnTilBehandlingBarn(revurderingSøknad.barn.filter { it.ident == barn2.ident.verdi }, revurdering.id))
+        barnService.opprettBarn(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
         val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
         vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
 
         val vilkårFørstegangsbehandling = vilkårRepository.findByBehandlingId(førstegangsbehandling.id).single()
-        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteSøknad.single().id)
+        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnFørsteBehandling.single().id)
 
         val vilkårRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
         assertThat(vilkårRevurdering.size).isEqualTo(2)
 
-        val barn1Id = barnRevurdering.single { it.ident == barn1.ident.verdi }.id
+        val barn1Id = barnRevurdering.single { it.ident == barn1Ident }.id
         val vilkårBarn1 = vilkårRevurdering.single { it.barnId == barn1Id }
 
         assertThat(vilkårFørstegangsbehandling.id).isNotEqualTo(vilkårBarn1.id)
@@ -213,7 +204,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         assertThat(vilkårFørstegangsbehandling.sporbar.opprettetTid).isNotEqualTo(vilkårBarn1.sporbar.opprettetTid)
         assertThat(vilkårFørstegangsbehandling.sporbar.endret.endretTid).isNotEqualTo(vilkårBarn1.sporbar.endret.endretTid)
         assertThat(vilkårFørstegangsbehandling.barnId).isNotEqualTo(vilkårBarn1.barnId)
-        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteSøknad.first().id)
+        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnFørsteBehandling.first().id)
         assertThat(vilkårFørstegangsbehandling.opphavsvilkår).isNull()
         assertThat(vilkårBarn1.opphavsvilkår)
             .isEqualTo(Opphavsvilkår(førstegangsbehandling.id, vilkårFørstegangsbehandling.sporbar.endret.endretTid))
@@ -222,7 +213,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
             .isEqualTo(vilkårBarn1)
 
-        val barn2Id = barnRevurdering.single { it.ident == barn2.ident.verdi }.id
+        val barn2Id = barnRevurdering.single { it.ident == barn2Ident }.id
         val vilkårBarn2 = vilkårRevurdering.single { it.barnId == barn2Id }
 
         assertThat(vilkårBarn2.barnId).isEqualTo(barn2Id)
@@ -231,7 +222,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     }
 
     private fun opprettVilkårsvurderinger(
-        søknadskjema: SøknadBarnetilsyn,
         behandling: Behandling,
         barn: List<BehandlingBarn>,
     ): List<Vilkår> {
@@ -253,11 +243,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         return vilkårRepository.insertAll(vilkårsett)
     }
 
-    private fun lagreSøknad(
-        behandling: Behandling,
-        barn: List<BarnMedBarnepass> = listOf(SøknadUtil.barnMedBarnepass()),
-    ): SøknadBarnetilsyn {
-        søknadService.lagreSøknad(behandling.id, lagJournalpost(), SøknadUtil.søknadskjemaBarnetilsyn(barnMedBarnepass = barn))
-        return søknadService.hentSøknadBarnetilsyn(behandling.id)!!
-    }
+    fun List<String>.tilBehandlingBarn(behandling: Behandling) =
+        this.map { behandlingBarn(behandlingId = behandling.id, personIdent = it) }
 }
