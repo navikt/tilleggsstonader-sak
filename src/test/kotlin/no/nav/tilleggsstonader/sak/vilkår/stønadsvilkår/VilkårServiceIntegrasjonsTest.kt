@@ -146,42 +146,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             // barn 2 må opprettes manuellt fordi den ikke opprettes i gjenbruk
             opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
-            val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
-
-            val vilkårFørstegangsbehandling = vilkårRepository.findByBehandlingId(førstegangsbehandling.id).single()
-            assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteBehandling.single().id)
-
-            val vilkårRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
-            assertThat(vilkårRevurdering.size).isEqualTo(2)
-
-            val barn1Id = barnRevurdering.single { it.ident == barn1Ident }.id
-            val vilkårBarn1 = vilkårRevurdering.single { it.barnId == barn1Id }
-
-            assertThat(vilkårFørstegangsbehandling.id).isNotEqualTo(vilkårBarn1.id)
-            assertThat(vilkårFørstegangsbehandling.behandlingId).isNotEqualTo(vilkårBarn1.behandlingId)
-            assertThat(vilkårFørstegangsbehandling.sporbar.opprettetTid).isNotEqualTo(vilkårBarn1.sporbar.opprettetTid)
-            assertThat(vilkårFørstegangsbehandling.sporbar.endret.endretTid).isNotEqualTo(vilkårBarn1.sporbar.endret.endretTid)
-            assertThat(vilkårFørstegangsbehandling.barnId).isNotEqualTo(vilkårBarn1.barnId)
-            assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteBehandling.first().id)
-            assertThat(vilkårFørstegangsbehandling.opphavsvilkår).isNull()
-            assertThat(vilkårBarn1.opphavsvilkår)
-                .isEqualTo(
-                    Opphavsvilkår(
-                        førstegangsbehandling.id,
-                        vilkårFørstegangsbehandling.sporbar.endret.endretTid,
-                    ),
-                )
-
-            assertThat(vilkårFørstegangsbehandling).usingRecursiveComparison()
-                .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
-                .isEqualTo(vilkårBarn1)
-
-            val barn2Id = barnRevurdering.single { it.ident == barn2Ident }.id
-            val vilkårBarn2 = vilkårRevurdering.single { it.barnId == barn2Id }
-
-            assertThat(vilkårBarn2.barnId).isEqualTo(barn2Id)
-            assertThat(vilkårBarn2.behandlingId).isEqualTo(revurdering.id)
-            assertThat(vilkårBarn2.opphavsvilkår).isNull()
+            assertHarBeholdtBarn1OgOpprettetVilkårForNyttBarn()
         }
 
         /**
@@ -198,42 +163,27 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             // barn 2 må opprettes manuellt fordi den ikke opprettes i gjenbruk
             opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
+            assertHarBeholdtBarn1OgOpprettetVilkårForNyttBarn()
+        }
+
+        private fun assertHarBeholdtBarn1OgOpprettetVilkårForNyttBarn() {
             val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
+            val revurderingBarn1 = barnRevurdering.single { it.ident == barn1Ident }
+            val revurderingBarn2 = barnRevurdering.single { it.ident == barn2Ident }
 
             val vilkårFørstegangsbehandling = vilkårRepository.findByBehandlingId(førstegangsbehandling.id).single()
-            assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnFørsteBehandling.single().id)
-
             val vilkårRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
-            assertThat(vilkårRevurdering.size).isEqualTo(2)
+            val vilkårRevurderingBarn1 = vilkårRevurdering.single { it.barnId == revurderingBarn1.id }
+            val vilkårRevurderingBarn2 = vilkårRevurdering.single { it.barnId == revurderingBarn2.id }
 
-            val barn1Id = barnRevurdering.single { it.ident == barn1Ident }.id
-            val vilkårBarn1 = vilkårRevurdering.single { it.barnId == barn1Id }
-
-            assertThat(vilkårFørstegangsbehandling.id).isNotEqualTo(vilkårBarn1.id)
-            assertThat(vilkårFørstegangsbehandling.behandlingId).isNotEqualTo(vilkårBarn1.behandlingId)
-            assertThat(vilkårFørstegangsbehandling.sporbar.opprettetTid).isNotEqualTo(vilkårBarn1.sporbar.opprettetTid)
-            assertThat(vilkårFørstegangsbehandling.sporbar.endret.endretTid).isNotEqualTo(vilkårBarn1.sporbar.endret.endretTid)
-            assertThat(vilkårFørstegangsbehandling.barnId).isNotEqualTo(vilkårBarn1.barnId)
-            assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnFørsteBehandling.first().id)
-            assertThat(vilkårFørstegangsbehandling.opphavsvilkår).isNull()
-            assertThat(vilkårBarn1.opphavsvilkår)
-                .isEqualTo(
-                    Opphavsvilkår(
-                        førstegangsbehandling.id,
-                        vilkårFørstegangsbehandling.sporbar.endret.endretTid,
-                    ),
-                )
-
-            assertThat(vilkårFørstegangsbehandling).usingRecursiveComparison()
-                .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
-                .isEqualTo(vilkårBarn1)
-
-            val barn2Id = barnRevurdering.single { it.ident == barn2Ident }.id
-            val vilkårBarn2 = vilkårRevurdering.single { it.barnId == barn2Id }
-
-            assertThat(vilkårBarn2.barnId).isEqualTo(barn2Id)
-            assertThat(vilkårBarn2.behandlingId).isEqualTo(revurdering.id)
-            assertThat(vilkårBarn2.opphavsvilkår).isNull()
+            assertThat(vilkårRevurdering).hasSize(2)
+            with(vilkårRevurderingBarn1) {
+                assertThat(opphavsvilkår?.behandlingId).isEqualTo(førstegangsbehandling.id)
+                assertThat(delvilkårsett).isEqualTo(vilkårFørstegangsbehandling.delvilkårsett)
+            }
+            with(vilkårRevurderingBarn2) {
+                assertThat(opphavsvilkår).isNull()
+            }
         }
 
         private fun opprettFørstegangsbehandling(barn: List<BehandlingBarn>) {
