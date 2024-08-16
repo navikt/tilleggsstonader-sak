@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
@@ -58,7 +57,6 @@ class JournalføringServiceTest {
     val barnService = mockk<BarnService>()
     val personService = mockk<PersonService>()
     val oppgaveService = mockk<OppgaveService>()
-    val unleashService = mockk<UnleashService>()
     val gjennbrukDataRevurderingService = mockk<GjennbrukDataRevurderingService>(relaxed = true)
 
     val journalføringService = JournalføringService(
@@ -71,7 +69,6 @@ class JournalføringServiceTest {
         TransactionHandler(),
         personService,
         oppgaveService,
-        unleashService,
         gjennbrukDataRevurderingService,
     )
 
@@ -100,7 +97,6 @@ class JournalføringServiceTest {
         every { personService.hentPersonIdenter(personIdent) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
         justRun { oppgaveService.ferdigstillOppgave(any()) }
         every { journalpostService.hentIdentFraJournalpost(journalpost) } returns personIdent
-        every { unleashService.isEnabled(any()) } returns true
     }
 
     @AfterEach

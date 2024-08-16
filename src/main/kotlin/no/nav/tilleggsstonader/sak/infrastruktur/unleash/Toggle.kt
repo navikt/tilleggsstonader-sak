@@ -9,7 +9,6 @@ enum class Toggle(override val toggleId: String) : ToggleId {
     REVURDERING_INNVILGE_TIDLIGERE_INNVILGET("sak.revurdering-innvilge-etter-innvilgelse"),
 
     AUTOMATISK_JOURNALFORING_REVURDERING("sak.automatisk-jfr-revurdering"),
-    MANUELL_JOURNALFØRING_TIDLIGERE_INNVILGET("sak.manuell-jfr-tidligere-innvilget-behandling"),
 
     SIMULERING("sak.simulering"),
 }
