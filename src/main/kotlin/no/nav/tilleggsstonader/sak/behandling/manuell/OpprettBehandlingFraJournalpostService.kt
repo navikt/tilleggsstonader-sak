@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.behandling.manuell.SøknadTilsynBarnSendInnFy
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -103,7 +104,10 @@ class OpprettBehandlingFraJournalpostService(
         val brevkoder = journalpost.dokumenter?.mapNotNull { it.brevkode }
         val dokumentJournalpost = journalpost.dokumenter
             ?.singleOrNull { it.brevkode == BREVKODE_1 || it.brevkode == BREVKODE_2 }
-            ?: error("Journalpost=${journalpost.journalpostId} ($brevkoder) inneholder ikke gyldig brevkode")
+            ?: brukerfeil(
+                "Journalpost=${journalpost.journalpostId} ($brevkoder) inneholder ikke gyldig brevkode. " +
+                    "Tillater kun gammel søknad om tilsyn til barn enn så lenge.",
+            )
         val dokument = journalpostService.hentDokument(
             journalpost = journalpost,
             dokumentInfoId = dokumentJournalpost.dokumentInfoId,
