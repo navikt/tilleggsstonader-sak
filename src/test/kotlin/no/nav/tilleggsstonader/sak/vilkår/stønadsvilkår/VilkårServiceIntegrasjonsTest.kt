@@ -83,9 +83,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         assertThat(vilkårForRevurdering.opphavsvilkår)
             .isEqualTo(Opphavsvilkår(behandling.id, vilkårForBehandling.sporbar.endret.endretTid))
 
-        assertThat(vilkårForBehandling).usingRecursiveComparison()
-            .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
-            .isEqualTo(vilkårForRevurdering)
+        assertVilkårErGjenbrukt(vilkårForBehandling, vilkårForRevurdering)
     }
 
     @Disabled // TODO
@@ -181,12 +179,11 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             val vilkårRevurderingBarn2 = vilkårRevurdering.single { it.barnId == revurderingBarn2.id }
 
             assertThat(vilkårRevurdering).hasSize(2)
-            with(vilkårRevurderingBarn1) {
-                assertThat(opphavsvilkår?.behandlingId).isEqualTo(førstegangsbehandling.id)
-                assertThat(delvilkårsett).isEqualTo(vilkårFørstegangsbehandling.delvilkårsett)
-            }
+            assertVilkårErGjenbrukt(vilkårFørstegangsbehandling, vilkårRevurderingBarn1)
+
             with(vilkårRevurderingBarn2) {
                 assertThat(opphavsvilkår).isNull()
+                assertThat(barnId).isEqualTo(revurderingBarn2.id)
             }
         }
 
@@ -235,4 +232,15 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
     fun List<String>.tilBehandlingBarn(behandling: Behandling) =
         this.map { behandlingBarn(behandlingId = behandling.id, personIdent = it) }
+
+    private fun assertVilkårErGjenbrukt(
+        vilkårForBehandling: Vilkår,
+        vilkårForRevurdering: Vilkår
+    ) {
+        assertThat(vilkårForBehandling).usingRecursiveComparison()
+            .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
+            .isEqualTo(vilkårForRevurdering)
+
+        assertThat(vilkårForRevurdering.opphavsvilkår?.behandlingId).isEqualTo(vilkårForBehandling.behandlingId)
+    }
 }
