@@ -124,6 +124,9 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
         val fagsak = fagsak()
 
+        val førstegangsbehandling = behandling(fagsak, status = BehandlingStatus.FERDIGSTILT)
+        val revurdering = behandling(fagsak)
+
         @BeforeEach
         fun setUp() {
             testoppsettService.lagreFagsak(fagsak)
@@ -136,11 +139,13 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
          */
         @Test
         internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og kopiere vilkår for eksisterende barn på fagsak`() {
-            val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-            val barnPåFørsteBehandling = barnRepository.insertAll(listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling))
+            val barnPåFørsteBehandling = listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling)
+
+            testoppsettService.lagre(førstegangsbehandling)
+            barnRepository.insertAll(barnPåFørsteBehandling)
             opprettVilkårsvurderinger(førstegangsbehandling, barnPåFørsteBehandling)
 
-            val revurdering = testoppsettService.lagre(behandling(fagsak))
+            testoppsettService.lagre(revurdering)
             gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
             barnService.opprettBarn(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
@@ -164,7 +169,12 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteBehandling.first().id)
             assertThat(vilkårFørstegangsbehandling.opphavsvilkår).isNull()
             assertThat(vilkårBarn1.opphavsvilkår)
-                .isEqualTo(Opphavsvilkår(førstegangsbehandling.id, vilkårFørstegangsbehandling.sporbar.endret.endretTid))
+                .isEqualTo(
+                    Opphavsvilkår(
+                        førstegangsbehandling.id,
+                        vilkårFørstegangsbehandling.sporbar.endret.endretTid,
+                    ),
+                )
 
             assertThat(vilkårFørstegangsbehandling).usingRecursiveComparison()
                 .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
@@ -185,11 +195,13 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
          */
         @Test
         internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og gjennbruke eksisterende vilkår for barn`() {
-            val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-            val barnFørsteBehandling = barnService.opprettBarn(listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling))
+            val barnFørsteBehandling = listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling)
+
+            testoppsettService.lagre(førstegangsbehandling)
+            barnRepository.insertAll(barnFørsteBehandling)
             opprettVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling)
 
-            val revurdering = testoppsettService.lagre(behandling(fagsak))
+            testoppsettService.lagre(revurdering)
             gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
             barnService.opprettBarn(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
@@ -213,7 +225,12 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnFørsteBehandling.first().id)
             assertThat(vilkårFørstegangsbehandling.opphavsvilkår).isNull()
             assertThat(vilkårBarn1.opphavsvilkår)
-                .isEqualTo(Opphavsvilkår(førstegangsbehandling.id, vilkårFørstegangsbehandling.sporbar.endret.endretTid))
+                .isEqualTo(
+                    Opphavsvilkår(
+                        førstegangsbehandling.id,
+                        vilkårFørstegangsbehandling.sporbar.endret.endretTid,
+                    ),
+                )
 
             assertThat(vilkårFørstegangsbehandling).usingRecursiveComparison()
                 .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
