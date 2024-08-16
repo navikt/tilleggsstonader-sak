@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
+import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
@@ -11,13 +11,9 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
-import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
-import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -28,9 +24,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMeta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.EksempelRegel
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 import java.util.UUID
 
 internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
@@ -43,9 +42,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårService: VilkårService
-
-    @Autowired
-    lateinit var søknadService: SøknadService
 
     @Autowired
     lateinit var barnRepository: BarnRepository
@@ -61,11 +57,11 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
         val revurdering = testoppsettService.lagre(behandling(fagsak))
-        val søknadskjema = lagreSøknad(behandling)
-        val barnPåFørsteSøknad = barnRepository.insertAll(søknadBarnTilBehandlingBarn(søknadskjema.barn, behandling.id))
+        val barn1Ident = FnrGenerator.generer(LocalDate.now().minusYears(3))
+        val barnFørsteBehandling = barnRepository.insertAll(listOf(barn1Ident).tilBehandlingBarn(behandling))
         val barnIdMap = barnService.gjenbrukBarn(behandling.id, revurdering.id)
 
-        val vilkårForBehandling = opprettVilkårsvurderinger(søknadskjema, behandling, barnPåFørsteSøknad).first()
+        val vilkårForBehandling = opprettVilkårsvurderinger(behandling, barnFørsteBehandling).first()
 
         vilkårService.kopierVilkårsettTilNyBehandling(
             forrigeBehandlingId = behandling.id,
@@ -81,15 +77,13 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         assertThat(vilkårForBehandling.sporbar.opprettetTid).isNotEqualTo(vilkårForRevurdering.sporbar.opprettetTid)
         assertThat(vilkårForBehandling.sporbar.endret.endretTid).isNotEqualTo(vilkårForRevurdering.sporbar.endret.endretTid)
         assertThat(vilkårForBehandling.barnId).isNotEqualTo(vilkårForRevurdering.barnId)
-        assertThat(vilkårForBehandling.barnId).isEqualTo(barnPåFørsteSøknad.first().id)
+        assertThat(vilkårForBehandling.barnId).isEqualTo(barnFørsteBehandling.first().id)
         assertThat(vilkårForBehandling.opphavsvilkår).isNull()
-        assertThat(vilkårForRevurdering.barnId).isEqualTo(barnIdMap[barnPåFørsteSøknad.first().id])
+        assertThat(vilkårForRevurdering.barnId).isEqualTo(barnIdMap[barnFørsteBehandling.first().id])
         assertThat(vilkårForRevurdering.opphavsvilkår)
             .isEqualTo(Opphavsvilkår(behandling.id, vilkårForBehandling.sporbar.endret.endretTid))
 
-        assertThat(vilkårForBehandling).usingRecursiveComparison()
-            .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
-            .isEqualTo(vilkårForRevurdering)
+        assertVilkårErGjenbrukt(vilkårForBehandling, vilkårForRevurdering)
     }
 
     @Disabled // TODO
@@ -120,118 +114,124 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             .hasMessage("Tidligere behandling=$tidligereBehandlingId har ikke noen vilkår")
     }
 
-    /**
-     * Søknad 1: Barn1
-     *
-     * Søknad 2: Barn2
-     */
-    @Test
-    internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og kopiere vilkår for eksisterende barn på fagsak`() {
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
+    @Nested
+    inner class OpprettelseAvNyeBarnVidHentingAvVilkår {
 
-        val barn1 = SøknadUtil.barnMedBarnepass()
-        val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        val førsteSøknad = lagreSøknad(førstegangsbehandling, listOf(barn1))
-        val barnPåFørsteSøknad = barnService.opprettBarn(søknadBarnTilBehandlingBarn(førsteSøknad.barn, førstegangsbehandling.id))
-        opprettVilkårsvurderinger(førsteSøknad, førstegangsbehandling, barnPåFørsteSøknad)
+        val barn1Ident = FnrGenerator.generer(LocalDate.now().minusYears(3))
+        val barn2Ident = FnrGenerator.generer(LocalDate.now().minusYears(7))
 
-        val barn2 = SøknadUtil.barnMedBarnepass()
-        val revurdering = testoppsettService.lagre(behandling(fagsak))
-        val revurderingSøknad = lagreSøknad(revurdering, listOf(barn2))
-        gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
-        barnService.opprettBarn(søknadBarnTilBehandlingBarn(revurderingSøknad.barn, revurdering.id))
+        val fagsak = fagsak()
 
-        val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
-        vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
+        val førstegangsbehandling = behandling(fagsak, status = BehandlingStatus.FERDIGSTILT)
+        val revurdering = behandling(fagsak)
 
-        val vilkårFørstegangsbehandling = vilkårRepository.findByBehandlingId(førstegangsbehandling.id).single()
-        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteSøknad.single().id)
+        @BeforeEach
+        fun setUp() {
+            testoppsettService.lagreFagsak(fagsak)
+        }
 
-        val vilkårRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
-        assertThat(vilkårRevurdering.size).isEqualTo(2)
+        /**
+         * Søknad 1: Barn1
+         *
+         * Søknad 2: Barn2
+         */
+        @Test
+        internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og kopiere vilkår for eksisterende barn på fagsak`() {
+            val barnPåFørsteBehandling = listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling)
 
-        val barn1Id = barnRevurdering.single { it.ident == barn1.ident.verdi }.id
-        val vilkårBarn1 = vilkårRevurdering.single { it.barnId == barn1Id }
+            opprettFørstegangsbehandling(barnPåFørsteBehandling)
 
-        assertThat(vilkårFørstegangsbehandling.id).isNotEqualTo(vilkårBarn1.id)
-        assertThat(vilkårFørstegangsbehandling.behandlingId).isNotEqualTo(vilkårBarn1.behandlingId)
-        assertThat(vilkårFørstegangsbehandling.sporbar.opprettetTid).isNotEqualTo(vilkårBarn1.sporbar.opprettetTid)
-        assertThat(vilkårFørstegangsbehandling.sporbar.endret.endretTid).isNotEqualTo(vilkårBarn1.sporbar.endret.endretTid)
-        assertThat(vilkårFørstegangsbehandling.barnId).isNotEqualTo(vilkårBarn1.barnId)
-        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteSøknad.first().id)
-        assertThat(vilkårFørstegangsbehandling.opphavsvilkår).isNull()
-        assertThat(vilkårBarn1.opphavsvilkår)
-            .isEqualTo(Opphavsvilkår(førstegangsbehandling.id, vilkårFørstegangsbehandling.sporbar.endret.endretTid))
+            // barn 2 må opprettes manuelt fordi den ikke opprettes i gjenbruk
+            opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
-        assertThat(vilkårFørstegangsbehandling).usingRecursiveComparison()
-            .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
-            .isEqualTo(vilkårBarn1)
+            opprettVilkårForNyeBarnVidHentingAvVilkår()
 
-        val barn2Id = barnRevurdering.single { it.ident == barn2.ident.verdi }.id
-        val vilkårBarn2 = vilkårRevurdering.single { it.barnId == barn2Id }
+            assertHarBeholdtBarn1OgOpprettetVilkårForNyttBarn()
+        }
 
-        assertThat(vilkårBarn2.barnId).isEqualTo(barn2Id)
-        assertThat(vilkårBarn2.behandlingId).isEqualTo(revurdering.id)
-        assertThat(vilkårBarn2.opphavsvilkår).isNull()
-    }
+        /**
+         * Søknad 1: Barn1
+         *
+         * Søknad 2: Barn 1 og Barn2
+         */
+        @Test
+        internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og gjennbruke eksisterende vilkår for barn`() {
+            val barnFørsteBehandling = listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling)
 
-    /**
-     * Søknad 1: Barn1
-     *
-     * Søknad 2: Barn 1 og Barn2
-     */
-    @Test
-    internal fun `hentEllerOpprettVilkår skal opprette vilkår for nytt barn og gjennbruke eksisterende vilkår for barn`() {
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
+            opprettFørstegangsbehandling(barnFørsteBehandling)
 
-        val barn1 = SøknadUtil.barnMedBarnepass()
-        val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        val førsteSøknad = lagreSøknad(førstegangsbehandling, listOf(barn1))
-        val barnPåFørsteSøknad = barnService.opprettBarn(søknadBarnTilBehandlingBarn(førsteSøknad.barn, førstegangsbehandling.id))
-        opprettVilkårsvurderinger(førsteSøknad, førstegangsbehandling, barnPåFørsteSøknad)
+            // barn 2 må opprettes manuelt fordi den ikke opprettes i gjenbruk
+            opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
-        val barn2 = SøknadUtil.barnMedBarnepass()
-        val revurdering = testoppsettService.lagre(behandling(fagsak))
-        val revurderingSøknad = lagreSøknad(revurdering, listOf(barn1, barn2))
-        gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
-        barnService.opprettBarn(søknadBarnTilBehandlingBarn(revurderingSøknad.barn.filter { it.ident == barn2.ident.verdi }, revurdering.id))
+            opprettVilkårForNyeBarnVidHentingAvVilkår()
 
-        val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
-        vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
+            assertHarBeholdtBarn1OgOpprettetVilkårForNyttBarn()
+        }
 
-        val vilkårFørstegangsbehandling = vilkårRepository.findByBehandlingId(førstegangsbehandling.id).single()
-        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteSøknad.single().id)
+        /**
+         * Søknad 1: Barn1
+         *
+         * Søknad 2: Barn 1 og Barn2
+         */
+        @Test
+        fun `skal ikke opprette barn andre gangen man kaller på hent vilkår`() {
+            val barnFørsteBehandling = listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling)
 
-        val vilkårRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
-        assertThat(vilkårRevurdering.size).isEqualTo(2)
+            opprettFørstegangsbehandling(barnFørsteBehandling)
 
-        val barn1Id = barnRevurdering.single { it.ident == barn1.ident.verdi }.id
-        val vilkårBarn1 = vilkårRevurdering.single { it.barnId == barn1Id }
+            // barn 2 må opprettes manuelt fordi den ikke opprettes i gjenbruk
+            opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
-        assertThat(vilkårFørstegangsbehandling.id).isNotEqualTo(vilkårBarn1.id)
-        assertThat(vilkårFørstegangsbehandling.behandlingId).isNotEqualTo(vilkårBarn1.behandlingId)
-        assertThat(vilkårFørstegangsbehandling.sporbar.opprettetTid).isNotEqualTo(vilkårBarn1.sporbar.opprettetTid)
-        assertThat(vilkårFørstegangsbehandling.sporbar.endret.endretTid).isNotEqualTo(vilkårBarn1.sporbar.endret.endretTid)
-        assertThat(vilkårFørstegangsbehandling.barnId).isNotEqualTo(vilkårBarn1.barnId)
-        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteSøknad.first().id)
-        assertThat(vilkårFørstegangsbehandling.opphavsvilkår).isNull()
-        assertThat(vilkårBarn1.opphavsvilkår)
-            .isEqualTo(Opphavsvilkår(førstegangsbehandling.id, vilkårFørstegangsbehandling.sporbar.endret.endretTid))
+            opprettVilkårForNyeBarnVidHentingAvVilkår()
+            val vilkårRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
 
-        assertThat(vilkårFørstegangsbehandling).usingRecursiveComparison()
-            .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
-            .isEqualTo(vilkårBarn1)
+            opprettVilkårForNyeBarnVidHentingAvVilkår()
 
-        val barn2Id = barnRevurdering.single { it.ident == barn2.ident.verdi }.id
-        val vilkårBarn2 = vilkårRevurdering.single { it.barnId == barn2Id }
+            assertThat(vilkårRepository.findByBehandlingId(revurdering.id))
+                .`as`("Vilkåren er ikke opprettet på nytt")
+                .containsAnyElementsOf(vilkårRevurdering)
+        }
 
-        assertThat(vilkårBarn2.barnId).isEqualTo(barn2Id)
-        assertThat(vilkårBarn2.behandlingId).isEqualTo(revurdering.id)
-        assertThat(vilkårBarn2.opphavsvilkår).isNull()
+        private fun assertHarBeholdtBarn1OgOpprettetVilkårForNyttBarn() {
+            val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
+            val revurderingBarn1 = barnRevurdering.single { it.ident == barn1Ident }
+            val revurderingBarn2 = barnRevurdering.single { it.ident == barn2Ident }
+
+            val vilkårFørstegangsbehandling = vilkårRepository.findByBehandlingId(førstegangsbehandling.id).single()
+            val vilkårRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
+            val vilkårRevurderingBarn1 = vilkårRevurdering.single { it.barnId == revurderingBarn1.id }
+            val vilkårRevurderingBarn2 = vilkårRevurdering.single { it.barnId == revurderingBarn2.id }
+
+            assertThat(vilkårRevurdering).hasSize(2)
+            assertVilkårErGjenbrukt(vilkårFørstegangsbehandling, vilkårRevurderingBarn1)
+
+            with(vilkårRevurderingBarn2) {
+                assertThat(opphavsvilkår).isNull()
+                assertThat(barnId).isEqualTo(revurderingBarn2.id)
+            }
+        }
+
+        private fun opprettFørstegangsbehandling(barn: List<BehandlingBarn>) {
+            testoppsettService.lagre(førstegangsbehandling)
+            barnRepository.insertAll(barn)
+            opprettVilkårsvurderinger(førstegangsbehandling, barn)
+        }
+
+        private fun opprettRevurdering(barn: List<BehandlingBarn>) {
+            testoppsettService.lagre(revurdering)
+            gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
+            // barn som ikke var med i første behandling må opprettes manuelt
+            barnService.opprettBarn(barn)
+        }
+
+        private fun opprettVilkårForNyeBarnVidHentingAvVilkår() {
+            val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
+            // Oppretter vilkår for nye barn
+            vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
+        }
     }
 
     private fun opprettVilkårsvurderinger(
-        søknadskjema: SøknadBarnetilsyn,
         behandling: Behandling,
         barn: List<BehandlingBarn>,
     ): List<Vilkår> {
@@ -253,11 +253,17 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         return vilkårRepository.insertAll(vilkårsett)
     }
 
-    private fun lagreSøknad(
-        behandling: Behandling,
-        barn: List<BarnMedBarnepass> = listOf(SøknadUtil.barnMedBarnepass()),
-    ): SøknadBarnetilsyn {
-        søknadService.lagreSøknad(behandling.id, lagJournalpost(), SøknadUtil.søknadskjemaBarnetilsyn(barnMedBarnepass = barn))
-        return søknadService.hentSøknadBarnetilsyn(behandling.id)!!
+    fun List<String>.tilBehandlingBarn(behandling: Behandling) =
+        this.map { behandlingBarn(behandlingId = behandling.id, personIdent = it) }
+
+    private fun assertVilkårErGjenbrukt(
+        vilkårForBehandling: Vilkår,
+        vilkårForRevurdering: Vilkår,
+    ) {
+        assertThat(vilkårForBehandling).usingRecursiveComparison()
+            .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
+            .isEqualTo(vilkårForRevurdering)
+
+        assertThat(vilkårForRevurdering.opphavsvilkår?.behandlingId).isEqualTo(vilkårForBehandling.behandlingId)
     }
 }
