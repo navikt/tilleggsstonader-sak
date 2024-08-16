@@ -170,6 +170,25 @@ object OppdaterVilkår {
             }
     }
 
+    fun opprettVilkårForNyeBarn(
+        behandlingId: UUID,
+        metadata: HovedregelMetadata,
+        stønadstype: Stønadstype,
+        eksisterendeVilkår: List<Vilkår>,
+    ): List<Vilkår> {
+        return vilkårsreglerForStønad(stønadstype)
+            .filter { it.vilkårType.gjelderFlereBarn() }
+            .mapNotNull { vilkårsregel ->
+                metadata.barn.filter { barn ->
+                    eksisterendeVilkår.none {
+                        val vilkårFinnesForBarn = it.barnId == barn.id && it.type == vilkårsregel.vilkårType
+
+                        vilkårFinnesForBarn
+                    }
+                }.map { lagNyttVilkår(vilkårsregel, metadata, behandlingId, it.id) }
+            }.flatten()
+    }
+
     fun lagVilkårForNyttBarn(
         metadata: HovedregelMetadata,
         behandlingId: UUID,

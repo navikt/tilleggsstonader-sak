@@ -224,7 +224,7 @@ class VilkårService(
         return Pair(grunnlag, HovedregelMetadata(barn, behandling))
     }
 
-    private fun hentEllerOpprettVilkår(
+    fun hentEllerOpprettVilkår(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
     ): List<Vilkår> {
@@ -233,8 +233,36 @@ class VilkårService(
         return when {
             behandlingErLåstForVidereRedigering(behandlingId) -> lagretVilkårsett
             lagretVilkårsett.isEmpty() -> lagNyttVilkårsett(behandlingId, metadata)
-            else -> lagretVilkårsett
+            else -> hentEllerOpprettMedEvtNyeBarn(metadata, lagretVilkårsett, behandlingId)
         }
+    }
+
+    private fun hentEllerOpprettMedEvtNyeBarn(
+        metadata: HovedregelMetadata,
+        lagretVilkårsett: List<Vilkår>,
+        behandlingId: UUID,
+    ): List<Vilkår> {
+        val harVilkårForAlleBarn = lagretVilkårsett.filter { it.type.gjelderFlereBarn() }.map { it.type }.toSet().all { vilkårType ->
+            metadata.barn.all { barn ->
+                lagretVilkårsett.any { it.barnId == barn.id && it.type == vilkårType }
+            }
+        }
+
+        if (!harVilkårForAlleBarn) {
+            return lagretVilkårsett + opprettVilkårForNyeBarn(behandlingId, metadata, lagretVilkårsett)
+        }
+
+        return lagretVilkårsett
+    }
+
+    private fun opprettVilkårForNyeBarn(
+        behandlingId: UUID,
+        metadata: HovedregelMetadata,
+        lagretVilkårsett: List<Vilkår>,
+    ): List<Vilkår> {
+        val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
+        val nyeVilkår = OppdaterVilkår.opprettVilkårForNyeBarn(behandlingId, metadata, stønadstype, lagretVilkårsett)
+        return vilkårRepository.insertAll(nyeVilkår)
     }
 
     private fun lagNyttVilkårsett(
