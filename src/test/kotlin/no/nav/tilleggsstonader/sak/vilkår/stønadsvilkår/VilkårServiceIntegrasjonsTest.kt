@@ -141,10 +141,10 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
             opprettFørstegangsbehandling(barnPåFørsteBehandling)
 
-            // barn 2 må opprettes manuellt fordi den ikke opprettes i gjenbruk
+            // barn 2 må opprettes manuelt fordi den ikke opprettes i gjenbruk
             opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
-            oprettVilkårForNyeBarnVidHentingAvVilkår()
+            opprettVilkårForNyeBarnVidHentingAvVilkår()
 
             assertHarBeholdtBarn1OgOpprettetVilkårForNyttBarn()
         }
@@ -160,12 +160,36 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
             opprettFørstegangsbehandling(barnFørsteBehandling)
 
-            // barn 2 må opprettes manuellt fordi den ikke opprettes i gjenbruk
+            // barn 2 må opprettes manuelt fordi den ikke opprettes i gjenbruk
             opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
-            oprettVilkårForNyeBarnVidHentingAvVilkår()
+            opprettVilkårForNyeBarnVidHentingAvVilkår()
 
             assertHarBeholdtBarn1OgOpprettetVilkårForNyttBarn()
+        }
+
+        /**
+         * Søknad 1: Barn1
+         *
+         * Søknad 2: Barn 1 og Barn2
+         */
+        @Test
+        fun `skal ikke opprette barn andre gangen man kaller på hent vilkår`() {
+            val barnFørsteBehandling = listOf(barn1Ident).tilBehandlingBarn(førstegangsbehandling)
+
+            opprettFørstegangsbehandling(barnFørsteBehandling)
+
+            // barn 2 må opprettes manuelt fordi den ikke opprettes i gjenbruk
+            opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
+
+            opprettVilkårForNyeBarnVidHentingAvVilkår()
+            val vilkårRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
+
+            opprettVilkårForNyeBarnVidHentingAvVilkår()
+
+            assertThat(vilkårRepository.findByBehandlingId(revurdering.id))
+                .`as`("Vilkåren er ikke opprettet på nytt")
+                .containsAnyElementsOf(vilkårRevurdering)
         }
 
         private fun assertHarBeholdtBarn1OgOpprettetVilkårForNyttBarn() {
@@ -196,16 +220,15 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         private fun opprettRevurdering(barn: List<BehandlingBarn>) {
             testoppsettService.lagre(revurdering)
             gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
-            // barn som ikke var med i første behandling må opprettes manuellt
+            // barn som ikke var med i første behandling må opprettes manuelt
             barnService.opprettBarn(barn)
         }
 
-        private fun oprettVilkårForNyeBarnVidHentingAvVilkår() {
+        private fun opprettVilkårForNyeBarnVidHentingAvVilkår() {
             val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
             // Oppretter vilkår for nye barn
             vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
         }
-
     }
 
     private fun opprettVilkårsvurderinger(
@@ -235,7 +258,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
     private fun assertVilkårErGjenbrukt(
         vilkårForBehandling: Vilkår,
-        vilkårForRevurdering: Vilkår
+        vilkårForRevurdering: Vilkår,
     ) {
         assertThat(vilkårForBehandling).usingRecursiveComparison()
             .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
