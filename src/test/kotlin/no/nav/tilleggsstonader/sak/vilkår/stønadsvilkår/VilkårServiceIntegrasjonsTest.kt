@@ -147,7 +147,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
             val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
-            vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
 
             val vilkårFørstegangsbehandling = vilkårRepository.findByBehandlingId(førstegangsbehandling.id).single()
             assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnPåFørsteBehandling.single().id)
@@ -200,7 +199,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             opprettRevurdering(listOf(barn2Ident).tilBehandlingBarn(revurdering))
 
             val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
-            vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
 
             val vilkårFørstegangsbehandling = vilkårRepository.findByBehandlingId(førstegangsbehandling.id).single()
             assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(barnFørsteBehandling.single().id)
@@ -249,6 +247,9 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             gjennbrukDataRevurderingService.gjenbrukData(revurdering, førstegangsbehandling.id)
             // barn som ikke var med i første behandling må opprettes manuellt
             barnService.opprettBarn(barn)
+            val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
+            // Oppretter vilkår for nye barn
+            vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
         }
     }
 
