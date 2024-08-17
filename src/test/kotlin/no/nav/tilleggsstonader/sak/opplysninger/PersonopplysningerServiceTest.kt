@@ -4,7 +4,10 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.opplysninger.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
+import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.metadataGjeldende
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlSøker
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.vergemaalEllerFremtidsfullmakt
 import org.assertj.core.api.Assertions.assertThat
@@ -12,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.UUID
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse as AdressebeskyttelsePdl
 
 class PersonopplysningerServiceTest {
 
@@ -56,6 +60,20 @@ class PersonopplysningerServiceTest {
             every { personService.hentSøker(any()) } returns pdlSøker
 
             assertThat(service.hentPersonopplysningerForFagsakPerson(UUID.randomUUID()).harVergemål).isTrue
+        }
+    }
+
+    @Nested
+    inner class AdressebeskyttelseMapping {
+
+        @Test
+        fun `skal mappe status fra pdl til status`() {
+            val gradering = AdressebeskyttelseGradering.FORTROLIG
+            val pdlSøker = pdlSøker(adressebeskyttelse = listOf(AdressebeskyttelsePdl(gradering, metadataGjeldende)))
+            every { personService.hentSøker(any()) } returns pdlSøker
+
+            assertThat(service.hentPersonopplysningerForFagsakPerson(UUID.randomUUID()).adressebeskyttelse)
+                .isEqualTo(Adressebeskyttelse.FORTROLIG)
         }
     }
 }
