@@ -47,21 +47,17 @@ class ArenaClientConfig {
                     id = 1,
                     tittel = "Kontroller/registrer saksopplysninger - automatisk journalført",
                     kommentar = "En kommentar\\n\\n med radbryte",
-                    fristFerdigstillelse = LocalDate.now(),
                     benk = "Inn",
                     tildelt = null,
                     opprettetTidspunkt = LocalDateTime.now(),
-                    målgruppe = Målgruppe.NEDSATT__ARBEIDSEVNE,
                 ),
                 ArenaOppgaveDto(
                     id = 2,
                     tittel = "Vurder dokument",
                     kommentar = "En kommentar",
-                    fristFerdigstillelse = LocalDate.now(),
                     benk = null,
                     tildelt = "ABC1234",
                     opprettetTidspunkt = LocalDateTime.now(),
-                    målgruppe = Målgruppe.NEDSATT__ARBEIDSEVNE,
                 ),
             )
         }
