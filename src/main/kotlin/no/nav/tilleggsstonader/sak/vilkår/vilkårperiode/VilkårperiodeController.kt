@@ -33,6 +33,14 @@ class VilkårperiodeController(
         return vilkårperiodeService.hentVilkårperioderResponse(behandlingId)
     }
 
+    @PostMapping("behandling/{behandlingId}/oppdater-grunnlag")
+    fun oppdaterGrunnlag(@PathVariable behandlingId: UUID) {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        vilkårperiodeService.oppdaterGrunnlag(behandlingId)
+    }
+
     @PostMapping
     fun opprettVilkårMedPeriode(
         @RequestBody vilkårperiode: LagreVilkårperiode,
