@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusHarSakerDto
 import no.nav.tilleggsstonader.kontrakter.arena.SakStatus
 import no.nav.tilleggsstonader.kontrakter.arena.VedtakStatus
 import no.nav.tilleggsstonader.kontrakter.arena.oppgave.ArenaOppgaveDto
-import no.nav.tilleggsstonader.kontrakter.arena.sak.Målgruppe
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
