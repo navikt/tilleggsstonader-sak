@@ -44,6 +44,7 @@ class ArenaClientConfig {
             every { client.harSaker(any()) } returns ArenaStatusHarSakerDto(true)
             every { client.hentOppgaver(any()) } returns listOf(
                 ArenaOppgaveDto(
+                    id = 1,
                     tittel = "Kontroller/registrer saksopplysninger - automatisk journalført",
                     kommentar = "En kommentar\\n\\n med radbryte",
                     fristFerdigstillelse = LocalDate.now(),
@@ -53,6 +54,7 @@ class ArenaClientConfig {
                     målgruppe = Målgruppe.NEDSATT__ARBEIDSEVNE,
                 ),
                 ArenaOppgaveDto(
+                    id = 2,
                     tittel = "Vurder dokument",
                     kommentar = "En kommentar",
                     fristFerdigstillelse = LocalDate.now(),
