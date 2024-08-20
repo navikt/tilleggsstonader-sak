@@ -45,7 +45,7 @@ class ArenaClientConfig {
                 ArenaOppgaveDto(
                     id = 1,
                     tittel = "Kontroller/registrer saksopplysninger - automatisk journalført",
-                    kommentar = "En kommentar\\n\\n med radbryte",
+                    kommentar = "En kommentar\n\n med \nradbryte",
                     benk = "Inn",
                     tildelt = null,
                     opprettetTidspunkt = LocalDateTime.now(),
