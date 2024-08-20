@@ -38,6 +38,7 @@ spec:
   gcp:
     sqlInstances:
       - type: POSTGRES_15
+        tier: db-f1-micro
         flags:
           - name: cloudsql.logical_decoding  # trengs for å bruke replication slots i databasen.
             value: "on"
