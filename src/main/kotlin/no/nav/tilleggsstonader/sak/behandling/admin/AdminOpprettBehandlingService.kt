@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
-class OpprettBehandlingFraJournalpostService(
+class AdminOpprettBehandlingService(
     private val personService: PersonService,
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,

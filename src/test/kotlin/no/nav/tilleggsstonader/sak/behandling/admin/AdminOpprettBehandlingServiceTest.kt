@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.admin.OpprettBehandlingFraJournalpostService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -31,7 +30,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class OpprettBehandlingFraJournalpostServiceTest {
+class AdminOpprettBehandlingServiceTest {
 
     val personService = mockk<PersonService>()
     val fagsakService = mockk<FagsakService>()
@@ -41,7 +40,7 @@ class OpprettBehandlingFraJournalpostServiceTest {
     val tilgangService = mockk<TilgangService>(relaxed = true)
     val barnService = mockk<BarnService>()
 
-    val service = OpprettBehandlingFraJournalpostService(
+    val service = AdminOpprettBehandlingService(
         personService = personService,
         fagsakService = fagsakService,
         behandlingService = behandlingService,

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.admin
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.sak.behandling.admin.OpprettBehandlingFraJournalpostService.OpprettBehandlingFraJournalpostStatus
+import no.nav.tilleggsstonader.sak.behandling.admin.AdminOpprettBehandlingService.OpprettBehandlingFraJournalpostStatus
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -13,8 +13,8 @@ import java.util.UUID
 @RestController
 @RequestMapping(path = ["/api/behandling/journalpost"])
 @ProtectedWithClaims(issuer = "azuread")
-class BehandlingFraJournalpostController(
-    private val opprettBehandlingFraJournalpostService: OpprettBehandlingFraJournalpostService,
+class AdminOpprettBehandlingController(
+    private val adminOpprettBehandlingService: AdminOpprettBehandlingService,
     private val tilgangService: TilgangService,
 ) {
 
@@ -22,7 +22,7 @@ class BehandlingFraJournalpostController(
     fun hentStatus(@PathVariable journalpostId: String): OpprettBehandlingFraJournalpostStatus {
         tilgangService.validerHarSaksbehandlerrolle()
         // Tilgangskontroll gjøres inne i opprettBehandlingFraJournalpost
-        return opprettBehandlingFraJournalpostService.hentInformasjon(journalpostId)
+        return adminOpprettBehandlingService.hentInformasjon(journalpostId)
     }
 
     @PostMapping("{journalpostId}")
@@ -31,6 +31,6 @@ class BehandlingFraJournalpostController(
 
         // Tilgangskontroll gjøres inne i opprettBehandlingFraJournalpost
 
-        return opprettBehandlingFraJournalpostService.opprettBehandlingFraJournalpost(journalpostId)
+        return adminOpprettBehandlingService.opprettBehandlingFraJournalpost(journalpostId)
     }
 }
