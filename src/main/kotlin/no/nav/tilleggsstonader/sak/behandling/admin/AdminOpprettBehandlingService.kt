@@ -2,33 +2,24 @@ package no.nav.tilleggsstonader.sak.behandling.admin
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
-import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
-import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
-import no.nav.tilleggsstonader.sak.behandling.manuell.SøknadTilsynBarnSendInnFyllUtUtil.parseInfoFraSøknad
-import no.nav.tilleggsstonader.sak.behandling.manuell.Søknadsinformasjon
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
+import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
-import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
-import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -38,130 +29,80 @@ class AdminOpprettBehandlingService(
     private val personService: PersonService,
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
-    private val journalpostService: JournalpostService,
     private val taskService: TaskService,
-    private val tilgangService: TilgangService,
     private val barnService: BarnService,
     private val unleashService: UnleashService,
 ) {
 
     @Transactional
-    fun opprettBehandlingFraJournalpost(journalpostId: String): UUID {
-        brukerfeilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_BEHANDLING_FRA_JOURNALPOST)) {
-            "Feature toggle for å kunne opprette behandling fra journalpost er slått av"
-        }
+    fun opprettFørstegangsbehandling(ident: String, valgteBarn: Set<String>): UUID {
+        validerOpprettelseAvBehandling(ident, valgteBarn)
 
-        val info = hentInformasjon(journalpostId)
-
-        val fagsak = fagsakService.hentEllerOpprettFagsak(info.ident, Stønadstype.BARNETILSYN)
-
+        val fagsak = fagsakService.hentEllerOpprettFagsak(ident, Stønadstype.BARNETILSYN)
         val behandling = behandlingService.opprettBehandling(
             fagsakId = fagsak.id,
             behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET,
         )
-        val behandlingBarn =
-            info.barnIdenterFraSøknad.map { BehandlingBarn(behandlingId = behandling.id, ident = it) }
+
+        val behandlingBarn = valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) }
         barnService.opprettBarn(behandlingBarn)
 
-        behandlingService.leggTilBehandlingsjournalpost(journalpostId, Journalposttype.I, behandling.id)
-
         opprettBehandleSakOppgave(behandling)
+
         return behandling.id
     }
 
-    fun hentInformasjon(journalpostId: String): OpprettBehandlingFraJournalpostStatus {
-        val journalpost = journalpostService.hentJournalpost(journalpostId)
-
-        val journalstatus = journalpost.journalstatus
-        brukerfeilHvisIkke(journalstatus == Journalstatus.FERDIGSTILT || journalstatus == Journalstatus.JOURNALFOERT) {
-            "Journalpost har status=$journalstatus, forventer at den skal være ferdigstilt"
+    private fun validerOpprettelseAvBehandling(ident: String, barn: Set<String>) {
+        brukerfeilHvisIkke(unleashService.isEnabled(Toggle.ADMIN_KAN_OPPRETTE_BEHANDLING)) {
+            "Feature toggle for å kunne opprette behandling er slått av"
+        }
+        feilHvis(barn.isEmpty()) {
+            "Må velge minimum 1 barn"
         }
 
-        val ident = journalpostService.hentIdentFraJournalpost(journalpost)
-        tilgangService.validerTilgangTilPerson(ident, AuditLoggerEvent.CREATE)
+        val person = personService.hentPersonMedBarn(ident)
 
-        val søknadsinformasjon = hentSøknadsinformasjon(journalpost)
-
-        val personIdenter = personService.hentPersonIdenter(ident)
-        val gjeldendeIdent = personIdenter.gjeldende().ident
-        validerIdentErGyldig(personIdenter.identer(), søknadsinformasjon.ident)
-        validerBarnFraSøknad(gjeldendeIdent, søknadsinformasjon.identerBarn)
-
-        val fagsak = fagsakService.finnFagsak(personIdenter.identer(), Stønadstype.BARNETILSYN)
-        validerAtDetIkkeFinnesBehandlingFor(fagsak)
-
-        return OpprettBehandlingFraJournalpostStatus(
-            ident = gjeldendeIdent,
-            barnIdenterFraSøknad = søknadsinformasjon.identerBarn,
-            fagsakId = fagsak?.id,
-        )
+        validerAtBarnFinnesPåPerson(person, barn)
+        validerAtDetIkkeFinnesBehandlingFraFør(ident)
     }
 
-    private val BREVKODE_1 = "${DokumentBrevkode.BARNETILSYN.verdi}B"
-    private val BREVKODE_2 = "NAV 11-12.12" // Tidligere skjema for tilleggsstønader
-    private fun hentSøknadsinformasjon(
-        journalpost: Journalpost,
-    ): Søknadsinformasjon {
-        val brevkoder = journalpost.dokumenter?.mapNotNull { it.brevkode }
-        val dokumentJournalpost = journalpost.dokumenter
-            ?.singleOrNull { it.brevkode == BREVKODE_1 || it.brevkode == BREVKODE_2 }
-            ?: brukerfeil(
-                "Journalpost=${journalpost.journalpostId} ($brevkoder) inneholder ikke gyldig brevkode. " +
-                    "Tillater kun gammel søknad om tilsyn til barn enn så lenge.",
-            )
-        val dokument = journalpostService.hentDokument(
-            journalpost = journalpost,
-            dokumentInfoId = dokumentJournalpost.dokumentInfoId,
-            dokumentVariantformat = Dokumentvariantformat.ORIGINAL,
-        )
-        return parseInfoFraSøknad(dokument)
-    }
+    fun hentPerson(ident: String): PersoninfoDto {
+        validerAtDetIkkeFinnesBehandlingFraFør(ident)
 
-    private fun validerIdentErGyldig(identer: Set<String>, identFraSøknad: String) {
-        feilHvisIkke(identer.contains(identFraSøknad)) {
-            "Ident i søknad tilsvarer ikke ident på personen tilknyttet journalposten"
-        }
+        val person = personService.hentPersonMedBarn(ident)
+        return PersoninfoDto(
+            barn = person.barn.map {
+                Barn(
+                    ident = it.key,
+                    navn = it.value.navn.gjeldende().visningsnavn(),
+                )
+            },
+        )
     }
 
     private fun opprettBehandleSakOppgave(behandling: Behandling) {
         val task = OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
             OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
                 behandlingId = behandling.id,
-                saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                saksbehandler = SikkerhetContext.SYSTEM_FORKORTELSE,
                 beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
             ),
         )
         taskService.save(task)
     }
 
-    /**
-     * Tillater kun å opprette førstegangsbehandling på personen
-     */
-    private fun validerAtDetIkkeFinnesBehandlingFor(fagsak: Fagsak?) {
+    private fun validerAtBarnFinnesPåPerson(person: SøkerMedBarn, barn: Set<String>) {
+        feilHvis(barn.any { !person.barn.contains(it) }) {
+            "Barn finnes ikke på person"
+        }
+    }
+
+    private fun validerAtDetIkkeFinnesBehandlingFraFør(ident: String) {
+        val personIdenter = personService.hentPersonIdenter(ident)
+        val fagsak = fagsakService.finnFagsak(personIdenter.identer(), Stønadstype.BARNETILSYN)
         val behandlinger = fagsak?.let { behandlingService.hentBehandlinger(it.id) } ?: emptyList()
-        feilHvis(behandlinger.isNotEmpty()) {
-            "Det finnes allerede en behandling på personen"
+        brukerfeilHvis(behandlinger.isNotEmpty()) {
+            "Det finnes allerede en behandling på personen. Gå til behandlingsoversikten og opprett endring derifra."
         }
     }
-
-    private fun validerBarnFraSøknad(gjeldendeIdent: String, barnIdenterFraSøknad: Set<String>) {
-        feilHvis(barnIdenterFraSøknad.isEmpty()) {
-            "Søknaden mangler identer på barn - kan ikke opprette behandling manuelt uten barn"
-        }
-        val søker = personService.hentPersonMedBarn(gjeldendeIdent)
-        barnIdenterFraSøknad.forEach {
-            feilHvisIkke(
-                søker.barn.containsKey(it),
-                sensitivFeilmelding = { "Søknaden inneholder barn $it som ikke finnes på personen=$gjeldendeIdent" },
-            ) {
-                "Søknaden inneholder barn som ikke finnes på personen"
-            }
-        }
-    }
-
-    data class OpprettBehandlingFraJournalpostStatus(
-        val ident: String,
-        val barnIdenterFraSøknad: Set<String>,
-        val fagsakId: UUID?,
-    )
 }
