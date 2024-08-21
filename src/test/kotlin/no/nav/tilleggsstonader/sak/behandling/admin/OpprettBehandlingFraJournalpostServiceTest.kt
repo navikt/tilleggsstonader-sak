@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.behandling.manuell
+package no.nav.tilleggsstonader.sak.behandling.admin
 
 import io.mockk.every
 import io.mockk.justRun
@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.admin.OpprettBehandlingFraJournalpostService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService

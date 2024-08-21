@@ -1,7 +1,7 @@
-package no.nav.tilleggsstonader.sak.behandling.manuell
+package no.nav.tilleggsstonader.sak.behandling.admin
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.sak.behandling.manuell.OpprettBehandlingFraJournalpostService.OpprettBehandlingFraJournalpostStatus
+import no.nav.tilleggsstonader.sak.behandling.admin.OpprettBehandlingFraJournalpostService.OpprettBehandlingFraJournalpostStatus
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

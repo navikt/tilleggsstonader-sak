@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.behandling.manuell
+package no.nav.tilleggsstonader.sak.behandling.admin
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
 import no.nav.tilleggsstonader.sak.behandling.manuell.SøknadTilsynBarnSendInnFyllUtUtil.parseInfoFraSøknad
+import no.nav.tilleggsstonader.sak.behandling.manuell.Søknadsinformasjon
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
