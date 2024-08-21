@@ -2,7 +2,10 @@ package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
@@ -37,7 +40,15 @@ internal class SimuleringControllerTest : IntegrationTest() {
     internal fun `Skal returnere 200 OK for simulering av behandling`() {
         val personIdent = "12345678901"
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(personIdent))))
-        val behandling = testoppsettService.lagre(behandling(fagsak, resultat = BehandlingResultat.INNVILGET))
+        val behandling = testoppsettService.lagre(
+            behandling(
+                fagsak,
+                type = BehandlingType.REVURDERING,
+                resultat = BehandlingResultat.INNVILGET,
+                status = BehandlingStatus.UTREDES,
+                steg = StegType.SIMULERING,
+            ),
+        )
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
         val respons: ResponseEntity<SimuleringDto> = simulerForBehandling(behandling.id)
