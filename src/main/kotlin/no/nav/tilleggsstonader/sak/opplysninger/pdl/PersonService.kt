@@ -36,11 +36,13 @@ class PersonService(
         val barnIdentifikatorer = søker.forelderBarnRelasjon
             .filter { it.relatertPersonsRolle == Familierelasjonsrolle.BARN }
             .mapNotNull { it.relatertPersonsIdent }
-        return SøkerMedBarn(ident, søker, hentPersonForelderBarnRelasjon(barnIdentifikatorer))
+        return SøkerMedBarn(ident, søker, hentBarn(barnIdentifikatorer))
     }
 
-    fun hentPersonForelderBarnRelasjon(barnIdentifikatorer: List<String>) =
-        pdlClient.hentPersonForelderBarnRelasjon(barnIdentifikatorer)
+    fun hentBarn(barnIdentifikatorer: List<String>) =
+        cacheManager.getCachedOrLoad("personService_hentBarn", barnIdentifikatorer) {
+            pdlClient.hentBarn(it.toList())
+        }
 
     fun hentAndreForeldre(personIdenter: List<String>): Map<String, PdlAnnenForelder> {
         return pdlClient.hentAndreForeldre(personIdenter)

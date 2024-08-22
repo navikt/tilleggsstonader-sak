@@ -112,7 +112,7 @@ data class PdlSøker(
     fun alleIdenter(): Set<String> = folkeregisteridentifikator.map { it.ident }.toSet()
 }
 
-data class PdlPersonForelderBarn(
+data class PdlBarn(
     val adressebeskyttelse: List<Adressebeskyttelse>,
     override val bostedsadresse: List<Bostedsadresse>,
     @JsonProperty("doedsfall") val dødsfall: List<Dødsfall>,

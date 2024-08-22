@@ -10,7 +10,7 @@ object PdlConfig {
 
     val søkerQuery = graphqlQuery("/pdl/søker.graphql")
 
-    val forelderBarnQuery = graphqlQuery("/pdl/forelder_barn.graphql")
+    val forelderBarnQuery = graphqlQuery("/pdl/barn.graphql")
 
     val annenForelderQuery = graphqlQuery("/pdl/andreForeldre.graphql")
 

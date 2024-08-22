@@ -27,7 +27,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Opphold
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Oppholdsadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Oppholdstillatelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonForelderBarn
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonFraSøk
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
@@ -179,13 +179,13 @@ object PdlTestdata {
             ),
         )
 
-    val pdlPersonForelderBarnData =
+    val pdlBarnData =
         PersonBolk(
             listOf(
                 PersonDataBolk(
                     "11111122222",
                     "ok",
-                    PdlPersonForelderBarn(
+                    PdlBarn(
                         adressebeskyttelse,
                         bostedsadresse,
                         dødsfall,

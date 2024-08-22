@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBolkResponse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlHentIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
@@ -19,7 +20,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdentRequestVariables
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonBolkRequest
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonBolkRequestVariables
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonForelderBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonRequest
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonRequestVariables
@@ -52,14 +52,14 @@ class PdlClient(
         return feilsjekkOgReturnerData(personIdent, pdlResponse) { it.person }
     }
 
-    fun hentPersonForelderBarnRelasjon(personIdenter: List<String>): Map<String, PdlPersonForelderBarn> {
+    fun hentBarn(personIdenter: List<String>): Map<String, PdlBarn> {
         if (personIdenter.isEmpty()) return emptyMap()
         val request = PdlPersonBolkRequest(
             variables = PdlPersonBolkRequestVariables(personIdenter),
             query = PdlConfig.forelderBarnQuery,
         )
 
-        val pdlResponse = postForEntity<PdlBolkResponse<PdlPersonForelderBarn>>(pdlUri, request, PdlUtil.httpHeaders)
+        val pdlResponse = postForEntity<PdlBolkResponse<PdlBarn>>(pdlUri, request, PdlUtil.httpHeaders)
 
         return feilsjekkOgReturnerData(pdlResponse)
     }
