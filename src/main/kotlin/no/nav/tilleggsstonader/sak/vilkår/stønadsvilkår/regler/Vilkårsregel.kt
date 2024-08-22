@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -24,7 +25,8 @@ abstract class Vilkårsregel(
     val regler: Map<RegelId, RegelSteg>,
 ) {
 
-    val hovedregler get(): Set<RegelId> = regler.filter { it.value.erHovedregel }.keys.toSet()
+    @get:JsonIgnore
+    val hovedregler: Set<RegelId> = regler.filter { it.value.erHovedregel }.keys.toSet()
 
     open fun initiereDelvilkår(
         metadata: HovedregelMetadata,

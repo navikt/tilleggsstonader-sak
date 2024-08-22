@@ -61,6 +61,5 @@
         }
       }
     }
-  },
-  "hovedregler" : [ "UTGIFTER_DOKUMENTERT", "ANNEN_FORELDER_MOTTAR_STØTTE", "HAR_FULLFØRT_FJERDEKLASSE" ]
+  }
 }
