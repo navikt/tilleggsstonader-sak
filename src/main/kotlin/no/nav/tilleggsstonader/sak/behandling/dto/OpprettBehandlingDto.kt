@@ -6,6 +6,7 @@ import java.util.UUID
 data class OpprettBehandlingDto(
     val fagsakId: UUID,
     val årsak: BehandlingÅrsak,
+    val valgteBarn: Set<String> = emptySet(),
 )
 
 data class BarnTilRevurderingDto(

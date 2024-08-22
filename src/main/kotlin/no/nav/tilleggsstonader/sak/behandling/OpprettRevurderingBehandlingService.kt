@@ -1,15 +1,18 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sisteFerdigstilteBehandling
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
@@ -53,7 +56,10 @@ class OpprettRevurderingBehandlingService(
 
         val forrigeBehandlingId = behandling.forrigeBehandlingId ?: sisteAvsluttetBehandlingId(fagsakId)
 
+        validerValgteBarn(request, forrigeBehandlingId)
+
         gjenbrukDataRevurderingService.gjenbrukData(behandling, forrigeBehandlingId)
+        barnService.opprettBarn(request.valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) })
 
         taskService.save(
             OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
@@ -68,11 +74,36 @@ class OpprettRevurderingBehandlingService(
         return behandling.id
     }
 
+    private fun validerValgteBarn(request: OpprettBehandlingDto, forrigeBehandlingId: UUID) {
+        val stønadstype: Stønadstype by lazy { fagsakService.hentFagsak(request.fagsakId).stønadstype }
+        feilHvis(request.valgteBarn.isNotEmpty() && stønadstype != Stønadstype.BARNETILSYN) {
+            "Kan ikke sende inn barn til $stønadstype"
+        }
+
+        feilHvis(request.årsak != BehandlingÅrsak.SØKNAD && request.valgteBarn.isNotEmpty()) {
+            "Kan ikke sende med barn på annet enn årsak Søknad"
+        }
+
+        val barnTilRevurdering = hentBarnTilRevurdering(request.fagsakId, forrigeBehandlingId).barn
+
+        val valgbareIdenter = barnTilRevurdering.filterNot { it.finnesPåForrigeBehandling }.map { it.ident }
+        feilHvis(!valgbareIdenter.containsAll(request.valgteBarn)) {
+            "Kan ikke velge barn som ikke er valgbare."
+        }
+    }
+
     fun hentBarnTilRevurdering(fagsakId: UUID): BarnTilRevurderingDto {
-        val ident = fagsakService.hentAktivIdent(fagsakId)
         val forrigeBehandlingId = behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
             ?: sisteAvsluttetBehandlingId(fagsakId)
 
+        return hentBarnTilRevurdering(fagsakId, forrigeBehandlingId)
+    }
+
+    private fun hentBarnTilRevurdering(
+        fagsakId: UUID,
+        forrigeBehandlingId: UUID,
+    ): BarnTilRevurderingDto {
+        val ident = fagsakService.hentAktivIdent(fagsakId)
         val barnPåSøker = personService.hentPersonMedBarn(ident).barn
         val eksisterendeBarn = barnService.finnBarnPåBehandling(forrigeBehandlingId).associateBy { it.ident }
 

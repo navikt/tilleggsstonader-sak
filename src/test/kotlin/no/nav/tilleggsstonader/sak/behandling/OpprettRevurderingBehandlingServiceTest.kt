@@ -131,7 +131,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
     @Nested
     inner class GjenbrukDataFraForrigeBehandling {
         var tidligereBehandling: Behandling? = null
-        val barnIdent = "barn1"
+        val barnIdent = PdlClientConfig.barnFnr
         val fom = LocalDate.of(2024, 1, 1)
         val tom = LocalDate.of(2024, 1, 31)
 
@@ -215,12 +215,24 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             resultat = BehandlingResultat.INNVILGET,
         )
 
+        val eksisterendeBarn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.barnFnr)
+
+        @BeforeEach
+        fun setUp() {
+            testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = false)
+            val barn = barnService.opprettBarn(listOf(eksisterendeBarn))
+            val vilkår = barn.map {
+                vilkår(
+                    behandlingId = behandling.id,
+                    barnId = it.id,
+                    type = VilkårType.PASS_BARN,
+                )
+            }
+            vilkårRepository.insertAll(vilkår)
+        }
+
         @Test
         fun `hentBarnTilRevurdering - skal markere barn som finnes med på forrige behandling`() {
-            testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = false)
-            val eksisterendeBarn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.barnFnr)
-            barnService.opprettBarn(listOf(eksisterendeBarn))
-
             val barnTilRevurdering = service.hentBarnTilRevurdering(behandling.fagsakId)
 
             assertThat(barnTilRevurdering.barn).hasSize(2)
@@ -230,13 +242,85 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             assertThat(barnTilRevurdering.barn.single { it.ident == PdlClientConfig.barn2Fnr }.finnesPåForrigeBehandling)
                 .isFalse()
         }
+
+        @Test
+        fun `skal opprette behandling med nytt barn`() {
+            val request = opprettBehandlingDto(
+                fagsakId = behandling.fagsakId,
+                årsak = BehandlingÅrsak.SØKNAD,
+                valgteBarn = setOf(PdlClientConfig.barn2Fnr),
+            )
+            val behandlingIdRevurdering = service.opprettBehandling(request)
+
+            with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
+                assertThat(this).hasSize(2)
+                assertThat(this.map { it.ident })
+                    .containsExactlyInAnyOrder(PdlClientConfig.barnFnr, PdlClientConfig.barn2Fnr)
+            }
+        }
+
+        @Test
+        fun `hvis man ikke sender inn noen barn skal man kun beholde barn fra forrige behandling`() {
+            val request = opprettBehandlingDto(
+                fagsakId = behandling.fagsakId,
+                årsak = BehandlingÅrsak.SØKNAD,
+                valgteBarn = setOf(),
+            )
+            val behandlingIdRevurdering = service.opprettBehandling(request)
+
+            with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
+                assertThat(this).hasSize(1)
+                assertThat(this.map { it.ident }).containsExactlyInAnyOrder(PdlClientConfig.barnFnr)
+            }
+        }
+
+        @Test
+        fun `skal feile hvis man sender inn barn på årsak nye opplysninger`() {
+            val request = opprettBehandlingDto(
+                fagsakId = behandling.fagsakId,
+                årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
+                valgteBarn = setOf(PdlClientConfig.barn2Fnr),
+            )
+
+            assertThatThrownBy {
+                service.opprettBehandling(request)
+            }.hasMessage("Kan ikke sende med barn på annet enn årsak Søknad")
+        }
+
+        @Test
+        fun `skal feile hvis man prøver å sende inn barn som ikke finnes på personen`() {
+            val request = opprettBehandlingDto(
+                fagsakId = behandling.fagsakId,
+                årsak = BehandlingÅrsak.SØKNAD,
+                valgteBarn = setOf("ukjent ident"),
+            )
+
+            assertThatThrownBy {
+                service.opprettBehandling(request)
+            }.hasMessage("Kan ikke velge barn som ikke er valgbare.")
+        }
+
+        @Test
+        fun `skal feile hvis man prøver å sende inn barn som allerede finnes på behandlingen`() {
+            val request = opprettBehandlingDto(
+                fagsakId = behandling.fagsakId,
+                årsak = BehandlingÅrsak.SØKNAD,
+                valgteBarn = setOf(PdlClientConfig.barnFnr),
+            )
+
+            assertThatThrownBy {
+                service.opprettBehandling(request)
+            }.hasMessage("Kan ikke velge barn som ikke er valgbare.")
+        }
     }
 
     private fun opprettBehandlingDto(
         fagsakId: UUID,
         årsak: BehandlingÅrsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
+        valgteBarn: Set<String> = emptySet(),
     ) = OpprettBehandlingDto(
         fagsakId = fagsakId,
         årsak = årsak,
+        valgteBarn = valgteBarn,
     )
 }
