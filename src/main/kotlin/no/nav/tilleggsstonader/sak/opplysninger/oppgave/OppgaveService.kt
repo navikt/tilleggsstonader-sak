@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
@@ -240,6 +241,25 @@ class OppgaveService(
 
         oppgave.erFerdigstilt = true
         oppgaveRepository.update(oppgave)
+    }
+
+    /**
+     *  Forsøker å ferdigstille oppgave hvis den finnes. Hvis oppgaven er feilregistrert i oppgavesystemet vil den bli markert som ferdigstilt.
+     */
+    fun ferdigstillOppgaveOgsåHvisFeilregistrert(behandlingId: UUID, oppgavetype: Oppgavetype) {
+        val oppgave = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
+        oppgave?.let {
+            try {
+                ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
+            } catch (e: Exception) {
+                val oppgaveStatus = hentOppgave(oppgave.gsakOppgaveId).status
+                if (oppgaveStatus == StatusEnum.FEILREGISTRERT) {
+                    oppgaveRepository.update(oppgave.copy(erFerdigstilt = true))
+                } else {
+                    throw e
+                }
+            }
+        }
     }
 
     fun ferdigstillOppgave(gsakOppgaveId: Long) {

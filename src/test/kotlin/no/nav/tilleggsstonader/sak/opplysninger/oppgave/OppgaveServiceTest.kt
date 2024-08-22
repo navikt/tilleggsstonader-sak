@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -240,6 +241,24 @@ internal class OppgaveServiceTest {
     }
 
     @Test
+    fun `Ferdigstill oppgave - oppgaven er feilregistrert`() {
+        every {
+            oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(any(), any())
+        } returns lagTestOppgave()
+
+        every { oppgaveClient.ferdigstillOppgave(any()) } throws Exception("Oppgaven er allerede ferdigstilt")
+        every { oppgaveClient.finnOppgaveMedId(any()) } returns lagEksternTestOppgave().copy(status = StatusEnum.FEILREGISTRERT)
+
+        val slot = slot<OppgaveDomain>()
+
+        every { oppgaveRepository.update(capture(slot)) } answers { firstArg() }
+
+        oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(BEHANDLING_ID, Oppgavetype.BehandleSak)
+
+        assertThat(slot.captured.erFerdigstilt).isTrue()
+    }
+
+    @Test
     fun `Fordel oppgave skal tildele oppgave til saksbehandler`() {
         val oppgaveSlot = slot<Long>()
         val saksbehandlerSlot = slot<String>()
@@ -304,7 +323,8 @@ internal class OppgaveServiceTest {
                 lagEksternTestOppgave().copy(id = 3),
             ),
         )
-        val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = "01010172272", enhet = ENHET_NR_NAY)).oppgaver
+        val oppgaver =
+            oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = "01010172272", enhet = ENHET_NR_NAY)).oppgaver
 
         verify(exactly = 1) { personService.hentPersonKortBolk(eq(listOf("1"))) }
         assertThat(oppgaver.single { it.id == oppgaveIdMedNavn }.navn).contains("fornavn1 ")
