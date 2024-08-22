@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -200,7 +201,9 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
     private fun opprettBehandlingDto(
         fagsakId: UUID,
+        årsak: BehandlingÅrsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
     ) = OpprettBehandlingDto(
         fagsakId = fagsakId,
+        årsak = årsak,
     )
 }

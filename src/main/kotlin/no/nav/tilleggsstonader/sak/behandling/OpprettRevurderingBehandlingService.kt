@@ -38,7 +38,7 @@ class OpprettRevurderingBehandlingService(
         val fagsakId = request.fagsakId
         val behandling = behandlingService.opprettBehandling(
             fagsakId = fagsakId,
-            behandlingsårsak = request.behandlingsårsak,
+            behandlingsårsak = request.årsak,
             kravMottatt = null, // TODO flytt til request
         )
 
