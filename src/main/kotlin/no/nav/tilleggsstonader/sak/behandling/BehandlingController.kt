@@ -4,6 +4,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
@@ -50,7 +51,14 @@ class BehandlingController(
         return saksbehandling.tilDto()
     }
 
-    @PostMapping()
+    @GetMapping("barn-til-revurdering/{fagsakId}")
+    fun hentBarnTilRevurdering(@PathVariable fagsakId: UUID): BarnTilRevurderingDto {
+        tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerHarSaksbehandlerrolle()
+        return opprettRevurderingBehandlingService.hentBarnTilRevurdering(fagsakId)
+    }
+
+    @PostMapping
     fun opprettBehandling(@RequestBody request: OpprettBehandlingDto): UUID {
         tilgangService.validerTilgangTilFagsak(request.fagsakId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()

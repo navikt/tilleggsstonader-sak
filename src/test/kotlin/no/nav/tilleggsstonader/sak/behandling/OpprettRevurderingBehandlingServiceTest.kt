@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
@@ -54,6 +55,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
     override fun tearDown() {
         super.tearDown()
         BrukerContextUtil.clearBrukerContext()
+        PdlClientConfig.opprettPdlSøker()
     }
 
     @Nested
@@ -159,7 +161,13 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 ),
             )
 
-            stønadsperiodeRepository.insert(stønadsperiode(behandlingId = tidligereBehandling!!.id, fom = fom, tom = tom))
+            stønadsperiodeRepository.insert(
+                stønadsperiode(
+                    behandlingId = tidligereBehandling!!.id,
+                    fom = fom,
+                    tom = tom,
+                ),
+            )
 
             vilkårRepository.insertAll(
                 barn.map {
@@ -191,11 +199,36 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
         @Test
         fun `skal gjenbruke informasjon fra forrige behandling`() {
-            val revurderingId = service.opprettBehandling(opprettBehandlingDto(fagsakId = tidligereBehandling!!.fagsakId))
+            val revurderingId =
+                service.opprettBehandling(opprettBehandlingDto(fagsakId = tidligereBehandling!!.fagsakId))
 
             assertThat(vilkårperiodeRepository.findByBehandlingId(revurderingId)).hasSize(2)
             assertThat(stønadsperiodeRepository.findAllByBehandlingId(revurderingId)).hasSize(1)
             assertThat(vilkårRepository.findByBehandlingId(revurderingId)).hasSize(1)
+        }
+    }
+
+    @Nested
+    inner class HåndteringAvBarn {
+        val behandling = behandling(
+            status = BehandlingStatus.FERDIGSTILT,
+            resultat = BehandlingResultat.INNVILGET,
+        )
+
+        @Test
+        fun `hentBarnTilRevurdering - skal markere barn som finnes med på forrige behandling`() {
+            testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = false)
+            val eksisterendeBarn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.barnFnr)
+            barnService.opprettBarn(listOf(eksisterendeBarn))
+
+            val barnTilRevurdering = service.hentBarnTilRevurdering(behandling.fagsakId)
+
+            assertThat(barnTilRevurdering.barn).hasSize(2)
+            assertThat(barnTilRevurdering.barn.single { it.ident == eksisterendeBarn.ident }.finnesPåForrigeBehandling)
+                .isTrue()
+
+            assertThat(barnTilRevurdering.barn.single { it.ident == PdlClientConfig.barn2Fnr }.finnesPåForrigeBehandling)
+                .isFalse()
         }
     }
 
