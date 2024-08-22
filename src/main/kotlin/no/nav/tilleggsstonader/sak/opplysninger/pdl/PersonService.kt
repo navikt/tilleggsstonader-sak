@@ -40,7 +40,9 @@ class PersonService(
     }
 
     fun hentBarn(barnIdentifikatorer: List<String>) =
-        pdlClient.hentBarn(barnIdentifikatorer)
+        cacheManager.getCachedOrLoad("personService_hentBarn", barnIdentifikatorer) {
+            pdlClient.hentBarn(it.toList())
+        }
 
     fun hentAndreForeldre(personIdenter: List<String>): Map<String, PdlAnnenForelder> {
         return pdlClient.hentAndreForeldre(personIdenter)
