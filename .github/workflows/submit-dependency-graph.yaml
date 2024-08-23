@@ -13,10 +13,21 @@ jobs:
     permissions: # The Dependency Submission API requires write permission
       contents: write
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Gradle to generate and submit dependency graphs
-        uses: gradle/gradle-build-action@v2
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Setup Gradle to generate and submit dependency graphs
+        uses: gradle/gradle-build-action@v3
+        env:
+          # Eksluder test dependencies
+          DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: compileClasspath|runtimeClasspath
+        with:
+          gradle-version: wrapper
           dependency-graph: generate-and-submit
+          arguments: --configuration-cache test
       - name: Run a build, generating the dependency graph snapshot which will be submitted
         run: ./gradlew build
