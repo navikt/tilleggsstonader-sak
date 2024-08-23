@@ -244,6 +244,7 @@ class OppgaveService(
             } catch (e: Exception) {
                 val oppgaveStatus = hentOppgave(oppgave.gsakOppgaveId).status
                 if (oppgaveStatus == StatusEnum.FEILREGISTRERT) {
+                    logger.warn("Ferdigstilling - oppgave=${oppgave.id} er feilregistrert. Markerer oppgave som ferdigstilt")
                     oppgaveRepository.update(oppgave.copy(erFerdigstilt = true))
                 } else {
                     throw e
