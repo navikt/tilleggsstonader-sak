@@ -226,16 +226,6 @@ class OppgaveService(
         ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
     }
 
-    fun ferdigstillOppgaveHvisOppgaveFinnes(
-        behandlingId: UUID,
-        oppgavetype: Oppgavetype,
-    ) {
-        val oppgave = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
-        oppgave?.let {
-            ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
-        }
-    }
-
     private fun ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave: OppgaveDomain) {
         ferdigstillOppgave(oppgave.gsakOppgaveId)
 

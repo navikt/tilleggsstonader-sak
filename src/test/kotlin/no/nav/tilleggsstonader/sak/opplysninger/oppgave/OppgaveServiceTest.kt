@@ -224,7 +224,7 @@ internal class OppgaveServiceTest {
         every {
             oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(any(), any())
         } returns null
-        oppgaveService.ferdigstillOppgaveHvisOppgaveFinnes(BEHANDLING_ID, Oppgavetype.BehandleSak)
+        oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(BEHANDLING_ID, Oppgavetype.BehandleSak)
     }
 
     @Test
@@ -236,7 +236,7 @@ internal class OppgaveServiceTest {
         val slot = slot<Long>()
         every { oppgaveClient.ferdigstillOppgave(capture(slot)) } just runs
 
-        oppgaveService.ferdigstillOppgaveHvisOppgaveFinnes(BEHANDLING_ID, Oppgavetype.BehandleSak)
+        oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(BEHANDLING_ID, Oppgavetype.BehandleSak)
         assertThat(slot.captured).isEqualTo(GSAK_OPPGAVE_ID)
     }
 
