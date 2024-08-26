@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringStegService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
@@ -72,6 +73,7 @@ class BehandlingFlytTest(
     @Autowired val taskWorker: TaskWorker,
     @Autowired val vilkårperiodeService: VilkårperiodeService,
     @Autowired val stønadsperiodeService: StønadsperiodeService,
+    @Autowired val simuleringStegService: SimuleringStegService,
 ) : IntegrationTest() {
 
     val personIdent = FnrGenerator.generer(år = 2000)
@@ -191,6 +193,22 @@ class BehandlingFlytTest(
         }
     }
 
+    @Test
+    fun `skal ikke kunne sende til beslutter dersom det ikke er simulert`() {
+        somSaksbehandler {
+            val behandlingId = opprettBehandling(personIdent)
+            vurderInngangsvilkår(behandlingId)
+            opprettVilkår(behandlingId)
+            utfyllVilkår(behandlingId)
+            opprettVedtak(behandlingId)
+            genererSaksbehandlerBrev(behandlingId)
+            lagreBrevmottakere(behandlingId)
+            assertThatThrownBy {
+                sendTilBeslutter(behandlingId)
+            }.hasMessageContaining("Behandling er i feil steg=SIMULERING")
+        }
+    }
+
     private fun newTransaction() {
         if (TestTransaction.isActive()) {
             TestTransaction.flagForCommit() // need this, otherwise the next line does a rollback
@@ -224,6 +242,7 @@ class BehandlingFlytTest(
         utfyllVilkår(behandlingId)
 
         opprettVedtak(behandlingId)
+        simuler(behandlingId)
         genererSaksbehandlerBrev(behandlingId)
         lagreBrevmottakere(behandlingId)
         sendTilBeslutter(behandlingId)
@@ -360,6 +379,11 @@ class BehandlingFlytTest(
             behandlingId,
             InnvilgelseTilsynBarnDto(utgifter, null),
         )
+    }
+
+    private fun simuler(behandlingId: UUID) {
+        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
+        simuleringStegService.hentEllerOpprettSimuleringsresultat(saksbehandling)
     }
 
     private fun utgift() = Utgift(

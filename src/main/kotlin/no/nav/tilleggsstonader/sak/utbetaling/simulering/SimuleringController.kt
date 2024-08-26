@@ -22,8 +22,8 @@ import java.util.UUID
 class SimuleringController(
     private val tilgangService: TilgangService,
     private val behandlingService: BehandlingService,
-    private val simuleringService: SimuleringService,
     private val unleashService: UnleashService,
+    private val simuleringStegService: SimuleringStegService,
 ) {
 
     @GetMapping("/{behandlingId}")
@@ -35,7 +35,7 @@ class SimuleringController(
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.UPDATE)
 
-        val perioder = simuleringService.simuler(saksbehandling)
+        val perioder = simuleringStegService.hentEllerOpprettSimuleringsresultat(saksbehandling)
 
         return if (perioder.isNullOrEmpty()) {
             null

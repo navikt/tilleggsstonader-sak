@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerRollerF
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringSteg
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.VilkårSteg
 import org.slf4j.LoggerFactory
@@ -71,6 +72,7 @@ class StegService(
         return when (steg) {
             StegType.INNGANGSVILKÅR -> håndterInngangsvilkår(behandlingId)
             StegType.VILKÅR -> håndterVilkår(behandlingId)
+            StegType.SIMULERING -> håndterSimulering(behandlingId)
             else -> error("Steg $steg kan ikke ferdigstilles her")
         }
     }
@@ -86,6 +88,11 @@ class StegService(
     private fun håndterVilkår(behandlingId: UUID): Behandling {
         val vilkårSteg: VilkårSteg = behandlingSteg.filterIsInstance<VilkårSteg>().single()
         return håndterSteg(behandlingId, vilkårSteg)
+    }
+
+    private fun håndterSimulering(behandlingId: UUID): Behandling {
+        val simuleringSteg: SimuleringSteg = behandlingSteg.filterIsInstance<SimuleringSteg>().single()
+        return håndterSteg(behandlingId, simuleringSteg)
     }
 
     @Transactional
