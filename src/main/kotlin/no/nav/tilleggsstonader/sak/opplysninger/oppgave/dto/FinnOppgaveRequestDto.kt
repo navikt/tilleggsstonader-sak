@@ -24,16 +24,19 @@ data class FinnOppgaveRequestDto(
     val opprettetTom: LocalDate? = null,
     val fristFom: LocalDate? = null,
     val fristTom: LocalDate? = null,
-    val enhetsmappe: Long? = null,
     val ident: String?,
-    val limit: Long = 150, // TODO slett når frontend implementert limit og offset
-    val offset: Long = 0, // TODO slett når frontend implementert limit og offset
-    val orderBy: Sorteringsfelt = Sorteringsfelt.OPPRETTET_TIDSPUNKT, // TODO slett når frontend implementert
-    val order: Sorteringsrekkefølge = Sorteringsrekkefølge.ASC, // TODO slett når frontend implementert
+    val limit: Long = 150,
+    val offset: Long = 0,
+    val orderBy: Sorteringsfelt = Sorteringsfelt.OPPRETTET_TIDSPUNKT,
+    val order: Sorteringsrekkefølge = Sorteringsrekkefølge.ASC,
     val oppgaverPåVent: Boolean = false,
 ) {
 
-    fun tilFinnOppgaveRequest(aktørid: String? = null, ventemappe: MappeDto): FinnOppgaveRequest {
+    fun tilFinnOppgaveRequest(
+        aktørid: String? = null,
+        klarmappe: MappeDto,
+        ventemappe: MappeDto,
+    ): FinnOppgaveRequest {
         return FinnOppgaveRequest(
             tema = Tema.TSO,
             behandlingstema = if (this.behandlingstema != null) {
@@ -47,7 +50,7 @@ data class FinnOppgaveRequestDto(
                 null
             },
             enhet = this.enhet,
-            erUtenMappe = !this.oppgaverPåVent,
+            erUtenMappe = false,
             saksbehandler = this.saksbehandler,
             aktørId = aktørid,
             journalpostId = this.journalpostId,
@@ -59,7 +62,7 @@ data class FinnOppgaveRequestDto(
             fristTomDato = this.fristTom,
             aktivFomDato = null,
             aktivTomDato = null,
-            mappeId = if (this.oppgaverPåVent) ventemappe.id.toLong() else null,
+            mappeId = if (this.oppgaverPåVent) ventemappe.id else klarmappe.id,
             limit = this.limit,
             offset = this.offset,
             sorteringsrekkefolge = order,

@@ -266,6 +266,23 @@ internal class VilkårServiceTest {
         assertThat(erAlleVilkårOppfylt).isFalse
     }
 
+    @Test
+    fun `Skal opprette vilkår for nye barn`() {
+        val vilkårsett = lagVilkårsett(behandlingId, OPPFYLT)
+        every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns barn
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
+
+        val vilkårSlot = slot<List<Vilkår>>()
+
+        every { vilkårRepository.insertAll(capture(vilkårSlot)) } answers { vilkårSlot.captured }
+
+        vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
+
+        assertThat(vilkårSlot.captured).hasSize(2)
+        assertThat(vilkårSlot.captured.map { it.barnId }).containsExactlyInAnyOrderElementsOf(barn.map { it.id })
+    }
+
     @Nested
     inner class OppdaterVilkår {
         @Test

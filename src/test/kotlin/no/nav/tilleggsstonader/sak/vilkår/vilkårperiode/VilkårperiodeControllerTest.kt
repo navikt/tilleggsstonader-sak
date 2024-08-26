@@ -12,9 +12,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
@@ -76,12 +77,27 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         assertThat(exception.detail.detail).contains("BehandlingId er ikke lik")
     }
 
+    @Nested
+    inner class OppdateringAvGrunnlag {
+
+        @Test
+        fun `må ha saksbehandlerrolle for å kunne oppdatere grunnlag`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            headers.setBearerAuth(onBehalfOfToken(rolleConfig.veilederRolle))
+            val exception = catchProblemDetailException {
+                oppdaterGrunnlag(behandling.id)
+            }
+            assertThat(exception.detail.detail)
+                .contains("Mangler nødvendig saksbehandlerrolle for å utføre handlingen")
+        }
+    }
+
     private fun hentVilkårperioder(behandling: Behandling) =
-        restTemplate.exchange<VilkårperioderDto>(
+        restTemplate.exchange<VilkårperioderResponse>(
             localhost("api/vilkarperiode/behandling/${behandling.id}"),
             HttpMethod.GET,
             HttpEntity(null, headers),
-        ).body!!
+        ).body!!.vilkårperioder
 
     private fun opprettVilkårperiode(
         lagreVilkårperiode: LagreVilkårperiode,
@@ -98,5 +114,13 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         localhost("api/vilkarperiode/$vilkårperiodeId"),
         HttpMethod.DELETE,
         HttpEntity(slettVikårperiode, headers),
+    ).body!!
+
+    private fun oppdaterGrunnlag(
+        behandlingId: UUID,
+    ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
+        localhost("api/vilkarperiode/behandling/$behandlingId/oppdater-grunnlag"),
+        HttpMethod.POST,
+        HttpEntity(null, headers),
     ).body!!
 }

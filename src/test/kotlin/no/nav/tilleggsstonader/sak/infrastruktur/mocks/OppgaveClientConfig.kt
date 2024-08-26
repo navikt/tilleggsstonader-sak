@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveMappe
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -68,7 +69,10 @@ class OppgaveClientConfig {
             oppgavelager[oppgaveId] ?: error("Finner ikke oppgave=$oppgaveId")
         }
 
-        val mapper = listOf(MappeDto(MAPPE_ID_PÅ_VENT, "10 På vent", "4462"))
+        val mapper = listOf(
+            MappeDto(MAPPE_ID_PÅ_VENT, OppgaveMappe.PÅ_VENT.navn, "4462"),
+            MappeDto(MAPPE_ID_KLAR, OppgaveMappe.KLAR.navn, "4462"),
+        )
         every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(mapper.size, mapper)
 
         every { oppgaveClient.opprettOppgave(any()) } answers {
@@ -175,6 +179,7 @@ class OppgaveClientConfig {
     )
 
     companion object {
-        const val MAPPE_ID_PÅ_VENT = 10
+        const val MAPPE_ID_PÅ_VENT = 10L
+        const val MAPPE_ID_KLAR = 20L
     }
 }

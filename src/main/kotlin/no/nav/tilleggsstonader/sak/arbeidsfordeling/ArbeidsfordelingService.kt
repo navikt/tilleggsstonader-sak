@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.config.getNullable
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.tilDiskresjonskode
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Component
@@ -21,9 +22,10 @@ class ArbeidsfordelingService(
     private val egenAnsattService: EgenAnsattService,
 ) {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     companion object {
         const val MASKINELL_JOURNALFOERENDE_ENHET = "9999"
-        val ENHET_NASJONAL_NAY = Arbeidsfordelingsenhet("4462", "Tilleggsstønad INN")
     }
 
     fun hentNavEnhetId(ident: String, oppgavetype: Oppgavetype, tema: Tema = Tema.TSO) = when (oppgavetype) {
@@ -33,7 +35,12 @@ class ArbeidsfordelingService(
 
     fun hentNavEnhet(ident: String, tema: Tema = Tema.TSO): Arbeidsfordelingsenhet? {
         return cacheManager.getNullable("navEnhet", ident) {
-            arbeidsfordelingClient.finnArbeidsfordelingsenhet(lagArbeidsfordelingKritierieForPerson(ident, tema)).firstOrNull()
+            val kriterie = lagArbeidsfordelingKritierieForPerson(ident, tema)
+            val enheter = arbeidsfordelingClient.finnArbeidsfordelingsenhet(kriterie)
+            if (enheter.size != 1) {
+                logger.warn("Fant enheter=$enheter for $kriterie")
+            }
+            enheter.firstOrNull()
         }
     }
 

@@ -2,17 +2,22 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.AktivitetClientConfig.Companion.resetMock
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetClient
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -40,6 +45,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.assertj.core.api.Assertions.assertThat
@@ -48,8 +59,12 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.time.LocalDate.now
+import java.time.LocalDateTime
+import java.time.YearMonth
 import java.util.UUID
 
 class VilkårperiodeServiceTest : IntegrationTest() {
@@ -71,6 +86,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var aktivitetClient: AktivitetClient
+
+    @Autowired
+    lateinit var ytelseClient: YtelseClient
 
     @AfterEach
     override fun tearDown() {
@@ -753,6 +771,31 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
             }
         }
+
+        @Test
+        fun `skal ikke ta ta med ferdig avklarte perioder fra AAP som grunnlag`() {
+            val nesteDag = now().plusDays(1) // for å få 2 ulike AAP-perioder
+            every {
+                ytelseClient.hentYtelser(any())
+            } returns YtelsePerioderDto(
+                perioder = listOf(
+                    YtelsePeriode(TypeYtelsePeriode.AAP, now(), now(), aapErFerdigAvklart = false),
+                    YtelsePeriode(TypeYtelsePeriode.AAP, nesteDag, nesteDag, aapErFerdigAvklart = true),
+                    YtelsePeriode(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), aapErFerdigAvklart = null),
+                ),
+                hentetInformasjon = emptyList(),
+            )
+
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
+
+            val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
+            val perioder = grunnlag!!.grunnlag.ytelse.perioder
+            assertThat(perioder).containsExactlyInAnyOrder(
+                PeriodeGrunnlagYtelse(TypeYtelsePeriode.AAP, now(), now()),
+                PeriodeGrunnlagYtelse(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now()),
+            )
+        }
     }
 
     @Nested
@@ -809,6 +852,75 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(2)
             res.map { assertThat(it.resultat).isNotEqualTo(ResultatVilkårperiode.SLETTET) }
+        }
+    }
+
+    @Nested
+    inner class OppdaterGrunnlag {
+
+        @Test
+        fun `skal kunne oppdatere grunnlaget når en behandling redigerbar og i riktig steg`() {
+            every {
+                aktivitetClient.hentAktiviteter(any(), any(), any())
+            } answers {
+                listOf(aktivitetArenaDto(id = "1", erStønadsberettiget = true))
+            } andThenAnswer {
+                listOf(aktivitetArenaDto(id = "2", erStønadsberettiget = true))
+            }
+
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.INNGANGSVILKÅR))
+            val grunnlag = vilkårperiodeService.hentVilkårperioderResponse(behandling.id).grunnlag!!
+            val grunnlag2 = vilkårperiodeService.hentVilkårperioderResponse(behandling.id).grunnlag!!
+
+            testWithBrukerContext(groups = listOf(rolleConfig.saksbehandlerRolle)) {
+                vilkårperiodeService.oppdaterGrunnlag(behandling.id)
+            }
+
+            val grunnlag3 = vilkårperiodeService.hentVilkårperioderResponse(behandling.id).grunnlag!!
+
+            assertThat(grunnlag.aktivitet.aktiviteter.map { it.id }).containsExactly("1")
+            assertThat(grunnlag2.aktivitet.aktiviteter.map { it.id }).containsExactly("1")
+
+            // Oppdatert grunnlag inneholder kun id=2
+            assertThat(grunnlag3.aktivitet.aktiviteter.map { it.id }).containsExactly("2")
+        }
+
+        @Test
+        fun `skal bruke tidligere hentet informasjon sin fom og bruke tom fra dagens dato`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.INNGANGSVILKÅR))
+            val fomFørsteGangHentet = now().minusYears(3).minusDays(1)
+            behandling.let {
+                val hentetInformasjon =
+                    HentetInformasjon(fom = fomFørsteGangHentet, tom = now(), LocalDateTime.now())
+                val aktivitet = GrunnlagAktivitet(emptyList())
+                val grunnlag = VilkårperioderGrunnlag(aktivitet, GrunnlagYtelse(emptyList()), hentetInformasjon)
+                vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(it.id, grunnlag))
+            }
+            testWithBrukerContext("beh1", listOf(rolleConfig.saksbehandlerRolle)) {
+                vilkårperiodeService.oppdaterGrunnlag(behandling.id)
+            }
+            with(vilkårperioderGrunnlagRepository.findByIdOrThrow(behandling.id)) {
+                assertThat(sporbar.opprettetAv).isEqualTo("VL")
+                assertThat(sporbar.endret.endretAv).isEqualTo("beh1")
+                assertThat(grunnlag.hentetInformasjon.fom).isEqualTo(fomFørsteGangHentet)
+                assertThat(grunnlag.hentetInformasjon.tom)
+                    .isEqualTo(YearMonth.now().plusYears(1).atEndOfMonth())
+            }
+        }
+
+        @Test
+        fun `skal ikke kunne oppdatere dataen når behandlingen har feil steg`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.VILKÅR))
+            val feil = assertThrows<Feil> { vilkårperiodeService.oppdaterGrunnlag(behandling.id) }
+            assertThat(feil.frontendFeilmelding)
+                .isEqualTo("Kan ikke oppdatere grunnlag når behandlingen er i annet steg enn vilkår.")
+        }
+
+        @Test
+        fun `skal ikke kunne oppdatere dataen når behandlingen er låst`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
+            val feil = assertThrows<Feil> { vilkårperiodeService.oppdaterGrunnlag(behandling.id) }
+            assertThat(feil.frontendFeilmelding).isEqualTo("Kan ikke oppdatere grunnlag når behandlingen er låst")
         }
     }
 }

@@ -40,7 +40,6 @@ class OpprettOppgaveForOpprettetBehandlingTask(
         val saksbehandler: String,
         val beskrivelse: String? = null,
         val hendelseTidspunkt: LocalDateTime = osloNow(),
-        val mappeId: Long? = null,
         val prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
     )
 
@@ -71,7 +70,6 @@ class OpprettOppgaveForOpprettetBehandlingTask(
                     oppgavetype = Oppgavetype.BehandleSak,
                     tilordnetNavIdent = tilordnetNavIdent,
                     beskrivelse = data.beskrivelse,
-                    mappeId = data.mappeId,
                     prioritet = data.prioritet,
                 ),
             )

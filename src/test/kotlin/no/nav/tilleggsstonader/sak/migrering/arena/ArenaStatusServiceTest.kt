@@ -29,6 +29,7 @@ class ArenaStatusServiceTest {
     val arenaStatusService = ArenaStatusService(
         personService = personService,
         fagsakService = fagsakService,
+        fagsakPersonService = mockk(),
         behandlingService = behandlingService,
         søknadRoutingService = søknadRoutingService,
     )

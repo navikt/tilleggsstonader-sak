@@ -6,6 +6,7 @@ import io.mockk.slot
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
@@ -48,7 +49,7 @@ class JournalførVedtaksbrevTaskTest {
     @BeforeEach
     fun setUp() {
         every { brevService.hentBesluttetBrev(saksbehandling.id) } returns vedtaksbrev(behandlingId = saksbehandling.id)
-        every { arbeidsfordelingService.hentNavEnhet(any()) } returns ArbeidsfordelingService.ENHET_NASJONAL_NAY
+        every { arbeidsfordelingService.hentNavEnhet(any()) } returns ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY
         every { brevmottakerRepository.insert(any()) } returns mockk()
         every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
             Brevmottaker(

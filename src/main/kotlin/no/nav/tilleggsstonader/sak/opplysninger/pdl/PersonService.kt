@@ -36,11 +36,13 @@ class PersonService(
         val barnIdentifikatorer = søker.forelderBarnRelasjon
             .filter { it.relatertPersonsRolle == Familierelasjonsrolle.BARN }
             .mapNotNull { it.relatertPersonsIdent }
-        return SøkerMedBarn(ident, søker, hentPersonForelderBarnRelasjon(barnIdentifikatorer))
+        return SøkerMedBarn(ident, søker, hentBarn(barnIdentifikatorer))
     }
 
-    fun hentPersonForelderBarnRelasjon(barnIdentifikatorer: List<String>) =
-        pdlClient.hentPersonForelderBarnRelasjon(barnIdentifikatorer)
+    fun hentBarn(barnIdentifikatorer: List<String>) =
+        cacheManager.getCachedOrLoad("personService_hentBarn", barnIdentifikatorer) {
+            pdlClient.hentBarn(it.toList())
+        }
 
     fun hentAndreForeldre(personIdenter: List<String>): Map<String, PdlAnnenForelder> {
         return pdlClient.hentAndreForeldre(personIdenter)
@@ -62,7 +64,11 @@ class PersonService(
         }
     }
 
-    fun hentAktørIder(ident: String): PdlIdenter = pdlClient.hentAktørIder(ident)
+    fun hentAktørId(ident: String): String = hentAktørIder(ident).gjeldende().ident
+
+    fun hentAktørIder(ident: String): PdlIdenter = cacheManager.getValue("pdl-aktørId", ident) {
+        pdlClient.hentAktørIder(ident)
+    }
 
     fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto? = pdlClient.hentGeografiskTilknytning(ident)
 

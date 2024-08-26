@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -28,17 +27,18 @@ class VilkårperiodeController(
 ) {
 
     @GetMapping("behandling/{behandlingId}")
-    fun hentMålgrupper(@PathVariable behandlingId: UUID): VilkårperioderDto {
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-
-        return vilkårperiodeService.hentVilkårperioderDto(behandlingId)
-    }
-
-    @GetMapping("behandling/{behandlingId}/v2")
     fun hentVilkårperioder(@PathVariable behandlingId: UUID): VilkårperioderResponse {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return vilkårperiodeService.hentVilkårperioderResponse(behandlingId)
+    }
+
+    @PostMapping("behandling/{behandlingId}/oppdater-grunnlag")
+    fun oppdaterGrunnlag(@PathVariable behandlingId: UUID) {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        vilkårperiodeService.oppdaterGrunnlag(behandlingId)
     }
 
     @PostMapping

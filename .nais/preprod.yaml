@@ -31,9 +31,14 @@ spec:
     requests:
       memory: 512Mi
       cpu: 500m
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
   gcp:
     sqlInstances:
       - type: POSTGRES_15
+        tier: db-f1-micro
         flags:
           - name: cloudsql.logical_decoding  # trengs for å bruke replication slots i databasen.
             value: "on"
@@ -93,7 +98,7 @@ spec:
         - application: utsjekk
           namespace: helved
       external:
-        - host: pdl-api-q1.dev-fss-pub.nais.io
+        - host: pdl-api.dev-fss-pub.nais.io
         - host: tilleggsstonader-arena.dev-fss-pub.nais.io
         - host: tilleggsstonader-unleash-api.nav.cloud.nais.io
         - host: kodeverk-api.nav.no

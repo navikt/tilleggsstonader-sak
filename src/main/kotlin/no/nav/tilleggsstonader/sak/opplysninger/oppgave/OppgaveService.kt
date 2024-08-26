@@ -11,12 +11,15 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveResponseDto
@@ -51,10 +54,26 @@ class OppgaveService(
         FnrUtil.validerOptionalIdent(finnOppgaveRequest.ident)
 
         val aktørId = finnOppgaveRequest.ident.takeUnless { it.isNullOrBlank() }
-            ?.let { personService.hentAktørIder(it).identer.first().ident }
+            ?.let { personService.hentAktørId(it) }
 
-        val oppgaveResponse =
-            oppgaveClient.hentOppgaver(finnOppgaveRequest.tilFinnOppgaveRequest(aktørId, finnVentemappe()))
+        val enhet = finnOppgaveRequest.enhet ?: error("Enhet er påkrevd når man søker etter oppgaver")
+        val request = finnOppgaveRequest.tilFinnOppgaveRequest(
+            aktørId,
+            klarmappe = finnMappe(enhet, OppgaveMappe.KLAR),
+            ventemappe = finnMappe(enhet, OppgaveMappe.PÅ_VENT),
+        )
+        return finnOppgaver(request)
+    }
+
+    fun hentOppgaverForPerson(personIdent: String): FinnOppgaveResponseDto {
+        val aktørId = personService.hentAktørId(personIdent)
+        val oppgaveRequest = FinnOppgaveRequest(aktørId = aktørId, tema = Tema.TSO)
+
+        return finnOppgaver(oppgaveRequest)
+    }
+
+    private fun finnOppgaver(request: FinnOppgaveRequest): FinnOppgaveResponseDto {
+        val oppgaveResponse = oppgaveClient.hentOppgaver(request)
 
         val personer = personService.hentPersonKortBolk(oppgaveResponse.oppgaver.mapNotNull { it.ident }.distinct())
         val oppgaveMetadata = finnOppgaveMetadata(oppgaveResponse.oppgaver)
@@ -70,28 +89,6 @@ class OppgaveService(
             },
         )
     }
-
-    fun hentOppgaverForPerson(personIdent: String): FinnOppgaveResponseDto {
-        val oppgaveRequest = FinnOppgaveRequest(aktørId = personIdent, tema = Tema.TSO)
-
-        val oppgaveResponse = oppgaveClient.hentOppgaver(oppgaveRequest)
-
-        val navn = personService.hentVisningsnavnForPerson(personIdent)
-
-        return FinnOppgaveResponseDto(
-            antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
-            oppgaver = oppgaveResponse.oppgaver.map { oppgave ->
-                OppgaveDto(
-                    oppgave = oppgave,
-                    navn = navn,
-                    oppgaveMetadata = finnOppgaveMetadata(listOf(oppgave))[oppgave.id],
-                )
-            },
-        )
-    }
-
-    // TODO: Bruk enhet fra saksbehandler
-    fun finnVentemappe() = finnMapper("4462").single { it.navn == "10 På vent" }
 
     private fun finnOppgaveMetadata(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
         val oppgaveIder = oppgaver.map { it.id }
@@ -179,12 +176,26 @@ class OppgaveService(
             enhetsnummer = enhetsnummer,
             behandlingstema = finnBehandlingstema(stønadstype).value,
             tilordnetRessurs = oppgave.tilordnetNavIdent,
-            mappeId = oppgave.mappeId,
+            mappeId = utledMappeId(personIdent, oppgave, enhetsnummer),
             prioritet = oppgave.prioritet,
             behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgave.oppgavetype),
         )
 
         return oppgaveClient.opprettOppgave(opprettOppgave)
+    }
+
+    /**
+     * Skal plassere oppgaver vi oppretter som skal håndteres i ny saksbehandling i egen mappe
+     * for at de ikke skal blandes med uplasserte som håndteres dagligen i gosys
+     */
+    private fun utledMappeId(ident: String, oppgave: OpprettOppgave, enhetsnummer: String?): Long? {
+        if (!skalPlasseresIKlarMappe(oppgave.oppgavetype)) {
+            return null
+        }
+        if (enhetsnummer == null) {
+            error("Mangler enhetsnummer for oppgave for ident=$ident oppgavetype=$oppgave.oppgavetype")
+        }
+        return finnMappe(enhetsnummer, OppgaveMappe.KLAR).id
     }
 
     fun tilbakestillFordelingPåOppgave(gsakOppgaveId: Long, versjon: Int): Oppgave {
@@ -215,21 +226,31 @@ class OppgaveService(
         ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
     }
 
-    fun ferdigstillOppgaveHvisOppgaveFinnes(
-        behandlingId: UUID,
-        oppgavetype: Oppgavetype,
-    ) {
-        val oppgave = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
-        oppgave?.let {
-            ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
-        }
-    }
-
     private fun ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave: OppgaveDomain) {
         ferdigstillOppgave(oppgave.gsakOppgaveId)
 
         oppgave.erFerdigstilt = true
         oppgaveRepository.update(oppgave)
+    }
+
+    /**
+     *  Forsøker å ferdigstille oppgave hvis den finnes. Hvis oppgaven er feilregistrert i oppgavesystemet vil den bli markert som ferdigstilt.
+     */
+    fun ferdigstillOppgaveOgsåHvisFeilregistrert(behandlingId: UUID, oppgavetype: Oppgavetype) {
+        val oppgave = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
+        oppgave?.let {
+            try {
+                ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
+            } catch (e: Exception) {
+                val oppgaveStatus = hentOppgave(oppgave.gsakOppgaveId).status
+                if (oppgaveStatus == StatusEnum.FEILREGISTRERT) {
+                    logger.warn("Ferdigstilling - oppgave=${oppgave.id} er feilregistrert. Markerer oppgave som ferdigstilt")
+                    oppgaveRepository.update(oppgave.copy(erFerdigstilt = true))
+                } else {
+                    throw e
+                }
+            }
+        }
     }
 
     fun ferdigstillOppgave(gsakOppgaveId: Long) {
@@ -280,6 +301,16 @@ class OppgaveService(
             else -> frist
         }
     }
+
+    fun finnMappe(enhet: String, oppgaveMappe: OppgaveMappe) = finnMapper(enhet)
+        .filter { it.navn.endsWith(oppgaveMappe.navn, ignoreCase = true) }
+        .let {
+            if (it.size != 1) {
+                secureLogger.error("Finner ${it.size} mapper for enhet=$enhet navn=$oppgaveMappe - mapper=$it")
+                error("Finner ikke mapper for enhet=$enhet navn=$oppgaveMappe. Se secure logs for mer info")
+            }
+            it.single()
+        }
 
     fun finnMapper(enheter: List<String>): List<MappeDto> {
         return enheter.flatMap { finnMapper(it) }

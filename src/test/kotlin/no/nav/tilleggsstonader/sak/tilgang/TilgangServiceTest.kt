@@ -27,6 +27,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 
@@ -221,6 +222,34 @@ internal class TilgangServiceTest {
         every { fagsakService.hentFagsakDtoPåEksternId(any()) } returns fagsak.tilDto(behandlinger = listOf(), true)
 
         tilgangService.validerTilgangTilEksternFagsak(fagsak.eksternId.id, AuditLoggerEvent.ACCESS)
+    }
+
+    @Nested
+    inner class Roller {
+
+        @Test
+        fun `egne ansatt - har rolle hvis man har egne-ansatt-rolle`() {
+            testWithBrukerContext(groups = listOf(rolleConfig.egenAnsatt)) {
+                assertThat(tilgangService.harEgenAnsattRolle()).isTrue()
+                assertThat(tilgangService.harStrengtFortroligRolle()).isFalse()
+            }
+        }
+
+        @Test
+        fun `strengt fortrolig - har rolle hvis man har kode6-rolle`() {
+            testWithBrukerContext(groups = listOf(rolleConfig.kode6)) {
+                assertThat(tilgangService.harStrengtFortroligRolle()).isTrue()
+                assertThat(tilgangService.harEgenAnsattRolle()).isFalse()
+            }
+        }
+
+        @Test
+        fun `roller - har ikke tilgang hvis man ikke har noen roller`() {
+            testWithBrukerContext(groups = listOf()) {
+                assertThat(tilgangService.harEgenAnsattRolle()).isFalse()
+                assertThat(tilgangService.harStrengtFortroligRolle()).isFalse()
+            }
+        }
     }
 
     private fun filtrer(personer: List<PdlSøker>): List<PdlSøker> =

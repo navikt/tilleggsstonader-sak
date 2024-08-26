@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonForelderBarn
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import java.time.LocalDate
@@ -13,7 +13,7 @@ data class GrunnlagBarn(
     val dødsdato: LocalDate?,
 )
 
-fun Map<String, PdlPersonForelderBarn>.tilGrunnlagsdataBarn() = entries.map { (ident, barn) ->
+fun Map<String, PdlBarn>.tilGrunnlagsdataBarn() = entries.map { (ident, barn) ->
     GrunnlagBarn(
         ident = ident,
         navn = barn.navn.gjeldende().tilNavn(),

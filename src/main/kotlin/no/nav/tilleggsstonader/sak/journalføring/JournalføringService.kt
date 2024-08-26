@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
@@ -8,6 +9,8 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sisteFerdigstilteBehandling
+import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -21,6 +24,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.journalføring.JournalføringHelper.tilAvsenderMottaker
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.valider
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -44,6 +48,7 @@ class JournalføringService(
     private val transactionHandler: TransactionHandler,
     private val personService: PersonService,
     private val oppgaveService: OppgaveService,
+    private val gjennbrukDataRevurderingService: GjennbrukDataRevurderingService,
 ) {
 
     @Transactional
@@ -107,8 +112,14 @@ class JournalføringService(
             behandlingÅrsak = behandlingÅrsak,
         )
 
+        val forrigeBehandling = behandlingService.hentBehandlinger(behandling.fagsakId).sisteFerdigstilteBehandling()
+
+        if (forrigeBehandling != null) {
+            gjennbrukDataRevurderingService.gjenbrukData(behandling, forrigeBehandling.id)
+        }
+
         if (journalpost.harStrukturertSøknad()) {
-            lagreSøknadOgBarn(journalpost, behandling)
+            lagreSøknadOgNyeBarn(journalpost, behandling)
         }
 
         ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
@@ -130,12 +141,14 @@ class JournalføringService(
                 journalpostService.hentIdentFraJournalpost(journalpost),
                 journalføringRequest.stønadstype,
             )
+
         ferdigstillJournalpost(
             journalpost,
             journalføringRequest.journalførendeEnhet,
             fagsak,
             journalføringRequest.dokumentTitler,
             journalføringRequest.logiskeVedlegg,
+            journalføringRequest.nyAvsender?.tilAvsenderMottaker(),
         )
     }
 
@@ -152,6 +165,7 @@ class JournalføringService(
         fagsak: Fagsak,
         dokumentTitler: Map<String, String>? = null,
         logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
+        avsenderMottaker: AvsenderMottaker? = null,
     ) {
         journalpostService.oppdaterOgFerdigstillJournalpost(
             journalpost = journalpost,
@@ -160,6 +174,7 @@ class JournalføringService(
             saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
             dokumenttitler = dokumentTitler,
             logiskeVedlegg = logiskVedlegg,
+            avsender = avsenderMottaker,
         )
     }
 
@@ -178,20 +193,26 @@ class JournalføringService(
         return behandling
     }
 
-    private fun lagreSøknadOgBarn(
+    private fun lagreSøknadOgNyeBarn(
         journalpost: Journalpost,
         behandling: Behandling,
     ) {
         lagreSøknad(journalpost, behandling.id)
-        val barn = søknadService.hentSøknadBarnetilsyn(behandling.id)?.barn?.map {
-            BehandlingBarn(
-                behandlingId = behandling.id,
-                ident = it.ident,
-                søknadBarnId = it.id,
-            )
-        } ?: error("Søknad mangler barn")
+        val eksisterendeBarn = barnService.finnBarnPåBehandling(behandling.id)
 
-        barnService.opprettBarn(barn)
+        val nyeBarn = søknadService.hentSøknadBarnetilsyn(behandling.id)?.barn
+            ?.filterNot { barn -> eksisterendeBarn.any { it.ident == barn.ident } }?.map {
+                BehandlingBarn(
+                    behandlingId = behandling.id,
+                    ident = it.ident,
+                )
+            } ?: emptyList()
+
+        feilHvis(nyeBarn.isEmpty() && eksisterendeBarn.isEmpty()) {
+            "Kan ikke opprette behandling uten barn"
+        }
+
+        barnService.opprettBarn(nyeBarn)
     }
 
     private fun lagreSøknad(journalpost: Journalpost, behandlingId: UUID) {
@@ -204,17 +225,17 @@ class JournalføringService(
         personIdent: String,
     ) {
         feilHvis(journalpost.bruker == null) {
-            "Journalposten mangler bruker. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
+            "Journalposten mangler bruker. Kan ikke journalføre ${journalpost.journalpostId}"
         }
 
         feilHvis(journalpost.journalstatus != Journalstatus.MOTTATT) {
-            "Journalposten har ugyldig journalstatus ${journalpost.journalstatus}. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
+            "Journalposten har ugyldig journalstatus ${journalpost.journalstatus}. Kan ikke journalføre ${journalpost.journalpostId}"
         }
 
         journalpost.bruker?.let {
             val allePersonIdenter = personService.hentPersonIdenter(personIdent).identer()
             feilHvisIkke(fagsakPersonOgJournalpostBrukerErSammePerson(allePersonIdenter, personIdent, it)) {
-                "Ikke samsvar mellom personident på journalposten og personen vi forsøker å opprette behandling for. Kan ikke automatisk journalføre ${journalpost.journalpostId}"
+                "Ikke samsvar mellom personident på journalposten og personen vi forsøker å opprette behandling for. Kan ikke journalføre ${journalpost.journalpostId}"
             }
         }
     }

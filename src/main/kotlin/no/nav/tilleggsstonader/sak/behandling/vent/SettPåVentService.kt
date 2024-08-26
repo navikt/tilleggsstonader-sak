@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.springframework.stereotype.Service
@@ -161,14 +162,15 @@ class SettPåVentService(
     ): OppdatertOppgaveResponse {
         val oppgave = hentOppgave(behandlingId)
 
-        val mappeId = oppgaveService.finnVentemappe().id.toLong()
+        val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
+        val mappe = oppgaveService.finnMappe(enhet, OppgaveMappe.PÅ_VENT)
         val oppdatertOppgave = Oppgave(
             id = oppgave.id,
             versjon = oppgave.versjon,
             tilordnetRessurs = "",
             fristFerdigstillelse = dto.frist,
             beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, dto.frist),
-            mappeId = Optional.of(mappeId),
+            mappeId = Optional.of(mappe.id),
         )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
     }
@@ -195,6 +197,9 @@ class SettPåVentService(
         } else {
             ""
         }
+
+        val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
+        val mappeId = oppgaveService.finnMappe(enhet, OppgaveMappe.KLAR).id
         oppgaveService.oppdaterOppgave(
             Oppgave(
                 id = oppgave.id,
@@ -202,7 +207,7 @@ class SettPåVentService(
                 tilordnetRessurs = tilordnetRessurs,
                 fristFerdigstillelse = osloDateNow(),
                 beskrivelse = SettPåVentBeskrivelseUtil.taAvVent(oppgave),
-                mappeId = Optional.empty(),
+                mappeId = Optional.ofNullable(mappeId),
             ),
         )
     }

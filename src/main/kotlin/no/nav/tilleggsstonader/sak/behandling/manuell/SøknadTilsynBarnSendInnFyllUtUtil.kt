@@ -20,7 +20,7 @@ object SøknadTilsynBarnSendInnFyllUtUtil {
         val identerBarn = søknad.rettighetstype.tilsynsutgifter
             .flatMap { it.tilsynsutgifterBarn }
             .flatMap { it.barn }
-            .map { it.personidentifikator }
+            .map { it.personidentifikator.replace(" ", "").trim() }
             .toSet()
         return Søknadsinformasjon(ident = søknad.personidentifikator, identerBarn = identerBarn)
     }

@@ -22,6 +22,10 @@ spec:
   prometheus:
     enabled: true
     path: /internal/prometheus
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
   replicas:
     min: 2
     max: 4

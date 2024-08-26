@@ -13,8 +13,9 @@ object OppgaveUtil {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    val ENHET_NR_NAY = "4462"
-    val ENHET_NR_EGEN_ANSATT = "4483"
+    val ENHET_NR_NAY = "4462" // Tilleggsstønad INN
+    val ENHET_NR_EGEN_ANSATT = "4483" // NAV Arbeid og ytelser Egne ansatte
+    val ENHET_NR_STRENGT_FORTROLIG = "2103" // NAV Vikafossen
 
     fun sekunderSidenEndret(oppgave: Oppgave): Long? {
         val endretTidspunkt = oppgave.endretTidspunkt
@@ -41,6 +42,16 @@ object OppgaveUtil {
         -> "tilleggsstonader-sak"
 
         else -> error("Håndterer ikke behandlesAvApplikasjon for $oppgavetype")
+    }
+
+    fun skalPlasseresIKlarMappe(oppgavetype: Oppgavetype) = when (oppgavetype) {
+        Oppgavetype.Journalføring,
+        Oppgavetype.BehandleSak,
+        Oppgavetype.BehandleUnderkjentVedtak,
+        Oppgavetype.GodkjenneVedtak,
+        -> true
+
+        else -> error("Håndterer ikke klar-mappe-håndtering for $oppgavetype")
     }
 
     /**

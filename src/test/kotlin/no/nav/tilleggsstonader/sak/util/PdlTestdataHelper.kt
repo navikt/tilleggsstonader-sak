@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Metadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Opphold
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Oppholdsadresse
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonForelderBarn
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Personnavn
@@ -92,7 +92,7 @@ object PdlTestdataHelper {
         fødselsdato: Fødselsdato? = null,
         navn: Navn = lagNavn(),
     ) =
-        PdlPersonForelderBarn(
+        PdlBarn(
             adressebeskyttelse = adressebeskyttelse,
             bostedsadresse = bostedsadresse,
             dødsfall = dødsfall,

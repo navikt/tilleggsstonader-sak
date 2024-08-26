@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.DokarkivBruker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostRequest
@@ -13,6 +14,8 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import org.springframework.http.HttpStatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo as DokumentInfoJournalpost
 
@@ -47,7 +50,9 @@ object JournalføringHelper {
         journalpost: Journalpost,
         eksternFagsakId: Long,
         dokumenttitler: Map<String, String>?,
+        nyAvsender: AvsenderMottaker?,
     ) = OppdaterJournalpostRequest(
+        avsenderMottaker = nyAvsender,
         bruker = journalpost.bruker?.let {
             DokarkivBruker(idType = BrukerIdType.valueOf(it.type.toString()), id = it.id)
         },
@@ -71,4 +76,25 @@ object JournalføringHelper {
             }
         },
     )
+
+    /**
+     * Frontend sender inn avsenderMottaker som en del av journalføringsrequesten.
+     *
+     * Dersom avsender er lik bruker populeres id, idType og navn i nyAvsender fra frontend.
+     *
+     * Dersom det er en annen avsender enn bruker, oppgis bare navn.
+     */
+    fun JournalføringRequest.NyAvsender.tilAvsenderMottaker(): AvsenderMottaker {
+        feilHvis(erBruker && personIdent.isNullOrBlank()) {
+            "Mangler personident på avsender"
+        }
+        feilHvis(navn.isNullOrBlank()) {
+            "Mangler navn på avsender"
+        }
+        return AvsenderMottaker(
+            id = personIdent,
+            idType = if (personIdent != null) BrukerIdType.FNR else null,
+            navn = navn,
+        )
+    }
 }

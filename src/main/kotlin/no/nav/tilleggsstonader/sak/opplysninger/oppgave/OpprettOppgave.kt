@@ -9,7 +9,6 @@ data class OpprettOppgave(
     val beskrivelse: String? = null,
     val tilordnetNavIdent: String? = null,
     val enhetsnummer: String? = null,
-    val mappeId: Long? = null,
     val prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
     val fristFerdigstillelse: LocalDate? = null,
     val journalpostId: String? = null,

@@ -3,11 +3,13 @@ package no.nav.tilleggsstonader.sak.opplysninger.dto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering as AdressebeskyttelseGraderingPdl
 
 data class PersonopplysningerDto(
     val personIdent: String,
     val navn: NavnDto,
     val harVergemål: Boolean,
+    val adressebeskyttelse: Adressebeskyttelse,
 )
 
 data class StatsborgerskapDto(
@@ -75,13 +77,17 @@ data class FullmaktDto(
     val områder: List<String>,
 )
 
-@Suppress("unused") // Kopi fra PDL
 enum class Adressebeskyttelse {
 
     STRENGT_FORTROLIG,
     STRENGT_FORTROLIG_UTLAND,
     FORTROLIG,
     UGRADERT,
+    ;
+
+    companion object {
+        fun fraPdl(status: AdressebeskyttelseGraderingPdl) = Adressebeskyttelse.valueOf(status.name)
+    }
 }
 
 @Suppress("unused")

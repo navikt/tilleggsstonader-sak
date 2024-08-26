@@ -52,6 +52,18 @@ class CacheConfig {
         }
     }
 
+    @Bean("5secCache")
+    fun fiveSecCache(): CacheManager = object : ConcurrentMapCacheManager() {
+        override fun createConcurrentMapCache(name: String): Cache {
+            val concurrentMap = Caffeine
+                .newBuilder()
+                .maximumSize(100)
+                .expireAfterWrite(5, TimeUnit.SECONDS)
+                .recordStats().build<Any, Any>().asMap()
+            return ConcurrentMapCache(name, concurrentMap, true)
+        }
+    }
+
     @Bean("longCache")
     fun longCache(): CacheManager = object : ConcurrentMapCacheManager() {
         override fun createConcurrentMapCache(name: String): Cache {

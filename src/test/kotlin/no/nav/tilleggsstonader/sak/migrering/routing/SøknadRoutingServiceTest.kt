@@ -163,12 +163,12 @@ class SøknadRoutingServiceTest {
         }
 
         @Test
-        fun `skal ikke route hvis det er vedtak uten utfall`() {
+        fun `skal route hvis det er vedtak uten utfall`() {
             every { arenaService.hentStatus(any(), any()) } returns arenaStatusVedtakUtenUtfall()
 
-            assertThat(skalBehandlesINyLøsning()).isFalse()
+            assertThat(skalBehandlesINyLøsning()).isTrue()
 
-            verify(exactly = 0) {
+            verify(exactly = 1) {
                 søknadRoutingRepository.insert(any())
             }
         }
