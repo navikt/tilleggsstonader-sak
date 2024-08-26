@@ -5,7 +5,6 @@ import java.time.LocalDate
 
 data class SimuleringDto(
     val perioder: List<OppsummeringForPeriode>,
-    val oppsummering: SimuleringOppsummering,
 )
 
 data class SimuleringOppsummering(
