@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sisteFerdigstilteBehandling
 import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -113,10 +112,10 @@ class JournalføringService(
             behandlingÅrsak = behandlingÅrsak,
         )
 
-        val forrigeBehandling = behandlingService.hentBehandlinger(behandling.fagsakId).sisteFerdigstilteBehandling()
+        val behandlingIdForGjenbruk = gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
 
-        if (forrigeBehandling != null) {
-            gjennbrukDataRevurderingService.gjenbrukData(behandling, forrigeBehandling.id)
+        if (behandlingIdForGjenbruk != null) {
+            gjennbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk)
         }
 
         if (journalpost.harStrukturertSøknad()) {

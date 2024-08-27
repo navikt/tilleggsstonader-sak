@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -114,6 +115,8 @@ class JournalføringServiceTest {
         every { journalpostService.hentIdentFraJournalpost(any()) } returns personIdent
         justRun { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any(), any(), captureNullable(nyAvsenderSlot)) }
         every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
+
+        every { gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<Behandling>()) } returns null
     }
 
     @AfterEach
@@ -284,7 +287,7 @@ class JournalføringServiceTest {
                 resultat = BehandlingResultat.INNVILGET,
                 status = BehandlingStatus.FERDIGSTILT,
             )
-        val nyBehandling = behandling(fagsak = fagsak)
+        val nyBehandling = behandling(fagsak = fagsak, forrigeBehandlingId = forrigeBehandling.id)
         val barn1 = SøknadBarn(ident = "123456789", data = mockk())
         val barn2 = SøknadBarn(ident = "987654321", data = mockk())
         val eksisterendeBarn = listOf(barn1, barn2)
@@ -319,6 +322,9 @@ class JournalføringServiceTest {
 
         @Test
         fun `skal gjennbruke data fra tidligere behandling`() {
+            every { gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<Behandling>()) } returns
+                forrigeBehandling.id
+
             journalføringService.journalførTilNyBehandling(
                 journalpost.journalpostId,
                 personIdent,
