@@ -381,7 +381,7 @@ class IverksettServiceTest : IntegrationTest() {
     }
 
     private fun hentEksternBehandlingId(behandling: Behandling) =
-        testoppsettService.hentSaksbehandling(behandling.id).eksternId
+        testoppsettService.hentSaksbehandling(behandling.id).eksternId.toString()
 
     private fun hentAndeler(behandling: Behandling): Set<AndelTilkjentYtelse> {
         return tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse

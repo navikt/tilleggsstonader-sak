@@ -241,6 +241,6 @@ class IverksettService(
             ?.iverksettingId
             ?.let {
                 val eksternBehandlingId = behandlingService.hentEksternBehandlingId(behandlingId).id
-                ForrigeIverksettingDto(behandlingId = eksternBehandlingId, iverksettingId = it)
+                ForrigeIverksettingDto(behandlingId = eksternBehandlingId.toString(), iverksettingId = it)
             }
 }

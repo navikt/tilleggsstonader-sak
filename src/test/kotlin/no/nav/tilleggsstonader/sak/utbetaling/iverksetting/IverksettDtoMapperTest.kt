@@ -75,7 +75,7 @@ class IverksettDtoMapperTest {
 
     @Test
     fun `skal mappe forrigeIverksetting`() {
-        val forrigeIverksetting = ForrigeIverksettingDto(11L, UUID.randomUUID())
+        val forrigeIverksetting = ForrigeIverksettingDto("11", UUID.randomUUID())
         val dto = IverksettDtoMapper.map(
             behandling = behandling,
             andelerTilkjentYtelse = listOf(andel.copy(beløp = 0)),
