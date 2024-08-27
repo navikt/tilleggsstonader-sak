@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
@@ -30,8 +28,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
+import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest.Journalføringsaksjon
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
@@ -40,7 +40,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -74,9 +75,7 @@ class JournalføringServiceTest {
 
     val enhet = ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY.enhetNr
     val personIdent = "123456789"
-    val aktørId = "9876543210127"
-    val tidligerePersonIdent = "9123456789"
-    val fagsak = fagsak()
+    val fagsak = fagsak(identer = setOf(PersonIdent(personIdent)))
     val journalpostId = "1"
     val journalpost = Journalpost(
         journalpostId = journalpostId,
@@ -88,28 +87,36 @@ class JournalføringServiceTest {
     )
 
     val taskSlot = slot<Task>()
+    val nyAvsenderSlot = slot<AvsenderMottaker?>()
 
     @BeforeEach
     fun setUp() {
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
         every { fagsakService.hentEllerOpprettFagsak(any(), any()) } returns fagsak
+
+        justRun { behandlingService.leggTilBehandlingsjournalpost(any(), any(), any()) }
+        every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
+
         every { taskService.save(capture(taskSlot)) } returns mockk()
         every { personService.hentPersonIdenter(personIdent) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
         justRun { oppgaveService.ferdigstillOppgave(any()) }
-        every { journalpostService.hentIdentFraJournalpost(journalpost) } returns personIdent
+        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
+        every { journalpostService.hentIdentFraJournalpost(any()) } returns personIdent
+        justRun { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any(), any(), captureNullable(nyAvsenderSlot)) }
+        every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
     }
 
     @AfterEach
     fun tearDown() {
         taskSlot.clear()
+        nyAvsenderSlot.clear()
     }
 
     @Test
     internal fun `skal ikke kunne journalføre hvis journalpostens bruker mangler`() {
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost.copy(bruker = null)
-        every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
 
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             journalføringService.journalførTilNyBehandling(
                 journalpostId,
                 personIdent,
@@ -123,21 +130,8 @@ class JournalføringServiceTest {
 
     @Test
     internal fun `skal kunne journalføre og opprette behandling`() {
-        every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
-        every {
-            journalpostService.oppdaterOgFerdigstillJournalpost(
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-            )
-        } just Runs
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
 
-        every { behandlingService.hentBehandlinger(fagsak.id) } returns emptyList()
-        every { behandlingService.leggTilBehandlingsjournalpost(any(), any(), any()) } just Runs
         every {
             behandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
@@ -145,8 +139,6 @@ class JournalføringServiceTest {
             )
         } returns behandling(fagsak = fagsak)
         every { journalpostService.hentSøknadFraJournalpost(any()) } returns mockk()
-        every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
-        every { behandlingService.finnSisteIverksatteBehandling(any()) } returns mockk()
 
         journalføringService.journalførTilNyBehandling(
             journalpostId,
@@ -174,7 +166,7 @@ class JournalføringServiceTest {
             )
         }
 
-        Assertions.assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
+        assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
     }
 
     @Test
@@ -186,29 +178,15 @@ class JournalføringServiceTest {
             oppgaveId = "1",
             journalførendeEnhet = "123",
             årsak = JournalføringRequest.Journalføringsårsak.PAPIRSØKNAD,
-            aksjon = JournalføringRequest.Journalføringsaksjon.JOURNALFØR_PÅ_FAGSAK,
+            aksjon = Journalføringsaksjon.JOURNALFØR_PÅ_FAGSAK,
             nyAvsender = nyAvsender,
         )
 
-        val nyAvsenderSlot = slot<AvsenderMottaker?>()
-
-        every {
-            journalpostService.oppdaterOgFerdigstillJournalpost(
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                captureNullable(nyAvsenderSlot),
-            )
-        } just Runs
-
         journalføringService.fullførJournalpost(journalføringRequest, journalpost)
 
-        Assertions.assertThat(nyAvsenderSlot.captured!!.navn).isEqualTo(nyAvsender.navn)
-        Assertions.assertThat(nyAvsenderSlot.captured!!.id).isEqualTo(nyAvsender.personIdent)
-        Assertions.assertThat(nyAvsenderSlot.captured!!.idType).isEqualTo(BrukerIdType.FNR)
+        assertThat(nyAvsenderSlot.captured!!.navn).isEqualTo(nyAvsender.navn)
+        assertThat(nyAvsenderSlot.captured!!.id).isEqualTo(nyAvsender.personIdent)
+        assertThat(nyAvsenderSlot.captured!!.idType).isEqualTo(BrukerIdType.FNR)
     }
 
     @Nested
@@ -232,27 +210,20 @@ class JournalføringServiceTest {
                     DokumentInfo(
                         "",
                         brevkode = DokumentBrevkode.BARNETILSYN.verdi,
-                        dokumentvarianter = listOf(Dokumentvariant(variantformat = Dokumentvariantformat.ORIGINAL, null, true)),
+                        dokumentvarianter = listOf(
+                            Dokumentvariant(
+                                variantformat = Dokumentvariantformat.ORIGINAL,
+                                null,
+                                true,
+                            ),
+                        ),
                     ),
                 ),
             )
-            every { personService.hentPersonIdenter(any()) } returns PdlIdenter(listOf(PdlIdent(personIdent, false)))
-            every { behandlingService.finnSisteIverksatteBehandling(any()) } returns forrigeBehandling
+            every { behandlingService.finnesBehandlingForFagsak(any()) } returns true
             every { behandlingService.opprettBehandling(any(), any(), any(), any()) } returns nyBehandling
-            every { behandlingService.leggTilBehandlingsjournalpost(any(), any(), any()) } just Runs
-            every {
-                journalpostService.oppdaterOgFerdigstillJournalpost(
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                )
-            } just Runs
             every { behandlingService.hentBehandlinger(any<UUID>()) } returns listOf(forrigeBehandling)
             every { journalpostService.hentSøknadFraJournalpost(any()) } returns mockk()
-            every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
             every { barnService.finnBarnPåBehandling(nyBehandling.id) } returns eksisterendeBarn.map { it.tilBehandlingBarn() }
             every { søknadService.hentSøknadBarnetilsyn(nyBehandling.id) } returns mockk() {
                 every { barn } returns setOf(barn1, barn2)
@@ -299,8 +270,8 @@ class JournalføringServiceTest {
                 "4462",
             )
 
-            Assertions.assertThat(barnSlot.captured).size().isEqualTo(1)
-            Assertions.assertThat(barnSlot.captured.first().ident).isEqualTo(barn3.ident)
+            assertThat(barnSlot.captured).size().isEqualTo(1)
+            assertThat(barnSlot.captured.first().ident).isEqualTo(barn3.ident)
         }
 
         private fun SøknadBarn.tilBehandlingBarn() = BehandlingBarn(
