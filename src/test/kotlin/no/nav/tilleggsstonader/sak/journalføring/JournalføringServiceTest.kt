@@ -10,6 +10,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottakerIdType
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariant
@@ -47,6 +48,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.UUID
+import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottaker as AvsenderMottakerKontrakt
 
 class JournalføringServiceTest {
 
@@ -77,6 +79,13 @@ class JournalføringServiceTest {
     val personIdent = "123456789"
     val fagsak = fagsak(identer = setOf(PersonIdent(personIdent)))
     val journalpostId = "1"
+    val avsenderMottaker = AvsenderMottakerKontrakt(
+        id = personIdent,
+        type = AvsenderMottakerIdType.FNR,
+        navn = "navn",
+        land = "",
+        erLikBruker = true,
+    )
     val journalpost = Journalpost(
         journalpostId = journalpostId,
         journalposttype = Journalposttype.I,
@@ -84,6 +93,7 @@ class JournalføringServiceTest {
         dokumenter = listOf(DokumentInfo("", brevkode = "1")),
         bruker = Bruker(personIdent, BrukerIdType.FNR),
         journalforendeEnhet = "123",
+        avsenderMottaker = avsenderMottaker,
     )
 
     val taskSlot = slot<Task>()
@@ -155,16 +165,7 @@ class JournalføringServiceTest {
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
             )
         }
-        verify(exactly = 1) {
-            journalpostService.oppdaterOgFerdigstillJournalpost(
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-            )
-        }
+        verifyOppdaterOgFerdigstilJournalpost(1)
 
         assertThat(taskSlot.captured.type).isEqualTo(OpprettOppgaveForOpprettetBehandlingTask.TYPE)
     }
@@ -182,11 +183,96 @@ class JournalføringServiceTest {
             nyAvsender = nyAvsender,
         )
 
-        journalføringService.fullførJournalpost(journalføringRequest, journalpost)
+        journalføringService.fullførJournalpost(journalføringRequest, journalpost.copy(avsenderMottaker = null))
 
         assertThat(nyAvsenderSlot.captured!!.navn).isEqualTo(nyAvsender.navn)
         assertThat(nyAvsenderSlot.captured!!.id).isEqualTo(nyAvsender.personIdent)
         assertThat(nyAvsenderSlot.captured!!.idType).isEqualTo(BrukerIdType.FNR)
+    }
+
+    @Nested
+    inner class Papirsøknad {
+
+        val requestNyBehandling = JournalføringRequest(
+            stønadstype = Stønadstype.BARNETILSYN,
+            oppgaveId = "1",
+            journalførendeEnhet = "123",
+            årsak = JournalføringRequest.Journalføringsårsak.PAPIRSØKNAD,
+            aksjon = Journalføringsaksjon.OPPRETT_BEHANDLING,
+        )
+
+        val requestJournalfør = requestNyBehandling.copy(aksjon = Journalføringsaksjon.JOURNALFØR_PÅ_FAGSAK)
+
+        @Test
+        fun `kan ikke opprette førstegangsbehandling for papirsøknad`() {
+            every { behandlingService.finnesBehandlingForFagsak(fagsak.id) } returns false
+
+            assertThatThrownBy {
+                journalføringService.fullførJournalpost(requestNyBehandling, journalpost)
+            }.hasMessageContaining("Journalføring av papirsøknad må gjøres uten å opprette ny behandling")
+        }
+
+        @Test
+        fun `kan ikke opprette revurdering for papirsøknad`() {
+            every { behandlingService.finnesBehandlingForFagsak(fagsak.id) } returns true
+
+            assertThatThrownBy {
+                journalføringService.fullførJournalpost(requestNyBehandling, journalpost)
+            }.hasMessageContaining("Journalføring av papirsøknad må gjøres uten å opprette ny behandling")
+        }
+
+        @Test
+        fun `kan journalføre papirsøknad uten opprette behandling`() {
+            every { behandlingService.finnesBehandlingForFagsak(fagsak.id) } returns true
+
+            journalføringService.fullførJournalpost(requestJournalfør, journalpost)
+
+            verify(exactly = 0) { behandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verifyOppdaterOgFerdigstilJournalpost(1)
+        }
+    }
+
+    @Nested
+    inner class Ettersending {
+
+        val requestOpprettBehandling = JournalføringRequest(
+            stønadstype = Stønadstype.BARNETILSYN,
+            oppgaveId = "1",
+            journalførendeEnhet = "123",
+            årsak = JournalføringRequest.Journalføringsårsak.ETTERSENDING,
+            aksjon = Journalføringsaksjon.OPPRETT_BEHANDLING,
+        )
+        val requestJournalfør = requestOpprettBehandling.copy(aksjon = Journalføringsaksjon.JOURNALFØR_PÅ_FAGSAK)
+
+        @Test
+        fun `kan ikke opprette førstegangsbehandling for ettersending`() {
+            every { behandlingService.finnesBehandlingForFagsak(fagsak.id) } returns false
+
+            assertThatThrownBy {
+                journalføringService.fullførJournalpost(requestOpprettBehandling, journalpost)
+            }.hasMessageContaining("Journalføring av ettersending må gjøres uten å opprette ny behandling")
+        }
+
+        @Test
+        fun `kan opprette revurdering for ettersending`() {
+            every { behandlingService.finnesBehandlingForFagsak(fagsak.id) } returns true
+            every { behandlingService.opprettBehandling(any(), any(), any(), any(), any()) } returns
+                behandling(fagsak = fagsak)
+
+            journalføringService.fullførJournalpost(requestOpprettBehandling, journalpost)
+            verify(exactly = 1) { behandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verifyOppdaterOgFerdigstilJournalpost(1)
+        }
+
+        @Test
+        fun `kan journalføre ettersending uten å opprette behandling`() {
+            every { behandlingService.finnesBehandlingForFagsak(fagsak.id) } returns false
+
+            journalføringService.fullførJournalpost(requestJournalfør, journalpost)
+
+            verify(exactly = 0) { behandlingService.opprettBehandling(any(), any(), any(), any(), any()) }
+            verifyOppdaterOgFerdigstilJournalpost(1)
+        }
     }
 
     @Nested
@@ -265,7 +351,7 @@ class JournalføringServiceTest {
                 journalpost.journalpostId,
                 personIdent,
                 Stønadstype.BARNETILSYN,
-                BehandlingÅrsak.NYE_OPPLYSNINGER,
+                BehandlingÅrsak.SØKNAD,
                 "",
                 "4462",
             )
@@ -278,5 +364,18 @@ class JournalføringServiceTest {
             ident = ident,
             behandlingId = nyBehandling.id,
         )
+    }
+
+    private fun verifyOppdaterOgFerdigstilJournalpost(antallKall: Int) {
+        verify(exactly = antallKall) {
+            journalpostService.oppdaterOgFerdigstillJournalpost(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        }
     }
 }

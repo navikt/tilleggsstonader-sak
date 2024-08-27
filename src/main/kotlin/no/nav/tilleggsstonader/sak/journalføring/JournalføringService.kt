@@ -102,9 +102,10 @@ class JournalføringService(
         logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
     ) {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
+
         val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
 
-        validerKanOppretteBehandling(journalpost, personIdent)
+        validerKanOppretteBehandling(journalpost, fagsak, behandlingÅrsak)
 
         val behandling = opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
             fagsak = fagsak,
@@ -222,8 +223,10 @@ class JournalføringService(
 
     private fun validerKanOppretteBehandling(
         journalpost: Journalpost,
-        personIdent: String,
+        fagsak: Fagsak,
+        behandlingÅrsak: BehandlingÅrsak,
     ) {
+        val personIdent = fagsak.hentAktivIdent()
         feilHvis(journalpost.bruker == null) {
             "Journalposten mangler bruker. Kan ikke journalføre ${journalpost.journalpostId}"
         }
@@ -238,7 +241,37 @@ class JournalføringService(
                 "Ikke samsvar mellom personident på journalposten og personen vi forsøker å opprette behandling for. Kan ikke journalføre ${journalpost.journalpostId}"
             }
         }
+
+        if (fagsak.stønadstype == Stønadstype.BARNETILSYN) {
+            validerKanOppretteNyBehandlingForTilsynBarn(behandlingÅrsak, fagsak)
+        }
     }
+
+    /**
+     * For tilsyn barn må man ta stilling til hvilke barn som skal legges til i behandlingen.
+     * Vi tror behovet for dette er begrenset og er allerede støttet på annen måte.
+     * Ønsker derfor at disse journalføringene gjøres uten å opprette behandling, men at behandlingen opprettes manuelt
+     */
+    private fun validerKanOppretteNyBehandlingForTilsynBarn(
+        behandlingÅrsak: BehandlingÅrsak,
+        fagsak: Fagsak,
+    ) {
+        feilHvis(behandlingÅrsak == BehandlingÅrsak.PAPIRSØKNAD) {
+            feilmeldingOpprettBehandlingManuelt("papirsøknad")
+        }
+        feilHvis(
+            behandlingÅrsak == BehandlingÅrsak.NYE_OPPLYSNINGER &&
+                !behandlingService.finnesBehandlingForFagsak(fagsak.id),
+        ) {
+            feilmeldingOpprettBehandlingManuelt("ettersending")
+        }
+    }
+
+    private fun feilmeldingOpprettBehandlingManuelt(typeJournalføring: String) =
+        "Journalføring av $typeJournalføring må gjøres uten å opprette ny behandling. " +
+            "Behandlingen må opprettes manuelt etter journalføringen. " +
+            "Hvis søker har behandling fra før så kan det gjøres fra behandlingsoversikten. " +
+            "Hvis søker ikke har behandling fra før så må det gjøres via Admin - opprett behandling"
 
     private fun fagsakPersonOgJournalpostBrukerErSammePerson(
         allePersonIdenter: Set<String>,

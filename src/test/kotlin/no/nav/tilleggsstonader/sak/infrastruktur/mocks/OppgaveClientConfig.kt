@@ -86,7 +86,7 @@ class OppgaveClientConfig {
                 error("Allerede ferdigstilt")
             }
             val oppdatertOppgave = oppgave.copy(
-                versjon = oppgave.versjon!! + 1,
+                versjon = oppgave.versjon + 1,
                 status = StatusEnum.FERDIGSTILT,
                 ferdigstiltTidspunkt = osloNow().format(DateTimeFormatter.ISO_DATE_TIME),
             )
@@ -96,7 +96,7 @@ class OppgaveClientConfig {
         every { oppgaveClient.oppdaterOppgave(any()) } answers {
             val oppdaterOppgave = firstArg<Oppgave>().let {
                 val eksisterendeOppgave = oppgavelager[it.id]!!
-                val versjon = it.versjon!!
+                val versjon = it.versjon
                 feilHvis(versjon != eksisterendeOppgave.versjon, HttpStatus.CONFLICT) {
                     "Oppgaven har endret seg siden du sist hentet oppgaver. versjon=$versjon (${eksisterendeOppgave.versjon}) " +
                         "For å kunne gjøre endringer må du hente oppgaver på nytt."
@@ -176,6 +176,7 @@ class OppgaveClientConfig {
         enhetsnummer = "",
         ident = OppgaveIdentV2(ident = "12345678910", gruppe = IdentGruppe.FOLKEREGISTERIDENT),
         journalpostId = (++journalPostId).toString(),
+        mappeId = MAPPE_ID_KLAR,
     )
 
     companion object {
