@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sisteFerdigstilteBehandling
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
@@ -80,7 +79,7 @@ class OpprettRevurderingBehandlingService(
             "Kan ikke sende inn barn til $stønadstype"
         }
 
-        feilHvis(request.årsak != BehandlingÅrsak.SØKNAD && request.valgteBarn.isNotEmpty()) {
+        feilHvis(!request.årsak.erSøknadEllerPapirsøknad() && request.valgteBarn.isNotEmpty()) {
             "Kan ikke sende med barn på annet enn årsak Søknad"
         }
 

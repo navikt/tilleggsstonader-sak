@@ -65,6 +65,9 @@ enum class BehandlingÅrsak {
     PAPIRSØKNAD,
     SATSENDRING,
     MANUELT_OPPRETTET,
+    ;
+
+    fun erSøknadEllerPapirsøknad() = this == SØKNAD || this == PAPIRSØKNAD
 }
 
 enum class BehandlingType(val visningsnavn: String) {
