@@ -92,7 +92,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             val vedtakDto = innvilgelseDto(
                 utgifter = mapOf(barn(barn.id, Utgift(januar, januar, 100))),
             )
-            steg.utførSteg(saksbehandling, vedtakDto)
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val vedtak = repository.findByIdOrThrow(saksbehandling.id)
 
@@ -147,7 +147,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     ),
                 ),
             )
-            steg.utførSteg(saksbehandling, vedtakDto)
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val dagsatsForUtgift100 = BigDecimal("2.95")
             val dagsatsForUtgift200 = BigDecimal("5.91")
@@ -208,7 +208,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             val vedtakDto = innvilgelseDto(
                 mapOf(barn(barn.id, Utgift(juni, juni, 100))),
             )
-            steg.utførSteg(saksbehandling, vedtakDto)
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             with(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.single()) {
                 assertThat(this.fom).isEqualTo(juni.atDay(3))
@@ -277,7 +277,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
             stønadsperiodeRepository.insertAll(stønadsperioder)
 
-            steg.utførSteg(saksbehandling, vedtakDto)
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val forventedeAndeler = stønadsperioder.map {
                 andelTilkjentYtelse(
@@ -305,7 +305,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
             stønadsperiodeRepository.insert(stønadsperiode)
 
-            steg.utførSteg(saksbehandling, vedtakDto)
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val forventetAndel = andelTilkjentYtelse(
                 fom = stønadsperiode.fom,
@@ -330,7 +330,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
             stønadsperiodeRepository.insert(stønadsperiode)
 
-            steg.utførSteg(saksbehandling, vedtakDto)
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val forventetAndel = andelTilkjentYtelse(
                 fom = stønadsperiode.fom,
@@ -356,7 +356,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             stønadsperiodeRepository.insert(stønadsperiode)
 
             assertThatThrownBy {
-                steg.utførSteg(
+                steg.utførOgReturnerNesteSteg(
                     saksbehandling,
                     vedtakDto,
                 )
@@ -376,7 +376,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             )
 
             assertThatThrownBy {
-                steg.utførSteg(
+                steg.utførOgReturnerNesteSteg(
                     saksbehandling,
                     vedtak,
                 )
