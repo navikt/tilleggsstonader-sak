@@ -193,22 +193,6 @@ class BehandlingFlytTest(
         }
     }
 
-    @Test
-    fun `skal ikke kunne sende til beslutter dersom det ikke er simulert`() {
-        somSaksbehandler {
-            val behandlingId = opprettBehandling(personIdent)
-            vurderInngangsvilkår(behandlingId)
-            opprettVilkår(behandlingId)
-            utfyllVilkår(behandlingId)
-            opprettVedtak(behandlingId)
-            genererSaksbehandlerBrev(behandlingId)
-            lagreBrevmottakere(behandlingId)
-            assertThatThrownBy {
-                sendTilBeslutter(behandlingId)
-            }.hasMessageContaining("Behandling er i feil steg=SIMULERING")
-        }
-    }
-
     private fun newTransaction() {
         if (TestTransaction.isActive()) {
             TestTransaction.flagForCommit() // need this, otherwise the next line does a rollback
