@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
@@ -28,17 +27,6 @@ class SimuleringService(
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
-
-    @Transactional
-    fun simuler(saksbehandling: Saksbehandling): List<OppsummeringForPeriode>? {
-        if (saksbehandling.status.behandlingErLåstForVidereRedigering() ||
-            !tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)
-        ) {
-            return hentLagretSimuleringsoppsummering(saksbehandling.id)
-        }
-        val simuleringsresultat = hentOgLagreSimuleringsresultat(saksbehandling)
-        return simuleringsresultat.data.oppsummeringer
-    }
 
     fun hentLagretSimuleringsoppsummering(behandlingId: UUID): List<OppsummeringForPeriode>? {
         return hentLagretSimmuleringsresultat(behandlingId)?.oppsummeringer

@@ -9,7 +9,6 @@ import io.mockk.slot
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -27,8 +26,6 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.springframework.data.repository.findByIdOrNull
 
 internal class SimuleringServiceTest {
 
@@ -84,7 +81,7 @@ internal class SimuleringServiceTest {
             iverksettClient.simuler(capture(simulerSlot))
         } returns SimuleringResponseDto(mockk(), mockk())
 
-        simuleringService.simuler(saksbehandling)
+        simuleringService.hentOgLagreSimuleringsresultat(saksbehandling)
 
         assertThat(simulerSlot.captured.behandlingId).isEqualTo(saksbehandling.eksternId.toString())
         assertThat(simulerSlot.captured.utbetalinger).hasSize(1)
@@ -92,39 +89,6 @@ internal class SimuleringServiceTest {
         assertThat(simulerSlot.captured.utbetalinger.first().fraOgMedDato).isEqualTo(tilkjentYtelse.andelerTilkjentYtelse.first().fom)
         assertThat(simulerSlot.captured.utbetalinger.first().tilOgMedDato).isEqualTo(tilkjentYtelse.andelerTilkjentYtelse.first().tom)
         assertThat(simulerSlot.captured.forrigeIverksetting).isEqualTo(null)
-    }
-
-    @Test
-    internal fun `skal feile hvis behandlingen ikke er redigerbar og mangler lagret simulering`() {
-        val behandling =
-            behandling(
-                fagsak = fagsak,
-                type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                status = BehandlingStatus.FATTER_VEDTAK,
-            )
-        every { behandlingService.hentBehandling(any()) } returns behandling
-        assertThrows<RuntimeException> {
-            simuleringService.simuler(saksbehandling(id = behandling.id))
-        }
-    }
-
-    @Test
-    internal fun `skal hente lagret simulering hvis behandlingen ikke er redigerbar`() {
-        val behandling =
-            behandling(
-                fagsak = fagsak,
-                type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                status = BehandlingStatus.FATTER_VEDTAK,
-            )
-        every { behandlingService.hentBehandling(any()) } returns behandling
-        every {
-            simuleringsresultatRepository.findByIdOrNull(behandling.id)
-        } returns Simuleringsresultat(
-            behandlingId = behandling.id,
-            data = SimuleringResponse(mockk(), mockk()),
-        )
-        val simuleringsresultatDto = simuleringService.simuler(saksbehandling(fagsak, behandling))
-        assertThat(simuleringsresultatDto).isNotNull
     }
 
     @Test
@@ -148,9 +112,8 @@ internal class SimuleringServiceTest {
         val simulerSlot = slot<Simuleringsresultat>()
         every { simuleringsresultatRepository.insert(capture(simulerSlot)) } answers { firstArg() }
 
-        simuleringService.simuler(saksbehandling(id = behandling.id))
+        simuleringService.hentOgLagreSimuleringsresultat(saksbehandling(id = behandling.id))
 
-//        assertThat(simulerSlot.captured.data.oppsummering.fom)
-//            .isEqualTo(LocalDate.of(2021, 2, 1))
+        assertThat(simulerSlot.captured.data.oppsummeringer).hasSize(16)
     }
 }

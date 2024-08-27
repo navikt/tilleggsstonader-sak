@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDate
 import java.util.UUID
 
 @RestController
@@ -22,8 +21,8 @@ import java.util.UUID
 class SimuleringController(
     private val tilgangService: TilgangService,
     private val behandlingService: BehandlingService,
-    private val simuleringService: SimuleringService,
     private val unleashService: UnleashService,
+    private val simuleringStegService: SimuleringStegService,
 ) {
 
     @GetMapping("/{behandlingId}")
@@ -35,22 +34,12 @@ class SimuleringController(
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.UPDATE)
 
-        val perioder = simuleringService.simuler(saksbehandling)
+        val perioder = simuleringStegService.hentEllerOpprettSimuleringsresultat(saksbehandling)
 
         return if (perioder.isNullOrEmpty()) {
             null
         } else {
-            SimuleringDto(
-                perioder = perioder,
-                // Mocker oppsummering da det ikke er bestemt om vi eller utsjekk skal lage
-                oppsummering = SimuleringOppsummering(
-                    fom = LocalDate.of(2023, 7, 1),
-                    tom = LocalDate.of(2024, 7, 31),
-                    etterbetaling = 0,
-                    feilutbetaling = 2724,
-                    nesteUtbetaling = null,
-                ),
-            )
+            SimuleringDto(perioder = perioder)
         }
     }
 }
