@@ -14,8 +14,9 @@ class VilkårsregelEnHovedregel :
         VilkårType.EKSEMPEL,
         setOf(
             RegelSteg(
-                RegelId.HAR_ET_NAVN,
-                jaNeiSvarRegel(
+                regelId = RegelId.HAR_ET_NAVN,
+                erHovedregel = true,
+                svarMapping = jaNeiSvarRegel(
                     hvisNei = NesteRegel(
                         RegelId.HAR_ET_NAVN2,
                         BegrunnelseType.PÅKREVD,
@@ -24,10 +25,10 @@ class VilkårsregelEnHovedregel :
             ),
             RegelSteg(
                 regelId = RegelId.HAR_ET_NAVN2,
+                erHovedregel = false,
                 svarMapping = jaNeiSvarRegel(),
             ),
         ),
-        hovedregler = setOf(RegelId.HAR_ET_NAVN),
     )
 
 class VilkårsregelToHovedregler :
@@ -36,15 +37,13 @@ class VilkårsregelToHovedregler :
         setOf(
             RegelSteg(
                 regelId = RegelId.HAR_ET_NAVN,
+                erHovedregel = true,
                 svarMapping = jaNeiSvarRegel(hvisNei = SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE),
             ),
             RegelSteg(
                 regelId = RegelId.HAR_ET_NAVN2,
+                erHovedregel = true,
                 svarMapping = jaNeiSvarRegel(),
             ),
-        ),
-        hovedregler = setOf(
-            RegelId.HAR_ET_NAVN,
-            RegelId.HAR_ET_NAVN2,
         ),
     )

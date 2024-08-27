@@ -6,12 +6,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel.Companion.OPPFYLT_MED_PÅKREVD_BEGRUNNELSE
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.regelIder
 
 class EksempelRegel : Vilkårsregel(
     vilkårType = VilkårType.EKSEMPEL,
     regler = setOf(HAR_ET_NAVN),
-    hovedregler = regelIder(HAR_ET_NAVN),
 ) {
 
     companion object {
@@ -19,6 +17,7 @@ class EksempelRegel : Vilkårsregel(
         private val HAR_ET_NAVN =
             RegelSteg(
                 regelId = RegelId.HAR_ET_NAVN,
+                erHovedregel = true,
                 svarMapping = jaNeiSvarRegel(hvisJa = OPPFYLT_MED_PÅKREVD_BEGRUNNELSE),
             )
     }
