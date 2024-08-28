@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåEksisterendeVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -29,7 +29,7 @@ class TestSaksbehandlingService(
 
         vilkårsett.forEach { vilkår ->
             val delvilkårsett = lagDelvilkårsett(regler.getValue(vilkår.vilkårType), vilkår)
-            vilkårService.oppdaterVilkår(SvarPåVilkårDto(vilkår.id, behandlingId, delvilkårsett))
+            vilkårService.oppdaterVilkår(SvarPåEksisterendeVilkårDto(vilkår.id, behandlingId, delvilkårsett))
         }
         return behandlingId
     }
