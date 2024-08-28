@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
  *  SVAR_2 som peker til ett nytt spørsmål
  * {
  *  [regelId]: "SPØRSMÅL_1",
+ *  [erHovedregel]: true
  *  [svarMapping]: {
  *      "SVAR_1": SluttSvarRegel.OPPFYLT,
  *      "SVAR_2": {
@@ -24,6 +25,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
  */
 data class RegelSteg(
     val regelId: RegelId,
+    val erHovedregel: Boolean,
     val svarMapping: Map<SvarId, SvarRegel>,
 ) {
 
