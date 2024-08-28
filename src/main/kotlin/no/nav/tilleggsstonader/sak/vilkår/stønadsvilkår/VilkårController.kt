@@ -5,9 +5,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåEksisterendeVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
@@ -37,20 +39,28 @@ class VilkårController(
     }
 
     @PostMapping
-    fun oppdaterVilkår(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
-        tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
+    fun oppdaterVilkår(@RequestBody svarPåEksisterendeVilkårDto: SvarPåEksisterendeVilkårDto): VilkårDto {
+        tilgangService.validerTilgangTilBehandling(svarPåEksisterendeVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         try {
-            return vilkårService.oppdaterVilkår(svarPåVilkårDto)
+            return vilkårService.oppdaterVilkår(svarPåEksisterendeVilkårDto)
         } catch (e: Exception) {
-            val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
+            val delvilkårJson = objectMapper.writeValueAsString(svarPåEksisterendeVilkårDto.delvilkårsett)
             secureLogger.warn(
-                "id=${svarPåVilkårDto.id}" +
-                    " behandlingId=${svarPåVilkårDto.behandlingId}" +
-                    " svar=$delvilkårJson",
+                "id=${svarPåEksisterendeVilkårDto.id}" +
+                        " behandlingId=${svarPåEksisterendeVilkårDto.behandlingId}" +
+                        " svar=$delvilkårJson",
             )
             throw e
         }
+    }
+
+    @PostMapping("opprett")
+    fun opprettVilkår(@RequestBody opprettVilkårDto: OpprettVilkårDto): VilkårDto {
+        tilgangService.validerTilgangTilBehandling(opprettVilkårDto.behandlingId, AuditLoggerEvent.CREATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return vilkårService.opprettNyttVilkår(opprettVilkårDto).tilDto()
     }
 
     @PostMapping("nullstill")
