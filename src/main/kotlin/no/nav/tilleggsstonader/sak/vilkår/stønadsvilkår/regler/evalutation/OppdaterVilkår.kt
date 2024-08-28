@@ -8,35 +8,50 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.svarTilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler.Companion.ALLE_VILKÅRSREGLER
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering.utledResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelValidering.validerVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnReglerForVilkårstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
 import java.util.UUID
 
 object OppdaterVilkår {
 
-    /**
-     * Oppdaterer [Vilkår] med nye svar og resultat
-     * Validerer att svaren er gyldige
-     */
-    fun validerOgOppdatertVilkår(
+    fun validerVilkårOgBeregnResultat(
         vilkår: Vilkår,
         oppdatering: List<DelvilkårDto>,
-        vilkårsregler: Map<VilkårType, Vilkårsregel> = ALLE_VILKÅRSREGLER.vilkårsregler,
-    ): Vilkår { // TODO: Ikke default input her, kanskje?
-        val vilkårsregel =
-            vilkårsregler[vilkår.type] ?: error("Finner ikke vilkårsregler for ${vilkår.type}")
+    ): RegelResultat {
+        val relevanteRegler = finnReglerForVilkårstype(vilkår.type)
 
-        validerVilkår(vilkårsregel, oppdatering, vilkår.delvilkårsett)
+        // Valider delvilkår
+        validerVilkår(relevanteRegler, oppdatering, vilkår.delvilkårsett)
 
-        val vilkårsresultat = utledResultat(vilkårsregel, oppdatering)
+        // Utled og valider resultat
+        val vilkårsresultat = utledResultat(relevanteRegler, oppdatering)
+
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
-        val oppdaterteDelvilkår = oppdaterDelvilkår(vilkår, vilkårsresultat, oppdatering)
+
+        return vilkårsresultat
+    }
+
+    /*
+     * Oppdaterer [Vilkår] med nye svar og resultat
+     */
+    fun oppdaterVilkår(
+        vilkår: Vilkår,
+        oppdatering: LagreVilkårDto,
+        vilkårsresultat: RegelResultat,
+    ): Vilkår {
+        val oppdaterteDelvilkår = oppdaterDelvilkår(
+            vilkår = vilkår,
+            vilkårsresultat = vilkårsresultat,
+            validertOppdatering = oppdatering.delvilkårsett,
+        )
+
         return vilkår.copy(
             resultat = vilkårsresultat.vilkår,
             delvilkårwrapper = oppdaterteDelvilkår,
@@ -62,9 +77,9 @@ object OppdaterVilkår {
     private fun oppdaterDelvilkår(
         vilkår: Vilkår,
         vilkårsresultat: RegelResultat,
-        oppdatering: List<DelvilkårDto>,
+        validertOppdatering: List<DelvilkårDto>,
     ): DelvilkårWrapper {
-        val vurderingerPåType = oppdatering.associateBy { it.vurderinger.first().regelId }
+        val vurderingerPåType = validertOppdatering.associateBy { it.vurderinger.first().regelId }
         val delvilkårsett = vilkår.delvilkårsett.map {
             if (it.resultat == Vilkårsresultat.IKKE_AKTUELL) {
                 it

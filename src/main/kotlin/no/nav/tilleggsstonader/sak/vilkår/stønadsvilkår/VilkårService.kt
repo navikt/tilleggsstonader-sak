@@ -22,14 +22,19 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåEksisterendeVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.lagNyttVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.validerVilkårOgBeregnResultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnReglerForVilkårstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -50,15 +55,58 @@ class VilkårService(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @Transactional
-    fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
-        val vilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
-        val behandlingId = vilkår.behandlingId
+    fun oppdaterVilkår(svarPåEksisterendeVilkårDto: SvarPåEksisterendeVilkårDto): VilkårDto {
+        val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(svarPåEksisterendeVilkårDto.id)
+        val behandlingId = eksisterendeVilkår.behandlingId
 
         validerBehandling(behandlingId)
-        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, svarPåVilkårDto.behandlingId)
+        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, svarPåEksisterendeVilkårDto.behandlingId)
 
-        val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, svarPåVilkårDto.delvilkårsett)
+        val oppdatertVilkår = flettVilkårOgVurderResultat(
+            nyttVilkår = eksisterendeVilkår,
+            opprettVilkårDto = svarPåEksisterendeVilkårDto
+        )
         return vilkårRepository.update(oppdatertVilkår).tilDto()
+    }
+
+    fun opprettNyttVilkår(opprettVilkårDto: OpprettVilkårDto): Vilkår {
+        val behandlingId = opprettVilkårDto.behandlingId
+
+        // TODO: Valider at innsendt barn finnes på behandlingen
+
+        validerBehandling(behandlingId)
+
+        val relevanteRegler = finnReglerForVilkårstype(VilkårType.PASS_BARN) // TODO: Ikke hardkod denne
+
+        val nyttVilkår =
+            lagNyttVilkår(
+                behandlingId = behandlingId,
+                metadata = hentHovedregelMetadata(behandlingId),
+                vilkårsregel = relevanteRegler,
+                barnId = opprettVilkårDto.barnId,
+            )
+
+        val oppdatertVilkår = flettVilkårOgVurderResultat(nyttVilkår, opprettVilkårDto)
+
+        return vilkårRepository.insert(oppdatertVilkår)
+    }
+
+    private fun flettVilkårOgVurderResultat(
+        nyttVilkår: Vilkår,
+        opprettVilkårDto: LagreVilkårDto,
+    ): Vilkår {
+        val vurderingsresultat =
+            validerVilkårOgBeregnResultat(
+                vilkår = nyttVilkår,
+                oppdatering = opprettVilkårDto.delvilkårsett,
+            )
+
+        val oppdatertVilkår = OppdaterVilkår.oppdaterVilkår(
+            vilkår = nyttVilkår,
+            oppdatering = opprettVilkårDto,
+            vilkårsresultat = vurderingsresultat,
+        )
+        return oppdatertVilkår
     }
 
     @Transactional
@@ -242,11 +290,12 @@ class VilkårService(
         lagretVilkårsett: List<Vilkår>,
         behandlingId: UUID,
     ): List<Vilkår> {
-        val harVilkårForAlleBarn = lagretVilkårsett.filter { it.type.gjelderFlereBarn() }.map { it.type }.toSet().all { vilkårType ->
-            metadata.barn.all { barn ->
-                lagretVilkårsett.any { it.barnId == barn.id && it.type == vilkårType }
+        val harVilkårForAlleBarn =
+            lagretVilkårsett.filter { it.type.gjelderFlereBarn() }.map { it.type }.toSet().all { vilkårType ->
+                metadata.barn.all { barn ->
+                    lagretVilkårsett.any { it.barnId == barn.id && it.type == vilkårType }
+                }
             }
-        }
 
         if (!harVilkårForAlleBarn) {
             return lagretVilkårsett + opprettVilkårForNyeBarn(behandlingId, metadata, lagretVilkårsett)

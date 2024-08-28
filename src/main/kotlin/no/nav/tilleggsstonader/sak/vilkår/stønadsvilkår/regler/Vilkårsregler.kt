@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler.Companion.ALLE_VILKÅRSREGLER
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegel
 
 /**
@@ -14,6 +15,9 @@ class Vilkårsregler private constructor(val vilkårsregler: Map<VilkårType, Vi
         val ALLE_VILKÅRSREGLER = Vilkårsregler(alleVilkårsregler.associateBy { it.vilkårType })
     }
 }
+
+fun finnReglerForVilkårstype(vilkårstype: VilkårType) = ALLE_VILKÅRSREGLER.vilkårsregler[vilkårstype]
+    ?: error("Finner ikke vilkårsregler for $vilkårstype")
 
 private val alleVilkårsregler: List<Vilkårsregel> =
     Stønadstype.entries.map { vilkårsreglerForStønad(it) }.flatten()
