@@ -101,8 +101,12 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
             vilkårRepository.insert(vilkår(behandlingId = behandling.id))
 
-            val nyBehandlingId =
-                service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
+            val request = opprettBehandlingDto(
+                fagsakId = behandling.fagsakId,
+                årsak = BehandlingÅrsak.SØKNAD,
+                valgteBarn = setOf(PdlClientConfig.barnFnr),
+            )
+            val nyBehandlingId = service.opprettBehandling(request)
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeBehandlingId).isNull()
@@ -311,6 +315,30 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             assertThatThrownBy {
                 service.opprettBehandling(request)
             }.hasMessage("Kan ikke velge barn som ikke er valgbare.")
+        }
+    }
+
+    @Nested
+    inner class HåndteringAvBarnFørsteBehandlingErHenlagt {
+
+        val behandling = behandling(
+            status = BehandlingStatus.FERDIGSTILT,
+            resultat = BehandlingResultat.HENLAGT,
+        )
+
+        @Test
+        fun `må minumum velge 1 barn i tilfelle første behandling er henlagt`() {
+            val request = opprettBehandlingDto(
+                fagsakId = behandling.fagsakId,
+                årsak = BehandlingÅrsak.SØKNAD,
+                valgteBarn = setOf(),
+            )
+
+            testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = false)
+
+            assertThatThrownBy {
+                service.opprettBehandling(request)
+            }.hasMessage("Behandling må opprettes med minimum 1 barn")
         }
     }
 
