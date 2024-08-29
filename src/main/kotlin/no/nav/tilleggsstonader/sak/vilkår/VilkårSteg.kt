@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.VilkårsresultatUtil
 import org.springframework.stereotype.Service
 
 @Service
@@ -22,7 +23,8 @@ class VilkårSteg(
     }
 
     override fun validerSteg(saksbehandling: Saksbehandling) {
-        val vilkårsresultat = vilkårService.hentVilkårsresultat(saksbehandling.id)
+        val vilkår = vilkårService.hentVilkår(saksbehandling.id)
+        val vilkårsresultat = VilkårsresultatUtil.utledVilkårsresultat(vilkår)
 
         brukerfeilHvisIkke(OppdaterVilkår.erAlleVilkårTattStillingTil(vilkårsresultat)) {
             "Alle vilkår må være tatt stilling til"

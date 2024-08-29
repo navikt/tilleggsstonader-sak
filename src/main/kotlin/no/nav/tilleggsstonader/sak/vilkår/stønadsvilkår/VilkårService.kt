@@ -245,19 +245,14 @@ class VilkårService(
     }
 
     fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
-        val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
-        feilHvis(vilkårsett.isEmpty()) { "Mangler vilkår for behandling=$behandlingId" }
+        val vilkårsett = hentVilkår(behandlingId)
         return vilkårsett.map { it.tilDto() }
     }
 
-    fun hentVilkårsresultat(behandlingId: UUID): List<Vilkårsresultat> {
-        return vilkårRepository.findByBehandlingId(behandlingId).groupBy { it.type }.map {
-            if (it.key.gjelderFlereBarn()) {
-                OppdaterVilkår.utledResultatForVilkårSomGjelderFlereBarn(it.value)
-            } else {
-                it.value.single().resultat
-            }
-        }
+    fun hentVilkår(behandlingId: UUID): List<Vilkår> {
+        val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
+        feilHvis(vilkårsett.isEmpty()) { "Mangler vilkår for behandling=$behandlingId" }
+        return vilkårsett
     }
 
     @Transactional

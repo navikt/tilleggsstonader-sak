@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMeta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering.utledResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelValidering.validerVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.VilkårsresultatUtil.utledVilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
 import java.util.UUID
@@ -136,17 +137,6 @@ object OppdaterVilkår {
             vilkårsett.map { it.type }.containsAll(VilkårType.hentVilkårForStønad(stønadstype))
         val vilkårsresultat = utledVilkårsresultat(vilkårsett)
         return inneholderAlleTyperVilkår && vilkårsresultat.all { it == Vilkårsresultat.OPPFYLT }
-    }
-
-    private fun utledVilkårsresultat(lagretVilkårsett: List<Vilkår>): List<Vilkårsresultat> {
-        val vilkårsresultat = lagretVilkårsett.groupBy { it.type }.map {
-            if (it.key.gjelderFlereBarn()) {
-                utledResultatForVilkårSomGjelderFlereBarn(it.value)
-            } else {
-                it.value.single().resultat
-            }
-        }
-        return vilkårsresultat
     }
 
     /**
