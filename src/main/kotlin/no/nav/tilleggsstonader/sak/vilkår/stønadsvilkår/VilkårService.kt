@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -51,6 +53,7 @@ class VilkårService(
     private val barnService: BarnService,
     private val behandlingFaktaService: BehandlingFaktaService,
     private val fagsakService: FagsakService,
+    private val unleashService: UnleashService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -99,6 +102,7 @@ class VilkårService(
         val vurderingsresultat = OppdaterVilkår.validerVilkårOgBeregnResultat(
             vilkår = vilkår,
             oppdatering = lagreVilkårDto,
+            toggleVilkårPeriodiseringEnabled = unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING),
         )
         val oppdatertVilkår = OppdaterVilkår.oppdaterVilkår(
             vilkår = vilkår,
