@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -26,6 +27,11 @@ data class Vilkår(
     val behandlingId: UUID,
     val resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
     val type: VilkårType,
+    val fom: LocalDate? = null,
+    val tom: LocalDate? = null,
+    @Column("belop")
+    val beløp: Int? = null,
+
     val barnId: UUID? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),

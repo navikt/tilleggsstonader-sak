@@ -1,18 +1,24 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto
 
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import java.time.LocalDate
 import java.util.UUID
 
 sealed interface LagreVilkårDto {
     val behandlingId: UUID
     val delvilkårsett: List<DelvilkårDto>
-    // TODO: fom/tom og utgifter
+    val fom: LocalDate?
+    val tom: LocalDate?
+    val beløp: Int?
 }
 
 data class SvarPåVilkårDto(
     val id: UUID,
     override val behandlingId: UUID,
     override val delvilkårsett: List<DelvilkårDto>,
+    override val fom: LocalDate?,
+    override val tom: LocalDate?,
+    override val beløp: Int?,
 ) : LagreVilkårDto
 
 data class OpprettVilkårDto(
@@ -20,4 +26,7 @@ data class OpprettVilkårDto(
     val barnId: UUID,
     override val behandlingId: UUID,
     override val delvilkårsett: List<DelvilkårDto>,
+    override val fom: LocalDate?,
+    override val tom: LocalDate?,
+    override val beløp: Int?,
 ) : LagreVilkårDto

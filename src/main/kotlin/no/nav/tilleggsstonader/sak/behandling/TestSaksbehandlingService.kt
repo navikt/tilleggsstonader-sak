@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.util.UUID
 
 @Service
@@ -29,7 +30,15 @@ class TestSaksbehandlingService(
 
         vilkårsett.forEach { vilkår ->
             val delvilkårsett = lagDelvilkårsett(regler.getValue(vilkår.vilkårType), vilkår)
-            vilkårService.oppdaterVilkår(SvarPåVilkårDto(vilkår.id, behandlingId, delvilkårsett))
+            val svarPåVilkårDto = SvarPåVilkårDto(
+                id = vilkår.id,
+                behandlingId = behandlingId,
+                delvilkårsett = delvilkårsett,
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                beløp = 1,
+            )
+            vilkårService.oppdaterVilkår(svarPåVilkårDto)
         }
         return behandlingId
     }

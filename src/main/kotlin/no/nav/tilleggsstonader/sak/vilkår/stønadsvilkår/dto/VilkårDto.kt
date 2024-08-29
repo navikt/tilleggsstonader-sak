@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -15,6 +16,9 @@ data class VilkårDto(
     val behandlingId: UUID,
     val resultat: Vilkårsresultat,
     val vilkårType: VilkårType,
+    val fom: LocalDate?,
+    val tom: LocalDate?,
+    val beløp: Int?,
     val barnId: UUID? = null,
     val endretAv: String,
     val endretTid: LocalDateTime,
@@ -58,6 +62,9 @@ fun Vilkår.tilDto() =
         behandlingId = this.behandlingId,
         resultat = this.resultat,
         vilkårType = this.type,
+        fom = this.fom,
+        tom = this.tom,
+        beløp = this.beløp,
         barnId = this.barnId,
         endretAv = this.sporbar.endret.endretAv,
         endretTid = this.sporbar.endret.endretTid,
