@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.barn.NyttBarnId
 import no.nav.tilleggsstonader.sak.behandling.barn.TidligereBarnId
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -17,19 +18,24 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.lagNyttVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnesVilkårTypeForStønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -61,17 +67,41 @@ class VilkårService(
         return vilkårRepository.update(oppdatertVilkår).tilDto()
     }
 
+    @Transactional
+    fun opprettNyttVilkår(opprettVilkårDto: OpprettVilkårDto): Vilkår {
+        val behandlingId = opprettVilkårDto.behandlingId
+
+        validerBehandling(behandlingId)
+        validerBehandlingOgVilkårType(behandlingId, opprettVilkårDto.vilkårType)
+
+        val relevanteRegler = hentVilkårsregel(opprettVilkårDto.vilkårType)
+        val metadata = hentHovedregelMetadata(behandlingId)
+        validerBarnFinnesPåBehandling(metadata, opprettVilkårDto)
+
+        val nyttVilkår =
+            lagNyttVilkår(
+                behandlingId = behandlingId,
+                metadata = metadata,
+                vilkårsregel = relevanteRegler,
+                barnId = opprettVilkårDto.barnId,
+            )
+
+        val oppdatertVilkår = flettVilkårOgVurderResultat(nyttVilkår, opprettVilkårDto)
+
+        return vilkårRepository.insert(oppdatertVilkår)
+    }
+
     private fun flettVilkårOgVurderResultat(
         vilkår: Vilkår,
-        svarPåVilkårDto: SvarPåVilkårDto,
+        lagreVilkårDto: LagreVilkårDto,
     ): Vilkår {
         val vurderingsresultat = OppdaterVilkår.validerVilkårOgBeregnResultat(
             vilkår = vilkår,
-            oppdatering = svarPåVilkårDto.delvilkårsett,
+            oppdatering = lagreVilkårDto.delvilkårsett,
         )
         val oppdatertVilkår = OppdaterVilkår.oppdaterVilkår(
             vilkår = vilkår,
-            oppdatering = svarPåVilkårDto.delvilkårsett,
+            oppdatering = lagreVilkårDto.delvilkårsett,
             vilkårsresultat = vurderingsresultat,
         )
         return oppdatertVilkår
@@ -137,13 +167,32 @@ class VilkårService(
     private fun hentHovedregelMetadata(behandlingId: UUID) = hentGrunnlagOgMetadata(behandlingId).second
 
     private fun validerBehandling(behandlingId: UUID) {
-        val behandling = behandlingService.hentBehandling(behandlingId)
+        validerBehandling(behandlingService.hentSaksbehandling(behandlingId))
+    }
 
+    private fun validerBehandlingOgVilkårType(behandlingId: UUID, vilkårType: VilkårType) {
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+
+        validerBehandling(behandling)
+
+        feilHvisIkke(finnesVilkårTypeForStønadstype(behandling.stønadstype, vilkårType)) {
+            "Vilkårtype=$vilkårType eksisterer ikke for stønadstype=${behandling.stønadstype}"
+        }
+    }
+
+    private fun validerBehandling(behandling: Saksbehandling) {
         validerErIVilkårSteg(behandling)
         validerLåstForVidereRedigering(behandling)
     }
 
-    private fun validerLåstForVidereRedigering(behandling: Behandling) {
+    private fun validerBarnFinnesPåBehandling(metadata: HovedregelMetadata, opprettVilkårDto: OpprettVilkårDto) {
+        val barnIderPåBehandling = metadata.barn.map { it.id }.toSet()
+        feilHvisIkke(barnIderPåBehandling.contains(opprettVilkårDto.barnId)) {
+            "Finner ikke barn på behandling"
+        }
+    }
+
+    private fun validerLåstForVidereRedigering(behandling: Saksbehandling) {
         if (behandling.status.behandlingErLåstForVidereRedigering()) {
             throw ApiFeil("Behandlingen er låst for videre redigering", HttpStatus.BAD_REQUEST)
         }
@@ -166,7 +215,7 @@ class VilkårService(
     private fun behandlingErLåstForVidereRedigering(behandlingId: UUID) =
         behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
 
-    private fun validerErIVilkårSteg(behandling: Behandling) {
+    private fun validerErIVilkårSteg(behandling: Saksbehandling) {
         brukerfeilHvisIkke(behandling.steg == StegType.VILKÅR) {
             "Kan ikke oppdatere vilkår når behandling er på steg=${behandling.steg}."
         }

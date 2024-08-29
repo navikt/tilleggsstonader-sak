@@ -11,6 +11,8 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -20,9 +22,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.EksempelRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -228,6 +233,73 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             val barnRevurdering = barnService.finnBarnPåBehandling(revurdering.id)
             // Oppretter vilkår for nye barn
             vilkårService.hentEllerOpprettVilkår(revurdering.id, HovedregelMetadata(barnRevurdering, revurdering))
+        }
+    }
+
+    @Nested
+    inner class OpprettVilkår {
+
+        val behandling = behandling(status = BehandlingStatus.UTREDES, steg = StegType.VILKÅR)
+        val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.barnFnr)
+
+        val opprettOppfyltDelvilkår = OpprettVilkårDto(
+            vilkårType = VilkårType.PASS_BARN,
+            barnId = barn.id,
+            behandlingId = behandling.id,
+            delvilkårsett = oppfylteDelvilkårPassBarnDto(),
+        )
+
+        @BeforeEach
+        fun setUp() {
+            testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = false)
+            barnRepository.insert(barn)
+            testoppsettService.opprettGrunnlagsdata(behandling.id)
+        }
+
+        @Test
+        fun `skal opprette vilkår på behandling`() {
+            vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår)
+
+            val vilkårFraDb = vilkårRepository.findByBehandlingId(behandling.id).single()
+            assertThat(vilkårFraDb.behandlingId).isEqualTo(behandling.id)
+            assertThat(vilkårFraDb.type).isEqualTo(VilkårType.PASS_BARN)
+            assertThat(vilkårFraDb.barnId).isEqualTo(barn.id)
+            assertThat(vilkårFraDb.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+            assertThat(vilkårFraDb.opphavsvilkår).isNull()
+            assertThat(vilkårFraDb.delvilkårsett.map { it.hovedregel })
+                .containsExactlyInAnyOrderElementsOf(opprettOppfyltDelvilkår.delvilkårsett.map { it.hovedregel() })
+        }
+
+        @Test
+        fun `kan ikke opprette vilkår på behandling som er ferdigstilt`() {
+            behandlingRepository.update(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
+
+            assertThatThrownBy {
+                vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår)
+            }.hasMessageContaining("Behandlingen er låst for videre redigering")
+        }
+
+        @Test
+        fun `kan ikke opprette vilkår på behandling som er i feil steg`() {
+            behandlingRepository.update(behandling.copy(steg = StegType.INNGANGSVILKÅR))
+
+            assertThatThrownBy {
+                vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår)
+            }.hasMessageContaining("Kan ikke oppdatere vilkår når behandling er på steg=INNGANGSVILKÅR")
+        }
+
+        @Test
+        fun `kan ikke opprette vilkår på barn som ikke finnes på behandling`() {
+            assertThatThrownBy {
+                vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår.copy(barnId = UUID.randomUUID()))
+            }.hasMessageContaining("Finner ikke barn på behandling")
+        }
+
+        @Test
+        fun `kan ikke opprette vilkårtype som ikke finnes på stønadstype`() {
+            assertThatThrownBy {
+                vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår.copy(vilkårType = VilkårType.EKSEMPEL))
+            }.hasMessageContaining("Vilkårtype=EKSEMPEL eksisterer ikke for stønadstype=BARNETILSYN")
         }
     }
 
