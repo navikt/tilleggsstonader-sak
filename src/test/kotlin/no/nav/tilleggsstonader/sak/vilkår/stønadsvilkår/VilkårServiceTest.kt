@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
@@ -91,8 +92,7 @@ internal class VilkårServiceTest {
 
     @BeforeEach
     fun setUp() {
-        every { behandlingService.hentBehandling(behandlingId) } returns behandling
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling(fagsak, behandling)
+        mockHentBehandling(behandling)
         every { behandlingService.oppdaterStatusPåBehandling(any(), any()) } returns behandling
 
         every { vilkårRepository.insertAll(any()) } answers { firstArg() }
@@ -371,11 +371,13 @@ internal class VilkårServiceTest {
 
     @Test
     internal fun `skal ikke oppdatere vilkår hvis behandlingen er låst for videre behandling`() {
-        every { behandlingService.hentBehandling(behandlingId) } returns behandling(
+        val behandling = behandling(
             fagsak(),
             BehandlingStatus.FERDIGSTILT,
             StegType.VILKÅR,
         )
+        mockHentBehandling(behandling)
+
         val vilkår = vilkår(
             behandlingId,
             resultat = IKKE_TATT_STILLING_TIL,
@@ -400,11 +402,12 @@ internal class VilkårServiceTest {
 
     @Test
     internal fun `skal ikke oppdatere vilkår hvis behandlingen ikke er i steg VILKÅR`() {
-        every { behandlingService.hentBehandling(behandlingId) } returns behandling(
+        val behandling = behandling(
             fagsak(),
             BehandlingStatus.UTREDES,
             StegType.INNGANGSVILKÅR,
         )
+        mockHentBehandling(behandling)
         val vilkår = vilkår(
             behandlingId,
             resultat = IKKE_TATT_STILLING_TIL,
@@ -487,5 +490,10 @@ internal class VilkårServiceTest {
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(vilkår)
         every { vilkårRepository.update(capture(lagretVilkår)) } answers { it.invocation.args.first() as Vilkår }
         return vilkår
+    }
+
+    private fun mockHentBehandling(behandling: Behandling) {
+        every { behandlingService.hentBehandling(behandlingId) } returns behandling
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling(fagsak, behandling)
     }
 }
