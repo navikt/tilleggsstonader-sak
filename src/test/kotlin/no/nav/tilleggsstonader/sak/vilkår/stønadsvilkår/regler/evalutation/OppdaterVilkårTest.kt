@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.validerVilkårOgBeregnResultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -46,10 +47,16 @@ internal class OppdaterVilkårTest {
         }
 
         @Test
-        fun `skal validere at pass av barn inneholkder beløp`() {
+        fun `skal kaste feil hvis innvilget pass av barn ikke inneholder beløp`() {
             assertThatThrownBy {
                 validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(beløp = null), true)
             }.hasMessageContaining("Mangler beløp på vilkår")
+        }
+
+        @Test
+        fun `skal ikke kaste feil hvis ikke oppfylt pass av barn ikke inneholder beløp`() {
+            val dto = opprettVilkårDto.copy(beløp = null, delvilkårsett = ikkeOppfylteDelvilkårPassBarnDto())
+            validerVilkårOgBeregnResultat(vilkår, dto, true)
         }
 
         @Disabled // TODO fiks når annen type enn eksempel er tilgjengelig
