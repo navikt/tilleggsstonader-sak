@@ -46,11 +46,11 @@ object VilkårsresultatUtil {
      */
     private fun harNoenIkkeOppfyltOgRestenIkkeOppfyltEllerOppfyltEllerSkalIkkevurderes(vilkårsresultat: List<Vilkårsresultat>) =
         vilkårsresultat.any { it == Vilkårsresultat.IKKE_OPPFYLT } &&
-                vilkårsresultat.all {
-                    it == Vilkårsresultat.OPPFYLT ||
-                            it == Vilkårsresultat.IKKE_OPPFYLT ||
-                            it == Vilkårsresultat.SKAL_IKKE_VURDERES
-                }
+            vilkårsresultat.all {
+                it == Vilkårsresultat.OPPFYLT ||
+                    it == Vilkårsresultat.IKKE_OPPFYLT ||
+                    it == Vilkårsresultat.SKAL_IKKE_VURDERES
+            }
 
     private fun utledResultatForVilkårSomGjelderFlereBarn(value: List<Vilkår>): Vilkårsresultat {
         feilHvis(value.any { !it.type.gjelderFlereBarn() }) {
