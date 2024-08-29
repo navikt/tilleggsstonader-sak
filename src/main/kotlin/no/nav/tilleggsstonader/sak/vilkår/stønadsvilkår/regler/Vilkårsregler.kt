@@ -25,6 +25,15 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
         )
     }
 
+private val vilkårstyperPerStønad: Map<Stønadstype, Set<VilkårType>> =
+    Stønadstype.entries.associateWith { vilkårsreglerForStønad(it).map { it.vilkårType }.toSet() }
+
+fun finnesVilkårTypeForStønadstype(stønadstype: Stønadstype, vilkårType: VilkårType): Boolean {
+    val vilkårstyper = vilkårstyperPerStønad[stønadstype]
+        ?: error("Finner ikke vilkårstyper for stønadstype=$stønadstype")
+    return vilkårstyper.contains(vilkårType)
+}
+
 fun hentVilkårsregel(vilkårType: VilkårType): Vilkårsregel {
     return Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler[vilkårType]
         ?: error("Finner ikke vilkårsregler for vilkårType=$vilkårType")

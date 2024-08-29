@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMeta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.lagNyttVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnesVilkårTypeForStønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -70,10 +71,9 @@ class VilkårService(
     fun opprettNyttVilkår(opprettVilkårDto: OpprettVilkårDto): Vilkår {
         val behandlingId = opprettVilkårDto.behandlingId
 
-        // TODO: Valider vilkårtype finnes på stønadstype
-
         validerBehandling(behandlingId)
         validerBarnFinnesPåBehandling(opprettVilkårDto)
+        validerBehandlingOgVilkårType(behandlingId, opprettVilkårDto.vilkårType)
 
         val relevanteRegler = hentVilkårsregel(opprettVilkårDto.vilkårType)
 
@@ -166,8 +166,20 @@ class VilkårService(
     private fun hentHovedregelMetadata(behandlingId: UUID) = hentGrunnlagOgMetadata(behandlingId).second
 
     private fun validerBehandling(behandlingId: UUID) {
+        validerBehandling(behandlingService.hentSaksbehandling(behandlingId))
+    }
+
+    private fun validerBehandlingOgVilkårType(behandlingId: UUID, vilkårType: VilkårType) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
+        validerBehandling(behandling)
+
+        feilHvisIkke(finnesVilkårTypeForStønadstype(behandling.stønadstype, vilkårType)) {
+            "Vilkårtype=$vilkårType eksisterer ikke for stønadstype=${behandling.stønadstype}"
+        }
+    }
+
+    private fun validerBehandling(behandling: Saksbehandling) {
         validerErIVilkårSteg(behandling)
         validerLåstForVidereRedigering(behandling)
     }

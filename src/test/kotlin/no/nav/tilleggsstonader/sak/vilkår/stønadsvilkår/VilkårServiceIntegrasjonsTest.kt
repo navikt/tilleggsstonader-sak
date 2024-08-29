@@ -299,7 +299,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         fun `kan ikke opprette vilkårtype som ikke finnes på stønadstype`() {
             assertThatThrownBy {
                 vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår.copy(vilkårType = VilkårType.EKSEMPEL))
-            }.hasMessageContaining("yolo")
+            }.hasMessageContaining("Vilkårtype=EKSEMPEL eksisterer ikke for stønadstype=BARNETILSYN")
         }
     }
 
