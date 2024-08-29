@@ -27,13 +27,13 @@ object OppdaterVilkår {
      */
     fun validerVilkårOgBeregnResultat(
         vilkår: Vilkår,
-        oppdatering: List<DelvilkårDto>,
+        oppdatering: LagreVilkårDto,
     ): RegelResultat {
         val vilkårsregel = hentVilkårsregel(vilkår.type)
 
-        validerVilkår(vilkårsregel, oppdatering, vilkår.delvilkårsett)
+        validerVilkår(vilkårsregel, oppdatering.delvilkårsett, vilkår.delvilkårsett)
 
-        val vilkårsresultat = utledResultat(vilkårsregel, oppdatering)
+        val vilkårsresultat = utledResultat(vilkårsregel, oppdatering.delvilkårsett)
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
         return vilkårsresultat
     }

@@ -97,7 +97,7 @@ class VilkårService(
     ): Vilkår {
         val vurderingsresultat = OppdaterVilkår.validerVilkårOgBeregnResultat(
             vilkår = vilkår,
-            oppdatering = lagreVilkårDto.delvilkårsett,
+            oppdatering = lagreVilkårDto,
         )
         val oppdatertVilkår = OppdaterVilkår.oppdaterVilkår(
             vilkår = vilkår,
