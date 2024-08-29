@@ -31,7 +31,6 @@ data class Vilkår(
     val type: VilkårType,
     val fom: LocalDate? = null,
     val tom: LocalDate? = null,
-    @Column("utgift")
     val utgift: Int? = null,
 
     val barnId: UUID? = null,
