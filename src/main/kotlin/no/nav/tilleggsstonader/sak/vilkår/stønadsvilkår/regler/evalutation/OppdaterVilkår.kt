@@ -34,7 +34,19 @@ object OppdaterVilkår {
 
         val vilkårsresultat = utledResultat(vilkårsregel, oppdatering)
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
-        val oppdaterteDelvilkår = oppdaterDelvilkår(vilkår, vilkårsresultat, oppdatering)
+        return oppdaterVilkår(vilkår, oppdatering, vilkårsresultat)
+    }
+
+    private fun oppdaterVilkår(
+        vilkår: Vilkår,
+        oppdatering: List<DelvilkårDto>,
+        vilkårsresultat: RegelResultat,
+    ): Vilkår {
+        val oppdaterteDelvilkår = oppdaterDelvilkår(
+            vilkår = vilkår,
+            vilkårsresultat = vilkårsresultat,
+            oppdatering = oppdatering,
+        )
         return vilkår.copy(
             resultat = vilkårsresultat.vilkår,
             delvilkårwrapper = oppdaterteDelvilkår,
