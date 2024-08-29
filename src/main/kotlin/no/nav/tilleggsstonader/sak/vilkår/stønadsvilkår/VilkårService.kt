@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.barn.NyttBarnId
 import no.nav.tilleggsstonader.sak.behandling.barn.TidligereBarnId
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -165,7 +166,7 @@ class VilkårService(
     private fun hentHovedregelMetadata(behandlingId: UUID) = hentGrunnlagOgMetadata(behandlingId).second
 
     private fun validerBehandling(behandlingId: UUID) {
-        val behandling = behandlingService.hentBehandling(behandlingId)
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
         validerErIVilkårSteg(behandling)
         validerLåstForVidereRedigering(behandling)
@@ -178,7 +179,7 @@ class VilkårService(
         }
     }
 
-    private fun validerLåstForVidereRedigering(behandling: Behandling) {
+    private fun validerLåstForVidereRedigering(behandling: Saksbehandling) {
         if (behandling.status.behandlingErLåstForVidereRedigering()) {
             throw ApiFeil("Behandlingen er låst for videre redigering", HttpStatus.BAD_REQUEST)
         }
@@ -201,7 +202,7 @@ class VilkårService(
     private fun behandlingErLåstForVidereRedigering(behandlingId: UUID) =
         behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
 
-    private fun validerErIVilkårSteg(behandling: Behandling) {
+    private fun validerErIVilkårSteg(behandling: Saksbehandling) {
         brukerfeilHvisIkke(behandling.steg == StegType.VILKÅR) {
             "Kan ikke oppdatere vilkår når behandling er på steg=${behandling.steg}."
         }
