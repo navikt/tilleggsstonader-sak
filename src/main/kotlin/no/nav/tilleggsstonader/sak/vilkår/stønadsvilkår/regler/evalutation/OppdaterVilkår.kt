@@ -27,6 +27,7 @@ object OppdaterVilkår {
     fun validerVilkårOgBeregnResultat(
         vilkår: Vilkår,
         oppdatering: LagreVilkårDto,
+        toggleVilkårPeriodiseringEnabled: Boolean,
     ): RegelResultat {
         val vilkårsregel = hentVilkårsregel(vilkår.type)
 
@@ -34,7 +35,27 @@ object OppdaterVilkår {
 
         val vilkårsresultat = utledResultat(vilkårsregel, oppdatering.delvilkårsett)
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
+        validerPeriodeOgBeløp(oppdatering, vilkårsresultat, toggleVilkårPeriodiseringEnabled)
+
         return vilkårsresultat
+    }
+
+    private fun validerPeriodeOgBeløp(
+        oppdatering: LagreVilkårDto,
+        vilkårsresultat: RegelResultat,
+        toggleVilkårPeriodiseringEnabled: Boolean,
+    ) {
+        if (toggleVilkårPeriodiseringEnabled) {
+            feilHvis(oppdatering.fom == null || oppdatering.tom == null) {
+                "Mangler fom/tom på vilkår"
+            }
+            feilHvis(vilkårsresultat.vilkårType == VilkårType.PASS_BARN && oppdatering.beløp == null) {
+                "Mangler beløp på vilkår"
+            }
+            feilHvis(vilkårsresultat.vilkårType != VilkårType.PASS_BARN && oppdatering.beløp != null) {
+                "Kan ikke ha beløp på vilkårType=${vilkårsresultat.vilkårType}"
+            }
+        }
     }
 
     fun oppdaterVilkår(
