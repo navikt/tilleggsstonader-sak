@@ -8,7 +8,7 @@ interface LagreVilkårDto {
     // TODO: fom/tom og utgifter
 }
 
-data class SvarPåEksisterendeVilkårDto(
+data class SvarPåVilkårDto(
     val id: UUID,
     override val behandlingId: UUID,
     override val delvilkårsett: List<DelvilkårDto>,

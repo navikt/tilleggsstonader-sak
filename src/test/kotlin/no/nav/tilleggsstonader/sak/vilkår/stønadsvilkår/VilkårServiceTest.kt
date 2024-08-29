@@ -35,7 +35,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.SKAL_IKKE_VURDERES
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåEksisterendeVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
@@ -292,7 +292,7 @@ internal class VilkårServiceTest {
             assertThat(
                 Assertions.catchThrowable {
                     vilkårService.oppdaterVilkår(
-                        SvarPåEksisterendeVilkårDto(
+                        SvarPåVilkårDto(
                             id = vilkårId,
                             behandlingId = behandlingId,
                             delvilkårsett = listOf(),
@@ -308,7 +308,7 @@ internal class VilkårServiceTest {
             val vilkår = initiererVilkår(lagretVilkår)
 
             vilkårService.oppdaterVilkår(
-                SvarPåEksisterendeVilkårDto(
+                SvarPåVilkårDto(
                     id = vilkår.id,
                     behandlingId = behandlingId,
                     delvilkårsett = PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto(),
@@ -386,7 +386,7 @@ internal class VilkårServiceTest {
         assertThat(
             Assertions.catchThrowable {
                 vilkårService.oppdaterVilkår(
-                    SvarPåEksisterendeVilkårDto(
+                    SvarPåVilkårDto(
                         id = vilkår.id,
                         behandlingId = behandlingId,
                         listOf(),
@@ -415,7 +415,7 @@ internal class VilkårServiceTest {
         assertThat(
             Assertions.catchThrowable {
                 vilkårService.oppdaterVilkår(
-                    SvarPåEksisterendeVilkårDto(
+                    SvarPåVilkårDto(
                         id = vilkår.id,
                         behandlingId = behandlingId,
                         listOf(),

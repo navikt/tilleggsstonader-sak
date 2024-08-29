@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåEksisterendeVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
@@ -39,16 +39,16 @@ class VilkårController(
     }
 
     @PostMapping
-    fun oppdaterVilkår(@RequestBody svarPåEksisterendeVilkårDto: SvarPåEksisterendeVilkårDto): VilkårDto {
-        tilgangService.validerTilgangTilBehandling(svarPåEksisterendeVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
+    fun oppdaterVilkår(@RequestBody svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
+        tilgangService.validerTilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         try {
-            return vilkårService.oppdaterVilkår(svarPåEksisterendeVilkårDto)
+            return vilkårService.oppdaterVilkår(svarPåVilkårDto)
         } catch (e: Exception) {
-            val delvilkårJson = objectMapper.writeValueAsString(svarPåEksisterendeVilkårDto.delvilkårsett)
+            val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
-                "id=${svarPåEksisterendeVilkårDto.id}" +
-                        " behandlingId=${svarPåEksisterendeVilkårDto.behandlingId}" +
+                "id=${svarPåVilkårDto.id}" +
+                        " behandlingId=${svarPåVilkårDto.behandlingId}" +
                         " svar=$delvilkårJson",
             )
             throw e

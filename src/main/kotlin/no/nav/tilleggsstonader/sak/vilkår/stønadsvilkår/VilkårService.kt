@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåEksisterendeVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
@@ -55,16 +55,16 @@ class VilkårService(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     @Transactional
-    fun oppdaterVilkår(svarPåEksisterendeVilkårDto: SvarPåEksisterendeVilkårDto): VilkårDto {
-        val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(svarPåEksisterendeVilkårDto.id)
+    fun oppdaterVilkår(svarPåVilkårDto: SvarPåVilkårDto): VilkårDto {
+        val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
         val behandlingId = eksisterendeVilkår.behandlingId
 
         validerBehandling(behandlingId)
-        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, svarPåEksisterendeVilkårDto.behandlingId)
+        validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, svarPåVilkårDto.behandlingId)
 
         val oppdatertVilkår = flettVilkårOgVurderResultat(
             nyttVilkår = eksisterendeVilkår,
-            opprettVilkårDto = svarPåEksisterendeVilkårDto
+            opprettVilkårDto = svarPåVilkårDto
         )
         return vilkårRepository.update(oppdatertVilkår).tilDto()
     }
