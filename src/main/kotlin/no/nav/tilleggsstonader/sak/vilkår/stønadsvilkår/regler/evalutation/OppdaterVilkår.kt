@@ -12,9 +12,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.svarTilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler.Companion.ALLE_VILKÅRSREGLER
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering.utledResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelValidering.validerVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
 import java.util.UUID
 
@@ -24,19 +24,29 @@ object OppdaterVilkår {
      * Oppdaterer [Vilkår] med nye svar og resultat
      * Validerer att svaren er gyldige
      */
-    fun validerOgOppdatertVilkår(
+    fun validerVilkårOgBeregnResultat(
         vilkår: Vilkår,
         oppdatering: List<DelvilkårDto>,
-        vilkårsregler: Map<VilkårType, Vilkårsregel> = ALLE_VILKÅRSREGLER.vilkårsregler,
-    ): Vilkår { // TODO: Ikke default input her, kanskje?
-        val vilkårsregel =
-            vilkårsregler[vilkår.type] ?: error("Finner ikke vilkårsregler for ${vilkår.type}")
+    ): RegelResultat {
+        val vilkårsregel = hentVilkårsregel(vilkår.type)
 
         validerVilkår(vilkårsregel, oppdatering, vilkår.delvilkårsett)
 
         val vilkårsresultat = utledResultat(vilkårsregel, oppdatering)
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
-        val oppdaterteDelvilkår = oppdaterDelvilkår(vilkår, vilkårsresultat, oppdatering)
+        return vilkårsresultat
+    }
+
+    fun oppdaterVilkår(
+        vilkår: Vilkår,
+        oppdatering: List<DelvilkårDto>,
+        vilkårsresultat: RegelResultat,
+    ): Vilkår {
+        val oppdaterteDelvilkår = oppdaterDelvilkår(
+            vilkår = vilkår,
+            vilkårsresultat = vilkårsresultat,
+            oppdatering = oppdatering,
+        )
         return vilkår.copy(
             resultat = vilkårsresultat.vilkår,
             delvilkårwrapper = oppdaterteDelvilkår,

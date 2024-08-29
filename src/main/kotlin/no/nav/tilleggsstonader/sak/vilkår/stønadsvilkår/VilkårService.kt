@@ -57,8 +57,24 @@ class VilkårService(
         validerBehandling(behandlingId)
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, svarPåVilkårDto.behandlingId)
 
-        val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, svarPåVilkårDto.delvilkårsett)
+        val oppdatertVilkår = flettVilkårOgVurderResultat(vilkår, svarPåVilkårDto)
         return vilkårRepository.update(oppdatertVilkår).tilDto()
+    }
+
+    private fun flettVilkårOgVurderResultat(
+        vilkår: Vilkår,
+        svarPåVilkårDto: SvarPåVilkårDto,
+    ): Vilkår {
+        val vurderingsresultat = OppdaterVilkår.validerVilkårOgBeregnResultat(
+            vilkår = vilkår,
+            oppdatering = svarPåVilkårDto.delvilkårsett,
+        )
+        val oppdatertVilkår = OppdaterVilkår.oppdaterVilkår(
+            vilkår = vilkår,
+            oppdatering = svarPåVilkårDto.delvilkårsett,
+            vilkårsresultat = vurderingsresultat,
+        )
+        return oppdatertVilkår
     }
 
     @Transactional
@@ -242,11 +258,12 @@ class VilkårService(
         lagretVilkårsett: List<Vilkår>,
         behandlingId: UUID,
     ): List<Vilkår> {
-        val harVilkårForAlleBarn = lagretVilkårsett.filter { it.type.gjelderFlereBarn() }.map { it.type }.toSet().all { vilkårType ->
-            metadata.barn.all { barn ->
-                lagretVilkårsett.any { it.barnId == barn.id && it.type == vilkårType }
+        val harVilkårForAlleBarn =
+            lagretVilkårsett.filter { it.type.gjelderFlereBarn() }.map { it.type }.toSet().all { vilkårType ->
+                metadata.barn.all { barn ->
+                    lagretVilkårsett.any { it.barnId == barn.id && it.type == vilkårType }
+                }
             }
-        }
 
         if (!harVilkårForAlleBarn) {
             return lagretVilkårsett + opprettVilkårForNyeBarn(behandlingId, metadata, lagretVilkårsett)

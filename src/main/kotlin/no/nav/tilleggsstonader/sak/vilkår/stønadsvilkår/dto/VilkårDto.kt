@@ -29,12 +29,6 @@ data class OpphavsvilkårDto(
 
 data class OppdaterVilkårDto(val id: UUID, val behandlingId: UUID)
 
-data class SvarPåVilkårDto(
-    val id: UUID,
-    val behandlingId: UUID,
-    val delvilkårsett: List<DelvilkårDto>,
-)
-
 data class GjenbrukVilkårDto(val behandlingId: UUID, val kopierBehandlingId: UUID)
 
 data class DelvilkårDto(
