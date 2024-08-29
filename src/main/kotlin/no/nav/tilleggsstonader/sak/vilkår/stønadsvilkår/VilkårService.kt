@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårReposit
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
@@ -59,6 +60,11 @@ class VilkårService(
 
         val oppdatertVilkår = flettVilkårOgVurderResultat(vilkår, svarPåVilkårDto)
         return vilkårRepository.update(oppdatertVilkår).tilDto()
+    }
+
+    @Transactional
+    fun opprettNyttVilkår(opprettVilkårDto: OpprettVilkårDto): Vilkår {
+        TODO("Not yet implemented")
     }
 
     private fun flettVilkårOgVurderResultat(
