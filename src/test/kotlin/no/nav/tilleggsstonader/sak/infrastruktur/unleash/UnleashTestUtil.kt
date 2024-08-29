@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 fun mockUnleashService(isEnabled: Boolean = true): UnleashService {
     val mockk = mockk<UnleashService>()
     every { mockk.isEnabled(any()) } returns isEnabled
+    every { mockk.isEnabled(Toggle.VILKÅR_PERIODISERING) } returns false
     every { mockk.isEnabled(any(), any<Boolean>()) } returns isEnabled
 
     // Variants må konfigureres en og en då de kan ha ulike navn som er relevant å konfigurere
