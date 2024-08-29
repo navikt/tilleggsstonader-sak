@@ -12,9 +12,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.svarTilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler.Companion.ALLE_VILKÅRSREGLER
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering.utledResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelValidering.validerVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
 import java.util.UUID
 
@@ -27,10 +27,8 @@ object OppdaterVilkår {
     fun validerOgOppdatertVilkår(
         vilkår: Vilkår,
         oppdatering: List<DelvilkårDto>,
-        vilkårsregler: Map<VilkårType, Vilkårsregel> = ALLE_VILKÅRSREGLER.vilkårsregler,
-    ): Vilkår { // TODO: Ikke default input her, kanskje?
-        val vilkårsregel =
-            vilkårsregler[vilkår.type] ?: error("Finner ikke vilkårsregler for ${vilkår.type}")
+    ): Vilkår {
+        val vilkårsregel = hentVilkårsregel(vilkår.type)
 
         validerVilkår(vilkårsregel, oppdatering, vilkår.delvilkårsett)
 
