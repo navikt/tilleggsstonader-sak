@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.svarTilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
@@ -39,13 +40,13 @@ object OppdaterVilkår {
 
     fun oppdaterVilkår(
         vilkår: Vilkår,
-        oppdatering: List<DelvilkårDto>,
+        oppdatering: LagreVilkårDto,
         vilkårsresultat: RegelResultat,
     ): Vilkår {
         val oppdaterteDelvilkår = oppdaterDelvilkår(
             vilkår = vilkår,
             vilkårsresultat = vilkårsresultat,
-            oppdatering = oppdatering,
+            validerteDelvilkårsett = oppdatering.delvilkårsett,
         )
         return vilkår.copy(
             resultat = vilkårsresultat.vilkår,
@@ -72,9 +73,9 @@ object OppdaterVilkår {
     private fun oppdaterDelvilkår(
         vilkår: Vilkår,
         vilkårsresultat: RegelResultat,
-        oppdatering: List<DelvilkårDto>,
+        validerteDelvilkårsett: List<DelvilkårDto>,
     ): DelvilkårWrapper {
-        val vurderingerPåType = oppdatering.associateBy { it.vurderinger.first().regelId }
+        val vurderingerPåType = validerteDelvilkårsett.associateBy { it.vurderinger.first().regelId }
         val delvilkårsett = vilkår.delvilkårsett.map {
             if (it.resultat == Vilkårsresultat.IKKE_AKTUELL) {
                 it

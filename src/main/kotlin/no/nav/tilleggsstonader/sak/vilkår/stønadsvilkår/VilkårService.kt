@@ -101,7 +101,7 @@ class VilkårService(
         )
         val oppdatertVilkår = OppdaterVilkår.oppdaterVilkår(
             vilkår = vilkår,
-            oppdatering = lagreVilkårDto.delvilkårsett,
+            oppdatering = lagreVilkårDto,
             vilkårsresultat = vurderingsresultat,
         )
         return oppdatertVilkår
