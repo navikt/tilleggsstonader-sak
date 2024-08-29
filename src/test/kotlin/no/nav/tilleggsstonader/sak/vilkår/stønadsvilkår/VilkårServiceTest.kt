@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
@@ -49,6 +50,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDate
 import java.time.Year
 import java.util.UUID
 
@@ -66,6 +68,7 @@ internal class VilkårServiceTest {
         behandlingFaktaService = behandlingFaktaService,
         barnService = barnService,
         fagsakService = fagsakService,
+        unleashService = mockUnleashService(),
     )
 
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
@@ -296,6 +299,9 @@ internal class VilkårServiceTest {
                             id = vilkårId,
                             behandlingId = behandlingId,
                             delvilkårsett = listOf(),
+                            fom = null,
+                            tom = null,
+                            beløp = null,
                         ),
                     )
                 },
@@ -312,11 +318,17 @@ internal class VilkårServiceTest {
                     id = vilkår.id,
                     behandlingId = behandlingId,
                     delvilkårsett = PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto(),
+                    fom = LocalDate.now(),
+                    tom = LocalDate.now(),
+                    beløp = 1,
                 ),
             )
 
             assertThat(lagretVilkår.captured.resultat).isEqualTo(OPPFYLT)
             assertThat(lagretVilkår.captured.type).isEqualTo(vilkår.type)
+            assertThat(lagretVilkår.captured.fom).isEqualTo(LocalDate.now())
+            assertThat(lagretVilkår.captured.tom).isEqualTo(LocalDate.now())
+            assertThat(lagretVilkår.captured.beløp).isEqualTo(1)
             assertThat(lagretVilkår.captured.opphavsvilkår).isNull()
 
             assertThat(lagretVilkår.captured.delvilkårsett).hasSize(3)
@@ -392,6 +404,9 @@ internal class VilkårServiceTest {
                         id = vilkår.id,
                         behandlingId = behandlingId,
                         listOf(),
+                        fom = null,
+                        tom = null,
+                        beløp = null,
                     ),
                 )
             },
@@ -422,6 +437,9 @@ internal class VilkårServiceTest {
                         id = vilkår.id,
                         behandlingId = behandlingId,
                         listOf(),
+                        fom = null,
+                        tom = null,
+                        beløp = null,
                     ),
                 )
             },

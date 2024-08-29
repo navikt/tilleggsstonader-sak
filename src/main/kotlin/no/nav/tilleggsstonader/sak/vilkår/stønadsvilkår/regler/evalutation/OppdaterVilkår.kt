@@ -51,6 +51,9 @@ object OppdaterVilkår {
             resultat = vilkårsresultat.vilkår,
             delvilkårwrapper = oppdaterteDelvilkår,
             opphavsvilkår = null,
+            fom = oppdatering.fom,
+            tom = oppdatering.tom,
+            beløp = oppdatering.beløp,
         )
     }
 
