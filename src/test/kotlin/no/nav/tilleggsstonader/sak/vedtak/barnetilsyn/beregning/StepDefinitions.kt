@@ -18,7 +18,6 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -43,7 +42,7 @@ class StepDefinitions {
     var exception: Exception? = null
 
     var stønadsperioder = emptyList<StønadsperiodeDto>()
-    var utgifter = mutableMapOf<UUID, List<Utgift>>()
+    var utgifter = mutableMapOf<UUID, List<UtgiftBeregning>>()
     var beregningsresultat: BeregningsresultatTilsynBarnDto? = null
     val behandlingId = UUID.randomUUID()
 
@@ -68,7 +67,7 @@ class StepDefinitions {
         val barnUuid = barnIder[barnId]!!
         assertThat(utgifter).doesNotContainKey(barnUuid)
         utgifter[barnUuid] = dataTable.mapRad { rad ->
-            Utgift(
+            UtgiftBeregning(
                 fom = parseÅrMåned(DomenenøkkelFelles.FOM, rad),
                 tom = parseÅrMåned(DomenenøkkelFelles.TOM, rad),
                 utgift = parseInt(BeregningNøkler.UTGIFT, rad),
