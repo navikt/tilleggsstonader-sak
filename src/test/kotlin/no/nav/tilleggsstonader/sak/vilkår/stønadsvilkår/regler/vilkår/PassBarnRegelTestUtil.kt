@@ -15,7 +15,14 @@ object PassBarnRegelTestUtil {
         delvilkår(Vurdering(RegelId.UTGIFTER_DOKUMENTERT, SvarId.JA)),
     )
 
+    fun ikkeOppfylteDelvilkårPassBarn() = listOf(
+        delvilkår(Vurdering(RegelId.HAR_FULLFØRT_FJERDEKLASSE, SvarId.NEI, "en begrunnelse")),
+        delvilkår(Vurdering(RegelId.ANNEN_FORELDER_MOTTAR_STØTTE, SvarId.JA, "en begrunnelse")),
+        delvilkår(Vurdering(RegelId.UTGIFTER_DOKUMENTERT, SvarId.JA)),
+    )
+
     fun oppfylteDelvilkårPassBarnDto() = oppfylteDelvilkårPassBarn().map { it.tilDto() }
+    fun ikkeOppfylteDelvilkårPassBarnDto() = ikkeOppfylteDelvilkårPassBarn().map { it.tilDto() }
 
     private fun delvilkår(vararg vurderinger: Vurdering) = Delvilkår(
         resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,

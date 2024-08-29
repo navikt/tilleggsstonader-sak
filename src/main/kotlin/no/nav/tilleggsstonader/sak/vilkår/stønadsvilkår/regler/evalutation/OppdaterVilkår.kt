@@ -47,14 +47,20 @@ object OppdaterVilkår {
         toggleVilkårPeriodiseringEnabled: Boolean,
     ) {
         if (toggleVilkårPeriodiseringEnabled) {
+            val vilkårType = vilkårsresultat.vilkårType
+            val resultat = vilkårsresultat.vilkår
             feilHvis(oppdatering.fom == null || oppdatering.tom == null) {
                 "Mangler fom/tom på vilkår"
             }
-            feilHvis(vilkårsresultat.vilkårType == VilkårType.PASS_BARN && oppdatering.beløp == null) {
+            feilHvis(
+                vilkårType == VilkårType.PASS_BARN &&
+                    resultat == Vilkårsresultat.OPPFYLT &&
+                    oppdatering.beløp == null,
+            ) {
                 "Mangler beløp på vilkår"
             }
-            feilHvis(vilkårsresultat.vilkårType != VilkårType.PASS_BARN && oppdatering.beløp != null) {
-                "Kan ikke ha beløp på vilkårType=${vilkårsresultat.vilkårType}"
+            feilHvis(vilkårType != VilkårType.PASS_BARN && oppdatering.beløp != null) {
+                "Kan ikke ha beløp på vilkårType=$vilkårType"
             }
         }
     }
