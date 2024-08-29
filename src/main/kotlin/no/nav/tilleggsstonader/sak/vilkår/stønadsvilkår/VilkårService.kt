@@ -17,11 +17,13 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
@@ -30,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.lagNyttVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import org.slf4j.LoggerFactory
@@ -64,20 +67,39 @@ class VilkårService(
 
     @Transactional
     fun opprettNyttVilkår(opprettVilkårDto: OpprettVilkårDto): Vilkår {
-        TODO("Not yet implemented")
+        val behandlingId = opprettVilkårDto.behandlingId
+
+        // TODO: Valider vilkårtype finnes på stønadstype
+
+        validerBehandling(behandlingId)
+        validerBarnFinnesPåBehandling(opprettVilkårDto)
+
+        val relevanteRegler = hentVilkårsregel(opprettVilkårDto.vilkårType)
+
+        val nyttVilkår =
+            lagNyttVilkår(
+                behandlingId = behandlingId,
+                metadata = hentHovedregelMetadata(behandlingId),
+                vilkårsregel = relevanteRegler,
+                barnId = opprettVilkårDto.barnId,
+            )
+
+        val oppdatertVilkår = flettVilkårOgVurderResultat(nyttVilkår, opprettVilkårDto)
+
+        return vilkårRepository.insert(oppdatertVilkår)
     }
 
     private fun flettVilkårOgVurderResultat(
         vilkår: Vilkår,
-        svarPåVilkårDto: SvarPåVilkårDto,
+        lagreVilkårDto: LagreVilkårDto,
     ): Vilkår {
         val vurderingsresultat = OppdaterVilkår.validerVilkårOgBeregnResultat(
             vilkår = vilkår,
-            oppdatering = svarPåVilkårDto.delvilkårsett,
+            oppdatering = lagreVilkårDto.delvilkårsett,
         )
         val oppdatertVilkår = OppdaterVilkår.oppdaterVilkår(
             vilkår = vilkår,
-            oppdatering = svarPåVilkårDto.delvilkårsett,
+            oppdatering = lagreVilkårDto.delvilkårsett,
             vilkårsresultat = vurderingsresultat,
         )
         return oppdatertVilkår
@@ -147,6 +169,13 @@ class VilkårService(
 
         validerErIVilkårSteg(behandling)
         validerLåstForVidereRedigering(behandling)
+    }
+
+    private fun validerBarnFinnesPåBehandling(opprettVilkårDto: OpprettVilkårDto) {
+        val barnIderPåBehandling = barnService.finnBarnPåBehandling(opprettVilkårDto.behandlingId).map { it.id }.toSet()
+        feilHvisIkke(barnIderPåBehandling.contains(opprettVilkårDto.barnId)) {
+            "Finner ikke barn på behandling"
+        }
     }
 
     private fun validerLåstForVidereRedigering(behandling: Behandling) {
