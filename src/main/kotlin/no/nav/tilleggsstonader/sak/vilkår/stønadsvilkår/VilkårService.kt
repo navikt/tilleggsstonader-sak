@@ -72,15 +72,16 @@ class VilkårService(
         val behandlingId = opprettVilkårDto.behandlingId
 
         validerBehandling(behandlingId)
-        validerBarnFinnesPåBehandling(opprettVilkårDto)
         validerBehandlingOgVilkårType(behandlingId, opprettVilkårDto.vilkårType)
 
         val relevanteRegler = hentVilkårsregel(opprettVilkårDto.vilkårType)
+        val metadata = hentHovedregelMetadata(behandlingId)
+        validerBarnFinnesPåBehandling(metadata, opprettVilkårDto)
 
         val nyttVilkår =
             lagNyttVilkår(
                 behandlingId = behandlingId,
-                metadata = hentHovedregelMetadata(behandlingId),
+                metadata = metadata,
                 vilkårsregel = relevanteRegler,
                 barnId = opprettVilkårDto.barnId,
             )
@@ -184,8 +185,8 @@ class VilkårService(
         validerLåstForVidereRedigering(behandling)
     }
 
-    private fun validerBarnFinnesPåBehandling(opprettVilkårDto: OpprettVilkårDto) {
-        val barnIderPåBehandling = barnService.finnBarnPåBehandling(opprettVilkårDto.behandlingId).map { it.id }.toSet()
+    private fun validerBarnFinnesPåBehandling(metadata: HovedregelMetadata, opprettVilkårDto: OpprettVilkårDto) {
+        val barnIderPåBehandling = metadata.barn.map { it.id }.toSet()
         feilHvisIkke(barnIderPåBehandling.contains(opprettVilkårDto.barnId)) {
             "Finner ikke barn på behandling"
         }
