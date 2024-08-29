@@ -26,7 +26,7 @@ class VilkårSteg(
         val vilkår = vilkårService.hentVilkår(saksbehandling.id)
         val vilkårsresultat = VilkårsresultatUtil.utledVilkårsresultat(vilkår)
 
-        brukerfeilHvisIkke(OppdaterVilkår.erAlleVilkårTattStillingTil(vilkårsresultat)) {
+        brukerfeilHvisIkke(VilkårsresultatUtil.erAlleVilkårTattStillingTil(vilkårsresultat)) {
             "Alle vilkår må være tatt stilling til"
         }
     }

@@ -29,6 +29,29 @@ object VilkårsresultatUtil {
         return inneholderAlleTyperVilkår && vilkårsresultat.all { it == Vilkårsresultat.OPPFYLT }
     }
 
+    /**
+     * Et vilkår skal anses som vurdert dersom det er oppfylt eller saksbehandler har valgt å ikke vurdere det
+     */
+    fun erAlleVilkårTattStillingTil(vilkårsresultat: List<Vilkårsresultat>): Boolean {
+        return if (vilkårsresultat.all { it == Vilkårsresultat.OPPFYLT || it == Vilkårsresultat.SKAL_IKKE_VURDERES }) {
+            true
+        } else {
+            harNoenIkkeOppfyltOgRestenIkkeOppfyltEllerOppfyltEllerSkalIkkevurderes(vilkårsresultat)
+        }
+    }
+
+    /**
+     * [Vilkårsresultat.IKKE_OPPFYLT] er gyldig i kombinasjon med andre som er
+     * [Vilkårsresultat.IKKE_OPPFYLT], [Vilkårsresultat.OPPFYLT] og [Vilkårsresultat.SKAL_IKKE_VURDERES]
+     */
+    private fun harNoenIkkeOppfyltOgRestenIkkeOppfyltEllerOppfyltEllerSkalIkkevurderes(vilkårsresultat: List<Vilkårsresultat>) =
+        vilkårsresultat.any { it == Vilkårsresultat.IKKE_OPPFYLT } &&
+                vilkårsresultat.all {
+                    it == Vilkårsresultat.OPPFYLT ||
+                            it == Vilkårsresultat.IKKE_OPPFYLT ||
+                            it == Vilkårsresultat.SKAL_IKKE_VURDERES
+                }
+
     private fun utledResultatForVilkårSomGjelderFlereBarn(value: List<Vilkår>): Vilkårsresultat {
         feilHvis(value.any { !it.type.gjelderFlereBarn() }) {
             "Denne metoden kan kun kalles med vilkår som kan ha flere barn"
