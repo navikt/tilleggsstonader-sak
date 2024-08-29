@@ -44,6 +44,11 @@ data class Vilkår(
 
     init {
         require(resultat.erIkkeDelvilkårsresultat()) // Verdien AUTOMATISK_OPPFYLT er kun forbeholdt delvilkår
+        if (fom != null || tom != null) {
+            require(fom != null)
+            require(tom != null)
+            require(fom <= tom)
+        }
     }
 
     /**
