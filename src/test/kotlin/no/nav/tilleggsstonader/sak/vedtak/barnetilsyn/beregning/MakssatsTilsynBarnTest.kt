@@ -1,5 +1,6 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.finnMakssats
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.YearMonth

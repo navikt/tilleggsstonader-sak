@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import io.cucumber.datatable.DataTable
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
