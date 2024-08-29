@@ -57,7 +57,8 @@ class VilkårService(
         validerBehandling(behandlingId)
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, svarPåVilkårDto.behandlingId)
 
-        val oppdatertVilkår = OppdaterVilkår.validerOgOppdatertVilkår(vilkår, svarPåVilkårDto.delvilkårsett)
+        val vurderingsresultat = OppdaterVilkår.validerVilkårOgBeregnResultat(vilkår, svarPåVilkårDto.delvilkårsett)
+        val oppdatertVilkår = OppdaterVilkår.oppdaterVilkår(vilkår, svarPåVilkårDto.delvilkårsett, vurderingsresultat)
         return vilkårRepository.update(oppdatertVilkår).tilDto()
     }
 

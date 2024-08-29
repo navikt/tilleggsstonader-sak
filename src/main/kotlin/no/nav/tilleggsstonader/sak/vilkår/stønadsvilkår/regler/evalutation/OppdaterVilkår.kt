@@ -24,20 +24,20 @@ object OppdaterVilkår {
      * Oppdaterer [Vilkår] med nye svar og resultat
      * Validerer att svaren er gyldige
      */
-    fun validerOgOppdatertVilkår(
+    fun validerVilkårOgBeregnResultat(
         vilkår: Vilkår,
         oppdatering: List<DelvilkårDto>,
-    ): Vilkår {
+    ): RegelResultat {
         val vilkårsregel = hentVilkårsregel(vilkår.type)
 
         validerVilkår(vilkårsregel, oppdatering, vilkår.delvilkårsett)
 
         val vilkårsresultat = utledResultat(vilkårsregel, oppdatering)
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
-        return oppdaterVilkår(vilkår, oppdatering, vilkårsresultat)
+        return vilkårsresultat
     }
 
-    private fun oppdaterVilkår(
+    fun oppdaterVilkår(
         vilkår: Vilkår,
         oppdatering: List<DelvilkårDto>,
         vilkårsresultat: RegelResultat,
