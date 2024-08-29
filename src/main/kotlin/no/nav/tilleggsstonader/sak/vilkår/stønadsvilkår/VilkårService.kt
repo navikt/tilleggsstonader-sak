@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMeta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.lagNyttVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.VilkårsresultatUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnesVilkårTypeForStønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import org.slf4j.LoggerFactory
@@ -429,7 +430,7 @@ class VilkårService(
     fun erAlleVilkårOppfylt(behandlingId: UUID): Boolean {
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
         val lagretVilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
-        return OppdaterVilkår.erAlleVilkårOppfylt(lagretVilkårsett, stønadstype)
+        return VilkårsresultatUtil.erAlleVilkårOppfylt(lagretVilkårsett, stønadstype)
     }
 
     fun hentOppfyltePassBarnVilkår(behandlingId: UUID): List<Vilkår> {

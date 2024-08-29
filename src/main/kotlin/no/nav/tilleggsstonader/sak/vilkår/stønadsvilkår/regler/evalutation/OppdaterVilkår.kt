@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
@@ -15,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMeta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering.utledResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelValidering.validerVilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.VilkårsresultatUtil.utledVilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
 import java.util.UUID
@@ -127,16 +125,6 @@ object OppdaterVilkår {
                     "${value.map { it.resultat }}",
             )
         }
-    }
-
-    fun erAlleVilkårOppfylt(
-        vilkårsett: List<Vilkår>,
-        stønadstype: Stønadstype,
-    ): Boolean {
-        val inneholderAlleTyperVilkår =
-            vilkårsett.map { it.type }.containsAll(VilkårType.hentVilkårForStønad(stønadstype))
-        val vilkårsresultat = utledVilkårsresultat(vilkårsett)
-        return inneholderAlleTyperVilkår && vilkårsresultat.all { it == Vilkårsresultat.OPPFYLT }
     }
 
     /**
