@@ -45,9 +45,10 @@ data class Vilkår(
     init {
         require(resultat.erIkkeDelvilkårsresultat()) // Verdien AUTOMATISK_OPPFYLT er kun forbeholdt delvilkår
         if (fom != null || tom != null) {
-            require(fom != null)
-            require(tom != null)
-            require(fom <= tom)
+            require(fom != null) { "Krever at fom er satt hvis tom er satt" }
+            require(tom != null) { "Krever at tom er satt hvis fom er satt" }
+            require(fom <= tom) { "Krever at fom <= tom" }
+            require(beløp != null) { "Krever at beløp er satt hvis fom og tom er satt" }
         }
     }
 
