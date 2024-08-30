@@ -100,6 +100,9 @@ data class VilkårInternt(
     val resultat: Vilkårsresultat,
     val delvilkår: List<DelvilkårInternt>,
     val fødselsdatoBarn: LocalDate?,
+    val fom: LocalDate?,
+    val tom: LocalDate?,
+    val beløp: Int?,
 )
 
 data class DelvilkårInternt(
