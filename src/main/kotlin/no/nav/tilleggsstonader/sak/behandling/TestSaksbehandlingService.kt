@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
-import java.time.LocalDate
+import java.time.YearMonth
 import java.util.UUID
 
 @Service
@@ -34,8 +34,8 @@ class TestSaksbehandlingService(
                 id = vilkår.id,
                 behandlingId = behandlingId,
                 delvilkårsett = delvilkårsett,
-                fom = LocalDate.now(),
-                tom = LocalDate.now(),
+                fom = YearMonth.now(),
+                tom = YearMonth.now(),
                 beløp = 1,
             )
             vilkårService.oppdaterVilkår(svarPåVilkårDto)

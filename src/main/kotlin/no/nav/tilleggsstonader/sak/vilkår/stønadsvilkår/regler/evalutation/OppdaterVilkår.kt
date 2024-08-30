@@ -79,8 +79,8 @@ object OppdaterVilkår {
             resultat = vilkårsresultat.vilkår,
             delvilkårwrapper = oppdaterteDelvilkår,
             opphavsvilkår = null,
-            fom = oppdatering.fom,
-            tom = oppdatering.tom,
+            fom = oppdatering.fom?.atDay(1),
+            tom = oppdatering.tom?.atEndOfMonth(),
             beløp = oppdatering.beløp,
         )
     }

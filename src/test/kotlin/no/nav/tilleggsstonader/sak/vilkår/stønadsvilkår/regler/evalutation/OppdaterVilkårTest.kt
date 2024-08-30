@@ -11,7 +11,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
+import java.time.YearMonth
 import java.util.UUID
 
 internal class OppdaterVilkårTest {
@@ -30,8 +30,8 @@ internal class OppdaterVilkårTest {
             barnId = UUID.randomUUID(),
             behandlingId = behandlingId,
             delvilkårsett = oppfylteDelvilkårPassBarnDto(),
-            fom = LocalDate.now(),
-            tom = LocalDate.now().plusDays(1),
+            fom = YearMonth.now(),
+            tom = YearMonth.now().plusMonths(1),
             beløp = 1,
         )
 

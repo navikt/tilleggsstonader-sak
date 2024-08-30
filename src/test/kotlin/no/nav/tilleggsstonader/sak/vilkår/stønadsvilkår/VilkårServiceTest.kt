@@ -50,8 +50,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
-import java.time.LocalDate
 import java.time.Year
+import java.time.YearMonth
 import java.util.UUID
 
 internal class VilkårServiceTest {
@@ -318,16 +318,16 @@ internal class VilkårServiceTest {
                     id = vilkår.id,
                     behandlingId = behandlingId,
                     delvilkårsett = PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto(),
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now(),
+                    fom = YearMonth.now(),
+                    tom = YearMonth.now().plusMonths(1),
                     beløp = 1,
                 ),
             )
 
             assertThat(lagretVilkår.captured.resultat).isEqualTo(OPPFYLT)
             assertThat(lagretVilkår.captured.type).isEqualTo(vilkår.type)
-            assertThat(lagretVilkår.captured.fom).isEqualTo(LocalDate.now())
-            assertThat(lagretVilkår.captured.tom).isEqualTo(LocalDate.now())
+            assertThat(lagretVilkår.captured.fom).isEqualTo(YearMonth.now().atDay(1))
+            assertThat(lagretVilkår.captured.tom).isEqualTo(YearMonth.now().plusMonths(1).atEndOfMonth())
             assertThat(lagretVilkår.captured.beløp).isEqualTo(1)
             assertThat(lagretVilkår.captured.opphavsvilkår).isNull()
 

@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.time.YearMonth
 import java.util.UUID
 
 internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
@@ -247,8 +248,8 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             barnId = barn.id,
             behandlingId = behandling.id,
             delvilkårsett = oppfylteDelvilkårPassBarnDto(),
-            fom = LocalDate.now(),
-            tom = LocalDate.now().plusDays(1),
+            fom = YearMonth.now(),
+            tom = YearMonth.now().plusMonths(1),
             beløp = 1,
         )
 
@@ -266,8 +267,8 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             val vilkårFraDb = vilkårRepository.findByBehandlingId(behandling.id).single()
             assertThat(vilkårFraDb.behandlingId).isEqualTo(behandling.id)
             assertThat(vilkårFraDb.type).isEqualTo(VilkårType.PASS_BARN)
-            assertThat(vilkårFraDb.fom).isEqualTo(LocalDate.now())
-            assertThat(vilkårFraDb.tom).isEqualTo(LocalDate.now().plusDays(1))
+            assertThat(vilkårFraDb.fom).isEqualTo(YearMonth.now().atDay(1))
+            assertThat(vilkårFraDb.tom).isEqualTo(YearMonth.now().plusMonths(1).atEndOfMonth())
             assertThat(vilkårFraDb.beløp).isEqualTo(1)
             assertThat(vilkårFraDb.barnId).isEqualTo(barn.id)
             assertThat(vilkårFraDb.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
