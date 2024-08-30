@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilUtgifterBeregning
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -21,6 +20,7 @@ class TilsynBarnVedtakController(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     tilgangService: TilgangService,
     private val tilsynBarnVedtakService: TilsynBarnVedtakService,
+    private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
 ) : VedtakController<VedtakTilsynBarnDto, VedtakTilsynBarn>(
     tilgangService,
     tilsynBarnVedtakService,
@@ -47,7 +47,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: UUID,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
-        // TODO bruk vilkår
-        return tilsynBarnBeregningService.beregn(behandlingId, vedtak.utgifter.tilUtgifterBeregning())
+        val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandlingId, vedtak.utgifter)
+        return tilsynBarnBeregningService.beregn(behandlingId, utgifter)
     }
 }

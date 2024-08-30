@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -40,6 +41,7 @@ class TilsynBarnBeregnYtelseStegTest {
     private val stønadsperiodeService = mockk<StønadsperiodeRepository>(relaxed = true)
     private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>(relaxed = true)
     private val vilkårService = mockk<VilkårService>(relaxed = true)
+    private val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>(relaxed = true)
 
     val steg = TilsynBarnBeregnYtelseSteg(
         tilsynBarnBeregningService = TilsynBarnBeregningService(stønadsperiodeService, vilkårperiodeRepository),
@@ -48,6 +50,7 @@ class TilsynBarnBeregnYtelseStegTest {
         simuleringService = simuleringService,
         vilkårService = vilkårService,
         unleashService = mockUnleashService(),
+        tilsynBarnUtgiftService = tilsynBarnUtgiftService,
     )
 
     val saksbehandling = saksbehandling()
@@ -63,6 +66,8 @@ class TilsynBarnBeregnYtelseStegTest {
         mockStønadsperioder(fom, tom, saksbehandling.id)
         mockVilkårperioder(fom, tom, saksbehandling.id)
         mockVilkår(saksbehandling.id)
+        every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any(), any()) } returns
+            mapOf(barn.id to listOf(UtgiftBeregning(YearMonth.now(), YearMonth.now(), 1)))
     }
 
     @Test
