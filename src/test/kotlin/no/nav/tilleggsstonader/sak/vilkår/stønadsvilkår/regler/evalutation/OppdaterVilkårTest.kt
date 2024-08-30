@@ -39,11 +39,11 @@ internal class OppdaterVilkårTest {
         fun `skal validere at man har med beløp for vilkår for pass av barn`() {
             assertThatThrownBy {
                 validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(fom = null), true)
-            }.hasMessageContaining("Mangler fom/tom på vilkår")
+            }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
 
             assertThatThrownBy {
                 validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(tom = null), true)
-            }.hasMessageContaining("Mangler fom/tom på vilkår")
+            }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
         }
 
         @Test

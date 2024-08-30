@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
@@ -52,10 +54,15 @@ object OppdaterVilkår {
         if (toggleVilkårPeriodiseringEnabled) {
             val vilkårType = vilkårsresultat.vilkårType
             val resultat = vilkårsresultat.vilkår
-            feilHvis(oppdatering.fom == null || oppdatering.tom == null) {
-                "Mangler fom/tom på vilkår"
+            val fom = oppdatering.fom
+            val tom = oppdatering.tom
+            brukerfeilHvis(fom == null || tom == null) {
+                "Mangler fra og med/til og med på vilkår"
             }
-            feilHvis(
+            brukerfeilHvisIkke(fom <= tom) {
+                "Til og med må være lik eller etter fra og med"
+            }
+            brukerfeilHvis(
                 vilkårType == VilkårType.PASS_BARN &&
                     resultat == Vilkårsresultat.OPPFYLT &&
                     oppdatering.beløp == null,

@@ -50,15 +50,24 @@ data class Vilkår(
             require(fom != null) { "Krever at fom er satt hvis tom er satt" }
             require(tom != null) { "Krever at tom er satt hvis fom er satt" }
             require(fom <= tom) { "Krever at fom <= tom" }
-            require(beløp != null) { "Krever at beløp er satt hvis fom og tom er satt" }
-            validerFomTomForType(fom, tom)
+
+            validerDataForType(fom, tom)
         }
     }
 
-    private fun validerFomTomForType(fom: LocalDate, tom: LocalDate) {
+    private fun validerDataForType(fom: LocalDate, tom: LocalDate) {
         when (type) {
-            VilkårType.PASS_BARN -> validerFørsteOgSisteDagIValgtMåned(fom, tom)
+            VilkårType.PASS_BARN -> {
+                validerFørsteOgSisteDagIValgtMåned(fom, tom)
+                validerPåkrevdBeløpHvisOppfylt()
+            }
             else -> error("Må ta stilling til validering av fom/tom. Eks om vilkåret bruker dato eller månedsvelger")
+        }
+    }
+
+    private fun validerPåkrevdBeløpHvisOppfylt() {
+        if (resultat == Vilkårsresultat.OPPFYLT) {
+            require(beløp != null) { "Beløp er påkrevd når resultat er oppfylt" }
         }
     }
 
