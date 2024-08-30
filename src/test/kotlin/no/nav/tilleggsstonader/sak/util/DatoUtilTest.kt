@@ -2,7 +2,9 @@ package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.time.YearMonth
 
 class DatoUtilTest {
@@ -42,6 +44,37 @@ class DatoUtilTest {
             april.atDay(7) to april.atDay(8),
         ).forEach {
             assertThat(it.first.datoEllerNesteMandagHvisLørdagEllerSøndag()).isEqualTo(it.second)
+        }
+    }
+
+    @Nested
+    inner class FørsteDagIMpneden {
+
+        @Test
+        fun `erFørsteDagIMåneden skal sjekke om dagen er siste dag i måneden`() {
+            assertThat(LocalDate.of(2024, 1, 1).erFørsteDagIMåneden()).isTrue
+            assertThat(LocalDate.of(2024, 2, 1).erFørsteDagIMåneden()).isTrue
+
+            assertThat(LocalDate.of(2024, 1, 31).erFørsteDagIMåneden()).isFalse
+            assertThat(LocalDate.of(2024, 3, 30).erFørsteDagIMåneden()).isFalse
+        }
+    }
+
+    @Nested
+    inner class SisteDagIMåneden {
+
+        @Test
+        fun `erSisteDagIMåneden skal sjekke om dagen er siste dag i måneden`() {
+            assertThat(LocalDate.of(2024, 1, 31).erSisteDagIMåneden()).isTrue
+            assertThat(LocalDate.of(2024, 2, 1).erSisteDagIMåneden()).isFalse
+            assertThat(LocalDate.of(2024, 3, 30).erSisteDagIMåneden()).isFalse
+        }
+
+        @Test
+        fun `tilSisteDagIMåneden skal endre dato til siste dagen i måneden for inneværende måned`() {
+            assertThat(LocalDate.of(2024, 1, 31).tilSisteDagIMåneden()).isEqualTo(LocalDate.of(2024, 1, 31))
+            assertThat(LocalDate.of(2024, 1, 30).tilSisteDagIMåneden()).isEqualTo(LocalDate.of(2024, 1, 31))
+            assertThat(LocalDate.of(2024, 2, 4).tilSisteDagIMåneden()).isEqualTo(LocalDate.of(2024, 2, 29))
         }
     }
 }

@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
+import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.springframework.data.annotation.Id
@@ -49,6 +51,23 @@ data class Vilkår(
             require(tom != null) { "Krever at tom er satt hvis fom er satt" }
             require(fom <= tom) { "Krever at fom <= tom" }
             require(beløp != null) { "Krever at beløp er satt hvis fom og tom er satt" }
+            validerFomTomForType(fom, tom)
+        }
+    }
+
+    private fun validerFomTomForType(fom: LocalDate, tom: LocalDate) {
+        when (type) {
+            VilkårType.PASS_BARN -> validerFørsteOgSisteDagIValgtMåned(fom, tom)
+            else -> error("Må ta stilling til validering av fom/tom. Eks om vilkåret bruker dato eller månedsvelger")
+        }
+    }
+
+    private fun validerFørsteOgSisteDagIValgtMåned(fom: LocalDate, tom: LocalDate) {
+        require(fom.erFørsteDagIMåneden()) {
+            "For vilkår=$type skal FOM være første dagen i måneden"
+        }
+        require(tom.erSisteDagIMåneden()) {
+            "For vilkår=$type skal TOM være siste dagen i måneden"
         }
     }
 

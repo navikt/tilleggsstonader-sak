@@ -34,8 +34,8 @@ class TestSaksbehandlingService(
                 id = vilkår.id,
                 behandlingId = behandlingId,
                 delvilkårsett = delvilkårsett,
-                fom = LocalDate.now(),
-                tom = LocalDate.now(),
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 1, 31),
                 beløp = 1,
             )
             vilkårService.oppdaterVilkår(svarPåVilkårDto)

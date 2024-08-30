@@ -318,16 +318,16 @@ internal class VilkårServiceTest {
                     id = vilkår.id,
                     behandlingId = behandlingId,
                     delvilkårsett = PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto(),
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now(),
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 1, 31),
                     beløp = 1,
                 ),
             )
 
             assertThat(lagretVilkår.captured.resultat).isEqualTo(OPPFYLT)
             assertThat(lagretVilkår.captured.type).isEqualTo(vilkår.type)
-            assertThat(lagretVilkår.captured.fom).isEqualTo(LocalDate.now())
-            assertThat(lagretVilkår.captured.tom).isEqualTo(LocalDate.now())
+            assertThat(lagretVilkår.captured.fom).isEqualTo(LocalDate.of(2024, 1, 1))
+            assertThat(lagretVilkår.captured.tom).isEqualTo(LocalDate.of(2024, 1, 31))
             assertThat(lagretVilkår.captured.beløp).isEqualTo(1)
             assertThat(lagretVilkår.captured.opphavsvilkår).isNull()
 

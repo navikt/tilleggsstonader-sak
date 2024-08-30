@@ -247,8 +247,8 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             barnId = barn.id,
             behandlingId = behandling.id,
             delvilkårsett = oppfylteDelvilkårPassBarnDto(),
-            fom = LocalDate.now(),
-            tom = LocalDate.now().plusDays(1),
+            fom = LocalDate.of(2024, 1, 1),
+            tom = LocalDate.of(2024, 1, 31),
             beløp = 1,
         )
 
@@ -266,8 +266,8 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             val vilkårFraDb = vilkårRepository.findByBehandlingId(behandling.id).single()
             assertThat(vilkårFraDb.behandlingId).isEqualTo(behandling.id)
             assertThat(vilkårFraDb.type).isEqualTo(VilkårType.PASS_BARN)
-            assertThat(vilkårFraDb.fom).isEqualTo(LocalDate.now())
-            assertThat(vilkårFraDb.tom).isEqualTo(LocalDate.now().plusDays(1))
+            assertThat(vilkårFraDb.fom).isEqualTo(LocalDate.of(2024, 1, 1))
+            assertThat(vilkårFraDb.tom).isEqualTo(LocalDate.of(2024, 1, 31))
             assertThat(vilkårFraDb.beløp).isEqualTo(1)
             assertThat(vilkårFraDb.barnId).isEqualTo(barn.id)
             assertThat(vilkårFraDb.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
