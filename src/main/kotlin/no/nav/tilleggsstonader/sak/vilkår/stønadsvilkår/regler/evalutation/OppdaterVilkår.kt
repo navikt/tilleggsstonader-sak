@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
+import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -17,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.Re
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelValidering.validerVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
+import java.time.LocalDate
 import java.util.UUID
 
 object OppdaterVilkår {
@@ -79,10 +82,42 @@ object OppdaterVilkår {
             resultat = vilkårsresultat.vilkår,
             delvilkårwrapper = oppdaterteDelvilkår,
             opphavsvilkår = null,
-            fom = oppdatering.fom,
-            tom = oppdatering.tom,
+            fom = utledFom(vilkår, oppdatering),
+            tom = utledTom(vilkår, oppdatering),
             beløp = oppdatering.beløp,
         )
+    }
+
+    private fun utledFom(vilkår: Vilkår, oppdatering: LagreVilkårDto): LocalDate? {
+        return oppdatering.fom?.let {
+            when (vilkår.type) {
+                VilkårType.PASS_BARN -> {
+                    validerErFørsteDagIMåned(it)
+                    it
+                }
+                else -> error("Har ikke tatt stilling til type dato for ${vilkår.type}")
+            }
+        }
+    }
+
+    private fun utledTom(vilkår: Vilkår, oppdatering: LagreVilkårDto): LocalDate? {
+        return oppdatering.tom?.let {
+            when (vilkår.type) {
+                VilkårType.PASS_BARN -> {
+                    validerErSisteDagIMåned(it)
+                    it
+                }
+                else -> error("Har ikke tatt stilling til type dato for ${vilkår.type}")
+            }
+        }
+    }
+
+    private fun validerErFørsteDagIMåned(dato: LocalDate) {
+        require(dato.erFørsteDagIMåneden()) { "Dato=$dato er ikke første dag i måneden" }
+    }
+
+    private fun validerErSisteDagIMåned(dato: LocalDate) {
+        require(dato.erSisteDagIMåneden()) { "Dato=$dato er ikke siste dag i måneden" }
     }
 
     private fun validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat: RegelResultat) {
