@@ -8,10 +8,12 @@ data class SimuleringResponse(val oppsummeringer: List<OppsummeringForPeriode>, 
 
 object SimuleringResponseMapper {
 
-    fun map(simuleringResponse: SimuleringResponseDto): SimuleringResponse {
-        return SimuleringResponse(
-            oppsummeringer = simuleringResponse.oppsummeringer,
-            detaljer = simuleringResponse.detaljer,
-        )
+    fun map(simuleringResponse: SimuleringResponseDto?): SimuleringResponse? {
+        return simuleringResponse?.let {
+            SimuleringResponse(
+                oppsummeringer = it.oppsummeringer,
+                detaljer = it.detaljer,
+            )
+        }
     }
 }
