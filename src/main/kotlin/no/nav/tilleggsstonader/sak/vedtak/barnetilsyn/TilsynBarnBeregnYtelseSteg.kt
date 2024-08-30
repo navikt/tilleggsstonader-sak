@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
@@ -25,6 +26,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.YearMonth
+import java.util.UUID
 
 @Service
 class TilsynBarnBeregnYtelseSteg(
@@ -67,12 +70,32 @@ class TilsynBarnBeregnYtelseSteg(
             "Funksjonalitet mangler for å kunne innvilge revurdering når tidligere behandling er innvilget. Sett saken på vent."
         }
 
-        val beregningsresultat =
-            tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter.tilUtgifterBeregning())
+        val utgifter = if (unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING)) {
+            hentUtgifterBeregningFraVilkår(saksbehandling)
+        } else {
+            vedtak.utgifter.tilUtgifterBeregning()
+        }
+        val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, utgifter)
         validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, vedtak, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
     }
+
+    private fun hentUtgifterBeregningFraVilkår(saksbehandling: Saksbehandling): Map<UUID, List<UtgiftBeregning>> =
+        vilkårService.hentOppfyltePassBarnVilkår(saksbehandling.id)
+            .groupBy { it.barnId ?: error("Vilkår=${it.id} type=${it.type} for tilsyn barn mangler barnId") }
+            .mapValues {
+                it.value.map {
+                    feilHvis(it.fom == null || it.tom == null || it.beløp == null) {
+                        "Forventer at fom, tom og beløp er satt på vilkår=${it.id} når vilkåret er innvilget"
+                    }
+                    UtgiftBeregning(
+                        fom = YearMonth.now(), // it.fom, // TODO
+                        tom = YearMonth.now(), // it.fom, // TODO
+                        utgift = it.beløp,
+                    )
+                }
+            }
 
     private fun lagreAvslag(
         saksbehandling: Saksbehandling,
