@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -12,6 +13,8 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
+import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
@@ -89,9 +92,15 @@ class TilsynBarnBeregnYtelseSteg(
                     feilHvis(it.fom == null || it.tom == null || it.beløp == null) {
                         "Forventer at fom, tom og beløp er satt på vilkår=${it.id} når vilkåret er innvilget"
                     }
+                    feilHvisIkke(it.fom.erFørsteDagIMåneden()) {
+                        "Noe er feil. Fom skal være satt til første dagen i måneden"
+                    }
+                    feilHvisIkke(it.tom.erSisteDagIMåneden()) {
+                        "Noe er feil. Tom skal være satt til siste dagen i måneden"
+                    }
                     UtgiftBeregning(
-                        fom = YearMonth.now(), // it.fom, // TODO
-                        tom = YearMonth.now(), // it.fom, // TODO
+                        fom = YearMonth.from(it.fom),
+                        tom = YearMonth.from(it.tom),
                         utgift = it.beløp,
                     )
                 }

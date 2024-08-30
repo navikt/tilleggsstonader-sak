@@ -47,6 +47,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: UUID,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
+        // TODO bruk vilkår
         return tilsynBarnBeregningService.beregn(behandlingId, vedtak.utgifter.tilUtgifterBeregning())
     }
 }
