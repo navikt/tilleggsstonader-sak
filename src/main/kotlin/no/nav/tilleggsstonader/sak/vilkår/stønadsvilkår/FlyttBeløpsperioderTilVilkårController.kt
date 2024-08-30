@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
@@ -38,17 +39,16 @@ class FlyttBeløpsperioderTilVilkårController(
     @Transactional
     fun oppdaterVilkår() {
         utførEndringSomSystem()
-        vedtakTilsynBarnVedtakRepository.findAll()
-            .forEach {
-                håndterVedtak(it)
-            }
+        val alleVedtak = vedtakTilsynBarnVedtakRepository.findAll()
+        alleVedtak.forEach { håndterVedtak(it) }
+
+        oppdaterBehandlingerSomErPåVedtakUtenVedtak(alleVedtak)
     }
 
     private fun håndterVedtak(vedtak: VedtakTilsynBarn) {
         val vedtakData = vedtak.vedtak
         val behandlingId = vedtak.behandlingId
         if (vedtakData == null) {
-            logger.info("Ignorerer vedtak=$behandlingId")
             return
         }
         val vilkårForBehandling = vilkårRepository.findByBehandlingId(behandlingId).associateBy { it.barnId }
@@ -64,19 +64,22 @@ class FlyttBeløpsperioderTilVilkårController(
                 leggTilNyeVilkårForAndreUtgifter(vilkår, utgifter.drop(1))
             }
         }
-        /*
-        TODO Trenger vi å oppdatere steget?
-        val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
-        if (behandling.steg == StegType.BESLUTTE_VEDTAK && vedtak.type == TypeVedtak.INNVILGELSE) {
-            jdbcTemplate.update(
-                "UPDATE behandling SET steg=:steg WHERE id=:behandlingId",
-                mapOf(
-                    "behandlingId" to behandling.id,
-                    "steg" to StegType.
+    }
+
+    private fun oppdaterBehandlingerSomErPåVedtakUtenVedtak(alleVedtak: Iterable<VedtakTilsynBarn>) {
+        val behandlingerSomHarVedtak = alleVedtak.map { it.behandlingId }.toSet()
+        behandlingRepository.findAll().forEach { behandling ->
+            if (behandling.steg == StegType.BESLUTTE_VEDTAK && !behandling.erAvsluttet() && !behandlingerSomHarVedtak.contains(behandling.id)) {
+                logger.info("Setter behandling til Inngangsvilkår for å kunne legge inn perioder")
+                jdbcTemplate.update(
+                    "UPDATE behandling SET steg=:steg WHERE id=:id",
+                    mapOf(
+                        "id" to behandling.id,
+                        "steg" to StegType.INNGANGSVILKÅR.name,
+                    ),
                 )
-            )
+            }
         }
-         */
     }
 
     private fun oppdaterVilkårMedPeriode(
