@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilUtgifterBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
@@ -31,6 +30,7 @@ class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     private val vilkårService: VilkårService,
     private val unleashService: UnleashService,
+    private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
     vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -67,8 +67,8 @@ class TilsynBarnBeregnYtelseSteg(
             "Funksjonalitet mangler for å kunne innvilge revurdering når tidligere behandling er innvilget. Sett saken på vent."
         }
 
-        val beregningsresultat =
-            tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, vedtak.utgifter.tilUtgifterBeregning())
+        val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(saksbehandling.id, vedtak.utgifter)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, utgifter)
         validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, vedtak, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)

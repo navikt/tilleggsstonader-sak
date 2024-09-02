@@ -150,14 +150,19 @@ class InterntVedtakService(
     }
 
     private fun mapVilkår(behandlingId: UUID, behandlingBarn: Map<UUID, GrunnlagBarn>): List<VilkårInternt> {
-        return vilkårService.hentVilkårsett(behandlingId).map { vilkår ->
-            VilkårInternt(
-                type = vilkår.vilkårType,
-                resultat = vilkår.resultat,
-                fødselsdatoBarn = vilkår.barnId?.let { behandlingBarn.finnFødselsdato(it) },
-                delvilkår = vilkår.delvilkårsett.map { mapDelvilkår(it) },
-            )
-        }
+        return vilkårService.hentVilkårsett(behandlingId)
+            .map { vilkår ->
+                VilkårInternt(
+                    type = vilkår.vilkårType,
+                    resultat = vilkår.resultat,
+                    fødselsdatoBarn = vilkår.barnId?.let { behandlingBarn.finnFødselsdato(it) },
+                    delvilkår = vilkår.delvilkårsett.map { mapDelvilkår(it) },
+                    fom = vilkår.fom,
+                    tom = vilkår.tom,
+                    utgift = vilkår.utgift,
+                )
+            }
+            .sortedWith(compareBy<VilkårInternt> { it.type }.thenBy { it.fødselsdatoBarn }.thenBy { it.fom })
     }
 
     private fun mapDelvilkår(delvilkår: DelvilkårDto) =

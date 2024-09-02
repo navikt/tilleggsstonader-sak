@@ -240,6 +240,9 @@ fun vilkår(
     delvilkår: List<Delvilkår> = emptyList(),
     barnId: UUID? = null,
     opphavsvilkår: Opphavsvilkår? = null,
+    fom: LocalDate? = null,
+    tom: LocalDate? = null,
+    beløp: Int? = null,
 ): Vilkår = Vilkår(
     behandlingId = behandlingId,
     resultat = resultat,
@@ -247,6 +250,9 @@ fun vilkår(
     barnId = barnId,
     delvilkårwrapper = DelvilkårWrapper(delvilkår),
     opphavsvilkår = opphavsvilkår,
+    fom = fom,
+    tom = tom,
+    utgift = beløp,
 )
 
 fun fagsakpersoner(vararg identer: String): Set<PersonIdent> = identer.map {
