@@ -328,7 +328,7 @@ internal class VilkårServiceTest {
             assertThat(lagretVilkår.captured.type).isEqualTo(vilkår.type)
             assertThat(lagretVilkår.captured.fom).isEqualTo(LocalDate.of(2024, 1, 1))
             assertThat(lagretVilkår.captured.tom).isEqualTo(LocalDate.of(2024, 1, 31))
-            assertThat(lagretVilkår.captured.beløp).isEqualTo(1)
+            assertThat(lagretVilkår.captured.utgift).isEqualTo(1)
             assertThat(lagretVilkår.captured.opphavsvilkår).isNull()
 
             assertThat(lagretVilkår.captured.delvilkårsett).hasSize(3)

@@ -268,7 +268,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             assertThat(vilkårFraDb.type).isEqualTo(VilkårType.PASS_BARN)
             assertThat(vilkårFraDb.fom).isEqualTo(LocalDate.of(2024, 1, 1))
             assertThat(vilkårFraDb.tom).isEqualTo(LocalDate.of(2024, 1, 31))
-            assertThat(vilkårFraDb.beløp).isEqualTo(1)
+            assertThat(vilkårFraDb.utgift).isEqualTo(1)
             assertThat(vilkårFraDb.barnId).isEqualTo(barn.id)
             assertThat(vilkårFraDb.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
             assertThat(vilkårFraDb.opphavsvilkår).isNull()

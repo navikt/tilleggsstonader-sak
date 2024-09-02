@@ -42,8 +42,8 @@ class TilsynBarnUtgiftService(
     ): UtgiftBeregning {
         val fom = it.fom
         val tom = it.tom
-        val beløp = it.beløp
-        feilHvis(fom == null || tom == null || beløp == null) {
+        val utgift = it.utgift
+        feilHvis(fom == null || tom == null || utgift == null) {
             "Forventer at fom, tom og beløp er satt på vilkår=${it.id} når vilkåret er innvilget"
         }
         feilHvisIkke(fom.erFørsteDagIMåneden()) {
@@ -55,7 +55,7 @@ class TilsynBarnUtgiftService(
         return UtgiftBeregning(
             fom = YearMonth.from(fom),
             tom = YearMonth.from(tom),
-            utgift = beløp,
+            utgift = utgift,
         )
     }
 }

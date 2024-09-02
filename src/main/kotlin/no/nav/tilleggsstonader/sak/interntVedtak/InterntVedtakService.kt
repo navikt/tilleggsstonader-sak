@@ -159,7 +159,7 @@ class InterntVedtakService(
                     delvilkår = vilkår.delvilkårsett.map { mapDelvilkår(it) },
                     fom = vilkår.fom,
                     tom = vilkår.tom,
-                    beløp = vilkår.beløp,
+                    utgift = vilkår.utgift,
                 )
             }
             .sortedWith(compareBy<VilkårInternt> { it.type }.thenBy { it.fødselsdatoBarn }.thenBy { it.fom })

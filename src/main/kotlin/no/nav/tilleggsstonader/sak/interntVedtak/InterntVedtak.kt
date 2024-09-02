@@ -102,7 +102,7 @@ data class VilkårInternt(
     val fødselsdatoBarn: LocalDate?,
     val fom: LocalDate?,
     val tom: LocalDate?,
-    val beløp: Int?,
+    val utgift: Int?,
 )
 
 data class DelvilkårInternt(

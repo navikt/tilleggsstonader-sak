@@ -252,7 +252,7 @@ fun vilkår(
     opphavsvilkår = opphavsvilkår,
     fom = fom,
     tom = tom,
-    beløp = beløp,
+    utgift = beløp,
 )
 
 fun fagsakpersoner(vararg identer: String): Set<PersonIdent> = identer.map {

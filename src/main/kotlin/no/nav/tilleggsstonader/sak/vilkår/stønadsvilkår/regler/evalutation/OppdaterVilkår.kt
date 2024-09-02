@@ -91,7 +91,7 @@ object OppdaterVilkår {
             opphavsvilkår = null,
             fom = utledFom(vilkår, oppdatering),
             tom = utledTom(vilkår, oppdatering),
-            beløp = oppdatering.beløp,
+            utgift = oppdatering.beløp,
         )
     }
 

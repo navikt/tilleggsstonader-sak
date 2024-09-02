@@ -129,7 +129,7 @@
     "fødselsdatoBarn" : "2024-05-15",
     "fom" : "2024-02-01",
     "tom" : "2024-02-29",
-    "beløp" : 100
+    "utgift" : 100
   }, {
     "type" : "PASS_BARN",
     "resultat" : "OPPFYLT",
@@ -158,7 +158,7 @@
     "fødselsdatoBarn" : "2024-05-15",
     "fom" : "2024-02-01",
     "tom" : "2024-02-29",
-    "beløp" : 200
+    "utgift" : 200
   }, {
     "type" : "PASS_BARN",
     "resultat" : "OPPFYLT",
@@ -187,7 +187,7 @@
     "fødselsdatoBarn" : "2024-10-15",
     "fom" : "2024-02-01",
     "tom" : "2024-02-29",
-    "beløp" : 200
+    "utgift" : 200
   } ],
   "vedtak" : {
     "type" : "INNVILGELSE",
