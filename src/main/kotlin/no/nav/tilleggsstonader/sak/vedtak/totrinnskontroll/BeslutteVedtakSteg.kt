@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
+import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevService
 import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevTask
@@ -67,6 +68,7 @@ class BeslutteVedtakSteg(
                 opprettJournalførVedtaksbrevTask(saksbehandling)
                 StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
             } else {
+                taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
                 StegType.FERDIGSTILLE_BEHANDLING
             }
         } else {

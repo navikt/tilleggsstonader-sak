@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
@@ -69,6 +70,7 @@ class BehandlingFlytTest(
     @Autowired val brevController: BrevController,
     @Autowired val brevmottakereRepository: BrevmottakerRepository,
     @Autowired val totrinnskontrollController: TotrinnskontrollController,
+    @Autowired val totrinnskontrollService: TotrinnskontrollService,
     @Autowired val taskService: TaskService,
     @Autowired val stegService: StegService,
     @Autowired val taskWorker: TaskWorker,
@@ -214,11 +216,13 @@ class BehandlingFlytTest(
 
         somBeslutter {
             godkjennTotrinnskontroll(behandlingId)
-            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
         }
+        kjørTasks()
+        assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
+
         with(testoppsettService.hentBehandling(behandlingId)) {
-            assertThat(status).isEqualTo(BehandlingStatus.IVERKSETTER_VEDTAK)
-            assertThat(steg).isEqualTo(StegType.FERDIGSTILLE_BEHANDLING)
+            assertThat(status).isEqualTo(BehandlingStatus.FERDIGSTILT)
+            assertThat(steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
         }
     }
 
@@ -237,7 +241,6 @@ class BehandlingFlytTest(
 
     private fun godkjennTotrinnskontroll(behandlingId: UUID) {
         totrinnskontrollController.beslutteVedtak(behandlingId, BeslutteVedtakDto(true))
-        kjørTasks()
     }
 
     private fun underkjennTotrinnskontroll(behandlingId: UUID) {
@@ -359,7 +362,7 @@ class BehandlingFlytTest(
     }
 
     private fun assertStatusTotrinnskontroll(behandlingId: UUID, expectedStatus: TotrinnkontrollStatus) {
-        with(totrinnskontrollController.hentTotrinnskontroll(behandlingId)) {
+        with(totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)) {
             assertThat(status).isEqualTo(expectedStatus)
         }
     }

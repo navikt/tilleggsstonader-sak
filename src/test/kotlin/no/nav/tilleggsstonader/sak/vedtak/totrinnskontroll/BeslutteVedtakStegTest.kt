@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevService
 import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevTask
@@ -155,7 +156,7 @@ class BeslutteVedtakStegTest {
         )
 
         assertThat(nesteSteg).isEqualTo(StegType.FERDIGSTILLE_BEHANDLING)
-        assertHarOpprettetTaskerAvType(FerdigstillOppgaveTask.TYPE)
+        assertHarOpprettetTaskerAvType(FerdigstillOppgaveTask.TYPE, FerdigstillBehandlingTask.TYPE)
         verify(exactly = 0) { brevService.lagEndeligBeslutterbrev(any()) }
         verify(exactly = 1) { iverksettService.iverksettBehandlingFørsteGang(any()) }
     }
