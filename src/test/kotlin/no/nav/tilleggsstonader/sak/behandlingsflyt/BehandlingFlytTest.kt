@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandling.TestBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.TestSaksbehandlingController
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.brev.BrevController
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
@@ -190,6 +191,34 @@ class BehandlingFlytTest(
             assertThatThrownBy {
                 stegService.håndterSteg(behandlingId, StegType.INNGANGSVILKÅR)
             }.hasMessageContaining("Finner ingen perioder hvor vilkår for AAP er oppfylt")
+        }
+    }
+
+    @Test
+    fun `skal ikke sende brev vid årsak korrigering uten brev`() {
+        val behandlingId = somSaksbehandler {
+            val behandlingId = opprettBehandling(personIdent)
+            val behandling = testoppsettService.hentBehandling(behandlingId)
+            testoppsettService.oppdater(behandling.copy(årsak = BehandlingÅrsak.KORRIGERING_UTEN_BREV))
+
+            vurderInngangsvilkår(behandlingId)
+            opprettVilkår(behandlingId)
+            utfyllVilkår(behandlingId)
+            opprettVedtak(behandlingId)
+            simuler(behandlingId)
+            sendTilBeslutter(behandlingId)
+            assertSisteFerdigstillOppgaveTask(Oppgavetype.BehandleSak)
+            behandlingId
+        }
+        assertSisteOpprettedeOppgave(behandlingId, Oppgavetype.GodkjenneVedtak)
+
+        somBeslutter {
+            godkjennTotrinnskontroll(behandlingId)
+            assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
+        }
+        with(testoppsettService.hentBehandling(behandlingId)) {
+            assertThat(status).isEqualTo(BehandlingStatus.IVERKSETTER_VEDTAK)
+            assertThat(steg).isEqualTo(StegType.FERDIGSTILLE_BEHANDLING)
         }
     }
 
