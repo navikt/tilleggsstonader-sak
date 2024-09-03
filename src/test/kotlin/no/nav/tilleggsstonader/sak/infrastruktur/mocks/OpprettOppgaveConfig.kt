@@ -94,9 +94,11 @@ class OpprettOppgaveConfig(
 
     private fun mapTema(stønadstype: Stønadstype): Tema = when (stønadstype) {
         Stønadstype.BARNETILSYN -> Tema.TSO
+        Stønadstype.LÆREMIDLER -> Tema.TSO
     }
 
     private fun mapBehandlingstema(stønadstype: Stønadstype): Behandlingstema = when (stønadstype) {
         Stønadstype.BARNETILSYN -> Behandlingstema.TilsynBarn
+        else -> error("Finner ikke behandlingstema for stønadstype $stønadstype")
     }
 }

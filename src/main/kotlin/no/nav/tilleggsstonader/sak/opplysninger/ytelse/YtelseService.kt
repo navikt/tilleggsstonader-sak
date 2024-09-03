@@ -77,5 +77,6 @@ class YtelseService(
                     TypeYtelsePeriode.ENSLIG_FORSØRGER,
                     TypeYtelsePeriode.OMSTILLINGSSTØNAD,
                 )
+            else -> error("Finner ikke relevante ytelser for stønadstype $type")
         }
 }
