@@ -32,7 +32,7 @@ internal class OppdaterVilkårTest {
             delvilkårsett = oppfylteDelvilkårPassBarnDto(),
             fom = LocalDate.now(),
             tom = LocalDate.now().plusDays(1),
-            beløp = 1,
+            utgift = 1,
         )
 
         @Test
@@ -49,13 +49,13 @@ internal class OppdaterVilkårTest {
         @Test
         fun `skal kaste feil hvis innvilget pass av barn ikke inneholder beløp`() {
             assertThatThrownBy {
-                validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(beløp = null), true)
-            }.hasMessageContaining("Mangler beløp på vilkår")
+                validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(utgift = null), true)
+            }.hasMessageContaining("Mangler utgift på vilkår")
         }
 
         @Test
         fun `skal ikke kaste feil hvis ikke oppfylt pass av barn ikke inneholder beløp`() {
-            val dto = opprettVilkårDto.copy(beløp = null, delvilkårsett = ikkeOppfylteDelvilkårPassBarnDto())
+            val dto = opprettVilkårDto.copy(utgift = null, delvilkårsett = ikkeOppfylteDelvilkårPassBarnDto())
             validerVilkårOgBeregnResultat(vilkår, dto, true)
         }
 

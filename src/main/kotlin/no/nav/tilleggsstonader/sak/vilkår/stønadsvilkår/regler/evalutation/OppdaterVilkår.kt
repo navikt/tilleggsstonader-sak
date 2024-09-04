@@ -65,12 +65,12 @@ object OppdaterVilkår {
             brukerfeilHvis(
                 vilkårType == VilkårType.PASS_BARN &&
                     resultat == Vilkårsresultat.OPPFYLT &&
-                    oppdatering.beløp == null,
+                    oppdatering.utgift == null,
             ) {
-                "Mangler beløp på vilkår"
+                "Mangler utgift på vilkår"
             }
-            feilHvis(vilkårType != VilkårType.PASS_BARN && oppdatering.beløp != null) {
-                "Kan ikke ha beløp på vilkårType=$vilkårType"
+            feilHvis(vilkårType != VilkårType.PASS_BARN && oppdatering.utgift != null) {
+                "Kan ikke ha utgift på vilkårType=$vilkårType"
             }
         }
     }
@@ -91,7 +91,7 @@ object OppdaterVilkår {
             opphavsvilkår = null,
             fom = utledFom(vilkår, oppdatering),
             tom = utledTom(vilkår, oppdatering),
-            utgift = oppdatering.beløp,
+            utgift = oppdatering.utgift,
         )
     }
 

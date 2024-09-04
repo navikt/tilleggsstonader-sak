@@ -301,7 +301,7 @@ internal class VilkårServiceTest {
                             delvilkårsett = listOf(),
                             fom = null,
                             tom = null,
-                            beløp = null,
+                            utgift = null,
                         ),
                     )
                 },
@@ -320,7 +320,7 @@ internal class VilkårServiceTest {
                     delvilkårsett = PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
-                    beløp = 1,
+                    utgift = 1,
                 ),
             )
 
@@ -406,7 +406,7 @@ internal class VilkårServiceTest {
                         listOf(),
                         fom = null,
                         tom = null,
-                        beløp = null,
+                        utgift = null,
                     ),
                 )
             },
@@ -439,7 +439,7 @@ internal class VilkårServiceTest {
                         listOf(),
                         fom = null,
                         tom = null,
-                        beløp = null,
+                        utgift = null,
                     ),
                 )
             },

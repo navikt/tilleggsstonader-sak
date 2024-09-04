@@ -9,7 +9,7 @@ sealed interface LagreVilkårDto {
     val delvilkårsett: List<DelvilkårDto>
     val fom: LocalDate?
     val tom: LocalDate?
-    val beløp: Int?
+    val utgift: Int?
 }
 
 data class SvarPåVilkårDto(
@@ -18,7 +18,7 @@ data class SvarPåVilkårDto(
     override val delvilkårsett: List<DelvilkårDto>,
     override val fom: LocalDate?,
     override val tom: LocalDate?,
-    override val beløp: Int?,
+    override val utgift: Int?,
 ) : LagreVilkårDto
 
 data class OpprettVilkårDto(
@@ -28,5 +28,5 @@ data class OpprettVilkårDto(
     override val delvilkårsett: List<DelvilkårDto>,
     override val fom: LocalDate?,
     override val tom: LocalDate?,
-    override val beløp: Int?,
+    override val utgift: Int?,
 ) : LagreVilkårDto

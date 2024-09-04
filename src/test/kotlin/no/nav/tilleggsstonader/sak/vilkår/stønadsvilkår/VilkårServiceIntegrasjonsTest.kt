@@ -249,7 +249,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             delvilkårsett = oppfylteDelvilkårPassBarnDto(),
             fom = LocalDate.of(2024, 1, 1),
             tom = LocalDate.of(2024, 1, 31),
-            beløp = 1,
+            utgift = 1,
         )
 
         @BeforeEach
