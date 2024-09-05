@@ -114,11 +114,13 @@ class JournalførVedtaksbrevTask(
 
     private fun utledBrevtittel(saksbehandling: Saksbehandling) = when (saksbehandling.stønadstype) {
         Stønadstype.BARNETILSYN -> "Vedtak om stønad til tilsyn barn" // TODO
+        else -> error("Utledning av brevtype er ikke implementert for ${saksbehandling.stønadstype}")
     }
 
     private fun utledDokumenttype(saksbehandling: Saksbehandling) =
         when (saksbehandling.stønadstype) {
             Stønadstype.BARNETILSYN -> Dokumenttype.BARNETILSYN_VEDTAKSBREV
+            else -> error("Utledning av dokumenttype er ikke implementert for ${saksbehandling.stønadstype}")
         }
 
     override fun onCompletion(task: Task) {

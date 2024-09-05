@@ -14,6 +14,7 @@ class VedtaksresultatService(
     fun hentVedtaksresultat(saksbehandling: Saksbehandling): TypeVedtak {
         return when (saksbehandling.stønadstype) {
             Stønadstype.BARNETILSYN -> tilsynBarnRepository.findByIdOrNull(saksbehandling.id)?.type
+            else -> error("Kan ikke hente vedtaksresultat for stønadstype ${saksbehandling.stønadstype}.")
         } ?: error("Finner ikke vedtaksresultat for behandling=$saksbehandling")
     }
 }

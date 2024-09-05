@@ -23,6 +23,7 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
         Stønadstype.BARNETILSYN -> listOf(
             PassBarnRegel(),
         )
+        Stønadstype.LÆREMIDLER -> emptyList()
     }
 
 private val vilkårstyperPerStønad: Map<Stønadstype, Set<VilkårType>> =

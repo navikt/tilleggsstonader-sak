@@ -90,6 +90,7 @@ class InterntVedtakService(
     ): Søknadsinformasjon? {
         val søknad = when (behandling.stønadstype) {
             Stønadstype.BARNETILSYN -> søknadService.hentSøknadBarnetilsyn(behandling.id)
+            else -> error("Kan ikke hente søknad for stønadstype ${behandling.stønadstype}")
         }
         if (søknad == null) {
             return null
