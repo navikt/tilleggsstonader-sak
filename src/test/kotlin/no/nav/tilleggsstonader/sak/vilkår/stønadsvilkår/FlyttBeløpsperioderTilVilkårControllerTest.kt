@@ -36,7 +36,7 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
     @Autowired
     lateinit var controller: FlyttBeløpsperioderTilVilkårController
 
-    val behandling = behandling(steg = StegType.BESLUTTE_VEDTAK)
+    val behandling = behandling(steg = StegType.BEREGNE_YTELSE)
     val barn = behandlingBarn(behandlingId = behandling.id)
 
     @BeforeEach
@@ -132,7 +132,7 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
             controller.oppdaterVilkår()
         }
 
-        assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.INNGANGSVILKÅR)
+        assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
     }
 
     @Test
@@ -142,7 +142,7 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
             controller.oppdaterVilkår()
         }
 
-        assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.BESLUTTE_VEDTAK)
+        assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.BEREGNE_YTELSE)
     }
 
     @Test
@@ -151,6 +151,6 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
             controller.oppdaterVilkår()
         }
 
-        assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.INNGANGSVILKÅR)
+        assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
     }
 }

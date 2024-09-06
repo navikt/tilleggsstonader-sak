@@ -69,13 +69,13 @@ class FlyttBeløpsperioderTilVilkårController(
     private fun oppdaterBehandlingerSomErPåVedtakUtenVedtak(alleVedtak: Iterable<VedtakTilsynBarn>) {
         val behandlingerSomHarVedtak = alleVedtak.map { it.behandlingId }.toSet()
         behandlingRepository.findAll().forEach { behandling ->
-            if (behandling.steg == StegType.BESLUTTE_VEDTAK && !behandling.erAvsluttet() && !behandlingerSomHarVedtak.contains(behandling.id)) {
+            if (behandling.steg == StegType.BEREGNE_YTELSE && !behandling.erAvsluttet() && !behandlingerSomHarVedtak.contains(behandling.id)) {
                 logger.info("Setter behandling til Inngangsvilkår for å kunne legge inn perioder")
                 jdbcTemplate.update(
                     "UPDATE behandling SET steg=:steg WHERE id=:id",
                     mapOf(
                         "id" to behandling.id,
-                        "steg" to StegType.INNGANGSVILKÅR.name,
+                        "steg" to StegType.VILKÅR.name,
                     ),
                 )
             }
