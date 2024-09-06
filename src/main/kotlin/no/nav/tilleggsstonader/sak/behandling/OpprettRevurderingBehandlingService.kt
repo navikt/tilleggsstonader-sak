@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
@@ -80,7 +81,11 @@ class OpprettRevurderingBehandlingService(
             return
         }
 
-        feilHvis(!request.årsak.erSøknadEllerPapirsøknad() && request.valgteBarn.isNotEmpty()) {
+        feilHvis(
+            !request.årsak.erSøknadEllerPapirsøknad() &&
+                request.årsak != BehandlingÅrsak.KORRIGERING_UTEN_BREV &&
+                request.valgteBarn.isNotEmpty(),
+        ) {
             "Kan ikke sende med barn på annet enn årsak Søknad"
         }
 
