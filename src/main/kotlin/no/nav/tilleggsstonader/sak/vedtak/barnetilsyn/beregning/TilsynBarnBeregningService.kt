@@ -203,9 +203,9 @@ class TilsynBarnBeregningService(
                 "Utgiftsperioder overlapper"
             }
 
-            val ikkePositivUtgift = utgifterForBarn.firstOrNull { it.utgift < 1 }?.utgift
+            val ikkePositivUtgift = utgifterForBarn.firstOrNull { it.utgift < 0 }?.utgift
             feilHvis(ikkePositivUtgift != null) {
-                "Utgiftsperioder inneholder ugyldig verdi: $ikkePositivUtgift"
+                "Utgiftsperioder inneholder ugyldig utgift: $ikkePositivUtgift"
             }
         }
     }

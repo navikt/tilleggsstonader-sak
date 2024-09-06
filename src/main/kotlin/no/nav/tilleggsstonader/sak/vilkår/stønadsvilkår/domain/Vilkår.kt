@@ -49,6 +49,7 @@ data class Vilkår(
             require(fom != null) { "Krever at fom er satt hvis tom er satt" }
             require(tom != null) { "Krever at tom er satt hvis fom er satt" }
             require(fom <= tom) { "Krever at fom <= tom" }
+            require(utgift == null || utgift >= 0) { "Utgift må være positivt tall" }
 
             validerDataForType(fom, tom)
         }
