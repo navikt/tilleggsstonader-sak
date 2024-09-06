@@ -40,7 +40,7 @@ class FlyttBeløpsperioderTilVilkårController(
     fun oppdaterVilkår() {
         utførEndringSomSystem()
         val alleVedtak = vedtakTilsynBarnVedtakRepository.findAll()
-        alleVedtak.forEach { håndterVedtak(it) }
+        // alleVedtak.forEach { håndterVedtak(it) }
 
         oppdaterBehandlingerSomErPåVedtakUtenVedtak(alleVedtak)
     }

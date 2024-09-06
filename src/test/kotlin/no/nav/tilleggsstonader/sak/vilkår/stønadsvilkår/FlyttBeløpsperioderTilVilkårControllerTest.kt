@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårReposit
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.YearMonth
@@ -44,6 +45,7 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
         barnRepository.insert(barn)
     }
 
+    @Disabled
     @Test
     fun `skal oppdatere vilkår med utgift fra vedtak`() {
         val fom = YearMonth.of(2023, 1)
@@ -77,6 +79,7 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
         assertThat(oppdatertVilkår.utgift).isEqualTo(utgift)
     }
 
+    @Disabled
     @Test
     fun `skal opprette nye vilkår dersom det finnes fler enn 1 utgift`() {
         val fom = YearMonth.of(2023, 1)
