@@ -1,9 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.erSortert
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
@@ -201,9 +199,6 @@ class TilsynBarnBeregningService(
             "Utgiftsperioder mangler"
         }
         utgifter.entries.forEach { (_, utgifterForBarn) ->
-            feilHvisIkke(utgifterForBarn.erSortert()) {
-                "Utgiftsperioder er ikke sortert"
-            }
             feilHvis(utgifterForBarn.overlapper()) {
                 "Utgiftsperioder overlapper"
             }
