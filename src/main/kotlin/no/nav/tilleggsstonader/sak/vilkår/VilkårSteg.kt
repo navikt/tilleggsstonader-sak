@@ -37,12 +37,19 @@ class VilkårSteg(
         validerIkkeOverlappendeVilkår(vilkår)
 
         if (unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING)) {
-            val manglerVerdierPåVilkårSomErTattStillingTil =
-                vilkår.filter { it.resultat == Vilkårsresultat.OPPFYLT || it.resultat == Vilkårsresultat.IKKE_OPPFYLT }
+            val manglerVerdierPåOppfylteVilkår =
+                vilkår.filter { it.resultat == Vilkårsresultat.OPPFYLT }
                     .any { it.fom == null || it.tom == null || it.utgift == null }
-            brukerfeilHvis(manglerVerdierPåVilkårSomErTattStillingTil) {
+            brukerfeilHvis(manglerVerdierPåOppfylteVilkår) {
                 "Mangler fom, tom eller utgift på et eller flere vilkår. " +
-                    "Vennligst ta stilling til hvilken periode vilkåret gjelder for"
+                    "Vennligst ta stilling til hvilken periode vilkåret gjelder for."
+            }
+            val manglerVerdierPåIkkeOppfylteVilkår =
+                vilkår.filter { it.resultat == Vilkårsresultat.IKKE_OPPFYLT }
+                    .any { it.fom == null || it.tom == null }
+            brukerfeilHvis(manglerVerdierPåIkkeOppfylteVilkår) {
+                "Mangler fom eller tom på et eller flere vilkår. " +
+                    "Vennligst ta stilling til hvilken periode vilkåret gjelder for."
             }
         }
     }
