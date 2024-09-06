@@ -50,11 +50,11 @@ class IverksettClient(
         return getForEntity<IverksettStatus>(url, uriVariables = uriVariables)
     }
 
-    fun simuler(simuleringRequest: SimuleringRequestDto): SimuleringResponseDto {
+    fun simuler(simuleringRequest: SimuleringRequestDto): SimuleringResponseDto? {
         val url = UriComponentsBuilder.fromUri(uri)
             .pathSegment("api", "simulering", "v2")
             .toUriString()
 
-        return postForEntity<SimuleringResponseDto>(url, simuleringRequest)
+        return postForEntityNullable<SimuleringResponseDto>(url, simuleringRequest)
     }
 }

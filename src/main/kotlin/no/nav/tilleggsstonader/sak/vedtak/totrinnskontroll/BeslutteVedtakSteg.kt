@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
+import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevService
 import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevTask
@@ -60,12 +61,16 @@ class BeslutteVedtakSteg(
         return if (data.godkjent) {
             oppdaterResultatPåBehandling(saksbehandling)
             // opprettTaskForBehandlingsstatistikk(saksbehandling.id, oppgaveId)
-            brevService.lagEndeligBeslutterbrev(saksbehandling)
-            opprettJournalførVedtaksbrevTask(saksbehandling)
 
             iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
-
-            StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
+            if (!saksbehandling.skalIkkeSendeBrev) {
+                brevService.lagEndeligBeslutterbrev(saksbehandling)
+                opprettJournalførVedtaksbrevTask(saksbehandling)
+                StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
+            } else {
+                taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
+                StegType.FERDIGSTILLE_BEHANDLING
+            }
         } else {
             opprettBehandleUnderkjentVedtakOppgave(saksbehandling, saksbehandler)
             StegType.SEND_TIL_BESLUTTER

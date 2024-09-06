@@ -56,7 +56,7 @@ class ArenaStatusService(
     private fun skalKunneOppretteSakIArenaForPerson(identer: Set<String>): Boolean {
         val fagsakPersonId = fagsakPersonService.finnPerson(identer)?.id
         return fagsakPersonId in setOf(
-            UUID.fromString("8eb563de-9035-4390-8993-42ebfa5a5aa7"),
+            UUID.fromString("5b04e044-8701-4de5-a5d9-6a30443df150"),
         )
     }
 
