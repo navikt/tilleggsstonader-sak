@@ -44,7 +44,7 @@ class TilsynBarnUtgiftService(
         val tom = it.tom
         val utgift = it.utgift
         feilHvis(fom == null || tom == null || utgift == null) {
-            "Forventer at fom, tom og beløp er satt på vilkår=${it.id} når vilkåret er innvilget"
+            "Forventer at fra-dato, til-dato og utgift er satt. Gå tilbake til Pass barn-fanen, og legg til datoer og utgifter der. For utviklerteamet: dette gjelder vilkår=${it.id}."
         }
         feilHvisIkke(fom.erFørsteDagIMåneden()) {
             "Noe er feil. Fom skal være satt til første dagen i måneden"
