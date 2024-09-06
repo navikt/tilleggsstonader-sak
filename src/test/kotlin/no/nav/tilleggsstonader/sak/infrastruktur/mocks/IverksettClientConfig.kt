@@ -38,6 +38,7 @@ class IverksettClientConfig {
             justRun { iverksettClient.iverksett(any()) }
             every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK
             every { iverksettClient.simuler(any()) } returns simuleringsresultat
+            every { iverksettClient.simuler(match { it.personident == "identIngenEndring" }) } returns null
         }
     }
 }

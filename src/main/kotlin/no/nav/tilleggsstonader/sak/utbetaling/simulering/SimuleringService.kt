@@ -60,11 +60,12 @@ class SimuleringService(
             Simuleringsresultat(
                 behandlingId = saksbehandling.id,
                 data = SimuleringResponseMapper.map(resultat),
+                ingenEndringIUtbetaling = resultat == null,
             ),
         )
     }
 
-    private fun simulerMedTilkjentYtelse(saksbehandling: Saksbehandling): SimuleringResponseDto {
+    private fun simulerMedTilkjentYtelse(saksbehandling: Saksbehandling): SimuleringResponseDto? {
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
         val forrigeIverksettingDto = iverksettService.forrigeIverksetting(saksbehandling, tilkjentYtelse)
 

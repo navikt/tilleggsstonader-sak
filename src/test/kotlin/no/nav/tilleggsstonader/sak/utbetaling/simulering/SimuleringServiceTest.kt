@@ -114,6 +114,6 @@ internal class SimuleringServiceTest {
 
         simuleringService.hentOgLagreSimuleringsresultat(saksbehandling(id = behandling.id))
 
-        assertThat(simulerSlot.captured.data.oppsummeringer).hasSize(16)
+        assertThat(simulerSlot.captured.data!!.oppsummeringer).hasSize(16)
     }
 }
