@@ -9,12 +9,12 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserRegisterDtoMapper.tilDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.UUID
 
 @Service
 class YtelseService(
@@ -41,7 +41,7 @@ class YtelseService(
     }
 
     fun hentYtelseForGrunnlag(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         fom: LocalDate,
         tom: LocalDate,
     ): YtelsePerioderDto {

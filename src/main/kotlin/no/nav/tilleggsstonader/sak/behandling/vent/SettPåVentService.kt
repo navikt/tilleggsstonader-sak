@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveMappe
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.temporal.ChronoUnit
 import java.util.Optional
-import java.util.UUID
 
 @Service
 class SettPåVentService(
@@ -29,7 +29,7 @@ class SettPåVentService(
     private val settPåVentRepository: SettPåVentRepository,
 ) {
 
-    fun hentStatusSettPåVent(behandlingId: UUID): StatusPåVentDto {
+    fun hentStatusSettPåVent(behandlingId: BehandlingId): StatusPåVentDto {
         val settPåVent = finnAktivSattPåVent(behandlingId)
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
 
@@ -48,7 +48,7 @@ class SettPåVentService(
     }
 
     @Transactional
-    fun settPåVent(behandlingId: UUID, dto: SettPåVentDto): StatusPåVentDto {
+    fun settPåVent(behandlingId: BehandlingId, dto: SettPåVentDto): StatusPåVentDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke sette behandling på vent når status=${behandling.status}"
@@ -83,7 +83,7 @@ class SettPåVentService(
     }
 
     @Transactional
-    fun oppdaterSettPåVent(behandlingId: UUID, dto: OppdaterSettPåVentDto): StatusPåVentDto {
+    fun oppdaterSettPåVent(behandlingId: BehandlingId, dto: OppdaterSettPåVentDto): StatusPåVentDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
             "Status på behandlingen må være ${BehandlingStatus.SATT_PÅ_VENT} for å kunne oppdatere"
@@ -132,13 +132,13 @@ class SettPåVentService(
     ) = !settPåVent.årsaker.containsAll(dto.årsaker) ||
         settPåVent.årsaker.size != dto.årsaker.size
 
-    private fun hentOppgave(behandlingId: UUID): Oppgave {
+    private fun hentOppgave(behandlingId: BehandlingId): Oppgave {
         val oppgave = hentBehandleSakOppgave(behandlingId)
         return oppgaveService.hentOppgave(oppgave.gsakOppgaveId)
     }
 
     @Transactional
-    fun taAvVent(behandlingId: UUID, taAvVentDto: TaAvVentDto?) {
+    fun taAvVent(behandlingId: BehandlingId, taAvVentDto: TaAvVentDto?) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
             "Kan ikke ta behandling av vent når status=${behandling.status}"
@@ -152,12 +152,12 @@ class SettPåVentService(
         taOppgaveAvVent(settPåVent.oppgaveId, skalTilordnesRessurs = taAvVentDto?.skalTilordnesRessurs ?: true)
     }
 
-    private fun finnAktivSattPåVent(behandlingId: UUID) =
+    private fun finnAktivSattPåVent(behandlingId: BehandlingId) =
         settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
             ?: error("Finner ikke settPåVent for behandling=$behandlingId")
 
     private fun settOppgavePåVent(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         dto: SettPåVentDto,
     ): OppdatertOppgaveResponse {
         val oppgave = hentOppgave(behandlingId)
@@ -243,7 +243,7 @@ class SettPåVentService(
         )
     }
 
-    private fun hentBehandleSakOppgave(behandlingId: UUID) =
+    private fun hentBehandleSakOppgave(behandlingId: BehandlingId) =
         oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandlingId)
             ?: error("Finner ikke behandleSakOppgave for behandling=$behandlingId")
 }

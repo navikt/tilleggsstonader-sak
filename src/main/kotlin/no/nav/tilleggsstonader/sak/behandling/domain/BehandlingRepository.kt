@@ -1,19 +1,19 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 /**
  * TODO: Alle metoder burde gåes igjennom senere
  */
 @Repository
-interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUpdateRepository<Behandling> {
+interface BehandlingRepository : RepositoryInterface<Behandling, BehandlingId>, InsertUpdateRepository<Behandling> {
 
     fun findByFagsakId(fagsakId: FagsakId): List<Behandling>
 
@@ -41,7 +41,7 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
                     LIMIT 1
                     """,
     )
-    fun finnAktivIdent(behandlingId: UUID): String
+    fun finnAktivIdent(behandlingId: BehandlingId): String
 
     // language=PostgreSQL
     @Query(
@@ -77,7 +77,7 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
              LIMIT 1
              """,
     )
-    fun finnSaksbehandling(behandlingId: UUID): Saksbehandling
+    fun finnSaksbehandling(behandlingId: BehandlingId): Saksbehandling
 
     // language=PostgreSQL
     @Query(
@@ -158,7 +158,7 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
         WHERE behandling_id IN (:behandlingId)
         """,
     )
-    fun finnEksterneIder(behandlingId: Set<UUID>): Set<EksternId>
+    fun finnEksterneIder(behandlingId: Set<BehandlingId>): Set<EksternId>
 
     // language=PostgreSQL
     @Query(
@@ -173,7 +173,7 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
     fun finnSisteIverksatteBehandlingerForPersonIdenter(
         personidenter: Collection<String>,
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
-    ): List<Pair<String, UUID>>
+    ): List<Pair<String, BehandlingId>>
 
     fun findAllByStatusAndResultatIn(status: BehandlingStatus, resultat: List<BehandlingResultat>): List<Behandling>
 

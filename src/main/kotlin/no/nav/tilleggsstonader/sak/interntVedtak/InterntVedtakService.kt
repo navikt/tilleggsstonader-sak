@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
@@ -37,7 +38,7 @@ class InterntVedtakService(
     private val tilsynBarnVedtakService: TilsynBarnVedtakService,
 ) {
 
-    fun lagInterntVedtak(behandlingId: UUID): InterntVedtak {
+    fun lagInterntVedtak(behandlingId: BehandlingId): InterntVedtak {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag
@@ -55,7 +56,7 @@ class InterntVedtakService(
     }
 
     private fun mapBarnPåBarnId(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         grunnlag: Grunnlag,
     ): Map<UUID, GrunnlagBarn> {
         val behandlingbarn = barnService.finnBarnPåBehandling(behandlingId).associateBy { it.ident }
@@ -138,7 +139,7 @@ class InterntVedtakService(
         )
     }
 
-    private fun mapStønadsperioder(behandlingId: UUID): List<Stønadsperiode> {
+    private fun mapStønadsperioder(behandlingId: BehandlingId): List<Stønadsperiode> {
         val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
         return stønadsperioder.map {
             Stønadsperiode(
@@ -150,7 +151,7 @@ class InterntVedtakService(
         }
     }
 
-    private fun mapVilkår(behandlingId: UUID, behandlingBarn: Map<UUID, GrunnlagBarn>): List<VilkårInternt> {
+    private fun mapVilkår(behandlingId: BehandlingId, behandlingBarn: Map<UUID, GrunnlagBarn>): List<VilkårInternt> {
         return vilkårService.hentVilkårsett(behandlingId)
             .map { vilkår ->
                 VilkårInternt(

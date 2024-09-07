@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
@@ -44,7 +45,7 @@ class StepDefinitions {
     var stønadsperioder = emptyList<StønadsperiodeDto>()
     var utgifter = mutableMapOf<UUID, List<UtgiftBeregning>>()
     var beregningsresultat: BeregningsresultatTilsynBarnDto? = null
-    val behandlingId = UUID.randomUUID()
+    val behandlingId = BehandlingId.randomUUID()
 
     @Gitt("følgende støndsperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {

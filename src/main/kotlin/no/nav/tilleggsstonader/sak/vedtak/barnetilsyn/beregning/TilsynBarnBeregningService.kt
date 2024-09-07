@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
@@ -40,7 +41,7 @@ class TilsynBarnBeregningService(
 
     // Hva burde denne ta inn? Hva burde bli sendt inn i beregningscontroller?
     fun beregn(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         utgifterPerBarn: Map<UUID, List<UtgiftBeregning>>,
     ): BeregningsresultatTilsynBarnDto {
         val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
@@ -167,7 +168,7 @@ class TilsynBarnBeregningService(
         return antallDagerMedAktivitetPerUke.sum()
     }
 
-    private fun finnAktiviteter(behandlingId: UUID): List<Aktivitet> {
+    private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
         return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
             .tilAktiviteter()
     }

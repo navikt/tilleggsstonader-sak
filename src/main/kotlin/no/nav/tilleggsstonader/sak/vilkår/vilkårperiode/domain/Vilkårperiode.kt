@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -18,7 +19,7 @@ import java.util.*
 data class Vilkårperiode(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val kilde: KildeVilkårsperiode,
     @Column("forrige_vilkarperiode_id")
     val forrigeVilkårperiodeId: UUID? = null,

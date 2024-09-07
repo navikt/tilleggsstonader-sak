@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -21,7 +22,7 @@ class IverksettStatusService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun hentStatusOgOppdaterAndeler(eksternFagsakId: Long, behandlingId: UUID, eksternBehandlingId: Long, iverksettingId: UUID) {
+    fun hentStatusOgOppdaterAndeler(eksternFagsakId: Long, behandlingId: BehandlingId, eksternBehandlingId: Long, iverksettingId: UUID) {
         val status = iverksettClient.hentStatus(eksternFagsakId, eksternBehandlingId, iverksettingId)
         val statusIverksetting = when (status) {
             IverksettStatus.OK -> StatusIverksetting.OK
@@ -36,7 +37,7 @@ class IverksettStatusService(
     }
 
     private fun hentAndelerForIverksettingId(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         iverksettingId: UUID,
     ): List<AndelTilkjentYtelse> {
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)

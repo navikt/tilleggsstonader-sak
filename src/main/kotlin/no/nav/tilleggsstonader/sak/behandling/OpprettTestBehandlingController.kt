@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -46,7 +47,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
-import java.util.UUID
 
 @RestController
 @RequestMapping(path = ["/api/test/opprett-behandling"])
@@ -63,7 +63,7 @@ class OpprettTestBehandlingController(
 
     @Transactional
     @PostMapping
-    fun opprettBehandling(@RequestBody testBehandlingRequest: TestBehandlingRequest): UUID {
+    fun opprettBehandling(@RequestBody testBehandlingRequest: TestBehandlingRequest): BehandlingId {
         val fagsak: Fagsak = lagFagsak(testBehandlingRequest)
         val behandling = lagBehandling(fagsak)
         opprettSøknad(fagsak, behandling)

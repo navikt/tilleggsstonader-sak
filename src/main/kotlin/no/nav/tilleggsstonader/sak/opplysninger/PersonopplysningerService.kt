@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.dto.NavnDto
@@ -10,7 +11,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class PersonopplysningerService(
@@ -20,7 +20,7 @@ class PersonopplysningerService(
 ) {
 
     // TODO denne burde hente fra grunnlag?
-    fun hentPersonopplysninger(behandlingId: UUID): PersonopplysningerDto {
+    fun hentPersonopplysninger(behandlingId: BehandlingId): PersonopplysningerDto {
         return hentPersonopplysninger(behandlingService.hentAktivIdent(behandlingId))
     }
 

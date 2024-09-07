@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilUke
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -15,10 +16,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktiviteter
 import org.assertj.core.api.Assertions.assertThat
-import java.util.UUID
 
 class BeregningUtilsStepDefinitons {
-    val behandlingId = UUID.randomUUID()
+    val behandlingId = BehandlingId.randomUUID()
 
     var stønadsperioder: StønadsperiodeDto? = null
     var stønadsperiodePerUke: Map<Uke, PeriodeMedDager> = emptyMap()

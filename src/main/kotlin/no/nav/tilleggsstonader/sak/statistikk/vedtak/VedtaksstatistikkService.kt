@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
@@ -13,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.util.UUID
 
 @Service
 class VedtaksstatistikkService(
@@ -28,7 +28,7 @@ class VedtaksstatistikkService(
     private val tilsynBarnVedtakService: TilsynBarnVedtakService,
 
 ) {
-    fun lagreVedtaksstatistikk(behandlingId: UUID, fagsakId: FagsakId, hendelseTidspunkt: LocalDateTime) {
+    fun lagreVedtaksstatistikk(behandlingId: BehandlingId, fagsakId: FagsakId, hendelseTidspunkt: LocalDateTime) {
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         val vilkårsvurderinger = vilkårService.hentVilkårsett(behandlingId)

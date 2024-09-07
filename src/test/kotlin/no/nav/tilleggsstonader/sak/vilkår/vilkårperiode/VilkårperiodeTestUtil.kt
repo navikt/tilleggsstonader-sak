@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
@@ -21,7 +22,7 @@ import java.util.UUID
 object VilkårperiodeTestUtil {
 
     fun målgruppe(
-        behandlingId: UUID = UUID.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.randomUUID(),
         fom: LocalDate = osloDateNow(),
         tom: LocalDate = osloDateNow().plusDays(5),
         type: MålgruppeType = MålgruppeType.AAP,
@@ -68,7 +69,7 @@ object VilkårperiodeTestUtil {
     )
 
     fun aktivitet(
-        behandlingId: UUID = UUID.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.randomUUID(),
         fom: LocalDate = osloDateNow(),
         tom: LocalDate = osloDateNow().plusDays(5),
         type: AktivitetType = AktivitetType.TILTAK,
@@ -111,7 +112,7 @@ object VilkårperiodeTestUtil {
         medlemskap: VurderingDto? = null,
         dekkesAvAnnetRegelverk: VurderingDto? = null,
         begrunnelse: String? = null,
-        behandlingId: UUID = UUID.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.randomUUID(),
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
@@ -127,7 +128,7 @@ object VilkårperiodeTestUtil {
         tom: LocalDate = osloDateNow(),
         lønnet: VurderingDto? = null,
         begrunnelse: String? = null,
-        behandlingId: UUID = UUID.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.randomUUID(),
         aktivitetsdager: Int? = 5,
     ) = LagreVilkårperiode(
         type = type,

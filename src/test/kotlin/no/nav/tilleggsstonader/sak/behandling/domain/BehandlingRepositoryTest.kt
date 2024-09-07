@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
@@ -33,7 +34,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
-import java.util.UUID
 
 class BehandlingRepositoryTest : IntegrationTest() {
     @Autowired
@@ -55,7 +55,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     fun `skal ikke være mulig å legge inn en behandling med referanse til en behandling som ikke eksisterer`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         assertThatThrownBy {
-            testoppsettService.lagre(behandling(fagsak, forrigeBehandlingId = UUID.randomUUID()))
+            testoppsettService.lagre(behandling(fagsak, forrigeBehandlingId = BehandlingId.randomUUID()))
         }
             .isInstanceOf(DbActionExecutionException::class.java)
     }
@@ -275,7 +275,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     fun `finnEksterneIder - send inn behandlingIder som ikke finnes, forvent ingen treff `() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         testoppsettService.lagre(behandling(fagsak))
-        val eksterneIder = behandlingRepository.finnEksterneIder(setOf(UUID.randomUUID(), UUID.randomUUID()))
+        val eksterneIder = behandlingRepository.finnEksterneIder(setOf(BehandlingId.randomUUID(), BehandlingId.randomUUID()))
         assertThat(eksterneIder.isEmpty())
     }
 
@@ -486,7 +486,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     }
 
     private fun lagreBehandling(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         status: BehandlingStatus,
         resultat: BehandlingResultat,
         fagsak: Fagsak,

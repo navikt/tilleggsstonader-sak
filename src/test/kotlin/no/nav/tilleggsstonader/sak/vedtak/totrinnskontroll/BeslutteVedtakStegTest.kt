@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.brev.BrevService
 import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
@@ -77,7 +78,7 @@ class BeslutteVedtakStegTest {
         stønadstype = Stønadstype.BARNETILSYN,
         identer = setOf(PersonIdent(ident = "12345678901")),
     )
-    private val behandlingId = UUID.randomUUID()
+    private val behandlingId = BehandlingId.randomUUID()
 
     private val oppgave = OppgaveDomain(
         id = UUID.randomUUID(),

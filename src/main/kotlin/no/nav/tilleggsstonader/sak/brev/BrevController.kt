@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.brev
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.Base64
-import java.util.UUID
 
 @RestController
 @RequestMapping("/api/brev")
@@ -23,7 +23,7 @@ class BrevController(
 ) {
 
     @PostMapping("/{behandlingId}")
-    fun genererPdf(@RequestBody request: GenererPdfRequest, @PathVariable behandlingId: UUID): ByteArray {
+    fun genererPdf(@RequestBody request: GenererPdfRequest, @PathVariable behandlingId: BehandlingId): ByteArray {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
         tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.UPDATE)
@@ -33,14 +33,14 @@ class BrevController(
     }
 
     @GetMapping("/{behandlingId}")
-    fun hentBrev(@PathVariable behandlingId: UUID): ByteArray {
+    fun hentBrev(@PathVariable behandlingId: BehandlingId): ByteArray {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
 
         return Base64.getEncoder().encode(brevService.hentBeslutterbrevEllerRekonstruerSaksbehandlerBrev(behandlingId))
     }
 
     @GetMapping("/beslutter/{behandlingId}")
-    fun forhåndsvisBeslutterbrev(@PathVariable behandlingId: UUID): ByteArray {
+    fun forhåndsvisBeslutterbrev(@PathVariable behandlingId: BehandlingId): ByteArray {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.ACCESS)
 

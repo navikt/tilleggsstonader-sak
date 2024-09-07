@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.UUID
 
 internal class OppgaveRepositoryTest : IntegrationTest() {
 
@@ -43,7 +43,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
 
         assertThat(
             oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(
-                UUID.randomUUID(),
+                BehandlingId.randomUUID(),
                 Oppgavetype.BehandleSak,
             ),
         )

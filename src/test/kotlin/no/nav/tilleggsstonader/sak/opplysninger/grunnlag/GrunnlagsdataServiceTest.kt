@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaStatusDtoUtil.arenaStatusDto
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.Optional
-import java.util.UUID
 
 class GrunnlagsdataServiceTest {
 
@@ -52,8 +52,8 @@ class GrunnlagsdataServiceTest {
 
     @BeforeEach
     fun setUp() {
-        val repository = mutableMapOf<UUID, Grunnlagsdata>()
-        every { grunnlagsdataRepository.findById(any<UUID>()) } answers {
+        val repository = mutableMapOf<BehandlingId, Grunnlagsdata>()
+        every { grunnlagsdataRepository.findById(any<BehandlingId>()) } answers {
             repository[firstArg()]?.let { Optional.of(it) } ?: Optional.empty()
         }
         every { grunnlagsdataRepository.insert(any()) } answers {

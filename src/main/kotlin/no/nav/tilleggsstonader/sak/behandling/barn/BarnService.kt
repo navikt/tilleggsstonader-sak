@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.barn
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,13 +15,13 @@ class BarnService(
     fun opprettBarn(barn: List<BehandlingBarn>): List<BehandlingBarn> =
         barnRepository.insertAll(barn)
 
-    fun finnBarnPåBehandling(behandlingId: UUID): List<BehandlingBarn> =
+    fun finnBarnPåBehandling(behandlingId: BehandlingId): List<BehandlingBarn> =
         barnRepository.findByBehandlingId(behandlingId)
 
     @Transactional
     fun gjenbrukBarn(
-        forrigeBehandlingId: UUID,
-        nyBehandlingId: UUID,
+        forrigeBehandlingId: BehandlingId,
+        nyBehandlingId: BehandlingId,
     ): Map<TidligereBarnId, NyttBarnId> {
         val nyeBarnPåGammelId = barnRepository.findByBehandlingId(forrigeBehandlingId)
             .associate { it.id to it.copy(id = UUID.randomUUID(), behandlingId = nyBehandlingId, sporbar = Sporbar()) }

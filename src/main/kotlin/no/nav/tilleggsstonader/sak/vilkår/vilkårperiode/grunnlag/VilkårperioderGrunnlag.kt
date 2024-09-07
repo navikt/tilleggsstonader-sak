@@ -2,13 +2,13 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class VilkårperioderGrunnlag(
     val aktivitet: GrunnlagAktivitet,
@@ -19,7 +19,7 @@ data class VilkårperioderGrunnlag(
 @Table("vilkarperioder_grunnlag")
 data class VilkårperioderGrunnlagDomain(
     @Id
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val grunnlag: VilkårperioderGrunnlag,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),

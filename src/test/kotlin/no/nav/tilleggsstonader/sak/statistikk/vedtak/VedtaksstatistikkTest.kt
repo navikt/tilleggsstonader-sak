@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
@@ -14,7 +15,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.temporal.ChronoUnit
-import java.util.UUID
 
 class VedtaksstatistikkTest : IntegrationTest() {
 
@@ -24,7 +24,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
     @Autowired
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
-    final val id: UUID = UUID.randomUUID()
+    final val id: BehandlingId = BehandlingId.randomUUID()
     final val fagsakId: FagsakId = FagsakId.randomUUID()
 
     @Test
@@ -135,7 +135,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
     }
 
     private fun vedtaksstatistikk() = Vedtaksstatistikk(
-        id = id,
+        id = id.id,
         fagsakId = fagsakId,
         behandlingId = id,
         eksternFagsakId = 1722,

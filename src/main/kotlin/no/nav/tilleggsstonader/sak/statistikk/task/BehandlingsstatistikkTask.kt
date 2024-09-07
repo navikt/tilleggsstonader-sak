@@ -6,6 +6,7 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.statistikk.behandling.BehandlingsstatistikkService
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
@@ -13,7 +14,6 @@ import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Properties
-import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -41,7 +41,7 @@ class BehandlingsstatistikkTask(
     companion object {
 
         fun opprettMottattTask(
-            behandlingId: UUID,
+            behandlingId: BehandlingId,
             hendelseTidspunkt: LocalDateTime = osloNow(),
             oppgaveId: Long?,
         ): Task =
@@ -52,21 +52,21 @@ class BehandlingsstatistikkTask(
                 oppgaveId = oppgaveId,
             )
 
-        fun opprettPåbegyntTask(behandlingId: UUID): Task =
+        fun opprettPåbegyntTask(behandlingId: BehandlingId): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.PÅBEGYNT,
                 hendelseTidspunkt = osloNow(),
             )
 
-        fun opprettVenterTask(behandlingId: UUID): Task =
+        fun opprettVenterTask(behandlingId: BehandlingId): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.VENTER,
                 hendelseTidspunkt = osloNow(),
             )
 
-        fun opprettVedtattTask(behandlingId: UUID): Task =
+        fun opprettVedtattTask(behandlingId: BehandlingId): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.VEDTATT,
@@ -74,7 +74,7 @@ class BehandlingsstatistikkTask(
             )
 
         fun opprettBesluttetTask(
-            behandlingId: UUID,
+            behandlingId: BehandlingId,
         ): Task =
             opprettTask(
                 behandlingId = behandlingId,
@@ -82,7 +82,7 @@ class BehandlingsstatistikkTask(
                 hendelseTidspunkt = osloNow(),
             )
 
-        fun opprettFerdigTask(behandlingId: UUID): Task =
+        fun opprettFerdigTask(behandlingId: BehandlingId): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.FERDIG,
@@ -90,7 +90,7 @@ class BehandlingsstatistikkTask(
             )
 
         private fun opprettTask(
-            behandlingId: UUID,
+            behandlingId: BehandlingId,
             hendelse: Hendelse,
             oppgaveId: Long? = null,
             hendelseTidspunkt: LocalDateTime = osloNow(),
@@ -122,7 +122,7 @@ class BehandlingsstatistikkTask(
     }
 
     data class BehandlingsstatistikkTaskPayload(
-        val behandlingId: UUID,
+        val behandlingId: BehandlingId,
         val hendelse: Hendelse,
         val hendelseTidspunkt: LocalDateTime,
         val gjeldendeSaksbehandler: String?,

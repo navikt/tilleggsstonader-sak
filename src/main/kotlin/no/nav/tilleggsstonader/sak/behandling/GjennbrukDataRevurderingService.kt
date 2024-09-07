@@ -7,13 +7,13 @@ import no.nav.tilleggsstonader.sak.behandling.barn.TidligereBarnId
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class GjennbrukDataRevurderingService(
@@ -25,7 +25,7 @@ class GjennbrukDataRevurderingService(
 ) {
 
     @Transactional
-    fun gjenbrukData(behandling: Behandling, behandlingIdForGjenbruk: UUID) {
+    fun gjenbrukData(behandling: Behandling, behandlingIdForGjenbruk: BehandlingId) {
         val barnIder: Map<TidligereBarnId, NyttBarnId> =
             barnService.gjenbrukBarn(forrigeBehandlingId = behandlingIdForGjenbruk, nyBehandlingId = behandling.id)
 
@@ -47,17 +47,17 @@ class GjennbrukDataRevurderingService(
         )
     }
 
-    fun finnBehandlingIdForGjenbruk(behandling: Behandling): UUID? {
+    fun finnBehandlingIdForGjenbruk(behandling: Behandling): BehandlingId? {
         return behandling.forrigeBehandlingId
             ?: finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(behandling.fagsakId)
     }
 
-    fun finnBehandlingIdForGjenbruk(fagsakId: FagsakId): UUID? {
+    fun finnBehandlingIdForGjenbruk(fagsakId: FagsakId): BehandlingId? {
         return behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
             ?: finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId)
     }
 
-    private fun finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId: FagsakId): UUID? {
+    private fun finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId: FagsakId): BehandlingId? {
         return behandlingService.hentBehandlinger(fagsakId).lastOrNull {
             it.status == BehandlingStatus.FERDIGSTILT &&
                 it.resultat != BehandlingResultat.HENLAGT

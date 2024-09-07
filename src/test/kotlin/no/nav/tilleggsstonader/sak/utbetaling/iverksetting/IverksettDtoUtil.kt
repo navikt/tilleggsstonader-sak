@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -9,9 +10,9 @@ object IverksettDtoUtil {
 
     fun iverksettDto(
         sakId: String = "fagsakId",
-        behandlingId: UUID = UUID.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.randomUUID(),
         eksternBehandlingId: Long = 1,
-        iverksettingId: UUID = behandlingId,
+        iverksettingId: UUID = behandlingId.id,
         personident: String = "123",
         vedtak: VedtaksdetaljerDto = vedtaksdetaljerDto(),
         forrigeIverksetting: ForrigeIverksettingDto? = null,

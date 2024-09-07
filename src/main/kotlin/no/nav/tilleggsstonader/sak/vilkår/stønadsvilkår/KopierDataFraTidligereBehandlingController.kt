@@ -5,6 +5,7 @@ import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
@@ -50,7 +51,7 @@ class KopierDataFraTidligereBehandlingController(
     @PostMapping("{behandlingId}/inngangsvilkar")
     @Transactional
     fun inngangsvilkår(
-        @PathVariable behandlingId: UUID,
+        @PathVariable behandlingId: BehandlingId,
     ) {
         utførEndringSomSystem()
 
@@ -90,7 +91,7 @@ class KopierDataFraTidligereBehandlingController(
     @PostMapping("{behandlingId}/stonadsperioder")
     @Transactional
     fun stønadsperioder(
-        @PathVariable behandlingId: UUID,
+        @PathVariable behandlingId: BehandlingId,
     ) {
         utførEndringSomSystem()
 
@@ -123,7 +124,7 @@ class KopierDataFraTidligereBehandlingController(
     }
 
     private fun validerHarLikFagsak(
-        forrigeBehandling: UUID?,
+        forrigeBehandling: BehandlingId?,
         behandling: Behandling,
     ) {
         forrigeBehandling?.let {

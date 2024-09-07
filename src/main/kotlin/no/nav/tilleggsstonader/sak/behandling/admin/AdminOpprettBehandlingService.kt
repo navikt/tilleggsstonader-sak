@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -22,7 +23,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class AdminOpprettBehandlingService(
@@ -35,7 +35,7 @@ class AdminOpprettBehandlingService(
 ) {
 
     @Transactional
-    fun opprettFørstegangsbehandling(ident: String, valgteBarn: Set<String>): UUID {
+    fun opprettFørstegangsbehandling(ident: String, valgteBarn: Set<String>): BehandlingId {
         validerOpprettelseAvBehandling(ident, valgteBarn)
 
         val fagsak = fagsakService.hentEllerOpprettFagsak(ident, Stønadstype.BARNETILSYN)

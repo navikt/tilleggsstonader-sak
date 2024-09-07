@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
@@ -48,7 +49,6 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 internal class OppgaveServiceTest {
 
@@ -335,7 +335,7 @@ internal class OppgaveServiceTest {
     @Test
     fun `skal legge til behandlingId på oppgaver for å enklere kunne gå til behandling fra frontend`() {
         val oppgaveIdMedBehandling = 1L
-        val behandlingId = UUID.randomUUID()
+        val behandlingId = BehandlingId.randomUUID()
 
         every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(
             2,
@@ -424,7 +424,7 @@ internal class OppgaveServiceTest {
         private val FAGSAK_ID = FagsakId.fromString("1242f220-cad3-4640-95c1-190ec814c91e")
         private const val FAGSAK_EKSTERN_ID = 98765L
         private const val GSAK_OPPGAVE_ID = 12345L
-        private val BEHANDLING_ID = UUID.fromString("1c4209bd-3217-4130-8316-8658fe300a84")
+        private val BEHANDLING_ID = BehandlingId.fromString("1c4209bd-3217-4130-8316-8658fe300a84")
         private const val ENHETSNUMMER = "4462"
         private const val FNR = "11223312345"
         private const val SAKSBEHANDLER_ID = "Z999999"

@@ -6,6 +6,7 @@ import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -15,7 +16,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class GjennbrukDataRevurderingServiceTest {
 
@@ -59,7 +59,7 @@ class GjennbrukDataRevurderingServiceTest {
 
         @Test
         fun `skal bruke forrige behandlingId hvis den finnes på behandling som man sender inn`() {
-            val behandling = behandling(forrigeBehandlingId = UUID.randomUUID())
+            val behandling = behandling(forrigeBehandlingId = BehandlingId.randomUUID())
 
             assertThat(service.finnBehandlingIdForGjenbruk(behandling)).isEqualTo(behandling.forrigeBehandlingId)
 

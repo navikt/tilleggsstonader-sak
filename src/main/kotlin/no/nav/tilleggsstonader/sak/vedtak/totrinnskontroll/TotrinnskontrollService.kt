@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
@@ -63,7 +64,7 @@ class TotrinnskontrollService(
     }
 
     @Transactional
-    fun angreSendTilBeslutter(behandlingId: UUID) {
+    fun angreSendTilBeslutter(behandlingId: BehandlingId) {
         val eksisterandeTotrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
 
@@ -128,23 +129,23 @@ class TotrinnskontrollService(
         return sisteTotrinnskontroll.saksbehandler
     }
 
-    fun hentSaksbehandlerSomSendteTilBeslutter(behandlingId: UUID): String {
+    fun hentSaksbehandlerSomSendteTilBeslutter(behandlingId: BehandlingId): String {
         val totrinnskontrollSaksbehandler =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
                 ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
         return totrinnskontrollSaksbehandler.saksbehandler
     }
 
-    fun hentBeslutter(behandlingId: UUID): String? {
+    fun hentBeslutter(behandlingId: BehandlingId): String? {
         return totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
             ?.beslutter
             ?.takeIf { NAVIDENT_REGEX.matches(it) }
     }
 
-    fun hentTotrinnskontroll(behandlingId: UUID): Totrinnskontroll? =
+    fun hentTotrinnskontroll(behandlingId: BehandlingId): Totrinnskontroll? =
         totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
 
-    fun hentTotrinnskontrollStatus(behandlingId: UUID): StatusTotrinnskontrollDto {
+    fun hentTotrinnskontrollStatus(behandlingId: BehandlingId): StatusTotrinnskontrollDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val behandlingStatus = behandling.status
 
@@ -209,7 +210,7 @@ class TotrinnskontrollService(
     /**
      * Hvis behandlingen utredes sjekkes det for om det finnes ett tidligere beslutt, som då kun kan være underkjent
      */
-    private fun finnStatusForVedtakSomErFattet(behandlingId: UUID): StatusTotrinnskontrollDto {
+    private fun finnStatusForVedtakSomErFattet(behandlingId: BehandlingId): StatusTotrinnskontrollDto {
         val totrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
                 ?: return StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
@@ -257,7 +258,7 @@ class TotrinnskontrollService(
         return totrinnskontrollRepository.update(gjeldeneTotrinnskontroll.copy(status = status))
     }
 
-    private fun settBeslutter(behandlingId: UUID) {
+    private fun settBeslutter(behandlingId: BehandlingId) {
         val totrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
         if (totrinnskontroll != null) {

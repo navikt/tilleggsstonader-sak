@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalIkkeOppretteOppgave
@@ -18,7 +19,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Properties
-import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -73,7 +73,7 @@ class OpprettOppgaveTask(
 
     companion object {
 
-        fun opprettTask(behandlingId: UUID, oppgave: OpprettOppgave): Task {
+        fun opprettTask(behandlingId: BehandlingId, oppgave: OpprettOppgave): Task {
             return opprettTask(OppgavekoblingBehandling(behandlingId), oppgave)
         }
 
@@ -112,7 +112,7 @@ class OpprettOppgaveTask(
 sealed class Oppgavekobling
 
 data class OppgavekoblingBehandling(
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
 ) : Oppgavekobling()
 
 data class OppgavekoblingPerson(

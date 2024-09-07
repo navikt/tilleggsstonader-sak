@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.behandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -29,7 +30,7 @@ class StegControllerTest : IntegrationTest() {
         assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.INNGANGSVILKÅR)
     }
 
-    private fun resetSteg(behandlingId: UUID, stegType: StegType) =
+    private fun resetSteg(behandlingId: BehandlingId, stegType: StegType) =
         restTemplate.exchange<UUID>(
             localhost("api/steg/behandling/$behandlingId/reset"),
             HttpMethod.POST,

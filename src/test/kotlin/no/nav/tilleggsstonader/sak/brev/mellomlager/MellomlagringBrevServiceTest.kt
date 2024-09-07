@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.data.repository.findByIdOrNull
-import java.util.UUID
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MellomlagringBrevServiceTest {
@@ -70,7 +70,7 @@ class MellomlagringBrevServiceTest {
         )
     }
 
-    private val behandlingId = UUID.randomUUID()
+    private val behandlingId = BehandlingId.randomUUID()
     private val brevmal = "testMal"
     private val brevverdier = "{}"
     private val mellomlagretBrev = MellomlagretBrev(behandlingId, brevverdier, brevmal)

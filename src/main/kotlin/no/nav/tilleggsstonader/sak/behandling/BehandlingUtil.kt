@@ -5,8 +5,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.FØRSTEGANGSBEHANDLING
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.REVURDERING
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import java.util.UUID
 
 object BehandlingUtil {
 
@@ -18,7 +18,7 @@ object BehandlingUtil {
         }
     }
 
-    fun validerBehandlingIdErLik(behandlingIdParam: UUID, behandlingIdRequest: UUID) =
+    fun validerBehandlingIdErLik(behandlingIdParam: BehandlingId, behandlingIdRequest: BehandlingId) =
         feilHvis(behandlingIdParam != behandlingIdRequest) {
             "BehandlingId er ikke lik param=$behandlingIdParam request=$behandlingIdRequest"
         }

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
@@ -21,12 +22,12 @@ class StønadsperiodeService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val grunnlagsdataService: GrunnlagsdataService,
 ) {
-    fun hentStønadsperioder(behandlingId: UUID): List<StønadsperiodeDto> {
+    fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeDto> {
         return stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
     }
 
     @Transactional
-    fun lagreStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>): List<StønadsperiodeDto> {
+    fun lagreStønadsperioder(behandlingId: BehandlingId, stønadsperioder: List<StønadsperiodeDto>): List<StønadsperiodeDto> {
         validerBehandling(behandlingId)
         validerStønadsperioder(behandlingId, stønadsperioder)
 
@@ -38,7 +39,7 @@ class StønadsperiodeService(
         return (nyeStønadsperioder + oppdaterteStønadsperioder).tilSortertDto()
     }
 
-    private fun validerBehandling(behandlingId: UUID) {
+    private fun validerBehandling(behandlingId: BehandlingId) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke lagre stønadsperioder når behandlingen er låst"
@@ -77,7 +78,7 @@ class StønadsperiodeService(
     }
 
     private fun leggTilNyeStønadsperioder(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         stønadsperioder: List<StønadsperiodeDto>,
         tidligereStønadsperiode: List<Stønadsperiode>,
     ): List<Stønadsperiode> {
@@ -99,12 +100,12 @@ class StønadsperiodeService(
         return stønadsperiodeRepository.insertAll(nyeStønadsperioder)
     }
 
-    fun validerStønadsperioder(behandlingId: UUID) {
+    fun validerStønadsperioder(behandlingId: BehandlingId) {
         val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
         validerStønadsperioder(behandlingId, stønadsperioder)
     }
 
-    fun validerStønadsperioder(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>) {
+    fun validerStønadsperioder(behandlingId: BehandlingId, stønadsperioder: List<StønadsperiodeDto>) {
         val vilkårperioder = vilkårperiodeService.hentVilkårperioderDto(behandlingId)
         val fødselsdato = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag.fødsel
             ?.fødselsdatoEller1JanForFødselsår()
@@ -112,7 +113,7 @@ class StønadsperiodeService(
         StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato)
     }
 
-    fun gjenbrukStønadsperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
+    fun gjenbrukStønadsperioder(forrigeBehandlingId: BehandlingId, nyBehandlingId: BehandlingId) {
         val eksisterendeStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeBehandlingId)
         val nyeStønadsperioder = eksisterendeStønadsperioder.map {
             it.copy(

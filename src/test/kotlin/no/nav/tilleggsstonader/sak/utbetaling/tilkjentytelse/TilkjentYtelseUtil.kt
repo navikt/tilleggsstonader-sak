@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -7,12 +8,11 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverks
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import java.time.LocalDate
-import java.util.UUID
 
 object TilkjentYtelseUtil {
 
     fun tilkjentYtelse(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         vararg andeler: AndelTilkjentYtelse = arrayOf(andelTilkjentYtelse(kildeBehandlingId = behandlingId)),
     ): TilkjentYtelse {
         return TilkjentYtelse(
@@ -22,7 +22,7 @@ object TilkjentYtelseUtil {
     }
 
     fun andelTilkjentYtelse(
-        kildeBehandlingId: UUID,
+        kildeBehandlingId: BehandlingId,
         beløp: Int = 11554,
         fom: LocalDate = LocalDate.of(2021, 1, 1),
         tom: LocalDate = LocalDate.of(2021, 1, 31),

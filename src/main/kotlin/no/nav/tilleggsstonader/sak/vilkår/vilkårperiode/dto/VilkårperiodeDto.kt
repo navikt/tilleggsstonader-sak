@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
@@ -104,7 +105,7 @@ fun List<VilkårperiodeDto>.mergeSammenhengendeOppfylteVilkårperioder(): Map<Vi
 }
 
 data class LagreVilkårperiode(
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     @JsonDeserialize(using = VilkårperiodeTypeDeserializer::class)
     val type: VilkårperiodeType,
     val fom: LocalDate,
@@ -136,7 +137,7 @@ data class VurderingDto(
 )
 
 data class SlettVikårperiode(
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val kommentar: String? = null,
 )
 

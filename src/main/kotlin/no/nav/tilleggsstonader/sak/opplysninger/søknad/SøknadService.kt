@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
@@ -11,7 +12,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBar
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class SøknadService(
@@ -21,13 +21,13 @@ class SøknadService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentSøknadBarnetilsyn(behandlingId: UUID): SøknadBarnetilsyn? {
+    fun hentSøknadBarnetilsyn(behandlingId: BehandlingId): SøknadBarnetilsyn? {
         return søknadBehandlingRepository.findByIdOrNull(behandlingId)
             ?.let { søknadBarnetilsynRepository.findByIdOrThrow(it.søknadId) }
     }
 
     fun lagreSøknad(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         journalpost: Journalpost,
         skjema: Søknadsskjema<SøknadsskjemaBarnetilsyn>,
     ): SøknadBarnetilsyn {
@@ -37,7 +37,7 @@ class SøknadService(
         return søknadBarnetilsyn
     }
 
-    fun kopierSøknad(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
+    fun kopierSøknad(forrigeBehandlingId: BehandlingId, nyBehandlingId: BehandlingId) {
         val søknad = søknadBehandlingRepository.findByIdOrNull(forrigeBehandlingId)
         if (søknad == null) {
             logger.info("Finner ingen søknad på forrige behandling=$forrigeBehandlingId")

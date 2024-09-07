@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -17,7 +18,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.UUID
 
 class EksternVedtakServiceTest {
 
@@ -38,9 +38,9 @@ class EksternVedtakServiceTest {
     @BeforeEach
     internal fun setUp() {
         every { fagsakService.hentFagsakPåEksternId(eksternFagsakId) } returns fagsak
-        every { behandlingService.hentEksternBehandlingId(any<UUID>()) } returns EksternBehandlingId(
+        every { behandlingService.hentEksternBehandlingId(any<BehandlingId>()) } returns EksternBehandlingId(
             eksternBehandlingId.toLong(),
-            UUID.randomUUID(),
+            BehandlingId.randomUUID(),
         )
     }
 

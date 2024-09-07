@@ -57,7 +57,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
         val iverksattAndel = andelTilkjentYtelse(
             kildeBehandlingId = behandling.id,
             statusIverksetting = StatusIverksetting.SENDT,
-            iverksetting = Iverksetting(behandling.id, osloNow()),
+            iverksetting = Iverksetting(behandling.id.id, osloNow()),
         )
         val andelIkkeSendt = andelTilkjentYtelse(kildeBehandlingId = behandling.id)
         val tilkjentYtelse = opprettTilkjentYtelse(behandling, iverksattAndel, andelIkkeSendt)
@@ -82,7 +82,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
 
     @Test
     fun `skal kaste feil hvis andel for iverksetting har annen status enn SENDT`() {
-        val iverksetting = Iverksetting(behandling.id, osloNow())
+        val iverksetting = Iverksetting(behandling.id.id, osloNow())
         val andel =
             andelTilkjentYtelse(behandling.id, statusIverksetting = StatusIverksetting.OK, iverksetting = iverksetting)
         opprettTilkjentYtelse(behandling, andel)
@@ -110,7 +110,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
             eksternFagsakId = fagsak.eksternId.id,
             behandlingId = behandling.id,
             eksternBehandlingId = eksternBehandlingId,
-            iverksettingId = behandling.id,
+            iverksettingId = behandling.id.id,
         )
     }
 

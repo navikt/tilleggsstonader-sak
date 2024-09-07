@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.PersonIdentDto
@@ -28,7 +29,7 @@ class BrevmottakereController(
 ) {
 
     @GetMapping("/{behandlingId}")
-    fun hentBrevmottakere(@PathVariable behandlingId: UUID): BrevmottakereDto {
+    fun hentBrevmottakere(@PathVariable behandlingId: BehandlingId): BrevmottakereDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return brevmottakereService.hentEllerOpprettBrevmottakere(behandlingId)
@@ -36,7 +37,7 @@ class BrevmottakereController(
 
     @PostMapping("/{behandlingId}")
     fun velgBrevmottakere(
-        @PathVariable behandlingId: UUID,
+        @PathVariable behandlingId: BehandlingId,
         @RequestBody brevmottakere: BrevmottakereDto,
     ) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)

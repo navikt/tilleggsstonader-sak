@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
@@ -35,7 +36,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.util.UUID
 
 class StegServiceTest(
     @Autowired
@@ -240,7 +240,7 @@ class StegServiceTest(
         return barnRepository.insert(BehandlingBarn(behandlingId = behandling.id, ident = "123"))
     }
 
-    private fun opprettVilkårBarnetilsyn(behandlingId: UUID, barn: BehandlingBarn) {
+    private fun opprettVilkårBarnetilsyn(behandlingId: BehandlingId, barn: BehandlingBarn) {
         val fom = LocalDate.of(2023, 1, 1)
         val tom = LocalDate.of(2023, 1, 31)
         stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandlingId, fom = fom, tom = tom))

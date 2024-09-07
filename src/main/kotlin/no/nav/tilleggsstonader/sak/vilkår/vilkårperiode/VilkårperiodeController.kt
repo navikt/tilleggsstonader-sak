@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -27,14 +28,14 @@ class VilkårperiodeController(
 ) {
 
     @GetMapping("behandling/{behandlingId}")
-    fun hentVilkårperioder(@PathVariable behandlingId: UUID): VilkårperioderResponse {
+    fun hentVilkårperioder(@PathVariable behandlingId: BehandlingId): VilkårperioderResponse {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return vilkårperiodeService.hentVilkårperioderResponse(behandlingId)
     }
 
     @PostMapping("behandling/{behandlingId}/oppdater-grunnlag")
-    fun oppdaterGrunnlag(@PathVariable behandlingId: UUID) {
+    fun oppdaterGrunnlag(@PathVariable behandlingId: BehandlingId) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 

@@ -6,6 +6,7 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import org.springframework.stereotype.Service
 import java.util.Properties
 import java.util.UUID
@@ -36,7 +37,7 @@ class HentStatusFraIverksettingTask(
 
         fun opprettTask(
             eksternFagsakId: Long,
-            behandlingId: UUID,
+            behandlingId: BehandlingId,
             eksternBehandlingId: Long,
             iverksettingId: UUID,
         ): Task {
@@ -63,7 +64,7 @@ class HentStatusFraIverksettingTask(
 
     private data class TaskData(
         val eksternFagsakId: Long,
-        val behandlingId: UUID,
+        val behandlingId: BehandlingId,
         val eksternBehandlingId: Long,
         val iverksettingId: UUID,
     )

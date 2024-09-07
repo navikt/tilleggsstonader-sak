@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev.mellomlager
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping(path = ["/api/brev/mellomlager/"])
@@ -22,9 +22,9 @@ class BrevMellomlagerController(
 
     @PostMapping("/{behandlingId}")
     fun mellomlagreBrevverdier(
-        @PathVariable behandlingId: UUID,
+        @PathVariable behandlingId: BehandlingId,
         @RequestBody mellomlagretBrev: MellomlagreBrevDto,
-    ): UUID {
+    ): BehandlingId {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -37,7 +37,7 @@ class BrevMellomlagerController(
 
     @GetMapping("/{behandlingId}")
     fun hentMellomlagretBrevverdier(
-        @PathVariable behandlingId: UUID,
+        @PathVariable behandlingId: BehandlingId,
     ): MellomlagreBrevDto? {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 

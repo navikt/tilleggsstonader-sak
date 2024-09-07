@@ -7,10 +7,10 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveMetadata
 import java.time.LocalDate
 import java.util.Optional
-import java.util.UUID
 
 data class FinnOppgaveResponseDto(
     val antallTreffTotalt: Long,
@@ -61,7 +61,7 @@ data class OppgaveDto(
      * Ekstra felter
      */
     val navn: String?,
-    val behandlingId: UUID?,
+    val behandlingId: BehandlingId?,
     val sendtTilTotrinnskontrollAv: String?,
 ) {
     constructor(

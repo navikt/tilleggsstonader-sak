@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak.TRUKKET_TILBA
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -41,7 +42,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus
 import java.time.LocalDateTime
-import java.util.UUID
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class BehandlingServiceTest {
@@ -175,7 +175,7 @@ internal class BehandlingServiceTest {
             every {
                 behandlingRepository.findByIdOrThrow(any())
             } returns behandling.copy(resultat = BehandlingResultat.IKKE_SATT)
-            behandlingService.oppdaterResultatPåBehandling(UUID.randomUUID(), BehandlingResultat.INNVILGET)
+            behandlingService.oppdaterResultatPåBehandling(BehandlingId.randomUUID(), BehandlingResultat.INNVILGET)
         }
 
         @Test
@@ -184,14 +184,14 @@ internal class BehandlingServiceTest {
                 behandlingRepository.findByIdOrThrow(any())
             } returns behandling.copy(resultat = BehandlingResultat.INNVILGET)
             assertThatThrownBy {
-                behandlingService.oppdaterResultatPåBehandling(UUID.randomUUID(), BehandlingResultat.INNVILGET)
+                behandlingService.oppdaterResultatPåBehandling(BehandlingId.randomUUID(), BehandlingResultat.INNVILGET)
             }.hasMessageContaining("Kan ikke endre resultat på behandling når resultat")
         }
 
         @Test
         internal fun `skal feile hvis man setter IKKE_SATT`() {
             assertThatThrownBy {
-                behandlingService.oppdaterResultatPåBehandling(UUID.randomUUID(), BehandlingResultat.IKKE_SATT)
+                behandlingService.oppdaterResultatPåBehandling(BehandlingId.randomUUID(), BehandlingResultat.IKKE_SATT)
             }.hasMessageContaining("Må sette et endelig resultat")
         }
     }

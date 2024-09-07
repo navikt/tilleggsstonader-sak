@@ -2,20 +2,20 @@ package no.nav.tilleggsstonader.sak.behandling.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import org.springframework.data.relational.core.mapping.Column
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 /**
  * Aggregert behandling og fagsak
  */
 data class Saksbehandling(
-    val id: UUID,
+    val id: BehandlingId,
     val eksternId: Long,
-    val forrigeBehandlingId: UUID? = null,
+    val forrigeBehandlingId: BehandlingId? = null,
     val type: BehandlingType,
     val status: BehandlingStatus,
     val steg: StegType,

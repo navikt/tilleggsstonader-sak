@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.PathVariable
@@ -8,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping(path = ["/api/steg"])
@@ -19,7 +19,7 @@ class StegController(
 ) {
 
     @PostMapping("behandling/{behandlingId}/ferdigstill")
-    fun ferdigstillSteg(@PathVariable behandlingId: UUID, @RequestBody request: FerdigstillStegRequest): UUID {
+    fun ferdigstillSteg(@PathVariable behandlingId: BehandlingId, @RequestBody request: FerdigstillStegRequest): BehandlingId {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -27,7 +27,7 @@ class StegController(
     }
 
     @PostMapping("behandling/{behandlingId}/reset")
-    fun resetTilSteg(@PathVariable behandlingId: UUID, @RequestBody request: ResetStegRequest) {
+    fun resetTilSteg(@PathVariable behandlingId: BehandlingId, @RequestBody request: ResetStegRequest) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 

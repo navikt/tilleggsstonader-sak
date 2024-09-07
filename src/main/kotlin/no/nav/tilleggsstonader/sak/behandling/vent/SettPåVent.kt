@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
@@ -12,7 +13,7 @@ import java.util.UUID
 data class SettPåVent(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val oppgaveId: Long,
     @Column("arsaker")
     val årsaker: List<ÅrsakSettPåVent>,

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -15,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 /**
  * TODO: Vurder å ta med fakta
@@ -31,7 +31,7 @@ data class InterntVedtak(
 )
 
 data class Behandlinginfo(
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val eksternFagsakId: Long,
     val stønadstype: Stønadstype,
     val årsak: BehandlingÅrsak,

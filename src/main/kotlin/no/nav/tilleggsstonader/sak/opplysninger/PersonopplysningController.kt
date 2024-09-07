@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.dto.PersonopplysningerDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping(path = ["/api/personopplysninger"])
@@ -20,7 +20,7 @@ class PersonopplysningController(
 ) {
 
     @GetMapping("{behandlingId}")
-    fun hentPersonopplysninger(@PathVariable behandlingId: UUID): PersonopplysningerDto {
+    fun hentPersonopplysninger(@PathVariable behandlingId: BehandlingId): PersonopplysningerDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return personopplysningerService.hentPersonopplysninger(behandlingId)
     }

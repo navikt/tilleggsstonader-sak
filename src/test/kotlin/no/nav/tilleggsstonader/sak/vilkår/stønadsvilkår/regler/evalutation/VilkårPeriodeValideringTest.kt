@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.VilkårPeriodeValidering.validerIkkeOverlappendeVilkår
@@ -10,7 +11,7 @@ import java.util.UUID
 
 class VilkårPeriodeValideringTest {
 
-    val behandlingId = UUID.randomUUID()
+    val behandlingId = BehandlingId.randomUUID()
     val barnId = UUID.randomUUID()
 
     val fom = LocalDate.of(2024, 1, 1)

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import org.springframework.data.annotation.Id
@@ -10,7 +11,7 @@ import java.util.UUID
 data class Totrinnskontroll(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     val saksbehandler: String,

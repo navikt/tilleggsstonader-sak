@@ -3,11 +3,11 @@ package no.nav.tilleggsstonader.sak.behandling.historikk.dto
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class BehandlingshistorikkDto(
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     var steg: StegType,
     val endretAvNavn: String,
     val endretAv: String,

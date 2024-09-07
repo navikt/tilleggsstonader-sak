@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
@@ -19,7 +20,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGrader
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 /**
  * Det blir kanskje litt mye cache med cache her og i [TilgangskontrollService]
@@ -70,13 +70,13 @@ class TilgangService(
         }
     }
 
-    fun validerTilgangTilBehandling(behandlingId: UUID, event: AuditLoggerEvent) {
+    fun validerTilgangTilBehandling(behandlingId: BehandlingId, event: AuditLoggerEvent) {
         val personIdent = cacheManager.getValue("behandlingPersonIdent", behandlingId) {
             behandlingService.hentAktivIdent(behandlingId)
         }
         val tilgang = harTilgangTilPersonMedRelasjoner(personIdent)
         auditLogger.log(
-            Sporingsdata(event, personIdent, tilgang, custom1 = CustomKeyValue("behandling", behandlingId)),
+            Sporingsdata(event, personIdent, tilgang, custom1 = CustomKeyValue("behandling", behandlingId.id)),
         )
         if (!tilgang.harTilgang) {
             throw ManglerTilgang(
@@ -90,7 +90,7 @@ class TilgangService(
     fun validerTilgangTilBehandling(saksbehandling: Saksbehandling, event: AuditLoggerEvent) {
         val tilgang = harTilgangTilPersonMedRelasjoner(saksbehandling.ident)
         auditLogger.log(
-            Sporingsdata(event, saksbehandling.ident, tilgang, CustomKeyValue("behandling", saksbehandling.id)),
+            Sporingsdata(event, saksbehandling.ident, tilgang, CustomKeyValue("behandling", saksbehandling.id.id)),
         )
         if (!tilgang.harTilgang) {
             throw ManglerTilgang(

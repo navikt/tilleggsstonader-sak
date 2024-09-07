@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping("/api/vedtak/tilsyn-barn")
@@ -28,7 +28,7 @@ class TilsynBarnVedtakController(
 
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
-        @PathVariable behandlingId: UUID,
+        @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ) {
         lagreVedtak(behandlingId, vedtak.tilDto())
@@ -36,7 +36,7 @@ class TilsynBarnVedtakController(
 
     @PostMapping("{behandlingId}/avslag")
     fun avslå(
-        @PathVariable behandlingId: UUID,
+        @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagRequest,
     ) {
         lagreVedtak(behandlingId, vedtak.tilDto())
@@ -44,7 +44,7 @@ class TilsynBarnVedtakController(
 
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
-        @PathVariable behandlingId: UUID,
+        @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
         val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandlingId)

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.simulering
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping(path = ["/api/simulering"])
@@ -26,7 +26,7 @@ class SimuleringController(
 ) {
 
     @GetMapping("/{behandlingId}")
-    fun simulerForBehandling(@PathVariable behandlingId: UUID): SimuleringDto? {
+    fun simulerForBehandling(@PathVariable behandlingId: BehandlingId): SimuleringDto? {
         feilHvisIkke(unleashService.isEnabled(Toggle.SIMULERING)) {
             "Toggle for simulering er skrudd av"
         }

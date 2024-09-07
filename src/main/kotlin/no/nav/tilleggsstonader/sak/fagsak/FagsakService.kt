@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
 import no.nav.tilleggsstonader.sak.fagsak.dto.FagsakDto
 import no.nav.tilleggsstonader.sak.fagsak.dto.tilDto
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -26,7 +27,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class FagsakService(
@@ -124,7 +124,7 @@ class FagsakService(
         gjeldendePersonIdent: PdlIdent,
     ) = fagsakPersonService.oppdaterIdent(person, gjeldendePersonIdent.ident)
 
-    fun hentFagsakForBehandling(behandlingId: UUID): Fagsak {
+    fun hentFagsakForBehandling(behandlingId: BehandlingId): Fagsak {
         return fagsakRepository.finnFagsakTilBehandling(behandlingId)?.tilFagsakMedPerson()
             ?: throw Feil("Finner ikke fagsak til behandlingId=$behandlingId")
     }

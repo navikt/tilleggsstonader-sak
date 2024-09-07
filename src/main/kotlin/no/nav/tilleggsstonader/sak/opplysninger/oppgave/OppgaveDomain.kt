@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
@@ -11,7 +12,7 @@ import java.util.UUID
 data class OppgaveDomain(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val behandlingId: UUID?,
+    val behandlingId: BehandlingId?,
     val gsakOppgaveId: Long,
     val type: Oppgavetype,
     var erFerdigstilt: Boolean = false,
@@ -28,6 +29,6 @@ data class OppgaveDomain(
  */
 data class OppgaveMetadata(
     val gsakOppgaveId: Long,
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val sendtTilTotrinnskontrollAv: String?,
 )

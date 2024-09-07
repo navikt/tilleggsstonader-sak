@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistor
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerGyldigTilstand
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerHarTilgang
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegValidering.validerRollerForResetSteg
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -18,7 +19,6 @@ import no.nav.tilleggsstonader.sak.vilkår.VilkårSteg
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class StegService(
@@ -33,7 +33,7 @@ class StegService(
     private val metrics = StegMetrics(behandlingSteg)
 
     @Transactional
-    fun resetSteg(behandlingId: UUID, steg: StegType) {
+    fun resetSteg(behandlingId: BehandlingId, steg: StegType) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         if (behandling.status != BehandlingStatus.UTREDES) {
             error("Kan ikke resette steg når status=${behandling.status} behandling=$behandlingId")
@@ -51,7 +51,7 @@ class StegService(
 
     @Transactional
     fun håndterSteg(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         behandlingSteg: BehandlingSteg<Void?>,
     ): Behandling {
         return håndterSteg(
@@ -62,7 +62,7 @@ class StegService(
     }
 
     @Transactional
-    fun håndterSteg(behandlingId: UUID, steg: StegType): Behandling {
+    fun håndterSteg(behandlingId: BehandlingId, steg: StegType): Behandling {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
         feilHvis(behandling.steg != steg) {
@@ -78,26 +78,26 @@ class StegService(
     }
 
     private fun håndterInngangsvilkår(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
     ): Behandling {
         val inngangsvilkårSteg: InngangsvilkårSteg = behandlingSteg.filterIsInstance<InngangsvilkårSteg>().single()
 
         return håndterSteg(behandlingId, inngangsvilkårSteg)
     }
 
-    private fun håndterVilkår(behandlingId: UUID): Behandling {
+    private fun håndterVilkår(behandlingId: BehandlingId): Behandling {
         val vilkårSteg: VilkårSteg = behandlingSteg.filterIsInstance<VilkårSteg>().single()
         return håndterSteg(behandlingId, vilkårSteg)
     }
 
-    private fun håndterSimulering(behandlingId: UUID): Behandling {
+    private fun håndterSimulering(behandlingId: BehandlingId): Behandling {
         val simuleringSteg: SimuleringSteg = behandlingSteg.filterIsInstance<SimuleringSteg>().single()
         return håndterSteg(behandlingId, simuleringSteg)
     }
 
     @Transactional
     fun <T> håndterSteg(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         behandlingSteg: BehandlingSteg<T>,
         data: T,
     ): Behandling {
@@ -184,7 +184,7 @@ class StegService(
 
     private fun <T> oppdaterHistorikk(
         behandlingSteg: BehandlingSteg<T>,
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         saksbehandlerIdent: String,
     ) {
         if (behandlingSteg.settInnHistorikk()) {

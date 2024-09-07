@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
@@ -13,4 +14,4 @@ interface SøknadBarnetilsynRepository :
 
 @Repository
 interface SøknadBehandlingRepository :
-    RepositoryInterface<SøknadBehandling, UUID>, InsertUpdateRepository<SøknadBehandling>
+    RepositoryInterface<SøknadBehandling, BehandlingId>, InsertUpdateRepository<SøknadBehandling>

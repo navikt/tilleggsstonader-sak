@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
@@ -24,7 +25,7 @@ import java.util.UUID
 data class TilkjentYtelse(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     @MappedCollection(idColumn = "tilkjent_ytelse_id")
     val andelerTilkjentYtelse: Set<AndelTilkjentYtelse>,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)

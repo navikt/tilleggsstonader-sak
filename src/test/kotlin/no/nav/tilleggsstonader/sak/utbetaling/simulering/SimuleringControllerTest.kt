@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -24,7 +25,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.exchange
-import java.util.UUID
 
 internal class SimuleringControllerTest : IntegrationTest() {
 
@@ -93,7 +93,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
         ),
     )
 
-    private fun simulerForBehandling(behandlingId: UUID): ResponseEntity<SimuleringDto> {
+    private fun simulerForBehandling(behandlingId: BehandlingId): ResponseEntity<SimuleringDto> {
         return restTemplate.exchange(
             localhost("/api/simulering/$behandlingId"),
             HttpMethod.GET,
@@ -101,7 +101,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
         )
     }
 
-    private fun opprettVedtak(behandlingId: UUID) {
+    private fun opprettVedtak(behandlingId: BehandlingId) {
         tilsynBarnVedtakRepository.insert(
             innvilgetVedtak(behandlingId = behandlingId),
         )

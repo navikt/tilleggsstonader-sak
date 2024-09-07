@@ -9,6 +9,7 @@ import no.nav.familie.prosessering.util.IdUtils
 import no.nav.familie.prosessering.util.MDCConstants
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import org.springframework.stereotype.Service
@@ -41,7 +42,7 @@ class IverksettBehandlingMånedTask(
         iverksettService.iverksett(taskData.behandlingId, UUID.fromString(iverksettingId), måned)
     }
 
-    private fun validerErSisteBehandling(behandlingId: UUID) {
+    private fun validerErSisteBehandling(behandlingId: BehandlingId) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val sisteBehandling = behandlingService.finnSisteIverksatteBehandling(behandling.fagsakId)
 
@@ -58,7 +59,7 @@ class IverksettBehandlingMånedTask(
 
     companion object {
 
-        fun opprettTask(behandlingId: UUID, måned: YearMonth): Task {
+        fun opprettTask(behandlingId: BehandlingId, måned: YearMonth): Task {
             val properties = Properties().apply {
                 setProperty("behandlingId", behandlingId.toString())
                 setProperty("iverksettingId", UUID.randomUUID().toString())
@@ -75,7 +76,7 @@ class IverksettBehandlingMånedTask(
     }
 
     private data class TaskData(
-        val behandlingId: UUID,
+        val behandlingId: BehandlingId,
         val måned: YearMonth,
     )
 }

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdataBarn
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilDto
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDate.now
-import java.util.UUID
 
 class VilkårsoppsummeringUtilTest {
 
@@ -105,6 +105,6 @@ class VilkårsoppsummeringUtilTest {
         private fun barn(localDate: LocalDate?) = lagGrunnlagsdataBarn(fødselsdato = localDate)
 
         private fun stønadsperiode(fom: LocalDate, tom: LocalDate) =
-            stønadsperiode(UUID.randomUUID(), fom = fom, tom = tom).tilDto()
+            stønadsperiode(BehandlingId.randomUUID(), fom = fom, tom = tom).tilDto()
     }
 }

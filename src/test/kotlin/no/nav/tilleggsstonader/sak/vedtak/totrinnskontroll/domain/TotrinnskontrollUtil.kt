@@ -1,13 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
-import java.util.UUID
 
 object TotrinnskontrollUtil {
 
     fun totrinnskontroll(
         status: TotrinnInternStatus,
-        behandlingId: UUID = UUID.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.randomUUID(),
         saksbehandler: String = "saksbehandler",
         årsakerUnderkjent: List<ÅrsakUnderkjent> = emptyList(),
         begrunnelse: String? = null,

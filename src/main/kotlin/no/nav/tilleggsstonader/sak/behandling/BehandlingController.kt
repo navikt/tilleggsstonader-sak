@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping(path = ["/api/behandling"])
@@ -40,7 +40,7 @@ class BehandlingController(
 ) {
 
     @GetMapping("{behandlingId}")
-    fun hentBehandling(@PathVariable behandlingId: UUID): BehandlingDto {
+    fun hentBehandling(@PathVariable behandlingId: BehandlingId): BehandlingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
@@ -60,7 +60,7 @@ class BehandlingController(
     }
 
     @PostMapping
-    fun opprettBehandling(@RequestBody request: OpprettBehandlingDto): UUID {
+    fun opprettBehandling(@RequestBody request: OpprettBehandlingDto): BehandlingId {
         tilgangService.validerTilgangTilFagsak(request.fagsakId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -106,7 +106,7 @@ class BehandlingController(
      */
 
     @PostMapping("{behandlingId}/henlegg")
-    fun henleggBehandling(@PathVariable behandlingId: UUID, @RequestBody henlagt: HenlagtDto): BehandlingDto {
+    fun henleggBehandling(@PathVariable behandlingId: BehandlingId, @RequestBody henlagt: HenlagtDto): BehandlingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         val henlagtBehandling = henleggService.henleggBehandling(behandlingId, henlagt)

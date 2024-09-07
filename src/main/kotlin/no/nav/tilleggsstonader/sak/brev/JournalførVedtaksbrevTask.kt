@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
@@ -25,7 +26,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException
 import java.util.Properties
-import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -47,7 +47,7 @@ class JournalførVedtaksbrevTask(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun doTask(task: Task) {
-        val behandlingId = UUID.fromString(task.payload)
+        val behandlingId = BehandlingId.fromString(task.payload)
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
         val vedtaksbrev = brevService.hentBesluttetBrev(saksbehandling.id)
@@ -124,12 +124,12 @@ class JournalførVedtaksbrevTask(
         }
 
     override fun onCompletion(task: Task) {
-        taskService.save(DistribuerVedtaksbrevTask.opprettTask(UUID.fromString(task.payload)))
+        taskService.save(DistribuerVedtaksbrevTask.opprettTask(BehandlingId.fromString(task.payload)))
     }
 
     companion object {
 
-        fun opprettTask(behandlingId: UUID): Task =
+        fun opprettTask(behandlingId: BehandlingId): Task =
             Task(
                 type = TYPE,
                 payload = behandlingId.toString(),

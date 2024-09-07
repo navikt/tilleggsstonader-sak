@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -32,7 +33,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import java.util.UUID
 
 internal class TotrinnskontrollServiceTest {
 
@@ -109,7 +109,7 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `totrinnskontroll settes til angret fra saksbehandler`() {
         assertDoesNotThrow("Should not throw an exception") {
-            totrinnskontrollService.angreSendTilBeslutter(UUID.randomUUID())
+            totrinnskontrollService.angreSendTilBeslutter(BehandlingId.randomUUID())
         }
     }
 
@@ -119,7 +119,7 @@ internal class TotrinnskontrollServiceTest {
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
         } returns totrinnskontroll(opprettetAv = saksbehandler, TotrinnInternStatus.UNDERKJENT)
         assertThatThrownBy {
-            totrinnskontrollService.angreSendTilBeslutter(UUID.randomUUID())
+            totrinnskontrollService.angreSendTilBeslutter(BehandlingId.randomUUID())
         }.hasMessageContaining("Kan ikke angre når status=${TotrinnInternStatus.UNDERKJENT}")
     }
 
@@ -147,7 +147,7 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `skal utlede saksbehandler som sendte behandling til besluttning`() {
-        val response = totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(UUID.randomUUID())
+        val response = totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(BehandlingId.randomUUID())
 
         assertThat(response).isEqualTo(saksbehandler)
     }
@@ -297,7 +297,7 @@ internal class TotrinnskontrollServiceTest {
         status: TotrinnInternStatus = TotrinnInternStatus.KAN_FATTE_VEDTAK,
     ) =
         Totrinnskontroll(
-            behandlingId = UUID.randomUUID(),
+            behandlingId = BehandlingId.randomUUID(),
             sporbar = Sporbar(opprettetAv),
             status = status,
             saksbehandler = opprettetAv,
@@ -309,7 +309,7 @@ internal class TotrinnskontrollServiceTest {
 
     ) =
         Totrinnskontroll(
-            behandlingId = UUID.randomUUID(),
+            behandlingId = BehandlingId.randomUUID(),
             sporbar = Sporbar(opprettetAv),
             status = TotrinnInternStatus.UNDERKJENT,
             saksbehandler = opprettetAv,
@@ -327,7 +327,7 @@ internal class TotrinnskontrollServiceTest {
 
     companion object {
 
-        private val BEHANDLING_ID = UUID.randomUUID()
+        private val BEHANDLING_ID = BehandlingId.randomUUID()
         private val fagsak = fagsak()
     }
 }

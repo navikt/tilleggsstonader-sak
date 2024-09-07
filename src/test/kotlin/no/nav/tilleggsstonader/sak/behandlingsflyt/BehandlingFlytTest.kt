@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
@@ -59,7 +60,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class BehandlingFlytTest(
     @Autowired val barnService: BarnService,
@@ -233,16 +233,16 @@ class BehandlingFlytTest(
         }
     }
 
-    private fun angreSendTilBeslutter(behandlingId: UUID) {
+    private fun angreSendTilBeslutter(behandlingId: BehandlingId) {
         totrinnskontrollController.angreSendTilBeslutter(behandlingId)
         kjørTasks()
     }
 
-    private fun godkjennTotrinnskontroll(behandlingId: UUID) {
+    private fun godkjennTotrinnskontroll(behandlingId: BehandlingId) {
         totrinnskontrollController.beslutteVedtak(behandlingId, BeslutteVedtakDto(true))
     }
 
-    private fun underkjennTotrinnskontroll(behandlingId: UUID) {
+    private fun underkjennTotrinnskontroll(behandlingId: BehandlingId) {
         totrinnskontrollController.beslutteVedtak(
             behandlingId,
             BeslutteVedtakDto(false, "", listOf(ÅrsakUnderkjent.VEDTAK_OG_BEREGNING)),
@@ -250,7 +250,7 @@ class BehandlingFlytTest(
         kjørTasks()
     }
 
-    private fun opprettBehandlingOgSendTilBeslutter(personIdent: String): UUID {
+    private fun opprettBehandlingOgSendTilBeslutter(personIdent: String): BehandlingId {
         val behandlingId = opprettBehandling(personIdent)
         vurderInngangsvilkår(behandlingId)
         utfyllVilkår(behandlingId)
@@ -263,7 +263,7 @@ class BehandlingFlytTest(
         return behandlingId
     }
 
-    private fun vurderInngangsvilkår(behandlingId: UUID) {
+    private fun vurderInngangsvilkår(behandlingId: BehandlingId) {
         val fom = LocalDate.of(2024, 1, 1)
         val tom = LocalDate.of(2024, 1, 31)
 
@@ -300,7 +300,7 @@ class BehandlingFlytTest(
         stegService.håndterSteg(behandlingId, StegType.INNGANGSVILKÅR)
     }
 
-    private fun utfyllVilkår(behandlingId: UUID) {
+    private fun utfyllVilkår(behandlingId: BehandlingId) {
         val barn = barnService.finnBarnPåBehandling(behandlingId).first()
         vilkårController.opprettVilkår(
             OpprettVilkårDto(
@@ -316,14 +316,14 @@ class BehandlingFlytTest(
         stegService.håndterSteg(behandlingId, StegType.VILKÅR)
     }
 
-    private fun opprettBehandling(personIdent: String): UUID {
+    private fun opprettBehandling(personIdent: String): BehandlingId {
         val behandlingId = opprettTestBehandlingController.opprettBehandling(TestBehandlingRequest(personIdent))
         testoppsettService.opprettGrunnlagsdata(behandlingId)
         kjørTasks()
         return behandlingId
     }
 
-    private fun sendTilBeslutter(behandlingId: UUID) {
+    private fun sendTilBeslutter(behandlingId: BehandlingId) {
         kjørTasks()
         totrinnskontrollController.sendTilBeslutter(behandlingId)
         kjørTasks()
@@ -352,7 +352,7 @@ class BehandlingFlytTest(
         else -> it.payload
     }
 
-    private fun verifiserBehandlingIverksettes(behandlingId: UUID) {
+    private fun verifiserBehandlingIverksettes(behandlingId: BehandlingId) {
         with(testoppsettService.hentBehandling(behandlingId)) {
             assertThat(status).isEqualTo(BehandlingStatus.IVERKSETTER_VEDTAK)
             assertThat(steg).isEqualTo(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
@@ -366,23 +366,23 @@ class BehandlingFlytTest(
         assertThat(taskData.oppgavetype).isEqualTo(expectedOppgaveType)
     }
 
-    private fun assertStatusTotrinnskontroll(behandlingId: UUID, expectedStatus: TotrinnkontrollStatus) {
+    private fun assertStatusTotrinnskontroll(behandlingId: BehandlingId, expectedStatus: TotrinnkontrollStatus) {
         with(totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)) {
             assertThat(status).isEqualTo(expectedStatus)
         }
     }
 
-    private fun assertSisteOpprettedeOppgave(behandlingId: UUID, expectedOppgaveType: Oppgavetype) {
+    private fun assertSisteOpprettedeOppgave(behandlingId: BehandlingId, expectedOppgaveType: Oppgavetype) {
         assertThat(oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)?.type)
             .isEqualTo(expectedOppgaveType)
     }
 
-    private fun genererSaksbehandlerBrev(behandlingId: UUID) {
+    private fun genererSaksbehandlerBrev(behandlingId: BehandlingId) {
         val html = "SAKSBEHANDLER_SIGNATUR, BREVDATO_PLACEHOLDER, BESLUTTER_SIGNATUR"
         brevController.genererPdf(GenererPdfRequest(html), behandlingId)
     }
 
-    private fun lagreBrevmottakere(behandlingId: UUID) {
+    private fun lagreBrevmottakere(behandlingId: BehandlingId) {
         brevmottakereRepository.insert(
             Brevmottaker(
                 behandlingId = behandlingId,
@@ -393,14 +393,14 @@ class BehandlingFlytTest(
         )
     }
 
-    private fun opprettVedtak(behandlingId: UUID) {
+    private fun opprettVedtak(behandlingId: BehandlingId) {
         tilsynBarnVedtakController.lagreVedtak(
             behandlingId,
             InnvilgelseTilsynBarnDto(null),
         )
     }
 
-    private fun simuler(behandlingId: UUID) {
+    private fun simuler(behandlingId: BehandlingId) {
         val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
         simuleringStegService.hentEllerOpprettSimuleringsresultat(saksbehandling)
     }

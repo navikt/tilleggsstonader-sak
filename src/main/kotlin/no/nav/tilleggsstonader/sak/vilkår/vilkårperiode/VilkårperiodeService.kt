@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -65,7 +66,7 @@ class VilkårperiodeService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentVilkårperioder(behandlingId: UUID): Vilkårperioder {
+    fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId)
 
         return Vilkårperioder(
@@ -78,7 +79,7 @@ class VilkårperiodeService(
         return vilkårperiodeRepository.findByIdOrThrow(id)
     }
 
-    fun hentVilkårperioderResponse(behandlingId: UUID): VilkårperioderResponse {
+    fun hentVilkårperioderResponse(behandlingId: BehandlingId): VilkårperioderResponse {
         val grunnlagsdataVilkårsperioder = hentEllerOpprettGrunnlag(behandlingId)
 
         return VilkårperioderResponse(
@@ -88,7 +89,7 @@ class VilkårperiodeService(
     }
 
     @Transactional
-    fun oppdaterGrunnlag(behandlingId: UUID) {
+    fun oppdaterGrunnlag(behandlingId: BehandlingId) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke oppdatere grunnlag når behandlingen er låst"
@@ -109,7 +110,7 @@ class VilkårperiodeService(
         logger.info("Oppdatert grunnlagsdata for behandling=$behandlingId timerSidenForrige=$tidSidenForrigeHenting")
     }
 
-    private fun hentEllerOpprettGrunnlag(behandlingId: UUID): VilkårperioderGrunnlag? {
+    private fun hentEllerOpprettGrunnlag(behandlingId: BehandlingId): VilkårperioderGrunnlag? {
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)?.grunnlag
 
         return if (grunnlag != null) {
@@ -121,7 +122,7 @@ class VilkårperiodeService(
         }
     }
 
-    private fun opprettGrunnlagsdata(behandlingId: UUID): VilkårperioderGrunnlagDomain {
+    private fun opprettGrunnlagsdata(behandlingId: BehandlingId): VilkårperioderGrunnlagDomain {
         brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
             "Behandlingen er ikke påbegynt. Kan ikke opprette vilkårperiode hvis man ikke er saksbehandler"
         }
@@ -142,7 +143,7 @@ class VilkårperiodeService(
     }
 
     private fun hentGrunnlagsdata(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         fom: LocalDate,
         tom: LocalDate,
     ): VilkårperioderGrunnlag {
@@ -158,7 +159,7 @@ class VilkårperiodeService(
     }
 
     private fun hentGrunnlagAktvititet(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         fom: LocalDate,
         tom: LocalDate,
     ) = GrunnlagAktivitet(
@@ -170,7 +171,7 @@ class VilkårperiodeService(
     )
 
     private fun hentGrunnlagYtelse(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         fom: LocalDate,
         tom: LocalDate,
     ): GrunnlagYtelse {
@@ -189,7 +190,7 @@ class VilkårperiodeService(
         )
     }
 
-    fun hentVilkårperioderDto(behandlingId: UUID): VilkårperioderDto {
+    fun hentVilkårperioderDto(behandlingId: BehandlingId): VilkårperioderDto {
         return hentVilkårperioder(behandlingId).tilDto()
     }
 
@@ -197,7 +198,7 @@ class VilkårperiodeService(
         vilkårsperioder: List<Vilkårperiode>,
     ) = vilkårsperioder.filter { it.type is T }
 
-    fun validerOgLagResponse(behandlingId: UUID, periode: Vilkårperiode? = null): LagreVilkårperiodeResponse {
+    fun validerOgLagResponse(behandlingId: BehandlingId, periode: Vilkårperiode? = null): LagreVilkårperiodeResponse {
         val valideringsresultat = validerStønadsperioder(behandlingId)
 
         return LagreVilkårperiodeResponse(
@@ -253,7 +254,7 @@ class VilkårperiodeService(
         }
     }
 
-    private fun validerStønadsperioder(behandlingId: UUID): Result<Unit> {
+    private fun validerStønadsperioder(behandlingId: BehandlingId): Result<Unit> {
         val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
         val vilkårperioder = hentVilkårperioder(behandlingId)
 
@@ -332,7 +333,7 @@ class VilkårperiodeService(
         }
     }
 
-    fun gjenbrukVilkårperioder(forrigeBehandlingId: UUID, nyBehandlingId: UUID) {
+    fun gjenbrukVilkårperioder(forrigeBehandlingId: BehandlingId, nyBehandlingId: BehandlingId) {
         val eksisterendeVilkårperioder =
             vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
 
@@ -348,6 +349,6 @@ class VilkårperiodeService(
         vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)
     }
 
-    private fun behandlingErLåstForVidereRedigering(behandlingId: UUID) =
+    private fun behandlingErLåstForVidereRedigering(behandlingId: BehandlingId) =
         behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
 }

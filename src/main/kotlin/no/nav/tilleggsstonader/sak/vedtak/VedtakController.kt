@@ -1,18 +1,18 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import java.util.UUID
 
 @ProtectedWithClaims(issuer = "azuread")
 abstract class VedtakController<DTO, DOMENE>(
     private val tilgangService: TilgangService,
     private val vedtakService: VedtakService<DTO, DOMENE>,
 ) {
-    fun lagreVedtak(behandlingId: UUID, vedtak: DTO) {
+    fun lagreVedtak(behandlingId: BehandlingId, vedtak: DTO) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         vedtakService.håndterSteg(behandlingId, vedtak)
     }
@@ -22,7 +22,7 @@ abstract class VedtakController<DTO, DOMENE>(
      * På en måte hadde det vært fint hvis GET returnerer beløpsperioder
      */
     @GetMapping("{behandlingId}")
-    fun hentVedtak(@PathVariable behandlingId: UUID): DTO? {
+    fun hentVedtak(@PathVariable behandlingId: BehandlingId): DTO? {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vedtakService.hentVedtakDto(behandlingId)
     }

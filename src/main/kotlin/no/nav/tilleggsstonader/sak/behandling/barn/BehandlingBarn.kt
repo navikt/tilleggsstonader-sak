@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.barn
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
@@ -11,7 +12,7 @@ import java.util.UUID
 data class BehandlingBarn(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val ident: String,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),

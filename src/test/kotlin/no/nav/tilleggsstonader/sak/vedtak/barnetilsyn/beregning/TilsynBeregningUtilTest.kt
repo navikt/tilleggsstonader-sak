@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -10,10 +11,9 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.temporal.Temporal
-import java.util.UUID
 
 class TilsynBeregningUtilTest {
-    val behandlingId = UUID.randomUUID()
+    val behandlingId = BehandlingId.randomUUID()
 
     val januar = YearMonth.of(2024, 1)
     val februar = YearMonth.of(2024, 2)

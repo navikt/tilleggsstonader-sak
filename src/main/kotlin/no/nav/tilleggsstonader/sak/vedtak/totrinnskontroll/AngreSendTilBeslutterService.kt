@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -19,7 +20,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class AngreSendTilBeslutterService(
@@ -31,7 +31,7 @@ class AngreSendTilBeslutterService(
 ) {
 
     @Transactional
-    fun angreSendTilBeslutter(behandlingId: UUID) {
+    fun angreSendTilBeslutter(behandlingId: BehandlingId) {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
         validerKanAngreSendTilBeslutter(saksbehandling)

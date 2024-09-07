@@ -4,11 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerOrganisasjonD
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerPersonDto
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerUtil.validerUnikeBrevmottakere
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class BrevmottakereService(
@@ -17,7 +17,7 @@ class BrevmottakereService(
 ) {
 
     @Transactional
-    fun lagreBrevmottakere(behandlingId: UUID, brevmottakereDto: BrevmottakereDto) {
+    fun lagreBrevmottakere(behandlingId: BehandlingId, brevmottakereDto: BrevmottakereDto) {
         validerBehandlingKanRedigeres(behandlingId)
         validerAntallBrevmottakere(brevmottakereDto)
         validerUnikeBrevmottakere(brevmottakereDto)
@@ -44,7 +44,7 @@ class BrevmottakereService(
     }
 
     @Transactional
-    fun hentEllerOpprettBrevmottakere(behandlingId: UUID): BrevmottakereDto {
+    fun hentEllerOpprettBrevmottakere(behandlingId: BehandlingId): BrevmottakereDto {
         return if (brevmottakereRepository.existsByBehandlingId(behandlingId)) {
             brevmottakereRepository.findByBehandlingId(behandlingId).tilBrevmottakereDto()
         } else {
@@ -58,7 +58,7 @@ class BrevmottakereService(
 
     private fun fjernMottakereIkkeIDto(
         brevmottakereDto: BrevmottakereDto,
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
     ) {
         val nyeBrevmottakere = brevmottakereDto.personer.map { it.id } + brevmottakereDto.organisasjoner.map { it.id }
         brevmottakereRepository.findByBehandlingId(behandlingId)
@@ -66,13 +66,13 @@ class BrevmottakereService(
             .forEach { brevmottakereRepository.deleteById(it.id) }
     }
 
-    private fun validerBehandlingKanRedigeres(behandlingId: UUID) {
+    private fun validerBehandlingKanRedigeres(behandlingId: BehandlingId) {
         brukerfeilHvis(behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke oppdatere brevmottakere fordi behandling er låst for redigering."
         }
     }
 
-    private fun lagreNyBrevmottakerPerson(behandlingId: UUID, it: BrevmottakerPersonDto) {
+    private fun lagreNyBrevmottakerPerson(behandlingId: BehandlingId, it: BrevmottakerPersonDto) {
         brevmottakereRepository.insert(
             Brevmottaker(
                 id = it.id,
@@ -85,7 +85,7 @@ class BrevmottakereService(
         )
     }
 
-    private fun lagreNyOrganisasjonsmottaker(behandlingId: UUID, it: BrevmottakerOrganisasjonDto) {
+    private fun lagreNyOrganisasjonsmottaker(behandlingId: BehandlingId, it: BrevmottakerOrganisasjonDto) {
         brevmottakereRepository.insert(
             Brevmottaker(
                 id = it.id,
@@ -120,7 +120,7 @@ class BrevmottakereService(
         )
     }
 
-    private fun opprettBrevmottaker(behandlingId: UUID): Brevmottaker {
+    private fun opprettBrevmottaker(behandlingId: BehandlingId): Brevmottaker {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
         val brevmottaker = Brevmottaker(

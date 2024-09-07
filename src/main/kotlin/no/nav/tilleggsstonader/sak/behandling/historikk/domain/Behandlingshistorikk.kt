@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import org.springframework.data.annotation.Id
@@ -19,7 +20,7 @@ import java.util.UUID
 data class Behandlingshistorikk(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val steg: StegType,
     val utfall: StegUtfall? = null,
     val metadata: JsonWrapper? = null,

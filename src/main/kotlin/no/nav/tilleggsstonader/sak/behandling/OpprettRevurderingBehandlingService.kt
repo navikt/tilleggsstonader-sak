@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -24,7 +25,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class OpprettRevurderingBehandlingService(
@@ -41,7 +41,7 @@ class OpprettRevurderingBehandlingService(
 ) {
 
     @Transactional
-    fun opprettBehandling(request: OpprettBehandlingDto): UUID {
+    fun opprettBehandling(request: OpprettBehandlingDto): BehandlingId {
         feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING)) {
             "Feature toggle for å kunne opprette revurdering er slått av"
         }
@@ -73,7 +73,7 @@ class OpprettRevurderingBehandlingService(
         return behandling.id
     }
 
-    private fun validerValgteBarn(request: OpprettBehandlingDto, behandlingIdForGjenbruk: UUID?) {
+    private fun validerValgteBarn(request: OpprettBehandlingDto, behandlingIdForGjenbruk: BehandlingId?) {
         val stønadstype: Stønadstype by lazy { fagsakService.hentFagsak(request.fagsakId).stønadstype }
         feilHvis(request.valgteBarn.isNotEmpty() && stønadstype != Stønadstype.BARNETILSYN) {
             "Kan ikke sende inn barn til $stønadstype"
@@ -109,7 +109,7 @@ class OpprettRevurderingBehandlingService(
 
     private fun hentBarnTilRevurdering(
         fagsakId: FagsakId,
-        forrigeBehandlingId: UUID?,
+        forrigeBehandlingId: BehandlingId?,
     ): BarnTilRevurderingDto {
         val ident = fagsakService.hentAktivIdent(fagsakId)
         val barnPåSøker = personService.hentPersonMedBarn(ident).barn

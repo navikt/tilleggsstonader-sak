@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -13,7 +14,6 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.UUID
 
 internal class BehandlingServiceIntegrationTest : IntegrationTest() {
 
@@ -43,7 +43,7 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
 
     @Test
     internal fun `hentBehandlinger - skal kaste feil hvis behandling ikke finnes`() {
-        assertThatThrownBy { behandlingService.hentBehandlinger(setOf(UUID.randomUUID())) }
+        assertThatThrownBy { behandlingService.hentBehandlinger(setOf(BehandlingId.randomUUID())) }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("Finner ikke Behandling for")
     }

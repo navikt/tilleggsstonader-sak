@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -10,16 +11,15 @@ import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 /**
  * @param forrigeBehandlingId forrige iverksatte behandling
  */
 data class Behandling(
     @Id
-    val id: UUID = UUID.randomUUID(),
+    val id: BehandlingId = BehandlingId.randomUUID(),
     val fagsakId: FagsakId,
-    val forrigeBehandlingId: UUID? = null,
+    val forrigeBehandlingId: BehandlingId? = null,
     // @Version ?
     val versjon: Int = 0,
 
@@ -110,5 +110,5 @@ enum class BehandlingStatus {
 data class EksternBehandlingId(
     @Id
     val id: Long = 0,
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
 )

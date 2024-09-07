@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -34,7 +35,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class JournalføringService(
@@ -215,7 +215,7 @@ class JournalføringService(
         barnService.opprettBarn(nyeBarn)
     }
 
-    private fun lagreSøknad(journalpost: Journalpost, behandlingId: UUID) {
+    private fun lagreSøknad(journalpost: Journalpost, behandlingId: BehandlingId) {
         val søknad = journalpostService.hentSøknadFraJournalpost(journalpost)
         søknadService.lagreSøknad(behandlingId, journalpost, søknad)
     }

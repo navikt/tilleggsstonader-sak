@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -41,7 +42,7 @@ class BrevmottakereServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling
 
         assertThatThrownBy {
-            brevmottakereService.lagreBrevmottakere(UUID.randomUUID(), vanligeBrevmottakereDto)
+            brevmottakereService.lagreBrevmottakere(BehandlingId.randomUUID(), vanligeBrevmottakereDto)
         }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling er låst for redigering.")
     }
 
@@ -52,7 +53,7 @@ class BrevmottakereServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling
 
         assertThatThrownBy {
-            brevmottakereService.lagreBrevmottakere(UUID.randomUUID(), vanligeBrevmottakereDto)
+            brevmottakereService.lagreBrevmottakere(BehandlingId.randomUUID(), vanligeBrevmottakereDto)
         }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling er låst for redigering.")
     }
 
@@ -63,7 +64,7 @@ class BrevmottakereServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling
 
         assertThatThrownBy {
-            brevmottakereService.lagreBrevmottakere(UUID.randomUUID(), vanligeBrevmottakereDto)
+            brevmottakereService.lagreBrevmottakere(BehandlingId.randomUUID(), vanligeBrevmottakereDto)
         }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling er låst for redigering.")
     }
 
@@ -74,7 +75,7 @@ class BrevmottakereServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling
 
         assertThatThrownBy {
-            brevmottakereService.lagreBrevmottakere(UUID.randomUUID(), vanligeBrevmottakereDto)
+            brevmottakereService.lagreBrevmottakere(BehandlingId.randomUUID(), vanligeBrevmottakereDto)
         }.hasMessageContaining("Kan ikke oppdatere brevmottakere fordi behandling er låst for redigering.")
     }
 
@@ -86,7 +87,7 @@ class BrevmottakereServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling()
 
         val feil = catchThrowableOfType<ApiFeil> {
-            brevmottakereService.lagreBrevmottakere(UUID.randomUUID(), brevmottakereDto)
+            brevmottakereService.lagreBrevmottakere(BehandlingId.randomUUID(), brevmottakereDto)
         }
         assertThat(feil.message).contains("Vedtaksbrevet må ha minst 1 mottaker")
         assertThat(feil.httpStatus).isEqualTo(BAD_REQUEST)
@@ -106,7 +107,7 @@ class BrevmottakereServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling()
 
         val feil = catchThrowableOfType<ApiFeil> {
-            brevmottakereService.lagreBrevmottakere(UUID.randomUUID(), brevmottakereDto)
+            brevmottakereService.lagreBrevmottakere(BehandlingId.randomUUID(), brevmottakereDto)
         }
         assertThat(feil.message).contains("Vedtaksbrevet kan ikke ha mer enn 2 mottakere")
         assertThat(feil.httpStatus).isEqualTo(BAD_REQUEST)
@@ -132,7 +133,7 @@ class BrevmottakereServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling()
 
         val feil = catchThrowableOfType<ApiFeil> {
-            brevmottakereService.lagreBrevmottakere(UUID.randomUUID(), brevmottakereDto)
+            brevmottakereService.lagreBrevmottakere(BehandlingId.randomUUID(), brevmottakereDto)
         }
         assertThat(feil.message).contains("En person kan bare legges til en gang som brevmottaker")
         assertThat(feil.httpStatus).isEqualTo(BAD_REQUEST)
@@ -157,7 +158,7 @@ class BrevmottakereServiceTest {
         every { behandlingService.hentBehandling(any()) } returns behandling()
 
         val feil = catchThrowableOfType<ApiFeil> {
-            brevmottakereService.lagreBrevmottakere(UUID.randomUUID(), brevmottakereDto)
+            brevmottakereService.lagreBrevmottakere(BehandlingId.randomUUID(), brevmottakereDto)
         }
         assertThat(feil.message).contains("En organisasjon kan bare legges til en gang som brevmottaker")
         assertThat(feil.httpStatus).isEqualTo(BAD_REQUEST)
@@ -166,7 +167,7 @@ class BrevmottakereServiceTest {
     @Test
     fun `hentEllerOpprettBrevmottakere skal returnere BrevmottakereDto dersom disse finnes i repository`() {
         val id = UUID.randomUUID()
-        val behandlingID = UUID.randomUUID()
+        val behandlingID = BehandlingId.randomUUID()
         val ident = "123123123"
         val mottakernavn = "Test Testersen"
 
@@ -195,10 +196,10 @@ class BrevmottakereServiceTest {
             organisasjoner = emptyList(),
         )
 
-        every { brevmottakereRepository.existsByBehandlingId(any()) } returns true
-        every { brevmottakereRepository.findByBehandlingId(any()) } returns listOf(brevmottakerTestObjekt)
+        every { brevmottakereRepository.existsByBehandlingId(behandlingID) } returns true
+        every { brevmottakereRepository.findByBehandlingId(behandlingID) } returns listOf(brevmottakerTestObjekt)
 
-        val brevmottakere: BrevmottakereDto = brevmottakereService.hentEllerOpprettBrevmottakere(id)
+        val brevmottakere: BrevmottakereDto = brevmottakereService.hentEllerOpprettBrevmottakere(behandlingID)
 
         assertThat(brevmottakere).isEqualTo(brevmottakereDtoFasit)
     }

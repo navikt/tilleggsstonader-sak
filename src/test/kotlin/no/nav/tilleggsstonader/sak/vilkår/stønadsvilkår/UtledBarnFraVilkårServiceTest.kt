@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 internal class UtledBarnFraVilkårServiceTest {
 
@@ -60,7 +60,7 @@ internal class UtledBarnFraVilkårServiceTest {
         navn: String = "navn",
         personIdent: String = "barnid",
     ): BehandlingBarn = BehandlingBarn(
-        behandlingId = UUID.randomUUID(),
+        behandlingId = BehandlingId.randomUUID(),
         ident = personIdent,
     )
 }

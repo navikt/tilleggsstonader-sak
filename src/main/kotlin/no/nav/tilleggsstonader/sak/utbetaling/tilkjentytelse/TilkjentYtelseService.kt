@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
@@ -19,11 +20,11 @@ class TilkjentYtelseService(
     private val tilkjentYtelseRepository: TilkjentYtelseRepository,
 ) {
 
-    fun hentForBehandlingEllerNull(behandlingId: UUID): TilkjentYtelse? {
+    fun hentForBehandlingEllerNull(behandlingId: BehandlingId): TilkjentYtelse? {
         return tilkjentYtelseRepository.findByBehandlingId(behandlingId)
     }
 
-    fun hentForBehandling(behandlingId: UUID): TilkjentYtelse {
+    fun hentForBehandling(behandlingId: BehandlingId): TilkjentYtelse {
         return tilkjentYtelseRepository.findByBehandlingId(behandlingId)
             ?: error("Fant ikke tilkjent ytelse med behandlingsid $behandlingId")
     }
@@ -32,7 +33,7 @@ class TilkjentYtelseService(
         return tilkjentYtelseRepository.insert(nyTilkjentYtelse)
     }
 
-    fun harLøpendeUtbetaling(behandlingId: UUID): Boolean {
+    fun harLøpendeUtbetaling(behandlingId: BehandlingId): Boolean {
         return tilkjentYtelseRepository.findByBehandlingId(behandlingId)
             ?.let { it.andelerTilkjentYtelse.any { andel -> andel.tom.isAfter(osloDateNow()) } } ?: false
     }

@@ -130,7 +130,7 @@ class FlyttBeløpsperioderTilVilkårController(
                     "utgift" to forrigeVilkår.utgift,
                     "delvilkar" to objectMapper.writeValueAsString(forrigeVilkår.delvilkårsett),
                     "resultat" to forrigeVilkår.resultat.name,
-                    "opphavsvilkaar_behandling_id" to forrigeVilkår.behandlingId,
+                    "opphavsvilkaar_behandling_id" to forrigeVilkår.behandlingId.id,
                     "opphavsvilkaar_vurderingstidspunkt" to forrigeVilkår.sporbar.endret.endretTid,
                 ),
             )

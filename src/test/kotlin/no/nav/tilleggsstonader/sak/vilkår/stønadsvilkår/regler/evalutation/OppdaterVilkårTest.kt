@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
@@ -16,7 +17,7 @@ import java.util.UUID
 
 internal class OppdaterVilkårTest {
 
-    val behandlingId = UUID.randomUUID()
+    val behandlingId = BehandlingId.randomUUID()
     val vilkår = vilkår(
         behandlingId = behandlingId,
         type = VilkårType.PASS_BARN,

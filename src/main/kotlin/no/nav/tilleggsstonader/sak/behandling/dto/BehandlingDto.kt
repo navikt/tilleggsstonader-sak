@@ -10,14 +10,14 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class BehandlingDto(
-    val id: UUID,
-    val forrigeBehandlingId: UUID?,
+    val id: BehandlingId,
+    val forrigeBehandlingId: BehandlingId?,
     val fagsakId: FagsakId,
     val fagsakPersonId: FagsakPersonId,
     val steg: StegType,

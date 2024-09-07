@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.brev.mellomlager
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class MellomlagringBrevService(
@@ -12,7 +12,7 @@ class MellomlagringBrevService(
     private val mellomlagerFrittståendeBrevRepository: MellomlagerFrittståendeBrevRepository,
 ) {
 
-    fun mellomLagreBrev(behandlingId: UUID, brevverdier: String, brevmal: String): UUID {
+    fun mellomLagreBrev(behandlingId: BehandlingId, brevverdier: String, brevmal: String): BehandlingId {
         slettMellomlagringHvisFinnes(behandlingId)
         val mellomlagretBrev = MellomlagretBrev(
             behandlingId,
@@ -42,12 +42,12 @@ class MellomlagringBrevService(
             SikkerhetContext.hentSaksbehandler(),
         )?.let { MellomlagreBrevDto(it.brevverdier, it.brevmal) }
 
-    fun hentMellomlagretBrev(behhandlingId: UUID): MellomlagreBrevDto? =
+    fun hentMellomlagretBrev(behhandlingId: BehandlingId): MellomlagreBrevDto? =
         mellomlagerBrevRepository.findByIdOrNull(behhandlingId)?.let {
             MellomlagreBrevDto(it.brevverdier, it.brevmal)
         }
 
-    fun slettMellomlagringHvisFinnes(behandlingId: UUID) {
+    fun slettMellomlagringHvisFinnes(behandlingId: BehandlingId) {
         mellomlagerBrevRepository.deleteById(behandlingId)
     }
 

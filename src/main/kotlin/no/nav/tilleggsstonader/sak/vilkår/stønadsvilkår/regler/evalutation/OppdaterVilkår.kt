@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
@@ -168,7 +169,7 @@ object OppdaterVilkår {
     fun lagNyttVilkår(
         vilkårsregel: Vilkårsregel,
         metadata: HovedregelMetadata,
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         barnId: UUID? = null,
     ): Vilkår {
         val delvilkårsett = vilkårsregel.initiereDelvilkår(metadata, barnId = barnId)

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping("/api/totrinnskontroll")
@@ -27,14 +27,14 @@ class TotrinnskontrollController(
 ) {
 
     @GetMapping("{behandlingId}")
-    fun hentTotrinnskontroll(@PathVariable behandlingId: UUID): StatusTotrinnskontrollDto {
+    fun hentTotrinnskontroll(@PathVariable behandlingId: BehandlingId): StatusTotrinnskontrollDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)
     }
 
     @PostMapping("/{behandlingId}/send-til-beslutter")
     fun sendTilBeslutter(
-        @PathVariable behandlingId: UUID,
+        @PathVariable behandlingId: BehandlingId,
     ): StatusTotrinnskontrollDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         stegService.håndterSteg(behandlingId, sendTilBeslutterSteg)
@@ -43,7 +43,7 @@ class TotrinnskontrollController(
 
     @PostMapping("/{behandlingId}/beslutte-vedtak")
     fun beslutteVedtak(
-        @PathVariable behandlingId: UUID,
+        @PathVariable behandlingId: BehandlingId,
         @RequestBody request: BeslutteVedtakDto,
     ): StatusTotrinnskontrollDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
@@ -52,7 +52,7 @@ class TotrinnskontrollController(
     }
 
     @PostMapping("/{behandlingId}/angre-send-til-beslutter")
-    fun angreSendTilBeslutter(@PathVariable behandlingId: UUID): StatusTotrinnskontrollDto {
+    fun angreSendTilBeslutter(@PathVariable behandlingId: BehandlingId): StatusTotrinnskontrollDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 

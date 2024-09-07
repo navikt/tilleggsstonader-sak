@@ -7,12 +7,12 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Properties
-import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -26,7 +26,7 @@ class FerdigstillOppgaveTask(private val oppgaveService: OppgaveService) : Async
      * Då payload er unik per task type, så settes unik inn
      */
     data class FerdigstillOppgaveTaskData(
-        val behandlingId: UUID,
+        val behandlingId: BehandlingId,
         val oppgavetype: Oppgavetype,
         val unik: LocalDateTime? = osloNow(),
     )
@@ -41,7 +41,7 @@ class FerdigstillOppgaveTask(private val oppgaveService: OppgaveService) : Async
 
     companion object {
 
-        fun opprettTask(behandlingId: UUID, oppgavetype: Oppgavetype, oppgaveId: Long?): Task {
+        fun opprettTask(behandlingId: BehandlingId, oppgavetype: Oppgavetype, oppgaveId: Long?): Task {
             return Task(
                 type = TYPE,
                 payload = objectMapper.writeValueAsString(FerdigstillOppgaveTaskData(behandlingId, oppgavetype)),

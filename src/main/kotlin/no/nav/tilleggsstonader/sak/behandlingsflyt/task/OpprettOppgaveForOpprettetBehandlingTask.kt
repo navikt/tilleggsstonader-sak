@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
@@ -19,7 +20,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Properties
-import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -36,7 +36,7 @@ class OpprettOppgaveForOpprettetBehandlingTask(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     data class OpprettOppgaveTaskData(
-        val behandlingId: UUID,
+        val behandlingId: BehandlingId,
         val saksbehandler: String,
         val beskrivelse: String? = null,
         val hendelseTidspunkt: LocalDateTime = osloNow(),

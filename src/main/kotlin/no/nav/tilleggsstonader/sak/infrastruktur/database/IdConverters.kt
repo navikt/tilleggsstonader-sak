@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import org.springframework.core.convert.converter.Converter
@@ -28,10 +29,15 @@ object IdConverters {
     class FagsakIdWritingConverter : ValueClassWriter<FagsakId>({ it.id })
     class FagsakIdReaderConverter : ValueClassReader<FagsakId>({ FagsakId(it) })
 
+    class BehandlingIdWritingConverter : ValueClassWriter<BehandlingId>({ it.id })
+    class BehandlingIdReaderConverter : ValueClassReader<BehandlingId>({ BehandlingId(it) })
+
     val alleValueClassConverters = listOf(
         FagsakPersonIdWritingConverter(),
         FagsakPersonIdReaderConverter(),
         FagsakIdWritingConverter(),
         FagsakIdReaderConverter(),
+        BehandlingIdWritingConverter(),
+        BehandlingIdReaderConverter(),
     )
 }

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Fødsel
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagArena
@@ -7,11 +8,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Navn
 import java.time.LocalDate
-import java.util.UUID
 
 object GrunnlagsdataUtil {
     fun grunnlagsdataDomain(
-        behandlingId: UUID = UUID.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.randomUUID(),
         grunnlag: Grunnlag = lagGrunnlagsdata(),
     ) = Grunnlagsdata(
         behandlingId = behandlingId,

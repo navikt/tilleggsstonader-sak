@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
@@ -57,7 +58,7 @@ fun oppgave(
 ): OppgaveDomain = oppgave(behandling.id, erFerdigstilt, gsakOppgaveId, type)
 
 fun oppgave(
-    behandlingId: UUID?,
+    behandlingId: BehandlingId?,
     erFerdigstilt: Boolean = false,
     gsakOppgaveId: Long = 123,
     type: Oppgavetype = Oppgavetype.Journalføring,
@@ -73,11 +74,11 @@ fun behandling(
     status: BehandlingStatus = BehandlingStatus.OPPRETTET,
     steg: StegType = StegType.INNGANGSVILKÅR,
     kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
-    id: UUID = UUID.randomUUID(),
+    id: BehandlingId = BehandlingId.randomUUID(),
     type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
     resultat: BehandlingResultat = BehandlingResultat.IKKE_SATT,
     opprettetTid: LocalDateTime = SporbarUtils.now(),
-    forrigeBehandlingId: UUID? = null,
+    forrigeBehandlingId: BehandlingId? = null,
     årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
     vedtakstidspunkt: LocalDateTime? = null,
@@ -102,11 +103,11 @@ fun saksbehandling(
     fagsak: Fagsak = fagsak(),
     status: BehandlingStatus = BehandlingStatus.OPPRETTET,
     steg: StegType = StegType.VILKÅR,
-    id: UUID = UUID.randomUUID(),
+    id: BehandlingId = BehandlingId.randomUUID(),
     type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
     resultat: BehandlingResultat = BehandlingResultat.IKKE_SATT,
     opprettetTid: LocalDateTime = SporbarUtils.now(),
-    forrigeBehandlingId: UUID? = null,
+    forrigeBehandlingId: BehandlingId? = null,
     årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
     kravMottatt: LocalDate? = null,
@@ -163,7 +164,7 @@ fun Behandling.innvilgetOgFerdigstilt() = this.copy(
 
 fun behandlingBarn(
     id: UUID = UUID.randomUUID(),
-    behandlingId: UUID = UUID.randomUUID(),
+    behandlingId: BehandlingId = BehandlingId.randomUUID(),
     personIdent: String = "1",
     søknadBarnId: UUID? = null,
 ) = BehandlingBarn(
@@ -223,7 +224,7 @@ fun Fagsak.tilFagsakDomain() = FagsakDomain(
 )
 
 fun stønadsperiode(
-    behandlingId: UUID,
+    behandlingId: BehandlingId,
     fom: LocalDate,
     tom: LocalDate,
     målgruppe: MålgruppeType = MålgruppeType.AAP,
@@ -237,7 +238,7 @@ fun stønadsperiode(
 )
 
 fun vilkår(
-    behandlingId: UUID,
+    behandlingId: BehandlingId,
     type: VilkårType,
     resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
     delvilkår: List<Delvilkår> = emptyList(),
@@ -292,7 +293,7 @@ fun revurderingsinformasjon() = RevurderingsinformasjonDto(
  */
 
 fun vedtaksbrev(
-    behandlingId: UUID = UUID.randomUUID(),
+    behandlingId: BehandlingId = BehandlingId.randomUUID(),
     saksbehandlerHtml: String = "Brev med ${BESLUTTER_SIGNATUR_PLACEHOLDER} og ${BREVDATO_PLACEHOLDER}",
     saksbehandlersignatur: String = "Saksbehandler Signatur",
     besluttersignatur: String? = "Beslutter signatur",

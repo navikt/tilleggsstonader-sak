@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -45,7 +46,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
-import java.util.UUID
 
 @Service
 class BehandlingService(
@@ -59,9 +59,9 @@ class BehandlingService(
 
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
-    fun hentAktivIdent(behandlingId: UUID): String = behandlingRepository.finnAktivIdent(behandlingId)
+    fun hentAktivIdent(behandlingId: BehandlingId): String = behandlingRepository.finnAktivIdent(behandlingId)
 
-    fun hentEksterneIder(behandlingIder: Set<UUID>) = behandlingIder.takeIf { it.isNotEmpty() }
+    fun hentEksterneIder(behandlingIder: Set<BehandlingId>) = behandlingIder.takeIf { it.isNotEmpty() }
         ?.let { behandlingRepository.finnEksterneIder(it) } ?: emptySet()
 
     fun finnSisteIverksatteBehandling(fagsakId: FagsakId) =
@@ -79,7 +79,7 @@ class BehandlingService(
                 it.status == FERDIGSTILT && it.resultat != BehandlingResultat.HENLAGT
             }
 
-    fun hentBehandlingsjournalposter(behandlingId: UUID): List<Behandlingsjournalpost> {
+    fun hentBehandlingsjournalposter(behandlingId: BehandlingId): List<Behandlingsjournalpost> {
         return behandlingsjournalpostRepository.findAllByBehandlingId(behandlingId)
     }
 
@@ -135,23 +135,23 @@ class BehandlingService(
         return behandling
     }
 
-    fun hentBehandling(behandlingId: UUID): Behandling = behandlingRepository.findByIdOrThrow(behandlingId)
+    fun hentBehandling(behandlingId: BehandlingId): Behandling = behandlingRepository.findByIdOrThrow(behandlingId)
 
-    fun hentSaksbehandling(behandlingId: UUID): Saksbehandling = behandlingRepository.finnSaksbehandling(behandlingId)
+    fun hentSaksbehandling(behandlingId: BehandlingId): Saksbehandling = behandlingRepository.finnSaksbehandling(behandlingId)
 
     fun hentSaksbehandling(eksternBehandlingId: Long): Saksbehandling =
         behandlingRepository.finnSaksbehandling(eksternBehandlingId)
 
-    fun hentEksternBehandlingId(behandlingId: UUID) = eksternBehandlingIdRepository.findByBehandlingId(behandlingId)
+    fun hentEksternBehandlingId(behandlingId: BehandlingId) = eksternBehandlingIdRepository.findByBehandlingId(behandlingId)
 
     fun hentBehandlingPåEksternId(eksternBehandlingId: Long): Behandling = behandlingRepository.finnMedEksternId(
         eksternBehandlingId,
     ) ?: error("Kan ikke finne behandling med eksternId=$eksternBehandlingId")
 
-    fun hentBehandlinger(behandlingIder: Set<UUID>): List<Behandling> =
+    fun hentBehandlinger(behandlingIder: Set<BehandlingId>): List<Behandling> =
         behandlingRepository.findAllByIdOrThrow(behandlingIder) { it.id }
 
-    fun oppdaterStatusPåBehandling(behandlingId: UUID, status: BehandlingStatus): Behandling {
+    fun oppdaterStatusPåBehandling(behandlingId: BehandlingId, status: BehandlingStatus): Behandling {
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer status på behandling $behandlingId " +
@@ -166,7 +166,7 @@ class BehandlingService(
     }
 
     // TODO skal vi sette kategori på behandling?
-    fun oppdaterKategoriPåBehandling(behandlingId: UUID, kategori: BehandlingKategori): Behandling {
+    fun oppdaterKategoriPåBehandling(behandlingId: BehandlingId, kategori: BehandlingKategori): Behandling {
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer kategori på behandling $behandlingId " +
@@ -175,7 +175,7 @@ class BehandlingService(
         return behandlingRepository.update(behandling.copy(kategori = kategori))
     }
 
-    fun oppdaterForrigeBehandlingId(behandlingId: UUID, forrigeBehandlingId: UUID): Behandling {
+    fun oppdaterForrigeBehandlingId(behandlingId: BehandlingId, forrigeBehandlingId: BehandlingId): Behandling {
         val behandling = hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke endre forrigeBehandlingId når behandlingen er låst"
@@ -187,7 +187,7 @@ class BehandlingService(
         return behandlingRepository.update(behandling.copy(forrigeBehandlingId = forrigeBehandlingId))
     }
 
-    fun oppdaterStegPåBehandling(behandlingId: UUID, steg: StegType): Behandling {
+    fun oppdaterStegPåBehandling(behandlingId: BehandlingId, steg: StegType): Behandling {
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer steg på behandling $behandlingId " +
@@ -196,7 +196,7 @@ class BehandlingService(
         return behandlingRepository.update(behandling.copy(steg = steg))
     }
 
-    fun oppdaterKravMottatt(behandlingId: UUID, kravMottatt: LocalDate?): Behandling {
+    fun oppdaterKravMottatt(behandlingId: BehandlingId, kravMottatt: LocalDate?): Behandling {
         return behandlingRepository.update(hentBehandling(behandlingId).copy(kravMottatt = kravMottatt))
     }
 
@@ -207,7 +207,7 @@ class BehandlingService(
         return behandlingRepository.findByFagsakId(fagsakId).sortertEtterVedtakstidspunkt()
     }
 
-    fun leggTilBehandlingsjournalpost(journalpostId: String, journalposttype: Journalposttype, behandlingId: UUID) {
+    fun leggTilBehandlingsjournalpost(journalpostId: String, journalposttype: Journalposttype, behandlingId: BehandlingId) {
         behandlingsjournalpostRepository.insert(
             Behandlingsjournalpost(
                 behandlingId = behandlingId,
@@ -219,7 +219,7 @@ class BehandlingService(
     }
 
     @Transactional
-    fun henleggBehandling(behandlingId: UUID, henlagt: HenlagtDto): Behandling {
+    fun henleggBehandling(behandlingId: BehandlingId, henlagt: HenlagtDto): Behandling {
         val behandling = hentBehandling(behandlingId)
         validerAtBehandlingenKanHenlegges(behandling)
         val henlagtBehandling = behandling.copy(
@@ -256,7 +256,7 @@ class BehandlingService(
     /**
      * Setter endelig resultat på behandling, setter vedtakstidspunkt på behandling
      */
-    fun oppdaterResultatPåBehandling(behandlingId: UUID, behandlingResultat: BehandlingResultat): Behandling {
+    fun oppdaterResultatPåBehandling(behandlingId: BehandlingId, behandlingResultat: BehandlingResultat): Behandling {
         val behandling = hentBehandling(behandlingId)
         feilHvis(behandlingResultat == BehandlingResultat.IKKE_SATT) {
             "Må sette et endelig resultat og ikke $behandlingResultat"

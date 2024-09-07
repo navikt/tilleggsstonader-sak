@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -495,7 +496,7 @@ internal class StønadsperiodeValideringUtilTest {
 
         @Test
         fun `skal ikke kaste feil om stønadsperiode overlapper med slettet vilkårperiode uten rett til stønad`() {
-            val behandlingId = UUID.randomUUID()
+            val behandlingId = BehandlingId.randomUUID()
 
             val målgrupper = listOf(
                 målgruppe(

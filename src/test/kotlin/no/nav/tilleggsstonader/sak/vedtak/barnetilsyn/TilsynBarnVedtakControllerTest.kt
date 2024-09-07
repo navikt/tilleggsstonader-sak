@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
@@ -32,7 +33,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.client.exchange
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class TilsynBarnVedtakControllerTest(
     @Autowired
@@ -73,7 +73,7 @@ class TilsynBarnVedtakControllerTest(
     @Test
     fun `skal validere token`() {
         headers.clear()
-        val exception = catchProblemDetailException { hentVedtak(UUID.randomUUID()) }
+        val exception = catchProblemDetailException { hentVedtak(BehandlingId.randomUUID()) }
 
         assertThat(exception.httpStatus).isEqualTo(HttpStatus.UNAUTHORIZED)
     }
@@ -138,7 +138,7 @@ class TilsynBarnVedtakControllerTest(
         )
     }
 
-    private fun hentVedtak(behandlingId: UUID) =
+    private fun hentVedtak(behandlingId: BehandlingId) =
         restTemplate.exchange<VedtakTilsynBarnDto>(
             localhost("api/vedtak/tilsyn-barn/$behandlingId"),
             HttpMethod.GET,

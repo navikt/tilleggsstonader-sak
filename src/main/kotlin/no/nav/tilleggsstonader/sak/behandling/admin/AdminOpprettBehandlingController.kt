@@ -2,13 +2,13 @@ package no.nav.tilleggsstonader.sak.behandling.admin
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.IdentRequest
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping(path = ["/api/behandling/admin"])
@@ -27,7 +27,7 @@ class AdminOpprettBehandlingController(
     }
 
     @PostMapping("opprett-foerstegangsbehandling")
-    fun opprettFørstegangsbehandling(@RequestBody request: AdminOpprettFørstegangsbehandlingDto): UUID {
+    fun opprettFørstegangsbehandling(@RequestBody request: AdminOpprettFørstegangsbehandlingDto): BehandlingId {
         tilgangService.validerHarSaksbehandlerrolle()
         tilgangService.validerTilgangTilPersonMedBarn(request.ident, AuditLoggerEvent.CREATE)
 

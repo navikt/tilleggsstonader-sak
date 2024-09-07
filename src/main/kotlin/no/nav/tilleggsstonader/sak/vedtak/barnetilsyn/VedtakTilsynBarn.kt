@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsresultat
@@ -16,7 +17,7 @@ import java.util.UUID
  */
 data class VedtakTilsynBarn(
     @Id
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val type: TypeVedtak,
     val vedtak: VedtaksdataTilsynBarn? = null,
     val beregningsresultat: VedtaksdataBeregningsresultat? = null,

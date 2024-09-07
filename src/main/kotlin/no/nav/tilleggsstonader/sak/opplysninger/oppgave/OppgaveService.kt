@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -36,7 +37,6 @@ import org.springframework.stereotype.Service
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 @Service
 class OppgaveService(
@@ -115,7 +115,7 @@ class OppgaveService(
     }
 
     fun opprettOppgave(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         oppgave: OpprettOppgave,
     ): Long {
         val fagsak = fagsakService.hentFagsakForBehandling(behandlingId)
@@ -130,7 +130,7 @@ class OppgaveService(
     fun opprettOppgave(
         personIdent: String,
         stønadstype: Stønadstype,
-        behandlingId: UUID?,
+        behandlingId: BehandlingId?,
         oppgave: OpprettOppgave,
     ): Long {
         feilHvis(oppgave.oppgavetype == Oppgavetype.BehandleSak && behandlingId == null) {
@@ -148,7 +148,7 @@ class OppgaveService(
 
     private fun getOppgaveFinnesFraFør(
         oppgavetype: Oppgavetype,
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
     ) = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
 
     fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse {
@@ -205,11 +205,11 @@ class OppgaveService(
     fun hentOppgaveDomain(oppgaveId: Long): OppgaveDomain? =
         oppgaveRepository.findByGsakOppgaveId(oppgaveId)
 
-    fun hentOppgaveSomIkkeErFerdigstilt(behandlingId: UUID, oppgavetype: Oppgavetype): OppgaveDomain? {
+    fun hentOppgaveSomIkkeErFerdigstilt(behandlingId: BehandlingId, oppgavetype: Oppgavetype): OppgaveDomain? {
         return oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
     }
 
-    fun hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandlingId: UUID): OppgaveDomain? {
+    fun hentBehandleSakOppgaveSomIkkeErFerdigstilt(behandlingId: BehandlingId): OppgaveDomain? {
         return oppgaveRepository.findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
             behandlingId,
             setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak),
@@ -220,7 +220,7 @@ class OppgaveService(
         return oppgaveClient.finnOppgaveMedId(gsakOppgaveId)
     }
 
-    fun ferdigstillBehandleOppgave(behandlingId: UUID, oppgavetype: Oppgavetype) {
+    fun ferdigstillBehandleOppgave(behandlingId: BehandlingId, oppgavetype: Oppgavetype) {
         val oppgave = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
             ?: error("Finner ikke oppgave for behandling $behandlingId type=$oppgavetype")
         ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave)
@@ -236,7 +236,7 @@ class OppgaveService(
     /**
      *  Forsøker å ferdigstille oppgave hvis den finnes. Hvis oppgaven er feilregistrert i oppgavesystemet vil den bli markert som ferdigstilt.
      */
-    fun ferdigstillOppgaveOgsåHvisFeilregistrert(behandlingId: UUID, oppgavetype: Oppgavetype) {
+    fun ferdigstillOppgaveOgsåHvisFeilregistrert(behandlingId: BehandlingId, oppgavetype: Oppgavetype) {
         val oppgave = oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId, oppgavetype)
         oppgave?.let {
             try {
@@ -257,13 +257,13 @@ class OppgaveService(
         oppgaveClient.ferdigstillOppgave(gsakOppgaveId)
     }
 
-    fun finnSisteBehandleSakOppgaveForBehandling(behandlingId: UUID): OppgaveDomain? =
+    fun finnSisteBehandleSakOppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         oppgaveRepository.findTopByBehandlingIdAndTypeOrderBySporbarOpprettetTidDesc(
             behandlingId,
             Oppgavetype.BehandleSak,
         )
 
-    fun finnSisteOppgaveForBehandling(behandlingId: UUID): OppgaveDomain? {
+    fun finnSisteOppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? {
         return oppgaveRepository.findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId)
     }
 

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsgrunnlag
@@ -54,7 +55,7 @@ object TilsynBarnTestUtil {
     fun innvilgetVedtak(
         vedtak: VedtaksdataTilsynBarn? = vedtaksdata,
         beregningsresultat: VedtaksdataBeregningsresultat? = vedtakBeregningsresultat,
-        behandlingId: UUID = UUID.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.randomUUID(),
     ) = VedtakTilsynBarn(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,

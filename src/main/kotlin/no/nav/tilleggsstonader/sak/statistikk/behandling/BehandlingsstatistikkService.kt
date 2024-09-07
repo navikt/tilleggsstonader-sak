@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
@@ -23,7 +24,6 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.util.UUID
 
 @Service
 class BehandlingsstatistikkService(
@@ -37,7 +37,7 @@ class BehandlingsstatistikkService(
 
     @Transactional
     fun sendBehandlingstatistikk(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
         gjeldendeSaksbehandler: String?,
@@ -56,7 +56,7 @@ class BehandlingsstatistikkService(
     }
 
     private fun mapTilBehandlingDVH(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
         gjeldendeSaksbehandler: String?,
@@ -130,7 +130,7 @@ class BehandlingsstatistikkService(
             null
         }
 
-    private fun finnSisteOppgaveForBehandlingen(behandlingId: UUID, oppgaveId: Long?): Oppgave? {
+    private fun finnSisteOppgaveForBehandlingen(behandlingId: BehandlingId, oppgaveId: Long?): Oppgave? {
         val gsakOppgaveId = oppgaveId ?: oppgaveService.finnSisteOppgaveForBehandling(behandlingId)?.gsakOppgaveId
 
         return gsakOppgaveId?.let { oppgaveService.hentOppgave(it) }

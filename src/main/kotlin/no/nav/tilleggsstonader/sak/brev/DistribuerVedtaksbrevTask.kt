@@ -9,12 +9,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import org.springframework.stereotype.Service
 import java.util.Properties
-import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -33,7 +33,7 @@ class DistribuerVedtaksbrevTask(
 ) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
-        val behandlingId = UUID.fromString(task.payload)
+        val behandlingId = BehandlingId.fromString(task.payload)
 
         val brevmottakere = brevmottakerRepository.findByBehandlingId(behandlingId)
 
@@ -70,7 +70,7 @@ class DistribuerVedtaksbrevTask(
 
     companion object {
 
-        fun opprettTask(behandlingId: UUID): Task =
+        fun opprettTask(behandlingId: BehandlingId): Task =
             Task(
                 type = TYPE,
                 payload = behandlingId.toString(),

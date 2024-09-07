@@ -9,9 +9,9 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.Filtype
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.dokumentTypeInterntVedtak
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.brev.FamilieDokumentClient
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -28,7 +28,7 @@ class InterntVedtakTask(
 ) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
-        val behandlingId = UUID.fromString(task.payload)
+        val behandlingId = BehandlingId.fromString(task.payload)
         val interntVedtak = interntVedtakService.lagInterntVedtak(behandlingId)
         val html = htmlifyClient.generateHtml(interntVedtak)
         val pdf = dokumentClient.genererPdf(html)
@@ -63,7 +63,7 @@ class InterntVedtakTask(
     companion object {
         const val TYPE = "lagInterntVedtak"
 
-        fun lagTask(behandlingId: UUID): Task {
+        fun lagTask(behandlingId: BehandlingId): Task {
             return Task(TYPE, behandlingId.toString())
         }
     }

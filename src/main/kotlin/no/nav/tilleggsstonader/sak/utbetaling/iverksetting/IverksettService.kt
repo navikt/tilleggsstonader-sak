@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -45,7 +46,7 @@ class IverksettService(
      * for å kunne sjekke status på iverksetting og for å kunne opphøre andeler fra forrige behandling.
      */
     @Transactional
-    fun iverksettBehandlingFørsteGang(behandlingId: UUID) {
+    fun iverksettBehandlingFørsteGang(behandlingId: BehandlingId) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         if (!behandling.resultat.skalIverksettes) {
             logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
@@ -58,26 +59,28 @@ class IverksettService(
 
         val totrinnskontroll = hentTotrinnskontroll(behandlingId)
 
+        val iverksettingId = behandlingId.id
         val dto = IverksettDtoMapper.map(
             behandling = behandling,
             andelerTilkjentYtelse = andeler,
             totrinnskontroll = totrinnskontroll,
-            iverksettingId = behandlingId,
+            iverksettingId = iverksettingId,
             forrigeIverksetting = forrigeIverksetting(behandling, tilkjentYtelse),
         )
-        opprettHentStatusFraIverksettingTask(behandling, behandlingId)
+        opprettHentStatusFraIverksettingTask(behandling, iverksettingId)
         iverksettClient.iverksett(dto)
     }
 
-    fun hentAndelTilkjentYtelse(behandlingId: UUID) =
+    fun hentAndelTilkjentYtelse(behandlingId: BehandlingId) =
         andelTilkjentYtelseRepository.findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId)
 
     private fun andelerForFørsteIverksettingAvBehandling(tilkjentYtelse: TilkjentYtelse): Collection<AndelTilkjentYtelse> {
         val måned = YearMonth.now()
-        val andelerTilIverksetting = finnAndelerTilIverksetting(tilkjentYtelse, tilkjentYtelse.behandlingId, måned)
+        val iverksettingId = tilkjentYtelse.behandlingId.id
+        val andelerTilIverksetting = finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, måned)
 
         return andelerTilIverksetting.ifEmpty {
-            val iverksetting = Iverksetting(tilkjentYtelse.behandlingId, osloNow())
+            val iverksetting = Iverksetting(iverksettingId, osloNow())
 
             listOf(tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned))
         }
@@ -93,7 +96,7 @@ class IverksettService(
      * Når man iverksetter samme behandling neste gang skal man bruke inneværende måned for å iverksette aktuell måned
      */
     @Transactional
-    fun iverksett(behandlingId: UUID, iverksettingId: UUID, måned: YearMonth) {
+    fun iverksett(behandlingId: BehandlingId, iverksettingId: UUID, måned: YearMonth) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         if (!behandling.resultat.skalIverksettes) {
             logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
@@ -189,7 +192,7 @@ class IverksettService(
         andelTilkjentYtelseRepository.updateAll(andelerSomSkalOppdateres)
     }
 
-    private fun hentTotrinnskontroll(behandlingId: UUID): Totrinnskontroll {
+    private fun hentTotrinnskontroll(behandlingId: BehandlingId): Totrinnskontroll {
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandlingId)
             ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
         feilHvis(totrinnskontroll.status != TotrinnInternStatus.GODKJENT) {
@@ -234,7 +237,7 @@ class IverksettService(
     /**
      * Utleder [ForrigeIverksettingDto] ut fra andel med siste tidspunkt for iverksetting
      */
-    private fun TilkjentYtelse.forrigeIverksetting(behandlingId: UUID): ForrigeIverksettingDto? =
+    private fun TilkjentYtelse.forrigeIverksetting(behandlingId: BehandlingId): ForrigeIverksettingDto? =
         andelerTilkjentYtelse
             .mapNotNull { it.iverksetting }
             .maxByOrNull { it.iverksettingTidspunkt }

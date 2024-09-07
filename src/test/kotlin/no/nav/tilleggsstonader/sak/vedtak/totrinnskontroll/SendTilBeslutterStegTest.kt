@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.brev.Vedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -42,7 +43,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
 import java.util.Properties
-import java.util.UUID
 
 class SendTilBeslutterStegTest {
 
@@ -71,7 +71,7 @@ class SendTilBeslutterStegTest {
     )
     private val saksbehandlerNavn = "saksbehandlernavn"
     private val vedtaksbrev = Vedtaksbrev(
-        behandlingId = UUID.randomUUID(),
+        behandlingId = BehandlingId.randomUUID(),
         saksbehandlersignatur = saksbehandlerNavn,
         beslutterPdf = null,
         saksbehandlerIdent = saksbehandlerNavn,

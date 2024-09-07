@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -16,7 +17,6 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.temporal.ChronoUnit
-import java.util.UUID
 
 internal class VilkårRepositoryTest : IntegrationTest() {
 
@@ -43,7 +43,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
             ),
         )
 
-        Assertions.assertThat(vilkårRepository.findByBehandlingId(UUID.randomUUID())).isEmpty()
+        Assertions.assertThat(vilkårRepository.findByBehandlingId(BehandlingId.randomUUID())).isEmpty()
         Assertions.assertThat(vilkårRepository.findByBehandlingId(behandling.id)).containsOnly(vilkår)
     }
 

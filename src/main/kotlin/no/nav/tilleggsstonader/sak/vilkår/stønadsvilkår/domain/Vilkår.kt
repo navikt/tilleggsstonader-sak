@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
@@ -26,7 +27,7 @@ import java.util.UUID
 data class Vilkår(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
     val type: VilkårType,
     val fom: LocalDate? = null,
@@ -104,7 +105,7 @@ fun List<Vilkår>.utledVurderinger(vilkårType: VilkårType, regelId: RegelId) =
  * Behandling C gjenbruker fra B, men peker mot A sitt vilkår
  */
 data class Opphavsvilkår(
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val vurderingstidspunkt: LocalDateTime,
 )
 

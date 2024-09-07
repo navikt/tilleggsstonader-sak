@@ -1,14 +1,14 @@
 package no.nav.tilleggsstonader.sak.brev
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import org.springframework.data.annotation.Id
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class Vedtaksbrev(
     @Id
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val saksbehandlerHtml: String,
     val saksbehandlersignatur: String,
     val besluttersignatur: String? = null,

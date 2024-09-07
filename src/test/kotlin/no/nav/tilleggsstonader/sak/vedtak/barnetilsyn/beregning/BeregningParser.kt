@@ -7,11 +7,11 @@ import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import java.util.UUID
 
 enum class BeregningNøkler(
     override val nøkkel: String,
@@ -33,7 +33,7 @@ enum class BeregningNøkler(
     BELØP("Beløp"),
 }
 
-fun mapStønadsperioder(behandlingId: UUID, dataTable: DataTable) = dataTable.mapRad { rad ->
+fun mapStønadsperioder(behandlingId: BehandlingId, dataTable: DataTable) = dataTable.mapRad { rad ->
     Stønadsperiode(
         behandlingId = behandlingId,
         fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
@@ -44,7 +44,7 @@ fun mapStønadsperioder(behandlingId: UUID, dataTable: DataTable) = dataTable.ma
     )
 }
 
-fun mapAktiviteter(behandlingId: UUID, dataTable: DataTable) = dataTable.mapRad { rad ->
+fun mapAktiviteter(behandlingId: BehandlingId, dataTable: DataTable) = dataTable.mapRad { rad ->
     aktivitet(
         behandlingId = behandlingId,
         fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),

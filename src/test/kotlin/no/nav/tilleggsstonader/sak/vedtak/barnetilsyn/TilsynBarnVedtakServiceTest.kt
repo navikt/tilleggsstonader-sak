@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
@@ -25,7 +26,7 @@ class TilsynBarnVedtakServiceTest {
     @Test
     fun `skal mappe avslått vedtak til dto`() {
         val vedtak = VedtakTilsynBarn(
-            behandlingId = UUID.randomUUID(),
+            behandlingId = BehandlingId.randomUUID(),
             type = TypeVedtak.AVSLAG,
             avslagBegrunnelse = "begrunnelse",
             årsakerAvslag = ÅrsakAvslag.Wrapper(årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET)),

@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -107,7 +108,7 @@ class TilsynBarnBeregnYtelseStegTest {
     private fun mockVilkårperioder(
         fom: LocalDate = LocalDate.of(2023, 1, 1),
         tom: LocalDate = LocalDate.of(2023, 1, 31),
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
     ) {
         every {
             vilkårperiodeRepository.findByBehandlingIdAndResultat(
@@ -126,7 +127,7 @@ class TilsynBarnBeregnYtelseStegTest {
     private fun mockStønadsperioder(
         fom: LocalDate = LocalDate.of(2023, 1, 1),
         tom: LocalDate = LocalDate.of(2023, 1, 31),
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
     ) {
         every { stønadsperiodeService.findAllByBehandlingId(behandlingId) } returns listOf(
             stønadsperiode(

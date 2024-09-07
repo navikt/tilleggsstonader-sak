@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
@@ -134,7 +135,7 @@ class VilkårService(
     }
 
     private fun oppdaterVilkårTilSkalIkkeVurderes(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         vilkår: Vilkår,
     ): VilkårDto {
         val metadata = hentHovedregelMetadata(behandlingId)
@@ -152,13 +153,13 @@ class VilkårService(
         ).tilDto()
     }
 
-    private fun hentHovedregelMetadata(behandlingId: UUID) = hentGrunnlagOgMetadata(behandlingId).second
+    private fun hentHovedregelMetadata(behandlingId: BehandlingId) = hentGrunnlagOgMetadata(behandlingId).second
 
-    private fun validerBehandling(behandlingId: UUID) {
+    private fun validerBehandling(behandlingId: BehandlingId) {
         validerBehandling(behandlingService.hentSaksbehandling(behandlingId))
     }
 
-    private fun validerBehandlingOgVilkårType(behandlingId: UUID, vilkårType: VilkårType) {
+    private fun validerBehandlingOgVilkårType(behandlingId: BehandlingId, vilkårType: VilkårType) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
         validerBehandling(behandling)
@@ -190,7 +191,7 @@ class VilkårService(
      * Tilgangskontroll sjekker att man har tilgang til behandlingId som blir sendt inn, men det er mulig å sende inn
      * en annen behandlingId enn den som er på vilkåret
      */
-    private fun validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId: UUID, requestBehandlingId: UUID) {
+    private fun validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId: BehandlingId, requestBehandlingId: BehandlingId) {
         if (behandlingId != requestBehandlingId) {
             throw Feil(
                 "BehandlingId=$requestBehandlingId er ikke lik vilkårets sin behandlingId=$behandlingId",
@@ -207,28 +208,28 @@ class VilkårService(
     }
 
     @Transactional
-    fun hentVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
+    fun hentVilkårsvurdering(behandlingId: BehandlingId): VilkårsvurderingDto {
         val (grunnlag, metadata) = hentGrunnlagOgMetadata(behandlingId)
         val vurderinger = hentEllerOpprettVilkår(behandlingId, metadata).map(Vilkår::tilDto)
         return VilkårsvurderingDto(vilkårsett = vurderinger, grunnlag = grunnlag)
     }
 
-    fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
+    fun hentVilkårsett(behandlingId: BehandlingId): List<VilkårDto> {
         val vilkårsett = hentVilkår(behandlingId)
         return vilkårsett.map { it.tilDto() }
     }
 
-    fun hentVilkår(behandlingId: UUID): List<Vilkår> {
+    fun hentVilkår(behandlingId: BehandlingId): List<Vilkår> {
         return vilkårRepository.findByBehandlingId(behandlingId)
     }
 
     @Transactional
-    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårsvurderingDto {
+    fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: BehandlingId): VilkårsvurderingDto {
         // grunnlagsdataService.oppdaterOgHentNyGrunnlagsdata(behandlingId)
         return this.hentVilkårsvurdering(behandlingId)
     }
 
-    fun hentGrunnlagOgMetadata(behandlingId: UUID): Pair<BehandlingFaktaDto, HovedregelMetadata> {
+    fun hentGrunnlagOgMetadata(behandlingId: BehandlingId): Pair<BehandlingFaktaDto, HovedregelMetadata> {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val barn = barnService.finnBarnPåBehandling(behandlingId)
         val grunnlag = behandlingFaktaService.hentFakta(behandlingId)
@@ -237,7 +238,7 @@ class VilkårService(
 
     // TODO rename metode når man kun henter lagretVilkårsett når FT fjernes
     fun hentEllerOpprettVilkår(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         metadata: HovedregelMetadata,
     ): List<Vilkår> {
         return vilkårRepository.findByBehandlingId(behandlingId)
@@ -253,7 +254,7 @@ class VilkårService(
      * Når en revurdering opprettes skal den kopiere de tidligere vilkårene for samme stønad.
      */
     fun kopierVilkårsettTilNyBehandling(
-        forrigeBehandlingId: UUID,
+        forrigeBehandlingId: BehandlingId,
         nyBehandling: Behandling,
         barnIdMap: Map<TidligereBarnId, NyttBarnId>,
         stønadstype: Stønadstype,
@@ -272,7 +273,7 @@ class VilkårService(
 
     private fun lagKopiAvTidligereVurderinger(
         tidligereVilkår: Map<UUID, Vilkår>,
-        nyBehandlingsId: UUID,
+        nyBehandlingsId: BehandlingId,
         barnIdMap: Map<TidligereBarnId, NyttBarnId>,
     ): List<Vilkår> =
         tidligereVilkår.values.map { vilkår ->
@@ -291,18 +292,18 @@ class VilkårService(
                 ?: error("Fant ikke barn=$it på gjeldende behandling med barnIdMapping=$barnIdMap")
         }
 
-    fun erAlleVilkårOppfylt(behandlingId: UUID): Boolean {
+    fun erAlleVilkårOppfylt(behandlingId: BehandlingId): Boolean {
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
         val lagretVilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
         return VilkårsresultatUtil.erAlleVilkårOppfylt(lagretVilkårsett, stønadstype)
     }
 
-    fun hentOppfyltePassBarnVilkår(behandlingId: UUID): List<Vilkår> {
+    fun hentOppfyltePassBarnVilkår(behandlingId: BehandlingId): List<Vilkår> {
         return hentPassBarnVilkår(behandlingId)
             .filter { it.resultat == Vilkårsresultat.OPPFYLT }
     }
 
-    fun hentPassBarnVilkår(behandlingId: UUID): List<Vilkår> {
+    fun hentPassBarnVilkår(behandlingId: BehandlingId): List<Vilkår> {
         return vilkårRepository.findByBehandlingId(behandlingId)
             .filter { it.type == VilkårType.PASS_BARN }
     }

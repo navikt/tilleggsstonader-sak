@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping(path = ["/api/vilkar"])
@@ -80,13 +80,13 @@ class VilkårController(
     }
 
     @GetMapping("{behandlingId}")
-    fun getVilkår(@PathVariable behandlingId: UUID): VilkårsvurderingDto {
+    fun getVilkår(@PathVariable behandlingId: BehandlingId): VilkårsvurderingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return vilkårService.hentVilkårsvurdering(behandlingId)
     }
 
     @GetMapping("{behandlingId}/oppdater")
-    fun oppdaterRegisterdata(@PathVariable behandlingId: UUID): VilkårsvurderingDto {
+    fun oppdaterRegisterdata(@PathVariable behandlingId: BehandlingId): VilkårsvurderingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId)

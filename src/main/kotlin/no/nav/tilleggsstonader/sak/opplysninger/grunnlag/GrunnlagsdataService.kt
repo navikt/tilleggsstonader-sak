@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
@@ -12,7 +13,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class GrunnlagsdataService(
@@ -25,17 +25,17 @@ class GrunnlagsdataService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentGrunnlagsdata(behandlingId: UUID): Grunnlagsdata {
+    fun hentGrunnlagsdata(behandlingId: BehandlingId): Grunnlagsdata {
         return grunnlagsdataRepository.findByIdOrThrow(behandlingId)
     }
 
-    fun opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId: UUID) {
+    fun opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId: BehandlingId) {
         if (!grunnlagsdataRepository.existsById(behandlingId)) {
             opprettGrunnlagsdata(behandlingId)
         }
     }
 
-    private fun opprettGrunnlagsdata(behandlingId: UUID): Grunnlagsdata {
+    private fun opprettGrunnlagsdata(behandlingId: BehandlingId): Grunnlagsdata {
         // TODO historikk behandling påbegynt NAV-20376
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         logger.info("Oppretter grunnlagsdata for behandling=$behandlingId status=${behandling.status}")

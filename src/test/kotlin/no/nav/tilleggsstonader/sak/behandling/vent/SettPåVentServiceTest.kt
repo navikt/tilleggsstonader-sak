@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_KLAR
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_PÅ_VENT
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.Optional
-import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
 class SettPåVentServiceTest : IntegrationTest() {
@@ -191,7 +191,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             validerHistorikkInnslag(behandling.id, skalHaMetadata = true)
         }
 
-        private fun validerTattAvVent(behandlingId: UUID, kommentar: String? = null) {
+        private fun validerTattAvVent(behandlingId: BehandlingId, kommentar: String? = null) {
             with(settPåVentRepository.findAll().single()) {
                 assertThat(aktiv).isFalse()
                 assertThat(taAvVentKommentar).isEqualTo(kommentar)
@@ -209,7 +209,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             }
         }
 
-        private fun validerHistorikkInnslag(behandlingId: UUID, skalHaMetadata: Boolean) {
+        private fun validerHistorikkInnslag(behandlingId: BehandlingId, skalHaMetadata: Boolean) {
             with(behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId)) {
                 assertThat(utfall).isEqualTo(StegUtfall.TATT_AV_VENT)
                 if (skalHaMetadata) {

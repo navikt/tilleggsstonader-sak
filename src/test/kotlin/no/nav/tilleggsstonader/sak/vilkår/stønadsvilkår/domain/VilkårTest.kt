@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -10,8 +11,8 @@ import java.util.UUID
 
 internal class VilkårTest {
 
-    private val behandlingIdFørstegangsbehandling = UUID.randomUUID()
-    private val behandlingIdRevurdering = UUID.randomUUID()
+    private val behandlingIdFørstegangsbehandling = BehandlingId.randomUUID()
+    private val behandlingIdRevurdering = BehandlingId.randomUUID()
 
     @Test
     internal fun `opprettOpphavsvilkår - et vilkår som ikke er gjenbrukt skal peke til behandlingen`() {
@@ -47,7 +48,7 @@ internal class VilkårTest {
     fun `skal feile dersom FOM fra vilkår ikke er første dagen i måneden`() {
         assertThatThrownBy {
             vilkår(
-                behandlingId = UUID.randomUUID(),
+                behandlingId = BehandlingId.randomUUID(),
                 barnId = UUID.randomUUID(),
                 type = VilkårType.PASS_BARN,
                 resultat = Vilkårsresultat.OPPFYLT,
@@ -62,7 +63,7 @@ internal class VilkårTest {
     fun `skal feile dersom TOM fra vilkår ikke er siste dagen i måneden`() {
         assertThatThrownBy {
             vilkår(
-                behandlingId = UUID.randomUUID(),
+                behandlingId = BehandlingId.randomUUID(),
                 barnId = UUID.randomUUID(),
                 type = VilkårType.PASS_BARN,
                 resultat = Vilkårsresultat.OPPFYLT,

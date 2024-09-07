@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
@@ -275,7 +276,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         tom: LocalDate = this.TOM,
         medlemskap: SvarJaNei? = null,
         dekkesAvAnnetRegelverk: SvarJaNei? = SvarJaNei.NEI,
-        behandlingId: UUID = UUID.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.randomUUID(),
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
@@ -289,7 +290,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         fom: LocalDate = this.FOM,
         tom: LocalDate = this.TOM,
         lønnet: SvarJaNei? = SvarJaNei.NEI,
-        behandlingId: UUID = UUID.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.randomUUID(),
         aktivitetsdager: Int = 5,
     ) = LagreVilkårperiode(
         type = type,
@@ -316,6 +317,6 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
     private fun opprettVilkårperiode(periode: LagreVilkårperiode): LagreVilkårperiodeResponse {
         val oppdatertPeriode = vilkårperiodeService.opprettVilkårperiode(periode)
-        return vilkårperiodeService.validerOgLagResponse(behandlingId = oppdatertPeriode.id, periode = oppdatertPeriode)
+        return vilkårperiodeService.validerOgLagResponse(behandlingId = oppdatertPeriode.behandlingId, periode = oppdatertPeriode)
     }
 }

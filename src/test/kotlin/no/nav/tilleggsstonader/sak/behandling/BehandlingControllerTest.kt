@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -22,7 +23,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.exchange
-import java.util.UUID
 
 internal class BehandlingControllerTest : IntegrationTest() {
 
@@ -93,7 +93,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
         }
     }
 
-    private fun hentBehandling(id: UUID): ResponseEntity<BehandlingDto> {
+    private fun hentBehandling(id: BehandlingId): ResponseEntity<BehandlingDto> {
         return restTemplate.exchange(
             localhost("/api/behandling/$id"),
             HttpMethod.GET,
@@ -101,7 +101,7 @@ internal class BehandlingControllerTest : IntegrationTest() {
         )
     }
 
-    private fun henlegg(id: UUID, henlagt: HenlagtDto): ResponseEntity<BehandlingDto> {
+    private fun henlegg(id: BehandlingId, henlagt: HenlagtDto): ResponseEntity<BehandlingDto> {
         return restTemplate.exchange<BehandlingDto>(
             localhost("/api/behandling/$id/henlegg"),
             HttpMethod.POST,

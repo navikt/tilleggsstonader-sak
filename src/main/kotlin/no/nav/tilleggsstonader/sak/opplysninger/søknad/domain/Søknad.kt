@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -33,7 +34,7 @@ interface Søknad<T> {
 @Table("soknad_behandling")
 data class SøknadBehandling(
     @Id
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     @Column("soknad_id")
     val søknadId: UUID,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)

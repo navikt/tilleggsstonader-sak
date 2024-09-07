@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class SimuleringService(
@@ -27,7 +27,7 @@ class SimuleringService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentLagretSimulering(behandlingId: UUID): Simuleringsresultat? {
+    fun hentLagretSimulering(behandlingId: BehandlingId): Simuleringsresultat? {
         return simuleringsresultatRepository.findByIdOrNull(behandlingId)
     }
 

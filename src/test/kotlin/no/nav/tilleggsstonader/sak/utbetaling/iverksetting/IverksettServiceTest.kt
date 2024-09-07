@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.IverksettClientConfig.Companion.clearMock
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
@@ -77,6 +78,10 @@ class IverksettServiceTest : IntegrationTest() {
         clearMock(iverksettClient)
     }
 
+    private fun IverksettService.iverksett(behandlingId: BehandlingId, iverksettingId: BehandlingId, måned: YearMonth) {
+        this.iverksett(behandlingId, iverksettingId.id, måned)
+    }
+
     @Test
     fun `skal ikke iverksette hvis resultat er avslag`() {
         val behandling =
@@ -100,7 +105,7 @@ class IverksettServiceTest : IntegrationTest() {
 
         val oppdatertTilkjentYtelse = tilkjentYtelseRepository.findByIdOrThrow(tilkjentYtelse.id)
         val andel = oppdatertTilkjentYtelse.andelerTilkjentYtelse.single()
-        assertThat(andel.iverksetting?.iverksettingId).isEqualTo(behandling.id)
+        assertThat(andel.iverksetting?.iverksettingId).isEqualTo(behandling.id.id)
         assertThat(andel.statusIverksetting).isEqualTo(StatusIverksetting.SENDT)
         assertHarOpprettetTaskForÅSjekkeStatus(fagsak, behandling)
     }
@@ -175,7 +180,7 @@ class IverksettServiceTest : IntegrationTest() {
 
             assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
                 .isEqualTo(hentEksternBehandlingId(behandling))
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling.id)
+            assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling.id.id)
         }
 
         @Test
@@ -197,7 +202,7 @@ class IverksettServiceTest : IntegrationTest() {
 
             assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
                 .isEqualTo(hentEksternBehandlingId(behandling))
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling.id)
+            assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling.id.id)
         }
 
         @Test
@@ -251,7 +256,7 @@ class IverksettServiceTest : IntegrationTest() {
 
             assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
                 .isEqualTo(hentEksternBehandlingId(behandling2))
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling2.id)
+            assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling2.id.id)
         }
 
         @Test
@@ -394,6 +399,10 @@ class IverksettServiceTest : IntegrationTest() {
                 if (it.satstype == Satstype.DAG) dato.datoEllerNesteMandagHvisLørdagEllerSøndag() else dato
             it.fom == datoEllerNesteMandag
         }
+    }
+
+    fun AndelTilkjentYtelse.assertHarStatusOgId(statusIverksetting: StatusIverksetting, iverksettingId: BehandlingId?) {
+        assertHarStatusOgId(statusIverksetting, iverksettingId?.id)
     }
 
     fun AndelTilkjentYtelse.assertHarStatusOgId(statusIverksetting: StatusIverksetting, iverksettingId: UUID? = null) {

@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -28,7 +29,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.exchange
 import java.time.LocalDateTime
-import java.util.UUID
 
 internal class BehandlingshistorikkControllerTest : IntegrationTest() {
 
@@ -190,7 +190,7 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         )
     }
 
-    private fun hentHistorikk(id: UUID): ResponseEntity<List<HendelseshistorikkDto>> {
+    private fun hentHistorikk(id: BehandlingId): ResponseEntity<List<HendelseshistorikkDto>> {
         return restTemplate.exchange(
             localhost("/api/behandlingshistorikk/$id"),
             HttpMethod.GET,

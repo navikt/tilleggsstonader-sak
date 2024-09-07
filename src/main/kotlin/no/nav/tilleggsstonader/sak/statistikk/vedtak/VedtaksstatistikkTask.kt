@@ -7,11 +7,11 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Properties
-import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -34,7 +34,7 @@ class VedtaksstatistikkTask(
     companion object {
 
         fun opprettVedtaksstatistikkTask(
-            behandlingId: UUID,
+            behandlingId: BehandlingId,
             fagsakId: FagsakId,
             hendelseTidspunkt: LocalDateTime = osloNow(),
             stønadstype: Stønadstype,
@@ -60,7 +60,7 @@ class VedtaksstatistikkTask(
     }
 
     data class VedtaksstatistikkTaskPayload(
-        val behandlingId: UUID,
+        val behandlingId: BehandlingId,
         val fagsakId: FagsakId,
         val hendelseTidspunkt: LocalDateTime,
     )

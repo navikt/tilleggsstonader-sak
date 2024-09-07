@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -13,7 +14,6 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class TilkjentYtelseServiceTest {
 
@@ -31,7 +31,7 @@ class TilkjentYtelseServiceTest {
         @Test
         internal fun `skal returnere true hvis det finnes andel med sluttdato etter idag`() {
             val andelTilkjentYtelse = andelTilkjentYtelse(
-                kildeBehandlingId = UUID.randomUUID(),
+                kildeBehandlingId = BehandlingId.randomUUID(),
                 beløp = 1,
                 fom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 tom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
@@ -45,7 +45,7 @@ class TilkjentYtelseServiceTest {
         @Test
         internal fun `skal returnere false hvis det finnes andel med sluttdato før idag`() {
             val andelTilkjentYtelse = andelTilkjentYtelse(
-                kildeBehandlingId = UUID.randomUUID(),
+                kildeBehandlingId = BehandlingId.randomUUID(),
                 beløp = 1,
                 fom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 tom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),

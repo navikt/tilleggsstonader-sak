@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.erLørdagEllerSøndag
@@ -29,7 +30,7 @@ data class AndelTilkjentYtelse(
     val tom: LocalDate,
     val satstype: Satstype,
     val type: TypeAndel,
-    val kildeBehandlingId: UUID,
+    val kildeBehandlingId: BehandlingId,
     @Version
     val version: Int = 0,
     val statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,

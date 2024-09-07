@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
@@ -38,7 +39,7 @@ data class Vedtaksstatistikk(
     @Id
     val id: UUID = UUID.randomUUID(),
     val fagsakId: FagsakId,
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     val eksternFagsakId: Long,
     val eksternBehandlingId: Long,
     val relatertBehandlingId: Long?, // Ekstern behandlingsid på relatert behandling

@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class VedtakTilsynBarnTest {
     @Nested
@@ -31,7 +31,7 @@ class VedtakTilsynBarnTest {
         fun `skal feile om avslått vedtak ikke har årsaker`() {
             assertThatThrownBy {
                 VedtakTilsynBarn(
-                    behandlingId = UUID.randomUUID(),
+                    behandlingId = BehandlingId.randomUUID(),
                     type = TypeVedtak.AVSLAG,
                     avslagBegrunnelse = "begrunnelse",
                 )
@@ -43,7 +43,7 @@ class VedtakTilsynBarnTest {
         fun `skal feile om avslått vedtak ikke har årsak for avslag`() {
             assertThatThrownBy {
                 VedtakTilsynBarn(
-                    behandlingId = UUID.randomUUID(),
+                    behandlingId = BehandlingId.randomUUID(),
                     type = TypeVedtak.AVSLAG,
                     årsakerAvslag = ÅrsakAvslag.Wrapper(listOf(ÅrsakAvslag.INGEN_AKTIVITET)),
                 )

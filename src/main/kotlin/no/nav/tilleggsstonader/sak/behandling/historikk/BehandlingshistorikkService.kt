@@ -9,9 +9,9 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.tilHendelseshisto
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
 import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class BehandlingshistorikkService(private val behandlingshistorikkRepository: BehandlingshistorikkRepository) {
@@ -32,11 +32,11 @@ class BehandlingshistorikkService(private val behandlingshistorikkRepository: Be
         }
     }
 
-    fun finnSisteBehandlingshistorikk(behandlingId: UUID): Behandlingshistorikk {
+    fun finnSisteBehandlingshistorikk(behandlingId: BehandlingId): Behandlingshistorikk {
         return behandlingshistorikkRepository.findTopByBehandlingIdOrderByEndretTidDesc(behandlingId)
     }
 
-    fun finnSisteBehandlingshistorikk(behandlingId: UUID, type: StegType): Behandlingshistorikk? =
+    fun finnSisteBehandlingshistorikk(behandlingId: BehandlingId, type: StegType): Behandlingshistorikk? =
         behandlingshistorikkRepository.findTopByBehandlingIdAndStegOrderByEndretTidDesc(behandlingId, type)
 
     fun opprettHistorikkInnslag(behandlingshistorikk: Behandlingshistorikk) {
@@ -47,7 +47,7 @@ class BehandlingshistorikkService(private val behandlingshistorikkRepository: Be
      * @param metadata json object that will be serialized
      */
     fun opprettHistorikkInnslag(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         stegtype: StegType,
         utfall: StegUtfall?,
         metadata: Any?,

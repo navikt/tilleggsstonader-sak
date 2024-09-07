@@ -16,12 +16,12 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Profile("integrasjonstest")
 @Service
@@ -34,9 +34,9 @@ class TestoppsettService(
     private val grunnlagsdataService: GrunnlagsdataService,
 ) {
 
-    fun hentBehandling(behandlingId: UUID) = behandlingRepository.findByIdOrThrow(behandlingId)
+    fun hentBehandling(behandlingId: BehandlingId) = behandlingRepository.findByIdOrThrow(behandlingId)
 
-    fun hentSaksbehandling(behandlingId: UUID) = behandlingRepository.finnSaksbehandling(behandlingId)
+    fun hentSaksbehandling(behandlingId: BehandlingId) = behandlingRepository.finnSaksbehandling(behandlingId)
 
     fun opprettBehandlingMedFagsak(
         behandling: Behandling,
@@ -77,7 +77,7 @@ class TestoppsettService(
         return behandlingRepository.update(behandling)
     }
 
-    fun opprettGrunnlagsdata(behandlingId: UUID) {
+    fun opprettGrunnlagsdata(behandlingId: BehandlingId) {
         grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
     }
 

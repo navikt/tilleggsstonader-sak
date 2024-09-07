@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.libs.utils.fnr.Fødselsnummer
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
@@ -12,7 +13,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsy
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.UUID
 
 /**
  * Denne klassen håndterer henting av VilkårGrunnlagDto
@@ -26,7 +26,7 @@ class BehandlingFaktaService(
 ) {
 
     fun hentFakta(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
     ): BehandlingFaktaDto {
         val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
         val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
@@ -72,7 +72,7 @@ class BehandlingFaktaService(
     private fun mapBarn(
         grunnlagsdata: Grunnlagsdata,
         søknad: SøknadBarnetilsyn?,
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
     ): List<FaktaBarn> {
         val søknadBarnPåIdent = søknad?.barn?.associateBy { it.ident } ?: emptyMap()
         if (søknad != null) {

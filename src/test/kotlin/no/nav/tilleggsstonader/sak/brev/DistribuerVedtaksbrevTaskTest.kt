@@ -10,13 +10,13 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class DistribuerVedtaksbrevTaskTest {
 
@@ -32,7 +32,7 @@ class DistribuerVedtaksbrevTaskTest {
 
     @BeforeEach
     fun setUp() {
-        every { stegService.håndterSteg(any<UUID>(), brevSteg) } returns mockk()
+        every { stegService.håndterSteg(any<BehandlingId>(), brevSteg) } returns mockk()
     }
 
     @Test

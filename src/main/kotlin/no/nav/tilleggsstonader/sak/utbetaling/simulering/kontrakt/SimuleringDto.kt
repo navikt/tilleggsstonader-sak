@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt
 
-import java.util.UUID
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 
 data class SimuleringDto(
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
 )

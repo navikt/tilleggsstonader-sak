@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.jdbc.repository.query.Query
@@ -20,7 +21,7 @@ interface AndelTilkjentYtelseRepository :
         AND b.status = 'FERDIGSTILT' AND b.resultat IN ('INNVILGET', 'OPPHØRT')
         """,
     )
-    fun finnBehandlingerForIverksetting(sisteDatoIMåned: LocalDate): List<UUID>
+    fun finnBehandlingerForIverksetting(sisteDatoIMåned: LocalDate): List<BehandlingId>
 
-    fun findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId: UUID): List<AndelTilkjentYtelse>
+    fun findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId: BehandlingId): List<AndelTilkjentYtelse>
 }

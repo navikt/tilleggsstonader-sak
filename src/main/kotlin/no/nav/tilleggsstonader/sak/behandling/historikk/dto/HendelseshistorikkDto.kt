@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.behandling.historikk.dto
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class HendelseshistorikkDto(
-    val behandlingId: UUID,
+    val behandlingId: BehandlingId,
     var hendelse: Hendelse,
     val endretAvNavn: String,
     val endretTid: LocalDateTime,

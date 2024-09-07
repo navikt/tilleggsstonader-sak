@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -92,7 +93,7 @@ class InterntVedtakServiceTest {
     val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.randomUUID()))
     val behandling = saksbehandling(
         behandling = behandling(
-            id = UUID.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31"),
+            id = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31"),
             vedtakstidspunkt = vedtakstidspunkt,
             opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
             fagsak = fagsak,

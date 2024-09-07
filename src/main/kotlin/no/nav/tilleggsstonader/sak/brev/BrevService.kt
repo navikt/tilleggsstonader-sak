@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_SIGNATUR_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.BREVDATO_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.SAKSBEHANDLER_SIGNATUR_PLACEHOLDER
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
@@ -19,7 +20,6 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class BrevService(
@@ -44,7 +44,7 @@ class BrevService(
         return familieDokumentClient.genererPdf(htmlMedSignatur)
     }
 
-    fun hentBeslutterbrevEllerRekonstruerSaksbehandlerBrev(behandlingId: UUID): ByteArray {
+    fun hentBeslutterbrevEllerRekonstruerSaksbehandlerBrev(behandlingId: BehandlingId): ByteArray {
         val vedtaksbrev = vedtaksbrevRepository.findByIdOrThrow(behandlingId)
         return when (vedtaksbrev.beslutterPdf) {
             null -> familieDokumentClient.genererPdf(vedtaksbrev.saksbehandlerHtml)
@@ -53,7 +53,7 @@ class BrevService(
     }
 
     private fun lagreEllerOppdaterSaksbehandlerVedtaksbrev(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         saksbehandlersignatur: String,
         saksbehandlerHtml: String,
     ): Vedtaksbrev {
@@ -169,7 +169,7 @@ class BrevService(
         vedtaksbrevRepository.deleteById(saksbehandling.id)
     }
 
-    fun hentBesluttetBrev(behandlingId: UUID): Vedtaksbrev {
+    fun hentBesluttetBrev(behandlingId: BehandlingId): Vedtaksbrev {
         val vedtaksbrev = vedtaksbrevRepository.findByIdOrThrow(behandlingId)
 
         feilHvis(vedtaksbrev.beslutterPdf == null) {

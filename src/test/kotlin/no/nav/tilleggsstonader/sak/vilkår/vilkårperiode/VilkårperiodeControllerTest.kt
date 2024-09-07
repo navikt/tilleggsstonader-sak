@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -117,7 +118,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     ).body!!
 
     private fun oppdaterGrunnlag(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
     ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
         localhost("api/vilkarperiode/behandling/$behandlingId/oppdater-grunnlag"),
         HttpMethod.POST,

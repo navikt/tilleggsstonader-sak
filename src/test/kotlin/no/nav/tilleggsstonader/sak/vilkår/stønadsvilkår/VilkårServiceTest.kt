@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -302,7 +303,7 @@ internal class VilkårServiceTest {
             val vilkår = vilkår(
                 behandlingId = behandlingId,
                 type = VilkårType.PASS_BARN,
-                opphavsvilkår = Opphavsvilkår(UUID.randomUUID(), LocalDateTime.now()),
+                opphavsvilkår = Opphavsvilkår(BehandlingId.randomUUID(), LocalDateTime.now()),
             )
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
@@ -380,7 +381,7 @@ internal class VilkårServiceTest {
     }
 
     private fun lagVilkårsett(
-        behandlingId: UUID,
+        behandlingId: BehandlingId,
         resultat: Vilkårsresultat = OPPFYLT,
     ): List<Vilkår> {
         return VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN).map {
