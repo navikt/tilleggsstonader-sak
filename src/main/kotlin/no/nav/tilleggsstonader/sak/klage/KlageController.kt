@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.klage
 import no.nav.familie.prosessering.rest.Ressurs
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.klage.FagsystemVedtak
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.klage.dto.KlagebehandlingerDto
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
@@ -34,7 +35,7 @@ class KlageController(
     }
 
     @GetMapping("/fagsak-person/{fagsakPersonId}")
-    fun hentKlagebehandlinger(@PathVariable fagsakPersonId: UUID): KlagebehandlingerDto {
+    fun hentKlagebehandlinger(@PathVariable fagsakPersonId: FagsakPersonId): KlagebehandlingerDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         return klageService.hentBehandlinger(fagsakPersonId)
     }

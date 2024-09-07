@@ -3,11 +3,12 @@ package no.nav.tilleggsstonader.sak.fagsak.dto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import java.util.UUID
 
 data class FagsakDto(
     val id: UUID,
-    val fagsakPersonId: UUID,
+    val fagsakPersonId: FagsakPersonId,
     val personIdent: String,
     val stønadstype: Stønadstype,
     val erLøpende: Boolean,

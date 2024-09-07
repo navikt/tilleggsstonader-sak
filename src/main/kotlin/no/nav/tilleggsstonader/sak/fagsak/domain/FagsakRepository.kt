@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.jdbc.repository.query.Query
@@ -21,7 +22,7 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpda
     )
     fun findBySøkerIdent(personIdenter: Set<String>, stønadstype: Stønadstype): FagsakDomain?
 
-    fun findByFagsakPersonIdAndStønadstype(fagsakPersonId: UUID, stønadstype: Stønadstype): FagsakDomain?
+    fun findByFagsakPersonIdAndStønadstype(fagsakPersonId: FagsakPersonId, stønadstype: Stønadstype): FagsakDomain?
 
     // language=PostgreSQL
     @Query(
@@ -43,7 +44,7 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpda
     )
     fun findBySøkerIdent(personIdenter: Set<String>): List<FagsakDomain>
 
-    fun findByFagsakPersonId(fagsakPersonId: UUID): List<FagsakDomain>
+    fun findByFagsakPersonId(fagsakPersonId: FagsakPersonId): List<FagsakDomain>
 
     // language=PostgreSQL
     @Query(

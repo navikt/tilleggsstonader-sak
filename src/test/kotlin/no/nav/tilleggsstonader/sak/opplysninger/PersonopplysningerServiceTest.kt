@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
@@ -14,7 +15,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.util.UUID
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse as AdressebeskyttelsePdl
 
 class PersonopplysningerServiceTest {
@@ -42,7 +42,7 @@ class PersonopplysningerServiceTest {
         fun `har ikke verge hvis man ikke har noen vergemål`() {
             every { personService.hentSøker(any()) } returns pdlSøker()
 
-            assertThat(service.hentPersonopplysningerForFagsakPerson(UUID.randomUUID()).harVergemål).isFalse
+            assertThat(service.hentPersonopplysningerForFagsakPerson(FagsakPersonId.random()).harVergemål).isFalse
         }
 
         @Test
@@ -51,7 +51,7 @@ class PersonopplysningerServiceTest {
             val pdlSøker = pdlSøker(vergemaalEllerFremtidsfullmakt = listOf(vergemaalEllerFremtidsfullmakt))
             every { personService.hentSøker(any()) } returns pdlSøker
 
-            assertThat(service.hentPersonopplysningerForFagsakPerson(UUID.randomUUID()).harVergemål).isFalse
+            assertThat(service.hentPersonopplysningerForFagsakPerson(FagsakPersonId.random()).harVergemål).isFalse
         }
 
         @Test
@@ -59,7 +59,7 @@ class PersonopplysningerServiceTest {
             val pdlSøker = pdlSøker(vergemaalEllerFremtidsfullmakt = listOf(vergemaalEllerFremtidsfullmakt()))
             every { personService.hentSøker(any()) } returns pdlSøker
 
-            assertThat(service.hentPersonopplysningerForFagsakPerson(UUID.randomUUID()).harVergemål).isTrue
+            assertThat(service.hentPersonopplysningerForFagsakPerson(FagsakPersonId.random()).harVergemål).isTrue
         }
     }
 
@@ -72,7 +72,7 @@ class PersonopplysningerServiceTest {
             val pdlSøker = pdlSøker(adressebeskyttelse = listOf(AdressebeskyttelsePdl(gradering, metadataGjeldende)))
             every { personService.hentSøker(any()) } returns pdlSøker
 
-            assertThat(service.hentPersonopplysningerForFagsakPerson(UUID.randomUUID()).adressebeskyttelse)
+            assertThat(service.hentPersonopplysningerForFagsakPerson(FagsakPersonId.random()).adressebeskyttelse)
                 .isEqualTo(Adressebeskyttelse.FORTROLIG)
         }
     }

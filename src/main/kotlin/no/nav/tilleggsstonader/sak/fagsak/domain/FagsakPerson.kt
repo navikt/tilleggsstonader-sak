@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -8,11 +9,10 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.MappedCollection
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class FagsakPerson(
     @Id
-    val id: UUID = UUID.randomUUID(),
+    val id: FagsakPersonId = FagsakPersonId.random(),
     @MappedCollection(idColumn = "fagsak_person_id")
     val identer: Set<PersonIdent>,
     val opprettetAv: String = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.dto.NavnDto
 import no.nav.tilleggsstonader.sak.opplysninger.dto.PersonopplysningerDto
@@ -23,7 +24,7 @@ class PersonopplysningerService(
         return hentPersonopplysninger(behandlingService.hentAktivIdent(behandlingId))
     }
 
-    fun hentPersonopplysningerForFagsakPerson(fagsakPersonId: UUID): PersonopplysningerDto {
+    fun hentPersonopplysningerForFagsakPerson(fagsakPersonId: FagsakPersonId): PersonopplysningerDto {
         return hentPersonopplysninger(fagsakPersonService.hentAktivIdent(fagsakPersonId))
     }
 

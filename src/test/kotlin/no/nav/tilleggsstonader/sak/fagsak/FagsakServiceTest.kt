@@ -4,13 +4,13 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.UUID
 
 internal class FagsakServiceTest : IntegrationTest() {
 
@@ -40,7 +40,7 @@ internal class FagsakServiceTest : IntegrationTest() {
 
         @Test
         fun `skal ikke returnere noe om ingen fagsaker er knyttet til personid`() {
-            val res = fagsakService.finnFagsakerForFagsakPersonId(UUID.randomUUID())
+            val res = fagsakService.finnFagsakerForFagsakPersonId(FagsakPersonId.random())
             assertThat(res.barnetilsyn).isNull()
         }
     }

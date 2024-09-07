@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
 import no.nav.tilleggsstonader.sak.fagsak.dto.FagsakDto
 import no.nav.tilleggsstonader.sak.fagsak.dto.tilDto
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -81,7 +82,7 @@ class FagsakService(
         )
     }
 
-    fun finnFagsakerForFagsakPersonId(fagsakPersonId: UUID): Fagsaker {
+    fun finnFagsakerForFagsakPersonId(fagsakPersonId: FagsakPersonId): Fagsaker {
         val fagsaker = fagsakRepository.findByFagsakPersonId(fagsakPersonId)
             .map { it.tilFagsakMedPerson() }
             .associateBy { it.stønadstype }
