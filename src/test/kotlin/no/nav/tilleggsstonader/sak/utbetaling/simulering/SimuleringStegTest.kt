@@ -58,11 +58,23 @@ class SimuleringStegTest {
     inner class Førstegangsbehandling {
 
         @Test
-        fun `skal ikke utføre simulering for førstegangsbehandling`() {
+        fun `skal utføre simulering for innvilget førstegangsbehandling`() {
             val saksbehandling = saksbehandling(
                 type = BehandlingType.FØRSTEGANGSBEHANDLING,
             )
             mockVedtakMedType(TypeVedtak.INNVILGELSE)
+
+            simuleringSteg.utførSteg(saksbehandling, null)
+
+            verify { simuleringService.hentOgLagreSimuleringsresultat(saksbehandling) }
+        }
+
+        @Test
+        fun `skal ikke utføre simulering for avslått førstegangsbehandling`() {
+            val saksbehandling = saksbehandling(
+                type = BehandlingType.FØRSTEGANGSBEHANDLING,
+            )
+            mockVedtakMedType(TypeVedtak.AVSLAG)
 
             simuleringSteg.utførSteg(saksbehandling, null)
 
