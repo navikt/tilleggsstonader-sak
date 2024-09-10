@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -35,7 +34,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.lagNyttVilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.VilkårsresultatUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnesVilkårTypeForStønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
@@ -52,7 +50,6 @@ class VilkårService(
     private val barnService: BarnService,
     private val behandlingFaktaService: BehandlingFaktaService,
     private val fagsakService: FagsakService,
-    private val unleashService: UnleashService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -134,22 +131,6 @@ class VilkårService(
         validerBehandling(behandlingId)
 
         return oppdaterVilkårTilSkalIkkeVurderes(behandlingId, vilkår)
-    }
-
-    private fun nullstillVilkårMedNyeHovedregler(
-        behandlingId: UUID,
-        vilkår: Vilkår,
-    ): VilkårDto {
-        val metadata = hentHovedregelMetadata(behandlingId)
-        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkår(metadata, barnId = vilkår.barnId)
-        val delvilkårWrapper = DelvilkårWrapper(nyeDelvilkår)
-        return vilkårRepository.update(
-            vilkår.copy(
-                resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                delvilkårwrapper = delvilkårWrapper,
-                opphavsvilkår = null,
-            ),
-        ).tilDto()
     }
 
     private fun oppdaterVilkårTilSkalIkkeVurderes(
@@ -268,22 +249,6 @@ class VilkårService(
         return hentEllerOpprettVilkårsvurdering(behandlingId)
     }
 
-    /*
-    @Transactional
-    fun opprettVilkårForOmregning(behandling: Behandling) {
-        feilHvisIkke(behandling.årsak == BehandlingÅrsak.G_OMREGNING) { "Maskinelle vurderinger kun for G-omregning." }
-        val (_, metadata) = hentGrunnlagOgMetadata(behandling.id)
-        val stønadstype = fagsakService.hentFagsakForBehandling(behandling.id).stønadstype
-        kopierVurderingerTilNyBehandling(
-            eksisterendeBehandlingId = behandling.forrigeBehandlingId ?: error("Finner ikke forrige behandlingId"),
-            nyBehandlingsId = behandling.id,
-            metadata = metadata,
-            stønadType = stønadstype,
-
-        )
-    }
-     */
-
     fun hentGrunnlagOgMetadata(behandlingId: UUID): Pair<BehandlingFaktaDto, HovedregelMetadata> {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val barn = barnService.finnBarnPåBehandling(behandlingId)
@@ -296,55 +261,6 @@ class VilkårService(
         metadata: HovedregelMetadata,
     ): List<Vilkår> {
         return vilkårRepository.findByBehandlingId(behandlingId)
-        /*
-        return when {
-            behandlingErLåstForVidereRedigering(behandlingId) -> lagretVilkårsett
-            lagretVilkårsett.isEmpty() -> lagNyttVilkårsett(behandlingId, metadata)
-            else -> hentEllerOpprettMedEvtNyeBarn(metadata, lagretVilkårsett, behandlingId)
-        }
-         */
-    }
-
-    private fun hentEllerOpprettMedEvtNyeBarn(
-        metadata: HovedregelMetadata,
-        lagretVilkårsett: List<Vilkår>,
-        behandlingId: UUID,
-    ): List<Vilkår> {
-        val harVilkårForAlleBarn =
-            lagretVilkårsett.filter { it.type.gjelderFlereBarn() }.map { it.type }.toSet().all { vilkårType ->
-                metadata.barn.all { barn ->
-                    lagretVilkårsett.any { it.barnId == barn.id && it.type == vilkårType }
-                }
-            }
-
-        if (!harVilkårForAlleBarn) {
-            return lagretVilkårsett + opprettVilkårForNyeBarn(behandlingId, metadata, lagretVilkårsett)
-        }
-
-        return lagretVilkårsett
-    }
-
-    private fun opprettVilkårForNyeBarn(
-        behandlingId: UUID,
-        metadata: HovedregelMetadata,
-        lagretVilkårsett: List<Vilkår>,
-    ): List<Vilkår> {
-        val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
-        val nyeVilkår = OppdaterVilkår.opprettVilkårForNyeBarn(behandlingId, metadata, stønadstype, lagretVilkårsett)
-        return vilkårRepository.insertAll(nyeVilkår)
-    }
-
-    private fun lagNyttVilkårsett(
-        behandlingId: UUID,
-        metadata: HovedregelMetadata,
-    ): List<Vilkår> {
-        val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
-        val nyttVilkårsett: List<Vilkår> = opprettNyeVilkår(
-            behandlingId = behandlingId,
-            metadata = metadata,
-            stønadstype = stønadstype,
-        )
-        return vilkårRepository.insertAll(nyttVilkårsett)
     }
 
     /*private fun finnEndringerIGrunnlagsdata(behandlingId: UUID): List<GrunnlagsdataEndring> {

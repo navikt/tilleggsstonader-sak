@@ -107,9 +107,9 @@
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Er barnet ferdig med 4. skoleår?",
-        "svar" : "Nei",
-        "begrunnelse" : "en begrunnelse"
+        "regel" : "Er utgiftene tilfredstillende dokumentert?",
+        "svar" : "Ja",
+        "begrunnelse" : null
       } ]
     }, {
       "resultat" : "IKKE_TATT_STILLING_TIL",
@@ -121,9 +121,9 @@
     }, {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Er utgiftene tilfredstillende dokumentert?",
-        "svar" : "Ja",
-        "begrunnelse" : null
+        "regel" : "Er barnet ferdig med 4. skoleår?",
+        "svar" : "Nei",
+        "begrunnelse" : "en begrunnelse"
       } ]
     } ],
     "fødselsdatoBarn" : "2024-05-15",
@@ -136,9 +136,9 @@
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Er barnet ferdig med 4. skoleår?",
-        "svar" : "Nei",
-        "begrunnelse" : "en begrunnelse"
+        "regel" : "Er utgiftene tilfredstillende dokumentert?",
+        "svar" : "Ja",
+        "begrunnelse" : null
       } ]
     }, {
       "resultat" : "IKKE_TATT_STILLING_TIL",
@@ -150,9 +150,9 @@
     }, {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Er utgiftene tilfredstillende dokumentert?",
-        "svar" : "Ja",
-        "begrunnelse" : null
+        "regel" : "Er barnet ferdig med 4. skoleår?",
+        "svar" : "Nei",
+        "begrunnelse" : "en begrunnelse"
       } ]
     } ],
     "fødselsdatoBarn" : "2024-05-15",
@@ -165,9 +165,9 @@
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Er barnet ferdig med 4. skoleår?",
-        "svar" : "Nei",
-        "begrunnelse" : "en begrunnelse"
+        "regel" : "Er utgiftene tilfredstillende dokumentert?",
+        "svar" : "Ja",
+        "begrunnelse" : null
       } ]
     }, {
       "resultat" : "IKKE_TATT_STILLING_TIL",
@@ -179,9 +179,9 @@
     }, {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Er utgiftene tilfredstillende dokumentert?",
-        "svar" : "Ja",
-        "begrunnelse" : null
+        "regel" : "Er barnet ferdig med 4. skoleår?",
+        "svar" : "Nei",
+        "begrunnelse" : "en begrunnelse"
       } ]
     } ],
     "fødselsdatoBarn" : "2024-10-15",

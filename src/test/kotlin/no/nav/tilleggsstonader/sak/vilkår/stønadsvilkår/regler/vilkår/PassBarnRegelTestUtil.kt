@@ -10,15 +10,15 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 object PassBarnRegelTestUtil {
 
     fun oppfylteDelvilkårPassBarn() = listOf(
-        delvilkår(Vurdering(RegelId.HAR_FULLFØRT_FJERDEKLASSE, SvarId.NEI, "en begrunnelse")),
-        delvilkår(Vurdering(RegelId.ANNEN_FORELDER_MOTTAR_STØTTE, SvarId.NEI)),
         delvilkår(Vurdering(RegelId.UTGIFTER_DOKUMENTERT, SvarId.JA)),
+        delvilkår(Vurdering(RegelId.ANNEN_FORELDER_MOTTAR_STØTTE, SvarId.NEI)),
+        delvilkår(Vurdering(RegelId.HAR_FULLFØRT_FJERDEKLASSE, SvarId.NEI, "en begrunnelse")),
     )
 
     fun ikkeOppfylteDelvilkårPassBarn() = listOf(
-        delvilkår(Vurdering(RegelId.HAR_FULLFØRT_FJERDEKLASSE, SvarId.NEI, "en begrunnelse")),
-        delvilkår(Vurdering(RegelId.ANNEN_FORELDER_MOTTAR_STØTTE, SvarId.JA, "en begrunnelse")),
         delvilkår(Vurdering(RegelId.UTGIFTER_DOKUMENTERT, SvarId.JA)),
+        delvilkår(Vurdering(RegelId.ANNEN_FORELDER_MOTTAR_STØTTE, SvarId.JA, "en begrunnelse")),
+        delvilkår(Vurdering(RegelId.HAR_FULLFØRT_FJERDEKLASSE, SvarId.NEI, "en begrunnelse")),
     )
 
     fun oppfylteDelvilkårPassBarnDto() = oppfylteDelvilkårPassBarn().map { it.tilDto() }

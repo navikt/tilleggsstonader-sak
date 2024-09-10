@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
@@ -34,16 +33,16 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.IKKE_OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.IKKE_TATT_STILLING_TIL
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.SKAL_IKKE_VURDERES
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarn
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -71,7 +70,6 @@ internal class VilkårServiceTest {
         behandlingFaktaService = behandlingFaktaService,
         barnService = barnService,
         fagsakService = fagsakService,
-        unleashService = mockUnleashService(),
     )
 
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
@@ -396,20 +394,6 @@ internal class VilkårServiceTest {
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }
     }
 
-    @Test
-    internal fun `behandlingen uten barn skal kaste feilmelding`() {
-        assertThatThrownBy {
-            opprettNyeVilkår(
-                behandlingId,
-                HovedregelMetadata(
-                    barn = emptyList(),
-                    behandling = behandling,
-                ),
-                Stønadstype.BARNETILSYN,
-            )
-        }.hasMessageContaining("Kan ikke opprette vilkår når ingen barn er knyttet til behandling")
-    }
-
     private fun lagVilkårsett(
         behandlingId: UUID,
         resultat: Vilkårsresultat = OPPFYLT,
@@ -424,34 +408,13 @@ internal class VilkårServiceTest {
         }
     }
 
-    private fun List<Vilkår>.finnVilkårAvType(
-        vilkårType: VilkårType,
-    ): List<Vilkår> {
-        return this.filter { it.type == vilkårType }
-    }
-
-    private fun List<Vilkår>.inneholderKunResultat(
-        resultat: Vilkårsresultat = IKKE_TATT_STILLING_TIL,
-    ) {
-        assertThat(
-            this.map { it.resultat }.toSet(),
-        ).containsOnly(resultat)
-    }
-
-    private fun List<Vilkår>.finnVurderingResultaterForBarn(ident: UUID): List<Vilkårsresultat>? {
-        return this.find { vilkår -> vilkår.barnId == ident }?.delvilkårsett?.map { delvilkår -> delvilkår.resultat }
-    }
-
     private fun initiererVilkår(lagretVilkår: CapturingSlot<Vilkår>): Vilkår {
-        val vilkår =
-            opprettNyeVilkår(
-                behandlingId,
-                HovedregelMetadata(
-                    barn = barn,
-                    behandling = behandling,
-                ),
-                Stønadstype.BARNETILSYN,
-            ).first()
+        val vilkår = vilkår(
+            behandlingId = behandlingId,
+            resultat = IKKE_OPPFYLT,
+            delvilkår = ikkeOppfylteDelvilkårPassBarn(),
+            type = VilkårType.PASS_BARN
+        )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(vilkår)
         every { vilkårRepository.update(capture(lagretVilkår)) } answers { it.invocation.args.first() as Vilkår }
