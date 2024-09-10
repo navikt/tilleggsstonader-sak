@@ -33,7 +33,6 @@ object OppdaterVilkår {
     fun validerVilkårOgBeregnResultat(
         vilkår: Vilkår,
         oppdatering: LagreVilkårDto,
-        toggleVilkårPeriodiseringEnabled: Boolean,
     ): RegelResultat {
         val vilkårsregel = hentVilkårsregel(vilkår.type)
 
@@ -41,7 +40,7 @@ object OppdaterVilkår {
 
         val vilkårsresultat = utledResultat(vilkårsregel, oppdatering.delvilkårsett)
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
-        validerPeriodeOgBeløp(oppdatering, vilkårsresultat, toggleVilkårPeriodiseringEnabled)
+        validerPeriodeOgBeløp(oppdatering, vilkårsresultat)
 
         return vilkårsresultat
     }
@@ -49,29 +48,26 @@ object OppdaterVilkår {
     private fun validerPeriodeOgBeløp(
         oppdatering: LagreVilkårDto,
         vilkårsresultat: RegelResultat,
-        toggleVilkårPeriodiseringEnabled: Boolean,
     ) {
-        if (toggleVilkårPeriodiseringEnabled) {
-            val vilkårType = vilkårsresultat.vilkårType
-            val resultat = vilkårsresultat.vilkår
-            val fom = oppdatering.fom
-            val tom = oppdatering.tom
-            brukerfeilHvis(fom == null || tom == null) {
-                "Mangler fra og med/til og med på vilkår"
-            }
-            brukerfeilHvisIkke(fom <= tom) {
-                "Til og med må være lik eller etter fra og med"
-            }
-            brukerfeilHvis(
-                vilkårType == VilkårType.PASS_BARN &&
-                    resultat == Vilkårsresultat.OPPFYLT &&
-                    oppdatering.utgift == null,
-            ) {
-                "Mangler utgift på vilkår"
-            }
-            feilHvis(vilkårType != VilkårType.PASS_BARN && oppdatering.utgift != null) {
-                "Kan ikke ha utgift på vilkårType=$vilkårType"
-            }
+        val vilkårType = vilkårsresultat.vilkårType
+        val resultat = vilkårsresultat.vilkår
+        val fom = oppdatering.fom
+        val tom = oppdatering.tom
+        brukerfeilHvis(fom == null || tom == null) {
+            "Mangler fra og med/til og med på vilkår"
+        }
+        brukerfeilHvisIkke(fom <= tom) {
+            "Til og med må være lik eller etter fra og med"
+        }
+        brukerfeilHvis(
+            vilkårType == VilkårType.PASS_BARN &&
+                resultat == Vilkårsresultat.OPPFYLT &&
+                oppdatering.utgift == null,
+        ) {
+            "Mangler utgift på vilkår"
+        }
+        feilHvis(vilkårType != VilkårType.PASS_BARN && oppdatering.utgift != null) {
+            "Kan ikke ha utgift på vilkårType=$vilkårType"
         }
     }
 
@@ -102,6 +98,7 @@ object OppdaterVilkår {
                     validerErFørsteDagIMåned(it)
                     it
                 }
+
                 else -> error("Har ikke tatt stilling til type dato for ${vilkår.type}")
             }
         }
@@ -114,6 +111,7 @@ object OppdaterVilkår {
                     validerErSisteDagIMåned(it)
                     it
                 }
+
                 else -> error("Har ikke tatt stilling til type dato for ${vilkår.type}")
             }
         }

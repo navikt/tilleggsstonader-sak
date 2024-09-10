@@ -102,7 +102,6 @@ class VilkårService(
         val vurderingsresultat = OppdaterVilkår.validerVilkårOgBeregnResultat(
             vilkår = vilkår,
             oppdatering = lagreVilkårDto,
-            toggleVilkårPeriodiseringEnabled = unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING),
         )
         val oppdatertVilkår = OppdaterVilkår.oppdaterVilkår(
             vilkår = vilkår,
