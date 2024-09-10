@@ -1,14 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilUtgifterBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import org.springframework.stereotype.Service
@@ -18,17 +15,12 @@ import java.util.UUID
 @Service
 class TilsynBarnUtgiftService(
     private val vilkårService: VilkårService,
-    private val unleashService: UnleashService,
 ) {
     fun hentUtgifterTilBeregning(
         behandlingId: UUID,
         utgifterFraVedtak: Map<UUID, List<Utgift>>,
     ): Map<UUID, List<UtgiftBeregning>> {
-        return if (unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING)) {
-            hentUtgifterFraOppfylteVilkår(behandlingId)
-        } else {
-            utgifterFraVedtak.tilUtgifterBeregning()
-        }
+        return hentUtgifterFraOppfylteVilkår(behandlingId)
     }
 
     private fun hentUtgifterFraOppfylteVilkår(behandlingId: UUID): Map<UUID, List<UtgiftBeregning>> {
