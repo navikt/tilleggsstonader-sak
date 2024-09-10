@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KodeverkServiceUtil.mockedKodeverkService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
@@ -11,6 +12,7 @@ import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdataBarn
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagNavn
+import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagBarnMedBarnepass
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagDokumentasjon
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagSkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagSøknadBarn
@@ -21,6 +23,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.util.UUID
 
 internal class BehandlingFaktaServiceTest {
@@ -100,6 +103,45 @@ internal class BehandlingFaktaServiceTest {
             assertThatThrownBy {
                 service.hentFakta(behandlingId)
             }.hasMessage("Mangler grunnlagsdata for barn i søknad (2,3)")
+        }
+
+        @Test
+        fun `hvis barnet er under 9 år så har man ikke fullført fjerdetrinn for å kunne automatisk prefylle delvilkår i frontend`() {
+            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns grunnlagsdataDomain(
+                grunnlag = lagGrunnlagsdata(
+                    barn = listOf(lagGrunnlagsdataBarn("1", fødselsdato = LocalDate.now().minusYears(8))),
+                ),
+            )
+            val barnMedBarnepass = lagBarnMedBarnepass(startetIFemte = null, årsak = null)
+            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn(
+                barn = setOf(lagSøknadBarn(ident = "1", data = barnMedBarnepass)),
+            )
+            every { barnService.finnBarnPåBehandling(any()) } returns listOf(
+                behandlingBarn(personIdent = "1"),
+            )
+
+            val fakta = service.hentFakta(behandlingId)
+
+            assertThat(fakta.barn.single().vilkårFakta.harFullførtFjerdetrinn).isEqualTo(JaNei.NEI)
+        }
+
+        @Test
+        fun `hvis barnet er over 11 år så vet man ikke om barnet fullført fjerdetrinn`() {
+            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns grunnlagsdataDomain(
+                grunnlag = lagGrunnlagsdata(
+                    barn = listOf(lagGrunnlagsdataBarn("1", fødselsdato = LocalDate.now().minusYears(11))),
+                ),
+            )
+            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn(
+                barn = setOf(lagSøknadBarn(ident = "1")),
+            )
+            every { barnService.finnBarnPåBehandling(any()) } returns listOf(
+                behandlingBarn(personIdent = "1"),
+            )
+
+            val fakta = service.hentFakta(behandlingId)
+
+            assertThat(fakta.barn.single().vilkårFakta.harFullførtFjerdetrinn).isNull()
         }
     }
 

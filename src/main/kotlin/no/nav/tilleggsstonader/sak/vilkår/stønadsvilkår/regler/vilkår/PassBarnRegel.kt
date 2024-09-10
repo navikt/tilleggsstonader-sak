@@ -31,6 +31,7 @@ class PassBarnRegel : Vilkårsregel(
     ),
 ) {
 
+    // TODO då man ikke lengre initierer delvilkår fra backend med periodisering av vilkår burde denne fjernes?
     override fun initiereDelvilkår(
         metadata: HovedregelMetadata,
         resultat: Vilkårsresultat,

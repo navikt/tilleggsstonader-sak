@@ -63,6 +63,14 @@ data class FaktaBarn(
     val barnId: UUID,
     val registergrunnlag: RegistergrunnlagBarn,
     val søknadgrunnlag: SøknadsgrunnlagBarn?,
+    val vilkårFakta: VilkårFaktaBarn,
+)
+
+/**
+ * Kan brukes for å automatisk sette info på vilkår
+ */
+data class VilkårFaktaBarn(
+    val harFullførtFjerdetrinn: JaNei?,
 )
 
 data class FaktaDokumentasjon(

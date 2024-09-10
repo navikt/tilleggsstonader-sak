@@ -44,7 +44,7 @@ object VilkårGrunnlagUtil {
         registergrunnlag = registergrunnlag,
         søknadgrunnlag = søknadgrunnlag,
         vilkårFakta = VilkårFaktaBarn(
-            harFullførtFjerdetrinn = null
-        )
+            harFullførtFjerdetrinn = null,
+        ),
     )
 }
