@@ -365,29 +365,23 @@ class VilkårService(
         val tidligereVurderinger =
             vilkårRepository.findByBehandlingId(forrigeBehandlingId).associateBy { it.id }
 
-        val kopiAvVurderinger: Map<UUID, Vilkår> = lagKopiAvTidligereVurderinger(
+        val kopiAvVurderinger = lagKopiAvTidligereVurderinger(
             tidligereVurderinger,
             nyBehandling.id,
             barnIdMap,
         )
 
-        val nyeBarnVurderinger = opprettVilkårForNyeBarn(
-            vilkårKopi = kopiAvVurderinger,
-            nyBehandling = nyBehandling,
-            stønadstype = stønadstype,
-        )
-
-        vilkårRepository.insertAll(kopiAvVurderinger.values.toList() + nyeBarnVurderinger)
+        vilkårRepository.insertAll(kopiAvVurderinger)
     }
 
     private fun lagKopiAvTidligereVurderinger(
         tidligereVilkår: Map<UUID, Vilkår>,
         nyBehandlingsId: UUID,
         barnIdMap: Map<TidligereBarnId, NyttBarnId>,
-    ): Map<UUID, Vilkår> =
+    ): List<Vilkår> =
         tidligereVilkår.values
-            .associate { vilkår ->
-                vilkår.id to vilkår.copy(
+            .map { vilkår ->
+                vilkår.copy(
                     id = UUID.randomUUID(),
                     behandlingId = nyBehandlingsId,
                     sporbar = Sporbar(),
@@ -395,29 +389,6 @@ class VilkårService(
                     opphavsvilkår = vilkår.opprettOpphavsvilkår(),
                 )
             }
-
-    private fun opprettVilkårForNyeBarn(
-        vilkårKopi: Map<UUID, Vilkår>,
-        nyBehandling: Behandling,
-        stønadstype: Stønadstype,
-    ): List<Vilkår> {
-        if (unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING)) {
-            return emptyList()
-        }
-        val alleBarn = barnService.finnBarnPåBehandling(nyBehandling.id)
-
-        return alleBarn
-            .filter { barn -> vilkårKopi.none { it.value.barnId == barn.id } }
-            .map {
-                OppdaterVilkår.lagVilkårForNyttBarn(
-                    HovedregelMetadata(barn = alleBarn, behandling = nyBehandling),
-                    it.behandlingId,
-                    it.id,
-                    stønadstype,
-                )
-            }
-            .flatten()
-    }
 
     private fun finnBarnId(barnId: UUID?, barnIdMap: Map<UUID, UUID>): UUID? =
         barnId?.let {
