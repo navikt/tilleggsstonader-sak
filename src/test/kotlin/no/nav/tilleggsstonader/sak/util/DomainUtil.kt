@@ -236,8 +236,8 @@ fun stønadsperiode(
 
 fun vilkår(
     behandlingId: UUID,
+    type: VilkårType,
     resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
-    type: VilkårType = VilkårType.EKSEMPEL,
     delvilkår: List<Delvilkår> = emptyList(),
     barnId: UUID? = null,
     opphavsvilkår: Opphavsvilkår? = null,

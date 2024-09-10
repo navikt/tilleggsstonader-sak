@@ -338,8 +338,8 @@ internal class VilkårServiceTest {
 
         val vilkår = vilkår(
             behandlingId,
-            resultat = IKKE_TATT_STILLING_TIL,
             VilkårType.PASS_BARN,
+            resultat = IKKE_TATT_STILLING_TIL,
         )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
@@ -371,8 +371,8 @@ internal class VilkårServiceTest {
         mockHentBehandling(behandling)
         val vilkår = vilkår(
             behandlingId,
-            resultat = IKKE_TATT_STILLING_TIL,
             VilkårType.PASS_BARN,
+            resultat = IKKE_TATT_STILLING_TIL,
         )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
@@ -413,7 +413,7 @@ internal class VilkårServiceTest {
             behandlingId = behandlingId,
             resultat = IKKE_OPPFYLT,
             delvilkår = ikkeOppfylteDelvilkårPassBarn(),
-            type = VilkårType.PASS_BARN
+            type = VilkårType.PASS_BARN,
         )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(vilkår)

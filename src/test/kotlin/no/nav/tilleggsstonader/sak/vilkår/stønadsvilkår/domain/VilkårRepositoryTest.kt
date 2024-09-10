@@ -70,8 +70,8 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         val vilkår = vilkårRepository.insert(
             vilkår(
                 behandling.id,
-                Vilkårsresultat.IKKE_TATT_STILLING_TIL,
                 VilkårType.PASS_BARN,
+                Vilkårsresultat.IKKE_TATT_STILLING_TIL,
             ),
         )
         val nyttTidspunkt = osloNow().minusDays(1).truncatedTo(ChronoUnit.MILLIS)
@@ -91,7 +91,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
 
         val vilkår: Vilkår = BrukerContextUtil.testWithBrukerContext(preferredUsername = saksbehandler) {
             vilkårRepository.insert(
-                vilkår(behandling.id, Vilkårsresultat.IKKE_TATT_STILLING_TIL, VilkårType.PASS_BARN),
+                vilkår(behandling.id, VilkårType.PASS_BARN, Vilkårsresultat.IKKE_TATT_STILLING_TIL),
             )
         }
         Assertions.assertThat(vilkår.sporbar.opprettetAv).isEqualTo(saksbehandler)
