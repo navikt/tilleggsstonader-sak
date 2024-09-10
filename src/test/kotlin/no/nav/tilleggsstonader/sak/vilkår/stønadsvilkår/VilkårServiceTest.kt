@@ -34,7 +34,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.AUTOMATISK_OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.IKKE_TATT_STILLING_TIL
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.SKAL_IKKE_VURDERES
@@ -122,7 +121,7 @@ internal class VilkårServiceTest {
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(
             vilkår(
                 resultat = OPPFYLT,
-                type = VilkårType.EKSEMPEL,
+                type = VilkårType.PASS_BARN,
                 behandlingId = behandlingId,
             ),
         )
@@ -175,7 +174,7 @@ internal class VilkårServiceTest {
         val eksisterendeVilkårsett = listOf(
             vilkår(
                 resultat = OPPFYLT,
-                type = VilkårType.EKSEMPEL,
+                type = VilkårType.PASS_BARN,
                 behandlingId = behandlingId,
             ),
         )
@@ -189,17 +188,17 @@ internal class VilkårServiceTest {
     }
 
     @Test
-    internal fun `Skal returnere ikke oppfylt hvis vilkårsett ikke inneholder alle vilkår`() {
+    internal fun `Skal returnere oppfylt hvis vilkårsett ikke inneholder alle vilkår, men alle er oppfylt`() {
         val vilkårsett = listOf(
             vilkår(
                 resultat = OPPFYLT,
-                type = VilkårType.EKSEMPEL,
+                type = VilkårType.PASS_BARN,
                 behandlingId = behandlingId,
             ),
         )
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
         val erAlleVilkårOppfylt = vilkårService.erAlleVilkårOppfylt(behandlingId)
-        assertThat(erAlleVilkårOppfylt).isFalse
+        assertThat(erAlleVilkårOppfylt).isTrue
     }
 
     @Test
@@ -307,7 +306,7 @@ internal class VilkårServiceTest {
 
         @Test
         internal fun `skal kunne slette vilkår opprettet i denne behandlingen`() {
-            val vilkår = vilkår(behandlingId = behandlingId)
+            val vilkår = vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN)
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
             vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
@@ -319,6 +318,7 @@ internal class VilkårServiceTest {
         internal fun `skal ikke kunne slette vilkår opprettet i tidligere behandling`() {
             val vilkår = vilkår(
                 behandlingId = behandlingId,
+                type = VilkårType.PASS_BARN,
                 opphavsvilkår = Opphavsvilkår(UUID.randomUUID(), LocalDateTime.now()),
             )
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår

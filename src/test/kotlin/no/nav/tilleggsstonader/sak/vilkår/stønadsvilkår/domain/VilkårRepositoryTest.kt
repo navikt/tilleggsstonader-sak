@@ -36,7 +36,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
             vilkår(
                 behandlingId = behandling.id,
                 resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                type = VilkårType.EKSEMPEL,
+                type = VilkårType.PASS_BARN,
                 delvilkår = listOf(Delvilkår(Vilkårsresultat.OPPFYLT, vurderinger)),
                 barnId = null,
                 opphavsvilkår = Opphavsvilkår(behandling.id, SporbarUtils.now()),
@@ -55,7 +55,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
             vilkår(
                 behandlingId = behandling.id,
                 resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                type = VilkårType.EKSEMPEL,
+                type = VilkårType.PASS_BARN,
                 opphavsvilkår = null,
             ),
         )
@@ -71,7 +71,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
             vilkår(
                 behandling.id,
                 Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                VilkårType.EKSEMPEL,
+                VilkårType.PASS_BARN,
             ),
         )
         val nyttTidspunkt = osloNow().minusDays(1).truncatedTo(ChronoUnit.MILLIS)
@@ -91,7 +91,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
 
         val vilkår: Vilkår = BrukerContextUtil.testWithBrukerContext(preferredUsername = saksbehandler) {
             vilkårRepository.insert(
-                vilkår(behandling.id, Vilkårsresultat.IKKE_TATT_STILLING_TIL, VilkårType.EKSEMPEL),
+                vilkår(behandling.id, Vilkårsresultat.IKKE_TATT_STILLING_TIL, VilkårType.PASS_BARN),
             )
         }
         Assertions.assertThat(vilkår.sporbar.opprettetAv).isEqualTo(saksbehandler)

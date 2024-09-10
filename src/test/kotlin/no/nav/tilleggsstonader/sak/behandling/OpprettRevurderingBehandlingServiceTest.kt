@@ -80,7 +80,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 opprettGrunnlagsdata = false,
             )
 
-            vilkårRepository.insert(vilkår(behandlingId = behandling.id))
+            vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
             val nyBehandlingId =
                 service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
@@ -99,7 +99,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 opprettGrunnlagsdata = false,
             )
 
-            vilkårRepository.insert(vilkår(behandlingId = behandling.id))
+            vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
             val request = opprettBehandlingDto(
                 fagsakId = behandling.fagsakId,
@@ -122,7 +122,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
                 opprettGrunnlagsdata = false,
             )
 
-            vilkårRepository.insert(vilkår(behandlingId = behandling.id))
+            vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
             val nyBehandlingId =
                 service.opprettBehandling(opprettBehandlingDto(fagsakId = behandling.fagsakId))
