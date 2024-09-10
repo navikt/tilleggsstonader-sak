@@ -113,14 +113,18 @@ class VilkårService(
     }
 
     @Transactional
-    fun nullstillVilkår(oppdaterVilkårDto: OppdaterVilkårDto): VilkårDto {
-        val vilkår = vilkårRepository.findByIdOrThrow(oppdaterVilkårDto.id)
+    fun slettVilkår(oppdaterVilkårDto: OppdaterVilkårDto) {
+        val vilkårId = oppdaterVilkårDto.id
+        val vilkår = vilkårRepository.findByIdOrThrow(vilkårId)
         val behandlingId = vilkår.behandlingId
 
+        feilHvis(vilkår.opphavsvilkår != null) {
+            "Kan ikke slette vilkår opprettet i tidligere behandling"
+        }
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
         validerBehandling(behandlingId)
 
-        return nullstillVilkårMedNyeHovedregler(behandlingId, vilkår)
+        vilkårRepository.deleteById(vilkårId)
     }
 
     @Transactional

@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -63,11 +64,12 @@ class VilkårController(
         return vilkårService.opprettNyttVilkår(opprettVilkårDto).tilDto()
     }
 
-    @PostMapping("nullstill")
-    fun nullstillVilkår(@RequestBody request: OppdaterVilkårDto): VilkårDto {
+    @DeleteMapping
+    fun slettVilkår(@RequestBody request: OppdaterVilkårDto) {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
         tilgangService.validerHarSaksbehandlerrolle()
-        return vilkårService.nullstillVilkår(request)
+
+        vilkårService.slettVilkår(request)
     }
 
     @PostMapping("ikkevurder")
