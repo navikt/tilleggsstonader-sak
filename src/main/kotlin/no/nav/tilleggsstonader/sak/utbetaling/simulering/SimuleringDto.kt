@@ -4,7 +4,8 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.OppsummeringFo
 import java.time.LocalDate
 
 data class SimuleringDto(
-    val perioder: List<OppsummeringForPeriode>,
+    val perioder: List<OppsummeringForPeriode>?,
+    val ingenEndringIUtbetaling: Boolean,
 )
 
 data class SimuleringOppsummering(

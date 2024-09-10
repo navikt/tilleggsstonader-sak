@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.OppsummeringForPeriode
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,17 +16,17 @@ class SimuleringStegService(
 ) {
 
     @Transactional
-    fun hentEllerOpprettSimuleringsresultat(saksbehandling: Saksbehandling): List<OppsummeringForPeriode>? {
+    fun hentEllerOpprettSimuleringsresultat(saksbehandling: Saksbehandling): Simuleringsresultat? {
         if (saksbehandling.status.behandlingErLåstForVidereRedigering() ||
             !tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)
         ) {
-            return simuleringService.hentLagretSimuleringsoppsummering(saksbehandling.id)
+            return simuleringService.hentLagretSimulering(saksbehandling.id)
         } else {
             if (saksbehandling.steg == StegType.SIMULERING) {
                 stegService.håndterSteg(saksbehandling.id, StegType.SIMULERING)
             }
 
-            return simuleringService.hentLagretSimuleringsoppsummering(saksbehandling.id)
+            return simuleringService.hentLagretSimulering(saksbehandling.id)
         }
     }
 }
