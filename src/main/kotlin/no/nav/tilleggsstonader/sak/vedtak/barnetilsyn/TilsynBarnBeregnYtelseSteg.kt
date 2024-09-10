@@ -69,7 +69,6 @@ class TilsynBarnBeregnYtelseSteg(
 
         val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(saksbehandling.id, vedtak.utgifter)
         val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, utgifter)
-        validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, vedtak, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
     }
@@ -86,16 +85,6 @@ class TilsynBarnBeregnYtelseSteg(
                 årsakerAvslag = ÅrsakAvslag.Wrapper(årsaker = vedtak.årsakerAvslag),
             ),
         )
-    }
-
-    private fun validerKunBarnMedOppfylteVilkår(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
-        val barnMedOppfylteVilkår =
-            vilkårService.hentOppfyltePassBarnVilkår(behandlingId = saksbehandling.id).map { it.barnId }
-        val barnUtenOppfylteVilkår = vedtak.utgifter.keys.filter { !barnMedOppfylteVilkår.contains(it) }
-
-        feilHvis(barnUtenOppfylteVilkår.isNotEmpty()) {
-            "Det finnes utgifter på barn som ikke har oppfylt vilkårsvurdering, id=$barnUtenOppfylteVilkår"
-        }
     }
 
     private fun lagreAndeler(
