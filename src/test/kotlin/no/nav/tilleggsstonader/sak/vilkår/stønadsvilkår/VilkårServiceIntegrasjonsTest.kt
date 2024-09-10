@@ -100,25 +100,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             .hasMessage("Kan ikke laste inn nye grunnlagsdata for behandling med status ${behandling.status}")
     }
 
-    @Test
-    internal fun `kopierVilkårsettTilNyBehandling - skal kaste feil hvis det ikke finnes noen vurderinger`() {
-        val tidligereBehandlingId = UUID.randomUUID()
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val revurdering = testoppsettService.lagre(behandling(fagsak))
-
-        assertThat(
-            catchThrowable {
-                vilkårService.kopierVilkårsettTilNyBehandling(
-                    tidligereBehandlingId,
-                    revurdering,
-                    emptyMap(),
-                    Stønadstype.BARNETILSYN,
-                )
-            },
-        )
-            .hasMessage("Tidligere behandling=$tidligereBehandlingId har ikke noen vilkår")
-    }
-
     @Nested
     inner class OpprettelseAvNyeBarnVidHentingAvVilkår {
 

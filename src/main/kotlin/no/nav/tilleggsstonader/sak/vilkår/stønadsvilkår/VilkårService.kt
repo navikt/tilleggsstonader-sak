@@ -371,8 +371,6 @@ class VilkårService(
         val tidligereVurderinger =
             vilkårRepository.findByBehandlingId(forrigeBehandlingId).associateBy { it.id }
 
-        validerAtVurderingerKanKopieres(tidligereVurderinger, forrigeBehandlingId)
-
         val kopiAvVurderinger: Map<UUID, Vilkår> = lagKopiAvTidligereVurderinger(
             tidligereVurderinger,
             nyBehandling.id,
@@ -386,16 +384,6 @@ class VilkårService(
         )
 
         vilkårRepository.insertAll(kopiAvVurderinger.values.toList() + nyeBarnVurderinger)
-    }
-
-    private fun validerAtVurderingerKanKopieres(
-        tidligereVurderinger: Map<UUID, Vilkår>,
-        forrigeBehandlingId: UUID,
-    ) {
-        if (tidligereVurderinger.isEmpty()) {
-            val melding = "Tidligere behandling=$forrigeBehandlingId har ikke noen vilkår"
-            throw Feil(melding, melding)
-        }
     }
 
     private fun lagKopiAvTidligereVurderinger(
@@ -419,6 +407,9 @@ class VilkårService(
         nyBehandling: Behandling,
         stønadstype: Stønadstype,
     ): List<Vilkår> {
+        if (unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING)) {
+            return emptyList()
+        }
         val alleBarn = barnService.finnBarnPåBehandling(nyBehandling.id)
 
         return alleBarn
