@@ -299,6 +299,11 @@ class VilkårService(
     ): List<Vilkår> {
         val lagretVilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
 
+        // TODO rename metode når man kun henter lagretVilkårsett når FT fjernes
+        if (unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING)) {
+            return lagretVilkårsett
+        }
+
         return when {
             behandlingErLåstForVidereRedigering(behandlingId) -> lagretVilkårsett
             lagretVilkårsett.isEmpty() -> lagNyttVilkårsett(behandlingId, metadata)
