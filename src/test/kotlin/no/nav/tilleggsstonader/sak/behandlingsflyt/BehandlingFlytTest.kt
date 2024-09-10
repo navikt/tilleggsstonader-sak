@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.OpprettTestBehandlingController
 import no.nav.tilleggsstonader.sak.behandling.TestBehandlingRequest
-import no.nav.tilleggsstonader.sak.behandling.TestSaksbehandlingController
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -40,6 +39,9 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårController
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
@@ -64,7 +66,6 @@ class BehandlingFlytTest(
     @Autowired val barnService: BarnService,
     @Autowired val oppgaveRepository: OppgaveRepository,
     @Autowired val opprettTestBehandlingController: OpprettTestBehandlingController,
-    @Autowired val testSaksbehandlingController: TestSaksbehandlingController,
     @Autowired val vilkårController: VilkårController,
     @Autowired val tilsynBarnVedtakController: TilsynBarnVedtakController,
     @Autowired val brevController: BrevController,
@@ -204,7 +205,6 @@ class BehandlingFlytTest(
             testoppsettService.oppdater(behandling.copy(årsak = BehandlingÅrsak.KORRIGERING_UTEN_BREV))
 
             vurderInngangsvilkår(behandlingId)
-            opprettVilkår(behandlingId)
             utfyllVilkår(behandlingId)
             opprettVedtak(behandlingId)
             simuler(behandlingId)
@@ -254,7 +254,6 @@ class BehandlingFlytTest(
     private fun opprettBehandlingOgSendTilBeslutter(personIdent: String): UUID {
         val behandlingId = opprettBehandling(personIdent)
         vurderInngangsvilkår(behandlingId)
-        opprettVilkår(behandlingId)
         utfyllVilkår(behandlingId)
 
         opprettVedtak(behandlingId)
@@ -303,12 +302,19 @@ class BehandlingFlytTest(
     }
 
     private fun utfyllVilkår(behandlingId: UUID) {
-        testSaksbehandlingController.utfyllVilkår(behandlingId)
+        val barn = barnService.finnBarnPåBehandling(behandlingId).first()
+        vilkårController.opprettVilkår(
+            OpprettVilkårDto(
+                vilkårType = VilkårType.PASS_BARN,
+                barnId = barn.id,
+                behandlingId = behandlingId,
+                delvilkårsett = oppfylteDelvilkårPassBarnDto(),
+                fom = YearMonth.now().atDay(1),
+                tom = YearMonth.now().atEndOfMonth(),
+                utgift = 1000,
+            ),
+        )
         stegService.håndterSteg(behandlingId, StegType.VILKÅR)
-    }
-
-    private fun opprettVilkår(behandlingId: UUID) {
-        vilkårController.getVilkår(behandlingId)
     }
 
     private fun opprettBehandling(personIdent: String): UUID {

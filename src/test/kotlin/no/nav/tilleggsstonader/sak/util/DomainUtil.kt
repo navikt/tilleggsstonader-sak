@@ -44,6 +44,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 import java.util.UUID
 
 fun oppgave(
@@ -240,9 +241,9 @@ fun vilkår(
     delvilkår: List<Delvilkår> = emptyList(),
     barnId: UUID? = null,
     opphavsvilkår: Opphavsvilkår? = null,
-    fom: LocalDate? = null,
-    tom: LocalDate? = null,
-    utgift: Int? = null,
+    fom: LocalDate? = YearMonth.now().atDay(1),
+    tom: LocalDate? = YearMonth.now().atEndOfMonth(),
+    utgift: Int? = 1000,
 ): Vilkår = Vilkår(
     behandlingId = behandlingId,
     resultat = resultat,
