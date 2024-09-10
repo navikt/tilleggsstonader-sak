@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -296,18 +295,14 @@ class VilkårService(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
     ): List<Vilkår> {
-        val lagretVilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
-
-        // TODO rename metode når man kun henter lagretVilkårsett når FT fjernes
-        if (unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING)) {
-            return lagretVilkårsett
-        }
-
+        return vilkårRepository.findByBehandlingId(behandlingId)
+        /*
         return when {
             behandlingErLåstForVidereRedigering(behandlingId) -> lagretVilkårsett
             lagretVilkårsett.isEmpty() -> lagNyttVilkårsett(behandlingId, metadata)
             else -> hentEllerOpprettMedEvtNyeBarn(metadata, lagretVilkårsett, behandlingId)
         }
+         */
     }
 
     private fun hentEllerOpprettMedEvtNyeBarn(
