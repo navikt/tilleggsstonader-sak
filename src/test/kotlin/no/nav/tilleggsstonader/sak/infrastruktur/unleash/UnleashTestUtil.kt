@@ -19,7 +19,6 @@ fun mockUnleashService(isEnabled: Boolean = true): UnleashService {
 fun resetMock(mockk: UnleashService, isEnabled: Boolean = true) {
     clearMocks(mockk)
     every { mockk.isEnabled(any()) } returns isEnabled
-    every { mockk.isEnabled(Toggle.VILKÅR_PERIODISERING) } returns false
     every { mockk.isEnabled(any(), any<Boolean>()) } returns isEnabled
 }
 
