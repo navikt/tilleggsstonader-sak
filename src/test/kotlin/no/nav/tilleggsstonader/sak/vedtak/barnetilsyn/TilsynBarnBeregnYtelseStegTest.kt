@@ -91,7 +91,7 @@ class TilsynBarnBeregnYtelseStegTest {
     }
 
     @Test
-    fun `skal returnere neste steg SEND_TIL_BESLUTTER ved førstegangsbehandling`() {
+    fun `skal returnere neste steg SIMULERING ved førstegangsbehandling`() {
         val vedtak = innvilgelseDto(
             utgifter = mapOf(barn(barn.id, Utgift(måned, måned, 100))),
         )
@@ -99,7 +99,7 @@ class TilsynBarnBeregnYtelseStegTest {
         val nesteSteg = steg.utførOgReturnerNesteSteg(saksbehandling, vedtak)
 
         assertThat(saksbehandling.type).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
-        assertThat(nesteSteg).isEqualTo(StegType.SEND_TIL_BESLUTTER)
+        assertThat(nesteSteg).isEqualTo(StegType.SIMULERING)
     }
 
     @Test
