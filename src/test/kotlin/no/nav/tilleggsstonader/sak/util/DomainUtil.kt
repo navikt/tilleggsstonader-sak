@@ -242,7 +242,7 @@ fun vilkår(
     opphavsvilkår: Opphavsvilkår? = null,
     fom: LocalDate? = null,
     tom: LocalDate? = null,
-    beløp: Int? = null,
+    utgift: Int? = null,
 ): Vilkår = Vilkår(
     behandlingId = behandlingId,
     resultat = resultat,
@@ -252,7 +252,7 @@ fun vilkår(
     opphavsvilkår = opphavsvilkår,
     fom = fom,
     tom = tom,
-    utgift = beløp,
+    utgift = utgift,
 )
 
 fun fagsakpersoner(vararg identer: String): Set<PersonIdent> = identer.map {
