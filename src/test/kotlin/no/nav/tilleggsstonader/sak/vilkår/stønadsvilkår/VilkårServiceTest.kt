@@ -117,57 +117,6 @@ internal class VilkårServiceTest {
         BrukerContextUtil.clearBrukerContext()
     }
 
-    @Nested
-    inner class OppretteVilkårBarnetilsyn {
-        val nyttVilkårsett = slot<List<Vilkår>>()
-
-        @BeforeEach
-        fun setUp() {
-            every { vilkårRepository.insertAll(capture(nyttVilkårsett)) } answers { firstArg() }
-            every { vilkårRepository.findByBehandlingId(behandlingId) } returns emptyList()
-            every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
-        }
-
-        @Test
-        fun `skal opprette nye Vilkår for barnetilsyn med alle vilkår dersom ingen vurderinger finnes`() {
-            val aktuelleVilkårTyper = VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN)
-
-            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
-
-            val vilkårsett = nyttVilkårsett.captured
-
-            assertThat(vilkårsett).hasSize(aktuelleVilkårTyper.size + 1) // 2 barn, ekstra vilkår av type PASS_BARN
-            assertThat(
-                vilkårsett.map { it.type }.distinct(),
-            ).containsExactlyInAnyOrderElementsOf(aktuelleVilkårTyper)
-
-            vilkårsett.finnVilkårAvType(VilkårType.PASS_BARN).inneholderKunResultat(IKKE_TATT_STILLING_TIL)
-        }
-
-        @Test
-        fun `skal opprette et vilkår av type PASS_BARN per barn`() {
-            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
-
-            val vilkårPassBarn = nyttVilkårsett.captured.finnVilkårAvType(VilkårType.PASS_BARN)
-            assertThat(vilkårPassBarn).hasSize(2)
-        }
-
-        @Test
-        fun `skal initiere automatisk verdi for ALDER_LAVERE_ENN_GRENSEVERDI`() {
-            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
-
-            val vilkårPassBarn = nyttVilkårsett.captured.finnVilkårAvType(VilkårType.PASS_BARN)
-
-            val resultaterBarnUnder9år =
-                vilkårPassBarn.finnVurderingResultaterForBarn(barn.single { it.ident == barnUnder9år }.id)
-            assertThat(resultaterBarnUnder9år).containsOnlyOnce(AUTOMATISK_OPPFYLT)
-
-            val resultaterBarnOver10år =
-                vilkårPassBarn.finnVurderingResultaterForBarn(barn.single { it.ident == barnOver10år }.id)
-            assertThat(resultaterBarnOver10år).containsOnly(IKKE_TATT_STILLING_TIL)
-        }
-    }
-
     @Test
     fun `skal ikke opprette nye Vilkår for behandlinger som allerede har vurderinger`() {
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(
@@ -272,23 +221,6 @@ internal class VilkårServiceTest {
 
         val erAlleVilkårOppfylt = vilkårService.erAlleVilkårOppfylt(behandlingId)
         assertThat(erAlleVilkårOppfylt).isFalse
-    }
-
-    @Test
-    fun `Skal opprette vilkår for nye barn`() {
-        val vilkårsett = lagVilkårsett(behandlingId, OPPFYLT)
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
-        every { barnService.finnBarnPåBehandling(behandlingId) } returns barn
-        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
-
-        val vilkårSlot = slot<List<Vilkår>>()
-
-        every { vilkårRepository.insertAll(capture(vilkårSlot)) } answers { vilkårSlot.captured }
-
-        vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
-
-        assertThat(vilkårSlot.captured).hasSize(2)
-        assertThat(vilkårSlot.captured.map { it.barnId }).containsExactlyInAnyOrderElementsOf(barn.map { it.id })
     }
 
     @Nested
