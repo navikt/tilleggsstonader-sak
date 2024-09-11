@@ -12,4 +12,6 @@ enum class Toggle(override val toggleId: String) : ToggleId {
     SIMULERING("sak.simulering"),
 
     ADMIN_KAN_OPPRETTE_BEHANDLING("sak.admin-kan-opprette-behandling"),
+
+    HENT_BEHANDLINGER_FOR_OPPFØLGING("sak.hent-behandlinger-for-oppfoelging")
 }
