@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.fagsak.dto.tilDto
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
@@ -148,16 +147,6 @@ class FagsakService(
     }
 
     fun hentAktivIdent(fagsakId: UUID): String = fagsakRepository.finnAktivIdent(fagsakId)
-
-    fun hentAktiveIdenter(fagsakId: Set<UUID>): Map<UUID, String> {
-        if (fagsakId.isEmpty()) return emptyMap()
-
-        val aktiveIdenter = fagsakRepository.finnAktivIdenter(fagsakId)
-        feilHvis(!aktiveIdenter.map { it.first }.containsAll(fagsakId)) {
-            "Finner ikke ident til fagsaker ${aktiveIdenter.map { it.first }.filterNot(fagsakId::contains)}"
-        }
-        return aktiveIdenter.associateBy({ it.first }, { it.second })
-    }
 
     private fun opprettFagsak(stønadstype: Stønadstype, fagsakPerson: FagsakPerson): FagsakDomain {
         val fagsak = fagsakRepository.insert(

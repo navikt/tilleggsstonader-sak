@@ -67,17 +67,6 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpda
 
     // language=PostgreSQL
     @Query(
-        """
-        SELECT DISTINCT f.id AS first, 
-            FIRST_VALUE(ident) OVER (PARTITION BY pi.fagsak_person_id ORDER BY pi.endret_tid DESC) AS second
-        FROM fagsak f
-          JOIN person_ident pi ON pi.fagsak_person_id = f.fagsak_person_id
-        WHERE f.id IN (:fagsakIder)""",
-    )
-    fun finnAktivIdenter(fagsakIder: Set<UUID>): List<Pair<UUID, String>>
-
-    // language=PostgreSQL
-    @Query(
         """SELECT COUNT(*) > 0 FROM gjeldende_iverksatte_behandlinger b 
               JOIN tilkjent_ytelse ty
               ON b.id = ty.behandling_id
