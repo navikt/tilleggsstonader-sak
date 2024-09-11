@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -36,7 +35,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.time.YearMonth
 import java.util.UUID
 
 class StegServiceTest(
@@ -85,7 +83,7 @@ class StegServiceTest(
         )
         val barn = lagBarn(behandling)
         opprettVilkårBarnetilsyn(behandlingId = behandling.id, barn = barn)
-        val vedtakTilsynBarn = opprettVedtakTilsynBarn(barn)
+        val vedtakTilsynBarn = opprettVedtakTilsynBarn()
 
         stegService.håndterSteg(saksbehandling(behandling = behandling), tilsynBarnBeregnYtelseSteg, vedtakTilsynBarn)
 
@@ -136,7 +134,7 @@ class StegServiceTest(
                 behandling(steg = StegType.BEHANDLING_FERDIGSTILT),
             )
             val barn = lagBarn(behandling)
-            val vedtakTilsynBarn = opprettVedtakTilsynBarn(barn)
+            val vedtakTilsynBarn = opprettVedtakTilsynBarn()
             val exception = catchThrowableOfType<Feil> {
                 stegService.håndterSteg(
                     saksbehandling(behandling = behandling),
@@ -259,10 +257,8 @@ class StegServiceTest(
         )
     }
 
-    private fun opprettVedtakTilsynBarn(barn: BehandlingBarn): InnvilgelseTilsynBarnDto {
-        val måned = YearMonth.of(2023, 1)
+    private fun opprettVedtakTilsynBarn(): InnvilgelseTilsynBarnDto {
         return InnvilgelseTilsynBarnDto(
-            utgifter = mapOf(barn.id to listOf(Utgift(måned, måned, 100))),
             beregningsresultat = null,
         )
     }

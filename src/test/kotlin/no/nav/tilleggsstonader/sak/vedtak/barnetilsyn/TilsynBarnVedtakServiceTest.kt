@@ -19,7 +19,6 @@ class TilsynBarnVedtakServiceTest {
 
         val dto = tilsynBarnVedtakService.mapTilDto(vedtak) as InnvilgelseTilsynBarnDto
 
-        assertThat(dto.utgifter).isEqualTo(vedtak.vedtak?.utgifter)
         assertThat(dto.beregningsresultat!!.perioder).isEqualTo(vedtak.beregningsresultat!!.perioder)
     }
 

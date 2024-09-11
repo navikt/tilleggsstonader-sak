@@ -95,7 +95,6 @@ class TilsynBarnVedtakControllerTest(
 
         val lagretDto = hentVedtak(behandling.id).body!!
 
-        assertThat((lagretDto as InnvilgelseTilsynBarnDto).utgifter).isEqualTo(vedtak.utgifter)
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.INNVILGELSE)
     }
 
@@ -116,9 +115,6 @@ class TilsynBarnVedtakControllerTest(
     }
 
     private fun lagInnvilgeVedtak() = InnvilgelseTilsynBarnRequest(
-        utgifter = mapOf(
-            barn(barn.id, Utgift(YearMonth.of(2023, 1), YearMonth.of(2023, 1), 100)),
-        ),
         beregningsresultat = null,
     )
 

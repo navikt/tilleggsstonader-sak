@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -65,9 +64,7 @@ class TilsynBarnBeregnYtelseStegTest {
 
     @Test
     fun `skal slette data som finnes fra før, før man lagrer ny data`() {
-        val vedtak = innvilgelseDto(
-            utgifter = mapOf(barn(barn.id, Utgift(måned, måned, 100))),
-        )
+        val vedtak = innvilgelseDto()
         steg.utførOgReturnerNesteSteg(saksbehandling, vedtak)
 
         verifyOrder {
@@ -85,9 +82,7 @@ class TilsynBarnBeregnYtelseStegTest {
 
     @Test
     fun `skal returnere neste steg SIMULERING ved førstegangsbehandling`() {
-        val vedtak = innvilgelseDto(
-            utgifter = mapOf(barn(barn.id, Utgift(måned, måned, 100))),
-        )
+        val vedtak = innvilgelseDto()
 
         val nesteSteg = steg.utførOgReturnerNesteSteg(saksbehandling, vedtak)
 
@@ -99,9 +94,7 @@ class TilsynBarnBeregnYtelseStegTest {
     fun `skal returnere neste steg SIMULERING ved revurdering`() {
         val revurdering = saksbehandling(type = BehandlingType.REVURDERING)
 
-        val vedtak = innvilgelseDto(
-            utgifter = mapOf(barn(barn.id, Utgift(måned, måned, 100))),
-        )
+        val vedtak = innvilgelseDto()
 
         mockVilkårperioder(behandlingId = revurdering.id)
         mockStønadsperioder(behandlingId = revurdering.id)

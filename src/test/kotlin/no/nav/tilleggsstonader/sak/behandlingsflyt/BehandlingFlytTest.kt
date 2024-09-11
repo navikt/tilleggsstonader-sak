@@ -30,7 +30,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringStegService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -395,11 +394,9 @@ class BehandlingFlytTest(
     }
 
     private fun opprettVedtak(behandlingId: UUID) {
-        val barn = barnService.finnBarnPåBehandling(behandlingId)
-        val utgifter = barn.first().let { mapOf(it.id to listOf(utgift())) }
         tilsynBarnVedtakController.lagreVedtak(
             behandlingId,
-            InnvilgelseTilsynBarnDto(utgifter, null),
+            InnvilgelseTilsynBarnDto(null),
         )
     }
 
@@ -407,12 +404,6 @@ class BehandlingFlytTest(
         val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
         simuleringStegService.hentEllerOpprettSimuleringsresultat(saksbehandling)
     }
-
-    private fun utgift() = Utgift(
-        fom = YearMonth.of(2024, 1),
-        tom = YearMonth.of(2024, 1),
-        utgift = 1000,
-    )
 
     private fun <T> somSaksbehandler(preferredUsername: String = "saksbehandler", fn: () -> T): T {
         kjørTasks()

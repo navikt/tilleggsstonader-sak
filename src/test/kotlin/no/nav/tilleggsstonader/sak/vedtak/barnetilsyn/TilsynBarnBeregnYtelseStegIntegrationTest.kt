@@ -95,9 +95,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThat(vedtak.behandlingId).isEqualTo(saksbehandling.id)
             assertThat(vedtak.type).isEqualTo(TypeVedtak.INNVILGELSE)
             assertThat(vedtak.vedtak).isEqualTo(
-                VedtaksdataTilsynBarn(
-                    utgifter = vedtakDto.utgifter,
-                ),
+                VedtaksdataTilsynBarn(emptyMap()),
             )
         }
 

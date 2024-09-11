@@ -16,10 +16,8 @@ import java.util.UUID
 object TilsynBarnTestUtil {
 
     fun innvilgelseDto(
-        utgifter: Map<UUID, List<Utgift>> = mapOf(),
         beregningsresultat: BeregningsresultatTilsynBarnDto? = null,
     ) = InnvilgelseTilsynBarnDto(
-        utgifter = utgifter,
         beregningsresultat = beregningsresultat,
     )
 

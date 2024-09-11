@@ -19,7 +19,6 @@ class TilsynBarnVedtakService(
     override fun mapTilDto(vedtak: VedtakTilsynBarn): VedtakTilsynBarnDto {
         when (vedtak.type) {
             TypeVedtak.INNVILGELSE -> return InnvilgelseTilsynBarnDto(
-                utgifter = vedtak.vedtak?.utgifter ?: error("Mangler utgifter i vedtak"),
                 beregningsresultat = vedtak.beregningsresultat?.let {
                     BeregningsresultatTilsynBarnDto(perioder = it.perioder)
                 },

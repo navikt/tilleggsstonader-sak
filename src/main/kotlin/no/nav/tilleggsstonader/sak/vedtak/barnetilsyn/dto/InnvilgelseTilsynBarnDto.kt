@@ -13,15 +13,13 @@ import java.util.UUID
  * @param utgifter map utgifter per [no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn]
  */
 data class InnvilgelseTilsynBarnDto(
-    val utgifter: Map<UUID, List<Utgift>>,
     val beregningsresultat: BeregningsresultatTilsynBarnDto?,
 ) : VedtakTilsynBarnDto(TypeVedtak.INNVILGELSE)
 
 data class InnvilgelseTilsynBarnRequest(
-    val utgifter: Map<UUID, List<Utgift>>,
     val beregningsresultat: BeregningsresultatTilsynBarnDto?,
 ) {
-    fun tilDto() = InnvilgelseTilsynBarnDto(utgifter, beregningsresultat)
+    fun tilDto() = InnvilgelseTilsynBarnDto(beregningsresultat)
 }
 
 data class Utgift(
