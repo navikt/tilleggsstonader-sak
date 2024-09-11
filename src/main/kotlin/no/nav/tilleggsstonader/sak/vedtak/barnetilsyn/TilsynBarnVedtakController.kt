@@ -26,7 +26,7 @@ class TilsynBarnVedtakController(
     tilsynBarnVedtakService,
 ) {
 
-    @PostMapping("{behandlingId}")
+    @PostMapping("{behandlingId}", "{behandlingId}/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: UUID,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
