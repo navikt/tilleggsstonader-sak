@@ -18,7 +18,7 @@ class VilkårPeriodeValideringTest {
 
     @Test
     fun `skal ikke kaste feil hvis 2 perioder uten barnId ikke overlapper`() {
-        val vilkår = vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN, fom = fom, tom = tom, beløp = 1)
+        val vilkår = vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN, fom = fom, tom = tom, utgift = 1)
         val vilkår2 = vilkår.copy(fom = fom.plusMonths(1), tom = tom.plusMonths(1))
 
         validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår2))
@@ -26,7 +26,7 @@ class VilkårPeriodeValideringTest {
 
     @Test
     fun `skal kaste feil hvis 2 perioder uten barnId overlapper`() {
-        val vilkår = vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN, fom = fom, tom = tom, beløp = 1)
+        val vilkår = vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN, fom = fom, tom = tom, utgift = 1)
 
         assertThatThrownBy {
             validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår))
@@ -41,7 +41,7 @@ class VilkårPeriodeValideringTest {
             barnId = barnId,
             fom = fom,
             tom = tom,
-            beløp = 1,
+            utgift = 1,
         )
         val vilkår2 = vilkår.copy(fom = fom.plusMonths(1), tom = tom.plusMonths(1))
 
@@ -56,7 +56,7 @@ class VilkårPeriodeValideringTest {
             barnId = barnId,
             fom = fom,
             tom = tom,
-            beløp = 1,
+            utgift = 1,
         )
         assertThatThrownBy {
             validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår))
@@ -71,7 +71,7 @@ class VilkårPeriodeValideringTest {
             barnId = barnId,
             fom = fom,
             tom = tom,
-            beløp = 1,
+            utgift = 1,
         )
         val vilkår2 = vilkår.copy(barnId = UUID.randomUUID())
 
