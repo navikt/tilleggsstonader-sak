@@ -35,8 +35,8 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         val vilkår = vilkårRepository.insert(
             vilkår(
                 behandlingId = behandling.id,
+                type = VilkårType.PASS_BARN,
                 resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                type = VilkårType.EKSEMPEL,
                 delvilkår = listOf(Delvilkår(Vilkårsresultat.OPPFYLT, vurderinger)),
                 barnId = null,
                 opphavsvilkår = Opphavsvilkår(behandling.id, SporbarUtils.now()),
@@ -54,9 +54,8 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         val vilkår = vilkårRepository.insert(
             vilkår(
                 behandlingId = behandling.id,
+                type = VilkårType.PASS_BARN,
                 resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                type = VilkårType.EKSEMPEL,
-                opphavsvilkår = null,
             ),
         )
         Assertions.assertThat(vilkårRepository.findByBehandlingId(behandling.id)).containsOnly(vilkår)
@@ -70,8 +69,8 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         val vilkår = vilkårRepository.insert(
             vilkår(
                 behandling.id,
+                VilkårType.PASS_BARN,
                 Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                VilkårType.EKSEMPEL,
             ),
         )
         val nyttTidspunkt = osloNow().minusDays(1).truncatedTo(ChronoUnit.MILLIS)
@@ -90,9 +89,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val vilkår: Vilkår = BrukerContextUtil.testWithBrukerContext(preferredUsername = saksbehandler) {
-            vilkårRepository.insert(
-                vilkår(behandling.id, Vilkårsresultat.IKKE_TATT_STILLING_TIL, VilkårType.EKSEMPEL),
-            )
+            vilkårRepository.insert(vilkår(behandling.id, VilkårType.PASS_BARN, Vilkårsresultat.IKKE_TATT_STILLING_TIL))
         }
         Assertions.assertThat(vilkår.sporbar.opprettetAv).isEqualTo(saksbehandler)
         Assertions.assertThat(vilkår.sporbar.endret.endretAv).isEqualTo(saksbehandler)

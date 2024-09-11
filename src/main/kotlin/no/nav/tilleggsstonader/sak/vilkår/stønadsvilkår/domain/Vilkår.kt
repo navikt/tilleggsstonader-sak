@@ -61,6 +61,9 @@ data class Vilkår(
                 validerFørsteOgSisteDagIValgtMåned(fom, tom)
                 validerPåkrevdBeløpHvisOppfylt()
             }
+            VilkårType.EKSEMPEL -> {
+                // Dette er kun for tester foreløpig
+            }
             else -> error("Må ta stilling til validering av fom/tom. Eks om vilkåret bruker dato eller månedsvelger")
         }
     }
