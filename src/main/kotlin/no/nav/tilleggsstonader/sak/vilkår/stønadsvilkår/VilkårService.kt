@@ -133,22 +133,6 @@ class VilkårService(
         return oppdaterVilkårTilSkalIkkeVurderes(behandlingId, vilkår)
     }
 
-    private fun nullstillVilkårMedNyeHovedregler(
-        behandlingId: UUID,
-        vilkår: Vilkår,
-    ): VilkårDto {
-        val metadata = hentHovedregelMetadata(behandlingId)
-        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkår(metadata, barnId = vilkår.barnId)
-        val delvilkårWrapper = DelvilkårWrapper(nyeDelvilkår)
-        return vilkårRepository.update(
-            vilkår.copy(
-                resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                delvilkårwrapper = delvilkårWrapper,
-                opphavsvilkår = null,
-            ),
-        ).tilDto()
-    }
-
     private fun oppdaterVilkårTilSkalIkkeVurderes(
         behandlingId: UUID,
         vilkår: Vilkår,
@@ -215,9 +199,6 @@ class VilkårService(
             )
         }
     }
-
-    private fun behandlingErLåstForVidereRedigering(behandlingId: UUID) =
-        behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
 
     private fun validerErIVilkårSteg(behandling: Saksbehandling) {
         brukerfeilHvisIkke(behandling.steg == StegType.VILKÅR) {
