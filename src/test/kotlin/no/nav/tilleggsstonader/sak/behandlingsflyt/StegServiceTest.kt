@@ -247,7 +247,16 @@ class StegServiceTest(
         val tom = LocalDate.of(2023, 1, 31)
         stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandlingId, fom = fom, tom = tom))
         vilkårperiodeRepository.insert(aktivitet(behandlingId = behandlingId, fom = fom, tom = tom))
-        vilkårRepository.insert(vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN, barnId = barn.id))
+        vilkårRepository.insert(
+            vilkår(
+                behandlingId = behandlingId,
+                type = VilkårType.PASS_BARN,
+                barnId = barn.id,
+                fom = fom,
+                tom = tom,
+                utgift = 100,
+            ),
+        )
     }
 
     private fun opprettVedtakTilsynBarn(barn: BehandlingBarn): InnvilgelseTilsynBarnDto {
