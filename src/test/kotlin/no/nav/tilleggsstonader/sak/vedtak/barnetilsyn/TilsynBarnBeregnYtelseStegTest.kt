@@ -13,16 +13,12 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
-import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
@@ -40,7 +36,6 @@ class TilsynBarnBeregnYtelseStegTest {
     private val simuleringService = mockk<SimuleringService>(relaxed = true)
     private val stønadsperiodeService = mockk<StønadsperiodeRepository>(relaxed = true)
     private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>(relaxed = true)
-    private val vilkårService = mockk<VilkårService>(relaxed = true)
     private val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>(relaxed = true)
 
     val steg = TilsynBarnBeregnYtelseSteg(
@@ -48,7 +43,6 @@ class TilsynBarnBeregnYtelseStegTest {
         vedtakRepository = repository,
         tilkjentytelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
-        vilkårService = vilkårService,
         unleashService = mockUnleashService(),
         tilsynBarnUtgiftService = tilsynBarnUtgiftService,
     )
@@ -65,7 +59,6 @@ class TilsynBarnBeregnYtelseStegTest {
         val tom = LocalDate.of(2023, 1, 31)
         mockStønadsperioder(fom, tom, saksbehandling.id)
         mockVilkårperioder(fom, tom, saksbehandling.id)
-        mockVilkår(saksbehandling.id)
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any(), any()) } returns
             mapOf(barn.id to listOf(UtgiftBeregning(YearMonth.now(), YearMonth.now(), 1)))
     }
@@ -110,24 +103,12 @@ class TilsynBarnBeregnYtelseStegTest {
             utgifter = mapOf(barn(barn.id, Utgift(måned, måned, 100))),
         )
 
-        mockVilkår(revurdering.id)
         mockVilkårperioder(behandlingId = revurdering.id)
         mockStønadsperioder(behandlingId = revurdering.id)
 
         val nesteSteg = steg.utførOgReturnerNesteSteg(revurdering, vedtak)
         assertThat(revurdering.type).isEqualTo(BehandlingType.REVURDERING)
         assertThat(nesteSteg).isEqualTo(StegType.SIMULERING)
-    }
-
-    private fun mockVilkår(behandlingId: UUID) {
-        every { vilkårService.hentOppfyltePassBarnVilkår(behandlingId) } returns listOf(
-            vilkår(
-                behandlingId = behandlingId,
-                barnId = barn.id,
-                resultat = Vilkårsresultat.OPPFYLT,
-                type = VilkårType.PASS_BARN,
-            ),
-        )
     }
 
     private fun mockVilkårperioder(

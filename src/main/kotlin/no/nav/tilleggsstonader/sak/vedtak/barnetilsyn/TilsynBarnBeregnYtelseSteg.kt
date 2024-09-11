@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
@@ -28,7 +27,6 @@ import java.time.LocalDate
 @Service
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
-    private val vilkårService: VilkårService,
     private val unleashService: UnleashService,
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
     vedtakRepository: TilsynBarnVedtakRepository,
@@ -69,7 +67,6 @@ class TilsynBarnBeregnYtelseSteg(
 
         val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(saksbehandling.id, vedtak.utgifter)
         val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, utgifter)
-        validerKunBarnMedOppfylteVilkår(saksbehandling, vedtak)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, vedtak, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
     }
@@ -86,16 +83,6 @@ class TilsynBarnBeregnYtelseSteg(
                 årsakerAvslag = ÅrsakAvslag.Wrapper(årsaker = vedtak.årsakerAvslag),
             ),
         )
-    }
-
-    private fun validerKunBarnMedOppfylteVilkår(saksbehandling: Saksbehandling, vedtak: InnvilgelseTilsynBarnDto) {
-        val barnMedOppfylteVilkår =
-            vilkårService.hentOppfyltePassBarnVilkår(behandlingId = saksbehandling.id).map { it.barnId }
-        val barnUtenOppfylteVilkår = vedtak.utgifter.keys.filter { !barnMedOppfylteVilkår.contains(it) }
-
-        feilHvis(barnUtenOppfylteVilkår.isNotEmpty()) {
-            "Det finnes utgifter på barn som ikke har oppfylt vilkårsvurdering, id=$barnUtenOppfylteVilkår"
-        }
     }
 
     private fun lagreAndeler(
