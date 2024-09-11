@@ -263,30 +263,29 @@ class VilkårService(
         val tidligereVurderinger =
             vilkårRepository.findByBehandlingId(forrigeBehandlingId).associateBy { it.id }
 
-        val kopiAvVurderinger: Map<UUID, Vilkår> = lagKopiAvTidligereVurderinger(
+        val kopiAvVurderinger = lagKopiAvTidligereVurderinger(
             tidligereVurderinger,
             nyBehandling.id,
             barnIdMap,
         )
 
-        vilkårRepository.insertAll(kopiAvVurderinger.values.toList())
+        vilkårRepository.insertAll(kopiAvVurderinger)
     }
 
     private fun lagKopiAvTidligereVurderinger(
         tidligereVilkår: Map<UUID, Vilkår>,
         nyBehandlingsId: UUID,
         barnIdMap: Map<TidligereBarnId, NyttBarnId>,
-    ): Map<UUID, Vilkår> =
-        tidligereVilkår.values
-            .associate { vilkår ->
-                vilkår.id to vilkår.copy(
-                    id = UUID.randomUUID(),
-                    behandlingId = nyBehandlingsId,
-                    sporbar = Sporbar(),
-                    barnId = finnBarnId(vilkår.barnId, barnIdMap),
-                    opphavsvilkår = vilkår.opprettOpphavsvilkår(),
-                )
-            }
+    ): List<Vilkår> =
+        tidligereVilkår.values.map { vilkår ->
+            vilkår.copy(
+                id = UUID.randomUUID(),
+                behandlingId = nyBehandlingsId,
+                sporbar = Sporbar(),
+                barnId = finnBarnId(vilkår.barnId, barnIdMap),
+                opphavsvilkår = vilkår.opprettOpphavsvilkår(),
+            )
+        }
 
     private fun finnBarnId(barnId: UUID?, barnIdMap: Map<UUID, UUID>): UUID? =
         barnId?.let {
