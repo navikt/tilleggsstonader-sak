@@ -230,22 +230,6 @@ class VilkårService(
         return this.hentVilkårsvurdering(behandlingId)
     }
 
-    /*
-    @Transactional
-    fun opprettVilkårForOmregning(behandling: Behandling) {
-        feilHvisIkke(behandling.årsak == BehandlingÅrsak.G_OMREGNING) { "Maskinelle vurderinger kun for G-omregning." }
-        val (_, metadata) = hentGrunnlagOgMetadata(behandling.id)
-        val stønadstype = fagsakService.hentFagsakForBehandling(behandling.id).stønadstype
-        kopierVurderingerTilNyBehandling(
-            eksisterendeBehandlingId = behandling.forrigeBehandlingId ?: error("Finner ikke forrige behandlingId"),
-            nyBehandlingsId = behandling.id,
-            metadata = metadata,
-            stønadType = stønadstype,
-
-        )
-    }
-     */
-
     fun hentGrunnlagOgMetadata(behandlingId: UUID): Pair<BehandlingFaktaDto, HovedregelMetadata> {
         val behandling = behandlingService.hentBehandling(behandlingId)
         val barn = barnService.finnBarnPåBehandling(behandlingId)
