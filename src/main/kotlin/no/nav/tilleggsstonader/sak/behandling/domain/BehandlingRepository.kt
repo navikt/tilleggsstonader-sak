@@ -180,7 +180,7 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
 
     @Query(
         """
-            SELECT b.id
+            SELECT b.*
             FROM gjeldende_iverksatte_behandlinger b
             WHERE b.stonadstype = :stønadstype
         """
