@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetService
@@ -39,11 +40,19 @@ class OppfølgingService(
 
             val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
 
-            val registerAktivitet = aktivitetService.hentAktiviteter(fagsak.fagsakPersonId, stønadsperioder.first().fom, stønadsperioder.last().tom)
-            val stønadsperioderSomMåSjekkes = stønadsperioder.filterNot { stønadsperiodeMåKontrolleres(it, fagsak, registerAktivitet) }
+            val registerAktivitet = aktivitetService.hentAktiviteter(
+                fagsak.fagsakPersonId,
+                stønadsperioder.first().fom,
+                stønadsperioder.last().tom
+            )
+            val stønadsperioderSomMåSjekkes =
+                stønadsperioder.filterNot { stønadsperiodeMåKontrolleres(it, fagsak, registerAktivitet) }
 
             if (stønadsperioderSomMåSjekkes.isNotEmpty()) {
-                BehandlingForOppfølgingDto(behandling.id, stønadsperioderSomMåSjekkes)
+                BehandlingForOppfølgingDto(
+                    behandling.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId),
+                    stønadsperioderSomMåSjekkes
+                )
             } else {
                 null
             }
