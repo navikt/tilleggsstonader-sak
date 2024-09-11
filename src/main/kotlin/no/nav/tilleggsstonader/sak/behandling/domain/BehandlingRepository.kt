@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.jdbc.repository.query.Query
@@ -13,11 +15,11 @@ import java.util.UUID
 @Repository
 interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUpdateRepository<Behandling> {
 
-    fun findByFagsakId(fagsakId: UUID): List<Behandling>
+    fun findByFagsakId(fagsakId: FagsakId): List<Behandling>
 
-    fun findByFagsakIdAndStatus(fagsakId: UUID, status: BehandlingStatus): List<Behandling>
+    fun findByFagsakIdAndStatus(fagsakId: FagsakId, status: BehandlingStatus): List<Behandling>
 
-    fun existsByFagsakId(fagsakId: UUID): Boolean
+    fun existsByFagsakId(fagsakId: FagsakId): Boolean
 
     // language=PostgreSQL
     @Query(
@@ -126,7 +128,7 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
         LIMIT 1
     """,
     )
-    fun finnSisteIverksatteBehandling(fagsakId: UUID): Behandling?
+    fun finnSisteIverksatteBehandling(fagsakId: FagsakId): Behandling?
 
     @Query(
         """
@@ -140,11 +142,11 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
          AND b.arsak != 'MIGRERING'
     """,
     )
-    fun finnBehandlingerForGjenbrukAvVilkår(fagsakPersonId: UUID): List<Behandling>
+    fun finnBehandlingerForGjenbrukAvVilkår(fagsakPersonId: FagsakPersonId): List<Behandling>
 
-    fun existsByFagsakIdAndStatusIsNot(fagsakId: UUID, behandlingStatus: BehandlingStatus): Boolean
+    fun existsByFagsakIdAndStatusIsNot(fagsakId: FagsakId, behandlingStatus: BehandlingStatus): Boolean
 
-    fun existsByFagsakIdAndStatusIsNotIn(fagsakId: UUID, behandlingStatus: List<BehandlingStatus>): Boolean
+    fun existsByFagsakIdAndStatusIsNotIn(fagsakId: FagsakId, behandlingStatus: List<BehandlingStatus>): Boolean
 
     // language=PostgreSQL
     @Query(

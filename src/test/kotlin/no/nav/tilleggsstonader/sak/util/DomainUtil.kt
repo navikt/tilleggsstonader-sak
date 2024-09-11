@@ -29,6 +29,8 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -177,17 +179,17 @@ fun fagsakPerson(
 fun fagsak(
     identer: Set<PersonIdent> = defaultIdenter,
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
-    id: UUID = UUID.randomUUID(),
+    id: FagsakId = FagsakId.randomUUID(),
     eksternId: EksternFagsakId = EksternFagsakId(fagsakId = id),
     sporbar: Sporbar = Sporbar(),
-    fagsakPersonId: UUID = UUID.randomUUID(),
+    fagsakPersonId: FagsakPersonId = FagsakPersonId.random(),
 ): Fagsak {
     return fagsak(stønadstype, id, FagsakPerson(id = fagsakPersonId, identer = identer), eksternId, sporbar)
 }
 
 fun fagsak(
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
-    id: UUID = UUID.randomUUID(),
+    id: FagsakId = FagsakId.randomUUID(),
     person: FagsakPerson,
     eksternId: EksternFagsakId = EksternFagsakId(fagsakId = id),
     sporbar: Sporbar = Sporbar(),
@@ -203,9 +205,9 @@ fun fagsak(
 }
 
 fun fagsakDomain(
-    id: UUID = UUID.randomUUID(),
+    id: FagsakId = FagsakId.randomUUID(),
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
-    personId: UUID = UUID.randomUUID(),
+    personId: FagsakPersonId = FagsakPersonId.random(),
 ): FagsakDomain = FagsakDomain(
     id = id,
     fagsakPersonId = personId,
@@ -240,6 +242,9 @@ fun vilkår(
     delvilkår: List<Delvilkår> = emptyList(),
     barnId: UUID? = null,
     opphavsvilkår: Opphavsvilkår? = null,
+    fom: LocalDate? = null,
+    tom: LocalDate? = null,
+    beløp: Int? = null,
 ): Vilkår = Vilkår(
     behandlingId = behandlingId,
     resultat = resultat,
@@ -247,6 +252,9 @@ fun vilkår(
     barnId = barnId,
     delvilkårwrapper = DelvilkårWrapper(delvilkår),
     opphavsvilkår = opphavsvilkår,
+    fom = fom,
+    tom = tom,
+    utgift = beløp,
 )
 
 fun fagsakpersoner(vararg identer: String): Set<PersonIdent> = identer.map {

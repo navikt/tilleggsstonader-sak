@@ -2,20 +2,26 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
+import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.svarTilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler.Companion.ALLE_VILKÅRSREGLER
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering.utledResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelValidering.validerVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
+import java.time.LocalDate
 import java.util.UUID
 
 object OppdaterVilkår {
@@ -24,24 +30,101 @@ object OppdaterVilkår {
      * Oppdaterer [Vilkår] med nye svar og resultat
      * Validerer att svaren er gyldige
      */
-    fun validerOgOppdatertVilkår(
+    fun validerVilkårOgBeregnResultat(
         vilkår: Vilkår,
-        oppdatering: List<DelvilkårDto>,
-        vilkårsregler: Map<VilkårType, Vilkårsregel> = ALLE_VILKÅRSREGLER.vilkårsregler,
-    ): Vilkår { // TODO: Ikke default input her, kanskje?
-        val vilkårsregel =
-            vilkårsregler[vilkår.type] ?: error("Finner ikke vilkårsregler for ${vilkår.type}")
+        oppdatering: LagreVilkårDto,
+        toggleVilkårPeriodiseringEnabled: Boolean,
+    ): RegelResultat {
+        val vilkårsregel = hentVilkårsregel(vilkår.type)
 
-        validerVilkår(vilkårsregel, oppdatering, vilkår.delvilkårsett)
+        validerVilkår(vilkårsregel, oppdatering.delvilkårsett, vilkår.delvilkårsett)
 
-        val vilkårsresultat = utledResultat(vilkårsregel, oppdatering)
+        val vilkårsresultat = utledResultat(vilkårsregel, oppdatering.delvilkårsett)
         validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat)
-        val oppdaterteDelvilkår = oppdaterDelvilkår(vilkår, vilkårsresultat, oppdatering)
+        validerPeriodeOgBeløp(oppdatering, vilkårsresultat, toggleVilkårPeriodiseringEnabled)
+
+        return vilkårsresultat
+    }
+
+    private fun validerPeriodeOgBeløp(
+        oppdatering: LagreVilkårDto,
+        vilkårsresultat: RegelResultat,
+        toggleVilkårPeriodiseringEnabled: Boolean,
+    ) {
+        if (toggleVilkårPeriodiseringEnabled) {
+            val vilkårType = vilkårsresultat.vilkårType
+            val resultat = vilkårsresultat.vilkår
+            val fom = oppdatering.fom
+            val tom = oppdatering.tom
+            brukerfeilHvis(fom == null || tom == null) {
+                "Mangler fra og med/til og med på vilkår"
+            }
+            brukerfeilHvisIkke(fom <= tom) {
+                "Til og med må være lik eller etter fra og med"
+            }
+            brukerfeilHvis(
+                vilkårType == VilkårType.PASS_BARN &&
+                    resultat == Vilkårsresultat.OPPFYLT &&
+                    oppdatering.utgift == null,
+            ) {
+                "Mangler utgift på vilkår"
+            }
+            feilHvis(vilkårType != VilkårType.PASS_BARN && oppdatering.utgift != null) {
+                "Kan ikke ha utgift på vilkårType=$vilkårType"
+            }
+        }
+    }
+
+    fun oppdaterVilkår(
+        vilkår: Vilkår,
+        oppdatering: LagreVilkårDto,
+        vilkårsresultat: RegelResultat,
+    ): Vilkår {
+        val oppdaterteDelvilkår = oppdaterDelvilkår(
+            vilkår = vilkår,
+            vilkårsresultat = vilkårsresultat,
+            validerteDelvilkårsett = oppdatering.delvilkårsett,
+        )
         return vilkår.copy(
             resultat = vilkårsresultat.vilkår,
             delvilkårwrapper = oppdaterteDelvilkår,
             opphavsvilkår = null,
+            fom = utledFom(vilkår, oppdatering),
+            tom = utledTom(vilkår, oppdatering),
+            utgift = oppdatering.utgift,
         )
+    }
+
+    private fun utledFom(vilkår: Vilkår, oppdatering: LagreVilkårDto): LocalDate? {
+        return oppdatering.fom?.let {
+            when (vilkår.type) {
+                VilkårType.PASS_BARN -> {
+                    validerErFørsteDagIMåned(it)
+                    it
+                }
+                else -> error("Har ikke tatt stilling til type dato for ${vilkår.type}")
+            }
+        }
+    }
+
+    private fun utledTom(vilkår: Vilkår, oppdatering: LagreVilkårDto): LocalDate? {
+        return oppdatering.tom?.let {
+            when (vilkår.type) {
+                VilkårType.PASS_BARN -> {
+                    validerErSisteDagIMåned(it)
+                    it
+                }
+                else -> error("Har ikke tatt stilling til type dato for ${vilkår.type}")
+            }
+        }
+    }
+
+    private fun validerErFørsteDagIMåned(dato: LocalDate) {
+        require(dato.erFørsteDagIMåneden()) { "Dato=$dato er ikke første dag i måneden" }
+    }
+
+    private fun validerErSisteDagIMåned(dato: LocalDate) {
+        require(dato.erSisteDagIMåneden()) { "Dato=$dato er ikke siste dag i måneden" }
     }
 
     private fun validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat: RegelResultat) {
@@ -62,9 +145,9 @@ object OppdaterVilkår {
     private fun oppdaterDelvilkår(
         vilkår: Vilkår,
         vilkårsresultat: RegelResultat,
-        oppdatering: List<DelvilkårDto>,
+        validerteDelvilkårsett: List<DelvilkårDto>,
     ): DelvilkårWrapper {
-        val vurderingerPåType = oppdatering.associateBy { it.vurderinger.first().regelId }
+        val vurderingerPåType = validerteDelvilkårsett.associateBy { it.vurderinger.first().regelId }
         val delvilkårsett = vilkår.delvilkårsett.map {
             if (it.resultat == Vilkårsresultat.IKKE_AKTUELL) {
                 it
@@ -85,70 +168,6 @@ object OppdaterVilkår {
         }.toList()
         return vilkår.delvilkårwrapper.copy(delvilkårsett = delvilkårsett)
     }
-
-    /**
-     * Et vilkår skal anses som vurdert dersom det er oppfylt eller saksbehandler har valgt å ikke vurdere det
-     */
-    fun erAlleVilkårTattStillingTil(vilkårsresultat: List<Vilkårsresultat>): Boolean {
-        return if (vilkårsresultat.all { it == Vilkårsresultat.OPPFYLT || it == Vilkårsresultat.SKAL_IKKE_VURDERES }) {
-            true
-        } else {
-            harNoenIkkeOppfyltOgRestenIkkeOppfyltEllerOppfyltEllerSkalIkkevurderes(vilkårsresultat)
-        }
-    }
-
-    fun utledResultatForVilkårSomGjelderFlereBarn(value: List<Vilkår>): Vilkårsresultat {
-        feilHvis(value.any { !it.type.gjelderFlereBarn() }) {
-            "Denne metoden kan kun kalles med vilkår som kan ha flere barn"
-        }
-        return when {
-            value.any { it.resultat == Vilkårsresultat.OPPFYLT } -> Vilkårsresultat.OPPFYLT
-            value.all { it.barnId == null && it.resultat == Vilkårsresultat.IKKE_TATT_STILLING_TIL } -> Vilkårsresultat.SKAL_IKKE_VURDERES // Dersom man ikke har barn på behandlingen så er ikke disse vilkårene aktuelle å vurdere
-            value.any { it.resultat == Vilkårsresultat.IKKE_TATT_STILLING_TIL } -> Vilkårsresultat.IKKE_TATT_STILLING_TIL
-            value.all { it.resultat == Vilkårsresultat.SKAL_IKKE_VURDERES } -> Vilkårsresultat.SKAL_IKKE_VURDERES
-            value.any { it.resultat == Vilkårsresultat.IKKE_OPPFYLT } &&
-                value.all { it.resultat == Vilkårsresultat.IKKE_OPPFYLT || it.resultat == Vilkårsresultat.SKAL_IKKE_VURDERES } ->
-                Vilkårsresultat.IKKE_OPPFYLT
-
-            else -> throw Feil(
-                "Utled resultat for aleneomsorg - kombinasjon av resultat er ikke behandlet: " +
-                    "${value.map { it.resultat }}",
-            )
-        }
-    }
-
-    fun erAlleVilkårOppfylt(
-        vilkårsett: List<Vilkår>,
-        stønadstype: Stønadstype,
-    ): Boolean {
-        val inneholderAlleTyperVilkår =
-            vilkårsett.map { it.type }.containsAll(VilkårType.hentVilkårForStønad(stønadstype))
-        val vilkårsresultat = utledVilkårsresultat(vilkårsett)
-        return inneholderAlleTyperVilkår && vilkårsresultat.all { it == Vilkårsresultat.OPPFYLT }
-    }
-
-    private fun utledVilkårsresultat(lagretVilkårsett: List<Vilkår>): List<Vilkårsresultat> {
-        val vilkårsresultat = lagretVilkårsett.groupBy { it.type }.map {
-            if (it.key.gjelderFlereBarn()) {
-                utledResultatForVilkårSomGjelderFlereBarn(it.value)
-            } else {
-                it.value.single().resultat
-            }
-        }
-        return vilkårsresultat
-    }
-
-    /**
-     * [Vilkårsresultat.IKKE_OPPFYLT] er gyldig i kombinasjon med andre som er
-     * [Vilkårsresultat.IKKE_OPPFYLT], [Vilkårsresultat.OPPFYLT] og [Vilkårsresultat.SKAL_IKKE_VURDERES]
-     */
-    private fun harNoenIkkeOppfyltOgRestenIkkeOppfyltEllerOppfyltEllerSkalIkkevurderes(vilkårsresultat: List<Vilkårsresultat>) =
-        vilkårsresultat.any { it == Vilkårsresultat.IKKE_OPPFYLT } &&
-            vilkårsresultat.all {
-                it == Vilkårsresultat.OPPFYLT ||
-                    it == Vilkårsresultat.IKKE_OPPFYLT ||
-                    it == Vilkårsresultat.SKAL_IKKE_VURDERES
-            }
 
     // TODO rename noe stønadsspesifikt vilkår
     fun opprettNyeVilkår(

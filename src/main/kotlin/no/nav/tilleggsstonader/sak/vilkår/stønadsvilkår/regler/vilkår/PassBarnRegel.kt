@@ -12,11 +12,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMeta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.NesteRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelSteg
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel.Companion.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel.Companion.OPPFYLT_MED_VALGFRI_BEGRUNNELSE
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.regelIder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
 import java.time.LocalDate
 import java.util.UUID
@@ -29,13 +29,9 @@ class PassBarnRegel : Vilkårsregel(
         HAR_FULLFØRT_FJERDEKLASSE,
         UNNTAK_ALDER,
     ),
-    hovedregler = regelIder(
-        UTGIFTER_DOKUMENTERT,
-        ANNEN_FORELDER_MOTTAR_STØTTE,
-        HAR_FULLFØRT_FJERDEKLASSE,
-    ),
 ) {
 
+    // TODO då man ikke lengre initierer delvilkår fra backend med periodisering av vilkår burde denne fjernes?
     override fun initiereDelvilkår(
         metadata: HovedregelMetadata,
         resultat: Vilkårsresultat,
@@ -56,45 +52,44 @@ class PassBarnRegel : Vilkårsregel(
 
     companion object {
 
-        private val unntakAlderMapping =
-            setOf(
-                SvarId.TRENGER_MER_TILSYN_ENN_JEVNALDRENDE,
-                SvarId.FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID,
-            )
-                .associateWith {
-                    SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE
-                } + mapOf(SvarId.NEI to SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE)
-
         private val UNNTAK_ALDER =
             RegelSteg(
                 regelId = RegelId.UNNTAK_ALDER,
-                svarMapping = unntakAlderMapping,
+                erHovedregel = false,
+                svarMapping = mapOf(
+                    SvarId.TRENGER_MER_TILSYN_ENN_JEVNALDRENDE to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    SvarId.FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    SvarId.NEI to IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                ),
             )
 
         private val HAR_FULLFØRT_FJERDEKLASSE =
             RegelSteg(
                 regelId = RegelId.HAR_FULLFØRT_FJERDEKLASSE,
+                erHovedregel = true,
                 svarMapping = jaNeiSvarRegel(
                     hvisJa = NesteRegel(UNNTAK_ALDER.regelId),
-                    hvisNei = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    hvisNei = OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
                 ),
             )
 
         private val UTGIFTER_DOKUMENTERT =
             RegelSteg(
                 regelId = RegelId.UTGIFTER_DOKUMENTERT,
+                erHovedregel = true,
                 jaNeiSvarRegel(
-                    hvisJa = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
-                    hvisNei = SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                    hvisJa = OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                 ),
             )
 
         private val ANNEN_FORELDER_MOTTAR_STØTTE =
             RegelSteg(
                 regelId = RegelId.ANNEN_FORELDER_MOTTAR_STØTTE,
+                erHovedregel = true,
                 jaNeiSvarRegel(
-                    hvisJa = SluttSvarRegel.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
-                    hvisNei = SluttSvarRegel.OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    hvisJa = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                    hvisNei = OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
                 ),
             )
     }

@@ -58,7 +58,26 @@ internal class SimuleringControllerTest : IntegrationTest() {
         val simuleringsresultat = simuleringsresultatRepository.findByIdOrThrow(behandling.id)
 
         // Verifiser at simuleringsresultatet er lagret
-        assertThat(simuleringsresultat.data.detaljer.perioder).hasSize(16)
+        assertThat(simuleringsresultat.data!!.detaljer.perioder).hasSize(16)
+        assertThat(simuleringsresultat.ingenEndringIUtbetaling).isFalse()
+    }
+
+    @Test
+    internal fun `Skal håndtere 204 No Content for behandling uten endring i utbetalinger, og lagre ned dette`() {
+        val personIdent = "identIngenEndring"
+        val fagsak = opprettFagsak(personIdent)
+        val behandling = opprettBehandling(fagsak)
+        opprettVedtak(behandling.id)
+
+        tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
+
+        val respons: ResponseEntity<SimuleringDto> = simulerForBehandling(behandling.id)
+
+        assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
+        val simuleringsresultat = simuleringsresultatRepository.findByIdOrThrow(behandling.id)
+
+        assertThat(simuleringsresultat.data).isNull()
+        assertThat(simuleringsresultat.ingenEndringIUtbetaling).isTrue()
     }
 
     private fun opprettFagsak(personIdent: String) =

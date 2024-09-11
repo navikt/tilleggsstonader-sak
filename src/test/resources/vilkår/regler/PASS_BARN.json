@@ -3,6 +3,7 @@
   "regler" : {
     "UTGIFTER_DOKUMENTERT" : {
       "regelId" : "UTGIFTER_DOKUMENTERT",
+      "erHovedregel" : true,
       "svarMapping" : {
         "JA" : {
           "begrunnelseType" : "VALGFRI",
@@ -16,6 +17,7 @@
     },
     "ANNEN_FORELDER_MOTTAR_STØTTE" : {
       "regelId" : "ANNEN_FORELDER_MOTTAR_STØTTE",
+      "erHovedregel" : true,
       "svarMapping" : {
         "JA" : {
           "begrunnelseType" : "PÅKREVD",
@@ -29,6 +31,7 @@
     },
     "HAR_FULLFØRT_FJERDEKLASSE" : {
       "regelId" : "HAR_FULLFØRT_FJERDEKLASSE",
+      "erHovedregel" : true,
       "svarMapping" : {
         "JA" : {
           "regelId" : "UNNTAK_ALDER",
@@ -42,6 +45,7 @@
     },
     "UNNTAK_ALDER" : {
       "regelId" : "UNNTAK_ALDER",
+      "erHovedregel" : false,
       "svarMapping" : {
         "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE" : {
           "begrunnelseType" : "VALGFRI",

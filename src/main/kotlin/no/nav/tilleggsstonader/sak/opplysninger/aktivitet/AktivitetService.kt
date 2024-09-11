@@ -6,10 +6,10 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.UUID
 
 @Service
 class AktivitetService(
@@ -18,8 +18,9 @@ class AktivitetService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
+
     fun hentAktiviteter(
-        fagsakPersonId: UUID,
+        fagsakPersonId: FagsakPersonId,
         fom: LocalDate = osloDateNow().minusYears(3),
         tom: LocalDate = osloDateNow().plusYears(1)
     ): List<AktivitetArenaDto> {

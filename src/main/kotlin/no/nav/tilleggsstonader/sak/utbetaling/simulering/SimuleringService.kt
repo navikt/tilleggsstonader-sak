@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettDtoMapper
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.OppsummeringForPeriode
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -28,12 +27,8 @@ class SimuleringService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentLagretSimuleringsoppsummering(behandlingId: UUID): List<OppsummeringForPeriode>? {
-        return hentLagretSimmuleringsresultat(behandlingId)?.oppsummeringer
-    }
-
-    fun hentLagretSimmuleringsresultat(behandlingId: UUID): SimuleringResponse? {
-        return simuleringsresultatRepository.findByIdOrNull(behandlingId)?.data
+    fun hentLagretSimulering(behandlingId: UUID): Simuleringsresultat? {
+        return simuleringsresultatRepository.findByIdOrNull(behandlingId)
     }
 
     fun slettSimuleringForBehandling(saksbehandling: Saksbehandling) {
@@ -60,11 +55,12 @@ class SimuleringService(
             Simuleringsresultat(
                 behandlingId = saksbehandling.id,
                 data = SimuleringResponseMapper.map(resultat),
+                ingenEndringIUtbetaling = resultat == null,
             ),
         )
     }
 
-    private fun simulerMedTilkjentYtelse(saksbehandling: Saksbehandling): SimuleringResponseDto {
+    private fun simulerMedTilkjentYtelse(saksbehandling: Saksbehandling): SimuleringResponseDto? {
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
         val forrigeIverksettingDto = iverksettService.forrigeIverksetting(saksbehandling, tilkjentYtelse)
 

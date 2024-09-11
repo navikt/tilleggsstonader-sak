@@ -106,3 +106,23 @@ Egenskap: Beregning - Utgifter
       # Pga avrunding av utgift * sats, blir denne 4.01 og ikke 4.02
       | 02.2023 | 4.01    | 8           | 2            | 136    |
       | 03.2023 | 3.88    | 8           | 2            | 131    |
+
+  Scenario: 0 i utgifter:
+
+    Gitt følgende støndsperioder
+      | Fom        | Tom        | Aktivitet | Målgruppe       |
+      | 01.01.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
+
+    Gitt følgende aktiviteter
+      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
+      | 01.01.2023 | 28.02.2023 | UTDANNING | 5               |
+
+    Gitt følgende utgifter for barn med id: 1
+      | Fom     | Tom     | Utgift |
+      | 01.2023 | 01.2023 | 0      |
+
+    Når beregner
+
+    Så forvent følgende beregningsresultat
+      | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
+      | 01.2023 | 0.00    | 22           | 0      | 0           |

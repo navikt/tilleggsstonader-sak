@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.StønadstypeDvh.BARNETILSYN
@@ -36,7 +37,7 @@ import java.util.UUID
 data class Vedtaksstatistikk(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val fagsakId: UUID,
+    val fagsakId: FagsakId,
     val behandlingId: UUID,
     val eksternFagsakId: Long,
     val eksternBehandlingId: Long,

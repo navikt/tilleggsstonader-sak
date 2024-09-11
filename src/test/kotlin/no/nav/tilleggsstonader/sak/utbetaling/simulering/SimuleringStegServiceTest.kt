@@ -42,7 +42,7 @@ class SimuleringStegServiceTest {
                 status = BehandlingStatus.FATTER_VEDTAK,
             )
 
-        every { simuleringService.hentLagretSimuleringsoppsummering(any()) } returns mockk()
+        every { simuleringService.hentLagretSimulering(any()) } returns mockk()
         val simuleringsresultatDto = simuleringStegService.hentEllerOpprettSimuleringsresultat(saksbehandling)
 
         verify { stegService wasNot Called }

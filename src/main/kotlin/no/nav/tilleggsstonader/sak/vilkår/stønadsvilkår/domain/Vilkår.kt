@@ -2,12 +2,15 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
+import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -26,6 +29,10 @@ data class Vilkår(
     val behandlingId: UUID,
     val resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
     val type: VilkårType,
+    val fom: LocalDate? = null,
+    val tom: LocalDate? = null,
+    val utgift: Int? = null,
+
     val barnId: UUID? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
@@ -38,6 +45,39 @@ data class Vilkår(
 
     init {
         require(resultat.erIkkeDelvilkårsresultat()) // Verdien AUTOMATISK_OPPFYLT er kun forbeholdt delvilkår
+        if (fom != null || tom != null) {
+            require(fom != null) { "Krever at fom er satt hvis tom er satt" }
+            require(tom != null) { "Krever at tom er satt hvis fom er satt" }
+            require(fom <= tom) { "Krever at fom <= tom" }
+            require(utgift == null || utgift >= 0) { "Utgift må være positivt tall" }
+
+            validerDataForType(fom, tom)
+        }
+    }
+
+    private fun validerDataForType(fom: LocalDate, tom: LocalDate) {
+        when (type) {
+            VilkårType.PASS_BARN -> {
+                validerFørsteOgSisteDagIValgtMåned(fom, tom)
+                validerPåkrevdBeløpHvisOppfylt()
+            }
+            else -> error("Må ta stilling til validering av fom/tom. Eks om vilkåret bruker dato eller månedsvelger")
+        }
+    }
+
+    private fun validerPåkrevdBeløpHvisOppfylt() {
+        if (resultat == Vilkårsresultat.OPPFYLT) {
+            require(utgift != null) { "Utgift er påkrevd når resultat er oppfylt" }
+        }
+    }
+
+    private fun validerFørsteOgSisteDagIValgtMåned(fom: LocalDate, tom: LocalDate) {
+        require(fom.erFørsteDagIMåneden()) {
+            "For vilkår=$type skal FOM være første dagen i måneden"
+        }
+        require(tom.erSisteDagIMåneden()) {
+            "For vilkår=$type skal TOM være siste dagen i måneden"
+        }
     }
 
     /**

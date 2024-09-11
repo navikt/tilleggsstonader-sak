@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
@@ -56,6 +57,7 @@ import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import java.net.URI
 import java.time.LocalDate
@@ -87,7 +89,7 @@ class InterntVedtakServiceTest {
     )
 
     val vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay()
-    val fagsak = fagsak(eksternId = EksternFagsakId(1673L, UUID.randomUUID()))
+    val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.randomUUID()))
     val behandling = saksbehandling(
         behandling = behandling(
             id = UUID.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31"),
@@ -162,16 +164,44 @@ class InterntVedtakServiceTest {
     val behandlingId = behandling.id
     val totrinnskontroll = TotrinnskontrollUtil.totrinnskontroll(TotrinnInternStatus.GODKJENT, beslutter = "saksbeh2")
     val søknad = SøknadBarnetilsynUtil.søknadBarnetilsyn()
-    val barn = listOf(GrunnlagsdataUtil.lagGrunnlagsdataBarn(fødselsdato = LocalDate.of(2024, 5, 15)))
+    val barn = listOf(
+        GrunnlagsdataUtil.lagGrunnlagsdataBarn(ident = "1", fødselsdato = LocalDate.of(2024, 5, 15)),
+        GrunnlagsdataUtil.lagGrunnlagsdataBarn(ident = "2", fødselsdato = LocalDate.of(2024, 10, 15)),
+    )
     val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = barn))
-    val behandlingBarn = listOf(behandlingBarn(personIdent = grunnlagsdata.grunnlag.barn.single().ident))
+    val behandlingBarn = listOf(
+        behandlingBarn(personIdent = grunnlagsdata.grunnlag.barn.first().ident),
+        behandlingBarn(personIdent = grunnlagsdata.grunnlag.barn.last().ident),
+    )
     val barnId = behandlingBarn[0].id
+    val barnId2 = behandlingBarn[1].id
     val vilkår = listOf(
         vilkår(
             behandlingId = behandlingId,
             type = VilkårType.PASS_BARN,
             delvilkår = oppfylteDelvilkårPassBarn(),
             barnId = barnId,
+            fom = LocalDate.of(2024, 2, 1),
+            tom = LocalDate.of(2024, 2, 29),
+            beløp = 100,
+        ).tilDto(),
+        vilkår(
+            behandlingId = behandlingId,
+            type = VilkårType.PASS_BARN,
+            delvilkår = oppfylteDelvilkårPassBarn(),
+            barnId = barnId,
+            fom = LocalDate.of(2024, 2, 1),
+            tom = LocalDate.of(2024, 2, 29),
+            beløp = 200,
+        ).tilDto(),
+        vilkår(
+            behandlingId = behandlingId,
+            type = VilkårType.PASS_BARN,
+            delvilkår = oppfylteDelvilkårPassBarn(),
+            barnId = barnId2,
+            fom = LocalDate.of(2024, 2, 1),
+            tom = LocalDate.of(2024, 2, 29),
+            beløp = 200,
         ).tilDto(),
     )
 
@@ -317,8 +347,10 @@ class InterntVedtakServiceTest {
 
     private fun lagHtmlifyClient(): HtmlifyClient {
         val restTemplate = TestRestTemplate().restTemplate
-        restTemplate.messageConverters.removeIf { it is MappingJackson2HttpMessageConverter }
-        restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter(ObjectMapperProvider.objectMapper))
+        restTemplate.messageConverters = listOf(
+            StringHttpMessageConverter(),
+            MappingJackson2HttpMessageConverter(ObjectMapperProvider.objectMapper),
+        )
         return HtmlifyClient(URI.create("http://localhost:8001"), restTemplate)
     }
 

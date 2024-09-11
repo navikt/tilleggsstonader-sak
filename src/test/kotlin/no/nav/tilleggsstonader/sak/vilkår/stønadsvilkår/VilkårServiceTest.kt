@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import io.mockk.CapturingSlot
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -9,12 +10,14 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
@@ -26,6 +29,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.søknadBarnTilBehandlingBarn
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -43,11 +47,14 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.Op
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.Year
 import java.util.UUID
 
@@ -65,6 +72,7 @@ internal class VilkårServiceTest {
         behandlingFaktaService = behandlingFaktaService,
         barnService = barnService,
         fagsakService = fagsakService,
+        unleashService = mockUnleashService(),
     )
 
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
@@ -91,8 +99,7 @@ internal class VilkårServiceTest {
 
     @BeforeEach
     fun setUp() {
-        every { behandlingService.hentBehandling(behandlingId) } returns behandling
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling(fagsak, behandling)
+        mockHentBehandling(behandling)
         every { behandlingService.oppdaterStatusPåBehandling(any(), any()) } returns behandling
 
         every { vilkårRepository.insertAll(any()) } answers { firstArg() }
@@ -101,6 +108,7 @@ internal class VilkårServiceTest {
 
         every { behandlingFaktaService.hentFakta(behandlingId) } returns mockVilkårGrunnlagDto()
         every { vilkårRepository.insertAll(any()) } answers { firstArg() }
+        justRun { vilkårRepository.deleteById(any()) }
         BrukerContextUtil.mockBrukerContext("saksbehandlernavn")
     }
 
@@ -296,6 +304,9 @@ internal class VilkårServiceTest {
                             id = vilkårId,
                             behandlingId = behandlingId,
                             delvilkårsett = listOf(),
+                            fom = null,
+                            tom = null,
+                            utgift = null,
                         ),
                     )
                 },
@@ -312,11 +323,17 @@ internal class VilkårServiceTest {
                     id = vilkår.id,
                     behandlingId = behandlingId,
                     delvilkårsett = PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto(),
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 1, 31),
+                    utgift = 1,
                 ),
             )
 
             assertThat(lagretVilkår.captured.resultat).isEqualTo(OPPFYLT)
             assertThat(lagretVilkår.captured.type).isEqualTo(vilkår.type)
+            assertThat(lagretVilkår.captured.fom).isEqualTo(LocalDate.of(2024, 1, 1))
+            assertThat(lagretVilkår.captured.tom).isEqualTo(LocalDate.of(2024, 1, 31))
+            assertThat(lagretVilkår.captured.utgift).isEqualTo(1)
             assertThat(lagretVilkår.captured.opphavsvilkår).isNull()
 
             assertThat(lagretVilkår.captured.delvilkårsett).hasSize(3)
@@ -354,28 +371,41 @@ internal class VilkårServiceTest {
     }
 
     @Nested
-    inner class NullstillVilkår {
+    inner class SlettVilkår {
 
         @Test
-        internal fun `nullstille skal fjerne opphavsvilkår fra vilkår`() {
-            val oppdatertVilkår = slot<Vilkår>()
-            val vilkår = initiererVilkår(oppdatertVilkår)
+        internal fun `skal kunne slette vilkår opprettet i denne behandlingen`() {
+            val vilkår = vilkår(behandlingId = behandlingId)
+            every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
-            vilkårService.nullstillVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
+            vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
 
-            assertThat(oppdatertVilkår.captured.resultat).isEqualTo(IKKE_TATT_STILLING_TIL)
-            assertThat(oppdatertVilkår.captured.type).isEqualTo(vilkår.type)
-            assertThat(oppdatertVilkår.captured.opphavsvilkår).isNull()
+            verify { vilkårRepository.deleteById(vilkår.id) }
+        }
+
+        @Test
+        internal fun `skal ikke kunne slette vilkår opprettet i tidligere behandling`() {
+            val vilkår = vilkår(
+                behandlingId = behandlingId,
+                opphavsvilkår = Opphavsvilkår(UUID.randomUUID(), LocalDateTime.now()),
+            )
+            every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
+
+            assertThatThrownBy {
+                vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
+            }.hasMessageContaining("Kan ikke slette vilkår opprettet i tidligere behandling")
         }
     }
 
     @Test
     internal fun `skal ikke oppdatere vilkår hvis behandlingen er låst for videre behandling`() {
-        every { behandlingService.hentBehandling(behandlingId) } returns behandling(
+        val behandling = behandling(
             fagsak(),
             BehandlingStatus.FERDIGSTILT,
             StegType.VILKÅR,
         )
+        mockHentBehandling(behandling)
+
         val vilkår = vilkår(
             behandlingId,
             resultat = IKKE_TATT_STILLING_TIL,
@@ -390,6 +420,9 @@ internal class VilkårServiceTest {
                         id = vilkår.id,
                         behandlingId = behandlingId,
                         listOf(),
+                        fom = null,
+                        tom = null,
+                        utgift = null,
                     ),
                 )
             },
@@ -400,11 +433,12 @@ internal class VilkårServiceTest {
 
     @Test
     internal fun `skal ikke oppdatere vilkår hvis behandlingen ikke er i steg VILKÅR`() {
-        every { behandlingService.hentBehandling(behandlingId) } returns behandling(
+        val behandling = behandling(
             fagsak(),
             BehandlingStatus.UTREDES,
             StegType.INNGANGSVILKÅR,
         )
+        mockHentBehandling(behandling)
         val vilkår = vilkår(
             behandlingId,
             resultat = IKKE_TATT_STILLING_TIL,
@@ -419,6 +453,9 @@ internal class VilkårServiceTest {
                         id = vilkår.id,
                         behandlingId = behandlingId,
                         listOf(),
+                        fom = null,
+                        tom = null,
+                        utgift = null,
                     ),
                 )
             },
@@ -429,7 +466,7 @@ internal class VilkårServiceTest {
 
     @Test
     internal fun `behandlingen uten barn skal kaste feilmelding`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             opprettNyeVilkår(
                 behandlingId,
                 HovedregelMetadata(
@@ -487,5 +524,10 @@ internal class VilkårServiceTest {
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(vilkår)
         every { vilkårRepository.update(capture(lagretVilkår)) } answers { it.invocation.args.first() as Vilkår }
         return vilkår
+    }
+
+    private fun mockHentBehandling(behandling: Behandling) {
+        every { behandlingService.hentBehandling(behandlingId) } returns behandling
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling(fagsak, behandling)
     }
 }

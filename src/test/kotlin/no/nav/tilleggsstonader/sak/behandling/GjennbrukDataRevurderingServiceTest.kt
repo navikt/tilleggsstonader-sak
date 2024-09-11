@@ -6,6 +6,7 @@ import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -32,7 +33,7 @@ class GjennbrukDataRevurderingServiceTest {
         vilkårService = vilkårService,
     )
 
-    val fagsakId = UUID.randomUUID()
+    val fagsakId = FagsakId.randomUUID()
     val iverksattFerdigstiltBehandling = behandling()
     val henlagtBehandling = behandling(
         status = BehandlingStatus.FERDIGSTILT,
@@ -50,7 +51,7 @@ class GjennbrukDataRevurderingServiceTest {
     @BeforeEach
     fun setUp() {
         every { behandlingService.finnSisteIverksatteBehandling(any()) } returns null
-        every { behandlingService.hentBehandlinger(any<UUID>()) } returns emptyList()
+        every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns emptyList()
     }
 
     @Nested
@@ -62,17 +63,17 @@ class GjennbrukDataRevurderingServiceTest {
 
             assertThat(service.finnBehandlingIdForGjenbruk(behandling)).isEqualTo(behandling.forrigeBehandlingId)
 
-            verify(exactly = 0) { behandlingService.hentBehandlinger(any<UUID>()) }
+            verify(exactly = 0) { behandlingService.hentBehandlinger(any<FagsakId>()) }
         }
 
         @Test
         fun `skal bruke siste avslåtte behandling hvis forrigeBehandlingId på behandling er null`() {
             val behandling = behandling()
-            every { behandlingService.hentBehandlinger(any<UUID>()) } returns listOf(avslåttBehandling)
+            every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(avslåttBehandling)
 
             assertThat(service.finnBehandlingIdForGjenbruk(behandling)).isEqualTo(avslåttBehandling.id)
 
-            verify(exactly = 1) { behandlingService.hentBehandlinger(any<UUID>()) }
+            verify(exactly = 1) { behandlingService.hentBehandlinger(any<FagsakId>()) }
         }
     }
 
@@ -88,7 +89,7 @@ class GjennbrukDataRevurderingServiceTest {
 
         @Test
         fun `skal bruke siste behandling som er avslått hvis det finnes henlagte behandlinger før den avslåtte`() {
-            every { behandlingService.hentBehandlinger(any<UUID>()) } returns listOf(
+            every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(
                 henlagtBehandling,
                 avslåttBehandling,
                 henlagtBehandling,
@@ -99,7 +100,7 @@ class GjennbrukDataRevurderingServiceTest {
 
         @Test
         fun `skal bruke siste behandling som er opphørt hvis det finnes henlagte behandlinger før den opphørte`() {
-            every { behandlingService.hentBehandlinger(any<UUID>()) } returns listOf(
+            every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(
                 henlagtBehandling,
                 opphørtBehandling,
                 henlagtBehandling,
@@ -110,7 +111,7 @@ class GjennbrukDataRevurderingServiceTest {
 
         @Test
         fun `skal returnere null hvis det kun finnes henlagte behandlinger`() {
-            every { behandlingService.hentBehandlinger(any<UUID>()) } returns listOf(henlagtBehandling)
+            every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(henlagtBehandling)
 
             assertThat(service.finnBehandlingIdForGjenbruk(fagsakId)).isNull()
         }

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto
 
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -26,13 +26,19 @@ data class InnvilgelseTilsynBarnRequest(
 }
 
 data class Utgift(
-    override val fom: YearMonth,
-    override val tom: YearMonth,
+    val fom: YearMonth,
+    val tom: YearMonth,
     val utgift: Int,
-) : Periode<YearMonth> {
-    init {
-        validatePeriode()
-    }
+) {
+    fun tilUtgiftBeregning() = UtgiftBeregning(
+        fom = fom,
+        tom = tom,
+        utgift = utgift,
+    )
+}
+
+fun Map<UUID, List<Utgift>>.tilUtgifterBeregning(): Map<UUID, List<UtgiftBeregning>> {
+    return map { (barnId, utgifter) -> barnId to utgifter.map { it.tilUtgiftBeregning() } }.toMap()
 }
 
 data class BeregningsresultatTilsynBarnDto(

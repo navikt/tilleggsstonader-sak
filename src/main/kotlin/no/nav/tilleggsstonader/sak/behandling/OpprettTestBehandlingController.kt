@@ -81,6 +81,7 @@ class OpprettTestBehandlingController(
     private fun opprettSøknad(fagsak: Fagsak, behandling: Behandling) {
         when (fagsak.stønadstype) {
             Stønadstype.BARNETILSYN -> opprettSøknadBarnetilsyn(fagsak, behandling)
+            else -> error("Kan ikke opprette søknad for stønadstype ${fagsak.stønadstype}.")
         }
     }
 

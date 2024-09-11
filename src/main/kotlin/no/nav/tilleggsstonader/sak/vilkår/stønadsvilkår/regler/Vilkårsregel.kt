@@ -23,9 +23,10 @@ data class HovedregelMetadata(
 abstract class Vilkårsregel(
     val vilkårType: VilkårType,
     val regler: Map<RegelId, RegelSteg>,
-    @JsonIgnore
-    val hovedregler: Set<RegelId>,
 ) {
+
+    @get:JsonIgnore
+    val hovedregler: Set<RegelId> = regler.filter { it.value.erHovedregel }.keys.toSet()
 
     open fun initiereDelvilkår(
         metadata: HovedregelMetadata,
@@ -40,8 +41,8 @@ abstract class Vilkårsregel(
         }
     }
 
-    constructor(vilkårType: VilkårType, regler: Set<RegelSteg>, hovedregler: Set<RegelId>) :
-        this(vilkårType, regler.associateBy { it.regelId }, hovedregler)
+    constructor(vilkårType: VilkårType, regler: Set<RegelSteg>) :
+        this(vilkårType, regler.associateBy { it.regelId })
 
     fun regel(regelId: RegelId): RegelSteg {
         return regler[regelId] ?: throw Feil("Finner ikke regelId=$regelId for vilkårType=$vilkårType")

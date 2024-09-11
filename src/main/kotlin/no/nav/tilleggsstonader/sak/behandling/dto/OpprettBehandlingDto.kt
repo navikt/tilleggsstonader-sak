@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.behandling.dto
 
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import java.util.UUID
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 
 data class OpprettBehandlingDto(
-    val fagsakId: UUID,
+    val fagsakId: FagsakId,
     val årsak: BehandlingÅrsak,
     val valgteBarn: Set<String> = emptySet(),
 )

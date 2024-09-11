@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.brev.mellomlager
 
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
@@ -10,7 +11,7 @@ import java.util.UUID
 data class MellomlagretFrittståendeBrev(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val fagsakId: UUID,
+    val fagsakId: FagsakId,
     val brevverdier: String,
     val brevmal: String,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)

@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandling.TestBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.TestSaksbehandlingController
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.brev.BrevController
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
@@ -32,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
@@ -68,6 +70,7 @@ class BehandlingFlytTest(
     @Autowired val brevController: BrevController,
     @Autowired val brevmottakereRepository: BrevmottakerRepository,
     @Autowired val totrinnskontrollController: TotrinnskontrollController,
+    @Autowired val totrinnskontrollService: TotrinnskontrollService,
     @Autowired val taskService: TaskService,
     @Autowired val stegService: StegService,
     @Autowired val taskWorker: TaskWorker,
@@ -193,6 +196,36 @@ class BehandlingFlytTest(
         }
     }
 
+    @Test
+    fun `skal ikke sende brev vid årsak korrigering uten brev`() {
+        val behandlingId = somSaksbehandler {
+            val behandlingId = opprettBehandling(personIdent)
+            val behandling = testoppsettService.hentBehandling(behandlingId)
+            testoppsettService.oppdater(behandling.copy(årsak = BehandlingÅrsak.KORRIGERING_UTEN_BREV))
+
+            vurderInngangsvilkår(behandlingId)
+            opprettVilkår(behandlingId)
+            utfyllVilkår(behandlingId)
+            opprettVedtak(behandlingId)
+            simuler(behandlingId)
+            sendTilBeslutter(behandlingId)
+            assertSisteFerdigstillOppgaveTask(Oppgavetype.BehandleSak)
+            behandlingId
+        }
+        assertSisteOpprettedeOppgave(behandlingId, Oppgavetype.GodkjenneVedtak)
+
+        somBeslutter {
+            godkjennTotrinnskontroll(behandlingId)
+        }
+        kjørTasks()
+        assertStatusTotrinnskontroll(behandlingId, TotrinnkontrollStatus.UAKTUELT)
+
+        with(testoppsettService.hentBehandling(behandlingId)) {
+            assertThat(status).isEqualTo(BehandlingStatus.FERDIGSTILT)
+            assertThat(steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
+        }
+    }
+
     private fun newTransaction() {
         if (TestTransaction.isActive()) {
             TestTransaction.flagForCommit() // need this, otherwise the next line does a rollback
@@ -208,7 +241,6 @@ class BehandlingFlytTest(
 
     private fun godkjennTotrinnskontroll(behandlingId: UUID) {
         totrinnskontrollController.beslutteVedtak(behandlingId, BeslutteVedtakDto(true))
-        kjørTasks()
     }
 
     private fun underkjennTotrinnskontroll(behandlingId: UUID) {
@@ -330,7 +362,7 @@ class BehandlingFlytTest(
     }
 
     private fun assertStatusTotrinnskontroll(behandlingId: UUID, expectedStatus: TotrinnkontrollStatus) {
-        with(totrinnskontrollController.hentTotrinnskontroll(behandlingId)) {
+        with(totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)) {
             assertThat(status).isEqualTo(expectedStatus)
         }
     }

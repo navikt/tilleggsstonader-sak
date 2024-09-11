@@ -52,9 +52,9 @@ object SøknadBarnetilsynUtil {
     )
 
     fun lagBarnMedBarnepass(
-        type: TypeBarnepass = TypeBarnepass.ANDRE,
-        startetIFemte: JaNei = JaNei.JA,
-        årsak: ÅrsakBarnepass = ÅrsakBarnepass.MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID,
+        type: TypeBarnepass = TypeBarnepass.BARNEHAGE_SFO_AKS,
+        startetIFemte: JaNei? = JaNei.JA,
+        årsak: ÅrsakBarnepass? = ÅrsakBarnepass.MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID,
     ) = BarnMedBarnepass(
         type = type,
         startetIFemte = startetIFemte,

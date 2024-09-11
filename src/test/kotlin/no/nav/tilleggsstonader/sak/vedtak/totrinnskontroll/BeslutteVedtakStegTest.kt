@@ -17,8 +17,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevService
+import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
@@ -116,12 +118,10 @@ class BeslutteVedtakStegTest {
         val nesteSteg = utførTotrinnskontroll(godkjent = true)
 
         assertThat(nesteSteg).isEqualTo(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
-        assertThat(taskSlot[0].type).isEqualTo(FerdigstillOppgaveTask.TYPE)
+        assertHarOpprettetTaskerAvType(FerdigstillOppgaveTask.TYPE, JournalførVedtaksbrevTask.TYPE)
 
         verify(exactly = 1) { iverksettService.iverksettBehandlingFørsteGang(behandlingId) }
-        // assertThat(taskSlot[2].type).isEqualTo(BehandlingsstatistikkTask.TYPE)
-        // assertThat(objectMapper.readValue<BehandlingsstatistikkTaskPayload>(taskSlot[2].payload).hendelse)
-        //    .isEqualTo(Hendelse.BESLUTTET)
+        verify(exactly = 1) { brevService.lagEndeligBeslutterbrev(any()) }
         verify(exactly = 1) {
             behandlingService.oppdaterResultatPåBehandling(
                 behandlingId,
@@ -141,18 +141,39 @@ class BeslutteVedtakStegTest {
         val taskData = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot[1].payload)
 
         assertThat(nesteSteg).isEqualTo(StegType.SEND_TIL_BESLUTTER)
-        assertThat(taskSlot[0].type).isEqualTo(FerdigstillOppgaveTask.TYPE)
-        assertThat(taskSlot[1].type).isEqualTo(OpprettOppgaveTask.TYPE)
+        assertHarOpprettetTaskerAvType(FerdigstillOppgaveTask.TYPE, OpprettOppgaveTask.TYPE)
         assertThat(taskData.oppgave.oppgavetype).isEqualTo(Oppgavetype.BehandleUnderkjentVedtak)
+
         verify(exactly = 0) { iverksettService.iverksettBehandlingFørsteGang(any()) }
+        verify(exactly = 0) { brevService.lagEndeligBeslutterbrev(any()) }
+    }
+
+    @Test
+    fun `skal ikke sende brev dersom behandlingsårsak er korrigering uten brev`() {
+        val nesteSteg = utførTotrinnskontroll(
+            godkjent = true,
+            saksbehandling = saksbehandling(årsak = BehandlingÅrsak.KORRIGERING_UTEN_BREV),
+        )
+
+        assertThat(nesteSteg).isEqualTo(StegType.FERDIGSTILLE_BEHANDLING)
+        assertHarOpprettetTaskerAvType(FerdigstillOppgaveTask.TYPE, FerdigstillBehandlingTask.TYPE)
+        verify(exactly = 0) { brevService.lagEndeligBeslutterbrev(any()) }
+        verify(exactly = 1) { iverksettService.iverksettBehandlingFørsteGang(any()) }
     }
 
     @Test
     internal fun `Skal kaste feil når behandling allerede er iverksatt `() {
         val behandling = behandling(fagsak, BehandlingStatus.IVERKSETTER_VEDTAK, StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
+
         val apiFeil =
             catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(saksbehandling(behandling = behandling)) }
+
         assertThat(apiFeil.message).isEqualTo("Behandlingen er allerede besluttet. Status på behandling er 'Iverksetter vedtak'")
+        assertHarOpprettetTaskerAvType()
+    }
+
+    private fun assertHarOpprettetTaskerAvType(vararg typeTask: String) {
+        assertThat(taskSlot.map { it.type }).containsExactlyInAnyOrder(*typeTask)
     }
 
     private fun utførTotrinnskontroll(

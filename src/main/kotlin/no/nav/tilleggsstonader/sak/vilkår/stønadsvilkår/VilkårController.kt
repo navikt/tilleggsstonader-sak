@@ -5,12 +5,15 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregler
 import org.slf4j.LoggerFactory
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -53,11 +56,20 @@ class VilkårController(
         }
     }
 
-    @PostMapping("nullstill")
-    fun nullstillVilkår(@RequestBody request: OppdaterVilkårDto): VilkårDto {
+    @PostMapping("opprett")
+    fun opprettVilkår(@RequestBody opprettVilkårDto: OpprettVilkårDto): VilkårDto {
+        tilgangService.validerTilgangTilBehandling(opprettVilkårDto.behandlingId, AuditLoggerEvent.CREATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return vilkårService.opprettNyttVilkår(opprettVilkårDto).tilDto()
+    }
+
+    @DeleteMapping
+    fun slettVilkår(@RequestBody request: OppdaterVilkårDto) {
         tilgangService.validerTilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
         tilgangService.validerHarSaksbehandlerrolle()
-        return vilkårService.nullstillVilkår(request)
+
+        vilkårService.slettVilkår(request)
     }
 
     @PostMapping("ikkevurder")

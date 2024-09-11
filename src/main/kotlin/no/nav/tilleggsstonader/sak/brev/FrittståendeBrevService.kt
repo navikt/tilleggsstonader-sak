@@ -13,12 +13,12 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagringBrevService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import org.slf4j.MDC
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class FrittståendeBrevService(
@@ -41,7 +41,7 @@ class FrittståendeBrevService(
     }
 
     fun sendFrittståendeBrev(
-        fagsakId: UUID,
+        fagsakId: FagsakId,
         request: FrittståendeBrevDto,
     ) {
         val fagsak = fagsakService.hentFagsak(fagsakId)
@@ -88,5 +88,6 @@ class FrittståendeBrevService(
     private fun utledDokumenttype(stønadstype: Stønadstype) =
         when (stønadstype) {
             Stønadstype.BARNETILSYN -> Dokumenttype.BARNETILSYN_FRITTSTÅENDE_BREV
+            else -> error("Frittstående brev er ikke støttet for stønadstype $stønadstype")
         }
 }

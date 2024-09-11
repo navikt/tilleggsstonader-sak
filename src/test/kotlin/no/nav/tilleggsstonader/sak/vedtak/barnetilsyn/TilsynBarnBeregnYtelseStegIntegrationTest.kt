@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -25,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -79,6 +81,12 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 resultat = Vilkårsresultat.OPPFYLT,
             ),
         )
+    }
+
+    @AfterEach
+    override fun tearDown() {
+        super.tearDown()
+        resetMock(unleashService)
     }
 
     @Nested
@@ -366,14 +374,15 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
     @Nested
     inner class ValideringInnvilgelse {
+
+        val vedtak = innvilgelseDto(
+            utgifter = mapOf(barn(UUID.randomUUID(), Utgift(januar, januar, utgift))),
+        )
+
         @Test
         fun `skal validere at det kun sendes inn utgifter på barn som har oppfylte vilkår`() {
             stønadsperiodeRepository.insert(stønadsperiode)
             vilkårperiodeRepository.insert(aktivitet)
-
-            val vedtak = innvilgelseDto(
-                utgifter = mapOf(barn(UUID.randomUUID(), Utgift(januar, januar, utgift))),
-            )
 
             assertThatThrownBy {
                 steg.utførOgReturnerNesteSteg(

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.dto.PersonopplysningerDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -25,7 +26,7 @@ class PersonopplysningController(
     }
 
     @GetMapping("fagsak-person/{fagsakPersonId}")
-    fun hentPersonopplysningerForPerson(@PathVariable fagsakPersonId: UUID): PersonopplysningerDto {
+    fun hentPersonopplysningerForPerson(@PathVariable fagsakPersonId: FagsakPersonId): PersonopplysningerDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         return personopplysningerService.hentPersonopplysningerForFagsakPerson(fagsakPersonId)
     }

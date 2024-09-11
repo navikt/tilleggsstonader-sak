@@ -1,8 +1,8 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
+package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBeregningUtil.tilÅrMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested

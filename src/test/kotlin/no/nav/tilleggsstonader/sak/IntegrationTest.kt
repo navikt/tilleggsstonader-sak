@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLogg
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
@@ -102,6 +103,9 @@ abstract class IntegrationTest {
 
     @Autowired
     protected lateinit var testoppsettService: TestoppsettService
+
+    @Autowired
+    protected lateinit var unleashService: UnleashService
 
     val logger = LoggerFactory.getLogger(javaClass)
 

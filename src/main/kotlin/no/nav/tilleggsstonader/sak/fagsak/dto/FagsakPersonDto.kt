@@ -1,13 +1,14 @@
 package no.nav.tilleggsstonader.sak.fagsak.dto
 
-import java.util.UUID
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 
 class FagsakPersonDto(
-    val id: UUID,
-    val tilsynBarn: UUID?,
+    val id: FagsakPersonId,
+    val tilsynBarn: FagsakId?,
 )
 
 class FagsakPersonUtvidetDto(
-    val id: UUID,
+    val id: FagsakPersonId,
     val tilsynBarn: FagsakDto?,
 )

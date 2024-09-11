@@ -5,10 +5,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -80,7 +82,11 @@ class OpprettRevurderingBehandlingService(
             return
         }
 
-        feilHvis(!request.årsak.erSøknadEllerPapirsøknad() && request.valgteBarn.isNotEmpty()) {
+        feilHvis(
+            !request.årsak.erSøknadEllerPapirsøknad() &&
+                request.årsak != BehandlingÅrsak.KORRIGERING_UTEN_BREV &&
+                request.valgteBarn.isNotEmpty(),
+        ) {
             "Kan ikke sende med barn på annet enn årsak Søknad"
         }
 
@@ -96,13 +102,13 @@ class OpprettRevurderingBehandlingService(
         }
     }
 
-    fun hentBarnTilRevurdering(fagsakId: UUID): BarnTilRevurderingDto {
+    fun hentBarnTilRevurdering(fagsakId: FagsakId): BarnTilRevurderingDto {
         val forrigeBehandlingId = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(fagsakId)
         return hentBarnTilRevurdering(fagsakId, forrigeBehandlingId)
     }
 
     private fun hentBarnTilRevurdering(
-        fagsakId: UUID,
+        fagsakId: FagsakId,
         forrigeBehandlingId: UUID?,
     ): BarnTilRevurderingDto {
         val ident = fagsakService.hentAktivIdent(fagsakId)

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakController
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
@@ -19,12 +20,13 @@ class TilsynBarnVedtakController(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     tilgangService: TilgangService,
     private val tilsynBarnVedtakService: TilsynBarnVedtakService,
+    private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
 ) : VedtakController<VedtakTilsynBarnDto, VedtakTilsynBarn>(
     tilgangService,
     tilsynBarnVedtakService,
 ) {
 
-    @PostMapping("{behandlingId}")
+    @PostMapping("{behandlingId}", "{behandlingId}/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: UUID,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
@@ -45,6 +47,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: UUID,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
-        return tilsynBarnBeregningService.beregn(behandlingId, vedtak.utgifter)
+        val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandlingId, vedtak.utgifter)
+        return tilsynBarnBeregningService.beregn(behandlingId, utgifter)
     }
 }

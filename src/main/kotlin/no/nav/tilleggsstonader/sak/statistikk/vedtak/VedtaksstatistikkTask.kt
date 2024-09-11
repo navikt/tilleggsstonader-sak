@@ -7,6 +7,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Properties
@@ -34,7 +35,7 @@ class VedtaksstatistikkTask(
 
         fun opprettVedtaksstatistikkTask(
             behandlingId: UUID,
-            fagsakId: UUID,
+            fagsakId: FagsakId,
             hendelseTidspunkt: LocalDateTime = osloNow(),
             stønadstype: Stønadstype,
         ): Task =
@@ -60,7 +61,7 @@ class VedtaksstatistikkTask(
 
     data class VedtaksstatistikkTaskPayload(
         val behandlingId: UUID,
-        val fagsakId: UUID,
+        val fagsakId: FagsakId,
         val hendelseTidspunkt: LocalDateTime,
     )
 }

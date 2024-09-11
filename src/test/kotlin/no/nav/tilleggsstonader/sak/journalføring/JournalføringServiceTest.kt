@@ -31,6 +31,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest.Journalføringsaksjon
@@ -48,7 +49,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottaker as AvsenderMottakerKontrakt
 
 class JournalføringServiceTest {
@@ -311,7 +311,7 @@ class JournalføringServiceTest {
             )
             every { behandlingService.finnesBehandlingForFagsak(any()) } returns true
             every { behandlingService.opprettBehandling(any(), any(), any(), any()) } returns nyBehandling
-            every { behandlingService.hentBehandlinger(any<UUID>()) } returns listOf(forrigeBehandling)
+            every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(forrigeBehandling)
             every { journalpostService.hentSøknadFraJournalpost(any()) } returns mockk()
             every { barnService.finnBarnPåBehandling(nyBehandling.id) } returns eksisterendeBarn.map { it.tilBehandlingBarn() }
             every { søknadService.hentSøknadBarnetilsyn(nyBehandling.id) } returns mockk() {

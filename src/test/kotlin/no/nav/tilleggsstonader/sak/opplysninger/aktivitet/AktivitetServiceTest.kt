@@ -4,12 +4,12 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class AktivitetServiceTest {
 
@@ -18,7 +18,7 @@ class AktivitetServiceTest {
 
     val service = AktivitetService(fagsakPersonService, aktivitetClient)
 
-    val personId = UUID.randomUUID()
+    val personId = FagsakPersonId.random()
 
     @BeforeEach
     fun setUp() {

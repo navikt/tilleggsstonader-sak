@@ -18,6 +18,7 @@ object MålgruppeValidering {
                 MålgruppeType.SYKEPENGER_100_PROSENT -> true
                 MålgruppeType.INGEN_MÅLGRUPPE -> true
             }
+            else -> error("Målgruppevalidering for stønadstype=$stønadstype er ikke implementert")
         }
         feilHvisIkke(gyldig) {
             "målgruppe=$målgruppeType er ikke gyldig for $stønadstype"
