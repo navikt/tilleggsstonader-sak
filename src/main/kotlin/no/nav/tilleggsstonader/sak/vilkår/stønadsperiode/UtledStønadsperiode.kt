@@ -16,71 +16,75 @@ import java.util.UUID
 /**
  * Denne løsningen finner kombinasjonen av målgruppe og aktivitet
  * Den har ikke noe forhold til ev enhet som brukeren har en viss tidspunkt, som vil gjelde for tiltaksperioder
+ *
+ * Den finner "prioriterte" målgruppe/aktivitet-kombinasjoner, sånn at AAP trumfer Overgangsstønad
  */
 object UtledStønadsperiode {
 
     fun utled(behandlingId: UUID, vilkårperioder: List<Vilkårperiode>): List<Stønadsperiode> {
-        val perioder = vilkårperioder.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
-        val målgrupper = tilPeriodeVilkår<MålgruppeType>(perioder)
-        val aktiviteter = tilPeriodeVilkår<AktivitetType>(perioder)
-
-        return snittMålgruppeAktivitet(målgrupper, aktiviteter)
-            .tilSammenslåtteStønadsperioder(behandlingId)
-    }
-
-    private fun snittMålgruppeAktivitet(
-        målgrupper: Map<MålgruppeType, List<VilkårperiodeHolder>>,
-        aktiviteter: Map<AktivitetType, List<VilkårperiodeHolder>>,
-    ): List<StønadsperiodeHolder> {
-        val map = mutableMapOf<LocalDate, Pair<MålgruppeType, AktivitetType>>()
-
-        målgrupper.keys
-            .sortert()
-            .map { typeMålgruppe ->
-                målgrupper.verdier(typeMålgruppe)
-                    .flatMap { målgruppe -> aktiviteter.snittMålgruppe(typeMålgruppe, målgruppe) }
-                    .forEach { (typeAktivitet, datoer) ->
-                        datoer.forEach { dato ->
-                            map.putIfAbsent(dato, Pair(typeMålgruppe, typeAktivitet))
-                        }
-                    }
-            }
-
-        return map
-            .map { StønadsperiodeHolder(fom = it.key, tom = it.key, typer = it.value) }
-            .toList()
-    }
-
-    private fun Map<AktivitetType, List<VilkårperiodeHolder>>.snittMålgruppe(
-        typeMålgruppe: MålgruppeType,
-        målgruppe: VilkårperiodeHolder,
-    ): List<Pair<AktivitetType, List<LocalDate>>> {
-        return typeMålgruppe.gyldigeAktiviter.sortert().map { typeAktivitet ->
-            val snittDatoer = verdier(typeAktivitet).snittDatoer(målgruppe)
-            typeAktivitet to snittDatoer
-        }
-    }
-
-    private fun List<StønadsperiodeHolder>.tilSammenslåtteStønadsperioder(
-        behandlingId: UUID,
-    ): List<Stønadsperiode> {
-        return this
-            .groupBy { it.typer }
-            .values
-            .flatMap { it.mergeSammenhengende() }
+        return vilkårperioder
+            .snittMålgruppeAktivitet()
+            .map { StønadsperiodeHolder(fom = it.key, tom = it.key, målgruppeAktivitet = it.value) }
+            .slåSammen()
             .tilStønadsperioder(behandlingId)
     }
 
-    private fun List<StønadsperiodeHolder>.tilStønadsperioder(
-        behandlingId: UUID,
-    ): List<Stønadsperiode> {
+    private fun List<Vilkårperiode>.snittMålgruppeAktivitet(): Map<LocalDate, MålgruppeAktivitet> {
+        val perioder = this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
+        val målgrupper = tilPeriodeVilkår<MålgruppeType>(perioder)
+        val aktiviteter = tilPeriodeVilkår<AktivitetType>(perioder)
+
+        return mutableMapOf<LocalDate, MålgruppeAktivitet>().apply {
+            finnDatoerForSnitt(målgrupper, aktiviteter)
+                .forEach { (typer, datoer) ->
+                    datoer.forEach { dato -> putIfAbsent(dato, typer) }
+                }
+        }
+    }
+
+    /**
+     * Itererer over sorterte målgrupper for å finne snitt med sorterte aktiviteter
+     */
+    private fun finnDatoerForSnitt(
+        målgrupper: Map<MålgruppeType, List<VilkårperiodeHolder>>,
+        aktiviteter: Map<AktivitetType, List<VilkårperiodeHolder>>,
+    ): List<Pair<MålgruppeAktivitet, List<LocalDate>>> {
+        return målgrupper.keys
+            .sortert()
+            .flatMap { typeMålgruppe ->
+                val gyldigeAktiviteter = typeMålgruppe.gyldigeAktiviter.sortert()
+                målgrupper
+                    .verdier(typeMålgruppe)
+                    .flatMap { målgruppe ->
+                        gyldigeAktiviteter.map { typeAktivitet ->
+                            val snittDatoer = aktiviteter.verdier(typeAktivitet).snittDatoer(målgruppe)
+                            MålgruppeAktivitet(typeMålgruppe, typeAktivitet) to snittDatoer
+                        }
+                    }
+            }
+    }
+
+    /**
+     * Grupperer perioder på målgruppe og aktivitet
+     * Merger sammenhengende tvers grupperingen
+     */
+    private fun List<StønadsperiodeHolder>.slåSammen(): List<StønadsperiodeHolder> {
+        return this
+            .groupBy { it.målgruppeAktivitet }
+            .values
+            .flatMap { periode ->
+                periode.sortedBy { it.fom }.mergeSammenhengende { a, b -> a.tom.plusDays(1) == b.tom }
+            }
+    }
+
+    private fun List<StønadsperiodeHolder>.tilStønadsperioder(behandlingId: UUID): List<Stønadsperiode> {
         return this.map {
             Stønadsperiode(
                 behandlingId = behandlingId,
                 fom = it.fom,
                 tom = it.tom,
-                målgruppe = it.typer.first,
-                aktivitet = it.typer.second,
+                målgruppe = it.målgruppeAktivitet.målgruppe,
+                aktivitet = it.målgruppeAktivitet.aktivitet,
             )
         }
     }
@@ -150,14 +154,16 @@ object UtledStønadsperiode {
     private data class StønadsperiodeHolder(
         override val fom: LocalDate,
         override val tom: LocalDate,
-        val typer: Pair<MålgruppeType, AktivitetType>,
+        val målgruppeAktivitet: MålgruppeAktivitet,
     ) : Periode<LocalDate>, Mergeable<LocalDate, StønadsperiodeHolder> {
         override fun merge(other: StønadsperiodeHolder): StønadsperiodeHolder {
-            require(typer == other.typer) { "Kan ikke merge 2 ulike" }
+            require(målgruppeAktivitet == other.målgruppeAktivitet) { "Kan ikke merge 2 ulike" }
             return this.copy(fom = minOf(other.fom, fom), tom = maxOf(other.tom, tom))
         }
     }
 
-    private fun List<StønadsperiodeHolder>.mergeSammenhengende() =
-        this.sortedBy { it.fom }.mergeSammenhengende { a, b -> a.tom.plusDays(1) == b.tom }
+    private data class MålgruppeAktivitet(
+        val målgruppe: MålgruppeType,
+        val aktivitet: AktivitetType,
+    )
 }
