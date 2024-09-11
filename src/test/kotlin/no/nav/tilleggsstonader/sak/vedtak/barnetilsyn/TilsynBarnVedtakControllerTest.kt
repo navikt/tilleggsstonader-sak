@@ -14,9 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -123,7 +121,7 @@ class TilsynBarnVedtakControllerTest(
         vedtak: InnvilgelseTilsynBarnRequest,
     ) {
         restTemplate.exchange<Map<String, Any>?>(
-            localhost("api/vedtak/tilsyn-barn/${behandling.id}"),
+            localhost("api/vedtak/tilsyn-barn/${behandling.id}/innvilgelse"),
             HttpMethod.POST,
             HttpEntity(vedtak, headers),
         )
