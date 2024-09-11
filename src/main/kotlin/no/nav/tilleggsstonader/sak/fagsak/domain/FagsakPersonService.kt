@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -7,7 +8,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class FagsakPersonService(
@@ -15,13 +15,13 @@ class FagsakPersonService(
     private val fagsakPersonRepository: FagsakPersonRepository,
 ) {
 
-    fun hentPerson(personId: UUID): FagsakPerson = fagsakPersonRepository.findByIdOrThrow(personId)
+    fun hentPerson(personId: FagsakPersonId): FagsakPerson = fagsakPersonRepository.findByIdOrThrow(personId)
 
-    fun hentPersoner(personId: List<UUID>): Iterable<FagsakPerson> = fagsakPersonRepository.findAllById(personId)
+    fun hentPersoner(personId: List<FagsakPersonId>): Iterable<FagsakPerson> = fagsakPersonRepository.findAllById(personId)
 
     fun finnPerson(personIdenter: Set<String>): FagsakPerson? = fagsakPersonRepository.findByIdent(personIdenter)
 
-    fun hentIdenter(personId: UUID): Set<PersonIdent> {
+    fun hentIdenter(personId: FagsakPersonId): Set<PersonIdent> {
         val personIdenter = fagsakPersonRepository.findPersonIdenter(personId)
         feilHvis(personIdenter.isEmpty(), sensitivFeilmelding = { "Finner ikke personidenter til person=$personId" }) {
             "Finner ikke personidenter til person"
@@ -29,7 +29,7 @@ class FagsakPersonService(
         return personIdenter
     }
 
-    fun hentAktivIdent(personId: UUID): String = fagsakPersonRepository.hentAktivIdent(personId)
+    fun hentAktivIdent(personId: FagsakPersonId): String = fagsakPersonRepository.hentAktivIdent(personId)
 
     @Transactional
     fun hentEllerOpprettPerson(ident: String): FagsakPerson {

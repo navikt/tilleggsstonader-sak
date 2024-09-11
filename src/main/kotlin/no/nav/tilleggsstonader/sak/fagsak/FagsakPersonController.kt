@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.IdentRequest
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.fagsak.dto.FagsakPersonDto
 import no.nav.tilleggsstonader.sak.fagsak.dto.FagsakPersonUtvidetDto
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.validation.annotation.Validated
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping(path = ["/api/fagsak-person"])
@@ -27,7 +27,7 @@ class FagsakPersonController(
 ) {
 
     @PostMapping
-    fun hentEllerOpprettFagsakPerson(@RequestBody identRequest: IdentRequest): UUID {
+    fun hentEllerOpprettFagsakPerson(@RequestBody identRequest: IdentRequest): FagsakPersonId {
         tilgangService.validerTilgangTilPersonMedBarn(identRequest.ident, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -35,7 +35,7 @@ class FagsakPersonController(
     }
 
     @GetMapping("{fagsakPersonId}")
-    fun hentFagsakPerson(@PathVariable fagsakPersonId: UUID): FagsakPersonDto {
+    fun hentFagsakPerson(@PathVariable fagsakPersonId: FagsakPersonId): FagsakPersonDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         val person = fagsakPersonService.hentPerson(fagsakPersonId)
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(person.id)
@@ -46,7 +46,7 @@ class FagsakPersonController(
     }
 
     @GetMapping("{fagsakPersonId}/utvidet")
-    fun hentFagsakPersonUtvidet(@PathVariable fagsakPersonId: UUID): FagsakPersonUtvidetDto {
+    fun hentFagsakPersonUtvidet(@PathVariable fagsakPersonId: FagsakPersonId): FagsakPersonUtvidetDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         val person = fagsakPersonService.hentPerson(fagsakPersonId)
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(person.id)

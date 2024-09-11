@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserRegisterDtoMapper.tilDto
 import org.springframework.stereotype.Service
@@ -21,7 +22,7 @@ class YtelseService(
     private val ytelseClient: YtelseClient,
     private val behandlingService: BehandlingService,
 ) {
-    fun hentYtelser(fagsakPersonId: UUID): YtelserRegisterDto {
+    fun hentYtelser(fagsakPersonId: FagsakPersonId): YtelserRegisterDto {
         val ident = fagsakPersonService.hentAktivIdent(fagsakPersonId)
         val typer = listOf(
             TypeYtelsePeriode.AAP,

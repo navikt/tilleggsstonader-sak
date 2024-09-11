@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.aktivitet
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,7 +23,7 @@ class AktivitetController(
 
     @GetMapping("{fagsakPersonId}")
     fun hentAktiviteter(
-        @PathVariable fagsakPersonId: UUID,
+        @PathVariable fagsakPersonId: FagsakPersonId,
     ): List<AktivitetArenaDto> {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         return aktivitetService.hentAktiviteter(fagsakPersonId)

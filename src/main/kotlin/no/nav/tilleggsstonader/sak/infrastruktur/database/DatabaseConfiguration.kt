@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.PropertiesWrapperTilStringConverter
 import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValueClassConverters
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
@@ -122,7 +123,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 VilkårperioderGrunnlagReader(),
                 VilkårperioderGrunnlagWriter(),
 
-            ) + alleVedtaksstatistikkJsonConverters,
+            ) + alleVedtaksstatistikkJsonConverters +
+                alleValueClassConverters,
         )
     }
 

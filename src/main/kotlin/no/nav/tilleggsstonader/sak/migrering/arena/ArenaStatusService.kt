@@ -5,12 +5,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 /**
  * Arena kaller på oss for å sjekke om personen finnes i ny løsning.
@@ -56,7 +56,7 @@ class ArenaStatusService(
     private fun skalKunneOppretteSakIArenaForPerson(identer: Set<String>): Boolean {
         val fagsakPersonId = fagsakPersonService.finnPerson(identer)?.id
         return fagsakPersonId in setOf(
-            UUID.fromString("5b04e044-8701-4de5-a5d9-6a30443df150"),
+            FagsakPersonId.fromString("5b04e044-8701-4de5-a5d9-6a30443df150"),
         )
     }
 

@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -17,7 +18,7 @@ data class BehandlingDto(
     val id: UUID,
     val forrigeBehandlingId: UUID?,
     val fagsakId: UUID,
-    val fagsakPersonId: UUID,
+    val fagsakPersonId: FagsakPersonId,
     val steg: StegType,
     val kategori: BehandlingKategori,
     val type: BehandlingType,
@@ -32,7 +33,7 @@ data class BehandlingDto(
     val henlagtÅrsak: HenlagtÅrsak? = null,
 )
 
-fun Behandling.tilDto(stønadstype: Stønadstype, fagsakPersonId: UUID): BehandlingDto =
+fun Behandling.tilDto(stønadstype: Stønadstype, fagsakPersonId: FagsakPersonId): BehandlingDto =
     BehandlingDto(
         id = this.id,
         forrigeBehandlingId = this.forrigeBehandlingId,

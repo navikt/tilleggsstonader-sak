@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.Arbeidsfordelingsenhet
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -46,7 +47,7 @@ internal class KlageServiceTest {
         )
 
     private val fagsakId = UUID.randomUUID()
-    private val fagsakPersonId = UUID.randomUUID()
+    private val fagsakPersonId = FagsakPersonId.random()
     private val eksternFagsakId = EksternFagsakId(1L, fagsakId)
     private val personIdent = "12345678910"
     private val arbeidsfordelingEnhetNr = "1"
@@ -174,7 +175,7 @@ internal class KlageServiceTest {
                 ),
             )
 
-            val klager = klageService.hentBehandlinger(UUID.randomUUID())
+            val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
             assertThat(klager.barnetilsyn.first().vedtaksdato).isEqualTo(tidsPunktAvsluttetIKabal)
         }
@@ -195,7 +196,7 @@ internal class KlageServiceTest {
             every { klageClient.hentKlagebehandlinger(any()) } returns
                 mapOf(eksternFagsakId.id to listOf(klagebehandlingIkkeAvsluttetKabal))
 
-            val klager = klageService.hentBehandlinger(UUID.randomUUID())
+            val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
             assertThat(klager.barnetilsyn.first().vedtaksdato).isNull()
         }
@@ -218,7 +219,7 @@ internal class KlageServiceTest {
                         ),
                 )
 
-            val klager = klageService.hentBehandlinger(UUID.randomUUID())
+            val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
             assertThat(klager.barnetilsyn.first().vedtaksdato).isEqualTo(tidspunktAvsluttetFamilieKlage)
         }
@@ -251,7 +252,7 @@ internal class KlageServiceTest {
             every { klageClient.hentKlagebehandlinger(any()) } returns
                 mapOf(eksternFagsakId.id to listOf(klagebehandlingAvsluttetKabal))
 
-            val klager = klageService.hentBehandlinger(UUID.randomUUID())
+            val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
             assertThat(klager.barnetilsyn.first().vedtaksdato).isEqualTo(tidsPunktAvsluttetIKabal)
             assertThat(klager.barnetilsyn.first().klageinstansResultat.first().årsakFeilregistrert).isEqualTo(

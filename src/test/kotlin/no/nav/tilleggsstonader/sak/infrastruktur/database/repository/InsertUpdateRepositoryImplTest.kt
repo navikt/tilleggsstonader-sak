@@ -7,12 +7,12 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
-import java.util.UUID
 
 class InsertUpdateRepositoryImplTest : IntegrationTest() {
 
@@ -127,7 +127,7 @@ class InsertUpdateRepositoryImplTest : IntegrationTest() {
     private fun fagsakPerson(ident: String = "1") = FagsakPerson(identer = setOf(PersonIdent(ident)))
 
     private fun fagsakDomain(
-        fagsakPersonId: UUID,
+        fagsakPersonId: FagsakPersonId,
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     ) =
         FagsakDomain(

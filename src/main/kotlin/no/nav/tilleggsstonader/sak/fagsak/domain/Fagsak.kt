@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -14,7 +15,7 @@ data class Fagsaker(
 
 data class Fagsak(
     val id: UUID,
-    val fagsakPersonId: UUID,
+    val fagsakPersonId: FagsakPersonId,
     val personIdenter: Set<PersonIdent>,
     val eksternId: EksternFagsakId,
     val stønadstype: Stønadstype,
@@ -33,7 +34,7 @@ data class Fagsak(
 data class FagsakDomain(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val fagsakPersonId: UUID,
+    val fagsakPersonId: FagsakPersonId,
     @Column("stonadstype")
     val stønadstype: Stønadstype,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)

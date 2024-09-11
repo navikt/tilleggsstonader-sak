@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -502,7 +503,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     private fun lagreFagsak(
         fagsakId: UUID,
         stønadstype: Stønadstype,
-        fagsakPersonId: UUID,
+        fagsakPersonId: FagsakPersonId,
     ): Fagsak {
         return testoppsettService.lagreFagsak(
             fagsak(
