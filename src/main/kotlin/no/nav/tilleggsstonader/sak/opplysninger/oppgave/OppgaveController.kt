@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_EGEN_ANSATT
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping("/api/oppgave")
@@ -38,7 +38,7 @@ class OppgaveController(
     }
 
     @GetMapping("/soek/person/{fagsakPersonId}")
-    fun hentOppgaverForPerson(@PathVariable fagsakPersonId: UUID): FinnOppgaveResponseDto {
+    fun hentOppgaverForPerson(@PathVariable fagsakPersonId: FagsakPersonId): FinnOppgaveResponseDto {
         val personIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
         tilgangService.validerTilgangTilPerson(personIdent, AuditLoggerEvent.ACCESS)
 

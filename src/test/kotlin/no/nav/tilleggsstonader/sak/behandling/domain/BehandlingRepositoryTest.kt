@@ -15,6 +15,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -63,7 +65,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        assertThat(behandlingRepository.findByFagsakId(UUID.randomUUID())).isEmpty()
+        assertThat(behandlingRepository.findByFagsakId(FagsakId.randomUUID())).isEmpty()
         assertThat(behandlingRepository.findByFagsakId(fagsak.id)).containsOnly(behandling)
     }
 
@@ -122,7 +124,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak, status = OPPRETTET))
 
-        assertThat(behandlingRepository.findByFagsakIdAndStatus(UUID.randomUUID(), OPPRETTET)).isEmpty()
+        assertThat(behandlingRepository.findByFagsakIdAndStatus(FagsakId.randomUUID(), OPPRETTET)).isEmpty()
         assertThat(behandlingRepository.findByFagsakIdAndStatus(fagsak.id, FERDIGSTILT)).isEmpty()
         assertThat(behandlingRepository.findByFagsakIdAndStatus(fagsak.id, OPPRETTET)).containsOnly(behandling)
     }
@@ -291,7 +293,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
         @Test
         fun `inner ikke når det ikke finnes noen behandlinger`() {
-            assertThat(behandlingRepository.existsByFagsakId(UUID.randomUUID())).isFalse
+            assertThat(behandlingRepository.existsByFagsakId(FagsakId.randomUUID())).isFalse
         }
 
         @Test
@@ -304,7 +306,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
                     type = BehandlingType.FØRSTEGANGSBEHANDLING,
                 ),
             )
-            assertThat(behandlingRepository.existsByFagsakId(UUID.randomUUID())).isFalse
+            assertThat(behandlingRepository.existsByFagsakId(FagsakId.randomUUID())).isFalse
         }
 
         @Test
@@ -317,7 +319,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
                     type = BehandlingType.REVURDERING,
                 ),
             )
-            assertThat(behandlingRepository.existsByFagsakId(UUID.randomUUID())).isFalse
+            assertThat(behandlingRepository.existsByFagsakId(FagsakId.randomUUID())).isFalse
         }
     }
 
@@ -500,9 +502,9 @@ class BehandlingRepositoryTest : IntegrationTest() {
     }
 
     private fun lagreFagsak(
-        fagsakId: UUID,
+        fagsakId: FagsakId,
         stønadstype: Stønadstype,
-        fagsakPersonId: UUID,
+        fagsakPersonId: FagsakPersonId,
     ): Fagsak {
         return testoppsettService.lagreFagsak(
             fagsak(

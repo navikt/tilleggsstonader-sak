@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -20,19 +19,10 @@ abstract class BeregnYtelseSteg<DTO, DOMENE>(
     open val simuleringService: SimuleringService,
 ) : BehandlingSteg<DTO> {
 
-    override fun utførOgReturnerNesteSteg(saksbehandling: Saksbehandling, vedtak: DTO): StegType {
+    override fun utførSteg(saksbehandling: Saksbehandling, data: DTO) {
         validerStønadstype(saksbehandling)
         nullstillEksisterendeVedtakPåBehandling(saksbehandling)
-        lagreVedtak(saksbehandling, vedtak)
-
-        return when (saksbehandling.type) {
-            BehandlingType.REVURDERING -> StegType.SIMULERING
-            BehandlingType.FØRSTEGANGSBEHANDLING -> StegType.SEND_TIL_BESLUTTER
-        }
-    }
-
-    override fun utførSteg(saksbehandling: Saksbehandling, data: DTO) {
-        error("Bruker utførOgReturnerNesteSteg i stedet for utførSteg")
+        lagreVedtak(saksbehandling, data)
     }
 
     protected abstract fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: DTO)

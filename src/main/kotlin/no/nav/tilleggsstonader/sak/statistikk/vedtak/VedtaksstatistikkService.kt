@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
@@ -27,7 +28,7 @@ class VedtaksstatistikkService(
     private val tilsynBarnVedtakService: TilsynBarnVedtakService,
 
 ) {
-    fun lagreVedtaksstatistikk(behandlingId: UUID, fagsakId: UUID, hendelseTidspunkt: LocalDateTime) {
+    fun lagreVedtaksstatistikk(behandlingId: UUID, fagsakId: FagsakId, hendelseTidspunkt: LocalDateTime) {
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         val vilkårsvurderinger = vilkårService.hentVilkårsett(behandlingId)

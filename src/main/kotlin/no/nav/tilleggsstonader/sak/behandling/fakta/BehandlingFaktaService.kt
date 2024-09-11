@@ -1,12 +1,17 @@
 package no.nav.tilleggsstonader.sak.behandling.fakta
 
+import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.libs.utils.fnr.Fødselsnummer
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -79,6 +84,13 @@ class BehandlingFaktaService(
             val barnGrunnlagsdata = grunnlagsdataBarn[behandlingBarn.ident]
                 ?: error("Finner ikke barn med ident=${behandlingBarn.ident} på behandling=$behandlingId")
 
+            val søknadgrunnlag = søknadBarnPåIdent[behandlingBarn.ident]?.let { søknadBarn ->
+                SøknadsgrunnlagBarn(
+                    type = søknadBarn.data.type,
+                    startetIFemte = søknadBarn.data.startetIFemte,
+                    årsak = søknadBarn.data.årsak,
+                )
+            }
             FaktaBarn(
                 ident = behandlingBarn.ident,
                 barnId = behandlingBarn.id,
@@ -88,15 +100,26 @@ class BehandlingFaktaService(
                     alder = barnGrunnlagsdata.alder,
                     dødsdato = barnGrunnlagsdata.dødsdato,
                 ),
-                søknadgrunnlag = søknadBarnPåIdent[behandlingBarn.ident]?.let { søknadBarn ->
-                    SøknadsgrunnlagBarn(
-                        type = søknadBarn.data.type,
-                        startetIFemte = søknadBarn.data.startetIFemte,
-                        årsak = søknadBarn.data.årsak,
-                    )
-                },
+                søknadgrunnlag = søknadgrunnlag,
+                vilkårFakta = VilkårFaktaBarn(
+                    harFullførtFjerdetrinn = utledHarFullførtFjerdetrinn(barnGrunnlagsdata, søknadgrunnlag),
+                ),
             )
         }
+    }
+
+    private fun utledHarFullførtFjerdetrinn(
+        barnGrunnlagsdata: GrunnlagBarn,
+        søknadgrunnlag: SøknadsgrunnlagBarn?,
+    ): JaNei? {
+        val fødselsdato = barnGrunnlagsdata.fødselsdato ?: Fødselsnummer(barnGrunnlagsdata.ident).fødselsdato
+        if (søknadgrunnlag?.startetIFemte == JaNei.JA) {
+            return null
+        }
+        if (!harFullførtFjerdetrinn(fødselsdato, LocalDate.now())) {
+            return JaNei.NEI
+        }
+        return null
     }
 
     private fun mapDokumentasjon(søknad: SøknadBarnetilsyn, grunnlagsdata: Grunnlagsdata): FaktaDokumentasjon {

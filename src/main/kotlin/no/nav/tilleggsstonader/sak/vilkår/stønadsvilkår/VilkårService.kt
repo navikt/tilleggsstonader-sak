@@ -113,14 +113,18 @@ class VilkårService(
     }
 
     @Transactional
-    fun nullstillVilkår(oppdaterVilkårDto: OppdaterVilkårDto): VilkårDto {
-        val vilkår = vilkårRepository.findByIdOrThrow(oppdaterVilkårDto.id)
+    fun slettVilkår(oppdaterVilkårDto: OppdaterVilkårDto) {
+        val vilkårId = oppdaterVilkårDto.id
+        val vilkår = vilkårRepository.findByIdOrThrow(vilkårId)
         val behandlingId = vilkår.behandlingId
 
+        feilHvis(vilkår.opphavsvilkår != null) {
+            "Kan ikke slette vilkår opprettet i tidligere behandling"
+        }
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
         validerBehandling(behandlingId)
 
-        return nullstillVilkårMedNyeHovedregler(behandlingId, vilkår)
+        vilkårRepository.deleteById(vilkårId)
     }
 
     @Transactional
@@ -295,6 +299,11 @@ class VilkårService(
     ): List<Vilkår> {
         val lagretVilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
 
+        // TODO rename metode når man kun henter lagretVilkårsett når FT fjernes
+        if (unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING)) {
+            return lagretVilkårsett
+        }
+
         return when {
             behandlingErLåstForVidereRedigering(behandlingId) -> lagretVilkårsett
             lagretVilkårsett.isEmpty() -> lagNyttVilkårsett(behandlingId, metadata)
@@ -362,8 +371,6 @@ class VilkårService(
         val tidligereVurderinger =
             vilkårRepository.findByBehandlingId(forrigeBehandlingId).associateBy { it.id }
 
-        validerAtVurderingerKanKopieres(tidligereVurderinger, forrigeBehandlingId)
-
         val kopiAvVurderinger: Map<UUID, Vilkår> = lagKopiAvTidligereVurderinger(
             tidligereVurderinger,
             nyBehandling.id,
@@ -377,16 +384,6 @@ class VilkårService(
         )
 
         vilkårRepository.insertAll(kopiAvVurderinger.values.toList() + nyeBarnVurderinger)
-    }
-
-    private fun validerAtVurderingerKanKopieres(
-        tidligereVurderinger: Map<UUID, Vilkår>,
-        forrigeBehandlingId: UUID,
-    ) {
-        if (tidligereVurderinger.isEmpty()) {
-            val melding = "Tidligere behandling=$forrigeBehandlingId har ikke noen vilkår"
-            throw Feil(melding, melding)
-        }
     }
 
     private fun lagKopiAvTidligereVurderinger(
@@ -410,6 +407,9 @@ class VilkårService(
         nyBehandling: Behandling,
         stønadstype: Stønadstype,
     ): List<Vilkår> {
+        if (unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING)) {
+            return emptyList()
+        }
         val alleBarn = barnService.finnBarnPåBehandling(nyBehandling.id)
 
         return alleBarn

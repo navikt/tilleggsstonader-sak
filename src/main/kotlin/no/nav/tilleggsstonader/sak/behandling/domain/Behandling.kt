@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import org.springframework.data.annotation.Id
@@ -17,7 +18,7 @@ import java.util.UUID
 data class Behandling(
     @Id
     val id: UUID = UUID.randomUUID(),
-    val fagsakId: UUID,
+    val fagsakId: FagsakId,
     val forrigeBehandlingId: UUID? = null,
     // @Version ?
     val versjon: Int = 0,

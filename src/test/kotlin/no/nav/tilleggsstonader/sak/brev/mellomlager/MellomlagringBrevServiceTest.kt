@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.AfterAll
@@ -51,7 +52,7 @@ class MellomlagringBrevServiceTest {
 
     @Test
     fun `hentMellomlagretFrittståendeSanityBrev skal returnere mellomlagret frittstående brev`() {
-        val fagsakId = UUID.randomUUID()
+        val fagsakId = FagsakId.randomUUID()
 
         val brev = MellomlagretFrittståendeBrev(
             fagsakId = fagsakId,

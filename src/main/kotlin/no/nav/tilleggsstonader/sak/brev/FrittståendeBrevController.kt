@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.PathVariable
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.Base64
-import java.util.UUID
 
 @RestController
 @RequestMapping(path = ["/api/frittstaende-brev"])
@@ -29,7 +29,7 @@ class FrittståendeBrevController(
 
     @PostMapping("/send/{fagsakId}")
     fun sendFrittståendeBrev(
-        @PathVariable fagsakId: UUID,
+        @PathVariable fagsakId: FagsakId,
         @RequestBody request: FrittståendeBrevDto,
     ) {
         tilgangService.validerHarSaksbehandlerrolle()

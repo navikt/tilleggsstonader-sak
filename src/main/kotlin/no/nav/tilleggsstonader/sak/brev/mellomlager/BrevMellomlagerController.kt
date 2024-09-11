@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev.mellomlager
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -47,9 +48,9 @@ class BrevMellomlagerController(
 
     @PostMapping("/fagsak/{fagsakId}")
     fun mellomlagreFrittståendeSanitybrev(
-        @PathVariable fagsakId: UUID,
+        @PathVariable fagsakId: FagsakId,
         @RequestBody mellomlagreBrev: MellomlagreBrevDto,
-    ): UUID {
+    ): FagsakId {
         tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -62,7 +63,7 @@ class BrevMellomlagerController(
 
     @GetMapping("/fagsak/{fagsakId}")
     fun hentMellomlagretFrittståendesanitybrev(
-        @PathVariable fagsakId: UUID,
+        @PathVariable fagsakId: FagsakId,
     ): MellomlagreBrevDto? {
         tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
 

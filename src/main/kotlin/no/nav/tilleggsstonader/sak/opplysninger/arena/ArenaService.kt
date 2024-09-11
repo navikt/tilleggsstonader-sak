@@ -6,11 +6,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.IdenterRequest
 import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class ArenaService(
@@ -31,7 +31,7 @@ class ArenaService(
     }
 
     @Cacheable("arena-oppgaver", cacheManager = "5secCache")
-    fun hentOppgaver(fagsakPersonId: UUID): List<ArenaOppgaveDto> {
+    fun hentOppgaver(fagsakPersonId: FagsakPersonId): List<ArenaOppgaveDto> {
         val aktivIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
         val identer = personService.hentPersonIdenter(aktivIdent).identer()
         return arenaClient.hentOppgaver(IdenterRequest(identer))

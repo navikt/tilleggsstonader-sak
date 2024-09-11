@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak.TRUKKET_TILBA
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -90,7 +91,7 @@ internal class BehandlingServiceTest {
                 stegType = StegType.VILKÅR,
                 behandlingsårsak = BehandlingÅrsak.PAPIRSØKNAD,
                 kravMottatt = osloDateNow().plusDays(1),
-                fagsakId = UUID.randomUUID(),
+                fagsakId = FagsakId.randomUUID(),
             )
         }
     }
@@ -210,7 +211,7 @@ internal class BehandlingServiceTest {
                 behandlingRepository.findByFagsakId(any())
             } returns listOf(behandling1, behandling2, behandling3)
 
-            val hentBehandlinger = behandlingService.hentBehandlinger(UUID.randomUUID())
+            val hentBehandlinger = behandlingService.hentBehandlinger(FagsakId.randomUUID())
             assertThat(hentBehandlinger)
                 .containsExactly(behandling3, behandling1, behandling2)
         }

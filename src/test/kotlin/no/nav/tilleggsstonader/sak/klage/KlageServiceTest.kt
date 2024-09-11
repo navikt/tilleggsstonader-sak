@@ -18,6 +18,8 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.Arbeidsfordelingsenhet
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -45,8 +47,8 @@ internal class KlageServiceTest {
             klageClient,
         )
 
-    private val fagsakId = UUID.randomUUID()
-    private val fagsakPersonId = UUID.randomUUID()
+    private val fagsakId = FagsakId.randomUUID()
+    private val fagsakPersonId = FagsakPersonId.random()
     private val eksternFagsakId = EksternFagsakId(1L, fagsakId)
     private val personIdent = "12345678910"
     private val arbeidsfordelingEnhetNr = "1"
@@ -89,7 +91,7 @@ internal class KlageServiceTest {
         @Test
         internal fun `skal ikke kunne opprette klage med krav mottatt frem i tid`() {
             val opprettKlageDto = OpprettKlageDto(mottattDato = LocalDate.now().plusDays(1))
-            val feil = assertThrows<ApiFeil> { klageService.opprettKlage(UUID.randomUUID(), opprettKlageDto) }
+            val feil = assertThrows<ApiFeil> { klageService.opprettKlage(FagsakId.randomUUID(), opprettKlageDto) }
 
             assertThat(feil.feil).contains("Kan ikke opprette klage med krav mottatt frem i tid for fagsak=")
         }
@@ -174,7 +176,7 @@ internal class KlageServiceTest {
                 ),
             )
 
-            val klager = klageService.hentBehandlinger(UUID.randomUUID())
+            val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
             assertThat(klager.barnetilsyn.first().vedtaksdato).isEqualTo(tidsPunktAvsluttetIKabal)
         }
@@ -195,7 +197,7 @@ internal class KlageServiceTest {
             every { klageClient.hentKlagebehandlinger(any()) } returns
                 mapOf(eksternFagsakId.id to listOf(klagebehandlingIkkeAvsluttetKabal))
 
-            val klager = klageService.hentBehandlinger(UUID.randomUUID())
+            val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
             assertThat(klager.barnetilsyn.first().vedtaksdato).isNull()
         }
@@ -218,7 +220,7 @@ internal class KlageServiceTest {
                         ),
                 )
 
-            val klager = klageService.hentBehandlinger(UUID.randomUUID())
+            val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
             assertThat(klager.barnetilsyn.first().vedtaksdato).isEqualTo(tidspunktAvsluttetFamilieKlage)
         }
@@ -251,7 +253,7 @@ internal class KlageServiceTest {
             every { klageClient.hentKlagebehandlinger(any()) } returns
                 mapOf(eksternFagsakId.id to listOf(klagebehandlingAvsluttetKabal))
 
-            val klager = klageService.hentBehandlinger(UUID.randomUUID())
+            val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
             assertThat(klager.barnetilsyn.first().vedtaksdato).isEqualTo(tidsPunktAvsluttetIKabal)
             assertThat(klager.barnetilsyn.first().klageinstansResultat.first().årsakFeilregistrert).isEqualTo(

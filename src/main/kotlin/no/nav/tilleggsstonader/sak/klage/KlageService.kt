@@ -9,12 +9,13 @@ import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.klage.dto.KlagebehandlingerDto
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.UUID
 
 @Service
 class KlageService(
@@ -22,7 +23,7 @@ class KlageService(
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val klageClient: KlageClient,
 ) {
-    fun hentBehandlinger(fagsakPersonId: UUID): KlagebehandlingerDto {
+    fun hentBehandlinger(fagsakPersonId: FagsakPersonId): KlagebehandlingerDto {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
         val eksterneFagsakIder = listOfNotNull(fagsaker.barnetilsyn?.eksternId?.id)
 
@@ -40,7 +41,7 @@ class KlageService(
         )
     }
 
-    fun opprettKlage(fagsakId: UUID, opprettKlageDto: OpprettKlageDto) {
+    fun opprettKlage(fagsakId: FagsakId, opprettKlageDto: OpprettKlageDto) {
         val klageMottatt = opprettKlageDto.mottattDato
 
         brukerfeilHvis(klageMottatt.isAfter(LocalDate.now())) {

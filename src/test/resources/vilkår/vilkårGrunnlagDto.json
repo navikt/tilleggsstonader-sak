@@ -45,6 +45,9 @@
       "type" : "BARNEHAGE_SFO_AKS",
       "startetIFemte" : "JA",
       "årsak" : "MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID"
+    },
+    "vilkårFakta" : {
+      "harFullførtFjerdetrinn" : null
     }
   } ],
   "dokumentasjon" : {
