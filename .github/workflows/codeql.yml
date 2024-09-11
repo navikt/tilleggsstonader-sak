@@ -42,7 +42,10 @@ jobs:
           build-mode: ${{ matrix.build-mode }}
 
       - name: Compile for CodeQL scan
-        run: ./gradlew build -PskipLint -x test
+        run: ./gradlew build -PskipLint -x test --no-daemon
+        env:
+          JAVA_OPTS: "-Xmx2g"
+          GRADLE_OPTS: "-Xmx2g"
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
