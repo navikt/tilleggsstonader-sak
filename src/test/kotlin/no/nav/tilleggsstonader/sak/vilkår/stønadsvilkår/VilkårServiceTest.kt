@@ -114,23 +114,6 @@ internal class VilkårServiceTest {
         BrukerContextUtil.clearBrukerContext()
     }
 
-    @Test
-    @Disabled
-    fun `skal ikke opprette nye Vilkår for behandlinger som allerede har vurderinger`() {
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(
-            vilkår(
-                behandlingId = behandlingId,
-                type = VilkårType.PASS_BARN,
-                resultat = OPPFYLT,
-            ),
-        )
-
-        vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
-
-        verify(exactly = 0) { vilkårRepository.updateAll(any()) }
-        verify(exactly = 0) { vilkårRepository.insertAll(any()) }
-    }
-
     /*
     @Test
     internal fun `skal ikke returnere delvilkår som er ikke aktuelle til frontend`() {
@@ -180,7 +163,7 @@ internal class VilkårServiceTest {
         )
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns eksisterendeVilkårsett
 
-        val vilkårsett = vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId).vilkårsett
+        val vilkårsett = vilkårService.hentVilkårsvurdering(behandlingId).vilkårsett
 
         assertThat(vilkårsett).hasSize(1)
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }

@@ -207,26 +207,10 @@ class VilkårService(
     }
 
     @Transactional
-    fun hentEllerOpprettVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
+    fun hentVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
         val (grunnlag, metadata) = hentGrunnlagOgMetadata(behandlingId)
         val vurderinger = hentEllerOpprettVilkår(behandlingId, metadata).map(Vilkår::tilDto)
         return VilkårsvurderingDto(vilkårsett = vurderinger, grunnlag = grunnlag)
-    }
-
-    @Transactional
-    fun hentOpprettEllerOppdaterVilkårsvurdering(behandlingId: UUID): VilkårsvurderingDto {
-        val behandling = behandlingService.hentSaksbehandling(behandlingId)
-
-        if (behandling.harStatusOpprettet) {
-            /*val endredeGrunnlagsdata = finnEndringerIGrunnlagsdata(behandlingId)
-            if (endredeGrunnlagsdata.isNotEmpty()) {
-                secureLogger.info("Grunnlagsdata som har endret seg: $endredeGrunnlagsdata")
-                logger.info("Grunnlagsdata har endret seg siden sist. Sletter gamle vilkår og grunnlagsdata og legger inn nye.")
-                grunnlagsdataService.oppdaterOgHentNyGrunnlagsdata(behandlingId)
-                vilkårsvurderingRepository.deleteByBehandlingId(behandlingId)
-            }*/
-        }
-        return hentEllerOpprettVilkårsvurdering(behandlingId)
     }
 
     fun hentVilkårsett(behandlingId: UUID): List<VilkårDto> {
@@ -243,7 +227,7 @@ class VilkårService(
     @Transactional
     fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: UUID): VilkårsvurderingDto {
         // grunnlagsdataService.oppdaterOgHentNyGrunnlagsdata(behandlingId)
-        return hentEllerOpprettVilkårsvurdering(behandlingId)
+        return this.hentVilkårsvurdering(behandlingId)
     }
 
     /*
