@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpdateRepository<FagsakDomain> {
+interface FagsakRepository : RepositoryInterface<FagsakDomain, FagsakId>, InsertUpdateRepository<FagsakDomain> {
 
     // language=PostgreSQL
     @Query(
@@ -63,18 +64,7 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpda
               ORDER BY pi.endret_tid DESC
               LIMIT 1""",
     )
-    fun finnAktivIdent(fagsakId: UUID): String
-
-    // language=PostgreSQL
-    @Query(
-        """
-        SELECT DISTINCT f.id AS first, 
-            FIRST_VALUE(ident) OVER (PARTITION BY pi.fagsak_person_id ORDER BY pi.endret_tid DESC) AS second
-        FROM fagsak f
-          JOIN person_ident pi ON pi.fagsak_person_id = f.fagsak_person_id
-        WHERE f.id IN (:fagsakIder)""",
-    )
-    fun finnAktivIdenter(fagsakIder: Set<UUID>): List<Pair<UUID, String>>
+    fun finnAktivIdent(fagsakId: FagsakId): String
 
     // language=PostgreSQL
     @Query(
@@ -87,5 +77,5 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpda
               WHERE b.fagsak_id = :fagsakId
               LIMIT 1""",
     )
-    fun harLøpendeUtbetaling(fagsakId: UUID): Boolean
+    fun harLøpendeUtbetaling(fagsakId: FagsakId): Boolean
 }

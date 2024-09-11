@@ -251,16 +251,6 @@ class FagsakRepositoryTest : IntegrationTest() {
     }
 
     @Test
-    internal fun `skal hente siste identen for hver fagsak`() {
-        val fagsak = testoppsettService.lagreFagsak(opprettFagsakMedFlereIdenter())
-        val fagsak2 = testoppsettService.lagreFagsak(opprettFagsakMedFlereIdenter("4", "5", "6"))
-        val aktiveIdenterPerFagsak = fagsakRepository.finnAktivIdenter(setOf(fagsak.id, fagsak2.id))
-        assertThat(aktiveIdenterPerFagsak).hasSize(2)
-        assertThat(aktiveIdenterPerFagsak.single { it.first == fagsak.id }.second).isEqualTo("2")
-        assertThat(aktiveIdenterPerFagsak.single { it.first == fagsak2.id }.second).isEqualTo("5")
-    }
-
-    @Test
     internal fun `skal kunne søke opp fagsak basert på forskjellige personidenter - kun ett treff per fagsak`() {
         val fagsakMedFlereIdenter = testoppsettService.lagreFagsak(opprettFagsakMedFlereIdenter("4", "5", "6"))
 

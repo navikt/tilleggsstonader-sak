@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import org.springframework.data.relational.core.mapping.Column
 import java.time.LocalDate
@@ -27,7 +28,7 @@ data class Saksbehandling(
     @Column("henlagt_arsak")
     val henlagtÅrsak: HenlagtÅrsak? = null,
     val ident: String,
-    val fagsakId: UUID,
+    val fagsakId: FagsakId,
     val fagsakPersonId: FagsakPersonId,
     val eksternFagsakId: Long,
     @Column("stonadstype")

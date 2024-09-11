@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.Arbeidsfordelingsenhet
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
@@ -46,7 +47,7 @@ internal class KlageServiceTest {
             klageClient,
         )
 
-    private val fagsakId = UUID.randomUUID()
+    private val fagsakId = FagsakId.randomUUID()
     private val fagsakPersonId = FagsakPersonId.random()
     private val eksternFagsakId = EksternFagsakId(1L, fagsakId)
     private val personIdent = "12345678910"
@@ -90,7 +91,7 @@ internal class KlageServiceTest {
         @Test
         internal fun `skal ikke kunne opprette klage med krav mottatt frem i tid`() {
             val opprettKlageDto = OpprettKlageDto(mottattDato = LocalDate.now().plusDays(1))
-            val feil = assertThrows<ApiFeil> { klageService.opprettKlage(UUID.randomUUID(), opprettKlageDto) }
+            val feil = assertThrows<ApiFeil> { klageService.opprettKlage(FagsakId.randomUUID(), opprettKlageDto) }
 
             assertThat(feil.feil).contains("Kan ikke opprette klage med krav mottatt frem i tid for fagsak=")
         }
