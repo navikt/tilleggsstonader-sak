@@ -65,7 +65,7 @@ class TilsynBarnBeregnYtelseSteg(
             "Funksjonalitet mangler for å kunne innvilge revurdering når tidligere behandling er innvilget. Sett saken på vent."
         }
 
-        val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(saksbehandling.id, vedtak.utgifter)
+        val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(saksbehandling.id)
         val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, utgifter)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, vedtak, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)

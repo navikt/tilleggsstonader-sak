@@ -47,7 +47,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: UUID,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
-        val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandlingId, vedtak.utgifter)
+        val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandlingId)
         return tilsynBarnBeregningService.beregn(behandlingId, utgifter)
     }
 }

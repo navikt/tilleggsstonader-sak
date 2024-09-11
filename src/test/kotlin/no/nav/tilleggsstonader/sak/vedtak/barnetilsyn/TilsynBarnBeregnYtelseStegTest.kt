@@ -59,7 +59,7 @@ class TilsynBarnBeregnYtelseStegTest {
         val tom = LocalDate.of(2023, 1, 31)
         mockStønadsperioder(fom, tom, saksbehandling.id)
         mockVilkårperioder(fom, tom, saksbehandling.id)
-        every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any(), any()) } returns
+        every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns
             mapOf(barn.id to listOf(UtgiftBeregning(YearMonth.now(), YearMonth.now(), 1)))
     }
 
