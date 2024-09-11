@@ -38,14 +38,14 @@ class VilkårSteg(
                 .any { it.fom == null || it.tom == null || it.utgift == null }
         brukerfeilHvis(manglerVerdierPåOppfylteVilkår) {
             "Mangler fom, tom eller utgift på et eller flere vilkår. " +
-                    "Vennligst ta stilling til hvilken periode vilkåret gjelder for."
+                "Vennligst ta stilling til hvilken periode vilkåret gjelder for."
         }
         val manglerVerdierPåIkkeOppfylteVilkår =
             vilkår.filter { it.resultat == Vilkårsresultat.IKKE_OPPFYLT }
                 .any { it.fom == null || it.tom == null }
         brukerfeilHvis(manglerVerdierPåIkkeOppfylteVilkår) {
             "Mangler fom eller tom på et eller flere vilkår. " +
-                    "Vennligst ta stilling til hvilken periode vilkåret gjelder for."
+                "Vennligst ta stilling til hvilken periode vilkåret gjelder for."
         }
     }
 

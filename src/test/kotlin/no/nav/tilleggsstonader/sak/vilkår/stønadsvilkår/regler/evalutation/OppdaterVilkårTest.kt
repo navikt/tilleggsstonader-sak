@@ -38,32 +38,32 @@ internal class OppdaterVilkårTest {
         @Test
         fun `skal validere at man har med beløp for vilkår for pass av barn`() {
             assertThatThrownBy {
-                validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(fom = null), true)
+                validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(fom = null))
             }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
 
             assertThatThrownBy {
-                validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(tom = null), true)
+                validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(tom = null))
             }.hasMessageContaining("Mangler fra og med/til og med på vilkår")
         }
 
         @Test
         fun `skal kaste feil hvis innvilget pass av barn ikke inneholder beløp`() {
             assertThatThrownBy {
-                validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(utgift = null), true)
+                validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(utgift = null))
             }.hasMessageContaining("Mangler utgift på vilkår")
         }
 
         @Test
         fun `skal ikke kaste feil hvis ikke oppfylt pass av barn ikke inneholder beløp`() {
             val dto = opprettVilkårDto.copy(utgift = null, delvilkårsett = ikkeOppfylteDelvilkårPassBarnDto())
-            validerVilkårOgBeregnResultat(vilkår, dto, true)
+            validerVilkårOgBeregnResultat(vilkår, dto)
         }
 
         @Disabled // TODO fiks når annen type enn eksempel er tilgjengelig
         @Test
         fun `skal validere at annet vilkår enn pass av barn ikke inneholder beløp`() {
             assertThatThrownBy {
-                validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(vilkårType = VilkårType.EKSEMPEL), true)
+                validerVilkårOgBeregnResultat(vilkår, opprettVilkårDto.copy(vilkårType = VilkårType.EKSEMPEL))
             }.hasMessageContaining("Mangler beløp på vilkår")
         }
     }
