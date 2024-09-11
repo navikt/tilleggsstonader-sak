@@ -7,10 +7,10 @@ import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokdist.Distribusjonstype
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import org.springframework.stereotype.Service
 import java.util.Properties
-import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -42,7 +42,7 @@ class DistribuerFrittståendeBrevTask(
 
     companion object {
 
-        fun opprettTask(fagsakId: UUID, journalpostId: String): Task =
+        fun opprettTask(fagsakId: FagsakId, journalpostId: String): Task =
             Task(
                 type = TYPE,
                 payload = objectMapper.writeValueAsString(
@@ -62,6 +62,6 @@ class DistribuerFrittståendeBrevTask(
 }
 
 data class DistribuerFrittståendeBrevPayload(
-    val fagsakId: UUID,
+    val fagsakId: FagsakId,
     val journalpostId: String,
 )

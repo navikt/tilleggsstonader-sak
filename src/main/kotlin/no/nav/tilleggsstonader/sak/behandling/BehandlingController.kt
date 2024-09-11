@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
@@ -52,7 +53,7 @@ class BehandlingController(
     }
 
     @GetMapping("barn-til-revurdering/{fagsakId}")
-    fun hentBarnTilRevurdering(@PathVariable fagsakId: UUID): BarnTilRevurderingDto {
+    fun hentBarnTilRevurdering(@PathVariable fagsakId: FagsakId): BarnTilRevurderingDto {
         tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
         return opprettRevurderingBehandlingService.hentBarnTilRevurdering(fagsakId)

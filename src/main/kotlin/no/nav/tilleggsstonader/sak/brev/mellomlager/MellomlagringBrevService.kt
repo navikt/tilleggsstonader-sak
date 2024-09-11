@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.brev.mellomlager
 
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -22,10 +23,10 @@ class MellomlagringBrevService(
     }
 
     fun mellomLagreFrittståendeSanitybrev(
-        fagsakId: UUID,
+        fagsakId: FagsakId,
         brevverdier: String,
         brevmal: String,
-    ): UUID {
+    ): FagsakId {
         slettMellomlagretFrittståendeBrev(fagsakId, SikkerhetContext.hentSaksbehandler())
         val mellomlagretBrev = MellomlagretFrittståendeBrev(
             fagsakId = fagsakId,
@@ -35,7 +36,7 @@ class MellomlagringBrevService(
         return mellomlagerFrittståendeBrevRepository.insert(mellomlagretBrev).fagsakId
     }
 
-    fun hentMellomlagretFrittståendeSanitybrev(fagsakId: UUID): MellomlagreBrevDto? =
+    fun hentMellomlagretFrittståendeSanitybrev(fagsakId: FagsakId): MellomlagreBrevDto? =
         mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(
             fagsakId,
             SikkerhetContext.hentSaksbehandler(),
@@ -50,7 +51,7 @@ class MellomlagringBrevService(
         mellomlagerBrevRepository.deleteById(behandlingId)
     }
 
-    fun slettMellomlagretFrittståendeBrev(fagsakId: UUID, saksbehandlerIdent: String) {
+    fun slettMellomlagretFrittståendeBrev(fagsakId: FagsakId, saksbehandlerIdent: String) {
         mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsakId, saksbehandlerIdent)
             ?.let { mellomlagerFrittståendeBrevRepository.deleteById(it.id) }
     }

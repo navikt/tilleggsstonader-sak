@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
@@ -100,12 +101,12 @@ class TilgangService(
         }
     }
 
-    fun validerTilgangTilFagsak(fagsakId: UUID, event: AuditLoggerEvent) {
+    fun validerTilgangTilFagsak(fagsakId: FagsakId, event: AuditLoggerEvent) {
         val personIdent = cacheManager.getValue("fagsakIdent", fagsakId) {
             fagsakService.hentAktivIdent(fagsakId)
         }
         val tilgang = harTilgangTilPersonMedRelasjoner(personIdent)
-        auditLogger.log(Sporingsdata(event, personIdent, tilgang, custom1 = CustomKeyValue("fagsak", fagsakId)))
+        auditLogger.log(Sporingsdata(event, personIdent, tilgang, custom1 = CustomKeyValue("fagsak", fagsakId.id)))
         if (!tilgang.harTilgang) {
             throw ManglerTilgang(
                 melding = "Saksbehandler ${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +

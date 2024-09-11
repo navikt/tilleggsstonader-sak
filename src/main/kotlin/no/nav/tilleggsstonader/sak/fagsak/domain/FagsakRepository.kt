@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpdateRepository<FagsakDomain> {
+interface FagsakRepository : RepositoryInterface<FagsakDomain, FagsakId>, InsertUpdateRepository<FagsakDomain> {
 
     // language=PostgreSQL
     @Query(
@@ -63,7 +64,7 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpda
               ORDER BY pi.endret_tid DESC
               LIMIT 1""",
     )
-    fun finnAktivIdent(fagsakId: UUID): String
+    fun finnAktivIdent(fagsakId: FagsakId): String
 
     // language=PostgreSQL
     @Query(
@@ -76,5 +77,5 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, UUID>, InsertUpda
               WHERE b.fagsak_id = :fagsakId
               LIMIT 1""",
     )
-    fun harLøpendeUtbetaling(fagsakId: UUID): Boolean
+    fun harLøpendeUtbetaling(fagsakId: FagsakId): Boolean
 }

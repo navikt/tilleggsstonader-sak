@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -178,7 +179,7 @@ fun fagsakPerson(
 fun fagsak(
     identer: Set<PersonIdent> = defaultIdenter,
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
-    id: UUID = UUID.randomUUID(),
+    id: FagsakId = FagsakId.randomUUID(),
     eksternId: EksternFagsakId = EksternFagsakId(fagsakId = id),
     sporbar: Sporbar = Sporbar(),
     fagsakPersonId: FagsakPersonId = FagsakPersonId.random(),
@@ -188,7 +189,7 @@ fun fagsak(
 
 fun fagsak(
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
-    id: UUID = UUID.randomUUID(),
+    id: FagsakId = FagsakId.randomUUID(),
     person: FagsakPerson,
     eksternId: EksternFagsakId = EksternFagsakId(fagsakId = id),
     sporbar: Sporbar = Sporbar(),
@@ -204,7 +205,7 @@ fun fagsak(
 }
 
 fun fagsakDomain(
-    id: UUID = UUID.randomUUID(),
+    id: FagsakId = FagsakId.randomUUID(),
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     personId: FagsakPersonId = FagsakPersonId.random(),
 ): FagsakDomain = FagsakDomain(

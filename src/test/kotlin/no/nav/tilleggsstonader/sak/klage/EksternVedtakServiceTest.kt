@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -28,7 +29,7 @@ class EksternVedtakServiceTest {
         behandlingService = behandlingService,
     )
 
-    private val fagsakId = UUID.randomUUID()
+    private val fagsakId = FagsakId.randomUUID()
     private val fagsak = fagsak(id = fagsakId)
     private val eksternFagsakId = fagsak.eksternId.id
 
@@ -67,7 +68,7 @@ class EksternVedtakServiceTest {
             status = BehandlingStatus.FERDIGSTILT,
             resultat = BehandlingResultat.HENLAGT,
         )
-        every { behandlingService.hentBehandlinger(any<UUID>()) } returns listOf(henlagtBehandling)
+        every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(henlagtBehandling)
 
         assertThat(service.hentVedtak(eksternFagsakId)).isEmpty()
     }
@@ -80,7 +81,7 @@ class EksternVedtakServiceTest {
             status = BehandlingStatus.UTREDES,
             resultat = BehandlingResultat.IKKE_SATT,
         )
-        every { behandlingService.hentBehandlinger(any<UUID>()) } returns listOf(henlagtBehandling)
+        every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(henlagtBehandling)
 
         assertThat(service.hentVedtak(eksternFagsakId)).isEmpty()
     }

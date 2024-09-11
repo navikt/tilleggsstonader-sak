@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.TidligereBarnId
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -51,12 +52,12 @@ class GjennbrukDataRevurderingService(
             ?: finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(behandling.fagsakId)
     }
 
-    fun finnBehandlingIdForGjenbruk(fagsakId: UUID): UUID? {
+    fun finnBehandlingIdForGjenbruk(fagsakId: FagsakId): UUID? {
         return behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
             ?: finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId)
     }
 
-    private fun finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId: UUID): UUID? {
+    private fun finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId: FagsakId): UUID? {
         return behandlingService.hentBehandlinger(fagsakId).lastOrNull {
             it.status == BehandlingStatus.FERDIGSTILT &&
                 it.resultat != BehandlingResultat.HENLAGT

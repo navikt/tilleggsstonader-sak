@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -24,6 +25,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     final val id: UUID = UUID.randomUUID()
+    final val fagsakId: FagsakId = FagsakId.randomUUID()
 
     @Test
     fun `kan skrive vedtaksstatistikk til tabell når alle JSON-objekter er tomme lister`() {
@@ -134,7 +136,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     private fun vedtaksstatistikk() = Vedtaksstatistikk(
         id = id,
-        fagsakId = id,
+        fagsakId = fagsakId,
         behandlingId = id,
         eksternFagsakId = 1722,
         eksternBehandlingId = 4005,

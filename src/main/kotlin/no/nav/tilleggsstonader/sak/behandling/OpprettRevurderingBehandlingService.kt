@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -101,13 +102,13 @@ class OpprettRevurderingBehandlingService(
         }
     }
 
-    fun hentBarnTilRevurdering(fagsakId: UUID): BarnTilRevurderingDto {
+    fun hentBarnTilRevurdering(fagsakId: FagsakId): BarnTilRevurderingDto {
         val forrigeBehandlingId = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(fagsakId)
         return hentBarnTilRevurdering(fagsakId, forrigeBehandlingId)
     }
 
     private fun hentBarnTilRevurdering(
-        fagsakId: UUID,
+        fagsakId: FagsakId,
         forrigeBehandlingId: UUID?,
     ): BarnTilRevurderingDto {
         val ident = fagsakService.hentAktivIdent(fagsakId)

@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -63,16 +64,16 @@ class BehandlingService(
     fun hentEksterneIder(behandlingIder: Set<UUID>) = behandlingIder.takeIf { it.isNotEmpty() }
         ?.let { behandlingRepository.finnEksterneIder(it) } ?: emptySet()
 
-    fun finnSisteIverksatteBehandling(fagsakId: UUID) =
+    fun finnSisteIverksatteBehandling(fagsakId: FagsakId) =
         behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
 
-    fun finnesÅpenBehandling(fagsakId: UUID) =
+    fun finnesÅpenBehandling(fagsakId: FagsakId) =
         behandlingRepository.existsByFagsakIdAndStatusIsNot(fagsakId, FERDIGSTILT)
 
-    fun finnesBehandlingSomIkkeErFerdigstiltEllerSattPåVent(fagsakId: UUID) =
+    fun finnesBehandlingSomIkkeErFerdigstiltEllerSattPåVent(fagsakId: FagsakId) =
         behandlingRepository.existsByFagsakIdAndStatusIsNotIn(fagsakId, listOf(FERDIGSTILT, SATT_PÅ_VENT))
 
-    fun finnSisteIverksatteBehandlingMedEventuellAvslått(fagsakId: UUID): Behandling? =
+    fun finnSisteIverksatteBehandlingMedEventuellAvslått(fagsakId: FagsakId): Behandling? =
         behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
             ?: hentBehandlinger(fagsakId).lastOrNull {
                 it.status == FERDIGSTILT && it.resultat != BehandlingResultat.HENLAGT
@@ -90,7 +91,7 @@ class BehandlingService(
 
     @Transactional
     fun opprettBehandling(
-        fagsakId: UUID,
+        fagsakId: FagsakId,
         status: BehandlingStatus = BehandlingStatus.OPPRETTET,
         stegType: StegType = StegType.INNGANGSVILKÅR,
         behandlingsårsak: BehandlingÅrsak,
@@ -199,10 +200,10 @@ class BehandlingService(
         return behandlingRepository.update(hentBehandling(behandlingId).copy(kravMottatt = kravMottatt))
     }
 
-    fun finnesBehandlingForFagsak(fagsakId: UUID) =
+    fun finnesBehandlingForFagsak(fagsakId: FagsakId) =
         behandlingRepository.existsByFagsakId(fagsakId)
 
-    fun hentBehandlinger(fagsakId: UUID): List<Behandling> {
+    fun hentBehandlinger(fagsakId: FagsakId): List<Behandling> {
         return behandlingRepository.findByFagsakId(fagsakId).sortertEtterVedtakstidspunkt()
     }
 
@@ -271,7 +272,7 @@ class BehandlingService(
         )
     }
 
-    fun utledNesteBehandlingstype(fagsakId: UUID): BehandlingType {
+    fun utledNesteBehandlingstype(fagsakId: FagsakId): BehandlingType {
         val behandlinger = hentBehandlinger(fagsakId)
         return utledBehandlingType(behandlinger)
     }

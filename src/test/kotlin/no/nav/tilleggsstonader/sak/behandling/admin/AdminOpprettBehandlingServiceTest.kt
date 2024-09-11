@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -22,7 +23,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class AdminOpprettBehandlingServiceTest {
 
@@ -57,7 +57,7 @@ class AdminOpprettBehandlingServiceTest {
 
         every { fagsakService.finnFagsak(any(), Stønadstype.BARNETILSYN) } returns fagsak
         every { fagsakService.hentEllerOpprettFagsak(personIdent = ident, Stønadstype.BARNETILSYN) } returns fagsak
-        every { behandlingService.hentBehandlinger(any<UUID>()) } returns emptyList()
+        every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns emptyList()
         every { behandlingService.opprettBehandling(fagsak.id, any(), any(), any(), any()) } returns behandling
         every { barnService.opprettBarn(capture(opprettedeBarnSlot)) } answers { firstArg() }
     }
@@ -80,7 +80,7 @@ class AdminOpprettBehandlingServiceTest {
 
     @Test
     fun `skal feile hvis det finnes behandlinger fra før`() {
-        every { behandlingService.hentBehandlinger(any<UUID>()) } returns listOf(behandling())
+        every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(behandling())
 
         assertThatThrownBy {
             service.opprettFørstegangsbehandling(ident, setOf(identBarn))

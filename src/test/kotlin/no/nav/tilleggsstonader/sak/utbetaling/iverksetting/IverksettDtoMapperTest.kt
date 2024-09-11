@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -17,7 +18,7 @@ import java.util.UUID
 class IverksettDtoMapperTest {
 
     val iverksettingId = UUID.randomUUID()
-    val fagsak = fagsak(identer = setOf(PersonIdent("ident1")), eksternId = EksternFagsakId(200, UUID.randomUUID()))
+    val fagsak = fagsak(identer = setOf(PersonIdent("ident1")), eksternId = EksternFagsakId(200, FagsakId.randomUUID()))
     val behandling = saksbehandling(fagsak = fagsak, behandling = behandling(vedtakstidspunkt = osloNow()))
     val iverksetting = Iverksetting(iverksettingId, osloNow())
     val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = 100, iverksetting = iverksetting)

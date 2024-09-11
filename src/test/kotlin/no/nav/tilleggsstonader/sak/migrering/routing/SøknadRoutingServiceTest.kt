@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class SøknadRoutingServiceTest {
 
@@ -58,7 +58,7 @@ class SøknadRoutingServiceTest {
         every { søknadRoutingRepository.countByType(any()) } returns 10
         every { søknadRoutingRepository.insert(any()) } answers { firstArg() }
         every { fagsakService.finnFagsak(any(), any()) } returns null
-        every { behandlingService.hentBehandlinger(any<UUID>()) } returns emptyList()
+        every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns emptyList()
         every { arenaService.hentStatus(any(), any()) } returns arenaStatusKanIkkeRoutes()
         every { personService.hentPersonIdenter(any()) } answers { PdlIdenter(listOf(PdlIdent(firstArg(), false))) }
     }
@@ -112,7 +112,7 @@ class SøknadRoutingServiceTest {
 
             verify {
                 fagsakService.finnFagsak(any(), any())
-                behandlingService.hentBehandlinger(any<UUID>())
+                behandlingService.hentBehandlinger(any<FagsakId>())
                 søknadRoutingRepository.insert(any())
                 arenaService wasNot called
             }

@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -27,7 +28,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.util.UUID
 
 class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
@@ -343,7 +343,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
     }
 
     private fun opprettBehandlingDto(
-        fagsakId: UUID,
+        fagsakId: FagsakId,
         årsak: BehandlingÅrsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
         valgteBarn: Set<String> = emptySet(),
     ) = OpprettBehandlingDto(
