@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
@@ -20,7 +19,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering.utledResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelValidering.validerVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkårsreglerForStønad
 import java.time.LocalDate
 import java.util.UUID
 
@@ -166,72 +164,6 @@ object OppdaterVilkår {
         }.toList()
         return vilkår.delvilkårwrapper.copy(delvilkårsett = delvilkårsett)
     }
-
-    // TODO rename noe stønadsspesifikt vilkår
-    fun opprettNyeVilkår(
-        behandlingId: UUID,
-        metadata: HovedregelMetadata,
-        stønadstype: Stønadstype,
-    ): List<Vilkår> {
-        return vilkårsreglerForStønad(stønadstype)
-            .flatMap { vilkårsregel ->
-                feilHvis(vilkårsregel.vilkårType.gjelderFlereBarn() && metadata.barn.isEmpty()) {
-                    "Kan ikke opprette vilkår når ingen barn er knyttet til behandling $behandlingId"
-                }
-
-                if (vilkårsregel.vilkårType.gjelderFlereBarn()) {
-                    metadata.barn.map { lagNyttVilkår(vilkårsregel, metadata, behandlingId, it.id) }
-                } else {
-                    listOf(lagNyttVilkår(vilkårsregel, metadata, behandlingId))
-                }
-            }
-    }
-
-    fun opprettVilkårForNyeBarn(
-        behandlingId: UUID,
-        metadata: HovedregelMetadata,
-        stønadstype: Stønadstype,
-        eksisterendeVilkår: List<Vilkår>,
-    ): List<Vilkår> {
-        return vilkårsreglerForStønad(stønadstype)
-            .filter { it.vilkårType.gjelderFlereBarn() }
-            .mapNotNull { vilkårsregel ->
-                metadata.barn.filter { barn ->
-                    eksisterendeVilkår.none {
-                        val vilkårFinnesForBarn = it.barnId == barn.id && it.type == vilkårsregel.vilkårType
-
-                        vilkårFinnesForBarn
-                    }
-                }.map { lagNyttVilkår(vilkårsregel, metadata, behandlingId, it.id) }
-            }.flatten()
-    }
-
-    fun lagVilkårForNyttBarn(
-        metadata: HovedregelMetadata,
-        behandlingId: UUID,
-        barnId: UUID,
-        stønadstype: Stønadstype,
-    ): List<Vilkår> {
-        return emptyList()
-    }
-    /*
-    return when (stønadstype) {
-        OVERGANGSSTØNAD, SKOLEPENGER -> listOf(
-            lagNyVilkår(
-                AleneomsorgRegel(),
-                metadata,
-                behandlingId,
-                barnId,
-            ),
-        )
-
-        BARNETILSYN -> listOf(
-            lagNyVilkår(AleneomsorgRegel(), metadata, behandlingId, barnId),
-            lagNyVilkår(AlderPåBarnRegel(), metadata, behandlingId, barnId),
-        )
-    }
-    }
-     */
 
     fun lagNyttVilkår(
         vilkårsregel: Vilkårsregel,

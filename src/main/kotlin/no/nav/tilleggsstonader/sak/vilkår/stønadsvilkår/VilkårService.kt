@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -20,7 +19,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -36,7 +34,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.lagNyttVilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.VilkårsresultatUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.finnesVilkårTypeForStønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
@@ -53,7 +50,6 @@ class VilkårService(
     private val barnService: BarnService,
     private val behandlingFaktaService: BehandlingFaktaService,
     private val fagsakService: FagsakService,
-    private val unleashService: UnleashService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -292,64 +288,12 @@ class VilkårService(
         return Pair(grunnlag, HovedregelMetadata(barn, behandling))
     }
 
+    // TODO rename metode når man kun henter lagretVilkårsett når FT fjernes
     fun hentEllerOpprettVilkår(
         behandlingId: UUID,
         metadata: HovedregelMetadata,
     ): List<Vilkår> {
-        val lagretVilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
-
-        // TODO rename metode når man kun henter lagretVilkårsett når FT fjernes
-        if (unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING)) {
-            return lagretVilkårsett
-        }
-
-        return when {
-            behandlingErLåstForVidereRedigering(behandlingId) -> lagretVilkårsett
-            lagretVilkårsett.isEmpty() -> lagNyttVilkårsett(behandlingId, metadata)
-            else -> hentEllerOpprettMedEvtNyeBarn(metadata, lagretVilkårsett, behandlingId)
-        }
-    }
-
-    private fun hentEllerOpprettMedEvtNyeBarn(
-        metadata: HovedregelMetadata,
-        lagretVilkårsett: List<Vilkår>,
-        behandlingId: UUID,
-    ): List<Vilkår> {
-        val harVilkårForAlleBarn =
-            lagretVilkårsett.filter { it.type.gjelderFlereBarn() }.map { it.type }.toSet().all { vilkårType ->
-                metadata.barn.all { barn ->
-                    lagretVilkårsett.any { it.barnId == barn.id && it.type == vilkårType }
-                }
-            }
-
-        if (!harVilkårForAlleBarn) {
-            return lagretVilkårsett + opprettVilkårForNyeBarn(behandlingId, metadata, lagretVilkårsett)
-        }
-
-        return lagretVilkårsett
-    }
-
-    private fun opprettVilkårForNyeBarn(
-        behandlingId: UUID,
-        metadata: HovedregelMetadata,
-        lagretVilkårsett: List<Vilkår>,
-    ): List<Vilkår> {
-        val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
-        val nyeVilkår = OppdaterVilkår.opprettVilkårForNyeBarn(behandlingId, metadata, stønadstype, lagretVilkårsett)
-        return vilkårRepository.insertAll(nyeVilkår)
-    }
-
-    private fun lagNyttVilkårsett(
-        behandlingId: UUID,
-        metadata: HovedregelMetadata,
-    ): List<Vilkår> {
-        val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
-        val nyttVilkårsett: List<Vilkår> = opprettNyeVilkår(
-            behandlingId = behandlingId,
-            metadata = metadata,
-            stønadstype = stønadstype,
-        )
-        return vilkårRepository.insertAll(nyttVilkårsett)
+        return vilkårRepository.findByBehandlingId(behandlingId)
     }
 
     /*private fun finnEndringerIGrunnlagsdata(behandlingId: UUID): List<GrunnlagsdataEndring> {
@@ -376,13 +320,7 @@ class VilkårService(
             barnIdMap,
         )
 
-        val nyeBarnVurderinger = opprettVilkårForNyeBarn(
-            vilkårKopi = kopiAvVurderinger,
-            nyBehandling = nyBehandling,
-            stønadstype = stønadstype,
-        )
-
-        vilkårRepository.insertAll(kopiAvVurderinger.values.toList() + nyeBarnVurderinger)
+        vilkårRepository.insertAll(kopiAvVurderinger.values.toList())
     }
 
     private fun lagKopiAvTidligereVurderinger(
@@ -400,29 +338,6 @@ class VilkårService(
                     opphavsvilkår = vilkår.opprettOpphavsvilkår(),
                 )
             }
-
-    private fun opprettVilkårForNyeBarn(
-        vilkårKopi: Map<UUID, Vilkår>,
-        nyBehandling: Behandling,
-        stønadstype: Stønadstype,
-    ): List<Vilkår> {
-        if (unleashService.isEnabled(Toggle.VILKÅR_PERIODISERING)) {
-            return emptyList()
-        }
-        val alleBarn = barnService.finnBarnPåBehandling(nyBehandling.id)
-
-        return alleBarn
-            .filter { barn -> vilkårKopi.none { it.value.barnId == barn.id } }
-            .map {
-                OppdaterVilkår.lagVilkårForNyttBarn(
-                    HovedregelMetadata(barn = alleBarn, behandling = nyBehandling),
-                    it.behandlingId,
-                    it.id,
-                    stønadstype,
-                )
-            }
-            .flatten()
-    }
 
     private fun finnBarnId(barnId: UUID?, barnIdMap: Map<UUID, UUID>): UUID? =
         barnId?.let {

@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
@@ -34,17 +33,15 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.AUTOMATISK_OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.IKKE_TATT_STILLING_TIL
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.SKAL_IKKE_VURDERES
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.OppdaterVilkår.opprettNyeVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarn
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -73,7 +70,6 @@ internal class VilkårServiceTest {
         behandlingFaktaService = behandlingFaktaService,
         barnService = barnService,
         fagsakService = fagsakService,
-        unleashService = mockUnleashService(),
     )
 
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
@@ -116,57 +112,6 @@ internal class VilkårServiceTest {
     @AfterEach
     internal fun tearDown() {
         BrukerContextUtil.clearBrukerContext()
-    }
-
-    @Nested
-    inner class OppretteVilkårBarnetilsyn {
-        val nyttVilkårsett = slot<List<Vilkår>>()
-
-        @BeforeEach
-        fun setUp() {
-            every { vilkårRepository.insertAll(capture(nyttVilkårsett)) } answers { firstArg() }
-            every { vilkårRepository.findByBehandlingId(behandlingId) } returns emptyList()
-            every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
-        }
-
-        @Test
-        fun `skal opprette nye Vilkår for barnetilsyn med alle vilkår dersom ingen vurderinger finnes`() {
-            val aktuelleVilkårTyper = VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN)
-
-            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
-
-            val vilkårsett = nyttVilkårsett.captured
-
-            assertThat(vilkårsett).hasSize(aktuelleVilkårTyper.size + 1) // 2 barn, ekstra vilkår av type PASS_BARN
-            assertThat(
-                vilkårsett.map { it.type }.distinct(),
-            ).containsExactlyInAnyOrderElementsOf(aktuelleVilkårTyper)
-
-            vilkårsett.finnVilkårAvType(VilkårType.PASS_BARN).inneholderKunResultat(IKKE_TATT_STILLING_TIL)
-        }
-
-        @Test
-        fun `skal opprette et vilkår av type PASS_BARN per barn`() {
-            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
-
-            val vilkårPassBarn = nyttVilkårsett.captured.finnVilkårAvType(VilkårType.PASS_BARN)
-            assertThat(vilkårPassBarn).hasSize(2)
-        }
-
-        @Test
-        fun `skal initiere automatisk verdi for ALDER_LAVERE_ENN_GRENSEVERDI`() {
-            vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
-
-            val vilkårPassBarn = nyttVilkårsett.captured.finnVilkårAvType(VilkårType.PASS_BARN)
-
-            val resultaterBarnUnder9år =
-                vilkårPassBarn.finnVurderingResultaterForBarn(barn.single { it.ident == barnUnder9år }.id)
-            assertThat(resultaterBarnUnder9år).containsOnlyOnce(AUTOMATISK_OPPFYLT)
-
-            val resultaterBarnOver10år =
-                vilkårPassBarn.finnVurderingResultaterForBarn(barn.single { it.ident == barnOver10år }.id)
-            assertThat(resultaterBarnOver10år).containsOnly(IKKE_TATT_STILLING_TIL)
-        }
     }
 
     @Test
@@ -275,23 +220,6 @@ internal class VilkårServiceTest {
 
         val erAlleVilkårOppfylt = vilkårService.erAlleVilkårOppfylt(behandlingId)
         assertThat(erAlleVilkårOppfylt).isFalse
-    }
-
-    @Test
-    fun `Skal opprette vilkår for nye barn`() {
-        val vilkårsett = lagVilkårsett(behandlingId, OPPFYLT)
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
-        every { barnService.finnBarnPåBehandling(behandlingId) } returns barn
-        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak()
-
-        val vilkårSlot = slot<List<Vilkår>>()
-
-        every { vilkårRepository.insertAll(capture(vilkårSlot)) } answers { vilkårSlot.captured }
-
-        vilkårService.hentEllerOpprettVilkårsvurdering(behandlingId)
-
-        assertThat(vilkårSlot.captured).hasSize(2)
-        assertThat(vilkårSlot.captured.map { it.barnId }).containsExactlyInAnyOrderElementsOf(barn.map { it.id })
     }
 
     @Nested
@@ -468,20 +396,6 @@ internal class VilkårServiceTest {
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }
     }
 
-    @Test
-    internal fun `behandlingen uten barn skal kaste feilmelding`() {
-        assertThatThrownBy {
-            opprettNyeVilkår(
-                behandlingId,
-                HovedregelMetadata(
-                    barn = emptyList(),
-                    behandling = behandling,
-                ),
-                Stønadstype.BARNETILSYN,
-            )
-        }.hasMessageContaining("Kan ikke opprette vilkår når ingen barn er knyttet til behandling")
-    }
-
     private fun lagVilkårsett(
         behandlingId: UUID,
         resultat: Vilkårsresultat = OPPFYLT,
@@ -515,15 +429,12 @@ internal class VilkårServiceTest {
     }
 
     private fun initiererVilkår(lagretVilkår: CapturingSlot<Vilkår>): Vilkår {
-        val vilkår =
-            opprettNyeVilkår(
-                behandlingId,
-                HovedregelMetadata(
-                    barn = barn,
-                    behandling = behandling,
-                ),
-                Stønadstype.BARNETILSYN,
-            ).first()
+        val vilkår = vilkår(
+            behandlingId = behandlingId,
+            resultat = Vilkårsresultat.IKKE_OPPFYLT,
+            delvilkår = ikkeOppfylteDelvilkårPassBarn(),
+            type = VilkårType.PASS_BARN,
+        )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(vilkår)
         every { vilkårRepository.update(capture(lagretVilkår)) } answers { it.invocation.args.first() as Vilkår }
