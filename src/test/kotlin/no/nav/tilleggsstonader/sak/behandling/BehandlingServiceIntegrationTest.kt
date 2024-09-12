@@ -149,7 +149,7 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
                     fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
                 )
-            }.hasMessage("Kan ikke opprette ny behandling når det finnes en førstegangsbehandling på vent")
+            }.hasMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
         }
 
         @Test
@@ -161,20 +161,22 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
                     fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
                 )
-            }.hasMessage("Kan ikke opprette ny behandling når det finnes en førstegangsbehandling på vent")
+            }.hasMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
         }
 
         @Test
-        internal fun `opprettBehandling er mulig hvis det finnes en revurdering på vent`() {
+        internal fun `opprettBehandling er ikke mulig hvis det finnes en revurdering på vent`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
             testoppsettService.lagre(behandling(fagsak, BehandlingStatus.FERDIGSTILT))
             testoppsettService.lagre(
                 behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT, type = BehandlingType.REVURDERING),
             )
-            behandlingService.opprettBehandling(
-                fagsak.id,
-                behandlingsårsak = behandlingÅrsak,
-            )
+            assertThatThrownBy {
+                behandlingService.opprettBehandling(
+                    fagsak.id,
+                    behandlingsårsak = behandlingÅrsak,
+                )
+            }.hasMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
         }
     }
 }
