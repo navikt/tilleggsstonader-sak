@@ -77,7 +77,9 @@ class FlyttBeløpsperioderTilVilkårController(
         vilkårPåBarnId: Map<UUID, List<Vilkår>>,
         dryRun: String,
     ) {
-        require(vilkår.opphavsvilkår!!.behandlingId == behandling.forrigeBehandlingId)
+        require(vilkår.opphavsvilkår!!.behandlingId == behandling.forrigeBehandlingId) {
+            "vilkår=${vilkår.id} opphavsbehandling=${vilkår.opphavsvilkår.behandlingId} er ikke lik ${behandling.forrigeBehandlingId}"
+        }
         val forrigeBarnId = finnForrigeBarnId(behandling, vilkår.barnId!!)
 
         if (forrigeBarnId == null) {
