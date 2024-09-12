@@ -4,23 +4,24 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.YearMonth
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
 
@@ -36,121 +37,55 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
     @Autowired
     lateinit var controller: FlyttBeløpsperioderTilVilkårController
 
-    val behandling = behandling(steg = StegType.BEREGNE_YTELSE)
+    val fagsak = fagsak()
+    val behandling = behandling(fagsak, status = BehandlingStatus.FERDIGSTILT)
+    val behandling2 = behandling(fagsak, steg = StegType.BEREGNE_YTELSE, forrigeBehandlingId = behandling.id)
     val barn = behandlingBarn(behandlingId = behandling.id)
+    val barn2 = behandlingBarn(behandlingId = behandling2.id)
+
+    val vilkår = vilkår(
+        behandlingId = behandling.id,
+        type = VilkårType.PASS_BARN,
+        resultat = Vilkårsresultat.OPPFYLT,
+        barnId = barn.id,
+        fom = LocalDate.of(2023, 1, 1),
+        tom = LocalDate.of(2024, 12, 31),
+        beløp = 1003,
+    )
+
+    val vilkår2 = vilkår(
+        behandlingId = behandling2.id,
+        type = VilkårType.PASS_BARN,
+        resultat = Vilkårsresultat.OPPFYLT,
+        barnId = barn2.id,
+        fom = null,
+        tom = null,
+        beløp = null,
+        opphavsvilkår = Opphavsvilkår(behandlingId = vilkår.behandlingId, LocalDateTime.now()),
+    )
 
     @BeforeEach
     fun setUp() {
-        testoppsettService.opprettBehandlingMedFagsak(behandling)
+        testoppsettService.lagreFagsak(fagsak)
+        testoppsettService.lagre(behandling)
+        testoppsettService.lagre(behandling2)
         barnRepository.insert(barn)
+        barnRepository.insert(barn2)
+
+        vilkårRepository.insert(vilkår)
+        vilkårRepository.insert(vilkår2)
     }
 
-    @Disabled
     @Test
     fun `skal oppdatere vilkår med utgift fra vedtak`() {
-        val fom = YearMonth.of(2023, 1)
-        val tom = YearMonth.of(2023, 2)
-        val utgift = 100
-        val vedtaksdata = VedtaksdataTilsynBarn(
-            utgifter = mapOf(
-                barn(
-                    barnId = barn.id,
-                    Utgift(fom, tom, utgift),
-                ),
-            ),
-        )
-        vedtakRepository.insert(innvilgetVedtak(behandlingId = behandling.id, vedtak = vedtaksdata))
-        val opprinneligVilkår = vilkårRepository.insert(
-            vilkår(behandlingId = behandling.id, barnId = barn.id, type = VilkårType.PASS_BARN),
-        )
-
         testWithBrukerContext {
-            controller.oppdaterVilkår()
+            controller.oppdaterVilkårSomManglerReferanseTilForrigeBehandling("false")
         }
 
-        val oppdatertVilkår = vilkårRepository.findByBehandlingId(behandling.id).single()
-        assertThat(oppdatertVilkår)
-            .usingRecursiveComparison()
-            .ignoringFields("fom", "tom", "utgift")
-            .isEqualTo(opprinneligVilkår)
-
-        assertThat(oppdatertVilkår.fom).isEqualTo(fom.atDay(1))
-        assertThat(oppdatertVilkår.tom).isEqualTo(tom.atEndOfMonth())
-        assertThat(oppdatertVilkår.utgift).isEqualTo(utgift)
-    }
-
-    @Disabled
-    @Test
-    fun `skal opprette nye vilkår dersom det finnes fler enn 1 utgift`() {
-        val fom = YearMonth.of(2023, 1)
-        val tom = YearMonth.of(2023, 2)
-        val utgift = 100
-        val vedtaksdata = VedtaksdataTilsynBarn(
-            utgifter = mapOf(
-                barn(
-                    barnId = barn.id,
-                    Utgift(fom, tom, utgift),
-                    Utgift(fom.plusYears(1), tom.plusYears(2), utgift + 1),
-                ),
-            ),
-        )
-        vedtakRepository.insert(innvilgetVedtak(behandlingId = behandling.id, vedtak = vedtaksdata))
-        val opprinneligVilkår = vilkårRepository.insert(
-            vilkår(behandlingId = behandling.id, barnId = barn.id, type = VilkårType.PASS_BARN),
-        )
-
-        testWithBrukerContext {
-            controller.oppdaterVilkår()
+        with(vilkårRepository.findByIdOrThrow(vilkår2.id)) {
+            assertThat(fom).isEqualTo(LocalDate.of(2023, 1, 1))
+            assertThat(tom).isEqualTo(LocalDate.of(2024, 12, 31))
+            assertThat(utgift).isEqualTo(1003)
         }
-
-        val oppdaterteVilkår = vilkårRepository.findByBehandlingId(behandling.id)
-        val oppdatertVilkår = oppdaterteVilkår.single { it.id == opprinneligVilkår.id }
-        val opprettetVilkår = oppdaterteVilkår.single { it.id != opprinneligVilkår.id }
-        with(oppdatertVilkår) {
-            assertThat(this)
-                .usingRecursiveComparison()
-                .ignoringFields("fom", "tom", "utgift")
-                .isEqualTo(opprinneligVilkår)
-
-            assertThat(this.fom).isEqualTo(fom.atDay(1))
-            assertThat(this.tom).isEqualTo(tom.atEndOfMonth())
-            assertThat(this.utgift).isEqualTo(utgift)
-        }
-        assertThat(opprettetVilkår)
-            .usingRecursiveComparison()
-            .ignoringFields("id", "fom", "tom", "utgift")
-            .isEqualTo(oppdatertVilkår)
-
-        assertThat(opprettetVilkår.fom).isEqualTo(fom.atDay(1).plusYears(1))
-        assertThat(opprettetVilkår.tom).isEqualTo(tom.atEndOfMonth().plusYears(2))
-        assertThat(opprettetVilkår.utgift).isEqualTo(101)
-    }
-
-    @Test
-    fun `skal oppdatere en behandling som er i steg vedtak som mangler vedtak til steg inngangsvilkår for å kunne legge in perioder og utgift på vilkår`() {
-        testWithBrukerContext {
-            controller.oppdaterVilkår()
-        }
-
-        assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
-    }
-
-    @Test
-    fun `skal ikke oppdatere behandling dersom behandling er henlagt, dermed avsluttet`() {
-        testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
-        testWithBrukerContext {
-            controller.oppdaterVilkår()
-        }
-
-        assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.BEREGNE_YTELSE)
-    }
-
-    @Test
-    fun `skal oppdatere en behandling som er i steg vedtak som mangler vedtak til steg inngangsvilkår for å kunne legge in perioder og beløp på vilkår`() {
-        testWithBrukerContext {
-            controller.oppdaterVilkår()
-        }
-
-        assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.VILKÅR)
     }
 }
