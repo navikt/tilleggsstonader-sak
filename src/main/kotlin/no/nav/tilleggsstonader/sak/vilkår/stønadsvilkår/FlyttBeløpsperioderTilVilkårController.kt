@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -27,7 +26,6 @@ import java.util.UUID
 @ProtectedWithClaims(issuer = "azuread")
 @Validated
 class FlyttBeløpsperioderTilVilkårController(
-    private val vedtakTilsynBarnVedtakRepository: TilsynBarnVedtakRepository,
     private val jdbcTemplate: NamedParameterJdbcTemplate,
     private val behandlingRepository: BehandlingRepository,
     private val vilkårRepository: VilkårRepository,
@@ -97,6 +95,7 @@ class FlyttBeløpsperioderTilVilkårController(
     private fun getBehandlingerUnderArbeid(oppfylteVilkåtUtenFomOgTom: List<Vilkår>) =
         behandlingRepository.findAllById(oppfylteVilkåtUtenFomOgTom.map { it.behandlingId }.toSet())
             .filter { it.status in statusUnderArbeid }
+            .filter { it.forrigeBehandlingId != null }
             .associateBy { it.id }
 
     private fun oppdaterVilkår(vilkår: Vilkår, forrigeVilkår: Vilkår, dryRun: String) {

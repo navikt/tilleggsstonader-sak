@@ -10,8 +10,6 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -24,9 +22,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
-
-    @Autowired
-    lateinit var vedtakRepository: TilsynBarnVedtakRepository
 
     @Autowired
     lateinit var vilkårRepository: VilkårRepository
