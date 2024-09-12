@@ -33,7 +33,7 @@ object GrunnlagsdataUtil {
     fun lagGrunnlagsdataBarn(
         ident: String = "1",
         navn: Navn = lagNavn(),
-        fødselsdato: LocalDate = LocalDate.of(2024, 6, 4),
+        fødselsdato: LocalDate? = LocalDate.of(2024, 6, 4),
         dødsdato: LocalDate? = null,
     ) = GrunnlagBarn(
         ident = ident,

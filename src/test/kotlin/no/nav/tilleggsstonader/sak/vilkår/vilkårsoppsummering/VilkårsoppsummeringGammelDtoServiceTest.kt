@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.grunnlagsdataDomain
 import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.grunnlagBarn
 import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.mockVilkårGrunnlagDto
 import no.nav.tilleggsstonader.sak.util.vilkår
@@ -26,14 +28,21 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.UUID
 
-class VilkårsoppsummeringDtoServiceTest {
+class VilkårsoppsummeringGammelDtoServiceTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
     val stønadsperiodeService = mockk<StønadsperiodeService>()
     val vilkårService = mockk<VilkårService>()
     val behandlingFaktaService = mockk<BehandlingFaktaService>()
+    val grunnlagsdataService = mockk<GrunnlagsdataService>()
 
     val vilkårsoppsummeringService =
-        VilkårsoppsummeringService(vilkårperiodeService, stønadsperiodeService, vilkårService, behandlingFaktaService)
+        VilkårsoppsummeringService(
+            vilkårperiodeService,
+            stønadsperiodeService,
+            vilkårService,
+            behandlingFaktaService,
+            grunnlagsdataService,
+        )
 
     val fom = LocalDate.now()
     val tom = LocalDate.now().plusMonths(1)
@@ -79,6 +88,7 @@ class VilkårsoppsummeringDtoServiceTest {
             )
             every { stønadsperiodeService.hentStønadsperioder(any()) } returns listOf(stønadsperiode)
             every { vilkårService.hentPassBarnVilkår(any()) } returns listOf(vilkårPassBarn)
+            every { grunnlagsdataService.hentGrunnlagsdata(any()) } returns grunnlagsdataDomain()
         }
 
         @Test
