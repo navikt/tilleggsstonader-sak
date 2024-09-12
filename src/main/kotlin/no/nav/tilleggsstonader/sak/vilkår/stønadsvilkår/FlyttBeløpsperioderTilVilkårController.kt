@@ -4,6 +4,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
@@ -40,7 +41,7 @@ class FlyttBeløpsperioderTilVilkårController(
     fun oppdaterVilkår() {
         utførEndringSomSystem()
         val alleVedtak = vedtakTilsynBarnVedtakRepository.findAll()
-        // alleVedtak.forEach { håndterVedtak(it) }
+        alleVedtak.forEach { håndterVedtak(it) }
 
         oppdaterBehandlingerSomErPåVedtakUtenVedtak(alleVedtak)
     }
@@ -60,6 +61,9 @@ class FlyttBeløpsperioderTilVilkårController(
             if (utgifter.isNotEmpty()) {
                 val vilkår = vilkårForBehandling[barnId]
                     ?: error("Finner ikke vilkår for barnId=$barnId behandling=$behandlingId")
+                feilHvis(vilkår.fom != null || vilkår.tom != null) {
+                    "Vilkår har allerede fom eller tom"
+                }
                 oppdaterVilkårMedPeriode(vilkår, utgifter)
                 leggTilNyeVilkårForAndreUtgifter(vilkår, utgifter.drop(1))
             }
@@ -101,6 +105,7 @@ class FlyttBeløpsperioderTilVilkårController(
         vilkår: Vilkår,
         utgifter: List<Utgift>,
     ) {
+        logger.info("Oppretter ${utgifter.size} nye vilkår for behandling=${vilkår.behandlingId} vilkår=${vilkår.id}")
         utgifter.forEach {
             jdbcTemplate.update(
                 """
