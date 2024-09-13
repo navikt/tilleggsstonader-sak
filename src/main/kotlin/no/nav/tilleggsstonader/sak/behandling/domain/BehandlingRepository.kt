@@ -174,4 +174,15 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
         personidenter: Collection<String>,
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     ): List<Pair<String, UUID>>
+
+    fun findAllByStatusAndResultatIn(status: BehandlingStatus, resultat: List<BehandlingResultat>): List<Behandling>
+
+    @Query(
+        """
+            SELECT b.*
+            FROM gjeldende_iverksatte_behandlinger b
+            WHERE b.stonadstype = :stønadstype
+        """,
+    )
+    fun finnGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype = Stønadstype.BARNETILSYN): List<Behandling>
 }
