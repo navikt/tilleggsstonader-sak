@@ -8,6 +8,7 @@ on:
       - '**/*.yml'
       - '**/*.json'
       - '**/*.md'
+      - '.gitignore'
   pull_request:
     branches: [ "main" ]
     paths-ignore:
@@ -15,6 +16,7 @@ on:
       - '**/*.yml'
       - '**/*.json'
       - '**/*.md'
+      - '.gitignore'
   schedule:
     - cron: '42 13 * * 3'
 
