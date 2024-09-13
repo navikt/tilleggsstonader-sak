@@ -1,8 +1,11 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
+import com.sun.org.slf4j.internal.LoggerFactory
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
+import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -22,19 +25,20 @@ class OppfølgingService(
     private val fagsakService: FagsakService,
 ) {
 
+    val logger = LoggerFactory.getLogger(javaClass)
+
+    /**
+     * Hent alle behandlinger som er iverksatt og sjekk om det er stønadsperioder som må kontrolleres.
+     *
+     * Hent aktiviteter og sjekk om det er aktiviteter som overlapper stønadsperiodene.
+     *
+     * Hent ytelsesperioder og gjør det samme
+     *
+     * Ignorer aktivitetestypene, og målgruppene som vi ikke henter. (Reel arbeidssøker)
+     *
+     */
     fun hentBehandlingerForOppfølging(): List<BehandlingForOppfølgingDto> {
         val behandlingerMedMuligLøpendePerioder = behandlingRepository.finnGjeldendeIverksatteBehandlinger()
-
-        /**
-         * Hent aktiviteter og sjekk om det finnes "opphør" i perioder som har blitt brukt. Dvs hvis man har en stønadsperiode med Tiltak 01.05-31.05 og man ikke finner noe tiltak for overlapper med denne perioden, så vil det kunne påvirke vedtaksperioden.
-         *
-         * Hvis det er type reell arbeidsssøker så trenger man ikke å verifisere noe?
-         *
-         * Henter ytelsesperioder og gjør det samme
-         *
-         * Hvis det er en type ytelse(målgruppe) som vi ikke henter, så kan man ignore den?
-         *
-         */
         return behandlingerMedMuligLøpendePerioder.mapNotNull { behandling ->
             val fagsak = fagsakService.hentFagsak(behandling.fagsakId)
 
@@ -64,33 +68,38 @@ class OppfølgingService(
         fagsak: Fagsak,
         registerAktivitet: List<AktivitetArenaDto>
     ): Boolean {
+        fun perioderErSammenhengende(
+            a: ArenaAktivitetPeriode,
+            b: ArenaAktivitetPeriode
+        ) = a.tom.plusDays(1) == b.fom
+
         return when (stønadsperiode.aktivitet) {
-            AktivitetType.REELL_ARBEIDSSØKER -> {
-                false
-            }
-
-            AktivitetType.INGEN_AKTIVITET -> {
-                error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
-            }
-
+            AktivitetType.REELL_ARBEIDSSØKER -> false
+            AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
             AktivitetType.TILTAK -> {
                 val tiltak = registerAktivitet
-                    .filter { it.tom!! >= stønadsperiode.fom && it.fom!! <= stønadsperiode.tom }
-                    .filterNot { it.erUtdanning ?: false || it.status == StatusAktivitet.AVBRUTT || it.status == StatusAktivitet.OPPHØRT }
+                    .asSequence()
+                    .filter { tiltakHarRelevantStatus(it) }
+                    .filterNot { tiltakErUtdanning(it) }
+                    .mapNotNull { mapTilPeriode(it) }
+                    .filter { it.overlapper(stønadsperiode) }
                     .sortedBy { it.fom }
-                    .slåSammenSammenhengende()
+                    .toList()
+                    .mergeSammenhengende { a, b -> a.overlapper(b) || perioderErSammenhengende(a, b) }
 
-                val stønadsperiodeHarOverlappendeTiltak =
-                    tiltak.any { it.fom <= stønadsperiode.fom && it.tom >= stønadsperiode.tom }
+                val stønadsperiodeHarOverlappendeTiltak = tiltak.any { it.inneholder(stønadsperiode) }
                 !stønadsperiodeHarOverlappendeTiltak
             }
-
             AktivitetType.UTDANNING -> {
                 val utdanning = registerAktivitet
-                    .filter { it.tom!! >= stønadsperiode.fom && it.fom!! <= stønadsperiode.tom }
-                    .filter { it.erUtdanning ?: false && it.status != StatusAktivitet.AVBRUTT && it.status != StatusAktivitet.OPPHØRT }
+                    .asSequence()
+                    .filter { tiltakHarRelevantStatus(it) }
+                    .filter { tiltakErUtdanning(it)}
+                    .mapNotNull { mapTilPeriode(it) }
+                    .filter { it.overlapper(stønadsperiode) }
                     .sortedBy { it.fom }
-                    .slåSammenSammenhengende()
+                    .toList()
+                    .mergeSammenhengende { a, b -> a.overlapper(b) || perioderErSammenhengende(a, b) }
 
                 val stønadsperiodeHarOverlappendeUtdanning =
                     utdanning.any { it.fom <= stønadsperiode.fom && it.tom >= stønadsperiode.tom }
@@ -98,28 +107,24 @@ class OppfølgingService(
             }
         }
     }
+
+    private fun mapTilPeriode(aktivitet: AktivitetArenaDto): ArenaAktivitetPeriode? {
+        if(aktivitet.fom == null || aktivitet.tom == null) {
+            logger.warn("Aktivitet med id=${aktivitet.id} mangler fom eller tom dato: ${aktivitet.fom} - ${aktivitet.tom}")
+            return null
+        }
+        return ArenaAktivitetPeriode(aktivitet.fom!!, aktivitet.tom!!)
+    }
+
+    private fun tiltakHarRelevantStatus(it: AktivitetArenaDto) =
+        it.status != StatusAktivitet.AVBRUTT && it.status != StatusAktivitet.OPPHØRT
+
+    private fun tiltakErUtdanning(it: AktivitetArenaDto) = it.erUtdanning ?: false
 }
 
-data class ArenaAktivitetPeriode(val fom: LocalDate, val tom: LocalDate)
-
-private fun List<AktivitetArenaDto>.slåSammenSammenhengende(): List<ArenaAktivitetPeriode> =
-    this.fold(mutableListOf()) { acc, entry ->
-        val last = acc.lastOrNull()
-
-        if (last == null) {
-            acc.add(ArenaAktivitetPeriode(entry.fom!!, entry.tom!!))
-        } else {
-            // Hvis last og entry overlapper eller er sammenhengende: slå sammen til en periode
-            val overlapper = !(last.tom < entry.fom || last.fom > entry.tom)
-            val erSammenhengende = last.tom.plusDays(1) == entry.fom
-
-            if (overlapper || erSammenhengende) {
-                acc.removeLast()
-                acc.add(ArenaAktivitetPeriode(minOf(last.fom, entry.fom!!), maxOf(last.tom, entry.tom!!)))
-            } else {
-                acc.add(ArenaAktivitetPeriode(entry.fom!!, entry.tom!!))
-            }
-        }
-
-        acc
+data class ArenaAktivitetPeriode(override val fom: LocalDate, override val tom: LocalDate) : Periode<LocalDate>,
+    Mergeable<LocalDate, ArenaAktivitetPeriode> {
+    override fun merge(other: ArenaAktivitetPeriode): ArenaAktivitetPeriode {
+        return ArenaAktivitetPeriode(minOf(fom, other.fom), maxOf(tom, other.tom))
     }
+}
