@@ -47,7 +47,7 @@ class OppfølgingService(
             val registerAktivitet = aktivitetService.hentAktiviteter(
                 fagsak.fagsakPersonId,
                 stønadsperioder.first().fom,
-                stønadsperioder.last().tom
+                stønadsperioder.last().tom,
             )
             val stønadsperioderSomMåSjekkes =
                 stønadsperioder.filterNot { stønadsperiodeMåKontrolleres(it, fagsak, registerAktivitet) }
@@ -55,7 +55,7 @@ class OppfølgingService(
             if (stønadsperioderSomMåSjekkes.isNotEmpty()) {
                 BehandlingForOppfølgingDto(
                     behandling.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId),
-                    stønadsperioderSomMåSjekkes
+                    stønadsperioderSomMåSjekkes,
                 )
             } else {
                 null
@@ -66,11 +66,11 @@ class OppfølgingService(
     fun stønadsperiodeMåKontrolleres(
         stønadsperiode: StønadsperiodeDto,
         fagsak: Fagsak,
-        registerAktivitet: List<AktivitetArenaDto>
+        registerAktivitet: List<AktivitetArenaDto>,
     ): Boolean {
         fun perioderErSammenhengende(
             a: ArenaAktivitetPeriode,
-            b: ArenaAktivitetPeriode
+            b: ArenaAktivitetPeriode,
         ) = a.tom.plusDays(1) == b.fom
 
         return when (stønadsperiode.aktivitet) {
@@ -94,7 +94,7 @@ class OppfølgingService(
                 val utdanning = registerAktivitet
                     .asSequence()
                     .filter { tiltakHarRelevantStatus(it) }
-                    .filter { tiltakErUtdanning(it)}
+                    .filter { tiltakErUtdanning(it) }
                     .mapNotNull { mapTilPeriode(it) }
                     .filter { it.overlapper(stønadsperiode) }
                     .sortedBy { it.fom }
@@ -109,7 +109,7 @@ class OppfølgingService(
     }
 
     private fun mapTilPeriode(aktivitet: AktivitetArenaDto): ArenaAktivitetPeriode? {
-        if(aktivitet.fom == null || aktivitet.tom == null) {
+        if (aktivitet.fom == null || aktivitet.tom == null) {
             logger.warn("Aktivitet med id=${aktivitet.id} mangler fom eller tom dato: ${aktivitet.fom} - ${aktivitet.tom}")
             return null
         }
@@ -122,7 +122,8 @@ class OppfølgingService(
     private fun tiltakErUtdanning(it: AktivitetArenaDto) = it.erUtdanning ?: false
 }
 
-data class ArenaAktivitetPeriode(override val fom: LocalDate, override val tom: LocalDate) : Periode<LocalDate>,
+data class ArenaAktivitetPeriode(override val fom: LocalDate, override val tom: LocalDate) :
+    Periode<LocalDate>,
     Mergeable<LocalDate, ArenaAktivitetPeriode> {
     override fun merge(other: ArenaAktivitetPeriode): ArenaAktivitetPeriode {
         return ArenaAktivitetPeriode(minOf(fom, other.fom), maxOf(tom, other.tom))

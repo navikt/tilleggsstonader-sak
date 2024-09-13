@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
-
 @RestController
 @RequestMapping(path = ["/api/oppfoelging"])
 @ProtectedWithClaims(issuer = "azuread")
@@ -20,14 +19,14 @@ import java.util.*
 class OppfølgingController(
     private val tilgangService: TilgangService,
     private val oppfølgingService: OppfølgingService,
-    private val unleashService: UnleashService
+    private val unleashService: UnleashService,
 ) {
 
     @GetMapping("behandlinger")
     fun hentBehandlingerForOppfølging(): List<BehandlingForOppfølgingDto> {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
 
-        feilHvisIkke(unleashService.isEnabled(Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING)){
+        feilHvisIkke(unleashService.isEnabled(Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING)) {
             "Feature toggle ${Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING} er ikke aktivert"
         }
 

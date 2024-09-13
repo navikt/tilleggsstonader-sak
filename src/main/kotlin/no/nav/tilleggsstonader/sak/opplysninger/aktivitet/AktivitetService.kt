@@ -18,11 +18,10 @@ class AktivitetService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-
     fun hentAktiviteter(
         fagsakPersonId: FagsakPersonId,
         fom: LocalDate = osloDateNow().minusYears(3),
-        tom: LocalDate = osloDateNow().plusYears(1)
+        tom: LocalDate = osloDateNow().plusYears(1),
     ): List<AktivitetArenaDto> {
         val ident = fagsakPersonService.hentAktivIdent(fagsakPersonId)
         return aktivitetClient.hentAktiviteter(
