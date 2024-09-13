@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
+import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerOrganisasjonDto
+import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerPersonDto
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerUtil.validerUnikeBrevmottakere
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -30,6 +32,7 @@ class BrevmottakereService(
             }
         }
         brevmottakereDto.personer.forEach {
+            fjernMottakereIkkeIDto(brevmottakereDto, behandlingId)
             val brevmottaker = brevmottakereRepository.findByIdOrNull(it.id)
 
             if (brevmottaker != null) {
@@ -38,8 +41,6 @@ class BrevmottakereService(
                 lagreNyBrevmottakerPerson(behandlingId, it)
             }
         }
-
-        fjernMottakereIkkeIDto(brevmottakereDto, behandlingId)
     }
 
     @Transactional
@@ -59,26 +60,27 @@ class BrevmottakereService(
         brevmottakereDto: BrevmottakereDto,
         behandlingId: UUID,
     ) {
-        brevmottakereDto.personer.map { it.id } + brevmottakereDto.organisasjoner.map { it.id }.let { nyeBrevmottakere ->
-            brevmottakereRepository.findByBehandlingId(behandlingId)
-                .filter { it.id !in nyeBrevmottakere }
-                .forEach { brevmottakereRepository.deleteById(it.id) }
-        }
+        val nyeBrevmottakere = brevmottakereDto.personer.map { it.id } + brevmottakereDto.organisasjoner.map { it.id }
+        brevmottakereRepository.findByBehandlingId(behandlingId)
+            .filter { it.id !in nyeBrevmottakere }
+            .forEach { brevmottakereRepository.deleteById(it.id) }
     }
 
     private fun validerBehandlingKanRedigeres(behandlingId: UUID) {
         brukerfeilHvis(behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke oppdetere brevmottakere fordi behandling er låst for redigering."
+            "Kan ikke oppdatere brevmottakere fordi behandling er låst for redigering."
         }
     }
 
     private fun lagreNyBrevmottakerPerson(behandlingId: UUID, it: BrevmottakerPersonDto) {
         brevmottakereRepository.insert(
             Brevmottaker(
+                id = it.id,
                 behandlingId = behandlingId,
-                ident = it.personIdent,
-                mottakerRolle = it.mottakerRolle,
+                mottakerRolle = MottakerRolle.valueOf(it.mottakerRolle.name),
                 mottakerType = MottakerType.PERSON,
+                ident = it.personIdent,
+                mottakerNavn = it.navn,
             ),
         )
     }
@@ -86,11 +88,13 @@ class BrevmottakereService(
     private fun lagreNyOrganisasjonsmottaker(behandlingId: UUID, it: BrevmottakerOrganisasjonDto) {
         brevmottakereRepository.insert(
             Brevmottaker(
+                id = it.id,
                 behandlingId = behandlingId,
-                ident = it.organisasjonsnummer,
-                mottakerRolle = it.mottakerRolle,
+                mottakerRolle = MottakerRolle.FULLMAKT,
                 mottakerType = MottakerType.ORGANISASJON,
-                navnHosOrganisasjon = it.navnHosOrganisasjon,
+                ident = it.organisasjonsnummer,
+                mottakerNavn = it.navnHosOrganisasjon,
+                organisasjonsNavn = it.organisasjonsnavn,
             ),
         )
     }
@@ -98,8 +102,10 @@ class BrevmottakereService(
     private fun oppdaterBrevmottakerPerson(brevmottaker: Brevmottaker, it: BrevmottakerPersonDto) {
         brevmottakereRepository.update(
             brevmottaker.copy(
+                mottakerRolle = MottakerRolle.valueOf(it.mottakerRolle.name),
+                mottakerType = MottakerType.PERSON,
                 ident = it.personIdent,
-                mottakerRolle = it.mottakerRolle,
+                mottakerNavn = it.navn,
             ),
         )
     }
@@ -107,9 +113,9 @@ class BrevmottakereService(
     private fun oppdaterOrganisasjonsmottaker(brevmottaker: Brevmottaker, it: BrevmottakerOrganisasjonDto) {
         brevmottakereRepository.update(
             brevmottaker.copy(
-                mottakerRolle = it.mottakerRolle,
                 ident = it.organisasjonsnummer,
-                navnHosOrganisasjon = it.navnHosOrganisasjon,
+                mottakerNavn = it.navnHosOrganisasjon,
+                organisasjonsNavn = it.organisasjonsnavn,
             ),
         )
     }

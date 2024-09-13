@@ -98,7 +98,7 @@ class JournalførVedtaksbrevTask(
         },
         navn = when (brevmottaker.mottakerType) {
             MottakerType.PERSON -> null
-            MottakerType.ORGANISASJON -> brevmottaker.navnHosOrganisasjon
+            MottakerType.ORGANISASJON -> brevmottaker.mottakerNavn
         },
     )
 
