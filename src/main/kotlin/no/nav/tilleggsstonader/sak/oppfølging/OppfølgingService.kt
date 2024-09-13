@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
-import com.sun.org.slf4j.internal.LoggerFactory
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
@@ -14,6 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
