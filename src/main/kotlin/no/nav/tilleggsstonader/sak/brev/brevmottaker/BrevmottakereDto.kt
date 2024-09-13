@@ -1,34 +1,24 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
-import java.util.UUID
+import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerOrganisasjonDto
+import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerPersonDto
+import no.nav.tilleggsstonader.kontrakter.brevmottaker.MottakerRolle
 
 data class BrevmottakereDto(
     val personer: List<BrevmottakerPersonDto>,
     val organisasjoner: List<BrevmottakerOrganisasjonDto>,
 )
 
-data class BrevmottakerPersonDto(
-    val id: UUID,
-    val personIdent: String,
-    val mottakerRolle: MottakerRolle,
-)
-
-data class BrevmottakerOrganisasjonDto(
-    val id: UUID,
-    val organisasjonsnummer: String,
-    val navnHosOrganisasjon: String,
-    val mottakerRolle: MottakerRolle,
-)
-
 fun Brevmottaker.tilPersonDto(): BrevmottakerPersonDto =
-    BrevmottakerPersonDto(id = id, personIdent = ident, mottakerRolle = mottakerRolle)
+    BrevmottakerPersonDto(id = id, personIdent = ident, mottakerRolle = MottakerRolle.valueOf(mottakerRolle.name), navn = mottakerNavn)
 
 fun Brevmottaker.tilOrganisasjonDto(): BrevmottakerOrganisasjonDto =
     BrevmottakerOrganisasjonDto(
         id = id,
         organisasjonsnummer = ident,
-        navnHosOrganisasjon = navnHosOrganisasjon ?: error("Navn hos organisasjon er påkrevd"),
-        mottakerRolle = mottakerRolle,
+        navnHosOrganisasjon = mottakerNavn ?: error("Navn hos organisasjon er påkrevd"),
+        organisasjonsnavn = organisasjonsNavn.orEmpty(),
+
     )
 
 fun List<Brevmottaker>.tilBrevmottakereDto(): BrevmottakereDto =

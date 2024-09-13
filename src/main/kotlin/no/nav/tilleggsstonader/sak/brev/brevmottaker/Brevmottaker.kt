@@ -13,7 +13,8 @@ data class Brevmottaker(
     val mottakerRolle: MottakerRolle,
     val mottakerType: MottakerType,
     val ident: String,
-    val navnHosOrganisasjon: String? = null,
+    val mottakerNavn: String? = null,
+    val organisasjonsNavn: String? = null,
 
     val journalpostId: String? = null,
     val bestillingId: String? = null,
@@ -22,7 +23,7 @@ data class Brevmottaker(
     val sporbar: Sporbar = Sporbar(),
 ) {
     init {
-        feilHvis(mottakerType == MottakerType.ORGANISASJON && navnHosOrganisasjon.isNullOrBlank()) {
+        feilHvis(mottakerType == MottakerType.ORGANISASJON && mottakerNavn.isNullOrBlank()) {
             "Navn hos organisasjon er påkrevd"
         }
 
