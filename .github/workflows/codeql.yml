@@ -1,9 +1,20 @@
 name: "CodeQL"
+
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '**/*.json'
+      - '**/*.md'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '**/*.json'
+      - '**/*.md'
   schedule:
     - cron: '42 13 * * 3'
 
@@ -14,14 +25,8 @@ jobs:
     permissions:
       # required for all workflows
       security-events: write
-
       # required to fetch internal or private CodeQL packs
       packages: read
-
-      # only required for workflows in private repositories
-      actions: read
-      contents: read
-
     steps:
       - uses: actions/checkout@v4
 
