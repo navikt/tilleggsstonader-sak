@@ -110,7 +110,7 @@ internal class OpprettBehandlingUtilTest {
 
             assertThatThrownBy {
                 validerKanOppretteNyBehandling(BehandlingType.FØRSTEGANGSBEHANDLING, listOf(behandling))
-            }.hasMessage("Kan ikke opprette ny behandling når det finnes en førstegangsbehandling på vent")
+            }.hasMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
         }
 
         @Test
@@ -123,7 +123,7 @@ internal class OpprettBehandlingUtilTest {
 
             assertThatThrownBy {
                 validerKanOppretteNyBehandling(BehandlingType.FØRSTEGANGSBEHANDLING, listOf(behandling))
-            }.hasMessage("Kan ikke opprette ny behandling når det finnes en førstegangsbehandling på vent")
+            }.hasMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
         }
     }
 
@@ -164,7 +164,8 @@ internal class OpprettBehandlingUtilTest {
                     type = BehandlingType.REVURDERING,
                 ),
             )
-            validerKanOppretteNyBehandling(BehandlingType.REVURDERING, behandlinger)
+            assertThatThrownBy { validerKanOppretteNyBehandling(BehandlingType.REVURDERING, behandlinger) }
+                .hasMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
         }
 
         @Test
