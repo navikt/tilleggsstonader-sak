@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering
 
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering.VilkårsoppsummeringUtil.harBarnUnder2ÅrIStønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering.VilkårsoppsummeringUtil.utledAlderNårStønadsperiodeBegynner
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -18,6 +20,7 @@ class VilkårsoppsummeringService(
     private val stønadsperiodeService: StønadsperiodeService,
     private val vilkårService: VilkårService,
     private val behandlingFaktaService: BehandlingFaktaService,
+    private val grunnlagsdataService: GrunnlagsdataService,
 ) {
 
     fun hentVilkårsoppsummering(behandlingId: UUID): VilkårsoppsummeringDto {
@@ -26,11 +29,22 @@ class VilkårsoppsummeringService(
         val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
 
         return VilkårsoppsummeringDto(
+            stønadsperioder = stønadsperioder,
+            visVarselKontantstøtte = visVarselForKontantstøtte(behandlingId, stønadsperioder),
+
             aktivitet = vilkårperioder.aktiviteter.any { it.resultat == ResultatVilkårperiode.OPPFYLT },
             målgruppe = vilkårperioder.målgrupper.any { it.resultat == ResultatVilkårperiode.OPPFYLT },
             stønadsperiode = stønadsperioder.isNotEmpty(),
             passBarn = oppsummeringPassBarnVilkår(behandlingId, stønadsperioder),
         )
+    }
+
+    private fun visVarselForKontantstøtte(behandlingId: UUID, stønadsperioder: List<StønadsperiodeDto>): Boolean {
+        if (stønadsperioder.isEmpty()) {
+            return false
+        }
+        val barn = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag.barn
+        return harBarnUnder2ÅrIStønadsperiode(barn, stønadsperioder)
     }
 
     private fun oppsummeringPassBarnVilkår(

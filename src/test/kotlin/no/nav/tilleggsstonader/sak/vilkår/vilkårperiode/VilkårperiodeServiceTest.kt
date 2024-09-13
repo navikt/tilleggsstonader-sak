@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.AktivitetClientConfig.Companion.resetMock
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetClient
@@ -742,7 +743,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `veileder skal ikke hentes då det opprettes grunnlag når behandlingStatus=OPPRETTET`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val exception = catchThrowableOfType<Feil> {
+            val exception = catchThrowableOfType<ApiFeil> {
                 testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
                     vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
                 }
@@ -755,7 +756,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
 
-            val exception = catchThrowableOfType<Feil> {
+            val exception = catchThrowableOfType<ApiFeil> {
                 testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
                     vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
                 }
