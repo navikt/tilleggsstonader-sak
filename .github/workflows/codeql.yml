@@ -38,10 +38,7 @@ jobs:
           build-mode: manual
 
       - name: Compile for CodeQL scan
-        run: ./gradlew build -PskipLint -x test --no-daemon
-        env:
-          JAVA_OPTS: "-Xmx4g"
-          GRADLE_OPTS: "-Xmx4g"
+        run: ./gradlew build -x :check -x :cyclonedxBom
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
