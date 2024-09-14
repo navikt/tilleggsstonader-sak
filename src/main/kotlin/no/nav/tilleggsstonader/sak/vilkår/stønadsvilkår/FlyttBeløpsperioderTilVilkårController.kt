@@ -55,18 +55,26 @@ class FlyttBeløpsperioderTilVilkårController(
         val oppfylteVilkåtUtenFomOgTom = alleVilkår
             .filter { it.fom == null && it.tom == null && it.utgift == null }
             .filter { it.resultat == Vilkårsresultat.OPPFYLT }
-            .filter { it.opphavsvilkår != null }
 
         val behandlingerUnderArbeid = getBehandlingerUnderArbeid(oppfylteVilkåtUtenFomOgTom)
 
-        oppfylteVilkåtUtenFomOgTom.forEach { vilkår ->
-            val behandling = behandlingerUnderArbeid[vilkår.behandlingId]
-            if (behandling == null) {
-                logger.info("Ignorerer vilkår på behandling=${vilkår.behandlingId} då den sannsynligvis ikke er under arbeid")
-            } else {
-                håndterVilkår(vilkår, behandling, vilkårPåBarnId, dryRun)
+        oppfylteVilkåtUtenFomOgTom
+            .groupBy { it.barnId }
+            .mapNotNull {
+                if (it.value.size == 1) {
+                    it.value.single()
+                } else {
+                    logger.info("Vilkår for barn=${it.key} har flere vilkår, ignorerer")
+                    null
+                }
+            }.forEach { vilkår ->
+                val behandling = behandlingerUnderArbeid[vilkår.behandlingId]
+                if (behandling == null) {
+                    logger.info("Ignorerer vilkår på behandling=${vilkår.behandlingId} då den sannsynligvis ikke er under arbeid")
+                } else {
+                    håndterVilkår(vilkår, behandling, vilkårPåBarnId, dryRun)
+                }
             }
-        }
     }
 
     private fun håndterVilkår(
@@ -75,17 +83,21 @@ class FlyttBeløpsperioderTilVilkårController(
         vilkårPåBarnId: Map<UUID, List<Vilkår>>,
         dryRun: String,
     ) {
-        require(vilkår.opphavsvilkår!!.behandlingId == behandling.forrigeBehandlingId) {
-            "vilkår=${vilkår.id} opphavsbehandling=${vilkår.opphavsvilkår.behandlingId} er ikke lik ${behandling.forrigeBehandlingId}"
-        }
         val forrigeBarnId = finnForrigeBarnId(behandling, vilkår.barnId!!)
 
         if (forrigeBarnId == null) {
             logger.info("Finner ikke match til barn=${vilkår.barnId}")
         } else {
-            val forrigeVilkår = vilkårPåBarnId.getValue(forrigeBarnId).single()
+            val forrigeVilkår = vilkårPåBarnId.getValue(forrigeBarnId).let {
+                if (it.size == 1) {
+                    it.single()
+                } else {
+                    logger.info("Vilkår=${vilkår.id} har flere vilkår i forrige behandling, mapper ikke")
+                    return
+                }
+            }
             if (forrigeVilkår.fom == null || forrigeVilkår.tom == null || forrigeVilkår.utgift == null) {
-                logger.info("ForrigeVilkår=${forrigeVilkår.id} har ikke perioder")
+                logger.info("Vilkår=${vilkår.id} med forrigeVilkår=${forrigeVilkår.id} har ikke perioder")
             } else {
                 oppdaterVilkår(vilkår, forrigeVilkår, dryRun)
             }
