@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -55,7 +56,7 @@ class FlyttBeløpsperioderTilVilkårController(
         val vilkårPåBarnId = alleVilkår.groupBy { it.barnId!! }
         val oppfylteVilkåtUtenFomOgTom = alleVilkår
             .filter { it.fom == null && it.tom == null && it.utgift == null }
-            .filter { it.resultat == Vilkårsresultat.OPPFYLT }
+            .filter { it.resultat == Vilkårsresultat.IKKE_TATT_STILLING_TIL }
 
         val behandlingerUnderArbeid = getBehandlingerUnderArbeid(oppfylteVilkåtUtenFomOgTom)
 
@@ -70,9 +71,7 @@ class FlyttBeløpsperioderTilVilkårController(
                 }
             }.forEach { vilkår ->
                 val behandling = behandlingerUnderArbeid[vilkår.behandlingId]
-                if (behandling == null) {
-                    logger.info("Ignorerer vilkår på behandling=${vilkår.behandlingId} då den sannsynligvis ikke er under arbeid")
-                } else {
+                if (behandling != null) {
                     håndterVilkår(vilkår, behandling, vilkårPåBarnId, dryRun)
                 }
             }
@@ -97,6 +96,10 @@ class FlyttBeløpsperioderTilVilkårController(
                     return
                 }
             }
+            if (forrigeVilkår.resultat != Vilkårsresultat.OPPFYLT) {
+                logger.info("Vilkår=${vilkår.id} forrige vilkår har ikke resultat oppfylt")
+                return
+            }
             if (forrigeVilkår.fom == null || forrigeVilkår.tom == null || forrigeVilkår.utgift == null) {
                 logger.info("Vilkår=${vilkår.id} med forrigeVilkår=${forrigeVilkår.id} har ikke perioder")
             } else {
@@ -116,12 +119,19 @@ class FlyttBeløpsperioderTilVilkårController(
         logger.info("Oppdaterer vilkår=${vilkår.id} med data fra ${forrigeVilkår.id}")
         if (dryRun == "false") {
             jdbcTemplate.update(
-                "UPDATE vilkar SET fom=:fom, tom=:tom, utgift=:utgift WHERE id=:id",
+                "UPDATE vilkar SET fom=:fom, tom=:tom, utgift=:utgift, delvilkar=:delvilkar::json," +
+                    "resultat=:resultat, opphavsvilkaar_behandling_id=:opphavsvilkaar_behandling_id," +
+                    "opphavsvilkaar_vurderingstidspunkt=:opphavsvilkaar_vurderingstidspunkt" +
+                    " WHERE id=:id",
                 mapOf(
                     "id" to vilkår.id,
                     "fom" to forrigeVilkår.fom,
                     "tom" to forrigeVilkår.tom,
                     "utgift" to forrigeVilkår.utgift,
+                    "delvilkar" to objectMapper.writeValueAsString(forrigeVilkår.delvilkårsett),
+                    "resultat" to forrigeVilkår.resultat.name,
+                    "opphavsvilkaar_behandling_id" to forrigeVilkår.behandlingId,
+                    "opphavsvilkaar_vurderingstidspunkt" to forrigeVilkår.sporbar.endret.endretTid,
                 ),
             )
         }
