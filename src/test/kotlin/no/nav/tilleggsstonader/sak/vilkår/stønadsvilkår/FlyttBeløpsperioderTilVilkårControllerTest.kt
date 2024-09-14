@@ -34,7 +34,7 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
 
     val fagsak = fagsak()
     val behandling = behandling(fagsak, status = BehandlingStatus.FERDIGSTILT)
-    val behandling2 = behandling(fagsak, steg = StegType.BEREGNE_YTELSE, forrigeBehandlingId = behandling.id)
+    val behandling2 = behandling(fagsak, steg = StegType.VILKÅR, forrigeBehandlingId = behandling.id)
     val barn = behandlingBarn(behandlingId = behandling.id)
     val barn2 = behandlingBarn(behandlingId = behandling2.id)
 
