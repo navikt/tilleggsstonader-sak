@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -107,6 +108,7 @@ class FlyttBeløpsperioderTilVilkårController(
     private fun getBehandlingerUnderArbeid(oppfylteVilkåtUtenFomOgTom: List<Vilkår>) =
         behandlingRepository.findAllById(oppfylteVilkåtUtenFomOgTom.map { it.behandlingId }.toSet())
             .filter { it.status in statusUnderArbeid }
+            .filter { it.steg in setOf(StegType.INNGANGSVILKÅR, StegType.VILKÅR) }
             .filter { it.forrigeBehandlingId != null }
             .associateBy { it.id }
 
