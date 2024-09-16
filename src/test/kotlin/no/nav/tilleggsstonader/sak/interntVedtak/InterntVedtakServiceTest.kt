@@ -90,7 +90,7 @@ class InterntVedtakServiceTest {
     )
 
     val vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay()
-    val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.randomUUID()))
+    val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()))
     val behandling = saksbehandling(
         behandling = behandling(
             id = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31"),

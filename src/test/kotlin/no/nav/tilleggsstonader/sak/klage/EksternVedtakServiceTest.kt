@@ -29,7 +29,7 @@ class EksternVedtakServiceTest {
         behandlingService = behandlingService,
     )
 
-    private val fagsakId = FagsakId.randomUUID()
+    private val fagsakId = FagsakId.random()
     private val fagsak = fagsak(id = fagsakId)
     private val eksternFagsakId = fagsak.eksternId.id
 

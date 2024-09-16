@@ -65,7 +65,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        assertThat(behandlingRepository.findByFagsakId(FagsakId.randomUUID())).isEmpty()
+        assertThat(behandlingRepository.findByFagsakId(FagsakId.random())).isEmpty()
         assertThat(behandlingRepository.findByFagsakId(fagsak.id)).containsOnly(behandling)
     }
 
@@ -124,7 +124,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak, status = OPPRETTET))
 
-        assertThat(behandlingRepository.findByFagsakIdAndStatus(FagsakId.randomUUID(), OPPRETTET)).isEmpty()
+        assertThat(behandlingRepository.findByFagsakIdAndStatus(FagsakId.random(), OPPRETTET)).isEmpty()
         assertThat(behandlingRepository.findByFagsakIdAndStatus(fagsak.id, FERDIGSTILT)).isEmpty()
         assertThat(behandlingRepository.findByFagsakIdAndStatus(fagsak.id, OPPRETTET)).containsOnly(behandling)
     }
@@ -293,7 +293,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
         @Test
         fun `inner ikke når det ikke finnes noen behandlinger`() {
-            assertThat(behandlingRepository.existsByFagsakId(FagsakId.randomUUID())).isFalse
+            assertThat(behandlingRepository.existsByFagsakId(FagsakId.random())).isFalse
         }
 
         @Test
@@ -306,7 +306,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
                     type = BehandlingType.FØRSTEGANGSBEHANDLING,
                 ),
             )
-            assertThat(behandlingRepository.existsByFagsakId(FagsakId.randomUUID())).isFalse
+            assertThat(behandlingRepository.existsByFagsakId(FagsakId.random())).isFalse
         }
 
         @Test
@@ -319,7 +319,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
                     type = BehandlingType.REVURDERING,
                 ),
             )
-            assertThat(behandlingRepository.existsByFagsakId(FagsakId.randomUUID())).isFalse
+            assertThat(behandlingRepository.existsByFagsakId(FagsakId.random())).isFalse
         }
     }
 

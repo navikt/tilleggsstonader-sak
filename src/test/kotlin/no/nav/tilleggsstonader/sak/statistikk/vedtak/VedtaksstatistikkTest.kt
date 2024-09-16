@@ -25,7 +25,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     final val id: BehandlingId = BehandlingId.random()
-    final val fagsakId: FagsakId = FagsakId.randomUUID()
+    final val fagsakId: FagsakId = FagsakId.random()
 
     @Test
     fun `kan skrive vedtaksstatistikk til tabell når alle JSON-objekter er tomme lister`() {

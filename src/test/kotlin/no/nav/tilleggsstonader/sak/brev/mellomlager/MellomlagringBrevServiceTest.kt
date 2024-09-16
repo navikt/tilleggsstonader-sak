@@ -52,7 +52,7 @@ class MellomlagringBrevServiceTest {
 
     @Test
     fun `hentMellomlagretFrittståendeSanityBrev skal returnere mellomlagret frittstående brev`() {
-        val fagsakId = FagsakId.randomUUID()
+        val fagsakId = FagsakId.random()
 
         val brev = MellomlagretFrittståendeBrev(
             fagsakId = fagsakId,

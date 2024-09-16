@@ -33,7 +33,7 @@ data class Fagsak(
 @Table("fagsak")
 data class FagsakDomain(
     @Id
-    val id: FagsakId = FagsakId.randomUUID(),
+    val id: FagsakId = FagsakId.random(),
     val fagsakPersonId: FagsakPersonId,
     @Column("stonadstype")
     val stønadstype: Stønadstype,

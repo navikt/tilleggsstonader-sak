@@ -181,7 +181,7 @@ fun fagsakPerson(
 fun fagsak(
     identer: Set<PersonIdent> = defaultIdenter,
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
-    id: FagsakId = FagsakId.randomUUID(),
+    id: FagsakId = FagsakId.random(),
     eksternId: EksternFagsakId = EksternFagsakId(fagsakId = id),
     sporbar: Sporbar = Sporbar(),
     fagsakPersonId: FagsakPersonId = FagsakPersonId.random(),
@@ -191,7 +191,7 @@ fun fagsak(
 
 fun fagsak(
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
-    id: FagsakId = FagsakId.randomUUID(),
+    id: FagsakId = FagsakId.random(),
     person: FagsakPerson,
     eksternId: EksternFagsakId = EksternFagsakId(fagsakId = id),
     sporbar: Sporbar = Sporbar(),
@@ -207,7 +207,7 @@ fun fagsak(
 }
 
 fun fagsakDomain(
-    id: FagsakId = FagsakId.randomUUID(),
+    id: FagsakId = FagsakId.random(),
     stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     personId: FagsakPersonId = FagsakPersonId.random(),
 ): FagsakDomain = FagsakDomain(

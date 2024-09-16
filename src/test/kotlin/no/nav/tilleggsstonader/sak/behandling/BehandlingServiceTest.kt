@@ -91,7 +91,7 @@ internal class BehandlingServiceTest {
                 stegType = StegType.VILKÅR,
                 behandlingsårsak = BehandlingÅrsak.PAPIRSØKNAD,
                 kravMottatt = osloDateNow().plusDays(1),
-                fagsakId = FagsakId.randomUUID(),
+                fagsakId = FagsakId.random(),
             )
         }
     }
@@ -211,7 +211,7 @@ internal class BehandlingServiceTest {
                 behandlingRepository.findByFagsakId(any())
             } returns listOf(behandling1, behandling2, behandling3)
 
-            val hentBehandlinger = behandlingService.hentBehandlinger(FagsakId.randomUUID())
+            val hentBehandlinger = behandlingService.hentBehandlinger(FagsakId.random())
             assertThat(hentBehandlinger)
                 .containsExactly(behandling3, behandling1, behandling2)
         }

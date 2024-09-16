@@ -33,7 +33,7 @@ class GjennbrukDataRevurderingServiceTest {
         vilkårService = vilkårService,
     )
 
-    val fagsakId = FagsakId.randomUUID()
+    val fagsakId = FagsakId.random()
     val iverksattFerdigstiltBehandling = behandling()
     val henlagtBehandling = behandling(
         status = BehandlingStatus.FERDIGSTILT,

@@ -47,7 +47,7 @@ internal class KlageServiceTest {
             klageClient,
         )
 
-    private val fagsakId = FagsakId.randomUUID()
+    private val fagsakId = FagsakId.random()
     private val fagsakPersonId = FagsakPersonId.random()
     private val eksternFagsakId = EksternFagsakId(1L, fagsakId)
     private val personIdent = "12345678910"
@@ -91,7 +91,7 @@ internal class KlageServiceTest {
         @Test
         internal fun `skal ikke kunne opprette klage med krav mottatt frem i tid`() {
             val opprettKlageDto = OpprettKlageDto(mottattDato = LocalDate.now().plusDays(1))
-            val feil = assertThrows<ApiFeil> { klageService.opprettKlage(FagsakId.randomUUID(), opprettKlageDto) }
+            val feil = assertThrows<ApiFeil> { klageService.opprettKlage(FagsakId.random(), opprettKlageDto) }
 
             assertThat(feil.feil).contains("Kan ikke opprette klage med krav mottatt frem i tid for fagsak=")
         }

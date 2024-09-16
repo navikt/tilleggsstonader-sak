@@ -18,7 +18,7 @@ import java.util.UUID
 class IverksettDtoMapperTest {
 
     val iverksettingId = UUID.randomUUID()
-    val fagsak = fagsak(identer = setOf(PersonIdent("ident1")), eksternId = EksternFagsakId(200, FagsakId.randomUUID()))
+    val fagsak = fagsak(identer = setOf(PersonIdent("ident1")), eksternId = EksternFagsakId(200, FagsakId.random()))
     val behandling = saksbehandling(fagsak = fagsak, behandling = behandling(vedtakstidspunkt = osloNow()))
     val iverksetting = Iverksetting(iverksettingId, osloNow())
     val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = 100, iverksetting = iverksetting)

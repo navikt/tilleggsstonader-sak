@@ -12,7 +12,7 @@ value class FagsakId(
     }
 
     companion object {
-        fun randomUUID() = FagsakId(UUID.randomUUID())
+        fun random() = FagsakId(UUID.randomUUID())
         fun fromString(id: String) = FagsakId(UUID.fromString(id))
     }
 }
