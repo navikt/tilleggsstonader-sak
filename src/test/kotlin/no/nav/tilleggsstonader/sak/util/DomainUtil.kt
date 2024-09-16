@@ -46,6 +46,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 import java.util.UUID
 
 fun oppgave(
@@ -237,14 +238,14 @@ fun stønadsperiode(
 
 fun vilkår(
     behandlingId: UUID,
+    type: VilkårType,
     resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
-    type: VilkårType = VilkårType.EKSEMPEL,
     delvilkår: List<Delvilkår> = emptyList(),
     barnId: UUID? = null,
     opphavsvilkår: Opphavsvilkår? = null,
-    fom: LocalDate? = null,
-    tom: LocalDate? = null,
-    beløp: Int? = null,
+    fom: LocalDate? = YearMonth.now().atDay(1),
+    tom: LocalDate? = YearMonth.now().atEndOfMonth(),
+    utgift: Int? = 100,
 ): Vilkår = Vilkår(
     behandlingId = behandlingId,
     resultat = resultat,
@@ -254,7 +255,7 @@ fun vilkår(
     opphavsvilkår = opphavsvilkår,
     fom = fom,
     tom = tom,
-    utgift = beløp,
+    utgift = utgift,
 )
 
 fun fagsakpersoner(vararg identer: String): Set<PersonIdent> = identer.map {

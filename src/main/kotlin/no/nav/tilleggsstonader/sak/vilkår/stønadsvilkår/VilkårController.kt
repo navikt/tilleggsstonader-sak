@@ -82,7 +82,7 @@ class VilkårController(
     @GetMapping("{behandlingId}")
     fun getVilkår(@PathVariable behandlingId: UUID): VilkårsvurderingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return vilkårService.hentOpprettEllerOppdaterVilkårsvurdering(behandlingId)
+        return vilkårService.hentVilkårsvurdering(behandlingId)
     }
 
     @GetMapping("{behandlingId}/oppdater")

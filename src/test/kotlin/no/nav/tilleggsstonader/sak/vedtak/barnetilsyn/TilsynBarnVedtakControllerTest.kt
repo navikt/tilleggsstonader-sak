@@ -52,7 +52,15 @@ class TilsynBarnVedtakControllerTest(
     val stønadsperiode =
         stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
     val aktivitet = aktivitet(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
-    val vilkår = vilkår(behandlingId = behandling.id, barnId = barn.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT)
+    val vilkår = vilkår(
+        behandlingId = behandling.id,
+        barnId = barn.id,
+        type = VilkårType.PASS_BARN,
+        resultat = Vilkårsresultat.OPPFYLT,
+        fom = YearMonth.now().atDay(1),
+        tom = YearMonth.now().atEndOfMonth(),
+        utgift = 100,
+    )
 
     @BeforeEach
     fun setUp() {

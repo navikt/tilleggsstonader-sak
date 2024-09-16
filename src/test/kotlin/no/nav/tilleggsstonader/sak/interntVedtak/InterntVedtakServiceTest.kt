@@ -183,7 +183,7 @@ class InterntVedtakServiceTest {
             barnId = barnId,
             fom = LocalDate.of(2024, 2, 1),
             tom = LocalDate.of(2024, 2, 29),
-            beløp = 100,
+            utgift = 100,
         ).tilDto(),
         vilkår(
             behandlingId = behandlingId,
@@ -192,7 +192,7 @@ class InterntVedtakServiceTest {
             barnId = barnId,
             fom = LocalDate.of(2024, 2, 1),
             tom = LocalDate.of(2024, 2, 29),
-            beløp = 200,
+            utgift = 200,
         ).tilDto(),
         vilkår(
             behandlingId = behandlingId,
@@ -201,7 +201,7 @@ class InterntVedtakServiceTest {
             barnId = barnId2,
             fom = LocalDate.of(2024, 2, 1),
             tom = LocalDate.of(2024, 2, 29),
-            beløp = 200,
+            utgift = 200,
         ).tilDto(),
     )
 

@@ -13,9 +13,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -35,7 +33,6 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
@@ -73,14 +70,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     fun setUp() {
         testoppsettService.opprettBehandlingMedFagsak(behandling)
         barnRepository.insert(barn)
-        vilkårRepository.insert(
-            vilkår(
-                behandlingId = behandling.id,
-                barnId = barn.id,
-                type = VilkårType.PASS_BARN,
-                resultat = Vilkårsresultat.OPPFYLT,
-            ),
-        )
     }
 
     @AfterEach
@@ -96,10 +85,9 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         fun `skal lagre vedtak`() {
             stønadsperiodeRepository.insert(stønadsperiode)
             vilkårperiodeRepository.insert(aktivitet)
+            lagVilkårForPeriode(januar, januar, 100)
 
-            val vedtakDto = innvilgelseDto(
-                utgifter = mapOf(barn(barn.id, Utgift(januar, januar, 100))),
-            )
+            val vedtakDto = innvilgelseDto()
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
             val vedtak = repository.findByIdOrThrow(saksbehandling.id)
@@ -145,17 +133,10 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 ),
             )
             vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            lagVilkårForPeriode(januar, februar, 100)
+            lagVilkårForPeriode(mars, april, 200)
 
-            val vedtakDto = innvilgelseDto(
-                mapOf(
-                    barn(
-                        barn.id,
-                        Utgift(januar, februar, 100),
-                        Utgift(mars, april, 200),
-                    ),
-                ),
-            )
-            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
+            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDto())
 
             val dagsatsForUtgift100 = BigDecimal("2.95")
             val dagsatsForUtgift200 = BigDecimal("5.91")
@@ -213,10 +194,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             )
             stønadsperiodeRepository.insert(stønadsperiode1)
             vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = juni.atDay(1), tom = juni.atEndOfMonth()))
-            val vedtakDto = innvilgelseDto(
-                mapOf(barn(barn.id, Utgift(juni, juni, 100))),
-            )
-            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
+            lagVilkårForPeriode(juni, juni, 100)
+            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDto())
 
             with(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.single()) {
                 assertThat(this.fom).isEqualTo(juni.atDay(3))
@@ -240,14 +219,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Nested
     inner class MålgruppeMapping {
         val beløp1DagUtgift100 = 3
-        val vedtakDto = innvilgelseDto(
-            mapOf(
-                barn(
-                    barn.id,
-                    Utgift(januar, mars, 100),
-                ),
-            ),
-        )
+        val vedtakDto = innvilgelseDto()
 
         @BeforeEach
         fun setUp() {
@@ -258,6 +230,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     tom = april.atEndOfMonth(),
                 ),
             )
+            lagVilkårForPeriode(januar, mars, 100)
         }
 
         @Test
@@ -372,25 +345,18 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         }
     }
 
-    @Nested
-    inner class ValideringInnvilgelse {
-
-        val vedtak = innvilgelseDto(
-            utgifter = mapOf(barn(UUID.randomUUID(), Utgift(januar, januar, utgift))),
+    private fun lagVilkårForPeriode(fom: YearMonth, tom: YearMonth, utgift: Int) {
+        vilkårRepository.insert(
+            vilkår(
+                behandlingId = behandling.id,
+                barnId = barn.id,
+                type = VilkårType.PASS_BARN,
+                resultat = Vilkårsresultat.OPPFYLT,
+                fom = fom.atDay(1),
+                tom = tom.atEndOfMonth(),
+                utgift = utgift,
+            ),
         )
-
-        @Test
-        fun `skal validere at det kun sendes inn utgifter på barn som har oppfylte vilkår`() {
-            stønadsperiodeRepository.insert(stønadsperiode)
-            vilkårperiodeRepository.insert(aktivitet)
-
-            assertThatThrownBy {
-                steg.utførOgReturnerNesteSteg(
-                    saksbehandling,
-                    vedtak,
-                )
-            }.hasMessageContaining("Det finnes utgifter på barn som ikke har oppfylt vilkårsvurdering")
-        }
     }
 
     private fun Stønadsperiode.medLikTomSomFom() = copy(tom = fom)

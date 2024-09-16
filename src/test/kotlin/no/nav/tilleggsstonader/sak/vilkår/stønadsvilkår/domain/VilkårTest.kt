@@ -53,7 +53,7 @@ internal class VilkårTest {
                 resultat = Vilkårsresultat.OPPFYLT,
                 fom = LocalDate.of(2024, 8, 2),
                 tom = LocalDate.of(2024, 9, 2),
-                beløp = 1,
+                utgift = 1,
             )
         }.hasMessageContaining("For vilkår=PASS_BARN skal FOM være første dagen i måneden")
     }
@@ -68,7 +68,7 @@ internal class VilkårTest {
                 resultat = Vilkårsresultat.OPPFYLT,
                 fom = LocalDate.of(2024, 8, 1),
                 tom = LocalDate.of(2024, 9, 2),
-                beløp = 2,
+                utgift = 2,
             )
         }.hasMessageContaining("For vilkår=PASS_BARN skal TOM være siste dagen i måneden")
     }
