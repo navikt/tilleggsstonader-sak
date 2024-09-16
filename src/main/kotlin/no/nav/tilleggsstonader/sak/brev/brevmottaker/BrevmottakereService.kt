@@ -21,6 +21,7 @@ class BrevmottakereService(
         validerBehandlingKanRedigeres(behandlingId)
         validerAntallBrevmottakere(brevmottakereDto)
         validerUnikeBrevmottakere(brevmottakereDto)
+        fjernMottakereIkkeIDto(brevmottakereDto, behandlingId)
 
         brevmottakereDto.organisasjoner.forEach {
             val brevmottaker = brevmottakereRepository.findByIdOrNull(it.id)
@@ -32,7 +33,6 @@ class BrevmottakereService(
             }
         }
         brevmottakereDto.personer.forEach {
-            fjernMottakereIkkeIDto(brevmottakereDto, behandlingId)
             val brevmottaker = brevmottakereRepository.findByIdOrNull(it.id)
 
             if (brevmottaker != null) {
