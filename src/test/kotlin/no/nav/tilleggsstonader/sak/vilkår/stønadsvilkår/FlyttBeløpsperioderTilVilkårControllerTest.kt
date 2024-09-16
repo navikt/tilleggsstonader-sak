@@ -45,7 +45,7 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
         barnId = barn.id,
         fom = LocalDate.of(2023, 1, 1),
         tom = LocalDate.of(2024, 12, 31),
-        beløp = 1003,
+        utgift = 1003,
     )
 
     val vilkår2 = vilkår(
@@ -55,7 +55,7 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
         barnId = barn2.id,
         fom = null,
         tom = null,
-        beløp = null,
+        utgift = null,
         opphavsvilkår = Opphavsvilkår(behandlingId = vilkår.behandlingId, LocalDateTime.now()),
     )
 
