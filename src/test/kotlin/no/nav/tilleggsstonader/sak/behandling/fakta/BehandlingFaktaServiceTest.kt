@@ -41,7 +41,7 @@ internal class BehandlingFaktaServiceTest {
         faktaArbeidOgOppholdMapper,
     )
 
-    val behandlingId = BehandlingId.randomUUID()
+    val behandlingId = BehandlingId.random()
 
     @BeforeEach
     fun setUp() {

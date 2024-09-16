@@ -55,7 +55,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     fun `skal ikke være mulig å legge inn en behandling med referanse til en behandling som ikke eksisterer`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         assertThatThrownBy {
-            testoppsettService.lagre(behandling(fagsak, forrigeBehandlingId = BehandlingId.randomUUID()))
+            testoppsettService.lagre(behandling(fagsak, forrigeBehandlingId = BehandlingId.random()))
         }
             .isInstanceOf(DbActionExecutionException::class.java)
     }
@@ -275,7 +275,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     fun `finnEksterneIder - send inn behandlingIder som ikke finnes, forvent ingen treff `() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         testoppsettService.lagre(behandling(fagsak))
-        val eksterneIder = behandlingRepository.finnEksterneIder(setOf(BehandlingId.randomUUID(), BehandlingId.randomUUID()))
+        val eksterneIder = behandlingRepository.finnEksterneIder(setOf(BehandlingId.random(), BehandlingId.random()))
         assertThat(eksterneIder.isEmpty())
     }
 

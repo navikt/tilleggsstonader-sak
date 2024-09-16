@@ -60,7 +60,7 @@ internal class UtledBarnFraVilkårServiceTest {
         navn: String = "navn",
         personIdent: String = "barnid",
     ): BehandlingBarn = BehandlingBarn(
-        behandlingId = BehandlingId.randomUUID(),
+        behandlingId = BehandlingId.random(),
         ident = personIdent,
     )
 }

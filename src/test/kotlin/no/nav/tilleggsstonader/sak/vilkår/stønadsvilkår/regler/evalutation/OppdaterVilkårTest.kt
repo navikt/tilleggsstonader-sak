@@ -17,7 +17,7 @@ import java.util.UUID
 
 internal class OppdaterVilkårTest {
 
-    val behandlingId = BehandlingId.randomUUID()
+    val behandlingId = BehandlingId.random()
     val vilkår = vilkår(
         behandlingId = behandlingId,
         type = VilkårType.PASS_BARN,

@@ -303,7 +303,7 @@ internal class VilkårServiceTest {
             val vilkår = vilkår(
                 behandlingId = behandlingId,
                 type = VilkårType.PASS_BARN,
-                opphavsvilkår = Opphavsvilkår(BehandlingId.randomUUID(), LocalDateTime.now()),
+                opphavsvilkår = Opphavsvilkår(BehandlingId.random(), LocalDateTime.now()),
             )
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 

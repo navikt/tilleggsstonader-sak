@@ -74,7 +74,7 @@ fun behandling(
     status: BehandlingStatus = BehandlingStatus.OPPRETTET,
     steg: StegType = StegType.INNGANGSVILKÅR,
     kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
-    id: BehandlingId = BehandlingId.randomUUID(),
+    id: BehandlingId = BehandlingId.random(),
     type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
     resultat: BehandlingResultat = BehandlingResultat.IKKE_SATT,
     opprettetTid: LocalDateTime = SporbarUtils.now(),
@@ -103,7 +103,7 @@ fun saksbehandling(
     fagsak: Fagsak = fagsak(),
     status: BehandlingStatus = BehandlingStatus.OPPRETTET,
     steg: StegType = StegType.VILKÅR,
-    id: BehandlingId = BehandlingId.randomUUID(),
+    id: BehandlingId = BehandlingId.random(),
     type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
     resultat: BehandlingResultat = BehandlingResultat.IKKE_SATT,
     opprettetTid: LocalDateTime = SporbarUtils.now(),
@@ -164,7 +164,7 @@ fun Behandling.innvilgetOgFerdigstilt() = this.copy(
 
 fun behandlingBarn(
     id: UUID = UUID.randomUUID(),
-    behandlingId: BehandlingId = BehandlingId.randomUUID(),
+    behandlingId: BehandlingId = BehandlingId.random(),
     personIdent: String = "1",
     søknadBarnId: UUID? = null,
 ) = BehandlingBarn(
@@ -293,7 +293,7 @@ fun revurderingsinformasjon() = RevurderingsinformasjonDto(
  */
 
 fun vedtaksbrev(
-    behandlingId: BehandlingId = BehandlingId.randomUUID(),
+    behandlingId: BehandlingId = BehandlingId.random(),
     saksbehandlerHtml: String = "Brev med ${BESLUTTER_SIGNATUR_PLACEHOLDER} og ${BREVDATO_PLACEHOLDER}",
     saksbehandlersignatur: String = "Saksbehandler Signatur",
     besluttersignatur: String? = "Beslutter signatur",

@@ -31,7 +31,7 @@ class VedtakTilsynBarnTest {
         fun `skal feile om avslått vedtak ikke har årsaker`() {
             assertThatThrownBy {
                 VedtakTilsynBarn(
-                    behandlingId = BehandlingId.randomUUID(),
+                    behandlingId = BehandlingId.random(),
                     type = TypeVedtak.AVSLAG,
                     avslagBegrunnelse = "begrunnelse",
                 )
@@ -43,7 +43,7 @@ class VedtakTilsynBarnTest {
         fun `skal feile om avslått vedtak ikke har årsak for avslag`() {
             assertThatThrownBy {
                 VedtakTilsynBarn(
-                    behandlingId = BehandlingId.randomUUID(),
+                    behandlingId = BehandlingId.random(),
                     type = TypeVedtak.AVSLAG,
                     årsakerAvslag = ÅrsakAvslag.Wrapper(listOf(ÅrsakAvslag.INGEN_AKTIVITET)),
                 )

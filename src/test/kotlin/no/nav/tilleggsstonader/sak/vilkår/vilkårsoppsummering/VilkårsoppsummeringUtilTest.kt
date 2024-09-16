@@ -105,6 +105,6 @@ class VilkårsoppsummeringUtilTest {
         private fun barn(localDate: LocalDate?) = lagGrunnlagsdataBarn(fødselsdato = localDate)
 
         private fun stønadsperiode(fom: LocalDate, tom: LocalDate) =
-            stønadsperiode(BehandlingId.randomUUID(), fom = fom, tom = tom).tilDto()
+            stønadsperiode(BehandlingId.random(), fom = fom, tom = tom).tilDto()
     }
 }

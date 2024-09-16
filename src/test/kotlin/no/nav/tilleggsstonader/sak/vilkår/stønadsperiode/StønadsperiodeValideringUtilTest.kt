@@ -496,7 +496,7 @@ internal class StønadsperiodeValideringUtilTest {
 
         @Test
         fun `skal ikke kaste feil om stønadsperiode overlapper med slettet vilkårperiode uten rett til stønad`() {
-            val behandlingId = BehandlingId.randomUUID()
+            val behandlingId = BehandlingId.random()
 
             val målgrupper = listOf(
                 målgruppe(

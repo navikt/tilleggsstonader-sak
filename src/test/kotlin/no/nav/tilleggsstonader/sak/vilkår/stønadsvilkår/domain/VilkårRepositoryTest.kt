@@ -43,7 +43,7 @@ internal class VilkårRepositoryTest : IntegrationTest() {
             ),
         )
 
-        Assertions.assertThat(vilkårRepository.findByBehandlingId(BehandlingId.randomUUID())).isEmpty()
+        Assertions.assertThat(vilkårRepository.findByBehandlingId(BehandlingId.random())).isEmpty()
         Assertions.assertThat(vilkårRepository.findByBehandlingId(behandling.id)).containsOnly(vilkår)
     }
 

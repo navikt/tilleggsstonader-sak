@@ -276,7 +276,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         tom: LocalDate = this.TOM,
         medlemskap: SvarJaNei? = null,
         dekkesAvAnnetRegelverk: SvarJaNei? = SvarJaNei.NEI,
-        behandlingId: BehandlingId = BehandlingId.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.random(),
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
@@ -290,7 +290,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         fom: LocalDate = this.FOM,
         tom: LocalDate = this.TOM,
         lønnet: SvarJaNei? = SvarJaNei.NEI,
-        behandlingId: BehandlingId = BehandlingId.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.random(),
         aktivitetsdager: Int = 5,
     ) = LagreVilkårperiode(
         type = type,

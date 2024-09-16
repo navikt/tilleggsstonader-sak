@@ -17,7 +17,7 @@ import java.time.LocalDateTime
  */
 data class Behandling(
     @Id
-    val id: BehandlingId = BehandlingId.randomUUID(),
+    val id: BehandlingId = BehandlingId.random(),
     val fagsakId: FagsakId,
     val forrigeBehandlingId: BehandlingId? = null,
     // @Version ?

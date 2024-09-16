@@ -43,7 +43,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
 
         assertThat(
             oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(
-                BehandlingId.randomUUID(),
+                BehandlingId.random(),
                 Oppgavetype.BehandleSak,
             ),
         )

@@ -73,7 +73,7 @@ class TilsynBarnVedtakControllerTest(
     @Test
     fun `skal validere token`() {
         headers.clear()
-        val exception = catchProblemDetailException { hentVedtak(BehandlingId.randomUUID()) }
+        val exception = catchProblemDetailException { hentVedtak(BehandlingId.random()) }
 
         assertThat(exception.httpStatus).isEqualTo(HttpStatus.UNAUTHORIZED)
     }

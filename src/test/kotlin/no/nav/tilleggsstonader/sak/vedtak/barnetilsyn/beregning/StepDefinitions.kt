@@ -45,7 +45,7 @@ class StepDefinitions {
     var stønadsperioder = emptyList<StønadsperiodeDto>()
     var utgifter = mutableMapOf<UUID, List<UtgiftBeregning>>()
     var beregningsresultat: BeregningsresultatTilsynBarnDto? = null
-    val behandlingId = BehandlingId.randomUUID()
+    val behandlingId = BehandlingId.random()
 
     @Gitt("følgende støndsperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {

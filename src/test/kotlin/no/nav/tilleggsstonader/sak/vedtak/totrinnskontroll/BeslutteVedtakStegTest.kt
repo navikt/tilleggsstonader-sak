@@ -78,7 +78,7 @@ class BeslutteVedtakStegTest {
         stønadstype = Stønadstype.BARNETILSYN,
         identer = setOf(PersonIdent(ident = "12345678901")),
     )
-    private val behandlingId = BehandlingId.randomUUID()
+    private val behandlingId = BehandlingId.random()
 
     private val oppgave = OppgaveDomain(
         id = UUID.randomUUID(),

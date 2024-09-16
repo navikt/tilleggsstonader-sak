@@ -24,7 +24,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
     @Autowired
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
-    final val id: BehandlingId = BehandlingId.randomUUID()
+    final val id: BehandlingId = BehandlingId.random()
     final val fagsakId: FagsakId = FagsakId.randomUUID()
 
     @Test

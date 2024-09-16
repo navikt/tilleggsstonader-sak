@@ -11,7 +11,7 @@ import java.time.LocalDate
 
 object GrunnlagsdataUtil {
     fun grunnlagsdataDomain(
-        behandlingId: BehandlingId = BehandlingId.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.random(),
         grunnlag: Grunnlag = lagGrunnlagsdata(),
     ) = Grunnlagsdata(
         behandlingId = behandlingId,

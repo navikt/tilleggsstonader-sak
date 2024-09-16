@@ -175,7 +175,7 @@ internal class BehandlingServiceTest {
             every {
                 behandlingRepository.findByIdOrThrow(any())
             } returns behandling.copy(resultat = BehandlingResultat.IKKE_SATT)
-            behandlingService.oppdaterResultatPåBehandling(BehandlingId.randomUUID(), BehandlingResultat.INNVILGET)
+            behandlingService.oppdaterResultatPåBehandling(BehandlingId.random(), BehandlingResultat.INNVILGET)
         }
 
         @Test
@@ -184,14 +184,14 @@ internal class BehandlingServiceTest {
                 behandlingRepository.findByIdOrThrow(any())
             } returns behandling.copy(resultat = BehandlingResultat.INNVILGET)
             assertThatThrownBy {
-                behandlingService.oppdaterResultatPåBehandling(BehandlingId.randomUUID(), BehandlingResultat.INNVILGET)
+                behandlingService.oppdaterResultatPåBehandling(BehandlingId.random(), BehandlingResultat.INNVILGET)
             }.hasMessageContaining("Kan ikke endre resultat på behandling når resultat")
         }
 
         @Test
         internal fun `skal feile hvis man setter IKKE_SATT`() {
             assertThatThrownBy {
-                behandlingService.oppdaterResultatPåBehandling(BehandlingId.randomUUID(), BehandlingResultat.IKKE_SATT)
+                behandlingService.oppdaterResultatPåBehandling(BehandlingId.random(), BehandlingResultat.IKKE_SATT)
             }.hasMessageContaining("Må sette et endelig resultat")
         }
     }

@@ -11,7 +11,7 @@ import java.util.UUID
 
 class VilkårPeriodeValideringTest {
 
-    val behandlingId = BehandlingId.randomUUID()
+    val behandlingId = BehandlingId.random()
     val barnId = UUID.randomUUID()
 
     val fom = LocalDate.of(2024, 1, 1)

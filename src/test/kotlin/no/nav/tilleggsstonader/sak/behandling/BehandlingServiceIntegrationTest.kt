@@ -43,7 +43,7 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
 
     @Test
     internal fun `hentBehandlinger - skal kaste feil hvis behandling ikke finnes`() {
-        assertThatThrownBy { behandlingService.hentBehandlinger(setOf(BehandlingId.randomUUID())) }
+        assertThatThrownBy { behandlingService.hentBehandlinger(setOf(BehandlingId.random())) }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("Finner ikke Behandling for")
     }

@@ -59,7 +59,7 @@ class GjennbrukDataRevurderingServiceTest {
 
         @Test
         fun `skal bruke forrige behandlingId hvis den finnes på behandling som man sender inn`() {
-            val behandling = behandling(forrigeBehandlingId = BehandlingId.randomUUID())
+            val behandling = behandling(forrigeBehandlingId = BehandlingId.random())
 
             assertThat(service.finnBehandlingIdForGjenbruk(behandling)).isEqualTo(behandling.forrigeBehandlingId)
 

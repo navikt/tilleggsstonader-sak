@@ -55,7 +55,7 @@ object TilsynBarnTestUtil {
     fun innvilgetVedtak(
         vedtak: VedtaksdataTilsynBarn? = vedtaksdata,
         beregningsresultat: VedtaksdataBeregningsresultat? = vedtakBeregningsresultat,
-        behandlingId: BehandlingId = BehandlingId.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.random(),
     ) = VedtakTilsynBarn(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,

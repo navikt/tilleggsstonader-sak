@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 
 fun søknadBarnTilBehandlingBarn(
     barn: Collection<SøknadBarn>,
-    behandlingId: BehandlingId = BehandlingId.randomUUID(),
+    behandlingId: BehandlingId = BehandlingId.random(),
 ): List<BehandlingBarn> =
     barn.map {
         it.tilBehandlingBarn(behandlingId)

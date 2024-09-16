@@ -109,7 +109,7 @@ internal class TotrinnskontrollServiceTest {
     @Test
     internal fun `totrinnskontroll settes til angret fra saksbehandler`() {
         assertDoesNotThrow("Should not throw an exception") {
-            totrinnskontrollService.angreSendTilBeslutter(BehandlingId.randomUUID())
+            totrinnskontrollService.angreSendTilBeslutter(BehandlingId.random())
         }
     }
 
@@ -119,7 +119,7 @@ internal class TotrinnskontrollServiceTest {
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any())
         } returns totrinnskontroll(opprettetAv = saksbehandler, TotrinnInternStatus.UNDERKJENT)
         assertThatThrownBy {
-            totrinnskontrollService.angreSendTilBeslutter(BehandlingId.randomUUID())
+            totrinnskontrollService.angreSendTilBeslutter(BehandlingId.random())
         }.hasMessageContaining("Kan ikke angre når status=${TotrinnInternStatus.UNDERKJENT}")
     }
 
@@ -147,7 +147,7 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `skal utlede saksbehandler som sendte behandling til besluttning`() {
-        val response = totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(BehandlingId.randomUUID())
+        val response = totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(BehandlingId.random())
 
         assertThat(response).isEqualTo(saksbehandler)
     }
@@ -297,7 +297,7 @@ internal class TotrinnskontrollServiceTest {
         status: TotrinnInternStatus = TotrinnInternStatus.KAN_FATTE_VEDTAK,
     ) =
         Totrinnskontroll(
-            behandlingId = BehandlingId.randomUUID(),
+            behandlingId = BehandlingId.random(),
             sporbar = Sporbar(opprettetAv),
             status = status,
             saksbehandler = opprettetAv,
@@ -309,7 +309,7 @@ internal class TotrinnskontrollServiceTest {
 
     ) =
         Totrinnskontroll(
-            behandlingId = BehandlingId.randomUUID(),
+            behandlingId = BehandlingId.random(),
             sporbar = Sporbar(opprettetAv),
             status = TotrinnInternStatus.UNDERKJENT,
             saksbehandler = opprettetAv,
@@ -327,7 +327,7 @@ internal class TotrinnskontrollServiceTest {
 
     companion object {
 
-        private val BEHANDLING_ID = BehandlingId.randomUUID()
+        private val BEHANDLING_ID = BehandlingId.random()
         private val fagsak = fagsak()
     }
 }

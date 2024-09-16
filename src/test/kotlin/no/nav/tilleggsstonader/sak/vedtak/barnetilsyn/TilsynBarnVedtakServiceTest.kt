@@ -26,7 +26,7 @@ class TilsynBarnVedtakServiceTest {
     @Test
     fun `skal mappe avslått vedtak til dto`() {
         val vedtak = VedtakTilsynBarn(
-            behandlingId = BehandlingId.randomUUID(),
+            behandlingId = BehandlingId.random(),
             type = TypeVedtak.AVSLAG,
             avslagBegrunnelse = "begrunnelse",
             årsakerAvslag = ÅrsakAvslag.Wrapper(årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET)),

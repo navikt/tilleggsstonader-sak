@@ -10,7 +10,7 @@ object IverksettDtoUtil {
 
     fun iverksettDto(
         sakId: String = "fagsakId",
-        behandlingId: BehandlingId = BehandlingId.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.random(),
         eksternBehandlingId: Long = 1,
         iverksettingId: UUID = behandlingId.id,
         personident: String = "123",

@@ -70,7 +70,7 @@ class MellomlagringBrevServiceTest {
         )
     }
 
-    private val behandlingId = BehandlingId.randomUUID()
+    private val behandlingId = BehandlingId.random()
     private val brevmal = "testMal"
     private val brevverdier = "{}"
     private val mellomlagretBrev = MellomlagretBrev(behandlingId, brevverdier, brevmal)

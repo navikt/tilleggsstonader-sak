@@ -7,7 +7,7 @@ object TotrinnskontrollUtil {
 
     fun totrinnskontroll(
         status: TotrinnInternStatus,
-        behandlingId: BehandlingId = BehandlingId.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.random(),
         saksbehandler: String = "saksbehandler",
         årsakerUnderkjent: List<ÅrsakUnderkjent> = emptyList(),
         begrunnelse: String? = null,

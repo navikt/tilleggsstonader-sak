@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktiviteter
 import org.assertj.core.api.Assertions.assertThat
 
 class BeregningUtilsStepDefinitons {
-    val behandlingId = BehandlingId.randomUUID()
+    val behandlingId = BehandlingId.random()
 
     var stønadsperioder: StønadsperiodeDto? = null
     var stønadsperiodePerUke: Map<Uke, PeriodeMedDager> = emptyMap()

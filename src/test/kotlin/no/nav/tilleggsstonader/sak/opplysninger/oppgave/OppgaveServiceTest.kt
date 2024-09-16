@@ -335,7 +335,7 @@ internal class OppgaveServiceTest {
     @Test
     fun `skal legge til behandlingId på oppgaver for å enklere kunne gå til behandling fra frontend`() {
         val oppgaveIdMedBehandling = 1L
-        val behandlingId = BehandlingId.randomUUID()
+        val behandlingId = BehandlingId.random()
 
         every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(
             2,

@@ -15,7 +15,7 @@ value class BehandlingId(
     }
 
     companion object {
-        fun randomUUID() = BehandlingId(UUID.randomUUID())
+        fun random() = BehandlingId(UUID.randomUUID())
         fun fromString(id: String) = BehandlingId(UUID.fromString(id))
     }
 }

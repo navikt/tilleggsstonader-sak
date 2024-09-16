@@ -13,7 +13,7 @@ import java.time.YearMonth
 import java.time.temporal.Temporal
 
 class TilsynBeregningUtilTest {
-    val behandlingId = BehandlingId.randomUUID()
+    val behandlingId = BehandlingId.random()
 
     val januar = YearMonth.of(2024, 1)
     val februar = YearMonth.of(2024, 2)

@@ -71,7 +71,7 @@ class SendTilBeslutterStegTest {
     )
     private val saksbehandlerNavn = "saksbehandlernavn"
     private val vedtaksbrev = Vedtaksbrev(
-        behandlingId = BehandlingId.randomUUID(),
+        behandlingId = BehandlingId.random(),
         saksbehandlersignatur = saksbehandlerNavn,
         beslutterPdf = null,
         saksbehandlerIdent = saksbehandlerNavn,

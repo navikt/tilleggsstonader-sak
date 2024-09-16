@@ -22,7 +22,7 @@ import java.util.UUID
 object VilkårperiodeTestUtil {
 
     fun målgruppe(
-        behandlingId: BehandlingId = BehandlingId.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.random(),
         fom: LocalDate = osloDateNow(),
         tom: LocalDate = osloDateNow().plusDays(5),
         type: MålgruppeType = MålgruppeType.AAP,
@@ -69,7 +69,7 @@ object VilkårperiodeTestUtil {
     )
 
     fun aktivitet(
-        behandlingId: BehandlingId = BehandlingId.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.random(),
         fom: LocalDate = osloDateNow(),
         tom: LocalDate = osloDateNow().plusDays(5),
         type: AktivitetType = AktivitetType.TILTAK,
@@ -112,7 +112,7 @@ object VilkårperiodeTestUtil {
         medlemskap: VurderingDto? = null,
         dekkesAvAnnetRegelverk: VurderingDto? = null,
         begrunnelse: String? = null,
-        behandlingId: BehandlingId = BehandlingId.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.random(),
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
@@ -128,7 +128,7 @@ object VilkårperiodeTestUtil {
         tom: LocalDate = osloDateNow(),
         lønnet: VurderingDto? = null,
         begrunnelse: String? = null,
-        behandlingId: BehandlingId = BehandlingId.randomUUID(),
+        behandlingId: BehandlingId = BehandlingId.random(),
         aktivitetsdager: Int? = 5,
     ) = LagreVilkårperiode(
         type = type,

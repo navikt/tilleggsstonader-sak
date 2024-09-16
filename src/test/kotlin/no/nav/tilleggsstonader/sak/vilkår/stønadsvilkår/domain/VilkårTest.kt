@@ -11,8 +11,8 @@ import java.util.UUID
 
 internal class VilkårTest {
 
-    private val behandlingIdFørstegangsbehandling = BehandlingId.randomUUID()
-    private val behandlingIdRevurdering = BehandlingId.randomUUID()
+    private val behandlingIdFørstegangsbehandling = BehandlingId.random()
+    private val behandlingIdRevurdering = BehandlingId.random()
 
     @Test
     internal fun `opprettOpphavsvilkår - et vilkår som ikke er gjenbrukt skal peke til behandlingen`() {
@@ -48,7 +48,7 @@ internal class VilkårTest {
     fun `skal feile dersom FOM fra vilkår ikke er første dagen i måneden`() {
         assertThatThrownBy {
             vilkår(
-                behandlingId = BehandlingId.randomUUID(),
+                behandlingId = BehandlingId.random(),
                 barnId = UUID.randomUUID(),
                 type = VilkårType.PASS_BARN,
                 resultat = Vilkårsresultat.OPPFYLT,
@@ -63,7 +63,7 @@ internal class VilkårTest {
     fun `skal feile dersom TOM fra vilkår ikke er siste dagen i måneden`() {
         assertThatThrownBy {
             vilkår(
-                behandlingId = BehandlingId.randomUUID(),
+                behandlingId = BehandlingId.random(),
                 barnId = UUID.randomUUID(),
                 type = VilkårType.PASS_BARN,
                 resultat = Vilkårsresultat.OPPFYLT,

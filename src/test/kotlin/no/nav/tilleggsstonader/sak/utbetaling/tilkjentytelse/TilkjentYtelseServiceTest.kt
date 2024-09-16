@@ -31,7 +31,7 @@ class TilkjentYtelseServiceTest {
         @Test
         internal fun `skal returnere true hvis det finnes andel med sluttdato etter idag`() {
             val andelTilkjentYtelse = andelTilkjentYtelse(
-                kildeBehandlingId = BehandlingId.randomUUID(),
+                kildeBehandlingId = BehandlingId.random(),
                 beløp = 1,
                 fom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 tom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
@@ -45,7 +45,7 @@ class TilkjentYtelseServiceTest {
         @Test
         internal fun `skal returnere false hvis det finnes andel med sluttdato før idag`() {
             val andelTilkjentYtelse = andelTilkjentYtelse(
-                kildeBehandlingId = BehandlingId.randomUUID(),
+                kildeBehandlingId = BehandlingId.random(),
                 beløp = 1,
                 fom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 tom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
