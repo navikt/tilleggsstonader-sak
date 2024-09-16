@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service
 @Service
 class LøpendeBehandlingerMetricService(private val behandlingRepository: BehandlingRepository) {
 
-    private val løpendeBehandlingerGauge = MultiGauge.builder("løpende_iverksatte_behandlinger").register(Metrics.globalRegistry)
+    private val antallGjeldendeIverksatteBehandlingerGauge = MultiGauge.builder("løpende_iverksatte_behandlinger").register(Metrics.globalRegistry)
 
     @Scheduled(initialDelay = MetricUtil.FREKVENS_30_SEC, fixedDelay = MetricUtil.FREKVENS_30_MIN)
-    fun hentAntallLøpendeBehandlinger() {
+    fun hentAntallGjeldendeIverksatteBehandlinger() {
         val rows = Stønadstype.entries.map {
             val antallGjeldendeIverksatteBehandlinger = behandlingRepository.antallGjeldendeIverksatteBehandlinger(stønadstype = it)
             MultiGauge.Row.of(Tags.of(Tag.of("ytelse", it.name)), antallGjeldendeIverksatteBehandlinger)
         }
-        behandlingRepository.antallGjeldendeIverksatteBehandlinger()
+        antallGjeldendeIverksatteBehandlingerGauge.register(rows, true)
     }
 }
