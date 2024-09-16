@@ -185,4 +185,13 @@ interface BehandlingRepository : RepositoryInterface<Behandling, UUID>, InsertUp
         """,
     )
     fun finnGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype = Stønadstype.BARNETILSYN): List<Behandling>
+
+    @Query(
+        """
+            SELECT COUNT(*)
+            FROM gjeldende_iverksatte_behandlinger b
+            WHERE b.stonadstype = :stønadstype
+        """,
+    )
+    fun antallGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype = Stønadstype.BARNETILSYN): Int
 }
