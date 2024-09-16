@@ -2,9 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
@@ -21,7 +18,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDto
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -106,7 +103,6 @@ fun List<VilkårperiodeDto>.mergeSammenhengendeOppfylteVilkårperioder(): Map<Vi
 
 data class LagreVilkårperiode(
     val behandlingId: BehandlingId,
-    @JsonDeserialize(using = VilkårperiodeTypeDeserializer::class)
     val type: VilkårperiodeType,
     val fom: LocalDate,
     val tom: LocalDate,
@@ -155,9 +151,3 @@ fun Vilkårperioder.tilDto() = VilkårperioderDto(
     målgrupper = målgrupper.map(Vilkårperiode::tilDto),
     aktiviteter = aktiviteter.map(Vilkårperiode::tilDto),
 )
-
-class VilkårperiodeTypeDeserializer : JsonDeserializer<VilkårperiodeType>() {
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): VilkårperiodeType {
-        return vilkårperiodetyper[p.text] ?: error("Finner ikke mapping for ${p.text}")
-    }
-}
