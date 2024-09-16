@@ -259,9 +259,7 @@ class VilkårService(
     }
 
     fun hentVilkår(behandlingId: UUID): List<Vilkår> {
-        val vilkårsett = vilkårRepository.findByBehandlingId(behandlingId)
-        feilHvis(vilkårsett.isEmpty()) { "Mangler vilkår for behandling=$behandlingId" }
-        return vilkårsett
+        return vilkårRepository.findByBehandlingId(behandlingId)
     }
 
     @Transactional

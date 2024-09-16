@@ -34,7 +34,7 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
 
     val fagsak = fagsak()
     val behandling = behandling(fagsak, status = BehandlingStatus.FERDIGSTILT)
-    val behandling2 = behandling(fagsak, steg = StegType.BEREGNE_YTELSE, forrigeBehandlingId = behandling.id)
+    val behandling2 = behandling(fagsak, steg = StegType.VILKÅR, forrigeBehandlingId = behandling.id)
     val barn = behandlingBarn(behandlingId = behandling.id)
     val barn2 = behandlingBarn(behandlingId = behandling2.id)
 
@@ -51,7 +51,7 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
     val vilkår2 = vilkår(
         behandlingId = behandling2.id,
         type = VilkårType.PASS_BARN,
-        resultat = Vilkårsresultat.OPPFYLT,
+        resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
         barnId = barn2.id,
         fom = null,
         tom = null,
@@ -81,6 +81,11 @@ class FlyttBeløpsperioderTilVilkårControllerTest : IntegrationTest() {
             assertThat(fom).isEqualTo(LocalDate.of(2023, 1, 1))
             assertThat(tom).isEqualTo(LocalDate.of(2024, 12, 31))
             assertThat(utgift).isEqualTo(1003)
+            assertThat(delvilkårwrapper).isEqualTo(vilkår.delvilkårwrapper)
+            assertThat(resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+
+            assertThat(opphavsvilkår!!.behandlingId).isEqualTo(vilkår.behandlingId)
+            assertThat(opphavsvilkår!!.vurderingstidspunkt).isNotNull()
         }
     }
 }
