@@ -30,7 +30,6 @@ jobs:
         with:
           gradle-version: wrapper
           dependency-graph: generate-and-submit
-          arguments: --configuration-cache test
 
       - name: Run a build (dependency-graph will be generated and submitted post-job)
         run: ./gradlew build -x :check -x :cyclonedxBom
