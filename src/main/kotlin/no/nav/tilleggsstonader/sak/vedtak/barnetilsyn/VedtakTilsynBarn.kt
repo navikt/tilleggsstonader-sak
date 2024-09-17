@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -8,7 +9,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
-import java.util.UUID
 
 /**
  * Trenger vi noe mer enn data her? Kan den kanskje dekke alle tilfeller?
@@ -44,7 +44,7 @@ data class VedtakTilsynBarn(
 }
 
 data class VedtaksdataTilsynBarn(
-    val utgifter: Map<UUID, List<Utgift>>,
+    val utgifter: Map<BarnId, List<Utgift>>,
 )
 
 data class VedtaksdataBeregningsresultat(

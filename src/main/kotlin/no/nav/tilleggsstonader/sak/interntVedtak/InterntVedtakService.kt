@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
@@ -21,7 +22,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålg
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode.Vurdering
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.UUID
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode as DelvilkårVilkårperiodeDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode as VilkårperiodeDomain
 
@@ -58,7 +58,7 @@ class InterntVedtakService(
     private fun mapBarnPåBarnId(
         behandlingId: BehandlingId,
         grunnlag: Grunnlag,
-    ): Map<UUID, GrunnlagBarn> {
+    ): Map<BarnId, GrunnlagBarn> {
         val behandlingbarn = barnService.finnBarnPåBehandling(behandlingId).associateBy { it.ident }
         return grunnlag.barn.associateBy {
             val barn =
@@ -151,7 +151,7 @@ class InterntVedtakService(
         }
     }
 
-    private fun mapVilkår(behandlingId: BehandlingId, behandlingBarn: Map<UUID, GrunnlagBarn>): List<VilkårInternt> {
+    private fun mapVilkår(behandlingId: BehandlingId, behandlingBarn: Map<BarnId, GrunnlagBarn>): List<VilkårInternt> {
         return vilkårService.hentVilkårsett(behandlingId)
             .map { vilkår ->
                 VilkårInternt(
@@ -179,7 +179,7 @@ class InterntVedtakService(
             },
         )
 
-    private fun mapVedtak(vedtak: VedtakTilsynBarn?, behandlingbarn: Map<UUID, GrunnlagBarn>): VedtakInternt? {
+    private fun mapVedtak(vedtak: VedtakTilsynBarn?, behandlingbarn: Map<BarnId, GrunnlagBarn>): VedtakInternt? {
         return vedtak?.let {
             VedtakInternt(
                 type = it.type,
@@ -201,7 +201,7 @@ class InterntVedtakService(
         }
     }
 
-    private fun Map<UUID, GrunnlagBarn>.finnFødselsdato(barnId: UUID): LocalDate {
+    private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {
         val barn = this[barnId] ?: error("Finner ikke barn=$barnId")
         return barn.fødselsdato ?: error("Mangler fødselsdato for barn=$barnId")
     }

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
 
 internal class OppdaterVilkårTest {
 
@@ -28,7 +28,7 @@ internal class OppdaterVilkårTest {
     inner class ValideringAvBeløp {
         val opprettVilkårDto = OpprettVilkårDto(
             vilkårType = VilkårType.PASS_BARN,
-            barnId = UUID.randomUUID(),
+            barnId = BarnId.random(),
             behandlingId = behandlingId,
             delvilkårsett = oppfylteDelvilkårPassBarnDto(),
             fom = LocalDate.now(),

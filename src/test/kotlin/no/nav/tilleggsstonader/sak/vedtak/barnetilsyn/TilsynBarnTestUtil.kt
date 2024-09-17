@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
@@ -12,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 object TilsynBarnTestUtil {
 
@@ -46,7 +46,7 @@ object TilsynBarnTestUtil {
     val vedtaksdata = VedtaksdataTilsynBarn(
         utgifter = mapOf(
             barn(
-                UUID.randomUUID(),
+                BarnId.random(),
                 Utgift(YearMonth.of(2023, 1), YearMonth.of(2023, 1), 100),
             ),
         ),
@@ -63,5 +63,5 @@ object TilsynBarnTestUtil {
         beregningsresultat = beregningsresultat,
     )
 
-    fun barn(barnId: UUID, vararg utgifter: Utgift) = Pair(barnId, utgifter.toList())
+    fun barn(barnId: BarnId, vararg utgifter: Utgift) = Pair(barnId, utgifter.toList())
 }

@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
@@ -31,7 +32,6 @@ import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class StepDefinitions {
 
@@ -43,7 +43,7 @@ class StepDefinitions {
     var exception: Exception? = null
 
     var stønadsperioder = emptyList<StønadsperiodeDto>()
-    var utgifter = mutableMapOf<UUID, List<UtgiftBeregning>>()
+    var utgifter = mutableMapOf<BarnId, List<UtgiftBeregning>>()
     var beregningsresultat: BeregningsresultatTilsynBarnDto? = null
     val behandlingId = BehandlingId.random()
 

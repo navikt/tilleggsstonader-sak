@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår
 
 import no.nav.tilleggsstonader.libs.utils.fnr.Fødselsnummer
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
@@ -19,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
 import java.time.LocalDate
-import java.util.UUID
 
 class PassBarnRegel : Vilkårsregel(
     vilkårType = VilkårType.PASS_BARN,
@@ -35,7 +35,7 @@ class PassBarnRegel : Vilkårsregel(
     override fun initiereDelvilkår(
         metadata: HovedregelMetadata,
         resultat: Vilkårsresultat,
-        barnId: UUID?,
+        barnId: BarnId?,
     ): List<Delvilkår> {
         if (resultat != Vilkårsresultat.IKKE_TATT_STILLING_TIL) {
             return super.initiereDelvilkår(metadata, resultat, barnId)
@@ -112,7 +112,7 @@ class PassBarnRegel : Vilkårsregel(
     }
 
     private fun harFullførtFjerdetrinn(
-        barnId: UUID?,
+        barnId: BarnId?,
         metadata: HovedregelMetadata,
         datoForBeregning: LocalDate = osloDateNow(),
     ): Boolean {

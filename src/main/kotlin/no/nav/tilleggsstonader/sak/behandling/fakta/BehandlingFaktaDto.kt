@@ -8,9 +8,9 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class BehandlingFaktaDto(
     val søknadMottattTidspunkt: LocalDateTime?,
@@ -60,7 +60,7 @@ data class SøknadsgrunnlagAktivitet(
 
 data class FaktaBarn(
     val ident: String,
-    val barnId: UUID,
+    val barnId: BarnId,
     val registergrunnlag: RegistergrunnlagBarn,
     val søknadgrunnlag: SøknadsgrunnlagBarn?,
     val vilkårFakta: VilkårFaktaBarn,

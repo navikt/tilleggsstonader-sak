@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
-import java.util.UUID
 
 /**
  * Brukes for å utlede hvilke delvilkår som må besvares
@@ -31,7 +31,7 @@ abstract class Vilkårsregel(
     open fun initiereDelvilkår(
         metadata: HovedregelMetadata,
         resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-        barnId: UUID? = null,
+        barnId: BarnId? = null,
     ): List<Delvilkår> {
         return hovedregler.map {
             Delvilkår(

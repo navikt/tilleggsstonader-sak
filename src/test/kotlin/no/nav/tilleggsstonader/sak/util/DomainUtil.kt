@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
@@ -163,10 +164,10 @@ fun Behandling.innvilgetOgFerdigstilt() = this.copy(
 )
 
 fun behandlingBarn(
-    id: UUID = UUID.randomUUID(),
+    id: BarnId = BarnId.random(),
     behandlingId: BehandlingId = BehandlingId.random(),
     personIdent: String = "1",
-    søknadBarnId: UUID? = null,
+    søknadBarnId: BarnId? = null,
 ) = BehandlingBarn(
     id = id,
     behandlingId = behandlingId,
@@ -242,7 +243,7 @@ fun vilkår(
     type: VilkårType,
     resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
     delvilkår: List<Delvilkår> = emptyList(),
-    barnId: UUID? = null,
+    barnId: BarnId? = null,
     opphavsvilkår: Opphavsvilkår? = null,
     fom: LocalDate? = YearMonth.now().atDay(1),
     tom: LocalDate? = YearMonth.now().atEndOfMonth(),
