@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.jdbc.repository.query.Modifying
@@ -10,7 +11,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Repository
-interface VilkårRepository : RepositoryInterface<Vilkår, UUID>, InsertUpdateRepository<Vilkår> {
+interface VilkårRepository : RepositoryInterface<Vilkår, VilkårId>, InsertUpdateRepository<Vilkår> {
 
     fun findByBehandlingId(behandlingId: BehandlingId): List<Vilkår>
 
@@ -20,11 +21,11 @@ interface VilkårRepository : RepositoryInterface<Vilkår, UUID>, InsertUpdateRe
 
     @Modifying
     @Query("UPDATE vilkar SET endret_tid = :nyttTidspunkt WHERE id = :id")
-    fun oppdaterEndretTid(id: UUID, nyttTidspunkt: LocalDateTime)
+    fun oppdaterEndretTid(id: VilkårId, nyttTidspunkt: LocalDateTime)
 
     @Modifying
     @Query("UPDATE vilkar SET opprettet_av = 'VL', endret_av = 'VL' WHERE id = :id")
-    fun settMaskinelltOpprettet(id: UUID)
+    fun settMaskinelltOpprettet(id: VilkårId)
 
     fun findByTypeAndBehandlingIdIn(vilkårtype: VilkårType, behandlingIds: Collection<UUID>): List<Vilkår>
 }

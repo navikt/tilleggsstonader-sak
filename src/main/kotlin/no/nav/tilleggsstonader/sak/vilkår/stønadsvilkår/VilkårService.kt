@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
@@ -43,7 +44,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class VilkårService(
@@ -273,13 +273,13 @@ class VilkårService(
     }
 
     private fun lagKopiAvTidligereVurderinger(
-        tidligereVilkår: Map<UUID, Vilkår>,
+        tidligereVilkår: Map<VilkårId, Vilkår>,
         nyBehandlingsId: BehandlingId,
         barnIdMap: Map<TidligereBarnId, NyttBarnId>,
     ): List<Vilkår> =
         tidligereVilkår.values.map { vilkår ->
             vilkår.copy(
-                id = UUID.randomUUID(),
+                id = VilkårId.random(),
                 behandlingId = nyBehandlingsId,
                 sporbar = Sporbar(),
                 barnId = finnBarnId(vilkår.barnId, barnIdMap),

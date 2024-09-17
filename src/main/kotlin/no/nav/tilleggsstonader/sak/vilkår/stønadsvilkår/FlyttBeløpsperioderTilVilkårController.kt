@@ -124,7 +124,7 @@ class FlyttBeløpsperioderTilVilkårController(
                     "opphavsvilkaar_vurderingstidspunkt=:opphavsvilkaar_vurderingstidspunkt" +
                     " WHERE id=:id",
                 mapOf(
-                    "id" to vilkår.id,
+                    "id" to vilkår.id.id,
                     "fom" to forrigeVilkår.fom,
                     "tom" to forrigeVilkår.tom,
                     "utgift" to forrigeVilkår.utgift,

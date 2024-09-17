@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto
 
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -11,10 +12,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class VilkårDto(
-    val id: UUID,
+    val id: VilkårId,
     val behandlingId: BehandlingId,
     val resultat: Vilkårsresultat,
     val vilkårType: VilkårType,
@@ -33,7 +33,7 @@ data class OpphavsvilkårDto(
     val endretTid: LocalDateTime,
 )
 
-data class OppdaterVilkårDto(val id: UUID, val behandlingId: BehandlingId)
+data class OppdaterVilkårDto(val id: VilkårId, val behandlingId: BehandlingId)
 
 data class GjenbrukVilkårDto(val behandlingId: BehandlingId, val kopierbehandlingId: BehandlingId)
 

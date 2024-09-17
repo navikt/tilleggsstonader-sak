@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -56,7 +57,6 @@ import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
-import java.util.UUID
 
 internal class VilkårServiceTest {
 
@@ -211,7 +211,7 @@ internal class VilkårServiceTest {
     inner class OppdaterVilkår {
         @Test
         internal fun `kan ikke oppdatere vilkår koblet til en behandling som ikke finnes`() {
-            val vilkårId = UUID.randomUUID()
+            val vilkårId = VilkårId.random()
             every { vilkårRepository.findByIdOrNull(vilkårId) } returns null
             assertThat(
                 Assertions.catchThrowable {
