@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
@@ -408,8 +409,8 @@ internal class VilkårServiceTest {
         ).containsOnly(resultat)
     }
 
-    private fun List<Vilkår>.finnVurderingResultaterForBarn(ident: UUID): List<Vilkårsresultat>? {
-        return this.find { vilkår -> vilkår.barnId == ident }?.delvilkårsett?.map { delvilkår -> delvilkår.resultat }
+    private fun List<Vilkår>.finnVurderingResultaterForBarn(barnId: BarnId): List<Vilkårsresultat>? {
+        return this.find { vilkår -> vilkår.barnId == barnId }?.delvilkårsett?.map { delvilkår -> delvilkår.resultat }
     }
 
     private fun initiererVilkår(lagretVilkår: CapturingSlot<Vilkår>): Vilkår {

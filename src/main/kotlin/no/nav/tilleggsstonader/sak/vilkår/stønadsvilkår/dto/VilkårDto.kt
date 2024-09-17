@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto
 
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -20,7 +21,7 @@ data class VilkårDto(
     val fom: LocalDate?,
     val tom: LocalDate?,
     val utgift: Int?,
-    val barnId: UUID? = null,
+    val barnId: BarnId? = null,
     val endretAv: String,
     val endretTid: LocalDateTime,
     val delvilkårsett: List<DelvilkårDto> = emptyList(),

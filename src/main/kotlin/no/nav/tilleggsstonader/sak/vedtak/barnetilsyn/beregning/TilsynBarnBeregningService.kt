@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
@@ -24,7 +25,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktiviteter
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.util.UUID
 import kotlin.math.min
 
 /**
@@ -42,7 +42,7 @@ class TilsynBarnBeregningService(
     // Hva burde denne ta inn? Hva burde bli sendt inn i beregningscontroller?
     fun beregn(
         behandlingId: BehandlingId,
-        utgifterPerBarn: Map<UUID, List<UtgiftBeregning>>,
+        utgifterPerBarn: Map<BarnId, List<UtgiftBeregning>>,
     ): BeregningsresultatTilsynBarnDto {
         val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
         val aktiviteter = finnAktiviteter(behandlingId)
@@ -105,7 +105,7 @@ class TilsynBarnBeregningService(
     private fun lagBeregningsgrunnlagPerMåned(
         stønadsperioder: List<StønadsperiodeDto>,
         aktiviteter: List<Aktivitet>,
-        utgifterPerBarn: Map<UUID, List<UtgiftBeregning>>,
+        utgifterPerBarn: Map<BarnId, List<UtgiftBeregning>>,
     ): List<Beregningsgrunnlag> {
         val stønadsperioderPerMåned = stønadsperioder.tilÅrMåned()
         val utgifterPerMåned = utgifterPerBarn.tilÅrMåned()
@@ -176,7 +176,7 @@ class TilsynBarnBeregningService(
     private fun validerPerioder(
         stønadsperioder: List<StønadsperiodeDto>,
         aktiviteter: List<Aktivitet>,
-        utgifter: Map<UUID, List<UtgiftBeregning>>,
+        utgifter: Map<BarnId, List<UtgiftBeregning>>,
     ) {
         validerStønadsperioder(stønadsperioder)
         validerAktiviteter(aktiviteter)
@@ -195,7 +195,7 @@ class TilsynBarnBeregningService(
         }
     }
 
-    private fun validerUtgifter(utgifter: Map<UUID, List<UtgiftBeregning>>) {
+    private fun validerUtgifter(utgifter: Map<BarnId, List<UtgiftBeregning>>) {
         feilHvis(utgifter.values.flatten().isEmpty()) {
             "Utgiftsperioder mangler"
         }

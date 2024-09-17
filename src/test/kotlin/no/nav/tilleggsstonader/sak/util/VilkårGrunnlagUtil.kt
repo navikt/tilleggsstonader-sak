@@ -7,8 +7,8 @@ import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaHovedytelse
 import no.nav.tilleggsstonader.sak.behandling.fakta.RegistergrunnlagBarn
 import no.nav.tilleggsstonader.sak.behandling.fakta.SøknadsgrunnlagBarn
 import no.nav.tilleggsstonader.sak.behandling.fakta.VilkårFaktaBarn
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import java.time.LocalDate
-import java.util.UUID
 
 object VilkårGrunnlagUtil {
     fun mockVilkårGrunnlagDto(
@@ -29,7 +29,7 @@ object VilkårGrunnlagUtil {
 
     fun grunnlagBarn(
         ident: String = "123",
-        barnId: UUID = UUID.randomUUID(),
+        barnId: BarnId = BarnId.random(),
         registergrunnlag: RegistergrunnlagBarn =
             RegistergrunnlagBarn(
                 navn = "navn",

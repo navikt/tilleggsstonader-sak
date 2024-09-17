@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -286,7 +287,7 @@ class VilkårService(
             )
         }
 
-    private fun finnBarnId(barnId: UUID?, barnIdMap: Map<UUID, UUID>): UUID? =
+    private fun finnBarnId(barnId: BarnId?, barnIdMap: Map<BarnId, BarnId>): BarnId? =
         barnId?.let {
             barnIdMap[it]
                 ?: error("Fant ikke barn=$it på gjeldende behandling med barnIdMapping=$barnIdMap")
@@ -313,7 +314,7 @@ class VilkårService(
         fun byggBarnMapFraTidligereTilNyId(
             barnPåForrigeBehandling: List<BehandlingBarn>,
             barnPåGjeldendeBehandling: List<BehandlingBarn>,
-        ): Map<UUID, BehandlingBarn> {
+        ): Map<BarnId, BehandlingBarn> {
             val barnFraForrigeBehandlingMap = barnPåForrigeBehandling.associateBy { it.id }.toMutableMap()
             return barnPåGjeldendeBehandling.mapNotNull { nyttBarn ->
                 val forrigeBarnId =

@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.behandling.barn
 
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class BarnService(
@@ -24,7 +24,7 @@ class BarnService(
         nyBehandlingId: BehandlingId,
     ): Map<TidligereBarnId, NyttBarnId> {
         val nyeBarnPåGammelId = barnRepository.findByBehandlingId(forrigeBehandlingId)
-            .associate { it.id to it.copy(id = UUID.randomUUID(), behandlingId = nyBehandlingId, sporbar = Sporbar()) }
+            .associate { it.id to it.copy(id = BarnId.random(), behandlingId = nyBehandlingId, sporbar = Sporbar()) }
         barnRepository.insertAll(nyeBarnPåGammelId.values.toList())
         return nyeBarnPåGammelId.map { it.key to it.value.id }.toMap()
     }
@@ -33,8 +33,8 @@ class BarnService(
 /**
  * Typer for å få litt tydeligere grensesnitt på [gjenbrukBarn]
  */
-typealias TidligereBarnId = UUID
-typealias NyttBarnId = UUID
+typealias TidligereBarnId = BarnId
+typealias NyttBarnId = BarnId
 
 /**
  * Her skal vi opprette barn

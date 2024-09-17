@@ -1,13 +1,13 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
 import no.nav.tilleggsstonader.libs.utils.osloNow
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
 
 internal class VilkårTest {
 
@@ -49,7 +49,7 @@ internal class VilkårTest {
         assertThatThrownBy {
             vilkår(
                 behandlingId = BehandlingId.random(),
-                barnId = UUID.randomUUID(),
+                barnId = BarnId.random(),
                 type = VilkårType.PASS_BARN,
                 resultat = Vilkårsresultat.OPPFYLT,
                 fom = LocalDate.of(2024, 8, 2),
@@ -64,7 +64,7 @@ internal class VilkårTest {
         assertThatThrownBy {
             vilkår(
                 behandlingId = BehandlingId.random(),
-                barnId = UUID.randomUUID(),
+                barnId = BarnId.random(),
                 type = VilkårType.PASS_BARN,
                 resultat = Vilkårsresultat.OPPFYLT,
                 fom = LocalDate.of(2024, 8, 1),

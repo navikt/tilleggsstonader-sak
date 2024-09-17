@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -10,13 +11,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import org.springframework.stereotype.Service
 import java.time.YearMonth
-import java.util.UUID
 
 @Service
 class TilsynBarnUtgiftService(
     private val vilkårService: VilkårService,
 ) {
-    fun hentUtgifterTilBeregning(behandlingId: BehandlingId): Map<UUID, List<UtgiftBeregning>> {
+    fun hentUtgifterTilBeregning(behandlingId: BehandlingId): Map<BarnId, List<UtgiftBeregning>> {
         return vilkårService.hentOppfyltePassBarnVilkår(behandlingId)
             .groupBy { it.barnId ?: error("Vilkår=${it.id} type=${it.type} for tilsyn barn mangler barnId") }
             .mapValues { (_, values) -> values.map { mapUtgiftBeregning(it) } }

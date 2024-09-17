@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping("/api/vilkar/admin")
@@ -80,7 +80,7 @@ class FlyttBeløpsperioderTilVilkårController(
     private fun håndterVilkår(
         vilkår: Vilkår,
         behandling: Behandling,
-        vilkårPåBarnId: Map<UUID, List<Vilkår>>,
+        vilkårPåBarnId: Map<BarnId, List<Vilkår>>,
         dryRun: String,
     ) {
         val forrigeBarnId = finnForrigeBarnId(behandling, vilkår.barnId!!)
@@ -137,7 +137,7 @@ class FlyttBeløpsperioderTilVilkårController(
         }
     }
 
-    private fun finnForrigeBarnId(behandling: Behandling, barnId: UUID): UUID? {
+    private fun finnForrigeBarnId(behandling: Behandling, barnId: BarnId): BarnId? {
         val forrigeBehandlingId = behandling.forrigeBehandlingId!!
         val barn = barnRepository.findByIdOrThrow(barnId)
         return barnService.finnBarnPåBehandling(forrigeBehandlingId).firstOrNull { it.ident == barn.ident }?.id

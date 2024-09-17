@@ -1,17 +1,17 @@
 package no.nav.tilleggsstonader.sak.behandling.barn
 
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
-import java.util.UUID
 
 /**
  * Usikker på om vi trenger [navn], kan denne hentes fra personopplysninger i stedet?
  */
 data class BehandlingBarn(
     @Id
-    val id: UUID = UUID.randomUUID(),
+    val id: BarnId = BarnId.random(),
     val behandlingId: BehandlingId,
     val ident: String,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)

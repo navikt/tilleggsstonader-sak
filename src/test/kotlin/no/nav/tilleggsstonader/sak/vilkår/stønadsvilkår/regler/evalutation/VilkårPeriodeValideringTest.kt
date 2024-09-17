@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -7,12 +8,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.Vi
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
 
 class VilkårPeriodeValideringTest {
 
     val behandlingId = BehandlingId.random()
-    val barnId = UUID.randomUUID()
+    val barnId = BarnId.random()
 
     val fom = LocalDate.of(2024, 1, 1)
     val tom = LocalDate.of(2024, 1, 31)
@@ -74,7 +74,7 @@ class VilkårPeriodeValideringTest {
             tom = tom,
             utgift = 1,
         )
-        val vilkår2 = vilkår.copy(barnId = UUID.randomUUID())
+        val vilkår2 = vilkår.copy(barnId = BarnId.random())
 
         validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår2))
     }

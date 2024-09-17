@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
@@ -32,6 +33,9 @@ object IdConverters {
     class BehandlingIdWritingConverter : ValueClassWriter<BehandlingId>({ it.id })
     class BehandlingIdReaderConverter : ValueClassReader<BehandlingId>({ BehandlingId(it) })
 
+    class BarnIdWritingConverter : ValueClassWriter<BarnId>({ it.id })
+    class BarnIdReaderConverter : ValueClassReader<BarnId>({ BarnId(it) })
+
     val alleValueClassConverters = listOf(
         FagsakPersonIdWritingConverter(),
         FagsakPersonIdReaderConverter(),
@@ -39,5 +43,7 @@ object IdConverters {
         FagsakIdReaderConverter(),
         BehandlingIdWritingConverter(),
         BehandlingIdReaderConverter(),
+        BarnIdWritingConverter(),
+        BarnIdReaderConverter(),
     )
 }

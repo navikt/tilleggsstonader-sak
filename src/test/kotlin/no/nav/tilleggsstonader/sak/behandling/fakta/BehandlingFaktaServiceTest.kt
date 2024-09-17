@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KodeverkServiceUtil.mockedKodeverkService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
@@ -25,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
 
 internal class BehandlingFaktaServiceTest {
 
@@ -53,7 +53,7 @@ internal class BehandlingFaktaServiceTest {
         every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns grunnlagsdataDomain()
         every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn()
         every { barnService.finnBarnPåBehandling(any()) } returns
-            listOf(behandlingBarn(personIdent = "1", id = UUID.fromString("60921c76-f8ef-4000-9824-f127a50a575e")))
+            listOf(behandlingBarn(personIdent = "1", id = BarnId.fromString("60921c76-f8ef-4000-9824-f127a50a575e")))
 
         val data = service.hentFakta(behandlingId)
         assertFileIsEqual("vilkår/vilkårGrunnlagDto.json", data)

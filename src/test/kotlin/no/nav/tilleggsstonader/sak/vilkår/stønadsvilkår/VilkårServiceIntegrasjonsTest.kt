@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
@@ -35,7 +36,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.util.UUID
 
 internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
@@ -161,7 +161,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         @Test
         fun `kan ikke opprette vilkår på barn som ikke finnes på behandling`() {
             assertThatThrownBy {
-                vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår.copy(barnId = UUID.randomUUID()))
+                vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår.copy(barnId = BarnId.random()))
             }.hasMessageContaining("Finner ikke barn på behandling")
         }
 

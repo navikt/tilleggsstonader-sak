@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -21,7 +22,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.Re
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelValidering.validerVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsregel
 import java.time.LocalDate
-import java.util.UUID
 
 object OppdaterVilkår {
 
@@ -170,7 +170,7 @@ object OppdaterVilkår {
         vilkårsregel: Vilkårsregel,
         metadata: HovedregelMetadata,
         behandlingId: BehandlingId,
-        barnId: UUID? = null,
+        barnId: BarnId? = null,
     ): Vilkår {
         val delvilkårsett = vilkårsregel.initiereDelvilkår(metadata, barnId = barnId)
         return Vilkår(
