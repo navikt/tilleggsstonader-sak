@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkårDto
@@ -280,6 +281,7 @@ class VilkårService(
         tidligereVilkår.values.map { vilkår ->
             vilkår.copy(
                 id = VilkårId.random(),
+                status = VilkårStatus.UENDRET,
                 behandlingId = nyBehandlingsId,
                 sporbar = Sporbar(),
                 barnId = finnBarnId(vilkår.barnId, barnIdMap),

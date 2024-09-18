@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårStatus
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -20,6 +21,7 @@ internal class VilkårTest {
             behandlingId = behandlingIdFørstegangsbehandling,
             delvilkårwrapper = DelvilkårWrapper(emptyList()),
             type = VilkårType.EKSEMPEL,
+            status = VilkårStatus.NY,
             opphavsvilkår = null,
         )
         val opphavsvilkår = vilkår.opprettOpphavsvilkår()
@@ -39,6 +41,7 @@ internal class VilkårTest {
             delvilkårwrapper = DelvilkårWrapper(emptyList()),
             type = VilkårType.EKSEMPEL,
             opphavsvilkår = opphavsvilkår,
+            status = VilkårStatus.UENDRET,
         )
         val nyttOpphavsvilkår = vilkår.opprettOpphavsvilkår()
         Assertions.assertThat(nyttOpphavsvilkår).isEqualTo(opphavsvilkår)

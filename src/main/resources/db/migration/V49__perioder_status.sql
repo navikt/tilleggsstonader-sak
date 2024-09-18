@@ -1,1 +1,2 @@
 ALTER TABLE vilkar_periode ADD COLUMN status VARCHAR;
+ALTER TABLE vilkar ADD COLUMN status VARCHAR;

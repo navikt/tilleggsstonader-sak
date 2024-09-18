@@ -30,6 +30,7 @@ data class Vilkår(
     val id: VilkårId = VilkårId.random(),
     val behandlingId: BehandlingId,
     val resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+    val status: VilkårStatus?,
     val type: VilkårType,
     val fom: LocalDate? = null,
     val tom: LocalDate? = null,
@@ -163,3 +164,11 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Støn
         }
     }
 }
+
+enum class VilkårStatus {
+    NY,
+    ENDRET,
+    UENDRET,
+    SLETTET,
+}
+
