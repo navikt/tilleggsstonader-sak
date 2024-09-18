@@ -27,7 +27,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
@@ -36,6 +35,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.evaulerVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
@@ -278,6 +278,11 @@ class VilkårperiodeService(
         validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
 
         val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.type, vilkårperiode.delvilkår)
+        val nyStatus = if (eksisterendeVilkårperiode.status == Vilkårstatus.NY) {
+            Vilkårstatus.NY
+        } else {
+            Vilkårstatus.ENDRET
+        }
         val oppdatert = when (eksisterendeVilkårperiode.kilde) {
             KildeVilkårsperiode.MANUELL -> {
                 eksisterendeVilkårperiode.copy(
@@ -287,7 +292,7 @@ class VilkårperiodeService(
                     delvilkår = resultatEvaluering.delvilkår,
                     aktivitetsdager = vilkårperiode.aktivitetsdager,
                     resultat = resultatEvaluering.resultat,
-                    status = Vilkårstatus.ENDRET,
+                    status = nyStatus,
                 )
             }
 
@@ -297,7 +302,7 @@ class VilkårperiodeService(
                     begrunnelse = vilkårperiode.begrunnelse,
                     delvilkår = resultatEvaluering.delvilkår,
                     resultat = resultatEvaluering.resultat,
-                    status = Vilkårstatus.ENDRET,
+                    status = nyStatus,
                 )
             }
         }

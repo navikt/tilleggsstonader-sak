@@ -40,13 +40,13 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
@@ -326,7 +326,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(oppdatertPeriode.begrunnelse).isEqualTo("Oppdatert begrunnelse")
             assertThat(oppdatertPeriode.medlemskap.svar).isEqualTo(SvarJaNei.JA)
             assertThat(oppdatertPeriode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
-            assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
         }
 
         @Test
@@ -362,6 +361,45 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.resultat).isEqualTo(
                 ResultatDelvilkårperiode.IKKE_OPPFYLT,
             )
+        }
+
+        @Test
+        fun `endring av vilkårperioder opprettet i denne behandlingen skal beholde status NY`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(
+                opprettVilkårperiodeMålgruppe(
+                    medlemskap = null,
+                    behandlingId = behandling.id,
+                ),
+            )
+            val oppdatering = vilkårperiode.tilOppdatering()
+            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
+            assertThat(vilkårperiode.status).isEqualTo(Vilkårstatus.NY)
+            assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.NY)
+        }
+
+        @Test
+        fun `endring av vilkårperioder opprettet kopiert fra tidligere behandling skal få status ENDRET`() {
+            val revurdering = testoppsettService.lagBehandlingOgRevurdering()
+
+            val opprinneligVilkårperiode = vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = revurdering.forrigeBehandlingId!!,
+                    kilde = KildeVilkårsperiode.MANUELL,
+                ),
+            )
+
+            vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
+
+            val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
+            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(
+                vilkårperiode.id,
+                vilkårperiode.tilOppdatering(),
+            )
+
+            assertThat(opprinneligVilkårperiode.status).isEqualTo(Vilkårstatus.NY)
+            assertThat(vilkårperiode.status).isEqualTo(Vilkårstatus.UENDRET)
             assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
         }
 
@@ -925,7 +963,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `skal ikke kunne oppdatere dataen når behandlingen er låst`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
             val feil = assertThrows<Feil> { vilkårperiodeService.oppdaterGrunnlag(behandling.id) }
             assertThat(feil.frontendFeilmelding).isEqualTo("Kan ikke oppdatere grunnlag når behandlingen er låst")
         }

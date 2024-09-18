@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivite
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import java.time.LocalDate
 import java.util.UUID
 
@@ -32,6 +33,7 @@ object VilkårperiodeTestUtil {
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
         slettetKommentar: String? = null,
         forrigeVilkårperiodeId: UUID? = null,
+        status: Vilkårstatus = Vilkårstatus.NY,
     ) = Vilkårperiode(
         behandlingId = behandlingId,
         fom = fom,
@@ -44,6 +46,7 @@ object VilkårperiodeTestUtil {
         aktivitetsdager = null,
         slettetKommentar = slettetKommentar,
         forrigeVilkårperiodeId = forrigeVilkårperiodeId,
+        status = status,
     )
 
     fun delvilkårMålgruppe(
@@ -79,6 +82,7 @@ object VilkårperiodeTestUtil {
         kilde: KildeVilkårsperiode = KildeVilkårsperiode.SYSTEM,
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
         slettetKommentar: String? = null,
+        status: Vilkårstatus = Vilkårstatus.NY,
     ) = Vilkårperiode(
         behandlingId = behandlingId,
         fom = fom,
@@ -90,6 +94,7 @@ object VilkårperiodeTestUtil {
         resultat = resultat,
         aktivitetsdager = aktivitetsdager,
         slettetKommentar = slettetKommentar,
+        status = status,
     )
 
     fun delvilkårAktivitet(
