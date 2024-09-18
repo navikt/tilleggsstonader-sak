@@ -7,12 +7,14 @@ import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.*
 
 class SimuleringStegServiceTest {
 
@@ -42,7 +44,7 @@ class SimuleringStegServiceTest {
                 status = BehandlingStatus.FATTER_VEDTAK,
             )
 
-        every { simuleringService.hentLagretSimulering(any()) } returns mockk()
+        every { simuleringService.hentLagretSimulering(any()) } returns Simuleringsresultat(behandlingId = BehandlingId(UUID.randomUUID()), data = null)
         val simuleringsresultatDto = simuleringStegService.hentEllerOpprettSimuleringsresultat(saksbehandling)
 
         verify { stegService wasNot Called }

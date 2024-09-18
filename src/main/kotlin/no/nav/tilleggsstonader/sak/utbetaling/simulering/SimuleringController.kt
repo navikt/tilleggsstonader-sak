@@ -34,13 +34,6 @@ class SimuleringController(
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.UPDATE)
 
-        val simulering = simuleringStegService.hentEllerOpprettSimuleringsresultat(saksbehandling)
-
-        return simulering?.let {
-            SimuleringDto(
-                perioder = simulering.data?.oppsummeringer,
-                ingenEndringIUtbetaling = it.ingenEndringIUtbetaling,
-            )
-        }
+        return simuleringStegService.hentEllerOpprettSimuleringsresultat(saksbehandling)
     }
 }
