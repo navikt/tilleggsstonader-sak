@@ -48,6 +48,7 @@ spotless {
 configurations.all {
     resolutionStrategy {
         failOnNonReproducibleResolution()
+        force("org.apache.commons:commons-compress:1.26.0")
     }
 }
 
