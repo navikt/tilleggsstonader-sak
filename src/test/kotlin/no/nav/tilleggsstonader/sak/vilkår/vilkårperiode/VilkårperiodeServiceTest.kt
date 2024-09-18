@@ -40,6 +40,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -325,6 +326,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(oppdatertPeriode.begrunnelse).isEqualTo("Oppdatert begrunnelse")
             assertThat(oppdatertPeriode.medlemskap.svar).isEqualTo(SvarJaNei.JA)
             assertThat(oppdatertPeriode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+            assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
         }
 
         @Test
@@ -360,6 +362,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.resultat).isEqualTo(
                 ResultatDelvilkårperiode.IKKE_OPPFYLT,
             )
+            assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
         }
 
         @Test
@@ -584,6 +587,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 val oppdatertPeriode = vilkårperiodeRepository.findByIdOrThrow(lagretPeriode.id)
                 assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
                 assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
+                assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.SLETTET)
             }
         }
     }
@@ -822,7 +826,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 "sporbar",
                 "behandlingId",
                 "forrigeVilkårperiodeId",
+                "status",
             ).containsExactlyInAnyOrderElementsOf(eksisterendeVilkårperioder)
+            assertThat(res.map { it.status }).containsOnly(Vilkårstatus.UENDRET)
         }
 
         @Test

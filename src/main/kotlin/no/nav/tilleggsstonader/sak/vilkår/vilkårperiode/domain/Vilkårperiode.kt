@@ -17,6 +17,13 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.*
 
+enum class Vilkårstatus {
+    NY,
+    ENDRET,
+    UENDRET,
+    SLETTET,
+}
+
 @Table("vilkar_periode")
 data class Vilkårperiode(
     @Id
@@ -36,6 +43,8 @@ data class Vilkårperiode(
     val aktivitetsdager: Int?,
 
     val slettetKommentar: String? = null,
+
+    val status: Vilkårstatus? = null,
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),

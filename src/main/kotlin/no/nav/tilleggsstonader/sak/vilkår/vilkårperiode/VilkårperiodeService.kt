@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
@@ -231,6 +232,7 @@ class VilkårperiodeService(
                 resultat = resultatEvaluering.resultat,
                 aktivitetsdager = vilkårperiode.aktivitetsdager,
                 kilde = KildeVilkårsperiode.MANUELL,
+                status = Vilkårstatus.NY,
             ),
         )
     }
@@ -285,6 +287,7 @@ class VilkårperiodeService(
                     delvilkår = resultatEvaluering.delvilkår,
                     aktivitetsdager = vilkårperiode.aktivitetsdager,
                     resultat = resultatEvaluering.resultat,
+                    status = Vilkårstatus.ENDRET,
                 )
             }
 
@@ -294,6 +297,7 @@ class VilkårperiodeService(
                     begrunnelse = vilkårperiode.begrunnelse,
                     delvilkår = resultatEvaluering.delvilkår,
                     resultat = resultatEvaluering.resultat,
+                    status = Vilkårstatus.ENDRET,
                 )
             }
         }
@@ -328,6 +332,7 @@ class VilkårperiodeService(
                 vilkårperiode.copy(
                     resultat = ResultatVilkårperiode.SLETTET,
                     slettetKommentar = slettVikårperiode.kommentar,
+                    status = Vilkårstatus.SLETTET,
                 ),
             )
         }
@@ -344,6 +349,7 @@ class VilkårperiodeService(
                     behandlingId = nyBehandlingId,
                     forrigeVilkårperiodeId = it.id,
                     sporbar = Sporbar(),
+                    status = Vilkårstatus.UENDRET,
                 )
             }
         vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)
