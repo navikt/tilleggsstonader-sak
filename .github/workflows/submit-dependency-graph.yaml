@@ -7,6 +7,7 @@ on:
     paths:
       - "**.gradle.kts"
       - "gradle.properties"
+      - ".github/workflows/submit-dependency-graph.yaml"
 jobs:
   dependencies:
     runs-on: ubuntu-latest
@@ -24,12 +25,12 @@ jobs:
 
       - name: Setup Gradle to generate and submit dependency graphs
         uses: gradle/actions/setup-gradle@v4
-        env:
-          # Eksluder test dependencies
-          DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: compileClasspath|runtimeClasspath
         with:
           gradle-version: wrapper
           dependency-graph: generate-and-submit
 
       - name: Run a build (dependency-graph will be generated and submitted post-job)
-        run: ./gradlew build -x :check -x :cyclonedxBom
+        env:
+          # Eksluder test dependencies
+          DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: compileClasspath|runtimeClasspath
+        run: ./gradlew --configuration-cache build -x :check -x :cyclonedxBom
