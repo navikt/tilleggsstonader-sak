@@ -6,7 +6,7 @@ import java.time.LocalDate
 data class SimuleringDto(
     val perioder: List<OppsummeringForPeriode>?,
     val ingenEndringIUtbetaling: Boolean,
-    val simuleringOppsummering: SimuleringOppsummering?,
+    val oppsummering: SimuleringOppsummering?,
 )
 
 data class SimuleringOppsummering(
@@ -14,9 +14,4 @@ data class SimuleringOppsummering(
     val tom: LocalDate,
     val etterbetaling: Int,
     val feilutbetaling: Int,
-)
-
-data class NesteUtbetaling(
-    val utbetalingsdato: LocalDate,
-    val beløp: Int,
 )

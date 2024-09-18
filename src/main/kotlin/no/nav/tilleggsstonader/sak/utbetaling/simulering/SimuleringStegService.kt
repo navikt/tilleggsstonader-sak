@@ -34,7 +34,7 @@ class SimuleringStegService(
         return SimuleringDto(
             perioder = this.data?.oppsummeringer,
             ingenEndringIUtbetaling = this.ingenEndringIUtbetaling,
-            simuleringOppsummering = lagSimuleringOppsummering(this),
+            oppsummering = lagSimuleringOppsummering(this),
         )
     }
 
