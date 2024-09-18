@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDto
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -38,6 +39,7 @@ data class VilkårperiodeDto(
     val sistEndret: LocalDateTime,
     val aktivitetsdager: Int? = null,
     val forrigeVilkårperiodeId: UUID?,
+    val status: Vilkårstatus?,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -58,6 +60,7 @@ fun Vilkårperiode.tilDto() =
         slettetKommentar = this.slettetKommentar,
         sistEndret = this.sporbar.endret.endretTid,
         forrigeVilkårperiodeId = this.forrigeVilkårperiodeId,
+        status = this.status,
     )
 
 fun DelvilkårVilkårperiode.tilDto() = when (this) {
