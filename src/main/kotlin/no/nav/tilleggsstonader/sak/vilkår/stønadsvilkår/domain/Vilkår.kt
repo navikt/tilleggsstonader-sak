@@ -171,4 +171,3 @@ enum class VilkårStatus {
     UENDRET,
     SLETTET,
 }
-
