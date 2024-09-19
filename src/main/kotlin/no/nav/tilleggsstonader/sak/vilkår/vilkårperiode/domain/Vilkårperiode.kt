@@ -119,8 +119,23 @@ data class Vilkårperiode(
             }
         }
     }
+
     fun kanSlettesPermanent() =
         this.forrigeVilkårperiodeId == null && this.kilde != KildeVilkårsperiode.SYSTEM
+
+    fun forrigeVilkårperiodeId(): UUID {
+        return when (status) {
+            Vilkårstatus.SLETTET -> error("Skal ikke kopiere vilkårperiode som er slettet")
+            Vilkårstatus.UENDRET ->
+                forrigeVilkårperiodeId
+                    ?: error("Forventer at vilkårperiode med status=$status har forrigeVilkårperiodeId")
+
+            null,
+            Vilkårstatus.NY,
+            Vilkårstatus.ENDRET,
+            -> id
+        }
+    }
 }
 
 enum class KildeVilkårsperiode {

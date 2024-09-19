@@ -352,7 +352,7 @@ class VilkårperiodeService(
                 it.copy(
                     id = UUID.randomUUID(),
                     behandlingId = nyBehandlingId,
-                    forrigeVilkårperiodeId = it.id,
+                    forrigeVilkårperiodeId = it.forrigeVilkårperiodeId(),
                     sporbar = Sporbar(),
                     status = Vilkårstatus.UENDRET,
                 )
