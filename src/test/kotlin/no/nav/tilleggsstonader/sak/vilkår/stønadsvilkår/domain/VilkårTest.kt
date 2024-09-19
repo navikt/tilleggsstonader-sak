@@ -47,6 +47,21 @@ internal class VilkårTest {
     }
 
     @Test
+    internal fun `opprettOpphavsvilkår - skal ikke bruke opphavsvilkår hvis den finnes og vilkåret er endret`() {
+        val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, osloNow())
+        val vilkår = Vilkår(
+            behandlingId = behandlingIdRevurdering,
+            delvilkårwrapper = DelvilkårWrapper(emptyList()),
+            type = VilkårType.EKSEMPEL,
+            opphavsvilkår = opphavsvilkår,
+            status = VilkårStatus.ENDRET,
+        )
+        val nyttOpphavsvilkår = vilkår.opprettOpphavsvilkår()
+        Assertions.assertThat(nyttOpphavsvilkår.vurderingstidspunkt).isEqualTo(vilkår.sporbar.endret.endretTid)
+        Assertions.assertThat(nyttOpphavsvilkår.behandlingId).isEqualTo(vilkår.behandlingId)
+    }
+
+    @Test
     fun `skal feile dersom FOM fra vilkår ikke er første dagen i måneden`() {
         assertThatThrownBy {
             vilkår(
