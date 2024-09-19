@@ -15,3 +15,24 @@ data class SimuleringOppsummering(
     val etterbetaling: Int,
     val feilutbetaling: Int,
 )
+
+fun Simuleringsresultat.tilDto(): SimuleringDto {
+    return SimuleringDto(
+        perioder = this.data?.oppsummeringer,
+        ingenEndringIUtbetaling = this.ingenEndringIUtbetaling,
+        oppsummering = lagSimuleringOppsummering(this),
+    )
+}
+
+private fun lagSimuleringOppsummering(simulering: Simuleringsresultat): SimuleringOppsummering? {
+    if (simulering.data == null) {
+        return null
+    }
+
+    return SimuleringOppsummering(
+        fom = simulering.data.oppsummeringer.minOf { it.fom },
+        tom = simulering.data.oppsummeringer.maxOf { it.tom },
+        etterbetaling = simulering.data.oppsummeringer.sumOf { it.totalEtterbetaling },
+        feilutbetaling = simulering.data.oppsummeringer.sumOf { it.totalFeilutbetaling },
+    )
+}
