@@ -5,6 +5,8 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.dto.SimuleringDto
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.dto.tilDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

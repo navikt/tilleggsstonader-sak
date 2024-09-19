@@ -1,5 +1,6 @@
-package no.nav.tilleggsstonader.sak.utbetaling.simulering
+package no.nav.tilleggsstonader.sak.utbetaling.simulering.dto
 
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.OppsummeringForPeriode
 import java.time.LocalDate
 
