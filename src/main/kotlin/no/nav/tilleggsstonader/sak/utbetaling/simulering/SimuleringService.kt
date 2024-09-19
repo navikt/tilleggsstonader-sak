@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettDtoMapper
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringResponseMapper
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
@@ -57,7 +56,7 @@ class SimuleringService(
         return simuleringsresultatRepository.insert(
             Simuleringsresultat(
                 behandlingId = saksbehandling.id,
-                data = SimuleringResponseMapper.map(resultat),
+                data = resultat?.let { SimuleringKontraktTilDomeneMapper.map(it) },
                 ingenEndringIUtbetaling = resultat == null,
             ),
         )

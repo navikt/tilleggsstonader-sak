@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering.dto
 
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.OppsummeringForPeriode
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.OppsummeringForPeriode
 import java.time.LocalDate
 
 data class SimuleringDto(

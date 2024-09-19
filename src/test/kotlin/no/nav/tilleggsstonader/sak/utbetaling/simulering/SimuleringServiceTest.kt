@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringResponse
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
@@ -29,6 +29,8 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDetaljer as SimuleringDetaljerKontrakt
 
 internal class SimuleringServiceTest {
 
@@ -72,7 +74,7 @@ internal class SimuleringServiceTest {
         val tilkjentYtelse = tilkjentYtelse(behandlingId = saksbehandling.id)
         val simuleringsresultat = Simuleringsresultat(
             behandlingId = saksbehandling.id,
-            data = SimuleringResponse(mockk(), mockk()),
+            data = SimuleringJson(mockk(), mockk()),
         )
         every { behandlingService.hentBehandling(any()) } returns behandling
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
@@ -80,9 +82,10 @@ internal class SimuleringServiceTest {
         every { simuleringsresultatRepository.insert(any()) } returns simuleringsresultat
 
         val simulerSlot = slot<SimuleringRequestDto>()
+        val detaljer = SimuleringDetaljerKontrakt("", LocalDate.now(), 0, emptyList())
         every {
             iverksettClient.simuler(capture(simulerSlot))
-        } returns SimuleringResponseDto(mockk(), mockk())
+        } returns SimuleringResponseDto(emptyList(), detaljer)
 
         simuleringService.hentOgLagreSimuleringsresultat(saksbehandling)
 

@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValue
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringResponse
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
@@ -210,8 +210,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         override fun convert(data: VilkårperiodeType): String = data.tilDbType()
     }
 
-    class SimuleringResponseWriter : JsonWriter<SimuleringResponse>()
-    class SimuleringResponseReader : JsonReader<SimuleringResponse>(SimuleringResponse::class)
+    class SimuleringResponseWriter : JsonWriter<SimuleringJson>()
+    class SimuleringResponseReader : JsonReader<SimuleringJson>(SimuleringJson::class)
 
     class GrunnlagWriter : JsonWriter<Grunnlag>()
     class GrunnlagReader : JsonReader<Grunnlag>(Grunnlag::class)
