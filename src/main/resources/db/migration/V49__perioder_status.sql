@@ -62,7 +62,10 @@ WHERE vp.behandling_id = b.id
 -- Oppdaterer de vilkår som har opphavsvilkår men mangler match i forrige behandling, til status ENDRET
 UPDATE vilkar vp
 SET status = 'ENDRET'
-WHERE vp.opphavsvilkaar_behandling_id IS NOT NULL
+FROM behandling b
+WHERE b.id = vp.behandling_id
+  AND vp.opphavsvilkaar_behandling_id IS NOT NULL
+  AND b.forrige_behandling_id IS NOT NULL
   AND NOT EXISTS (SELECT *
                   FROM behandling b
                            JOIN behandling_barn barn ON vp.barn_id::uuid = barn.id
