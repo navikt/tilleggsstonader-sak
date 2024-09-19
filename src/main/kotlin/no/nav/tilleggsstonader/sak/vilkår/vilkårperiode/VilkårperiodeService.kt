@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
@@ -347,16 +346,7 @@ class VilkårperiodeService(
         val eksisterendeVilkårperioder =
             vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
 
-        val kopiertePerioderMedReferanse = eksisterendeVilkårperioder
-            .map {
-                it.copy(
-                    id = UUID.randomUUID(),
-                    behandlingId = nyBehandlingId,
-                    forrigeVilkårperiodeId = it.forrigeVilkårperiodeId(),
-                    sporbar = Sporbar(),
-                    status = Vilkårstatus.UENDRET,
-                )
-            }
+        val kopiertePerioderMedReferanse = eksisterendeVilkårperioder.map { it.kopierTilBehandling(nyBehandlingId) }
         vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)
     }
 

@@ -123,7 +123,17 @@ data class Vilkårperiode(
     fun kanSlettesPermanent() =
         this.forrigeVilkårperiodeId == null && this.kilde != KildeVilkårsperiode.SYSTEM
 
-    fun forrigeVilkårperiodeId(): UUID {
+    fun kopierTilBehandling(nyBehandlingId: BehandlingId): Vilkårperiode {
+        return copy(
+            id = UUID.randomUUID(),
+            behandlingId = nyBehandlingId,
+            forrigeVilkårperiodeId = forrigeVilkårPeriodeIdForKopiertVilkår(),
+            sporbar = Sporbar(),
+            status = Vilkårstatus.UENDRET,
+        )
+    }
+
+    private fun forrigeVilkårPeriodeIdForKopiertVilkår(): UUID {
         return when (status) {
             Vilkårstatus.SLETTET -> error("Skal ikke kopiere vilkårperiode som er slettet")
             Vilkårstatus.UENDRET ->

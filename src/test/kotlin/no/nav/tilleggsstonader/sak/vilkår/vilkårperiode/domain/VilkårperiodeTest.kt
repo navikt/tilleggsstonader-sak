@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
-import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårMålgruppe
@@ -86,19 +86,21 @@ class VilkårperiodeTest {
     }
 
     @Nested
-    inner class ForrigeVilkårperiodeId {
+    inner class GjenbrukUtledForrigeVilkårPeriodeId {
+
+        private val behandlingId = BehandlingId.random()
 
         @Test
         fun `man skal ikke kopiere vilkår som er slettet`() {
             assertThatThrownBy {
-                målgruppe(status = Vilkårstatus.SLETTET).forrigeVilkårperiodeId()
+                målgruppe(status = Vilkårstatus.SLETTET).kopierTilBehandling(behandlingId).forrigeVilkårperiodeId
             }.hasMessageContaining("Skal ikke kopiere vilkårperiode som er slettet")
         }
 
         @Test
         fun `skal feile et vilkår med status uendret ikke inneholder forrigeVilkårPeriode, då det ellers ikke kan ha status UENDRET`() {
             assertThatThrownBy {
-                målgruppe(status = Vilkårstatus.UENDRET).forrigeVilkårperiodeId()
+                målgruppe(status = Vilkårstatus.UENDRET).kopierTilBehandling(behandlingId).forrigeVilkårperiodeId
             }.hasMessageContaining("Forventer at vilkårperiode med status=UENDRET har forrigeVilkårperiodeId")
         }
 
@@ -106,21 +108,21 @@ class VilkårperiodeTest {
         fun `kopiering av et vilkår med status UENDRET skal peke til forrigeVilkårPeriodeId fordi det var då vilkåret ble vurdert`() {
             val forrigeVilkårperiodeId = UUID.randomUUID()
             val målgruppe = målgruppe(status = Vilkårstatus.UENDRET, forrigeVilkårperiodeId = forrigeVilkårperiodeId)
-            assertThat(målgruppe.forrigeVilkårperiodeId()).isEqualTo(forrigeVilkårperiodeId)
+            assertThat(målgruppe.kopierTilBehandling(behandlingId).forrigeVilkårperiodeId).isEqualTo(forrigeVilkårperiodeId)
         }
 
         @Test
         fun `kopiering av et vilkår med status ENDRET skal peke til vilkåret sitt id fordi det var då vilkåret ble vurdert`() {
             val forrigeVilkårperiodeId = UUID.randomUUID()
             val målgruppe = målgruppe(status = Vilkårstatus.ENDRET, forrigeVilkårperiodeId = forrigeVilkårperiodeId)
-            assertThat(målgruppe.forrigeVilkårperiodeId()).isEqualTo(målgruppe.id)
+            assertThat(målgruppe.kopierTilBehandling(behandlingId).forrigeVilkårperiodeId).isEqualTo(målgruppe.id)
         }
 
         @Test
         fun `kopiering av et vilkår med status NY skal peke til vilkåret sitt id fordi det var då vilkåret ble vurdert`() {
             val forrigeVilkårperiodeId = UUID.randomUUID()
             val målgruppe = målgruppe(status = Vilkårstatus.NY, forrigeVilkårperiodeId = forrigeVilkårperiodeId)
-            assertThat(målgruppe.forrigeVilkårperiodeId()).isEqualTo(målgruppe.id)
+            assertThat(målgruppe.kopierTilBehandling(behandlingId).forrigeVilkårperiodeId).isEqualTo(målgruppe.id)
         }
     }
 }
