@@ -243,7 +243,7 @@ fun vilkår(
     behandlingId: BehandlingId,
     type: VilkårType,
     resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
-    status: VilkårStatus? = null,
+    status: VilkårStatus = VilkårStatus.NY,
     delvilkår: List<Delvilkår> = emptyList(),
     barnId: BarnId? = null,
     opphavsvilkår: Opphavsvilkår? = null,
