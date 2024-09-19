@@ -18,8 +18,8 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -42,6 +42,7 @@ class JournalførVedtaksbrevTask(
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val journalpostService: JournalpostService,
     private val brevmottakerRepository: BrevmottakerRepository,
+    private val transactionHandler: TransactionHandler,
 ) : AsyncTaskStep {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -51,8 +52,20 @@ class JournalførVedtaksbrevTask(
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
         val vedtaksbrev = brevService.hentBesluttetBrev(saksbehandling.id)
-        val brevmottaker = hentBrevmottaker(saksbehandling)
 
+        val ikkeJournalførteBrevmottakere = brevmottakerRepository.findByBehandlingId(behandlingId).filter { it.journalpostId == null }
+        ikkeJournalførteBrevmottakere.forEach { brevmottaker ->
+            transactionHandler.runInNewTransaction {
+                journalførVedtaksbrevForEnMottaker(vedtaksbrev, saksbehandling, brevmottaker)
+            }
+        }
+    }
+
+    private fun journalførVedtaksbrevForEnMottaker(
+        vedtaksbrev: Vedtaksbrev,
+        saksbehandling: Saksbehandling,
+        brevmottaker: Brevmottaker,
+    ) {
         val dokument = Dokument(
             dokument = vedtaksbrev.beslutterPdf?.bytes ?: error("Mangler beslutterpdf"),
             filtype = Filtype.PDFA,
@@ -60,7 +73,7 @@ class JournalførVedtaksbrevTask(
             tittel = utledBrevtittel(saksbehandling),
         )
 
-        val eksternReferanseId = "${saksbehandling.eksternId}-vedtaksbrev"
+        val eksternReferanseId = "${saksbehandling.eksternId}-vedtaksbrev-${brevmottaker.id}"
 
         val arkviverDokumentRequest = ArkiverDokumentRequest(
             fnr = saksbehandling.ident,
@@ -101,16 +114,6 @@ class JournalførVedtaksbrevTask(
             MottakerType.ORGANISASJON -> brevmottaker.mottakerNavn
         },
     )
-
-    private fun hentBrevmottaker(saksbehandling: Saksbehandling): Brevmottaker {
-        return brevmottakerRepository.findByBehandlingId(saksbehandling.id).let {
-            feilHvis(it.size > 1) {
-                "Støtte for flere brevmottakere er ikke implementert"
-            }
-
-            it.first()
-        }
-    }
 
     private fun utledBrevtittel(saksbehandling: Saksbehandling) = when (saksbehandling.stønadstype) {
         Stønadstype.BARNETILSYN -> "Vedtak om stønad til tilsyn barn" // TODO

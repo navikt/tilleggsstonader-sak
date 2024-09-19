@@ -3,8 +3,11 @@ package no.nav.tilleggsstonader.sak.brev
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -12,6 +15,8 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksbrev
@@ -22,7 +27,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatusCode
 import org.springframework.web.client.HttpClientErrorException
 import java.net.http.HttpTimeoutException
-import java.util.Properties
+import java.util.*
 
 class JournalførVedtaksbrevTaskTest {
 
@@ -41,6 +46,7 @@ class JournalførVedtaksbrevTaskTest {
         arbeidsfordelingService,
         journalpostService,
         brevmottakerRepository,
+        TransactionHandler(),
     )
 
     val saksbehandling = saksbehandling()
@@ -90,5 +96,101 @@ class JournalførVedtaksbrevTaskTest {
 
         assertThat(taskSlot.captured.payload).isEqualTo(saksbehandling.id.toString())
         assertThat(taskSlot.captured.type).isEqualTo(DistribuerVedtaksbrevTask.TYPE)
+    }
+
+    @Test
+    internal fun `dersom det finnes én brevmottaker skal opprettJournalpost og brevmottakerRepository-update kjøres én gang hver`() {
+        val brevmottaker = mockk<Brevmottaker>()
+        every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse("journalpostID", true, null)
+        every { brevmottakerRepository.update(any()) } returns brevmottaker
+
+        journalførVedtaksbrevTask.doTask(task)
+
+        verify(exactly = 1) { journalpostService.opprettJournalpost(any()) }
+        verify(exactly = 1) { brevmottakerRepository.update(any()) }
+    }
+
+    @Test
+    internal fun `dersom det finnes to brevmottakere skal opprettJournalpost og brevmottakerRepository-update kjøres to ganger hver`() {
+        val brevmottakerDuplikat = Brevmottaker(
+            behandlingId = saksbehandling.id,
+            mottakerRolle = MottakerRolle.BRUKER,
+            mottakerType = MottakerType.PERSON,
+            ident = saksbehandling.ident,
+        )
+        every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
+            brevmottakerDuplikat,
+            brevmottakerDuplikat,
+        )
+
+        val brevmottaker = mockk<Brevmottaker>()
+        every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse(
+            journalpostId = "mocket JournalpostId",
+            ferdigstilt = true,
+            dokumenter = null,
+        )
+        every { brevmottakerRepository.update(any()) } returns brevmottaker
+
+        journalførVedtaksbrevTask.doTask(task)
+
+        verify(exactly = 2) { journalpostService.opprettJournalpost(any()) }
+        verify(exactly = 2) { brevmottakerRepository.update(any()) }
+    }
+
+    @Test
+    internal fun `kaster feil hvis dokument fra arkiv ikke er ferdigstilt`() {
+        val brevmottaker = mockk<Brevmottaker>()
+        every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse(
+            journalpostId = "mocket JournalpostId",
+            ferdigstilt = false,
+            dokumenter = null,
+        )
+        every { brevmottakerRepository.update(any()) } returns brevmottaker
+
+        Assertions.assertThatThrownBy {
+            journalførVedtaksbrevTask.doTask(task)
+        }.isInstanceOf(Feil::class.java).message().isEqualTo("Journalposten ble ikke ferdigstilt og kan derfor ikke distribueres")
+    }
+
+    @Test
+    internal fun `Det skal ikke opprettes ny journalpost for brevmottakere som allerede har journalpostId`() {
+        val arkiverDokumentRequestSlot = slot<ArkiverDokumentRequest>()
+
+        val brevmottakerUUID = UUID.randomUUID()
+
+        val brevmottakerUtenJournalføringsId = Brevmottaker(
+            id = brevmottakerUUID,
+            behandlingId = saksbehandling.id,
+            mottakerRolle = MottakerRolle.BRUKER,
+            mottakerType = MottakerType.PERSON,
+            ident = saksbehandling.ident,
+        )
+
+        val brevmottakerMedJournalføringsId = Brevmottaker(
+            behandlingId = saksbehandling.id,
+            mottakerRolle = MottakerRolle.BRUKER,
+            mottakerType = MottakerType.PERSON,
+            ident = saksbehandling.ident,
+            journalpostId = "eksisterende journalpost id",
+        )
+        every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
+            brevmottakerUtenJournalføringsId,
+            brevmottakerMedJournalføringsId,
+        )
+
+        val brevmottaker = mockk<Brevmottaker>()
+        every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse(
+            journalpostId = "mocket JournalpostId",
+            ferdigstilt = true,
+            dokumenter = null,
+        )
+        every { brevmottakerRepository.update(any()) } returns brevmottaker
+
+        journalførVedtaksbrevTask.doTask(task)
+
+        verify(exactly = 1) { journalpostService.opprettJournalpost(capture(arkiverDokumentRequestSlot)) }
+        verify(exactly = 1) { brevmottakerRepository.update(any()) }
+
+        assertThat(arkiverDokumentRequestSlot.captured.avsenderMottaker?.id!!.equals(brevmottakerUUID))
     }
 }
