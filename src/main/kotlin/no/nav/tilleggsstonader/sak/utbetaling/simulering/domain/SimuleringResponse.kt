@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.utbetaling.simulering
+package no.nav.tilleggsstonader.sak.utbetaling.simulering.domain
 
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.OppsummeringForPeriode
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDetaljer

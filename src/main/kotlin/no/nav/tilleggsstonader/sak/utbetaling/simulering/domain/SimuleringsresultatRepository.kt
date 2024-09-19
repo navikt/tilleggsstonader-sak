@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.utbetaling.simulering
+package no.nav.tilleggsstonader.sak.utbetaling.simulering.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository

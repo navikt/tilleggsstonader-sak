@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValue
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringResponse
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
