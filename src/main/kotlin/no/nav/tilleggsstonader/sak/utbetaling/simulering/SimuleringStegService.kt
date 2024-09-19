@@ -16,17 +16,17 @@ class SimuleringStegService(
 ) {
 
     @Transactional
-    fun hentEllerOpprettSimuleringsresultat(saksbehandling: Saksbehandling): Simuleringsresultat? {
+    fun hentEllerOpprettSimuleringsresultat(saksbehandling: Saksbehandling): SimuleringDto? {
         if (saksbehandling.status.behandlingErLåstForVidereRedigering() ||
             !tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)
         ) {
-            return simuleringService.hentLagretSimulering(saksbehandling.id)
+            return simuleringService.hentLagretSimulering(saksbehandling.id)?.tilDto()
         } else {
             if (saksbehandling.steg == StegType.SIMULERING) {
                 stegService.håndterSteg(saksbehandling.id, StegType.SIMULERING)
             }
 
-            return simuleringService.hentLagretSimulering(saksbehandling.id)
+            return simuleringService.hentLagretSimulering(saksbehandling.id)?.tilDto()
         }
     }
 }
