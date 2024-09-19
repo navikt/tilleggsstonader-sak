@@ -133,6 +133,9 @@ data class Vilkårperiode(
         )
     }
 
+    /**
+     * Liknende som [no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår.opprettOpphavsvilkår]
+     */
     private fun forrigeVilkårPeriodeIdForKopiertVilkår(): UUID {
         return when (status) {
             Vilkårstatus.SLETTET -> error("Skal ikke kopiere vilkårperiode som er slettet")

@@ -88,12 +88,24 @@ data class Vilkår(
         }
     }
 
+    fun kopierTilBehandling(nyBehandlingId: BehandlingId, barnIdINyBehandling: BarnId?): Vilkår {
+        return copy(
+            id = VilkårId.random(),
+            status = VilkårStatus.UENDRET,
+            behandlingId = nyBehandlingId,
+            sporbar = Sporbar(),
+            barnId = barnIdINyBehandling,
+            opphavsvilkår = opphavsvilkårForKopiertVilkår(),
+        )
+    }
+
     /**
      * Brukes når man skal gjenbruke denne vilkårsvurderingen i en annan vilkårsvurdering
      * Hvis vilkåret er uendret skal gjenbruke det forrige opphavsvilkåret då vilkåret er uendret
      * Men dersom det har blitt endret eller nytt i denne behandlingen skal man peke til at det ble vurdert i denne behandlingen
+     * Liknende som [no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode.forrigeVilkårPeriodeIdForKopiertVilkår]
      */
-    fun opprettOpphavsvilkår(): Opphavsvilkår {
+    private fun opphavsvilkårForKopiertVilkår(): Opphavsvilkår {
         return when (status) {
             VilkårStatus.SLETTET -> error("Skal ikke kopiere vilkår som er slettet")
             VilkårStatus.UENDRET -> opphavsvilkår ?: error("Forventer at vilkår med status=$status har opphavsvilkår")

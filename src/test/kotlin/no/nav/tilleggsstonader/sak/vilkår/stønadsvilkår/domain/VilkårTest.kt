@@ -23,8 +23,8 @@ internal class VilkårTest {
             status = VilkårStatus.NY,
             opphavsvilkår = null,
         )
-        val opphavsvilkår = vilkår.opprettOpphavsvilkår()
-        assertThat(opphavsvilkår).isEqualTo(
+        val nyttOpphavsvilkår = vilkår.kopierTilBehandling(BehandlingId.random(), BarnId.random()).opphavsvilkår!!
+        assertThat(nyttOpphavsvilkår).isEqualTo(
             Opphavsvilkår(
                 behandlingIdFørstegangsbehandling,
                 vilkår.sporbar.endret.endretTid,
@@ -42,7 +42,7 @@ internal class VilkårTest {
             opphavsvilkår = opphavsvilkår,
             status = VilkårStatus.UENDRET,
         )
-        val nyttOpphavsvilkår = vilkår.opprettOpphavsvilkår()
+        val nyttOpphavsvilkår = vilkår.kopierTilBehandling(BehandlingId.random(), BarnId.random()).opphavsvilkår
         assertThat(nyttOpphavsvilkår).isEqualTo(opphavsvilkår)
     }
 
@@ -56,7 +56,7 @@ internal class VilkårTest {
             opphavsvilkår = opphavsvilkår,
             status = VilkårStatus.ENDRET,
         )
-        val nyttOpphavsvilkår = vilkår.opprettOpphavsvilkår()
+        val nyttOpphavsvilkår = vilkår.kopierTilBehandling(BehandlingId.random(), BarnId.random()).opphavsvilkår!!
         assertThat(nyttOpphavsvilkår.vurderingstidspunkt).isEqualTo(vilkår.sporbar.endret.endretTid)
         assertThat(nyttOpphavsvilkår.behandlingId).isEqualTo(vilkår.behandlingId)
     }
