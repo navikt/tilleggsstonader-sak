@@ -21,8 +21,17 @@ class AktivitetController(
     private val behandlingService: BehandlingService,
 ) {
 
-    @GetMapping("{fagsakPersonId}")
+    @GetMapping("temp/{fagsakPersonId}")
     fun hentAktiviteter(
+        @PathVariable fagsakPersonId: FagsakPersonId,
+    ): AktiviteterDto {
+        tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
+        return aktivitetService.hentAktiviteterMedPerioder(fagsakPersonId)
+    }
+
+    @Deprecated("Byttes ut med hentAktiviteter, fordi vi trenger informasjon om for hvilken periode vi henter ut data.")
+    @GetMapping("{fagsakPersonId}")
+    fun hentAktiviteterDeprecated(
         @PathVariable fagsakPersonId: FagsakPersonId,
     ): List<AktivitetArenaDto> {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
