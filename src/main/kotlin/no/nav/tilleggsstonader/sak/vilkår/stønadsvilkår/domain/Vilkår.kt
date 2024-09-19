@@ -64,9 +64,11 @@ data class Vilkår(
                 validerFørsteOgSisteDagIValgtMåned(fom, tom)
                 validerPåkrevdBeløpHvisOppfylt()
             }
+
             VilkårType.EKSEMPEL -> {
                 // Dette er kun for tester foreløpig
             }
+
             else -> error("Må ta stilling til validering av fom/tom. Eks om vilkåret bruker dato eller månedsvelger")
         }
     }
@@ -88,9 +90,20 @@ data class Vilkår(
 
     /**
      * Brukes når man skal gjenbruke denne vilkårsvurderingen i en annan vilkårsvurdering
+     * Hvis vilkåret er uendret skal gjenbruke det forrige opphavsvilkåret då vilkåret er uendret
+     * Men dersom det har blitt endret eller nytt i denne behandlingen skal man peke til at det ble vurdert i denne behandlingen
      */
-    fun opprettOpphavsvilkår(): Opphavsvilkår =
-        opphavsvilkår ?: Opphavsvilkår(behandlingId, sporbar.endret.endretTid)
+    fun opprettOpphavsvilkår(): Opphavsvilkår {
+        return when (status) {
+            VilkårStatus.SLETTET -> error("Skal ikke kopiere vilkår som er slettet")
+            VilkårStatus.UENDRET -> opphavsvilkår ?: error("Forventer at vilkår med status=$status har opphavsvilkår")
+
+            null,
+            VilkårStatus.NY,
+            VilkårStatus.ENDRET,
+            -> Opphavsvilkår(behandlingId, sporbar.endret.endretTid)
+        }
+    }
 }
 
 fun List<Vilkår>.utledVurderinger(vilkårType: VilkårType, regelId: RegelId) =

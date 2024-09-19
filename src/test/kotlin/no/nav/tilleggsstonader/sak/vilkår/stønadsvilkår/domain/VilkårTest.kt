@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -24,7 +24,7 @@ internal class VilkårTest {
             opphavsvilkår = null,
         )
         val opphavsvilkår = vilkår.opprettOpphavsvilkår()
-        Assertions.assertThat(opphavsvilkår).isEqualTo(
+        assertThat(opphavsvilkår).isEqualTo(
             Opphavsvilkår(
                 behandlingIdFørstegangsbehandling,
                 vilkår.sporbar.endret.endretTid,
@@ -43,7 +43,7 @@ internal class VilkårTest {
             status = VilkårStatus.UENDRET,
         )
         val nyttOpphavsvilkår = vilkår.opprettOpphavsvilkår()
-        Assertions.assertThat(nyttOpphavsvilkår).isEqualTo(opphavsvilkår)
+        assertThat(nyttOpphavsvilkår).isEqualTo(opphavsvilkår)
     }
 
     @Test
@@ -57,8 +57,8 @@ internal class VilkårTest {
             status = VilkårStatus.ENDRET,
         )
         val nyttOpphavsvilkår = vilkår.opprettOpphavsvilkår()
-        Assertions.assertThat(nyttOpphavsvilkår.vurderingstidspunkt).isEqualTo(vilkår.sporbar.endret.endretTid)
-        Assertions.assertThat(nyttOpphavsvilkår.behandlingId).isEqualTo(vilkår.behandlingId)
+        assertThat(nyttOpphavsvilkår.vurderingstidspunkt).isEqualTo(vilkår.sporbar.endret.endretTid)
+        assertThat(nyttOpphavsvilkår.behandlingId).isEqualTo(vilkår.behandlingId)
     }
 
     @Test
