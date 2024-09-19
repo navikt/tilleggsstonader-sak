@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -258,7 +257,6 @@ class VilkårService(
         forrigeBehandlingId: BehandlingId,
         nyBehandling: Behandling,
         barnIdMap: Map<TidligereBarnId, NyttBarnId>,
-        stønadstype: Stønadstype,
     ) {
         val tidligereVurderinger =
             vilkårRepository.findByBehandlingId(forrigeBehandlingId).associateBy { it.id }

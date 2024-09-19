@@ -1,10 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -54,9 +52,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     @Autowired
     lateinit var barnService: BarnService
 
-    @Autowired
-    lateinit var gjennbrukDataRevurderingService: GjennbrukDataRevurderingService
-
     @Test
     internal fun `kopierVilkårsettTilNyBehandling - skal kopiere vilkår til ny behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
@@ -72,7 +67,6 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             forrigeBehandlingId = behandling.id,
             nyBehandling = revurdering,
             barnIdMap = barnIdMap,
-            stønadstype = Stønadstype.BARNETILSYN,
         )
 
         val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id).first()

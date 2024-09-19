@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.NyttBarnId
 import no.nav.tilleggsstonader.sak.behandling.barn.TidligereBarnId
@@ -43,7 +42,6 @@ class GjennbrukDataRevurderingService(
             forrigeBehandlingId = behandlingIdForGjenbruk,
             nyBehandling = behandling,
             barnIdMap = barnIder,
-            stønadstype = Stønadstype.BARNETILSYN, // TODO: Hent stønadstype fra behandling
         )
     }
 
