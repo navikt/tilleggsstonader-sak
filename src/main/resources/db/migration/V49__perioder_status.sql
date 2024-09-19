@@ -18,7 +18,7 @@ WHERE vp.forrige_vilkarperiode_id = vp_gammel.id
   AND vp.fom = vp_gammel.fom
   AND vp.tom = vp_gammel.tom
   AND vp.resultat = vp_gammel.resultat
-  AND vp.aktivitetsdager = vp_gammel.aktivitetsdager
+  AND vp.aktivitetsdager is not distinct from vp_gammel.aktivitetsdager
   AND vp.delvilkar::text = vp_gammel.delvilkar::text
   AND vp.resultat <> 'SLETTET'
 ;
@@ -33,7 +33,7 @@ WHERE vp.forrige_vilkarperiode_id = vp_gammel.id
         AND vp.fom = vp_gammel.fom
         AND vp.tom = vp_gammel.tom
         AND vp.resultat = vp_gammel.resultat
-        AND vp.aktivitetsdager = vp_gammel.aktivitetsdager
+        AND vp.aktivitetsdager is not distinct from vp_gammel.aktivitetsdager
         AND vp.delvilkar::text = vp_gammel.delvilkar::text
     )
   AND vp.resultat <> 'SLETTET'
@@ -70,9 +70,9 @@ WHERE vp.opphavsvilkaar_behandling_id IS NOT NULL
                            JOIN behandling_barn barn_forrige
                                 ON vilkar_forrige.barn_id::uuid = barn_forrige.id AND barn.ident = barn_forrige.ident
                   WHERE vilkar_forrige.behandling_id = b.forrige_behandling_id
-                    AND vilkar_forrige.fom = vp.fom
-                    AND vilkar_forrige.tom = vp.tom
-                    AND vilkar_forrige.utgift = vp.utgift
+                    AND vilkar_forrige.fom is not distinct from vp.fom
+                    AND vilkar_forrige.tom is not distinct from vp.tom
+                    AND vilkar_forrige.utgift is not distinct from vp.utgift
                     AND vilkar_forrige.delvilkar::text = vp.delvilkar::text)
 ;
 
