@@ -52,7 +52,7 @@ class SøknadRoutingService(
         }
 
         val arenaStatus = arenaService.hentStatus(request.ident, request.stønadstype)
-        if (harGyldigStateIArena(arenaStatus)) {
+        if (harGyldigStateIArena(request.stønadstype, arenaStatus)) {
             lagreRouting(request, arenaStatus)
             return true
         }
@@ -82,13 +82,17 @@ class SøknadRoutingService(
         else -> error("Har ikke maksAntalLToggle for stønadstype=$this")
     }
 
-    private fun harGyldigStateIArena(arenaStatus: ArenaStatusDto): Boolean {
+    private fun harGyldigStateIArena(stønadstype: Stønadstype, arenaStatus: ArenaStatusDto): Boolean {
         val harAktivtVedtak = arenaStatus.vedtak.harAktivtVedtak
         val harVedtakUtenUtfall = arenaStatus.vedtak.harVedtakUtenUtfall
-        val harGyldigStatus = !harAktivtVedtak
-
-        val harAktivSakUtenVedtak = arenaStatus.sak.harAktivSakUtenVedtak
         val harVedtak = arenaStatus.vedtak.harVedtak
+        val harAktivSakUtenVedtak = arenaStatus.sak.harAktivSakUtenVedtak
+
+        val harGyldigStatus = when (stønadstype) {
+            Stønadstype.BARNETILSYN -> !harAktivtVedtak
+            Stønadstype.LÆREMIDLER -> !harVedtak
+        }
+
         logger.info("routing - harGyldigStatusArena=$harGyldigStatus - harAktivSakUtenVedtak=$harAktivSakUtenVedtak harVedtak=$harVedtak harAktivtVedtak=$harAktivtVedtak harVedtakUtenUtfall=$harVedtakUtenUtfall")
         return harGyldigStatus
     }

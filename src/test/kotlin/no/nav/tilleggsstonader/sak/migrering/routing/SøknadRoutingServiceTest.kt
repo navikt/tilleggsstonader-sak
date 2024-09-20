@@ -178,6 +178,22 @@ class SøknadRoutingServiceTest {
                 søknadRoutingRepository.insert(any())
             }
         }
+
+        @Test
+        fun `skal ikke route læremidler dersom det finnes noe vedtak uansett om det er aktivt eller ikke`() {
+            unleashService.mockGetVariant(SØKNAD_ROUTING_LÆREMIDLER, søknadRoutingVariant(10))
+            every { arenaService.hentStatus(any(), any()) } returns arenaStatusUtenAktivtVedtak()
+            every { søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER) } returns 0
+
+            assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.LÆREMIDLER))).isFalse
+
+            verify(exactly = 0) {
+                søknadRoutingRepository.insert(any())
+            }
+            verify(exactly = 1) {
+                arenaService.hentStatus(any(), any())
+            }
+        }
     }
 
     @Nested
@@ -187,7 +203,7 @@ class SøknadRoutingServiceTest {
         fun `skal behandles i ny løsning dersom maks antall ikke er nådd`() {
             unleashService.mockGetVariant(SØKNAD_ROUTING_LÆREMIDLER, søknadRoutingVariant(10))
             every { søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER) } returns 0
-            every { arenaService.hentStatus(any(), any()) } returns arenaStatusUtenAktivtVedtak()
+            every { arenaService.hentStatus(any(), any()) } returns arenaStatusKanRoutes()
 
             assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.LÆREMIDLER))).isTrue
 
@@ -202,7 +218,7 @@ class SøknadRoutingServiceTest {
         fun `skal ikke behandles i ny løsning dersom maks antall er nådd`() {
             unleashService.mockGetVariant(SØKNAD_ROUTING_LÆREMIDLER, søknadRoutingVariant(0))
             every { søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER) } returns 0
-            every { arenaService.hentStatus(any(), any()) } returns arenaStatusUtenAktivtVedtak()
+            every { arenaService.hentStatus(any(), any()) } returns arenaStatusKanRoutes()
 
             assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.LÆREMIDLER))).isFalse
 
