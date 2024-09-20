@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.FØRSTEGANGS
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.REVURDERING
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import java.time.LocalDate
 
 object BehandlingUtil {
 
@@ -15,6 +16,15 @@ object BehandlingUtil {
             REVURDERING
         } else {
             FØRSTEGANGSBEHANDLING
+        }
+    }
+
+    fun skalNullstilleBehandling(behandling: Behandling, nyRevurderFra: LocalDate?): Boolean {
+        val forrigeRevurdererFra = behandling.revurderFra
+        return when {
+            nyRevurderFra == null -> false
+            forrigeRevurdererFra == null -> true
+            else -> nyRevurderFra > forrigeRevurdererFra
         }
     }
 
