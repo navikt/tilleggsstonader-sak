@@ -3,9 +3,13 @@ package no.nav.tilleggsstonader.sak.migrering.routing
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantWithNameOrDefault
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -16,6 +20,7 @@ class SøknadRoutingService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val arenaService: ArenaService,
+    private val unleashService: UnleashService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -31,7 +36,6 @@ class SøknadRoutingService(
         return søknadRouting != null
     }
 
-    // TODO burde vi sjekke om det finnes oppgave i arena/gosys?
     private fun skalBehandlesINyLøsning(request: IdentStønadstype): Boolean {
         if (harLagretRouting(request)) {
             logger.info("routing - harLagretRouting=true")
@@ -42,12 +46,40 @@ class SøknadRoutingService(
             lagreRouting(request, mapOf("harBehandling" to true))
             return true
         }
+
+        if (skalStoppesPgaFeatureToggle(request.stønadstype)) {
+            return false
+        }
+
         val arenaStatus = arenaService.hentStatus(request.ident, request.stønadstype)
         if (harGyldigStateIArena(arenaStatus)) {
             lagreRouting(request, arenaStatus)
             return true
         }
         return false
+    }
+
+    private fun skalStoppesPgaFeatureToggle(stønadstype: Stønadstype): Boolean {
+        return when (stønadstype) {
+            Stønadstype.BARNETILSYN -> false // tilsyn barn skal ikke stoppes med feature toggle
+            Stønadstype.LÆREMIDLER -> maksAntallErNådd(stønadstype)
+            else -> error("Støtter ennå ikke stønadstype=$stønadstype")
+        }
+    }
+
+    private fun maksAntallErNådd(stønadstype: Stønadstype): Boolean {
+        val maksAntall = maksAntall(stønadstype)
+        val antall = søknadRoutingRepository.countByType(stønadstype)
+        logger.info("routing - antallIDatabase=$antall toggleMaksAntall=$maksAntall")
+        return antall >= maksAntall
+    }
+
+    private fun maksAntall(stønadstype: Stønadstype) =
+        unleashService.getVariantWithNameOrDefault(stønadstype.maksAntallToggle(), "antall", 0)
+
+    private fun Stønadstype.maksAntallToggle() = when (this) {
+        Stønadstype.LÆREMIDLER -> Toggle.SØKNAD_ROUTING_LÆREMIDLER
+        else -> error("Har ikke maksAntalLToggle for stønadstype=$this")
     }
 
     private fun harGyldigStateIArena(arenaStatus: ArenaStatusDto): Boolean {
