@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -36,6 +37,8 @@ data class Vilkårperiode(
     val aktivitetsdager: Int?,
 
     val slettetKommentar: String? = null,
+
+    val status: Vilkårstatus? = null,
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
@@ -116,8 +119,36 @@ data class Vilkårperiode(
             }
         }
     }
+
     fun kanSlettesPermanent() =
         this.forrigeVilkårperiodeId == null && this.kilde != KildeVilkårsperiode.SYSTEM
+
+    fun kopierTilBehandling(nyBehandlingId: BehandlingId): Vilkårperiode {
+        return copy(
+            id = UUID.randomUUID(),
+            behandlingId = nyBehandlingId,
+            forrigeVilkårperiodeId = forrigeVilkårPeriodeIdForKopiertVilkår(),
+            sporbar = Sporbar(),
+            status = Vilkårstatus.UENDRET,
+        )
+    }
+
+    /**
+     * Liknende som [no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår.opprettOpphavsvilkår]
+     */
+    private fun forrigeVilkårPeriodeIdForKopiertVilkår(): UUID {
+        return when (status) {
+            Vilkårstatus.SLETTET -> error("Skal ikke kopiere vilkårperiode som er slettet")
+            Vilkårstatus.UENDRET ->
+                forrigeVilkårperiodeId
+                    ?: error("Forventer at vilkårperiode med status=$status har forrigeVilkårperiodeId")
+
+            null,
+            Vilkårstatus.NY,
+            Vilkårstatus.ENDRET,
+            -> id
+        }
+    }
 }
 
 enum class KildeVilkårsperiode {

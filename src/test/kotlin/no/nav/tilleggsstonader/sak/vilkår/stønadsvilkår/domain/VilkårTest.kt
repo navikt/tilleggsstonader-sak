@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -20,10 +20,11 @@ internal class VilkårTest {
             behandlingId = behandlingIdFørstegangsbehandling,
             delvilkårwrapper = DelvilkårWrapper(emptyList()),
             type = VilkårType.EKSEMPEL,
+            status = VilkårStatus.NY,
             opphavsvilkår = null,
         )
-        val opphavsvilkår = vilkår.opprettOpphavsvilkår()
-        Assertions.assertThat(opphavsvilkår).isEqualTo(
+        val nyttOpphavsvilkår = vilkår.kopierTilBehandling(BehandlingId.random(), BarnId.random()).opphavsvilkår!!
+        assertThat(nyttOpphavsvilkår).isEqualTo(
             Opphavsvilkår(
                 behandlingIdFørstegangsbehandling,
                 vilkår.sporbar.endret.endretTid,
@@ -39,9 +40,25 @@ internal class VilkårTest {
             delvilkårwrapper = DelvilkårWrapper(emptyList()),
             type = VilkårType.EKSEMPEL,
             opphavsvilkår = opphavsvilkår,
+            status = VilkårStatus.UENDRET,
         )
-        val nyttOpphavsvilkår = vilkår.opprettOpphavsvilkår()
-        Assertions.assertThat(nyttOpphavsvilkår).isEqualTo(opphavsvilkår)
+        val nyttOpphavsvilkår = vilkår.kopierTilBehandling(BehandlingId.random(), BarnId.random()).opphavsvilkår
+        assertThat(nyttOpphavsvilkår).isEqualTo(opphavsvilkår)
+    }
+
+    @Test
+    internal fun `opprettOpphavsvilkår - skal ikke bruke opphavsvilkår hvis den finnes og vilkåret er endret`() {
+        val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, osloNow())
+        val vilkår = Vilkår(
+            behandlingId = behandlingIdRevurdering,
+            delvilkårwrapper = DelvilkårWrapper(emptyList()),
+            type = VilkårType.EKSEMPEL,
+            opphavsvilkår = opphavsvilkår,
+            status = VilkårStatus.ENDRET,
+        )
+        val nyttOpphavsvilkår = vilkår.kopierTilBehandling(BehandlingId.random(), BarnId.random()).opphavsvilkår!!
+        assertThat(nyttOpphavsvilkår.vurderingstidspunkt).isEqualTo(vilkår.sporbar.endret.endretTid)
+        assertThat(nyttOpphavsvilkår.behandlingId).isEqualTo(vilkår.behandlingId)
     }
 
     @Test

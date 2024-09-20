@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
@@ -276,13 +275,8 @@ class VilkårService(
         barnIdMap: Map<TidligereBarnId, NyttBarnId>,
     ): List<Vilkår> =
         tidligereVilkår.values.map { vilkår ->
-            vilkår.copy(
-                id = VilkårId.random(),
-                behandlingId = nyBehandlingsId,
-                sporbar = Sporbar(),
-                barnId = finnBarnId(vilkår.barnId, barnIdMap),
-                opphavsvilkår = vilkår.opprettOpphavsvilkår(),
-            )
+            val barnIdINyBehandling = finnBarnId(vilkår.barnId, barnIdMap)
+            vilkår.kopierTilBehandling(nyBehandlingsId, barnIdINyBehandling)
         }
 
     private fun finnBarnId(barnId: BarnId?, barnIdMap: Map<BarnId, BarnId>): BarnId? =

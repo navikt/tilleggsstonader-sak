@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
@@ -17,6 +18,7 @@ data class VilkårDto(
     val id: VilkårId,
     val behandlingId: BehandlingId,
     val resultat: Vilkårsresultat,
+    val status: VilkårStatus?,
     val vilkårType: VilkårType,
     val fom: LocalDate?,
     val tom: LocalDate?,
@@ -63,6 +65,7 @@ fun Vilkår.tilDto() =
         id = this.id,
         behandlingId = this.behandlingId,
         resultat = this.resultat,
+        status = this.status,
         vilkårType = this.type,
         fom = this.fom,
         tom = this.tom,

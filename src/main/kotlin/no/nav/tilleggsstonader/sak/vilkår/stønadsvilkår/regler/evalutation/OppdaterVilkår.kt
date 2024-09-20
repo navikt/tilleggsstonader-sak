@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
@@ -82,8 +83,8 @@ object OppdaterVilkår {
         )
         return vilkår.copy(
             resultat = vilkårsresultat.vilkår,
+            status = utledStatus(vilkår),
             delvilkårwrapper = oppdaterteDelvilkår,
-            opphavsvilkår = null,
             fom = utledFom(vilkår, oppdatering),
             tom = utledTom(vilkår, oppdatering),
             utgift = oppdatering.utgift,
@@ -113,6 +114,13 @@ object OppdaterVilkår {
 
                 else -> error("Har ikke tatt stilling til type dato for ${vilkår.type}")
             }
+        }
+    }
+
+    private fun utledStatus(eksisterendeVilkår: Vilkår): VilkårStatus? {
+        return when (eksisterendeVilkår.status) {
+            VilkårStatus.UENDRET -> VilkårStatus.ENDRET
+            else -> eksisterendeVilkår.status
         }
     }
 
@@ -179,6 +187,7 @@ object OppdaterVilkår {
             barnId = barnId,
             delvilkårwrapper = DelvilkårWrapper(delvilkårsett),
             resultat = utledResultat(vilkårsregel, delvilkårsett.map { it.tilDto() }).vilkår,
+            status = VilkårStatus.NY,
             opphavsvilkår = null,
         )
     }

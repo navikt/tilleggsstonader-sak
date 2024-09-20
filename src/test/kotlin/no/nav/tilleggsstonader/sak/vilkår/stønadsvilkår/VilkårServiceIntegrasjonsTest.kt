@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
@@ -129,6 +130,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
             assertThat(vilkårFraDb.utgift).isEqualTo(1)
             assertThat(vilkårFraDb.barnId).isEqualTo(barn.id)
             assertThat(vilkårFraDb.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+            assertThat(vilkårFraDb.status).isEqualTo(VilkårStatus.NY)
             assertThat(vilkårFraDb.opphavsvilkår).isNull()
             assertThat(vilkårFraDb.delvilkårsett.map { it.hovedregel })
                 .containsExactlyInAnyOrderElementsOf(opprettOppfyltDelvilkår.delvilkårsett.map { it.hovedregel() })
@@ -197,9 +199,10 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         vilkårForRevurdering: Vilkår,
     ) {
         assertThat(vilkårForBehandling).usingRecursiveComparison()
-            .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår")
+            .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår", "status")
             .isEqualTo(vilkårForRevurdering)
 
         assertThat(vilkårForRevurdering.opphavsvilkår?.behandlingId).isEqualTo(vilkårForBehandling.behandlingId)
+        assertThat(vilkårForRevurdering.status).isEqualTo(VilkårStatus.UENDRET)
     }
 }

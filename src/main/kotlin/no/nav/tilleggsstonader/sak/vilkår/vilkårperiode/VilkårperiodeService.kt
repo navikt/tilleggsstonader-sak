@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
@@ -35,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.evaulerVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
@@ -231,6 +231,7 @@ class VilkårperiodeService(
                 resultat = resultatEvaluering.resultat,
                 aktivitetsdager = vilkårperiode.aktivitetsdager,
                 kilde = KildeVilkårsperiode.MANUELL,
+                status = Vilkårstatus.NY,
             ),
         )
     }
@@ -276,6 +277,11 @@ class VilkårperiodeService(
         validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
 
         val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.type, vilkårperiode.delvilkår)
+        val nyStatus = if (eksisterendeVilkårperiode.status == Vilkårstatus.NY) {
+            Vilkårstatus.NY
+        } else {
+            Vilkårstatus.ENDRET
+        }
         val oppdatert = when (eksisterendeVilkårperiode.kilde) {
             KildeVilkårsperiode.MANUELL -> {
                 eksisterendeVilkårperiode.copy(
@@ -285,6 +291,7 @@ class VilkårperiodeService(
                     delvilkår = resultatEvaluering.delvilkår,
                     aktivitetsdager = vilkårperiode.aktivitetsdager,
                     resultat = resultatEvaluering.resultat,
+                    status = nyStatus,
                 )
             }
 
@@ -294,6 +301,7 @@ class VilkårperiodeService(
                     begrunnelse = vilkårperiode.begrunnelse,
                     delvilkår = resultatEvaluering.delvilkår,
                     resultat = resultatEvaluering.resultat,
+                    status = nyStatus,
                 )
             }
         }
@@ -328,6 +336,7 @@ class VilkårperiodeService(
                 vilkårperiode.copy(
                     resultat = ResultatVilkårperiode.SLETTET,
                     slettetKommentar = slettVikårperiode.kommentar,
+                    status = Vilkårstatus.SLETTET,
                 ),
             )
         }
@@ -337,15 +346,7 @@ class VilkårperiodeService(
         val eksisterendeVilkårperioder =
             vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
 
-        val kopiertePerioderMedReferanse = eksisterendeVilkårperioder
-            .map {
-                it.copy(
-                    id = UUID.randomUUID(),
-                    behandlingId = nyBehandlingId,
-                    forrigeVilkårperiodeId = it.id,
-                    sporbar = Sporbar(),
-                )
-            }
+        val kopiertePerioderMedReferanse = eksisterendeVilkårperioder.map { it.kopierTilBehandling(nyBehandlingId) }
         vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)
     }
 

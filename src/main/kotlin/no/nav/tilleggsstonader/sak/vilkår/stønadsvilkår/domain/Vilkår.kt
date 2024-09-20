@@ -30,6 +30,7 @@ data class Vilkår(
     val id: VilkårId = VilkårId.random(),
     val behandlingId: BehandlingId,
     val resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+    val status: VilkårStatus?,
     val type: VilkårType,
     val fom: LocalDate? = null,
     val tom: LocalDate? = null,
@@ -63,9 +64,11 @@ data class Vilkår(
                 validerFørsteOgSisteDagIValgtMåned(fom, tom)
                 validerPåkrevdBeløpHvisOppfylt()
             }
+
             VilkårType.EKSEMPEL -> {
                 // Dette er kun for tester foreløpig
             }
+
             else -> error("Må ta stilling til validering av fom/tom. Eks om vilkåret bruker dato eller månedsvelger")
         }
     }
@@ -85,11 +88,34 @@ data class Vilkår(
         }
     }
 
+    fun kopierTilBehandling(nyBehandlingId: BehandlingId, barnIdINyBehandling: BarnId?): Vilkår {
+        return copy(
+            id = VilkårId.random(),
+            status = VilkårStatus.UENDRET,
+            behandlingId = nyBehandlingId,
+            sporbar = Sporbar(),
+            barnId = barnIdINyBehandling,
+            opphavsvilkår = opphavsvilkårForKopiertVilkår(),
+        )
+    }
+
     /**
      * Brukes når man skal gjenbruke denne vilkårsvurderingen i en annan vilkårsvurdering
+     * Hvis vilkåret er uendret skal gjenbruke det forrige opphavsvilkåret då vilkåret er uendret
+     * Men dersom det har blitt endret eller nytt i denne behandlingen skal man peke til at det ble vurdert i denne behandlingen
+     * Liknende som [no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode.forrigeVilkårPeriodeIdForKopiertVilkår]
      */
-    fun opprettOpphavsvilkår(): Opphavsvilkår =
-        opphavsvilkår ?: Opphavsvilkår(behandlingId, sporbar.endret.endretTid)
+    private fun opphavsvilkårForKopiertVilkår(): Opphavsvilkår {
+        return when (status) {
+            VilkårStatus.SLETTET -> error("Skal ikke kopiere vilkår som er slettet")
+            VilkårStatus.UENDRET -> opphavsvilkår ?: error("Forventer at vilkår med status=$status har opphavsvilkår")
+
+            null,
+            VilkårStatus.NY,
+            VilkårStatus.ENDRET,
+            -> Opphavsvilkår(behandlingId, sporbar.endret.endretTid)
+        }
+    }
 }
 
 fun List<Vilkår>.utledVurderinger(vilkårType: VilkårType, regelId: RegelId) =
@@ -162,4 +188,11 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Støn
             it.gjelderStønader.contains(stønadstype)
         }
     }
+}
+
+enum class VilkårStatus {
+    NY,
+    ENDRET,
+    UENDRET,
+    SLETTET,
 }
