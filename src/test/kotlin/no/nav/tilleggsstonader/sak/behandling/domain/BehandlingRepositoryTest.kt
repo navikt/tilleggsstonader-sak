@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
+import java.time.LocalDate
 
 class BehandlingRepositoryTest : IntegrationTest() {
     @Autowired
@@ -129,8 +130,8 @@ class BehandlingRepositoryTest : IntegrationTest() {
         assertThat(behandlingRepository.findByFagsakIdAndStatus(fagsak.id, OPPRETTET)).containsOnly(behandling)
     }
 
-    @Test
-    fun `finnBehandlingServiceObject returnerer korrekt konstruert BehandlingServiceObject`() {
+    @Nested
+    inner class FinnSaksbehandling {
         val fagsak = testoppsettService
             .lagreFagsak(
                 fagsak(
@@ -144,30 +145,59 @@ class BehandlingRepositoryTest : IntegrationTest() {
                     ),
                 ),
             )
-        val behandling = testoppsettService.lagre(behandling(fagsak, status = OPPRETTET, resultat = INNVILGET))
+        val behandling = testoppsettService.lagre(
+            behandling(
+                fagsak,
+                status = OPPRETTET,
+                resultat = INNVILGET,
+                revurderFra = LocalDate.of(2023, 1, 1),
+                type = BehandlingType.REVURDERING,
+                årsak = BehandlingÅrsak.SØKNAD,
+                henlagtÅrsak = HenlagtÅrsak.FEILREGISTRERT,
+                vedtakstidspunkt = SporbarUtils.now(),
+                kravMottatt = LocalDate.now(),
+            ),
+        )
 
-        val behandlingServiceObject = behandlingRepository.finnSaksbehandling(behandling.id)
+        @Test
+        fun `finnSaksbehandling returnerer korrekt konstruert saksbehandling`() {
+            behandlingRepository.finnSaksbehandling(behandling.id)
+                .assertFelterErLike(behandling, fagsak)
+        }
 
-        assertThat(behandlingServiceObject.id).isEqualTo(behandling.id)
-        assertThat(behandlingServiceObject.eksternId).isGreaterThan(0)
-        assertThat(behandlingServiceObject.forrigeBehandlingId).isEqualTo(behandling.forrigeBehandlingId)
-        assertThat(behandlingServiceObject.type).isEqualTo(behandling.type)
-        assertThat(behandlingServiceObject.status).isEqualTo(behandling.status)
-        assertThat(behandlingServiceObject.steg).isEqualTo(behandling.steg)
-        assertThat(behandlingServiceObject.årsak).isEqualTo(behandling.årsak)
-        assertThat(behandlingServiceObject.kravMottatt).isEqualTo(behandling.kravMottatt)
-        assertThat(behandlingServiceObject.resultat).isEqualTo(behandling.resultat)
-        assertThat(behandlingServiceObject.henlagtÅrsak).isEqualTo(behandling.henlagtÅrsak)
-        assertThat(behandlingServiceObject.ident).isEqualTo("2")
-        assertThat(behandlingServiceObject.fagsakId).isEqualTo(fagsak.id)
-        assertThat(behandlingServiceObject.fagsakPersonId).isEqualTo(fagsak.fagsakPersonId)
-        assertThat(behandlingServiceObject.eksternFagsakId).isEqualTo(fagsak.eksternId.id)
-        assertThat(behandlingServiceObject.stønadstype).isEqualTo(fagsak.stønadstype)
-        assertThat(behandlingServiceObject.opprettetAv).isEqualTo(behandling.sporbar.opprettetAv)
-        assertThat(behandlingServiceObject.opprettetTid).isEqualTo(behandling.sporbar.opprettetTid)
-        assertThat(behandlingServiceObject.endretAv).isEqualTo(behandling.sporbar.endret.endretAv)
-        assertThat(behandlingServiceObject.endretTid).isEqualTo(behandling.sporbar.endret.endretTid)
-        assertThat(behandlingServiceObject.vedtakstidspunkt).isEqualTo(behandling.vedtakstidspunkt)
+        @Test
+        fun `finnSaksbehandling med eksternBehandlingId skal mappe ok`() {
+            val eksternBehandlingId = eksternBehandlingIdRepository.findByBehandlingId(behandling.id).id
+            behandlingRepository.finnSaksbehandling(eksternBehandlingId)
+                .assertFelterErLike(behandling, fagsak)
+        }
+    }
+
+    private fun Saksbehandling.assertFelterErLike(
+        behandling: Behandling,
+        fagsak: Fagsak,
+    ) {
+        assertThat(id).isEqualTo(behandling.id)
+        assertThat(eksternId).isGreaterThan(0)
+        assertThat(forrigeBehandlingId).isEqualTo(behandling.forrigeBehandlingId)
+        assertThat(type).isEqualTo(behandling.type)
+        assertThat(status).isEqualTo(behandling.status)
+        assertThat(steg).isEqualTo(behandling.steg)
+        assertThat(årsak).isEqualTo(behandling.årsak)
+        assertThat(kravMottatt).isEqualTo(behandling.kravMottatt)
+        assertThat(resultat).isEqualTo(behandling.resultat)
+        assertThat(henlagtÅrsak).isEqualTo(behandling.henlagtÅrsak)
+        assertThat(ident).isEqualTo("2")
+        assertThat(fagsakId).isEqualTo(fagsak.id)
+        assertThat(fagsakPersonId).isEqualTo(fagsak.fagsakPersonId)
+        assertThat(eksternFagsakId).isEqualTo(fagsak.eksternId.id)
+        assertThat(stønadstype).isEqualTo(fagsak.stønadstype)
+        assertThat(opprettetAv).isEqualTo(behandling.sporbar.opprettetAv)
+        assertThat(opprettetTid).isEqualTo(behandling.sporbar.opprettetTid)
+        assertThat(endretAv).isEqualTo(behandling.sporbar.endret.endretAv)
+        assertThat(endretTid).isEqualTo(behandling.sporbar.endret.endretTid)
+        assertThat(vedtakstidspunkt).isEqualTo(behandling.vedtakstidspunkt)
+        assertThat(revurderFra).isEqualTo(behandling.revurderFra)
     }
 
     @Test

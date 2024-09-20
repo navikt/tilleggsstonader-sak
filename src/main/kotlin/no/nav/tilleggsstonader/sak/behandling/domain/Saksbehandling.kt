@@ -33,6 +33,7 @@ data class Saksbehandling(
     val eksternFagsakId: Long,
     @Column("stonadstype")
     val stønadstype: Stønadstype,
+    val revurderFra: LocalDate?,
     val opprettetAv: String,
     val opprettetTid: LocalDateTime,
     val endretAv: String,
