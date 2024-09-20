@@ -85,7 +85,6 @@ object OppdaterVilkår {
             resultat = vilkårsresultat.vilkår,
             status = utledStatus(vilkår),
             delvilkårwrapper = oppdaterteDelvilkår,
-            opphavsvilkår = null,
             fom = utledFom(vilkår, oppdatering),
             tom = utledTom(vilkår, oppdatering),
             utgift = oppdatering.utgift,

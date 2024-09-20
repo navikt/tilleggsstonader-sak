@@ -42,6 +42,7 @@ WHERE vp.forrige_vilkarperiode_id = vp_gammel.id
 UPDATE vilkar_periode
 SET status = 'SLETTET'
 WHERE resultat = 'SLETTET';
+
 ALTER TABLE vilkar_periode
     ALTER COLUMN status SET NOT NULL;
 
@@ -59,24 +60,14 @@ WHERE vp.behandling_id = b.id
   AND vp.opphavsvilkaar_behandling_id IS NOT NULL
 ;
 
--- Oppdaterer de vilkår som har opphavsvilkår men mangler match i forrige behandling, til status ENDRET
+-- Vilkår som ble opprettet i en revurdering der opphavsvilkaar_behandling_id er fjernet skal oppdateres til ENDRET
 UPDATE vilkar vp
 SET status = 'ENDRET'
 FROM behandling b
-WHERE b.id = vp.behandling_id
-  AND vp.opphavsvilkaar_behandling_id IS NOT NULL
+WHERE vp.behandling_id = b.id
   AND b.forrige_behandling_id IS NOT NULL
-  AND NOT EXISTS (SELECT *
-                  FROM behandling b
-                           JOIN behandling_barn barn ON vp.barn_id::uuid = barn.id
-                           JOIN vilkar vilkar_forrige on vilkar_forrige.behandling_id = b.forrige_behandling_id
-                           JOIN behandling_barn barn_forrige
-                                ON vilkar_forrige.barn_id::uuid = barn_forrige.id AND barn.ident = barn_forrige.ident
-                  WHERE vilkar_forrige.behandling_id = b.forrige_behandling_id
-                    AND vilkar_forrige.fom is not distinct from vp.fom
-                    AND vilkar_forrige.tom is not distinct from vp.tom
-                    AND vilkar_forrige.utgift is not distinct from vp.utgift
-                    AND vilkar_forrige.delvilkar::text = vp.delvilkar::text)
+  AND vp.opprettet_tid - INTERVAL '5 seconds' < b.opprettet_tid
+  AND opphavsvilkaar_behandling_id IS NULL
 ;
 
 ALTER TABLE vilkar
