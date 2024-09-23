@@ -109,7 +109,7 @@ class VilkårperiodeRevurderFraValideringTest {
     inner class OppdateringAvPeriode {
 
         @Test
-        fun `kan oppdatere periode med valgfritt dato dersom revurder-fra ikke er satt`() {
+        fun `kan oppdatere periode dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
                 val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.minusDays(2), aktivitetsdager = 1)
                 endringUtenRevurderFra(
@@ -127,7 +127,7 @@ class VilkårperiodeRevurderFraValideringTest {
         }
 
         @Test
-        fun `kan oppdatere tom hvis tom går tom siste dagen før revurder fra`() {
+        fun `kan oppdatere periodens tom-dato til og med dagen før revurder fra`() {
             val eksisterendeVilkårperiode = aktivitet(
                 fom = revurderFra.minusMonths(1),
                 tom = revurderFra.plusMonths(1),
