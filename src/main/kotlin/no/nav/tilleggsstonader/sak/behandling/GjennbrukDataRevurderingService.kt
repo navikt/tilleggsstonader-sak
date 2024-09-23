@@ -28,6 +28,17 @@ class GjennbrukDataRevurderingService(
         val barnIder: Map<TidligereBarnId, NyttBarnId> =
             barnService.gjenbrukBarn(forrigeBehandlingId = behandlingIdForGjenbruk, nyBehandlingId = behandling.id)
 
+        gjenbrukData(behandling, behandlingIdForGjenbruk, barnIder)
+    }
+
+    /**
+     * Når man nullstiller må man sende inn barnen som skal gjenbrukes
+     */
+    fun gjenbrukData(
+        behandling: Behandling,
+        behandlingIdForGjenbruk: BehandlingId,
+        barnIder: Map<TidligereBarnId, NyttBarnId>,
+    ) {
         vilkårperiodeService.gjenbrukVilkårperioder(
             forrigeBehandlingId = behandlingIdForGjenbruk,
             nyBehandlingId = behandling.id,
@@ -53,6 +64,22 @@ class GjennbrukDataRevurderingService(
     fun finnBehandlingIdForGjenbruk(fagsakId: FagsakId): BehandlingId? {
         return behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
             ?: finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId)
+    }
+
+    /**
+     * Returnerer en map som mapper tidligere barnId til nytt barnId
+     */
+    fun finnNyttIdForBarn(
+        nyBehandlingId: BehandlingId,
+        forrigeBehandlingId: BehandlingId,
+    ): Map<TidligereBarnId, NyttBarnId> {
+        val nyeBarn = barnService.finnBarnPåBehandling(nyBehandlingId).associateBy { it.ident }
+        val tidligereBarn = barnService.finnBarnPåBehandling(forrigeBehandlingId)
+        return tidligereBarn.associate {
+            val nyttBarnId = nyeBarn[it.ident]
+                ?: error("Finner ikke barn som er lik ${it.id} i nyBehandling=$nyBehandlingId")
+            it.id to nyttBarnId.id
+        }
     }
 
     private fun finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId: FagsakId): BehandlingId? {

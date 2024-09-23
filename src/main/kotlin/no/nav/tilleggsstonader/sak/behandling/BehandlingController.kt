@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 
 @RestController
 @RequestMapping(path = ["/api/behandling"])
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController
 class BehandlingController(
     private val behandlingService: BehandlingService,
     private val opprettRevurderingBehandlingService: OpprettRevurderingBehandlingService,
+    private val revurderFraService: RevurderFraService,
     private val grunnlagsdataService: GrunnlagsdataService,
     // private val behandlingPåVentService: BehandlingPåVentService,
     private val fagsakService: FagsakService,
@@ -119,6 +121,12 @@ class BehandlingController(
         val saksbehandling = behandlingService.hentSaksbehandling(eksternBehandlingId)
         tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
         return saksbehandling.tilDto()
+    }
+
+    @PostMapping("{behandlingId}/revurder-fra/{revurderFra}")
+    fun oppdaterRevurderFra(@PathVariable behandlingId: BehandlingId, @PathVariable revurderFra: LocalDate): BehandlingDto {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+        return revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra).tilDto()
     }
 
     /*
