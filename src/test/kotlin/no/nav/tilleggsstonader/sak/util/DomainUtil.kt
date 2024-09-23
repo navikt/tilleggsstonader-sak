@@ -85,6 +85,7 @@ fun behandling(
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
     vedtakstidspunkt: LocalDateTime? = null,
     kravMottatt: LocalDate? = null,
+    revurderFra: LocalDate? = null,
 ): Behandling = Behandling(
     fagsakId = fagsak.id,
     forrigeBehandlingId = forrigeBehandlingId,
@@ -99,6 +100,7 @@ fun behandling(
     henlagtÅrsak = henlagtÅrsak,
     vedtakstidspunkt = vedtakstidspunkt ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
     kravMottatt = kravMottatt,
+    revurderFra = revurderFra,
 )
 
 fun saksbehandling(
@@ -156,6 +158,7 @@ fun saksbehandling(
     endretAv = behandling.sporbar.endret.endretAv,
     endretTid = behandling.sporbar.endret.endretTid,
     kravMottatt = behandling.kravMottatt,
+    revurderFra = behandling.revurderFra,
 )
 
 fun Behandling.innvilgetOgFerdigstilt() = this.copy(
