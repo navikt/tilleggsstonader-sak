@@ -292,7 +292,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `kan ikke opprette stønadsperiode hvis revurderFra begynner før periode`() {
+        fun `kan ikke opprette periode hvis periode begyner før revurderFra`() {
             val behandling = testoppsettService.oppdater(
                 testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
             )
@@ -517,7 +517,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `kan ikke oppdatere stønadsperiode hvis revurderFra begynner før periode`() {
+        fun `kan ikke oppdatere periode hvis periode begynner før revurderFra`() {
             val behandling = testoppsettService.oppdater(
                 testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
             )
@@ -671,7 +671,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             }
 
             @Test
-            fun `kan ikke slette stønadsperiode hvis revurderFra begynner før periode`() {
+            fun `kan ikke slette periode hvis periode begynner før revurderFra`() {
                 val behandling = testoppsettService.oppdater(revurdering.copy(revurderFra = now()))
 
                 val aktivitet = aktivitet(
