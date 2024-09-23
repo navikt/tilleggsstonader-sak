@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class AutomatiskJournalføringService(
+class HåndterSøknadService(
     private val personService: PersonService,
     private val journalpostService: JournalpostService,
     private val taskService: TaskService,

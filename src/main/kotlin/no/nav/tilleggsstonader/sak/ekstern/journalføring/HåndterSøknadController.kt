@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
     consumes = [MediaType.APPLICATION_JSON_VALUE],
     produces = [MediaType.APPLICATION_JSON_VALUE],
 )
-class AutomatiskJournalføringController(private val automatiskJournalføringService: AutomatiskJournalføringService) {
+class HåndterSøknadController(private val håndterSøknadService: HåndterSøknadService) {
 
     @PostMapping
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
@@ -28,6 +28,6 @@ class AutomatiskJournalføringController(private val automatiskJournalføringSer
             "Kallet utføres ikke av en autorisert klient"
         }
         validerIdent(request.personIdent)
-        automatiskJournalføringService.håndterSøknad(request)
+        håndterSøknadService.håndterSøknad(request)
     }
 }

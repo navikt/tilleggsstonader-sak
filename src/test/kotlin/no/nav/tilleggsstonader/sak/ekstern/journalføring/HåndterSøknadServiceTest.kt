@@ -46,7 +46,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
-internal class AutomatiskJournalføringServiceTest {
+internal class HåndterSøknadServiceTest {
 
     val behandlingService: BehandlingService = mockk()
     val fagsakService: FagsakService = mockk()
@@ -59,7 +59,7 @@ internal class AutomatiskJournalføringServiceTest {
     val barnService: BarnService = mockk()
     val journalføringService: JournalføringService = mockk()
 
-    val automatiskJournalføringService = AutomatiskJournalføringService(
+    val håndterSøknadService = HåndterSøknadService(
         personService = personService,
         journalpostService = journalpostService,
         taskService = taskService,
@@ -116,7 +116,7 @@ internal class AutomatiskJournalføringServiceTest {
     internal fun `kan ikke opprette behandling hvis det eksisterer en åpen behandling i ny løsning`() {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling(status = BehandlingStatus.UTREDES))
         val kanOppretteBehandling =
-            automatiskJournalføringService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
+            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isFalse
     }
 
@@ -124,7 +124,7 @@ internal class AutomatiskJournalføringServiceTest {
     internal fun `kan opprette behandling hvis det ikke finnes innslag i ny løsning`() {
         every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf()
         val kanOppretteBehandling =
-            automatiskJournalføringService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
+            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isTrue
     }
 
@@ -137,7 +137,7 @@ internal class AutomatiskJournalføringServiceTest {
             ),
         )
         val kanOppretteBehandling =
-            automatiskJournalføringService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
+            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isTrue
     }
 
@@ -151,7 +151,7 @@ internal class AutomatiskJournalføringServiceTest {
             behandling(resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
         )
         val kanOppretteBehandling =
-            automatiskJournalføringService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
+            håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isTrue
     }
 
@@ -161,7 +161,7 @@ internal class AutomatiskJournalføringServiceTest {
 
         justRun { journalføringService.journalførTilNyBehandling(journalpostId, personIdent, Stønadstype.BARNETILSYN, any(), any(), any()) }
 
-        automatiskJournalføringService.håndterSøknad(
+        håndterSøknadService.håndterSøknad(
             HåndterSøknadRequest(
                 personIdent = personIdent,
                 journalpostId = journalpostId,
@@ -186,7 +186,7 @@ internal class AutomatiskJournalføringServiceTest {
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
         every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(behandling())
 
-        automatiskJournalføringService.håndterSøknad(
+        håndterSøknadService.håndterSøknad(
             HåndterSøknadRequest(
                 personIdent,
                 journalpostId,
