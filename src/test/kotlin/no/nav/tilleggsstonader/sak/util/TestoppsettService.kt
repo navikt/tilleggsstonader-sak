@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
@@ -99,7 +100,9 @@ class TestoppsettService(
         val fagsak = fagsak()
         lagreFagsak(fagsak)
         val førsteBehandling = lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET))
-        return lagre(behandling(fagsak = fagsak, forrigeBehandlingId = førsteBehandling.id))
+        val revurdering =
+            behandling(fagsak = fagsak, forrigeBehandlingId = førsteBehandling.id, type = BehandlingType.REVURDERING)
+        return lagre(revurdering)
     }
 
     private fun hentEllerOpprettPerson(fagsak: Fagsak): FagsakPerson {
