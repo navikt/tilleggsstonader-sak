@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -20,10 +22,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.time.LocalDate.now
 import java.util.UUID
 
 class StønadsperiodeServiceTest : IntegrationTest() {
@@ -228,7 +232,73 @@ class StønadsperiodeServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class GjenbrukStønadsperioder() {
+    inner class EndringHvisStønadsperiodeBegynnerFørRevurderFra {
+
+        val behandling = behandling(type = BehandlingType.REVURDERING)
+
+        val fom = now().minusMonths(1)
+        val tom = now().plusMonths(1)
+
+        val eksisterendeStønadsperiode = stønadsperiode(
+            behandlingId = behandling.id,
+            fom = fom,
+            tom = tom,
+            målgruppe = MålgruppeType.AAP,
+            aktivitet = AktivitetType.TILTAK,
+        )
+
+        @BeforeEach
+        fun setUp() {
+            val revurdering = testoppsettService.opprettBehandlingMedFagsak(behandling)
+            opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = fom, tom = tom))
+            opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = fom, tom = tom))
+            opprettVilkårperiode(aktivitet(behandlingId = revurdering.id, fom = fom, tom = tom))
+            opprettVilkårperiode(
+                aktivitet(
+                    behandlingId = revurdering.id,
+                    fom = fom,
+                    tom = tom,
+                    type = AktivitetType.UTDANNING,
+                    lønnet = null,
+                ),
+            )
+        }
+
+        @Test
+        fun `kan ikke opprette periode hvis revurderFra begynner før periode`() {
+            testoppsettService.oppdater(behandling.copy(revurderFra = now()))
+
+            assertThatThrownBy {
+                val stønadsperiode = stønadsperiodeDto(fom = now().minusDays(1), tom = now().minusDays(1))
+                stønadsperiodeService.lagreStønadsperioder(behandlingId = behandling.id, listOf(stønadsperiode))
+            }.hasMessageContaining("Kan ikke opprette periode")
+        }
+
+        @Test
+        fun `kan ikke oppdatere periode hvis revurderFra begynner før periode`() {
+            testoppsettService.oppdater(behandling.copy(revurderFra = now()))
+            stønadsperiodeRepository.insert(eksisterendeStønadsperiode)
+
+            val oppdatertStønadsperiode = eksisterendeStønadsperiode.tilDto().copy(aktivitet = AktivitetType.UTDANNING)
+
+            assertThatThrownBy {
+                stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(oppdatertStønadsperiode))
+            }.hasMessageContaining("Ugyldig endring på periode")
+        }
+
+        @Test
+        fun `kan ikke slette periode hvis revurderFra begynner før periode`() {
+            stønadsperiodeRepository.insert(eksisterendeStønadsperiode)
+            testoppsettService.oppdater(behandling.copy(revurderFra = now()))
+
+            assertThatThrownBy {
+                stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf())
+            }.hasMessageContaining("Kan ikke slette periode")
+        }
+    }
+
+    @Nested
+    inner class GjenbrukStønadsperioder {
         @Test
         fun `skal gjenbruke stønadsperioder fra forrige behandlingen`() {
             val revurdering = testoppsettService.lagBehandlingOgRevurdering()
@@ -317,6 +387,9 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
     private fun opprettVilkårperiode(periode: LagreVilkårperiode): LagreVilkårperiodeResponse {
         val oppdatertPeriode = vilkårperiodeService.opprettVilkårperiode(periode)
-        return vilkårperiodeService.validerOgLagResponse(behandlingId = oppdatertPeriode.behandlingId, periode = oppdatertPeriode)
+        return vilkårperiodeService.validerOgLagResponse(
+            behandlingId = oppdatertPeriode.behandlingId,
+            periode = oppdatertPeriode,
+        )
     }
 }
