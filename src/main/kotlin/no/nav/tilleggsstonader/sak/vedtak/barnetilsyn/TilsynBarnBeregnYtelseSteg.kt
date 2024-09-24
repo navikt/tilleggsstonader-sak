@@ -28,7 +28,6 @@ import java.time.LocalDate
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     private val unleashService: UnleashService,
-    private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
     vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -65,8 +64,7 @@ class TilsynBarnBeregnYtelseSteg(
             "Funksjonalitet mangler for å kunne innvilge revurdering når tidligere behandling er innvilget. Sett saken på vent."
         }
 
-        val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(saksbehandling.id)
-        val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id, utgifter)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
     }

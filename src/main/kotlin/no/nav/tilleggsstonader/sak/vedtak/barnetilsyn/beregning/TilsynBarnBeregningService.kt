@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnUtgiftService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilUke
@@ -37,13 +38,11 @@ private val SNITT_ANTALL_VIRKEDAGER_PER_MÅNED = BigDecimal("21.67")
 class TilsynBarnBeregningService(
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
+    private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
 ) {
 
-    // Hva burde denne ta inn? Hva burde bli sendt inn i beregningscontroller?
-    fun beregn(
-        behandlingId: BehandlingId,
-        utgifterPerBarn: Map<BarnId, List<UtgiftBeregning>>,
-    ): BeregningsresultatTilsynBarnDto {
+    fun beregn(behandlingId: BehandlingId): BeregningsresultatTilsynBarnDto {
+        val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandlingId)
         val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
         val aktiviteter = finnAktiviteter(behandlingId)
 

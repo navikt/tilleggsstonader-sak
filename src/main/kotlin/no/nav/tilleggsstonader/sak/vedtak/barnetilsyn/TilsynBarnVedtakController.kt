@@ -20,7 +20,6 @@ class TilsynBarnVedtakController(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     tilgangService: TilgangService,
     private val tilsynBarnVedtakService: TilsynBarnVedtakService,
-    private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
 ) : VedtakController<VedtakTilsynBarnDto, VedtakTilsynBarn>(
     tilgangService,
     tilsynBarnVedtakService,
@@ -47,7 +46,6 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
-        val utgifter = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandlingId)
-        return tilsynBarnBeregningService.beregn(behandlingId, utgifter)
+        return tilsynBarnBeregningService.beregn(behandlingId)
     }
 }

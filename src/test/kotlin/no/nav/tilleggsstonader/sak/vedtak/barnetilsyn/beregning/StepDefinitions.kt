@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnUtgiftService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
@@ -38,7 +39,8 @@ class StepDefinitions {
     private val logger = LoggerFactory.getLogger(javaClass)
     val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
-    val service = TilsynBarnBeregningService(stønadsperiodeRepository, vilkårperiodeRepository)
+    val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
+    val service = TilsynBarnBeregningService(stønadsperiodeRepository, vilkårperiodeRepository, tilsynBarnUtgiftService)
 
     var exception: Exception? = null
 
@@ -78,8 +80,9 @@ class StepDefinitions {
 
     @Når("beregner")
     fun `beregner`() {
+        every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
-            beregningsresultat = service.beregn(behandlingId = behandlingId, utgifter)
+            beregningsresultat = service.beregn(behandlingId = behandlingId)
         } catch (e: Exception) {
             exception = e
         }

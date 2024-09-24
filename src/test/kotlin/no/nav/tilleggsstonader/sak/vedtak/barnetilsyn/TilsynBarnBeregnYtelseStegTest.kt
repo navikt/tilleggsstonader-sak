@@ -38,13 +38,14 @@ class TilsynBarnBeregnYtelseStegTest {
     private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>(relaxed = true)
     private val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>(relaxed = true)
 
+    val tilsynBarnBeregningService =
+        TilsynBarnBeregningService(stønadsperiodeService, vilkårperiodeRepository, tilsynBarnUtgiftService)
     val steg = TilsynBarnBeregnYtelseSteg(
-        tilsynBarnBeregningService = TilsynBarnBeregningService(stønadsperiodeService, vilkårperiodeRepository),
+        tilsynBarnBeregningService = tilsynBarnBeregningService,
         vedtakRepository = repository,
         tilkjentytelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
         unleashService = mockUnleashService(),
-        tilsynBarnUtgiftService = tilsynBarnUtgiftService,
     )
 
     val saksbehandling = saksbehandling()
