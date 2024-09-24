@@ -143,7 +143,7 @@ class VilkårperiodeRevurderFraValideringTest {
         }
 
         @Test
-        fun `kan ikke oppdatere tom til før dagen før revurder fra`() {
+        fun `kan ikke oppdatere tom til 2 dager før revurder fra, då fjerner man data som gjelder dagen før revurderingsdatoet`() {
             val eksisterendeVilkårperiode = aktivitet(
                 fom = revurderFra.minusMonths(1),
                 tom = revurderFra.plusMonths(1),
@@ -157,7 +157,7 @@ class VilkårperiodeRevurderFraValideringTest {
         }
 
         @Test
-        fun `kan ikke oppdatere data på vilkår hvis det begynner før revurder-fra`() {
+        fun `kan ikke oppdatere data på periode hvis det begynner før revurder-fra`() {
             val eksisterendeVilkårperiode = aktivitet(
                 fom = revurderFra.minusMonths(1),
                 tom = revurderFra.plusMonths(1),
