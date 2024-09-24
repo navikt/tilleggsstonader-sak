@@ -2,9 +2,9 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerEndrePeriodeIForholdTilRevurderFra
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeIForholdTilRevurderFra
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeIForholdTilRevurderFra
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
@@ -31,11 +31,11 @@ class VilkårperiodeRevurderFraValideringTest {
         @Test
         fun `kan legge inn periode med valgfritt dato dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
-                validerNyPeriodeIForholdTilRevurderFra(
+                validerNyPeriodeRevurdering(
                     behandling,
                     opprettVilkårperiodeMålgruppe(fom = revurderFra.minusDays(1)),
                 )
-                validerNyPeriodeIForholdTilRevurderFra(
+                validerNyPeriodeRevurdering(
                     behandling,
                     opprettVilkårperiodeMålgruppe(fom = revurderFra.plusDays(1)),
                 )
@@ -45,11 +45,11 @@ class VilkårperiodeRevurderFraValideringTest {
         @Test
         fun `kan legge inn periode som begynner samme eller etter revurderingsdato`() {
             assertDoesNotThrow {
-                validerNyPeriodeIForholdTilRevurderFra(
+                validerNyPeriodeRevurdering(
                     behandlingMedRevurderFra,
                     opprettVilkårperiodeMålgruppe(fom = revurderFra),
                 )
-                validerNyPeriodeIForholdTilRevurderFra(
+                validerNyPeriodeRevurdering(
                     behandlingMedRevurderFra,
                     opprettVilkårperiodeMålgruppe(fom = revurderFra.plusDays(1)),
                 )
@@ -60,7 +60,7 @@ class VilkårperiodeRevurderFraValideringTest {
         fun `kan ikke legge inn ny periode som begynner før revurder-fra`() {
             assertThatThrownBy {
                 val vilkårperiode = opprettVilkårperiodeMålgruppe(fom = revurderFra.minusDays(1))
-                validerNyPeriodeIForholdTilRevurderFra(behandlingMedRevurderFra, vilkårperiode)
+                validerNyPeriodeRevurdering(behandlingMedRevurderFra, vilkårperiode)
             }.hasMessageContaining("Kan ikke opprette periode")
         }
     }
@@ -71,11 +71,11 @@ class VilkårperiodeRevurderFraValideringTest {
         @Test
         fun `kan slette periode med valgfritt dato dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
-                validerSlettPeriodeIForholdTilRevurderFra(
+                validerSlettPeriodeRevurdering(
                     behandling,
                     målgruppe(fom = revurderFra.minusDays(1)),
                 )
-                validerSlettPeriodeIForholdTilRevurderFra(
+                validerSlettPeriodeRevurdering(
                     behandling,
                     målgruppe(fom = revurderFra.plusDays(1)),
                 )
@@ -85,11 +85,11 @@ class VilkårperiodeRevurderFraValideringTest {
         @Test
         fun `kan slette periode som begynner samme eller etter revurderingsdato`() {
             assertDoesNotThrow {
-                validerSlettPeriodeIForholdTilRevurderFra(
+                validerSlettPeriodeRevurdering(
                     behandlingMedRevurderFra,
                     målgruppe(fom = revurderFra),
                 )
-                validerSlettPeriodeIForholdTilRevurderFra(
+                validerSlettPeriodeRevurdering(
                     behandlingMedRevurderFra,
                     målgruppe(fom = revurderFra.plusDays(1)),
                 )
@@ -100,7 +100,7 @@ class VilkårperiodeRevurderFraValideringTest {
         fun `kan ikke slette periode som begynner før revurder-fra`() {
             assertThatThrownBy {
                 val vilkårperiode = målgruppe(fom = revurderFra.minusDays(1))
-                validerSlettPeriodeIForholdTilRevurderFra(behandlingMedRevurderFra, vilkårperiode)
+                validerSlettPeriodeRevurdering(behandlingMedRevurderFra, vilkårperiode)
             }.hasMessageContaining("Kan ikke slette periode")
         }
     }
@@ -183,7 +183,7 @@ class VilkårperiodeRevurderFraValideringTest {
             eksisterendeVilkårperiode: Vilkårperiode,
             oppdatertVilkårperiode: Vilkårperiode,
         ) {
-            validerEndrePeriodeIForholdTilRevurderFra(
+            validerEndrePeriodeRevurdering(
                 behandling,
                 eksisterendeVilkårperiode,
                 oppdatertVilkårperiode,
@@ -194,7 +194,7 @@ class VilkårperiodeRevurderFraValideringTest {
             eksisterendeVilkårperiode: Vilkårperiode,
             oppdatertVilkårperiode: Vilkårperiode,
         ) {
-            validerEndrePeriodeIForholdTilRevurderFra(
+            validerEndrePeriodeRevurdering(
                 behandlingMedRevurderFra,
                 eksisterendeVilkårperiode,
                 oppdatertVilkårperiode,

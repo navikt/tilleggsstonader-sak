@@ -10,7 +10,7 @@ import java.time.LocalDate
 
 object VilkårperiodeRevurderFraValidering {
 
-    fun validerNyPeriodeIForholdTilRevurderFra(
+    fun validerNyPeriodeRevurdering(
         behandling: Saksbehandling,
         periode: LagreVilkårperiode,
     ) {
@@ -19,7 +19,7 @@ object VilkårperiodeRevurderFraValidering {
         }
     }
 
-    fun validerSlettPeriodeIForholdTilRevurderFra(
+    fun validerSlettPeriodeRevurdering(
         behandling: Saksbehandling,
         periode: Vilkårperiode,
     ) {
@@ -28,7 +28,7 @@ object VilkårperiodeRevurderFraValidering {
         }
     }
 
-    fun validerEndrePeriodeIForholdTilRevurderFra(
+    fun validerEndrePeriodeRevurdering(
         behandling: Saksbehandling,
         eksisterendePeriode: Vilkårperiode,
         oppdatertPeriode: Vilkårperiode,

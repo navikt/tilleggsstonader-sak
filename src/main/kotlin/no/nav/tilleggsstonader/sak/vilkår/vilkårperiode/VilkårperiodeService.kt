@@ -18,9 +18,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValide
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerEndrePeriodeIForholdTilRevurderFra
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeIForholdTilRevurderFra
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeIForholdTilRevurderFra
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -215,7 +215,7 @@ class VilkårperiodeService(
     fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
-        validerNyPeriodeIForholdTilRevurderFra(behandling, vilkårperiode)
+        validerNyPeriodeRevurdering(behandling, vilkårperiode)
 
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
@@ -309,7 +309,7 @@ class VilkårperiodeService(
                 )
             }
         }
-        validerEndrePeriodeIForholdTilRevurderFra(behandling, eksisterendeVilkårperiode, oppdatert)
+        validerEndrePeriodeRevurdering(behandling, eksisterendeVilkårperiode, oppdatert)
         return vilkårperiodeRepository.update(oppdatert)
     }
 
@@ -332,7 +332,7 @@ class VilkårperiodeService(
 
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
-        validerSlettPeriodeIForholdTilRevurderFra(behandling, vilkårperiode)
+        validerSlettPeriodeRevurdering(behandling, vilkårperiode)
 
         if (vilkårperiode.kanSlettesPermanent()) {
             vilkårperiodeRepository.deleteById(vilkårperiode.id)
