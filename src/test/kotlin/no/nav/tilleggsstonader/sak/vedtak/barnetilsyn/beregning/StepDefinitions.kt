@@ -7,10 +7,13 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.barnIder
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
+import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
@@ -18,6 +21,8 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnUtgiftService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
@@ -40,14 +45,21 @@ class StepDefinitions {
     val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
-    val service = TilsynBarnBeregningService(stønadsperiodeRepository, vilkårperiodeRepository, tilsynBarnUtgiftService)
+    val behandlingService = mockk<BehandlingService>()
+    val service = TilsynBarnBeregningService(
+        stønadsperiodeRepository = stønadsperiodeRepository,
+        vilkårperiodeRepository = vilkårperiodeRepository,
+        tilsynBarnUtgiftService = tilsynBarnUtgiftService,
+        behandlingService = behandlingService,
+    )
 
     var exception: Exception? = null
 
     var stønadsperioder = emptyList<StønadsperiodeDto>()
     var utgifter = mutableMapOf<BarnId, List<UtgiftBeregning>>()
     var beregningsresultat: BeregningsresultatTilsynBarn? = null
-    val behandlingId = BehandlingId.random()
+    var behandlingId = BehandlingId.random()
+    var behandling = behandling(id = behandlingId)
 
     @Gitt("følgende støndsperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {
@@ -80,6 +92,19 @@ class StepDefinitions {
 
     @Når("beregner")
     fun `beregner`() {
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling(behandling = behandling)
+        beregn()
+    }
+
+    @Når("beregner med revurderFra={}")
+    fun `beregner med revurder fra`(revurderFraStr: String) {
+        val revurderFra = parseDato(revurderFraStr)
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns
+            saksbehandling(behandling = behandling.copy(type = BehandlingType.REVURDERING, revurderFra = revurderFra))
+        beregn()
+    }
+
+    private fun beregn() {
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
             beregningsresultat = service.beregn(behandlingId = behandlingId)
