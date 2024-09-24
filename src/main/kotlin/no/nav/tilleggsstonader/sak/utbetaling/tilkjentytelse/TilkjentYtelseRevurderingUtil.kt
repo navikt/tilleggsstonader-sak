@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import java.time.LocalDate
+import java.time.YearMonth
 
 object TilkjentYtelseRevurderingUtil {
 
@@ -32,17 +33,13 @@ object TilkjentYtelseRevurderingUtil {
         tilkjentYtelse: TilkjentYtelse,
         revurderFra: LocalDate,
     ): List<AndelTilkjentYtelse> {
+        val revurderFraMåned = YearMonth.from(revurderFra).atDay(1)
         return tilkjentYtelse.andelerTilkjentYtelse
-            .mapNotNull { andel ->
+            .filter { andel ->
                 feilHvis(andel.fom != andel.tom) {
                     "Håndterer foreløpig ikke at fom != tom"
                 }
-                if (andel.fom >= revurderFra) {
-                    null
-                } else {
-                    val nyttDato = minOf(andel.tom, revurderFra.minusDays(1))
-                    andel.copy(fom = nyttDato, tom = nyttDato)
-                }
+                andel.tom < revurderFraMåned
             }
             .map {
                 // TODO hvordan håndtere ugyldig satstype/type
