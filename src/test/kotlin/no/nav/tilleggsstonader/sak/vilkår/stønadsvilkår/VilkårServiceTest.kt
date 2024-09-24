@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils.now
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -40,11 +42,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat.SKAL_IKKE_VURDERES
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OppdaterVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarn
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -57,6 +60,7 @@ import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
+import java.time.YearMonth
 
 internal class VilkårServiceTest {
 
@@ -238,7 +242,7 @@ internal class VilkårServiceTest {
                 SvarPåVilkårDto(
                     id = vilkår.id,
                     behandlingId = behandlingId,
-                    delvilkårsett = PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto(),
+                    delvilkårsett = oppfylteDelvilkårPassBarnDto(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     utgift = 1,
@@ -379,6 +383,68 @@ internal class VilkårServiceTest {
         ).isInstanceOf(ApiFeil::class.java)
             .hasMessageContaining("Kan ikke oppdatere vilkår når behandling er på steg")
         verify(exactly = 0) { vilkårRepository.insertAll(any()) }
+    }
+
+    @Nested
+    inner class EndringHvisStønadsperiodeBegynnerFørRevurderFra {
+
+        val fom = YearMonth.now().minusMonths(1)
+        val tom = YearMonth.now().plusMonths(1)
+
+        @BeforeEach
+        fun setUp() {
+            mockHentBehandling(behandling.copy(type = BehandlingType.REVURDERING, revurderFra = LocalDate.now()))
+        }
+
+        @Test
+        fun `kan ikke opprette periode hvis revurderFra begynner før periode`() {
+            val opprettOppfyltDelvilkår = OpprettVilkårDto(
+                vilkårType = VilkårType.PASS_BARN,
+                barnId = barn.first().id,
+                behandlingId = behandling.id,
+                delvilkårsett = oppfylteDelvilkårPassBarnDto(),
+                fom = fom.atDay(1),
+                tom = tom.atEndOfMonth(),
+                utgift = 1,
+            )
+
+            assertThatThrownBy {
+                vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår)
+            }.hasMessageContaining("Kan ikke opprette periode")
+        }
+
+        @Test
+        fun `kan ikke oppdatere periode hvis revurderFra begynner før periode`() {
+            val lagretVilkår = slot<Vilkår>()
+            val vilkår = initiererVilkår(lagretVilkår)
+
+            val svarPåVilkårDto = SvarPåVilkårDto(
+                id = vilkår.id,
+                behandlingId = behandling.id,
+                delvilkårsett = oppfylteDelvilkårPassBarnDto(),
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 1, 31),
+                utgift = 1,
+            )
+            assertThatThrownBy {
+                vilkårService.oppdaterVilkår(svarPåVilkårDto)
+            }.hasMessageContaining("Ugyldig endring på periode")
+        }
+
+        @Test
+        fun `kan ikke slette periode hvis revurderFra begynner før periode`() {
+            val vilkår = vilkår(
+                behandlingId = behandlingId,
+                type = VilkårType.PASS_BARN,
+                fom = fom.atDay(1),
+                tom = tom.atEndOfMonth(),
+            )
+            every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
+
+            assertThatThrownBy {
+                vilkårService.slettVilkår(OppdaterVilkårDto(vilkår.id, behandlingId))
+            }.hasMessageContaining("Kan ikke slette periode")
+        }
     }
 
     private fun lagVilkårsett(

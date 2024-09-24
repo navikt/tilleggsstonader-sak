@@ -20,6 +20,9 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårRevurderFraValidering.validerEndrePeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårRevurderFraValidering.validerNyPeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -60,10 +63,12 @@ class VilkårService(
         val vilkår = vilkårRepository.findByIdOrThrow(svarPåVilkårDto.id)
         val behandlingId = vilkår.behandlingId
 
-        validerBehandling(behandlingId)
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        validerBehandling(behandling)
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, svarPåVilkårDto.behandlingId)
 
         val oppdatertVilkår = flettVilkårOgVurderResultat(vilkår, svarPåVilkårDto)
+        validerEndrePeriodeRevurdering(behandling, vilkår, oppdatertVilkår)
         return vilkårRepository.update(oppdatertVilkår).tilDto()
     }
 
@@ -71,7 +76,8 @@ class VilkårService(
     fun opprettNyttVilkår(opprettVilkårDto: OpprettVilkårDto): Vilkår {
         val behandlingId = opprettVilkårDto.behandlingId
 
-        validerBehandling(behandlingId)
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        validerBehandling(behandling)
         validerBehandlingOgVilkårType(behandlingId, opprettVilkårDto.vilkårType)
 
         val relevanteRegler = hentVilkårsregel(opprettVilkårDto.vilkårType)
@@ -85,8 +91,8 @@ class VilkårService(
                 vilkårsregel = relevanteRegler,
                 barnId = opprettVilkårDto.barnId,
             )
-
         val oppdatertVilkår = flettVilkårOgVurderResultat(nyttVilkår, opprettVilkårDto)
+        validerNyPeriodeRevurdering(behandling, oppdatertVilkår)
 
         return vilkårRepository.insert(oppdatertVilkår)
     }
@@ -113,11 +119,14 @@ class VilkårService(
         val vilkår = vilkårRepository.findByIdOrThrow(vilkårId)
         val behandlingId = vilkår.behandlingId
 
+        // TODO burde slettemarkeres hvis opprettet i tidligere behandling?
         feilHvis(vilkår.opphavsvilkår != null) {
             "Kan ikke slette vilkår opprettet i tidligere behandling"
         }
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
-        validerBehandling(behandlingId)
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        validerBehandling(behandling)
+        validerSlettPeriodeRevurdering(behandling, vilkår)
 
         vilkårRepository.deleteById(vilkårId)
     }
@@ -128,7 +137,8 @@ class VilkårService(
         val behandlingId = vilkår.behandlingId
 
         validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId, oppdaterVilkårDto.behandlingId)
-        validerBehandling(behandlingId)
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        validerBehandling(behandling)
 
         return oppdaterVilkårTilSkalIkkeVurderes(behandlingId, vilkår)
     }
@@ -153,10 +163,6 @@ class VilkårService(
     }
 
     private fun hentHovedregelMetadata(behandlingId: BehandlingId) = hentGrunnlagOgMetadata(behandlingId).second
-
-    private fun validerBehandling(behandlingId: BehandlingId) {
-        validerBehandling(behandlingService.hentSaksbehandling(behandlingId))
-    }
 
     private fun validerBehandlingOgVilkårType(behandlingId: BehandlingId, vilkårType: VilkårType) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
