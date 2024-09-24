@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseRevurderingUtil.gjenbrukAndelerFraForrigeTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseRevurderingUtil.validerNyeAndelerBegynnerEtterRevurderFra
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -13,7 +15,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import org.springframework.stereotype.Service
 import java.time.YearMonth
-import java.util.*
 
 @Service
 class TilkjentYtelseService(
@@ -29,8 +30,28 @@ class TilkjentYtelseService(
             ?: error("Fant ikke tilkjent ytelse med behandlingsid $behandlingId")
     }
 
-    fun opprettTilkjentYtelse(nyTilkjentYtelse: TilkjentYtelse): TilkjentYtelse {
-        return tilkjentYtelseRepository.insert(nyTilkjentYtelse)
+    fun opprettTilkjentYtelse(
+        saksbehandling: Saksbehandling,
+        andeler: List<AndelTilkjentYtelse>,
+    ): TilkjentYtelse {
+        validerNyeAndelerBegynnerEtterRevurderFra(saksbehandling, andeler)
+
+        val andelerSomSkalBeholdes = finnAndelerSomSkalBeholdes(saksbehandling)
+
+        return tilkjentYtelseRepository.insert(
+            TilkjentYtelse(
+                behandlingId = saksbehandling.id,
+                andelerTilkjentYtelse = (andelerSomSkalBeholdes + andeler).toSet(),
+            ),
+        )
+    }
+
+    private fun finnAndelerSomSkalBeholdes(saksbehandling: Saksbehandling): List<AndelTilkjentYtelse> {
+        val revurderFra = saksbehandling.revurderFra ?: return emptyList()
+        val forrigeBehandlingId = saksbehandling.forrigeBehandlingId ?: return emptyList()
+
+        val forrigeTilkjentYtelse = hentForBehandling(forrigeBehandlingId)
+        return gjenbrukAndelerFraForrigeTilkjentYtelse(forrigeTilkjentYtelse, revurderFra)
     }
 
     fun harLøpendeUtbetaling(behandlingId: BehandlingId): Boolean {
@@ -53,7 +74,11 @@ class TilkjentYtelseService(
      *
      * @return den nye nullandelen som man kan sjekke status på iverksetting for
      */
-    fun leggTilNullAndel(tilkjentYtelse: TilkjentYtelse, iverksetting: Iverksetting, måned: YearMonth): AndelTilkjentYtelse {
+    fun leggTilNullAndel(
+        tilkjentYtelse: TilkjentYtelse,
+        iverksetting: Iverksetting,
+        måned: YearMonth,
+    ): AndelTilkjentYtelse {
         val nullAndel = AndelTilkjentYtelse(
             beløp = 0,
             fom = måned.atDay(1),
