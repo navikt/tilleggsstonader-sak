@@ -1,11 +1,15 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerNyPeriodeRevurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -27,20 +31,24 @@ class StønadsperiodeService(
     }
 
     @Transactional
-    fun lagreStønadsperioder(behandlingId: BehandlingId, stønadsperioder: List<StønadsperiodeDto>): List<StønadsperiodeDto> {
-        validerBehandling(behandlingId)
+    fun lagreStønadsperioder(
+        behandlingId: BehandlingId,
+        stønadsperioder: List<StønadsperiodeDto>,
+    ): List<StønadsperiodeDto> {
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        validerBehandling(behandling)
         validerStønadsperioder(behandlingId, stønadsperioder)
 
         val tidligereStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId)
 
-        slettStønadsperioder(tidligereStønadsperioder, stønadsperioder)
-        val oppdaterteStønadsperioder = oppdaterEksisterendeStønadsperioder(tidligereStønadsperioder, stønadsperioder)
-        val nyeStønadsperioder = leggTilNyeStønadsperioder(behandlingId, stønadsperioder, tidligereStønadsperioder)
+        slettStønadsperioder(behandling, tidligereStønadsperioder, stønadsperioder)
+        val oppdaterteStønadsperioder =
+            oppdaterEksisterendeStønadsperioder(behandling, tidligereStønadsperioder, stønadsperioder)
+        val nyeStønadsperioder = leggTilNyeStønadsperioder(behandling, stønadsperioder, tidligereStønadsperioder)
         return (nyeStønadsperioder + oppdaterteStønadsperioder).tilSortertDto()
     }
 
-    private fun validerBehandling(behandlingId: BehandlingId) {
-        val behandling = behandlingService.hentBehandling(behandlingId)
+    private fun validerBehandling(behandling: Saksbehandling) {
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke lagre stønadsperioder når behandlingen er låst"
         }
@@ -50,15 +58,18 @@ class StønadsperiodeService(
     }
 
     private fun slettStønadsperioder(
+        behandling: Saksbehandling,
         tidligereStønadsperioder: List<Stønadsperiode>,
         stønadsperioder: List<StønadsperiodeDto>,
     ) {
         val gjenståendePerioder = stønadsperioder.mapNotNull { it.id }.toSet()
         val perioderTilSletting = tidligereStønadsperioder.filterNot { gjenståendePerioder.contains(it.id) }
+        perioderTilSletting.forEach { validerSlettPeriodeRevurdering(behandling, it) }
         stønadsperiodeRepository.deleteAllById(perioderTilSletting.map { it.id })
     }
 
     private fun oppdaterEksisterendeStønadsperioder(
+        behandling: Saksbehandling,
         tidligereStønadsperioder: List<Stønadsperiode>,
         stønadsperioder: List<StønadsperiodeDto>,
     ): List<Stønadsperiode> {
@@ -71,14 +82,16 @@ class StønadsperiodeService(
                     tom = it.tom,
                     målgruppe = it.målgruppe,
                     aktivitet = it.aktivitet,
-                )
+                ).apply {
+                    validerEndrePeriodeRevurdering(behandling, tidligereStønadsperiode, this)
+                }
             }
         }
         return stønadsperiodeRepository.updateAll(perioderTilOppdatering)
     }
 
     private fun leggTilNyeStønadsperioder(
-        behandlingId: BehandlingId,
+        behandling: Saksbehandling,
         stønadsperioder: List<StønadsperiodeDto>,
         tidligereStønadsperiode: List<Stønadsperiode>,
     ): List<Stønadsperiode> {
@@ -89,12 +102,15 @@ class StønadsperiodeService(
             }
             Stønadsperiode(
                 id = UUID.randomUUID(),
-                behandlingId = behandlingId,
+                behandlingId = behandling.id,
                 fom = it.fom,
                 tom = it.tom,
                 målgruppe = it.målgruppe,
                 aktivitet = it.aktivitet,
             )
+        }
+        nyeStønadsperioder.forEach {
+            validerNyPeriodeRevurdering(behandling, it)
         }
 
         return stønadsperiodeRepository.insertAll(nyeStønadsperioder)
