@@ -115,6 +115,7 @@ fun saksbehandling(
     årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
     kravMottatt: LocalDate? = null,
+    revurderFra: LocalDate? = null,
 ): Saksbehandling = saksbehandling(
     fagsak,
     Behandling(
@@ -130,6 +131,7 @@ fun saksbehandling(
         henlagtÅrsak = henlagtÅrsak,
         kravMottatt = kravMottatt,
         kategori = BehandlingKategori.NASJONAL,
+        revurderFra = revurderFra,
     ),
 )
 

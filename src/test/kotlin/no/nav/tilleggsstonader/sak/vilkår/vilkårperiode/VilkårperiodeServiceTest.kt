@@ -290,6 +290,25 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 }.hasMessageContaining("Kan ikke registrere aktivitetsdager på ingen aktivitet")
             }
         }
+
+        @Test
+        fun `kan ikke opprette periode hvis periode begyner før revurderFra`() {
+            val behandling = testoppsettService.oppdater(
+                testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
+            )
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    opprettVilkårperiodeAktivitet(
+                        begrunnelse = "Begrunnelse",
+                        type = AktivitetType.INGEN_AKTIVITET,
+                        behandlingId = behandling.id,
+                        aktivitetsdager = 5,
+                        fom = now().minusDays(1),
+                    ),
+                )
+            }.hasMessageContaining("Kan ikke opprette periode")
+        }
     }
 
     @Nested
@@ -497,6 +516,29 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             }.hasMessageContaining("Kan ikke opprette eller endre vilkårperiode når behandling er låst for videre redigering")
         }
 
+        @Test
+        fun `kan ikke oppdatere periode hvis periode begynner før revurderFra`() {
+            val behandling = testoppsettService.oppdater(
+                testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
+            )
+
+            val aktivitet = aktivitet(
+                behandlingId = behandling.id,
+                kilde = KildeVilkårsperiode.MANUELL,
+                fom = now().minusMonths(1),
+                tom = now().plusMonths(1),
+                aktivitetsdager = 5,
+            )
+            val periode = vilkårperiodeRepository.insert(aktivitet)
+
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    periode.id,
+                    periode.tilOppdatering().copy(aktivitetsdager = 3),
+                )
+            }.hasMessageContaining("Ugyldig endring på periode")
+        }
+
         private fun Vilkårperiode.tilOppdatering(): LagreVilkårperiode {
             val delvilkårDto = when (this.delvilkår) {
                 is DelvilkårMålgruppe -> (this.delvilkår as DelvilkårMålgruppe).let {
@@ -626,6 +668,25 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
                 assertThat(oppdatertPeriode.sporbar.endret.endretAv).isEqualTo(saksbehandler)
                 assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.SLETTET)
+            }
+
+            @Test
+            fun `kan ikke slette periode hvis periode begynner før revurderFra`() {
+                val behandling = testoppsettService.oppdater(revurdering.copy(revurderFra = now()))
+
+                val aktivitet = aktivitet(
+                    behandlingId = behandling.id,
+                    fom = now().minusMonths(1),
+                    tom = now().plusMonths(1),
+                )
+                val periode = vilkårperiodeRepository.insert(aktivitet)
+
+                assertThatThrownBy {
+                    vilkårperiodeService.slettVilkårperiode(
+                        periode.id,
+                        SlettVikårperiode(revurdering.id, "kommentar"),
+                    )
+                }.hasMessageContaining("Kan ikke slette periode")
             }
         }
     }
