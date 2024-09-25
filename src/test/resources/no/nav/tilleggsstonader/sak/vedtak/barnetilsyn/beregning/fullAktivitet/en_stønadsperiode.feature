@@ -65,8 +65,8 @@ Egenskap: Beregning - En stønadsperiode med full aktivitet
 
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
-      | 03.2023 | 29.53   | 15           | 1000   | 443         |
-      | 04.2023 | 29.53   | 20           | 1000   | 591         |
+      | 04.2023 | 29.53   | 15           | 1000   | 443         |
+      | 05.2023 | 29.53   | 20           | 1000   | 591         |
 
     Så forvent følgende stønadsperioder for: 04.2023
       | Fom        | Tom        | Målgruppe       | Aktivitet |

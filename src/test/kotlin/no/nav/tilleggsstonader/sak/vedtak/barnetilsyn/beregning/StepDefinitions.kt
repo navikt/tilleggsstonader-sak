@@ -114,6 +114,10 @@ class StepDefinitions {
         perioder.forEachIndexed { index, resultat ->
             val forventetResultat = forventetBeregningsresultat[index]
             try {
+                assertThat(resultat.grunnlag.måned)
+                    .`as` { "måned" }
+                    .isEqualTo(forventetResultat.grunnlag.måned)
+
                 assertThat(resultat.dagsats)
                     .`as` { "dagsats" }
                     .isEqualTo(forventetResultat.dagsats)
