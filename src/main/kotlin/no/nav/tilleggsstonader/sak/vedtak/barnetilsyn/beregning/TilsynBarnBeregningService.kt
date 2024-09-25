@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
@@ -27,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeR
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.LocalDate
 import java.time.YearMonth
 import kotlin.math.min
 
@@ -45,37 +47,22 @@ class TilsynBarnBeregningService(
 ) {
 
     fun beregn(behandlingId: BehandlingId): BeregningsresultatTilsynBarn {
+        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
+
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandlingId)
-        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
+        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId)
+            .tilSortertDto()
+            .splitFraRevurderFra(revurderFra)
+
         val aktiviteter = finnAktiviteter(behandlingId)
 
         validerPerioder(stønadsperioder, aktiviteter, utgifterPerBarn)
 
         val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, aktiviteter, utgifterPerBarn)
-            .brukPerioderFraOgMedRevurderFra(behandlingId)
+            .brukPerioderFraOgMedRevurderFra(revurderFra)
         val perioder = beregn(beregningsgrunnlag)
 
         return BeregningsresultatTilsynBarn(perioder)
-    }
-
-    /**
-     * Dersom man har satt revurderFra så skal man kun beregne perioder fra og med den måneden
-     * Hvis vi eks innvilget 1000kr for 1-31 august, så mappes hele beløpet til 1 august.
-     * Dvs det lages en andel som har fom-tom 1-1 aug
-     * Når man revurderer fra midten på måneden og eks skal endre målgruppe eller aktivitetsdager,
-     * så har man allerede utbetalt 500kr for 1-14 august, men hele beløpet er ført på 1 aug.
-     * For at beregningen då skal bli riktig må man ha med grunnlaget til hele måneden og beregne det på nytt, sånn at man får en ny periode som er
-     * 1-14 aug, 500kr, 15-30 aug 700kr.
-     */
-    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedRevurderFra(
-        behandlingId: BehandlingId,
-    ): List<Beregningsgrunnlag> {
-        val revurderFraMåned = behandlingService.hentSaksbehandling(behandlingId).revurderFra
-            ?.let { YearMonth.from(it) }
-
-        if (revurderFraMåned == null) return this
-
-        return this.filter { it.måned >= revurderFraMåned }
     }
 
     private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<BeregningsresultatForMåned> {
@@ -190,6 +177,43 @@ class TilsynBarnBeregningService(
         }
 
         return antallDagerMedAktivitetPerUke.sum()
+    }
+
+    /**
+     * Dersom man har satt revurderFra så skal man kun beregne perioder fra og med den måneden
+     * Hvis vi eks innvilget 1000kr for 1-31 august, så mappes hele beløpet til 1 august.
+     * Dvs det lages en andel som har fom-tom 1-1 aug
+     * Når man revurderer fra midten på måneden og eks skal endre målgruppe eller aktivitetsdager,
+     * så har man allerede utbetalt 500kr for 1-14 august, men hele beløpet er ført på 1 aug.
+     * For at beregningen då skal bli riktig må man ha med grunnlaget til hele måneden og beregne det på nytt, sånn at man får en ny periode som er
+     * 1-14 aug, 500kr, 15-30 aug 700kr.
+     */
+    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedRevurderFra(
+        revurderFra: LocalDate?,
+    ): List<Beregningsgrunnlag> {
+        val revurderFraMåned = revurderFra?.let { YearMonth.from(it) }
+
+        if (revurderFraMåned == null) return this
+
+        return this.filter { it.måned >= revurderFraMåned }
+    }
+
+    private fun List<StønadsperiodeDto>.splitFraRevurderFra(revurderFra: LocalDate?): List<StønadsperiodeDto> {
+        if(revurderFra == null) return this
+        val revurderFraPeriode: Periode<LocalDate> = object: Periode<LocalDate> {
+            override val fom: LocalDate = revurderFra
+            override val tom: LocalDate = revurderFra
+        }
+        return this.flatMap {
+            if(it.inneholder(revurderFraPeriode) && it.fom < revurderFra) {
+                setOf(
+                    it.copy(tom = revurderFra.minusDays(1)),
+                    it.copy(fom = revurderFra),
+                )
+            } else {
+                listOf(it)
+            }
+        }
     }
 
     private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
