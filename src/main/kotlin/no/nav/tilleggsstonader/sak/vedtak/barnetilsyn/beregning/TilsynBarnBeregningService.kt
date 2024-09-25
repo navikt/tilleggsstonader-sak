@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
@@ -198,15 +197,16 @@ class TilsynBarnBeregningService(
         return this.filter { it.måned >= revurderFraMåned }
     }
 
+    /**
+     * Dersom man har en lang stønadsperiode for 1.1 - 31.1 så skal den splittes opp fra revurderFra sånn at man får 2 perioder
+     * Eks for revurderFra=15.1 så får man 1.1 - 14.1 og 15.1 - 31.1
+     * Dette for å kunne filtrere vekk perioder som begynner før revurderFra og beregne beløp som skal utbetales i gitt måned
+     */
     private fun List<StønadsperiodeDto>.splitFraRevurderFra(revurderFra: LocalDate?): List<StønadsperiodeDto> {
-        if(revurderFra == null) return this
-        val revurderFraPeriode: Periode<LocalDate> = object: Periode<LocalDate> {
-            override val fom: LocalDate = revurderFra
-            override val tom: LocalDate = revurderFra
-        }
+        if (revurderFra == null) return this
         return this.flatMap {
-            if(it.inneholder(revurderFraPeriode) && it.fom < revurderFra) {
-                setOf(
+            if (it.fom < revurderFra && revurderFra <= it.tom) {
+                listOf(
                     it.copy(tom = revurderFra.minusDays(1)),
                     it.copy(fom = revurderFra),
                 )
