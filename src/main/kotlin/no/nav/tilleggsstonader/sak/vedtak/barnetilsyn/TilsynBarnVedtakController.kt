@@ -46,6 +46,6 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
-        return tilsynBarnBeregningService.beregn(behandlingId)
+        return BeregningsresultatTilsynBarnDto(tilsynBarnBeregningService.beregn(behandlingId).perioder)
     }
 }

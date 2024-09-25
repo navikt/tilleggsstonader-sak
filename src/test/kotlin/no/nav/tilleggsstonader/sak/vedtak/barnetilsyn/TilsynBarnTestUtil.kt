@@ -3,9 +3,10 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
@@ -22,9 +23,9 @@ object TilsynBarnTestUtil {
         beregningsresultat = beregningsresultat,
     )
 
-    val vedtakBeregningsresultat = VedtaksdataBeregningsresultat(
+    val vedtakBeregningsresultat = BeregningsresultatTilsynBarn(
         perioder = listOf(
-            Beregningsresultat(
+            BeregningsresultatForMåned(
                 dagsats = BigDecimal.TEN,
                 månedsbeløp = 1000,
                 grunnlag = Beregningsgrunnlag(
@@ -54,7 +55,7 @@ object TilsynBarnTestUtil {
 
     fun innvilgetVedtak(
         vedtak: VedtaksdataTilsynBarn? = vedtaksdata,
-        beregningsresultat: VedtaksdataBeregningsresultat? = vedtakBeregningsresultat,
+        beregningsresultat: BeregningsresultatTilsynBarn? = vedtakBeregningsresultat,
         behandlingId: BehandlingId = BehandlingId.random(),
     ) = VedtakTilsynBarn(
         behandlingId = behandlingId,

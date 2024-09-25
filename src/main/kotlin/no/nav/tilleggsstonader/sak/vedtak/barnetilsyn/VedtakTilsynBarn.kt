@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -20,7 +20,7 @@ data class VedtakTilsynBarn(
     val behandlingId: BehandlingId,
     val type: TypeVedtak,
     val vedtak: VedtaksdataTilsynBarn? = null,
-    val beregningsresultat: VedtaksdataBeregningsresultat? = null,
+    val beregningsresultat: BeregningsresultatTilsynBarn? = null,
     @Column("arsaker_avslag")
     val årsakerAvslag: ÅrsakAvslag.Wrapper? = null,
     val avslagBegrunnelse: String? = null,
@@ -45,8 +45,4 @@ data class VedtakTilsynBarn(
 
 data class VedtaksdataTilsynBarn(
     val utgifter: Map<BarnId, List<Utgift>>,
-)
-
-data class VedtaksdataBeregningsresultat(
-    val perioder: List<Beregningsresultat>,
 )

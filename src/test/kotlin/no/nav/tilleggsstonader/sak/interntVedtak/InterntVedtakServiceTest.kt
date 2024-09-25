@@ -25,8 +25,8 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
@@ -220,7 +220,7 @@ class InterntVedtakServiceTest {
                 ),
             ),
         ),
-        beregningsresultat = VedtaksdataBeregningsresultat(emptyList()),
+        beregningsresultat = BeregningsresultatTilsynBarn(emptyList()),
     )
 
     @BeforeEach

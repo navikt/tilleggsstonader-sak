@@ -9,8 +9,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
@@ -109,8 +109,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 VedtaksdataTilsynBarnReader(),
                 VedtaksdataTilsynBarnWriter(),
-                VedtaksdataBeregningsresultatReader(),
-                VedtaksdataBeregningsresultatWriter(),
+                BeregningsresultatTilsynBarnReader(),
+                BeregningsresultatTilsynBarnWriter(),
                 ÅrsakAvslagReader(),
                 ÅrsakAvslagWriter(),
 
@@ -229,10 +229,10 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class VedtaksdataTilsynBarnReader : JsonReader<VedtaksdataTilsynBarn>(VedtaksdataTilsynBarn::class)
     class VedtaksdataTilsynBarnWriter : JsonWriter<VedtaksdataTilsynBarn>()
 
-    class VedtaksdataBeregningsresultatReader :
-        JsonReader<VedtaksdataBeregningsresultat>(VedtaksdataBeregningsresultat::class)
+    class BeregningsresultatTilsynBarnReader :
+        JsonReader<BeregningsresultatTilsynBarn>(BeregningsresultatTilsynBarn::class)
 
-    class VedtaksdataBeregningsresultatWriter : JsonWriter<VedtaksdataBeregningsresultat>()
+    class BeregningsresultatTilsynBarnWriter : JsonWriter<BeregningsresultatTilsynBarn>()
 
     class ÅrsakAvslagReader :
         JsonReader<ÅrsakAvslag.Wrapper>(ÅrsakAvslag.Wrapper::class)

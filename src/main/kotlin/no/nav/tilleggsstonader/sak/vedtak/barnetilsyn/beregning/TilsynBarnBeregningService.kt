@@ -10,11 +10,11 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningU
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilÅrMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beregningsresultat
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.StønadsperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -41,7 +41,7 @@ class TilsynBarnBeregningService(
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
 ) {
 
-    fun beregn(behandlingId: BehandlingId): BeregningsresultatTilsynBarnDto {
+    fun beregn(behandlingId: BehandlingId): BeregningsresultatTilsynBarn {
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandlingId)
         val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
         val aktiviteter = finnAktiviteter(behandlingId)
@@ -51,15 +51,15 @@ class TilsynBarnBeregningService(
         val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, aktiviteter, utgifterPerBarn)
         val perioder = beregn(beregningsgrunnlag)
 
-        return BeregningsresultatTilsynBarnDto(perioder)
+        return BeregningsresultatTilsynBarn(perioder)
     }
 
-    private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<Beregningsresultat> {
+    private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<BeregningsresultatForMåned> {
         return beregningsgrunnlag.map {
             val dagsats = beregnDagsats(it)
             val beløpsperioder = lagBeløpsperioder(dagsats, it)
 
-            Beregningsresultat(
+            BeregningsresultatForMåned(
                 dagsats = dagsats,
                 månedsbeløp = beløpsperioder.sumOf { it.beløp },
                 grunnlag = it,

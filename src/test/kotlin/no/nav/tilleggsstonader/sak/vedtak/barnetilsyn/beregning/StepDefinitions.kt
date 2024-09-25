@@ -19,8 +19,8 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnUtgiftService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Beløpsperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -46,7 +46,7 @@ class StepDefinitions {
 
     var stønadsperioder = emptyList<StønadsperiodeDto>()
     var utgifter = mutableMapOf<BarnId, List<UtgiftBeregning>>()
-    var beregningsresultat: BeregningsresultatTilsynBarnDto? = null
+    var beregningsresultat: BeregningsresultatTilsynBarn? = null
     val behandlingId = BehandlingId.random()
 
     @Gitt("følgende støndsperioder")
@@ -148,7 +148,7 @@ class StepDefinitions {
             }
         }
 
-        assertThat(perioder).hasSize(perioder.size)
+        assertThat(perioder).hasSize(forventetBeregningsresultat.size)
     }
 
     @Så("forvent følgende stønadsperioder for: {}")

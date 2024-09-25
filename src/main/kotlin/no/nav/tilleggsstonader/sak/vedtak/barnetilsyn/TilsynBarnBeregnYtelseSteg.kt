@@ -15,8 +15,8 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -85,7 +85,7 @@ class TilsynBarnBeregnYtelseSteg(
 
     private fun lagreAndeler(
         saksbehandling: Saksbehandling,
-        beregningsresultat: BeregningsresultatTilsynBarnDto,
+        beregningsresultat: BeregningsresultatTilsynBarn,
     ) {
         val andelerTilkjentYtelse = beregningsresultat.perioder.flatMap {
             it.beløpsperioder.map { beløpsperiode ->
@@ -115,7 +115,7 @@ class TilsynBarnBeregnYtelseSteg(
 
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
-        beregningsresultat: BeregningsresultatTilsynBarnDto,
+        beregningsresultat: BeregningsresultatTilsynBarn,
     ): VedtakTilsynBarn {
         return VedtakTilsynBarn(
             behandlingId = behandling.id,
@@ -123,7 +123,7 @@ class TilsynBarnBeregnYtelseSteg(
             vedtak = VedtaksdataTilsynBarn(
                 utgifter = emptyMap(),
             ),
-            beregningsresultat = VedtaksdataBeregningsresultat(beregningsresultat.perioder),
+            beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
         )
     }
 
