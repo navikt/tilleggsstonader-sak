@@ -51,7 +51,7 @@ class TilkjentYtelseService(
         val forrigeBehandlingId = saksbehandling.forrigeBehandlingId ?: return emptyList()
 
         val forrigeTilkjentYtelse = hentForBehandling(forrigeBehandlingId)
-        return gjenbrukAndelerFraForrigeTilkjentYtelse(forrigeTilkjentYtelse, revurderFra)
+        return gjenbrukAndelerFraForrigeTilkjentYtelse(saksbehandling, forrigeTilkjentYtelse, revurderFra)
     }
 
     fun harLøpendeUtbetaling(behandlingId: BehandlingId): Boolean {
