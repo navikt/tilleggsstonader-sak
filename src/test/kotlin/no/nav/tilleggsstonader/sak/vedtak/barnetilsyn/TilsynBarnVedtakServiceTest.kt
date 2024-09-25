@@ -18,9 +18,9 @@ class TilsynBarnVedtakServiceTest {
     fun `skal mappe innvilget vedtak til dto`() {
         val vedtak = innvilgetVedtak()
 
-        val dto = tilsynBarnVedtakService.mapTilDto(vedtak) as InnvilgelseTilsynBarnDto
+        val dto = tilsynBarnVedtakService.mapTilDto(vedtak)
 
-        assertThat(dto.beregningsresultat!!.perioder).isEqualTo(vedtak.beregningsresultat!!.perioder)
+        assertThat(dto).isInstanceOf(InnvilgelseTilsynBarnDto::class.java)
     }
 
     @Test

@@ -4,9 +4,9 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,14 +17,12 @@ class TilsynBarnVedtakService(
 ) : VedtakService<VedtakTilsynBarnDto, VedtakTilsynBarn>(stegService, tilsynBarnBeregnYtelseSteg, repository) {
 
     override fun mapTilDto(vedtak: VedtakTilsynBarn): VedtakTilsynBarnDto {
-        when (vedtak.type) {
-            TypeVedtak.INNVILGELSE -> return InnvilgelseTilsynBarnDto(
-                beregningsresultat = vedtak.beregningsresultat?.let {
-                    BeregningsresultatTilsynBarnDto(perioder = it.perioder)
-                },
+        return when (vedtak.type) {
+            TypeVedtak.INNVILGELSE -> InnvilgelseTilsynBarnDto(
+                beregningsresultat = vedtak.beregningsresultat?.tilDto(),
             )
 
-            TypeVedtak.AVSLAG -> return AvslagTilsynBarnDto(
+            TypeVedtak.AVSLAG -> AvslagTilsynBarnDto(
                 årsakerAvslag = vedtak.årsakerAvslag?.årsaker ?: error("Mangler årsak for avslag"),
                 begrunnelse = vedtak.avslagBegrunnelse ?: error("Mangler begrunnelse i avslag"),
             )
