@@ -6,7 +6,3 @@ logging:
 
 prosessering:
   enabled: false
-
-clients:
-  familie-dokument:
-    uri: https://familie-dokument.intern.dev.nav.no

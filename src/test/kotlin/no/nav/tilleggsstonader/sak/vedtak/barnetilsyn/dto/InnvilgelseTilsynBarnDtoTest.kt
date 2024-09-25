@@ -15,8 +15,6 @@ import java.util.UUID
 
 class InnvilgelseTilsynBarnDtoTest {
 
-    val stønadsperiodeId = UUID.randomUUID()
-
     @Test
     fun `skal mappe til dto`() {
         val dto = BeregningsresultatTilsynBarn(
@@ -24,7 +22,6 @@ class InnvilgelseTilsynBarnDtoTest {
                 beregningsresultatForMåned(
                     stønadsperiodeGrunnlag = listOf(
                         stønadsperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
-                        stønadsperiodeGrunnlag(LocalDate.of(2024, 1, 15), LocalDate.of(2024, 1, 16)),
                     ),
                 ),
             ),
@@ -37,26 +34,6 @@ class InnvilgelseTilsynBarnDtoTest {
                     måned = YearMonth.of(2024, 1),
                     utgifterTotal = 100,
                     antallBarn = 4,
-                    stønadsperioderGrunnlag = listOf(
-                        StønadsperiodeGrunnlagDto(
-                            stønadsperiode = StønadsperiodeDto(
-                                id = stønadsperiodeId,
-                                målgruppe = MålgruppeType.AAP,
-                                aktivitet = AktivitetType.TILTAK,
-                                fom = LocalDate.of(2024, 1, 2),
-                                tom = LocalDate.of(2024, 1, 4),
-                            ),
-                        ),
-                        StønadsperiodeGrunnlagDto(
-                            stønadsperiode = StønadsperiodeDto(
-                                id = stønadsperiodeId,
-                                målgruppe = MålgruppeType.AAP,
-                                aktivitet = AktivitetType.TILTAK,
-                                fom = LocalDate.of(2024, 1, 15),
-                                tom = LocalDate.of(2024, 1, 16),
-                            ),
-                        ),
-                    ),
                 ),
                 månedsbeløp = 100,
             ),
@@ -105,7 +82,7 @@ class InnvilgelseTilsynBarnDtoTest {
         tom: LocalDate,
     ) = StønadsperiodeGrunnlag(
         stønadsperiode = StønadsperiodeDto(
-            id = stønadsperiodeId,
+            id = UUID.randomUUID(),
             fom = fom,
             tom = tom,
             målgruppe = MålgruppeType.AAP,

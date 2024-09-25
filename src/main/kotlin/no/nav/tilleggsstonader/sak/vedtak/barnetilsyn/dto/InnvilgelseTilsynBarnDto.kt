@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
@@ -42,13 +41,8 @@ data class BeregningsresultatForMånedDto(
 
 data class BeregningsgrunnlagDto(
     val måned: YearMonth,
-    val stønadsperioderGrunnlag: List<StønadsperiodeGrunnlagDto>,
     val utgifterTotal: Int,
     val antallBarn: Int,
-)
-
-data class StønadsperiodeGrunnlagDto(
-    val stønadsperiode: StønadsperiodeDto,
 )
 
 fun BeregningsresultatTilsynBarn.tilDto(): BeregningsresultatTilsynBarnDto {
@@ -69,11 +63,6 @@ private fun BeregningsresultatForMåned.tilDto() = BeregningsresultatForMånedDt
 private fun Beregningsgrunnlag.tilDto() =
     BeregningsgrunnlagDto(
         måned = this.måned,
-        stønadsperioderGrunnlag = this.stønadsperioderGrunnlag.map {
-            StønadsperiodeGrunnlagDto(
-                stønadsperiode = it.stønadsperiode,
-            )
-        },
         utgifterTotal = this.utgifterTotal,
         antallBarn = this.antallBarn,
     )
