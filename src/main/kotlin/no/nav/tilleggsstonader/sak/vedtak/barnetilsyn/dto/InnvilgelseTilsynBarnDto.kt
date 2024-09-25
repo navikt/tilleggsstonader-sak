@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.YearMonth
 
 /**
@@ -29,6 +30,8 @@ data class Utgift(
 
 data class BeregningsresultatTilsynBarnDto(
     val perioder: List<BeregningsresultatForMånedDto>,
+    val gjelderFraOgMed: LocalDate?,
+    val gjelderTilOgMed: LocalDate?,
 )
 
 data class BeregningsresultatForMånedDto(
@@ -39,7 +42,6 @@ data class BeregningsresultatForMånedDto(
 
 data class BeregningsgrunnlagDto(
     val måned: YearMonth,
-    val makssats: Int,
     val stønadsperioderGrunnlag: List<StønadsperiodeGrunnlagDto>,
     val utgifterTotal: Int,
     val antallBarn: Int,
@@ -49,9 +51,14 @@ data class StønadsperiodeGrunnlagDto(
     val stønadsperiode: StønadsperiodeDto,
 )
 
-fun BeregningsresultatTilsynBarn.tilDto() = BeregningsresultatTilsynBarnDto(
-    perioder = this.perioder.map(BeregningsresultatForMåned::tilDto),
-)
+fun BeregningsresultatTilsynBarn.tilDto(): BeregningsresultatTilsynBarnDto {
+    val stønadsperioder = this.perioder.flatMap { it.grunnlag.stønadsperioderGrunnlag }
+    return BeregningsresultatTilsynBarnDto(
+        perioder = this.perioder.map(BeregningsresultatForMåned::tilDto),
+        gjelderFraOgMed = stønadsperioder.minOfOrNull { it.stønadsperiode.fom },
+        gjelderTilOgMed = stønadsperioder.maxOfOrNull { it.stønadsperiode.tom },
+    )
+}
 
 private fun BeregningsresultatForMåned.tilDto() = BeregningsresultatForMånedDto(
     dagsats = this.dagsats,
@@ -62,7 +69,6 @@ private fun BeregningsresultatForMåned.tilDto() = BeregningsresultatForMånedDt
 private fun Beregningsgrunnlag.tilDto() =
     BeregningsgrunnlagDto(
         måned = this.måned,
-        makssats = this.makssats,
         stønadsperioderGrunnlag = this.stønadsperioderGrunnlag.map {
             StønadsperiodeGrunnlagDto(
                 stønadsperiode = it.stønadsperiode,

@@ -32,7 +32,7 @@ no.nav.security.jwt:
 
 clients:
   familie-dokument:
-    uri: http://localhost:8082
+    uri: https://familie-dokument.intern.dev.nav.no
   klage:
     uri: http://localhost:8090
     scope: api://dev-gcp.tilleggsstonader.tilleggsstonader-klage-lokal/.default
