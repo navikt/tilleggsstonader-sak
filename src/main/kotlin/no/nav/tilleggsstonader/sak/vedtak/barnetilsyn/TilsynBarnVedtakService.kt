@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -14,13 +15,17 @@ class TilsynBarnVedtakService(
     repository: TilsynBarnVedtakRepository,
     stegService: StegService,
     tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
+    private val behandlingService: BehandlingService,
 ) : VedtakService<VedtakTilsynBarnDto, VedtakTilsynBarn>(stegService, tilsynBarnBeregnYtelseSteg, repository) {
 
     override fun mapTilDto(vedtak: VedtakTilsynBarn): VedtakTilsynBarnDto {
         return when (vedtak.type) {
-            TypeVedtak.INNVILGELSE -> InnvilgelseTilsynBarnDto(
-                beregningsresultat = vedtak.beregningsresultat?.tilDto(),
-            )
+            TypeVedtak.INNVILGELSE -> {
+                val behandling = behandlingService.hentSaksbehandling(vedtak.behandlingId)
+                InnvilgelseTilsynBarnDto(
+                    beregningsresultat = vedtak.beregningsresultat?.tilDto(revurderFra = behandling.revurderFra),
+                )
+            }
 
             TypeVedtak.AVSLAG -> AvslagTilsynBarnDto(
                 årsakerAvslag = vedtak.årsakerAvslag?.årsaker ?: error("Mangler årsak for avslag"),
