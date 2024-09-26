@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.norskFormat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import java.time.LocalDate
 
@@ -47,7 +48,7 @@ object VilkårRevurderFraValidering {
         feilHvis(
             eksisterendePeriode.resultat != oppdatertPeriode.resultat ||
                 eksisterendePeriode.utgift != oppdatertPeriode.utgift ||
-                eksisterendePeriode.delvilkårsett != oppdatertPeriode.delvilkårsett ||
+                ulikDelvilkårsett(eksisterendePeriode, oppdatertPeriode) ||
                 eksisterendePeriode.fom != oppdatertPeriode.fom ||
                 oppdatertPeriode.tom == null ||
                 oppdatertPeriode.tom < revurderFra.minusDays(1),
@@ -58,6 +59,15 @@ object VilkårRevurderFraValidering {
             )
             "Ugyldig endring på ${periodeInfo(behandling, eksisterendePeriode.fom)}"
         }
+    }
+
+    private fun ulikDelvilkårsett(
+        eksisterendePeriode: Vilkår,
+        oppdatertPeriode: Vilkår,
+    ) = eksisterendePeriode.delvilkårsett.ignorerBegrunnelse() != oppdatertPeriode.delvilkårsett.ignorerBegrunnelse()
+
+    private fun List<Delvilkår>.ignorerBegrunnelse() = this.map { delvilkår ->
+        delvilkår.copy(vurderinger = delvilkår.vurderinger.map { it.copy(begrunnelse = null) })
     }
 
     private fun periodeInfo(

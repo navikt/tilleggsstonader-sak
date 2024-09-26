@@ -142,6 +142,25 @@ class VilkårRevurderFraValideringTest {
         }
 
         @Test
+        fun `kan oppdatere begrunnelsen på en vurdering`() {
+            val eksisterendePeriode = vilkår(
+                fom = revurderFra.minusMonths(1),
+                tom = revurderFra.plusMonths(1),
+            )
+            val oppdaterteVurderingerMedNyBegrunnelse = eksisterendePeriode.delvilkårwrapper.copy(
+                delvilkårsett = eksisterendePeriode.delvilkårsett.map {
+                    it.copy(vurderinger = it.vurderinger.map { it.copy(begrunnelse = "ny begrunnelse") })
+                },
+            )
+            assertDoesNotThrow {
+                endringMedRevurderFra(
+                    eksisterendePeriode,
+                    eksisterendePeriode.copy(delvilkårwrapper = oppdaterteVurderingerMedNyBegrunnelse),
+                )
+            }
+        }
+
+        @Test
         fun `kan ikke oppdatere tom til 2 dager før revurder fra, då fjerner man data som gjelder dagen før revurderingsdatoet`() {
             val eksisterendePeriode = vilkår(
                 fom = revurderFra.minusMonths(4),
