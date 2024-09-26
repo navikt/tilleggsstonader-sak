@@ -273,6 +273,7 @@ class StepDefinitions {
                 throw e
             }
         }
+        assertThat(beløpsperioder).hasSize(forventedeBeløpsperioder.size)
     }
 
     private fun parseForventedeStønadsperioder(dataTable: DataTable): List<ForventedeStønadsperioder> {
