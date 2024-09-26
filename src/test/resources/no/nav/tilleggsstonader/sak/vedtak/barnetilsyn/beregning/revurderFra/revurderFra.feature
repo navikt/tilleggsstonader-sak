@@ -62,13 +62,25 @@ Egenskap: Beregning - med revurderFra
       | 02.2024 | 29.53   | 14           | 1000   | 413         |
       | 03.2024 | 29.53   | 13           | 1000   | 384         |
 
+    Så forvent følgende beløpsperioder for: 02.2024
+      | Dato       | Beløp | Målgruppe |
+      | 01.02.2024 | 413   | AAP       |
+
     Når beregner med revurderFra=2024-02-15
 
-    ## TODO disse utgiftene burde være de samme for februar, men virker nesten som at man får ulike tall beroende på hvordan stønadsperiodene ser ut?
+    # Disse tallene skal være de samme som når man ikke bruker revurderFra,
+    # då beregningsresultatet skal gi de nye tallene for selve måneden, sånn at ev. andeler blir oppdaterte for den måneden
+    # Eks hvis man tidligere hadde en periode som var 01.01 - 31.01 så har hele beløpet blitt utbetalt på 01.01
+    # Når vi då revurderer fra 15.01 så skal beløpet splittes opp på 01.01 og 15.01
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
-      | 02.2024 | 29.53   | 16           | 1000   | 472         |
+      | 02.2024 | 29.53   | 14           | 1000   | 413         |
       | 03.2024 | 29.53   | 13           | 1000   | 384         |
+
+    Så forvent følgende beløpsperioder for: 02.2024
+      | Dato       | Beløp | Målgruppe |
+      | 01.02.2024 | 236   | AAP       |
+      | 15.02.2024 | 177   | AAP       |
 
   # Når man revurder må man ta med alle perioder i inneværende måned fordi en andel får fom=fom og fom=fom dvs med samme fom og tom
   # Det betyr at hvis man tidligere har en periode fra 1.8-31.8 så er hele beløpet lagt inn på en andel med fom/tom = 1.8, med det fulle beløpet for hele den perioden
@@ -145,4 +157,4 @@ Egenskap: Beregning - med revurderFra
     Så forvent følgende stønadsperiodeGrunnlag for: 01.2024
       | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
       | 02.01.2024 | 14.01.2024 | AAP       | TILTAK    | 1                  | 2            |
-      | 15.01.2024 | 31.01.2024 | AAP       | TILTAK    | 2                  | 9           |
+      | 15.01.2024 | 31.01.2024 | AAP       | TILTAK    | 2                  | 9            |
