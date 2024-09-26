@@ -215,7 +215,7 @@ class VilkårService(
     @Transactional
     fun hentVilkårsvurdering(behandlingId: BehandlingId): VilkårsvurderingDto {
         val (grunnlag, metadata) = hentGrunnlagOgMetadata(behandlingId)
-        val vurderinger = hentEllerOpprettVilkår(behandlingId, metadata).map(Vilkår::tilDto)
+        val vurderinger = hentVilkår(behandlingId, metadata).map(Vilkår::tilDto)
         return VilkårsvurderingDto(vilkårsett = vurderinger, grunnlag = grunnlag)
     }
 
@@ -241,12 +241,12 @@ class VilkårService(
         return Pair(grunnlag, HovedregelMetadata(barn, behandling))
     }
 
-    // TODO rename metode når man kun henter lagretVilkårsett når FT fjernes
-    fun hentEllerOpprettVilkår(
+    private fun hentVilkår(
         behandlingId: BehandlingId,
         metadata: HovedregelMetadata,
     ): List<Vilkår> {
         return vilkårRepository.findByBehandlingId(behandlingId)
+            .sortedWith(compareBy({ it.fom }, { it.tom }))
     }
 
     /*private fun finnEndringerIGrunnlagsdata(behandlingId: UUID): List<GrunnlagsdataEndring> {

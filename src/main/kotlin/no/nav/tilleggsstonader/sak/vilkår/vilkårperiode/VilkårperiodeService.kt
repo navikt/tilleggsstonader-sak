@@ -71,15 +71,12 @@ class VilkårperiodeService(
 
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId)
+            .sortedWith(compareBy({ it.fom }, { it.tom }))
 
         return Vilkårperioder(
             målgrupper = finnPerioder<MålgruppeType>(vilkårsperioder),
             aktiviteter = finnPerioder<AktivitetType>(vilkårsperioder),
         )
-    }
-
-    fun hentVilkårperiode(id: UUID): Vilkårperiode {
-        return vilkårperiodeRepository.findByIdOrThrow(id)
     }
 
     fun hentVilkårperioderResponse(behandlingId: BehandlingId): VilkårperioderResponse {
