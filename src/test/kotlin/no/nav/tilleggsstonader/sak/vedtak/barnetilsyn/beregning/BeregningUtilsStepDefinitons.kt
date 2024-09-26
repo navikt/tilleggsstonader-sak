@@ -11,10 +11,10 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilUke
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilAktiviteter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilAktiviteter
 import org.assertj.core.api.Assertions.assertThat
 
 class BeregningUtilsStepDefinitons {

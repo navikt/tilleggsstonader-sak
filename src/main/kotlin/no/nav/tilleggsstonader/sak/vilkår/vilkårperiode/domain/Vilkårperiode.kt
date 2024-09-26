@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
@@ -250,25 +249,3 @@ data class Vilkårperioder(
     val målgrupper: List<Vilkårperiode>,
     val aktiviteter: List<Vilkårperiode>,
 )
-
-data class Aktivitet(
-    val type: AktivitetType,
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    val aktivitetsdager: Int,
-) : Periode<LocalDate>
-
-fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
-    return this.mapNotNull {
-        if (it.type is AktivitetType) {
-            Aktivitet(
-                type = it.type,
-                fom = it.fom,
-                tom = it.tom,
-                aktivitetsdager = it.aktivitetsdager ?: error("Aktivitetsdager mangler på periode ${it.id}"),
-            )
-        } else {
-            null
-        }
-    }
-}

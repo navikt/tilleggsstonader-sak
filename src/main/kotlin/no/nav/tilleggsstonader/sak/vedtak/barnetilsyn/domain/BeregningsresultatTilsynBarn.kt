@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
@@ -51,3 +53,25 @@ data class UtgiftBarn(
     val barnId: BarnId,
     val utgift: Int,
 )
+
+data class Aktivitet(
+    val type: AktivitetType,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val aktivitetsdager: Int,
+) : Periode<LocalDate>
+
+fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
+    return this.mapNotNull {
+        if (it.type is AktivitetType) {
+            Aktivitet(
+                type = it.type,
+                fom = it.fom,
+                tom = it.tom,
+                aktivitetsdager = it.aktivitetsdager ?: error("Aktivitetsdager mangler på periode ${it.id}"),
+            )
+        } else {
+            null
+        }
+    }
+}
