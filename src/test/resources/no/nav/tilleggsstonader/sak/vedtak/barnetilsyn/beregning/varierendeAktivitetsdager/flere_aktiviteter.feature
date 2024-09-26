@@ -94,3 +94,44 @@ Egenskap: Beregning - Flere aktiviteter med delvis aktivitet
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
       | 01.2023 | 29.53   | 2            | 1000   | 59          |
       | 02.2023 | 29.53   | 3            | 1000   | 89          |
+
+  Scenario: Stønadsperiode skal bruke 1 dag fra aktivitet 1 og 1 fra aktivitet 2
+    Gitt følgende støndsperioder
+      | Fom        | Tom        | Aktivitet | Målgruppe |
+      | 05.02.2024 | 09.02.2024 | TILTAK    | AAP       |
+
+    Gitt følgende aktiviteter
+      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
+      | 05.02.2024 | 08.02.2024 | TILTAK    | 1               |
+      | 09.02.2024 | 09.02.2024 | TILTAK    | 5               |
+
+    Gitt følgende utgifter for barn med id: 1
+      | Fom     | Tom     | Utgift |
+      | 02.2024 | 02.2024 | 1000   |
+
+    Når beregner
+
+    Så forvent følgende beregningsresultat
+      | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
+      | 02.2024 | 29.53   | 2            | 1000   | 59          |
+
+  Scenario: Skal bruke 1 dag fra første aktivitet og 1 dag fra den andre aktiviteten
+    Gitt følgende støndsperioder
+      | Fom        | Tom        | Aktivitet | Målgruppe |
+      | 05.02.2024 | 05.02.2024 | TILTAK    | AAP       |
+      | 09.02.2024 | 09.02.2024 | TILTAK    | AAP       |
+
+    Gitt følgende aktiviteter
+      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
+      | 05.02.2024 | 09.02.2024 | TILTAK    | 1               |
+      | 05.02.2024 | 05.02.2024 | TILTAK    | 1               |
+
+    Gitt følgende utgifter for barn med id: 1
+      | Fom     | Tom     | Utgift |
+      | 02.2024 | 02.2024 | 1000   |
+
+    Når beregner
+
+    Så forvent følgende beregningsresultat
+      | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
+      | 02.2024 | 29.53   | 2            | 1000   | 60          |

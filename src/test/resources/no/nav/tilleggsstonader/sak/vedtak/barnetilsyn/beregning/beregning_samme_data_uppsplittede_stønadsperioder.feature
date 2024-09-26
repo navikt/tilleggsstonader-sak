@@ -41,5 +41,3 @@ Egenskap: Beregning med stønadsperioder for februar med 3 aktivitetsdager. Hele
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
       | 02.2024 | 29.53   | 14           | 1000   | 413         |
-      #| 02.2024 | 29.53   | 16           | 1000   | 472         |
-    # På grunn av at 15 februar treffer midt i en uke får man 3+2 dager den uken
