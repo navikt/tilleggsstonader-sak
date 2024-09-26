@@ -13,7 +13,9 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
@@ -31,6 +33,7 @@ class OpprettOppgaveConfig(
     private val oppgaveRepository: OppgaveRepository,
     private val behandlingService: BehandlingService,
     private val oppgaveClient: OppgaveClient,
+    private val oppgaveService: OppgaveService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -74,6 +77,7 @@ class OpprettOppgaveConfig(
                 fristFerdigstillelse = osloDateNow().plusDays(14),
                 beskrivelse = mapBeskrivelse(oppgavetype),
                 behandlesAvApplikasjon = utledBehandlesAvApplikasjon(oppgavetype),
+                mappeId = oppgaveService.finnMappe(mapEnhet(), OppgaveMappe.KLAR).id,
             ),
         )
     }
