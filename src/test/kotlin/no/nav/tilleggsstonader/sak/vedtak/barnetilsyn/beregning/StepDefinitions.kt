@@ -201,7 +201,27 @@ class StepDefinitions {
                 assertThat(resultat.aktiviteter.size).isEqualTo(forventetResultat.antallAktiviteter)
                 assertThat(resultat.antallDager).isEqualTo(forventetResultat.antallDager)
             } catch (e: Throwable) {
-                logger.error("Feilet validering av rad ${index + 1}")
+                val actual = listOf(
+                    resultat.stønadsperiode.fom,
+                    resultat.stønadsperiode.tom,
+                    resultat.stønadsperiode.målgruppe,
+                    resultat.stønadsperiode.aktivitet,
+                    resultat.aktiviteter.size,
+                    resultat.antallDager,
+                ).joinToString(" | ")
+                val expected = listOf(
+                    forventetResultat.fom,
+                    forventetResultat.tom,
+                    forventetResultat.målgruppe,
+                    forventetResultat.aktivitet,
+                    forventetResultat.antallAktiviteter,
+                    forventetResultat.antallDager,
+                ).joinToString(" | ")
+                logger.error(
+                    "Feilet validering av rad ${index + 1}\n" +
+                        "expected = $expected\n" +
+                        "actual = $actual",
+                )
                 throw e
             }
         }

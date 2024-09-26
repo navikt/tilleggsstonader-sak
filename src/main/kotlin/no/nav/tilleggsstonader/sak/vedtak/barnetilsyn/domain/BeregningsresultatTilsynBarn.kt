@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 data class BeregningsresultatTilsynBarn(
     val perioder: List<BeregningsresultatForMåned>,
@@ -55,6 +56,7 @@ data class UtgiftBarn(
 )
 
 data class Aktivitet(
+    val id: UUID?, // Må være null pga bakåtkompatibilitet
     val type: AktivitetType,
     override val fom: LocalDate,
     override val tom: LocalDate,
@@ -65,6 +67,7 @@ fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
     return this.mapNotNull {
         if (it.type is AktivitetType) {
             Aktivitet(
+                id = it.id,
                 type = it.type,
                 fom = it.fom,
                 tom = it.tom,

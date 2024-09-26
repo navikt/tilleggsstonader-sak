@@ -37,6 +37,7 @@ object TilsynBeregningUtil {
                 }
             }
             .groupBy({ it.first }, { it.second })
+            .mapValues { it.value.sorted() }
     }
 
     /**
@@ -122,7 +123,9 @@ object TilsynBeregningUtil {
             aktivitet.splitPerUke { fom, tom ->
                 min(aktivitet.aktivitetsdager, antallDagerIPeriodeInklusiv(fom, tom))
             }
-        }.flatMap { it.entries }.groupBy({ it.key }, { it.value })
+        }.flatMap { it.entries }
+            .groupBy({ it.key }, { it.value })
+            .mapValues { it.value.sorted() }
     }
 
     private fun antallDagerIPeriodeInklusiv(fom: LocalDate, tom: LocalDate): Int {
@@ -138,7 +141,7 @@ data class Uke(
 data class PeriodeMedDager(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val antallDager: Int,
+    var antallDager: Int,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
