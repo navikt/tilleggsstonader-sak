@@ -174,6 +174,20 @@ class StønadsperiodeRevurderFraValideringTest {
             }
         }
 
+        @Test
+        fun `kan ikke endre fom til å begynne før revurderFra`() {
+            val eksisterendePeriode = stønadsperiode(
+                fom = revurderFra,
+                tom = revurderFra.plusMonths(1),
+            )
+            assertThatThrownBy {
+                endringMedRevurderFra(
+                    eksisterendePeriode,
+                    eksisterendePeriode.copy(fom = revurderFra.minusDays(2)),
+                )
+            }.hasMessageContaining("Kan ikke sette fom før revurderingsdato")
+        }
+
         private fun endringUtenRevurderFra(
             eksisterendePeriode: Stønadsperiode,
             oppdatertPeriode: Stønadsperiode,

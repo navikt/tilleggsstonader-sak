@@ -33,9 +33,17 @@ object VilkårRevurderFraValidering {
         oppdatertPeriode: Vilkår,
     ) {
         val revurderFra = behandling.revurderFra
-        if (revurderFra == null || eksisterendePeriode.tom == null || revurderFra > eksisterendePeriode.tom) {
+        if (revurderFra == null) { // || eksisterendePeriode.tom == null || revurderFra > eksisterendePeriode.tom) {
             return
         }
+
+        if (eksisterendePeriode.fom == null || eksisterendePeriode.fom >= revurderFra) {
+            feilHvis(oppdatertPeriode.fom != null && oppdatertPeriode.fom < revurderFra) {
+                "Kan ikke sette fom før revurderingsdato ${revurderFra.norskFormat()}"
+            }
+            return
+        }
+
         feilHvis(
             eksisterendePeriode.resultat != oppdatertPeriode.resultat ||
                 eksisterendePeriode.utgift != oppdatertPeriode.utgift ||

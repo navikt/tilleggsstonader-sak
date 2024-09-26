@@ -33,10 +33,15 @@ object VilkårperiodeRevurderFraValidering {
         eksisterendePeriode: Vilkårperiode,
         oppdatertPeriode: Vilkårperiode,
     ) {
-        val revurderFra = behandling.revurderFra
-        if (revurderFra == null || revurderFra > eksisterendePeriode.tom) {
+        val revurderFra = behandling.revurderFra ?: return
+
+        if (eksisterendePeriode.fom >= revurderFra) {
+            feilHvis(oppdatertPeriode.fom < revurderFra) {
+                "Kan ikke sette fom før revurderingsdato ${revurderFra.norskFormat()}"
+            }
             return
         }
+
         feilHvis(
             eksisterendePeriode.resultat != oppdatertPeriode.resultat ||
                 eksisterendePeriode.delvilkår != oppdatertPeriode.delvilkår ||

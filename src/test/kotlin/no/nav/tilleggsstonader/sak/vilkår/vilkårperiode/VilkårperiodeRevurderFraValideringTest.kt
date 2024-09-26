@@ -179,6 +179,20 @@ class VilkårperiodeRevurderFraValideringTest {
             }
         }
 
+        @Test
+        fun `kan ikke endre fom til å begynne før revurderFra`() {
+            val eksisterendeVilkårperiode = aktivitet(
+                fom = revurderFra,
+                tom = revurderFra.plusMonths(1),
+            )
+            assertThatThrownBy {
+                endringMedRevurderFra(
+                    eksisterendeVilkårperiode,
+                    eksisterendeVilkårperiode.copy(fom = revurderFra.minusDays(2)),
+                )
+            }.hasMessageContaining("Kan ikke sette fom før revurderingsdato")
+        }
+
         private fun endringUtenRevurderFra(
             eksisterendeVilkårperiode: Vilkårperiode,
             oppdatertVilkårperiode: Vilkårperiode,

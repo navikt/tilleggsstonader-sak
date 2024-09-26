@@ -32,10 +32,15 @@ object StønadsperiodeRevurderFraValidering {
         eksisterendePeriode: Stønadsperiode,
         oppdatertPeriode: Stønadsperiode,
     ) {
-        val revurderFra = behandling.revurderFra
-        if (revurderFra == null || revurderFra > eksisterendePeriode.tom) {
+        val revurderFra = behandling.revurderFra ?: return
+
+        if (eksisterendePeriode.fom >= revurderFra) {
+            feilHvis(oppdatertPeriode.fom < revurderFra) {
+                "Kan ikke sette fom før revurderingsdato ${revurderFra.norskFormat()}"
+            }
             return
         }
+
         feilHvis(
             eksisterendePeriode.fom != oppdatertPeriode.fom ||
                 eksisterendePeriode.målgruppe != oppdatertPeriode.målgruppe ||
