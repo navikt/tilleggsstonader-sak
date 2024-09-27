@@ -22,7 +22,9 @@ import java.util.UUID
 
 class TilkjentYtelseRevurderingUtilTest {
 
-    val revurdering = saksbehandling(revurderFra = LocalDate.now(), type = BehandlingType.REVURDERING)
+    val revurderFra = LocalDate.of(2024, 8, 6)
+
+    val revurdering = saksbehandling(revurderFra = revurderFra, type = BehandlingType.REVURDERING)
 
     @Nested
     inner class ValiderNyeAndelerBegynnerEtterRevurderFra {
@@ -31,7 +33,11 @@ class TilkjentYtelseRevurderingUtilTest {
         fun `skal validere ok hvis revurderFra ikke er satt`() {
             validerNyeAndelerBegynnerEtterRevurderFra(
                 saksbehandling(),
-                listOf(andelTilkjentYtelse(kildeBehandlingId = BehandlingId.random())),
+                listOf(
+                    iverksattAndel(fom = revurderFra.minusDays(5)),
+                    iverksattAndel(fom = revurderFra),
+                    iverksattAndel(fom = revurderFra.plusDays(7)),
+                ),
             )
         }
 
@@ -40,19 +46,19 @@ class TilkjentYtelseRevurderingUtilTest {
             validerNyeAndelerBegynnerEtterRevurderFra(
                 revurdering,
                 listOf(
-                    andelTilkjentYtelse(fom = LocalDate.now(), tom = LocalDate.now().plusDays(1)),
-                    andelTilkjentYtelse(fom = LocalDate.now().plusDays(1), tom = LocalDate.now().plusDays(1)),
+                    iverksattAndel(fom = revurderFra),
+                    iverksattAndel(fom = revurderFra.plusDays(1)),
                 ),
             )
         }
 
         @Test
-        fun `skal kaste feil hvis andel begynner fra revurderingsdato eller etter`() {
+        fun `skal kaste feil hvis andel begynner før revurderingsdato`() {
             assertThatThrownBy {
                 validerNyeAndelerBegynnerEtterRevurderFra(
                     revurdering,
                     listOf(
-                        andelTilkjentYtelse(fom = LocalDate.now().minusDays(1), tom = LocalDate.now().plusDays(1)),
+                        iverksattAndel(fom = revurderFra.minusDays(1)),
                     ),
                 )
             }.hasMessageContaining("Kan ikke opprette andeler som begynner før revurderFra")
@@ -139,20 +145,20 @@ class TilkjentYtelseRevurderingUtilTest {
                 assertThat(statusIverksetting).isEqualTo(StatusIverksetting.UBEHANDLET)
             }
         }
-
-        private fun iverksattAndel(
-            fom: LocalDate,
-            tom: LocalDate = fom,
-            type: TypeAndel,
-        ) = andelTilkjentYtelse(
-            fom = fom,
-            tom = tom,
-            type = type,
-            kildeBehandlingId = BehandlingId.random(),
-            beløp = 100,
-            satstype = Satstype.DAG,
-            iverksetting = Iverksetting(UUID.randomUUID(), LocalDateTime.now()),
-            statusIverksetting = StatusIverksetting.SENDT,
-        )
     }
+
+    private fun iverksattAndel(
+        fom: LocalDate,
+        tom: LocalDate = fom,
+        type: TypeAndel = TypeAndel.TILSYN_BARN_AAP,
+    ) = andelTilkjentYtelse(
+        fom = fom,
+        tom = tom,
+        type = type,
+        kildeBehandlingId = BehandlingId.random(),
+        beløp = 100,
+        satstype = Satstype.DAG,
+        iverksetting = Iverksetting(UUID.randomUUID(), LocalDateTime.now()),
+        statusIverksetting = StatusIverksetting.SENDT,
+    )
 }
