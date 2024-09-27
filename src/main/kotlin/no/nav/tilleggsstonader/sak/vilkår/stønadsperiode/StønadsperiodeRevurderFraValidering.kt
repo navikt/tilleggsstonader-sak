@@ -45,7 +45,8 @@ object StønadsperiodeRevurderFraValidering {
             eksisterendePeriode.fom != oppdatertPeriode.fom ||
                 eksisterendePeriode.målgruppe != oppdatertPeriode.målgruppe ||
                 eksisterendePeriode.aktivitet != oppdatertPeriode.aktivitet ||
-                oppdatertPeriode.tom < revurderFra.minusDays(1),
+                (eksisterendePeriode.tom < revurderFra && eksisterendePeriode.tom != oppdatertPeriode.tom) ||
+                (eksisterendePeriode.tom >= revurderFra && oppdatertPeriode.tom < revurderFra.minusDays(1)),
         ) {
             secureLogger.info(
                 "Ugyldig endring på stønadsperiode eksisterendePeriode=$eksisterendePeriode" +

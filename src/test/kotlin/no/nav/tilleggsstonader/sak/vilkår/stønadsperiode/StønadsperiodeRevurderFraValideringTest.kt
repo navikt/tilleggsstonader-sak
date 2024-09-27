@@ -140,6 +140,31 @@ class StønadsperiodeRevurderFraValideringTest {
         }
 
         @Test
+        fun `kan sende inn stønadsperiode uten endringer dersom den gjelder før revurderFra`() {
+            val eksisterendePeriode = stønadsperiode(
+                fom = revurderFra.minusMonths(1),
+                tom = revurderFra.minusMonths(1),
+            )
+            assertDoesNotThrow {
+                endringMedRevurderFra(eksisterendePeriode, eksisterendePeriode)
+            }
+        }
+
+        @Test
+        fun `kan ikke endre tom til før dagen før revurder fra`() {
+            val eksisterendePeriode = stønadsperiode(
+                fom = revurderFra.minusDays(2),
+                tom = revurderFra.minusDays(1),
+            )
+            assertThatThrownBy {
+                endringMedRevurderFra(
+                    eksisterendePeriode,
+                    eksisterendePeriode.copy(tom = revurderFra.minusDays(2)),
+                )
+            }.hasMessageContaining("Ugyldig endring på periode som")
+        }
+
+        @Test
         fun `kan ikke oppdatere tom til før dagen før revurder fra`() {
             val eksisterendePeriode = stønadsperiode(
                 fom = revurderFra.minusMonths(1),
