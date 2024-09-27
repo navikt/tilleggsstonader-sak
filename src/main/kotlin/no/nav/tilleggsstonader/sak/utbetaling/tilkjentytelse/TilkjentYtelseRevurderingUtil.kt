@@ -8,8 +8,8 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.tilFørsteDagIMåneden
 import java.time.LocalDate
-import java.time.YearMonth
 
 object TilkjentYtelseRevurderingUtil {
 
@@ -17,7 +17,7 @@ object TilkjentYtelseRevurderingUtil {
         saksbehandling: Saksbehandling,
         andeler: List<AndelTilkjentYtelse>,
     ) {
-        val revurderFra = saksbehandling.revurderFra ?: return
+        val revurderFra = saksbehandling.revurderFra?.tilFørsteDagIMåneden() ?: return
         val andelerSomBegynnerFørRevurderFra = andeler.filter { it.fom < revurderFra }
         feilHvis(andelerSomBegynnerFørRevurderFra.isNotEmpty()) {
             secureLogger.error(
@@ -33,7 +33,7 @@ object TilkjentYtelseRevurderingUtil {
         tilkjentYtelse: TilkjentYtelse,
         revurderFra: LocalDate,
     ): List<AndelTilkjentYtelse> {
-        val revurderFraMåned = YearMonth.from(revurderFra).atDay(1)
+        val revurderFraMåned = revurderFra.tilFørsteDagIMåneden()
 
         validerGjenbruk(saksbehandling)
         validerAndeler(tilkjentYtelse.andelerTilkjentYtelse)

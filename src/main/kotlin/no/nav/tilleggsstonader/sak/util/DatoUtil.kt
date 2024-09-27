@@ -97,4 +97,5 @@ fun LocalDate.datoEllerNesteMandagHvisLørdagEllerSøndag() = if (this.erLørdag
 fun LocalDate.erFørsteDagIMåneden() = this.dayOfMonth == 1
 
 fun LocalDate.erSisteDagIMåneden() = this.dayOfMonth == YearMonth.from(this).atEndOfMonth().dayOfMonth
+fun LocalDate.tilFørsteDagIMåneden() = YearMonth.from(this).atDay(1)
 fun LocalDate.tilSisteDagIMåneden() = YearMonth.from(this).atEndOfMonth()

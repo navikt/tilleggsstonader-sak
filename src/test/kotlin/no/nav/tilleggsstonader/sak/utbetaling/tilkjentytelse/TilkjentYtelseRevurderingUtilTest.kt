@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.tilFørsteDagIMåneden
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -42,23 +43,23 @@ class TilkjentYtelseRevurderingUtilTest {
         }
 
         @Test
-        fun `skal validere ok hvis andel begynner fra revurderingsdato eller etter`() {
+        fun `skal validere ok hvis andel begynner fra og med første i måneden for revurderFra`() {
             validerNyeAndelerBegynnerEtterRevurderFra(
                 revurdering,
                 listOf(
-                    iverksattAndel(fom = revurderFra),
+                    iverksattAndel(fom = revurderFra.tilFørsteDagIMåneden()),
                     iverksattAndel(fom = revurderFra.plusDays(1)),
                 ),
             )
         }
 
         @Test
-        fun `skal kaste feil hvis andel begynner før revurderingsdato`() {
+        fun `skal kaste feil hvis andel begynner før måneden for revurderFra`() {
             assertThatThrownBy {
                 validerNyeAndelerBegynnerEtterRevurderFra(
                     revurdering,
                     listOf(
-                        iverksattAndel(fom = revurderFra.minusDays(1)),
+                        iverksattAndel(fom = LocalDate.of(2024, 7, 30)),
                     ),
                 )
             }.hasMessageContaining("Kan ikke opprette andeler som begynner før revurderFra")
