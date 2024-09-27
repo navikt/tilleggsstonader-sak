@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryI
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
@@ -36,6 +37,10 @@ interface SøknadMetadataRepository : org.springframework.data.repository.Reposi
 @Repository
 interface SøknadBarnetilsynRepository :
     RepositoryInterface<SøknadBarnetilsyn, UUID>, InsertUpdateRepository<SøknadBarnetilsyn>
+
+@Repository
+interface SøknadLæremidlerRepository :
+    RepositoryInterface<SøknadLæremidler, UUID>, InsertUpdateRepository<SøknadLæremidler>
 
 @Repository
 interface SøknadBehandlingRepository :

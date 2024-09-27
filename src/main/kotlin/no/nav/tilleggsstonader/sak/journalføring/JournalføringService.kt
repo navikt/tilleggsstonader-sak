@@ -120,7 +120,7 @@ class JournalføringService(
         }
 
         if (journalpost.harStrukturertSøknad()) {
-            lagreSøknadOgNyeBarn(journalpost, behandling)
+            lagreSøknadOgNyeBarn(journalpost, behandling, stønadstype)
         }
 
         ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
@@ -197,8 +197,9 @@ class JournalføringService(
     private fun lagreSøknadOgNyeBarn(
         journalpost: Journalpost,
         behandling: Behandling,
+        stønadstype: Stønadstype,
     ) {
-        lagreSøknad(journalpost, behandling.id)
+        lagreSøknad(journalpost, behandling.id, stønadstype)
         val eksisterendeBarn = barnService.finnBarnPåBehandling(behandling.id)
 
         val nyeBarn = søknadService.hentSøknadBarnetilsyn(behandling.id)?.barn
@@ -216,8 +217,8 @@ class JournalføringService(
         barnService.opprettBarn(nyeBarn)
     }
 
-    private fun lagreSøknad(journalpost: Journalpost, behandlingId: BehandlingId) {
-        val søknad = journalpostService.hentSøknadFraJournalpost(journalpost)
+    private fun lagreSøknad(journalpost: Journalpost, behandlingId: BehandlingId, stønadstype: Stønadstype) {
+        val søknad = journalpostService.hentSøknadFraJournalpost(journalpost, stønadstype)
         søknadService.lagreSøknad(behandlingId, journalpost, søknad)
     }
 

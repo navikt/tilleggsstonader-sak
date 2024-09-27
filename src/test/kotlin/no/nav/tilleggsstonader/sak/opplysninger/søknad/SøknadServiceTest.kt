@@ -63,6 +63,9 @@ class SøknadServiceTest : IntegrationTest() {
             barnMedBarnepass = listOf(barnMedBarnepass(ident = "barn1", navn = "navn1")),
         )
         val søknad = søknadService.lagreSøknad(behandling.id, lagJournalpost("journalpostId"), skjema)
+
+//        assertThat(søknad).isInstanceOf(SøknadBarnetilsyn::class.java)
+        require(søknad is SøknadBarnetilsyn)
         assertThat(søknad.journalpostId).isEqualTo("journalpostId")
         assertThat(søknad.barn).hasSize(1)
         assertThat(søknad.barn.single().ident).isEqualTo("barn1")

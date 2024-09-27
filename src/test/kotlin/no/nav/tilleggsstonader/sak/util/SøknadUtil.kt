@@ -9,8 +9,10 @@ import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
@@ -25,6 +27,8 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.kontrakter.søknad.laeremidler.AnnenUtdanningType
+import no.nav.tilleggsstonader.kontrakter.søknad.laeremidler.UtdanningAvsnitt
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import java.time.LocalDate
@@ -38,7 +42,7 @@ object SøknadUtil {
         mottattTidspunkt: LocalDateTime = osloNow(),
         barnMedBarnepass: List<BarnMedBarnepass> = listOf(barnMedBarnepass()),
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
-    ): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
+    ): Søknadsskjema<Skjema> {
         val skjemaBarnetilsyn = SøknadsskjemaBarnetilsyn(
             hovedytelse = HovedytelseAvsnitt(
                 hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "")), emptyList()),
@@ -60,6 +64,32 @@ object SøknadUtil {
             ),
             barn = BarnAvsnitt(barnMedBarnepass = barnMedBarnepass),
             dokumentasjon = dokumentasjon,
+        )
+        return Søknadsskjema(
+            ident = ident,
+            mottattTidspunkt = mottattTidspunkt,
+            språk = Språkkode.NB,
+            skjema = skjemaBarnetilsyn,
+        )
+    }
+
+    fun søknadskjemaLæremidler(
+        ident: String = "søker",
+        mottattTidspunkt: LocalDateTime = osloNow(),
+        barnMedBarnepass: List<BarnMedBarnepass> = listOf(barnMedBarnepass()),
+        dokumentasjon: List<DokumentasjonFelt> = emptyList(),
+    ): Søknadsskjema<Skjema> {
+        val skjemaBarnetilsyn = SøknadsskjemaLæremidler(
+            hovedytelse = HovedytelseAvsnitt(
+                hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "")), emptyList()),
+                arbeidOgOpphold = arbeidOgOpphold(),
+            ),
+            dokumentasjon = dokumentasjon,
+            utdanning = UtdanningAvsnitt(
+                annenUtdanning = EnumFelt("Annen utdanning tekst", AnnenUtdanningType.INGEN_UTDANNING, "Ja", emptyList()),
+                mottarUtstyrsstipend = EnumFelt("Har mottarUtstyrsstipend?", JaNei.JA, "Ja", emptyList()),
+                harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
+            ),
         )
         return Søknadsskjema(
             ident = ident,
