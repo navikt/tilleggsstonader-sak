@@ -151,7 +151,7 @@ class JournalføringServiceTest {
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
             )
         } returns behandling(fagsak = fagsak)
-        every { journalpostService.hentSøknadFraJournalpost(any()) } returns mockk()
+        every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
 
         journalføringService.journalførTilNyBehandling(
             journalpostId,
@@ -312,7 +312,7 @@ class JournalføringServiceTest {
             every { behandlingService.finnesBehandlingForFagsak(any()) } returns true
             every { behandlingService.opprettBehandling(any(), any(), any(), any()) } returns nyBehandling
             every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(forrigeBehandling)
-            every { journalpostService.hentSøknadFraJournalpost(any()) } returns mockk()
+            every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
             every { barnService.finnBarnPåBehandling(nyBehandling.id) } returns eksisterendeBarn.map { it.tilBehandlingBarn() }
             every { søknadService.hentSøknadBarnetilsyn(nyBehandling.id) } returns mockk() {
                 every { barn } returns setOf(barn1, barn2)

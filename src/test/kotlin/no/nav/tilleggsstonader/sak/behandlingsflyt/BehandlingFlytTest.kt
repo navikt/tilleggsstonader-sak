@@ -6,6 +6,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.familie.prosessering.internal.TaskWorker
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.log.IdUtils
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
@@ -317,7 +318,7 @@ class BehandlingFlytTest(
     }
 
     private fun opprettBehandling(personIdent: String): BehandlingId {
-        val behandlingId = opprettTestBehandlingController.opprettBehandling(TestBehandlingRequest(personIdent))
+        val behandlingId = opprettTestBehandlingController.opprettBehandling(TestBehandlingRequest(personIdent, stønadstype = Stønadstype.BARNETILSYN))
         testoppsettService.opprettGrunnlagsdata(behandlingId)
         kjørTasks()
         return behandlingId

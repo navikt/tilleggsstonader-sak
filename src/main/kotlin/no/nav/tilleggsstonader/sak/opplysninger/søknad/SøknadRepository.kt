@@ -5,12 +5,17 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdat
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
 interface SøknadBarnetilsynRepository :
     RepositoryInterface<SøknadBarnetilsyn, UUID>, InsertUpdateRepository<SøknadBarnetilsyn>
+
+@Repository
+interface SøknadLæremidlerRepository :
+    RepositoryInterface<SøknadLæremidler, UUID>, InsertUpdateRepository<SøknadLæremidler>
 
 @Repository
 interface SøknadBehandlingRepository :
