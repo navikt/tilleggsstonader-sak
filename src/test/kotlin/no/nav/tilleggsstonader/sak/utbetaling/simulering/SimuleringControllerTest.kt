@@ -56,7 +56,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
         val respons: ResponseEntity<SimuleringDto> = simulerForBehandling(behandling.id)
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(respons.body!!.perioder).hasSize(16)
+        assertThat(respons.body!!.perioder).hasSize(15)
         val simuleringsresultat = simuleringsresultatRepository.findByIdOrThrow(behandling.id)
 
         // Verifiser at simuleringsresultatet er lagret
