@@ -45,14 +45,29 @@ object StønadsperiodeRevurderFraValidering {
             eksisterendePeriode.fom != oppdatertPeriode.fom ||
                 eksisterendePeriode.målgruppe != oppdatertPeriode.målgruppe ||
                 eksisterendePeriode.aktivitet != oppdatertPeriode.aktivitet ||
-                (eksisterendePeriode.tom < revurderFra && eksisterendePeriode.tom != oppdatertPeriode.tom) ||
-                (eksisterendePeriode.tom >= revurderFra && oppdatertPeriode.tom < revurderFra.minusDays(1)),
+                ugyldigEndringAvTom(eksisterendePeriode, oppdatertPeriode, revurderFra),
         ) {
             secureLogger.info(
                 "Ugyldig endring på stønadsperiode eksisterendePeriode=$eksisterendePeriode" +
                     " oppdatertPeriode=$oppdatertPeriode",
             )
             "Ugyldig endring på ${periodeInfo(behandling, eksisterendePeriode.fom)}"
+        }
+    }
+
+    /**
+     * Kan endre på tom hvis tom er 2 dager før revurderFra
+     * Kan endre på tom frem i tiden hvis tom er dagen før revurderFra
+     */
+    private fun ugyldigEndringAvTom(
+        eksisterendePeriode: Stønadsperiode,
+        oppdatertPeriode: Stønadsperiode,
+        revurderFra: LocalDate,
+    ): Boolean {
+        return if (eksisterendePeriode.tom < revurderFra.minusDays(1)) {
+            eksisterendePeriode.tom != oppdatertPeriode.tom
+        } else {
+            oppdatertPeriode.tom < revurderFra.minusDays(1)
         }
     }
 

@@ -179,7 +179,7 @@ class StønadsperiodeRevurderFraValideringTest {
         }
 
         @Test
-        fun `kan ikke oppdatere data på vilkår hvis det begynner før revurder-fra`() {
+        fun `kan ikke oppdatere data på periode hvis det begynner før revurder-fra`() {
             val eksisterendePeriode = stønadsperiode(
                 fom = revurderFra.minusMonths(1),
                 tom = revurderFra.plusMonths(1),
@@ -197,6 +197,20 @@ class StønadsperiodeRevurderFraValideringTest {
                     )
                 }.hasMessageContaining("Ugyldig endring på periode som begynner(01.12.2023) før revurderingsdato(01.01.2024)")
             }
+        }
+
+        @Test
+        fun `kan ikke oppdatere tom på vilkår hvis det begynner før revurder-fra`() {
+            val eksisterendePeriode = stønadsperiode(
+                fom = revurderFra.minusMonths(1),
+                tom = revurderFra.minusMonths(1),
+            )
+            assertThatThrownBy {
+                endringMedRevurderFra(
+                    eksisterendePeriode,
+                    eksisterendePeriode.copy(tom = eksisterendePeriode.tom.plusDays(1)),
+                )
+            }.hasMessageContaining("Ugyldig endring på periode")
         }
 
         @Test

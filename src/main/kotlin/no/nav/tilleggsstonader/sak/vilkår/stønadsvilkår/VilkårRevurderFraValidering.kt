@@ -33,10 +33,7 @@ object VilkårRevurderFraValidering {
         eksisterendePeriode: Vilkår,
         oppdatertPeriode: Vilkår,
     ) {
-        val revurderFra = behandling.revurderFra
-        if (revurderFra == null) { // || eksisterendePeriode.tom == null || revurderFra > eksisterendePeriode.tom) {
-            return
-        }
+        val revurderFra = behandling.revurderFra ?: return
 
         if (eksisterendePeriode.fom == null || eksisterendePeriode.fom >= revurderFra) {
             feilHvis(oppdatertPeriode.fom != null && oppdatertPeriode.fom < revurderFra) {
