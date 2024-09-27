@@ -6,7 +6,7 @@ Egenskap: Beregning med stønadsperioder for februar med 3 aktivitetsdager. Hele
   Scenario: En periode for februar, 3 aktivitetsdager
     Gitt følgende støndsperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
-      | 01.02.2024 | 31.02.2024 | TILTAK    | AAP       |
+      | 01.02.2024 | 29.02.2024 | TILTAK    | AAP       |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
@@ -26,7 +26,7 @@ Egenskap: Beregning med stønadsperioder for februar med 3 aktivitetsdager. Hele
     Gitt følgende støndsperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
       | 01.02.2024 | 14.02.2024 | TILTAK    | AAP       |
-      | 15.02.2024 | 31.02.2024 | TILTAK    | AAP       |
+      | 15.02.2024 | 29.02.2024 | TILTAK    | AAP       |
 
     Gitt følgende aktiviteter
       | Fom        | Tom        | Aktivitet | Aktivitetsdager |
