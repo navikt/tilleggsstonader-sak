@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -35,6 +36,7 @@ object JournalføringHelper {
         dokumentBrevkode: DokumentBrevkode,
     ): DokumentInfoJournalpost {
         val dokumenter = journalpost.dokumenter ?: error("Fant ingen dokumenter på journalposten")
+        secureLogger.info("journalpost=${journalpost}")
         return dokumenter.firstOrNull {
             DokumentBrevkode.erGyldigBrevkode(it.brevkode.toString()) &&
                 dokumentBrevkode == DokumentBrevkode.fraBrevkode(it.brevkode.toString()) &&
