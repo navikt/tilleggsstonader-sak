@@ -177,16 +177,29 @@ class TilsynBarnBeregningService(
         stønadsperiode: PeriodeMedDager,
         aktiviteter: List<PeriodeMedDager>,
     ): Int {
-        var maksAntallDagerIUke = stønadsperiode.antallDager
-
         return aktiviteter.filter { it.overlapper(stønadsperiode) }.fold(0) { acc, aktivitet ->
-            val maksAntallDagerSomKanTrekkesFra = minOf(maksAntallDagerIUke, aktivitet.antallDager)
+            // Tilgjengelige dager i uke i overlapp mellom stønadsperiode og aktivitet
+            val antallTilgjengeligeDager = minOf(stønadsperiode.antallDager, aktivitet.antallDager)
 
-            maksAntallDagerIUke -= maksAntallDagerSomKanTrekkesFra
-            aktivitet.antallDager -= maksAntallDagerSomKanTrekkesFra
+            trekkFraBrukteDager(stønadsperiode, aktivitet, antallTilgjengeligeDager)
 
-            acc + maksAntallDagerSomKanTrekkesFra
+            acc + antallTilgjengeligeDager
         }
+    }
+
+    /**
+     * Skal ikke kunne bruke en dager fra aktivitet eller stønadsperiode flere ganger.
+     * Trekker fra tilgjengelige dager fra antallDager
+     * Dersom stønadsperioden har 2 dager, og aktiviten 3 dager, så skal man kun totalt kunne bruke 2 dager
+     * Dersom stønadsperioden har 3 dager, og aktiviten 2 dager, så skal man kun totalt kunne bruke 2 dager
+     */
+    private fun trekkFraBrukteDager(
+        stønadsperiode: PeriodeMedDager,
+        aktivitet: PeriodeMedDager,
+        antallTilgjengeligeDager: Int,
+    ) {
+        aktivitet.antallDager -= antallTilgjengeligeDager
+        stønadsperiode.antallDager -= antallTilgjengeligeDager
     }
 
     private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
