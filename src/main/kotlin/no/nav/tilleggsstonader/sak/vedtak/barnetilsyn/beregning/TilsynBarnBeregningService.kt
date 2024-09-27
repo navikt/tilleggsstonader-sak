@@ -26,7 +26,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeR
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.math.min
 
 /**
  * Stønaden dekker 64% av utgifterne til barnetilsyn
@@ -132,13 +131,15 @@ class TilsynBarnBeregningService(
         stønadsperioder: List<StønadsperiodeDto>,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
     ): List<StønadsperiodeGrunnlag> {
+        val aktiviteterPerUke = aktiviteter.map { it.key to it.value.tilDagerPerUke() }.toMap()
+
         return stønadsperioder.map { stønadsperiode ->
             val relevanteAktiviteter = finnAktiviteterForStønadsperiode(stønadsperiode, aktiviteter)
 
             StønadsperiodeGrunnlag(
                 stønadsperiode = stønadsperiode,
                 aktiviteter = relevanteAktiviteter,
-                antallDager = antallDager(stønadsperiode, relevanteAktiviteter),
+                antallDager = antallDager(stønadsperiode, aktiviteterPerUke),
             )
         }
     }
@@ -151,21 +152,54 @@ class TilsynBarnBeregningService(
             ?: error("Finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som passer med stønadsperiode med fom=${stønadsperiode.fom} og tom=${stønadsperiode.tom}")
     }
 
-    private fun antallDager(stønadsperiode: StønadsperiodeDto, aktiviteter: List<Aktivitet>): Int {
+    private fun antallDager(
+        stønadsperiode: StønadsperiodeDto,
+        aktiviteterPerType: Map<AktivitetType, Map<Uke, List<PeriodeMedDager>>>,
+    ): Int {
         val stønadsperioderUker = stønadsperiode.tilUke()
-        val aktiviteterUker = aktiviteter.tilDagerPerUke()
+        val aktiviteterPerUke = aktiviteterPerType[stønadsperiode.aktivitet]
+            ?: error("Finner ikke aktiviteter for ${stønadsperiode.aktivitet}")
 
-        val antallDagerMedAktivitetPerUke = stønadsperioderUker.map { (uke, periode) ->
-            val maksAntallDagerIUke = periode.antallDager
-
-            val aktiviteterForUke = aktiviteterUker[uke]
-            val antallDagerMedAktivitet = aktiviteterForUke?.sumOf { it.antallDager }
+        return stønadsperioderUker.map { (uke, periode) ->
+            val aktiviteterForUke = aktiviteterPerUke[uke]
                 ?: error("Ingen aktivitet i uke fom=${uke.fom} og tom=${uke.tom}")
 
-            min(antallDagerMedAktivitet, maksAntallDagerIUke)
-        }
+            beregnAntallAktivitetsdagerForUke(periode, aktiviteterForUke)
+        }.sum()
+    }
 
-        return antallDagerMedAktivitetPerUke.sum()
+    /**
+     * Beregner antall dager per uke som kan brukes
+     * Hvis antall dager fra stønadsperiode er 1, så kan man maks bruke 1 dag fra aktiviteter
+     * Hvis antall dager fra stønadsperiode er 5, men aktiviteter kun har 2 dager så kan man kun bruke 2 dager
+     */
+    private fun beregnAntallAktivitetsdagerForUke(
+        stønadsperiode: PeriodeMedDager,
+        aktiviteter: List<PeriodeMedDager>,
+    ): Int {
+        return aktiviteter.filter { it.overlapper(stønadsperiode) }.fold(0) { acc, aktivitet ->
+            // Tilgjengelige dager i uke i overlapp mellom stønadsperiode og aktivitet
+            val antallTilgjengeligeDager = minOf(stønadsperiode.antallDager, aktivitet.antallDager)
+
+            trekkFraBrukteDager(stønadsperiode, aktivitet, antallTilgjengeligeDager)
+
+            acc + antallTilgjengeligeDager
+        }
+    }
+
+    /**
+     * Skal ikke kunne bruke en dager fra aktivitet eller stønadsperiode flere ganger.
+     * Trekker fra tilgjengelige dager fra antallDager
+     * Dersom stønadsperioden har 2 dager, og aktiviten 3 dager, så skal man kun totalt kunne bruke 2 dager
+     * Dersom stønadsperioden har 3 dager, og aktiviten 2 dager, så skal man kun totalt kunne bruke 2 dager
+     */
+    private fun trekkFraBrukteDager(
+        stønadsperiode: PeriodeMedDager,
+        aktivitet: PeriodeMedDager,
+        antallTilgjengeligeDager: Int,
+    ) {
+        aktivitet.antallDager -= antallTilgjengeligeDager
+        stønadsperiode.antallDager -= antallTilgjengeligeDager
     }
 
     private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
