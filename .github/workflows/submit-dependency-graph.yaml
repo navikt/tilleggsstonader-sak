@@ -1,4 +1,5 @@
-name: Submit dependency graph
+name: Send inn avhengighetsgraf til GitHub Security
+
 on:
   workflow_dispatch:
   push:
@@ -7,30 +8,10 @@ on:
     paths:
       - "**.gradle.kts"
       - "gradle.properties"
-      - ".github/workflows/submit-dependency-graph.yaml"
+
 jobs:
-  dependencies:
-    runs-on: ubuntu-latest
-    permissions: # The Dependency Submission API requires write permission
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-          cache: 'gradle'
-
-      - name: Setup Gradle to generate and submit dependency graphs
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: wrapper
-          dependency-graph: generate-and-submit
-
-      - name: Run a build (dependency-graph will be generated and submitted post-job)
-        env:
-          # Eksluder test dependencies
-          DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: compileClasspath|runtimeClasspath
-        run: ./gradlew --configuration-cache build -x :check -x :cyclonedxBom
+  submit-dependency-graph:
+    name: "Genererer opp avhengighetsgraf og sender den til GHAS"
+    uses: navikt/tilleggsstonader/.github/workflows/submit-dependency-graph.yml@main
+    permissions:
+      contents: "write" # Kreves av Dependency Submission API-et
