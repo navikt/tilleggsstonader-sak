@@ -2,9 +2,9 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20240916095727_7fab7b4"
+val familieProsesseringVersion = "2.20240925091323_ea1bd3c"
 val tilleggsstønaderLibsVersion = "2024.09.13-14.55.90172c4319d3"
-val tilleggsstønaderKontrakterVersion = "2024.09.20-10.20.696495fbaa64"
+val tilleggsstønaderKontrakterVersion = "2024.09.25-13.54.07dc7c28319c"
 val tokenSupportVersion = "5.0.5"
 val wiremockVersion = "3.9.1"
 val mockkVersion = "1.13.12"
@@ -21,7 +21,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.51.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
-    id("org.springframework.boot") version "3.3.3"
+    id("org.springframework.boot") version "3.3.4"
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("plugin.spring") version "2.0.20"
 
@@ -99,7 +99,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.18.1"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.19.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 }
