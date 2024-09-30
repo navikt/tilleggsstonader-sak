@@ -76,7 +76,6 @@ class PersonService(
         val person = hentPersonKortBolk(listOf(personIdent))
         return person.visningsnavnFor(personIdent)
     }
-
     private fun Map<String, PdlPersonKort>.visningsnavnFor(personIdent: String) =
         personIdent.let { this[it] }?.navn?.gjeldende()?.visningsnavn() ?: "Mangler navn"
 }
