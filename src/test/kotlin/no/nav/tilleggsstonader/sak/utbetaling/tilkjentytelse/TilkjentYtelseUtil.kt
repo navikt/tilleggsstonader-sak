@@ -22,7 +22,7 @@ object TilkjentYtelseUtil {
     }
 
     fun andelTilkjentYtelse(
-        kildeBehandlingId: BehandlingId,
+        kildeBehandlingId: BehandlingId = BehandlingId.random(),
         beløp: Int = 11554,
         fom: LocalDate = LocalDate.of(2021, 1, 1),
         tom: LocalDate = LocalDate.of(2021, 1, 31),

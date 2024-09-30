@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -103,14 +102,9 @@ class TilsynBarnBeregnYtelseSteg(
                     kildeBehandlingId = saksbehandling.id,
                 )
             }
-        }.toSet()
+        }
 
-        tilkjentytelseService.opprettTilkjentYtelse(
-            TilkjentYtelse(
-                behandlingId = saksbehandling.id,
-                andelerTilkjentYtelse = andelerTilkjentYtelse,
-            ),
-        )
+        tilkjentytelseService.opprettTilkjentYtelse(saksbehandling, andelerTilkjentYtelse)
     }
 
     private fun lagInnvilgetVedtak(

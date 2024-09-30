@@ -61,6 +61,19 @@ class DatoUtilTest {
     }
 
     @Nested
+    inner class FørsteDagIMåneden {
+
+        @Test
+        fun `tilFørsteDagIMåneden skal endre dato til første dagen i måneden for inneværende måned`() {
+            val førsteJan2024 = LocalDate.of(2024, 1, 1)
+            assertThat(førsteJan2024.tilFørsteDagIMåneden()).isEqualTo(førsteJan2024)
+            assertThat(LocalDate.of(2024, 1, 31).tilFørsteDagIMåneden()).isEqualTo(førsteJan2024)
+            assertThat(LocalDate.of(2024, 1, 30).tilFørsteDagIMåneden()).isEqualTo(førsteJan2024)
+            assertThat(LocalDate.of(2024, 2, 4).tilFørsteDagIMåneden()).isEqualTo(LocalDate.of(2024, 2, 1))
+        }
+    }
+
+    @Nested
     inner class SisteDagIMåneden {
 
         @Test

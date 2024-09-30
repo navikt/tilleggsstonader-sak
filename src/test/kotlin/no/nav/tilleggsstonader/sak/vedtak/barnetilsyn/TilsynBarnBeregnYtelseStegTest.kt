@@ -80,7 +80,7 @@ class TilsynBarnBeregnYtelseStegTest {
             simuleringService.slettSimuleringForBehandling(saksbehandling)
 
             repository.insert(any())
-            tilkjentYtelseService.opprettTilkjentYtelse(any())
+            tilkjentYtelseService.opprettTilkjentYtelse(saksbehandling, any())
         }
         verify(exactly = 0) {
             simuleringService.hentOgLagreSimuleringsresultat(any())
