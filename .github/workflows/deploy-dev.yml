@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       skip-checks:
-        description: "Skal jobben hoppe over testing og linting?"
+        description: "Hopp over testing og linting"
         type: boolean
         required: false
         default: false
