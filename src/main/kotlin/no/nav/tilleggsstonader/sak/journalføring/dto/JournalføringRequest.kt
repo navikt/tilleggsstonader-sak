@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import java.time.LocalDate
 
 data class JournalføringRequest(
@@ -60,7 +59,7 @@ data class JournalføringRequest(
 }
 
 fun JournalføringRequest.valider() {
-    feilHvis(gjelderKlage() && skalJournalføreTilNyBehandling()) {
+    brukerfeilHvis(gjelderKlage() && skalJournalføreTilNyBehandling()) {
         "Opprettelse av ny behandling er ikke støttet for klage. Du kan kun journalføre uten ny behandling, for så å opprette ny klagebehandling fra personoversikten."
     }
     dokumentTitler?.let {
