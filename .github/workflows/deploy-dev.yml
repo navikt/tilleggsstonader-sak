@@ -1,4 +1,4 @@
-name: Manuell deploy til ${{ github.event.inputs.cluster }}
+name: Manuell deploy til dev
 on:
   workflow_dispatch:
     inputs:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-deploy:
-    name: "Bygger app og deployer til ${{ github.event.inputs.cluster }}"
+    name: "Bygger app og deployer til dev-gcp"
     uses: navikt/tilleggsstonader/.github/workflows/java-build-and-deploy.yml@main
     secrets: inherit
     permissions:
