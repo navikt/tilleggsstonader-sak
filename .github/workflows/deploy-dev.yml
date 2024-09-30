@@ -2,14 +2,6 @@ name: Manuell deploy til ${{ github.event.inputs.cluster }}
 on:
   workflow_dispatch:
     inputs:
-      cluster:
-        description: "Hvilket cluster skal det deployes til?"
-        type: choice
-        required: true
-        default: "dev-gcp"
-        options:
-          - "dev-gcp"
-          - "prod-gcp"
       skip-checks:
         description: "Skal jobben hoppe over testing og linting?"
         type: boolean
@@ -24,6 +16,6 @@ jobs:
     permissions:
       id-token: write
     with:
-      cluster: ${{ github.event.inputs.cluster }}
-      manifest: ${{ github.event.inputs.cluster == 'prod-gcp' && '.nais/prod.yaml' || '.nais/preprod.yaml' }}
+      cluster: "dev-gcp"
+      manifest: ".nais/preprod.yaml"
       skip-checks: ${{ github.event.inputs.skip-checks }}
