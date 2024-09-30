@@ -1,119 +1,21 @@
-name: Build, push, and deploy app to dev and prod
+name: Bygg og deploy til prod og dev
 
 on:
   push:
     branches:
       - 'main'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref_name }}
-  cancel-in-progress: true
-
-env:
-  IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
-
-permissions:
-  contents: "read"
-  id-token: "write"
-
 jobs:
-  build:
-    name: Build, push and deploy to dev-gcp and prod-gcp
-    runs-on: ubuntu-latest
-    timeout-minutes: 7
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-          cache: 'gradle'
-
-      - name: Test and build
-        run: ./gradlew test bootJar -PskipLint
-
-      - name: Generate and output SBOM
-        run: ./gradlew cyclonedxBom
-
-      - uses: nais/docker-build-push@v0
-        id: docker-push
-        with:
-          team: tilleggsstonader
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          byosbom: build/reports/application.cdx.json
-
-      - name: Post build failures to Slack
-        if: failure()
-        run: |
-          curl -X POST --data "{\"text\": \"Build av $GITHUB_REPOSITORY feilet - $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}" $WEBHOOK_URL
-        env:
-          WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-    outputs:
-      image: ${{ steps.docker-push.outputs.image }}
-
-  deploy:
-    name: Deploy to GCP
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy til dev-gcp
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-gcp
-          RESOURCE: .nais/preprod.yaml
-          IMAGE: ${{ needs.build.outputs.image }}
-
-      - name: Deploy til prod-gcp
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: prod-gcp
-          RESOURCE: .nais/prod.yaml
-          IMAGE: ${{ needs.build.outputs.image }}
-
-      - name: Post deploy failures to Slack
-        if: failure()
-        run: |
-          curl -X POST --data "{\"text\": \"Deploy av $GITHUB_REPOSITORY feilet - $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}" $WEBHOOK_URL
-        env:
-          MESSAGE: "Deploy av feilet"
-          WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  trivy-scan:
-    name: Scan docker image med Trivy
-    needs: build
-    runs-on: ubuntu-latest
+  build_and_deploy:
+    name: "Bygger app og deployer til prod og dev"
+    uses: navikt/tilleggsstonader/.github/workflows/java-build-and-deploy-prod-and-dev.yml@main
+    secrets: inherit
     permissions:
-      contents: write # to write sarif
-      security-events: write # push sarif to github security
-      id-token: write # for nais/login
-    steps:
-      - uses: actions/checkout@v4
-      - uses: nais/login@v0
-        with:
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          team: tilleggsstonader
-
-      - name: Pull docker image
-        run: docker pull ${{ needs.build.outputs.image }}
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: '${{ needs.build.outputs.image }}'
-          format: 'sarif'
-          output: 'trivy.sarif'
-          severity: 'HIGH,CRITICAL'
-          limit-severities-for-sarif: true
-
-      - name: Upload results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'trivy.sarif'
+      contents: "write" # Kreves av nais/login
+      id-token: "write" # Kreves for å skrive sårbarhetsanalyse-rapport
+      security-events: "write" # Kreves for å pushe resultat av sårbarhetsanalyse til Github Security
+    with:
+      prod-cluster: 'prod-gcp'
+      prod-manifest: '.nais/prod.yaml'
+      dev-cluster: 'dev-gcp'
+      dev-manifest: '.nais/preprod.yaml'

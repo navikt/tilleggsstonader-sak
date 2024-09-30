@@ -1,63 +1,21 @@
-name: Build-Deploy dev
-
+name: Manuell deploy til dev
 on:
   workflow_dispatch:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref_name }}
-  cancel-in-progress: true
-
-env:
-  IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
-
-permissions:
-  contents: "read"
-  id-token: "write"
+    inputs:
+      skip-checks:
+        description: "Hopp over testing og linting"
+        type: boolean
+        required: false
+        default: false
 
 jobs:
-  build:
-    name: Build, push and deploy to dev-gcp
-    runs-on: ubuntu-latest
-    timeout-minutes: 7
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-          cache: 'gradle'
-
-      - name: Test and build
-        run: ./gradlew test bootJar -PskipLint
-
-      - name: Generate and output SBOM
-        run: ./gradlew cyclonedxBom
-
-      - uses: nais/docker-build-push@v0
-        id: docker-push
-        with:
-          team: tilleggsstonader
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          byosbom: build/reports/application.cdx.json
-    outputs:
-      image: ${{ steps.docker-push.outputs.image }}
-
-  deploy:
-    name: Deploy to GCP
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-gcp
-          RESOURCE: .nais/preprod.yaml
-          IMAGE: ${{ needs.build.outputs.image }}
-
+  build-and-deploy:
+    name: "Bygger app og deployer til dev-gcp"
+    uses: navikt/tilleggsstonader/.github/workflows/java-build-and-deploy.yml@main
+    secrets: inherit
+    permissions:
+      id-token: write
+    with:
+      cluster: "dev-gcp"
+      manifest: ".nais/preprod.yaml"
+      skip-checks: ${{ github.event.inputs.skip-checks }}
