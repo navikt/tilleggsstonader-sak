@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakController
@@ -21,6 +22,7 @@ class TilsynBarnVedtakController(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     tilgangService: TilgangService,
     private val tilsynBarnVedtakService: TilsynBarnVedtakService,
+    private val behandlingService: BehandlingService,
 ) : VedtakController<VedtakTilsynBarnDto, VedtakTilsynBarn>(
     tilgangService,
     tilsynBarnVedtakService,
@@ -47,6 +49,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
-        return tilsynBarnBeregningService.beregn(behandlingId).tilDto()
+        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
+        return tilsynBarnBeregningService.beregn(behandlingId).tilDto(revurderFra)
     }
 }
