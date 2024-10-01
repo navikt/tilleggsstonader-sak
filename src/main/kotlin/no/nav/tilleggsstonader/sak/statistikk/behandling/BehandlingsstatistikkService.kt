@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.statistikk.behandling
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
-import no.nav.tilleggsstonader.kontrakter.saksstatistikk.SakYterlseDvh
+import no.nav.tilleggsstonader.kontrakter.saksstatistikk.SakYtelseDvh
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -101,7 +101,7 @@ class BehandlingsstatistikkService(
             behandlingÅrsak = saksbehandling.årsak.name,
             avsender = "NAV Tilleggstønader",
             behandlingType = saksbehandling.type.name,
-            sakYtelse = SakYterlseDvh.fraStønadstype(saksbehandling.stønadstype),
+            sakYtelse = SakYtelseDvh.fraStønadstype(saksbehandling.stønadstype),
             behandlingResultat = saksbehandling.resultat.name,
             resultatBegrunnelse = utledResultatBegrunnelse(saksbehandling),
             ansvarligBeslutter = finnAnsvarligBeslutter(beslutterId, søkerHarStrengtFortroligAdresse),
