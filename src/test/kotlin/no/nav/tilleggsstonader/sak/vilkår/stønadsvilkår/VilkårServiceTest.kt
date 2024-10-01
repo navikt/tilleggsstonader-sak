@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -22,9 +23,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils.now
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
-import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
 import no.nav.tilleggsstonader.sak.util.VilkårGrunnlagUtil.mockVilkårGrunnlagDto
@@ -81,16 +82,18 @@ internal class VilkårServiceTest {
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
     private val barnOver10år = FnrGenerator.generer(Year.now().minusYears(11).value, 1, 13)
 
-    private val søknad = SøknadsskjemaBarnetilsynMapper.map(
-        SøknadUtil.søknadskjemaBarnetilsyn(
-            barnMedBarnepass = listOf(
-                barnMedBarnepass(ident = barnUnder9år),
-                barnMedBarnepass(ident = barnOver10år),
-            ),
+    private val søknadskjemaBarnetilsyn = SøknadUtil.søknadskjemaBarnetilsyn(
+        barnMedBarnepass = listOf(
+            barnMedBarnepass(ident = barnUnder9år),
+            barnMedBarnepass(ident = barnOver10år),
         ),
-        lagJournalpost(),
     )
-    private val barn = søknadBarnTilBehandlingBarn(søknad.barn)
+
+    val sokandBarnMedBarnepass = BarnMedBarnepass(type = TypeBarnepass.BARNEHAGE_SFO_AKS, null, null)
+    val soknadBarn1 = SøknadBarn(ident = barnUnder9år, data = sokandBarnMedBarnepass)
+    val soknadBarn2 = SøknadBarn(ident = barnOver10år, data = sokandBarnMedBarnepass)
+
+    private val barn = søknadBarnTilBehandlingBarn(listOf(soknadBarn1, soknadBarn2))
     private val fagsak = fagsak()
     private val behandling = behandling(
         fagsak = fagsak,

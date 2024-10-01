@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.kontrakter.søknad.laeremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
@@ -19,7 +20,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-interface Søknad<T> {
+sealed interface Søknad<T> {
     val id: UUID
     val journalpostId: String
     val mottattTidspunkt: LocalDateTime
@@ -74,6 +75,29 @@ data class SkjemaBarnetilsyn(
     val dokumentasjon: List<Dokumentasjon>,
 )
 
+@Table("soknad")
+data class SøknadLæremidler(
+    @Id
+    override val id: UUID = UUID.randomUUID(),
+    override val journalpostId: String,
+    override val mottattTidspunkt: LocalDateTime,
+    @Column("sprak")
+    override val språk: Språkkode,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    override val sporbar: Sporbar = Sporbar(),
+    override val data: SkjemaLæremidler,
+) : Søknad<SkjemaLæremidler>
+
+data class SkjemaLæremidler(
+    val hovedytelse: HovedytelseAvsnitt,
+    val utdanning: UtdanningAvsnitt,
+    val dokumentasjon: List<Dokumentasjon>,
+)
+data class UtdanningAvsnitt(
+    val annenUtdanning: AnnenUtdanningType?,
+    val mottarUtstyrsstipend: JaNei?,
+    val harFunksjonsnedsettelse: JaNei,
+)
 data class HovedytelseAvsnitt(
     val hovedytelse: List<Hovedytelse>,
     val arbeidOgOpphold: ArbeidOgOpphold?,
