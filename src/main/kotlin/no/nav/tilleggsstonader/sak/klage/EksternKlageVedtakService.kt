@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import org.springframework.stereotype.Service
 
 @Service
-class EksternVedtakService(
+class EksternKlageVedtakService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
 ) {

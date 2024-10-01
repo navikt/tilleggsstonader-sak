@@ -19,12 +19,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
-class EksternVedtakServiceTest {
+class EksternKlageVedtakServiceTest {
 
     private val fagsakService = mockk<FagsakService>()
     private val behandlingService = mockk<BehandlingService>()
 
-    private val service = EksternVedtakService(
+    private val service = EksternKlageVedtakService(
         fagsakService = fagsakService,
         behandlingService = behandlingService,
     )
