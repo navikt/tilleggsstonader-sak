@@ -81,6 +81,8 @@ spec:
         - application: tilleggsstonader-prosessering
         - application: tilleggsstonader-soknad-api
         - application: tilleggsstonader-klage
+        - application: bidrag-grunnlag
+          namespace: bidrag
         - application: arena
           namespace: teamarenanais
           cluster: dev-fss
