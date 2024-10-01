@@ -390,10 +390,11 @@ internal class VilkårServiceTest {
 
         val fom = YearMonth.now().minusMonths(1)
         val tom = YearMonth.now().plusMonths(1)
+        val revurderFra = LocalDate.now()
 
         @BeforeEach
         fun setUp() {
-            mockHentBehandling(behandling.copy(type = BehandlingType.REVURDERING, revurderFra = LocalDate.now()))
+            mockHentBehandling(behandling.copy(type = BehandlingType.REVURDERING, revurderFra = revurderFra))
         }
 
         @Test
@@ -415,8 +416,14 @@ internal class VilkårServiceTest {
 
         @Test
         fun `kan ikke oppdatere periode hvis revurderFra begynner før periode`() {
-            val lagretVilkår = slot<Vilkår>()
-            val vilkår = initiererVilkår(lagretVilkår)
+            val vilkår = vilkår(
+                behandlingId = behandlingId,
+                type = VilkårType.PASS_BARN,
+                fom = fom.atDay(1),
+                tom = tom.atEndOfMonth(),
+                delvilkår = ikkeOppfylteDelvilkårPassBarn(),
+            )
+            every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
             val svarPåVilkårDto = SvarPåVilkårDto(
                 id = vilkår.id,
