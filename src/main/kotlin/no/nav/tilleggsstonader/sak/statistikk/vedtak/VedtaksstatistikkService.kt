@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -33,17 +33,17 @@ class VedtaksstatistikkService(
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         val vilkårsvurderinger = vilkårService.hentVilkårsett(behandlingId)
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
-        val behandling = behandlingService.hentBehandling(behandlingId)
-        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
         val vedtak = tilsynBarnVedtakService.hentVedtak(behandlingId)
 
         vedtaksstatistikkRepository.insert(
             Vedtaksstatistikk(
                 fagsakId = fagsakId,
+                stønadstype = StønadstypeDvh.fraDomene(behandling.stønadstype),
                 behandlingId = behandlingId,
-                eksternFagsakId = saksbehandling.eksternFagsakId,
-                eksternBehandlingId = saksbehandling.eksternId,
+                eksternFagsakId = behandling.eksternFagsakId,
+                eksternBehandlingId = behandling.eksternId,
                 relatertBehandlingId = hentRelatertBehandlingId(behandling),
                 adressebeskyttelse = hentAdressebeskyttelse(personIdent),
                 tidspunktVedtak = hendelseTidspunkt,
@@ -69,7 +69,7 @@ class VedtaksstatistikkService(
         ).values.single().adressebeskyttelse.gradering(),
     )
 
-    private fun hentRelatertBehandlingId(behandling: Behandling) = behandling.forrigeBehandlingId?.let {
+    private fun hentRelatertBehandlingId(behandling: Saksbehandling) = behandling.forrigeBehandlingId?.let {
         behandlingService.hentEksternBehandlingId(it)
     }?.id
 }
