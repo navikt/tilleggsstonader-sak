@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilÅrMåned
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilSortertGrunnlagStønadsperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -33,7 +33,7 @@ class TilsynBeregningUtilTest {
                 )
                 val stønadsperioder = listOf(
                     stønadsperiode,
-                ).tilSortertDto()
+                ).tilSortertGrunnlagStønadsperiode()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -49,7 +49,7 @@ class TilsynBeregningUtilTest {
                     tom = LocalDate.of(2024, 3, 31),
                 )
 
-                val stønadsperioder = listOf(stønadsperiode).tilSortertDto()
+                val stønadsperioder = listOf(stønadsperiode).tilSortertGrunnlagStønadsperiode()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -81,7 +81,7 @@ class TilsynBeregningUtilTest {
                 val stønadsperioder = listOf(
                     stønadsperiode1,
                     stønadsperiode2,
-                ).tilSortertDto()
+                ).tilSortertGrunnlagStønadsperiode()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -110,7 +110,7 @@ class TilsynBeregningUtilTest {
                 val stønadsperioder = listOf(
                     stønadsperiode1,
                     stønadsperiode2,
-                ).tilSortertDto()
+                ).tilSortertGrunnlagStønadsperiode()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 

@@ -4,8 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -26,7 +26,7 @@ object TilsynBeregningUtil {
      * listOf(StønadsperiodeDto(fom = 01.01.24, tom=10.01.24), StønadsperiodeDto(fom = 20.01.24, tom=31.01.24)) deles opp i 2 innenfor samme måned:
      * jan -> listOf(StønadsperiodeDto(fom = 01.01.24, tom = 10.01.24), StønadsperiodeDto(fom = 20.01.24, tom = 31.01.24))
      */
-    fun List<StønadsperiodeDto>.tilÅrMåned(): Map<YearMonth, List<StønadsperiodeDto>> {
+    fun List<Stønadsperiode>.tilÅrMåned(): Map<YearMonth, List<Stønadsperiode>> {
         return this
             .flatMap { stønadsperiode ->
                 stønadsperiode.splitPerMåned { måned, periode ->
@@ -107,7 +107,7 @@ object TilsynBeregningUtil {
      * Splitter en stønadsperiode opp i uker (kun hverdager inkludert)
      * Antall dager i uken er oppad begrenset til antall dager i stønadsperioden som er innenfor uken
      */
-    fun StønadsperiodeDto.tilUke(): Map<Uke, PeriodeMedDager> {
+    fun Stønadsperiode.tilUke(): Map<Uke, PeriodeMedDager> {
         return this.splitPerUke { fom, tom ->
             antallDagerIPeriodeInklusiv(fom, tom)
         }
