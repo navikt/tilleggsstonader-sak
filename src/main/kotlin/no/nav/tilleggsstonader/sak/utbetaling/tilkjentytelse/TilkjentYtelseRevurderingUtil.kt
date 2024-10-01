@@ -68,7 +68,7 @@ object TilkjentYtelseRevurderingUtil {
      */
     private fun validerGjenbruk(saksbehandling: Saksbehandling) {
         feilHvis(saksbehandling.stønadstype != Stønadstype.BARNETILSYN) {
-            "Har ikke tatt stilling til hvordan andre stønasdtyper enn barnetilsyn skal gjenbruke andeler"
+            "Har ikke tatt stilling til hvordan andre stønadstyper enn barnetilsyn skal gjenbruke andeler"
         }
     }
 

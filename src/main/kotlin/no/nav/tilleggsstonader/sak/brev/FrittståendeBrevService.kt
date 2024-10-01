@@ -88,6 +88,7 @@ class FrittståendeBrevService(
     private fun utledDokumenttype(stønadstype: Stønadstype) =
         when (stønadstype) {
             Stønadstype.BARNETILSYN -> Dokumenttype.BARNETILSYN_FRITTSTÅENDE_BREV
+            Stønadstype.LÆREMIDLER -> Dokumenttype.LÆREMIDLER_FRITTSTÅENDE_BREV
             else -> error("Frittstående brev er ikke støttet for stønadstype $stønadstype")
         }
 }
