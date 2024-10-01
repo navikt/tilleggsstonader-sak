@@ -44,6 +44,7 @@ class BehandlingsstatistikkService(
         oppgaveId: Long?,
         behandlingMetode: BehandlingMetode?,
     ) {
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val behandlingDVH = mapTilBehandlingDVH(
             behandlingId = behandlingId,
             hendelse = hendelse,
@@ -51,11 +52,13 @@ class BehandlingsstatistikkService(
             gjeldendeSaksbehandler = gjeldendeSaksbehandler,
             oppgaveId = oppgaveId,
             behandlingMetode = behandlingMetode,
+            saksbehandling = saksbehandling,
         )
-        behandlingsstatistikkProducer.sendBehandling(behandlingDVH)
+        behandlingsstatistikkProducer.sendBehandling(behandlingDVH, saksbehandling.stønadstype)
     }
 
     private fun mapTilBehandlingDVH(
+        saksbehandling: Saksbehandling,
         behandlingId: BehandlingId,
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
@@ -63,7 +66,6 @@ class BehandlingsstatistikkService(
         oppgaveId: Long?,
         behandlingMetode: BehandlingMetode?,
     ): BehandlingDVH {
-        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling)
         val søkerHarStrengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)

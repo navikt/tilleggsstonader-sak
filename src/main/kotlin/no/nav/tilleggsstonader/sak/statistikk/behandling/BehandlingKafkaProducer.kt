@@ -16,13 +16,13 @@ class BehandlingKafkaProducer(
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
-    fun sendBehandling(behandlingDVH: BehandlingDVH) {
+    fun sendBehandling(behandlingDVH: BehandlingDVH, stønadstype: Stønadstype) {
         logger.info("Sending to Kafka topic: $topic")
         secureLogger.debug("Sending to Kafka topic: {}\nBehandlingstatistikk: {}", topic, behandlingDVH)
         runCatching {
             kafkaProducerService.sendMedStønadstypeIHeader(
                 topic,
-                Stønadstype.BARNETILSYN,
+                stønadstype,
                 behandlingDVH.behandlingId,
                 behandlingDVH.toJson(),
             )
