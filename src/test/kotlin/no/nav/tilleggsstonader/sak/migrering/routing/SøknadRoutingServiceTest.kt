@@ -9,7 +9,6 @@ import io.mockk.unmockkObject
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.arena.SakStatus
-import no.nav.tilleggsstonader.kontrakter.arena.VedtakStatus
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -20,6 +19,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle.SØKNAD_ROUTING_
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockGetVariant
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
+import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaStatusDtoUtil.vedtakStatus
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
@@ -242,22 +242,22 @@ class SøknadRoutingServiceTest {
 
     private fun arenaStatusKanIkkeRoutes() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = true),
-        VedtakStatus(harVedtak = true, harAktivtVedtak = true, harVedtakUtenUtfall = false),
+        vedtakStatus(harVedtak = true, harAktivtVedtak = true, harVedtakUtenUtfall = false),
     )
 
     private fun arenaStatusKanRoutes() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = false),
-        VedtakStatus(harVedtak = false, harAktivtVedtak = false, harVedtakUtenUtfall = false),
+        vedtakStatus(harVedtak = false, harAktivtVedtak = false, harVedtakUtenUtfall = false),
     )
 
     private fun arenaStatusUtenAktivtVedtak() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = false),
-        VedtakStatus(harVedtak = true, harAktivtVedtak = false, harVedtakUtenUtfall = false),
+        vedtakStatus(harVedtak = true, harAktivtVedtak = false, harVedtakUtenUtfall = false),
     )
 
     private fun arenaStatusVedtakUtenUtfall() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = false),
-        VedtakStatus(harVedtak = true, harAktivtVedtak = false, harVedtakUtenUtfall = true),
+        vedtakStatus(harVedtak = true, harAktivtVedtak = false, harVedtakUtenUtfall = true),
     )
 
     private fun skalBehandlesINyLøsning(request: IdentStønadstype = IdentStønadstype(ident, stønadstype)) =
