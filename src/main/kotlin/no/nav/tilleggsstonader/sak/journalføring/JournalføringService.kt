@@ -223,14 +223,6 @@ class JournalføringService(
         barnService.opprettBarn(nyeBarn)
     }
 
-    private fun skalLagreBarn(stønadstype: Stønadstype): Boolean {
-        return when (stønadstype) {
-            Stønadstype.BARNETILSYN -> true
-            Stønadstype.LÆREMIDLER -> false
-            else -> error("Har ikke tatt stilling til om Stønadstype=$stønadstype skal lagre barn")
-        }
-    }
-
     private fun lagreSøknad(journalpost: Journalpost, behandlingId: BehandlingId, stønadstype: Stønadstype) {
         val søknad = journalpostService.hentSøknadFraJournalpost(journalpost, stønadstype)
         søknadService.lagreSøknad(behandlingId, journalpost, søknad)
