@@ -44,6 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.cache.CacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.jdbc.core.JdbcAggregateOperations
@@ -107,6 +108,9 @@ abstract class IntegrationTest {
     @Autowired
     protected lateinit var unleashService: UnleashService
 
+    @Autowired
+    private lateinit var cacheManagers: List<CacheManager>
+
     val logger = LoggerFactory.getLogger(javaClass)
 
     @AfterEach
@@ -114,6 +118,7 @@ abstract class IntegrationTest {
         headers.clear()
         clearClientMocks()
         resetDatabase()
+        clearCaches()
     }
 
     private fun resetDatabase() {
@@ -158,6 +163,13 @@ abstract class IntegrationTest {
     }
 
     private fun clearClientMocks() {
+    }
+
+    private fun clearCaches() {
+        cacheManagers.forEach {
+            it.cacheNames.mapNotNull { cacheName -> it.getCache(cacheName) }
+                .forEach { cache -> cache.clear() }
+        }
     }
 
     protected fun localhost(path: String): String {
