@@ -200,7 +200,7 @@ class JournalføringService(
         stønadstype: Stønadstype,
     ) {
         lagreSøknad(journalpost, behandling.id, stønadstype)
-        if (skalLagreBarn(stønadstype)) {
+        if (stønadstype.gjelderBarn()) {
             lagreBarn(behandling)
         }
     }
