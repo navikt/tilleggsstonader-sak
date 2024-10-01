@@ -49,7 +49,7 @@ class EksternVedtakServiceTest : IntegrationTest() {
 
         val result = service.hentVedtaksinformasjonTilsynBarn(request)
 
-        assertThat(result.harVedtak).isTrue
+        assertThat(result.harInnvilgetVedtak).isTrue
 
         verify(exactly = 0) { arenaClient.hentStatus(any()) }
     }
@@ -60,7 +60,7 @@ class EksternVedtakServiceTest : IntegrationTest() {
 
         val result = service.hentVedtaksinformasjonTilsynBarn(request)
 
-        assertThat(result.harVedtak).isTrue
+        assertThat(result.harInnvilgetVedtak).isTrue
 
         verify(exactly = 1) { arenaClient.hentStatus(any()) }
     }
@@ -69,7 +69,7 @@ class EksternVedtakServiceTest : IntegrationTest() {
     fun `har ikke vedtak hvis personen ikke har iverksatt behandling eller vedtak i arena`() {
         val result = service.hentVedtaksinformasjonTilsynBarn(request)
 
-        assertThat(result.harVedtak).isFalse
+        assertThat(result.harInnvilgetVedtak).isFalse
 
         verify(exactly = 1) { arenaClient.hentStatus(any()) }
     }

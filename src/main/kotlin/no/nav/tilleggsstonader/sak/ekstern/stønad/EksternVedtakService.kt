@@ -25,7 +25,7 @@ class EksternVedtakService(
      */
     fun hentVedtaksinformasjonTilsynBarn(request: IdentRequest): VedtaksinformasjonTilsynBarnDto {
         return VedtaksinformasjonTilsynBarnDto(
-            harVedtak = harVedtak(request) || harVedtakIArena(request),
+            harInnvilgetVedtak = harVedtak(request) || harVedtakIArena(request),
         )
     }
 
