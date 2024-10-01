@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprett
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -241,8 +242,16 @@ class JournalføringService(
             }
         }
 
-        if (fagsak.stønadstype == Stønadstype.BARNETILSYN) {
-            validerKanOppretteNyBehandlingForTilsynBarn(behandlingÅrsak, fagsak)
+        if (fagsak.stønadstype.gjelderBarn()) {
+            validerKanOppretteNyBehandlingSomKanInneholdeNyeBarn(behandlingÅrsak, fagsak)
+        }
+    }
+
+    private fun skalValidereForAtManMåOppretteNyBehandlingManueltPgaNyeBarn(stønadstype: Stønadstype): Boolean {
+        return when (stønadstype) {
+            Stønadstype.BARNETILSYN -> true
+            Stønadstype.LÆREMIDLER -> false
+            else -> error("Har ikke tatt stilling til om $stønadstype skal validere for nye barn")
         }
     }
 
@@ -251,7 +260,7 @@ class JournalføringService(
      * Vi tror behovet for dette er begrenset og er allerede støttet på annen måte.
      * Ønsker derfor at disse journalføringene gjøres uten å opprette behandling, men at behandlingen opprettes manuelt
      */
-    private fun validerKanOppretteNyBehandlingForTilsynBarn(
+    private fun validerKanOppretteNyBehandlingSomKanInneholdeNyeBarn(
         behandlingÅrsak: BehandlingÅrsak,
         fagsak: Fagsak,
     ) {
