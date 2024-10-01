@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsy
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 object SøknadBarnetilsynUtil {
 
@@ -33,7 +34,7 @@ object SøknadBarnetilsynUtil {
 
         journalpostId: String = "testId",
         språk: Språkkode = Språkkode.NB,
-        mottattTidspunkt: LocalDateTime = LocalDate.of(2023, 1, 1).atStartOfDay(),
+        mottattTidspunkt: LocalDateTime = LocalDate.of(2023, 1, 1).atStartOfDay().truncatedTo(ChronoUnit.MILLIS),
     ) =
         SøknadBarnetilsyn(
             journalpostId = journalpostId,

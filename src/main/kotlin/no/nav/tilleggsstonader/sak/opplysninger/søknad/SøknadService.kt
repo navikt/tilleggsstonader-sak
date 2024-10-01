@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
@@ -15,11 +16,16 @@ import org.springframework.stereotype.Service
 
 @Service
 class SøknadService(
+    private val søknadMetadataRepository: SøknadMetadataRepository,
     private val søknadBehandlingRepository: SøknadBehandlingRepository,
     private val søknadBarnetilsynRepository: SøknadBarnetilsynRepository,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
+
+    fun hentSøknadMetadata(behandlingId: BehandlingId): SøknadMetadata? {
+        return søknadMetadataRepository.finnForBehandling(behandlingId)
+    }
 
     fun hentSøknadBarnetilsyn(behandlingId: BehandlingId): SøknadBarnetilsyn? {
         return søknadBehandlingRepository.findByIdOrNull(behandlingId)

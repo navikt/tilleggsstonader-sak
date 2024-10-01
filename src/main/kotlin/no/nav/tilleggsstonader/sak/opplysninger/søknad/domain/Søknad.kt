@@ -41,6 +41,17 @@ data class SøknadBehandling(
     val sporbar: Sporbar = Sporbar(),
 )
 
+/**
+ *
+ */
+@Table("soknad")
+data class SøknadMetadata(
+    val journalpostId: String,
+    val mottattTidspunkt: LocalDateTime,
+    @Column("sprak")
+    val språk: Språkkode,
+)
+
 @Table("soknad")
 data class SøknadBarnetilsyn(
     @Id

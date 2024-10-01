@@ -156,9 +156,7 @@ class BehandlingsstatistikkService(
     private fun finnHenvendelsestidspunkt(saksbehandling: Saksbehandling): LocalDateTime {
         return when (saksbehandling.type) {
             BehandlingType.FØRSTEGANGSBEHANDLING ->
-                søknadService.hentSøknadBarnetilsyn(saksbehandling.id)?.mottattTidspunkt
-                    ?: saksbehandling.opprettetTid
-
+                søknadService.hentSøknadMetadata(saksbehandling.id)?.mottattTidspunkt ?: saksbehandling.opprettetTid
             BehandlingType.REVURDERING -> saksbehandling.opprettetTid
         }
     }
