@@ -17,7 +17,7 @@ import java.time.temporal.ChronoUnit
 internal class BrevmottakerVedtaksbrevRepositoryTest : IntegrationTest() {
 
     @Autowired
-    private lateinit var brevmottakerRepository: BrevmottakerRepository
+    private lateinit var brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository
 
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
@@ -33,9 +33,9 @@ internal class BrevmottakerVedtaksbrevRepositoryTest : IntegrationTest() {
             bestillingId = null,
         )
 
-        brevmottakerRepository.insert(brevmottaker)
+        brevmottakerVedtaksbrevRepository.insert(brevmottaker)
 
-        val journalpostResultatFraDb = brevmottakerRepository.findByIdOrNull(brevmottaker.id)
+        val journalpostResultatFraDb = brevmottakerVedtaksbrevRepository.findByIdOrNull(brevmottaker.id)
 
         assertThat(journalpostResultatFraDb).isNotNull
         assertThat(journalpostResultatFraDb).usingRecursiveComparison().ignoringFields("opprettetTid", "sporbar.endret.endretTid")
@@ -75,9 +75,9 @@ internal class BrevmottakerVedtaksbrevRepositoryTest : IntegrationTest() {
             bestillingId = null,
         )
 
-        brevmottakerRepository.insert(brevmottaker1)
+        brevmottakerVedtaksbrevRepository.insert(brevmottaker1)
         assertThatThrownBy {
-            brevmottakerRepository.insert(brevmottaker2)
+            brevmottakerVedtaksbrevRepository.insert(brevmottaker2)
         }.hasCauseInstanceOf(DuplicateKeyException::class.java)
     }
 
@@ -103,11 +103,11 @@ internal class BrevmottakerVedtaksbrevRepositoryTest : IntegrationTest() {
             bestillingId = null,
         )
 
-        brevmottakerRepository.insert(brevmottaker)
-        brevmottakerRepository.insert(brevmottakerAnnenMottaker)
+        brevmottakerVedtaksbrevRepository.insert(brevmottaker)
+        brevmottakerVedtaksbrevRepository.insert(brevmottakerAnnenMottaker)
 
-        val hentetResultat = brevmottakerRepository.findByIdOrNull(brevmottaker.id)
-        val hentetResultatAnnenMottaker = brevmottakerRepository.findByIdOrNull(brevmottakerAnnenMottaker.id)
+        val hentetResultat = brevmottakerVedtaksbrevRepository.findByIdOrNull(brevmottaker.id)
+        val hentetResultatAnnenMottaker = brevmottakerVedtaksbrevRepository.findByIdOrNull(brevmottakerAnnenMottaker.id)
 
         assertThat(hentetResultat).isNotNull
         assertThat(hentetResultat).usingRecursiveComparison().ignoringFields("opprettetTid", "sporbar.endret.endretTid")

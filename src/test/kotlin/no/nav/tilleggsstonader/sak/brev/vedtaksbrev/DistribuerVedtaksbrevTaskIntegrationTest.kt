@@ -4,8 +4,8 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.familie.prosessering.internal.TaskWorker
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientConfig
@@ -23,13 +23,13 @@ class DistribuerVedtaksbrevTaskIntegrationTest : IntegrationTest() {
     private lateinit var taskService: TaskService
 
     @Autowired
-    private lateinit var brevmottakerRepository: BrevmottakerRepository
+    private lateinit var brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository
 
     @Test
     fun `bestillingId skal lagres selv om task feiler`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
         val task = taskService.save(Task(type = DistribuerVedtaksbrevTask.TYPE, behandling.id.toString()))
-        brevmottakerRepository.insertAll(
+        brevmottakerVedtaksbrevRepository.insertAll(
             listOf(
                 BrevmottakerVedtaksbrev(
                     behandlingId = behandling.id,
@@ -51,7 +51,7 @@ class DistribuerVedtaksbrevTaskIntegrationTest : IntegrationTest() {
 
         utførTask(task)
 
-        val resultat = brevmottakerRepository.findByBehandlingId(behandling.id)
+        val resultat = brevmottakerVedtaksbrevRepository.findByBehandlingId(behandling.id)
 
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0].bestillingId).isEqualTo("bestillingId")

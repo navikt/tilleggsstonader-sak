@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class BrevmottakereService(
-    private val brevmottakereRepository: BrevmottakerRepository,
+    private val brevmottakereRepository: BrevmottakerVedtaksbrevRepository,
     private val behandlingService: BehandlingService,
 ) {
 

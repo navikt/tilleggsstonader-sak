@@ -6,8 +6,8 @@ import io.mockk.verify
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -20,14 +20,14 @@ import org.junit.jupiter.api.Test
 
 class DistribuerVedtaksbrevTaskTest {
 
-    val brevmottakerRepository = mockk<BrevmottakerRepository>()
+    val brevmottakerVedtaksbrevRepository = mockk<BrevmottakerVedtaksbrevRepository>()
     val journalpostClient = mockk<JournalpostClient>()
     val stegService = mockk<StegService>()
     val brevSteg = mockk<BrevSteg>()
 
     val saksbehandling = saksbehandling()
     val distribuerVedtaksbrevTask =
-        DistribuerVedtaksbrevTask(brevmottakerRepository, journalpostClient, stegService, brevSteg, TransactionHandler())
+        DistribuerVedtaksbrevTask(brevmottakerVedtaksbrevRepository, journalpostClient, stegService, brevSteg, TransactionHandler())
     val task = Task(type = DistribuerVedtaksbrevTask.TYPE, payload = saksbehandling.id.toString())
 
     @BeforeEach
@@ -42,7 +42,7 @@ class DistribuerVedtaksbrevTaskTest {
 
         val journalpostIdA = "journalpostIdA"
         val journalpostIdB = "journalpostIdB"
-        every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
+        every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
             BrevmottakerVedtaksbrev(
                 behandlingId = saksbehandling.id,
                 mottaker = mottakerPerson(ident = saksbehandling.ident),
@@ -60,7 +60,7 @@ class DistribuerVedtaksbrevTaskTest {
             ),
         )
 
-        every { brevmottakerRepository.update(capture(brevmottakereSlots)) } returns mockk()
+        every { brevmottakerVedtaksbrevRepository.update(capture(brevmottakereSlots)) } returns mockk()
 
         val bestillingIdA = "bestillingId1"
         val bestillingIdB = "bestillingId2"
@@ -88,7 +88,7 @@ class DistribuerVedtaksbrevTaskTest {
 
         val journalpostIdA = "journalpostIdA"
         val journalpostIdB = "journalpostIdB"
-        every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
+        every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
             BrevmottakerVedtaksbrev(
                 behandlingId = saksbehandling.id,
                 mottaker = mottakerPerson(ident = saksbehandling.ident),
@@ -106,7 +106,7 @@ class DistribuerVedtaksbrevTaskTest {
             ),
         )
 
-        every { brevmottakerRepository.update(capture(brevmottakereSlots)) } returns mockk()
+        every { brevmottakerVedtaksbrevRepository.update(capture(brevmottakereSlots)) } returns mockk()
 
         val bestillingIdA = "bestillingId1"
         every { journalpostClient.distribuerJournalpost(capture(distribuerrequestSlots), null) } returns bestillingIdA

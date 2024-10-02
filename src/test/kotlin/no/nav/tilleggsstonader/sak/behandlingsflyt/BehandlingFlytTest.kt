@@ -18,8 +18,8 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -68,7 +68,7 @@ class BehandlingFlytTest(
     @Autowired val vilkårController: VilkårController,
     @Autowired val tilsynBarnVedtakController: TilsynBarnVedtakController,
     @Autowired val brevController: BrevController,
-    @Autowired val brevmottakereRepository: BrevmottakerRepository,
+    @Autowired val brevmottakereRepository: BrevmottakerVedtaksbrevRepository,
     @Autowired val totrinnskontrollController: TotrinnskontrollController,
     @Autowired val totrinnskontrollService: TotrinnskontrollService,
     @Autowired val taskService: TaskService,

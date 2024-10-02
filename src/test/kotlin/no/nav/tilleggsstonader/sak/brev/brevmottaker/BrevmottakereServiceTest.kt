@@ -20,7 +20,7 @@ import java.util.*
 
 class BrevmottakereServiceTest {
 
-    private val brevmottakereRepository = mockk<BrevmottakerRepository>()
+    private val brevmottakereRepository = mockk<BrevmottakerVedtaksbrevRepository>()
     private val behandlingService = mockk<BehandlingService>()
 
     private val brevmottakereService: BrevmottakereService =

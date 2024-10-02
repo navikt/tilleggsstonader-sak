@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.Mottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -42,7 +42,7 @@ class JournalførVedtaksbrevTask(
     private val brevService: BrevService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val journalpostService: JournalpostService,
-    private val brevmottakerRepository: BrevmottakerRepository,
+    private val brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository,
     private val transactionHandler: TransactionHandler,
 ) : AsyncTaskStep {
 
@@ -54,7 +54,7 @@ class JournalførVedtaksbrevTask(
 
         val vedtaksbrev = brevService.hentBesluttetBrev(saksbehandling.id)
 
-        val ikkeJournalførteBrevmottakere = brevmottakerRepository.findByBehandlingId(behandlingId).filter { it.journalpostId == null }
+        val ikkeJournalførteBrevmottakere = brevmottakerVedtaksbrevRepository.findByBehandlingId(behandlingId).filter { it.journalpostId == null }
         ikkeJournalførteBrevmottakere.forEach { brevmottaker ->
             transactionHandler.runInNewTransaction {
                 journalførVedtaksbrevForEnMottaker(vedtaksbrev, saksbehandling, brevmottaker)
@@ -94,7 +94,7 @@ class JournalførVedtaksbrevTask(
                 "Journalposten ble ikke ferdigstilt og kan derfor ikke distribueres"
             }
 
-            brevmottakerRepository.update(brevmottaker.copy(journalpostId = response.journalpostId))
+            brevmottakerVedtaksbrevRepository.update(brevmottaker.copy(journalpostId = response.journalpostId))
         } catch (e: HttpClientErrorException) {
             if (e.statusCode == HttpStatus.CONFLICT) {
                 logger.warn("Konflikt ved arkivering av dokument. Vedtaksbrevet har sannsynligvis allerede blitt arkivert for behandlingId=${saksbehandling.id} med eksternReferanseId=$eksternReferanseId")
