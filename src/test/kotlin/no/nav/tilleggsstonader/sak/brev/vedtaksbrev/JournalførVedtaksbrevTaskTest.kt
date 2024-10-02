@@ -11,10 +11,12 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.Mottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
@@ -58,11 +60,9 @@ class JournalførVedtaksbrevTaskTest {
         every { arbeidsfordelingService.hentNavEnhet(any()) } returns ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY
         every { brevmottakerRepository.insert(any()) } returns mockk()
         every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
-            Brevmottaker(
+            BrevmottakerVedtaksbrev(
                 behandlingId = saksbehandling.id,
-                mottakerRolle = MottakerRolle.BRUKER,
-                mottakerType = MottakerType.PERSON,
-                ident = saksbehandling.ident,
+                mottaker = mottakerPerson(ident = saksbehandling.ident),
             ),
         )
         every { behandlingService.hentSaksbehandling(saksbehandling.id) } returns saksbehandling
@@ -100,7 +100,7 @@ class JournalførVedtaksbrevTaskTest {
 
     @Test
     internal fun `dersom det finnes én brevmottaker skal opprettJournalpost og brevmottakerRepository-update kjøres én gang hver`() {
-        val brevmottaker = mockk<Brevmottaker>()
+        val brevmottaker = mockk<BrevmottakerVedtaksbrev>()
         every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse("journalpostID", true, null)
         every { brevmottakerRepository.update(any()) } returns brevmottaker
 
@@ -112,18 +112,20 @@ class JournalførVedtaksbrevTaskTest {
 
     @Test
     internal fun `dersom det finnes to brevmottakere skal opprettJournalpost og brevmottakerRepository-update kjøres to ganger hver`() {
-        val brevmottakerDuplikat = Brevmottaker(
+        val brevmottakerDuplikat = BrevmottakerVedtaksbrev(
             behandlingId = saksbehandling.id,
-            mottakerRolle = MottakerRolle.BRUKER,
-            mottakerType = MottakerType.PERSON,
-            ident = saksbehandling.ident,
+            mottaker = Mottaker(
+                mottakerRolle = MottakerRolle.BRUKER,
+                mottakerType = MottakerType.PERSON,
+                ident = saksbehandling.ident,
+            ),
         )
         every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
             brevmottakerDuplikat,
             brevmottakerDuplikat,
         )
 
-        val brevmottaker = mockk<Brevmottaker>()
+        val brevmottaker = mockk<BrevmottakerVedtaksbrev>()
         every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse(
             journalpostId = "mocket JournalpostId",
             ferdigstilt = true,
@@ -139,7 +141,7 @@ class JournalførVedtaksbrevTaskTest {
 
     @Test
     internal fun `kaster feil hvis dokument fra arkiv ikke er ferdigstilt`() {
-        val brevmottaker = mockk<Brevmottaker>()
+        val brevmottaker = mockk<BrevmottakerVedtaksbrev>()
         every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse(
             journalpostId = "mocket JournalpostId",
             ferdigstilt = false,
@@ -158,19 +160,15 @@ class JournalførVedtaksbrevTaskTest {
 
         val brevmottakerUUID = UUID.randomUUID()
 
-        val brevmottakerUtenJournalføringsId = Brevmottaker(
+        val brevmottakerUtenJournalføringsId = BrevmottakerVedtaksbrev(
             id = brevmottakerUUID,
             behandlingId = saksbehandling.id,
-            mottakerRolle = MottakerRolle.BRUKER,
-            mottakerType = MottakerType.PERSON,
-            ident = saksbehandling.ident,
+            mottaker = mottakerPerson(ident = saksbehandling.ident),
         )
 
-        val brevmottakerMedJournalføringsId = Brevmottaker(
+        val brevmottakerMedJournalføringsId = BrevmottakerVedtaksbrev(
             behandlingId = saksbehandling.id,
-            mottakerRolle = MottakerRolle.BRUKER,
-            mottakerType = MottakerType.PERSON,
-            ident = saksbehandling.ident,
+            mottaker = mottakerPerson(ident = saksbehandling.ident),
             journalpostId = "eksisterende journalpost id",
         )
         every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
@@ -178,7 +176,7 @@ class JournalførVedtaksbrevTaskTest {
             brevmottakerMedJournalføringsId,
         )
 
-        val brevmottaker = mockk<Brevmottaker>()
+        val brevmottaker = mockk<BrevmottakerVedtaksbrev>()
         every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse(
             journalpostId = "mocket JournalpostId",
             ferdigstilt = true,

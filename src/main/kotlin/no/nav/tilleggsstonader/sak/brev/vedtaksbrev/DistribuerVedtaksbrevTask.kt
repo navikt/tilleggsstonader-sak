@@ -7,8 +7,8 @@ import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokdist.Distribusjonstype
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
@@ -52,7 +52,7 @@ class DistribuerVedtaksbrevTask(
         stegService.håndterSteg(behandlingId, brevSteg)
     }
 
-    private fun distribuerTilBrevmottaker(it: Brevmottaker) = journalpostClient.distribuerJournalpost(
+    private fun distribuerTilBrevmottaker(it: BrevmottakerVedtaksbrev) = journalpostClient.distribuerJournalpost(
         DistribuerJournalpostRequest(
             journalpostId = it.journalpostId
                 ?: error("Ugyldig tilstand. Mangler journalpostId for brev som skal distribueres"),
@@ -62,7 +62,7 @@ class DistribuerVedtaksbrevTask(
         ),
     )
 
-    private fun validerHarBrevmottakere(brevmottakere: List<Brevmottaker>) {
+    private fun validerHarBrevmottakere(brevmottakere: List<BrevmottakerVedtaksbrev>) {
         feilHvis(brevmottakere.isEmpty()) {
             "Ingen brevmottakere"
         }

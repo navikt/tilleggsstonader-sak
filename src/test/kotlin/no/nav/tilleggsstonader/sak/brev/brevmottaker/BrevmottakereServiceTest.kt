@@ -171,14 +171,17 @@ class BrevmottakereServiceTest {
         val ident = "123123123"
         val mottakernavn = "Test Testersen"
 
-        val brevmottakerTestObjekt = Brevmottaker(
+        val brevmottakerTestObjekt = BrevmottakerVedtaksbrev(
             id = id,
             behandlingId = behandlingID,
-            mottakerRolle = no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle.BRUKER,
-            mottakerType = MottakerType.PERSON,
-            ident = ident,
-            mottakerNavn = mottakernavn,
-            organisasjonsNavn = null,
+            mottaker = Mottaker(
+                mottakerRolle = no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle.BRUKER,
+                mottakerType = MottakerType.PERSON,
+                ident = ident,
+                mottakerNavn = mottakernavn,
+                organisasjonsNavn = null,
+            ),
+
             journalpostId = null,
             bestillingId = null,
             sporbar = Sporbar(),

@@ -5,23 +5,30 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
+import org.springframework.data.relational.core.mapping.Table
 import java.util.UUID
 
-data class Brevmottaker(
+@Table("brevmottaker")
+data class BrevmottakerVedtaksbrev(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: BehandlingId,
-    val mottakerRolle: MottakerRolle,
-    val mottakerType: MottakerType,
-    val ident: String,
-    val mottakerNavn: String? = null,
-    val organisasjonsNavn: String? = null,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    val mottaker: Mottaker,
 
     val journalpostId: String? = null,
     val bestillingId: String? = null,
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
+)
+
+data class Mottaker(
+    val mottakerRolle: MottakerRolle,
+    val mottakerType: MottakerType,
+    val ident: String,
+    val mottakerNavn: String? = null,
+    val organisasjonsNavn: String? = null,
 ) {
     init {
         feilHvis(mottakerType == MottakerType.ORGANISASJON && mottakerNavn.isNullOrBlank()) {

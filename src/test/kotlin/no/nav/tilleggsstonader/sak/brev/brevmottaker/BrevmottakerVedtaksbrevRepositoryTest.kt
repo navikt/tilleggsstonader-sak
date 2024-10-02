@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions
@@ -13,7 +14,7 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.repository.findByIdOrNull
 import java.time.temporal.ChronoUnit
 
-internal class BrevmottakerRepositoryTest : IntegrationTest() {
+internal class BrevmottakerVedtaksbrevRepositoryTest : IntegrationTest() {
 
     @Autowired
     private lateinit var brevmottakerRepository: BrevmottakerRepository
@@ -25,11 +26,9 @@ internal class BrevmottakerRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        val brevmottaker = Brevmottaker(
+        val brevmottaker = BrevmottakerVedtaksbrev(
             behandlingId = behandling.id,
-            ident = fagsak.hentAktivIdent(),
-            mottakerRolle = MottakerRolle.BRUKER,
-            mottakerType = MottakerType.PERSON,
+            mottaker = mottakerPerson(ident = fagsak.hentAktivIdent()),
             journalpostId = "123",
             bestillingId = null,
         )
@@ -56,20 +55,22 @@ internal class BrevmottakerRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        val brevmottaker1 = Brevmottaker(
+        val brevmottaker1 = BrevmottakerVedtaksbrev(
             behandlingId = behandling.id,
-            ident = "ident",
-            mottakerType = MottakerType.PERSON,
-            mottakerRolle = MottakerRolle.VERGE,
+            mottaker = mottakerPerson(
+                ident = "ident",
+                mottakerRolle = MottakerRolle.VERGE,
+            ),
             journalpostId = "123",
             bestillingId = null,
         )
 
-        val brevmottaker2 = Brevmottaker(
+        val brevmottaker2 = BrevmottakerVedtaksbrev(
             behandlingId = behandling.id,
-            ident = "ident",
-            mottakerType = MottakerType.PERSON,
-            mottakerRolle = MottakerRolle.VERGE,
+            mottaker = mottakerPerson(
+                ident = "ident",
+                mottakerRolle = MottakerRolle.VERGE,
+            ),
             journalpostId = "123",
             bestillingId = null,
         )
@@ -85,20 +86,19 @@ internal class BrevmottakerRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        val brevmottaker = Brevmottaker(
+        val brevmottaker = BrevmottakerVedtaksbrev(
             behandlingId = behandling.id,
-            ident = fagsak.hentAktivIdent(),
-            mottakerType = MottakerType.PERSON,
-            mottakerRolle = MottakerRolle.BRUKER,
+            mottaker = mottakerPerson(ident = fagsak.hentAktivIdent()),
             journalpostId = "123",
             bestillingId = null,
         )
 
-        val brevmottakerAnnenMottaker = Brevmottaker(
+        val brevmottakerAnnenMottaker = BrevmottakerVedtaksbrev(
             behandlingId = behandling.id,
-            ident = "ident",
-            mottakerType = MottakerType.PERSON,
-            mottakerRolle = MottakerRolle.VERGE,
+            mottaker = mottakerPerson(
+                ident = "ident",
+                mottakerRolle = MottakerRolle.VERGE,
+            ),
             journalpostId = "123",
             bestillingId = null,
         )

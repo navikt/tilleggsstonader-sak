@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
-import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerOrganisasjonDto
-import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerPersonDto
+import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerDto
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerUtil.validerUnikeBrevmottakere
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -23,24 +22,8 @@ class BrevmottakereService(
         validerUnikeBrevmottakere(brevmottakereDto)
         fjernMottakereIkkeIDto(brevmottakereDto, behandlingId)
 
-        brevmottakereDto.organisasjoner.forEach {
-            val brevmottaker = brevmottakereRepository.findByIdOrNull(it.id)
-
-            if (brevmottaker != null) {
-                oppdaterOrganisasjonsmottaker(brevmottaker, it)
-            } else {
-                lagreNyOrganisasjonsmottaker(behandlingId, it)
-            }
-        }
-        brevmottakereDto.personer.forEach {
-            val brevmottaker = brevmottakereRepository.findByIdOrNull(it.id)
-
-            if (brevmottaker != null) {
-                oppdaterBrevmottakerPerson(brevmottaker, it)
-            } else {
-                lagreNyBrevmottakerPerson(behandlingId, it)
-            }
-        }
+        brevmottakereDto.organisasjoner.forEach { lagreEllerOppdater(behandlingId, it) }
+        brevmottakereDto.personer.forEach { lagreEllerOppdater(behandlingId, it) }
     }
 
     @Transactional
@@ -50,7 +33,7 @@ class BrevmottakereService(
         } else {
             validerBehandlingKanRedigeres(behandlingId)
 
-            val brevmottaker = opprettBrevmottaker(behandlingId)
+            val brevmottaker = opprettInitiellBrevmottakerForBehandling(behandlingId)
 
             listOf(brevmottaker).tilBrevmottakereDto()
         }
@@ -72,65 +55,45 @@ class BrevmottakereService(
         }
     }
 
-    private fun lagreNyBrevmottakerPerson(behandlingId: BehandlingId, it: BrevmottakerPersonDto) {
+    private fun lagreEllerOppdater(
+        behandlingId: BehandlingId,
+        dto: BrevmottakerDto,
+    ) {
+        val brevmottaker = brevmottakereRepository.findByIdOrNull(dto.id)
+
+        if (brevmottaker != null) {
+            oppdaterBrevmottaker(brevmottaker, dto)
+        } else {
+            opprettNyBrevmottaker(behandlingId, dto)
+        }
+    }
+
+    private fun opprettNyBrevmottaker(behandlingId: BehandlingId, it: BrevmottakerDto) {
         brevmottakereRepository.insert(
-            Brevmottaker(
+            BrevmottakerVedtaksbrev(
                 id = it.id,
                 behandlingId = behandlingId,
-                mottakerRolle = MottakerRolle.valueOf(it.mottakerRolle.name),
-                mottakerType = MottakerType.PERSON,
-                ident = it.personIdent,
-                mottakerNavn = it.navn,
+                mottaker = it.tilMottaker(),
             ),
         )
     }
 
-    private fun lagreNyOrganisasjonsmottaker(behandlingId: BehandlingId, it: BrevmottakerOrganisasjonDto) {
-        brevmottakereRepository.insert(
-            Brevmottaker(
-                id = it.id,
-                behandlingId = behandlingId,
-                mottakerRolle = MottakerRolle.FULLMAKT,
-                mottakerType = MottakerType.ORGANISASJON,
-                ident = it.organisasjonsnummer,
-                mottakerNavn = it.navnHosOrganisasjon,
-                organisasjonsNavn = it.organisasjonsnavn,
-            ),
-        )
+    private fun oppdaterBrevmottaker(brevmottaker: BrevmottakerVedtaksbrev, it: BrevmottakerDto) {
+        brevmottakereRepository.update(brevmottaker.copy(mottaker = it.tilMottaker()))
     }
 
-    private fun oppdaterBrevmottakerPerson(brevmottaker: Brevmottaker, it: BrevmottakerPersonDto) {
-        brevmottakereRepository.update(
-            brevmottaker.copy(
-                mottakerRolle = MottakerRolle.valueOf(it.mottakerRolle.name),
-                mottakerType = MottakerType.PERSON,
-                ident = it.personIdent,
-                mottakerNavn = it.navn,
-            ),
-        )
-    }
-
-    private fun oppdaterOrganisasjonsmottaker(brevmottaker: Brevmottaker, it: BrevmottakerOrganisasjonDto) {
-        brevmottakereRepository.update(
-            brevmottaker.copy(
-                ident = it.organisasjonsnummer,
-                mottakerNavn = it.navnHosOrganisasjon,
-                organisasjonsNavn = it.organisasjonsnavn,
-            ),
-        )
-    }
-
-    private fun opprettBrevmottaker(behandlingId: BehandlingId): Brevmottaker {
+    private fun opprettInitiellBrevmottakerForBehandling(behandlingId: BehandlingId): BrevmottakerVedtaksbrev {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
-        val brevmottaker = Brevmottaker(
+        val brevmottaker = BrevmottakerVedtaksbrev(
             behandlingId = behandlingId,
-            ident = saksbehandling.ident,
-            mottakerRolle = MottakerRolle.BRUKER,
-            mottakerType = MottakerType.PERSON,
+            mottaker = Mottaker(
+                ident = saksbehandling.ident,
+                mottakerRolle = MottakerRolle.BRUKER,
+                mottakerType = MottakerType.PERSON,
+            ),
         )
-        brevmottakereRepository.insert(brevmottaker)
-        return brevmottaker
+        return brevmottakereRepository.insert(brevmottaker)
     }
 
     private fun validerAntallBrevmottakere(brevmottakere: BrevmottakereDto) {
