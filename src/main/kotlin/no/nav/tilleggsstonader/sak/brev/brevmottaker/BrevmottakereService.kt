@@ -74,7 +74,7 @@ class BrevmottakereService(
 
     private fun lagreNyBrevmottakerPerson(behandlingId: BehandlingId, it: BrevmottakerPersonDto) {
         brevmottakereRepository.insert(
-            Brevmottaker(
+            BrevmottakerVedtaksbrev(
                 id = it.id,
                 behandlingId = behandlingId,
                 mottakerRolle = MottakerRolle.valueOf(it.mottakerRolle.name),
@@ -87,7 +87,7 @@ class BrevmottakereService(
 
     private fun lagreNyOrganisasjonsmottaker(behandlingId: BehandlingId, it: BrevmottakerOrganisasjonDto) {
         brevmottakereRepository.insert(
-            Brevmottaker(
+            BrevmottakerVedtaksbrev(
                 id = it.id,
                 behandlingId = behandlingId,
                 mottakerRolle = MottakerRolle.FULLMAKT,
@@ -99,7 +99,7 @@ class BrevmottakereService(
         )
     }
 
-    private fun oppdaterBrevmottakerPerson(brevmottaker: Brevmottaker, it: BrevmottakerPersonDto) {
+    private fun oppdaterBrevmottakerPerson(brevmottaker: BrevmottakerVedtaksbrev, it: BrevmottakerPersonDto) {
         brevmottakereRepository.update(
             brevmottaker.copy(
                 mottakerRolle = MottakerRolle.valueOf(it.mottakerRolle.name),
@@ -110,7 +110,7 @@ class BrevmottakereService(
         )
     }
 
-    private fun oppdaterOrganisasjonsmottaker(brevmottaker: Brevmottaker, it: BrevmottakerOrganisasjonDto) {
+    private fun oppdaterOrganisasjonsmottaker(brevmottaker: BrevmottakerVedtaksbrev, it: BrevmottakerOrganisasjonDto) {
         brevmottakereRepository.update(
             brevmottaker.copy(
                 ident = it.organisasjonsnummer,
@@ -120,10 +120,10 @@ class BrevmottakereService(
         )
     }
 
-    private fun opprettBrevmottaker(behandlingId: BehandlingId): Brevmottaker {
+    private fun opprettBrevmottaker(behandlingId: BehandlingId): BrevmottakerVedtaksbrev {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
-        val brevmottaker = Brevmottaker(
+        val brevmottaker = BrevmottakerVedtaksbrev(
             behandlingId = behandlingId,
             ident = saksbehandling.ident,
             mottakerRolle = MottakerRolle.BRUKER,

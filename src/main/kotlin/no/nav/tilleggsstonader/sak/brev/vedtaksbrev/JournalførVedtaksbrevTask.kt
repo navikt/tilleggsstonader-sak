@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -64,7 +64,7 @@ class JournalførVedtaksbrevTask(
     private fun journalførVedtaksbrevForEnMottaker(
         vedtaksbrev: Vedtaksbrev,
         saksbehandling: Saksbehandling,
-        brevmottaker: Brevmottaker,
+        brevmottaker: BrevmottakerVedtaksbrev,
     ) {
         val dokument = Dokument(
             dokument = vedtaksbrev.beslutterPdf?.bytes ?: error("Mangler beslutterpdf"),
@@ -103,7 +103,7 @@ class JournalførVedtaksbrevTask(
         }
     }
 
-    private fun lagAvsenderMottaker(brevmottaker: Brevmottaker) = AvsenderMottaker(
+    private fun lagAvsenderMottaker(brevmottaker: BrevmottakerVedtaksbrev) = AvsenderMottaker(
         id = brevmottaker.ident,
         idType = when (brevmottaker.mottakerType) {
             MottakerType.PERSON -> BrukerIdType.FNR

@@ -4,8 +4,8 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.familie.prosessering.internal.TaskWorker
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientConfig
@@ -31,7 +31,7 @@ class DistribuerVedtaksbrevTaskIntegrationTest : IntegrationTest() {
         val task = taskService.save(Task(type = DistribuerVedtaksbrevTask.TYPE, behandling.id.toString()))
         brevmottakerRepository.insertAll(
             listOf(
-                Brevmottaker(
+                BrevmottakerVedtaksbrev(
                     behandlingId = behandling.id,
                     mottakerRolle = MottakerRolle.BRUKER,
                     mottakerType = MottakerType.PERSON,
@@ -39,7 +39,7 @@ class DistribuerVedtaksbrevTaskIntegrationTest : IntegrationTest() {
                     journalpostId = "journalpostIdA",
                     bestillingId = null,
                 ),
-                Brevmottaker(
+                BrevmottakerVedtaksbrev(
                     behandlingId = behandling.id,
                     mottakerRolle = MottakerRolle.VERGE,
                     mottakerType = MottakerType.PERSON,

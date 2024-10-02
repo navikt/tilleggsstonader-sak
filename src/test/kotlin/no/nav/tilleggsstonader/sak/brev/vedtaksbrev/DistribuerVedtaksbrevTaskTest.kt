@@ -6,8 +6,8 @@ import io.mockk.verify
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -38,12 +38,12 @@ class DistribuerVedtaksbrevTaskTest {
     @Test
     fun `skal distribuere brev til alle brevmottakere`() {
         val distribuerrequestSlots = mutableListOf<DistribuerJournalpostRequest>()
-        val brevmottakereSlots = mutableListOf<Brevmottaker>()
+        val brevmottakereSlots = mutableListOf<BrevmottakerVedtaksbrev>()
 
         val journalpostIdA = "journalpostIdA"
         val journalpostIdB = "journalpostIdB"
         every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
-            Brevmottaker(
+            BrevmottakerVedtaksbrev(
                 behandlingId = saksbehandling.id,
                 mottakerRolle = MottakerRolle.BRUKER,
                 mottakerType = MottakerType.PERSON,
@@ -51,7 +51,7 @@ class DistribuerVedtaksbrevTaskTest {
                 journalpostId = journalpostIdA,
                 bestillingId = null,
             ),
-            Brevmottaker(
+            BrevmottakerVedtaksbrev(
                 behandlingId = saksbehandling.id,
                 mottakerRolle = MottakerRolle.VERGE,
                 mottakerType = MottakerType.PERSON,
@@ -85,12 +85,12 @@ class DistribuerVedtaksbrevTaskTest {
     @Test
     fun `skal ikke distribuere brev som allerede er distribuert`() {
         val distribuerrequestSlots = mutableListOf<DistribuerJournalpostRequest>()
-        val brevmottakereSlots = mutableListOf<Brevmottaker>()
+        val brevmottakereSlots = mutableListOf<BrevmottakerVedtaksbrev>()
 
         val journalpostIdA = "journalpostIdA"
         val journalpostIdB = "journalpostIdB"
         every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
-            Brevmottaker(
+            BrevmottakerVedtaksbrev(
                 behandlingId = saksbehandling.id,
                 mottakerRolle = MottakerRolle.BRUKER,
                 mottakerType = MottakerType.PERSON,
@@ -98,7 +98,7 @@ class DistribuerVedtaksbrevTaskTest {
                 journalpostId = journalpostIdA,
                 bestillingId = "alleredeDistribuertId",
             ),
-            Brevmottaker(
+            BrevmottakerVedtaksbrev(
                 behandlingId = saksbehandling.id,
                 mottakerRolle = MottakerRolle.VERGE,
                 mottakerType = MottakerType.PERSON,

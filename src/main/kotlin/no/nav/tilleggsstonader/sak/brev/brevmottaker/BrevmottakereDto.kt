@@ -9,10 +9,10 @@ data class BrevmottakereDto(
     val organisasjoner: List<BrevmottakerOrganisasjonDto>,
 )
 
-fun Brevmottaker.tilPersonDto(): BrevmottakerPersonDto =
+fun BrevmottakerVedtaksbrev.tilPersonDto(): BrevmottakerPersonDto =
     BrevmottakerPersonDto(id = id, personIdent = ident, mottakerRolle = MottakerRolle.valueOf(mottakerRolle.name), navn = mottakerNavn)
 
-fun Brevmottaker.tilOrganisasjonDto(): BrevmottakerOrganisasjonDto =
+fun BrevmottakerVedtaksbrev.tilOrganisasjonDto(): BrevmottakerOrganisasjonDto =
     BrevmottakerOrganisasjonDto(
         id = id,
         organisasjonsnummer = ident,
@@ -21,7 +21,7 @@ fun Brevmottaker.tilOrganisasjonDto(): BrevmottakerOrganisasjonDto =
 
     )
 
-fun List<Brevmottaker>.tilBrevmottakereDto(): BrevmottakereDto =
+fun List<BrevmottakerVedtaksbrev>.tilBrevmottakereDto(): BrevmottakereDto =
     BrevmottakereDto(
         personer = this.mapNotNull { if (it.mottakerType == MottakerType.PERSON) it.tilPersonDto() else null },
         organisasjoner = this.mapNotNull { if (it.mottakerType == MottakerType.ORGANISASJON) it.tilOrganisasjonDto() else null },

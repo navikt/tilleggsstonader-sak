@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVent
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretBrev
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretFrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.Vedtaksbrev
@@ -145,7 +145,7 @@ abstract class IntegrationTest {
             OppgaveDomain::class,
             Totrinnskontroll::class,
             Vedtaksbrev::class,
-            Brevmottaker::class,
+            BrevmottakerVedtaksbrev::class,
             MellomlagretFrittståendeBrev::class,
             MellomlagretBrev::class,
             VilkårperioderGrunnlagDomain::class,

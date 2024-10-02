@@ -5,9 +5,11 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
+import org.springframework.data.relational.core.mapping.Table
 import java.util.UUID
 
-data class Brevmottaker(
+@Table("brevmottakere")
+data class BrevmottakerVedtaksbrev(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: BehandlingId,

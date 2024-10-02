@@ -13,7 +13,7 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.repository.findByIdOrNull
 import java.time.temporal.ChronoUnit
 
-internal class BrevmottakerRepositoryTest : IntegrationTest() {
+internal class BrevmottakerVedtaksbrevRepositoryTest : IntegrationTest() {
 
     @Autowired
     private lateinit var brevmottakerRepository: BrevmottakerRepository
@@ -25,7 +25,7 @@ internal class BrevmottakerRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        val brevmottaker = Brevmottaker(
+        val brevmottaker = BrevmottakerVedtaksbrev(
             behandlingId = behandling.id,
             ident = fagsak.hentAktivIdent(),
             mottakerRolle = MottakerRolle.BRUKER,
@@ -56,7 +56,7 @@ internal class BrevmottakerRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        val brevmottaker1 = Brevmottaker(
+        val brevmottaker1 = BrevmottakerVedtaksbrev(
             behandlingId = behandling.id,
             ident = "ident",
             mottakerType = MottakerType.PERSON,
@@ -65,7 +65,7 @@ internal class BrevmottakerRepositoryTest : IntegrationTest() {
             bestillingId = null,
         )
 
-        val brevmottaker2 = Brevmottaker(
+        val brevmottaker2 = BrevmottakerVedtaksbrev(
             behandlingId = behandling.id,
             ident = "ident",
             mottakerType = MottakerType.PERSON,
@@ -85,7 +85,7 @@ internal class BrevmottakerRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        val brevmottaker = Brevmottaker(
+        val brevmottaker = BrevmottakerVedtaksbrev(
             behandlingId = behandling.id,
             ident = fagsak.hentAktivIdent(),
             mottakerType = MottakerType.PERSON,
@@ -94,7 +94,7 @@ internal class BrevmottakerRepositoryTest : IntegrationTest() {
             bestillingId = null,
         )
 
-        val brevmottakerAnnenMottaker = Brevmottaker(
+        val brevmottakerAnnenMottaker = BrevmottakerVedtaksbrev(
             behandlingId = behandling.id,
             ident = "ident",
             mottakerType = MottakerType.PERSON,
