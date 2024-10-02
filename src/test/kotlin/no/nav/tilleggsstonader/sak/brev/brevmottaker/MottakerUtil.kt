@@ -1,5 +1,9 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.Mottaker
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerType
+
 object MottakerUtil {
 
     fun mottakerPerson(ident: String, mottakerRolle: MottakerRolle = MottakerRolle.BRUKER) = Mottaker(

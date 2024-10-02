@@ -3,6 +3,10 @@ package no.nav.tilleggsstonader.sak.brev.brevmottaker
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerDto
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerOrganisasjonDto
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerPersonDto
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.Mottaker
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerType
 import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.MottakerRolle as MottakerRolleKontrakt
 

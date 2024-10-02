@@ -8,6 +8,9 @@ import no.nav.tilleggsstonader.kontrakter.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.Mottaker
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
@@ -175,7 +178,7 @@ class BrevmottakereServiceTest {
             id = id,
             behandlingId = behandlingID,
             mottaker = Mottaker(
-                mottakerRolle = no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle.BRUKER,
+                mottakerRolle = no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle.BRUKER,
                 mottakerType = MottakerType.PERSON,
                 ident = ident,
                 mottakerNavn = mottakernavn,
