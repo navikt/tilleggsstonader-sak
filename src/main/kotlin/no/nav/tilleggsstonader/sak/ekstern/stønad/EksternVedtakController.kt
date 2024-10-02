@@ -26,7 +26,11 @@ class EksternVedtakController(
     @PostMapping("tilsyn-barn")
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun hentVedtaksinformasjon(@RequestBody request: IdentRequest): VedtaksinformasjonTilsynBarnDto {
-        feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.BIDRAG_GRUNNLAG), HttpStatus.UNAUTHORIZED) {
+        val gyldigKlient = SikkerhetContext.kallKommerFra(
+            EksternApplikasjon.BIDRAG_GRUNNLAG,
+            EksternApplikasjon.BIDRAG_GRUNNLAG_FEATURE,
+        )
+        feilHvisIkke(gyldigKlient, HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
         return eksternVedtakService.hentVedtaksinformasjonTilsynBarn(request)

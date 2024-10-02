@@ -83,6 +83,8 @@ spec:
         - application: tilleggsstonader-klage
         - application: bidrag-grunnlag
           namespace: bidrag
+        - application: bidrag-grunnlag-feature
+          namespace: bidrag
         - application: arena
           namespace: teamarenanais
           cluster: dev-fss
