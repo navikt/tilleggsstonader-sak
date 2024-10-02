@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
+import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerDto
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerOrganisasjonDto
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerPersonDto
 import java.util.UUID
@@ -36,7 +37,12 @@ fun List<BrevmottakerVedtaksbrev>.tilBrevmottakereDto(): BrevmottakereDto =
         },
     )
 
-fun BrevmottakerOrganisasjonDto.tilMottaker() = Mottaker(
+fun BrevmottakerDto.tilMottaker() = when (this) {
+    is BrevmottakerOrganisasjonDto -> tilMottaker()
+    is BrevmottakerPersonDto -> tilMottaker()
+}
+
+private fun BrevmottakerOrganisasjonDto.tilMottaker() = Mottaker(
     mottakerRolle = MottakerRolle.FULLMAKT,
     mottakerType = MottakerType.ORGANISASJON,
     ident = organisasjonsnummer,
@@ -44,7 +50,7 @@ fun BrevmottakerOrganisasjonDto.tilMottaker() = Mottaker(
     organisasjonsNavn = organisasjonsnavn,
 )
 
-fun BrevmottakerPersonDto.tilMottaker() = Mottaker(
+private fun BrevmottakerPersonDto.tilMottaker() = Mottaker(
     mottakerRolle = MottakerRolle.valueOf(mottakerRolle.name),
     mottakerType = MottakerType.PERSON,
     ident = personIdent,
