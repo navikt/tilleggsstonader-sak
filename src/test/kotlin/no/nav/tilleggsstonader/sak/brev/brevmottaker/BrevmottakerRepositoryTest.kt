@@ -1,11 +1,7 @@
-package no.nav.tilleggsstonader.sak.brev
+package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions
