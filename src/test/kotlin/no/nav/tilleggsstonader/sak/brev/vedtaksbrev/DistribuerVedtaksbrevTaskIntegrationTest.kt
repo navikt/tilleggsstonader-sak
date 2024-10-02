@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientConfig
 import no.nav.tilleggsstonader.sak.util.behandling
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
@@ -33,17 +33,16 @@ class DistribuerVedtaksbrevTaskIntegrationTest : IntegrationTest() {
             listOf(
                 BrevmottakerVedtaksbrev(
                     behandlingId = behandling.id,
-                    mottakerRolle = MottakerRolle.BRUKER,
-                    mottakerType = MottakerType.PERSON,
-                    ident = "ident",
+                    mottaker = mottakerPerson(ident = "ident"),
                     journalpostId = "journalpostIdA",
                     bestillingId = null,
                 ),
                 BrevmottakerVedtaksbrev(
                     behandlingId = behandling.id,
-                    mottakerRolle = MottakerRolle.VERGE,
-                    mottakerType = MottakerType.PERSON,
-                    ident = "identAnnenMottaker",
+                    mottaker = mottakerPerson(
+                        mottakerRolle = MottakerRolle.VERGE,
+                        ident = "identAnnenMottaker",
+                    ),
                     journalpostId = JournalpostClientConfig.journalpostIdMedFeil,
                     bestillingId = null,
                 ),

@@ -13,8 +13,10 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingTestUtil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.Mottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
@@ -60,9 +62,7 @@ class JournalførVedtaksbrevTaskTest {
         every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
             BrevmottakerVedtaksbrev(
                 behandlingId = saksbehandling.id,
-                mottakerRolle = MottakerRolle.BRUKER,
-                mottakerType = MottakerType.PERSON,
-                ident = saksbehandling.ident,
+                mottaker = mottakerPerson(ident = saksbehandling.ident),
             ),
         )
         every { behandlingService.hentSaksbehandling(saksbehandling.id) } returns saksbehandling
@@ -114,9 +114,11 @@ class JournalførVedtaksbrevTaskTest {
     internal fun `dersom det finnes to brevmottakere skal opprettJournalpost og brevmottakerRepository-update kjøres to ganger hver`() {
         val brevmottakerDuplikat = BrevmottakerVedtaksbrev(
             behandlingId = saksbehandling.id,
-            mottakerRolle = MottakerRolle.BRUKER,
-            mottakerType = MottakerType.PERSON,
-            ident = saksbehandling.ident,
+            mottaker = Mottaker(
+                mottakerRolle = MottakerRolle.BRUKER,
+                mottakerType = MottakerType.PERSON,
+                ident = saksbehandling.ident,
+            ),
         )
         every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
             brevmottakerDuplikat,
@@ -161,16 +163,12 @@ class JournalførVedtaksbrevTaskTest {
         val brevmottakerUtenJournalføringsId = BrevmottakerVedtaksbrev(
             id = brevmottakerUUID,
             behandlingId = saksbehandling.id,
-            mottakerRolle = MottakerRolle.BRUKER,
-            mottakerType = MottakerType.PERSON,
-            ident = saksbehandling.ident,
+            mottaker = mottakerPerson(ident = saksbehandling.ident),
         )
 
         val brevmottakerMedJournalføringsId = BrevmottakerVedtaksbrev(
             behandlingId = saksbehandling.id,
-            mottakerRolle = MottakerRolle.BRUKER,
-            mottakerType = MottakerType.PERSON,
-            ident = saksbehandling.ident,
+            mottaker = mottakerPerson(ident = saksbehandling.ident),
             journalpostId = "eksisterende journalpost id",
         )
         every { brevmottakerRepository.findByBehandlingId(saksbehandling.id) } returns listOf(

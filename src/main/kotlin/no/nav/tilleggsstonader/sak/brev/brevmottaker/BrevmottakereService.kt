@@ -77,10 +77,7 @@ class BrevmottakereService(
             BrevmottakerVedtaksbrev(
                 id = it.id,
                 behandlingId = behandlingId,
-                mottakerRolle = MottakerRolle.valueOf(it.mottakerRolle.name),
-                mottakerType = MottakerType.PERSON,
-                ident = it.personIdent,
-                mottakerNavn = it.navn,
+                mottaker = it.tilMottaker(),
             ),
         )
     }
@@ -90,34 +87,17 @@ class BrevmottakereService(
             BrevmottakerVedtaksbrev(
                 id = it.id,
                 behandlingId = behandlingId,
-                mottakerRolle = MottakerRolle.FULLMAKT,
-                mottakerType = MottakerType.ORGANISASJON,
-                ident = it.organisasjonsnummer,
-                mottakerNavn = it.navnHosOrganisasjon,
-                organisasjonsNavn = it.organisasjonsnavn,
+                mottaker = it.tilMottaker(),
             ),
         )
     }
 
     private fun oppdaterBrevmottakerPerson(brevmottaker: BrevmottakerVedtaksbrev, it: BrevmottakerPersonDto) {
-        brevmottakereRepository.update(
-            brevmottaker.copy(
-                mottakerRolle = MottakerRolle.valueOf(it.mottakerRolle.name),
-                mottakerType = MottakerType.PERSON,
-                ident = it.personIdent,
-                mottakerNavn = it.navn,
-            ),
-        )
+        brevmottakereRepository.update(brevmottaker.copy(mottaker = it.tilMottaker()))
     }
 
     private fun oppdaterOrganisasjonsmottaker(brevmottaker: BrevmottakerVedtaksbrev, it: BrevmottakerOrganisasjonDto) {
-        brevmottakereRepository.update(
-            brevmottaker.copy(
-                ident = it.organisasjonsnummer,
-                mottakerNavn = it.navnHosOrganisasjon,
-                organisasjonsNavn = it.organisasjonsnavn,
-            ),
-        )
+        brevmottakereRepository.update(brevmottaker.copy(mottaker = it.tilMottaker()))
     }
 
     private fun opprettBrevmottaker(behandlingId: BehandlingId): BrevmottakerVedtaksbrev {
@@ -125,9 +105,11 @@ class BrevmottakereService(
 
         val brevmottaker = BrevmottakerVedtaksbrev(
             behandlingId = behandlingId,
-            ident = saksbehandling.ident,
-            mottakerRolle = MottakerRolle.BRUKER,
-            mottakerType = MottakerType.PERSON,
+            mottaker = Mottaker(
+                ident = saksbehandling.ident,
+                mottakerRolle = MottakerRolle.BRUKER,
+                mottakerType = MottakerType.PERSON,
+            ),
         )
         brevmottakereRepository.insert(brevmottaker)
         return brevmottaker

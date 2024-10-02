@@ -20,8 +20,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
@@ -387,9 +386,7 @@ class BehandlingFlytTest(
         brevmottakereRepository.insert(
             BrevmottakerVedtaksbrev(
                 behandlingId = behandlingId,
-                mottakerRolle = MottakerRolle.BRUKER,
-                mottakerType = MottakerType.PERSON,
-                ident = "ident",
+                mottaker = mottakerPerson(ident = "ident"),
             ),
         )
     }

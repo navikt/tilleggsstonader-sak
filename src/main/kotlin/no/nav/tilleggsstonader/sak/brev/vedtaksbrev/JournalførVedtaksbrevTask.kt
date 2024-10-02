@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.Mottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -83,7 +84,7 @@ class JournalførVedtaksbrevTask(
             journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(saksbehandling.ident)?.enhetNr
                 ?: error("Fant ikke arbeidsfordelingsenhet"),
             eksternReferanseId = eksternReferanseId,
-            avsenderMottaker = lagAvsenderMottaker(brevmottaker),
+            avsenderMottaker = lagAvsenderMottaker(brevmottaker.mottaker),
         )
 
         try {
@@ -103,7 +104,7 @@ class JournalførVedtaksbrevTask(
         }
     }
 
-    private fun lagAvsenderMottaker(brevmottaker: BrevmottakerVedtaksbrev) = AvsenderMottaker(
+    private fun lagAvsenderMottaker(brevmottaker: Mottaker) = AvsenderMottaker(
         id = brevmottaker.ident,
         idType = when (brevmottaker.mottakerType) {
             MottakerType.PERSON -> BrukerIdType.FNR
