@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.brev
+package no.nav.tilleggsstonader.sak.brev.vedtaksbrev
 
 import io.mockk.every
 import io.mockk.mockk

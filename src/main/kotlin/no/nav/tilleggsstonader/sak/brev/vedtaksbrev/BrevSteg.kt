@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.brev
+package no.nav.tilleggsstonader.sak.brev.vedtaksbrev
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
