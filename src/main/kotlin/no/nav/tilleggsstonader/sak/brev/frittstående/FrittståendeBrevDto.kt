@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.brev
+package no.nav.tilleggsstonader.sak.brev.frittstående
 
 data class FrittståendeBrevDto(
     val pdf: ByteArray,

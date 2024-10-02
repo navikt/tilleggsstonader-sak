@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.brev
+package no.nav.tilleggsstonader.sak.brev.frittstående
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
