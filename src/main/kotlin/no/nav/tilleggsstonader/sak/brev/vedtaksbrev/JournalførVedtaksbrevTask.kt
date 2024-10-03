@@ -6,19 +6,16 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
-import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokument
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokumenttype
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Filtype
-import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.tilAvsenderMottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.Mottaker
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
@@ -85,7 +82,7 @@ class JournalførVedtaksbrevTask(
             journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(saksbehandling.ident)?.enhetNr
                 ?: error("Fant ikke arbeidsfordelingsenhet"),
             eksternReferanseId = eksternReferanseId,
-            avsenderMottaker = lagAvsenderMottaker(brevmottaker.mottaker),
+            avsenderMottaker = brevmottaker.mottaker.tilAvsenderMottaker(),
         )
 
         val arkiverDokumentResponse = opprettJournalpost(arkviverDokumentRequest, saksbehandling, eksternReferanseId)
@@ -111,18 +108,6 @@ class JournalførVedtaksbrevTask(
         }
         return response
     }
-
-    private fun lagAvsenderMottaker(brevmottaker: Mottaker) = AvsenderMottaker(
-        id = brevmottaker.ident,
-        idType = when (brevmottaker.mottakerType) {
-            MottakerType.PERSON -> BrukerIdType.FNR
-            MottakerType.ORGANISASJON -> BrukerIdType.ORGNR
-        },
-        navn = when (brevmottaker.mottakerType) {
-            MottakerType.PERSON -> null
-            MottakerType.ORGANISASJON -> brevmottaker.mottakerNavn
-        },
-    )
 
     private fun utledBrevtittel(saksbehandling: Saksbehandling) = when (saksbehandling.stønadstype) {
         Stønadstype.BARNETILSYN -> "Vedtak om stønad til tilsyn barn" // TODO
