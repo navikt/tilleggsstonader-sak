@@ -54,7 +54,7 @@ class JournalførFrittståendeBrevTask(
 
         val journalpostId = arkiverDokumentResponse.journalpostId
         brevmottakereFrittståendeBrevService.oppdaterBrevmottaker(brevmottaker.copy(journalpostId = journalpostId))
-        taskService.save(DistribuerFrittståendeBrevTask.opprettTask(brev.fagsakId, journalpostId))
+        taskService.save(DistribuerFrittståendeBrevTask.opprettTask(brev.fagsakId, journalpostId, mottakerId))
     }
 
     private fun journalførBrev(
