@@ -62,7 +62,7 @@ class DistribuerFrittståendeBrevTask(
                 },
             )
 
-        const val TYPE = "frittståendeBrev"
+        const val TYPE = "distribuerFrittståendeBrev"
     }
 }
 
