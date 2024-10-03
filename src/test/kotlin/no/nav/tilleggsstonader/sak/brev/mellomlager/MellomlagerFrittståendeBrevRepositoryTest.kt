@@ -39,7 +39,6 @@ internal class MellomlagerFrittståendeBrevRepositoryTest : IntegrationTest() {
     @Test
     internal fun `skal finne igjen mellomlagret brev fra fagsakId og saksbehandlers ident`() {
         val saksbehandlerIdent = "12345678910"
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
 
         testWithBrukerContext(saksbehandlerIdent) {
             val mellomlagretBrev = repository.insert(mellomlagretFrittståendeBrev())
