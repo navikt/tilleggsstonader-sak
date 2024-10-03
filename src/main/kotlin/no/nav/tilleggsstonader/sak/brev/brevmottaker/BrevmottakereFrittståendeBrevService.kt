@@ -40,7 +40,7 @@ class BrevmottakereFrittståendeBrevService(
     fun hentEllerOpprettBrevmottakere(fagsakId: FagsakId): List<BrevmottakerFrittståendeBrev> {
         val saksbehandlerIdent = SikkerhetContext.hentSaksbehandler()
 
-        if (!brevmottakereRepository.existsByFagsakIdAndSporbarOpprettetAvIdIsNull(fagsakId, saksbehandlerIdent)) {
+        if (!brevmottakereRepository.existsByFagsakIdAndSporbarOpprettetAvAndBrevIdIsNull(fagsakId, saksbehandlerIdent)) {
             opprettInitiellBrevmottakerForFagsak(fagsakId)
         }
 
@@ -50,8 +50,8 @@ class BrevmottakereFrittståendeBrevService(
     fun hentBrevmottakere(id: UUID) = brevmottakereRepository.findByIdOrThrow(id)
 
     @Transactional
-    fun oppdaterBrevmottakere(brevmottaker: BrevmottakerFrittståendeBrev) {
-        brevmottakereRepository.update(brevmottaker)
+    fun oppdaterBrevmottaker(brevmottaker: BrevmottakerFrittståendeBrev): BrevmottakerFrittståendeBrev {
+        return brevmottakereRepository.update(brevmottaker)
     }
 
     private fun fjernMottakereIkkeIDto(

@@ -44,6 +44,6 @@ internal class FrittståendeBrevServiceTest : IntegrationTest() {
 
         val res = taskService.findAll().single()
 
-        Assertions.assertThat(res.type).isEqualTo(DistribuerFrittståendeBrevTask.TYPE)
+        Assertions.assertThat(res.type).isEqualTo(JournalførFrittståendeBrevTask.TYPE)
     }
 }
