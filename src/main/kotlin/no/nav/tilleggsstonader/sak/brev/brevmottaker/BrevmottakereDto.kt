@@ -31,15 +31,23 @@ fun Mottaker.tilOrganisasjonDto(id: UUID): BrevmottakerOrganisasjonDto =
         organisasjonsnavn = organisasjonsNavn.orEmpty(),
     )
 
-fun List<BrevmottakerVedtaksbrev>.tilBrevmottakereDto(): BrevmottakereDto =
+fun List<BrevmottakerVedtaksbrev>.tilBrevmottakereDto(): BrevmottakereDto = this
+    .map { it.id to it.mottaker }
+    .let(::brevmottakereDto)
+
+private fun brevmottakereDto(mottakere: List<Pair<UUID, Mottaker>>) =
     BrevmottakereDto(
-        personer = this.mapNotNull {
-            if (it.mottaker.mottakerType == MottakerType.PERSON) it.mottaker.tilPersonDto(it.id) else null
-        },
-        organisasjoner = this.mapNotNull {
-            if (it.mottaker.mottakerType == MottakerType.ORGANISASJON) it.mottaker.tilOrganisasjonDto(it.id) else null
-        },
+        personer = mottakere.mapPersoner(),
+        organisasjoner = mottakere.mapOrganisasjoner(),
     )
+
+private fun List<Pair<UUID, Mottaker>>.mapOrganisasjoner() = mapNotNull { (id, mottaker) ->
+    if (mottaker.mottakerType == MottakerType.ORGANISASJON) mottaker.tilOrganisasjonDto(id) else null
+}
+
+private fun List<Pair<UUID, Mottaker>>.mapPersoner() = mapNotNull { (id, mottaker) ->
+    if (mottaker.mottakerType == MottakerType.PERSON) mottaker.tilPersonDto(id) else null
+}
 
 fun BrevmottakerDto.tilMottaker() = when (this) {
     is BrevmottakerOrganisasjonDto -> tilMottaker()
