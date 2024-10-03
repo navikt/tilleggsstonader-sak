@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.mottakerPerson
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.frittstående.FrittståendeBrev
