@@ -69,7 +69,7 @@ class JournalførFrittståendeBrevTask(
             tittel = brev.tittel,
         )
 
-        val eksternReferanseId = brevmottaker.id.toString()
+        val eksternReferanseId = "frittstående-brev-${brevmottaker.id}"
         val arkiverDokumentRequest = ArkiverDokumentRequest(
             fnr = fagsak.hentAktivIdent(),
             forsøkFerdigstill = true,
