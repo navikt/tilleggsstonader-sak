@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.brev.brevmottaker
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerDto
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerOrganisasjonDto
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerPersonDto
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.Mottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle
@@ -40,6 +41,11 @@ private fun brevmottakereDto(mottakere: List<Pair<UUID, Mottaker>>) =
         personer = mottakere.mapPersoner(),
         organisasjoner = mottakere.mapOrganisasjoner(),
     )
+
+@JvmName("tilFrittståendeBrevmottakereDto")
+fun List<BrevmottakerFrittståendeBrev>.tilBrevmottakereDto(): BrevmottakereDto = this
+    .map { it.id to it.mottaker }
+    .let(::brevmottakereDto)
 
 private fun List<Pair<UUID, Mottaker>>.mapOrganisasjoner() = mapNotNull { (id, mottaker) ->
     if (mottaker.mottakerType == MottakerType.ORGANISASJON) mottaker.tilOrganisasjonDto(id) else null
