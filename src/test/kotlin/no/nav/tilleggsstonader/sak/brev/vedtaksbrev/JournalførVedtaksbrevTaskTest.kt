@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
+import no.nav.tilleggsstonader.sak.journalføring.ArkiverDokumentConflictException
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksbrev
@@ -26,8 +27,6 @@ import org.assertj.core.api.Assertions
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.http.HttpStatusCode
-import org.springframework.web.client.HttpClientErrorException
 import java.net.http.HttpTimeoutException
 import java.util.*
 
@@ -81,9 +80,17 @@ class JournalførVedtaksbrevTaskTest {
 
     @Test
     internal fun `skal ikke feile dersom kall mot dokarkiv feiler, og feilen er 409 Conflict`() {
-        every { journalpostService.opprettJournalpost(any()) } throws HttpClientErrorException(HttpStatusCode.valueOf(409))
+        val exception = ArkiverDokumentConflictException(ArkiverDokumentResponse("journalpostID", true, null))
+        val brevmottaker = BrevmottakerVedtaksbrev(
+            behandlingId = saksbehandling.id,
+            mottaker = mottakerPerson(ident = saksbehandling.ident),
+        )
+        every { brevmottakerVedtaksbrevRepository.update(any()) } returns brevmottaker
+        every { journalpostService.opprettJournalpost(any()) } throws exception
 
         journalførVedtaksbrevTask.doTask(task)
+
+        verify { brevmottakerVedtaksbrevRepository.update(any()) }
     }
 
     @Test
@@ -101,7 +108,11 @@ class JournalførVedtaksbrevTaskTest {
     @Test
     internal fun `dersom det finnes én brevmottaker skal opprettJournalpost og brevmottakerRepository-update kjøres én gang hver`() {
         val brevmottaker = mockk<BrevmottakerVedtaksbrev>()
-        every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse("journalpostID", true, null)
+        every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse(
+            "journalpostID",
+            true,
+            null,
+        )
         every { brevmottakerVedtaksbrevRepository.update(any()) } returns brevmottaker
 
         journalførVedtaksbrevTask.doTask(task)
@@ -151,7 +162,8 @@ class JournalførVedtaksbrevTaskTest {
 
         Assertions.assertThatThrownBy {
             journalførVedtaksbrevTask.doTask(task)
-        }.isInstanceOf(Feil::class.java).message().isEqualTo("Journalposten ble ikke ferdigstilt og kan derfor ikke distribueres")
+        }.isInstanceOf(Feil::class.java).message()
+            .isEqualTo("Journalposten ble ikke ferdigstilt og kan derfor ikke distribueres")
     }
 
     @Test

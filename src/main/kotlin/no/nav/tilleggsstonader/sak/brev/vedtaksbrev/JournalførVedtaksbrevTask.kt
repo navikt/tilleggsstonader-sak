@@ -5,6 +5,7 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokument
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokumenttype
@@ -21,11 +22,10 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
+import no.nav.tilleggsstonader.sak.journalføring.ArkiverDokumentConflictException
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.client.HttpClientErrorException
 import java.util.Properties
 
 @Service
@@ -54,7 +54,8 @@ class JournalførVedtaksbrevTask(
 
         val vedtaksbrev = brevService.hentBesluttetBrev(saksbehandling.id)
 
-        val ikkeJournalførteBrevmottakere = brevmottakerVedtaksbrevRepository.findByBehandlingId(behandlingId).filter { it.journalpostId == null }
+        val ikkeJournalførteBrevmottakere =
+            brevmottakerVedtaksbrevRepository.findByBehandlingId(behandlingId).filter { it.journalpostId == null }
         ikkeJournalførteBrevmottakere.forEach { brevmottaker ->
             transactionHandler.runInNewTransaction {
                 journalførVedtaksbrevForEnMottaker(vedtaksbrev, saksbehandling, brevmottaker)
@@ -87,21 +88,28 @@ class JournalførVedtaksbrevTask(
             avsenderMottaker = lagAvsenderMottaker(brevmottaker.mottaker),
         )
 
-        try {
-            val response = journalpostService.opprettJournalpost(arkviverDokumentRequest)
+        val arkiverDokumentResponse = opprettJournalpost(arkviverDokumentRequest, saksbehandling, eksternReferanseId)
+        brevmottakerVedtaksbrevRepository.update(brevmottaker.copy(journalpostId = arkiverDokumentResponse.journalpostId))
+    }
 
-            feilHvisIkke(response.ferdigstilt) {
-                "Journalposten ble ikke ferdigstilt og kan derfor ikke distribueres"
-            }
-
-            brevmottakerVedtaksbrevRepository.update(brevmottaker.copy(journalpostId = response.journalpostId))
-        } catch (e: HttpClientErrorException) {
-            if (e.statusCode == HttpStatus.CONFLICT) {
-                logger.warn("Konflikt ved arkivering av dokument. Vedtaksbrevet har sannsynligvis allerede blitt arkivert for behandlingId=${saksbehandling.id} med eksternReferanseId=$eksternReferanseId")
-            } else {
-                throw e
-            }
+    private fun opprettJournalpost(
+        arkviverDokumentRequest: ArkiverDokumentRequest,
+        saksbehandling: Saksbehandling,
+        eksternReferanseId: String,
+    ): ArkiverDokumentResponse {
+        val response = try {
+            journalpostService.opprettJournalpost(arkviverDokumentRequest)
+        } catch (e: ArkiverDokumentConflictException) {
+            logger.warn(
+                "Konflikt ved arkivering av dokument. Vedtaksbrevet har sannsynligvis allerede blitt arkivert" +
+                    " for behandlingId=${saksbehandling.id} med eksternReferanseId=$eksternReferanseId",
+            )
+            e.response
         }
+        feilHvisIkke(response.ferdigstilt) {
+            "Journalposten ble ikke ferdigstilt og kan derfor ikke distribueres"
+        }
+        return response
     }
 
     private fun lagAvsenderMottaker(brevmottaker: Mottaker) = AvsenderMottaker(
