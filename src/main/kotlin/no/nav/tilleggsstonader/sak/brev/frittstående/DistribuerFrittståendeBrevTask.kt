@@ -27,9 +27,6 @@ class DistribuerFrittståendeBrevTask(
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, DistribuerFrittståendeBrevPayload::class.java)
 
-        // TODO finn brevmottakere
-        // val brevmottakere = brevmottakerRepository.findByBehandlingId(behandlingId)
-
         journalpostClient.distribuerJournalpost(
             DistribuerJournalpostRequest(
                 journalpostId = payload.journalpostId,
