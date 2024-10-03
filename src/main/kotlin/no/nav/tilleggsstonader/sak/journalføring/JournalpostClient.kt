@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.log.NavHttpHeaders
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -140,11 +141,12 @@ class JournalpostClient(
         mapOf("journalfoerendeEnhet" to journalførendeEnhet)
 
     private fun håndterConflict(e: HttpClientErrorException.Conflict) {
-        var response: ArkiverDokumentResponse? = null
-        try {
-            response = objectMapper.readValue<ArkiverDokumentResponse>(e.responseBodyAsString)
+        val response: ArkiverDokumentResponse = try {
+            objectMapper.readValue<ArkiverDokumentResponse>(e.responseBodyAsString)
         } catch (ex: Exception) {
-            throw ex
+            secureLogger.warn("Klarte ikke å parsea body=${e.responseBodyAsString}", ex)
+            // kaster opprinnelig exception
+            throw e
         }
         throw ArkiverDokumentConflictException(response)
     }
