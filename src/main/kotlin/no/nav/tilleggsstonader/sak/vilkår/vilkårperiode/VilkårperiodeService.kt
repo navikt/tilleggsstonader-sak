@@ -45,6 +45,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnl
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDomenetype
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -185,6 +186,7 @@ class VilkårperiodeService(
                         type = it.type,
                         fom = it.fom,
                         tom = it.tom,
+                        ensligForsørgerStønadstype = it.ensligForsørgerStønadstype?.tilDomenetype(),
                     )
                 },
         )
