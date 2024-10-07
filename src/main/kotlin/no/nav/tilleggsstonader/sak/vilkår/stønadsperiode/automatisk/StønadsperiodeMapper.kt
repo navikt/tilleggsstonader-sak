@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import java.time.LocalDate
 
-
 /**
  * Util for å mappe, slå sammen og mappe til stønadsperioder
  */

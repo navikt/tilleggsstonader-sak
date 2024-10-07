@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.automatisk.StønadsperiodeMapper.tilStønadsperioder
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.automatisk.StønadsperiodeSortering.viktigereEnn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -23,7 +22,11 @@ import java.time.LocalDate
  */
 object UtledStønadsperiode {
 
-    fun utled(behandlingId: BehandlingId, vilkårperioder: List<Vilkårperiode>, medAntallAktivitetsdager: Boolean): List<Stønadsperiode> {
+    fun utled(
+        behandlingId: BehandlingId,
+        vilkårperioder: List<Vilkårperiode>,
+        medAntallAktivitetsdager: Boolean,
+    ): List<Stønadsperiode> {
         return vilkårperioder
             .snittMålgruppeAktivitet(medAntallAktivitetsdager)
             .tilStønadsperioder(behandlingId)
@@ -35,22 +38,17 @@ object UtledStønadsperiode {
         val tilAktiviteter = perioder.tilAktiviteter(medAntallAktivitetsdager)
         val aktiviteter = tilAktiviteter.slåSammenType()
 
-        return mutableMapOf<LocalDate, Pair<MålgruppeAktivitet, Int>>().apply {
+        return mutableMapOf<LocalDate, MålgruppeAktivitet>().apply {
             val map = this
             val finnDatoerForSnitt = finnDatoerForSnitt(målgrupper, aktiviteter)
             finnDatoerForSnitt
-                .forEach { (typer, datoer) ->
-                    datoer.forEach { dato ->
-                        val key = dato.first
-                        val prevValue = map[key]
-                        val pair = Pair(typer, dato.second)
-                        if (pair.viktigereEnn(prevValue)) {
-                            map[key] = pair
-                        }
+                .forEach { (målgruppeAktivitet, dato) ->
+                    val prevValue = map[dato]
+                    if (prevValue == null || prevValue < målgruppeAktivitet) {
+                        map[dato] = målgruppeAktivitet
                     }
                 }
         }
-            .mapValues { it.value.first }
     }
 
     /**
@@ -59,18 +57,18 @@ object UtledStønadsperiode {
     private fun finnDatoerForSnitt(
         målgrupper: Map<MålgruppeType, List<VilkårperiodeHolder>>,
         aktiviteter: Map<AktivitetType, List<AktivitetHolder>>,
-    ): List<Pair<MålgruppeAktivitet, List<Pair<LocalDate, Int>>>> {
+    ): List<Pair<MålgruppeAktivitet, LocalDate>> {
         return målgrupper.keys
             .flatMap { typeMålgruppe ->
                 målgrupper
                     .verdier(typeMålgruppe)
                     .flatMap { målgruppe ->
                         typeMålgruppe.gyldigeAktiviter.map { typeAktivitet ->
-                            val snittDatoer = aktiviteter.verdier(typeAktivitet).snittDatoer(målgruppe)
-                            MålgruppeAktivitet(typeMålgruppe, typeAktivitet) to snittDatoer
+                            aktiviteter.verdier(typeAktivitet).snittDatoer(målgruppe)
+                                .map { MålgruppeAktivitet(typeMålgruppe, typeAktivitet, it.second) to it.first }
                         }
                     }
-            }
+            }.flatten()
     }
 
     /**
