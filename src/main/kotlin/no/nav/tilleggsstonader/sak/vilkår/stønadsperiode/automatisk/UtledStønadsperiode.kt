@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import java.time.LocalDate
 
 /**
@@ -28,14 +27,14 @@ object UtledStønadsperiode {
         medAntallAktivitetsdager: Boolean,
     ): List<Stønadsperiode> {
         return vilkårperioder
+            .filtrerOppfylte()
             .snittMålgruppeAktivitet(medAntallAktivitetsdager)
             .tilStønadsperioder(behandlingId)
     }
 
     private fun List<Vilkårperiode>.snittMålgruppeAktivitet(medAntallAktivitetsdager: Boolean): Map<LocalDate, MålgruppeAktivitet> {
-        val perioder = this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
-        val målgrupper = tilPeriodeVilkår<MålgruppeType>(perioder)
-        val tilAktiviteter = perioder.tilAktiviteter(medAntallAktivitetsdager)
+        val målgrupper = this.tilMålgrupper()
+        val tilAktiviteter = this.tilAktiviteter(medAntallAktivitetsdager)
         val aktiviteter = tilAktiviteter.slåSammenType()
 
         return mutableMapOf<LocalDate, MålgruppeAktivitet>().apply {
@@ -50,6 +49,9 @@ object UtledStønadsperiode {
                 }
         }
     }
+
+    private fun List<Vilkårperiode>.filtrerOppfylte() =
+        this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
 
     /**
      * Itererer over sorterte målgrupper for å finne snitt med sorterte aktiviteter
@@ -80,32 +82,24 @@ object UtledStønadsperiode {
         }
         .flatten()
 
-    private inline fun <reified T : VilkårperiodeType> tilPeriodeVilkår(perioder: List<Vilkårperiode>): Map<T, List<VilkårperiodeHolder>> =
-        perioder.mapNotNull { periode ->
-            if (periode.type is T) {
-                periode.type to VilkårperiodeHolder(periode.fom, periode.tom)
-            } else {
-                null
-            }
-        }.groupBy({ it.first }, { it.second })
+    private fun List<Vilkårperiode>.tilMålgrupper(): Map<MålgruppeType, List<VilkårperiodeHolder>> = this
+        .filter { it.type is MålgruppeType }
+        .map { it.type as MålgruppeType to VilkårperiodeHolder(it.fom, it.tom) }
+        .groupBy({ it.first }, { it.second })
 
     private fun List<Vilkårperiode>.tilAktiviteter(medAntallAktivitetsdager: Boolean): List<AktivitetHolder> = this
-        .mapNotNull { periode ->
-            if (periode.type is AktivitetType) {
-                val aktivitetsdager = if (medAntallAktivitetsdager) {
+        .filter { it.type is AktivitetType }
+        .map { periode ->
+            AktivitetHolder(
+                fom = periode.fom,
+                tom = periode.tom,
+                type = periode.type as AktivitetType,
+                aktivitetsdager = if (medAntallAktivitetsdager) {
                     periode.aktivitetsdager ?: 5
                 } else {
                     5
-                }
-                AktivitetHolder(
-                    fom = periode.fom,
-                    tom = periode.tom,
-                    type = periode.type,
-                    aktivitetsdager = aktivitetsdager,
-                )
-            } else {
-                null
-            }
+                },
+            )
         }
 
     /**
