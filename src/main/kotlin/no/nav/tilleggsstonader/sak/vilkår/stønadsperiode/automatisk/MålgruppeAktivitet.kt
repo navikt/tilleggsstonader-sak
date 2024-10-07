@@ -26,6 +26,6 @@ data class MålgruppeAktivitet(
             return aktivitetCompareTo
         }
         // like
-        error("Burde ikke finnes 2 like, då de burde ha blitt merget")
+        return 0
     }
 }
