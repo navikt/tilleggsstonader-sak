@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 class BrevmottakereController(
     private val tilgangService: TilgangService,
     private val brevmottakereService: BrevmottakereService,
+    private val brevmottakereFrittståendeBrevService: BrevmottakereFrittståendeBrevService,
 ) {
 
     @GetMapping("/{behandlingId}")
@@ -35,5 +37,23 @@ class BrevmottakereController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         return brevmottakereService.lagreBrevmottakere(behandlingId, brevmottakere)
+    }
+
+    @GetMapping("fagsak/{fagsakId}")
+    fun hentBrevmottakere(@PathVariable fagsakId: FagsakId): BrevmottakereDto {
+        tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
+
+        return brevmottakereFrittståendeBrevService.hentEllerOpprettBrevmottakere(fagsakId).tilBrevmottakereDto()
+    }
+
+    @PostMapping("fagsak/{fagsakId}")
+    fun velgBrevmottakere(
+        @PathVariable fagsakId: FagsakId,
+        @RequestBody brevmottakere: BrevmottakereDto,
+    ) {
+        tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.UPDATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return brevmottakereFrittståendeBrevService.lagreBrevmottakere(fagsakId, brevmottakere)
     }
 }
