@@ -23,16 +23,16 @@ import java.time.LocalDate
  */
 object UtledStønadsperiode {
 
-    fun utled(behandlingId: BehandlingId, vilkårperioder: List<Vilkårperiode>): List<Stønadsperiode> {
+    fun utled(behandlingId: BehandlingId, vilkårperioder: List<Vilkårperiode>, medAntallAktivitetsdager: Boolean): List<Stønadsperiode> {
         return vilkårperioder
-            .snittMålgruppeAktivitet()
+            .snittMålgruppeAktivitet(medAntallAktivitetsdager)
             .tilStønadsperioder(behandlingId)
     }
 
-    private fun List<Vilkårperiode>.snittMålgruppeAktivitet(): Map<LocalDate, MålgruppeAktivitet> {
+    private fun List<Vilkårperiode>.snittMålgruppeAktivitet(medAntallAktivitetsdager: Boolean): Map<LocalDate, MålgruppeAktivitet> {
         val perioder = this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
         val målgrupper = tilPeriodeVilkår<MålgruppeType>(perioder)
-        val tilAktiviteter = perioder.tilAktiviteter()
+        val tilAktiviteter = perioder.tilAktiviteter(medAntallAktivitetsdager)
         val aktiviteter = tilAktiviteter.slåSammenType()
 
         return mutableMapOf<LocalDate, Pair<MålgruppeAktivitet, Int>>().apply {
@@ -91,14 +91,19 @@ object UtledStønadsperiode {
             }
         }.groupBy({ it.first }, { it.second })
 
-    private fun List<Vilkårperiode>.tilAktiviteter(): List<AktivitetHolder> = this
+    private fun List<Vilkårperiode>.tilAktiviteter(medAntallAktivitetsdager: Boolean): List<AktivitetHolder> = this
         .mapNotNull { periode ->
             if (periode.type is AktivitetType) {
+                val aktivitetsdager = if (medAntallAktivitetsdager) {
+                    periode.aktivitetsdager ?: 5
+                } else {
+                    5
+                }
                 AktivitetHolder(
                     fom = periode.fom,
                     tom = periode.tom,
                     type = periode.type,
-                    aktivitetsdager = periode.aktivitetsdager ?: 5,
+                    aktivitetsdager = aktivitetsdager,
                 )
             } else {
                 null

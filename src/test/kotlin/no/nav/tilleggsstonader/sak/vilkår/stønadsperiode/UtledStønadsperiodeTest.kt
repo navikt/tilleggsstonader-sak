@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
@@ -38,6 +37,7 @@ class UtledStønadsperiodeTest {
                 aktivitet(fom = dato(2023, 3, 20), tom = dato(2023, 4, 25), type = TILTAK),
                 aktivitet(fom = dato(2023, 3, 21), tom = dato(2023, 4, 30), type = UTDANNING),
             ),
+            medAntallAktivitetsdager = true,
         ).forenklet()
         assertThat(stønadsperioder).containsExactly(
             Periode(dato(2023, 3, 15), dato(2023, 3, 19), AAP, UTDANNING),
@@ -65,6 +65,7 @@ class UtledStønadsperiodeTest {
                 aktivitet(fom = dato(2023, 2, 1), tom = dato(2023, 3, 17), type = UTDANNING),
                 aktivitet(fom = dato(2023, 3, 19), tom = dato(2023, 3, 20), type = UTDANNING),
             ),
+            medAntallAktivitetsdager = true,
         ).forenklet()
         assertThat(stønadsperioder).containsExactly(
             Periode(dato(2023, 2, 10), dato(2023, 3, 14), OVERGANGSSTØNAD, UTDANNING),
@@ -78,6 +79,24 @@ class UtledStønadsperiodeTest {
     inner class AntallAktivitetsdager {
 
         @Test
+        fun `aktivitetsdager settes lik på alle hvis medAntallAktivitetsdager=false sånn at den ignoreres`() {
+            val dato = dato(2023, 3, 16)
+            val stønadsperioder = UtledStønadsperiode.utled(
+                behandlingId,
+                vilkårperioder = listOf(
+                    målgruppe(fom = dato, tom = dato, type = AAP),
+
+                    aktivitet(fom = dato, tom = dato, type = TILTAK, aktivitetsdager = 2),
+                    aktivitet(fom = dato, tom = dato, type = UTDANNING, aktivitetsdager = 5),
+                ),
+                medAntallAktivitetsdager = false,
+            ).forenklet()
+            assertThat(stønadsperioder).containsExactly(
+                Periode(dato, dato, AAP, TILTAK),
+            )
+        }
+
+        @Test
         fun `kombinasjon med høyere antall aktivitetsdager skal trumfe en annen som har lavere antall aktivitetsdager`() {
             val mars16 = dato(2023, 3, 16)
             val stønadsperioder = UtledStønadsperiode.utled(
@@ -89,6 +108,7 @@ class UtledStønadsperiodeTest {
                     aktivitet(fom = dato(2023, 3, 14), tom = dato(2023, 3, 18), type = UTDANNING, aktivitetsdager = 2),
                     aktivitet(fom = mars16, tom = mars16, type = REELL_ARBEIDSSØKER, aktivitetsdager = 5),
                 ),
+                medAntallAktivitetsdager = true,
             ).forenklet()
             assertThat(stønadsperioder).containsExactly(
                 Periode(dato(2023, 3, 15), dato(2023, 3, 15), AAP, UTDANNING),
@@ -108,6 +128,7 @@ class UtledStønadsperiodeTest {
                     aktivitet(fom = dato(2023, 3, 16), tom = dato(2023, 3, 17), type = UTDANNING, aktivitetsdager = 3),
                     aktivitet(fom = dato(2023, 3, 17), tom = dato(2023, 3, 17), type = TILTAK, aktivitetsdager = 1),
                 ),
+                medAntallAktivitetsdager = true,
             ).forenklet()
             assertThat(stønadsperioder).containsExactly(
                 Periode(dato(2023, 3, 15), dato(2023, 3, 15), AAP, TILTAK),
