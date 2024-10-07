@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -11,7 +12,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import java.time.LocalDate
-import java.util.UUID
 
 /**
  * Denne løsningen finner kombinasjonen av målgruppe og aktivitet
@@ -21,7 +21,7 @@ import java.util.UUID
  */
 object UtledStønadsperiode {
 
-    fun utled(behandlingId: UUID, vilkårperioder: List<Vilkårperiode>): List<Stønadsperiode> {
+    fun utled(behandlingId: BehandlingId, vilkårperioder: List<Vilkårperiode>): List<Stønadsperiode> {
         return vilkårperioder
             .snittMålgruppeAktivitet()
             .map { StønadsperiodeHolder(fom = it.key, tom = it.key, målgruppeAktivitet = it.value) }
@@ -77,7 +77,7 @@ object UtledStønadsperiode {
             }
     }
 
-    private fun List<StønadsperiodeHolder>.tilStønadsperioder(behandlingId: UUID): List<Stønadsperiode> {
+    private fun List<StønadsperiodeHolder>.tilStønadsperioder(behandlingId: BehandlingId): List<Stønadsperiode> {
         return this.map {
             Stønadsperiode(
                 behandlingId = behandlingId,

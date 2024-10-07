@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -11,13 +12,13 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType.AAP
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType.OVERGANGSSTØNAD
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
 
 class UtledStønadsperiodeTest {
 
-    val behandlingId = UUID.randomUUID()
+    val behandlingId = BehandlingId.random()
 
     /**
      * AAP          |-----------|
@@ -70,6 +71,20 @@ class UtledStønadsperiodeTest {
             Periode(dato(2023, 3, 17), dato(2023, 3, 17), OVERGANGSSTØNAD, UTDANNING),
             Periode(dato(2023, 3, 19), dato(2023, 3, 20), OVERGANGSSTØNAD, UTDANNING),
         )
+    }
+
+    @Nested
+    inner class AntallAktivitetsdager {
+
+        @Test
+        fun `kombinasjon med høyere antall aktivitetsdager skal trumfe en annan som har lavere antall aktivitetsdager`() {
+            TODO("Not yet implemented")
+        }
+
+        @Test
+        fun `2 tiltak som har høyere antall dager enn utdanning skal trume over utdanning`() {
+            TODO("Not yet implemented")
+        }
     }
 
     private fun Stønadsperiode.forenklet() = Periode(fom, tom, målgruppe, aktivitet)
