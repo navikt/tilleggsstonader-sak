@@ -66,8 +66,10 @@ object UtledStønadsperiode {
     /**
      * @return alle datoer for snittet mellom målgruppe og aktivitet
      */
-    private fun List<VilkårperiodeHolder>.snittDatoer(målgruppe: VilkårperiodeHolder): List<LocalDate> =
-        mapNotNull { aktivitet -> aktivitet.snitt(målgruppe)?.alleDatoer() }.flatten()
+    private fun List<VilkårperiodeHolder>.snittDatoer(målgruppe: VilkårperiodeHolder): List<LocalDate> = this
+        .mapNotNull { aktivitet -> aktivitet.snitt(målgruppe) }
+        .map { it.alleDatoer() }
+        .flatten()
 
     private fun Set<MålgruppeType>.sortert() = this.sortedBy { type ->
         prioriterteMålgrupper[type] ?: error("Har ikke mapping for $type")

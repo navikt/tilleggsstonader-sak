@@ -117,6 +117,11 @@ class UtledStønadsperiodeTest {
         }
     }
 
+    @Test
+    fun `skal ikke ta med perioder som har 100 prosent sykepenger`() {
+        TODO("Not yet implemented")
+    }
+
     private fun List<Stønadsperiode>.forenklet() =
         this.map { Periode(it.fom, it.tom, it.målgruppe, it.aktivitet) }
             .sortedBy { it.fom }
