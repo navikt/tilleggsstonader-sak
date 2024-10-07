@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeSortering.sortert
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeSortering.viktigereEnn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.UtledStønadsperiodeMapper.tilStønadsperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -32,14 +32,25 @@ object UtledStønadsperiode {
     private fun List<Vilkårperiode>.snittMålgruppeAktivitet(): Map<LocalDate, MålgruppeAktivitet> {
         val perioder = this.filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
         val målgrupper = tilPeriodeVilkår<MålgruppeType>(perioder)
-        val aktiviteter = tilPeriodeVilkår<AktivitetType>(perioder)
+        val tilAktiviteter = perioder.tilAktiviteter()
+        val aktiviteter = tilAktiviteter.slåSammenType()
 
-        return mutableMapOf<LocalDate, MålgruppeAktivitet>().apply {
-            finnDatoerForSnitt(målgrupper, aktiviteter)
+        return mutableMapOf<LocalDate, Pair<MålgruppeAktivitet, Int>>().apply {
+            val map = this
+            val finnDatoerForSnitt = finnDatoerForSnitt(målgrupper, aktiviteter)
+            finnDatoerForSnitt
                 .forEach { (typer, datoer) ->
-                    datoer.forEach { dato -> putIfAbsent(dato, typer) }
+                    datoer.forEach { dato ->
+                        val key = dato.first
+                        val prevValue = map[key]
+                        val pair = Pair(typer, dato.second)
+                        if (pair.viktigereEnn(prevValue)) {
+                            map[key] = pair
+                        }
+                    }
                 }
         }
+            .mapValues { it.value.first }
     }
 
     /**
@@ -47,16 +58,14 @@ object UtledStønadsperiode {
      */
     private fun finnDatoerForSnitt(
         målgrupper: Map<MålgruppeType, List<VilkårperiodeHolder>>,
-        aktiviteter: Map<AktivitetType, List<VilkårperiodeHolder>>,
-    ): List<Pair<MålgruppeAktivitet, List<LocalDate>>> {
+        aktiviteter: Map<AktivitetType, List<AktivitetHolder>>,
+    ): List<Pair<MålgruppeAktivitet, List<Pair<LocalDate, Int>>>> {
         return målgrupper.keys
-            .sortert()
             .flatMap { typeMålgruppe ->
-                val gyldigeAktiviteter = typeMålgruppe.gyldigeAktiviter.sortert()
                 målgrupper
                     .verdier(typeMålgruppe)
                     .flatMap { målgruppe ->
-                        gyldigeAktiviteter.map { typeAktivitet ->
+                        typeMålgruppe.gyldigeAktiviter.map { typeAktivitet ->
                             val snittDatoer = aktiviteter.verdier(typeAktivitet).snittDatoer(målgruppe)
                             MålgruppeAktivitet(typeMålgruppe, typeAktivitet) to snittDatoer
                         }
@@ -67,9 +76,10 @@ object UtledStønadsperiode {
     /**
      * @return alle datoer for snittet mellom målgruppe og aktivitet
      */
-    private fun List<VilkårperiodeHolder>.snittDatoer(målgruppe: VilkårperiodeHolder): List<LocalDate> = this
-        .mapNotNull { aktivitet -> aktivitet.snitt(målgruppe) }
-        .map { it.alleDatoer() }
+    private fun List<AktivitetHolder>.snittDatoer(målgruppe: VilkårperiodeHolder): List<Pair<LocalDate, Int>> = this
+        .mapNotNull { aktivitet ->
+            aktivitet.snitt(målgruppe)?.let { it.alleDatoer().map { it to aktivitet.aktivitetsdager } }
+        }
         .flatten()
 
     private inline fun <reified T : VilkårperiodeType> tilPeriodeVilkår(perioder: List<Vilkårperiode>): Map<T, List<VilkårperiodeHolder>> =
@@ -81,23 +91,73 @@ object UtledStønadsperiode {
             }
         }.groupBy({ it.first }, { it.second })
 
-    private fun <T> Map<T, List<VilkårperiodeHolder>>.verdier(type: T) = this.getOrDefault(type, emptyList())
+    private fun List<Vilkårperiode>.tilAktiviteter(): List<AktivitetHolder> = this
+        .mapNotNull { periode ->
+            if (periode.type is AktivitetType) {
+                AktivitetHolder(
+                    fom = periode.fom,
+                    tom = periode.tom,
+                    type = periode.type,
+                    aktivitetsdager = periode.aktivitetsdager ?: 5,
+                )
+            } else {
+                null
+            }
+        }
+
+    /**
+     * Slår sammen aktivitet av samme type og dato, og setter maks antall aktivitetsdager for gitt dato
+     */
+    private fun List<AktivitetHolder>.slåSammenType(): Map<AktivitetType, List<AktivitetHolder>> {
+        val map = mutableMapOf<Pair<AktivitetType, LocalDate>, Int>()
+        this.forEach { aktivitet ->
+            aktivitet.alleDatoer().forEach {
+                val key = Pair(aktivitet.type, it)
+                val antallAktivitetsdagerForDato = map.getOrDefault(key, 0)
+                map[key] = minOf(5, aktivitet.aktivitetsdager + antallAktivitetsdagerForDato)
+            }
+        }
+        return map.entries
+            .map { (key, aktivitetsdager) ->
+                AktivitetHolder(fom = key.second, tom = key.second, type = key.first, aktivitetsdager = aktivitetsdager)
+            }
+            .groupBy { it.type }
+            .mapValues {
+                it.value
+                    .sorted()
+                    .mergeSammenhengende { first, second ->
+                        val overlapperEllerSammenhengende =
+                            first.overlapper(second) || (first.tom.plusDays(1) == second.fom)
+                        overlapperEllerSammenhengende && first.aktivitetsdager == second.aktivitetsdager
+                    }
+            }
+    }
+
+    private fun <T, R> Map<T, List<R>>.verdier(type: T): List<R> = this.getOrDefault(type, emptyList())
 
     private data class VilkårperiodeHolder(
         override val fom: LocalDate,
         override val tom: LocalDate,
-    ) : Periode<LocalDate> {
+    ) : Periode<LocalDate>
 
-        fun snitt(other: VilkårperiodeHolder): VilkårperiodeHolder? {
+    private data class AktivitetHolder(
+        override val fom: LocalDate,
+        override val tom: LocalDate,
+        val type: AktivitetType,
+        val aktivitetsdager: Int,
+    ) : Periode<LocalDate>, Mergeable<LocalDate, AktivitetHolder> {
+        override fun merge(other: AktivitetHolder): AktivitetHolder {
+            return this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
+        }
+
+        fun snitt(other: VilkårperiodeHolder): AktivitetHolder? {
             return if (this.overlapper(other)) {
-                VilkårperiodeHolder(maxOf(this.fom, other.fom), minOf(this.tom, other.tom))
+                this.copy(fom = maxOf(this.fom, other.fom), tom = minOf(this.tom, other.tom))
             } else {
                 null
             }
         }
     }
-
-
 }
 
 private data class MålgruppeAktivitet(
@@ -107,32 +167,55 @@ private data class MålgruppeAktivitet(
 
 private object StønadsperiodeSortering {
 
-    fun Set<MålgruppeType>.sortert() = this.sortedBy { type ->
-        prioriterteMålgrupper[type] ?: error("Har ikke mapping for $type")
+    fun Pair<MålgruppeAktivitet, Int>.viktigereEnn(other: Pair<MålgruppeAktivitet, Int>?): Boolean {
+        if (other == null) {
+            return true
+        }
+        val aktivitetsdagerCompareTo = this.second.compareTo(other.second)
+        when {
+            aktivitetsdagerCompareTo > 0 -> return true
+            aktivitetsdagerCompareTo < 0 -> return false
+        }
+
+        val målgruppeCompareTo = this.first.målgruppe.prioritet().compareTo(other.first.målgruppe.prioritet())
+        when {
+            målgruppeCompareTo > 0 -> return true
+            målgruppeCompareTo < 0 -> return false
+        }
+
+        val aktivitetCompareTo = this.first.aktivitet.prioritet().compareTo(other.first.aktivitet.prioritet())
+        when {
+            aktivitetCompareTo > 0 -> return true
+            aktivitetCompareTo < 0 -> return false
+        }
+        // like
+        error("Burde ikke finnes 2 like")
     }
 
-    @JvmName("sortertAktivitet")
-    fun Set<AktivitetType>.sortert(): List<AktivitetType> = sortedBy { type ->
-        prioriterteAktiviteter[type] ?: error("Har ikke mapping for $type")
-    }
+    private fun MålgruppeType.prioritet(): Int =
+        prioriterteMålgrupper[this] ?: error("Har ikke mapping for $this")
+
+    @JvmName("prioritetAktivitet")
+    private fun AktivitetType.prioritet(): Int =
+        prioriterteAktiviteter[this] ?: error("Har ikke mapping for $this")
 
     // https://confluence.adeo.no/pages/viewpage.action?pageId=140668635
-    private val prioriterteMålgrupper: Map<MålgruppeType, Int> = MålgruppeType.entries.mapNotNull { type ->
+    val prioriterteMålgrupper: Map<MålgruppeType, Int> = MålgruppeType.entries.mapNotNull { type ->
         val verdi = when (type) {
-            MålgruppeType.AAP -> 1
-            MålgruppeType.NEDSATT_ARBEIDSEVNE -> 2
-            MålgruppeType.OVERGANGSSTØNAD -> 3
-            MålgruppeType.OMSTILLINGSSTØNAD -> 4
+            MålgruppeType.AAP -> 4
+            MålgruppeType.NEDSATT_ARBEIDSEVNE -> 3
+            MålgruppeType.OVERGANGSSTØNAD -> 2
+            MålgruppeType.OMSTILLINGSSTØNAD -> 1
             else -> null
         }
         verdi?.let { type to it }
     }.toMap()
 
-    private val prioriterteAktiviteter: Map<AktivitetType, Int> = AktivitetType.entries.mapNotNull { type ->
+    val prioriterteAktiviteter: Map<AktivitetType, Int> = AktivitetType.entries.mapNotNull { type ->
         val verdi = when (type) {
-            AktivitetType.TILTAK -> 1
+            AktivitetType.TILTAK -> 3
             AktivitetType.UTDANNING -> 2
-            AktivitetType.REELL_ARBEIDSSØKER -> 3
+            AktivitetType.REELL_ARBEIDSSØKER -> 1
             else -> null
         }
         verdi?.let { type to it }
