@@ -6,16 +6,16 @@ import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.OppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.ArbeidOgOppholdMapper.mapArbeidOgOpphold
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.OppholdUtenforNorge as OppholdUtenforNorgeKontrakt
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge as OppholdUtenforNorgeKontrakt
 
 class ArbeidOgOppholdMapperTest {
     @Test
