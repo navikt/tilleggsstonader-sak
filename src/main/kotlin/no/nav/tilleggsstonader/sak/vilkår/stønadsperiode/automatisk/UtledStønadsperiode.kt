@@ -103,29 +103,33 @@ object UtledStønadsperiode {
      * Slår sammen aktivitet av samme type og dato, og setter maks antall aktivitetsdager for gitt dato
      */
     private fun List<AktivitetHolder>.slåSammenType(): Map<AktivitetType, List<AktivitetHolder>> {
-        val map = mutableMapOf<Pair<AktivitetType, LocalDate>, Int>()
-        this.forEach { aktivitet ->
-            aktivitet.alleDatoer().forEach {
-                val key = Pair(aktivitet.type, it)
-                val antallAktivitetsdagerForDato = map.getOrDefault(key, 0)
-                map[key] = minOf(5, aktivitet.aktivitetsdager + antallAktivitetsdagerForDato)
+        return antallDagerPerAktivitetstypeOgDato()
+            .slåSammenPerioderPerTypeOgAktivitetsdager()
+    }
+
+    private fun List<AktivitetHolder>.antallDagerPerAktivitetstypeOgDato(): Map<Pair<AktivitetType, LocalDate>, Int> =
+        this.fold(mutableMapOf()) { acc, aktivitet ->
+            aktivitet.alleDatoer().forEach { dato ->
+                val key = Pair(aktivitet.type, dato)
+                val antallAktivitetsdagerForDato = acc.getOrDefault(key, 0)
+                acc[key] = minOf(5, aktivitet.aktivitetsdager + antallAktivitetsdagerForDato)
             }
+            acc
         }
-        return map.entries
+
+    private fun Map<Pair<AktivitetType, LocalDate>, Int>.slåSammenPerioderPerTypeOgAktivitetsdager()
+            : Map<AktivitetType, List<AktivitetHolder>> =
+        this.entries
             .map { (key, aktivitetsdager) ->
                 AktivitetHolder(fom = key.second, tom = key.second, type = key.first, aktivitetsdager = aktivitetsdager)
             }
             .groupBy { it.type }
-            .mapValues {
-                it.value
-                    .sorted()
-                    .mergeSammenhengende { first, second ->
-                        val overlapperEllerSammenhengende =
-                            first.overlapper(second) || (first.tom.plusDays(1) == second.fom)
-                        overlapperEllerSammenhengende && first.aktivitetsdager == second.aktivitetsdager
-                    }
+            .mapValues { (_, aktiviteter) ->
+                aktiviteter.sorted().mergeSammenhengende { first, second ->
+                    (first.overlapper(second) || first.tom.plusDays(1) == second.fom) &&
+                            first.aktivitetsdager == second.aktivitetsdager
+                }
             }
-    }
 
     private fun <T, R> Map<T, List<R>>.verdier(type: T): List<R> = this.getOrDefault(type, emptyList())
 
