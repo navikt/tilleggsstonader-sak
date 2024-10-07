@@ -151,6 +151,13 @@ class OpprettTestBehandlingController(
                 arbeidOgOpphold = arbeidOgOpphold(),
             ),
             utdanning = UtdanningAvsnitt(
+                aktiviteter = EnumFlereValgFelt(
+                    "Hvilken utdanning eller opplæring søker du om støtte til læremidler for",
+                    listOf(
+                        VerdiFelt("1", "Høyere utdfanning: 25. februar 2024 - 25. juli 2024"),
+                    ),
+                    listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
+                ),
                 annenUtdanning = EnumFelt(
                     "Annen utdanning tekst",
                     AnnenUtdanningType.INGEN_UTDANNING,
