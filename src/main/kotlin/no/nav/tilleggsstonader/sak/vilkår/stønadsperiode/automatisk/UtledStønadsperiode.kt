@@ -34,17 +34,15 @@ object UtledStønadsperiode {
         val målgrupper = this.tilMålgrupper()
         val aktiviteter = this.tilAktiviteter(medAntallAktivitetsdager)
 
-        return mutableMapOf<LocalDate, MålgruppeAktivitet>().apply {
-            val map = this
-            val finnDatoerForSnitt = finnDatoerForSnitt(målgrupper, aktiviteter)
-            finnDatoerForSnitt
-                .forEach { (målgruppeAktivitet, dato) ->
-                    val prevValue = map[dato]
-                    if (prevValue == null || prevValue < målgruppeAktivitet) {
-                        map[dato] = målgruppeAktivitet
-                    }
+        return finnDatoerForSnitt(målgrupper, aktiviteter)
+            .groupingBy { it.second }
+            .aggregate { _, prev: MålgruppeAktivitet?, (målgruppeAktivitet, _), _ ->
+                if (prev == null || prev < målgruppeAktivitet) {
+                    målgruppeAktivitet
+                } else {
+                    prev
                 }
-        }
+            }
     }
 
     private fun List<Vilkårperiode>.filtrerOppfylte() =

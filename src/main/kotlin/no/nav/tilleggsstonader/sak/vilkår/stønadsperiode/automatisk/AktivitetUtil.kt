@@ -59,7 +59,7 @@ object AktivitetUtil {
         .sorted()
         .mergeSammenhengende { first, second ->
             (first.overlapper(second) || first.tom.plusDays(1) == second.fom) &&
-                    first.aktivitetsdager == second.aktivitetsdager
+                first.aktivitetsdager == second.aktivitetsdager
         }
 }
 
