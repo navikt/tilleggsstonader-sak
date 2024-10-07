@@ -57,35 +57,32 @@ object UtledStønadsperiode {
      * Itererer over sorterte målgrupper for å finne snitt med sorterte aktiviteter
      */
     private fun finnDatoerForSnitt(
-        målgrupper: Map<MålgruppeType, List<VilkårperiodeHolder>>,
-        aktiviteter: Map<AktivitetType, List<AktivitetHolder>>,
+        målgrupper: List<MålgruppeHolder>,
+        aktiviteterPerType: Map<AktivitetType, List<AktivitetHolder>>,
     ): List<Pair<MålgruppeAktivitet, LocalDate>> {
-        return målgrupper.keys
-            .flatMap { typeMålgruppe ->
-                målgrupper
-                    .verdier(typeMålgruppe)
-                    .flatMap { målgruppe ->
-                        typeMålgruppe.gyldigeAktiviter.map { typeAktivitet ->
-                            aktiviteter.verdier(typeAktivitet).snittDatoer(målgruppe)
-                                .map { MålgruppeAktivitet(typeMålgruppe, typeAktivitet, it.second) to it.first }
-                        }
+        return målgrupper.flatMap { målgruppe ->
+            målgruppe.type.gyldigeAktiviter.flatMap { typeAktivitet ->
+                val verdier = aktiviteterPerType.verdier(typeAktivitet)
+                verdier.snittDatoer(målgruppe)
+                    .map { (dato, aktivitetsdager) ->
+                        MålgruppeAktivitet(målgruppe.type, typeAktivitet, aktivitetsdager) to dato
                     }
-            }.flatten()
+            }
+        }
     }
 
     /**
      * @return alle datoer for snittet mellom målgruppe og aktivitet
      */
-    private fun List<AktivitetHolder>.snittDatoer(målgruppe: VilkårperiodeHolder): List<Pair<LocalDate, Int>> = this
+    private fun List<AktivitetHolder>.snittDatoer(målgruppe: MålgruppeHolder): List<Pair<LocalDate, Int>> = this
         .mapNotNull { aktivitet ->
             aktivitet.snitt(målgruppe)?.let { it.alleDatoer().map { it to aktivitet.aktivitetsdager } }
         }
         .flatten()
 
-    private fun List<Vilkårperiode>.tilMålgrupper(): Map<MålgruppeType, List<VilkårperiodeHolder>> = this
+    private fun List<Vilkårperiode>.tilMålgrupper(): List<MålgruppeHolder> = this
         .filter { it.type is MålgruppeType }
-        .map { it.type as MålgruppeType to VilkårperiodeHolder(it.fom, it.tom) }
-        .groupBy({ it.first }, { it.second })
+        .map { MålgruppeHolder(it.fom, it.tom, it.type as MålgruppeType) }
 
     private fun List<Vilkårperiode>.tilAktiviteter(medAntallAktivitetsdager: Boolean): List<AktivitetHolder> = this
         .filter { it.type is AktivitetType }
@@ -132,9 +129,10 @@ object UtledStønadsperiode {
 
     private fun <T, R> Map<T, List<R>>.verdier(type: T): List<R> = this.getOrDefault(type, emptyList())
 
-    private data class VilkårperiodeHolder(
+    private data class MålgruppeHolder(
         override val fom: LocalDate,
         override val tom: LocalDate,
+        val type: MålgruppeType,
     ) : Periode<LocalDate>
 
     private data class AktivitetHolder(
@@ -147,7 +145,7 @@ object UtledStønadsperiode {
             return this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
         }
 
-        fun snitt(other: VilkårperiodeHolder): AktivitetHolder? {
+        fun snitt(other: MålgruppeHolder): AktivitetHolder? {
             return if (this.overlapper(other)) {
                 this.copy(fom = maxOf(this.fom, other.fom), tom = minOf(this.tom, other.tom))
             } else {
