@@ -30,10 +30,9 @@ object AktivitetUtil {
     /**
      * Slår sammen aktivitet av samme type og dato, og setter maks antall aktivitetsdager for gitt dato
      */
-    private fun List<AktivitetHolder>.slåSammenType(): Map<AktivitetType, List<AktivitetHolder>> {
-        return antallDagerPerAktivitetstypeOgDato()
-            .slåSammenPerioderPerTypeOgAktivitetsdager()
-    }
+    private fun List<AktivitetHolder>.slåSammenType(): Map<AktivitetType, List<AktivitetHolder>> = this
+        .antallDagerPerAktivitetstypeOgDato()
+        .slåSammenPerioderPerTypeOgAktivitetsdager()
 
     private fun List<AktivitetHolder>.antallDagerPerAktivitetstypeOgDato(): Map<Pair<AktivitetType, LocalDate>, Int> =
         this.fold(mutableMapOf()) { acc, aktivitet ->
@@ -47,16 +46,21 @@ object AktivitetUtil {
 
     private fun Map<Pair<AktivitetType, LocalDate>, Int>.slåSammenPerioderPerTypeOgAktivitetsdager(): Map<AktivitetType, List<AktivitetHolder>> =
         this.entries
-            .map { (key, aktivitetsdager) ->
-                AktivitetHolder(fom = key.second, tom = key.second, type = key.first, aktivitetsdager = aktivitetsdager)
-            }
+            .tilAktivitetHolder()
             .groupBy { it.type }
-            .mapValues { (_, aktiviteter) ->
-                aktiviteter.sorted().mergeSammenhengende { first, second ->
-                    (first.overlapper(second) || first.tom.plusDays(1) == second.fom) &&
-                        first.aktivitetsdager == second.aktivitetsdager
-                }
-            }
+            .mapValues { (_, aktiviteter) -> aktiviteter.mergeSammenhengende() }
+
+    private fun Set<Map.Entry<Pair<AktivitetType, LocalDate>, Int>>.tilAktivitetHolder() = this
+        .map { (key, aktivitetsdager) ->
+            AktivitetHolder(fom = key.second, tom = key.second, type = key.first, aktivitetsdager = aktivitetsdager)
+        }
+
+    private fun List<AktivitetHolder>.mergeSammenhengende() = this
+        .sorted()
+        .mergeSammenhengende { first, second ->
+            (first.overlapper(second) || first.tom.plusDays(1) == second.fom) &&
+                    first.aktivitetsdager == second.aktivitetsdager
+        }
 }
 
 data class AktivitetHolder(
