@@ -1,12 +1,12 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
+package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.automatisk
 
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeSortering.viktigereEnn
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.UtledStønadsperiodeMapper.tilStønadsperioder
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.automatisk.StønadsperiodeMapper.tilStønadsperioder
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.automatisk.StønadsperiodeSortering.viktigereEnn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -161,119 +161,6 @@ object UtledStønadsperiode {
             } else {
                 null
             }
-        }
-    }
-}
-
-private data class MålgruppeAktivitet(
-    val målgruppe: MålgruppeType,
-    val aktivitet: AktivitetType,
-)
-
-private object StønadsperiodeSortering {
-
-    fun Pair<MålgruppeAktivitet, Int>.viktigereEnn(other: Pair<MålgruppeAktivitet, Int>?): Boolean {
-        if (other == null) {
-            return true
-        }
-        val aktivitetsdagerCompareTo = this.second.compareTo(other.second)
-        when {
-            aktivitetsdagerCompareTo > 0 -> return true
-            aktivitetsdagerCompareTo < 0 -> return false
-        }
-
-        val målgruppeCompareTo = this.first.målgruppe.prioritet().compareTo(other.first.målgruppe.prioritet())
-        when {
-            målgruppeCompareTo > 0 -> return true
-            målgruppeCompareTo < 0 -> return false
-        }
-
-        val aktivitetCompareTo = this.first.aktivitet.prioritet().compareTo(other.first.aktivitet.prioritet())
-        when {
-            aktivitetCompareTo > 0 -> return true
-            aktivitetCompareTo < 0 -> return false
-        }
-        // like
-        error("Burde ikke finnes 2 like")
-    }
-
-    private fun MålgruppeType.prioritet(): Int =
-        prioriterteMålgrupper[this] ?: error("Har ikke mapping for $this")
-
-    @JvmName("prioritetAktivitet")
-    private fun AktivitetType.prioritet(): Int =
-        prioriterteAktiviteter[this] ?: error("Har ikke mapping for $this")
-
-    // https://confluence.adeo.no/pages/viewpage.action?pageId=140668635
-    val prioriterteMålgrupper: Map<MålgruppeType, Int> = MålgruppeType.entries.mapNotNull { type ->
-        val verdi = when (type) {
-            MålgruppeType.AAP -> 4
-            MålgruppeType.NEDSATT_ARBEIDSEVNE -> 3
-            MålgruppeType.OVERGANGSSTØNAD -> 2
-            MålgruppeType.OMSTILLINGSSTØNAD -> 1
-            else -> null
-        }
-        verdi?.let { type to it }
-    }.toMap()
-
-    val prioriterteAktiviteter: Map<AktivitetType, Int> = AktivitetType.entries.mapNotNull { type ->
-        val verdi = when (type) {
-            AktivitetType.TILTAK -> 3
-            AktivitetType.UTDANNING -> 2
-            AktivitetType.REELL_ARBEIDSSØKER -> 1
-            else -> null
-        }
-        verdi?.let { type to it }
-    }.toMap()
-}
-
-/**
- * Util for å mappe, slå sammen og mappe til stønadsperioder
- */
-private object UtledStønadsperiodeMapper {
-
-    fun Map<LocalDate, MålgruppeAktivitet>.tilStønadsperioder(behandlingId: BehandlingId) = this
-        .map { StønadsperiodeHolder(fom = it.key, tom = it.key, målgruppeAktivitet = it.value) }
-        .slåSammen()
-        .tilStønadsperiodeHolder(behandlingId)
-
-    /**
-     * Grupperer perioder på målgruppe og aktivitet
-     * Merger sammenhengende tvers grupperingen
-     */
-    private fun List<StønadsperiodeHolder>.slåSammen(): List<StønadsperiodeHolder> {
-        return this
-            .groupBy { it.målgruppeAktivitet }
-            .values
-            .flatMap { perioderPerGruppe ->
-                perioderPerGruppe
-                    .sorted()
-                    .mergeSammenhengende { a, b ->
-                        a.tom.plusDays(1) == b.tom
-                    }
-            }
-    }
-
-    private fun List<StønadsperiodeHolder>.tilStønadsperiodeHolder(behandlingId: BehandlingId): List<Stønadsperiode> {
-        return this.map {
-            Stønadsperiode(
-                behandlingId = behandlingId,
-                fom = it.fom,
-                tom = it.tom,
-                målgruppe = it.målgruppeAktivitet.målgruppe,
-                aktivitet = it.målgruppeAktivitet.aktivitet,
-            )
-        }
-    }
-
-    private data class StønadsperiodeHolder(
-        override val fom: LocalDate,
-        override val tom: LocalDate,
-        val målgruppeAktivitet: MålgruppeAktivitet,
-    ) : Periode<LocalDate>, Mergeable<LocalDate, StønadsperiodeHolder> {
-        override fun merge(other: StønadsperiodeHolder): StønadsperiodeHolder {
-            require(målgruppeAktivitet == other.målgruppeAktivitet) { "Kan ikke merge 2 ulike" }
-            return this.copy(fom = minOf(other.fom, fom), tom = maxOf(other.tom, tom))
         }
     }
 }
