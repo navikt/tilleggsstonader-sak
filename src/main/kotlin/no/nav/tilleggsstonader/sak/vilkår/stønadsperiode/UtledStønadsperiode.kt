@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeSortering.sortert
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.UtledStønadsperiodeMapper.tilStønadsperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -71,37 +72,6 @@ object UtledStønadsperiode {
         .map { it.alleDatoer() }
         .flatten()
 
-    private fun Set<MålgruppeType>.sortert() = this.sortedBy { type ->
-        prioriterteMålgrupper[type] ?: error("Har ikke mapping for $type")
-    }
-
-    @JvmName("sortertAktivitet")
-    private fun Set<AktivitetType>.sortert(): List<AktivitetType> = sortedBy { type ->
-        prioriterteAktiviteter[type] ?: error("Har ikke mapping for $type")
-    }
-
-    // https://confluence.adeo.no/pages/viewpage.action?pageId=140668635
-    val prioriterteMålgrupper: Map<MålgruppeType, Int> = MålgruppeType.entries.mapNotNull { type ->
-        val verdi = when (type) {
-            MålgruppeType.AAP -> 1
-            MålgruppeType.NEDSATT_ARBEIDSEVNE -> 2
-            MålgruppeType.OVERGANGSSTØNAD -> 3
-            MålgruppeType.OMSTILLINGSSTØNAD -> 4
-            else -> null
-        }
-        verdi?.let { type to it }
-    }.toMap()
-
-    val prioriterteAktiviteter: Map<AktivitetType, Int> = AktivitetType.entries.mapNotNull { type ->
-        val verdi = when (type) {
-            AktivitetType.TILTAK -> 1
-            AktivitetType.UTDANNING -> 2
-            AktivitetType.REELL_ARBEIDSSØKER -> 3
-            else -> null
-        }
-        verdi?.let { type to it }
-    }.toMap()
-
     private inline fun <reified T : VilkårperiodeType> tilPeriodeVilkår(perioder: List<Vilkårperiode>): Map<T, List<VilkårperiodeHolder>> =
         perioder.mapNotNull { periode ->
             if (periode.type is T) {
@@ -134,6 +104,40 @@ private data class MålgruppeAktivitet(
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
 )
+
+private object StønadsperiodeSortering {
+
+    fun Set<MålgruppeType>.sortert() = this.sortedBy { type ->
+        prioriterteMålgrupper[type] ?: error("Har ikke mapping for $type")
+    }
+
+    @JvmName("sortertAktivitet")
+    fun Set<AktivitetType>.sortert(): List<AktivitetType> = sortedBy { type ->
+        prioriterteAktiviteter[type] ?: error("Har ikke mapping for $type")
+    }
+
+    // https://confluence.adeo.no/pages/viewpage.action?pageId=140668635
+    private val prioriterteMålgrupper: Map<MålgruppeType, Int> = MålgruppeType.entries.mapNotNull { type ->
+        val verdi = when (type) {
+            MålgruppeType.AAP -> 1
+            MålgruppeType.NEDSATT_ARBEIDSEVNE -> 2
+            MålgruppeType.OVERGANGSSTØNAD -> 3
+            MålgruppeType.OMSTILLINGSSTØNAD -> 4
+            else -> null
+        }
+        verdi?.let { type to it }
+    }.toMap()
+
+    private val prioriterteAktiviteter: Map<AktivitetType, Int> = AktivitetType.entries.mapNotNull { type ->
+        val verdi = when (type) {
+            AktivitetType.TILTAK -> 1
+            AktivitetType.UTDANNING -> 2
+            AktivitetType.REELL_ARBEIDSSØKER -> 3
+            else -> null
+        }
+        verdi?.let { type to it }
+    }.toMap()
+}
 
 /**
  * Util for å mappe, slå sammen og mappe til stønadsperioder
