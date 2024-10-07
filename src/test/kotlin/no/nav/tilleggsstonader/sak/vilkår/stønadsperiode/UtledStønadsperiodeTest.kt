@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType.REELL_ARBEIDSSØKER
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType.TILTAK
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType.UTDANNING
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -37,7 +38,7 @@ class UtledStønadsperiodeTest {
                 aktivitet(fom = dato(2023, 3, 20), tom = dato(2023, 4, 25), type = TILTAK),
                 aktivitet(fom = dato(2023, 3, 21), tom = dato(2023, 4, 30), type = UTDANNING),
             ),
-        ).map { it.forenklet() }.sortedBy { it.fom }
+        ).forenklet()
         assertThat(stønadsperioder).containsExactly(
             Periode(dato(2023, 3, 15), dato(2023, 3, 19), AAP, UTDANNING),
             Periode(dato(2023, 3, 20), dato(2023, 4, 25), AAP, TILTAK),
@@ -64,7 +65,7 @@ class UtledStønadsperiodeTest {
                 aktivitet(fom = dato(2023, 2, 1), tom = dato(2023, 3, 17), type = UTDANNING),
                 aktivitet(fom = dato(2023, 3, 19), tom = dato(2023, 3, 20), type = UTDANNING),
             ),
-        ).map { it.forenklet() }.sortedBy { it.fom }
+        ).forenklet()
         assertThat(stønadsperioder).containsExactly(
             Periode(dato(2023, 2, 10), dato(2023, 3, 14), OVERGANGSSTØNAD, UTDANNING),
             Periode(dato(2023, 3, 15), dato(2023, 3, 16), AAP, UTDANNING),
@@ -77,17 +78,48 @@ class UtledStønadsperiodeTest {
     inner class AntallAktivitetsdager {
 
         @Test
-        fun `kombinasjon med høyere antall aktivitetsdager skal trumfe en annan som har lavere antall aktivitetsdager`() {
-            TODO("Not yet implemented")
+        fun `kombinasjon med høyere antall aktivitetsdager skal trumfe en annen som har lavere antall aktivitetsdager`() {
+            val mars16 = dato(2023, 3, 16)
+            val stønadsperioder = UtledStønadsperiode.utled(
+                behandlingId,
+                vilkårperioder = listOf(
+                    målgruppe(fom = dato(2023, 3, 15), tom = dato(2023, 3, 17), type = AAP),
+                    målgruppe(fom = mars16, tom = mars16, type = OVERGANGSSTØNAD),
+
+                    aktivitet(fom = dato(2023, 3, 14), tom = dato(2023, 3, 18), type = UTDANNING, aktivitetsdager = 2),
+                    aktivitet(fom = mars16, tom = mars16, type = REELL_ARBEIDSSØKER, aktivitetsdager = 5),
+                ),
+            ).forenklet()
+            assertThat(stønadsperioder).containsExactly(
+                Periode(dato(2023, 3, 15), dato(2023, 3, 15), AAP, UTDANNING),
+                Periode(mars16, mars16, OVERGANGSSTØNAD, REELL_ARBEIDSSØKER),
+                Periode(dato(2023, 3, 17), dato(2023, 3, 17), AAP, UTDANNING),
+            )
         }
 
         @Test
-        fun `2 tiltak som har høyere antall dager enn utdanning skal trume over utdanning`() {
-            TODO("Not yet implemented")
+        fun `2 tiltak som har høyere antall dager enn utdanning skal trumfe over utdanning`() {
+            val stønadsperioder = UtledStønadsperiode.utled(
+                behandlingId,
+                vilkårperioder = listOf(
+                    målgruppe(fom = dato(2023, 3, 15), tom = dato(2023, 3, 17), type = AAP),
+
+                    aktivitet(fom = dato(2023, 3, 14), tom = dato(2023, 3, 18), type = TILTAK, aktivitetsdager = 2),
+                    aktivitet(fom = dato(2023, 3, 16), tom = dato(2023, 3, 17), type = UTDANNING, aktivitetsdager = 3),
+                    aktivitet(fom = dato(2023, 3, 17), tom = dato(2023, 3, 17), type = TILTAK, aktivitetsdager = 1),
+                ),
+            ).forenklet()
+            assertThat(stønadsperioder).containsExactly(
+                Periode(dato(2023, 3, 15), dato(2023, 3, 15), AAP, TILTAK),
+                Periode(dato(2023, 3, 16), dato(2023, 3, 16), AAP, UTDANNING),
+                Periode(dato(2023, 3, 17), dato(2023, 3, 17), AAP, TILTAK),
+            )
         }
     }
 
-    private fun Stønadsperiode.forenklet() = Periode(fom, tom, målgruppe, aktivitet)
+    private fun List<Stønadsperiode>.forenklet() =
+        this.map { Periode(it.fom, it.tom, it.målgruppe, it.aktivitet) }
+            .sortedBy { it.fom }
 
     private data class Periode(
         val fom: LocalDate,
@@ -95,13 +127,6 @@ class UtledStønadsperiodeTest {
         val målgruppe: MålgruppeType,
         val aktivitet: AktivitetType,
     )
-
-    private fun stønadsperiode(
-        fom: LocalDate,
-        tom: LocalDate,
-        målgruppe: MålgruppeType,
-        aktivitet: AktivitetType,
-    ) = stønadsperiode(behandlingId, fom, tom, målgruppe, aktivitet)
 
     fun dato(year: Int, month: Int, day: Int) = LocalDate.of(year, month, day)
 }
