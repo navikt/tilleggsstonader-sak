@@ -30,7 +30,7 @@ import java.util.UUID
     maxAntallFeil = 50,
     settTilManuellOppfølgning = true,
     triggerTidVedFeilISekunder = 31L,
-    beskrivelse = "Journalfører vedtaksbrev",
+    beskrivelse = "Journalfører frittstående brev",
 )
 class JournalførFrittståendeBrevTask(
     private val taskService: TaskService,
