@@ -26,11 +26,15 @@ object UtledStønadsperiode {
     ): List<Stønadsperiode> {
         return vilkårperioder
             .filtrerOppfylte()
-            .snittMålgruppeAktivitet(medAntallAktivitetsdager)
+            .tilPrioritertMålgruppeAktivitetPerDato(medAntallAktivitetsdager)
             .tilStønadsperioder(behandlingId)
     }
 
-    private fun List<Vilkårperiode>.snittMålgruppeAktivitet(medAntallAktivitetsdager: Boolean): Map<LocalDate, MålgruppeAktivitet> {
+    /**
+     * Finner snitt av målgruppe og aktiviteter
+     * for å sen finne hvilken kombinasjon som skal prioriteres ut fra [MålgruppeAktivitet.compareTo]
+     */
+    private fun List<Vilkårperiode>.tilPrioritertMålgruppeAktivitetPerDato(medAntallAktivitetsdager: Boolean): Map<LocalDate, MålgruppeAktivitet> {
         val målgrupper = this.tilMålgrupper()
         val aktiviteter = this.tilAktiviteter(medAntallAktivitetsdager)
 
