@@ -136,7 +136,7 @@ class BeslutteVedtakStegTest {
         val nesteSteg = utførTotrinnskontroll(
             godkjent = false,
             begrunnelse = "begrunnelse",
-            årsakerUnderkjent = listOf(ÅrsakUnderkjent.AKTIVITET),
+            årsakerUnderkjent = listOf(ÅrsakUnderkjent.VEDTAKSBREV),
         )
 
         val taskData = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot[1].payload)
