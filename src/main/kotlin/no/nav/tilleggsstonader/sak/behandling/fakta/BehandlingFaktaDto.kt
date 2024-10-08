@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
@@ -8,26 +10,57 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class BehandlingFaktaDto(
-    val søknadMottattTidspunkt: LocalDateTime?,
-    val hovedytelse: FaktaHovedytelse,
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes(
+    JsonSubTypes.Type(BehandlingFaktaTilsynBarnDto::class, name = "BARNETILSYN"),
+    JsonSubTypes.Type(BehandlingFaktaLæremidlerDto::class, name = "LÆREMIDLER"),
+)
+sealed interface BehandlingFaktaDto {
+    val søknadMottattTidspunkt: LocalDateTime?
+    val hovedytelse: FaktaHovedytelse
+    val dokumentasjon: FaktaDokumentasjon?
+    val arena: ArenaFakta?
+}
+data class BehandlingFaktaTilsynBarnDto(
+    override val søknadMottattTidspunkt: LocalDateTime?,
+    override val hovedytelse: FaktaHovedytelse,
+    override val dokumentasjon: FaktaDokumentasjon?,
+    override val arena: ArenaFakta?,
     val aktivitet: FaktaAktivtet,
     val barn: List<FaktaBarn>,
-    val dokumentasjon: FaktaDokumentasjon?,
-    val arena: ArenaFakta?,
-)
+) : BehandlingFaktaDto
+
+data class BehandlingFaktaLæremidlerDto(
+    override val søknadMottattTidspunkt: LocalDateTime?,
+    override val hovedytelse: FaktaHovedytelse,
+    override val dokumentasjon: FaktaDokumentasjon?,
+    override val arena: ArenaFakta?,
+    val utdanning: FaktaUtdanning,
+) : BehandlingFaktaDto
 
 data class FaktaHovedytelse(
     val søknadsgrunnlag: SøknadsgrunnlagHovedytelse?,
+)
+data class FaktaUtdanning(
+    val søknadsgrunnlag: SøknadsgrunnlagUtdanning?,
 )
 
 data class SøknadsgrunnlagHovedytelse(
     val hovedytelse: List<Hovedytelse>,
     val arbeidOgOpphold: FaktaArbeidOgOpphold?,
+)
+
+data class SøknadsgrunnlagUtdanning(
+    val aktiviteter: List<ValgtAktivitet>?,
+    val annenUtdanning: AnnenUtdanningType?,
+    val mottarUtstyrsstipend: JaNei?,
+    val harFunksjonsnedsettelse: JaNei,
 )
 
 data class FaktaArbeidOgOpphold(

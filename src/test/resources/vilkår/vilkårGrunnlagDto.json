@@ -1,4 +1,5 @@
 {
+  "@type" : "BARNETILSYN",
   "søknadMottattTidspunkt" : "2023-01-01T00:00:00",
   "hovedytelse" : {
     "søknadsgrunnlag" : {
@@ -25,6 +26,18 @@
       }
     }
   },
+  "dokumentasjon" : {
+    "journalpostId" : "testId",
+    "dokumentasjon" : [ {
+      "type" : "Dokumentasjon av utgifter til privat pass",
+      "dokumenter" : [ {
+        "dokumentInfoId" : "688ad1dc-e35e-4ab8-a534-17c6e691463f"
+      } ]
+    } ]
+  },
+  "arena" : {
+    "vedtakTom" : "2024-01-01"
+  },
   "aktivitet" : {
     "søknadsgrunnlag" : {
       "aktiviteter" : [ ],
@@ -49,17 +62,5 @@
     "vilkårFakta" : {
       "harFullførtFjerdetrinn" : null
     }
-  } ],
-  "dokumentasjon" : {
-    "journalpostId" : "testId",
-    "dokumentasjon" : [ {
-      "type" : "Dokumentasjon av utgifter til privat pass",
-      "dokumenter" : [ {
-        "dokumentInfoId" : "688ad1dc-e35e-4ab8-a534-17c6e691463f"
-      } ]
-    } ]
-  },
-  "arena" : {
-    "vedtakTom" : "2024-01-01"
-  }
+  } ]
 }

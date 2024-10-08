@@ -103,6 +103,7 @@ class OpprettOppgaveConfig(
 
     private fun mapBehandlingstema(stønadstype: Stønadstype): Behandlingstema = when (stønadstype) {
         Stønadstype.BARNETILSYN -> Behandlingstema.TilsynBarn
+        Stønadstype.LÆREMIDLER -> Behandlingstema.Læremidler
         else -> error("Finner ikke behandlingstema for stønadstype $stønadstype")
     }
 }
