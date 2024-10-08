@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -48,7 +48,7 @@ data class FaktaHovedytelse(
     val søknadsgrunnlag: SøknadsgrunnlagHovedytelse?,
 )
 data class FaktaUtdanning(
-    val søknadsgrunnlag: UtdanningAvsnitt?,
+    val søknadsgrunnlag: SøknadsgrunnlagUtdanning?,
 )
 
 data class SøknadsgrunnlagHovedytelse(
@@ -57,6 +57,7 @@ data class SøknadsgrunnlagHovedytelse(
 )
 
 data class SøknadsgrunnlagUtdanning(
+    val aktiviteter: List<ValgtAktivitet>?,
     val annenUtdanning: AnnenUtdanningType?,
     val mottarUtstyrsstipend: JaNei?,
     val harFunksjonsnedsettelse: JaNei,
