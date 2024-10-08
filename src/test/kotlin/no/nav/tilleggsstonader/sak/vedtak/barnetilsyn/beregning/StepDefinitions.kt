@@ -7,8 +7,8 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.barnIder
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
@@ -45,12 +45,10 @@ class StepDefinitions {
     val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
-    val behandlingService = mockk<BehandlingService>()
     val service = TilsynBarnBeregningService(
         stønadsperiodeRepository = stønadsperiodeRepository,
         vilkårperiodeRepository = vilkårperiodeRepository,
         tilsynBarnUtgiftService = tilsynBarnUtgiftService,
-        behandlingService = behandlingService,
     )
 
     var exception: Exception? = null
@@ -92,22 +90,19 @@ class StepDefinitions {
 
     @Når("beregner")
     fun `beregner`() {
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling(behandling = behandling)
-        beregn()
+        beregn(saksbehandling(id = behandlingId))
     }
 
     @Når("beregner med revurderFra={}")
     fun `beregner med revurder fra`(revurderFraStr: String) {
         val revurderFra = parseDato(revurderFraStr)
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns
-            saksbehandling(behandling = behandling.copy(type = BehandlingType.REVURDERING, revurderFra = revurderFra))
-        beregn()
+        beregn(saksbehandling(id = behandlingId, type = BehandlingType.REVURDERING, revurderFra = revurderFra))
     }
 
-    private fun beregn() {
+    private fun beregn(behandling: Saksbehandling) {
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
-            beregningsresultat = service.beregn(behandlingId = behandlingId)
+            beregningsresultat = service.beregn(behandling)
         } catch (e: Exception) {
             exception = e
         }
@@ -120,6 +115,9 @@ class StepDefinitions {
 
     @Så("forvent følgende beregningsresultat")
     fun `forvent følgende beregningsresultat`(dataTable: DataTable) {
+        if (exception != null) {
+            logger.error("Feilet beregning", exception)
+        }
         assertThat(exception).isNull()
         val forventetBeregningsresultat = dataTable.mapRad { rad ->
             ForventetBeregningsresultat(

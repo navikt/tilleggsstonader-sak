@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -36,13 +35,11 @@ class TilsynBarnBeregnYtelseStegTest {
     private val stønadsperiodeService = mockk<StønadsperiodeRepository>(relaxed = true)
     private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>(relaxed = true)
     private val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>(relaxed = true)
-    private val behandlingService = mockk<BehandlingService>()
 
     val tilsynBarnBeregningService = TilsynBarnBeregningService(
         stønadsperiodeRepository = stønadsperiodeService,
         vilkårperiodeRepository = vilkårperiodeRepository,
         tilsynBarnUtgiftService = tilsynBarnUtgiftService,
-        behandlingService = behandlingService,
     )
     val steg = TilsynBarnBeregnYtelseSteg(
         tilsynBarnBeregningService = tilsynBarnBeregningService,
@@ -66,7 +63,6 @@ class TilsynBarnBeregnYtelseStegTest {
         mockVilkårperioder(fom, tom, saksbehandling.id)
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns
             mapOf(barn.id to listOf(UtgiftBeregning(YearMonth.now(), YearMonth.now(), 1)))
-        every { behandlingService.hentSaksbehandling(saksbehandling.id) } returns saksbehandling
     }
 
     @Test
@@ -100,7 +96,6 @@ class TilsynBarnBeregnYtelseStegTest {
     @Test
     fun `skal returnere neste steg SIMULERING ved revurdering`() {
         val revurdering = saksbehandling(type = BehandlingType.REVURDERING)
-        every { behandlingService.hentSaksbehandling(revurdering.id) } returns revurdering
 
         val vedtak = innvilgelseDto()
 

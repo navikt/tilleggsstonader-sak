@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -42,23 +42,20 @@ class TilsynBarnBeregningService(
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
-    private val behandlingService: BehandlingService,
 ) {
 
-    fun beregn(behandlingId: BehandlingId): BeregningsresultatTilsynBarn {
-        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
-
-        val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandlingId)
-        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId)
+    fun beregn(behandling: Saksbehandling): BeregningsresultatTilsynBarn {
+        val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
+        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandling.id)
             .tilSortertDto()
-            .splitFraRevurderFra(revurderFra)
+            .splitFraRevurderFra(behandling.revurderFra)
 
-        val aktiviteter = finnAktiviteter(behandlingId)
+        val aktiviteter = finnAktiviteter(behandling.id)
 
         validerPerioder(stønadsperioder, aktiviteter, utgifterPerBarn)
 
         val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, aktiviteter, utgifterPerBarn)
-            .brukPerioderFraOgMedRevurderFra(revurderFra)
+            .brukPerioderFraOgMedRevurderFra(behandling.revurderFra)
         val perioder = beregn(beregningsgrunnlag)
 
         return BeregningsresultatTilsynBarn(perioder)

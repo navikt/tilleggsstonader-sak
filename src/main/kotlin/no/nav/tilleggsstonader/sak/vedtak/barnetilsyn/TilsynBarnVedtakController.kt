@@ -49,7 +49,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
-        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
-        return tilsynBarnBeregningService.beregn(behandlingId).tilDto(revurderFra)
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        return tilsynBarnBeregningService.beregn(behandling).tilDto(behandling.revurderFra)
     }
 }
