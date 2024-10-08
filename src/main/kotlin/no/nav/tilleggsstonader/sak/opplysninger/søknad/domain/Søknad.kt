@@ -94,6 +94,7 @@ data class SkjemaLæremidler(
     val dokumentasjon: List<Dokumentasjon>,
 )
 data class UtdanningAvsnitt(
+    val aktiviteter: List<ValgtAktivitet>?,
     val annenUtdanning: AnnenUtdanningType?,
     val mottarUtstyrsstipend: JaNei?,
     val harFunksjonsnedsettelse: JaNei,

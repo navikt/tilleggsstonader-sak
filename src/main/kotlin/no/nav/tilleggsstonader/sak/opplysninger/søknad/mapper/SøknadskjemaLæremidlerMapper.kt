@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnit
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.ArbeidOgOppholdMapper.mapArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.DokumentasjonMapper.mapDokumentasjon
 import java.time.LocalDateTime
@@ -28,6 +29,7 @@ object SøknadskjemaLæremidlerMapper {
                 arbeidOgOpphold = mapArbeidOgOpphold(skjema.hovedytelse.arbeidOgOpphold),
             ),
             utdanning = UtdanningAvsnitt(
+                aktiviteter = skjema.utdanning.aktiviteter?.verdier?.map { ValgtAktivitet(id = it.verdi, label = it.label) },
                 annenUtdanning = skjema.utdanning.annenUtdanning?.verdi,
                 mottarUtstyrsstipend = skjema.utdanning.mottarUtstyrsstipend?.verdi,
                 harFunksjonsnedsettelse = skjema.utdanning.harFunksjonsnedsettelse.verdi,
