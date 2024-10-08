@@ -35,4 +35,5 @@ enum class ÅrsakUnderkjent {
     VEDTAK_OG_BEREGNING,
     VEDTAKSBREV,
     RETUR_ETTER_ØNSKE_FRA_SAKSBEHANDLER,
+    FEIL_I_UTGIFTER,
 }
