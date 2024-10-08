@@ -21,9 +21,13 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnUtgiftService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
@@ -45,10 +49,12 @@ class StepDefinitions {
     val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
+    val repository = mockk<TilsynBarnVedtakRepository>(relaxed = true)
     val service = TilsynBarnBeregningService(
         stønadsperiodeRepository = stønadsperiodeRepository,
         vilkårperiodeRepository = vilkårperiodeRepository,
         tilsynBarnUtgiftService = tilsynBarnUtgiftService,
+        repository = repository,
     )
 
     var exception: Exception? = null
@@ -58,6 +64,11 @@ class StepDefinitions {
     var beregningsresultat: BeregningsresultatTilsynBarn? = null
     var behandlingId = BehandlingId.random()
     var behandling = behandling(id = behandlingId)
+
+    init {
+        every { repository.findByIdOrThrow(any()) } returns
+            innvilgetVedtak(beregningsresultat = BeregningsresultatTilsynBarn(perioder = emptyList()))
+    }
 
     @Gitt("følgende støndsperioder")
     fun `følgende støndsperioder`(dataTable: DataTable) {
@@ -88,6 +99,16 @@ class StepDefinitions {
         }
     }
 
+    @Gitt("beregningsperioder fra forrige behandling")
+    fun `perioder fra forrige behandling`(dataTable: DataTable) {
+        val perioder = dataTable.mapRad {
+            val måned = parseÅrMåned(BeregningNøkler.MÅNED, it)
+            beregningsresultatForMåned(måned)
+        }
+        every { repository.findByIdOrThrow(any()) } returns
+            innvilgetVedtak(beregningsresultat = BeregningsresultatTilsynBarn(perioder = perioder))
+    }
+
     @Når("beregner")
     fun `beregner`() {
         beregn(saksbehandling(id = behandlingId))
@@ -96,7 +117,14 @@ class StepDefinitions {
     @Når("beregner med revurderFra={}")
     fun `beregner med revurder fra`(revurderFraStr: String) {
         val revurderFra = parseDato(revurderFraStr)
-        beregn(saksbehandling(id = behandlingId, type = BehandlingType.REVURDERING, revurderFra = revurderFra))
+        beregn(
+            saksbehandling(
+                id = behandlingId,
+                type = BehandlingType.REVURDERING,
+                revurderFra = revurderFra,
+                forrigeBehandlingId = BehandlingId.random(),
+            ),
+        )
     }
 
     private fun beregn(behandling: Saksbehandling) {

@@ -28,6 +28,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 class TilsynBarnBeregnYtelseStegTest {
+
     private val repository = mockk<TilsynBarnVedtakRepository>(relaxed = true)
     private val barnService = mockk<BarnService>()
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>(relaxed = true)
@@ -40,6 +41,7 @@ class TilsynBarnBeregnYtelseStegTest {
         stønadsperiodeRepository = stønadsperiodeService,
         vilkårperiodeRepository = vilkårperiodeRepository,
         tilsynBarnUtgiftService = tilsynBarnUtgiftService,
+        repository = repository,
     )
     val steg = TilsynBarnBeregnYtelseSteg(
         tilsynBarnBeregningService = tilsynBarnBeregningService,
