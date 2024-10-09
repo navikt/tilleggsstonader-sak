@@ -129,7 +129,7 @@ class JournalføringService(
             OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
                 OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
                     behandlingId = behandling.id,
-                    saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                    saksbehandler = null, // Behandle sak oppgaven skal være ufordelt
                     beskrivelse = oppgaveBeskrivelse,
                 ),
             ),
