@@ -19,4 +19,5 @@ enum class Toggle(override val toggleId: String) : ToggleId {
 
     // Behandlinger som må ryddes opp i
     SPESIAL_NØS_OPPRYDDING("sak.rydde-opp-med-nos"),
+    SPESIAL_IVERKSETT_ENDRINGER("sak.iverksett-endringer"),
 }

@@ -26,11 +26,16 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.clearBrukerContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -41,9 +46,12 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.util.Properties
 import java.util.UUID
 
@@ -53,13 +61,12 @@ class BeslutteVedtakStegTest {
     private val fagsakService = mockk<FagsakService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
     private val oppgaveService = mockk<OppgaveService>()
-
-    // private val iverksettingDtoMapper = mockk<IverksettingDtoMapper>()
-    // private val iverksett = mockk<IverksettClient>()
     private val vedtaksresultatService = mockk<VedtaksresultatService>()
     private val brevService = mockk<BrevService>()
     private val behandlingService = mockk<BehandlingService>()
     private val iverksettService = mockk<IverksettService>(relaxed = true)
+    private val tilkjentYtelseService = mockk<TilkjentYtelseService>()
+    private val unleashService = mockUnleashService(isEnabled = false)
 
     private val beslutteVedtakSteg = BeslutteVedtakSteg(
         taskService = taskService,
@@ -70,6 +77,8 @@ class BeslutteVedtakStegTest {
         vedtaksresultatService = vedtaksresultatService,
         brevService = brevService,
         iverksettService = iverksettService,
+        tilkjentYtelseService = tilkjentYtelseService,
+        unleashService = unleashService,
     )
 
     private val innloggetBeslutter = "sign2"
@@ -164,13 +173,85 @@ class BeslutteVedtakStegTest {
 
     @Test
     internal fun `Skal kaste feil når behandling allerede er iverksatt `() {
-        val behandling = behandling(fagsak, BehandlingStatus.IVERKSETTER_VEDTAK, StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
+        val behandling =
+            behandling(fagsak, BehandlingStatus.IVERKSETTER_VEDTAK, StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
 
         val apiFeil =
             catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(saksbehandling(behandling = behandling)) }
 
         assertThat(apiFeil.message).isEqualTo("Behandlingen er allerede besluttet. Status på behandling er 'Iverksetter vedtak'")
         assertHarOpprettetTaskerAvType()
+    }
+
+    @Nested
+    inner class ValideringAvEndringer {
+
+        private val dto = BeslutteVedtakDto(true)
+
+        @BeforeEach
+        fun setUp() {
+            every { brevService.lagEndeligBeslutterbrev(any()) } returns Fil("".toByteArray())
+        }
+
+        @Test
+        fun `skal kaste feil hvis man ikke har med alle andeler fra tidligere`() {
+            val forrigeBehandlingId = BehandlingId.random()
+            val behandling =
+                behandling(fagsak, BehandlingStatus.IVERKSETTER_VEDTAK, forrigeBehandlingId = forrigeBehandlingId)
+
+            val forrigeAndel =
+                andelTilkjentYtelse(fom = LocalDate.of(2023, 4, 4), statusIverksetting = StatusIverksetting.OK)
+            every { tilkjentYtelseService.hentForBehandling(forrigeBehandlingId) } returns
+                tilkjentYtelse(forrigeBehandlingId, forrigeAndel)
+
+            val andel = andelTilkjentYtelse(fom = LocalDate.of(2024, 4, 4))
+            every { tilkjentYtelseService.hentForBehandling(behandling.id) } returns
+                tilkjentYtelse(behandling.id, andel)
+
+            assertThatThrownBy {
+                beslutteVedtakSteg.utførOgReturnerNesteSteg(saksbehandling(behandling = behandling), dto)
+            }.hasMessageContaining("Denne iverksettingen blir kanskje endringer på perioder som allerede er utbetalt.")
+        }
+
+        @Test
+        fun `skal kaste feil hvis man lagt til en periode før siste tidligere iverksatte periode`() {
+            val forrigeBehandlingId = BehandlingId.random()
+            val behandling =
+                behandling(fagsak, BehandlingStatus.IVERKSETTER_VEDTAK, forrigeBehandlingId = forrigeBehandlingId)
+
+            val forrigeAndel =
+                andelTilkjentYtelse(fom = LocalDate.of(2023, 4, 4), statusIverksetting = StatusIverksetting.OK)
+            every { tilkjentYtelseService.hentForBehandling(forrigeBehandlingId) } returns
+                tilkjentYtelse(forrigeBehandlingId, forrigeAndel)
+
+            val andel = andelTilkjentYtelse(fom = LocalDate.of(2022, 4, 4))
+            every { tilkjentYtelseService.hentForBehandling(behandling.id) } returns
+                tilkjentYtelse(behandling.id, forrigeAndel, andel)
+
+            assertThatThrownBy {
+                beslutteVedtakSteg.utførOgReturnerNesteSteg(saksbehandling(behandling = behandling), dto)
+            }.hasMessageContaining("Denne iverksettingen blir kanskje endringer på perioder som allerede er utbetalt.")
+        }
+
+        @Test
+        fun `går greit hvis man legger til perioder etter forrige siste iverksatte andel`() {
+            val forrigeBehandlingId = BehandlingId.random()
+            val behandling =
+                behandling(fagsak, BehandlingStatus.IVERKSETTER_VEDTAK, forrigeBehandlingId = forrigeBehandlingId)
+
+            val forrigeAndel =
+                andelTilkjentYtelse(fom = LocalDate.of(2023, 4, 4), statusIverksetting = StatusIverksetting.OK)
+            val forrigeAndel2 =
+                andelTilkjentYtelse(fom = LocalDate.of(2025, 4, 4), statusIverksetting = StatusIverksetting.UBEHANDLET)
+            every { tilkjentYtelseService.hentForBehandling(forrigeBehandlingId) } returns
+                tilkjentYtelse(forrigeBehandlingId, forrigeAndel, forrigeAndel2)
+
+            val andel = andelTilkjentYtelse(fom = LocalDate.of(2024, 4, 4))
+            every { tilkjentYtelseService.hentForBehandling(behandling.id) } returns
+                tilkjentYtelse(behandling.id, forrigeAndel, andel)
+
+            beslutteVedtakSteg.utførOgReturnerNesteSteg(saksbehandling(behandling = behandling), dto)
+        }
     }
 
     private fun assertHarOpprettetTaskerAvType(vararg typeTask: String) {
