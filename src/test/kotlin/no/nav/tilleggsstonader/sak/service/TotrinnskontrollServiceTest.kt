@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -50,6 +51,7 @@ internal class TotrinnskontrollServiceTest {
             tilgangService = tilgangService,
             taskService = taskService,
             totrinnskontrollRepository = totrinnskontrollRepository,
+            mockUnleashService(),
         )
 
     val saksbehandler = "Behandler"
