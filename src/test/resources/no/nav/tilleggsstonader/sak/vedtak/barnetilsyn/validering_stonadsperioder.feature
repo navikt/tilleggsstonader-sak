@@ -14,7 +14,7 @@ Egenskap: Beregning barnetilsyn - validering av stønadsperioder
 
     Når beregner
 
-    Så forvent følgende feil: Stønadsperioder mangler
+    Så forvent følgende feil: Kan ikke innvilge når det ikke finnes noen stønadsperioder
 
   Scenario: Finner ingen aktiviteter på behandling
 

@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnUtgiftService
@@ -266,8 +267,8 @@ class TilsynBarnBeregningService(
     }
 
     private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
-        feilHvis(stønadsperioder.isEmpty()) {
-            "Stønadsperioder mangler"
+        brukerfeilHvis(stønadsperioder.isEmpty()) {
+            "Kan ikke innvilge når det ikke finnes noen stønadsperioder"
         }
     }
 
