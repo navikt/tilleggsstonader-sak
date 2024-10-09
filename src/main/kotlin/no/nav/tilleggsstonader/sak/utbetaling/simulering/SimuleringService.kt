@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresul
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
+import no.nav.tilleggsstonader.sak.util.EnvUtil
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -51,6 +52,13 @@ class SimuleringService(
         }
 
         val resultat = simulerMedTilkjentYtelse(saksbehandling)
+        feilHvis(EnvUtil.erIProd() && resultat?.oppsummeringer?.any { it.totalFeilutbetaling > 0 } ?: false) {
+            /**
+             * Kaster foreløpig bare en feil her, då feiler dette steget men vedtaket er lagret.
+             * Økonomi har ennå ikke satt opp tilbakekrevingsløypa i prod ennå
+             */
+            "Vedtak gir tilbakekreving, vi har foreløpig ikke støtte for iverksettinger som gir tilbakekreving"
+        }
 
         simuleringsresultatRepository.deleteById(saksbehandling.id)
         return simuleringsresultatRepository.insert(
