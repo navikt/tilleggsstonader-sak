@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.PathVariable
 @ProtectedWithClaims(issuer = "azuread")
 abstract class VedtakController<DTO, DOMENE>(
     private val tilgangService: TilgangService,
-    private val vedtakService: VedtakService<DTO, DOMENE>,
+    private val vedtakService: VedtakService<DOMENE>,
+    private val dtoMapper: VedtakDtoMapper<DOMENE, DTO>
 ) {
-    fun lagreVedtak(behandlingId: BehandlingId, vedtak: DTO) {
+    fun lagreVedtak(behandlingId: BehandlingId, vedtak: DOMENE) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         vedtakService.håndterSteg(behandlingId, vedtak)
     }
@@ -24,6 +25,6 @@ abstract class VedtakController<DTO, DOMENE>(
     @GetMapping("{behandlingId}")
     fun hentVedtak(@PathVariable behandlingId: BehandlingId): DTO? {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return vedtakService.hentVedtakDto(behandlingId)
+        return vedtakService.hentVedtak(behandlingId)?.let(dtoMapper::map)
     }
 }

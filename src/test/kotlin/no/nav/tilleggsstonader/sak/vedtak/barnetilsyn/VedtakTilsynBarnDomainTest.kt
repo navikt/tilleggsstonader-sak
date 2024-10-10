@@ -7,7 +7,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-class VedtakTilsynBarnTest {
+class VedtakTilsynBarnDomainTest {
     @Nested
     inner class InnvilgetVedtak {
         @Test

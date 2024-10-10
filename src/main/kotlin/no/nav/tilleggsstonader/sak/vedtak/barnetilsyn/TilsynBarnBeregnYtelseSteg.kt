@@ -18,6 +18,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.felles.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.felles.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.felles.VedtakTilsynBarnDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
@@ -30,17 +33,17 @@ class TilsynBarnBeregnYtelseSteg(
     vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-) : BeregnYtelseSteg<VedtakTilsynBarnDto, VedtakTilsynBarn>(
+) : BeregnYtelseSteg<VedtakTilsynBarnDomain>(
     stønadstype = Stønadstype.BARNETILSYN,
     vedtakRepository = vedtakRepository,
     tilkjentytelseService = tilkjentytelseService,
     simuleringService = simuleringService,
 ) {
 
-    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakTilsynBarnDto) {
+    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakTilsynBarnDomain) {
         when (vedtak) {
-            is InnvilgelseTilsynBarnDto -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
-            is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
+            is InnvilgelseTilsynBarn -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
+            is AvslagTilsynBarn -> lagreAvslag(saksbehandling, vedtak)
         }
         /*
         Funksjonalitet som mangler:
@@ -54,7 +57,7 @@ class TilsynBarnBeregnYtelseSteg(
 
     private fun beregnOgLagreInnvilgelse(
         saksbehandling: Saksbehandling,
-        vedtak: InnvilgelseTilsynBarnDto,
+        vedtak: InnvilgelseTilsynBarn,
     ) {
         brukerfeilHvis(
             saksbehandling.forrigeBehandlingId != null &&
@@ -70,7 +73,7 @@ class TilsynBarnBeregnYtelseSteg(
 
     private fun lagreAvslag(
         saksbehandling: Saksbehandling,
-        vedtak: AvslagTilsynBarnDto,
+        vedtak: AvslagTilsynBarn,
     ) {
         vedtakRepository.insert(
             VedtakTilsynBarn(

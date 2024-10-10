@@ -4,12 +4,14 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakController
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.felles.VedtakTilsynBarnDomain
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -23,9 +25,11 @@ class TilsynBarnVedtakController(
     tilgangService: TilgangService,
     private val tilsynBarnVedtakService: TilsynBarnVedtakService,
     private val behandlingService: BehandlingService,
-) : VedtakController<VedtakTilsynBarnDto, VedtakTilsynBarn>(
+    private val vedtakDtoMapper: TilsynBarnVedtakDtoMapper,
+) : VedtakController<VedtakTilsynBarnDto, VedtakTilsynBarnDomain>(
     tilgangService,
     tilsynBarnVedtakService,
+    vedtakDtoMapper
 ) {
 
     @PostMapping("{behandlingId}/innvilgelse")

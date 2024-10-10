@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.felles.VedtakTilsynBarnDomain
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,7 +17,7 @@ class TilsynBarnVedtakService(
     stegService: StegService,
     tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
     private val behandlingService: BehandlingService,
-) : VedtakService<VedtakTilsynBarnDto, VedtakTilsynBarn>(stegService, tilsynBarnBeregnYtelseSteg, repository) {
+) : VedtakService<VedtakTilsynBarnDomain>(stegService, tilsynBarnBeregnYtelseSteg, repository) {
 
     override fun mapTilDto(vedtak: VedtakTilsynBarn): VedtakTilsynBarnDto {
         return when (vedtak.type) {
