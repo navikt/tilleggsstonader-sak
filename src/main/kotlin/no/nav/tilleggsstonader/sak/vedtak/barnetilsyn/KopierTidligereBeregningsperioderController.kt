@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -47,10 +47,10 @@ class KopierTidligereBeregningsperioderController(
     }
 
     @GetMapping
-    fun finnBehandlingerSomTrengerOppdatering(): List<BehandlingId> {
+    fun finnBehandlingerSomTrengerOppdatering(): List<String> {
         utførEndringSomSystem()
 
-        return analyserVedtak().map { it.vedtak.behandlingId }
+        return analyserVedtak().map { "${it.vedtak.behandlingId} - ${it.steg}" }
     }
 
     @PostMapping("oppdater")
@@ -96,7 +96,7 @@ class KopierTidligereBeregningsperioderController(
             }
 
             var trengerOppdatering = beregningsresultatTilsynBarn != vedtak.beregningsresultat
-            logger.info("Vedtak for behandling=$behandlingId trengerOppdatering=$trengerOppdatering")
+            logger.info("Vedtak for behandling=$behandlingId trengerOppdatering=$trengerOppdatering steg=${behandling.steg}")
 
             val eksisterendeAndeler = finnAndeler(behandling)
             if (eksisterendeAndeler != tilAndeler(beregningsresultatTilsynBarn)) {
@@ -105,12 +105,13 @@ class KopierTidligereBeregningsperioderController(
             } else {
                 logger.info("Andeler er like for behandling=$behandlingId")
             }
-            Oppdateringsinformasjon(vedtak, beregningsresultatTilsynBarn, trengerOppdatering)
+            Oppdateringsinformasjon(vedtak, behandling.steg, beregningsresultatTilsynBarn, trengerOppdatering)
         }
     }
 
     private data class Oppdateringsinformasjon(
         val vedtak: VedtakTilsynBarn,
+        val steg: StegType,
         val nyttBeregningsresultat: BeregningsresultatTilsynBarn,
         val trengerOppdatering: Boolean,
     )
