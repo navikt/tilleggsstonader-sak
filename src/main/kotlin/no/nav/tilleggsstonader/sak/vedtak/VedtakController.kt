@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,6 +25,12 @@ abstract class VedtakController<DTO, DOMENE>(
     @GetMapping("{behandlingId}")
     fun hentVedtak(@PathVariable behandlingId: BehandlingId): DTO? {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        return vedtakService.hentVedtakDto(behandlingId)
+        return vedtakService.hentVedtakDto(behandlingId, false)
+    }
+
+    @GetMapping("fagsak/{fagsakId}")
+    fun hentInnvilgedePerioderForFagsak(@PathVariable fagsakId: FagsakId): DTO? {
+        tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
+        return vedtakService.hentVedtakDto(fagsakId)
     }
 }

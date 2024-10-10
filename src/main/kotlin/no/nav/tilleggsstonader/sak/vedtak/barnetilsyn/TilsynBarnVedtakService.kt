@@ -9,21 +9,26 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnD
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class TilsynBarnVedtakService(
     repository: TilsynBarnVedtakRepository,
     stegService: StegService,
     tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
-    private val behandlingService: BehandlingService,
-) : VedtakService<VedtakTilsynBarnDto, VedtakTilsynBarn>(stegService, tilsynBarnBeregnYtelseSteg, repository) {
+    behandlingService: BehandlingService,
+) : VedtakService<VedtakTilsynBarnDto, VedtakTilsynBarn>(
+    stegService,
+    tilsynBarnBeregnYtelseSteg,
+    repository,
+    behandlingService,
+) {
 
-    override fun mapTilDto(vedtak: VedtakTilsynBarn): VedtakTilsynBarnDto {
+    override fun mapTilDto(vedtak: VedtakTilsynBarn, revurderFra: LocalDate?): VedtakTilsynBarnDto {
         return when (vedtak.type) {
             TypeVedtak.INNVILGELSE -> {
-                val behandling = behandlingService.hentSaksbehandling(vedtak.behandlingId)
                 InnvilgelseTilsynBarnDto(
-                    beregningsresultat = vedtak.beregningsresultat?.tilDto(revurderFra = behandling.revurderFra),
+                    beregningsresultat = vedtak.beregningsresultat?.tilDto(revurderFra = revurderFra),
                 )
             }
 

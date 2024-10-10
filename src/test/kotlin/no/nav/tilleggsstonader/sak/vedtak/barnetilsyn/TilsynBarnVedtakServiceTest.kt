@@ -28,7 +28,7 @@ class TilsynBarnVedtakServiceTest {
     fun `skal mappe innvilget vedtak til dto`() {
         val vedtak = innvilgetVedtak()
 
-        val dto = tilsynBarnVedtakService.mapTilDto(vedtak)
+        val dto = tilsynBarnVedtakService.mapTilDto(vedtak, null)
 
         assertThat(dto).isInstanceOf(InnvilgelseTilsynBarnDto::class.java)
     }
@@ -42,7 +42,7 @@ class TilsynBarnVedtakServiceTest {
             årsakerAvslag = ÅrsakAvslag.Wrapper(årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET)),
         )
 
-        val dto = tilsynBarnVedtakService.mapTilDto(vedtak) as AvslagTilsynBarnDto
+        val dto = tilsynBarnVedtakService.mapTilDto(vedtak, null) as AvslagTilsynBarnDto
 
         assertThat(dto.begrunnelse).isEqualTo(vedtak.avslagBegrunnelse)
         assertThat(dto.type).isEqualTo(vedtak.type)
