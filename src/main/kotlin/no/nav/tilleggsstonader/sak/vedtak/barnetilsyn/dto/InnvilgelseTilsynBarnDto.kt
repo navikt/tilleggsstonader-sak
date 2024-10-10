@@ -12,9 +12,6 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
-/**
- * @param utgifter map utgifter per [no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn]
- */
 data class InnvilgelseTilsynBarnDto(
     val beregningsresultat: BeregningsresultatTilsynBarnDto?,
 ) : VedtakTilsynBarnDto(TypeVedtak.INNVILGELSE)

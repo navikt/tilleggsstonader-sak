@@ -73,10 +73,10 @@ object TilsynBeregningUtil {
      * Er datoen lør eller søn returneres mandagen uken etter
      */
     private fun LocalDate.nærmesteRelevateMandag(): LocalDate {
-        if (this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY) {
-            return this.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+        return if (this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY) {
+            this.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
         } else {
-            return this.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            this.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
         }
     }
 
