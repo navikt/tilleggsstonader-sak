@@ -1,13 +1,17 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnUtgiftService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilUke
@@ -29,7 +33,6 @@ import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
-import java.time.YearMonth
 
 /**
  * Stønaden dekker 64% av utgifterne til barnetilsyn
@@ -42,26 +45,42 @@ class TilsynBarnBeregningService(
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
-    private val behandlingService: BehandlingService,
+    private val repository: TilsynBarnVedtakRepository,
 ) {
 
-    fun beregn(behandlingId: BehandlingId): BeregningsresultatTilsynBarn {
-        val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
+    fun beregn(behandling: Saksbehandling): BeregningsresultatTilsynBarn {
+        val perioder = beregnAktuellePerioder(behandling)
+        val relevantePerioderFraForrigeVedtak = finnRelevantePerioderFraForrigeVedtak(behandling)
+        return BeregningsresultatTilsynBarn(relevantePerioderFraForrigeVedtak + perioder)
+    }
 
-        val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandlingId)
-        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId)
+    /**
+     * Dersom behandling er en revurdering beregnes perioder fra og med måneden for revurderFra
+     * Ellers beregnes perioder for hele perioden som man har stønadsperioder og utgifter
+     */
+    private fun beregnAktuellePerioder(behandling: Saksbehandling): List<BeregningsresultatForMåned> {
+        val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
+        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandling.id)
             .tilSortertDto()
-            .splitFraRevurderFra(revurderFra)
+            .splitFraRevurderFra(behandling.revurderFra)
 
-        val aktiviteter = finnAktiviteter(behandlingId)
+        val aktiviteter = finnAktiviteter(behandling.id)
 
         validerPerioder(stønadsperioder, aktiviteter, utgifterPerBarn)
 
         val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, aktiviteter, utgifterPerBarn)
-            .brukPerioderFraOgMedRevurderFra(revurderFra)
-        val perioder = beregn(beregningsgrunnlag)
+            .brukPerioderFraOgMedRevurderFra(behandling.revurderFra)
+        return beregn(beregningsgrunnlag)
+    }
 
-        return BeregningsresultatTilsynBarn(perioder)
+    private fun finnRelevantePerioderFraForrigeVedtak(behandling: Saksbehandling): List<BeregningsresultatForMåned> {
+        return behandling.forrigeBehandlingId?.let { forrigeBehandlingId ->
+            val beregningsresultat = repository.findByIdOrThrow(forrigeBehandlingId).beregningsresultat
+                ?: error("Finner ikke beregningsresultat på vedtak for behandling=$forrigeBehandlingId")
+            val revurderFraMåned = behandling.revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN
+
+            beregningsresultat.perioder.filter { it.grunnlag.måned < revurderFraMåned }
+        } ?: emptyList()
     }
 
     private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<BeregningsresultatForMåned> {
@@ -225,9 +244,7 @@ class TilsynBarnBeregningService(
     private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedRevurderFra(
         revurderFra: LocalDate?,
     ): List<Beregningsgrunnlag> {
-        val revurderFraMåned = revurderFra?.let { YearMonth.from(it) }
-
-        if (revurderFraMåned == null) return this
+        val revurderFraMåned = revurderFra?.toYearMonth() ?: return this
 
         return this.filter { it.måned >= revurderFraMåned }
     }
