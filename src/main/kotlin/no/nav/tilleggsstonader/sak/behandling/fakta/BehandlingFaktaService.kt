@@ -102,10 +102,10 @@ class BehandlingFaktaService(
             søknadsgrunnlag =
             utdanningAvsnitt?.let {
                 SøknadsgrunnlagUtdanning(
+                    aktiviteter = it.aktiviteter?.map { it.label },
                     annenUtdanning = it.annenUtdanning,
                     mottarUtstyrsstipend = it.mottarUtstyrsstipend,
                     harFunksjonsnedsettelse = it.harFunksjonsnedsettelse,
-                    aktiviteter = it.aktiviteter,
                 )
             },
         )
