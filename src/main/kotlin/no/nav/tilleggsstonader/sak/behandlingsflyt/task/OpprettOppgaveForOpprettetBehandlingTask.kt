@@ -89,9 +89,9 @@ class OpprettOppgaveForOpprettetBehandlingTask(
                 payload = objectMapper.writeValueAsString(data),
                 properties = Properties().apply {
                     if (data.saksbehandler != null) {
-                        this["saksbehandler"] = data.saksbehandler
+                        setProperty("saksbehandler", data.saksbehandler)
                     }
-                    this["behandlingId"] = data.behandlingId.toString()
+                    setProperty("behandlingId", data.behandlingId.toString())
                 },
             )
         }
