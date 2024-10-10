@@ -3,9 +3,11 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -84,7 +86,12 @@ class KopierTidligereBeregningsperioderController(
                 return@mapNotNull null
             }
             val behandling = behandlinger.getValue(behandlingId)
-            val beregningsresultatTilsynBarn = tilsynBarnBeregningService.beregn(behandling)
+            val beregningsresultatTilsynBarn = try {
+                tilsynBarnBeregningService.beregn(behandling)
+            } catch (e: Exception) {
+                secureLogger.warn("Feilet beregning av behandling=$behandlingId", e)
+                brukerfeil("Feilet beregning av behandling=$behandlingId")
+            }
 
             var trengerOppdatering = beregningsresultatTilsynBarn != vedtak.beregningsresultat
             logger.info("Vedtak for behandling=$behandlingId trengerOppdatering=$trengerOppdatering")
