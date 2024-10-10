@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TilsynBarnVedtakRepository :
-    VedtakRepository<VedtakTilsynBarn>,
-    RepositoryInterface<VedtakTilsynBarn, BehandlingId>,
-    InsertUpdateRepository<VedtakTilsynBarn>
+    VedtakRepository<VedtakTilsynBarnEntity>,
+    RepositoryInterface<VedtakTilsynBarnEntity, BehandlingId>,
+    InsertUpdateRepository<VedtakTilsynBarnEntity>

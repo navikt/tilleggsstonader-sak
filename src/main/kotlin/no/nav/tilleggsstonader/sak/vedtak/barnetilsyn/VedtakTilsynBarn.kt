@@ -15,7 +15,7 @@ import org.springframework.data.relational.core.mapping.Embedded
  * Eller om ma har vedtak, og beregningsgrunnlag som et eget?
  * Trenger man begrunnelse som eget felt?
  */
-data class VedtakTilsynBarn(
+data class VedtakTilsynBarnEntity(
     @Id
     val behandlingId: BehandlingId,
     val type: TypeVedtak,

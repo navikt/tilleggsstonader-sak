@@ -4,14 +4,13 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakController
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
-import no.nav.tilleggsstonader.sak.vedtak.felles.VedtakTilsynBarnDomain
+import no.nav.tilleggsstonader.sak.vedtak.felles.VedtakTilsynBarn
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -25,8 +24,8 @@ class TilsynBarnVedtakController(
     tilgangService: TilgangService,
     private val tilsynBarnVedtakService: TilsynBarnVedtakService,
     private val behandlingService: BehandlingService,
-    private val vedtakDtoMapper: TilsynBarnVedtakDtoMapper,
-) : VedtakController<VedtakTilsynBarnDto, VedtakTilsynBarnDomain>(
+    private val vedtakDtoMapper: TilsynBarnVedtakMapper,
+) : VedtakController<VedtakTilsynBarnDto, VedtakTilsynBarn>(
     tilgangService,
     tilsynBarnVedtakService,
     vedtakDtoMapper
@@ -37,7 +36,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ) {
-        lagreVedtak(behandlingId, vedtak.tilDto())
+        lagreVedtak(behandlingId, vedtakDtoMapper.map(vedtak.tilDto()))
     }
 
     @PostMapping("{behandlingId}/avslag")
@@ -45,7 +44,7 @@ class TilsynBarnVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagRequest,
     ) {
-        lagreVedtak(behandlingId, vedtak.tilDto())
+        lagreVedtak(behandlingId, vedtakDtoMapper.map(vedtak.tilDto()))
     }
 
     @PostMapping("{behandlingId}/beregn")

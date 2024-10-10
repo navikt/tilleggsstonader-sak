@@ -4,6 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -14,7 +17,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
  */
 abstract class BeregnYtelseSteg<DOMENE>(
     private val stønadstype: Stønadstype,
-    open val vedtakRepository: VedtakRepository<>,
+    open val vedtakRepository: RepositoryInterface<*, BehandlingId>,
     open val tilkjentytelseService: TilkjentYtelseService,
     open val simuleringService: SimuleringService,
 ) : BehandlingSteg<DOMENE> {

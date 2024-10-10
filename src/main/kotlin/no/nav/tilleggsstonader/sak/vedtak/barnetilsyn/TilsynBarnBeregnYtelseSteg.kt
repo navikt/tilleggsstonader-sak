@@ -15,12 +15,9 @@ import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.felles.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.felles.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.felles.VedtakTilsynBarnDomain
+import no.nav.tilleggsstonader.sak.vedtak.felles.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
@@ -30,17 +27,17 @@ import java.time.LocalDate
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     private val unleashService: UnleashService,
-    vedtakRepository: TilsynBarnVedtakRepository,
+    override val vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-) : BeregnYtelseSteg<VedtakTilsynBarnDomain>(
+) : BeregnYtelseSteg<VedtakTilsynBarn>(
     stønadstype = Stønadstype.BARNETILSYN,
     vedtakRepository = vedtakRepository,
     tilkjentytelseService = tilkjentytelseService,
     simuleringService = simuleringService,
 ) {
 
-    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakTilsynBarnDomain) {
+    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakTilsynBarn) {
         when (vedtak) {
             is InnvilgelseTilsynBarn -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
             is AvslagTilsynBarn -> lagreAvslag(saksbehandling, vedtak)
@@ -76,7 +73,7 @@ class TilsynBarnBeregnYtelseSteg(
         vedtak: AvslagTilsynBarn,
     ) {
         vedtakRepository.insert(
-            VedtakTilsynBarn(
+            VedtakTilsynBarnEntity(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.AVSLAG,
                 avslagBegrunnelse = vedtak.begrunnelse,
@@ -113,8 +110,8 @@ class TilsynBarnBeregnYtelseSteg(
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatTilsynBarn,
-    ): VedtakTilsynBarn {
-        return VedtakTilsynBarn(
+    ): VedtakTilsynBarnEntity {
+        return VedtakTilsynBarnEntity(
             behandlingId = behandling.id,
             type = TypeVedtak.INNVILGELSE,
             vedtak = VedtaksdataTilsynBarn(
