@@ -5,6 +5,7 @@ import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
@@ -74,6 +75,7 @@ class KopierTidligereBeregningsperioderController(
 
     private fun analyserVedtak(): List<Oppdateringsinformasjon> {
         val behandlinger = behandlingRepository.findAll()
+            .filter { it.resultat != BehandlingResultat.HENLAGT }
             .mapNotNull { behandling -> behandling.revurderFra?.let { behandlingRepository.finnSaksbehandling(behandling.id) } }
             .associateBy { it.id }
 
