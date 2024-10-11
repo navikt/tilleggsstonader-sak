@@ -10,6 +10,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode as StønadsperiodeInngangsvilkår
 
 data class BeregningsresultatTilsynBarn(
     val perioder: List<BeregningsresultatForMåned>,
@@ -45,10 +46,22 @@ data class Beregningsgrunnlag(
 )
 
 data class StønadsperiodeGrunnlag(
-    val stønadsperiode: StønadsperiodeDto,
+    val stønadsperiode: Stønadsperiode,
     val aktiviteter: List<Aktivitet>,
     val antallDager: Int,
 )
+
+data class Stønadsperiode(
+    val id: UUID? = null,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType,
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+    }
+}
 
 data class UtgiftBarn(
     val barnId: BarnId,
@@ -78,3 +91,21 @@ fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
         }
     }
 }
+
+fun StønadsperiodeDto.tilBeregningsgrunnlagStønadsperiode() = Stønadsperiode(
+    id = this.id,
+    fom = this.fom,
+    tom = this.tom,
+    målgruppe = this.målgruppe,
+    aktivitet = this.aktivitet,
+)
+
+fun StønadsperiodeInngangsvilkår.tilGrunnlagStønadsperiode() = Stønadsperiode(
+    id = this.id,
+    fom = this.fom,
+    tom = this.tom,
+    målgruppe = this.målgruppe,
+    aktivitet = this.aktivitet,
+)
+
+fun List<StønadsperiodeInngangsvilkår>.tilSortertGrunnlagStønadsperiode() = this.map { it.tilGrunnlagStønadsperiode() }.sortedBy { it.fom }

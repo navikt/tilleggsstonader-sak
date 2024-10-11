@@ -20,11 +20,11 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilAktiviteter
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilSortertGrunnlagStønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
@@ -60,7 +60,7 @@ class TilsynBarnBeregningService(
     private fun beregnAktuellePerioder(behandling: Saksbehandling): List<BeregningsresultatForMåned> {
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
         val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandling.id)
-            .tilSortertDto()
+            .tilSortertGrunnlagStønadsperiode()
             .splitFraRevurderFra(behandling.revurderFra)
 
         val aktiviteter = finnAktiviteter(behandling.id)
@@ -130,7 +130,7 @@ class TilsynBarnBeregningService(
     }
 
     private fun lagBeregningsgrunnlagPerMåned(
-        stønadsperioder: List<StønadsperiodeDto>,
+        stønadsperioder: List<Stønadsperiode>,
         aktiviteter: List<Aktivitet>,
         utgifterPerBarn: Map<BarnId, List<UtgiftBeregning>>,
     ): List<Beregningsgrunnlag> {
@@ -157,7 +157,7 @@ class TilsynBarnBeregningService(
     }
 
     private fun finnStønadsperioderMedAktiviteter(
-        stønadsperioder: List<StønadsperiodeDto>,
+        stønadsperioder: List<Stønadsperiode>,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
     ): List<StønadsperiodeGrunnlag> {
         val aktiviteterPerUke = aktiviteter.map { it.key to it.value.tilDagerPerUke() }.toMap()
@@ -174,7 +174,7 @@ class TilsynBarnBeregningService(
     }
 
     private fun finnAktiviteterForStønadsperiode(
-        stønadsperiode: StønadsperiodeDto,
+        stønadsperiode: Stønadsperiode,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
     ): List<Aktivitet> {
         return aktiviteter[stønadsperiode.aktivitet]?.filter { it.overlapper(stønadsperiode) }
@@ -182,7 +182,7 @@ class TilsynBarnBeregningService(
     }
 
     private fun antallDager(
-        stønadsperiode: StønadsperiodeDto,
+        stønadsperiode: Stønadsperiode,
         aktiviteterPerType: Map<AktivitetType, Map<Uke, List<PeriodeMedDager>>>,
     ): Int {
         val stønadsperioderUker = stønadsperiode.tilUke()
@@ -253,7 +253,7 @@ class TilsynBarnBeregningService(
      * Eks for revurderFra=15.1 så får man 1.1 - 14.1 og 15.1 - 31.1
      * Dette for å kunne filtrere vekk perioder som begynner før revurderFra og beregne beløp som skal utbetales i gitt måned
      */
-    private fun List<StønadsperiodeDto>.splitFraRevurderFra(revurderFra: LocalDate?): List<StønadsperiodeDto> {
+    private fun List<Stønadsperiode>.splitFraRevurderFra(revurderFra: LocalDate?): List<Stønadsperiode> {
         if (revurderFra == null) return this
         return this.flatMap {
             if (it.fom < revurderFra && revurderFra <= it.tom) {
@@ -273,7 +273,7 @@ class TilsynBarnBeregningService(
     }
 
     private fun validerPerioder(
-        stønadsperioder: List<StønadsperiodeDto>,
+        stønadsperioder: List<Stønadsperiode>,
         aktiviteter: List<Aktivitet>,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
     ) {
@@ -282,7 +282,7 @@ class TilsynBarnBeregningService(
         validerUtgifter(utgifter)
     }
 
-    private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
+    private fun validerStønadsperioder(stønadsperioder: List<Stønadsperiode>) {
         brukerfeilHvis(stønadsperioder.isEmpty()) {
             "Kan ikke innvilge når det ikke finnes noen stønadsperioder"
         }
