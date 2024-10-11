@@ -38,6 +38,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
@@ -236,12 +237,14 @@ fun stønadsperiode(
     tom: LocalDate,
     målgruppe: MålgruppeType = MålgruppeType.AAP,
     aktivitet: AktivitetType = AktivitetType.TILTAK,
+    status: StønadsperiodeStatus = StønadsperiodeStatus.NY,
 ): Stønadsperiode = Stønadsperiode(
     behandlingId = behandlingId,
     fom = fom,
     tom = tom,
     målgruppe = målgruppe,
     aktivitet = aktivitet,
+    status = status,
 )
 
 fun vilkår(

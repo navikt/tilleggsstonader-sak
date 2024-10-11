@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -197,8 +198,9 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         with(stønadsperiodeRepository.findAllByBehandlingId(revurdering.id).single()) {
             assertThat(this)
                 .usingRecursiveComparison()
-                .ignoringFields("id", "sporbar", "behandlingId")
+                .ignoringFields("id", "sporbar", "behandlingId", "status")
                 .isEqualTo(stønadsperiode)
+            assertThat(this.status).isEqualTo(StønadsperiodeStatus.UENDRET)
         }
     }
 

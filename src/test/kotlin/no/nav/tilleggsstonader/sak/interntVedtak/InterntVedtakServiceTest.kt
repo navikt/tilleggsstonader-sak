@@ -32,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollServi
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -153,6 +154,7 @@ class InterntVedtakServiceTest {
             tom = LocalDate.of(2024, 3, 31),
             målgruppe = MålgruppeType.AAP,
             aktivitet = AktivitetType.TILTAK,
+            status = StønadsperiodeStatus.NY,
         ),
         StønadsperiodeDto(
             id = UUID.randomUUID(),
@@ -160,6 +162,7 @@ class InterntVedtakServiceTest {
             tom = LocalDate.of(2024, 3, 31),
             målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
             aktivitet = AktivitetType.REELL_ARBEIDSSØKER,
+            status = StønadsperiodeStatus.NY,
         ),
     )
     val behandlingId = behandling.id

@@ -41,6 +41,7 @@ fun mapStønadsperioder(behandlingId: BehandlingId, dataTable: DataTable) = data
         målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
         aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
             ?: AktivitetType.TILTAK,
+        status = null,
     )
 }
 

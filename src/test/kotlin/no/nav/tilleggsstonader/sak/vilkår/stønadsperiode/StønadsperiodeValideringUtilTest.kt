@@ -4,6 +4,7 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -576,6 +577,7 @@ internal class StønadsperiodeValideringUtilTest {
         tom: LocalDate = LocalDate.of(2023, 1, 10),
         målgruppe: MålgruppeType = MålgruppeType.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
+        status: StønadsperiodeStatus = StønadsperiodeStatus.NY,
     ): StønadsperiodeDto {
         return StønadsperiodeDto(
             id = UUID.randomUUID(),
@@ -583,6 +585,7 @@ internal class StønadsperiodeValideringUtilTest {
             tom = tom,
             målgruppe = målgruppe,
             aktivitet = aktivitet,
+            status = status,
         )
     }
 }

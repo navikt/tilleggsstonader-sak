@@ -37,6 +37,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårController
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -294,6 +295,7 @@ class BehandlingFlytTest(
                     tom = tom,
                     målgruppe = MålgruppeType.AAP,
                     aktivitet = AktivitetType.TILTAK,
+                    status = StønadsperiodeStatus.NY,
                 ),
             ),
         )

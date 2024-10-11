@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -18,6 +19,7 @@ class StønadsperiodeDtoTest {
                 tom = osloDateNow().minusDays(1),
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
+                status = StønadsperiodeStatus.NY,
             )
         }.hasMessageContaining("Til-og-med før fra-og-med")
     }

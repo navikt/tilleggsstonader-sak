@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -105,5 +106,6 @@ class StønadsperiodeControllerTest : IntegrationTest() {
         tom = dagensDato,
         målgruppe = MålgruppeType.AAP,
         aktivitet = AktivitetType.TILTAK,
+        status = StønadsperiodeStatus.NY,
     )
 }

@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurd
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -82,12 +83,38 @@ class StønadsperiodeService(
                     tom = it.tom,
                     målgruppe = it.målgruppe,
                     aktivitet = it.aktivitet,
+                    status = utledNyStatusForPeriode(it, tidligereStønadsperiode),
                 ).apply {
                     validerEndrePeriodeRevurdering(behandling, tidligereStønadsperiode, this)
                 }
             }
         }
         return stønadsperiodeRepository.updateAll(perioderTilOppdatering)
+    }
+
+    private fun utledNyStatusForPeriode(
+        stønadsperiode: StønadsperiodeDto,
+        tidligereStønadsperiode: Stønadsperiode,
+    ): StønadsperiodeStatus? {
+        when (tidligereStønadsperiode.status) {
+            StønadsperiodeStatus.UENDRET -> return utledStatusBasertPåEndring(stønadsperiode, tidligereStønadsperiode)
+            else -> return stønadsperiode.status
+        }
+    }
+
+    private fun utledStatusBasertPåEndring(
+        oppdatertPeriode: StønadsperiodeDto,
+        eksisterendePeriode: Stønadsperiode,
+    ): StønadsperiodeStatus {
+        if (eksisterendePeriode.fom == oppdatertPeriode.fom &&
+            eksisterendePeriode.tom == oppdatertPeriode.tom &&
+            eksisterendePeriode.målgruppe == oppdatertPeriode.målgruppe &&
+            eksisterendePeriode.aktivitet == oppdatertPeriode.aktivitet
+        ) {
+            return StønadsperiodeStatus.UENDRET
+        }
+
+        return StønadsperiodeStatus.ENDRET
     }
 
     private fun leggTilNyeStønadsperioder(
@@ -107,6 +134,7 @@ class StønadsperiodeService(
                 tom = it.tom,
                 målgruppe = it.målgruppe,
                 aktivitet = it.aktivitet,
+                status = StønadsperiodeStatus.NY,
             )
         }
         nyeStønadsperioder.forEach {
@@ -135,6 +163,7 @@ class StønadsperiodeService(
             it.copy(
                 id = UUID.randomUUID(),
                 behandlingId = nyBehandlingId,
+                status = StønadsperiodeStatus.UENDRET,
                 sporbar = Sporbar(),
             )
         }
