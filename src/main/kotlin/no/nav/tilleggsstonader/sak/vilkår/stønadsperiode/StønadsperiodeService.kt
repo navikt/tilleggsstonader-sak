@@ -83,27 +83,25 @@ class StønadsperiodeService(
                     tom = it.tom,
                     målgruppe = it.målgruppe,
                     aktivitet = it.aktivitet,
-                    status = utledNyStatusForPeriode(it, tidligereStønadsperiode),
-                ).apply {
-                    validerEndrePeriodeRevurdering(behandling, tidligereStønadsperiode, this)
-                }
+                ).medNyStatus(tidligereStønadsperiode)
+                    .apply {
+                        validerEndrePeriodeRevurdering(behandling, tidligereStønadsperiode, this)
+                    }
             }
         }
         return stønadsperiodeRepository.updateAll(perioderTilOppdatering)
     }
 
-    private fun utledNyStatusForPeriode(
-        stønadsperiode: StønadsperiodeDto,
-        tidligereStønadsperiode: Stønadsperiode,
-    ): StønadsperiodeStatus? {
-        when (tidligereStønadsperiode.status) {
-            StønadsperiodeStatus.UENDRET -> return utledStatusBasertPåEndring(stønadsperiode, tidligereStønadsperiode)
-            else -> return stønadsperiode.status
+    private fun Stønadsperiode.medNyStatus(tidligereStønadsperiode: Stønadsperiode): Stønadsperiode {
+        val nyStatus = when (tidligereStønadsperiode.status) {
+            StønadsperiodeStatus.UENDRET -> utledStatusBasertPåEndring(this, tidligereStønadsperiode)
+            else -> this.status
         }
+        return this.copy(status = nyStatus)
     }
 
     private fun utledStatusBasertPåEndring(
-        oppdatertPeriode: StønadsperiodeDto,
+        oppdatertPeriode: Stønadsperiode,
         eksisterendePeriode: Stønadsperiode,
     ): StønadsperiodeStatus {
         if (eksisterendePeriode.fom == oppdatertPeriode.fom &&
