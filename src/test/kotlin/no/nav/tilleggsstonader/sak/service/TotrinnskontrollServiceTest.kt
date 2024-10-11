@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -50,6 +51,7 @@ internal class TotrinnskontrollServiceTest {
             tilgangService = tilgangService,
             taskService = taskService,
             totrinnskontrollRepository = totrinnskontrollRepository,
+            mockUnleashService(),
         )
 
     val saksbehandler = "Behandler"
@@ -271,7 +273,7 @@ internal class TotrinnskontrollServiceTest {
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.TOTRINNSKONTROLL_UNDERKJENT)
         assertThat(totrinnskontroll.totrinnskontroll?.begrunnelse).isEqualTo("begrunnelse underkjent")
         assertThat(totrinnskontroll.totrinnskontroll?.årsakerUnderkjent).containsExactlyInAnyOrder(
-            ÅrsakUnderkjent.INNGANGSVILKÅR_FORUTGÅENDE_MEDLEMSKAP_OPPHOLD,
+            ÅrsakUnderkjent.VEDTAKSBREV,
             ÅrsakUnderkjent.VEDTAK_OG_BEREGNING,
         )
     }
@@ -286,10 +288,10 @@ internal class TotrinnskontrollServiceTest {
         testWithBrukerContext(beslutter) {
             totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(
                 saksbehandling(status = BehandlingStatus.UTREDES),
-                BeslutteVedtakDto(false, "manglende", årsakerUnderkjent = listOf(ÅrsakUnderkjent.AKTIVITET)),
+                BeslutteVedtakDto(false, "manglende", årsakerUnderkjent = listOf(ÅrsakUnderkjent.VEDTAKSBREV)),
             )
         }
-        assertThat(oppdaterSlot.captured.årsakerUnderkjent?.årsaker!!).containsExactly(ÅrsakUnderkjent.AKTIVITET)
+        assertThat(oppdaterSlot.captured.årsakerUnderkjent?.årsaker!!).containsExactly(ÅrsakUnderkjent.VEDTAKSBREV)
     }
 
     private fun totrinnskontroll(
@@ -316,7 +318,7 @@ internal class TotrinnskontrollServiceTest {
             beslutter = beslutter,
             årsakerUnderkjent = Årsaker(
                 listOf(
-                    ÅrsakUnderkjent.INNGANGSVILKÅR_FORUTGÅENDE_MEDLEMSKAP_OPPHOLD,
+                    ÅrsakUnderkjent.VEDTAKSBREV,
                     ÅrsakUnderkjent.VEDTAK_OG_BEREGNING,
                 ),
             ),

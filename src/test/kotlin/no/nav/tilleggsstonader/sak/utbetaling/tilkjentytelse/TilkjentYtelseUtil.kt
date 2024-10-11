@@ -25,7 +25,7 @@ object TilkjentYtelseUtil {
         kildeBehandlingId: BehandlingId = BehandlingId.random(),
         beløp: Int = 11554,
         fom: LocalDate = LocalDate.of(2021, 1, 1),
-        tom: LocalDate = LocalDate.of(2021, 1, 31),
+        tom: LocalDate = fom,
         satstype: Satstype = Satstype.DAG,
         type: TypeAndel = TypeAndel.TILSYN_BARN_AAP,
         statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,

@@ -37,7 +37,7 @@ class OpprettOppgaveForOpprettetBehandlingTask(
 
     data class OpprettOppgaveTaskData(
         val behandlingId: BehandlingId,
-        val saksbehandler: String,
+        val saksbehandler: String? = null,
         val beskrivelse: String? = null,
         val hendelseTidspunkt: LocalDateTime = osloNow(),
         val prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
@@ -88,8 +88,10 @@ class OpprettOppgaveForOpprettetBehandlingTask(
                 type = TYPE,
                 payload = objectMapper.writeValueAsString(data),
                 properties = Properties().apply {
-                    this["saksbehandler"] = data.saksbehandler
-                    this["behandlingId"] = data.behandlingId.toString()
+                    if (data.saksbehandler != null) {
+                        setProperty("saksbehandler", data.saksbehandler)
+                    }
+                    setProperty("behandlingId", data.behandlingId.toString())
                 },
             )
         }

@@ -9,6 +9,7 @@ import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.time.LocalDateTime
+import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype as EnsligForsørgerStønadstypeKontrakter
 
 data class VilkårperioderGrunnlag(
     val aktivitet: GrunnlagAktivitet,
@@ -37,6 +38,7 @@ data class PeriodeGrunnlagYtelse(
     val type: TypeYtelsePeriode,
     val fom: LocalDate,
     val tom: LocalDate?,
+    val ensligForsørgerStønadstype: EnsligForsørgerStønadstype? = null,
 )
 
 data class HentetInformasjon(
@@ -44,3 +46,15 @@ data class HentetInformasjon(
     val tom: LocalDate,
     val tidspunktHentet: LocalDateTime,
 )
+
+enum class EnsligForsørgerStønadstype {
+    OVERGANGSSTØNAD,
+    SKOLEPENGER,
+}
+
+fun EnsligForsørgerStønadstypeKontrakter.tilDomenetype(): EnsligForsørgerStønadstype {
+    return when (this) {
+        EnsligForsørgerStønadstypeKontrakter.OVERGANGSSTØNAD -> EnsligForsørgerStønadstype.OVERGANGSSTØNAD
+        EnsligForsørgerStønadstypeKontrakter.SKOLEPENGER -> EnsligForsørgerStønadstype.SKOLEPENGER
+    }
+}

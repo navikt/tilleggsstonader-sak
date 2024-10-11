@@ -1,20 +1,24 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostResponse
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.log.NavHttpHeaders
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
@@ -50,7 +54,14 @@ class JournalpostClient(
         arkiverDokumentRequest: ArkiverDokumentRequest,
         saksbehandler: String?,
     ): ArkiverDokumentResponse {
-        return postForEntity(dokarkivUri.toString(), arkiverDokumentRequest, headerMedSaksbehandler(saksbehandler))
+        try {
+            return postForEntity(dokarkivUri.toString(), arkiverDokumentRequest, headerMedSaksbehandler(saksbehandler))
+        } catch (e: Exception) {
+            if (e is HttpClientErrorException.Conflict) {
+                håndterConflict(e)
+            }
+            throw e
+        }
     }
 
     fun oppdaterJournalpost(
@@ -128,4 +139,15 @@ class JournalpostClient(
 
     private fun journalførendeEnhetUriVariables(journalførendeEnhet: String): Map<String, String> =
         mapOf("journalfoerendeEnhet" to journalførendeEnhet)
+
+    private fun håndterConflict(e: HttpClientErrorException.Conflict) {
+        val response: ArkiverDokumentResponse = try {
+            objectMapper.readValue<ArkiverDokumentResponse>(e.responseBodyAsString)
+        } catch (ex: Exception) {
+            secureLogger.warn("Klarte ikke å parsea body=${e.responseBodyAsString}", ex)
+            // kaster opprinnelig exception
+            throw e
+        }
+        throw ArkiverDokumentConflictException(response)
+    }
 }

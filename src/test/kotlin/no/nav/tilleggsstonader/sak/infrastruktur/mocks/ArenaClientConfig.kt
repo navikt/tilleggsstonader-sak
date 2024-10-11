@@ -35,6 +35,7 @@ class ArenaClientConfig {
                 SakStatus(harAktivSakUtenVedtak = false),
                 VedtakStatus(
                     harVedtak = false,
+                    harInnvilgetVedtak = false,
                     harAktivtVedtak = false,
                     harVedtakUtenUtfall = false,
                     vedtakTom = LocalDate.now().minusDays(10),

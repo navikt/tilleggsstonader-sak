@@ -44,8 +44,38 @@ data class AndelTilkjentYtelse(
         feilHvis(YearMonth.from(fom) != YearMonth.from(tom)) {
             "For å unngå at man iverksetter frem i tiden skal perioder kun løpe over 1 måned"
         }
+
+        validerDataForType()
+    }
+
+    private fun validerDataForType() {
+        when (type) {
+            TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER,
+            TypeAndel.TILSYN_BARN_AAP,
+            TypeAndel.TILSYN_BARN_ETTERLATTE,
+            -> validerTilsynBarn()
+
+            TypeAndel.UGYLDIG -> {}
+        }
+    }
+
+    private fun validerTilsynBarn() {
+        validerSatstype(Satstype.DAG)
+        validerLikFomOgTom()
         feilHvis(satstype == Satstype.DAG && fom.erLørdagEllerSøndag()) {
             "Dagsats som begynner en lørdag eller søndag vil ikke bli utbetalt"
+        }
+    }
+
+    private fun validerSatstype(forventetSatstype: Satstype) {
+        feilHvis(satstype != forventetSatstype) {
+            "Forventer at satstype=$satstype er av type=$forventetSatstype"
+        }
+    }
+
+    private fun validerLikFomOgTom() {
+        feilHvis(fom != tom) {
+            "Forventer at fom=tom for type=$type"
         }
     }
 }

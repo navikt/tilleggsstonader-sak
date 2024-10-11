@@ -17,11 +17,13 @@ object ArenaStatusDtoUtil {
 
     fun vedtakStatus(
         harVedtak: Boolean = false,
+        harInnvilgetVedtak: Boolean = false,
         harAktivtVedtak: Boolean = false,
         harVedtakUtenUtfall: Boolean = false,
         vedtakTom: LocalDate? = null,
     ) = VedtakStatus(
         harVedtak = harVedtak,
+        harInnvilgetVedtak = harInnvilgetVedtak,
         harAktivtVedtak = harAktivtVedtak,
         harVedtakUtenUtfall = harVedtakUtenUtfall,
         vedtakTom = vedtakTom,

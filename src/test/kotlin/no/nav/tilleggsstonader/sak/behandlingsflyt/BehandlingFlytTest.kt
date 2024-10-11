@@ -6,6 +6,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.familie.prosessering.internal.TaskWorker
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.log.IdUtils
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
@@ -16,12 +17,11 @@ import no.nav.tilleggsstonader.sak.behandling.TestBehandlingRequest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.brev.BrevController
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerRepository
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerType
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
@@ -68,7 +68,7 @@ class BehandlingFlytTest(
     @Autowired val vilkårController: VilkårController,
     @Autowired val tilsynBarnVedtakController: TilsynBarnVedtakController,
     @Autowired val brevController: BrevController,
-    @Autowired val brevmottakereRepository: BrevmottakerRepository,
+    @Autowired val brevmottakereRepository: BrevmottakerVedtaksbrevRepository,
     @Autowired val totrinnskontrollController: TotrinnskontrollController,
     @Autowired val totrinnskontrollService: TotrinnskontrollService,
     @Autowired val taskService: TaskService,
@@ -317,7 +317,7 @@ class BehandlingFlytTest(
     }
 
     private fun opprettBehandling(personIdent: String): BehandlingId {
-        val behandlingId = opprettTestBehandlingController.opprettBehandling(TestBehandlingRequest(personIdent))
+        val behandlingId = opprettTestBehandlingController.opprettBehandling(TestBehandlingRequest(personIdent, stønadstype = Stønadstype.BARNETILSYN))
         testoppsettService.opprettGrunnlagsdata(behandlingId)
         kjørTasks()
         return behandlingId
@@ -384,11 +384,9 @@ class BehandlingFlytTest(
 
     private fun lagreBrevmottakere(behandlingId: BehandlingId) {
         brevmottakereRepository.insert(
-            Brevmottaker(
+            BrevmottakerVedtaksbrev(
                 behandlingId = behandlingId,
-                mottakerRolle = MottakerRolle.BRUKER,
-                mottakerType = MottakerType.PERSON,
-                ident = "ident",
+                mottaker = mottakerPerson(ident = "ident"),
             ),
         )
     }

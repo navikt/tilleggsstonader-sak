@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValue
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaLæremidler
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
@@ -122,6 +123,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 VilkårperioderGrunnlagReader(),
                 VilkårperioderGrunnlagWriter(),
+
+                SkjemaLæremidlerReader(),
+                SkjemaLæremidlerWriter(),
 
             ) + alleVedtaksstatistikkJsonConverters +
                 alleValueClassConverters,
@@ -246,4 +250,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class VilkårperioderGrunnlagReader : JsonReader<VilkårperioderGrunnlag>(VilkårperioderGrunnlag::class)
 
     class VilkårperioderGrunnlagWriter : JsonWriter<VilkårperioderGrunnlag>()
+
+    class SkjemaLæremidlerReader : JsonReader<SkjemaLæremidler>(SkjemaLæremidler::class)
+
+    class SkjemaLæremidlerWriter : JsonWriter<SkjemaLæremidler>()
 }

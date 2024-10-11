@@ -1,26 +1,36 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.brev.BrevService
-import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevTask
+import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevService
+import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.JournalførVedtaksbrevTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.tilBehandlingResult
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 /**
  * Det er litt blandning av begrep, totrinnskontroll, beslutte steg, etc
@@ -42,6 +52,8 @@ class BeslutteVedtakSteg(
     private val vedtaksresultatService: VedtaksresultatService,
     private val brevService: BrevService,
     private val iverksettService: IverksettService,
+    private val tilkjentYtelseService: TilkjentYtelseService,
+    private val unleashService: UnleashService,
 ) : BehandlingSteg<BeslutteVedtakDto> {
 
     override fun validerSteg(saksbehandling: Saksbehandling) {
@@ -60,6 +72,7 @@ class BeslutteVedtakSteg(
 
         return if (data.godkjent) {
             oppdaterResultatPåBehandling(saksbehandling)
+            validerIkkeGjørEndringerPåTidligereUtbetalinger(saksbehandling)
             // opprettTaskForBehandlingsstatistikk(saksbehandling.id, oppgaveId)
 
             iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
@@ -77,6 +90,54 @@ class BeslutteVedtakSteg(
         }
     }
 
+    private fun validerIkkeGjørEndringerPåTidligereUtbetalinger(saksbehandling: Saksbehandling) {
+        if (unleashService.isEnabled(Toggle.SPESIAL_IVERKSETT_ENDRINGER)) {
+            return
+        }
+
+        val forrigeBehandlingId = saksbehandling.forrigeBehandlingId
+        if (
+            forrigeBehandlingId == null ||
+            vedtaksresultatService.hentVedtaksresultat(saksbehandling) == TypeVedtak.AVSLAG
+        ) {
+            return
+        }
+        val forrigeAndeler = andelerFraForrigeBehandlingSomErIverksatte(forrigeBehandlingId)
+        val forrigeMaksTom = forrigeAndeler.maxOfOrNull { it.tom } ?: return
+
+        val andeler = tilkjentYtelseService.hentForBehandling(saksbehandling.id).andelerTilkjentYtelse
+            .tilForenkledeAndeler()
+            .filter { it.fom <= forrigeMaksTom }
+            .sorted()
+
+        feilHvis(forrigeAndeler != andeler) {
+            "Denne iverksettingen blir kanskje endringer på perioder som allerede er utbetalt. " +
+                "Det har vi ennå ikke støtte for og kan foreløpig ikke godkjennes."
+        }
+    }
+
+    private fun andelerFraForrigeBehandlingSomErIverksatte(forrigeBehandlingId: BehandlingId) =
+        tilkjentYtelseService.hentForBehandling(forrigeBehandlingId).andelerTilkjentYtelse
+            .filter {
+                it.statusIverksetting in setOf(
+                    StatusIverksetting.SENDT,
+                    StatusIverksetting.OK,
+                    StatusIverksetting.OK_UTEN_UTBETALING,
+                )
+            }
+            .tilForenkledeAndeler()
+            .sorted()
+
+    private fun Collection<AndelTilkjentYtelse>.tilForenkledeAndeler() =
+        this.map { ForenkletAndel(it.fom, it.tom, it.beløp, it.type) }.toSet()
+
+    private data class ForenkletAndel(
+        override val fom: LocalDate,
+        override val tom: LocalDate,
+        val beløp: Int,
+        val type: TypeAndel,
+    ) : Periode<LocalDate>
+
     private fun opprettJournalførVedtaksbrevTask(saksbehandling: Saksbehandling) {
         taskService.save(JournalførVedtaksbrevTask.opprettTask(saksbehandling.id))
     }
@@ -84,6 +145,7 @@ class BeslutteVedtakSteg(
     private fun oppdaterResultatPåBehandling(saksbehandling: Saksbehandling) {
         val behandlingId = saksbehandling.id
         val resultat = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
+        validerIkkeGjørEndringerPåTidligereUtbetalinger(saksbehandling)
         behandlingService.oppdaterResultatPåBehandling(
             behandlingId = behandlingId,
             behandlingResultat = resultat.tilBehandlingResult(),

@@ -8,6 +8,9 @@ import no.nav.tilleggsstonader.kontrakter.brevmottaker.MottakerRolle
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.Mottaker
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
@@ -20,7 +23,7 @@ import java.util.*
 
 class BrevmottakereServiceTest {
 
-    private val brevmottakereRepository = mockk<BrevmottakerRepository>()
+    private val brevmottakereRepository = mockk<BrevmottakerVedtaksbrevRepository>()
     private val behandlingService = mockk<BehandlingService>()
 
     private val brevmottakereService: BrevmottakereService =
@@ -171,14 +174,17 @@ class BrevmottakereServiceTest {
         val ident = "123123123"
         val mottakernavn = "Test Testersen"
 
-        val brevmottakerTestObjekt = Brevmottaker(
+        val brevmottakerTestObjekt = BrevmottakerVedtaksbrev(
             id = id,
             behandlingId = behandlingID,
-            mottakerRolle = no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerRolle.BRUKER,
-            mottakerType = MottakerType.PERSON,
-            ident = ident,
-            mottakerNavn = mottakernavn,
-            organisasjonsNavn = null,
+            mottaker = Mottaker(
+                mottakerRolle = no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle.BRUKER,
+                mottakerType = MottakerType.PERSON,
+                ident = ident,
+                mottakerNavn = mottakernavn,
+                organisasjonsNavn = null,
+            ),
+
             journalpostId = null,
             bestillingId = null,
             sporbar = Sporbar(),

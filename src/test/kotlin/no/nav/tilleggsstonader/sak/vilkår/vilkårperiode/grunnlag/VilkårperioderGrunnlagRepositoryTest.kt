@@ -23,41 +23,9 @@ internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
 
         val grunnlagJson =
             VilkårperioderGrunnlag(
-                aktivitet =
-                GrunnlagAktivitet(
-                    aktiviteter = listOf(
-                        AktivitetArenaDto(
-                            id = "123",
-                            fom = LocalDate.now(),
-                            tom = LocalDate.now().plusMonths(1),
-                            type = "TYPE",
-                            typeNavn = "Type navn",
-                            status = StatusAktivitet.AKTUELL,
-                            statusArena = "AKTUL",
-                            antallDagerPerUke = 5,
-                            prosentDeltakelse = 100.toBigDecimal(),
-                            erStønadsberettiget = true,
-                            erUtdanning = false,
-                            arrangør = "Arrangør",
-                            kilde = Kilde.ARENA,
-                        ),
-                    ),
-                ),
-                ytelse = GrunnlagYtelse(
-                    perioder =
-                    listOf(
-                        PeriodeGrunnlagYtelse(
-                            type = TypeYtelsePeriode.AAP,
-                            fom = LocalDate.now(),
-                            tom = LocalDate.now().plusDays(1),
-                        ),
-                    ),
-                ),
-                hentetInformasjon = HentetInformasjon(
-                    fom = LocalDate.now().minusMonths(3),
-                    tom = LocalDate.now().plusYears(1),
-                    tidspunktHentet = LocalDateTime.now(),
-                ),
+                aktivitet = grunnlagAktivitet(),
+                ytelse = grunnlagYtelse(),
+                hentetInformasjon = hentetInformasjon(),
             )
 
         vilkårperioderGrunnlagRepository.insert(
@@ -71,4 +39,72 @@ internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
         assertThat(lagretGrunnlag.behandlingId).isEqualTo(behandling.id)
         assertThat(lagretGrunnlag.grunnlag).isEqualTo(grunnlagJson)
     }
+
+    @Test
+    internal fun `skal håndtere at stønadstype for enslig forsørger periode ikke er lagret`() {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
+
+        val grunnlagJson =
+            VilkårperioderGrunnlag(
+                aktivitet = grunnlagAktivitet(),
+                ytelse = GrunnlagYtelse(
+                    perioder = listOf(
+                        PeriodeGrunnlagYtelse(
+                            type = TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now().plusDays(1),
+                        ),
+                    ),
+                ),
+                hentetInformasjon = hentetInformasjon(),
+            )
+
+        vilkårperioderGrunnlagRepository.insert(
+            VilkårperioderGrunnlagDomain(
+                behandlingId = behandling.id,
+                grunnlag = grunnlagJson,
+            ),
+        )
+
+        val lagretGrunnlag = vilkårperioderGrunnlagRepository.findByIdOrThrow(behandling.id)
+        assertThat(lagretGrunnlag.behandlingId).isEqualTo(behandling.id)
+        assertThat(lagretGrunnlag.grunnlag.ytelse.perioder.first().ensligForsørgerStønadstype).isNull()
+    }
+
+    private fun grunnlagYtelse() = GrunnlagYtelse(
+        perioder =
+        listOf(
+            PeriodeGrunnlagYtelse(
+                type = TypeYtelsePeriode.AAP,
+                fom = LocalDate.now(),
+                tom = LocalDate.now().plusDays(1),
+            ),
+        ),
+    )
+
+    private fun grunnlagAktivitet() = GrunnlagAktivitet(
+        aktiviteter = listOf(
+            AktivitetArenaDto(
+                id = "123",
+                fom = LocalDate.now(),
+                tom = LocalDate.now().plusMonths(1),
+                type = "TYPE",
+                typeNavn = "Type navn",
+                status = StatusAktivitet.AKTUELL,
+                statusArena = "AKTUL",
+                antallDagerPerUke = 5,
+                prosentDeltakelse = 100.toBigDecimal(),
+                erStønadsberettiget = true,
+                erUtdanning = false,
+                arrangør = "Arrangør",
+                kilde = Kilde.ARENA,
+            ),
+        ),
+    )
+
+    private fun hentetInformasjon() = HentetInformasjon(
+        fom = LocalDate.now().minusMonths(3),
+        tom = LocalDate.now().plusYears(1),
+        tidspunktHentet = LocalDateTime.now(),
+    )
 }

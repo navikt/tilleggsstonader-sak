@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.statistikk.behandling
 
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
-import no.nav.tilleggsstonader.kontrakter.saksstatistikk.SakYterlseDvh
+import no.nav.tilleggsstonader.kontrakter.saksstatistikk.SakYtelseDvh
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -44,6 +44,7 @@ class BehandlingsstatistikkService(
         oppgaveId: Long?,
         behandlingMetode: BehandlingMetode?,
     ) {
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val behandlingDVH = mapTilBehandlingDVH(
             behandlingId = behandlingId,
             hendelse = hendelse,
@@ -51,11 +52,13 @@ class BehandlingsstatistikkService(
             gjeldendeSaksbehandler = gjeldendeSaksbehandler,
             oppgaveId = oppgaveId,
             behandlingMetode = behandlingMetode,
+            saksbehandling = saksbehandling,
         )
-        behandlingsstatistikkProducer.sendBehandling(behandlingDVH)
+        behandlingsstatistikkProducer.sendBehandling(behandlingDVH, saksbehandling.stønadstype)
     }
 
     private fun mapTilBehandlingDVH(
+        saksbehandling: Saksbehandling,
         behandlingId: BehandlingId,
         hendelse: Hendelse,
         hendelseTidspunkt: LocalDateTime,
@@ -63,7 +66,6 @@ class BehandlingsstatistikkService(
         oppgaveId: Long?,
         behandlingMetode: BehandlingMetode?,
     ): BehandlingDVH {
-        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val sisteOppgaveForBehandling = finnSisteOppgaveForBehandlingen(behandlingId, oppgaveId)
         val henvendelseTidspunkt = finnHenvendelsestidspunkt(saksbehandling)
         val søkerHarStrengtFortroligAdresse = evaluerAdresseBeskyttelseStrengtFortrolig(saksbehandling.ident)
@@ -99,7 +101,7 @@ class BehandlingsstatistikkService(
             behandlingÅrsak = saksbehandling.årsak.name,
             avsender = "NAV Tilleggstønader",
             behandlingType = saksbehandling.type.name,
-            sakYtelse = SakYterlseDvh.fraStønadstype(saksbehandling.stønadstype),
+            sakYtelse = SakYtelseDvh.fraStønadstype(saksbehandling.stønadstype),
             behandlingResultat = saksbehandling.resultat.name,
             resultatBegrunnelse = utledResultatBegrunnelse(saksbehandling),
             ansvarligBeslutter = finnAnsvarligBeslutter(beslutterId, søkerHarStrengtFortroligAdresse),
@@ -154,9 +156,7 @@ class BehandlingsstatistikkService(
     private fun finnHenvendelsestidspunkt(saksbehandling: Saksbehandling): LocalDateTime {
         return when (saksbehandling.type) {
             BehandlingType.FØRSTEGANGSBEHANDLING ->
-                søknadService.hentSøknadBarnetilsyn(saksbehandling.id)?.mottattTidspunkt
-                    ?: saksbehandling.opprettetTid
-
+                søknadService.hentSøknadMetadata(saksbehandling.id)?.mottattTidspunkt ?: saksbehandling.opprettetTid
             BehandlingType.REVURDERING -> saksbehandling.opprettetTid
         }
     }

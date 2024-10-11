@@ -17,8 +17,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.INNVILGE
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.brev.Vedtaksbrev
-import no.nav.tilleggsstonader.sak.brev.VedtaksbrevRepository
+import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.Vedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow

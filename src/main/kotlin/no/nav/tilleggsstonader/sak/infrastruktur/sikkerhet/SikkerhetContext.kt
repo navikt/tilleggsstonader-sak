@@ -27,11 +27,11 @@ object SikkerhetContext {
             claims.getAsList("roles").contains("access_as_application")
     }
 
-    fun kallKommerFra(eksternApplikasjon: EksternApplikasjon): Boolean {
+    fun kallKommerFra(vararg eksternApplikasjon: EksternApplikasjon): Boolean {
         val claims = SpringTokenValidationContextHolder().getTokenValidationContext().getClaims("azuread")
         val applikasjonsnavn = claims.get("azp_name")?.toString() ?: "" // e.g. dev-gcp:some-team:application-name
         secureLogger.info("Applikasjonsnavn: $applikasjonsnavn")
-        return applikasjonsnavn.endsWith(eksternApplikasjon.namespaceAppNavn)
+        return eksternApplikasjon.any { applikasjonsnavn.endsWith(it.namespaceAppNavn) }
     }
 
     fun hentSaksbehandler(): String {

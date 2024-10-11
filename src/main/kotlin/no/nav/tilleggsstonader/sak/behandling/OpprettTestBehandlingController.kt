@@ -15,18 +15,21 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ArbeidOgOpphold
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.HovedytelseAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.OppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypePengestøtte
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
+import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.UtdanningAvsnitt
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -81,6 +84,7 @@ class OpprettTestBehandlingController(
     private fun opprettSøknad(fagsak: Fagsak, behandling: Behandling) {
         when (fagsak.stønadstype) {
             Stønadstype.BARNETILSYN -> opprettSøknadBarnetilsyn(fagsak, behandling)
+            Stønadstype.LÆREMIDLER -> opprettSøknadLæremidler(fagsak, behandling)
             else -> error("Kan ikke opprette søknad for stønadstype ${fagsak.stønadstype}.")
         }
     }
@@ -107,7 +111,10 @@ class OpprettTestBehandlingController(
             aktivitet = AktivitetAvsnitt(
                 aktiviteter = EnumFlereValgFelt(
                     "Hvilken aktivitet søker du om støtte i forbindelse med?",
-                    listOf(VerdiFelt("ANNET", "Annet"), VerdiFelt("1", "Arbeidstrening: 25. februar 2024 - 25. juli 2024")),
+                    listOf(
+                        VerdiFelt("ANNET", "Annet"),
+                        VerdiFelt("1", "Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
+                    ),
                     listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
                 ),
                 annenAktivitet = EnumFelt(
@@ -131,7 +138,45 @@ class OpprettTestBehandlingController(
         )
         val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
         val søknad = søknadService.lagreSøknad(behandling.id, journalpost, skjema)
-        opprettBarn(behandling, søknad)
+        opprettBarn(behandling, søknad as SøknadBarnetilsyn)
+    }
+
+    private fun opprettSøknadLæremidler(
+        fagsak: Fagsak,
+        behandling: Behandling,
+    ) {
+        val skjemaLæremidler = SøknadsskjemaLæremidler(
+            hovedytelse = HovedytelseAvsnitt(
+                hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
+                arbeidOgOpphold = arbeidOgOpphold(),
+            ),
+            utdanning = UtdanningAvsnitt(
+                aktiviteter = EnumFlereValgFelt(
+                    "Hvilken utdanning eller opplæring søker du om støtte til læremidler for",
+                    listOf(
+                        VerdiFelt("1", "Høyere utdfanning: 25. februar 2024 - 25. juli 2024"),
+                    ),
+                    listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
+                ),
+                annenUtdanning = EnumFelt(
+                    "Annen utdanning tekst",
+                    AnnenUtdanningType.INGEN_UTDANNING,
+                    "Ja",
+                    emptyList(),
+                ),
+                mottarUtstyrsstipend = EnumFelt("Har mottarUtstyrsstipend?", JaNei.JA, "Ja", emptyList()),
+                harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
+            ),
+            dokumentasjon = emptyList(),
+        )
+        val skjema = Søknadsskjema(
+            ident = fagsak.hentAktivIdent(),
+            mottattTidspunkt = osloNow(),
+            språk = Språkkode.NB,
+            skjema = skjemaLæremidler,
+        )
+        val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
+        søknadService.lagreSøknad(behandling.id, journalpost, skjema)
     }
 
     private fun arbeidOgOpphold() = ArbeidOgOpphold(
@@ -199,10 +244,10 @@ class OpprettTestBehandlingController(
     }
 
     private fun lagFagsak(testBehandlingRequest: TestBehandlingRequest) =
-        fagsakService.hentEllerOpprettFagsak(testBehandlingRequest.personIdent, Stønadstype.BARNETILSYN)
+        fagsakService.hentEllerOpprettFagsak(testBehandlingRequest.personIdent, testBehandlingRequest.stønadstype)
 }
 
 data class TestBehandlingRequest(
     val personIdent: String,
-    val stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
+    val stønadstype: Stønadstype,
 )

@@ -3,17 +3,23 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -85,7 +91,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         fun `skal lagre vedtak`() {
             stønadsperiodeRepository.insert(stønadsperiode)
             vilkårperiodeRepository.insert(aktivitet)
-            lagVilkårForPeriode(januar, januar, 100)
+            lagVilkårForPeriode(saksbehandling, januar, januar, 100)
 
             val vedtakDto = innvilgelseDto()
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
@@ -131,8 +137,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 ),
             )
             vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
-            lagVilkårForPeriode(januar, februar, 100)
-            lagVilkårForPeriode(mars, april, 200)
+            lagVilkårForPeriode(saksbehandling, januar, februar, 100)
+            lagVilkårForPeriode(saksbehandling, mars, april, 200)
 
             steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDto())
 
@@ -192,7 +198,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             )
             stønadsperiodeRepository.insert(stønadsperiode1)
             vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = juni.atDay(1), tom = juni.atEndOfMonth()))
-            lagVilkårForPeriode(juni, juni, 100)
+            lagVilkårForPeriode(saksbehandling, juni, juni, 100)
             steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDto())
 
             with(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.single()) {
@@ -215,6 +221,157 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     }
 
     @Nested
+    inner class RevurderingSkalBeholdePerioderFraForrigeBehandling {
+
+        @Test
+        fun `skal beholde perioder fra forrige behandling som er før måneden for revurderFra`() {
+            innvilgPerioderForJanuarOgFebruar(behandling.id)
+            assertHarPerioderForJanuarOgFebruar(behandling.id)
+
+            testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
+            val revurdering = opprettRevurdering(revurderFra = mars.atDay(15))
+
+            innvilgPerioderForMars(revurdering)
+
+            assertHarPerioderForJanuarTilMars(revurdering.id)
+        }
+
+        /**
+         * Inget reellt tilfelle, men verifiserer at man ikke gjenbruker perioder før revurder-fra-datoet
+         * I en revurdering er det egentlige ikke mulig å legge til perioder før revurder-fra
+         */
+        @Test
+        fun `skal ikke ta med perioder før revurder-fra`() {
+            innvilgPerioderForJanuarOgFebruar(behandling.id)
+            assertHarPerioderForJanuarOgFebruar(behandling.id)
+
+            testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
+            val revurdering = opprettRevurdering(revurderFra = april.atDay(15))
+
+            innvilgPerioderForMars(revurdering)
+
+            // Har ikke med periodene for mars som ble lagt inn i revurderingen
+            // Men har kopiert perioder for januar og februar fra forrige behandlingen
+            assertHarPerioderForJanuarOgFebruar(revurdering.id)
+        }
+
+        private fun opprettRevurdering(revurderFra: LocalDate?) = testoppsettService.lagre(
+            behandling(
+                fagsak = fagsak(id = behandling.fagsakId),
+                type = BehandlingType.REVURDERING,
+                revurderFra = revurderFra,
+                forrigeBehandlingId = behandling.id,
+            ),
+            opprettGrunnlagsdata = false,
+        ).let { testoppsettService.hentSaksbehandling(it.id) }
+
+        /**
+         * Stønadsperioder jan-mars
+         * Aktivitet jan-april
+         * Vilkår(utgifter) jan-feb
+         */
+        private fun innvilgPerioderForJanuarOgFebruar(behandlingId: BehandlingId) {
+            val behandling = testoppsettService.hentSaksbehandling(behandlingId)
+
+            val stønadsperiode = stønadsperiode(
+                behandlingId = behandlingId,
+                fom = januar.atDay(1),
+                tom = mars.atEndOfMonth(),
+            )
+            stønadsperiodeRepository.insert(stønadsperiode)
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                ),
+            )
+            lagVilkårForPeriode(behandling, januar, februar, 100)
+            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto())
+        }
+
+        /**
+         * Ikke helt reellt tilfelle. Vanligvis når man oppretter en revurdering gjenbruker man vilkårperioder, stønadsperioder og vilkår fra forrige behandling
+         * Dette er mest for å vise at man faktiskt beholder beregningsresultat fra forrige behandling
+         * Stønadsperiode mars-mars
+         * Aktivitet mars-april
+         * Vilkår(utgifter) mars-april
+         */
+        private fun innvilgPerioderForMars(behandling: Saksbehandling) {
+            val stønadsperiode = stønadsperiode(
+                behandlingId = behandling.id,
+                fom = mars.atDay(1),
+                tom = mars.atEndOfMonth(),
+            )
+            stønadsperiodeRepository.insert(stønadsperiode)
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandling.id,
+                    fom = mars.atDay(1),
+                    tom = april.atEndOfMonth(),
+                ),
+            )
+            lagVilkårForPeriode(behandling, mars, april, 100)
+            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto())
+        }
+
+        /**
+         * For førstegangsbehandlingen opprettes det kun perioder for jan og feb
+         * då det kun finnes overlapp mellom stønadsperioder og vilkår for januar og mars
+         */
+        private fun assertHarPerioderForJanuarOgFebruar(behandlingId: BehandlingId) {
+            val beregningsresultat = tilsynBarnVedtakService.hentVedtak(behandlingId)!!.beregningsresultat
+            with(beregningsresultat!!.perioder.sortedBy { it.grunnlag.måned }) {
+                assertThat(this).hasSize(2)
+                assertHarPerioderForJanuarOgFebruar(this)
+            }
+        }
+
+        /**
+         * For revurdering gjenbrukes perioder for januar og februar, samt oppretter perioder for mars
+         */
+        private fun assertHarPerioderForJanuarTilMars(behandlingId: BehandlingId) {
+            val beregningsresultat = tilsynBarnVedtakService.hentVedtak(behandlingId)!!.beregningsresultat
+            with(beregningsresultat!!.perioder.sortedBy { it.grunnlag.måned }) {
+                assertThat(this).hasSize(3)
+                // Januar og februar beholder fra forrige behandling, selv om det ikke finnes noen perioder for de denne gangen.
+                assertHarPerioderForJanuarOgFebruar(this)
+
+                /**
+                 * På grunn av at man revurder fra den 15 mars splittes stønadsperioder i 2
+                 * Det er fordi man i beregningsresultat i behandlingen kun ønsker å se
+                 * beløp som blir innvilget fra datoet man revurderer fra
+                 */
+                assertHarPerioderForMars(this)
+            }
+        }
+
+        private fun assertHarPerioderForJanuarOgFebruar(beregningsresultat: List<BeregningsresultatForMåned>) {
+            with(beregningsresultat[0].grunnlag.stønadsperioderGrunnlag.single()) {
+                assertThat(this.stønadsperiode.fom).isEqualTo(januar.atDay(1))
+                assertThat(this.stønadsperiode.tom).isEqualTo(januar.atEndOfMonth())
+            }
+
+            with(beregningsresultat[1].grunnlag.stønadsperioderGrunnlag.single()) {
+                assertThat(this.stønadsperiode.fom).isEqualTo(februar.atDay(1))
+                assertThat(this.stønadsperiode.tom).isEqualTo(februar.atEndOfMonth())
+            }
+        }
+
+        private fun assertHarPerioderForMars(beregningsresultatForMåneds: List<BeregningsresultatForMåned>) {
+            assertThat(beregningsresultatForMåneds[2].grunnlag.stønadsperioderGrunnlag).hasSize(2)
+            with(beregningsresultatForMåneds[2].grunnlag.stønadsperioderGrunnlag[0]) {
+                assertThat(this.stønadsperiode.fom).isEqualTo(mars.atDay(1))
+                assertThat(this.stønadsperiode.tom).isEqualTo(mars.atDay(14))
+            }
+            with(beregningsresultatForMåneds[2].grunnlag.stønadsperioderGrunnlag[1]) {
+                assertThat(this.stønadsperiode.fom).isEqualTo(mars.atDay(15))
+                assertThat(this.stønadsperiode.tom).isEqualTo(mars.atDay(31))
+            }
+        }
+    }
+
+    @Nested
     inner class MålgruppeMapping {
         val beløp1DagUtgift100 = 3
         val vedtakDto = innvilgelseDto()
@@ -228,7 +385,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     tom = april.atEndOfMonth(),
                 ),
             )
-            lagVilkårForPeriode(januar, mars, 100)
+            lagVilkårForPeriode(saksbehandling, januar, mars, 100)
         }
 
         @Test
@@ -343,7 +500,12 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         }
     }
 
-    private fun lagVilkårForPeriode(fom: YearMonth, tom: YearMonth, utgift: Int) {
+    private fun lagVilkårForPeriode(
+        behandling: Saksbehandling,
+        fom: YearMonth,
+        tom: YearMonth,
+        utgift: Int,
+    ) {
         vilkårRepository.insert(
             vilkår(
                 behandlingId = behandling.id,

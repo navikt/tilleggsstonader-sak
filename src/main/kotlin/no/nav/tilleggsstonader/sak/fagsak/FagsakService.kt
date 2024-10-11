@@ -88,6 +88,7 @@ class FagsakService(
             .associateBy { it.stønadstype }
         return Fagsaker(
             barnetilsyn = fagsaker[Stønadstype.BARNETILSYN],
+            læremidler = fagsaker[Stønadstype.LÆREMIDLER],
         )
     }
 

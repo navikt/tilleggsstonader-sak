@@ -42,6 +42,7 @@ class FagsakPersonController(
         return FagsakPersonDto(
             id = person.id,
             tilsynBarn = fagsaker.barnetilsyn?.id,
+            læremidler = fagsaker.læremidler?.id,
         )
     }
 
@@ -53,6 +54,7 @@ class FagsakPersonController(
         return FagsakPersonUtvidetDto(
             person.id,
             tilsynBarn = fagsaker.barnetilsyn?.let { fagsakService.fagsakTilDto(it) },
+            læremidler = fagsaker.læremidler?.let { fagsakService.fagsakTilDto(it) },
         )
     }
 }
