@@ -34,11 +34,9 @@ class BehandlingController(
     private val opprettRevurderingBehandlingService: OpprettRevurderingBehandlingService,
     private val revurderFraService: RevurderFraService,
     private val grunnlagsdataService: GrunnlagsdataService,
-    // private val behandlingPåVentService: BehandlingPåVentService,
     private val fagsakService: FagsakService,
     private val henleggService: HenleggService,
     private val tilgangService: TilgangService,
-    // private val gjenbrukVilkårService: GjenbrukVilkårService,
 ) {
 
     @GetMapping("{behandlingId}")
