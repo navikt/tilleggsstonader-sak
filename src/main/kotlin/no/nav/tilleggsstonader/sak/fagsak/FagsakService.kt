@@ -69,7 +69,7 @@ class FagsakService(
 
     fun fagsakTilDto(fagsak: Fagsak): FagsakDto {
         val behandlinger: List<Behandling> = behandlingService.hentBehandlinger(fagsak.id)
-        val erLøpende = erLøpende(fagsak)
+        val erLøpende = erLøpende(fagsak.id)
         return fagsak.tilDto(
             behandlinger = behandlinger.map {
                 it.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId)
@@ -88,8 +88,8 @@ class FagsakService(
         )
     }
 
-    fun erLøpende(fagsak: Fagsak): Boolean {
-        return fagsakRepository.harLøpendeUtbetaling(fagsak.id)
+    fun erLøpende(fagsakId: FagsakId): Boolean {
+        return fagsakRepository.harLøpendeUtbetaling(fagsakId)
     }
 
     fun hentFagsak(fagsakId: FagsakId): Fagsak = fagsakRepository.findByIdOrThrow(fagsakId).tilFagsakMedPerson()

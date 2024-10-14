@@ -54,6 +54,14 @@ fun min(first: LocalDate?, second: LocalDate?): LocalDate? {
     }
 }
 
+fun max(first: LocalDate?, second: LocalDate?): LocalDate? {
+    return when {
+        first == null -> second
+        second == null -> first
+        else -> maxOf(first, second)
+    }
+}
+
 fun LocalDate.isEqualOrBefore(other: LocalDate) = this == other || this.isBefore(other)
 fun LocalDate.isEqualOrAfter(other: LocalDate) = this == other || this.isAfter(other)
 

@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
@@ -31,13 +32,14 @@ object TilsynBarnTestUtil {
 
     fun beregningsresultatForMåned(
         måned: YearMonth = YearMonth.now(),
+        støndsperioder: List<StønadsperiodeGrunnlag> = emptyList(),
     ) = BeregningsresultatForMåned(
         dagsats = BigDecimal.TEN,
         månedsbeløp = 1000,
         grunnlag = Beregningsgrunnlag(
             måned = måned,
             makssats = 1000,
-            stønadsperioderGrunnlag = listOf(),
+            stønadsperioderGrunnlag = støndsperioder,
             utgifter = emptyList(),
             utgifterTotal = 2000,
             antallBarn = 1,

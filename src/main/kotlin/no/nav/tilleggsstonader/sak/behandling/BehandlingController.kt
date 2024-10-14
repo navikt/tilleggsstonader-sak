@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
+import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingsoversiktDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
@@ -13,6 +14,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
@@ -31,6 +33,7 @@ import java.time.LocalDate
 @ProtectedWithClaims(issuer = "azuread")
 class BehandlingController(
     private val behandlingService: BehandlingService,
+    private val behandlingsoversiktService: BehandlingsoversiktService,
     private val opprettRevurderingBehandlingService: OpprettRevurderingBehandlingService,
     private val revurderFraService: RevurderFraService,
     private val grunnlagsdataService: GrunnlagsdataService,
@@ -50,6 +53,13 @@ class BehandlingController(
             grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
         }
         return saksbehandling.tilDto()
+    }
+
+    @GetMapping("fagsak-person/{fagsakPersonId}")
+    fun hentBehandlingsoversikt(@PathVariable fagsakPersonId: FagsakPersonId): BehandlingsoversiktDto {
+        tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
+
+        return behandlingsoversiktService.hentOversikt(fagsakPersonId)
     }
 
     @GetMapping("barn-til-revurdering/{fagsakId}")
