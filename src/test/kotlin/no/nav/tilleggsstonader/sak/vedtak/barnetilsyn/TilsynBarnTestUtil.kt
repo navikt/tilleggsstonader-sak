@@ -32,14 +32,14 @@ object TilsynBarnTestUtil {
 
     fun beregningsresultatForMåned(
         måned: YearMonth = YearMonth.now(),
-        støndsperioder: List<StønadsperiodeGrunnlag> = emptyList(),
+        stønadsperioder: List<StønadsperiodeGrunnlag> = emptyList(),
     ) = BeregningsresultatForMåned(
         dagsats = BigDecimal.TEN,
         månedsbeløp = 1000,
         grunnlag = Beregningsgrunnlag(
             måned = måned,
             makssats = 1000,
-            stønadsperioderGrunnlag = støndsperioder,
+            stønadsperioderGrunnlag = stønadsperioder,
             utgifter = emptyList(),
             utgifterTotal = 2000,
             antallBarn = 1,

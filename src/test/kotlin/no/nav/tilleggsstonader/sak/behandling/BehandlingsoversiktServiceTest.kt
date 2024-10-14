@@ -95,7 +95,7 @@ class BehandlingsoversiktServiceTest {
         )
         val beregningsresultatForMåned = beregningsresultatForMåned(
             YearMonth.of(2024, 3),
-            støndsperioder = listOf(
+            stønadsperioder = listOf(
                 stønadsperiodeGrunnlag,
             ),
         )
