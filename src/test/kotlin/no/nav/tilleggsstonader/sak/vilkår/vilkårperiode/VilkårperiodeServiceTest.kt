@@ -47,6 +47,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.OVERGANGSSTØNAD
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.SKOLEPENGER
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
@@ -68,6 +70,7 @@ import java.time.LocalDate.now
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.UUID
+import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype as EnsligForsørgerStønadstypeKontrakter
 
 class VilkårperiodeServiceTest : IntegrationTest() {
 
@@ -898,6 +901,32 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(perioder).containsExactlyInAnyOrder(
                 PeriodeGrunnlagYtelse(TypeYtelsePeriode.AAP, now(), now()),
                 PeriodeGrunnlagYtelse(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now()),
+            )
+        }
+
+        @Test
+        fun `skal ikke ta med EF perioder med barnetilsyn som grunnlag`() {
+            every {
+                ytelseClient.hentYtelser(any())
+            } returns YtelsePerioderDto(
+                perioder = listOf(
+                    YtelsePeriode(TypeYtelsePeriode.AAP, now(), now(), aapErFerdigAvklart = false),
+                    YtelsePeriode(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), aapErFerdigAvklart = null, EnsligForsørgerStønadstypeKontrakter.BARNETILSYN),
+                    YtelsePeriode(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), aapErFerdigAvklart = null, EnsligForsørgerStønadstypeKontrakter.SKOLEPENGER),
+                    YtelsePeriode(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), aapErFerdigAvklart = null, EnsligForsørgerStønadstypeKontrakter.OVERGANGSSTØNAD),
+                ),
+                hentetInformasjon = emptyList(),
+            )
+
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            vilkårperiodeService.hentVilkårperioderResponse(behandling.id)
+
+            val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
+            val perioder = grunnlag!!.grunnlag.ytelse.perioder
+            assertThat(perioder).containsExactlyInAnyOrder(
+                PeriodeGrunnlagYtelse(TypeYtelsePeriode.AAP, now(), now()),
+                PeriodeGrunnlagYtelse(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), SKOLEPENGER),
+                PeriodeGrunnlagYtelse(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), OVERGANGSSTØNAD),
             )
         }
     }
