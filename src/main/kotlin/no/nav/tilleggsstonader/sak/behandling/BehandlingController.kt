@@ -79,34 +79,6 @@ class BehandlingController(
         )
     }
 
-    /*@PostMapping("{behandlingId}/vent")
-    fun settPåVent(
-        @PathVariable behandlingId: UUID,
-        @RequestBody settPåVentRequest: SettPåVentRequest,
-    ): Ressurs<UUID> {
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
-        behandlingPåVentService.settPåVent(behandlingId, settPåVentRequest)
-
-        return Ressurs.success(behandlingId)
-    }
-
-    @GetMapping("{behandlingId}/kan-ta-av-vent")
-    fun kanTaAvVent(@PathVariable behandlingId: UUID): Ressurs<TaAvVentStatusDto> {
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        tilgangService.validerHarSaksbehandlerrolle()
-        return Ressurs.success(behandlingPåVentService.kanTaAvVent(behandlingId))
-    }
-
-    @PostMapping("{behandlingId}/aktiver")
-    fun taAvVent(@PathVariable behandlingId: UUID): Ressurs<UUID> {
-        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
-        behandlingPåVentService.taAvVent(behandlingId)
-        return Ressurs.success(behandlingId)
-    }
-     */
-
     @PostMapping("{behandlingId}/henlegg")
     fun henleggBehandling(@PathVariable behandlingId: BehandlingId, @RequestBody henlagt: HenlagtDto): BehandlingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
@@ -128,13 +100,4 @@ class BehandlingController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         return revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra).tilDto()
     }
-
-    /*
-    @GetMapping("/gjenbruk/{behandlingId}")
-    fun hentBehandlingForGjenbrukAvVilkår(@PathVariable behandlingId: UUID): List<BehandlingDto> {
-        //tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        //tilgangService.validerHarSaksbehandlerrolle()
-        return Ressurs.success(gjenbrukVilkårService.finnBehandlingerForGjenbruk(behandlingId))
-    }
-     */
 }
