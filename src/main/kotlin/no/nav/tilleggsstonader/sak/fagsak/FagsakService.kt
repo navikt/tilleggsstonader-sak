@@ -67,10 +67,6 @@ class FagsakService(
     fun finnFagsaker(personIdenter: Set<String>): List<Fagsak> =
         fagsakRepository.findBySøkerIdent(personIdenter).map { it.tilFagsakMedPerson() }
 
-    fun hentFagsakMedBehandlinger(fagsakId: FagsakId): FagsakDto {
-        return fagsakTilDto(hentFagsak(fagsakId))
-    }
-
     fun fagsakTilDto(fagsak: Fagsak): FagsakDto {
         val behandlinger: List<Behandling> = behandlingService.hentBehandlinger(fagsak.id)
         val erLøpende = erLøpende(fagsak)
@@ -133,19 +129,11 @@ class FagsakService(
     fun hentEksternId(fagsakId: FagsakId): Long = eksternFagsakIdRepository.findByFagsakId(fagsakId).id
 
     fun hentFagsakPåEksternId(eksternFagsakId: Long): Fagsak =
-        fagsakRepository.finnMedEksternId(eksternFagsakId)
-            ?.tilFagsakMedPerson()
+        hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId)
             ?: error("Finner ikke fagsak til eksternFagsakId=$eksternFagsakId")
 
-    fun hentFagsakDtoPåEksternId(eksternFagsakId: Long): FagsakDto {
-        return hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId)
-            ?: error("Kan ikke finne fagsak med eksternId=$eksternFagsakId")
-    }
-
-    fun hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId: Long): FagsakDto? {
-        return fagsakRepository.finnMedEksternId(eksternFagsakId)
-            ?.tilFagsakMedPerson()
-            ?.let { fagsakTilDto(it) }
+    fun hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId: Long): Fagsak? {
+        return fagsakRepository.finnMedEksternId(eksternFagsakId)?.tilFagsakMedPerson()
     }
 
     fun hentAktivIdent(fagsakId: FagsakId): String = fagsakRepository.finnAktivIdent(fagsakId)

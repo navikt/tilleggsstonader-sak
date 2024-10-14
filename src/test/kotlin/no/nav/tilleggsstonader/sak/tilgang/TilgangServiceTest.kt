@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
-import no.nav.tilleggsstonader.sak.fagsak.dto.tilDto
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
@@ -219,7 +218,7 @@ internal class TilgangServiceTest {
     @Test
     internal fun `validerTilgangTilEksternFagsak `() {
         every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns Tilgang(true)
-        every { fagsakService.hentFagsakDtoPåEksternId(any()) } returns fagsak.tilDto(behandlinger = listOf(), true)
+        every { fagsakService.hentFagsakPåEksternId(any()) } returns fagsak
 
         tilgangService.validerTilgangTilEksternFagsak(fagsak.eksternId.id, AuditLoggerEvent.ACCESS)
     }
