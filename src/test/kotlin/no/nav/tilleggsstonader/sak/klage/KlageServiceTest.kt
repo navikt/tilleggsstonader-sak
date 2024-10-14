@@ -133,7 +133,7 @@ internal class KlageServiceTest {
 
             val klager = klageService.hentBehandlinger(fagsakPersonId)
 
-            assertThat(klager.barnetilsyn.single()).isEqualTo(klageBehandlingerDto[eksternFagsakId.id]!!.single())
+            assertThat(klager.tilsynBarn.single()).isEqualTo(klageBehandlingerDto[eksternFagsakId.id]!!.single())
         }
 
         @Test
@@ -142,7 +142,7 @@ internal class KlageServiceTest {
 
             val klager = klageService.hentBehandlinger(fagsakPersonId)
 
-            assertThat(klager.barnetilsyn).isEmpty()
+            assertThat(klager.tilsynBarn).isEmpty()
             verify(exactly = 0) { klageClient.hentKlagebehandlinger(any()) }
         }
 
@@ -178,7 +178,7 @@ internal class KlageServiceTest {
 
             val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
-            assertThat(klager.barnetilsyn.first().vedtaksdato).isEqualTo(tidsPunktAvsluttetIKabal)
+            assertThat(klager.tilsynBarn.first().vedtaksdato).isEqualTo(tidsPunktAvsluttetIKabal)
         }
 
         @Test
@@ -199,7 +199,7 @@ internal class KlageServiceTest {
 
             val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
-            assertThat(klager.barnetilsyn.first().vedtaksdato).isNull()
+            assertThat(klager.tilsynBarn.first().vedtaksdato).isNull()
         }
 
         @Test
@@ -222,7 +222,7 @@ internal class KlageServiceTest {
 
             val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
-            assertThat(klager.barnetilsyn.first().vedtaksdato).isEqualTo(tidspunktAvsluttetFamilieKlage)
+            assertThat(klager.tilsynBarn.first().vedtaksdato).isEqualTo(tidspunktAvsluttetFamilieKlage)
         }
 
         @Test
@@ -255,8 +255,8 @@ internal class KlageServiceTest {
 
             val klager = klageService.hentBehandlinger(FagsakPersonId.random())
 
-            assertThat(klager.barnetilsyn.first().vedtaksdato).isEqualTo(tidsPunktAvsluttetIKabal)
-            assertThat(klager.barnetilsyn.first().klageinstansResultat.first().årsakFeilregistrert).isEqualTo(
+            assertThat(klager.tilsynBarn.first().vedtaksdato).isEqualTo(tidsPunktAvsluttetIKabal)
+            assertThat(klager.tilsynBarn.first().klageinstansResultat.first().årsakFeilregistrert).isEqualTo(
                 årsakFeilregistrert,
             )
         }

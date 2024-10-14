@@ -36,7 +36,7 @@ class KlageService(
             }
 
         return KlagebehandlingerDto(
-            barnetilsyn = klagebehandlingerPåEksternId[fagsaker.barnetilsyn?.eksternId?.id] ?: emptyList(),
+            tilsynBarn = klagebehandlingerPåEksternId[fagsaker.barnetilsyn?.eksternId?.id] ?: emptyList(),
             læremidler = klagebehandlingerPåEksternId[fagsaker.læremidler?.eksternId?.id] ?: emptyList(),
         )
     }
