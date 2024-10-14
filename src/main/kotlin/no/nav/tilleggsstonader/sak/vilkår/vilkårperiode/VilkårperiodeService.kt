@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -181,6 +182,7 @@ class VilkårperiodeService(
         return GrunnlagYtelse(
             perioder = ytelserFraRegister.perioder
                 .filter { it.aapErFerdigAvklart != true }
+                .filter { it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN }
                 .map {
                     PeriodeGrunnlagYtelse(
                         type = it.type,
