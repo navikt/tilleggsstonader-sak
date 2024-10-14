@@ -12,7 +12,6 @@ data class FagsakDto(
     val personIdent: String,
     val stønadstype: Stønadstype,
     val erLøpende: Boolean,
-    // val erMigrert: Boolean,
     val behandlinger: List<BehandlingDto>,
     val eksternId: Long,
 )
