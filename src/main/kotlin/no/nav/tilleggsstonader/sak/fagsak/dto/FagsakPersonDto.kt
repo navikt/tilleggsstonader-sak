@@ -8,9 +8,3 @@ class FagsakPersonDto(
     val tilsynBarn: FagsakId?,
     val læremidler: FagsakId?,
 )
-
-class FagsakPersonUtvidetDto(
-    val id: FagsakPersonId,
-    val tilsynBarn: FagsakDto?,
-    val læremidler: FagsakDto?,
-)

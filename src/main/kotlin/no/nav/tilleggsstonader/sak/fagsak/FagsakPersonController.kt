@@ -4,7 +4,6 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.IdentRequest
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.fagsak.dto.FagsakPersonDto
-import no.nav.tilleggsstonader.sak.fagsak.dto.FagsakPersonUtvidetDto
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -43,18 +42,6 @@ class FagsakPersonController(
             id = person.id,
             tilsynBarn = fagsaker.barnetilsyn?.id,
             læremidler = fagsaker.læremidler?.id,
-        )
-    }
-
-    @GetMapping("{fagsakPersonId}/utvidet")
-    fun hentFagsakPersonUtvidet(@PathVariable fagsakPersonId: FagsakPersonId): FagsakPersonUtvidetDto {
-        tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
-        val person = fagsakPersonService.hentPerson(fagsakPersonId)
-        val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(person.id)
-        return FagsakPersonUtvidetDto(
-            person.id,
-            tilsynBarn = fagsaker.barnetilsyn?.let { fagsakService.fagsakTilDto(it) },
-            læremidler = fagsaker.læremidler?.let { fagsakService.fagsakTilDto(it) },
         )
     }
 }
