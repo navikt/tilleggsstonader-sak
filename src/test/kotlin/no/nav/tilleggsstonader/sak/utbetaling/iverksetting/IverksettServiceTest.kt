@@ -427,10 +427,13 @@ class IverksettServiceTest : IntegrationTest() {
         lagAndel(behandling, nestNesteMåned),
     )
 
-    private fun lagAndel(behandling: Behandling, måned: YearMonth, beløp: Int = 10) = andelTilkjentYtelse(
-        kildeBehandlingId = behandling.id,
-        fom = måned.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
-        tom = måned.atEndOfMonth(),
-        beløp = beløp,
-    )
+    private fun lagAndel(behandling: Behandling, måned: YearMonth, beløp: Int = 10): AndelTilkjentYtelse {
+        val fom = måned.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag()
+        return andelTilkjentYtelse(
+            kildeBehandlingId = behandling.id,
+            fom = fom,
+            tom = fom,
+            beløp = beløp,
+        )
+    }
 }

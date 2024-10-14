@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -59,7 +60,7 @@ data class Vedtaksstatistikk(
     val vedtaksperioder: VedtaksperioderDvh.JsonWrapper,
     val utbetalinger: UtbetalingerDvh.JsonWrapper,
     @Column("stonadstype")
-    val stønadstype: StønadstypeDvh = BARNETILSYN,
+    val stønadstype: StønadstypeDvh,
     val kravMottatt: LocalDate?,
     @Column("arsaker_avslag")
     val årsakerAvslag: ÅrsakAvslagDvh.JsonWrapper? = null,
@@ -78,6 +79,18 @@ data class Vedtaksstatistikk(
 
 enum class StønadstypeDvh {
     BARNETILSYN,
+    LÆREMIDLER,
+    ;
+
+    companion object {
+        fun fraDomene(stønadstype: Stønadstype): StønadstypeDvh {
+            return when (stønadstype) {
+                Stønadstype.BARNETILSYN -> BARNETILSYN
+                Stønadstype.LÆREMIDLER -> LÆREMIDLER
+                else -> error("Har ikke mapping for $stønadstype")
+            }
+        }
+    }
 }
 
 data class UtbetalingerDvh(

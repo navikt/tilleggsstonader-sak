@@ -277,6 +277,7 @@ class OppgaveService(
     private fun finnBehandlingstema(stønadstype: Stønadstype): Behandlingstema {
         return when (stønadstype) {
             Stønadstype.BARNETILSYN -> Behandlingstema.TilsynBarn
+            Stønadstype.LÆREMIDLER -> Behandlingstema.Læremidler
             else -> error("Behandlingstema er ikke implementert for stønadstype $stønadstype")
         }
     }

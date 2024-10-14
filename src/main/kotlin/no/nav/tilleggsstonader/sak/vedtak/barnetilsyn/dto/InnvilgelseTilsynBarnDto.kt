@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto
 
+import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
@@ -10,9 +12,6 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
-/**
- * @param utgifter map utgifter per [no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn]
- */
 data class InnvilgelseTilsynBarnDto(
     val beregningsresultat: BeregningsresultatTilsynBarnDto?,
 ) : VedtakTilsynBarnDto(TypeVedtak.INNVILGELSE)
@@ -47,15 +46,21 @@ data class BeregningsgrunnlagDto(
     val antallBarn: Int,
 )
 
+/**
+ * Beregningsresultat inneholder perioder for nytt vedtak inklusive perioder som er kopiert fra forrige behandling
+ * Men det er i de fleste tilfeller kun interessant å vise perioder fra og med revurderFra
+ */
 fun BeregningsresultatTilsynBarn.tilDto(
     revurderFra: LocalDate?,
 ): BeregningsresultatTilsynBarnDto {
-    val stønadsperioder = this.perioder
+    val filtrertPerioder = this.perioder
+        .filterNot { it.grunnlag.måned < (revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN) }
+    val stønadsperioder = filtrertPerioder
         .flatMap { it.grunnlag.stønadsperioderGrunnlag }
         .filtrerStønadsperioderFra(revurderFra)
 
     return BeregningsresultatTilsynBarnDto(
-        perioder = perioder.map { it.tilDto(revurderFra) },
+        perioder = filtrertPerioder.map { it.tilDto(revurderFra) },
         gjelderFraOgMed = stønadsperioder.minOfOrNull { it.stønadsperiode.fom },
         gjelderTilOgMed = stønadsperioder.maxOfOrNull { it.stønadsperiode.tom },
     )

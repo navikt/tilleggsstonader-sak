@@ -11,10 +11,12 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVent
-import no.nav.tilleggsstonader.sak.brev.Vedtaksbrev
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.Brevmottaker
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
+import no.nav.tilleggsstonader.sak.brev.frittstående.FrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretBrev
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretFrittståendeBrev
+import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.Vedtaksbrev
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
@@ -44,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.cache.CacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.jdbc.core.JdbcAggregateOperations
@@ -107,6 +110,9 @@ abstract class IntegrationTest {
     @Autowired
     protected lateinit var unleashService: UnleashService
 
+    @Autowired
+    private lateinit var cacheManagers: List<CacheManager>
+
     val logger = LoggerFactory.getLogger(javaClass)
 
     @AfterEach
@@ -114,6 +120,7 @@ abstract class IntegrationTest {
         headers.clear()
         clearClientMocks()
         resetDatabase()
+        clearCaches()
     }
 
     private fun resetDatabase() {
@@ -122,6 +129,9 @@ abstract class IntegrationTest {
             Task::class,
 
             SøknadRouting::class,
+
+            BrevmottakerFrittståendeBrev::class,
+            FrittståendeBrev::class,
 
             Grunnlagsdata::class,
             VedtakTilsynBarn::class,
@@ -140,7 +150,7 @@ abstract class IntegrationTest {
             OppgaveDomain::class,
             Totrinnskontroll::class,
             Vedtaksbrev::class,
-            Brevmottaker::class,
+            BrevmottakerVedtaksbrev::class,
             MellomlagretFrittståendeBrev::class,
             MellomlagretBrev::class,
             VilkårperioderGrunnlagDomain::class,
@@ -158,6 +168,13 @@ abstract class IntegrationTest {
     }
 
     private fun clearClientMocks() {
+    }
+
+    private fun clearCaches() {
+        cacheManagers.forEach {
+            it.cacheNames.mapNotNull { cacheName -> it.getCache(cacheName) }
+                .forEach { cache -> cache.clear() }
+        }
     }
 
     protected fun localhost(path: String): String {

@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.klage
 
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.klage.BehandlingEventType
 import no.nav.tilleggsstonader.kontrakter.klage.BehandlingResultat
 import no.nav.tilleggsstonader.kontrakter.klage.KlagebehandlingDto
@@ -60,7 +59,7 @@ class KlageService(
         klageClient.opprettKlage(
             OpprettKlagebehandlingRequest(
                 ident = aktivIdent,
-                stønadstype = Stønadstype.BARNETILSYN,
+                stønadstype = fagsak.stønadstype,
                 eksternFagsakId = fagsak.eksternId.id.toString(),
                 fagsystem = Fagsystem.TILLEGGSSTONADER,
                 klageMottatt = klageMottatt,

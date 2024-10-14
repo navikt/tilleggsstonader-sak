@@ -1,15 +1,19 @@
 package no.nav.tilleggsstonader.sak.behandling.fakta
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.libs.utils.fnr.Fødselsnummer
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -23,20 +27,44 @@ class BehandlingFaktaService(
     private val søknadService: SøknadService,
     private val barnService: BarnService,
     private val faktaArbeidOgOppholdMapper: FaktaArbeidOgOppholdMapper,
+    private val fagsakService: FagsakService,
 ) {
 
     fun hentFakta(
         behandlingId: BehandlingId,
     ): BehandlingFaktaDto {
+        val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
+        return when (stønadstype) {
+            Stønadstype.BARNETILSYN -> hentFaktaDTOForBarneTilsyn(behandlingId)
+            Stønadstype.LÆREMIDLER -> hentFaktaDTOForLæremidler(behandlingId)
+            else -> error("Uthenting av Fakta er ikke implementert for stønadstype=$stønadstype")
+        }
+    }
+    fun hentFaktaDTOForBarneTilsyn(
+        behandlingId: BehandlingId,
+    ): BehandlingFaktaTilsynBarnDto {
         val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
         val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
-        return BehandlingFaktaDto(
+        return BehandlingFaktaTilsynBarnDto(
             søknadMottattTidspunkt = søknad?.mottattTidspunkt,
-            hovedytelse = mapHovedytelse(søknad),
+            hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
             aktivitet = mapAktivitet(søknad),
             barn = mapBarn(grunnlagsdata, søknad, behandlingId),
-            dokumentasjon = søknad?.let { mapDokumentasjon(it, grunnlagsdata) },
+            dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata) },
             arena = arenaFakta(grunnlagsdata),
+        )
+    }
+    fun hentFaktaDTOForLæremidler(
+        behandlingId: BehandlingId,
+    ): BehandlingFaktaLæremidlerDto {
+        val søknad = søknadService.hentSøknadLæremidler(behandlingId)
+        val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
+        return BehandlingFaktaLæremidlerDto(
+            søknadMottattTidspunkt = søknad?.mottattTidspunkt,
+            hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
+            dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata) },
+            arena = arenaFakta(grunnlagsdata),
+            utdanning = søknad?.data?.utdanning.let { mapUtdanning(it) },
         )
     }
 
@@ -59,12 +87,25 @@ class BehandlingFaktaService(
             },
         )
 
-    private fun mapHovedytelse(søknad: SøknadBarnetilsyn?) =
+    private fun mapHovedytelse(hovedytelseAvsnitt: HovedytelseAvsnitt?) =
         FaktaHovedytelse(
-            søknadsgrunnlag = søknad?.let {
+            søknadsgrunnlag =
+            hovedytelseAvsnitt?.let {
                 SøknadsgrunnlagHovedytelse(
-                    hovedytelse = it.data.hovedytelse.hovedytelse,
-                    arbeidOgOpphold = faktaArbeidOgOppholdMapper.mapArbeidOgOpphold(it.data.hovedytelse.arbeidOgOpphold),
+                    hovedytelse = it.hovedytelse,
+                    arbeidOgOpphold = faktaArbeidOgOppholdMapper.mapArbeidOgOpphold(hovedytelseAvsnitt.arbeidOgOpphold),
+                )
+            },
+        )
+    private fun mapUtdanning(utdanningAvsnitt: UtdanningAvsnitt?) =
+        FaktaUtdanning(
+            søknadsgrunnlag =
+            utdanningAvsnitt?.let {
+                SøknadsgrunnlagUtdanning(
+                    aktiviteter = it.aktiviteter?.map { it.label },
+                    annenUtdanning = it.annenUtdanning,
+                    mottarUtstyrsstipend = it.mottarUtstyrsstipend,
+                    harFunksjonsnedsettelse = it.harFunksjonsnedsettelse,
                 )
             },
         )
@@ -122,9 +163,9 @@ class BehandlingFaktaService(
         return null
     }
 
-    private fun mapDokumentasjon(søknad: SøknadBarnetilsyn, grunnlagsdata: Grunnlagsdata): FaktaDokumentasjon {
+    private fun mapDokumentasjon(dokumentasjonListe: List<no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon>, journalpostId: String, grunnlagsdata: Grunnlagsdata): FaktaDokumentasjon {
         val navn = grunnlagsdata.grunnlag.barn.associate { it.ident to it.navn.fornavn }
-        val dokumentasjon = søknad.data.dokumentasjon.map { dokumentasjon ->
+        val dokumentasjon = dokumentasjonListe.map { dokumentasjon ->
             val navnBarn = dokumentasjon.identBarn?.let { navn[it] }?.let { " - $it" } ?: ""
             Dokumentasjon(
                 type = dokumentasjon.type.tittel + navnBarn,
@@ -132,7 +173,7 @@ class BehandlingFaktaService(
                 identBarn = dokumentasjon.identBarn,
             )
         }
-        return FaktaDokumentasjon(søknad.journalpostId, dokumentasjon)
+        return FaktaDokumentasjon(journalpostId, dokumentasjon)
     }
 
     private fun validerFinnesGrunnlagsdataForAlleBarnISøknad(

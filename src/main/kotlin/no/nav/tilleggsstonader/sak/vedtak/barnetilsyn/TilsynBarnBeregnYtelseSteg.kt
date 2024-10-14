@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
-import java.time.LocalDate
 
 @Service
 class TilsynBarnBeregnYtelseSteg(
@@ -63,7 +62,7 @@ class TilsynBarnBeregnYtelseSteg(
             "Funksjonalitet mangler for å kunne innvilge revurdering når tidligere behandling er innvilget. Sett saken på vent."
         }
 
-        val beregningsresultat = tilsynBarnBeregningService.beregn(behandlingId = saksbehandling.id)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
     }
@@ -119,19 +118,6 @@ class TilsynBarnBeregnYtelseSteg(
             ),
             beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
         )
-    }
-
-    /**
-     * Vi lagrer ned startdato for å eventuellt kunne opphøre bak i tiden for perioder som Arena eier.
-     */
-    private fun beregnStartdato(
-        saksbehandling: Saksbehandling,
-        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-    ): LocalDate {
-        feilHvis(saksbehandling.forrigeBehandlingId != null) {
-            "Når vi begynner å revurdere og opphøre må vi oppdatere denne metoden for å finne startdato"
-        }
-        return minOf(andelerTilkjentYtelse.minOf { it.fom })
     }
 
     private fun MålgruppeType.tilTypeAndel(): TypeAndel {

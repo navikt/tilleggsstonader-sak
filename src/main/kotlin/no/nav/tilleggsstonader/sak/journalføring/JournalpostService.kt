@@ -1,12 +1,11 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
@@ -14,8 +13,8 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequ
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.kontrakter.søknad.Skjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Søknadsskjema
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -108,7 +107,9 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
             val eksisterendeLogiskeVedlegg = dokument.logiskeVedlegg ?: emptyList()
             val logiskeVedleggForDokument = logiskeVedlegg[dokument.dokumentInfoId] ?: emptyList()
             val harIdentiskInnhold =
-                eksisterendeLogiskeVedlegg.size == logiskeVedleggForDokument.size && eksisterendeLogiskeVedlegg.containsAll(logiskeVedleggForDokument)
+                eksisterendeLogiskeVedlegg.size == logiskeVedleggForDokument.size && eksisterendeLogiskeVedlegg.containsAll(
+                    logiskeVedleggForDokument,
+                )
             if (!harIdentiskInnhold) {
                 journalpostClient.oppdaterLogiskeVedlegg(
                     dokument.dokumentInfoId,
@@ -118,14 +119,15 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
         }
     }
 
-    fun hentSøknadFraJournalpost(søknadJournalpost: Journalpost): Søknadsskjema<SøknadsskjemaBarnetilsyn> {
-        val dokumentinfo = JournalføringHelper.plukkUtOriginaldokument(søknadJournalpost, DokumentBrevkode.BARNETILSYN)
+    fun hentSøknadFraJournalpost(søknadJournalpost: Journalpost, stønadstype: Stønadstype): Søknadsskjema<out Skjema> {
+        val dokumentinfo =
+            JournalføringHelper.plukkUtOriginaldokument(søknadJournalpost, DokumentBrevkode.fraStønadstype(stønadstype))
         val data = journalpostClient.hentDokument(
             journalpostId = søknadJournalpost.journalpostId,
             dokumentInfoId = dokumentinfo.dokumentInfoId,
             Dokumentvariantformat.ORIGINAL,
         )
-        return objectMapper.readValue(data)
+        return SøknadsskjemaUtil.parseSøknadsskjema(stønadstype, data)
     }
 
     fun finnJournalpostOgPersonIdent(journalpostId: String): Pair<Journalpost, String> {
@@ -179,5 +181,12 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
         ) {
             "Vedlegget er sannsynligvis under arbeid, må åpnes i gosys"
         }
+    }
+}
+
+private fun DokumentBrevkode.Companion.fraStønadstype(stønadstype: Stønadstype): DokumentBrevkode {
+    return when (stønadstype) {
+        Stønadstype.BARNETILSYN -> DokumentBrevkode.BARNETILSYN
+        Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
     }
 }

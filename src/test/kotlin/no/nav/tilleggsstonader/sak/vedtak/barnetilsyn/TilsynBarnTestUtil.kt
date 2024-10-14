@@ -25,22 +25,26 @@ object TilsynBarnTestUtil {
 
     val vedtakBeregningsresultat = BeregningsresultatTilsynBarn(
         perioder = listOf(
-            BeregningsresultatForMåned(
-                dagsats = BigDecimal.TEN,
-                månedsbeløp = 1000,
-                grunnlag = Beregningsgrunnlag(
-                    måned = YearMonth.now(),
-                    makssats = 1000,
-                    stønadsperioderGrunnlag = emptyList(),
-                    utgifter = emptyList(),
-                    utgifterTotal = 2000,
-                    antallBarn = 1,
-                ),
-                beløpsperioder = listOf(
-                    Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = MålgruppeType.AAP),
-                    Beløpsperiode(dato = LocalDate.now().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
-                ),
-            ),
+            beregningsresultatForMåned(),
+        ),
+    )
+
+    fun beregningsresultatForMåned(
+        måned: YearMonth = YearMonth.now(),
+    ) = BeregningsresultatForMåned(
+        dagsats = BigDecimal.TEN,
+        månedsbeløp = 1000,
+        grunnlag = Beregningsgrunnlag(
+            måned = måned,
+            makssats = 1000,
+            stønadsperioderGrunnlag = listOf(),
+            utgifter = emptyList(),
+            utgifterTotal = 2000,
+            antallBarn = 1,
+        ),
+        beløpsperioder = listOf(
+            Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = MålgruppeType.AAP),
+            Beløpsperiode(dato = LocalDate.now().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
         ),
     )
 

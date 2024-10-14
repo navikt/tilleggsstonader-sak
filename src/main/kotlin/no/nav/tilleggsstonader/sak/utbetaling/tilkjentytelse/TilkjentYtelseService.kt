@@ -4,8 +4,6 @@ import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseRevurderingUtil.gjenbrukAndelerFraForrigeTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseRevurderingUtil.validerNyeAndelerBegynnerEtterRevurderFra
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -34,24 +32,12 @@ class TilkjentYtelseService(
         saksbehandling: Saksbehandling,
         andeler: List<AndelTilkjentYtelse>,
     ): TilkjentYtelse {
-        validerNyeAndelerBegynnerEtterRevurderFra(saksbehandling, andeler)
-
-        val andelerSomSkalBeholdes = finnAndelerSomSkalBeholdes(saksbehandling)
-
         return tilkjentYtelseRepository.insert(
             TilkjentYtelse(
                 behandlingId = saksbehandling.id,
-                andelerTilkjentYtelse = (andelerSomSkalBeholdes + andeler).toSet(),
+                andelerTilkjentYtelse = andeler.toSet(),
             ),
         )
-    }
-
-    private fun finnAndelerSomSkalBeholdes(saksbehandling: Saksbehandling): List<AndelTilkjentYtelse> {
-        val revurderFra = saksbehandling.revurderFra ?: return emptyList()
-        val forrigeBehandlingId = saksbehandling.forrigeBehandlingId ?: return emptyList()
-
-        val forrigeTilkjentYtelse = hentForBehandling(forrigeBehandlingId)
-        return gjenbrukAndelerFraForrigeTilkjentYtelse(saksbehandling, forrigeTilkjentYtelse, revurderFra)
     }
 
     fun harLøpendeUtbetaling(behandlingId: BehandlingId): Boolean {

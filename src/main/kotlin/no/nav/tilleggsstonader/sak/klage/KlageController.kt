@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController
 class KlageController(
     private val tilgangService: TilgangService,
     private val klageService: KlageService,
-    private val eksternVedtakService: EksternVedtakService,
+    private val eksternVedtakService: EksternKlageVedtakService,
 ) {
     @PostMapping("/fagsak/{fagsakId}")
     fun opprettKlage(@PathVariable fagsakId: FagsakId, @RequestBody opprettKlageDto: OpprettKlageDto): Ressurs<FagsakId> {

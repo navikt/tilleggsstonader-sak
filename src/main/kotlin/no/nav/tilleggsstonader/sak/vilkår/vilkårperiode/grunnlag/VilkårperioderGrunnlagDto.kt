@@ -23,6 +23,7 @@ data class PeriodeGrunnlagYtelseDto(
     val type: TypeYtelsePeriode,
     val fom: LocalDate,
     val tom: LocalDate?,
+    val ensligForsørgerStønadstype: EnsligForsørgerStønadstype? = null,
 )
 
 data class HentetInformasjonDto(
@@ -53,6 +54,7 @@ fun PeriodeGrunnlagYtelse.tilDto() =
         type = this.type,
         fom = this.fom,
         tom = this.tom,
+        ensligForsørgerStønadstype = this.ensligForsørgerStønadstype,
     )
 
 fun HentetInformasjon.tilDto() =

@@ -2,8 +2,10 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KodeverkServiceUtil.mockedKodeverkService
@@ -20,6 +22,7 @@ import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagSkjemaBarnetil
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagSøknadBarn
 import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.søknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
+import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -33,12 +36,14 @@ internal class BehandlingFaktaServiceTest {
     val søknadService = mockk<SøknadService>()
     val barnService = mockk<BarnService>()
     val faktaArbeidOgOppholdMapper = FaktaArbeidOgOppholdMapper(mockedKodeverkService())
+    val fagsakService = mockk<FagsakService>()
 
     val service = BehandlingFaktaService(
         grunnlagsdataService,
         søknadService,
         barnService,
         faktaArbeidOgOppholdMapper,
+        fagsakService,
     )
 
     val behandlingId = BehandlingId.random()
@@ -54,6 +59,10 @@ internal class BehandlingFaktaServiceTest {
         every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn()
         every { barnService.finnBarnPåBehandling(any()) } returns
             listOf(behandlingBarn(personIdent = "1", id = BarnId.fromString("60921c76-f8ef-4000-9824-f127a50a575e")))
+
+        val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
+
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
 
         val data = service.hentFakta(behandlingId)
         assertFileIsEqual("vilkår/vilkårGrunnlagDto.json", data)
@@ -78,7 +87,11 @@ internal class BehandlingFaktaServiceTest {
                 behandlingBarn(personIdent = "2"),
             )
 
-            val data = service.hentFakta(behandlingId)
+            val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
+
+            every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
+
+            val data = service.hentFakta(behandlingId) as BehandlingFaktaTilsynBarnDto
 
             assertThat(data.barn).hasSize(2)
             data.barn[0].let {
@@ -101,6 +114,11 @@ internal class BehandlingFaktaServiceTest {
             every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn(
                 barn = setOf(lagSøknadBarn(ident = "1"), lagSøknadBarn(ident = "2"), lagSøknadBarn(ident = "3")),
             )
+
+            val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
+
+            every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
+
             assertThatThrownBy {
                 service.hentFakta(behandlingId)
             }.hasMessage("Mangler grunnlagsdata for barn i søknad (2,3)")
@@ -121,7 +139,11 @@ internal class BehandlingFaktaServiceTest {
                 behandlingBarn(personIdent = "1"),
             )
 
-            val fakta = service.hentFakta(behandlingId)
+            val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
+
+            every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
+
+            val fakta = service.hentFakta(behandlingId) as BehandlingFaktaTilsynBarnDto
 
             assertThat(fakta.barn.single().vilkårFakta.harFullførtFjerdetrinn).isEqualTo(JaNei.NEI)
         }
@@ -140,7 +162,11 @@ internal class BehandlingFaktaServiceTest {
                 behandlingBarn(personIdent = "1"),
             )
 
-            val fakta = service.hentFakta(behandlingId)
+            val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
+
+            every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
+
+            val fakta = service.hentFakta(behandlingId) as BehandlingFaktaTilsynBarnDto
 
             assertThat(fakta.barn.single().vilkårFakta.harFullførtFjerdetrinn).isNull()
         }
@@ -159,6 +185,10 @@ internal class BehandlingFaktaServiceTest {
                 barn = emptySet(),
                 data = lagSkjemaBarnetilsyn(dokumentasjon = listOf(dokumentasjon)),
             )
+
+            val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
+
+            every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
 
             val fakta = service.hentFakta(behandlingId)
 
@@ -185,6 +215,10 @@ internal class BehandlingFaktaServiceTest {
             every { barnService.finnBarnPåBehandling(any()) } returns listOf(
                 behandlingBarn(personIdent = "1"),
             )
+
+            val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
+
+            every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
 
             val fakta = service.hentFakta(behandlingId)
 

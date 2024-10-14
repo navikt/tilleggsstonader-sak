@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
@@ -89,8 +89,8 @@ class GrunnlagsdataService(
         return barn.tilGrunnlagsdataBarn()
     }
 
-    private fun hentPerson(behandling: Saksbehandling) = when (behandling.stønadstype) {
-        Stønadstype.BARNETILSYN -> personService.hentPersonMedBarn(behandling.ident)
-        else -> personService.hentPersonUtenBarn(behandling.ident)
+    private fun hentPerson(behandling: Saksbehandling) = when (behandling.stønadstype.gjelderBarn()) {
+        true -> personService.hentPersonMedBarn(behandling.ident)
+        false -> personService.hentPersonUtenBarn(behandling.ident)
     }
 }

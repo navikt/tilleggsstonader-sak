@@ -29,6 +29,7 @@ object DatoUtil {
     fun årMånedNå() = YearMonth.now()
 }
 
+val YEAR_MONTH_MIN = YearMonth.from(LocalDate.MIN)
 val YEAR_MONTH_MAX = YearMonth.from(LocalDate.MAX)
 
 fun antallÅrSiden(dato: LocalDate?) = dato?.let { Period.between(it, dagensDato()).years }
@@ -93,6 +94,8 @@ fun LocalDate.datoEllerNesteMandagHvisLørdagEllerSøndag() = if (this.erLørdag
 } else {
     this
 }
+
+fun LocalDate.toYearMonth(): YearMonth = YearMonth.from(this)
 
 fun LocalDate.erFørsteDagIMåneden() = this.dayOfMonth == 1
 

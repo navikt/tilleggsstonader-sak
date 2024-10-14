@@ -18,6 +18,7 @@ object YtelserRegisterDtoMapper {
                     fom = it.fom,
                     tom = it.tom,
                     aapErFerdigAvklart = it.aapErFerdigAvklart,
+                    ensligForsørgerStønadstype = it.ensligForsørgerStønadstype,
                 )
             }.sortedWith(sorteringTomDesc),
             hentetInformasjon = hentetInformasjon.map { HentetInformasjonDto(type = it.type, status = it.status) },

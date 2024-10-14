@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
-import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaDto
+import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaTilsynBarnDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaAktivtet
 import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaBarn
 import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaHovedytelse
@@ -14,7 +14,7 @@ object VilkårGrunnlagUtil {
     fun mockVilkårGrunnlagDto(
         barn: List<FaktaBarn> = emptyList(),
     ) =
-        BehandlingFaktaDto(
+        BehandlingFaktaTilsynBarnDto(
             hovedytelse = FaktaHovedytelse(
                 søknadsgrunnlag = null,
             ),

@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprett
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -119,7 +120,7 @@ class JournalføringService(
         }
 
         if (journalpost.harStrukturertSøknad()) {
-            lagreSøknadOgNyeBarn(journalpost, behandling)
+            lagreSøknadOgNyeBarn(journalpost, behandling, stønadstype)
         }
 
         ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
@@ -128,7 +129,7 @@ class JournalføringService(
             OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
                 OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
                     behandlingId = behandling.id,
-                    saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                    saksbehandler = null, // Behandle sak oppgaven skal være ufordelt
                     beskrivelse = oppgaveBeskrivelse,
                 ),
             ),
@@ -196,8 +197,15 @@ class JournalføringService(
     private fun lagreSøknadOgNyeBarn(
         journalpost: Journalpost,
         behandling: Behandling,
+        stønadstype: Stønadstype,
     ) {
-        lagreSøknad(journalpost, behandling.id)
+        lagreSøknad(journalpost, behandling.id, stønadstype)
+        if (stønadstype.gjelderBarn()) {
+            lagreBarn(behandling)
+        }
+    }
+
+    private fun lagreBarn(behandling: Behandling) {
         val eksisterendeBarn = barnService.finnBarnPåBehandling(behandling.id)
 
         val nyeBarn = søknadService.hentSøknadBarnetilsyn(behandling.id)?.barn
@@ -215,8 +223,8 @@ class JournalføringService(
         barnService.opprettBarn(nyeBarn)
     }
 
-    private fun lagreSøknad(journalpost: Journalpost, behandlingId: BehandlingId) {
-        val søknad = journalpostService.hentSøknadFraJournalpost(journalpost)
+    private fun lagreSøknad(journalpost: Journalpost, behandlingId: BehandlingId, stønadstype: Stønadstype) {
+        val søknad = journalpostService.hentSøknadFraJournalpost(journalpost, stønadstype)
         søknadService.lagreSøknad(behandlingId, journalpost, søknad)
     }
 
@@ -241,8 +249,16 @@ class JournalføringService(
             }
         }
 
-        if (fagsak.stønadstype == Stønadstype.BARNETILSYN) {
-            validerKanOppretteNyBehandlingForTilsynBarn(behandlingÅrsak, fagsak)
+        if (fagsak.stønadstype.gjelderBarn()) {
+            validerKanOppretteNyBehandlingSomKanInneholdeNyeBarn(behandlingÅrsak, fagsak)
+        }
+    }
+
+    private fun skalValidereForAtManMåOppretteNyBehandlingManueltPgaNyeBarn(stønadstype: Stønadstype): Boolean {
+        return when (stønadstype) {
+            Stønadstype.BARNETILSYN -> true
+            Stønadstype.LÆREMIDLER -> false
+            else -> error("Har ikke tatt stilling til om $stønadstype skal validere for nye barn")
         }
     }
 
@@ -251,7 +267,7 @@ class JournalføringService(
      * Vi tror behovet for dette er begrenset og er allerede støttet på annen måte.
      * Ønsker derfor at disse journalføringene gjøres uten å opprette behandling, men at behandlingen opprettes manuelt
      */
-    private fun validerKanOppretteNyBehandlingForTilsynBarn(
+    private fun validerKanOppretteNyBehandlingSomKanInneholdeNyeBarn(
         behandlingÅrsak: BehandlingÅrsak,
         fagsak: Fagsak,
     ) {
