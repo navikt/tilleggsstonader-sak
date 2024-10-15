@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
@@ -125,6 +126,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 assertThat(tom).isEqualTo(FOM.plusDays(10))
                 assertThat(målgruppe).isEqualTo(MålgruppeType.OVERGANGSSTØNAD)
                 assertThat(aktivitet).isEqualTo(AktivitetType.UTDANNING)
+                assertThat(status).isEqualTo(StønadsperiodeStatus.NY)
 
                 assertThat(sporbar.opprettetAv).isEqualTo(SAKSHEH_A)
                 assertThat(sporbar.endret.endretAv).isEqualTo(SAKSHEH_B)
@@ -245,13 +247,14 @@ class StønadsperiodeServiceTest : IntegrationTest() {
             tom = tom,
             målgruppe = MålgruppeType.AAP,
             aktivitet = AktivitetType.TILTAK,
+            status = StønadsperiodeStatus.UENDRET,
         )
 
         @BeforeEach
         fun setUp() {
             val revurdering = testoppsettService.opprettBehandlingMedFagsak(behandling)
             opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = fom, tom = tom))
-            opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = fom, tom = tom))
+//            opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = fom, tom = tom))
             opprettVilkårperiode(aktivitet(behandlingId = revurdering.id, fom = fom, tom = tom))
             opprettVilkårperiode(
                 aktivitet(
@@ -295,6 +298,51 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf())
             }.hasMessageContaining("Kan ikke slette periode")
         }
+
+        @Nested
+        inner class OppdateringAvStatus {
+            @BeforeEach
+            fun setUp() {
+                stønadsperiodeRepository.insert(eksisterendeStønadsperiode)
+            }
+
+            @Test
+            fun `ingen endring på eksisterende periode skal ha status UENDRET`() {
+                val res = stønadsperiodeService.lagreStønadsperioder(
+                    behandling.id,
+                    listOf(eksisterendeStønadsperiode.tilDto()),
+                )
+
+                assertThat(res).hasSize(1)
+                assertThat(res[0].status).isEqualTo(StønadsperiodeStatus.UENDRET)
+            }
+
+            @Test
+            fun `oppdatering av eksisterende periode skal gi status ENDRET`() {
+                val res = stønadsperiodeService.lagreStønadsperioder(
+                    behandling.id,
+                    listOf(eksisterendeStønadsperiode.tilDto()),
+                )
+
+                assertThat(res).hasSize(1)
+                assertThat(res.single().status).isEqualTo(StønadsperiodeStatus.UENDRET)
+            }
+
+            @Test
+            fun `ny periode skal få status NY`() {
+                val nyPeriode = StønadsperiodeDto(
+                    fom = now().plusDays(1),
+                    tom = now().plusMonths(1),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                    status = null,
+                )
+                val res = stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyPeriode))
+
+                assertThat(res).hasSize(1)
+                assertThat(res.single().status).isEqualTo(StønadsperiodeStatus.NY)
+            }
+        }
     }
 
     @Nested
@@ -335,8 +383,74 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                     "id",
                     "sporbar",
                     "behandlingId",
+                    "status",
                 )
                 .containsExactlyInAnyOrderElementsOf(eksisterendeStønadsperidoder)
+
+            assertThat(stønadsperioder.map { it.status }).containsOnly(StønadsperiodeStatus.UENDRET)
+        }
+    }
+
+    @Nested
+    inner class StatusStønadsperioder {
+
+        val behandling = behandling(type = BehandlingType.REVURDERING)
+
+        val fom = now().minusMonths(1)
+        val tom = now().plusMonths(1)
+
+        val eksisterendeStønadsperiode = stønadsperiode(
+            behandlingId = behandling.id,
+            fom = fom,
+            tom = tom,
+            målgruppe = MålgruppeType.AAP,
+            aktivitet = AktivitetType.TILTAK,
+            status = StønadsperiodeStatus.UENDRET,
+        )
+
+        @BeforeEach
+        fun setUp() {
+            val revurdering = testoppsettService.opprettBehandlingMedFagsak(behandling)
+            opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = fom, tom = tom))
+            opprettVilkårperiode(aktivitet(behandlingId = revurdering.id, fom = fom, tom = tom))
+            stønadsperiodeRepository.insert(eksisterendeStønadsperiode)
+        }
+
+        @Test
+        fun `ingen endring på eksisterende periode skal ha status UENDRET`() {
+            val res = stønadsperiodeService.lagreStønadsperioder(
+                behandling.id,
+                listOf(eksisterendeStønadsperiode.tilDto()),
+            )
+
+            assertThat(res).hasSize(1)
+            assertThat(res[0].status).isEqualTo(StønadsperiodeStatus.UENDRET)
+        }
+
+        @Test
+        fun `oppdatering av eksisterende periode skal gi status ENDRET`() {
+            val res = stønadsperiodeService.lagreStønadsperioder(
+                behandling.id,
+                listOf(eksisterendeStønadsperiode.tilDto()),
+            )
+
+            assertThat(res).hasSize(1)
+            assertThat(res.single().status).isEqualTo(StønadsperiodeStatus.UENDRET)
+        }
+
+        @Test
+        fun `ny periode skal få status NY`() {
+            val nyPeriode = StønadsperiodeDto(
+                fom = now().plusDays(1),
+                tom = now().plusMonths(1),
+                målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.TILTAK,
+                status = null,
+            )
+            val res = stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyPeriode))
+
+            assertThat(res).hasSize(1)
+            assertThat(res.single().status).isEqualTo(StønadsperiodeStatus.NY)
         }
     }
 
@@ -377,12 +491,14 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         tom: LocalDate = this.TOM,
         målgruppeType: MålgruppeType = MålgruppeType.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
+        status: StønadsperiodeStatus = StønadsperiodeStatus.NY,
     ) = StønadsperiodeDto(
         id = id,
         fom = fom,
         tom = tom,
         målgruppe = målgruppeType,
         aktivitet = aktivitet,
+        status = status,
     )
 
     private fun opprettVilkårperiode(periode: LagreVilkårperiode): LagreVilkårperiodeResponse {

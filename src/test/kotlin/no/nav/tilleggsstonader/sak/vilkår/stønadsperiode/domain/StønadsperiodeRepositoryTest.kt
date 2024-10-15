@@ -24,6 +24,7 @@ internal class StønadsperiodeRepositoryTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
+                status = StønadsperiodeStatus.NY,
             ),
         )
 
@@ -41,6 +42,7 @@ internal class StønadsperiodeRepositoryTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
+                status = StønadsperiodeStatus.NY,
             ),
         )
 
@@ -51,6 +53,7 @@ internal class StønadsperiodeRepositoryTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
+                status = StønadsperiodeStatus.NY,
             ),
         )
 
