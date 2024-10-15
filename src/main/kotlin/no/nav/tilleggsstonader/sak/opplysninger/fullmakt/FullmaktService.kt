@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.fullmakt
 
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
@@ -8,7 +9,8 @@ import org.springframework.stereotype.Component
 class FullmaktService(
     private val fullmaktClient: FullmaktClient,
 ) {
-    val log = LoggerFactory.getLogger(FullmaktService::class.java)
+    val log: Logger = LoggerFactory.getLogger(FullmaktService::class.java)
+
     fun hentFullmektige(fullmaktsgiversIdent: String): List<FullmektigDto> {
         return try {
             fullmaktClient.hentFullmektige(fullmaktsgiversIdent)

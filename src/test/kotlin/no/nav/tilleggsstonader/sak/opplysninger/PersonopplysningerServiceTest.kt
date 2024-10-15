@@ -47,7 +47,7 @@ class PersonopplysningerServiceTest {
         fullmektigNavn = "Gulliver",
         gyldigFraOgMed = LocalDate.parse("2023-01-01"),
         gyldigTilOgMed = LocalDate.parse("2024-01-01"),
-        temaer = listOf("TSO")
+        temaer = listOf("TSO"),
     )
 
     @Nested

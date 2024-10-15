@@ -17,7 +17,7 @@ class FullmaktClient(
 ) : AbstractRestClient(restTemplate) {
 
     private val uriFullmektige = UriComponentsBuilder.fromUri(baseUrl)
-        .pathSegment("api", "fullmakt")
+        .pathSegment("api", "fullmakt", "fullmektige")
         .encode().toUriString()
 
     fun hentFullmektige(fullmaktsgiversIdent: String): List<FullmektigDto> {
