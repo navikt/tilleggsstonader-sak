@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -14,6 +15,7 @@ import java.time.LocalDate
  */
 data class FinnOppgaveRequestDto(
     val behandlingstema: String? = null,
+    val behandlingstype: String? = null,
     val oppgavetype: String? = null,
     val enhet: String? = null,
     val saksbehandler: String? = null,
@@ -41,6 +43,11 @@ data class FinnOppgaveRequestDto(
             tema = Tema.TSO,
             behandlingstema = if (this.behandlingstema != null) {
                 Behandlingstema.entries.find { it.value == this.behandlingstema }
+            } else {
+                null
+            },
+            behandlingstype = if (this.behandlingstype != null) {
+                Behandlingstype.entries.find { it.value == this.behandlingstype }
             } else {
                 null
             },
