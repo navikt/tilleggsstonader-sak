@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -98,6 +99,8 @@ class InterntVedtakServiceTest {
             opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
             fagsak = fagsak,
             resultat = BehandlingResultat.INNVILGET,
+            type = BehandlingType.REVURDERING,
+            revurderFra = LocalDate.of(2024, 1, 1),
         ),
         fagsak = fagsak,
     )
