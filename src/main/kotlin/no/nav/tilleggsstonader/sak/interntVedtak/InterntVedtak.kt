@@ -51,12 +51,6 @@ data class VedtakInternt(
     val type: TypeVedtak,
     val årsakerAvslag: List<ÅrsakAvslag>?,
     val avslagBegrunnelse: String?,
-    val utgifterBarn: List<UtgiftBarn>?,
-)
-
-data class UtgiftBarn(
-    val fødselsdatoBarn: LocalDate,
-    val utgifter: List<Utgift>,
 )
 
 data class Utgift(

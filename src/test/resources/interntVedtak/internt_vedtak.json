@@ -192,14 +192,6 @@
   "vedtak" : {
     "type" : "INNVILGELSE",
     "årsakerAvslag" : null,
-    "avslagBegrunnelse" : null,
-    "utgifterBarn" : [ {
-      "fødselsdatoBarn" : "2024-05-15",
-      "utgifter" : [ {
-        "beløp" : 1399,
-        "fom" : "2024-01-01",
-        "tom" : "2024-01-31"
-      } ]
-    } ]
+    "avslagBegrunnelse" : null
   }
 }

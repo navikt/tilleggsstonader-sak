@@ -51,7 +51,7 @@ class InterntVedtakService(
             aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
             stønadsperioder = mapStønadsperioder(behandlingId),
             vilkår = mapVilkår(behandlingId, behandlingbarn),
-            vedtak = mapVedtak(vedtak, behandlingbarn),
+            vedtak = mapVedtak(vedtak),
         )
     }
 
@@ -179,24 +179,12 @@ class InterntVedtakService(
             },
         )
 
-    private fun mapVedtak(vedtak: VedtakTilsynBarn?, behandlingbarn: Map<BarnId, GrunnlagBarn>): VedtakInternt? {
+    private fun mapVedtak(vedtak: VedtakTilsynBarn?): VedtakInternt? {
         return vedtak?.let {
             VedtakInternt(
                 type = it.type,
                 årsakerAvslag = it.årsakerAvslag?.årsaker,
                 avslagBegrunnelse = it.avslagBegrunnelse,
-                utgifterBarn = it.vedtak?.utgifter?.entries?.map { (barnId, utgifter) ->
-                    UtgiftBarn(
-                        fødselsdatoBarn = behandlingbarn.finnFødselsdato(barnId),
-                        utgifter = utgifter.map {
-                            Utgift(
-                                beløp = it.utgift,
-                                fom = it.fom.atDay(1),
-                                tom = it.fom.atEndOfMonth(),
-                            )
-                        },
-                    )
-                },
             )
         }
     }
