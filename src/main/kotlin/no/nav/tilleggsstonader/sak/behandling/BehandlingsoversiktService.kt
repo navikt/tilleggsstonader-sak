@@ -106,7 +106,7 @@ class BehandlingsoversiktService(
         val perioder = vedtak.beregningsresultat?.perioder
         val stønadsperioder = perioder?.flatMap { it.grunnlag.stønadsperioderGrunnlag }?.map { it.stønadsperiode }
         val minFom = stønadsperioder?.minOfOrNull { it.fom }
-        val maksTom = stønadsperioder?.minOfOrNull { it.tom }
+        val maksTom = stønadsperioder?.maxOfOrNull { it.tom }
         return Vedtaksperiode(fom = max(minFom, revurdererFra), tom = max(maksTom, revurdererFra))
     }
 }
