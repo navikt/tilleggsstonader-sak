@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.fagsak
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
@@ -15,8 +14,6 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
-import no.nav.tilleggsstonader.sak.fagsak.dto.FagsakDto
-import no.nav.tilleggsstonader.sak.fagsak.dto.tilDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
@@ -66,17 +63,6 @@ class FagsakService(
 
     fun finnFagsaker(personIdenter: Set<String>): List<Fagsak> =
         fagsakRepository.findBySøkerIdent(personIdenter).map { it.tilFagsakMedPerson() }
-
-    fun fagsakTilDto(fagsak: Fagsak): FagsakDto {
-        val behandlinger: List<Behandling> = behandlingService.hentBehandlinger(fagsak.id)
-        val erLøpende = erLøpende(fagsak.id)
-        return fagsak.tilDto(
-            behandlinger = behandlinger.map {
-                it.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId)
-            },
-            erLøpende = erLøpende,
-        )
-    }
 
     fun finnFagsakerForFagsakPersonId(fagsakPersonId: FagsakPersonId): Fagsaker {
         val fagsaker = fagsakRepository.findByFagsakPersonId(fagsakPersonId)
