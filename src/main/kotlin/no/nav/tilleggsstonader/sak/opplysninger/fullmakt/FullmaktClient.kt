@@ -21,7 +21,10 @@ class FullmaktClient(
         .encode().toUriString()
 
     fun hentFullmektige(fullmaktsgiversIdent: String): List<FullmektigDto> {
-        return postForEntity(uriFullmektige, IdentRequest(fullmaktsgiversIdent))
+        return postForEntity(
+            uri = uriFullmektige,
+            payload = IdentRequest(fullmaktsgiversIdent),
+        )
     }
 }
 
