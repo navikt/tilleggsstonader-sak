@@ -32,7 +32,7 @@ class ArenaClient(
         postForEntity(statusUri, request)
 
     fun hentVedtak(request: IdenterRequest): ArenaSakOgVedtakDto =
-        postForEntity(statusUri, request)
+        postForEntity(vedtakUri, request)
 
     fun harSaker(request: IdenterRequest): ArenaStatusHarSakerDto =
         postForEntity(statusHarSakerUri, request)
