@@ -66,7 +66,7 @@ class BehandlingsoversiktServiceTest {
 
             val behandling = oversikt.tilsynBarn!!.behandlinger.single()
             assertThat(behandling.vedtaksperiode?.fom).isEqualTo(LocalDate.of(2024, 3, 1))
-            assertThat(behandling.vedtaksperiode?.tom).isEqualTo(LocalDate.of(2024, 3, 13))
+            assertThat(behandling.vedtaksperiode?.tom).isEqualTo(LocalDate.of(2024, 3, 14))
         }
 
         @Test
@@ -93,11 +93,19 @@ class BehandlingsoversiktServiceTest {
             emptyList(),
             10,
         )
+        val stønadsperiodeGrunnlag2 = StønadsperiodeGrunnlag(
+            Stønadsperiode(
+                fom = LocalDate.of(2024, 3, 2),
+                tom = LocalDate.of(2024, 3, 14),
+                målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.TILTAK,
+            ),
+            emptyList(),
+            10,
+        )
         val beregningsresultatForMåned = beregningsresultatForMåned(
             YearMonth.of(2024, 3),
-            stønadsperioder = listOf(
-                stønadsperiodeGrunnlag,
-            ),
+            stønadsperioder = listOf(stønadsperiodeGrunnlag, stønadsperiodeGrunnlag2),
         )
         val beregningsresultat = BeregningsresultatTilsynBarn(perioder = listOf(beregningsresultatForMåned))
 

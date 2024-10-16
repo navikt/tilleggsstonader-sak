@@ -21,7 +21,14 @@ data class Stønadsperiode(
     @Column("malgruppe")
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
+    val status: StønadsperiodeStatus,
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 )
+
+enum class StønadsperiodeStatus {
+    NY,
+    ENDRET,
+    UENDRET,
+}
