@@ -74,7 +74,7 @@ class JournalføringService(
                 logiskVedlegg = journalføringRequest.logiskeVedlegg,
             )
         }
-        if (journalføringRequest.skalJournalføreTilNyBehandling() && journalføringRequest.gjelderKlage()) {
+        else if (journalføringRequest.skalJournalføreTilNyBehandling() && journalføringRequest.gjelderKlage()) {
             journalførTilNyKlage(
                 journalpostId = journalpost.journalpostId,
                 personIdent = journalpostService.hentIdentFraJournalpost(journalpost),
