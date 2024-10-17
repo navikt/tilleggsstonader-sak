@@ -10,13 +10,13 @@ import org.springframework.web.client.HttpServerErrorException
 class FullmaktService(
     private val fullmaktClient: FullmaktClient,
 ) {
-    val log: Logger = LoggerFactory.getLogger(FullmaktService::class.java)
+    val log: Logger = LoggerFactory.getLogger(javaClass)
 
     fun hentFullmektige(fullmaktsgiversIdent: String): List<FullmektigDto> {
         log.info("Henter fullmektige fra tilleggsstonader-integrasjoner...")
         return try {
             fullmaktClient.hentFullmektige(fullmaktsgiversIdent)
-            // .filtrerPåTilleggsstønadTemaer()
+                // .filtrerPåTilleggsstønadTemaer()
                 .also { log.info("Fant n={} fullmektige på bruker", it.size) }
         } catch (ex: HttpServerErrorException) {
             log.error("Klarte ikke hente fullmakter: {} \n {}", ex.message, ex.stackTraceToString())
@@ -24,7 +24,6 @@ class FullmaktService(
         }
     }
 }
-
 
 private fun List<FullmektigDto>.filtrerPåTilleggsstønadTemaer() =
     filter { it.temaer.any { tema -> tema in listOf(Tema.TSO.name, Tema.TSR.name) } }

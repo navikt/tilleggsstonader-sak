@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.fullmakt.FullmaktService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import org.springframework.stereotype.Service
 
 @Service
@@ -31,6 +32,7 @@ class PersonopplysningerService(
     }
 
     private fun hentPersonopplysninger(ident: String): PersonopplysningerDto {
+        logger.info("Henter personopplysninger")
         val pdlSøker = personService.hentSøker(ident)
         val harFullmektig = fullmaktService.hentFullmektige(ident).isNotEmpty()
         return PersonopplysningerDto(
