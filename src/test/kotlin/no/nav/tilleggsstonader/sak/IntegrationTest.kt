@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak
 
+import io.mockk.clearMocks
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLogg
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -22,6 +23,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
+import no.nav.tilleggsstonader.sak.klage.KlageClientMock
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRouting
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlagsdata
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
@@ -84,9 +86,13 @@ class DefaultRestTemplateConfiguration {
     "mock-arbeidsfordeling",
     "mock-kafka",
     "mock-ytelse-client",
+    "mock-klage",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
+
+    @Autowired
+    private lateinit var klageClientMock: KlageClientMock
 
     @Autowired
     protected lateinit var restTemplate: RestTemplate
