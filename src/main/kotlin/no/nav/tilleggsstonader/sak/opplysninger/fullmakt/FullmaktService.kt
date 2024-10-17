@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.opplysninger.fullmakt
 
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.fullmakt.FullmektigDto
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import org.springframework.web.client.HttpServerErrorException
 
 @Component
 class FullmaktService(
@@ -15,11 +15,9 @@ class FullmaktService(
     fun hentFullmektige(fullmaktsgiversIdent: String): List<FullmektigDto> {
         log.info("Henter fullmektige fra tilleggsstonader-integrasjoner...")
         return try {
-            fullmaktClient.hentFullmektige(fullmaktsgiversIdent)
-                // .filtrerPåTilleggsstønadTemaer()
-                .also { log.info("Fant n={} fullmektige på bruker", it.size) }
-        } catch (ex: HttpServerErrorException) {
-            log.error("Klarte ikke hente fullmakter: {} \n {}", ex.message, ex.stackTraceToString())
+            fullmaktClient.hentFullmektige(fullmaktsgiversIdent).filtrerPåTilleggsstønadTemaer()
+        } catch (ex: Exception) {
+            log.error("Kunne ikke hente fullmakter: {}", ex.message)
             emptyList()
         }
     }

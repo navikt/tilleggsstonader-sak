@@ -4,7 +4,6 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.dto.PersonopplysningerDto
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,14 +21,12 @@ class PersonopplysningController(
 
     @GetMapping("{behandlingId}")
     fun hentPersonopplysninger(@PathVariable behandlingId: BehandlingId): PersonopplysningerDto {
-        logger.info("Du har kommet til /api/personopplysninger/behandling/{fagsakPersonId}")
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return personopplysningerService.hentPersonopplysninger(behandlingId)
     }
 
     @GetMapping("fagsak-person/{fagsakPersonId}")
     fun hentPersonopplysningerForPerson(@PathVariable fagsakPersonId: FagsakPersonId): PersonopplysningerDto {
-        logger.info("Du har kommet til /api/personopplysninger/fagsak-person/{fagsakPersonId}")
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         return personopplysningerService.hentPersonopplysningerForFagsakPerson(fagsakPersonId)
     }
