@@ -2,7 +2,9 @@ package no.nav.tilleggsstonader.sak.journalføring
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.clearMocks
+import io.mockk.every
 import io.mockk.verify
+import java.time.LocalDate
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
@@ -10,6 +12,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -20,6 +24,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientConfig
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.klage.KlageClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
+import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.fagsakpersoner
 import no.nav.tilleggsstonader.sak.util.journalpost
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -117,18 +123,18 @@ class JournalpostControllerTest : IntegrationTest() {
     @Test
     fun `fullfør journalpost - skal ferdigstille journalpost, og opprette klage`() {
         val journalpostId = fullførJournalpost(
-            "2",
+            "1",
             JournalføringRequest(
                 stønadstype = Stønadstype.BARNETILSYN,
                 aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
                 årsak = JournalføringRequest.Journalføringsårsak.KLAGE,
                 oppgaveId = "123",
                 journalførendeEnhet = enhet,
-                logiskeVedlegg = mapOf("2" to listOf(LogiskVedlegg("2", "ny tittel"))),
+                logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
             ),
         )
 
-        assertThat(journalpostId).isEqualTo("2")
+        assertThat(journalpostId).isEqualTo("1")
 
         val fagsak = fagsakService.finnFagsak(setOf(ident), Stønadstype.BARNETILSYN)
         assertThat(fagsak).isNotNull
@@ -136,9 +142,20 @@ class JournalpostControllerTest : IntegrationTest() {
         val behandlinger = behandlingService.hentBehandlinger(fagsak!!.id)
         assertThat(behandlinger).hasSize(0)
 
-        verify(exactly = 1) { klageClient.opprettKlage(OpprettKlagebehandlingRequest(ident= "2", stønadstype = Stønadstype.BARNETILSYN, eksternFagsakId = fagsak.eksternId.fagsakId.toString(), fagsystem = Fagsystem.TILLEGGSSTONADER, klageMottatt = journalpost().datoMottatt!!.toLocalDate(), behandlendeEnhet = "999")) }
+        verify(exactly = 1) {
+            klageClient.opprettKlage(
+                OpprettKlagebehandlingRequest(
+                    ident = "12345678910",
+                    stønadstype = Stønadstype.BARNETILSYN,
+                    eksternFagsakId = "200000000",
+                    fagsystem = Fagsystem.TILLEGGSSTONADER,
+                    klageMottatt = LocalDate.of(2024,10,11),
+                    behandlendeEnhet = "4462"
+                )
+            )
+        }
 
-        verify(exactly = 1) { journalpostClient.ferdigstillJournalpost("2", enhet, saksbehandler) }
+        verify(exactly = 1) { journalpostClient.ferdigstillJournalpost("1", enhet, saksbehandler) }
         verify(exactly = 1) {
             journalpostClient.oppdaterLogiskeVedlegg(
                 "1",
