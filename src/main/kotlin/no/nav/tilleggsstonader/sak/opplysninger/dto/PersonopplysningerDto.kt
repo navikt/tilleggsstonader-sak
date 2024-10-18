@@ -9,6 +9,7 @@ data class PersonopplysningerDto(
     val personIdent: String,
     val navn: NavnDto,
     val harVergemål: Boolean,
+    val harFullmektig: Boolean,
     val adressebeskyttelse: Adressebeskyttelse,
 )
 
@@ -68,14 +69,6 @@ enum class AdresseType(val rekkefølge: Int) {
     KONTAKTADRESSE(3),
     KONTAKTADRESSE_UTLAND(4),
 }
-
-data class FullmaktDto(
-    val gyldigFraOgMed: LocalDate,
-    val gyldigTilOgMed: LocalDate,
-    val motpartsPersonident: String,
-    val navn: String?,
-    val områder: List<String>,
-)
 
 enum class Adressebeskyttelse {
 
