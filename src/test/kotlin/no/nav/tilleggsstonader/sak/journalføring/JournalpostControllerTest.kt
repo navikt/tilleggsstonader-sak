@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.klage.KlageClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
@@ -71,6 +72,7 @@ class JournalpostControllerTest : IntegrationTest() {
         super.tearDown()
 
         JournalpostClientConfig.resetOgInitialisereMocks(journalpostClient)
+        OppgaveClientConfig.resetOgInitialisereMocks(oppgaveClient)
     }
 
     @Test
@@ -147,7 +149,7 @@ class JournalpostControllerTest : IntegrationTest() {
                 OpprettKlagebehandlingRequest(
                     ident = "12345678910",
                     stønadstype = Stønadstype.BARNETILSYN,
-                    eksternFagsakId = "200000000",
+                    eksternFagsakId = fagsak.eksternId.id.toString(),
                     fagsystem = Fagsystem.TILLEGGSSTONADER,
                     klageMottatt = LocalDate.of(2024,10,11),
                     behandlendeEnhet = "4462"
