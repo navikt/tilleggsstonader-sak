@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -12,12 +11,10 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.NAVIDENT_REGEX
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
@@ -39,7 +36,6 @@ class TotrinnskontrollService(
     private val tilgangService: TilgangService,
     private val taskService: TaskService,
     private val totrinnskontrollRepository: TotrinnskontrollRepository,
-    private val unleashService: UnleashService,
 ) {
     @Transactional
     fun sendtilBeslutter(saksbehandling: Saksbehandling) {
@@ -89,16 +85,6 @@ class TotrinnskontrollService(
         saksbehandling: Saksbehandling,
         beslutteVedtak: BeslutteVedtakDto,
     ): String {
-        val behandlingerSomSkalRyddesOppSammenMedNøs = setOf(
-            BehandlingId.fromString("aa874c53-ddd1-4c13-ac84-2b6de62dd1d0"),
-            BehandlingId.fromString("7d005f23-98a8-4d9d-9d3f-aef31bd2207e"),
-        )
-        brukerfeilHvis(
-            saksbehandling.id in behandlingerSomSkalRyddesOppSammenMedNøs &&
-                !unleashService.isEnabled(Toggle.SPESIAL_NØS_OPPRYDDING),
-        ) {
-            "Denne behandlingen skal håndteres med NØS. Kontakt utviklerteamet ved spørsmål"
-        }
         settBeslutter(saksbehandling.id)
         val sisteTotrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId = saksbehandling.id)

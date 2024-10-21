@@ -17,7 +17,5 @@ enum class Toggle(override val toggleId: String) : ToggleId {
 
     SØKNAD_ROUTING_LÆREMIDLER("sak.soknad-routing.laremidler"),
 
-    // Behandlinger som må ryddes opp i
-    SPESIAL_NØS_OPPRYDDING("sak.rydde-opp-med-nos"),
     SPESIAL_IVERKSETT_ENDRINGER("sak.iverksett-endringer"),
 }
