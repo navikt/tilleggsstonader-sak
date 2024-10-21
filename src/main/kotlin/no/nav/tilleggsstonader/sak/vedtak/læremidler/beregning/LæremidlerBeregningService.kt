@@ -6,8 +6,11 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.YearMonth
-import kotlin.math.ceil
+
+private val PROSENT_50 = BigDecimal(0.5)
+private val PROSENTGRENSE_HALV_SATS = 50
 
 class LæremidlerBeregningService {
 
@@ -33,10 +36,10 @@ class LæremidlerBeregningService {
         )
     }
 
-    fun finnBeløpForStudieprosent(sats: Int, studieprosent: Int): BigDecimal {
-        if (studieprosent <= 50) {
-            return BigDecimal(ceil(sats * 0.5))
+    fun finnBeløpForStudieprosent(sats: Int, studieprosent: Int): Int {
+        if (studieprosent <= PROSENTGRENSE_HALV_SATS) {
+            return BigDecimal(sats).multiply(PROSENT_50).setScale(0, RoundingMode.HALF_UP).toInt()
         }
-        return BigDecimal(sats)
+        return sats
     }
 }

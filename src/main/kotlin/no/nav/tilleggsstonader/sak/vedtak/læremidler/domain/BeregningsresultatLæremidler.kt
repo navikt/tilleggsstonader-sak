@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -10,7 +9,7 @@ data class BeregningsresultatLæremidler(
 )
 
 data class BeregningsresultatForMåned(
-    val beløp: BigDecimal,
+    val beløp: Int,
     val grunnlag: Beregningsgrunnlag,
 )
 
