@@ -297,6 +297,9 @@ class VilkårperiodeService(
         validerBehandling(behandling)
 
         validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
+        feilHvis(eksisterendeVilkårperiode.kildeId != vilkårperiode.kildeId) {
+            "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
+        }
 
         val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.type, vilkårperiode.delvilkår)
         val nyStatus = if (eksisterendeVilkårperiode.status == Vilkårstatus.NY) {
