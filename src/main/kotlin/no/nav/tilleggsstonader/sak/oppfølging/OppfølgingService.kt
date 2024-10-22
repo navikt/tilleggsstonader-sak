@@ -46,8 +46,8 @@ class OppfølgingService(
 
             val registerAktivitet = aktivitetService.hentAktiviteter(
                 fagsak.fagsakPersonId,
-                stønadsperioder.first().fom,
-                stønadsperioder.last().tom,
+                stønadsperioder.minOf { it.fom },
+                stønadsperioder.maxOf { it.tom },
             )
             val stønadsperioderSomMåSjekkes =
                 stønadsperioder.filterNot { stønadsperiodeMåKontrolleres(it, fagsak, registerAktivitet) }
