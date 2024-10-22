@@ -74,17 +74,14 @@ class OppfølgingService(
             AktivitetType.TILTAK -> {
                 val tiltak = finnOverlappendePerioder(registerAktivitet.filterNot(::tiltakErUtdanning), stønadsperiode)
 
-                val stønadsperiodeHarOverlappendeTiltak = tiltak.any { it.inneholder(stønadsperiode) }
-                !stønadsperiodeHarOverlappendeTiltak
+                tiltak.none { it.inneholder(stønadsperiode) }
             }
 
             AktivitetType.UTDANNING -> {
                 val utdanning =
                     finnOverlappendePerioder(registerAktivitet.filter { tiltakErUtdanning(it) }, stønadsperiode)
 
-                val stønadsperiodeHarOverlappendeUtdanning =
-                    utdanning.any { it.fom <= stønadsperiode.fom && it.tom >= stønadsperiode.tom }
-                !stønadsperiodeHarOverlappendeUtdanning
+                utdanning.none { it.inneholder(stønadsperiode) }
             }
         }
     }
