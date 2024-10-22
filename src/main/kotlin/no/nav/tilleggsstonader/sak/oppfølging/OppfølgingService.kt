@@ -43,11 +43,10 @@ class OppfølgingService(
 
             val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
 
-            val registerAktivitet = aktivitetService.hentAktiviteter(
-                fagsak.fagsakPersonId,
-                stønadsperioder.minOf { it.fom },
-                stønadsperioder.maxOf { it.tom },
-            )
+            val fom = stønadsperioder.minOf { it.fom }
+            val tom = stønadsperioder.maxOf { it.tom }
+            val registerAktivitet = aktivitetService.hentAktiviteter(fagsak.fagsakPersonId, fom, tom)
+            val sammenslåtteAktiviteter = slåSammenAktiviteter(registerAktivitet)
             val stønadsperioderSomMåSjekkes =
                 stønadsperioder.filter { stønadsperiodeMåKontrolleres(it, fagsak, registerAktivitet) }
 
@@ -61,6 +60,15 @@ class OppfølgingService(
             }
         }
     }
+
+    private fun slåSammenAktiviteter(registerAktivitet: List<AktivitetArenaDto>) =
+        registerAktivitet
+            .mapNotNull { mapTilPeriode(it) }
+            .sorted()
+            .mergeSammenhengende { a, b ->
+                (a.aktivitet.erUtdanning ?: false) == (b.aktivitet.erUtdanning ?: false) &&
+                        a.overlapper(b) || perioderErSammenhengende(a, b)
+            }
 
     fun stønadsperiodeMåKontrolleres(
         stønadsperiode: StønadsperiodeDto,
@@ -85,11 +93,6 @@ class OppfølgingService(
         }
     }
 
-    private fun perioderErSammenhengende(
-        a: ArenaAktivitetPeriode,
-        b: ArenaAktivitetPeriode,
-    ) = a.tom.plusDays(1) == b.fom
-
     private fun finnOverlappendePerioder(
         registeraktiviteter: List<AktivitetArenaDto>,
         stønadsperiode: StønadsperiodeDto,
@@ -102,12 +105,12 @@ class OppfølgingService(
         .toList()
         .mergeSammenhengende { a, b -> a.overlapper(b) || perioderErSammenhengende(a, b) }
 
-    private fun mapTilPeriode(aktivitet: AktivitetArenaDto): ArenaAktivitetPeriode? {
+    private fun mapTilPeriode(aktivitet: AktivitetArenaDto): AktivitetHolder? {
         if (aktivitet.fom == null || aktivitet.tom == null) {
             logger.warn("Aktivitet med id=${aktivitet.id} mangler fom eller tom dato: ${aktivitet.fom} - ${aktivitet.tom}")
             return null
         }
-        return ArenaAktivitetPeriode(aktivitet.fom!!, aktivitet.tom!!)
+        return AktivitetHolder(aktivitet)
     }
 
     // TODO Usikker på denne
@@ -118,10 +121,24 @@ class OppfølgingService(
     private fun tiltakErUtdanning(it: AktivitetArenaDto) = it.erUtdanning ?: false
 }
 
-data class ArenaAktivitetPeriode(override val fom: LocalDate, override val tom: LocalDate) :
+data class AktivitetHolder(val aktivitet: AktivitetArenaDto) :
     Periode<LocalDate>,
-    Mergeable<LocalDate, ArenaAktivitetPeriode> {
-    override fun merge(other: ArenaAktivitetPeriode): ArenaAktivitetPeriode {
-        return ArenaAktivitetPeriode(minOf(fom, other.fom), maxOf(tom, other.tom))
+    Mergeable<LocalDate, AktivitetHolder> {
+
+    override val fom: LocalDate get() = aktivitet.fom!!
+    override val tom: LocalDate get() = aktivitet.tom!!
+
+    override fun merge(other: AktivitetHolder): AktivitetHolder {
+        return AktivitetHolder(
+            aktivitet = this.aktivitet.copy(
+                fom = minOf(fom, other.fom),
+                tom = maxOf(tom, other.tom)
+            )
+        )
     }
 }
+
+private fun perioderErSammenhengende(
+    a: Periode<LocalDate>,
+    b: Periode<LocalDate>,
+) = a.tom.plusDays(1) == b.fom
