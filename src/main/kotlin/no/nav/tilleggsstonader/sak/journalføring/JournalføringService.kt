@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -28,6 +29,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringHelper.tilAvsenderMottaker
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.valider
+import no.nav.tilleggsstonader.sak.klage.KlageService
+import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillJournalføringsoppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -49,6 +52,7 @@ class JournalføringService(
     private val personService: PersonService,
     private val oppgaveService: OppgaveService,
     private val gjennbrukDataRevurderingService: GjennbrukDataRevurderingService,
+    private val klageService: KlageService,
 ) {
 
     @Transactional
@@ -59,8 +63,18 @@ class JournalføringService(
         journalføringRequest.valider()
         validerGyldigAvsender(journalpost, journalføringRequest)
 
-        if (journalføringRequest.skalJournalføreTilNyBehandling()) {
+        if (journalføringRequest.skalJournalføreTilNyBehandling() && !journalføringRequest.gjelderKlage()) {
             journalførTilNyBehandling(
+                journalpostId = journalpost.journalpostId,
+                personIdent = journalpostService.hentIdentFraJournalpost(journalpost),
+                stønadstype = journalføringRequest.stønadstype,
+                behandlingÅrsak = journalføringRequest.årsak.behandlingsårsak,
+                journalførendeEnhet = journalføringRequest.journalførendeEnhet,
+                dokumentTitler = journalføringRequest.dokumentTitler,
+                logiskVedlegg = journalføringRequest.logiskeVedlegg,
+            )
+        } else if (journalføringRequest.skalJournalføreTilNyBehandling() && journalføringRequest.gjelderKlage()) {
+            journalførTilNyKlage(
                 journalpostId = journalpost.journalpostId,
                 personIdent = journalpostService.hentIdentFraJournalpost(journalpost),
                 stønadstype = journalføringRequest.stønadstype,
@@ -105,7 +119,7 @@ class JournalføringService(
 
         val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
 
-        validerKanOppretteBehandling(journalpost, fagsak, behandlingÅrsak)
+        validerKanOppretteBehandling(journalpost, fagsak, behandlingÅrsak, gjelderKlage = false)
 
         val behandling = opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
             fagsak = fagsak,
@@ -134,6 +148,29 @@ class JournalføringService(
                 ),
             ),
         )
+    }
+
+    fun journalførTilNyKlage(
+        journalpostId: String,
+        personIdent: String,
+        stønadstype: Stønadstype,
+        behandlingÅrsak: BehandlingÅrsak,
+        oppgaveBeskrivelse: String? = null,
+        journalførendeEnhet: String,
+        dokumentTitler: Map<String, String>? = null,
+        logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
+    ) {
+        val journalpost = journalpostService.hentJournalpost(journalpostId)
+
+        val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
+
+        validerKanOppretteBehandling(journalpost, fagsak, behandlingÅrsak, gjelderKlage = true)
+
+        feilHvis(journalpost.harStrukturertSøknad()) { "Journalpost med id=${journalpost.journalpostId} gjelder ikke en Klagebehandling." }
+
+        klageService.opprettKlage(fagsakId = fagsak.id, OpprettKlageDto(journalpost.datoMottatt?.toLocalDate() ?: osloDateNow()))
+
+        ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
     }
 
     private fun journalførUtenNyBehandling(journalføringRequest: JournalføringRequest, journalpost: Journalpost) {
@@ -232,6 +269,7 @@ class JournalføringService(
         journalpost: Journalpost,
         fagsak: Fagsak,
         behandlingÅrsak: BehandlingÅrsak,
+        gjelderKlage: Boolean,
     ) {
         val personIdent = fagsak.hentAktivIdent()
         feilHvis(journalpost.bruker == null) {
@@ -249,7 +287,7 @@ class JournalføringService(
             }
         }
 
-        if (fagsak.stønadstype.gjelderBarn()) {
+        if (fagsak.stønadstype.gjelderBarn() && !gjelderKlage) {
             validerKanOppretteNyBehandlingSomKanInneholdeNyeBarn(behandlingÅrsak, fagsak)
         }
     }
