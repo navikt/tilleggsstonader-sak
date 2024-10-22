@@ -40,6 +40,7 @@ data class VilkårperiodeDto(
     val aktivitetsdager: Int? = null,
     val forrigeVilkårperiodeId: UUID?,
     val status: Vilkårstatus?,
+    val kildeId: String?,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -61,6 +62,7 @@ fun Vilkårperiode.tilDto() =
         sistEndret = this.sporbar.endret.endretTid,
         forrigeVilkårperiodeId = this.forrigeVilkårperiodeId,
         status = this.status,
+        kildeId = this.kildeId,
     )
 
 fun DelvilkårVilkårperiode.tilDto() = when (this) {
@@ -112,6 +114,7 @@ data class LagreVilkårperiode(
     val aktivitetsdager: Int? = null,
     val delvilkår: DelvilkårVilkårperiodeDto,
     val begrunnelse: String? = null,
+    val kildeId: String? = null,
 )
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)

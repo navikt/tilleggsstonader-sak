@@ -150,6 +150,47 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         @Test
+        fun `skal kaste feil hvis kildeId ikke finnes blant aktivitetIder i grunnlag`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
+            val hentetInformasjon = HentetInformasjon(fom = now(), tom = now(), LocalDateTime.now())
+            val aktivitet = GrunnlagAktivitet(emptyList())
+            val grunnlag = VilkårperioderGrunnlag(aktivitet, GrunnlagYtelse(emptyList()), hentetInformasjon)
+
+            vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
+
+            val opprettVilkårperiode = opprettVilkårperiodeAktivitet(
+                lønnet = VurderingDto(SvarJaNei.NEI),
+                begrunnelse = "begrunnelse aktivitet",
+                behandlingId = behandling.id,
+                kildeId = "finnesIkke",
+            )
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiode)
+            }.hasMessageContaining("Aktivitet med id=finnesIkke finnes ikke i grunnlag")
+        }
+
+        @Test
+        fun `skal lagre kildeId på inngangsvilkår for aktivitet`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
+            val behandlingId = behandling.id
+            val hentetInformasjon = HentetInformasjon(fom = now(), tom = now(), LocalDateTime.now())
+            val aktivitet = GrunnlagAktivitet(listOf(aktivitetArenaDto("123")))
+            val grunnlag = VilkårperioderGrunnlag(aktivitet, GrunnlagYtelse(emptyList()), hentetInformasjon)
+
+            vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandlingId, grunnlag))
+
+            val opprettVilkårperiode = opprettVilkårperiodeAktivitet(
+                lønnet = VurderingDto(SvarJaNei.NEI),
+                begrunnelse = "begrunnelse aktivitet",
+                behandlingId = behandlingId,
+                kildeId = "123",
+            )
+            vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiode)
+            val vilkårperiode = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter.single()
+            assertThat(vilkårperiode.kildeId).isEqualTo("123")
+        }
+
+        @Test
         fun `skal kaste feil hvis målgruppe er ugyldig for stønadstype`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val opprettVilkårperiode = opprettVilkårperiodeMålgruppe(

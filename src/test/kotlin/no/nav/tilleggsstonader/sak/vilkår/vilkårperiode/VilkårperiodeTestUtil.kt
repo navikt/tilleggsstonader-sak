@@ -135,6 +135,7 @@ object VilkårperiodeTestUtil {
         begrunnelse: String? = null,
         behandlingId: BehandlingId = BehandlingId.random(),
         aktivitetsdager: Int? = 5,
+        kildeId: String? = null,
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,
@@ -143,5 +144,6 @@ object VilkårperiodeTestUtil {
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,
         aktivitetsdager = aktivitetsdager,
+        kildeId = kildeId,
     )
 }

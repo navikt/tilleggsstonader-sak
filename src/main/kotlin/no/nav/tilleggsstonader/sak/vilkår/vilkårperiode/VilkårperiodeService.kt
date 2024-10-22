@@ -222,6 +222,7 @@ class VilkårperiodeService(
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
         }
         validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
+        validerKildeId(vilkårperiode)
 
         val resultatEvaluering = evaulerVilkårperiode(vilkårperiode.type, vilkårperiode.delvilkår)
 
@@ -237,8 +238,24 @@ class VilkårperiodeService(
                 aktivitetsdager = vilkårperiode.aktivitetsdager,
                 kilde = KildeVilkårsperiode.MANUELL,
                 status = Vilkårstatus.NY,
+                kildeId = vilkårperiode.kildeId,
             ),
         )
+    }
+
+    private fun validerKildeId(vilkårperiode: LagreVilkårperiode) {
+        val behandlingId = vilkårperiode.behandlingId
+        val kildeId = vilkårperiode.kildeId ?: return
+        feilHvis(vilkårperiode.type is MålgruppeType) {
+            "Kan ikke sende inn kildeId på målgruppe, då målgruppeperioder ikke direkt har en id som aktivitet"
+        }
+
+        val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)
+            ?: error("Finner ikke grunnlag til behandling=$behandlingId")
+        val idIGrunnlag = grunnlag.grunnlag.aktivitet.aktiviteter.map { it.id }
+        feilHvis(kildeId !in idIGrunnlag) {
+            "Aktivitet med id=$kildeId finnes ikke i grunnlag"
+        }
     }
 
     private fun validerBehandling(behandling: Saksbehandling) {
