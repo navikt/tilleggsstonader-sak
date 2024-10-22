@@ -50,7 +50,7 @@ class OppfølgingService(
                 stønadsperioder.maxOf { it.tom },
             )
             val stønadsperioderSomMåSjekkes =
-                stønadsperioder.filterNot { stønadsperiodeMåKontrolleres(it, fagsak, registerAktivitet) }
+                stønadsperioder.filter { stønadsperiodeMåKontrolleres(it, fagsak, registerAktivitet) }
 
             if (stønadsperioderSomMåSjekkes.isNotEmpty()) {
                 BehandlingForOppfølgingDto(
