@@ -59,9 +59,6 @@ data class JournalføringRequest(
 }
 
 fun JournalføringRequest.valider() {
-    brukerfeilHvis(gjelderKlage() && skalJournalføreTilNyBehandling()) {
-        "Opprettelse av ny behandling er ikke støttet for klage. Du kan kun journalføre uten ny behandling, for så å opprette ny klagebehandling fra personoversikten."
-    }
     dokumentTitler?.let {
         brukerfeilHvis(
             it.containsValue(""),

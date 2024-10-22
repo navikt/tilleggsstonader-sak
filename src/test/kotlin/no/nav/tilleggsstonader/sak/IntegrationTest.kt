@@ -84,6 +84,7 @@ class DefaultRestTemplateConfiguration {
     "mock-arbeidsfordeling",
     "mock-kafka",
     "mock-ytelse-client",
+    "mock-klage",
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
