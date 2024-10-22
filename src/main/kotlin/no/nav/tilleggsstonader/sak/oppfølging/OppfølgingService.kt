@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
-import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
@@ -111,9 +110,10 @@ class OppfølgingService(
         return ArenaAktivitetPeriode(aktivitet.fom!!, aktivitet.tom!!)
     }
 
-    // Usikker på denne
+    // TODO Usikker på denne
     private fun tiltakHarRelevantStatus(it: AktivitetArenaDto) =
-        it.status != StatusAktivitet.AVBRUTT && it.status != StatusAktivitet.OPPHØRT
+        true
+    // it.status != StatusAktivitet.AVBRUTT && it.status != StatusAktivitet.OPPHØRT
 
     private fun tiltakErUtdanning(it: AktivitetArenaDto) = it.erUtdanning ?: false
 }
