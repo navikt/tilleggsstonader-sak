@@ -4,14 +4,20 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
+import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetService
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -22,6 +28,7 @@ class OppfølgingService(
     private val stønadsperiodeService: StønadsperiodeService,
     private val aktivitetService: AktivitetService,
     private val fagsakService: FagsakService,
+    private val ytelseService: YtelseService,
 ) {
 
     val logger = LoggerFactory.getLogger(javaClass)
@@ -45,15 +52,30 @@ class OppfølgingService(
 
             val fom = stønadsperioder.minOf { it.fom }
             val tom = stønadsperioder.maxOf { it.tom }
+<<<<<<< Updated upstream
             val registerAktivitet = aktivitetService.hentAktiviteter(fagsak.fagsakPersonId, fom, tom)
             val sammenslåtteAktiviteter = slåSammenAktiviteter(registerAktivitet)
+=======
+            val registeraktiviteter = aktivitetService.hentAktiviteter(fagsak.fagsakPersonId, fom = fom, tom = tom)
+            val ytelser = ytelseService.hentYtelseForGrunnlag(behandling.id, fom = fom, tom = tom)
+
+>>>>>>> Stashed changes
             val stønadsperioderSomMåSjekkes =
-                stønadsperioder.filter { stønadsperiodeMåKontrolleres(it, fagsak, registerAktivitet) }
+                stønadsperioder.filter { stønadsperiodeMåKontrolleres(it, fagsak, registeraktiviteter) }
+                    .map { PeriodeTilKontroll(it, årsak = mutableSetOf(ÅrsakKontroll.AKTIVITET)) }
+                    .associateBy { it.stønadsperiodeDto.id!! }
+
+            val sammenslåtteAktiviteter = slåSammenYtelser(ytelser)
+            val sammenslåtteYtelser = slåSammenYtelser(ytelser)
+
+            stønadsperioder
+                .filter { stønadsperiodeMåKontrolleres(it, fagsak, ytelser) }
 
             if (stønadsperioderSomMåSjekkes.isNotEmpty()) {
                 BehandlingForOppfølgingDto(
                     behandling.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId),
-                    stønadsperioderSomMåSjekkes,
+                    stønadsperioderSomMåSjekkes.values.toList(),
+                    mapFeiledeYtelser(ytelser)
                 )
             } else {
                 null
@@ -61,6 +83,7 @@ class OppfølgingService(
         }
     }
 
+<<<<<<< Updated upstream
     private fun slåSammenAktiviteter(registerAktivitet: List<AktivitetArenaDto>) =
         registerAktivitet
             .mapNotNull { mapTilPeriode(it) }
@@ -69,6 +92,18 @@ class OppfølgingService(
                 (a.aktivitet.erUtdanning ?: false) == (b.aktivitet.erUtdanning ?: false) &&
                         a.overlapper(b) || perioderErSammenhengende(a, b)
             }
+=======
+    private fun slåSammenYtelser(ytelser: YtelsePerioderDto) =
+        ytelser.perioder.map { HolderYtelse(it) }
+            .sorted()
+            .mergeSammenhengende { a, b -> a.ytelse == b.ytelse && a.overlapper(b) || perioderErSammenhengende(a, b) }
+
+    private fun mapFeiledeYtelser(ytelser: YtelsePerioderDto): List<TypeYtelsePeriode> {
+        return ytelser.hentetInformasjon
+            .filter { it.status != StatusHentetInformasjon.FEILET }
+            .map { it.type }
+    }
+>>>>>>> Stashed changes
 
     fun stønadsperiodeMåKontrolleres(
         stønadsperiode: StønadsperiodeDto,
@@ -80,7 +115,6 @@ class OppfølgingService(
             AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
             AktivitetType.TILTAK -> {
                 val tiltak = finnOverlappendePerioder(registerAktivitet.filterNot(::tiltakErUtdanning), stønadsperiode)
-
                 tiltak.none { it.inneholder(stønadsperiode) }
             }
 
@@ -93,6 +127,31 @@ class OppfølgingService(
         }
     }
 
+<<<<<<< Updated upstream
+=======
+    fun stønadsperiodeMåKontrolleres(
+        stønadsperiode: StønadsperiodeDto,
+        fagsak: Fagsak,
+        ytelser: YtelsePerioderDto,
+    ): Boolean {
+        return when (stønadsperiode.målgruppe) {
+
+            MålgruppeType.AAP -> finnOverlappendePerioder()
+            MålgruppeType.OVERGANGSSTØNAD -> TODO()
+
+            MålgruppeType.OMSTILLINGSSTØNAD,
+            MålgruppeType.NEDSATT_ARBEIDSEVNE,
+            MålgruppeType.UFØRETRYGD,
+            MålgruppeType.SYKEPENGER_100_PROSENT,
+            MålgruppeType.INGEN_MÅLGRUPPE,
+            MålgruppeType.DAGPENGER -> false
+        }
+    }
+
+    private fun perioderErSammenhengende(a: Periode<LocalDate>, b: Periode<LocalDate>) =
+        a.tom.plusDays(1) == b.fom
+
+>>>>>>> Stashed changes
     private fun finnOverlappendePerioder(
         registeraktiviteter: List<AktivitetArenaDto>,
         stønadsperiode: StønadsperiodeDto,
@@ -121,7 +180,22 @@ class OppfølgingService(
     private fun tiltakErUtdanning(it: AktivitetArenaDto) = it.erUtdanning ?: false
 }
 
+<<<<<<< Updated upstream
 data class AktivitetHolder(val aktivitet: AktivitetArenaDto) :
+=======
+private data class HolderYtelse(
+    val ytelse: YtelsePeriode
+): Periode<LocalDate>, Mergeable<LocalDate, HolderYtelse> {
+    override val fom: LocalDate get() = ytelse.fom
+    override val tom: LocalDate get() = ytelse.tom ?: LocalDate.MAX
+    override fun merge(other: HolderYtelse): HolderYtelse {
+        return this.copy(ytelse = this.ytelse.copy(fom = minOf(fom, other.fom), tom = maxOf(tom, other.tom)))
+    }
+}
+
+
+data class ArenaAktivitetPeriode(override val fom: LocalDate, override val tom: LocalDate) :
+>>>>>>> Stashed changes
     Periode<LocalDate>,
     Mergeable<LocalDate, AktivitetHolder> {
 
