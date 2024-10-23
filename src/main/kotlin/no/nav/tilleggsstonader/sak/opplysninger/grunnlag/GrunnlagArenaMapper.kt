@@ -1,14 +1,16 @@
 package no.nav.tilleggsstonader.sak.opplysninger.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.util.isEqualOrAfter
-import java.time.LocalDate
 
 object GrunnlagArenaMapper {
 
-    fun mapFaktaArena(status: ArenaStatusDto): GrunnlagArena = with(status.vedtak) {
+    fun mapFaktaArena(status: ArenaStatusDto, behandling: Saksbehandling): GrunnlagArena = with(status.vedtak) {
         GrunnlagArena(
-            vedtakTom = vedtakTom?.takeIf { it.isEqualOrAfter(LocalDate.now().minusMonths(3)) },
+            vedtakTom = vedtakTom?.takeIf {
+                it.isEqualOrAfter(behandling.opprettetTid.toLocalDate().minusYears(1))
+            },
         )
     }
 }
