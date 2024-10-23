@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.klage
 import no.nav.familie.prosessering.rest.Ressurs
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.kontrakter.klage.KlagebehandlingDto
+import no.nav.tilleggsstonader.kontrakter.klage.OppgaverBehandlingerRequest
+import no.nav.tilleggsstonader.kontrakter.klage.OppgaverBehandlingerResponse
 import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
+import java.util.UUID
 
 @Component
 class KlageClient(
@@ -38,6 +41,14 @@ class KlageClient(
             .toUriString()
 
         return getForEntity<Ressurs<Map<Long, List<KlagebehandlingDto>>>>(uri).getDataOrThrow()
+    }
+
+    fun hentBehandlingerForOppgaveIder(oppgaveIder: List<Long>): Map<Long, UUID> {
+        val uri = UriComponentsBuilder.fromUri(klageUri)
+            .pathSegment("api/ekstern/behandling/finn-oppgaver")
+            .build().toUriString()
+        val request = OppgaverBehandlingerRequest(oppgaveIder)
+        return postForEntity<Ressurs<OppgaverBehandlingerResponse>>(uri, request).getDataOrThrow().oppgaver
     }
 }
 

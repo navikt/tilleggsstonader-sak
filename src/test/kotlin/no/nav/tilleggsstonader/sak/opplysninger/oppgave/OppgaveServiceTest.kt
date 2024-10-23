@@ -12,6 +12,7 @@ import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
@@ -31,6 +32,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig
+import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.ENHET_NR_NAY
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -49,6 +51,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.UUID
 
 internal class OppgaveServiceTest {
 
@@ -58,6 +61,7 @@ internal class OppgaveServiceTest {
     private val oppgaveRepository = mockk<OppgaveRepository>()
     private val cacheManager = ConcurrentMapCacheManager()
     private val personService = mockk<PersonService>(relaxed = true)
+    private val klageService = mockk<KlageService>(relaxed = true)
 
     private val oppgaveService =
         OppgaveService(
@@ -67,6 +71,7 @@ internal class OppgaveServiceTest {
             arbeidsfordelingService = arbeidsfordelingService,
             cacheManager = cacheManager,
             personService = personService,
+            klageService = klageService,
         )
 
     val opprettOppgaveDomainSlot = slot<OppgaveDomain>()
@@ -347,13 +352,29 @@ internal class OppgaveServiceTest {
         every { oppgaveRepository.finnOppgaveMetadata(any()) } answers {
             firstArg<List<Long>>()
                 .filter { it == oppgaveIdMedBehandling }
-                .map { OppgaveMetadata(it, behandlingId, null) }
+                .map { OppgaveMetadata(it, behandlingId.id, null) }
         }
 
         val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, enhet = ENHET_NR_NAY)).oppgaver
 
-        assertThat(oppgaver.single { it.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingId)
+        assertThat(oppgaver.single { it.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingId.id)
         assertThat(oppgaver.single { it.id != oppgaveIdMedBehandling }.behandlingId).isNull()
+    }
+
+    @Test
+    fun `skal legge til behandlingId på klageoppgaver for å enklere kunne gå til behandling fra frontend`() {
+        val oppgaveIdMedBehandling = 1L
+        val behandlingIdKlage = UUID.randomUUID()
+
+        every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(
+            1,
+            listOf(lagEksternTestOppgave().copy(id = oppgaveIdMedBehandling, behandlingstype = Behandlingstype.Klage.value)),
+        )
+        every { klageService.hentBehandlingIderForOppgaveIder(any()) } returns mapOf(oppgaveIdMedBehandling to behandlingIdKlage)
+
+        val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, enhet = ENHET_NR_NAY)).oppgaver
+
+        assertThat(oppgaver.single { it.id == oppgaveIdMedBehandling }.behandlingId).isEqualTo(behandlingIdKlage)
     }
 
     @Test

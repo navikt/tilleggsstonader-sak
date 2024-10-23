@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
@@ -20,6 +21,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getCachedOrLoad
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getValue
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalPlasseresIKlarMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.utledBehandlesAvApplikasjon
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDto
@@ -46,6 +48,7 @@ class OppgaveService(
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val cacheManager: CacheManager,
     private val personService: PersonService,
+    private val klageService: KlageService,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -91,9 +94,22 @@ class OppgaveService(
     }
 
     private fun finnOppgaveMetadata(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
-        val oppgaveIder = oppgaver.map { it.id }
+        return finnOppgaveMetadataSak(oppgaver) + finnOppgaveMetadataKlage(oppgaver)
+    }
+
+    private fun finnOppgaveMetadataSak(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
+        val oppgaveIder = oppgaver.filter { it.behandlingstype != Behandlingstype.Klage.value }.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveMetadata", oppgaveIder) {
             oppgaveRepository.finnOppgaveMetadata(oppgaveIder).associateBy { it.gsakOppgaveId }
+        }
+    }
+
+    private fun finnOppgaveMetadataKlage(oppgaver: List<Oppgave>): Map<Long, OppgaveMetadata> {
+        val oppgaveIder = oppgaver.filter { it.behandlingstype == Behandlingstype.Klage.value }.map { it.id }
+        return cacheManager.getCachedOrLoad("oppgaveMetadataKlage", oppgaveIder) {
+            klageService.hentBehandlingIderForOppgaveIder(oppgaveIder)
+                .map { it.key to OppgaveMetadata(gsakOppgaveId = it.key, behandlingId = it.value) }
+                .toMap()
         }
     }
 
