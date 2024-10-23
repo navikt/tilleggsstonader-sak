@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
@@ -26,8 +27,8 @@ data class Vilkårperiode(
     @Column("forrige_vilkarperiode_id")
     val forrigeVilkårperiodeId: UUID? = null,
 
-    val fom: LocalDate,
-    val tom: LocalDate,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val type: VilkårperiodeType,
     @Column("delvilkar")
     val delvilkår: DelvilkårVilkårperiode,
@@ -41,10 +42,9 @@ data class Vilkårperiode(
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
-) {
+) : Periode<LocalDate> {
     init {
-        require(tom >= fom) { "Til-og-med før fra-og-med: $fom > $tom" }
-
+        validatePeriode()
         validerAktivitetsdager()
 
         when {
