@@ -42,6 +42,9 @@ data class Vilkårperiode(
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
+
+    val kildeId: String? = null,
+
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
