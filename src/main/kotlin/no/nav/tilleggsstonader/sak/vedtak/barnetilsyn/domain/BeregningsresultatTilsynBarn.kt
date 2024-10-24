@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -92,14 +91,6 @@ fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
     }
 }
 
-fun StønadsperiodeDto.tilBeregningsgrunnlagStønadsperiode() = Stønadsperiode(
-    id = this.id,
-    fom = this.fom,
-    tom = this.tom,
-    målgruppe = this.målgruppe,
-    aktivitet = this.aktivitet,
-)
-
 fun StønadsperiodeInngangsvilkår.tilGrunnlagStønadsperiode() = Stønadsperiode(
     id = this.id,
     fom = this.fom,
@@ -108,4 +99,5 @@ fun StønadsperiodeInngangsvilkår.tilGrunnlagStønadsperiode() = Stønadsperiod
     aktivitet = this.aktivitet,
 )
 
-fun List<StønadsperiodeInngangsvilkår>.tilSortertGrunnlagStønadsperiode() = this.map { it.tilGrunnlagStønadsperiode() }.sortedBy { it.fom }
+fun List<StønadsperiodeInngangsvilkår>.tilSortertGrunnlagStønadsperiode() =
+    this.map { it.tilGrunnlagStønadsperiode() }.sortedBy { it.fom }
