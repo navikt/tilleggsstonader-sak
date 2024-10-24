@@ -57,6 +57,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnl
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagTestUtil.periodeGrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -174,7 +175,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
             val behandlingId = behandling.id
             val hentetInformasjon = HentetInformasjon(fom = now(), tom = now(), LocalDateTime.now())
-            val aktivitet = GrunnlagAktivitet(listOf(aktivitetArenaDto("123")))
+            val aktivitet = GrunnlagAktivitet(listOf(periodeGrunnlagAktivitet("123")))
             val grunnlag = VilkårperioderGrunnlag(aktivitet, GrunnlagYtelse(emptyList()), hentetInformasjon)
 
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandlingId, grunnlag))
@@ -266,7 +267,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         @Nested
-        inner class IngenAktivitetMålgruppe {
+        inner class IngenPeriodeGrunnlagAktivitetMålgruppe {
             @Test
             fun `skal kaste feil ved tom og null begrunnelse på ingen aktivitet`() {
                 val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())

@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
-import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagTestUtil.periodeGrunnlagAktivitet
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -84,7 +84,7 @@ internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
 
     private fun grunnlagAktivitet() = GrunnlagAktivitet(
         aktiviteter = listOf(
-            AktivitetArenaDto(
+            periodeGrunnlagAktivitet(
                 id = "123",
                 fom = LocalDate.now(),
                 tom = LocalDate.now().plusMonths(1),

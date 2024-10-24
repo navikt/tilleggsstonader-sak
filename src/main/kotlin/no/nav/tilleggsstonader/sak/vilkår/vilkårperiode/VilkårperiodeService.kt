@@ -42,6 +42,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
@@ -169,7 +170,23 @@ class VilkårperiodeService(
             ident = behandlingService.hentSaksbehandling(behandlingId).ident,
             fom = fom,
             tom = tom,
-        ),
+        ).map {
+            PeriodeGrunnlagAktivitet(
+                id = it.id,
+                fom = it.fom,
+                tom = it.tom,
+                type = it.type,
+                typeNavn = it.typeNavn,
+                status = it.status,
+                statusArena = it.statusArena,
+                antallDagerPerUke = it.antallDagerPerUke,
+                prosentDeltakelse = it.prosentDeltakelse,
+                erStønadsberettiget = it.erStønadsberettiget,
+                erUtdanning = it.erUtdanning,
+                arrangør = it.arrangør,
+                kilde = it.kilde,
+            )
+        },
     )
 
     private fun hentGrunnlagYtelse(

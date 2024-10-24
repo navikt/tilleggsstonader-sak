@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-class AktivitetServiceTest {
+class PeriodeGrunnlagAktivitetServiceTest {
 
     val aktivitetClient = mockk<AktivitetClient>()
     val fagsakPersonService = mockk<FagsakPersonService>()
