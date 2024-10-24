@@ -125,7 +125,7 @@ Egenskap: Beregning av stønadsperioder
       Gitt følgende vilkårsperioder med aktiviteter
         | Fom        | Tom        | type   |
         | 01.01.2023 | 28.02.2023 | TILTAK |
-        | 01.03.2023 | 31.03.2023 | TILTAK |
+        | 03.03.2023 | 31.03.2023 | TILTAK |
 
       Gitt følgende vilkårsperioder med målgrupper
         | Fom        | Tom        | type |
@@ -201,3 +201,116 @@ Egenskap: Beregning av stønadsperioder
       Når forslag til stønadsperioder lages
 
       Så forvent følgende beregningsfeil: Aktivitet og målgruppe ligger lengre enn tre månder tilbake i tid fra søknadsdato
+
+  Regel: Stønadsperioden skal foreslås for flere like aktiviteter eller målgrupper som er rett etter hverandre
+    Scenario: To like aktiviter som er rett etter hverandre og en målgruppe
+      Gitt følgende vilkårsperioder med aktiviteter
+        | Fom        | Tom        | type   |
+        | 01.01.2023 | 01.02.2023 | TILTAK |
+        | 01.02.2023 | 01.03.2023 | TILTAK |
+
+      Gitt følgende vilkårsperioder med målgrupper
+        | Fom        | Tom        | type |
+        | 01.01.2023 | 01.03.2023 | AAP  |
+
+
+      Når forslag til stønadsperioder lages
+
+      Så forvent følgende stønadsperioder
+        | Fom        | Tom        | aktivitet | målgruppe |
+        | 01.01.2023 | 01.03.2023 | TILTAK    | AAP       |
+
+
+    Scenario: En aktivit og to like målgrupper som er rett etter hverandre
+      Gitt følgende vilkårsperioder med aktiviteter
+        | Fom        | Tom        | type   |
+        | 01.01.2023 | 01.03.2023 | TILTAK |
+
+      Gitt følgende vilkårsperioder med målgrupper
+        | Fom        | Tom        | type |
+        | 01.01.2023 | 01.02.2023 | AAP  |
+        | 02.02.2023 | 01.03.2023 | AAP  |
+
+      Når forslag til stønadsperioder lages
+
+      Så forvent følgende stønadsperioder
+        | Fom        | Tom        | aktivitet | målgruppe |
+        | 01.01.2023 | 01.03.2023 | TILTAK    | AAP       |
+
+    Scenario: To aktiviteter og to like målgrupper som er rett etter hverandre
+      Gitt følgende vilkårsperioder med aktiviteter
+        | Fom        | Tom        | type   |
+        | 01.01.2023 | 01.02.2023 | TILTAK |
+        | 01.02.2023 | 01.03.2023 | TILTAK |
+
+      Gitt følgende vilkårsperioder med målgrupper
+        | Fom        | Tom        | type |
+        | 01.01.2023 | 01.02.2023 | AAP  |
+        | 02.02.2023 | 01.03.2023 | AAP  |
+
+      Når forslag til stønadsperioder lages
+
+      Så forvent følgende stønadsperioder
+        | Fom        | Tom        | aktivitet | målgruppe |
+        | 01.01.2023 | 01.03.2023 | TILTAK    | AAP       |
+
+    Scenario: Tre aktiviteter og to like målgrupper som er rett etter hverandre
+      Gitt følgende vilkårsperioder med aktiviteter
+        | Fom        | Tom        | type   |
+        | 01.01.2023 | 01.02.2023 | TILTAK |
+        | 01.02.2023 | 01.03.2023 | TILTAK |
+        | 02.03.2023 | 01.04.2023 | TILTAK |
+
+      Gitt følgende vilkårsperioder med målgrupper
+        | Fom        | Tom        | type |
+        | 01.01.2023 | 01.02.2023 | AAP  |
+        | 02.02.2023 | 01.04.2023 | AAP  |
+
+      Når forslag til stønadsperioder lages
+
+      Så forvent følgende stønadsperioder
+        | Fom        | Tom        | aktivitet | målgruppe |
+        | 01.01.2023 | 01.04.2023 | TILTAK    | AAP       |
+
+    Scenario: En aktivitet og to like målgrupper som ikke er rett etter hverandre
+      Gitt følgende vilkårsperioder med aktiviteter
+        | Fom        | Tom        | type   |
+        | 01.01.2023 | 01.03.2023 | TILTAK |
+
+      Gitt følgende vilkårsperioder med målgrupper
+        | Fom        | Tom        | type |
+        | 01.01.2023 | 01.02.2023 | AAP  |
+        | 03.02.2023 | 01.04.2023 | AAP  |
+
+      Når forslag til stønadsperioder lages
+
+      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun én gyldig kombinasjon av aktivitet og målgruppe
+
+    Scenario: En aktivitet og tre like målgrupper hvor to er like etter hverandre, men den siste er med opphold
+      Gitt følgende vilkårsperioder med aktiviteter
+        | Fom        | Tom        | type   |
+        | 01.01.2023 | 01.03.2023 | TILTAK |
+
+      Gitt følgende vilkårsperioder med målgrupper
+        | Fom        | Tom        | type |
+        | 01.01.2023 | 01.02.2023 | AAP  |
+        | 03.02.2023 | 01.04.2023 | AAP  |
+        | 03.04.2023 | 01.05.2023 | AAP  |
+
+      Når forslag til stønadsperioder lages
+
+      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun én gyldig kombinasjon av aktivitet og målgruppe
+
+    Scenario: En aktivitet og to like målgrupper som overlapper
+      Gitt følgende vilkårsperioder med aktiviteter
+        | Fom        | Tom        | type   |
+        | 01.01.2023 | 01.03.2023 | TILTAK |
+
+      Gitt følgende vilkårsperioder med målgrupper
+        | Fom        | Tom        | type |
+        | 01.01.2023 | 01.02.2023 | AAP  |
+        | 15.01.2023 | 01.04.2023 | AAP  |
+
+      Når forslag til stønadsperioder lages
+
+      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun én gyldig kombinasjon av aktivitet og målgruppe
