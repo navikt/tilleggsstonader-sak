@@ -292,14 +292,6 @@ class JournalføringService(
         }
     }
 
-    private fun skalValidereForAtManMåOppretteNyBehandlingManueltPgaNyeBarn(stønadstype: Stønadstype): Boolean {
-        return when (stønadstype) {
-            Stønadstype.BARNETILSYN -> true
-            Stønadstype.LÆREMIDLER -> false
-            else -> error("Har ikke tatt stilling til om $stønadstype skal validere for nye barn")
-        }
-    }
-
     /**
      * For tilsyn barn må man ta stilling til hvilke barn som skal legges til i behandlingen.
      * Vi tror behovet for dette er begrenset og er allerede støttet på annen måte.
