@@ -7,7 +7,10 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeMapper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
@@ -30,6 +33,7 @@ data class Utgift(
 
 data class BeregningsresultatTilsynBarnDto(
     val perioder: List<BeregningsresultatForMånedDto>,
+    val vedtaksperioder: List<VedtaksperiodeDto>,
     val gjelderFraOgMed: LocalDate?,
     val gjelderTilOgMed: LocalDate?,
 )
@@ -38,6 +42,14 @@ data class BeregningsresultatForMånedDto(
     val dagsats: BigDecimal,
     val månedsbeløp: Int,
     val grunnlag: BeregningsgrunnlagDto,
+)
+
+data class VedtaksperiodeDto(
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType,
+    val antallBarn: Int,
 )
 
 data class BeregningsgrunnlagDto(
@@ -55,16 +67,26 @@ fun BeregningsresultatTilsynBarn.tilDto(
 ): BeregningsresultatTilsynBarnDto {
     val filtrertPerioder = this.perioder
         .filterNot { it.grunnlag.måned < (revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN) }
-    val stønadsperioder = filtrertPerioder
-        .flatMap { it.grunnlag.stønadsperioderGrunnlag }
+
+    val vedtaksperioder = VedtaksperiodeMapper.mapTilVedtaksperiode(this.perioder)
         .filtrerStønadsperioderFra(revurderFra)
+        .map { it.tilDto() }
 
     return BeregningsresultatTilsynBarnDto(
         perioder = filtrertPerioder.map { it.tilDto(revurderFra) },
-        gjelderFraOgMed = stønadsperioder.minOfOrNull { it.stønadsperiode.fom },
-        gjelderTilOgMed = stønadsperioder.maxOfOrNull { it.stønadsperiode.tom },
+        vedtaksperioder = vedtaksperioder,
+        gjelderFraOgMed = vedtaksperioder.minOfOrNull { it.fom },
+        gjelderTilOgMed = vedtaksperioder.maxOfOrNull { it.tom },
     )
 }
+
+private fun Vedtaksperiode.tilDto() = VedtaksperiodeDto(
+    fom = fom,
+    tom = tom,
+    målgruppe = målgruppe,
+    aktivitet = aktivitet,
+    antallBarn = antallBarn,
+)
 
 private fun BeregningsresultatForMåned.tilDto(revurderFra: LocalDate?): BeregningsresultatForMånedDto {
     val filtrerteBeløpsperioder = this.beløpsperioder.filtrerBeløpsperioderFra(revurderFra)
@@ -98,14 +120,12 @@ private fun List<Beløpsperiode>.filtrerBeløpsperioderFra(revurderFra: LocalDat
  * Skal kun ha med stønadsperioder som er etter [revurderFra]
  * Dersom stønadsperioden overlapper med [revurderFra] så skal den avkortes fra og med revurderFra-dato
  */
-private fun List<StønadsperiodeGrunnlag>.filtrerStønadsperioderFra(
+private fun List<Vedtaksperiode>.filtrerStønadsperioderFra(
     revurderFra: LocalDate?,
-): List<StønadsperiodeGrunnlag> = mapNotNull {
+): List<Vedtaksperiode> = mapNotNull {
     when {
         revurderFra == null -> it
-        it.stønadsperiode.tom < revurderFra -> null
-        else -> it.copy(
-            stønadsperiode = it.stønadsperiode.copy(fom = maxOf(it.stønadsperiode.fom, revurderFra)),
-        )
+        it.tom < revurderFra -> null
+        else -> it.copy(fom = maxOf(it.fom, revurderFra))
     }
 }

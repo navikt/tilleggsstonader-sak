@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 
-class EvalueringAktivitetTest {
+class EvalueringPeriodeGrunnlagAktivitetTest {
 
     @Nested
     inner class Tiltak {
@@ -97,7 +97,7 @@ class EvalueringAktivitetTest {
     }
 
     @Nested
-    inner class IngenAktivitet {
+    inner class IngenPeriodeGrunnlagAktivitet {
 
         @Test
         fun `Ingen aktivitet skal mappes til ikke oppfylt`() {

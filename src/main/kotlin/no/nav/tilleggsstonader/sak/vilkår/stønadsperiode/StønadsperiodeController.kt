@@ -38,4 +38,14 @@ class StønadsperiodeController(
 
         return stønadsperiodeService.lagreStønadsperioder(behandlingId, stønadsperioder)
     }
+
+    @PostMapping("{behandlingId}/foresla")
+    fun preutfyllPerioder(
+        @PathVariable behandlingId: BehandlingId,
+    ): List<StønadsperiodeDto> {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return stønadsperiodeService.foreslåPerioder(behandlingId)
+    }
 }

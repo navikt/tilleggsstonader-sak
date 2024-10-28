@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
@@ -49,6 +50,16 @@ object TilsynBarnTestUtil {
             Beløpsperiode(dato = LocalDate.now().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
         ),
     )
+
+    fun stønadsperiodeGrunnlag(
+        stønadsperiode: Stønadsperiode,
+    ): StønadsperiodeGrunnlag {
+        return StønadsperiodeGrunnlag(
+            stønadsperiode = stønadsperiode,
+            aktiviteter = emptyList(),
+            antallDager = 0,
+        )
+    }
 
     val vedtaksdata = VedtaksdataTilsynBarn(
         utgifter = mapOf(

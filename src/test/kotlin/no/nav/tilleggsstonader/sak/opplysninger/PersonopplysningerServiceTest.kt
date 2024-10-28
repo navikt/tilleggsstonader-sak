@@ -6,8 +6,10 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.dto.Adressebeskyttelse
+import no.nav.tilleggsstonader.sak.opplysninger.fullmakt.FullmaktService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
+import no.nav.tilleggsstonader.sak.util.FullmektigStubs
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.metadataGjeldende
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlSøker
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.vergemaalEllerFremtidsfullmakt
@@ -22,11 +24,13 @@ class PersonopplysningerServiceTest {
     private val fagsakPersonService = mockk<FagsakPersonService>()
     private val behandlingService = mockk<BehandlingService>()
     private val personService = mockk<PersonService>()
+    private val fullmaktService = mockk<FullmaktService>()
 
     private val service = PersonopplysningerService(
         fagsakPersonService = fagsakPersonService,
         behandlingService = behandlingService,
         personService = personService,
+        fullmaktService = fullmaktService,
     )
 
     @BeforeEach
@@ -34,6 +38,7 @@ class PersonopplysningerServiceTest {
         every { fagsakPersonService.hentAktivIdent(any()) } returns "0"
         every { behandlingService.hentAktivIdent(any()) } returns "1"
         every { personService.hentSøker(any()) } returns pdlSøker()
+        every { fullmaktService.hentFullmektige(any()) } returns emptyList()
     }
 
     @Nested
@@ -60,6 +65,17 @@ class PersonopplysningerServiceTest {
             every { personService.hentSøker(any()) } returns pdlSøker
 
             assertThat(service.hentPersonopplysningerForFagsakPerson(FagsakPersonId.random()).harVergemål).isTrue
+        }
+
+        @Test
+        fun `har fullmektig hvis det finnes gyldige fullmakter`() {
+            every { fullmaktService.hentFullmektige(any()) } returns listOf(FullmektigStubs.gyldig)
+            assertThat(service.hentPersonopplysningerForFagsakPerson(FagsakPersonId.random()).harFullmektig).isTrue
+        }
+
+        @Test
+        fun `har ikke fullmektig hvis lista med fullmektige er tom`() {
+            assertThat(service.hentPersonopplysningerForFagsakPerson(FagsakPersonId.random()).harFullmektig).isFalse
         }
     }
 

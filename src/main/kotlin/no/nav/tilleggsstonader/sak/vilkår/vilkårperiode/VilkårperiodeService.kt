@@ -42,6 +42,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
@@ -169,7 +170,23 @@ class VilkårperiodeService(
             ident = behandlingService.hentSaksbehandling(behandlingId).ident,
             fom = fom,
             tom = tom,
-        ),
+        ).map {
+            PeriodeGrunnlagAktivitet(
+                id = it.id,
+                fom = it.fom,
+                tom = it.tom,
+                type = it.type,
+                typeNavn = it.typeNavn,
+                status = it.status,
+                statusArena = it.statusArena,
+                antallDagerPerUke = it.antallDagerPerUke,
+                prosentDeltakelse = it.prosentDeltakelse,
+                erStønadsberettiget = it.erStønadsberettiget,
+                erUtdanning = it.erUtdanning,
+                arrangør = it.arrangør,
+                kilde = it.kilde,
+            )
+        },
     )
 
     private fun hentGrunnlagYtelse(
@@ -222,6 +239,7 @@ class VilkårperiodeService(
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
         }
         validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
+        validerKildeId(vilkårperiode)
 
         val resultatEvaluering = evaulerVilkårperiode(vilkårperiode.type, vilkårperiode.delvilkår)
 
@@ -237,8 +255,24 @@ class VilkårperiodeService(
                 aktivitetsdager = vilkårperiode.aktivitetsdager,
                 kilde = KildeVilkårsperiode.MANUELL,
                 status = Vilkårstatus.NY,
+                kildeId = vilkårperiode.kildeId,
             ),
         )
+    }
+
+    private fun validerKildeId(vilkårperiode: LagreVilkårperiode) {
+        val behandlingId = vilkårperiode.behandlingId
+        val kildeId = vilkårperiode.kildeId ?: return
+        feilHvis(vilkårperiode.type is MålgruppeType) {
+            "Kan ikke sende inn kildeId på målgruppe, då målgruppeperioder ikke direkt har en id som aktivitet"
+        }
+
+        val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)
+            ?: error("Finner ikke grunnlag til behandling=$behandlingId")
+        val idIGrunnlag = grunnlag.grunnlag.aktivitet.aktiviteter.map { it.id }
+        feilHvis(kildeId !in idIGrunnlag) {
+            "Aktivitet med id=$kildeId finnes ikke i grunnlag"
+        }
     }
 
     private fun validerBehandling(behandling: Saksbehandling) {
@@ -280,6 +314,9 @@ class VilkårperiodeService(
         validerBehandling(behandling)
 
         validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
+        feilHvis(eksisterendeVilkårperiode.kildeId != vilkårperiode.kildeId) {
+            "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
+        }
 
         val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.type, vilkårperiode.delvilkår)
         val nyStatus = if (eksisterendeVilkårperiode.status == Vilkårstatus.NY) {

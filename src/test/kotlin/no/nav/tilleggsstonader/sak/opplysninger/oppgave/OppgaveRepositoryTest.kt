@@ -184,7 +184,7 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
             val metadata = oppgaveRepository.finnOppgaveMetadata(listOf(1, 2, 3))
 
             assertThat(metadata.map { it.gsakOppgaveId to it.behandlingId })
-                .containsExactlyInAnyOrder(Pair(1, behandling1.id), Pair(2, behandling2.id))
+                .containsExactlyInAnyOrder(Pair(1, behandling1.id.id), Pair(2, behandling2.id.id))
         }
 
         @Test

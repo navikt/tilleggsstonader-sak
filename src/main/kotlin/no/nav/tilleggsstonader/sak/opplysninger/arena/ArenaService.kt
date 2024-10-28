@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.arena
 
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.arena.oppgave.ArenaOppgaveDto
+import no.nav.tilleggsstonader.kontrakter.arena.vedtak.ArenaSakOgVedtakDto
 import no.nav.tilleggsstonader.kontrakter.felles.IdenterRequest
 import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -23,6 +24,13 @@ class ArenaService(
     fun hentStatus(ident: String, stønadstype: Stønadstype): ArenaStatusDto {
         val identer = personService.hentPersonIdenter(ident).identer()
         return arenaClient.hentStatus(IdenterStønadstype(identer, stønadstype))
+    }
+
+    @Cacheable("arena-vedtak", cacheManager = "5secCache")
+    fun hentVedtak(fagsakPersonId: FagsakPersonId): ArenaSakOgVedtakDto {
+        val aktivIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
+        val identer = personService.hentPersonIdenter(aktivIdent).identer()
+        return arenaClient.hentVedtak(IdenterRequest(identer))
     }
 
     fun harSaker(ident: String): Boolean {

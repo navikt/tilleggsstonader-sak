@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.klage.dto.KlagebehandlingerDto
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.util.UUID
 
 @Service
 class KlageService(
@@ -49,6 +50,10 @@ class KlageService(
         }
 
         opprettKlage(fagsakService.hentFagsak(fagsakId), opprettKlageDto.mottattDato)
+    }
+
+    fun hentBehandlingIderForOppgaveIder(oppgaveIder: List<Long>): Map<Long, UUID> {
+        return klageClient.hentBehandlingerForOppgaveIder(oppgaveIder)
     }
 
     private fun opprettKlage(fagsak: Fagsak, klageMottatt: LocalDate) {

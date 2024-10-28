@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest.Journalføringsaksjon
+import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
@@ -62,6 +63,7 @@ class JournalføringServiceTest {
     val personService = mockk<PersonService>()
     val oppgaveService = mockk<OppgaveService>()
     val gjennbrukDataRevurderingService = mockk<GjennbrukDataRevurderingService>(relaxed = true)
+    val klageService = mockk<KlageService>()
 
     val journalføringService = JournalføringService(
         behandlingService,
@@ -74,6 +76,7 @@ class JournalføringServiceTest {
         personService,
         oppgaveService,
         gjennbrukDataRevurderingService,
+        klageService,
     )
 
     val enhet = ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY.enhetNr

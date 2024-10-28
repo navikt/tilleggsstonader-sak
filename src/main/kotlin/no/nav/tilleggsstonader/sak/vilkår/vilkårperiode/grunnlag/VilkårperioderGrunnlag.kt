@@ -1,12 +1,14 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
-import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
+import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
+import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype as EnsligForsørgerStønadstypeKontrakter
@@ -27,11 +29,30 @@ data class VilkårperioderGrunnlagDomain(
 )
 
 data class GrunnlagAktivitet(
-    val aktiviteter: List<AktivitetArenaDto>,
+    val aktiviteter: List<PeriodeGrunnlagAktivitet>,
 )
 
 data class GrunnlagYtelse(
     val perioder: List<PeriodeGrunnlagYtelse>,
+)
+
+/**
+ * Kopi av [no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto]
+ */
+data class PeriodeGrunnlagAktivitet(
+    val id: String,
+    val fom: LocalDate?,
+    val tom: LocalDate?,
+    val type: String,
+    val typeNavn: String,
+    val status: StatusAktivitet?,
+    val statusArena: String?,
+    val antallDagerPerUke: Int?,
+    val prosentDeltakelse: BigDecimal?,
+    val erStønadsberettiget: Boolean?,
+    val erUtdanning: Boolean?,
+    val arrangør: String?,
+    val kilde: Kilde,
 )
 
 data class PeriodeGrunnlagYtelse(

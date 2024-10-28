@@ -41,7 +41,24 @@ fun VilkårperioderGrunnlag.tilDto() =
 
 fun GrunnlagAktivitet.tilDto() =
     GrunnlagAktivitetDto(
-        aktiviteter = this.aktiviteter,
+        aktiviteter = this.aktiviteter.map { it.tilDto() },
+    )
+
+private fun PeriodeGrunnlagAktivitet.tilDto() =
+    AktivitetArenaDto(
+        id = id,
+        fom = fom,
+        tom = tom,
+        type = type,
+        typeNavn = typeNavn,
+        status = status,
+        statusArena = statusArena,
+        antallDagerPerUke = antallDagerPerUke,
+        prosentDeltakelse = prosentDeltakelse,
+        erStønadsberettiget = erStønadsberettiget,
+        erUtdanning = erUtdanning,
+        arrangør = arrangør,
+        kilde = kilde,
     )
 
 fun GrunnlagYtelse.tilDto() =

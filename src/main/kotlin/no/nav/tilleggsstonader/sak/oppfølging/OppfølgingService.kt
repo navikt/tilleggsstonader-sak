@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
-import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
@@ -46,11 +45,11 @@ class OppfølgingService(
 
             val registerAktivitet = aktivitetService.hentAktiviteter(
                 fagsak.fagsakPersonId,
-                stønadsperioder.first().fom,
-                stønadsperioder.last().tom,
+                stønadsperioder.minOf { it.fom },
+                stønadsperioder.maxOf { it.tom },
             )
             val stønadsperioderSomMåSjekkes =
-                stønadsperioder.filterNot { stønadsperiodeMåKontrolleres(it, fagsak, registerAktivitet) }
+                stønadsperioder.filter { stønadsperiodeMåKontrolleres(it, fagsak, registerAktivitet) }
 
             if (stønadsperioderSomMåSjekkes.isNotEmpty()) {
                 BehandlingForOppfølgingDto(
@@ -68,45 +67,40 @@ class OppfølgingService(
         fagsak: Fagsak,
         registerAktivitet: List<AktivitetArenaDto>,
     ): Boolean {
-        fun perioderErSammenhengende(
-            a: ArenaAktivitetPeriode,
-            b: ArenaAktivitetPeriode,
-        ) = a.tom.plusDays(1) == b.fom
-
         return when (stønadsperiode.aktivitet) {
             AktivitetType.REELL_ARBEIDSSØKER -> false
             AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
             AktivitetType.TILTAK -> {
-                val tiltak = registerAktivitet
-                    .asSequence()
-                    .filter { tiltakHarRelevantStatus(it) }
-                    .filterNot { tiltakErUtdanning(it) }
-                    .mapNotNull { mapTilPeriode(it) }
-                    .filter { it.overlapper(stønadsperiode) }
-                    .sortedBy { it.fom }
-                    .toList()
-                    .mergeSammenhengende { a, b -> a.overlapper(b) || perioderErSammenhengende(a, b) }
+                val tiltak = finnOverlappendePerioder(registerAktivitet.filterNot(::tiltakErUtdanning), stønadsperiode)
 
-                val stønadsperiodeHarOverlappendeTiltak = tiltak.any { it.inneholder(stønadsperiode) }
-                !stønadsperiodeHarOverlappendeTiltak
+                tiltak.none { it.inneholder(stønadsperiode) }
             }
-            AktivitetType.UTDANNING -> {
-                val utdanning = registerAktivitet
-                    .asSequence()
-                    .filter { tiltakHarRelevantStatus(it) }
-                    .filter { tiltakErUtdanning(it) }
-                    .mapNotNull { mapTilPeriode(it) }
-                    .filter { it.overlapper(stønadsperiode) }
-                    .sortedBy { it.fom }
-                    .toList()
-                    .mergeSammenhengende { a, b -> a.overlapper(b) || perioderErSammenhengende(a, b) }
 
-                val stønadsperiodeHarOverlappendeUtdanning =
-                    utdanning.any { it.fom <= stønadsperiode.fom && it.tom >= stønadsperiode.tom }
-                !stønadsperiodeHarOverlappendeUtdanning
+            AktivitetType.UTDANNING -> {
+                val utdanning =
+                    finnOverlappendePerioder(registerAktivitet.filter { tiltakErUtdanning(it) }, stønadsperiode)
+
+                utdanning.none { it.inneholder(stønadsperiode) }
             }
         }
     }
+
+    private fun perioderErSammenhengende(
+        a: ArenaAktivitetPeriode,
+        b: ArenaAktivitetPeriode,
+    ) = a.tom.plusDays(1) == b.fom
+
+    private fun finnOverlappendePerioder(
+        registeraktiviteter: List<AktivitetArenaDto>,
+        stønadsperiode: StønadsperiodeDto,
+    ) = registeraktiviteter
+        .asSequence()
+        .filter { tiltakHarRelevantStatus(it) }
+        .mapNotNull { mapTilPeriode(it) }
+        .filter { it.overlapper(stønadsperiode) }
+        .sorted()
+        .toList()
+        .mergeSammenhengende { a, b -> a.overlapper(b) || perioderErSammenhengende(a, b) }
 
     private fun mapTilPeriode(aktivitet: AktivitetArenaDto): ArenaAktivitetPeriode? {
         if (aktivitet.fom == null || aktivitet.tom == null) {
@@ -116,8 +110,10 @@ class OppfølgingService(
         return ArenaAktivitetPeriode(aktivitet.fom!!, aktivitet.tom!!)
     }
 
+    // TODO Usikker på denne
     private fun tiltakHarRelevantStatus(it: AktivitetArenaDto) =
-        it.status != StatusAktivitet.AVBRUTT && it.status != StatusAktivitet.OPPHØRT
+        true
+    // it.status != StatusAktivitet.AVBRUTT && it.status != StatusAktivitet.OPPHØRT
 
     private fun tiltakErUtdanning(it: AktivitetArenaDto) = it.erUtdanning ?: false
 }

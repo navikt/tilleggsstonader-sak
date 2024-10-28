@@ -29,6 +29,6 @@ data class OppgaveDomain(
  */
 data class OppgaveMetadata(
     val gsakOppgaveId: Long,
-    val behandlingId: BehandlingId,
-    val sendtTilTotrinnskontrollAv: String?,
+    val behandlingId: UUID,
+    val sendtTilTotrinnskontrollAv: String? = null,
 )
