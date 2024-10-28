@@ -33,9 +33,6 @@ import kotlin.jvm.optionals.getOrNull
 @Profile("mock-oppgave")
 class OppgaveClientConfig {
 
-    // HER MÅ DET LEGGES INN MOCKET KLAGE-OPPGAVE
-    // Se på og kopioer en klageoppgave fra DEV
-
     @Bean
     @Primary
     fun oppgaveClient(): OppgaveClient {
