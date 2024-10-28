@@ -56,7 +56,7 @@ class StepDefinitions {
     fun `skal stønaden være`(dataTable: DataTable) {
         val perioder = dataTable.mapRad { rad ->
             BeregningsresultatForMåned(
-                beløp = parseBigDecimal(DomenenøkkelFelles.BELØP, rad),
+                beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
                 grunnlag = Beregningsgrunnlag(
                     måned = parseÅrMåned(BeregningNøkler.MÅNED, rad),
                     studienivå = parseValgfriEnum<Studienivå>(BeregningNøkler.STUDIENIVÅ, rad)
