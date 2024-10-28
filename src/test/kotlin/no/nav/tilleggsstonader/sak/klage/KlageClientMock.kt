@@ -39,6 +39,7 @@ class KlageClientMock {
                 )
             }
         }
+        every { mockk.hentBehandlingerForOppgaveIder(any()) } returns emptyMap()
         return mockk
     }
 }

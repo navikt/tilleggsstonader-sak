@@ -33,6 +33,9 @@ import kotlin.jvm.optionals.getOrNull
 @Profile("mock-oppgave")
 class OppgaveClientConfig {
 
+    // HER MÅ DET LEGGES INN MOCKET KLAGE-OPPGAVE
+    // Se på og kopioer en klageoppgave fra DEV
+
     @Bean
     @Primary
     fun oppgaveClient(): OppgaveClient {
@@ -49,6 +52,7 @@ class OppgaveClientConfig {
             clearMocks(oppgaveClient)
 
             opprettOppgave(journalføringsoppgaveRequest)
+            opprettOppgave(klageOppgaveRequest)
 
             every { oppgaveClient.hentOppgaver(any()) } answers {
                 val request = firstArg<FinnOppgaveRequest>()
@@ -153,6 +157,19 @@ class OppgaveClientConfig {
             fristFerdigstillelse = osloDateNow().plusDays(14),
             beskrivelse = "Dummy søknad",
             behandlingstema = "ab0300",
+            enhetsnummer = "",
+            ident = OppgaveIdentV2(ident = "12345678910", gruppe = IdentGruppe.FOLKEREGISTERIDENT),
+            journalpostId = (++journalPostId).toString(),
+            mappeId = MAPPE_ID_KLAR,
+        )
+
+        private val klageOppgaveRequest = OpprettOppgaveRequest(
+            tema = Tema.TSO,
+            oppgavetype = Oppgavetype.BehandleSak,
+            fristFerdigstillelse = osloDateNow().plusDays(14),
+            beskrivelse = "Dummy klage",
+            behandlingstema = "ab0300",
+            behandlingstype = "ae0058",
             enhetsnummer = "",
             ident = OppgaveIdentV2(ident = "12345678910", gruppe = IdentGruppe.FOLKEREGISTERIDENT),
             journalpostId = (++journalPostId).toString(),
