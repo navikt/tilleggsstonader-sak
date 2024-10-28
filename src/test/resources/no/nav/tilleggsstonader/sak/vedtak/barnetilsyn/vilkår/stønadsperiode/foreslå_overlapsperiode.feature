@@ -133,7 +133,7 @@ Egenskap: Beregning av stønadsperioder
 
       Når forslag til stønadsperioder lages
 
-      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun én gyldig kombinasjon av aktivitet og målgruppe
+      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun tilfellet der målgruppe og aktivitet har ett sammenhengende overlapp.
 
     Scenario: Én aktiviteter og flere målgrupper, men kun én gyldig kombinasjon
       Gitt følgende vilkårsperioder med aktiviteter
@@ -221,7 +221,7 @@ Egenskap: Beregning av stønadsperioder
         | 01.01.2023 | 01.03.2023 | TILTAK    | AAP       |
 
 
-    Scenario: En aktivit og to like målgrupper som er rett etter hverandre
+    Scenario: En aktivitet og to like målgrupper som er rett etter hverandre
       Gitt følgende vilkårsperioder med aktiviteter
         | Fom        | Tom        | type   |
         | 01.01.2023 | 01.03.2023 | TILTAK |
@@ -284,7 +284,7 @@ Egenskap: Beregning av stønadsperioder
 
       Når forslag til stønadsperioder lages
 
-      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun én gyldig kombinasjon av aktivitet og målgruppe
+      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun tilfellet der målgruppe og aktivitet har ett sammenhengende overlapp.
 
     Scenario: En aktivitet og tre like målgrupper hvor to er like etter hverandre, men den siste er med opphold
       Gitt følgende vilkårsperioder med aktiviteter
@@ -299,7 +299,7 @@ Egenskap: Beregning av stønadsperioder
 
       Når forslag til stønadsperioder lages
 
-      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun én gyldig kombinasjon av aktivitet og målgruppe
+      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun tilfellet der målgruppe og aktivitet har ett sammenhengende overlapp.
 
     Scenario: En aktivitet og to like målgrupper som overlapper
       Gitt følgende vilkårsperioder med aktiviteter
@@ -313,4 +313,4 @@ Egenskap: Beregning av stønadsperioder
 
       Når forslag til stønadsperioder lages
 
-      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun én gyldig kombinasjon av aktivitet og målgruppe
+      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun tilfellet der målgruppe og aktivitet har ett sammenhengende overlapp.
