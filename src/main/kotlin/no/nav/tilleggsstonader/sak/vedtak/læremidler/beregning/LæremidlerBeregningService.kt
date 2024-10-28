@@ -13,6 +13,11 @@ private val PROSENT_50 = BigDecimal(0.5)
 private val PROSENTGRENSE_HALV_SATS = 50
 
 class LæremidlerBeregningService {
+    /**
+     * Beregning av læremidler er foreløpig kun basert på antakelser.
+     * Nå beregnes det med hele måneder, splittet i månedsskifte, men dette er ikke avklart som korrekt.
+     * Det er ikke tatt hensyn til begrensninger på semester og maks antall måneder i et år som skal dekkes.
+     */
 
     fun beregn(periode: BeregningPeriode): BeregningsresultatLæremidler {
         val beregningsgrunnlagPerMåned = periode.splitPerMåned { måned, periode ->
