@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.klage.dto.KlagebehandlingerDto
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.UUID
@@ -22,6 +23,7 @@ class KlageService(
     private val fagsakService: FagsakService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val klageClient: KlageClient,
+    private val oppgaveService: OppgaveService
 ) {
     fun hentBehandlinger(fagsakPersonId: FagsakPersonId): KlagebehandlingerDto {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
@@ -59,6 +61,8 @@ class KlageService(
     private fun opprettKlage(fagsak: Fagsak, klageMottatt: LocalDate) {
         val aktivIdent = fagsak.hentAktivIdent()
         val enhetId = arbeidsfordelingService.hentNavEnhet(aktivIdent)?.enhetNr
+        val stønadstype = fagsak.stønadstype
+        val behandlingstema = oppgaveService.finnBehandlingstema(stønadstype)
         brukerfeilHvis(enhetId == null) {
             "Finner ikke behandlende enhet for personen"
         }
