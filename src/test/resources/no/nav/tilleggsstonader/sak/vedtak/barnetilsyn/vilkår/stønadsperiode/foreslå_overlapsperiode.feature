@@ -121,20 +121,6 @@ Egenskap: Beregning av stønadsperioder
         | Fom        | Tom        | aktivitet | målgruppe |
         | 01.01.2023 | 31.03.2023 | TILTAK    | AAP       |
 
-    Scenario: Flere gyldige sammenhengende aktiviter skal (foreløpig) gi feilmelding
-      Gitt følgende vilkårsperioder med aktiviteter
-        | Fom        | Tom        | type   |
-        | 01.01.2023 | 28.02.2023 | TILTAK |
-        | 03.03.2023 | 31.03.2023 | TILTAK |
-
-      Gitt følgende vilkårsperioder med målgrupper
-        | Fom        | Tom        | type |
-        | 01.01.2023 | 31.03.2023 | AAP  |
-
-      Når forslag til stønadsperioder lages
-
-      Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun tilfellet der målgruppe og aktivitet har ett sammenhengende overlapp.
-
     Scenario: Én aktiviteter og flere målgrupper, men kun én gyldig kombinasjon
       Gitt følgende vilkårsperioder med aktiviteter
         | Fom        | Tom        | type   |
