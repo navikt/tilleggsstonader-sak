@@ -64,7 +64,7 @@ class AdminOpprettBehandlingServiceTest {
 
     @Test
     fun `skal opprette behandling med barn`() {
-        service.opprettFørstegangsbehandling(ident, setOf(identBarn))
+        service.opprettFørstegangsbehandling(ident, setOf(identBarn), true)
 
         with(opprettedeBarnSlot.captured.single()) {
             assertThat(this.ident).isEqualTo(identBarn)
@@ -79,18 +79,34 @@ class AdminOpprettBehandlingServiceTest {
     }
 
     @Test
+    fun `skal opprette behandling uten brev`() {
+        service.opprettFørstegangsbehandling(ident, setOf(identBarn), false)
+
+        with(opprettedeBarnSlot.captured.single()) {
+            assertThat(this.ident).isEqualTo(identBarn)
+            assertThat(this.behandlingId).isEqualTo(behandling.id)
+        }
+        verify(exactly = 1) {
+            behandlingService.opprettBehandling(
+                fagsakId = fagsak.id,
+                behandlingsårsak = BehandlingÅrsak.KORRIGERING_UTEN_BREV,
+            )
+        }
+    }
+
+    @Test
     fun `skal feile hvis det finnes behandlinger fra før`() {
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(behandling())
 
         assertThatThrownBy {
-            service.opprettFørstegangsbehandling(ident, setOf(identBarn))
+            service.opprettFørstegangsbehandling(ident, setOf(identBarn), true)
         }.hasMessageContaining("Det finnes allerede en behandling på personen")
     }
 
     @Test
     fun `skal feile hvis barnen ikke finnes på personen`() {
         assertThatThrownBy {
-            service.opprettFørstegangsbehandling(ident, setOf(identBarn, "annenIdent"))
+            service.opprettFørstegangsbehandling(ident, setOf(identBarn, "annenIdent"), true)
         }.hasMessageContaining("Barn finnes ikke på person")
     }
 }

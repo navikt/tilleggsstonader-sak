@@ -34,6 +34,7 @@ class AdminOpprettBehandlingController(
         return adminOpprettBehandlingService.opprettFørstegangsbehandling(
             ident = request.ident,
             valgteBarn = request.valgteBarn,
+            medBrev = request.medBrev,
         )
     }
 }

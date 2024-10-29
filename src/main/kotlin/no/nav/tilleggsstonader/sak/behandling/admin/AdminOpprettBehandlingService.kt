@@ -35,13 +35,13 @@ class AdminOpprettBehandlingService(
 ) {
 
     @Transactional
-    fun opprettFørstegangsbehandling(ident: String, valgteBarn: Set<String>): BehandlingId {
+    fun opprettFørstegangsbehandling(ident: String, valgteBarn: Set<String>, medBrev: Boolean): BehandlingId {
         validerOpprettelseAvBehandling(ident, valgteBarn)
 
         val fagsak = fagsakService.hentEllerOpprettFagsak(ident, Stønadstype.BARNETILSYN)
         val behandling = behandlingService.opprettBehandling(
             fagsakId = fagsak.id,
-            behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET,
+            behandlingsårsak = if (medBrev) BehandlingÅrsak.MANUELT_OPPRETTET else BehandlingÅrsak.KORRIGERING_UTEN_BREV,
         )
 
         val behandlingBarn = valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) }
