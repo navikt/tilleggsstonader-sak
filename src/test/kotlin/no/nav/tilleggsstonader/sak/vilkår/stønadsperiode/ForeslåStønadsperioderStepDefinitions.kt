@@ -17,13 +17,11 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
-import java.time.LocalDate
 
 class ForeslåStønadsperioderStepDefinitions {
     var aktiviteter: List<Vilkårperiode> = emptyList()
     var målgrupper: List<Vilkårperiode> = emptyList()
     var resultat: List<StønadsperiodeDto> = emptyList()
-    var søknadsdato: LocalDate? = null
     var feil: ApiFeil? = null
 
     @Gitt("følgende vilkårsperioder med aktiviteter")
@@ -48,11 +46,6 @@ class ForeslåStønadsperioderStepDefinitions {
         }
     }
 
-    @Gitt("følgende søknadsdato: {}")
-    fun `følgende søknadsdato`(dato: String) {
-        søknadsdato = parseDato(dato)
-    }
-
     @Når("forslag til stønadsperioder lages")
     fun `forslag til stønadsperioder lages`() {
         try {
@@ -62,7 +55,6 @@ class ForeslåStønadsperioderStepDefinitions {
                         målgrupper = målgrupper,
                         aktiviteter = aktiviteter,
                     ),
-                    søknadsdato!!,
                 )
         } catch (e: ApiFeil) {
             feil = e

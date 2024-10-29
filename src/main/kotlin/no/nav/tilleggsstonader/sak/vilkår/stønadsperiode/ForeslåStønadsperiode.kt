@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.util.tilFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -18,7 +17,6 @@ object ForeslåStønadsperiode {
 
     fun finnStønadsperioder(
         vilkårperioder: Vilkårperioder,
-        søknadsdato: LocalDate,
     ): List<StønadsperiodeDto> {
         val oppfylteVilkårsperioder = filtrerOppfylteVilkårsperioder(vilkårperioder)
 
@@ -42,7 +40,7 @@ object ForeslåStønadsperiode {
         val stønadsperiode = finnOverlapp(
             sammenslåtteVilkårsperioder.aktiviteter.first(),
             sammenslåtteVilkårsperioder.målgrupper.first(),
-        ).kuttTilMaksTreMånederTilbakeFraSøknadsdato(søknadsdato)
+        )
 
         return listOf(
             StønadsperiodeDto(
@@ -105,21 +103,5 @@ object ForeslåStønadsperiode {
             )
     }
 
-    private data class Stønadsperiode(val fom: LocalDate, val tom: LocalDate) {
-
-        fun kuttTilMaksTreMånederTilbakeFraSøknadsdato(søknadsdato: LocalDate): Stønadsperiode {
-            val førsteDagIMånedenForutForSøknadsdato = søknadsdato.minusMonths(3).tilFørsteDagIMåneden()
-
-            brukerfeilHvis(this.tom.isBefore(førsteDagIMånedenForutForSøknadsdato)) {
-                "Aktivitet og målgruppe ligger lengre enn tre månder tilbake i tid fra søknadsdato"
-            }
-            if (this.fom.isAfter(førsteDagIMånedenForutForSøknadsdato)) {
-                return this
-            }
-            return Stønadsperiode(
-                fom = førsteDagIMånedenForutForSøknadsdato,
-                tom = this.tom,
-            )
-        }
-    }
+    private data class Stønadsperiode(val fom: LocalDate, val tom: LocalDate)
 }
