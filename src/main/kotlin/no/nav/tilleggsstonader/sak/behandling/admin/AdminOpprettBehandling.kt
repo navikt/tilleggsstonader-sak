@@ -12,4 +12,5 @@ data class Barn(
 data class AdminOpprettFørstegangsbehandlingDto(
     val ident: String,
     val valgteBarn: Set<String>,
+    val medBrev: Boolean = true,
 )
