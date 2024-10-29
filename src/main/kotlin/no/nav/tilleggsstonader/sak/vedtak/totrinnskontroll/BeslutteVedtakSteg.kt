@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -111,6 +112,7 @@ class BeslutteVedtakSteg(
             .sorted()
 
         feilHvis(forrigeAndeler != andeler) {
+            secureLogger.info("Endringer i andeler=$andeler forrigeAndeler=$forrigeAndeler")
             "Denne iverksettingen blir kanskje endringer på perioder som allerede er utbetalt. " +
                 "Det har vi ennå ikke støtte for og kan foreløpig ikke godkjennes."
         }
