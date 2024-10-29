@@ -190,7 +190,7 @@ class OppgaveService(
             fristFerdigstillelse = oppgave.fristFerdigstillelse ?: lagFristForOppgave(osloNow()),
             beskrivelse = lagOppgaveTekst(oppgave.beskrivelse),
             enhetsnummer = enhetsnummer,
-            behandlingstema = finnBehandlingstema(stønadstype).value,//************
+            behandlingstema = finnBehandlingstema(stønadstype).value,
             tilordnetRessurs = oppgave.tilordnetNavIdent,
             mappeId = utledMappeId(personIdent, oppgave, enhetsnummer),
             prioritet = oppgave.prioritet,
@@ -290,7 +290,7 @@ class OppgaveService(
         return prefix + beskrivelseMedNewLine
     }
 
-    fun finnBehandlingstema(stønadstype: Stønadstype): Behandlingstema {
+    private fun finnBehandlingstema(stønadstype: Stønadstype): Behandlingstema {
         return when (stønadstype) {
             Stønadstype.BARNETILSYN -> Behandlingstema.TilsynBarn
             Stønadstype.LÆREMIDLER -> Behandlingstema.Læremidler
