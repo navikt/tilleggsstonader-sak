@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -107,6 +108,7 @@ class BeslutteVedtakSteg(
         val forrigeMaksTom = forrigeAndeler.maxOfOrNull { it.tom } ?: return
 
         val andeler = tilkjentYtelseService.hentForBehandling(saksbehandling.id).andelerTilkjentYtelse
+            .filter { it.satstype != Satstype.UGYLDIG }
             .tilForenkledeAndeler()
             .filter { it.fom <= forrigeMaksTom }
             .sorted()
@@ -120,6 +122,7 @@ class BeslutteVedtakSteg(
 
     private fun andelerFraForrigeBehandlingSomErIverksatte(forrigeBehandlingId: BehandlingId) =
         tilkjentYtelseService.hentForBehandling(forrigeBehandlingId).andelerTilkjentYtelse
+            .filter { it.satstype != Satstype.UGYLDIG }
             .filter {
                 it.statusIverksetting in setOf(
                     StatusIverksetting.SENDT,
