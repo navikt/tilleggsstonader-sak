@@ -16,13 +16,13 @@ import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.UUID
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 
 @Service
 class KlageService(
     private val fagsakService: FagsakService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val klageClient: KlageClient,
-    private val oppgaveService: OppgaveService,
 ) {
     fun hentBehandlinger(fagsakPersonId: FagsakPersonId): KlagebehandlingerDto {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)

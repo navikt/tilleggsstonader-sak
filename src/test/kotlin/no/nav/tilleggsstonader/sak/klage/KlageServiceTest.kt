@@ -40,14 +40,12 @@ internal class KlageServiceTest {
     private val arbeidsfordelingService = mockk<ArbeidsfordelingService>()
 
     private val klageClient = mockk<KlageClient>()
-    private val oppgaveService = mockk<OppgaveService>()
 
     private val klageService =
         KlageService(
             fagsakService,
             arbeidsfordelingService,
             klageClient,
-            oppgaveService,
         )
 
     private val fagsakId = FagsakId.random()
