@@ -39,9 +39,11 @@ class AdminOpprettBehandlingService(
         validerOpprettelseAvBehandling(ident, valgteBarn)
 
         val fagsak = fagsakService.hentEllerOpprettFagsak(ident, Stønadstype.BARNETILSYN)
+        val behandlingsårsak =
+            if (medBrev) BehandlingÅrsak.MANUELT_OPPRETTET else BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV
         val behandling = behandlingService.opprettBehandling(
             fagsakId = fagsak.id,
-            behandlingsårsak = if (medBrev) BehandlingÅrsak.MANUELT_OPPRETTET else BehandlingÅrsak.KORRIGERING_UTEN_BREV,
+            behandlingsårsak = behandlingsårsak,
         )
 
         val behandlingBarn = valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) }

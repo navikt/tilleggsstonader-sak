@@ -177,6 +177,7 @@ enum class BehandlingÅrsakDvh {
     SØKNAD,
     PAPIRSØKNAD,
     MANUELT_OPPRETTET,
+    MANUELT_OPPRETTET_UTEN_BREV,
     KORRIGERING_UTEN_BREV,
     SATSENDRING,
     ;
@@ -188,6 +189,7 @@ enum class BehandlingÅrsakDvh {
             BehandlingÅrsak.SØKNAD -> SØKNAD
             BehandlingÅrsak.PAPIRSØKNAD -> PAPIRSØKNAD
             BehandlingÅrsak.MANUELT_OPPRETTET -> MANUELT_OPPRETTET
+            BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV -> MANUELT_OPPRETTET_UTEN_BREV
             BehandlingÅrsak.KORRIGERING_UTEN_BREV -> KORRIGERING_UTEN_BREV
             BehandlingÅrsak.SATSENDRING -> SATSENDRING
         }

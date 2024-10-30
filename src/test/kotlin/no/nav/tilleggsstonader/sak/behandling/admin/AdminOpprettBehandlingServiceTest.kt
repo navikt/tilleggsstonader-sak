@@ -89,7 +89,7 @@ class AdminOpprettBehandlingServiceTest {
         verify(exactly = 1) {
             behandlingService.opprettBehandling(
                 fagsakId = fagsak.id,
-                behandlingsårsak = BehandlingÅrsak.KORRIGERING_UTEN_BREV,
+                behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
             )
         }
     }
