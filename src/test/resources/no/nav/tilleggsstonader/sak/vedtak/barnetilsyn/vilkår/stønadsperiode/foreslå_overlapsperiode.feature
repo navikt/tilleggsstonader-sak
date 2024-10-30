@@ -231,8 +231,8 @@ Egenskap: Beregning av stønadsperioder
 
       Gitt følgende vilkårsperioder med målgrupper
         | Fom        | Tom        | type |
-        | 01.01.2023 | 01.02.2023 | AAP  |
         | 02.02.2023 | 01.03.2023 | AAP  |
+        | 01.01.2023 | 01.02.2023 | AAP  |
 
       Når forslag til stønadsperioder lages
 
