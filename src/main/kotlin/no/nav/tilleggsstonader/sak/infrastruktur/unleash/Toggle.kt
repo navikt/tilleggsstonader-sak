@@ -16,4 +16,6 @@ enum class Toggle(override val toggleId: String) : ToggleId {
     SØKNAD_ROUTING_LÆREMIDLER("sak.soknad-routing.laremidler"),
 
     SPESIAL_IVERKSETT_ENDRINGER("sak.iverksett-endringer"),
+
+    OPPHØR_IGNORER_VALIDERING("sak.opphor-ignorer-validering"),
 }

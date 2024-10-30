@@ -43,6 +43,7 @@ class TilsynBarnBeregnYtelseStegTest {
         vilkårperiodeRepository = vilkårperiodeRepository,
         tilsynBarnUtgiftService = tilsynBarnUtgiftService,
         repository = repository,
+        unleashService = mockUnleashService(true),
     )
     val steg = TilsynBarnBeregnYtelseSteg(
         tilsynBarnBeregningService = tilsynBarnBeregningService,

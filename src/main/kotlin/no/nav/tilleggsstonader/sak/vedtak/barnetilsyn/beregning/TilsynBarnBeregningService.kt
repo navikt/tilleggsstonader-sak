@@ -1,12 +1,14 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
@@ -45,6 +47,7 @@ class TilsynBarnBeregningService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
     private val repository: TilsynBarnVedtakRepository,
+    private val unleashService: UnleashService,
 ) {
 
     fun beregn(behandling: Saksbehandling): BeregningsresultatTilsynBarn {
@@ -277,6 +280,9 @@ class TilsynBarnBeregningService(
         aktiviteter: List<Aktivitet>,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
     ) {
+        if (unleashService.isEnabled(Toggle.OPPHØR_IGNORER_VALIDERING)) {
+            return
+        }
         validerStønadsperioder(stønadsperioder)
         validerAktiviteter(aktiviteter)
         validerUtgifter(utgifter)
