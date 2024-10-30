@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -39,12 +40,14 @@ internal class KlageServiceTest {
     private val arbeidsfordelingService = mockk<ArbeidsfordelingService>()
 
     private val klageClient = mockk<KlageClient>()
+    private val oppgaveService = mockk<OppgaveService>()
 
     private val klageService =
         KlageService(
             fagsakService,
             arbeidsfordelingService,
             klageClient,
+            oppgaveService,
         )
 
     private val fagsakId = FagsakId.random()

@@ -22,6 +22,7 @@ class KlageService(
     private val fagsakService: FagsakService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val klageClient: KlageClient,
+    private val oppgaveService: OppgaveService,
 ) {
     fun hentBehandlinger(fagsakPersonId: FagsakPersonId): KlagebehandlingerDto {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
