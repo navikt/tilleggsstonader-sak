@@ -40,8 +40,9 @@ data class Saksbehandling(
     val endretTid: LocalDateTime,
 ) {
     val skalSendeBrev: Boolean = !skalIkkeSendeBrev
-    val skalIkkeSendeBrev get() = erKorrigeringUtenBrev || erSatsendring
-    val erKorrigeringUtenBrev get() = årsak == BehandlingÅrsak.KORRIGERING_UTEN_BREV
+    val skalIkkeSendeBrev get() = erÅrsakUtenBrev || erSatsendring
+    val erÅrsakUtenBrev
+        get() = årsak == BehandlingÅrsak.KORRIGERING_UTEN_BREV || årsak == BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV
     val erSatsendring get() = årsak == BehandlingÅrsak.SATSENDRING
 
     val harStatusOpprettet get() = status == BehandlingStatus.OPPRETTET

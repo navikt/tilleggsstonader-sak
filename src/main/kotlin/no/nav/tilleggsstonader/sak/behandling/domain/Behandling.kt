@@ -6,6 +6,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.BehandlingÅrsakDvh.MANUELT_OPPRETTET
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.BehandlingÅrsakDvh.MANUELT_OPPRETTET_UTEN_BREV
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
@@ -64,6 +66,11 @@ enum class BehandlingKategori {
     NASJONAL,
 }
 
+/**
+ * @property MANUELT_OPPRETTET brukes ved manuelt opprettede førstegangsbehandling via admin
+ * @property MANUELT_OPPRETTET_UTEN_BREV brukes ved manuelt opprettede førstegangsbehandling
+ * via admin der man ikke skal sende brev. Eks ved migrering der noe skal stanses i Arena og opprettes i TS
+ */
 enum class BehandlingÅrsak {
     KLAGE,
     NYE_OPPLYSNINGER,
@@ -72,6 +79,7 @@ enum class BehandlingÅrsak {
     PAPIRSØKNAD,
     SATSENDRING,
     MANUELT_OPPRETTET,
+    MANUELT_OPPRETTET_UTEN_BREV,
     ;
 
     fun erSøknadEllerPapirsøknad() = this == SØKNAD || this == PAPIRSØKNAD
