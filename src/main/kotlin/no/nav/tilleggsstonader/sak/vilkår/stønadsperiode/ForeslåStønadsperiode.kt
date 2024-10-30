@@ -103,7 +103,7 @@ object ForeslåStønadsperiode {
                 } else {
                     val sisteVilkårsperiode = last()
                     if (sisteVilkårsperiode.type == vilkårperiode.type &&
-                        (sisteVilkårsperiode.tom == vilkårperiode.fom || sisteVilkårsperiode.tom.plusDays(1) == vilkårperiode.fom)
+                        sisteVilkårsperiode.etterfølgesAv(vilkårperiode)
                     ) {
                         this[size - 1] = sisteVilkårsperiode.copy(tom = vilkårperiode.tom)
                     } else {
@@ -113,6 +113,10 @@ object ForeslåStønadsperiode {
             }
         }
     }
+
+    private fun Vilkårperiode.etterfølgesAv(
+        vilkårperiode: Vilkårperiode,
+    ) = (tom == vilkårperiode.fom || tom.plusDays(1) == vilkårperiode.fom)
 
     private data class Stønadsperiode(val fom: LocalDate, val tom: LocalDate) {
 
