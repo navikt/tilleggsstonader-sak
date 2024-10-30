@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
@@ -54,6 +55,7 @@ class StepDefinitions {
         vilkårperiodeRepository = vilkårperiodeRepository,
         tilsynBarnUtgiftService = tilsynBarnUtgiftService,
         repository = repository,
+        unleashService = mockUnleashService(false),
     )
 
     var exception: Exception? = null
