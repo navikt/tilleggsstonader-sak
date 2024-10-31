@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.util.tilFørsteDagIMåneden
@@ -95,28 +97,13 @@ object ForeslåStønadsperiode {
     }
 
     private fun slåSammenVilkårsperioderSomErLikeEtterHverandre(vilkårperioder: List<Vilkårperiode>): List<Vilkårperiode> {
-        val sorterteVilkårsperioder = vilkårperioder.sortedBy { it.fom }
-        return sorterteVilkårsperioder.fold(mutableListOf<Vilkårperiode>()) { sammenslåtteVilkårperioder, vilkårperiode ->
-            sammenslåtteVilkårperioder.apply {
-                if (isEmpty()) {
-                    add(vilkårperiode)
-                } else {
-                    val sisteVilkårsperiode = last()
-                    if (sisteVilkårsperiode.type == vilkårperiode.type &&
-                        sisteVilkårsperiode.etterfølgesAv(vilkårperiode)
-                    ) {
-                        this[size - 1] = sisteVilkårsperiode.copy(tom = vilkårperiode.tom)
-                    } else {
-                        add(vilkårperiode)
-                    }
-                }
-            }
-        }
+        return vilkårperioder
+            .sorted()
+            .mergeSammenhengende(
+                skalMerges = { v1, v2 -> v1.type == v2.type && v1.overlapperEllerPåfølgesAv(v2) },
+                merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
+            )
     }
-
-    private fun Vilkårperiode.etterfølgesAv(
-        vilkårperiode: Vilkårperiode,
-    ) = (tom == vilkårperiode.fom || tom.plusDays(1) == vilkårperiode.fom)
 
     private data class Stønadsperiode(val fom: LocalDate, val tom: LocalDate) {
 

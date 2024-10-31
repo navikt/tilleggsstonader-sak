@@ -258,6 +258,22 @@ Egenskap: Beregning av stønadsperioder
         | Fom        | Tom        | aktivitet | målgruppe |
         | 01.01.2023 | 01.04.2023 | TILTAK    | AAP       |
 
+    Scenario: En aktivitet og to like målgrupper som overlapper
+      Gitt følgende vilkårsperioder med aktiviteter
+        | Fom        | Tom        | type   |
+        | 01.01.2023 | 01.03.2023 | TILTAK |
+
+      Gitt følgende vilkårsperioder med målgrupper
+        | Fom        | Tom        | type |
+        | 01.01.2023 | 01.02.2023 | AAP  |
+        | 15.01.2023 | 01.04.2023 | AAP  |
+
+      Når forslag til stønadsperioder lages
+
+      Så forvent følgende stønadsperioder
+        | Fom        | Tom        | aktivitet | målgruppe |
+        | 01.01.2023 | 01.03.2023 | TILTAK    | AAP       |
+
     Scenario: En aktivitet og to like målgrupper som ikke er rett etter hverandre
       Gitt følgende vilkårsperioder med aktiviteter
         | Fom        | Tom        | type   |
@@ -287,15 +303,15 @@ Egenskap: Beregning av stønadsperioder
 
       Så forvent følgende beregningsfeil: Foreløpig håndterer vi kun tilfellet der målgruppe og aktivitet har ett sammenhengende overlapp.
 
-    Scenario: En aktivitet og to like målgrupper som overlapper
+    Scenario: En aktivitet og to ulike målgrupper som overlapper - skal ikke slå sammen perioder tvers ulike typer
       Gitt følgende vilkårsperioder med aktiviteter
         | Fom        | Tom        | type   |
-        | 01.01.2023 | 01.03.2023 | TILTAK |
+        | 01.01.2023 | 01.03.2023 | UTDANNING |
 
       Gitt følgende vilkårsperioder med målgrupper
         | Fom        | Tom        | type |
-        | 01.01.2023 | 01.02.2023 | AAP  |
-        | 15.01.2023 | 01.04.2023 | AAP  |
+        | 01.01.2023 | 31.01.2023 | AAP  |
+        | 01.02.2023 | 01.04.2023 | OVERGANGSSTØNAD  |
 
       Når forslag til stønadsperioder lages
 
