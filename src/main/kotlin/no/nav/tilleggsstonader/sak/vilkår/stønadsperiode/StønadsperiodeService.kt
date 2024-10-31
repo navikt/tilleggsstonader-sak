@@ -5,10 +5,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadMetadataRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
@@ -28,7 +26,6 @@ class StønadsperiodeService(
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperiodeService: VilkårperiodeService,
     private val grunnlagsdataService: GrunnlagsdataService,
-    private val søknadMetadataRepository: SøknadMetadataRepository,
 ) {
     fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeDto> {
         return stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
@@ -178,15 +175,8 @@ class StønadsperiodeService(
 
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
 
-        val søknadsdato = søknadMetadataRepository.finnForBehandling(behandlingId)?.mottattTidspunkt
-            ?: throw Feil(
-                "Fant ikke søknaden",
-                frontendFeilmelding = "Vi kan ikke utlede periode fordi det mangler søknad",
-            )
-
         return ForeslåStønadsperiode.finnStønadsperioder(
             vilkårperioder = vilkårsperioder,
-            søknadsdato = søknadsdato.toLocalDate(),
         )
     }
 
