@@ -108,7 +108,7 @@
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Er utgiftene tilfredstillende dokumentert?",
+        "regel" : "Har bruker dokumenterte utgifter til pass?",
         "svar" : "Ja",
         "begrunnelse" : null
       } ]
@@ -137,7 +137,7 @@
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Er utgiftene tilfredstillende dokumentert?",
+        "regel" : "Har bruker dokumenterte utgifter til pass?",
         "svar" : "Ja",
         "begrunnelse" : null
       } ]
@@ -166,7 +166,7 @@
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Er utgiftene tilfredstillende dokumentert?",
+        "regel" : "Har bruker dokumenterte utgifter til pass?",
         "svar" : "Ja",
         "begrunnelse" : null
       } ]
