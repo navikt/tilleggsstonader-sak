@@ -88,6 +88,13 @@ data class Vilkår(
         }
     }
 
+    fun skalKopieres(): Boolean {
+        if (status == VilkårStatus.SLETTET) return false
+        if (fom == null || tom == null) return false
+
+        return true
+    }
+
     fun kopierTilBehandling(nyBehandlingId: BehandlingId, barnIdINyBehandling: BarnId?): Vilkår {
         return copy(
             id = VilkårId.random(),

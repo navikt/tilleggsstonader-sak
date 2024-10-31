@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.barn.NyttBarnId
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.time.YearMonth
 
 internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
@@ -53,37 +55,81 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     @Autowired
     lateinit var barnService: BarnService
 
-    @Test
-    internal fun `kopierVilkårsettTilNyBehandling - skal kopiere vilkår til ny behandling`() {
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        val revurdering = testoppsettService.lagre(behandling(fagsak))
+    @Nested
+    inner class KopierVilkår {
+        val fagsak = fagsak()
+        val førstegangsbehandling = behandling(fagsak, status = BehandlingStatus.FERDIGSTILT)
+        val revurdering = behandling(fagsak)
         val barn1Ident = FnrGenerator.generer(LocalDate.now().minusYears(3))
-        val barnFørsteBehandling = barnRepository.insertAll(listOf(barn1Ident).tilBehandlingBarn(behandling))
-        val barnIdMap = barnService.gjenbrukBarn(behandling.id, revurdering.id)
+        val barnFørsteBehandling =
+            listOf(behandlingBarn(behandlingId = førstegangsbehandling.id, personIdent = barn1Ident))
+        var barnIdMap: Map<BarnId, NyttBarnId> = emptyMap()
 
-        val vilkårForBehandling = opprettVilkårsvurderinger(behandling, barnFørsteBehandling).first()
+        @BeforeEach
+        fun setUp() {
+            testoppsettService.lagreFagsak(fagsak)
+            testoppsettService.lagre(førstegangsbehandling)
+            testoppsettService.lagre(revurdering)
+            barnRepository.insertAll(barnFørsteBehandling)
 
-        vilkårService.kopierVilkårsettTilNyBehandling(
-            forrigeBehandlingId = behandling.id,
-            nyBehandling = revurdering,
-            barnIdMap = barnIdMap,
-        )
+            barnIdMap = barnService.gjenbrukBarn(førstegangsbehandling.id, revurdering.id)
+        }
 
-        val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id).first()
+        @Test
+        internal fun `kopierVilkårsettTilNyBehandling - skal kopiere vilkår til ny behandling`() {
+            val vilkårForBehandling = opprettVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling).first()
 
-        assertThat(vilkårForBehandling.id).isNotEqualTo(vilkårForRevurdering.id)
-        assertThat(vilkårForBehandling.behandlingId).isNotEqualTo(vilkårForRevurdering.behandlingId)
-        assertThat(vilkårForBehandling.sporbar.opprettetTid).isNotEqualTo(vilkårForRevurdering.sporbar.opprettetTid)
-        assertThat(vilkårForBehandling.sporbar.endret.endretTid).isNotEqualTo(vilkårForRevurdering.sporbar.endret.endretTid)
-        assertThat(vilkårForBehandling.barnId).isNotEqualTo(vilkårForRevurdering.barnId)
-        assertThat(vilkårForBehandling.barnId).isEqualTo(barnFørsteBehandling.first().id)
-        assertThat(vilkårForBehandling.opphavsvilkår).isNull()
-        assertThat(vilkårForRevurdering.barnId).isEqualTo(barnIdMap[barnFørsteBehandling.first().id])
-        assertThat(vilkårForRevurdering.opphavsvilkår)
-            .isEqualTo(Opphavsvilkår(behandling.id, vilkårForBehandling.sporbar.endret.endretTid))
+            vilkårService.kopierVilkårsettTilNyBehandling(
+                forrigeBehandlingId = førstegangsbehandling.id,
+                nyBehandling = revurdering,
+                barnIdMap = barnIdMap,
+            )
 
-        assertVilkårErGjenbrukt(vilkårForBehandling, vilkårForRevurdering)
+            val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id).first()
+
+            assertThat(vilkårForBehandling.id).isNotEqualTo(vilkårForRevurdering.id)
+            assertThat(vilkårForBehandling.behandlingId).isNotEqualTo(vilkårForRevurdering.behandlingId)
+            assertThat(vilkårForBehandling.sporbar.opprettetTid).isNotEqualTo(vilkårForRevurdering.sporbar.opprettetTid)
+            assertThat(vilkårForBehandling.sporbar.endret.endretTid).isNotEqualTo(vilkårForRevurdering.sporbar.endret.endretTid)
+            assertThat(vilkårForBehandling.barnId).isNotEqualTo(vilkårForRevurdering.barnId)
+            assertThat(vilkårForBehandling.barnId).isEqualTo(barnFørsteBehandling.first().id)
+            assertThat(vilkårForBehandling.opphavsvilkår).isNull()
+            assertThat(vilkårForRevurdering.barnId).isEqualTo(barnIdMap[barnFørsteBehandling.first().id])
+            assertThat(vilkårForRevurdering.opphavsvilkår)
+                .isEqualTo(Opphavsvilkår(førstegangsbehandling.id, vilkårForBehandling.sporbar.endret.endretTid))
+
+            assertVilkårErGjenbrukt(vilkårForBehandling, vilkårForRevurdering)
+        }
+
+        @Test
+        internal fun `kopierVilkårsettTilNyBehandling - skal ikke kopiere vilkår som mangler periode`() {
+            opprettVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling, fom = null, tom = null).first()
+
+            vilkårService.kopierVilkårsettTilNyBehandling(
+                forrigeBehandlingId = førstegangsbehandling.id,
+                nyBehandling = revurdering,
+                barnIdMap = barnIdMap,
+            )
+
+            val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
+
+            assertThat(vilkårForRevurdering).isEmpty()
+        }
+
+        @Test
+        internal fun `kopierVilkårsettTilNyBehandling - skal ikke kopiere vilkår som er slettet`() {
+            opprettVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling, status = VilkårStatus.SLETTET).first()
+
+            vilkårService.kopierVilkårsettTilNyBehandling(
+                forrigeBehandlingId = førstegangsbehandling.id,
+                nyBehandling = revurdering,
+                barnIdMap = barnIdMap,
+            )
+
+            val vilkårForRevurdering = vilkårRepository.findByBehandlingId(revurdering.id)
+
+            assertThat(vilkårForRevurdering).isEmpty()
+        }
     }
 
     @Disabled // TODO
@@ -172,6 +218,9 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
     private fun opprettVilkårsvurderinger(
         behandling: Behandling,
         barn: List<BehandlingBarn>,
+        fom: LocalDate? = YearMonth.now().atDay(1),
+        tom: LocalDate? = YearMonth.now().atEndOfMonth(),
+        status: VilkårStatus = VilkårStatus.NY,
     ): List<Vilkår> {
         val hovedregelMetadata =
             HovedregelMetadata(
@@ -181,6 +230,9 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         val delvilkårsett = EksempelRegel().initiereDelvilkår(hovedregelMetadata)
         val vilkårsett = listOf(
             vilkår(
+                fom = fom,
+                tom = tom,
+                status = status,
                 resultat = Vilkårsresultat.OPPFYLT,
                 type = VilkårType.PASS_BARN,
                 behandlingId = behandling.id,

@@ -280,7 +280,7 @@ class VilkårService(
         nyBehandlingsId: BehandlingId,
         barnIdMap: Map<TidligereBarnId, NyttBarnId>,
     ): List<Vilkår> =
-        tidligereVilkår.values.map { vilkår ->
+        tidligereVilkår.values.filter { it.skalKopieres() }.map { vilkår ->
             val barnIdINyBehandling = finnBarnId(vilkår.barnId, barnIdMap)
             vilkår.kopierTilBehandling(nyBehandlingsId, barnIdINyBehandling)
         }
