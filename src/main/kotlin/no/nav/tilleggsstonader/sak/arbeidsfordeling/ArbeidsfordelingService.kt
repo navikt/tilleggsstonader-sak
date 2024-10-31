@@ -47,7 +47,7 @@ class ArbeidsfordelingService(
     fun hentNavEnhetForOppfølging(ident: String, oppgavetype: Oppgavetype, tema: Tema = Tema.TSO): Arbeidsfordelingsenhet? {
         return cacheManager.getNullable("navEnhetForOppfølging", ident) {
             arbeidsfordelingClient.finnArbeidsfordelingsenhet(lagArbeidsfordelingKritierieForPerson(ident, tema, oppgavetype)).firstOrNull()
-                ?: error("Fant ikke NAV-enhet for oppgave av type $oppgavetype")
+                ?: error("Fant ikke Nav-enhet for oppgave av type $oppgavetype")
         }
     }
 

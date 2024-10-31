@@ -27,7 +27,7 @@ data class RolleConfig(
             veileder = AdRolle(rolleId = veilederRolle, beskrivelse = "Veileder"),
             kode6 = AdRolle(rolleId = kode6, beskrivelse = "Strengt fortrolig adresse"),
             kode7 = AdRolle(rolleId = kode7, beskrivelse = "Fortrolig adresse"),
-            egenAnsatt = AdRolle(rolleId = egenAnsatt, beskrivelse = "NAV-ansatt"),
+            egenAnsatt = AdRolle(rolleId = egenAnsatt, beskrivelse = "Nav-ansatt"),
         )
     }
 }

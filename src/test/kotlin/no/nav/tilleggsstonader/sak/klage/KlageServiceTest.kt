@@ -63,7 +63,7 @@ internal class KlageServiceTest {
         every { fagsakService.hentAktivIdent(fagsak.id) } returns personIdent
         every { arbeidsfordelingService.hentNavEnhet(any()) } returns Arbeidsfordelingsenhet(
             arbeidsfordelingEnhetNr,
-            "NAV arbeid og ytelser",
+            "Nav arbeid og ytelser",
         )
         justRun { klageClient.opprettKlage(capture(opprettKlageSlot)) }
     }
