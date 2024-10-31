@@ -89,7 +89,7 @@ internal class TilgangServiceTest {
 
     @Test
     internal fun `skal kaste ManglerTilgang dersom saksbehandler ikke har tilgang til behandling`() {
-        val tilgangsfeilNavAnsatt = Tilgang(false, "NAV-ansatt")
+        val tilgangsfeilNavAnsatt = Tilgang(false, "Nav-ansatt")
         every { tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(any(), any()) } returns tilgangsfeilNavAnsatt
 
         val feil = catchThrowableOfType<ManglerTilgang> {

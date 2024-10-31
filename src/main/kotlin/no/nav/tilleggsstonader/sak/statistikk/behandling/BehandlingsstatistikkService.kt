@@ -99,7 +99,7 @@ class BehandlingsstatistikkService(
             ),
             behandlingMetode = behandlingMetode?.name ?: "MANUELL",
             behandlingÅrsak = saksbehandling.årsak.name,
-            avsender = "NAV Tilleggstønader",
+            avsender = "Nav Tilleggstønader",
             behandlingType = saksbehandling.type.name,
             sakYtelse = SakYtelseDvh.fraStønadstype(saksbehandling.stønadstype),
             behandlingResultat = saksbehandling.resultat.name,
