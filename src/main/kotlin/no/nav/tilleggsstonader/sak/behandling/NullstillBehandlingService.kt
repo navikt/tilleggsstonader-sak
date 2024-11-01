@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -27,12 +28,16 @@ class NullstillBehandlingService(
     private val vedtaksbrevRepository: VedtaksbrevRepository,
 ) {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     @Transactional
     fun nullstillBehandling(behandlingId: BehandlingId) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Behandling er låst for videre redigering og kan ikke nullstilles"
         }
+        logger.info("Nullstiller behandling=$behandlingId")
+
         behandlingService.oppdaterStegPåBehandling(behandlingId, StegType.INNGANGSVILKÅR)
 
         slettDataIBehandling(behandlingId)
