@@ -10,7 +10,7 @@ enum class RegelId(val beskrivelse: String) {
 
     // PASSBARN
     ANNEN_FORELDER_MOTTAR_STØTTE("Mottar den andre forelderen støtte til pass av barnet?"),
-    UTGIFTER_DOKUMENTERT("Er utgiftene tilfredstillende dokumentert?"),
+    UTGIFTER_DOKUMENTERT("Har bruker dokumenterte utgifter til pass?"),
     HAR_FULLFØRT_FJERDEKLASSE("Er barnet ferdig med 4. skoleår?"),
     UNNTAK_ALDER("Har barnet behov for pass utover 4. skoleår, og er behovet tilfredsstillende dokumentert?"),
 }
