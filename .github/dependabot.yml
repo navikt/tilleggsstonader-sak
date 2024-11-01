@@ -28,3 +28,12 @@ updates:
     interval: weekly
     day: "sunday"
     time: "04:00"
+
+- package-ecosystem: docker
+  directory: "/"
+  schedule:
+    interval: "weekly"
+    day: "monday"
+    time: "08:00"
+  commit-message:
+    prefix: "[docker] "
