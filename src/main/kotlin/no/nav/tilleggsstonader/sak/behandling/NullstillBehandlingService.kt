@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagerBrevRepository
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -25,6 +26,7 @@ class NullstillBehandlingService(
     private val tilsynBarnVedtakRepository: TilsynBarnVedtakRepository,
     private val simuleringsresultatRepository: SimuleringsresultatRepository,
     private val tilkjentYtelseRepository: TilkjentYtelseRepository,
+    private val mellomlagerBrevRepository: MellomlagerBrevRepository,
     private val vedtaksbrevRepository: VedtaksbrevRepository,
 ) {
 
@@ -56,6 +58,7 @@ class NullstillBehandlingService(
         tilsynBarnVedtakRepository.deleteById(behandlingId)
         tilkjentYtelseRepository.findByBehandlingId(behandlingId)?.let(tilkjentYtelseRepository::delete)
         simuleringsresultatRepository.deleteById(behandlingId)
+        mellomlagerBrevRepository.deleteById(behandlingId)
         vedtaksbrevRepository.deleteById(behandlingId)
     }
 
