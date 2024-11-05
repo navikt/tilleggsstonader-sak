@@ -6,7 +6,7 @@ import java.time.LocalDate.parse
 
 object FullmektigStubs {
     val gyldig = FullmektigDto(
-        fullmektigIdent = "12345678910",
+        fullmektigIdent = "66611144422",
         fullmektigNavn = "Maud-Rita",
         gyldigFraOgMed = parse("2023-01-01"),
         gyldigTilOgMed = now().plusYears(10),
