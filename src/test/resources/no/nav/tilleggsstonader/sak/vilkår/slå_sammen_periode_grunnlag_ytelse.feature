@@ -11,7 +11,7 @@ Egenskap: Slå sammen periode grunnlag ytelse
       | 01.01.2024 | 01.02.2024 | ENSLIG_FORSØRGER  |
       | 01.01.2024 | 01.02.2024 | OMSTILLINGSSTØNAD |
 
-    Når Slår sammen
+    Når Slår sammen grunnlagsperioder
 
     Så Forvent grunnlagsperioderfor ytelse
       | Fom        | Tom        | Type              |
@@ -19,7 +19,47 @@ Egenskap: Slå sammen periode grunnlag ytelse
       | 01.01.2024 | 01.02.2024 | ENSLIG_FORSØRGER  |
       | 01.01.2024 | 01.02.2024 | OMSTILLINGSSTØNAD |
 
-  Scenario: Slå sammen overlappende og sammenhengende perioder som skilles av annen aktivitet
+
+  Scenario: Slå sammen påfølgende perioder av alle typer
+
+    Gitt Følgende grunnlagsperioderfor ytelse
+      | Fom        | Tom        | Type              |
+      | 01.01.2024 | 01.02.2024 | AAP               |
+      | 01.01.2024 | 01.02.2024 | ENSLIG_FORSØRGER  |
+      | 01.01.2024 | 01.02.2024 | OMSTILLINGSSTØNAD |
+      | 02.02.2024 | 01.03.2024 | AAP               |
+      | 02.02.2024 | 01.03.2024 | ENSLIG_FORSØRGER  |
+      | 02.02.2024 | 01.03.2024 | OMSTILLINGSSTØNAD |
+
+    Når Slår sammen grunnlagsperioder
+
+    Så Forvent grunnlagsperioderfor ytelse
+      | Fom        | Tom        | Type              |
+      | 01.01.2024 | 01.03.2024 | AAP               |
+      | 01.01.2024 | 01.03.2024 | ENSLIG_FORSØRGER  |
+      | 01.01.2024 | 01.03.2024 | OMSTILLINGSSTØNAD |
+
+  Scenario: Slå sammen overlappende perioder av alle typer
+
+    Gitt Følgende grunnlagsperioderfor ytelse
+      | Fom        | Tom        | Type              |
+      | 01.01.2024 | 01.02.2024 | AAP               |
+      | 01.01.2024 | 01.02.2024 | ENSLIG_FORSØRGER  |
+      | 01.01.2024 | 01.02.2024 | OMSTILLINGSSTØNAD |
+      | 01.02.2024 | 01.03.2024 | AAP               |
+      | 01.02.2024 | 01.03.2024 | ENSLIG_FORSØRGER  |
+      | 01.02.2024 | 01.03.2024 | OMSTILLINGSSTØNAD |
+
+    Når Slår sammen grunnlagsperioder
+
+    Så Forvent grunnlagsperioderfor ytelse
+      | Fom        | Tom        | Type              |
+      | 01.01.2024 | 01.03.2024 | AAP               |
+      | 01.01.2024 | 01.03.2024 | ENSLIG_FORSØRGER  |
+      | 01.01.2024 | 01.03.2024 | OMSTILLINGSSTØNAD |
+
+
+  Scenario: Slå sammen overlappende og sammenhengende perioder som skilles av annen ytelse
 
     Gitt Følgende grunnlagsperioderfor ytelse
       | Fom        | Tom        | Type              |
@@ -29,7 +69,7 @@ Egenskap: Slå sammen periode grunnlag ytelse
       | 20.01.2024 | 01.02.2024 | AAP               |
       | 01.01.2024 | 01.02.2024 | OMSTILLINGSSTØNAD |
 
-    Når Slår sammen
+    Når Slår sammen grunnlagsperioder
 
     Så Forvent grunnlagsperioderfor ytelse
       | Fom        | Tom        | Type              |
@@ -46,7 +86,7 @@ Egenskap: Slå sammen periode grunnlag ytelse
       | 14.01.2024 |            | AAP               |
       | 01.01.2024 | 01.02.2024 | OMSTILLINGSSTØNAD |
 
-    Når Slår sammen
+    Når Slår sammen grunnlagsperioder
 
     Så Forvent grunnlagsperioderfor ytelse
       | Fom        | Tom        | Type              |
@@ -65,7 +105,7 @@ Egenskap: Slå sammen periode grunnlag ytelse
       | 20.01.2024 | 01.02.2024 | AAP               | SKOLEPENGER                  |
       | 01.01.2024 | 01.02.2024 | OMSTILLINGSSTØNAD |                              |
 
-    Når Slår sammen
+    Når Slår sammen grunnlagsperioder
 
     Så Forvent grunnlagsperioderfor ytelse
       | Fom        | Tom        | Type              | Enslig forsørger stønadstype |

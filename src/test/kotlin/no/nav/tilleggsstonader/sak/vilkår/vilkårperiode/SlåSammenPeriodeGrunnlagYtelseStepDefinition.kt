@@ -41,8 +41,8 @@ class SlåSammenPeriodeGrunnlagYtelseStepDefinition {
         }
     }
 
-    @Når("Slår sammen")
-    fun `Slår sammen`() {
+    @Når("Slår sammen grunnlagsperioder")
+    fun `Slår sammen grunnlagsperioder`() {
         resultat = grunnlagsperioderforYtelse.slåSammenOverlappendeEllerPåfølgende()
     }
 
