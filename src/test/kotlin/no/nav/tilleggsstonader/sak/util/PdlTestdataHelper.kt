@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisteridentifikat
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregistermetadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatus
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødselsdato
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.IdentifiserendeInformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
@@ -54,7 +53,6 @@ object PdlTestdataHelper {
         forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList(),
         fødselsdato: List<Fødselsdato> = listOf(fødsel(år = 2000)),
         folkeregisterpersonstatus: List<Folkeregisterpersonstatus> = emptyList(),
-        fullmakt: List<Fullmakt> = emptyList(),
         kontaktadresse: List<Kontaktadresse> = emptyList(),
         navn: List<Navn> = listOf(lagNavn()),
         opphold: List<Opphold> = emptyList(),
@@ -73,7 +71,6 @@ object PdlTestdataHelper {
             folkeregisteridentifikator = folkeregisteridentifikator,
             fødselsdato = fødselsdato,
             folkeregisterpersonstatus = folkeregisterpersonstatus,
-            fullmakt = fullmakt,
             kontaktadresse = kontaktadresse,
             navn = navn,
             opphold = opphold,

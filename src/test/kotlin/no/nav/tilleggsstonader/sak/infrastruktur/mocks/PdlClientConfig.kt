@@ -17,12 +17,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisteridentifikat
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregistermetadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatus
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.IdentifiserendeInformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktadresseType
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.MotpartsRolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Opphold
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Oppholdstillatelse
@@ -170,7 +168,6 @@ class PdlClientConfig {
                         metadataGjeldende,
                     ),
                 ),
-                fullmakt = fullmakter(),
                 kontaktadresse = kontaktadresse(),
                 navn = listOf(lagNavn()),
                 opphold = listOf(Opphold(Oppholdstillatelse.PERMANENT, startdato, null)),
@@ -279,17 +276,6 @@ class PdlClientConfig {
                     land = "SWE",
                     gyldigFraOgMed = startdato.minusYears(3),
                     gyldigTilOgMed = startdato,
-                ),
-            )
-
-        private fun fullmakter(): List<Fullmakt> =
-            listOf(
-                Fullmakt(
-                    gyldigTilOgMed = startdato,
-                    gyldigFraOgMed = sluttdato,
-                    motpartsPersonident = "11111133333",
-                    motpartsRolle = MotpartsRolle.FULLMEKTIG,
-                    omraader = listOf(),
                 ),
             )
 
