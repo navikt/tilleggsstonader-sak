@@ -31,7 +31,7 @@ data class Vilkårperiode(
     @Column("delvilkar")
     val delvilkår: DelvilkårVilkårperiode,
     val begrunnelse: String?,
-    val resultat: ResultatVilkårperiode,
+    val resultat: ResultatVilkårperiode, //
     val aktivitetsdager: Int?,
 
     val slettetKommentar: String? = null,
@@ -43,7 +43,7 @@ data class Vilkårperiode(
 
     val kildeId: String? = null,
 
-) : Periode<LocalDate> {
+    ) : Periode<LocalDate> {
     init {
         validatePeriode()
         validerAktivitetsdager()
@@ -57,6 +57,45 @@ data class Vilkårperiode(
         validerPåkrevdBegrunnelse()
         validerSlettefelter()
     }
+
+    val faktaOgVurdering: FaktaOgVurdering
+        get() = when (this.type) {
+            AktivitetType.TILTAK -> TiltakTilsynBarn(
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager!!),
+                vurderinger = TiltakTilsynBarnVurdering(lønnet = (delvilkår as DelvilkårAktivitet).lønnet),
+                fom = fom,
+                tom = tom
+            )
+
+            AktivitetType.UTDANNING -> UtdanningTilsynBarn(
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager!!),
+                fom = fom,
+                tom = tom
+            )
+
+            AktivitetType.REELL_ARBEIDSSØKER -> ReellArbeidsøkerTilsynBarn(
+                fakta = FaktaAktivitetTilsynBarn(
+                    aktivitetsdager!!
+                ),
+                fom = fom,
+                tom = tom
+
+            )
+
+            AktivitetType.INGEN_AKTIVITET -> TomFaktaOgVurdering(
+                fom = fom,
+                tom = tom
+            )
+
+            is MålgruppeType -> MålgruppeTilsynBarn(
+                vurderinger = MålgruppeVurderingerTilsynBarn(
+                    medlemskap = (delvilkår as DelvilkårMålgruppe).medlemskap,
+                    dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk
+                ),
+                fom = fom,
+                tom = tom
+            )
+        }
 
     private fun validerAktivitetsdager() {
         if (type is AktivitetType) {
@@ -146,10 +185,86 @@ data class Vilkårperiode(
             null,
             Vilkårstatus.NY,
             Vilkårstatus.ENDRET,
-            -> id
+                -> id
         }
     }
 }
+
+data class TomFaktaOgVurdering(
+    override val fakta: TomFakta = TomFakta,
+    override val vurderinger: TomVurdering = TomVurdering,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+) : FaktaOgVurdering
+
+data object TomFakta : Fakta
+
+
+sealed class AktivitetPassBarnT() {
+    data class AktivitetPassBarnT(
+        var value: Int,
+        var left: Vurdering = None,
+        var right: AktivitetPassBarnT = None,
+    ) : Tree()
+
+    object None : Tree()
+}
+
+
+sealed interface FaktaOgVurdering : Periode<LocalDate> {
+    override val fom: LocalDate
+    override val tom: LocalDate
+    val fakta: Fakta
+    val vurderinger: Vurderinger
+}
+
+sealed interface Vurderinger {}
+
+sealed interface Fakta
+sealed interface FaktaAktivitetsdager {
+    val aktivitetsdager: Int
+}
+
+data class TiltakTilsynBarn(
+    override val fakta: FaktaAktivitetTilsynBarn,
+    override val vurderinger: TiltakTilsynBarnVurdering,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+) : FaktaOgVurdering
+
+data class MålgruppeTilsynBarn(
+    override val fakta: TomFakta = TomFakta,
+    override val vurderinger: MålgruppeVurderingerTilsynBarn,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+) : FaktaOgVurdering
+
+data class MålgruppeVurderingerTilsynBarn(
+    val medlemskap: DelvilkårVilkårperiode.Vurdering,
+    val dekketAvAnnetRegelverk: DelvilkårVilkårperiode.Vurdering,
+) : Vurderinger
+
+data class UtdanningTilsynBarn(
+    override val fakta: FaktaAktivitetTilsynBarn,
+    override val vurderinger: TomVurdering = TomVurdering,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+) : FaktaOgVurdering
+
+data class ReellArbeidsøkerTilsynBarn(
+    override val fakta: FaktaAktivitetTilsynBarn,
+    override val vurderinger: TomVurdering = TomVurdering,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+) : FaktaOgVurdering
+
+data object TomVurdering : Vurderinger
+
+data class TiltakTilsynBarnVurdering(val lønnet: DelvilkårVilkårperiode.Vurdering) : Vurderinger
+
+data class FaktaAktivitetTilsynBarn(
+    override val aktivitetsdager: Int,
+) : FaktaAktivitetsdager, Fakta
 
 enum class KildeVilkårsperiode {
     MANUELL,

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import java.math.BigDecimal
@@ -77,13 +78,14 @@ data class Aktivitet(
 
 fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
     return this.mapNotNull {
-        if (it.type is AktivitetType) {
+        val faktaOgVurdering = it.faktaOgVurdering.fakta
+        if (faktaOgVurdering is FaktaAktivitetTilsynBarn) {
             Aktivitet(
                 id = it.id,
-                type = it.type,
+                type = it.type as AktivitetType,
                 fom = it.fom,
                 tom = it.tom,
-                aktivitetsdager = it.aktivitetsdager ?: error("Aktivitetsdager mangler på periode ${it.id}"),
+                aktivitetsdager = faktaOgVurdering.aktivitetsdager
             )
         } else {
             null

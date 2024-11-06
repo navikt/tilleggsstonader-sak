@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode.Vurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.FaktaAktivitetsdager
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode as DelvilkårVilkårperiodeDomain
@@ -113,7 +114,7 @@ class InterntVedtakService(
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
-                aktivitetsdager = it.aktivitetsdager,
+                aktivitetsdager = if (it.faktaOgVurdering.fakta is FaktaAktivitetsdager) (it.faktaOgVurdering.fakta as FaktaAktivitetsdager).aktivitetsdager else null,
             )
         }
     }
