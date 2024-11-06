@@ -46,22 +46,15 @@ class VilkårperiodeTest {
     inner class ValideringSlettet {
 
         @Test
-        fun `kan ikke slette periode som er opprettet av systemet`() {
-            assertThatThrownBy {
-                målgruppe(kilde = KildeVilkårsperiode.SYSTEM).copy(resultat = ResultatVilkårperiode.SLETTET)
-            }.hasMessageContaining("Kan ikke slette når kilde=")
-        }
-
-        @Test
         fun `kan ha kommentar når resultat er slettet`() {
-            målgruppe(kilde = KildeVilkårsperiode.MANUELL)
+            målgruppe()
                 .copy(resultat = ResultatVilkårperiode.SLETTET, slettetKommentar = "Abc")
         }
 
         @Test
         fun `feiler hvis man mangler kommentar når resultat er slettet og perioden er gjenbrukt`() {
             assertThatThrownBy {
-                målgruppe(kilde = KildeVilkårsperiode.MANUELL, forrigeVilkårperiodeId = UUID.randomUUID())
+                målgruppe(forrigeVilkårperiodeId = UUID.randomUUID())
                     .copy(resultat = ResultatVilkårperiode.SLETTET)
             }.hasMessageContaining("Mangler kommentar for resultat=")
         }
@@ -69,7 +62,7 @@ class VilkårperiodeTest {
         @Test
         fun `feiler hvis man har kommentar når resultat er slettet`() {
             assertThatThrownBy {
-                målgruppe(kilde = KildeVilkårsperiode.MANUELL)
+                målgruppe()
                     .copy(slettetKommentar = "Abc")
             }.hasMessageContaining("Kan ikke ha slettetkommentar")
         }
@@ -80,7 +73,7 @@ class VilkårperiodeTest {
         @Test
         fun `100 prosent sykepenger må inneholde begrunnelse`() {
             assertThatThrownBy {
-                målgruppe(type = MålgruppeType.SYKEPENGER_100_PROSENT, kilde = KildeVilkårsperiode.MANUELL)
+                målgruppe(type = MålgruppeType.SYKEPENGER_100_PROSENT)
             }.hasMessageContaining("Mangler begrunnelse for 100% sykepenger")
         }
     }

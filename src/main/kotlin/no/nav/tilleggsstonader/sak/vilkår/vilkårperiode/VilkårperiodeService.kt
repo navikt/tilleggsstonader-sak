@@ -23,7 +23,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -256,7 +255,6 @@ class VilkårperiodeService(
                 begrunnelse = vilkårperiode.begrunnelse,
                 resultat = resultatEvaluering.resultat,
                 aktivitetsdager = vilkårperiode.aktivitetsdager,
-                kilde = KildeVilkårsperiode.MANUELL,
                 status = Vilkårstatus.NY,
                 kildeId = vilkårperiode.kildeId,
             ),
@@ -327,43 +325,18 @@ class VilkårperiodeService(
         } else {
             Vilkårstatus.ENDRET
         }
-        val oppdatert = when (eksisterendeVilkårperiode.kilde) {
-            KildeVilkårsperiode.MANUELL -> {
-                eksisterendeVilkårperiode.copy(
-                    begrunnelse = vilkårperiode.begrunnelse,
-                    fom = vilkårperiode.fom,
-                    tom = vilkårperiode.tom,
-                    delvilkår = resultatEvaluering.delvilkår,
-                    aktivitetsdager = vilkårperiode.aktivitetsdager,
-                    resultat = resultatEvaluering.resultat,
-                    status = nyStatus,
-                )
-            }
+        val oppdatert = eksisterendeVilkårperiode.copy(
+            begrunnelse = vilkårperiode.begrunnelse,
+            fom = vilkårperiode.fom,
+            tom = vilkårperiode.tom,
+            delvilkår = resultatEvaluering.delvilkår,
+            aktivitetsdager = vilkårperiode.aktivitetsdager,
+            resultat = resultatEvaluering.resultat,
+            status = nyStatus,
+        )
 
-            KildeVilkårsperiode.SYSTEM -> {
-                validerIkkeEndretFomTomForSystem(eksisterendeVilkårperiode, vilkårperiode)
-                eksisterendeVilkårperiode.copy(
-                    begrunnelse = vilkårperiode.begrunnelse,
-                    delvilkår = resultatEvaluering.delvilkår,
-                    resultat = resultatEvaluering.resultat,
-                    status = nyStatus,
-                )
-            }
-        }
         validerEndrePeriodeRevurdering(behandling, eksisterendeVilkårperiode, oppdatert)
         return vilkårperiodeRepository.update(oppdatert)
-    }
-
-    private fun validerIkkeEndretFomTomForSystem(
-        vilkårperiode: Vilkårperiode,
-        oppdaterVilkårperiode: LagreVilkårperiode,
-    ) {
-        feilHvis(vilkårperiode.fom != oppdaterVilkårperiode.fom) {
-            "Kan ikke oppdatere fom når kilde=${KildeVilkårsperiode.SYSTEM}"
-        }
-        feilHvis(vilkårperiode.tom != oppdaterVilkårperiode.tom) {
-            "Kan ikke oppdatere tom når kilde=${KildeVilkårsperiode.SYSTEM}"
-        }
     }
 
     fun slettVilkårperiode(id: UUID, slettVikårperiode: SlettVikårperiode): Vilkårperiode? {

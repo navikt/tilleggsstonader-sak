@@ -143,7 +143,6 @@ class InterntVedtakServiceTest {
             ),
             VilkårperiodeTestUtil.aktivitet(
                 resultat = ResultatVilkårperiode.SLETTET,
-                kilde = KildeVilkårsperiode.MANUELL,
                 slettetKommentar = "kommentar slettet",
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
@@ -317,7 +316,7 @@ class InterntVedtakServiceTest {
             assertThat(type).isEqualTo(MålgruppeType.AAP)
             assertThat(fom).isEqualTo(målgruppe.fom)
             assertThat(tom).isEqualTo(målgruppe.tom)
-            assertThat(kilde).isEqualTo(KildeVilkårsperiode.SYSTEM)
+            assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
             assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
             assertThat(begrunnelse).isEqualTo("målgruppe aap")
             with(delvilkår.medlemskap!!) {
@@ -335,7 +334,7 @@ class InterntVedtakServiceTest {
             assertThat(type).isEqualTo(AktivitetType.TILTAK)
             assertThat(fom).isEqualTo(aktivitet.fom)
             assertThat(tom).isEqualTo(aktivitet.tom)
-            assertThat(kilde).isEqualTo(KildeVilkårsperiode.SYSTEM)
+            assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
             assertThat(resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
             assertThat(begrunnelse).isEqualTo("aktivitet abd")
             with(delvilkår.lønnet!!) {

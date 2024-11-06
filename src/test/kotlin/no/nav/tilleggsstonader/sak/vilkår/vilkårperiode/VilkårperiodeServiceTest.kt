@@ -451,7 +451,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val opprinneligVilkårperiode = vilkårperiodeRepository.insert(
                 målgruppe(
                     behandlingId = revurdering.forrigeBehandlingId!!,
-                    kilde = KildeVilkårsperiode.MANUELL,
                 ),
             )
 
@@ -519,38 +518,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `skal validere at man ikke prøver å endre FOM eller TOM når perioden er opprettet av system`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.SYSTEM,
-            )
-            val periode = vilkårperiodeRepository.insert(målgruppe)
-
-            assertThatThrownBy {
-                vilkårperiodeService.oppdaterVilkårperiode(
-                    periode.id,
-                    periode.tilOppdatering().copy(fom = osloDateNow().minusYears(32)),
-                )
-            }.hasMessageContaining("Kan ikke oppdatere fom")
-
-            assertThatThrownBy {
-                vilkårperiodeService.oppdaterVilkårperiode(
-                    periode.id,
-                    periode.tilOppdatering().copy(tom = osloDateNow().plusYears(32)),
-                )
-            }.hasMessageContaining("Kan ikke oppdatere tom")
-        }
-
-        @Test
         fun `skal ikke kunne oppdatere kommentar hvis behandlingen ikke er under behandling`() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
 
             val målgruppe = målgruppe(
                 behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.MANUELL,
             )
             val periode = vilkårperiodeRepository.insert(målgruppe)
 
@@ -570,7 +543,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val aktivitet = aktivitet(
                 behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.MANUELL,
                 fom = now().minusMonths(1),
                 tom = now().plusMonths(1),
                 aktivitetsdager = 5,
@@ -621,7 +593,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             val målgruppe = målgruppe(
                 behandlingId = behandling.id,
-                kilde = KildeVilkårsperiode.MANUELL,
             )
 
             val lagretPeriode = vilkårperiodeRepository.insert(målgruppe)
@@ -643,23 +614,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
                 val målgruppe = målgruppe(
                     behandlingId = behandling.id,
-                    kilde = KildeVilkårsperiode.MANUELL,
                 )
 
                 lagretPeriode = vilkårperiodeRepository.insert(målgruppe)
-            }
-
-            @Test
-            fun `skal ikke kunne slette kommentar hvis kilden er system`() {
-                val målgruppe = målgruppe(
-                    behandlingId = behandling.id,
-                    kilde = KildeVilkårsperiode.SYSTEM,
-                )
-                val periode = vilkårperiodeRepository.insert(målgruppe)
-
-                assertThatThrownBy {
-                    vilkårperiodeService.slettVilkårperiode(periode.id, SlettVikårperiode(behandling.id, "kommentar"))
-                }.hasMessageContaining("Kan ikke slette når kilde=")
             }
         }
 
@@ -674,7 +631,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
                 val originalMålgruppe = målgruppe(
                     behandlingId = revurdering.forrigeBehandlingId!!,
-                    kilde = KildeVilkårsperiode.MANUELL,
                 )
 
                 vilkårperiodeRepository.insert(originalMålgruppe)
@@ -1012,14 +968,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 målgruppe(
                     behandlingId = revurdering.forrigeBehandlingId!!,
                     resultat = ResultatVilkårperiode.SLETTET,
-                    kilde = KildeVilkårsperiode.MANUELL,
                     slettetKommentar = "slettet",
                 ),
                 aktivitet(behandlingId = revurdering.forrigeBehandlingId!!),
                 aktivitet(
                     behandlingId = revurdering.forrigeBehandlingId!!,
                     resultat = ResultatVilkårperiode.SLETTET,
-                    kilde = KildeVilkårsperiode.MANUELL,
                     slettetKommentar = "slettet",
                 ),
             )

@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode.Vurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -29,7 +28,6 @@ object VilkårperiodeTestUtil {
         type: MålgruppeType = MålgruppeType.AAP,
         delvilkår: DelvilkårMålgruppe = delvilkårMålgruppe(),
         begrunnelse: String? = null,
-        kilde: KildeVilkårsperiode = KildeVilkårsperiode.SYSTEM,
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
         slettetKommentar: String? = null,
         forrigeVilkårperiodeId: UUID? = null,
@@ -41,7 +39,6 @@ object VilkårperiodeTestUtil {
         type = type,
         delvilkår = delvilkår,
         begrunnelse = begrunnelse,
-        kilde = kilde,
         resultat = resultat,
         aktivitetsdager = null,
         slettetKommentar = slettetKommentar,
@@ -79,7 +76,6 @@ object VilkårperiodeTestUtil {
         aktivitetsdager: Int? = 5,
         delvilkår: DelvilkårAktivitet = delvilkårAktivitet(),
         begrunnelse: String? = null,
-        kilde: KildeVilkårsperiode = KildeVilkårsperiode.SYSTEM,
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
         slettetKommentar: String? = null,
         status: Vilkårstatus = Vilkårstatus.NY,
@@ -90,7 +86,6 @@ object VilkårperiodeTestUtil {
         type = type,
         delvilkår = delvilkår,
         begrunnelse = begrunnelse,
-        kilde = kilde,
         resultat = resultat,
         aktivitetsdager = aktivitetsdager,
         slettetKommentar = slettetKommentar,

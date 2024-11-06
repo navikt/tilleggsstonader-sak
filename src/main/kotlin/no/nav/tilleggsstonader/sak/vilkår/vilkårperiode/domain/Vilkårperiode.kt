@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
+import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.*
@@ -21,7 +22,6 @@ data class Vilkårperiode(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: BehandlingId,
-    val kilde: KildeVilkårsperiode,
     @Column("forrige_vilkarperiode_id")
     val forrigeVilkårperiodeId: UUID? = null,
 
@@ -43,7 +43,11 @@ data class Vilkårperiode(
 
     val kildeId: String? = null,
 
+    // TODO kilde burde kunne fjernes, den brukes aldri til noe annet enn manuell. Må fjernes i frontend og.
+    @InsertOnlyProperty
+    val kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
 ) : Periode<LocalDate> {
+
     init {
         validatePeriode()
         validerAktivitetsdager()
@@ -107,9 +111,6 @@ data class Vilkårperiode(
 
     private fun validerSlettefelter() {
         if (resultat == ResultatVilkårperiode.SLETTET) {
-            feilHvis(kilde != KildeVilkårsperiode.MANUELL) {
-                "Kan ikke slette når kilde=$kilde"
-            }
             feilHvis(slettetKommentar.isNullOrBlank() && forrigeVilkårperiodeId != null) {
                 "Mangler kommentar for resultat=$resultat"
             }
@@ -120,8 +121,7 @@ data class Vilkårperiode(
         }
     }
 
-    fun kanSlettesPermanent() =
-        this.forrigeVilkårperiodeId == null && this.kilde != KildeVilkårsperiode.SYSTEM
+    fun kanSlettesPermanent() = this.forrigeVilkårperiodeId == null
 
     fun kopierTilBehandling(nyBehandlingId: BehandlingId): Vilkårperiode {
         return copy(
@@ -153,7 +153,6 @@ data class Vilkårperiode(
 
 enum class KildeVilkårsperiode {
     MANUELL,
-    SYSTEM,
 }
 
 enum class ResultatVilkårperiode {
