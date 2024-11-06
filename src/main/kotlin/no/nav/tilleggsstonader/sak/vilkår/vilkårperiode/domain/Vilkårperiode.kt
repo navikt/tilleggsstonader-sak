@@ -17,18 +17,25 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.*
 
+sealed interface VilkårperiodeSI<FAKTA_VURDERING : FaktaOgVurdering> : Periode<LocalDate> {
+    val faktaOgVurderingTypet: FAKTA_VURDERING
+
+    override val fom: LocalDate get() = faktaOgVurderingTypet.fom
+    override val tom: LocalDate get() = faktaOgVurderingTypet.tom
+}
+
 /**
  * @param type er ikke redigerbar men settes inn her for å kunne valideres sammen med de andre delene i [VilkårOgFakta]
  */
 data class VilkårOgFakta(
     val type: VilkårperiodeType,
-    val fom: LocalDate,
-    val tom: LocalDate,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val begrunnelse: String?,
     @Column("delvilkar")
     val delvilkår: DelvilkårVilkårperiode,
     val aktivitetsdager: Int?,
-) {
+) : Periode<LocalDate> {
     init {
         // validerPeriode? Burde Periode brukes her eller på Vilkårsvurdering?
         validerAktivitetsdager()
@@ -90,8 +97,40 @@ data class VilkårOgFakta(
     private fun manglerBegrunnelse() = begrunnelse.isNullOrBlank()
 }
 
+typealias Vilkårperiode = VilkårperiodeOld<FaktaOgVurdering>
+
+inline fun <reified T : FaktaOgVurdering> List<VilkårperiodeOld<*>>.ofType(): List<VilkårperiodeOld<T>> {
+    @Suppress("UNCHECKED_CAST")
+    return this.filter { it.faktaOgVurderingTypet is T } as List<VilkårperiodeOld<T>>
+}
+
+fun main() {
+    val vilkårOgFakta = VilkårOgFakta(
+        type = AktivitetType.TILTAK,
+        fom = LocalDate.now(),
+        tom = LocalDate.now(),
+        begrunnelse = "",
+        delvilkår = DelvilkårAktivitet(
+            lønnet = DelvilkårVilkårperiode.Vurdering(SvarJaNei.NEI, resultat = ResultatDelvilkårperiode.OPPFYLT),
+        ),
+        aktivitetsdager = 5,
+    )
+    val list = listOf(
+        VilkårperiodeOld<FaktaOgVurdering>(
+            id = UUID.randomUUID(),
+            behandlingId = BehandlingId.random(),
+            resultat = ResultatVilkårperiode.IKKE_VURDERT,
+            vilkårOgFakta = vilkårOgFakta,
+        ),
+    )
+
+    println(list.ofType<TiltakTilsynBarn>())
+    println(list.ofType<UtdanningTilsynBarn>())
+    println(list.ofType<MålgruppeTilsynBarn>())
+}
+
 @Table("vilkar_periode")
-data class Vilkårperiode(
+data class VilkårperiodeOld<T : FaktaOgVurdering>(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: BehandlingId,
@@ -115,7 +154,7 @@ data class Vilkårperiode(
     // TODO kilde burde kunne fjernes, den brukes aldri til noe annet enn manuell. Må fjernes i frontend og.
     @InsertOnlyProperty
     val kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
-) : Periode<LocalDate> {
+) : VilkårperiodeSI<T> {
     init {
         validatePeriode()
         validerSlettefelter()
@@ -124,6 +163,9 @@ data class Vilkårperiode(
     override val fom: LocalDate get() = this.vilkårOgFakta.fom
     override val tom: LocalDate get() = this.vilkårOgFakta.tom
     val type: VilkårperiodeType get() = this.vilkårOgFakta.type
+
+    @Suppress("UNCHECKED_CAST")
+    override val faktaOgVurderingTypet: T by lazy { mapFaktaOgVurdering(this) as T }
 
     private fun validerSlettefelter() {
         if (resultat == ResultatVilkårperiode.SLETTET) {
@@ -145,7 +187,7 @@ data class Vilkårperiode(
         status = Vilkårstatus.SLETTET,
     )
 
-    fun kopierTilBehandling(nyBehandlingId: BehandlingId): Vilkårperiode {
+    fun kopierTilBehandling(nyBehandlingId: BehandlingId): VilkårperiodeOld<T> {
         return copy(
             id = UUID.randomUUID(),
             behandlingId = nyBehandlingId,
@@ -155,7 +197,7 @@ data class Vilkårperiode(
         )
     }
 
-    fun medVilkårOgVurdering(vilkårOgFakta: VilkårOgFakta, resultat: ResultatVilkårperiode): Vilkårperiode {
+    fun medVilkårOgVurdering(vilkårOgFakta: VilkårOgFakta, resultat: ResultatVilkårperiode): VilkårperiodeOld<T> {
         val nyStatus = if (status == Vilkårstatus.NY) {
             Vilkårstatus.NY
         } else {
