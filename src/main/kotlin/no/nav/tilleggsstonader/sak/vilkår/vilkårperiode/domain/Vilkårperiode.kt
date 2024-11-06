@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -165,84 +163,11 @@ enum class ResultatVilkårperiode {
     SLETTET,
 }
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
-@JsonSubTypes(
-    JsonSubTypes.Type(DelvilkårMålgruppe::class, name = "MÅLGRUPPE"),
-    JsonSubTypes.Type(DelvilkårAktivitet::class, name = "AKTIVITET"),
-)
-sealed class DelvilkårVilkårperiode {
-    data class Vurdering(
-        val svar: SvarJaNei?,
-        val resultat: ResultatDelvilkårperiode,
-    ) {
-        init {
-            feilHvis(resultat == ResultatDelvilkårperiode.IKKE_AKTUELT && (svar != null)) {
-                "Ugyldig resultat=$resultat når svar=$svar"
-            }
-        }
-    }
-}
-
-enum class ResultatDelvilkårperiode {
-    OPPFYLT,
-    IKKE_OPPFYLT,
-    IKKE_VURDERT,
-    IKKE_AKTUELT,
-}
-
-data class DelvilkårMålgruppe(
-    val medlemskap: Vurdering,
-    val dekketAvAnnetRegelverk: Vurdering,
-) : DelvilkårVilkårperiode()
-
-data class DelvilkårAktivitet(
-    val lønnet: Vurdering,
-) : DelvilkårVilkårperiode()
-
-enum class SvarJaNei {
-    JA,
-    JA_IMPLISITT,
-    NEI,
-}
-
 @JsonDeserialize(using = VilkårperiodeTypeDeserializer::class)
 sealed interface VilkårperiodeType {
     fun tilDbType(): String
 
     fun girIkkeRettPåStønadsperiode(): Boolean
-}
-
-enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : VilkårperiodeType {
-    AAP(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
-    DAGPENGER(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
-    OMSTILLINGSSTØNAD(setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
-    OVERGANGSSTØNAD(setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING)),
-    NEDSATT_ARBEIDSEVNE(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
-    UFØRETRYGD(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
-    SYKEPENGER_100_PROSENT(emptySet()),
-    INGEN_MÅLGRUPPE(emptySet()),
-    ;
-
-    override fun tilDbType(): String = this.name
-
-    fun gjelderNedsattArbeidsevne() = this == NEDSATT_ARBEIDSEVNE || this == UFØRETRYGD || this == AAP
-
-    override fun girIkkeRettPåStønadsperiode() =
-        this == INGEN_MÅLGRUPPE ||
-            this == SYKEPENGER_100_PROSENT
-}
-
-enum class AktivitetType : VilkårperiodeType {
-    TILTAK,
-    UTDANNING,
-    REELL_ARBEIDSSØKER,
-    INGEN_AKTIVITET,
-    ;
-
-    override fun tilDbType(): String = this.name
-
-    override fun girIkkeRettPåStønadsperiode() =
-        this == INGEN_AKTIVITET
 }
 
 val vilkårperiodetyper: Map<String, VilkårperiodeType> =
