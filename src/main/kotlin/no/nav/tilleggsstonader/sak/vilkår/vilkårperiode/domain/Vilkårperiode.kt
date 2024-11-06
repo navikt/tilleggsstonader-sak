@@ -123,6 +123,12 @@ data class Vilkårperiode(
 
     fun kanSlettesPermanent() = this.forrigeVilkårperiodeId == null
 
+    fun markerSlettet(slettetKommentar: String?) = this.copy(
+        resultat = ResultatVilkårperiode.SLETTET,
+        slettetKommentar = slettetKommentar,
+        status = Vilkårstatus.SLETTET,
+    )
+
     fun kopierTilBehandling(nyBehandlingId: BehandlingId): Vilkårperiode {
         return copy(
             id = UUID.randomUUID(),

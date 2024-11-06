@@ -352,13 +352,7 @@ class VilkårperiodeService(
             vilkårperiodeRepository.deleteById(vilkårperiode.id)
             return null
         } else {
-            return vilkårperiodeRepository.update(
-                vilkårperiode.copy(
-                    resultat = ResultatVilkårperiode.SLETTET,
-                    slettetKommentar = slettVikårperiode.kommentar,
-                    status = Vilkårstatus.SLETTET,
-                ),
-            )
+            return vilkårperiodeRepository.update(vilkårperiode.markerSlettet(slettVikårperiode.kommentar))
         }
     }
 
