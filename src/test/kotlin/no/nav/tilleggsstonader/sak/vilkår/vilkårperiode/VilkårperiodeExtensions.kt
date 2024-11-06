@@ -12,12 +12,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.ResultatEva
 
 object VilkårperiodeExtensions {
     val Vilkårperiode.medlemskap: DelvilkårVilkårperiode.Vurdering
-        get() = (this.delvilkår as DelvilkårMålgruppe).medlemskap
+        get() = (this.vilkårOgFakta.delvilkår as DelvilkårMålgruppe).medlemskap
     val Vilkårperiode.dekketAvAnnetRegelverk: DelvilkårVilkårperiode.Vurdering
-        get() = (this.delvilkår as DelvilkårMålgruppe).dekketAvAnnetRegelverk
+        get() = (this.vilkårOgFakta.delvilkår as DelvilkårMålgruppe).dekketAvAnnetRegelverk
 
     val Vilkårperiode.lønnet: DelvilkårVilkårperiode.Vurdering
-        get() = (this.delvilkår as DelvilkårAktivitet).lønnet
+        get() = (this.vilkårOgFakta.delvilkår as DelvilkårAktivitet).lønnet
 
     val VilkårperiodeDto.medlemskap: VurderingDto?
         get() = (this.delvilkår as DelvilkårMålgruppeDto).medlemskap

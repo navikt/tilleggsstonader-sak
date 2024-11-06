@@ -5,11 +5,13 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårOgFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
@@ -34,16 +36,18 @@ object VilkårperiodeTestUtil {
         status: Vilkårstatus = Vilkårstatus.NY,
     ) = Vilkårperiode(
         behandlingId = behandlingId,
-        fom = fom,
-        tom = tom,
-        type = type,
-        delvilkår = delvilkår,
-        begrunnelse = begrunnelse,
         resultat = resultat,
-        aktivitetsdager = null,
         slettetKommentar = slettetKommentar,
         forrigeVilkårperiodeId = forrigeVilkårperiodeId,
         status = status,
+        vilkårOgFakta = VilkårOgFakta(
+            fom = fom,
+            tom = tom,
+            type = type,
+            delvilkår = delvilkår,
+            begrunnelse = begrunnelse,
+            aktivitetsdager = null,
+        ),
     )
 
     fun delvilkårMålgruppe(
@@ -81,15 +85,17 @@ object VilkårperiodeTestUtil {
         status: Vilkårstatus = Vilkårstatus.NY,
     ) = Vilkårperiode(
         behandlingId = behandlingId,
-        fom = fom,
-        tom = tom,
-        type = type,
-        delvilkår = delvilkår,
-        begrunnelse = begrunnelse,
         resultat = resultat,
-        aktivitetsdager = aktivitetsdager,
         slettetKommentar = slettetKommentar,
         status = status,
+        vilkårOgFakta = VilkårOgFakta(
+            type = type,
+            fom = fom,
+            tom = tom,
+            delvilkår = delvilkår,
+            begrunnelse = begrunnelse,
+            aktivitetsdager = aktivitetsdager,
+        ),
     )
 
     fun delvilkårAktivitet(
@@ -141,4 +147,22 @@ object VilkårperiodeTestUtil {
         aktivitetsdager = aktivitetsdager,
         kildeId = kildeId,
     )
+
+    fun Vilkårperiode.medVilkårOgFakta(
+        fom: LocalDate = this.vilkårOgFakta.fom,
+        tom: LocalDate = this.vilkårOgFakta.tom,
+        begrunnelse: String? = this.vilkårOgFakta.begrunnelse,
+        delvilkår: DelvilkårVilkårperiode = this.vilkårOgFakta.delvilkår,
+        aktivitetsdager: Int? = this.vilkårOgFakta.aktivitetsdager,
+    ): Vilkårperiode {
+        return this.copy(
+            vilkårOgFakta = this.vilkårOgFakta.copy(
+                fom = fom,
+                tom = tom,
+                begrunnelse = begrunnelse,
+                delvilkår = delvilkår,
+                aktivitetsdager = aktivitetsdager,
+            ),
+        )
+    }
 }

@@ -77,13 +77,14 @@ data class Aktivitet(
 
 fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
     return this.mapNotNull {
-        if (it.type is AktivitetType) {
+        val type = it.type
+        if (type is AktivitetType) {
             Aktivitet(
                 id = it.id,
-                type = it.type,
+                type = type,
                 fom = it.fom,
                 tom = it.tom,
-                aktivitetsdager = it.aktivitetsdager ?: error("Aktivitetsdager mangler på periode ${it.id}"),
+                aktivitetsdager = it.vilkårOgFakta.aktivitetsdager ?: error("Aktivitetsdager mangler på periode ${it.id}"),
             )
         } else {
             null

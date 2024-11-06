@@ -105,15 +105,15 @@ class InterntVedtakService(
     private fun mapVilkårperioder(vilkårperioder: List<VilkårperiodeDomain>): List<Vilkårperiode> {
         return vilkårperioder.map {
             Vilkårperiode(
-                type = it.type,
+                type = it.vilkårOgFakta.type,
                 fom = it.fom,
                 tom = it.tom,
-                delvilkår = mapDelvilkår(it.delvilkår),
+                delvilkår = mapDelvilkår(it.vilkårOgFakta.delvilkår),
                 kilde = it.kilde,
                 resultat = it.resultat,
-                begrunnelse = it.begrunnelse,
+                begrunnelse = it.vilkårOgFakta.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
-                aktivitetsdager = it.aktivitetsdager,
+                aktivitetsdager = it.vilkårOgFakta.aktivitetsdager,
             )
         }
     }

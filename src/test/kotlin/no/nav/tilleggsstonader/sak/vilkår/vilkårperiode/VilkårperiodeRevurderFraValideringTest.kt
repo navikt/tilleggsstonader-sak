@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medVilkårOgFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurdering
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
-
 class VilkårperiodeRevurderFraValideringTest {
 
     val revurderFra = LocalDate.of(2024, 1, 1)
@@ -114,14 +114,14 @@ class VilkårperiodeRevurderFraValideringTest {
                 val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.minusDays(2), aktivitetsdager = 1)
                 endringUtenRevurderFra(
                     eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.copy(aktivitetsdager = 2),
+                    eksisterendeVilkårperiode.medVilkårOgFakta(aktivitetsdager = 2),
                 )
             }
             assertDoesNotThrow {
                 val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.plusDays(1), aktivitetsdager = 1)
                 endringUtenRevurderFra(
                     eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.copy(aktivitetsdager = 2),
+                    eksisterendeVilkårperiode.medVilkårOgFakta(aktivitetsdager = 2),
                 )
             }
         }
@@ -136,7 +136,7 @@ class VilkårperiodeRevurderFraValideringTest {
                 listOf(revurderFra.minusDays(1), revurderFra, revurderFra.plusDays(1)).forEach { nyttTom ->
                     endringMedRevurderFra(
                         eksisterendeVilkårperiode,
-                        eksisterendeVilkårperiode.copy(tom = nyttTom),
+                        eksisterendeVilkårperiode.medVilkårOgFakta(tom = nyttTom),
                     )
                 }
             }
@@ -151,7 +151,7 @@ class VilkårperiodeRevurderFraValideringTest {
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.copy(tom = revurderFra.minusDays(2)),
+                    eksisterendeVilkårperiode.medVilkårOgFakta(tom = revurderFra.minusDays(2)),
                 )
             }.hasMessageContaining("Ugyldig endring på periode som begynner(01.12.2023) før revurderingsdato(01.01.2024)")
         }
@@ -166,9 +166,9 @@ class VilkårperiodeRevurderFraValideringTest {
                 resultat = ResultatVilkårperiode.OPPFYLT,
             )
             listOf<(Vilkårperiode) -> Vilkårperiode>(
-                { it.copy(aktivitetsdager = 2) },
+                { it.medVilkårOgFakta(aktivitetsdager = 2) },
                 { it.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT) },
-                { it.copy(delvilkår = delvilkårAktivitet(lønnet = vurdering(SvarJaNei.JA))) },
+                { it.medVilkårOgFakta(delvilkår = delvilkårAktivitet(lønnet = vurdering(SvarJaNei.JA))) },
             ).forEach { endreVilkårperiode ->
                 assertThatThrownBy {
                     endringMedRevurderFra(
@@ -188,7 +188,7 @@ class VilkårperiodeRevurderFraValideringTest {
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.copy(fom = revurderFra.minusDays(2)),
+                    eksisterendeVilkårperiode.medVilkårOgFakta(fom = revurderFra.minusDays(2)),
                 )
             }.hasMessageContaining("Kan ikke sette fom før revurderingsdato")
         }

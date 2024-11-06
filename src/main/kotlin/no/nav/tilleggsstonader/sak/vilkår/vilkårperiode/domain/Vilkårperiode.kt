@@ -17,39 +17,20 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.*
 
-@Table("vilkar_periode")
-data class Vilkårperiode(
-    @Id
-    val id: UUID = UUID.randomUUID(),
-    val behandlingId: BehandlingId,
-    @Column("forrige_vilkarperiode_id")
-    val forrigeVilkårperiodeId: UUID? = null,
-
-    override val fom: LocalDate,
-    override val tom: LocalDate,
+/**
+ * @param type er ikke redigerbar men settes inn her for å kunne valideres sammen med de andre delene i [VilkårOgFakta]
+ */
+data class VilkårOgFakta(
     val type: VilkårperiodeType,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val begrunnelse: String?,
     @Column("delvilkar")
     val delvilkår: DelvilkårVilkårperiode,
-    val begrunnelse: String?,
-    val resultat: ResultatVilkårperiode,
     val aktivitetsdager: Int?,
-
-    val slettetKommentar: String? = null,
-
-    val status: Vilkårstatus? = null,
-
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
-    val sporbar: Sporbar = Sporbar(),
-
-    val kildeId: String? = null,
-
-    // TODO kilde burde kunne fjernes, den brukes aldri til noe annet enn manuell. Må fjernes i frontend og.
-    @InsertOnlyProperty
-    val kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
-) : Periode<LocalDate> {
-
+) {
     init {
-        validatePeriode()
+        // validerPeriode? Burde Periode brukes her eller på Vilkårsvurdering?
         validerAktivitetsdager()
 
         when {
@@ -59,7 +40,6 @@ data class Vilkårperiode(
         }
 
         validerPåkrevdBegrunnelse()
-        validerSlettefelter()
     }
 
     private fun validerAktivitetsdager() {
@@ -108,6 +88,42 @@ data class Vilkårperiode(
     }
 
     private fun manglerBegrunnelse() = begrunnelse.isNullOrBlank()
+}
+
+@Table("vilkar_periode")
+data class Vilkårperiode(
+    @Id
+    val id: UUID = UUID.randomUUID(),
+    val behandlingId: BehandlingId,
+    @Column("forrige_vilkarperiode_id")
+    val forrigeVilkårperiodeId: UUID? = null,
+
+    val resultat: ResultatVilkårperiode,
+
+    val slettetKommentar: String? = null,
+
+    val status: Vilkårstatus? = null,
+
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    val vilkårOgFakta: VilkårOgFakta,
+
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    val sporbar: Sporbar = Sporbar(),
+
+    val kildeId: String? = null,
+
+    // TODO kilde burde kunne fjernes, den brukes aldri til noe annet enn manuell. Må fjernes i frontend og.
+    @InsertOnlyProperty
+    val kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+        validerSlettefelter()
+    }
+
+    override val fom: LocalDate get() = this.vilkårOgFakta.fom
+    override val tom: LocalDate get() = this.vilkårOgFakta.tom
+    val type: VilkårperiodeType get() = this.vilkårOgFakta.type
 
     private fun validerSlettefelter() {
         if (resultat == ResultatVilkårperiode.SLETTET) {
@@ -136,6 +152,19 @@ data class Vilkårperiode(
             forrigeVilkårperiodeId = forrigeVilkårPeriodeIdForKopiertVilkår(),
             sporbar = Sporbar(),
             status = Vilkårstatus.UENDRET,
+        )
+    }
+
+    fun medVilkårOgVurdering(vilkårOgFakta: VilkårOgFakta, resultat: ResultatVilkårperiode): Vilkårperiode {
+        val nyStatus = if (status == Vilkårstatus.NY) {
+            Vilkårstatus.NY
+        } else {
+            Vilkårstatus.ENDRET
+        }
+        return this.copy(
+            vilkårOgFakta = vilkårOgFakta,
+            status = nyStatus,
+            resultat = resultat,
         )
     }
 
