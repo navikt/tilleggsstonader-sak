@@ -20,7 +20,6 @@ sealed class DelvilkårVilkårperiode {
             }
         }
     }
-
 }
 
 enum class SvarJaNei {
