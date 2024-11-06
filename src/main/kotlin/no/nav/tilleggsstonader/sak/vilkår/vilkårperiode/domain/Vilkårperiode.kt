@@ -200,17 +200,6 @@ data class TomFaktaOgVurdering(
 data object TomFakta : Fakta
 
 
-sealed class AktivitetPassBarnT() {
-    data class AktivitetPassBarnT(
-        var value: Int,
-        var left: Vurdering = None,
-        var right: AktivitetPassBarnT = None,
-    ) : Tree()
-
-    object None : Tree()
-}
-
-
 sealed interface FaktaOgVurdering : Periode<LocalDate> {
     override val fom: LocalDate
     override val tom: LocalDate
