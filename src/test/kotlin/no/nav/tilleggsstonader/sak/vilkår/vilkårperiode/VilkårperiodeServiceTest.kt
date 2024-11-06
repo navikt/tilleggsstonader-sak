@@ -35,11 +35,13 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeEllerAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
@@ -115,7 +117,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 behandlingId = behandling.id,
             )
 
-            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiode)
+            @Suppress("UNCHECKED_CAST")
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiode) as VilkårperiodeMålgruppe
             assertThat(vilkårperiode.type).isEqualTo(opprettVilkårperiode.type)
             assertThat(vilkårperiode.kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
             assertThat(vilkårperiode.fom).isEqualTo(opprettVilkårperiode.fom)
@@ -585,7 +588,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             }.hasMessageContaining("Ugyldig endring på periode")
         }
 
-        private fun Vilkårperiode.tilOppdatering(): LagreVilkårperiode {
+        private fun MålgruppeEllerAktivitet.tilOppdatering(): LagreVilkårperiode {
             val delvilkårDto = when (this.delvilkår) {
                 is DelvilkårMålgruppe -> (this.delvilkår as DelvilkårMålgruppe).let {
                     DelvilkårMålgruppeDto(
@@ -634,7 +637,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         @Nested
         inner class SlettVilkårperiodePermanent {
             lateinit var behandling: Behandling
-            lateinit var lagretPeriode: Vilkårperiode
+            lateinit var lagretPeriode: MålgruppeEllerAktivitet
 
             @BeforeEach
             fun setUp() {
@@ -666,7 +669,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         @Nested
         inner class SlettGjenbruktVilkårperiode {
             lateinit var revurdering: Behandling
-            lateinit var lagretPeriode: Vilkårperiode
+            lateinit var lagretPeriode: MålgruppeEllerAktivitet
 
             @BeforeEach
             fun setUp() {
@@ -679,11 +682,11 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
                 vilkårperiodeRepository.insert(originalMålgruppe)
 
-                val revurderingMålgruppe = originalMålgruppe.copy(
+                val revurderingMålgruppe = (originalMålgruppe as Vilkårperiode).copy(
                     id = UUID.randomUUID(),
                     behandlingId = revurdering.id,
                     forrigeVilkårperiodeId = originalMålgruppe.id,
-                )
+                ) as MålgruppeEllerAktivitet
 
                 lagretPeriode = vilkårperiodeRepository.insert(revurderingMålgruppe)
             }

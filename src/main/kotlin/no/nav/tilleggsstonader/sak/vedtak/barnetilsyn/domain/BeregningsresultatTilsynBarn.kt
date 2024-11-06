@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
@@ -75,19 +76,15 @@ data class Aktivitet(
     val aktivitetsdager: Int,
 ) : Periode<LocalDate>
 
-fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
-    return this.mapNotNull {
-        if (it.type is AktivitetType) {
-            Aktivitet(
-                id = it.id,
-                type = it.type,
-                fom = it.fom,
-                tom = it.tom,
-                aktivitetsdager = it.aktivitetsdager ?: error("Aktivitetsdager mangler på periode ${it.id}"),
-            )
-        } else {
-            null
-        }
+fun List<VilkårperiodeAktivitet>.tilAktiviteter(): List<Aktivitet> {
+    return this.map {
+        Aktivitet(
+            id = it.id,
+            type = it.type,
+            fom = it.fom,
+            tom = it.tom,
+            aktivitetsdager = it.aktivitetsdager ?: error("Aktivitetsdager mangler på periode ${it.id}"),
+        )
     }
 }
 

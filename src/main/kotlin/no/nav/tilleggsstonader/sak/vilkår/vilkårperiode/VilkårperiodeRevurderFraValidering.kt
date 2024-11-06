@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.norskFormat
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeEllerAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import java.time.LocalDate
@@ -21,7 +22,7 @@ object VilkårperiodeRevurderFraValidering {
 
     fun validerSlettPeriodeRevurdering(
         behandling: Saksbehandling,
-        periode: Vilkårperiode,
+        periode: MålgruppeEllerAktivitet,
     ) {
         feilHvis(behandling.revurderFra != null && periode.fom < behandling.revurderFra) {
             "Kan ikke slette ${periodeInfo(behandling, periode.fom)}"
@@ -30,8 +31,8 @@ object VilkårperiodeRevurderFraValidering {
 
     fun validerEndrePeriodeRevurdering(
         behandling: Saksbehandling,
-        eksisterendePeriode: Vilkårperiode,
-        oppdatertPeriode: Vilkårperiode,
+        eksisterendePeriode: MålgruppeEllerAktivitet,
+        oppdatertPeriode: MålgruppeEllerAktivitet,
     ) {
         val revurderFra = behandling.revurderFra ?: return
 

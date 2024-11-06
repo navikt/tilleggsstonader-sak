@@ -21,7 +21,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.TypeVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
@@ -234,7 +237,7 @@ data class AktiviteterDvh(
     )
 
     companion object {
-        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): JsonWrapper {
+        fun fraDomene(vilkårsperioder: List<VilkårperiodeAktivitet>): JsonWrapper {
             return JsonWrapper(
                 vilkårsperioder
                     .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
@@ -258,7 +261,7 @@ data class MålgrupperDvh(
     )
 
     companion object {
-        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): JsonWrapper {
+        fun fraDomene(vilkårsperioder: List<VilkårperiodeMålgruppe>): JsonWrapper {
             return JsonWrapper(
                 vilkårsperioder
                     .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }

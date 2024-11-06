@@ -111,14 +111,14 @@ class VilkårperiodeRevurderFraValideringTest {
         @Test
         fun `kan oppdatere periode dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
-                val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.minusDays(2), aktivitetsdager = 1)
+                val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.minusDays(2), aktivitetsdager = 1) as Vilkårperiode
                 endringUtenRevurderFra(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.copy(aktivitetsdager = 2),
                 )
             }
             assertDoesNotThrow {
-                val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.plusDays(1), aktivitetsdager = 1)
+                val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.plusDays(1), aktivitetsdager = 1) as Vilkårperiode
                 endringUtenRevurderFra(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.copy(aktivitetsdager = 2),
@@ -131,7 +131,7 @@ class VilkårperiodeRevurderFraValideringTest {
             val eksisterendeVilkårperiode = aktivitet(
                 fom = revurderFra.minusMonths(1),
                 tom = revurderFra.plusMonths(1),
-            )
+            ) as Vilkårperiode
             assertDoesNotThrow {
                 listOf(revurderFra.minusDays(1), revurderFra, revurderFra.plusDays(1)).forEach { nyttTom ->
                     endringMedRevurderFra(
@@ -147,7 +147,7 @@ class VilkårperiodeRevurderFraValideringTest {
             val eksisterendeVilkårperiode = aktivitet(
                 fom = revurderFra.minusMonths(1),
                 tom = revurderFra.plusMonths(1),
-            )
+            ) as Vilkårperiode
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendeVilkårperiode,
@@ -164,7 +164,7 @@ class VilkårperiodeRevurderFraValideringTest {
                 aktivitetsdager = 3,
                 delvilkår = delvilkårAktivitet(lønnet = vurdering(SvarJaNei.NEI)),
                 resultat = ResultatVilkårperiode.OPPFYLT,
-            )
+            ) as Vilkårperiode
             listOf<(Vilkårperiode) -> Vilkårperiode>(
                 { it.copy(aktivitetsdager = 2) },
                 { it.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT) },
@@ -184,7 +184,7 @@ class VilkårperiodeRevurderFraValideringTest {
             val eksisterendeVilkårperiode = aktivitet(
                 fom = revurderFra,
                 tom = revurderFra.plusMonths(1),
-            )
+            ) as Vilkårperiode
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendeVilkårperiode,

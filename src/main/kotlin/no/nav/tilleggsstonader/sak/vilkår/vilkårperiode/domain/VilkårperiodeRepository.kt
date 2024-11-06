@@ -7,11 +7,11 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface VilkårperiodeRepository : RepositoryInterface<Vilkårperiode, UUID>, InsertUpdateRepository<Vilkårperiode> {
+interface VilkårperiodeRepository : RepositoryInterface<MålgruppeEllerAktivitet, UUID>, InsertUpdateRepository<MålgruppeEllerAktivitet> {
 
-    fun findByBehandlingId(behandlingId: BehandlingId): List<Vilkårperiode>
+    fun findByBehandlingId(behandlingId: BehandlingId): List<MålgruppeEllerAktivitet>
 
-    fun findByBehandlingIdAndResultat(behandlingId: BehandlingId, resultat: ResultatVilkårperiode): List<Vilkårperiode>
+    fun findByBehandlingIdAndResultat(behandlingId: BehandlingId, resultat: ResultatVilkårperiode): List<MålgruppeEllerAktivitet>
 
-    fun findByBehandlingIdAndResultatNot(behandlingId: BehandlingId, resultat: ResultatVilkårperiode): List<Vilkårperiode>
+    fun findByBehandlingIdAndResultatNot(behandlingId: BehandlingId, resultat: ResultatVilkårperiode): List<MålgruppeEllerAktivitet>
 }

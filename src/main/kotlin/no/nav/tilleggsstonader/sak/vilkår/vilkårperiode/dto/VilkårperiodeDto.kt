@@ -8,14 +8,19 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.norskFormat
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeEllerAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.TypeVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
@@ -47,7 +52,7 @@ data class VilkårperiodeDto(
     }
 }
 
-fun Vilkårperiode.tilDto() =
+fun MålgruppeEllerAktivitet.tilDto() =
     VilkårperiodeDto(
         id = this.id,
         type = this.type,
@@ -154,6 +159,6 @@ data class VilkårperioderResponse(
 )
 
 fun Vilkårperioder.tilDto() = VilkårperioderDto(
-    målgrupper = målgrupper.map(Vilkårperiode::tilDto),
-    aktiviteter = aktiviteter.map(Vilkårperiode::tilDto),
+    målgrupper = målgrupper.map(VilkårperiodeMålgruppe::tilDto),
+    aktiviteter = aktiviteter.map(VilkårperiodeAktivitet::tilDto),
 )

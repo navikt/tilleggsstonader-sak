@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
@@ -14,36 +15,100 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
+
+typealias MålgruppeEllerAktivitet = TypeVilkårperiode<*, *>
+
+sealed interface TypeVilkårperiode<Type, TypeDelvilkår> : Periode<LocalDate>
+        where Type : VilkårperiodeType,
+              TypeDelvilkår : DelvilkårVilkårperiode {
+
+    val id: UUID
+    val behandlingId: BehandlingId
+    val kilde: KildeVilkårsperiode
+    val forrigeVilkårperiodeId: UUID?
+
+    override val fom: LocalDate
+    override val tom: LocalDate
+
+    val type: Type
+    val delvilkår: TypeDelvilkår
+
+    val begrunnelse: String?
+    val resultat: ResultatVilkårperiode
+    val aktivitetsdager: Int?
+
+    val slettetKommentar: String?
+    val status: Vilkårstatus?
+    val sporbar: Sporbar
+
+    val kildeId: String?
+
+    fun medNyttDato(fom: LocalDate, tom: LocalDate): TypeVilkårperiode<Type, TypeDelvilkår>
+    fun kopierTilBehandling(nyBehandlingId: BehandlingId): TypeVilkårperiode<Type, TypeDelvilkår>
+
+    fun oppdater(
+        begrunnelse: String?,
+        fom: LocalDate,
+        tom: LocalDate,
+        delvilkår: TypeDelvilkår,
+        aktivitetsdager: Int?,
+        resultat: ResultatVilkårperiode,
+        status: Vilkårstatus
+    ): TypeVilkårperiode<Type, TypeDelvilkår>
+
+    fun kanSlettesPermanent(): Boolean
+    fun markerSlettet(slettetKommentar: String?): TypeVilkårperiode<Type, TypeDelvilkår>
+}
+
+typealias VilkårperiodeMålgruppe = TypeVilkårperiode<MålgruppeType, DelvilkårMålgruppe>
+typealias VilkårperiodeAktivitet = TypeVilkårperiode<AktivitetType, DelvilkårAktivitet>
+
+fun TypeVilkårperiode<*, *>.ifMålgruppe(): VilkårperiodeMålgruppe? {
+    if (this.type is MålgruppeType && this.delvilkår is DelvilkårMålgruppe) {
+        @Suppress("UNCHECKED_CAST")
+        return this as VilkårperiodeMålgruppe
+    }
+    return null
+}
+
+fun TypeVilkårperiode<*, *>.ifAktivitet(): VilkårperiodeAktivitet? {
+    if (this.type is AktivitetType && this.delvilkår is DelvilkårAktivitet) {
+        @Suppress("UNCHECKED_CAST")
+        return this as VilkårperiodeAktivitet
+    }
+    return null
+}
 
 @Table("vilkar_periode")
 data class Vilkårperiode(
     @Id
-    val id: UUID = UUID.randomUUID(),
-    val behandlingId: BehandlingId,
-    val kilde: KildeVilkårsperiode,
+    override val id: UUID = UUID.randomUUID(),
+    override val behandlingId: BehandlingId,
+    override val kilde: KildeVilkårsperiode,
     @Column("forrige_vilkarperiode_id")
-    val forrigeVilkårperiodeId: UUID? = null,
+    override val forrigeVilkårperiodeId: UUID? = null,
 
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val type: VilkårperiodeType,
+    override val type: VilkårperiodeType,
     @Column("delvilkar")
-    val delvilkår: DelvilkårVilkårperiode,
-    val begrunnelse: String?,
-    val resultat: ResultatVilkårperiode,
-    val aktivitetsdager: Int?,
+    override val delvilkår: DelvilkårVilkårperiode,
+    override val begrunnelse: String?,
+    override val resultat: ResultatVilkårperiode,
+    override val aktivitetsdager: Int?,
 
-    val slettetKommentar: String? = null,
+    override val slettetKommentar: String? = null,
 
-    val status: Vilkårstatus? = null,
+    override val status: Vilkårstatus? = null,
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
-    val sporbar: Sporbar = Sporbar(),
+    override val sporbar: Sporbar = Sporbar(),
 
-    val kildeId: String? = null,
+    override val kildeId: String? = null,
 
-) : Periode<LocalDate> {
+    ) : Periode<LocalDate>, TypeVilkårperiode<VilkårperiodeType, DelvilkårVilkårperiode> {
+
     init {
         validatePeriode()
         validerAktivitetsdager()
@@ -56,6 +121,33 @@ data class Vilkårperiode(
 
         validerPåkrevdBegrunnelse()
         validerSlettefelter()
+    }
+
+    override fun medNyttDato(
+        fom: LocalDate,
+        tom: LocalDate
+    ): TypeVilkårperiode<VilkårperiodeType, DelvilkårVilkårperiode> {
+        return this.copy(fom = fom, tom = tom)
+    }
+
+    override fun oppdater(
+        begrunnelse: String?,
+        fom: LocalDate,
+        tom: LocalDate,
+        delvilkår: DelvilkårVilkårperiode,
+        aktivitetsdager: Int?,
+        resultat: ResultatVilkårperiode,
+        status: Vilkårstatus
+    ): Vilkårperiode {
+        return this.copy(
+            begrunnelse = begrunnelse,
+            fom = fom,
+            tom = tom,
+            delvilkår = delvilkår,
+            aktivitetsdager = aktivitetsdager,
+            resultat = resultat,
+            status = status
+        )
     }
 
     private fun validerAktivitetsdager() {
@@ -120,10 +212,18 @@ data class Vilkårperiode(
         }
     }
 
-    fun kanSlettesPermanent() =
+    override fun kanSlettesPermanent() =
         this.forrigeVilkårperiodeId == null && this.kilde != KildeVilkårsperiode.SYSTEM
 
-    fun kopierTilBehandling(nyBehandlingId: BehandlingId): Vilkårperiode {
+    override fun markerSlettet(slettetKommentar: String?): Vilkårperiode {
+        return this.copy(
+            resultat = ResultatVilkårperiode.SLETTET,
+            slettetKommentar = slettetKommentar,
+            status = Vilkårstatus.SLETTET,
+        )
+    }
+
+    override fun kopierTilBehandling(nyBehandlingId: BehandlingId): Vilkårperiode {
         return copy(
             id = UUID.randomUUID(),
             behandlingId = nyBehandlingId,
@@ -174,6 +274,6 @@ val vilkårperiodetyper: Map<String, VilkårperiodeType> =
     listOf(MålgruppeType.entries, AktivitetType.entries).flatten().associateBy { it.name }
 
 data class Vilkårperioder(
-    val målgrupper: List<Vilkårperiode>,
-    val aktiviteter: List<Vilkårperiode>,
+    val målgrupper: List<VilkårperiodeMålgruppe>,
+    val aktiviteter: List<VilkårperiodeAktivitet>,
 )

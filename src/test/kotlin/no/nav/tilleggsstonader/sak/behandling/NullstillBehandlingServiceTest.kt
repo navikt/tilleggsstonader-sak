@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårReposit
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeEllerAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -183,7 +184,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         }.hasMessageContaining("Behandling er låst for videre redigering og kan ikke nullstilles")
     }
 
-    private fun assertVilkårPeriodeErGjenbrukt(vilkårperiode: Vilkårperiode) {
+    private fun assertVilkårPeriodeErGjenbrukt(vilkårperiode: MålgruppeEllerAktivitet) {
         with(vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()) {
             assertThat(this)
                 .usingRecursiveComparison()

@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -20,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import java.time.LocalDate
 import java.util.UUID
 
+@Suppress("UNCHECKED_CAST")
 object VilkårperiodeTestUtil {
 
     fun målgruppe(
@@ -47,7 +50,7 @@ object VilkårperiodeTestUtil {
         slettetKommentar = slettetKommentar,
         forrigeVilkårperiodeId = forrigeVilkårperiodeId,
         status = status,
-    )
+    ) as VilkårperiodeMålgruppe
 
     fun delvilkårMålgruppe(
         medlemskap: Vurdering = vurdering(),
@@ -95,7 +98,7 @@ object VilkårperiodeTestUtil {
         aktivitetsdager = aktivitetsdager,
         slettetKommentar = slettetKommentar,
         status = status,
-    )
+    ) as VilkårperiodeAktivitet
 
     fun delvilkårAktivitet(
         lønnet: Vurdering = vurdering(

@@ -23,13 +23,18 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeEllerAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ifAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ifMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
@@ -79,8 +84,8 @@ class VilkårperiodeService(
             .sortedWith(compareBy({ it.fom }, { it.tom }))
 
         return Vilkårperioder(
-            målgrupper = finnPerioder<MålgruppeType>(vilkårsperioder),
-            aktiviteter = finnPerioder<AktivitetType>(vilkårsperioder),
+            målgrupper = vilkårsperioder.filtrerMålgrupper(),
+            aktiviteter = vilkårsperioder.filtrerAktiviteter(),
         )
     }
 
@@ -218,11 +223,13 @@ class VilkårperiodeService(
         return hentVilkårperioder(behandlingId).tilDto()
     }
 
-    private inline fun <reified T : VilkårperiodeType> finnPerioder(
-        vilkårsperioder: List<Vilkårperiode>,
-    ) = vilkårsperioder.filter { it.type is T }
+    private fun List<MålgruppeEllerAktivitet>.filtrerMålgrupper() =
+        this.mapNotNull { it.ifMålgruppe() }
 
-    fun validerOgLagResponse(behandlingId: BehandlingId, periode: Vilkårperiode? = null): LagreVilkårperiodeResponse {
+    private fun List<MålgruppeEllerAktivitet>.filtrerAktiviteter() =
+        this.mapNotNull { it.ifAktivitet() }
+
+    fun validerOgLagResponse(behandlingId: BehandlingId, periode: MålgruppeEllerAktivitet? = null): LagreVilkårperiodeResponse {
         val valideringsresultat = validerStønadsperioder(behandlingId)
 
         return LagreVilkårperiodeResponse(
@@ -233,7 +240,7 @@ class VilkårperiodeService(
     }
 
     @Transactional
-    fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): Vilkårperiode {
+    fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): MålgruppeEllerAktivitet {
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
         validerNyPeriodeRevurdering(behandling, vilkårperiode)
@@ -309,7 +316,7 @@ class VilkårperiodeService(
         }
     }
 
-    fun oppdaterVilkårperiode(id: UUID, vilkårperiode: LagreVilkårperiode): Vilkårperiode {
+    fun oppdaterVilkårperiode(id: UUID, vilkårperiode: LagreVilkårperiode): MålgruppeEllerAktivitet {
         val eksisterendeVilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
         val behandling = behandlingService.hentSaksbehandling(eksisterendeVilkårperiode.behandlingId)
@@ -329,18 +336,34 @@ class VilkårperiodeService(
         }
         val oppdatert = when (eksisterendeVilkårperiode.kilde) {
             KildeVilkårsperiode.MANUELL -> {
-                eksisterendeVilkårperiode.copy(
-                    begrunnelse = vilkårperiode.begrunnelse,
-                    fom = vilkårperiode.fom,
-                    tom = vilkårperiode.tom,
-                    delvilkår = resultatEvaluering.delvilkår,
-                    aktivitetsdager = vilkårperiode.aktivitetsdager,
-                    resultat = resultatEvaluering.resultat,
-                    status = nyStatus,
-                )
+                /** Veldig rar del */
+                val delvilkårResultat = resultatEvaluering.delvilkår
+                eksisterendeVilkårperiode.ifMålgruppe()?.let {
+                    require(delvilkårResultat is DelvilkårMålgruppe)
+                    it.oppdater(
+                        begrunnelse = vilkårperiode.begrunnelse,
+                        fom = vilkårperiode.fom,
+                        tom = vilkårperiode.tom,
+                        delvilkår = delvilkårResultat,
+                        aktivitetsdager = vilkårperiode.aktivitetsdager,
+                        resultat = resultatEvaluering.resultat,
+                        status = nyStatus,
+                    )
+                } ?: eksisterendeVilkårperiode.ifAktivitet()?.let {
+                    require(delvilkårResultat is DelvilkårAktivitet)
+                    it.oppdater(
+                        begrunnelse = vilkårperiode.begrunnelse,
+                        fom = vilkårperiode.fom,
+                        tom = vilkårperiode.tom,
+                        delvilkår = delvilkårResultat,
+                        aktivitetsdager = vilkårperiode.aktivitetsdager,
+                        resultat = resultatEvaluering.resultat,
+                        status = nyStatus,
+                    )
+                } ?: error("Ugyldig kombinasjon")
             }
 
-            KildeVilkårsperiode.SYSTEM -> {
+            KildeVilkårsperiode.SYSTEM -> error("Har ikke støtte")/* {
                 validerIkkeEndretFomTomForSystem(eksisterendeVilkårperiode, vilkårperiode)
                 eksisterendeVilkårperiode.copy(
                     begrunnelse = vilkårperiode.begrunnelse,
@@ -349,6 +372,7 @@ class VilkårperiodeService(
                     status = nyStatus,
                 )
             }
+            */
         }
         validerEndrePeriodeRevurdering(behandling, eksisterendeVilkårperiode, oppdatert)
         return vilkårperiodeRepository.update(oppdatert)
@@ -366,7 +390,7 @@ class VilkårperiodeService(
         }
     }
 
-    fun slettVilkårperiode(id: UUID, slettVikårperiode: SlettVikårperiode): Vilkårperiode? {
+    fun slettVilkårperiode(id: UUID, slettVikårperiode: SlettVikårperiode): MålgruppeEllerAktivitet? {
         val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
         validerBehandlingIdErLik(slettVikårperiode.behandlingId, vilkårperiode.behandlingId)
@@ -380,11 +404,7 @@ class VilkårperiodeService(
             return null
         } else {
             return vilkårperiodeRepository.update(
-                vilkårperiode.copy(
-                    resultat = ResultatVilkårperiode.SLETTET,
-                    slettetKommentar = slettVikårperiode.kommentar,
-                    status = Vilkårstatus.SLETTET,
-                ),
+                vilkårperiode.markerSlettet(slettVikårperiode.kommentar) as MålgruppeEllerAktivitet
             )
         }
     }

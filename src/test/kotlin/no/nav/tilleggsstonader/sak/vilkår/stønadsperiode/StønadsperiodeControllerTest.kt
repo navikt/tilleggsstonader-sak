@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiod
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeEllerAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -56,7 +57,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
         opprettAktivitet(behandling)
     }
 
-    private fun opprettMålgruppe(behandling: Behandling): Vilkårperiode =
+    private fun opprettMålgruppe(behandling: Behandling): MålgruppeEllerAktivitet =
         vilkårperiodeService.opprettVilkårperiode(
             LagreVilkårperiode(
                 type = MålgruppeType.AAP,
@@ -70,7 +71,7 @@ class StønadsperiodeControllerTest : IntegrationTest() {
             ),
         )
 
-    private fun opprettAktivitet(behandling: Behandling): Vilkårperiode =
+    private fun opprettAktivitet(behandling: Behandling): MålgruppeEllerAktivitet =
         vilkårperiodeService.opprettVilkårperiode(
             LagreVilkårperiode(
                 type = AktivitetType.TILTAK,

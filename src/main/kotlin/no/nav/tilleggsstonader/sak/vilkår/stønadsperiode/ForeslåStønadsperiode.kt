@@ -9,7 +9,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.TypeVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
 
@@ -94,12 +96,12 @@ object ForeslåStønadsperiode {
         }
     }
 
-    private fun slåSammenVilkårsperioderSomErLikeEtterHverandre(vilkårperioder: List<Vilkårperiode>): List<Vilkårperiode> {
+    private fun <T: TypeVilkårperiode<*,*>> slåSammenVilkårsperioderSomErLikeEtterHverandre(vilkårperioder: List<T>): List<T> {
         return vilkårperioder
             .sorted()
             .mergeSammenhengende(
                 skalMerges = { v1, v2 -> v1.type == v2.type && v1.overlapperEllerPåfølgesAv(v2) },
-                merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
+                merge = { v1, v2 -> v1.medNyttDato(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) as T }, // Ulempe med denne type typcasting
             )
     }
 
