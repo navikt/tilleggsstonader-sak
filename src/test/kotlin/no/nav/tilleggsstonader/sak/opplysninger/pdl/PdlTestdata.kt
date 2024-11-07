@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisteridentifikat
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregistermetadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatus
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.ForelderBarnRelasjon
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fullmakt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Fødselsdato
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.IdentifiserendeInformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.InnflyttingTilNorge
@@ -21,7 +20,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Kontaktadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.KontaktadresseType
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Matrikkeladresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Metadata
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.MotpartsRolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Opphold
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Oppholdsadresse
@@ -135,15 +133,6 @@ object PdlTestdata {
                 folkeregisteridentifikatorSøker,
                 fødselsdato,
                 listOf(Folkeregisterpersonstatus("", "", metadataGjeldende)),
-                listOf(
-                    Fullmakt(
-                        osloDateNow(),
-                        osloDateNow(),
-                        "",
-                        MotpartsRolle.FULLMAKTSGIVER,
-                        listOf(""),
-                    ),
-                ),
                 listOf(
                     Kontaktadresse(
                         "",
