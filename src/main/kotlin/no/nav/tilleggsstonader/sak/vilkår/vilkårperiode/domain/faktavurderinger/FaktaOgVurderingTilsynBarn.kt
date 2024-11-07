@@ -4,11 +4,11 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
-sealed interface FaktaOgVurderingTilsynBarn : FaktaOgVurdering {
+sealed interface FaktaOgVurderingTilsynBarn : MålgruppeFaktaOgVurdering {
     override val type: TypeFaktaOgVurderingTilsynBarn
 }
 
-sealed interface AktivitetTilsynBarn : FaktaOgVurderingTilsynBarn {
+sealed interface AktivitetTilsynBarn : AktivitetFaktaOgVurdering {
     override val type: AktivitetTilsynBarnType
 }
 

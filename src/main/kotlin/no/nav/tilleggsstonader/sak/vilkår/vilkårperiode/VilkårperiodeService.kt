@@ -29,7 +29,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.mapFaktaOgVurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
@@ -75,12 +78,11 @@ class VilkårperiodeService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
-        val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId)
-            .sortedWith(compareBy({ it.fom }, { it.tom }))
+        val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
 
         return Vilkårperioder(
-            målgrupper = finnPerioder<MålgruppeType>(vilkårsperioder),
-            aktiviteter = finnPerioder<AktivitetType>(vilkårsperioder),
+            målgrupper = vilkårsperioder.ofType<MålgruppeFaktaOgVurdering>(),
+            aktiviteter = vilkårsperioder.ofType<AktivitetFaktaOgVurdering>(),
         )
     }
 
@@ -217,10 +219,6 @@ class VilkårperiodeService(
     fun hentVilkårperioderDto(behandlingId: BehandlingId): VilkårperioderDto {
         return hentVilkårperioder(behandlingId).tilDto()
     }
-
-    private inline fun <reified T : VilkårperiodeType> finnPerioder(
-        vilkårsperioder: List<Vilkårperiode>,
-    ) = vilkårsperioder.filter { it.vilkårOgFakta.type is T }
 
     fun validerOgLagResponse(behandlingId: BehandlingId, periode: Vilkårperiode? = null): LagreVilkårperiodeResponse {
         val valideringsresultat = validerStønadsperioder(behandlingId)

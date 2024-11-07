@@ -27,9 +27,7 @@ fun mapFaktaOgVurdering(vilkårperiode: Vilkårperiode): FaktaOgVurdering = with
             fakta = FaktaAktivitetTilsynBarn(vilkårOgFakta.aktivitetsdager!!),
         )
 
-        AktivitetType.INGEN_AKTIVITET -> TomFaktaOgVurdering(
-            type = AktivitetTilsynBarnType.INGEN_AKTIVITET_TILSYN_BARN,
-        )
+        AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
 
         is MålgruppeType -> MålgruppeTilsynBarn(
             type = MålgruppeTilsynBarnType.entries.single { it.vilkårperiodeType == type },
@@ -63,9 +61,7 @@ fun mapFaktaOgVurderingDto(vilkårperiode: LagreVilkårperiode, resultatEvalueri
             feilHvis(vilkårperiode.aktivitetsdager != null) {
                 "Kan ikke registrere aktivitetsdager på ingen aktivitet"
             }
-            TomFaktaOgVurdering(
-                type = AktivitetTilsynBarnType.INGEN_AKTIVITET_TILSYN_BARN,
-            )
+            IngenAktivitetTilsynBarn
         }
 
         is MålgruppeType -> {

@@ -8,12 +8,8 @@ sealed interface FaktaOgVurdering : FaktaOgVurderingJson {
     val vurderinger: Vurderinger
 }
 
-data class TomFaktaOgVurdering(
-    override val type: TypeFaktaOgVurdering,
-) : FaktaOgVurdering {
-    override val fakta: TomFakta = TomFakta
-    override val vurderinger: TomVurdering = TomVurdering
-}
+sealed interface MålgruppeFaktaOgVurdering : FaktaOgVurdering
+sealed interface AktivitetFaktaOgVurdering : FaktaOgVurdering
 
 data class MålgruppeVurderinger(
     override val medlemskap: DelvilkårVilkårperiode.Vurdering,
