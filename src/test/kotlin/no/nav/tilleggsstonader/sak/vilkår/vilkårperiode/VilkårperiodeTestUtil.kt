@@ -55,7 +55,7 @@ object VilkårperiodeTestUtil {
         type = type,
         begrunnelse = begrunnelse,
         faktaOgVurdering = MålgruppeTilsynBarn(
-            type = MålgruppeTilsynBarnType.entries.single { it.målgruppeType == type },
+            type = MålgruppeTilsynBarnType.entries.single { it.vilkårperiodeType == type },
             vurderinger = MålgruppeVurderinger(
                 medlemskap = delvilkår.medlemskap,
                 dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,

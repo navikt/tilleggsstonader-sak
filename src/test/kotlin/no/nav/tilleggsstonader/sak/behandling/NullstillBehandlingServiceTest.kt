@@ -185,7 +185,15 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
     private fun assertVilkårPeriodeErGjenbrukt(vilkårperiode: Vilkårperiode) {
         with(vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()) {
-            assertThat(this)
+            // TODO "nullstiller" felter fordi usingRecursiveComparison ikke virker som forventet
+            val oppdatertVilkårMedNullstilteFelter = this.copy(
+                id = vilkårperiode.id,
+                sporbar = vilkårperiode.sporbar,
+                behandlingId = vilkårperiode.behandlingId,
+                forrigeVilkårperiodeId = vilkårperiode.forrigeVilkårperiodeId,
+                status = vilkårperiode.status,
+            )
+            assertThat(oppdatertVilkårMedNullstilteFelter)
                 .usingRecursiveComparison()
                 .ignoringFields("id", "sporbar", "behandlingId", "forrigeVilkårperiodeId", "status")
                 .isEqualTo(vilkårperiode)
@@ -196,7 +204,14 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
     private fun assertStønadsperiodeErGjenbrukt(stønadsperiode: Stønadsperiode) {
         with(stønadsperiodeRepository.findAllByBehandlingId(revurdering.id).single()) {
-            assertThat(this)
+            // TODO "nullstiller" felter fordi usingRecursiveComparison ikke virker som forventet
+            val oppdatertVilkårMedNullstilteFelter = this.copy(
+                id = stønadsperiode.id,
+                sporbar = stønadsperiode.sporbar,
+                behandlingId = stønadsperiode.behandlingId,
+                status = stønadsperiode.status,
+            )
+            assertThat(oppdatertVilkårMedNullstilteFelter)
                 .usingRecursiveComparison()
                 .ignoringFields("id", "sporbar", "behandlingId", "status")
                 .isEqualTo(stønadsperiode)
@@ -206,7 +221,16 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
     private fun assertVilkårErGjenbrukt(vilkår: Vilkår) {
         with(vilkårRepository.findByBehandlingId(revurdering.id).single()) {
-            assertThat(this)
+            // TODO "nullstiller" felter fordi usingRecursiveComparison ikke virker som forventet
+            val oppdatertVilkårMedNullstilteFelter = this.copy(
+                id = vilkår.id,
+                sporbar = vilkår.sporbar,
+                behandlingId = vilkår.behandlingId,
+                barnId = vilkår.barnId,
+                opphavsvilkår = vilkår.opphavsvilkår,
+                status = vilkår.status,
+            )
+            assertThat(oppdatertVilkårMedNullstilteFelter)
                 .usingRecursiveComparison()
                 .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår", "status")
                 .isEqualTo(vilkår)
