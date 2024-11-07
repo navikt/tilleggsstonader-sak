@@ -19,11 +19,8 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.*
 
-sealed interface VilkårperiodeSI<FAKTA_VURDERING : FaktaOgVurdering> : Periode<LocalDate> {
-    val faktaOgVurderingTypet: FAKTA_VURDERING
-
-    override val fom: LocalDate get() = faktaOgVurderingTypet.fom
-    override val tom: LocalDate get() = faktaOgVurderingTypet.tom
+interface IVilkårperiode<FAKTA_VURDERING : FaktaOgVurdering> : Periode<LocalDate> {
+    val faktaOgVurdering: FAKTA_VURDERING
 }
 
 /**
@@ -99,14 +96,13 @@ data class VilkårOgFakta(
     private fun manglerBegrunnelse() = begrunnelse.isNullOrBlank()
 }
 
-typealias Vilkårperiode = VilkårperiodeOld<FaktaOgVurdering>
-
+typealias Vilkårperiode = GeneriskVilkårperiode<out FaktaOgVurdering>
 
 /**
  *
  */
 @Table("vilkar_periode")
-data class VilkårperiodeOld<T : FaktaOgVurdering>(
+data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: BehandlingId,
@@ -130,7 +126,7 @@ data class VilkårperiodeOld<T : FaktaOgVurdering>(
     // TODO kilde burde kunne fjernes, den brukes aldri til noe annet enn manuell. Må fjernes i frontend og.
     @InsertOnlyProperty
     val kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
-) : VilkårperiodeSI<T> {
+) : IVilkårperiode<T> {
     init {
         validatePeriode()
         validerSlettefelter()
@@ -141,7 +137,7 @@ data class VilkårperiodeOld<T : FaktaOgVurdering>(
     val type: VilkårperiodeType get() = this.vilkårOgFakta.type
 
     @Suppress("UNCHECKED_CAST")
-    override val faktaOgVurderingTypet: T by lazy { mapFaktaOgVurdering(this) as T }
+    override val faktaOgVurdering: T by lazy { mapFaktaOgVurdering(this) as T }
 
     private fun validerSlettefelter() {
         if (resultat == ResultatVilkårperiode.SLETTET) {
@@ -163,7 +159,7 @@ data class VilkårperiodeOld<T : FaktaOgVurdering>(
         status = Vilkårstatus.SLETTET,
     )
 
-    fun kopierTilBehandling(nyBehandlingId: BehandlingId): VilkårperiodeOld<T> {
+    fun kopierTilBehandling(nyBehandlingId: BehandlingId): GeneriskVilkårperiode<T> {
         return copy(
             id = UUID.randomUUID(),
             behandlingId = nyBehandlingId,
@@ -173,7 +169,7 @@ data class VilkårperiodeOld<T : FaktaOgVurdering>(
         )
     }
 
-    fun medVilkårOgVurdering(vilkårOgFakta: VilkårOgFakta, resultat: ResultatVilkårperiode): VilkårperiodeOld<T> {
+    fun medVilkårOgVurdering(vilkårOgFakta: VilkårOgFakta, resultat: ResultatVilkårperiode): GeneriskVilkårperiode<T> {
         val nyStatus = if (status == Vilkårstatus.NY) {
             Vilkårstatus.NY
         } else {

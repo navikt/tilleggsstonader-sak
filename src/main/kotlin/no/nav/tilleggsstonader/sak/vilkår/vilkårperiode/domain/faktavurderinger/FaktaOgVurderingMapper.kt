@@ -4,9 +4,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeOld
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 
-fun mapFaktaOgVurdering(vilkårperiode: VilkårperiodeOld<*>): FaktaOgVurdering = with(vilkårperiode) {
+fun mapFaktaOgVurdering(vilkårperiode: Vilkårperiode): FaktaOgVurdering = with(vilkårperiode) {
     return when (this.type) {
         AktivitetType.TILTAK -> TiltakTilsynBarn(
             fakta = FaktaAktivitetTilsynBarn(this.vilkårOgFakta.aktivitetsdager!!),
