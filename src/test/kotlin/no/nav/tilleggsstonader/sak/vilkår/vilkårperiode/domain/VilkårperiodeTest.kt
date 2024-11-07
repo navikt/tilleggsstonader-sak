@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medVilkårOgFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
@@ -26,7 +26,7 @@ class VilkårperiodeTest {
         @Test
         fun `målgruppe ugyldige detaljer kaster feil`() {
             assertThatThrownBy {
-                målgruppe().medVilkårOgFakta(delvilkår = delvilkårAktivitet())
+                målgruppe().medVurdering(delvilkår = delvilkårAktivitet())
             }.hasMessageContaining("Ugyldig kombinasjon")
         }
 
@@ -38,7 +38,7 @@ class VilkårperiodeTest {
         @Test
         fun `aktivitet ugyldige detaljer kaster feil`() {
             assertThatThrownBy {
-                aktivitet().medVilkårOgFakta(delvilkår = delvilkårMålgruppe())
+                aktivitet().medVurdering(delvilkår = delvilkårMålgruppe())
             }.hasMessageContaining("Ugyldig kombinasjon")
         }
     }

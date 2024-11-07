@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import org.postgresql.util.PGobject
@@ -126,6 +127,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 SkjemaLæremidlerReader(),
                 SkjemaLæremidlerWriter(),
+
+                FaktaOgVurderingReader(),
+                FaktaOgVurderingWriter(),
 
             ) + alleVedtaksstatistikkJsonConverters +
                 alleValueClassConverters,
@@ -254,4 +258,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class SkjemaLæremidlerReader : JsonReader<SkjemaLæremidler>(SkjemaLæremidler::class)
 
     class SkjemaLæremidlerWriter : JsonWriter<SkjemaLæremidler>()
+
+    class FaktaOgVurderingReader : JsonReader<FaktaOgVurdering>(FaktaOgVurdering::class)
+
+    class FaktaOgVurderingWriter : JsonWriter<FaktaOgVurdering>()
 }

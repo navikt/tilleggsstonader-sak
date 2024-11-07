@@ -7,8 +7,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårFaktaMapper.mapTilVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.mapFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.data.annotation.Id
@@ -109,14 +109,15 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     @Column("forrige_vilkarperiode_id")
     val forrigeVilkårperiodeId: UUID? = null,
 
+    val type: VilkårperiodeType,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    override val faktaOgVurdering: T,
+    val begrunnelse: String?,
+
     val resultat: ResultatVilkårperiode,
-
     val slettetKommentar: String? = null,
-
     val status: Vilkårstatus? = null,
-
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
-    val vilkårOgFakta: VilkårOgFakta,
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
@@ -128,16 +129,12 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     val kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
 ) : IVilkårperiode<T> {
     init {
+        // TODO valider kombinasjon av type og type og FaktaOgVurdering.type
         validatePeriode()
         validerSlettefelter()
     }
 
-    override val fom: LocalDate get() = this.vilkårOgFakta.fom
-    override val tom: LocalDate get() = this.vilkårOgFakta.tom
-    val type: VilkårperiodeType get() = this.vilkårOgFakta.type
-
-    @Suppress("UNCHECKED_CAST")
-    override val faktaOgVurdering: T by lazy { mapFaktaOgVurdering(this) as T }
+    val vilkårOgFakta: VilkårOgFakta by lazy { mapTilVilkårFakta() }
 
     private fun validerSlettefelter() {
         if (resultat == ResultatVilkårperiode.SLETTET) {
@@ -169,14 +166,15 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         )
     }
 
-    fun medVilkårOgVurdering(vilkårOgFakta: VilkårOgFakta, resultat: ResultatVilkårperiode): GeneriskVilkårperiode<T> {
+    fun medVilkårOgVurdering(faktaOgVurdering: FaktaOgVurdering, resultat: ResultatVilkårperiode): GeneriskVilkårperiode<T> {
         val nyStatus = if (status == Vilkårstatus.NY) {
             Vilkårstatus.NY
         } else {
             Vilkårstatus.ENDRET
         }
+        @Suppress("UNCHECKED_CAST")
         return this.copy(
-            vilkårOgFakta = vilkårOgFakta,
+            faktaOgVurdering = faktaOgVurdering as T,
             status = nyStatus,
             resultat = resultat,
         )

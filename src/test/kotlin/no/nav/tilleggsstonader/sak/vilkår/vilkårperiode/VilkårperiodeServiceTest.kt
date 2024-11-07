@@ -556,19 +556,16 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         private fun Vilkårperiode.tilOppdatering(): LagreVilkårperiode {
-            val delvilkårDto = when (this.vilkårOgFakta.delvilkår) {
-                is DelvilkårMålgruppe -> this.vilkårOgFakta.delvilkår.let {
-                    DelvilkårMålgruppeDto(
-                        medlemskap = VurderingDto(it.medlemskap.svar),
-                        dekketAvAnnetRegelverk = VurderingDto(it.dekketAvAnnetRegelverk.svar),
-                    )
-                }
+            val delvilkår = this.vilkårOgFakta.delvilkår
+            val delvilkårDto = when (delvilkår) {
+                is DelvilkårMålgruppe -> DelvilkårMålgruppeDto(
+                    medlemskap = VurderingDto(delvilkår.medlemskap.svar),
+                    dekketAvAnnetRegelverk = VurderingDto(delvilkår.dekketAvAnnetRegelverk.svar),
+                )
 
-                is DelvilkårAktivitet -> this.vilkårOgFakta.delvilkår.let {
-                    DelvilkårAktivitetDto(
-                        lønnet = VurderingDto(it.lønnet.svar),
-                    )
-                }
+                is DelvilkårAktivitet -> DelvilkårAktivitetDto(
+                    lønnet = VurderingDto(delvilkår.lønnet.svar),
+                )
             }
             return LagreVilkårperiode(
                 behandlingId = behandlingId,
@@ -909,9 +906,27 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             } returns YtelsePerioderDto(
                 perioder = listOf(
                     YtelsePeriode(TypeYtelsePeriode.AAP, now(), now(), aapErFerdigAvklart = false),
-                    YtelsePeriode(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), aapErFerdigAvklart = null, EnsligForsørgerStønadstypeKontrakter.BARNETILSYN),
-                    YtelsePeriode(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), aapErFerdigAvklart = null, EnsligForsørgerStønadstypeKontrakter.SKOLEPENGER),
-                    YtelsePeriode(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), aapErFerdigAvklart = null, EnsligForsørgerStønadstypeKontrakter.OVERGANGSSTØNAD),
+                    YtelsePeriode(
+                        TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                        now(),
+                        now(),
+                        aapErFerdigAvklart = null,
+                        EnsligForsørgerStønadstypeKontrakter.BARNETILSYN,
+                    ),
+                    YtelsePeriode(
+                        TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                        now(),
+                        now(),
+                        aapErFerdigAvklart = null,
+                        EnsligForsørgerStønadstypeKontrakter.SKOLEPENGER,
+                    ),
+                    YtelsePeriode(
+                        TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                        now(),
+                        now(),
+                        aapErFerdigAvklart = null,
+                        EnsligForsørgerStønadstypeKontrakter.OVERGANGSSTØNAD,
+                    ),
                 ),
                 hentetInformasjon = emptyList(),
             )

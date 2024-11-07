@@ -7,12 +7,22 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktiv
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode.Vurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårOgFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarnType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeVurderinger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -34,19 +44,22 @@ object VilkårperiodeTestUtil {
         slettetKommentar: String? = null,
         forrigeVilkårperiodeId: UUID? = null,
         status: Vilkårstatus = Vilkårstatus.NY,
-    ) = Vilkårperiode(
+    ) = GeneriskVilkårperiode(
         behandlingId = behandlingId,
         resultat = resultat,
         slettetKommentar = slettetKommentar,
         forrigeVilkårperiodeId = forrigeVilkårperiodeId,
         status = status,
-        vilkårOgFakta = VilkårOgFakta(
-            fom = fom,
-            tom = tom,
-            type = type,
-            delvilkår = delvilkår,
-            begrunnelse = begrunnelse,
-            aktivitetsdager = null,
+        fom = fom,
+        tom = tom,
+        type = type,
+        begrunnelse = begrunnelse,
+        faktaOgVurdering = MålgruppeTilsynBarn(
+            type = MålgruppeTilsynBarnType.entries.single { it.målgruppeType == type },
+            vurderinger = MålgruppeVurderinger(
+                medlemskap = delvilkår.medlemskap,
+                dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
+            ),
         ),
     )
 
@@ -83,19 +96,33 @@ object VilkårperiodeTestUtil {
         resultat: ResultatVilkårperiode = ResultatVilkårperiode.OPPFYLT,
         slettetKommentar: String? = null,
         status: Vilkårstatus = Vilkårstatus.NY,
-    ) = Vilkårperiode(
+    ) = GeneriskVilkårperiode(
         behandlingId = behandlingId,
         resultat = resultat,
         slettetKommentar = slettetKommentar,
         status = status,
-        vilkårOgFakta = VilkårOgFakta(
-            type = type,
-            fom = fom,
-            tom = tom,
-            delvilkår = delvilkår,
-            begrunnelse = begrunnelse,
-            aktivitetsdager = aktivitetsdager,
-        ),
+        fom = fom,
+        tom = tom,
+        type = type,
+        begrunnelse = begrunnelse,
+        faktaOgVurdering = when (type) {
+            AktivitetType.TILTAK -> TiltakTilsynBarn(
+                vurderinger = VurderingTiltakTilsynBarn(
+                    lønnet = delvilkår.lønnet,
+                ),
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
+            )
+
+            AktivitetType.UTDANNING -> UtdanningTilsynBarn(
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
+            )
+
+            AktivitetType.REELL_ARBEIDSSØKER -> ReellArbeidsøkerTilsynBarn(
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
+            )
+
+            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
+        },
     )
 
     fun delvilkårAktivitet(
@@ -148,21 +175,45 @@ object VilkårperiodeTestUtil {
         kildeId = kildeId,
     )
 
-    fun Vilkårperiode.medVilkårOgFakta(
-        fom: LocalDate = this.vilkårOgFakta.fom,
-        tom: LocalDate = this.vilkårOgFakta.tom,
-        begrunnelse: String? = this.vilkårOgFakta.begrunnelse,
-        delvilkår: DelvilkårVilkårperiode = this.vilkårOgFakta.delvilkår,
-        aktivitetsdager: Int? = this.vilkårOgFakta.aktivitetsdager,
+    fun Vilkårperiode.medAktivitetsdager(
+        aktivitetsdager: Int,
     ): Vilkårperiode {
-        return this.copy(
-            vilkårOgFakta = this.vilkårOgFakta.copy(
-                fom = fom,
-                tom = tom,
-                begrunnelse = begrunnelse,
-                delvilkår = delvilkår,
-                aktivitetsdager = aktivitetsdager,
-            ),
-        )
+        val fakta = faktaOgVurdering.fakta
+        require(fakta is FaktaAktivitetTilsynBarn)
+        val nyFakta = fakta.copy(aktivitetsdager = aktivitetsdager)
+
+        return when (faktaOgVurdering) {
+            is TiltakTilsynBarn -> withTypeOrThrow<TiltakTilsynBarn>()
+                .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
+
+            is UtdanningTilsynBarn -> withTypeOrThrow<UtdanningTilsynBarn>()
+                .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
+
+            is ReellArbeidsøkerTilsynBarn -> withTypeOrThrow<ReellArbeidsøkerTilsynBarn>()
+                .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
+
+            else -> error("Har ikke aktivitetsdager på type ${faktaOgVurdering::class}")
+        }
+    }
+
+    fun Vilkårperiode.medVurdering(
+        delvilkår: DelvilkårVilkårperiode,
+    ): Vilkårperiode {
+        return when (delvilkår) {
+            is DelvilkårAktivitet -> {
+                val nyVurdering = VurderingTiltakTilsynBarn(lønnet = delvilkår.lønnet)
+
+                withTypeOrThrow<TiltakTilsynBarn>()
+                    .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = nyVurdering)) }
+            }
+            is DelvilkårMålgruppe -> {
+                val nyVurdering = MålgruppeVurderinger(
+                    medlemskap = delvilkår.medlemskap,
+                    dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
+                )
+                withTypeOrThrow<MålgruppeTilsynBarn>()
+                    .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = nyVurdering)) }
+            }
+        }
     }
 }

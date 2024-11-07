@@ -7,7 +7,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medVilkårOgFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurdering
@@ -114,14 +115,14 @@ class VilkårperiodeRevurderFraValideringTest {
                 val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.minusDays(2), aktivitetsdager = 1)
                 endringUtenRevurderFra(
                     eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.medVilkårOgFakta(aktivitetsdager = 2),
+                    eksisterendeVilkårperiode.medAktivitetsdager(aktivitetsdager = 2),
                 )
             }
             assertDoesNotThrow {
                 val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.plusDays(1), aktivitetsdager = 1)
                 endringUtenRevurderFra(
                     eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.medVilkårOgFakta(aktivitetsdager = 2),
+                    eksisterendeVilkårperiode.medAktivitetsdager(aktivitetsdager = 2),
                 )
             }
         }
@@ -136,7 +137,7 @@ class VilkårperiodeRevurderFraValideringTest {
                 listOf(revurderFra.minusDays(1), revurderFra, revurderFra.plusDays(1)).forEach { nyttTom ->
                     endringMedRevurderFra(
                         eksisterendeVilkårperiode,
-                        eksisterendeVilkårperiode.medVilkårOgFakta(tom = nyttTom),
+                        eksisterendeVilkårperiode.copy(tom = nyttTom),
                     )
                 }
             }
@@ -151,7 +152,7 @@ class VilkårperiodeRevurderFraValideringTest {
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.medVilkårOgFakta(tom = revurderFra.minusDays(2)),
+                    eksisterendeVilkårperiode.copy(tom = revurderFra.minusDays(2)),
                 )
             }.hasMessageContaining("Ugyldig endring på periode som begynner(01.12.2023) før revurderingsdato(01.01.2024)")
         }
@@ -166,9 +167,9 @@ class VilkårperiodeRevurderFraValideringTest {
                 resultat = ResultatVilkårperiode.OPPFYLT,
             )
             listOf<(Vilkårperiode) -> Vilkårperiode>(
-                { it.medVilkårOgFakta(aktivitetsdager = 2) },
+                { it.medAktivitetsdager(aktivitetsdager = 2) },
                 { it.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT) },
-                { it.medVilkårOgFakta(delvilkår = delvilkårAktivitet(lønnet = vurdering(SvarJaNei.JA))) },
+                { it.medVurdering(delvilkår = delvilkårAktivitet(lønnet = vurdering(SvarJaNei.JA))) },
             ).forEach { endreVilkårperiode ->
                 assertThatThrownBy {
                     endringMedRevurderFra(
@@ -188,7 +189,7 @@ class VilkårperiodeRevurderFraValideringTest {
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.medVilkårOgFakta(fom = revurderFra.minusDays(2)),
+                    eksisterendeVilkårperiode.copy(fom = revurderFra.minusDays(2)),
                 )
             }.hasMessageContaining("Kan ikke sette fom før revurderingsdato")
         }

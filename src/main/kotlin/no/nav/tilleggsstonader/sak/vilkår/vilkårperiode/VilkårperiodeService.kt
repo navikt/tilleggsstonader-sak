@@ -23,13 +23,14 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårOgFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.mapFaktaOgVurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
@@ -58,7 +59,6 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import kotlin.collections.sortedWith
 
 @Service
 class VilkårperiodeService(
@@ -246,21 +246,17 @@ class VilkårperiodeService(
 
         val resultatEvaluering = evaulerVilkårperiode(vilkårperiode.type, vilkårperiode.delvilkår)
 
-        val vilkårOgFakta = VilkårOgFakta(
-            fom = vilkårperiode.fom,
-            tom = vilkårperiode.tom,
-            type = vilkårperiode.type,
-            delvilkår = resultatEvaluering.delvilkår,
-            begrunnelse = vilkårperiode.begrunnelse,
-            aktivitetsdager = vilkårperiode.aktivitetsdager,
-        )
         return vilkårperiodeRepository.insert(
-            Vilkårperiode(
+            GeneriskVilkårperiode(
                 behandlingId = vilkårperiode.behandlingId,
-                vilkårOgFakta = vilkårOgFakta,
                 resultat = resultatEvaluering.resultat,
                 status = Vilkårstatus.NY,
                 kildeId = vilkårperiode.kildeId,
+                type = vilkårperiode.type,
+                faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode, resultatEvaluering),
+                fom = vilkårperiode.fom,
+                tom = vilkårperiode.tom,
+                begrunnelse = vilkårperiode.begrunnelse,
             ),
         )
     }
@@ -325,14 +321,7 @@ class VilkårperiodeService(
 
         val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.vilkårOgFakta.type, vilkårperiode.delvilkår)
         val oppdatert = eksisterendeVilkårperiode.medVilkårOgVurdering(
-            VilkårOgFakta(
-                type = eksisterendeVilkårperiode.vilkårOgFakta.type,
-                begrunnelse = vilkårperiode.begrunnelse,
-                fom = vilkårperiode.fom,
-                tom = vilkårperiode.tom,
-                delvilkår = resultatEvaluering.delvilkår,
-                aktivitetsdager = vilkårperiode.aktivitetsdager,
-            ),
+            mapFaktaOgVurderingDto(vilkårperiode, resultatEvaluering),
             resultat = resultatEvaluering.resultat,
         )
 
