@@ -56,14 +56,20 @@ data class FaktaAktivitetTilsynBarn(
 
 sealed interface TypeFaktaOgVurderingTilsynBarn : TypeFaktaOgVurdering
 
-enum class AktivitetTilsynBarnType(val aktivitetType: AktivitetType) : TypeFaktaOgVurderingTilsynBarn {
+enum class AktivitetTilsynBarnType(
+    override val vilkårperiodeType: AktivitetType,
+) : TypeFaktaOgVurderingTilsynBarn {
+
     UTDANNING_TILSYN_BARN(AktivitetType.UTDANNING),
     TILTAK_TILSYN_BARN(AktivitetType.TILTAK),
     REELL_ARBEIDSSØKER_TILSYN_BARN(AktivitetType.REELL_ARBEIDSSØKER),
     INGEN_AKTIVITET_TILSYN_BARN(AktivitetType.INGEN_AKTIVITET),
 }
 
-enum class MålgruppeTilsynBarnType(val målgruppeType: MålgruppeType) : TypeFaktaOgVurderingTilsynBarn {
+enum class MålgruppeTilsynBarnType(
+    override val vilkårperiodeType: MålgruppeType,
+) : TypeFaktaOgVurderingTilsynBarn {
+
     AAP_TILSYN_BARN(MålgruppeType.AAP),
     OMSTILLINGSSTØNAD_TILSYN_BARN(MålgruppeType.OMSTILLINGSSTØNAD),
     OVERGANGSSTØNAD_TILSYN_BARN(MålgruppeType.OVERGANGSSTØNAD),

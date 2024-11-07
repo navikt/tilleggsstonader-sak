@@ -1,3 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
-sealed interface TypeFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+
+sealed interface TypeFaktaOgVurdering {
+    val vilkårperiodeType: VilkårperiodeType
+}

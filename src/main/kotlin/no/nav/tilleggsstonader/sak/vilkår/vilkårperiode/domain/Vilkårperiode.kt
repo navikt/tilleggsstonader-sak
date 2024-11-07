@@ -132,6 +132,10 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         // TODO valider kombinasjon av type og type og FaktaOgVurdering.type
         validatePeriode()
         validerSlettefelter()
+
+        feilHvis(faktaOgVurdering.type.vilkårperiodeType != type) {
+            "Ugyldig kombinasjon - type($type) må være lik faktaOgVurdering($faktaOgVurdering)"
+        }
     }
 
     val vilkårOgFakta: VilkårOgFakta by lazy { mapTilVilkårFakta() }

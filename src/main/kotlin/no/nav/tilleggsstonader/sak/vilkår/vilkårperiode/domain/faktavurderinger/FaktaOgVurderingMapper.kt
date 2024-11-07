@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
@@ -31,7 +32,7 @@ fun mapFaktaOgVurdering(vilkårperiode: Vilkårperiode): FaktaOgVurdering = with
         )
 
         is MålgruppeType -> MålgruppeTilsynBarn(
-            type = MålgruppeTilsynBarnType.entries.single { it.målgruppeType == type },
+            type = MålgruppeTilsynBarnType.entries.single { it.vilkårperiodeType == type },
             vurderinger = MålgruppeVurderinger(
                 medlemskap = (delvilkår as DelvilkårMålgruppe).medlemskap,
                 dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
@@ -67,7 +68,7 @@ fun mapFaktaOgVurderingDto(vilkårperiode: LagreVilkårperiode, resultatEvalueri
             val resultatEvaluering = EvalueringMålgruppe.utledResultat(vilkårperiode.type, vilkårperiode.delvilkår)
             require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
             MålgruppeTilsynBarn(
-                type = MålgruppeTilsynBarnType.entries.single { it.målgruppeType == vilkårperiode.type },
+                type = MålgruppeTilsynBarnType.entries.single { it.vilkårperiodeType == vilkårperiode.type },
                 vurderinger = MålgruppeVurderinger(
                     medlemskap = resultatEvaluering.delvilkår.medlemskap,
                     dekketAvAnnetRegelverk = resultatEvaluering.delvilkår.dekketAvAnnetRegelverk,
