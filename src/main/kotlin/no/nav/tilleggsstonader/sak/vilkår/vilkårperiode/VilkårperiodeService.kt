@@ -321,7 +321,10 @@ class VilkårperiodeService(
 
         val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.vilkårOgFakta.type, vilkårperiode.delvilkår)
         val oppdatert = eksisterendeVilkårperiode.medVilkårOgVurdering(
-            mapFaktaOgVurderingDto(vilkårperiode, resultatEvaluering),
+            fom = vilkårperiode.fom,
+            tom = vilkårperiode.tom,
+            begrunnelse = vilkårperiode.begrunnelse,
+            faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode, resultatEvaluering),
             resultat = resultatEvaluering.resultat,
         )
 

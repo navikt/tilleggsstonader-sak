@@ -174,6 +174,9 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         }
         @Suppress("UNCHECKED_CAST")
         return this.copy(
+            fom = fom,
+            tom = tom,
+            begrunnelse = begrunnelse,
             faktaOgVurdering = faktaOgVurdering as T,
             status = nyStatus,
             resultat = resultat,
