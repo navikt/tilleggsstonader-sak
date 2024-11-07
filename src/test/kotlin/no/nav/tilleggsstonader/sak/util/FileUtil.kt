@@ -6,6 +6,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.isDirectory
 
 object FileUtil {
     fun readFile(filnavn: String): String =
@@ -15,6 +16,11 @@ object FileUtil {
     fun listFiles(path: String): List<Path> {
         val uri = FileUtil::class.java.classLoader.getResource(path)!!.toURI()
         return Files.list(Paths.get(uri)).map { it.fileName }.toList()
+    }
+
+    fun listDir(path: String): List<Path> {
+        val uri = FileUtil::class.java.classLoader.getResource(path)!!.toURI()
+        return Files.list(Paths.get(uri)).filter { it.isDirectory() }.map { it.fileName }.toList()
     }
 
     /**

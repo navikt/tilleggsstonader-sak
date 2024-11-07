@@ -1,0 +1,12 @@
+{
+  "type": "TILTAK_TILSYN_BARN",
+  "fakta": {
+    "aktivitetsdager": 3
+  },
+  "vurderinger": {
+    "lønnet": {
+      "svar": "NEI",
+      "resultat": "OPPFYLT"
+    }
+  }
+}
