@@ -10,7 +10,7 @@ fun mapFaktaOgVurdering(vilkårperiode: VilkårperiodeOld<*>): FaktaOgVurdering 
     return when (this.type) {
         AktivitetType.TILTAK -> TiltakTilsynBarn(
             fakta = FaktaAktivitetTilsynBarn(this.vilkårOgFakta.aktivitetsdager!!),
-            vurderinger = TiltakTilsynBarnVurdering(lønnet = (this.vilkårOgFakta.delvilkår as DelvilkårAktivitet).lønnet),
+            vurderinger = VurderingTiltakTilsynBarn(lønnet = (this.vilkårOgFakta.delvilkår as DelvilkårAktivitet).lønnet),
             fom = fom,
             tom = tom,
             begrunnelse = this.vilkårOgFakta.begrunnelse,
@@ -32,12 +32,14 @@ fun mapFaktaOgVurdering(vilkårperiode: VilkårperiodeOld<*>): FaktaOgVurdering 
         )
 
         AktivitetType.INGEN_AKTIVITET -> TomFaktaOgVurdering(
+            type = AktivitetTilsynBarnType.INGEN_AKTIVITET_TILSYN_BARN,
             fom = fom,
             tom = tom,
         )
 
         is MålgruppeType -> MålgruppeTilsynBarn(
-            vurderinger = MålgruppeVurderingerTilsynBarn(
+            type = MålgruppeTilsynBarnType.entries.single { it.målgruppeType == this.type },
+            vurderinger = MålgruppeVurderinger(
                 medlemskap = (this.vilkårOgFakta.delvilkår as DelvilkårMålgruppe).medlemskap,
                 dekketAvAnnetRegelverk = this.vilkårOgFakta.delvilkår.dekketAvAnnetRegelverk,
             ),
