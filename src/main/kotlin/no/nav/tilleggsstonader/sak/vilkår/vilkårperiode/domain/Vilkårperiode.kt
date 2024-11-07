@@ -8,9 +8,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.mapFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -104,36 +101,10 @@ data class VilkårOgFakta(
 
 typealias Vilkårperiode = VilkårperiodeOld<FaktaOgVurdering>
 
-inline fun <reified T : FaktaOgVurdering> List<VilkårperiodeOld<*>>.ofType(): List<VilkårperiodeOld<T>> {
-    @Suppress("UNCHECKED_CAST")
-    return this.filter { it.faktaOgVurderingTypet is T } as List<VilkårperiodeOld<T>>
-}
 
-fun main() {
-    val vilkårOgFakta = VilkårOgFakta(
-        type = AktivitetType.TILTAK,
-        fom = LocalDate.now(),
-        tom = LocalDate.now(),
-        begrunnelse = "",
-        delvilkår = DelvilkårAktivitet(
-            lønnet = DelvilkårVilkårperiode.Vurdering(SvarJaNei.NEI, resultat = ResultatDelvilkårperiode.OPPFYLT),
-        ),
-        aktivitetsdager = 5,
-    )
-    val list = listOf(
-        VilkårperiodeOld<FaktaOgVurdering>(
-            id = UUID.randomUUID(),
-            behandlingId = BehandlingId.random(),
-            resultat = ResultatVilkårperiode.IKKE_VURDERT,
-            vilkårOgFakta = vilkårOgFakta,
-        ),
-    )
-
-    println(list.ofType<TiltakTilsynBarn>())
-    println(list.ofType<UtdanningTilsynBarn>())
-    println(list.ofType<MålgruppeTilsynBarn>())
-}
-
+/**
+ *
+ */
 @Table("vilkar_periode")
 data class VilkårperiodeOld<T : FaktaOgVurdering>(
     @Id

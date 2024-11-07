@@ -2,12 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
-import java.time.LocalDate
 
 /**
  * Ønsket å legge json-spesifike saker i en egen fil for å unngå at de andre filene forsøples.
@@ -35,37 +29,3 @@ import java.time.LocalDate
     JsonSubTypes.Type(MålgruppeTilsynBarn::class, name = "INGEN_MÅLGRUPPE_TILSYN_BARN"),
 )
 sealed interface FaktaOgVurderingJson
-
-/*
-private val typer: Map<String, TypeFaktaOgVurdering> =
-    listOf(
-        AktivitetTilsynBarnType.entries,
-        MålgruppeTilsynBarnType.entries
-    ).flatten().associateBy { it.name }
-
-class TypeFaktaOgVurderingDeserializer : JsonDeserializer<TypeFaktaOgVurdering>() {
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): TypeFaktaOgVurdering {
-        return typer[p.text] ?: error("Finner ikke mapping for ${p.text}")
-    }
-}
-
- */
-
-fun main() {
-    val målgruppe = MålgruppeTilsynBarn(
-        type = MålgruppeTilsynBarnType.AAP_TILSYN_BARN,
-        vurderinger = MålgruppeVurderinger(
-            medlemskap = DelvilkårVilkårperiode.Vurdering(SvarJaNei.JA, ResultatDelvilkårperiode.OPPFYLT),
-            dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(SvarJaNei.NEI, ResultatDelvilkårperiode.OPPFYLT),
-        ),
-        fom = LocalDate.now(),
-        tom = LocalDate.now(),
-        begrunnelse = "yolo",
-    )
-    val json = objectMapper.writeValueAsString(målgruppe)
-    val faktaOgVurdering = objectMapper.readValue<FaktaOgVurdering>(json)
-    println(json)
-    println(faktaOgVurdering)
-    println(faktaOgVurdering is MålgruppeTilsynBarn)
-    println(faktaOgVurdering is AktivitetTilsynBarn)
-}
