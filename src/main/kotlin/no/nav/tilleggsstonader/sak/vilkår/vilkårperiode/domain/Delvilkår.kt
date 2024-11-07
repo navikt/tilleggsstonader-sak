@@ -26,6 +26,9 @@ enum class SvarJaNei {
     JA,
     JA_IMPLISITT,
     NEI,
+    ;
+
+    fun harVurdert(): Boolean = this != JA_IMPLISITT
 }
 
 enum class ResultatDelvilkårperiode {

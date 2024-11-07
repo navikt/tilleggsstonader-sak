@@ -7,8 +7,13 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.TakeIfUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårFaktaMapper.mapTilVilkårFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.data.annotation.Id
@@ -28,73 +33,13 @@ interface IVilkårperiode<FAKTA_VURDERING : FaktaOgVurdering> : Periode<LocalDat
  */
 data class VilkårOgFakta(
     val type: VilkårperiodeType,
-    override val fom: LocalDate,
-    override val tom: LocalDate,
+    val fom: LocalDate,
+    val tom: LocalDate,
     val begrunnelse: String?,
     @Column("delvilkar")
     val delvilkår: DelvilkårVilkårperiode,
     val aktivitetsdager: Int?,
-) : Periode<LocalDate> {
-    init {
-        // validerPeriode? Burde Periode brukes her eller på Vilkårsvurdering?
-        validerAktivitetsdager()
-
-        when {
-            type is MålgruppeType && delvilkår is DelvilkårMålgruppe -> delvilkår.valider(begrunnelse)
-            type is AktivitetType && delvilkår is DelvilkårAktivitet -> delvilkår.valider()
-            else -> error("Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}")
-        }
-
-        validerPåkrevdBegrunnelse()
-    }
-
-    private fun validerAktivitetsdager() {
-        if (type is AktivitetType) {
-            if (type == AktivitetType.INGEN_AKTIVITET) {
-                brukerfeilHvis(aktivitetsdager != null) { "Kan ikke registrere aktivitetsdager på ingen aktivitet" }
-            } else {
-                brukerfeilHvis(aktivitetsdager !in 1..5) {
-                    "Aktivitetsdager må være et heltall mellom 1 og 5"
-                }
-            }
-        }
-
-        if (type is MålgruppeType) {
-            brukerfeilHvis(aktivitetsdager != null) { "Kan ikke registrere aktivitetsdager på målgruppe" }
-        }
-    }
-
-    private fun validerPåkrevdBegrunnelse() {
-        if (!begrunnelse.isNullOrBlank()) {
-            return
-        }
-        when (type) {
-            MålgruppeType.NEDSATT_ARBEIDSEVNE -> "Mangler begrunnelse for nedsatt arbeidsevne"
-            MålgruppeType.INGEN_MÅLGRUPPE -> "Mangler begrunnelse for ingen målgruppe"
-            MålgruppeType.SYKEPENGER_100_PROSENT -> "Mangler begrunnelse for 100% sykepenger"
-            AktivitetType.INGEN_AKTIVITET -> "Mangler begrunnelse for ingen aktivitet"
-            else -> null
-        }?.let { brukerfeil(it) }
-    }
-
-    private fun DelvilkårMålgruppe.valider(begrunnelse: String?) {
-        brukerfeilHvis((medlemskap.svar != null && medlemskap.svar != SvarJaNei.JA_IMPLISITT) && begrunnelse.isNullOrBlank()) {
-            "Mangler begrunnelse for vurdering av medlemskap"
-        }
-
-        brukerfeilHvis(dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
-            "Mangler begrunnelse for utgifter dekt av annet regelverk"
-        }
-    }
-
-    private fun DelvilkårAktivitet.valider() {
-        brukerfeilHvis(lønnet.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
-            "Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid"
-        }
-    }
-
-    private fun manglerBegrunnelse() = begrunnelse.isNullOrBlank()
-}
+)
 
 typealias Vilkårperiode = GeneriskVilkårperiode<out FaktaOgVurdering>
 
@@ -133,9 +78,54 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         validatePeriode()
         validerSlettefelter()
 
+        validerBegrunnelse()
+
         feilHvis(faktaOgVurdering.type.vilkårperiodeType != type) {
             "Ugyldig kombinasjon - type($type) må være lik faktaOgVurdering($faktaOgVurdering)"
         }
+
+        // TODO endre aktivitetsdager til value class og legg inn sjekk der
+        faktaOgVurdering.vurderinger.takeIfType<FaktaAktivitetsdager>()?.let {
+            brukerfeilHvis(it.aktivitetsdager !in 1..5) {
+                "Aktivitetsdager må være et heltall mellom 1 og 5"
+            }
+        }
+    }
+
+    private fun validerBegrunnelse() {
+        if (!manglerBegrunnelse()) {
+            return
+        }
+        validerPåkrevdBegrunnelseForType()
+        // TODO burde vi ha en valideringsmetode i vurderinger som tar inn begrunnelse?
+        faktaOgVurdering.vurderinger.takeIfType<LønnetVurdering>()?.let {
+            brukerfeilHvis(it.lønnet.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
+                "Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid"
+            }
+        }
+
+        faktaOgVurdering.vurderinger.takeIfType<DekketAvAnnetRegelverkVurdering>()?.let {
+            brukerfeilHvis(it.dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) {
+                "Mangler begrunnelse for utgifter dekt av annet regelverk"
+            }
+        }
+        faktaOgVurdering.vurderinger.takeIfType<MedlemskapVurdering>()?.let {
+            brukerfeilHvis(it.medlemskap.svar?.harVurdert() == true) {
+                "Mangler begrunnelse for vurdering av medlemskap"
+            }
+        }
+    }
+
+    private fun manglerBegrunnelse() = begrunnelse.isNullOrBlank()
+
+    private fun validerPåkrevdBegrunnelseForType() {
+        when (type) {
+            MålgruppeType.NEDSATT_ARBEIDSEVNE -> "Mangler begrunnelse for nedsatt arbeidsevne"
+            MålgruppeType.INGEN_MÅLGRUPPE -> "Mangler begrunnelse for ingen målgruppe"
+            MålgruppeType.SYKEPENGER_100_PROSENT -> "Mangler begrunnelse for 100% sykepenger"
+            AktivitetType.INGEN_AKTIVITET -> "Mangler begrunnelse for ingen aktivitet"
+            else -> null
+        }?.let { brukerfeil(it) }
     }
 
     val vilkårOgFakta: VilkårOgFakta by lazy { mapTilVilkårFakta() }
@@ -170,7 +160,13 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         )
     }
 
-    fun medVilkårOgVurdering(faktaOgVurdering: FaktaOgVurdering, resultat: ResultatVilkårperiode): GeneriskVilkårperiode<T> {
+    fun medVilkårOgVurdering(
+        fom: LocalDate,
+        tom: LocalDate,
+        begrunnelse: String?,
+        faktaOgVurdering: FaktaOgVurdering,
+        resultat: ResultatVilkårperiode,
+    ): GeneriskVilkårperiode<T> {
         val nyStatus = if (status == Vilkårstatus.NY) {
             Vilkårstatus.NY
         } else {

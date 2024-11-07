@@ -59,9 +59,14 @@ fun mapFaktaOgVurderingDto(vilkårperiode: LagreVilkårperiode, resultatEvalueri
             fakta = FaktaAktivitetTilsynBarn(vilkårperiode.aktivitetsdager!!),
         )
 
-        AktivitetType.INGEN_AKTIVITET -> TomFaktaOgVurdering(
-            type = AktivitetTilsynBarnType.INGEN_AKTIVITET_TILSYN_BARN,
-        )
+        AktivitetType.INGEN_AKTIVITET -> {
+            feilHvis(vilkårperiode.aktivitetsdager != null) {
+                "Kan ikke registrere aktivitetsdager på ingen aktivitet"
+            }
+            TomFaktaOgVurdering(
+                type = AktivitetTilsynBarnType.INGEN_AKTIVITET_TILSYN_BARN,
+            )
+        }
 
         is MålgruppeType -> {
             require(vilkårperiode.delvilkår is DelvilkårMålgruppeDto)
