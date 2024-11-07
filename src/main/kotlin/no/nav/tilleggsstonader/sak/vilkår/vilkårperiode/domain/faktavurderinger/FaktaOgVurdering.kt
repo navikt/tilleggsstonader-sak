@@ -1,6 +1,7 @@
-package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import java.time.LocalDate
 
 sealed interface FaktaOgVurdering : Periode<LocalDate> {

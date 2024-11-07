@@ -1,4 +1,10 @@
-package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
+
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeOld
 
 fun mapFaktaOgVurdering(vilkårperiode: VilkårperiodeOld<*>): FaktaOgVurdering = with(vilkårperiode) {
     return when (this.type) {
