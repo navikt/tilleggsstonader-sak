@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import java.time.LocalDate
 
 sealed interface FaktaOgVurderingTilsynBarn : FaktaOgVurdering {
     override val type: TypeFaktaOgVurderingTilsynBarn
@@ -16,9 +15,6 @@ sealed interface AktivitetTilsynBarn : FaktaOgVurderingTilsynBarn {
 data class MålgruppeTilsynBarn(
     override val type: MålgruppeTilsynBarnType,
     override val vurderinger: MålgruppeVurderinger,
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    override val begrunnelse: String?,
 ) : FaktaOgVurderingTilsynBarn {
     override val fakta: TomFakta = TomFakta
 }
@@ -26,28 +22,18 @@ data class MålgruppeTilsynBarn(
 data class TiltakTilsynBarn(
     override val fakta: FaktaAktivitetTilsynBarn,
     override val vurderinger: VurderingTiltakTilsynBarn,
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    override val begrunnelse: String?,
 ) : AktivitetTilsynBarn {
     override val type: AktivitetTilsynBarnType = AktivitetTilsynBarnType.TILTAK_TILSYN_BARN
 }
 
 data class UtdanningTilsynBarn(
     override val fakta: FaktaAktivitetTilsynBarn,
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    override val begrunnelse: String?,
 ) : AktivitetTilsynBarn {
     override val type: AktivitetTilsynBarnType = AktivitetTilsynBarnType.UTDANNING_TILSYN_BARN
     override val vurderinger: TomVurdering = TomVurdering
 }
 
-data class IngenAktivitetTilsynBarn(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    override val begrunnelse: String?,
-) : AktivitetTilsynBarn {
+data object IngenAktivitetTilsynBarn : AktivitetTilsynBarn {
     override val type: AktivitetTilsynBarnType = AktivitetTilsynBarnType.INGEN_AKTIVITET_TILSYN_BARN
     override val fakta: Fakta = TomFakta
     override val vurderinger: Vurderinger = TomVurdering
@@ -55,9 +41,6 @@ data class IngenAktivitetTilsynBarn(
 
 data class ReellArbeidsøkerTilsynBarn(
     override val fakta: FaktaAktivitetTilsynBarn,
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    override val begrunnelse: String?,
 ) : AktivitetTilsynBarn {
     override val type: AktivitetTilsynBarnType = AktivitetTilsynBarnType.REELL_ARBEIDSSØKER_TILSYN_BARN
     override val vurderinger: TomVurdering = TomVurdering

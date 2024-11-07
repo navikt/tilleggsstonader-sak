@@ -1,26 +1,18 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
-import java.time.LocalDate
 
-sealed interface FaktaOgVurdering : Periode<LocalDate>, FaktaOgVurderingJson {
+sealed interface FaktaOgVurdering : FaktaOgVurderingJson {
     val type: TypeFaktaOgVurdering
-    override val fom: LocalDate
-    override val tom: LocalDate
     val fakta: Fakta
     val vurderinger: Vurderinger
-    val begrunnelse: String?
 }
 
 data class TomFaktaOgVurdering(
     override val type: TypeFaktaOgVurdering,
-    override val fom: LocalDate,
-    override val tom: LocalDate,
 ) : FaktaOgVurdering {
     override val fakta: TomFakta = TomFakta
     override val vurderinger: TomVurdering = TomVurdering
-    override val begrunnelse: String? = null
 }
 
 data class MålgruppeVurderinger(
