@@ -15,11 +15,13 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FellesMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarnType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
@@ -54,13 +56,17 @@ object VilkårperiodeTestUtil {
         tom = tom,
         type = type,
         begrunnelse = begrunnelse,
-        faktaOgVurdering = MålgruppeTilsynBarn(
-            type = MålgruppeTilsynBarnType.entries.single { it.vilkårperiodeType == type },
-            vurderinger = MålgruppeVurderinger(
-                medlemskap = delvilkår.medlemskap,
-                dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
-            ),
-        ),
+        faktaOgVurdering = when (type) {
+            MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
+            MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
+            else -> FellesMålgruppeTilsynBarn(
+                type = MålgruppeTilsynBarnType.entries.single { it.vilkårperiodeType == type },
+                vurderinger = MålgruppeVurderinger(
+                    medlemskap = delvilkår.medlemskap,
+                    dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
+                ),
+            )
+        },
     )
 
     fun delvilkårMålgruppe(
@@ -211,7 +217,8 @@ object VilkårperiodeTestUtil {
                     medlemskap = delvilkår.medlemskap,
                     dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
                 )
-                withTypeOrThrow<MålgruppeTilsynBarn>()
+                // Ikke sikker denne virker med sykepenger og ingen målgruppe
+                withTypeOrThrow<FellesMålgruppeTilsynBarn>()
                     .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = nyVurdering)) }
             }
         }

@@ -38,11 +38,14 @@ fun mapFaktaOgVurderingDto(
             IngenAktivitetTilsynBarn
         }
 
+        MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
+        MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
+
         is MålgruppeType -> {
             require(vilkårperiode.delvilkår is DelvilkårMålgruppeDto)
             val resultatEvaluering = EvalueringMålgruppe.utledResultat(vilkårperiode.type, vilkårperiode.delvilkår)
             require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
-            MålgruppeTilsynBarn(
+            FellesMålgruppeTilsynBarn(
                 type = MålgruppeTilsynBarnType.entries.single { it.vilkårperiodeType == vilkårperiode.type },
                 vurderinger = MålgruppeVurderinger(
                     medlemskap = resultatEvaluering.delvilkår.medlemskap,

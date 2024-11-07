@@ -8,14 +8,30 @@ sealed interface FaktaOgVurderingTilsynBarn : MålgruppeFaktaOgVurdering {
     override val type: TypeFaktaOgVurderingTilsynBarn
 }
 
+sealed interface MålgruppeTilsynBarn : MålgruppeFaktaOgVurdering {
+    override val type: MålgruppeTilsynBarnType
+}
+
 sealed interface AktivitetTilsynBarn : AktivitetFaktaOgVurdering {
     override val type: AktivitetTilsynBarnType
 }
 
-data class MålgruppeTilsynBarn(
+data class FellesMålgruppeTilsynBarn(
     override val type: MålgruppeTilsynBarnType,
     override val vurderinger: MålgruppeVurderinger,
-) : FaktaOgVurderingTilsynBarn {
+) : MålgruppeTilsynBarn {
+    override val fakta: TomFakta = TomFakta
+}
+
+data object IngenMålgruppeTilsynBarn : MålgruppeTilsynBarn {
+    override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.INGEN_MÅLGRUPPE_TILSYN_BARN
+    override val vurderinger: TomVurdering = TomVurdering
+    override val fakta: TomFakta = TomFakta
+}
+
+data object SykepengerTilsynBarn : MålgruppeTilsynBarn {
+    override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.SYKEPENGER_100_PROSENT_TILSYN_BARN
+    override val vurderinger: TomVurdering = TomVurdering
     override val fakta: TomFakta = TomFakta
 }
 

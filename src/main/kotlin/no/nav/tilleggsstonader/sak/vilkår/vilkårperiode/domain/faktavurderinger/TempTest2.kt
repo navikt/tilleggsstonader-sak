@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 
 fun main() {
-    val målgruppe = MålgruppeTilsynBarn(
+    val målgruppe = FellesMålgruppeTilsynBarn(
         type = MålgruppeTilsynBarnType.AAP_TILSYN_BARN,
         vurderinger = MålgruppeVurderinger(
             medlemskap = DelvilkårVilkårperiode.Vurdering(SvarJaNei.JA, ResultatDelvilkårperiode.OPPFYLT),

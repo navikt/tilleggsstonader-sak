@@ -3,11 +3,14 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 import no.nav.tilleggsstonader.sak.util.TakeIfUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FellesMålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TomVurdering
 
 /**
+ * TODO fjerne før merge til main
  * Temporær mapping då vilkårperiode.vilkårOgFakta fortsatt brukes rundt om i koden
  */
 object VilkårFaktaMapper {
@@ -30,16 +33,21 @@ object VilkårFaktaMapper {
                             lønnet = vurderinger.lønnet,
                         )
 
-                        else -> error("Finnes ikke")
+                        else -> error("Har ikke mapper $vurderinger")
                     }
                 }
 
-                is MålgruppeTilsynBarn -> DelvilkårMålgruppe(
+                is IngenMålgruppeTilsynBarn,
+                is SykepengerTilsynBarn,
+                -> DelvilkårMålgruppe(
+                    medlemskap = DelvilkårVilkårperiode.Vurdering(null, ResultatDelvilkårperiode.IKKE_AKTUELT),
+                    dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(null, ResultatDelvilkårperiode.IKKE_AKTUELT),
+                )
+                is FellesMålgruppeTilsynBarn -> DelvilkårMålgruppe(
                     medlemskap = faktaOgVurdering.vurderinger.medlemskap,
                     dekketAvAnnetRegelverk = faktaOgVurdering.vurderinger.dekketAvAnnetRegelverk,
                 )
-
-                else -> error("Finnes ikke")
+                else -> error("Har ikke mappet $faktaOgVurdering")
             },
             aktivitetsdager = faktaOgVurdering.fakta.takeIfType<FaktaAktivitetsdager>()?.aktivitetsdager,
         )
