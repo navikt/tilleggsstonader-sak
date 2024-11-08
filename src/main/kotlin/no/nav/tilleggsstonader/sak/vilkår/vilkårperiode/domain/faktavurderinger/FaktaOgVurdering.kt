@@ -33,7 +33,7 @@ sealed interface DekketAvAnnetRegelverkVurdering : Vurderinger {
 }
 
 sealed interface Fakta
-sealed interface FaktaAktivitetsdager {
+sealed interface FaktaAktivitetsdager : Fakta {
     val aktivitetsdager: Int
 }
 

@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.FaktaOgVurderingDelvilkårMapper.tilDelvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -18,6 +19,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDto
@@ -53,11 +56,12 @@ fun Vilkårperiode.tilDto() =
         type = this.type,
         fom = this.fom,
         tom = this.tom,
-        delvilkår = this.vilkårOgFakta.delvilkår.tilDto(),
+        delvilkår = faktaOgVurdering.tilDelvilkår().tilDto(),
         resultat = this.resultat,
         begrunnelse = this.begrunnelse,
         kilde = this.kilde,
-        aktivitetsdager = this.vilkårOgFakta.aktivitetsdager,
+        aktivitetsdager = this.faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()
+            ?.aktivitetsdager,
         slettetKommentar = this.slettetKommentar,
         sistEndret = this.sporbar.endret.endretTid,
         forrigeVilkårperiodeId = this.forrigeVilkårperiodeId,

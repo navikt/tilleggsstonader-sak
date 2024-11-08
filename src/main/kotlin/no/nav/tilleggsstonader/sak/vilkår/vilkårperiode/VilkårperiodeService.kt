@@ -317,7 +317,7 @@ class VilkårperiodeService(
             "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
         }
 
-        val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.vilkårOgFakta.type, vilkårperiode.delvilkår)
+        val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.type, vilkårperiode.delvilkår)
         val oppdatert = eksisterendeVilkårperiode.medVilkårOgVurdering(
             fom = vilkårperiode.fom,
             tom = vilkårperiode.tom,

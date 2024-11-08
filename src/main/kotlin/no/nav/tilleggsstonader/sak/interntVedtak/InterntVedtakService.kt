@@ -20,6 +20,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode.Vurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.FaktaOgVurderingDelvilkårMapper.tilDelvilkår
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode as DelvilkårVilkårperiodeDomain
@@ -108,12 +111,12 @@ class InterntVedtakService(
                 type = it.type,
                 fom = it.fom,
                 tom = it.tom,
-                delvilkår = mapDelvilkår(it.vilkårOgFakta.delvilkår),
+                delvilkår = mapDelvilkår(it.faktaOgVurdering.tilDelvilkår()),
                 kilde = it.kilde,
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
-                aktivitetsdager = it.vilkårOgFakta.aktivitetsdager,
+                aktivitetsdager = it.faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
             )
         }
     }

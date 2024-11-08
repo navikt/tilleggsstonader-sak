@@ -34,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.FaktaOgVurderingDelvilkårMapper.tilDelvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
@@ -41,6 +42,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -120,7 +123,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(vilkårperiode.kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
             assertThat(vilkårperiode.fom).isEqualTo(opprettVilkårperiode.fom)
             assertThat(vilkårperiode.tom).isEqualTo(opprettVilkårperiode.tom)
-            assertThat(vilkårperiode.vilkårOgFakta.begrunnelse).isEqualTo("begrunnelse målgruppe")
+            assertThat(vilkårperiode.begrunnelse).isEqualTo("begrunnelse målgruppe")
 
             assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
             assertThat(vilkårperiode.medlemskap.svar).isEqualTo(SvarJaNei.NEI)
@@ -143,7 +146,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(vilkårperiode.kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
             assertThat(vilkårperiode.fom).isEqualTo(opprettVilkårperiode.fom)
             assertThat(vilkårperiode.tom).isEqualTo(opprettVilkårperiode.tom)
-            assertThat(vilkårperiode.vilkårOgFakta.begrunnelse).isEqualTo("begrunnelse aktivitet")
+            assertThat(vilkårperiode.begrunnelse).isEqualTo("begrunnelse aktivitet")
 
             assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
             assertThat(vilkårperiode.lønnet.svar).isEqualTo(SvarJaNei.NEI)
@@ -388,7 +391,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThat(oppdatertPeriode.fom).isEqualTo(nyttDato)
             assertThat(oppdatertPeriode.tom).isEqualTo(nyttDato)
-            assertThat(oppdatertPeriode.vilkårOgFakta.begrunnelse).isEqualTo("Oppdatert begrunnelse")
+            assertThat(oppdatertPeriode.begrunnelse).isEqualTo("Oppdatert begrunnelse")
             assertThat(oppdatertPeriode.medlemskap.svar).isEqualTo(SvarJaNei.JA)
             assertThat(oppdatertPeriode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
         }
@@ -421,7 +424,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThat(oppdatertPeriode.fom).isEqualTo(vilkårperiode.fom)
             assertThat(oppdatertPeriode.tom).isEqualTo(vilkårperiode.tom)
-            assertThat(oppdatertPeriode.vilkårOgFakta.begrunnelse).isEqualTo("Oppdatert begrunnelse")
+            assertThat(oppdatertPeriode.begrunnelse).isEqualTo("Oppdatert begrunnelse")
             assertThat(oppdatertPeriode.medlemskap.svar).isEqualTo(SvarJaNei.NEI)
             assertThat(oppdatertPeriode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
         }
@@ -556,7 +559,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         private fun Vilkårperiode.tilOppdatering(): LagreVilkårperiode {
-            val delvilkår = this.vilkårOgFakta.delvilkår
+            val delvilkår = this.faktaOgVurdering.tilDelvilkår()
             val delvilkårDto = when (delvilkår) {
                 is DelvilkårMålgruppe -> DelvilkårMålgruppeDto(
                     medlemskap = VurderingDto(delvilkår.medlemskap.svar),
@@ -572,9 +575,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 fom = fom,
                 tom = tom,
                 delvilkår = delvilkårDto,
-                begrunnelse = vilkårOgFakta.begrunnelse,
+                begrunnelse = begrunnelse,
                 type = type,
-                aktivitetsdager = vilkårOgFakta.aktivitetsdager,
+                aktivitetsdager = faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
             )
         }
     }

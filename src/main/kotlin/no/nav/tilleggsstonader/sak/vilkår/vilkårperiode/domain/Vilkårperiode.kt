@@ -7,11 +7,11 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.util.TakeIfUtil.takeIfType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårFaktaMapper.mapTilVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
@@ -27,19 +27,6 @@ import java.util.*
 interface IVilkårperiode<FAKTA_VURDERING : FaktaOgVurdering> : Periode<LocalDate> {
     val faktaOgVurdering: FAKTA_VURDERING
 }
-
-/**
- * @param type er ikke redigerbar men settes inn her for å kunne valideres sammen med de andre delene i [VilkårOgFakta]
- */
-data class VilkårOgFakta(
-    val type: VilkårperiodeType,
-    val fom: LocalDate,
-    val tom: LocalDate,
-    val begrunnelse: String?,
-    @Column("delvilkar")
-    val delvilkår: DelvilkårVilkårperiode,
-    val aktivitetsdager: Int?,
-)
 
 typealias Vilkårperiode = GeneriskVilkårperiode<out FaktaOgVurdering>
 
@@ -85,7 +72,7 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         }
 
         // TODO endre aktivitetsdager til value class og legg inn sjekk der
-        faktaOgVurdering.vurderinger.takeIfType<FaktaAktivitetsdager>()?.let {
+        faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.let {
             brukerfeilHvis(it.aktivitetsdager !in 1..5) {
                 "Aktivitetsdager må være et heltall mellom 1 og 5"
             }
@@ -98,18 +85,18 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         }
         validerPåkrevdBegrunnelseForType()
         // TODO burde vi ha en valideringsmetode i vurderinger som tar inn begrunnelse?
-        faktaOgVurdering.vurderinger.takeIfType<LønnetVurdering>()?.let {
+        faktaOgVurdering.vurderinger.takeIfVurderinger<LønnetVurdering>()?.let {
             brukerfeilHvis(it.lønnet.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
                 "Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid"
             }
         }
 
-        faktaOgVurdering.vurderinger.takeIfType<DekketAvAnnetRegelverkVurdering>()?.let {
+        faktaOgVurdering.vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.let {
             brukerfeilHvis(it.dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) {
                 "Mangler begrunnelse for utgifter dekt av annet regelverk"
             }
         }
-        faktaOgVurdering.vurderinger.takeIfType<MedlemskapVurdering>()?.let {
+        faktaOgVurdering.vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.let {
             brukerfeilHvis(it.medlemskap.svar?.harVurdert() == true) {
                 "Mangler begrunnelse for vurdering av medlemskap"
             }
@@ -127,8 +114,6 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
             else -> null
         }?.let { brukerfeil(it) }
     }
-
-    val vilkårOgFakta: VilkårOgFakta by lazy { mapTilVilkårFakta() }
 
     private fun validerSlettefelter() {
         if (resultat == ResultatVilkårperiode.SLETTET) {
