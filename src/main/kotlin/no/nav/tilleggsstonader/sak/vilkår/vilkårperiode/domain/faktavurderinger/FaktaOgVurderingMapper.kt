@@ -5,9 +5,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.ResultatEvaluering
 
 fun mapFaktaOgVurderingDto(
@@ -49,22 +48,38 @@ fun mapFaktaOgVurderingDto(
 
         MålgruppeType.OVERGANGSSTØNAD -> {
             require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
-            OvergangssstønadTilsynBarn(
-                vurderinger = VurderingOvergangsstønad(medlemskap = resultatEvaluering.delvilkår.medlemskap),
+            require(resultatEvaluering.delvilkår.medlemskap.svar == SvarJaNei.JA_IMPLISITT)
+            require(resultatEvaluering.delvilkår.dekketAvAnnetRegelverk.svar == null)
+            OvergangssstønadTilsynBarn
+        }
+
+        MålgruppeType.AAP -> {
+            require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
+            require(resultatEvaluering.delvilkår.medlemskap.svar == SvarJaNei.JA_IMPLISITT)
+            AAPTilsynBarn(
+                vurderinger = VurderingAAP(dekketAvAnnetRegelverk = resultatEvaluering.delvilkår.dekketAvAnnetRegelverk),
             )
         }
 
-        is MålgruppeType -> {
-            require(vilkårperiode.delvilkår is DelvilkårMålgruppeDto)
-            val resultatEvaluering = EvalueringMålgruppe.utledResultat(vilkårperiode.type, vilkårperiode.delvilkår)
+        MålgruppeType.UFØRETRYGD -> {
             require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
-            NedsattArbeidsevneTilsynBarn(
-                type = MålgruppeTilsynBarnType.entries.single { it.vilkårperiodeType == vilkårperiode.type },
-                vurderinger = MålgruppeVurderinger(
-                    medlemskap = resultatEvaluering.delvilkår.medlemskap,
+            UføretrygdTilsynBarn(
+                vurderinger = VurderingUføretrygd(
                     dekketAvAnnetRegelverk = resultatEvaluering.delvilkår.dekketAvAnnetRegelverk,
+                    medlemskap = resultatEvaluering.delvilkår.medlemskap,
                 ),
             )
         }
+        MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
+            require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
+            NedsattArbeidsevneTilsynBarn(
+                vurderinger = VurderingNedsattArbeidsevne(
+                    dekketAvAnnetRegelverk = resultatEvaluering.delvilkår.dekketAvAnnetRegelverk,
+                    medlemskap = resultatEvaluering.delvilkår.medlemskap,
+                ),
+            )
+        }
+
+        MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
     }
 }

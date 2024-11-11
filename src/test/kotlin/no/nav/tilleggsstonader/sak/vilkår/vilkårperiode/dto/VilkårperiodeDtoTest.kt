@@ -1,21 +1,14 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
 import java.time.LocalDate
 
 class VilkårperiodeDtoTest {
@@ -28,38 +21,6 @@ class VilkårperiodeDtoTest {
                 tom = osloDateNow().minusDays(1),
             ).tilDto()
         }.hasMessageContaining("Til-og-med før fra-og-med")
-    }
-
-    @Nested
-    inner class MappingAvVurdering {
-
-        @ParameterizedTest
-        @EnumSource(
-            value = ResultatDelvilkårperiode::class,
-            names = ["IKKE_AKTUELT"],
-            mode = EnumSource.Mode.EXCLUDE,
-        )
-        fun `skal returnere delvilkår hvis resultat != IKKE_AKTUELT`(resultat: ResultatDelvilkårperiode) {
-            val målgruppe = målgruppe(
-                begrunnelse = if (resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) "begrunnelse" else null,
-                delvilkår = DelvilkårMålgruppe(
-                    medlemskap = DelvilkårVilkårperiode.Vurdering(
-                        svar = null,
-                        resultat = resultat,
-                    ),
-                    dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(
-                        svar = null,
-                        resultat = resultat,
-                    ),
-                ),
-            ).tilDto()
-
-            assertThat(målgruppe.medlemskap).isNotNull()
-            assertThat(målgruppe.medlemskap?.svar).isNull()
-            assertThat(målgruppe.medlemskap?.resultat).isEqualTo(resultat)
-            assertThat(målgruppe.dekketAvAnnetRegelverk).isNotNull()
-            assertThat(målgruppe.dekketAvAnnetRegelverk?.svar).isNull()
-        }
     }
 
     @Nested

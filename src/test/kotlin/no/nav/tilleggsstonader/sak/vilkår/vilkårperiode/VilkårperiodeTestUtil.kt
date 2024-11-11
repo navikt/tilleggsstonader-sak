@@ -14,10 +14,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarnType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
@@ -25,10 +27,13 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOvergangsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -68,18 +73,27 @@ object VilkårperiodeTestUtil {
                     medlemskap = delvilkår.medlemskap,
                 ),
             )
-            MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadTilsynBarn(
-                vurderinger = VurderingOvergangsstønad(
-                    medlemskap = delvilkår.medlemskap,
-                ),
+
+            MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadTilsynBarn
+            MålgruppeType.AAP -> AAPTilsynBarn(
+                vurderinger = VurderingAAP(dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk),
             )
-            else -> NedsattArbeidsevneTilsynBarn(
-                type = MålgruppeTilsynBarnType.entries.single { it.vilkårperiodeType == type },
-                vurderinger = MålgruppeVurderinger(
-                    medlemskap = delvilkår.medlemskap,
+
+            MålgruppeType.UFØRETRYGD -> UføretrygdTilsynBarn(
+                vurderinger = VurderingUføretrygd(
                     dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
+                    medlemskap = delvilkår.medlemskap,
                 ),
             )
+
+            MålgruppeType.NEDSATT_ARBEIDSEVNE -> NedsattArbeidsevneTilsynBarn(
+                vurderinger = VurderingNedsattArbeidsevne(
+                    dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
+                    medlemskap = delvilkår.medlemskap,
+                ),
+            )
+
+            MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         },
     )
 
@@ -232,9 +246,34 @@ object VilkårperiodeTestUtil {
                     medlemskap = delvilkår.medlemskap,
                     dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
                 )
-                // Ikke sikker denne virker med sykepenger og ingen målgruppe
-                withTypeOrThrow<NedsattArbeidsevneTilsynBarn>()
-                    .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = nyVurdering)) }
+                val oppdatertFaktaOgVurdering = faktaOgVurdering.let {
+                    when (it) {
+                        OvergangssstønadTilsynBarn,
+                        IngenMålgruppeTilsynBarn,
+                        SykepengerTilsynBarn,
+                        -> error("${this::class.java.simpleName} har ikke vurderinger")
+                        is AAPTilsynBarn -> it.copy(vurderinger = it.vurderinger.copy(dekketAvAnnetRegelverk = nyVurdering.dekketAvAnnetRegelverk))
+                        is NedsattArbeidsevneTilsynBarn -> it.copy(
+                            vurderinger = it.vurderinger.copy(
+                                medlemskap = nyVurdering.medlemskap,
+                                dekketAvAnnetRegelverk = nyVurdering.dekketAvAnnetRegelverk,
+                            ),
+                        )
+                        is OmstillingsstønadTilsynBarn -> it.copy(
+                            vurderinger = it.vurderinger.copy(
+                                medlemskap = nyVurdering.medlemskap,
+                            ),
+                        )
+                        is UføretrygdTilsynBarn -> it.copy(
+                            vurderinger = it.vurderinger.copy(
+                                medlemskap = nyVurdering.medlemskap,
+                            ),
+                        )
+
+                        is AktivitetFaktaOgVurdering -> error("${this::class.java.simpleName} har feil type for DelvilkårMålgruppe")
+                    }
+                }
+                withTypeOrThrow<MålgruppeFaktaOgVurdering>().copy(faktaOgVurdering = oppdatertFaktaOgVurdering)
             }
         }
     }

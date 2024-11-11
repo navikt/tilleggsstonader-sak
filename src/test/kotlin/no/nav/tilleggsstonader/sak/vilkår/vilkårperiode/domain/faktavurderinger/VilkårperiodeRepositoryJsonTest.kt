@@ -148,7 +148,9 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
                 MålgruppeTilsynBarnType.INGEN_MÅLGRUPPE_TILSYN_BARN -> IngenMålgruppeTilsynBarn::class
                 MålgruppeTilsynBarnType.OMSTILLINGSSTØNAD_TILSYN_BARN -> OmstillingsstønadTilsynBarn::class
                 MålgruppeTilsynBarnType.OVERGANGSSTØNAD_TILSYN_BARN -> OvergangssstønadTilsynBarn::class
-                else -> NedsattArbeidsevneTilsynBarn::class
+                MålgruppeTilsynBarnType.AAP_TILSYN_BARN -> AAPTilsynBarn::class
+                MålgruppeTilsynBarnType.UFØRETRYGD_TILSYN_BARN -> UføretrygdTilsynBarn::class
+                MålgruppeTilsynBarnType.NEDSATT_ARBEIDSEVNE_TILSYN_BARN -> NedsattArbeidsevneTilsynBarn::class
             }
         }
         is AktivitetTilsynBarnType -> {

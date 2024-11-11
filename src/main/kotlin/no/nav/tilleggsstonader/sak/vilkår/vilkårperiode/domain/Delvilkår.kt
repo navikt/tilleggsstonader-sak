@@ -19,6 +19,10 @@ sealed class DelvilkårVilkårperiode {
                 "Ugyldig resultat=$resultat når svar=$svar"
             }
         }
+
+        companion object {
+            val VURDERING_IMPLISITT_OPPFYLT = Vurdering(SvarJaNei.JA_IMPLISITT, ResultatDelvilkårperiode.OPPFYLT)
+        }
     }
 }
 

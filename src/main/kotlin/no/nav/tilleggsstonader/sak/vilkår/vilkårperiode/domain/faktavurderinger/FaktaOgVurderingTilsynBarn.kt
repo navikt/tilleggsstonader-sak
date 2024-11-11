@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -17,17 +16,25 @@ sealed interface AktivitetTilsynBarn : AktivitetFaktaOgVurdering, FaktaOgVurderi
     override val type: AktivitetTilsynBarnType
 }
 
-data class NedsattArbeidsevneTilsynBarn(
-    override val type: MålgruppeTilsynBarnType,
-    override val vurderinger: MålgruppeVurderinger,
+data class AAPTilsynBarn(
+    override val vurderinger: VurderingAAP,
 ) : MålgruppeTilsynBarn {
+    override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.AAP_TILSYN_BARN
     override val fakta: TomFakta = TomFakta
+}
 
-    init {
-        feilHvisIkke(type.vilkårperiodeType.gjelderNedsattArbeidsevne()) {
-            "Kan ikke opprette ${this::class.java.simpleName} for $type då type ikke er nedsatt arbeidsevne"
-        }
-    }
+data class UføretrygdTilsynBarn(
+    override val vurderinger: VurderingUføretrygd,
+) : MålgruppeTilsynBarn {
+    override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.UFØRETRYGD_TILSYN_BARN
+    override val fakta: TomFakta = TomFakta
+}
+
+data class NedsattArbeidsevneTilsynBarn(
+    override val vurderinger: VurderingNedsattArbeidsevne,
+) : MålgruppeTilsynBarn {
+    override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.NEDSATT_ARBEIDSEVNE_TILSYN_BARN
+    override val fakta: TomFakta = TomFakta
 }
 
 data class OmstillingsstønadTilsynBarn(
@@ -37,10 +44,9 @@ data class OmstillingsstønadTilsynBarn(
     override val fakta: TomFakta = TomFakta
 }
 
-data class OvergangssstønadTilsynBarn(
-    override val vurderinger: VurderingOvergangsstønad,
-) : MålgruppeTilsynBarn {
+data object OvergangssstønadTilsynBarn : MålgruppeTilsynBarn {
     override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.OVERGANGSSTØNAD_TILSYN_BARN
+    override val vurderinger: VurderingOvergangsstønad = VurderingOvergangsstønad
     override val fakta: TomFakta = TomFakta
 }
 
