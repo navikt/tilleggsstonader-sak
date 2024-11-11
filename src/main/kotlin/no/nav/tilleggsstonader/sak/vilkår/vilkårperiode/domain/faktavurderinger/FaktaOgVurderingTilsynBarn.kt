@@ -8,11 +8,11 @@ sealed interface FaktaOgVurderingTilsynBarn : MålgruppeFaktaOgVurdering {
     override val type: TypeFaktaOgVurderingTilsynBarn
 }
 
-sealed interface MålgruppeTilsynBarn : MålgruppeFaktaOgVurdering {
+sealed interface MålgruppeTilsynBarn : MålgruppeFaktaOgVurdering, FaktaOgVurderingTilsynBarn {
     override val type: MålgruppeTilsynBarnType
 }
 
-sealed interface AktivitetTilsynBarn : AktivitetFaktaOgVurdering {
+sealed interface AktivitetTilsynBarn : AktivitetFaktaOgVurdering, FaktaOgVurderingTilsynBarn {
     override val type: AktivitetTilsynBarnType
 }
 

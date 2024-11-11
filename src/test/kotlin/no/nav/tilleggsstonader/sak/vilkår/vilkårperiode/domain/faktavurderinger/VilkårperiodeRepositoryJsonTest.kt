@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.util.EnumUtil.enumName
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaVurderingerJsonFilesUtil.tilTypeFaktaOgVurderingSuffix
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -49,9 +50,13 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
         val jsonFraObj = objectMapper.convertValue<Map<String, Any>>(vilkårperiode.faktaOgVurdering).toSortedMap()
         val jsonFraFil = objectMapper.readValue<Map<String, Any>>(json).toSortedMap()
 
+        assertThat(vilkårperiode.faktaOgVurdering).isInstanceOf(forventetType(fil.typeFaktaOgVurdering()))
         assertThat(jsonFraFil).isEqualTo(jsonFraObj)
     }
 
+    /**
+     * Når man legger til nye typer kan denne generere dummy-filer som man kan legge inn riktig data i
+     */
     @Disabled
     @Test
     fun `opprett dummy-filer`() {
@@ -70,14 +75,14 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
         }
     }
 
-    private fun opprettVilkårperiode(id: UUID, type: String, json: String) {
+    private fun opprettVilkårperiode(id: UUID, type: VilkårperiodeType, json: String) {
         namedParameterJdbcTemplate.update(
             insertQuery.trimIndent(),
             mapOf(
                 "id" to id,
                 "behandlingId" to behandling.id.id,
                 "forrigeVilkårperiodeId" to null,
-                "type" to type,
+                "type" to type.tilDbType(),
                 "fom" to LocalDate.now(),
                 "tom" to LocalDate.now(),
                 "faktaOgVurdering" to json,
@@ -135,6 +140,24 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
             :kilde
         )
     """
+
+    private fun forventetType(type: TypeFaktaOgVurdering): Class<out FaktaOgVurderingTilsynBarn> = when (type) {
+        is MålgruppeTilsynBarnType -> {
+            when (type) {
+                MålgruppeTilsynBarnType.SYKEPENGER_100_PROSENT_TILSYN_BARN -> SykepengerTilsynBarn::class
+                MålgruppeTilsynBarnType.INGEN_MÅLGRUPPE_TILSYN_BARN -> IngenMålgruppeTilsynBarn::class
+                else -> FellesMålgruppeTilsynBarn::class
+            }
+        }
+        is AktivitetTilsynBarnType -> {
+            when (type) {
+                AktivitetTilsynBarnType.UTDANNING_TILSYN_BARN -> UtdanningTilsynBarn::class
+                AktivitetTilsynBarnType.TILTAK_TILSYN_BARN -> TiltakTilsynBarn::class
+                AktivitetTilsynBarnType.REELL_ARBEIDSSØKER_TILSYN_BARN -> ReellArbeidsøkerTilsynBarn::class
+                AktivitetTilsynBarnType.INGEN_AKTIVITET_TILSYN_BARN -> IngenAktivitetTilsynBarn::class
+            }
+        }
+    }.java
 
     companion object {
         @JvmStatic

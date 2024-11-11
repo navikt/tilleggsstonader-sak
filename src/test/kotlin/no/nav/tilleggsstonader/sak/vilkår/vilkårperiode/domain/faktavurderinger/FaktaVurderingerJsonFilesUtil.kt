@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.util.EnumUtil.enumName
 import no.nav.tilleggsstonader.sak.util.FileUtil
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
 import kotlin.io.path.name
 
 object FaktaVurderingerJsonFilesUtil {
@@ -38,9 +41,18 @@ object FaktaVurderingerJsonFilesUtil {
          * Forventer at alle mapper har strukturen
          * /<Stønadstype>/<Type>_<Stønadstype>.json, der vi henter ut <Type>
          */
-        fun typeVilkårperiode(): String {
+        fun typeVilkårperiode(): VilkårperiodeType {
             val stønadstype = dirPath.substringAfterLast("/")
-            return fileName.substringBefore("_$stønadstype")
+            val type = fileName.substringBefore("_$stønadstype")
+            return vilkårperiodetyper[type]
+                ?: error("Finner ikke VilkårperiodeType=$type")
+        }
+
+        fun typeFaktaOgVurdering(): TypeFaktaOgVurdering {
+            val type = fileName.substringBefore(".")
+            return alleEnumTyperFaktaOgVurdering
+                .single { it.second.enumName() == type }
+                .second
         }
 
         override fun toString(): String {

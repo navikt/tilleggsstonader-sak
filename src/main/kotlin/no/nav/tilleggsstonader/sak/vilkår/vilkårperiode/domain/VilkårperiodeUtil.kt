@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Fakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 
 object VilkårperiodeUtil {
@@ -22,5 +21,4 @@ object VilkårperiodeUtil {
         @Suppress("UNCHECKED_CAST")
         return this as GeneriskVilkårperiode<T>
     }
-
 }
