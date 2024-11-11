@@ -44,6 +44,14 @@ class TilsynBarnVedtakController(
         lagreVedtak(behandlingId, vedtak.tilDto())
     }
 
+    @PostMapping("{behandlingId}/opphor")
+    fun opphør(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: AvslagRequest,
+    ) {
+        lagreVedtak(behandlingId, vedtak.tilDto())
+    }
+
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,

@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 
 @Service
 class TilsynBarnBeregnYtelseSteg(
@@ -40,6 +41,7 @@ class TilsynBarnBeregnYtelseSteg(
         when (vedtak) {
             is InnvilgelseTilsynBarnDto -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
             is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
+            is OpphørTilsynBarnDto -> TODO()
         }
         /*
         Funksjonalitet som mangler:

@@ -31,6 +31,8 @@ class TilsynBarnVedtakService(
                 årsakerAvslag = vedtak.årsakerAvslag?.årsaker ?: error("Mangler årsak for avslag"),
                 begrunnelse = vedtak.avslagBegrunnelse ?: error("Mangler begrunnelse i avslag"),
             )
+
+            TypeVedtak.OPPHØR -> TODO()
         }
     }
 }

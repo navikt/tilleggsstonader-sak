@@ -39,6 +39,8 @@ data class VedtakTilsynBarn(
                 require(årsakerAvslag != null && årsakerAvslag.årsaker.isNotEmpty()) { "Må velge minst en årsak for avslag" }
                 require(avslagBegrunnelse != null) { "Avslag må begrunnes" }
             }
+
+            TypeVedtak.OPPHØR -> TODO()
         }
     }
 }
