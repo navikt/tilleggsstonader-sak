@@ -15,15 +15,19 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FellesMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarnType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeVurderinger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOvergangsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
@@ -59,7 +63,17 @@ object VilkårperiodeTestUtil {
         faktaOgVurdering = when (type) {
             MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
             MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
-            else -> FellesMålgruppeTilsynBarn(
+            MålgruppeType.OMSTILLINGSSTØNAD -> OmstillingsstønadTilsynBarn(
+                vurderinger = VurderingOmstillingsstønad(
+                    medlemskap = delvilkår.medlemskap,
+                ),
+            )
+            MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadTilsynBarn(
+                vurderinger = VurderingOvergangsstønad(
+                    medlemskap = delvilkår.medlemskap,
+                ),
+            )
+            else -> NedsattArbeidsevneTilsynBarn(
                 type = MålgruppeTilsynBarnType.entries.single { it.vilkårperiodeType == type },
                 vurderinger = MålgruppeVurderinger(
                     medlemskap = delvilkår.medlemskap,
@@ -212,13 +226,14 @@ object VilkårperiodeTestUtil {
                 withTypeOrThrow<TiltakTilsynBarn>()
                     .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = nyVurdering)) }
             }
+
             is DelvilkårMålgruppe -> {
                 val nyVurdering = MålgruppeVurderinger(
                     medlemskap = delvilkår.medlemskap,
                     dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
                 )
                 // Ikke sikker denne virker med sykepenger og ingen målgruppe
-                withTypeOrThrow<FellesMålgruppeTilsynBarn>()
+                withTypeOrThrow<NedsattArbeidsevneTilsynBarn>()
                     .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(vurderinger = nyVurdering)) }
             }
         }

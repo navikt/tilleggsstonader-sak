@@ -18,17 +18,17 @@ fun mapFaktaOgVurderingDto(
         AktivitetType.TILTAK -> {
             require(resultatEvaluering.delvilkår is DelvilkårAktivitet)
             TiltakTilsynBarn(
-                fakta = FaktaAktivitetTilsynBarn(vilkårperiode.aktivitetsdager!!),
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = vilkårperiode.aktivitetsdager!!),
                 vurderinger = VurderingTiltakTilsynBarn(lønnet = resultatEvaluering.delvilkår.lønnet),
             )
         }
 
         AktivitetType.UTDANNING -> UtdanningTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(vilkårperiode.aktivitetsdager!!),
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = vilkårperiode.aktivitetsdager!!),
         )
 
         AktivitetType.REELL_ARBEIDSSØKER -> ReellArbeidsøkerTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(vilkårperiode.aktivitetsdager!!),
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = vilkårperiode.aktivitetsdager!!),
         )
 
         AktivitetType.INGEN_AKTIVITET -> {
@@ -43,13 +43,14 @@ fun mapFaktaOgVurderingDto(
         MålgruppeType.OMSTILLINGSSTØNAD -> {
             require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
             OmstillingsstønadTilsynBarn(
-                vurderinger = VurderingOmstillingsstønad(resultatEvaluering.delvilkår.medlemskap),
+                vurderinger = VurderingOmstillingsstønad(medlemskap = resultatEvaluering.delvilkår.medlemskap),
             )
         }
+
         MålgruppeType.OVERGANGSSTØNAD -> {
             require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
             OvergangssstønadTilsynBarn(
-                vurderinger = VurderingOvergangsstønad(resultatEvaluering.delvilkår.medlemskap),
+                vurderinger = VurderingOvergangsstønad(medlemskap = resultatEvaluering.delvilkår.medlemskap),
             )
         }
 
@@ -57,7 +58,7 @@ fun mapFaktaOgVurderingDto(
             require(vilkårperiode.delvilkår is DelvilkårMålgruppeDto)
             val resultatEvaluering = EvalueringMålgruppe.utledResultat(vilkårperiode.type, vilkårperiode.delvilkår)
             require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
-            FellesMålgruppeTilsynBarn(
+            NedsattArbeidsevneTilsynBarn(
                 type = MålgruppeTilsynBarnType.entries.single { it.vilkårperiodeType == vilkårperiode.type },
                 vurderinger = MålgruppeVurderinger(
                     medlemskap = resultatEvaluering.delvilkår.medlemskap,

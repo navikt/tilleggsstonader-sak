@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -16,11 +17,17 @@ sealed interface AktivitetTilsynBarn : AktivitetFaktaOgVurdering, FaktaOgVurderi
     override val type: AktivitetTilsynBarnType
 }
 
-data class FellesMålgruppeTilsynBarn(
+data class NedsattArbeidsevneTilsynBarn(
     override val type: MålgruppeTilsynBarnType,
     override val vurderinger: MålgruppeVurderinger,
 ) : MålgruppeTilsynBarn {
     override val fakta: TomFakta = TomFakta
+
+    init {
+        feilHvisIkke(type.vilkårperiodeType.gjelderNedsattArbeidsevne()) {
+            "Kan ikke opprette ${this::class.java.simpleName} for $type då type ikke er nedsatt arbeidsevne"
+        }
+    }
 }
 
 data class OmstillingsstønadTilsynBarn(

@@ -2,9 +2,9 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FellesMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
@@ -47,7 +47,7 @@ object FaktaOgVurderingDelvilkårMapper {
             medlemskap = this.vurderinger.medlemskap,
             dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(null, ResultatDelvilkårperiode.IKKE_AKTUELT),
         )
-        is FellesMålgruppeTilsynBarn -> DelvilkårMålgruppe(
+        is NedsattArbeidsevneTilsynBarn -> DelvilkårMålgruppe(
             medlemskap = this.vurderinger.medlemskap,
             dekketAvAnnetRegelverk = this.vurderinger.dekketAvAnnetRegelverk,
         )
