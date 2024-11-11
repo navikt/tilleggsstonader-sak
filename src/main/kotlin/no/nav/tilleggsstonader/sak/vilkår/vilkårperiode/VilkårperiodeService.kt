@@ -131,8 +131,8 @@ class VilkårperiodeService(
             "Behandlingen er ikke påbegynt. Kan ikke opprette vilkårperiode hvis man ikke er saksbehandler"
         }
 
-        val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
-        val utgangspunktDato = søknad?.mottattTidspunkt?.toLocalDate() ?: LocalDate.now()
+        val søknadMetadata = søknadService.hentSøknadMetadata(behandlingId)
+        val utgangspunktDato = søknadMetadata?.mottattTidspunkt?.toLocalDate() ?: LocalDate.now()
 
         val fom = YearMonth.from(utgangspunktDato).minusMonths(3).atDay(1)
         val tom = YearMonth.from(utgangspunktDato).plusYears(1).atEndOfMonth()
