@@ -46,8 +46,8 @@ data class VedtakTilsynBarn(
             }
 
             TypeVedtak.OPPHØR -> {
-                require(årsakerOpphør != null && årsakerOpphør.årsaker.isNotEmpty()) { "Må velge minst en årsak for avslag" }
-                require(opphørBegrunnelse != null) { "Avslag må begrunnes" }
+                require(årsakerOpphør != null && årsakerOpphør.årsaker.isNotEmpty()) { "Må velge minst en årsak for opphør" }
+                require(opphørBegrunnelse != null) { "Opphør må begrunnes" }
             }
         }
     }

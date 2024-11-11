@@ -68,10 +68,9 @@ class TilsynBarnBeregnYtelseSteg(
             VedtakTilsynBarn(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.OPPHØR,
-                vedtak = VedtaksdataTilsynBarn(
-                    utgifter = emptyMap(),
-                ),
                 beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
+                årsakerOpphør = ÅrsakOpphør.Wrapper(årsaker = vedtak.årsakerOpphør),
+                opphørBegrunnelse = vedtak.begrunnelse,
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)

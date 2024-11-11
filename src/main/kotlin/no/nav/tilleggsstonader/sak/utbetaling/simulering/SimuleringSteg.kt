@@ -25,6 +25,7 @@ class SimuleringSteg(
         when (type) {
             TypeVedtak.INNVILGELSE -> true
             TypeVedtak.AVSLAG -> false
+            TypeVedtak.OPPHØR -> true
             else -> error("Simulering støtter ikke resultat $type")
         }
 
