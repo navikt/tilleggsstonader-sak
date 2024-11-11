@@ -5,6 +5,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FellesMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TomVurdering
 
@@ -14,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
  */
 object FaktaOgVurderingDelvilkårMapper {
 
+    @Suppress("REDUNDANT_ELSE_IN_WHEN")
     fun FaktaOgVurdering.tilDelvilkår() = when (this) {
         is AktivitetTilsynBarn -> {
             val vurderinger = this.vurderinger
@@ -34,6 +37,14 @@ object FaktaOgVurderingDelvilkårMapper {
         is SykepengerTilsynBarn,
         -> DelvilkårMålgruppe(
             medlemskap = DelvilkårVilkårperiode.Vurdering(null, ResultatDelvilkårperiode.IKKE_AKTUELT),
+            dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(null, ResultatDelvilkårperiode.IKKE_AKTUELT),
+        )
+        is OmstillingsstønadTilsynBarn -> DelvilkårMålgruppe(
+            medlemskap = this.vurderinger.medlemskap,
+            dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(null, ResultatDelvilkårperiode.IKKE_AKTUELT),
+        )
+        is OvergangssstønadTilsynBarn -> DelvilkårMålgruppe(
+            medlemskap = this.vurderinger.medlemskap,
             dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(null, ResultatDelvilkårperiode.IKKE_AKTUELT),
         )
         is FellesMålgruppeTilsynBarn -> DelvilkårMålgruppe(

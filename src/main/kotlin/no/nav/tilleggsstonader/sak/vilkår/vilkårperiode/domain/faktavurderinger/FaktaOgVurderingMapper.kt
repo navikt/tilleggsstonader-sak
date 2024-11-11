@@ -40,6 +40,18 @@ fun mapFaktaOgVurderingDto(
 
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
         MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
+        MålgruppeType.OMSTILLINGSSTØNAD -> {
+            require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
+            OmstillingsstønadTilsynBarn(
+                vurderinger = VurderingOmstillingsstønad(resultatEvaluering.delvilkår.medlemskap),
+            )
+        }
+        MålgruppeType.OVERGANGSSTØNAD -> {
+            require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
+            OvergangssstønadTilsynBarn(
+                vurderinger = VurderingOvergangsstønad(resultatEvaluering.delvilkår.medlemskap),
+            )
+        }
 
         is MålgruppeType -> {
             require(vilkårperiode.delvilkår is DelvilkårMålgruppeDto)

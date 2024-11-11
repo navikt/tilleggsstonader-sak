@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
-sealed interface FaktaOgVurderingTilsynBarn : MålgruppeFaktaOgVurdering {
+sealed interface FaktaOgVurderingTilsynBarn : FaktaOgVurdering {
     override val type: TypeFaktaOgVurderingTilsynBarn
 }
 
@@ -20,6 +20,20 @@ data class FellesMålgruppeTilsynBarn(
     override val type: MålgruppeTilsynBarnType,
     override val vurderinger: MålgruppeVurderinger,
 ) : MålgruppeTilsynBarn {
+    override val fakta: TomFakta = TomFakta
+}
+
+data class OmstillingsstønadTilsynBarn(
+    override val vurderinger: VurderingOmstillingsstønad,
+) : MålgruppeTilsynBarn {
+    override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.OMSTILLINGSSTØNAD_TILSYN_BARN
+    override val fakta: TomFakta = TomFakta
+}
+
+data class OvergangssstønadTilsynBarn(
+    override val vurderinger: VurderingOvergangsstønad,
+) : MålgruppeTilsynBarn {
+    override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.OVERGANGSSTØNAD_TILSYN_BARN
     override val fakta: TomFakta = TomFakta
 }
 

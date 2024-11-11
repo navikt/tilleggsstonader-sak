@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(IngenAktivitetTilsynBarn::class, name = "INGEN_AKTIVITET_TILSYN_BARN"),
 
     JsonSubTypes.Type(FellesMålgruppeTilsynBarn::class, name = "AAP_TILSYN_BARN"),
-    JsonSubTypes.Type(FellesMålgruppeTilsynBarn::class, name = "OMSTILLINGSSTØNAD_TILSYN_BARN"),
-    JsonSubTypes.Type(FellesMålgruppeTilsynBarn::class, name = "OVERGANGSSTØNAD_TILSYN_BARN"),
+    JsonSubTypes.Type(OmstillingsstønadTilsynBarn::class, name = "OMSTILLINGSSTØNAD_TILSYN_BARN"),
+    JsonSubTypes.Type(OvergangssstønadTilsynBarn::class, name = "OVERGANGSSTØNAD_TILSYN_BARN"),
     JsonSubTypes.Type(FellesMålgruppeTilsynBarn::class, name = "NEDSATT_ARBEIDSEVNE_TILSYN_BARN"),
     JsonSubTypes.Type(FellesMålgruppeTilsynBarn::class, name = "UFØRETRYGD_TILSYN_BARN"),
     JsonSubTypes.Type(SykepengerTilsynBarn::class, name = "SYKEPENGER_100_PROSENT_TILSYN_BARN"),

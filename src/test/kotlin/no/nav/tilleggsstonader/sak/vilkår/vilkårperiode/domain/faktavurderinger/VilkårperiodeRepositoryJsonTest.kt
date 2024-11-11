@@ -146,6 +146,8 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
             when (type) {
                 MålgruppeTilsynBarnType.SYKEPENGER_100_PROSENT_TILSYN_BARN -> SykepengerTilsynBarn::class
                 MålgruppeTilsynBarnType.INGEN_MÅLGRUPPE_TILSYN_BARN -> IngenMålgruppeTilsynBarn::class
+                MålgruppeTilsynBarnType.OMSTILLINGSSTØNAD_TILSYN_BARN -> OmstillingsstønadTilsynBarn::class
+                MålgruppeTilsynBarnType.OVERGANGSSTØNAD_TILSYN_BARN -> OvergangssstønadTilsynBarn::class
                 else -> FellesMålgruppeTilsynBarn::class
             }
         }

@@ -2,10 +2,6 @@
   "type": "OMSTILLINGSSTØNAD_TILSYN_BARN",
   "fakta": {},
   "vurderinger": {
-    "dekketAvAnnetRegelverk": {
-      "svar": "NEI",
-      "resultat": "OPPFYLT"
-    },
     "medlemskap": {
       "svar": "JA",
       "resultat": "OPPFYLT"

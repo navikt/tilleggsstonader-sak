@@ -2,12 +2,8 @@
   "type": "OVERGANGSSTØNAD_TILSYN_BARN",
   "fakta": {},
   "vurderinger": {
-    "dekketAvAnnetRegelverk": {
-      "svar": "NEI",
-      "resultat": "OPPFYLT"
-    },
     "medlemskap": {
-      "svar": "JA",
+      "svar": "JA_IMPLISITT",
       "resultat": "OPPFYLT"
     }
   }

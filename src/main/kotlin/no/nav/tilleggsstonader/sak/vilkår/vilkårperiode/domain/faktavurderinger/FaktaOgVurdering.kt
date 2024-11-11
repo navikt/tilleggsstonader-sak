@@ -16,6 +16,14 @@ data class MålgruppeVurderinger(
     override val dekketAvAnnetRegelverk: DelvilkårVilkårperiode.Vurdering,
 ) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering
 
+data class VurderingOmstillingsstønad(
+    override val medlemskap: DelvilkårVilkårperiode.Vurdering,
+) : MedlemskapVurdering
+
+data class VurderingOvergangsstønad(
+    override val medlemskap: DelvilkårVilkårperiode.Vurdering,
+) : MedlemskapVurdering
+
 data object TomFakta : Fakta
 
 sealed interface Vurderinger
