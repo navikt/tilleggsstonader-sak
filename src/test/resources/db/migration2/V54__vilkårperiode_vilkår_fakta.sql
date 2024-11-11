@@ -19,6 +19,8 @@ SET fakta_og_vurdering =
 ALTER TABLE vilkar_periode
     DROP COLUMN delvilkar;
 ALTER TABLE vilkar_periode
+    DROP COLUMN aktivitetsdager;
+ALTER TABLE vilkar_periode
     ALTER COLUMN fakta_og_vurdering SET NOT NULL;
 
 /**
