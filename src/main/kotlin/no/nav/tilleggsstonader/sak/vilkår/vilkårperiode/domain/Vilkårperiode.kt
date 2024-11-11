@@ -86,20 +86,30 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         validerPåkrevdBegrunnelseForType()
         // TODO burde vi ha en valideringsmetode i vurderinger som tar inn begrunnelse?
         faktaOgVurdering.vurderinger.takeIfVurderinger<LønnetVurdering>()?.let {
+            validerIkkeAktuelt(it.lønnet.resultat)
             brukerfeilHvis(it.lønnet.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
                 "Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid"
             }
         }
 
         faktaOgVurdering.vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.let {
+            validerIkkeAktuelt(it.dekketAvAnnetRegelverk.resultat)
             brukerfeilHvis(it.dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) {
                 "Mangler begrunnelse for utgifter dekt av annet regelverk"
             }
         }
         faktaOgVurdering.vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.let {
+            validerIkkeAktuelt(it.medlemskap.resultat)
             brukerfeilHvis(it.medlemskap.svar?.harVurdert() == true) {
                 "Mangler begrunnelse for vurdering av medlemskap"
             }
+        }
+    }
+
+    // TODO fjern ikke-aktuelt i egen endring
+    private fun validerIkkeAktuelt(resultat: ResultatDelvilkårperiode) {
+        feilHvis(resultat == ResultatDelvilkårperiode.IKKE_AKTUELT) {
+            "Skal ikke mappe noe til ikke-aktuelt med ny vilkårperiode"
         }
     }
 
