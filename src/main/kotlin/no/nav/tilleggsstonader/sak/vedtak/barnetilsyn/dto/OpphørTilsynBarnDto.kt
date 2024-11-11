@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakOpphør
 
 data class OpphørTilsynBarnDto(

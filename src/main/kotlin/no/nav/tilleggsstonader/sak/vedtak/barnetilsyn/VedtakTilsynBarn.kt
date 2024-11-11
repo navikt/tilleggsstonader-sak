@@ -25,6 +25,11 @@ data class VedtakTilsynBarn(
     val årsakerAvslag: ÅrsakAvslag.Wrapper? = null,
     val avslagBegrunnelse: String? = null,
 
+    @Column("arsaker_opphor")
+    val årsakerOpphør: ÅrsakOpphør.Wrapper? = null,
+    @Column("opphor_begrunnelse")
+    val opphørBegrunnelse: String? = null,
+
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 ) {
@@ -40,7 +45,10 @@ data class VedtakTilsynBarn(
                 require(avslagBegrunnelse != null) { "Avslag må begrunnes" }
             }
 
-            TypeVedtak.OPPHØR -> TODO()
+            TypeVedtak.OPPHØR -> {
+                require(årsakerOpphør != null && årsakerOpphør.årsaker.isNotEmpty()) { "Må velge minst en årsak for avslag" }
+                require(opphørBegrunnelse != null) { "Avslag må begrunnes" }
+            }
         }
     }
 }
