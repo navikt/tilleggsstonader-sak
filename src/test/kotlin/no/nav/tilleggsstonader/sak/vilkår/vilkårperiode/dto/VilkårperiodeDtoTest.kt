@@ -60,24 +60,6 @@ class VilkårperiodeDtoTest {
             assertThat(målgruppe.dekketAvAnnetRegelverk).isNotNull()
             assertThat(målgruppe.dekketAvAnnetRegelverk?.svar).isNull()
         }
-
-        @Test
-        fun `skal returnere delvilkårsresultat IKKE_AKTUELT som vurdering=null`() {
-            val målgruppe = målgruppe(
-                delvilkår = DelvilkårMålgruppe(
-                    medlemskap = DelvilkårVilkårperiode.Vurdering(
-                        svar = null,
-                        resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
-                    ),
-                    dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(
-                        svar = null,
-                        resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
-                    ),
-                ),
-            ).tilDto()
-
-            assertThat(målgruppe.medlemskap).isNull()
-        }
     }
 
     @Nested
