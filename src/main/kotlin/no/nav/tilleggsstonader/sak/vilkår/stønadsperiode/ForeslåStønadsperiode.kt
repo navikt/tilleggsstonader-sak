@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
 
@@ -27,23 +26,28 @@ object ForeslåStønadsperiode {
             "Det finnes ingen kombinasjon av aktiviteter og målgrupper som kan brukes til å lage perioder med overlapp"
         }
 
-        val aktiviteter = slåSammenVilkårsperioderSomErLikeEtterHverandre(filtrerteVilkårperioder.aktiviteter)
-        val målgrupper = slåSammenVilkårsperioderSomErLikeEtterHverandre(filtrerteVilkårperioder.målgrupper)
+        val sammenslåtteVilkårsperioder = Vilkårperioder(
+            aktiviteter = slåSammenVilkårsperioderSomErLikeEtterHverandre(filtrerteVilkårperioder.aktiviteter),
+            målgrupper = slåSammenVilkårsperioderSomErLikeEtterHverandre(filtrerteVilkårperioder.målgrupper),
+        )
 
         brukerfeilHvis(
-            aktiviteter.size > 1 || målgrupper.size > 1,
+            sammenslåtteVilkårsperioder.aktiviteter.size > 1 || sammenslåtteVilkårsperioder.målgrupper.size > 1,
         ) {
             "Foreløpig håndterer vi kun tilfellet der målgruppe og aktivitet har ett sammenhengende overlapp."
         }
 
-        val stønadsperiode = finnOverlapp(aktiviteter.first(), målgrupper.first())
+        val stønadsperiode = finnOverlapp(
+            sammenslåtteVilkårsperioder.aktiviteter.first(),
+            sammenslåtteVilkårsperioder.målgrupper.first(),
+        )
 
         return listOf(
             StønadsperiodeDto(
                 fom = stønadsperiode.fom,
                 tom = stønadsperiode.tom,
-                målgruppe = målgrupper.first().type as MålgruppeType,
-                aktivitet = aktiviteter.first().type as AktivitetType,
+                målgruppe = sammenslåtteVilkårsperioder.målgrupper.first().type as MålgruppeType,
+                aktivitet = sammenslåtteVilkårsperioder.aktiviteter.first().type as AktivitetType,
                 status = null,
             ),
         )
@@ -90,10 +94,9 @@ object ForeslåStønadsperiode {
         }
     }
 
-    private fun slåSammenVilkårsperioderSomErLikeEtterHverandre(vilkårperioder: List<Vilkårperiode>): List<ForenkletVilkårPeriode> {
+    private fun slåSammenVilkårsperioderSomErLikeEtterHverandre(vilkårperioder: List<Vilkårperiode>): List<Vilkårperiode> {
         return vilkårperioder
             .sorted()
-            .map { ForenkletVilkårPeriode(fom = it.fom, tom = it.tom, type = it.type) }
             .mergeSammenhengende(
                 skalMerges = { v1, v2 -> v1.type == v2.type && v1.overlapperEllerPåfølgesAv(v2) },
                 merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
@@ -101,10 +104,4 @@ object ForeslåStønadsperiode {
     }
 
     private data class Stønadsperiode(val fom: LocalDate, val tom: LocalDate)
-
-    private data class ForenkletVilkårPeriode(
-        override val fom: LocalDate,
-        override val tom: LocalDate,
-        val type: VilkårperiodeType,
-    ) : Periode<LocalDate>
 }
