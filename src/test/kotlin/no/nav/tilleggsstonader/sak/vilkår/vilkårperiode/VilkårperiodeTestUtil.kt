@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
@@ -242,31 +241,27 @@ object VilkårperiodeTestUtil {
             }
 
             is DelvilkårMålgruppe -> {
-                val nyVurdering = MålgruppeVurderinger(
-                    medlemskap = delvilkår.medlemskap,
-                    dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
-                )
                 val oppdatertFaktaOgVurdering = faktaOgVurdering.let {
                     when (it) {
                         OvergangssstønadTilsynBarn,
                         IngenMålgruppeTilsynBarn,
                         SykepengerTilsynBarn,
                         -> error("${this::class.java.simpleName} har ikke vurderinger")
-                        is AAPTilsynBarn -> it.copy(vurderinger = it.vurderinger.copy(dekketAvAnnetRegelverk = nyVurdering.dekketAvAnnetRegelverk))
+                        is AAPTilsynBarn -> it.copy(vurderinger = it.vurderinger.copy(dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk))
                         is NedsattArbeidsevneTilsynBarn -> it.copy(
                             vurderinger = it.vurderinger.copy(
-                                medlemskap = nyVurdering.medlemskap,
-                                dekketAvAnnetRegelverk = nyVurdering.dekketAvAnnetRegelverk,
+                                medlemskap = delvilkår.medlemskap,
+                                dekketAvAnnetRegelverk = delvilkår.dekketAvAnnetRegelverk,
                             ),
                         )
                         is OmstillingsstønadTilsynBarn -> it.copy(
                             vurderinger = it.vurderinger.copy(
-                                medlemskap = nyVurdering.medlemskap,
+                                medlemskap = delvilkår.medlemskap,
                             ),
                         )
                         is UføretrygdTilsynBarn -> it.copy(
                             vurderinger = it.vurderinger.copy(
-                                medlemskap = nyVurdering.medlemskap,
+                                medlemskap = delvilkår.medlemskap,
                             ),
                         )
 
