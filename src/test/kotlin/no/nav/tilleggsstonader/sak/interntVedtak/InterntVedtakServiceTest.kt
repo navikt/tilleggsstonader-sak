@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import no.nav.tilleggsstonader.sak.util.FileUtil.skrivTilFil
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil
@@ -269,6 +270,14 @@ class InterntVedtakServiceTest {
         val html = lagHtmlifyClient().generateHtml(interntVedtak)
         skrivTilFil("interntVedtak/internt_vedtak.html", html)
         generatePdf(html, "interntVedtak/internt_vedtak.pdf")
+    }
+
+    @Test
+    fun `html skal være formattert for å enklere kunne sjekke diff`() {
+        val erIkkeFormatert = FileUtil.readFile("interntVedtak/internt_vedtak.html").split("\n")
+            .none { it.contains("<body") && it.contains("<div") }
+
+        assertThat(erIkkeFormatert).isTrue()
     }
 
     private fun assertStønadsperioder(stønadsperioder: List<Stønadsperiode>) {
