@@ -20,46 +20,46 @@ data class AAPTilsynBarn(
     override val vurderinger: VurderingAAP,
 ) : MålgruppeTilsynBarn {
     override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.AAP_TILSYN_BARN
-    override val fakta: TomFakta = TomFakta
+    override val fakta: IngenFakta = IngenFakta
 }
 
 data class UføretrygdTilsynBarn(
     override val vurderinger: VurderingUføretrygd,
 ) : MålgruppeTilsynBarn {
     override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.UFØRETRYGD_TILSYN_BARN
-    override val fakta: TomFakta = TomFakta
+    override val fakta: IngenFakta = IngenFakta
 }
 
 data class NedsattArbeidsevneTilsynBarn(
     override val vurderinger: VurderingNedsattArbeidsevne,
 ) : MålgruppeTilsynBarn {
     override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.NEDSATT_ARBEIDSEVNE_TILSYN_BARN
-    override val fakta: TomFakta = TomFakta
+    override val fakta: IngenFakta = IngenFakta
 }
 
 data class OmstillingsstønadTilsynBarn(
     override val vurderinger: VurderingOmstillingsstønad,
 ) : MålgruppeTilsynBarn {
     override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.OMSTILLINGSSTØNAD_TILSYN_BARN
-    override val fakta: TomFakta = TomFakta
+    override val fakta: IngenFakta = IngenFakta
 }
 
 data object OvergangssstønadTilsynBarn : MålgruppeTilsynBarn {
     override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.OVERGANGSSTØNAD_TILSYN_BARN
     override val vurderinger: VurderingOvergangsstønad = VurderingOvergangsstønad
-    override val fakta: TomFakta = TomFakta
+    override val fakta: IngenFakta = IngenFakta
 }
 
 data object IngenMålgruppeTilsynBarn : MålgruppeTilsynBarn {
     override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.INGEN_MÅLGRUPPE_TILSYN_BARN
-    override val vurderinger: TomVurdering = TomVurdering
-    override val fakta: TomFakta = TomFakta
+    override val vurderinger: IngenVurderinger = IngenVurderinger
+    override val fakta: IngenFakta = IngenFakta
 }
 
 data object SykepengerTilsynBarn : MålgruppeTilsynBarn {
     override val type: MålgruppeTilsynBarnType = MålgruppeTilsynBarnType.SYKEPENGER_100_PROSENT_TILSYN_BARN
-    override val vurderinger: TomVurdering = TomVurdering
-    override val fakta: TomFakta = TomFakta
+    override val vurderinger: IngenVurderinger = IngenVurderinger
+    override val fakta: IngenFakta = IngenFakta
 }
 
 data class TiltakTilsynBarn(
@@ -73,20 +73,20 @@ data class UtdanningTilsynBarn(
     override val fakta: FaktaAktivitetTilsynBarn,
 ) : AktivitetTilsynBarn {
     override val type: AktivitetTilsynBarnType = AktivitetTilsynBarnType.UTDANNING_TILSYN_BARN
-    override val vurderinger: TomVurdering = TomVurdering
+    override val vurderinger: IngenVurderinger = IngenVurderinger
 }
 
 data object IngenAktivitetTilsynBarn : AktivitetTilsynBarn {
     override val type: AktivitetTilsynBarnType = AktivitetTilsynBarnType.INGEN_AKTIVITET_TILSYN_BARN
-    override val fakta: Fakta = TomFakta
-    override val vurderinger: Vurderinger = TomVurdering
+    override val fakta: Fakta = IngenFakta
+    override val vurderinger: Vurderinger = IngenVurderinger
 }
 
 data class ReellArbeidsøkerTilsynBarn(
     override val fakta: FaktaAktivitetTilsynBarn,
 ) : AktivitetTilsynBarn {
     override val type: AktivitetTilsynBarnType = AktivitetTilsynBarnType.REELL_ARBEIDSSØKER_TILSYN_BARN
-    override val vurderinger: TomVurdering = TomVurdering
+    override val vurderinger: IngenVurderinger = IngenVurderinger
 }
 
 data class VurderingTiltakTilsynBarn(

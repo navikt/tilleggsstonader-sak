@@ -35,10 +35,10 @@ sealed interface TypeAktivitetOgVurdering : TypeFaktaOgVurdering {
  * Fakta, som kan inneholde ulike fakta, eks aktivitetsdager
  */
 sealed interface Fakta
-data object TomFakta : Fakta
+data object IngenFakta : Fakta
 
 /**
  * Vurderinger, som kan inneholde ulike vurderinger, eks lønnet
  */
 sealed interface Vurderinger
-data object TomVurdering : Vurderinger
+data object IngenVurderinger : Vurderinger
