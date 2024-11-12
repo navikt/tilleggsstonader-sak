@@ -2,11 +2,13 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 
-sealed interface MedlemskapVurdering : Vurderinger {
+sealed interface VurderingerMålgruppe : Vurderinger
+
+sealed interface MedlemskapVurdering : VurderingerMålgruppe {
     val medlemskap: DelvilkårVilkårperiode.Vurdering
 }
 
-sealed interface DekketAvAnnetRegelverkVurdering : Vurderinger {
+sealed interface DekketAvAnnetRegelverkVurdering : VurderingerMålgruppe {
     val dekketAvAnnetRegelverk: DelvilkårVilkårperiode.Vurdering
 }
 

@@ -24,7 +24,6 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -32,9 +31,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.FaktaOgVurderingDelvilkårMapper.tilDelvilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
@@ -52,6 +48,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.OVERGANGSSTØNAD
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.SKOLEPENGER
@@ -561,22 +558,11 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         private fun Vilkårperiode.tilOppdatering(): LagreVilkårperiode {
-            val delvilkår = this.faktaOgVurdering.tilDelvilkår()
-            val delvilkårDto = when (delvilkår) {
-                is DelvilkårMålgruppe -> DelvilkårMålgruppeDto(
-                    medlemskap = VurderingDto(delvilkår.medlemskap.svar),
-                    dekketAvAnnetRegelverk = VurderingDto(delvilkår.dekketAvAnnetRegelverk.svar),
-                )
-
-                is DelvilkårAktivitet -> DelvilkårAktivitetDto(
-                    lønnet = VurderingDto(delvilkår.lønnet.svar),
-                )
-            }
             return LagreVilkårperiode(
                 behandlingId = behandlingId,
                 fom = fom,
                 tom = tom,
-                delvilkår = delvilkårDto,
+                delvilkår = faktaOgVurdering.tilDelvilkårDto(),
                 begrunnelse = begrunnelse,
                 type = type,
                 aktivitetsdager = faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,

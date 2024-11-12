@@ -4,6 +4,8 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 
-sealed interface LønnetVurdering : Vurderinger {
+sealed interface VurderingerAktivitet : Vurderinger
+
+sealed interface LønnetVurdering : VurderingerAktivitet {
     val lønnet: DelvilkårVilkårperiode.Vurdering
 }
