@@ -57,7 +57,6 @@ class VilkårperiodeDtoTest {
             assertThat(målgruppe.dekketAvAnnetRegelverk?.svar).isEqualTo(SvarJaNei.JA)
             assertThat(målgruppe.dekketAvAnnetRegelverk?.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
         }
-
     }
 
     @Nested
