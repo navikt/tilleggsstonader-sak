@@ -10,9 +10,6 @@ spring:
     password: ${DATASOURCE_PASSWORD}
     url: ${DATASOURCE_URL}
     driver-class-name: org.postgresql.Driver
-  flyway:
-    locations:
-      - classpath:db/migration
 
 prosessering:
   fixedDelayString.in.milliseconds: 3000
