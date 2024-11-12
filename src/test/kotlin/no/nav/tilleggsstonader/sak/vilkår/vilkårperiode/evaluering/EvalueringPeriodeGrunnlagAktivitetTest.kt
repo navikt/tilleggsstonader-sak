@@ -2,10 +2,10 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringAktivitet.utledResultat
@@ -116,7 +116,7 @@ class EvalueringPeriodeGrunnlagAktivitetTest {
         lønnet: SvarJaNei? = null,
     ) = DelvilkårAktivitetDto(lønnet = VurderingDto(lønnet))
 
-    private val ResultatEvaluering.lønnet: DelvilkårVilkårperiode.Vurdering
+    private val ResultatEvaluering.lønnet: Vurdering
         get() = (this.delvilkår as DelvilkårAktivitet).lønnet
 }
 

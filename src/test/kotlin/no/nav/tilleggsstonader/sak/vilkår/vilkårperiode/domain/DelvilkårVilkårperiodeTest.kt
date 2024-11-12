@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.params.ParameterizedTest
@@ -14,7 +17,7 @@ class DelvilkårVilkårperiodeTest {
         @EnumSource(value = SvarJaNei::class)
         fun `kan ikke ha svar når resultat=IKKE_AKTUELT`(svar: SvarJaNei) {
             assertThatThrownBy {
-                DelvilkårVilkårperiode.Vurdering(svar, ResultatDelvilkårperiode.IKKE_AKTUELT)
+                Vurdering(svar, ResultatDelvilkårperiode.IKKE_AKTUELT)
             }.hasMessageContaining("Ugyldig resultat=IKKE_AKTUELT når svar=$svar")
         }
     }

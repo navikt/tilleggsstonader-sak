@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
 sealed interface FaktaOgVurderingTilsynBarn : FaktaOgVurdering {
@@ -90,7 +89,7 @@ data class ReellArbeidsøkerTilsynBarn(
 }
 
 data class VurderingTiltakTilsynBarn(
-    override val lønnet: DelvilkårVilkårperiode.Vurdering,
+    override val lønnet: Vurdering,
 ) : LønnetVurdering
 
 data class FaktaAktivitetTilsynBarn(
