@@ -101,7 +101,7 @@ sealed interface TypeFaktaOgVurderingTilsynBarn : TypeFaktaOgVurdering
 
 enum class AktivitetTilsynBarnType(
     override val vilkårperiodeType: AktivitetType,
-) : TypeFaktaOgVurderingTilsynBarn {
+) : TypeAktivitetOgVurdering, TypeFaktaOgVurderingTilsynBarn {
 
     UTDANNING_TILSYN_BARN(AktivitetType.UTDANNING),
     TILTAK_TILSYN_BARN(AktivitetType.TILTAK),
@@ -111,7 +111,7 @@ enum class AktivitetTilsynBarnType(
 
 enum class MålgruppeTilsynBarnType(
     override val vilkårperiodeType: MålgruppeType,
-) : TypeFaktaOgVurderingTilsynBarn {
+) : TypeMålgruppeOgVurdering, TypeFaktaOgVurderingTilsynBarn {
 
     AAP_TILSYN_BARN(MålgruppeType.AAP),
     OMSTILLINGSSTØNAD_TILSYN_BARN(MålgruppeType.OMSTILLINGSSTØNAD),
