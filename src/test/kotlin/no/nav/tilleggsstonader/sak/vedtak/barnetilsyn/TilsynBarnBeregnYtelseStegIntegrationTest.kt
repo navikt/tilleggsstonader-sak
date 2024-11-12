@@ -1,5 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.LocalDate
+import java.time.YearMonth
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -19,6 +23,8 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
@@ -35,10 +41,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.time.LocalDate
-import java.time.YearMonth
 
 class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
@@ -217,6 +219,36 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     assertThat(this.dato).isEqualTo(juni.atDay(3))
                 }
             }
+        }
+    }
+
+    @Nested
+    inner class Opphør {
+
+        @Test
+        fun `skal lagre vedtak`() {
+            stønadsperiodeRepository.insert(stønadsperiode)
+            vilkårperiodeRepository.insert(aktivitet)
+            lagVilkårForPeriode(saksbehandling, januar, januar, 100)
+
+            val vedtakDto = opphørDto()
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
+
+            val vedtak = repository.findByIdOrThrow(saksbehandling.id)
+
+            val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse
+
+            assertThat(vedtak.behandlingId).isEqualTo(saksbehandling.id)
+            assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
+            assertThat(vedtak.årsakerOpphør?.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
+            assertThat(vedtak.opphørBegrunnelse).isEqualTo("Nye utgifter")
+            assertThat(vedtak.beregningsresultat!!.perioder.single().beløpsperioder).containsExactly(
+                Beløpsperiode(
+                    LocalDate.of(2023, 1, 2), 65, MålgruppeType.AAP
+                )
+            )
+            assertThat(tilkjentYtelse).hasSize(1)
+
         }
     }
 
