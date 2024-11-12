@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -48,11 +49,21 @@ data class Søknadsinformasjon(
     val mottattTidspunkt: LocalDateTime,
 )
 
-data class VedtakInternt(
+sealed class VedtakInternt(
     val type: TypeVedtak,
-    val årsakerAvslag: List<ÅrsakAvslag>?,
-    val avslagBegrunnelse: String?,
 )
+
+data object VedtakInnvilgelseInternt : VedtakInternt(TypeVedtak.INNVILGELSE)
+
+data class VedtakAvslagInternt(
+    val årsakerAvslag: List<ÅrsakAvslag>,
+    val avslagBegrunnelse: String,
+) : VedtakInternt(TypeVedtak.AVSLAG)
+
+data class VedtakOpphørInternt(
+    val årsakerOpphør: List<ÅrsakOpphør>,
+    val opphørBegrunnelse: String,
+) : VedtakInternt(TypeVedtak.OPPHØR)
 
 data class Utgift(
     val beløp: Int,

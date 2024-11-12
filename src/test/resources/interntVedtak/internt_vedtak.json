@@ -191,8 +191,6 @@
     "utgift" : 200
   } ],
   "vedtak" : {
-    "type" : "INNVILGELSE",
-    "årsakerAvslag" : null,
-    "avslagBegrunnelse" : null
+    "type" : "INNVILGELSE"
   }
 }
