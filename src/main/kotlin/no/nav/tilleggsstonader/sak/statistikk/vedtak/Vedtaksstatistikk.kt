@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.StønadstypeDvh.BARNETILSYN
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
@@ -63,7 +64,9 @@ data class Vedtaksstatistikk(
     val stønadstype: StønadstypeDvh,
     val kravMottatt: LocalDate?,
     @Column("arsaker_avslag")
-    val årsakerAvslag: ÅrsakAvslagDvh.JsonWrapper? = null,
+    val årsakerAvslag: ÅrsakAvslagDvh.JsonWrapper?,
+    @Column("arsaker_opphor")
+    val årsakerOpphør: ÅrsakOpphørDvh.JsonWrapper?,
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
     @LastModifiedDate
     val endretTid: LocalDateTime = opprettetTid,
@@ -439,6 +442,35 @@ enum class ÅrsakAvslagDvh {
             ÅrsakAvslag.INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE -> INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE
             ÅrsakAvslag.MANGELFULL_DOKUMENTASJON -> MANGELFULL_DOKUMENTASJON
             ÅrsakAvslag.ANNET -> ANNET
+        }
+    }
+}
+
+enum class ÅrsakOpphørDvh {
+    ENDRING_AKTIVITET,
+    ENDRING_MÅLGRUPPE,
+    ENDRING_UTGIFTER,
+    ANNET,
+    ;
+
+    data class JsonWrapper(
+        val årsaker: List<ÅrsakOpphørDvh>,
+    )
+
+    companion object {
+        fun fraDomene(årsaker: List<ÅrsakOpphør>?): JsonWrapper? {
+            return årsaker?.let {
+                JsonWrapper(
+                    årsaker.map { typeFraDomene(it) },
+                )
+            }
+        }
+
+        private fun typeFraDomene(årsak: ÅrsakOpphør) = when (årsak) {
+            ÅrsakOpphør.ENDRING_AKTIVITET -> ENDRING_AKTIVITET
+            ÅrsakOpphør.ENDRING_MÅLGRUPPE -> ENDRING_MÅLGRUPPE
+            ÅrsakOpphør.ENDRING_UTGIFTER -> ENDRING_UTGIFTER
+            ÅrsakOpphør.ANNET -> ANNET
         }
     }
 }
