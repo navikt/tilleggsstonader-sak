@@ -2,10 +2,12 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
@@ -27,8 +29,20 @@ fun mapFaktaOgVurderingDto(
     resultatEvaluering: ResultatEvaluering,
 ): FaktaOgVurdering {
     return when (vilkårperiode.type) {
+        is AktivitetType -> mapAktiviteter(vilkårperiode, resultatEvaluering)
+        is MålgruppeType -> mapMålgrupper(vilkårperiode, resultatEvaluering)
+    }
+}
+
+private fun mapAktiviteter(
+    vilkårperiode: LagreVilkårperiode,
+    resultatEvaluering: ResultatEvaluering,
+): AktivitetTilsynBarn {
+    val type = vilkårperiode.type
+    require(type is AktivitetType)
+    require(resultatEvaluering.delvilkår is DelvilkårAktivitet)
+    return when (type) {
         AktivitetType.TILTAK -> {
-            require(resultatEvaluering.delvilkår is DelvilkårAktivitet)
             TiltakTilsynBarn(
                 fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = vilkårperiode.aktivitetsdager!!),
                 vurderinger = VurderingTiltakTilsynBarn(lønnet = resultatEvaluering.delvilkår.lønnet),
@@ -49,25 +63,32 @@ fun mapFaktaOgVurderingDto(
             }
             IngenAktivitetTilsynBarn
         }
+    }
+}
 
+private fun mapMålgrupper(
+    vilkårperiode: LagreVilkårperiode,
+    resultatEvaluering: ResultatEvaluering,
+): MålgruppeTilsynBarn {
+    val type = vilkårperiode.type
+    require(type is MålgruppeType)
+    require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
+    return when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
         MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
         MålgruppeType.OMSTILLINGSSTØNAD -> {
-            require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
             OmstillingsstønadTilsynBarn(
                 vurderinger = VurderingOmstillingsstønad(medlemskap = resultatEvaluering.delvilkår.medlemskap),
             )
         }
 
         MålgruppeType.OVERGANGSSTØNAD -> {
-            require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
             require(resultatEvaluering.delvilkår.medlemskap.svar == SvarJaNei.JA_IMPLISITT)
             require(resultatEvaluering.delvilkår.dekketAvAnnetRegelverk.svar == null)
             OvergangssstønadTilsynBarn
         }
 
         MålgruppeType.AAP -> {
-            require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
             require(resultatEvaluering.delvilkår.medlemskap.svar == SvarJaNei.JA_IMPLISITT)
             AAPTilsynBarn(
                 vurderinger = VurderingAAP(dekketAvAnnetRegelverk = resultatEvaluering.delvilkår.dekketAvAnnetRegelverk),
@@ -75,7 +96,6 @@ fun mapFaktaOgVurderingDto(
         }
 
         MålgruppeType.UFØRETRYGD -> {
-            require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
             UføretrygdTilsynBarn(
                 vurderinger = VurderingUføretrygd(
                     dekketAvAnnetRegelverk = resultatEvaluering.delvilkår.dekketAvAnnetRegelverk,
@@ -83,8 +103,8 @@ fun mapFaktaOgVurderingDto(
                 ),
             )
         }
+
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
-            require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
             NedsattArbeidsevneTilsynBarn(
                 vurderinger = VurderingNedsattArbeidsevne(
                     dekketAvAnnetRegelverk = resultatEvaluering.delvilkår.dekketAvAnnetRegelverk,
