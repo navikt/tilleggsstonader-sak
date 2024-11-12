@@ -5,6 +5,10 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFaktaOrThrow
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
@@ -76,19 +80,18 @@ data class Aktivitet(
 ) : Periode<LocalDate>
 
 fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
-    return this.mapNotNull {
-        if (it.type is AktivitetType) {
+    return this
+        .ofType<AktivitetTilsynBarn>()
+        .map {
+            val fakta = it.faktaOgVurdering.fakta
             Aktivitet(
                 id = it.id,
-                type = it.type,
+                type = it.faktaOgVurdering.type.vilkårperiodeType,
                 fom = it.fom,
                 tom = it.tom,
-                aktivitetsdager = it.aktivitetsdager ?: error("Aktivitetsdager mangler på periode ${it.id}"),
+                aktivitetsdager = fakta.takeIfFaktaOrThrow<FaktaAktivitetsdager>().aktivitetsdager,
             )
-        } else {
-            null
         }
-    }
 }
 
 fun StønadsperiodeInngangsvilkår.tilGrunnlagStønadsperiode() = Stønadsperiode(

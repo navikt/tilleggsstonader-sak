@@ -1,0 +1,10 @@
+{
+  "type": "OVERGANGSSTØNAD_TILSYN_BARN",
+  "fakta": {},
+  "vurderinger": {
+    "medlemskap": {
+      "svar": "JA_IMPLISITT",
+      "resultat": "OPPFYLT"
+    }
+  }
+}

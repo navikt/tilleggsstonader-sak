@@ -17,12 +17,17 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeServic
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode.Vurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode as DelvilkårVilkårperiodeDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode as VilkårperiodeDomain
 
 @Service
@@ -108,30 +113,27 @@ class InterntVedtakService(
                 type = it.type,
                 fom = it.fom,
                 tom = it.tom,
-                delvilkår = mapDelvilkår(it.delvilkår),
+                delvilkår = mapDelvilkår(it.faktaOgVurdering),
                 kilde = it.kilde,
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
-                aktivitetsdager = it.aktivitetsdager,
+                aktivitetsdager = it.faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
             )
         }
     }
 
-    private fun mapDelvilkår(delvilkår: DelvilkårVilkårperiodeDomain): DelvilkårVilkårperiode {
-        val medlemskap = if (delvilkår is DelvilkårMålgruppe) mapVurdering(delvilkår.medlemskap) else null
-        val dekketAvAnnetRegelverk =
-            if (delvilkår is DelvilkårMålgruppe) mapVurdering(delvilkår.dekketAvAnnetRegelverk) else null
-        val lønnet = if (delvilkår is DelvilkårAktivitet) mapVurdering(delvilkår.lønnet) else null
+    private fun mapDelvilkår(faktaOgVurdering: FaktaOgVurdering): DelvilkårVilkårperiode {
+        val vurderinger = faktaOgVurdering.vurderinger
         return DelvilkårVilkårperiode(
-            medlemskap = medlemskap,
-            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
-            lønnet = lønnet,
+            medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.let { mapVurdering(it) },
+            dekketAvAnnetRegelverk = vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.let { mapVurdering(it) },
+            lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.let { mapVurdering(it) },
         )
     }
 
     private fun mapVurdering(vurdering: Vurdering?): VurderingVilkårperiode? {
-        if (vurdering == null) {
+        if (vurdering == null || vurdering.resultat == ResultatDelvilkårperiode.IKKE_AKTUELT) {
             return null
         }
         return VurderingVilkårperiode(

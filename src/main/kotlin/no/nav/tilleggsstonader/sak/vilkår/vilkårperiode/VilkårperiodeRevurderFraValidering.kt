@@ -44,8 +44,7 @@ object VilkårperiodeRevurderFraValidering {
 
         feilHvis(
             eksisterendePeriode.resultat != oppdatertPeriode.resultat ||
-                eksisterendePeriode.delvilkår != oppdatertPeriode.delvilkår ||
-                eksisterendePeriode.aktivitetsdager != oppdatertPeriode.aktivitetsdager ||
+                eksisterendePeriode.faktaOgVurdering != oppdatertPeriode.faktaOgVurdering ||
                 eksisterendePeriode.fom != oppdatertPeriode.fom ||
                 oppdatertPeriode.tom < revurderFra.minusDays(1),
         ) {

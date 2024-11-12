@@ -24,7 +24,6 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -32,8 +31,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
@@ -41,12 +38,17 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.OVERGANGSSTØNAD
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.SKOLEPENGER
@@ -123,10 +125,10 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(vilkårperiode.begrunnelse).isEqualTo("begrunnelse målgruppe")
 
             assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+            assertThat(vilkårperiode.faktaOgVurdering.vurderinger).isInstanceOf(MedlemskapVurdering::class.java)
             assertThat(vilkårperiode.medlemskap.svar).isEqualTo(SvarJaNei.NEI)
             assertThat(vilkårperiode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
-            assertThat(vilkårperiode.dekketAvAnnetRegelverk.svar).isNull()
-            assertThat(vilkårperiode.dekketAvAnnetRegelverk.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_AKTUELT)
+            assertThat(vilkårperiode.faktaOgVurdering.vurderinger).isNotInstanceOf(DekketAvAnnetRegelverkVurdering::class.java)
         }
 
         @Test
@@ -422,10 +424,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(oppdatertPeriode.fom).isEqualTo(vilkårperiode.fom)
             assertThat(oppdatertPeriode.tom).isEqualTo(vilkårperiode.tom)
             assertThat(oppdatertPeriode.begrunnelse).isEqualTo("Oppdatert begrunnelse")
-            assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.svar).isEqualTo(SvarJaNei.NEI)
-            assertThat((oppdatertPeriode.delvilkår as DelvilkårMålgruppe).medlemskap.resultat).isEqualTo(
-                ResultatDelvilkårperiode.IKKE_OPPFYLT,
-            )
+            assertThat(oppdatertPeriode.medlemskap.svar).isEqualTo(SvarJaNei.NEI)
+            assertThat(oppdatertPeriode.medlemskap.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
         }
 
         @Test
@@ -558,28 +558,14 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         private fun Vilkårperiode.tilOppdatering(): LagreVilkårperiode {
-            val delvilkårDto = when (this.delvilkår) {
-                is DelvilkårMålgruppe -> (this.delvilkår as DelvilkårMålgruppe).let {
-                    DelvilkårMålgruppeDto(
-                        medlemskap = VurderingDto(it.medlemskap.svar),
-                        dekketAvAnnetRegelverk = VurderingDto(it.dekketAvAnnetRegelverk.svar),
-                    )
-                }
-
-                is DelvilkårAktivitet -> (this.delvilkår as DelvilkårAktivitet).let {
-                    DelvilkårAktivitetDto(
-                        lønnet = VurderingDto(it.lønnet.svar),
-                    )
-                }
-            }
             return LagreVilkårperiode(
                 behandlingId = behandlingId,
                 fom = fom,
                 tom = tom,
-                delvilkår = delvilkårDto,
+                delvilkår = faktaOgVurdering.tilDelvilkårDto(),
                 begrunnelse = begrunnelse,
                 type = type,
-                aktivitetsdager = aktivitetsdager,
+                aktivitetsdager = faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
             )
         }
     }
@@ -911,9 +897,27 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             } returns YtelsePerioderDto(
                 perioder = listOf(
                     YtelsePeriode(TypeYtelsePeriode.AAP, now(), now(), aapErFerdigAvklart = false),
-                    YtelsePeriode(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), aapErFerdigAvklart = null, EnsligForsørgerStønadstypeKontrakter.BARNETILSYN),
-                    YtelsePeriode(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), aapErFerdigAvklart = null, EnsligForsørgerStønadstypeKontrakter.SKOLEPENGER),
-                    YtelsePeriode(TypeYtelsePeriode.ENSLIG_FORSØRGER, now(), now(), aapErFerdigAvklart = null, EnsligForsørgerStønadstypeKontrakter.OVERGANGSSTØNAD),
+                    YtelsePeriode(
+                        TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                        now(),
+                        now(),
+                        aapErFerdigAvklart = null,
+                        EnsligForsørgerStønadstypeKontrakter.BARNETILSYN,
+                    ),
+                    YtelsePeriode(
+                        TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                        now(),
+                        now(),
+                        aapErFerdigAvklart = null,
+                        EnsligForsørgerStønadstypeKontrakter.SKOLEPENGER,
+                    ),
+                    YtelsePeriode(
+                        TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                        now(),
+                        now(),
+                        aapErFerdigAvklart = null,
+                        EnsligForsørgerStønadstypeKontrakter.OVERGANGSSTØNAD,
+                    ),
                 ),
                 hentetInformasjon = emptyList(),
             )
@@ -949,7 +953,18 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val res = vilkårperiodeRepository.findByBehandlingId(revurdering.id)
             assertThat(res).hasSize(2)
 
-            assertThat(res).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+            // TODO "nullstiller" felter fordi usingRecursiveComparison ikke virker som forventet
+            val nullstilteRes = res.map { oppdatert ->
+                val forrige = eksisterendeVilkårperioder.single { it.id == oppdatert.forrigeVilkårperiodeId!! }
+                oppdatert.copy(
+                    id = forrige.id,
+                    sporbar = forrige.sporbar,
+                    behandlingId = forrige.behandlingId,
+                    forrigeVilkårperiodeId = forrige.forrigeVilkårperiodeId,
+                    status = forrige.status,
+                )
+            }
+            assertThat(nullstilteRes).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
                 "id",
                 "sporbar",
                 "behandlingId",

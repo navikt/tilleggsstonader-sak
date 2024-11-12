@@ -8,14 +8,14 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
 import java.time.LocalDate
 
 class VilkårperiodeDtoTest {
@@ -33,50 +33,29 @@ class VilkårperiodeDtoTest {
     @Nested
     inner class MappingAvVurdering {
 
-        @ParameterizedTest
-        @EnumSource(
-            value = ResultatDelvilkårperiode::class,
-            names = ["IKKE_AKTUELT"],
-            mode = EnumSource.Mode.EXCLUDE,
-        )
-        fun `skal returnere delvilkår hvis resultat != IKKE_AKTUELT`(resultat: ResultatDelvilkårperiode) {
-            val målgruppe = målgruppe(
-                begrunnelse = if (resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) "begrunnelse" else null,
-                delvilkår = DelvilkårMålgruppe(
-                    medlemskap = DelvilkårVilkårperiode.Vurdering(
-                        svar = null,
-                        resultat = resultat,
-                    ),
-                    dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(
-                        svar = null,
-                        resultat = resultat,
-                    ),
-                ),
-            ).tilDto()
-
-            assertThat(målgruppe.medlemskap).isNotNull()
-            assertThat(målgruppe.medlemskap?.svar).isNull()
-            assertThat(målgruppe.medlemskap?.resultat).isEqualTo(resultat)
-            assertThat(målgruppe.dekketAvAnnetRegelverk).isNotNull()
-            assertThat(målgruppe.dekketAvAnnetRegelverk?.svar).isNull()
-        }
-
         @Test
-        fun `skal returnere delvilkårsresultat IKKE_AKTUELT som vurdering=null`() {
+        fun `skal mappe vurdering fra vilkår`() {
             val målgruppe = målgruppe(
+                type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                begrunnelse = "begrunnelse",
                 delvilkår = DelvilkårMålgruppe(
                     medlemskap = DelvilkårVilkårperiode.Vurdering(
-                        svar = null,
-                        resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
+                        svar = SvarJaNei.JA,
+                        resultat = ResultatDelvilkårperiode.OPPFYLT,
                     ),
                     dekketAvAnnetRegelverk = DelvilkårVilkårperiode.Vurdering(
-                        svar = null,
-                        resultat = ResultatDelvilkårperiode.IKKE_AKTUELT,
+                        svar = SvarJaNei.JA,
+                        resultat = ResultatDelvilkårperiode.IKKE_OPPFYLT,
                     ),
                 ),
             ).tilDto()
 
-            assertThat(målgruppe.medlemskap).isNull()
+            assertThat(målgruppe.medlemskap).isNotNull
+            assertThat(målgruppe.medlemskap?.svar).isEqualTo(SvarJaNei.JA)
+            assertThat(målgruppe.medlemskap?.resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+            assertThat(målgruppe.dekketAvAnnetRegelverk).isNotNull
+            assertThat(målgruppe.dekketAvAnnetRegelverk?.svar).isEqualTo(SvarJaNei.JA)
+            assertThat(målgruppe.dekketAvAnnetRegelverk?.resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
         }
     }
 
