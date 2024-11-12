@@ -1,3 +1,7 @@
+-- Lager en backup for vilkar_periode som senere kan slettes
+CREATE TABLE vilkar_periode_20241112 AS (SELECT *
+                                         FROM vilkar_periode);
+
 ALTER TABLE vilkar_periode
     ADD COLUMN fakta_og_vurdering JSONB;
 
