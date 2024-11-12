@@ -31,7 +31,7 @@ val alleVedtaksstatistikkJsonConverters = listOf(
     AktivitetDvhWriter(),
     VilkårsvurderingDvhWriter(),
     ÅrsakerAvslagDvhWriter(),
-    ÅrsakerOpphørDvhWriter()
+    ÅrsakerOpphørDvhWriter(),
 )
 
 @WritingConverter

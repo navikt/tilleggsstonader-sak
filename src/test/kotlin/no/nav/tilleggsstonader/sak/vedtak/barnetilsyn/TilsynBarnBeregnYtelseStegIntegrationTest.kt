@@ -1,9 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.time.LocalDate
-import java.time.YearMonth
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -41,6 +37,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.LocalDate
+import java.time.YearMonth
 
 class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
@@ -244,11 +244,12 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThat(vedtak.opphørBegrunnelse).isEqualTo("Nye utgifter")
             assertThat(vedtak.beregningsresultat!!.perioder.single().beløpsperioder).containsExactly(
                 Beløpsperiode(
-                    LocalDate.of(2023, 1, 2), 65, MålgruppeType.AAP
-                )
+                    LocalDate.of(2023, 1, 2),
+                    65,
+                    MålgruppeType.AAP,
+                ),
             )
             assertThat(tilkjentYtelse).hasSize(1)
-
         }
     }
 
