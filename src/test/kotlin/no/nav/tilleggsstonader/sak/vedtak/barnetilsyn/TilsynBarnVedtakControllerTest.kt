@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import java.time.LocalDate
-import java.time.YearMonth
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -34,6 +32,8 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.exchange
+import java.time.LocalDate
+import java.time.YearMonth
 
 class TilsynBarnVedtakControllerTest(
     @Autowired
