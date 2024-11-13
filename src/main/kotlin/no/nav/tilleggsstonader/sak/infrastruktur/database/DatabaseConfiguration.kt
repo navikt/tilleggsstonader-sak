@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import org.postgresql.util.PGobject
@@ -40,7 +41,6 @@ import org.springframework.transaction.PlatformTransactionManager
 import java.util.Optional
 import javax.sql.DataSource
 import kotlin.reflect.KClass
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 
 @Configuration
 @EnableJdbcAuditing
