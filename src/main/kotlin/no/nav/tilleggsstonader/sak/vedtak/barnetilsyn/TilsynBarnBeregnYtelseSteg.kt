@@ -23,12 +23,13 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValidatorService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 
 @Service
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     private val unleashService: UnleashService,
-    private val OpphørValidatorService: OpphørValidatorService,
+    private val opphørValidatorService: OpphørValidatorService,
     vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -65,7 +66,7 @@ class TilsynBarnBeregnYtelseSteg(
     }
 
     private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnDto) {
-        OpphørValidatorService.validerOpphør()
+        opphørValidatorService.validerOpphør(saksbehandling.id)
 
         val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling)
         vedtakRepository.insert(
