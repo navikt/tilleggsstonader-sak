@@ -7,6 +7,14 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.data.annotation.Id
@@ -17,25 +25,31 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.*
 
+interface IVilkårperiode<FAKTA_VURDERING : FaktaOgVurdering> : Periode<LocalDate> {
+    val faktaOgVurdering: FAKTA_VURDERING
+}
+
+typealias Vilkårperiode = GeneriskVilkårperiode<out FaktaOgVurdering>
+
+/**
+ *
+ */
 @Table("vilkar_periode")
-data class Vilkårperiode(
+data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     @Id
     val id: UUID = UUID.randomUUID(),
     val behandlingId: BehandlingId,
     @Column("forrige_vilkarperiode_id")
     val forrigeVilkårperiodeId: UUID? = null,
 
+    val type: VilkårperiodeType,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val type: VilkårperiodeType,
-    @Column("delvilkar")
-    val delvilkår: DelvilkårVilkårperiode,
+    override val faktaOgVurdering: T,
     val begrunnelse: String?,
+
     val resultat: ResultatVilkårperiode,
-    val aktivitetsdager: Int?,
-
     val slettetKommentar: String? = null,
-
     val status: Vilkårstatus? = null,
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
@@ -46,42 +60,63 @@ data class Vilkårperiode(
     // TODO kilde burde kunne fjernes, den brukes aldri til noe annet enn manuell. Må fjernes i frontend og.
     @InsertOnlyProperty
     val kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
-) : Periode<LocalDate> {
-
+) : IVilkårperiode<T> {
     init {
+        // TODO valider kombinasjon av type og type og FaktaOgVurdering.type
         validatePeriode()
-        validerAktivitetsdager()
+        validerSlettefelter()
 
-        when {
-            type is MålgruppeType && delvilkår is DelvilkårMålgruppe -> delvilkår.valider(begrunnelse)
-            type is AktivitetType && delvilkår is DelvilkårAktivitet -> delvilkår.valider()
-            else -> error("Ugyldig kombinasjon type=${type.javaClass.simpleName} detaljer=${delvilkår.javaClass.simpleName}")
+        validerBegrunnelse()
+
+        feilHvis(faktaOgVurdering.type.vilkårperiodeType != type) {
+            "Ugyldig kombinasjon - type($type) må være lik faktaOgVurdering($faktaOgVurdering)"
         }
 
-        validerPåkrevdBegrunnelse()
-        validerSlettefelter()
+        // TODO endre aktivitetsdager til value class og legg inn sjekk der
+        faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.let {
+            brukerfeilHvis(it.aktivitetsdager !in 1..5) {
+                "Aktivitetsdager må være et heltall mellom 1 og 5"
+            }
+        }
     }
 
-    private fun validerAktivitetsdager() {
-        if (type is AktivitetType) {
-            if (type == AktivitetType.INGEN_AKTIVITET) {
-                brukerfeilHvis(aktivitetsdager != null) { "Kan ikke registrere aktivitetsdager på ingen aktivitet" }
-            } else {
-                brukerfeilHvis(aktivitetsdager !in 1..5) {
-                    "Aktivitetsdager må være et heltall mellom 1 og 5"
-                }
+    private fun validerBegrunnelse() {
+        if (!manglerBegrunnelse()) {
+            return
+        }
+        validerPåkrevdBegrunnelseForType()
+        // TODO burde vi ha en valideringsmetode i vurderinger som tar inn begrunnelse?
+        faktaOgVurdering.vurderinger.takeIfVurderinger<LønnetVurdering>()?.let {
+            validerIkkeAktuelt(it.lønnet.resultat)
+            brukerfeilHvis(it.lønnet.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
+                "Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid"
             }
         }
 
-        if (type is MålgruppeType) {
-            brukerfeilHvis(aktivitetsdager != null) { "Kan ikke registrere aktivitetsdager på målgruppe" }
+        faktaOgVurdering.vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.let {
+            validerIkkeAktuelt(it.dekketAvAnnetRegelverk.resultat)
+            brukerfeilHvis(it.dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) {
+                "Mangler begrunnelse for utgifter dekt av annet regelverk"
+            }
+        }
+        faktaOgVurdering.vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.let {
+            validerIkkeAktuelt(it.medlemskap.resultat)
+            brukerfeilHvis(it.medlemskap.svar?.harVurdert() == true) {
+                "Mangler begrunnelse for vurdering av medlemskap"
+            }
         }
     }
 
-    private fun validerPåkrevdBegrunnelse() {
-        if (!begrunnelse.isNullOrBlank()) {
-            return
+    // TODO fjern ikke-aktuelt i egen endring
+    private fun validerIkkeAktuelt(resultat: ResultatDelvilkårperiode) {
+        feilHvis(resultat == ResultatDelvilkårperiode.IKKE_AKTUELT) {
+            "Skal ikke mappe noe til ikke-aktuelt med ny vilkårperiode"
         }
+    }
+
+    private fun manglerBegrunnelse() = begrunnelse.isNullOrBlank()
+
+    private fun validerPåkrevdBegrunnelseForType() {
         when (type) {
             MålgruppeType.NEDSATT_ARBEIDSEVNE -> "Mangler begrunnelse for nedsatt arbeidsevne"
             MålgruppeType.INGEN_MÅLGRUPPE -> "Mangler begrunnelse for ingen målgruppe"
@@ -90,24 +125,6 @@ data class Vilkårperiode(
             else -> null
         }?.let { brukerfeil(it) }
     }
-
-    private fun DelvilkårMålgruppe.valider(begrunnelse: String?) {
-        brukerfeilHvis((medlemskap.svar != null && medlemskap.svar != SvarJaNei.JA_IMPLISITT) && begrunnelse.isNullOrBlank()) {
-            "Mangler begrunnelse for vurdering av medlemskap"
-        }
-
-        brukerfeilHvis(dekketAvAnnetRegelverk.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
-            "Mangler begrunnelse for utgifter dekt av annet regelverk"
-        }
-    }
-
-    private fun DelvilkårAktivitet.valider() {
-        brukerfeilHvis(lønnet.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT && manglerBegrunnelse()) {
-            "Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid"
-        }
-    }
-
-    private fun manglerBegrunnelse() = begrunnelse.isNullOrBlank()
 
     private fun validerSlettefelter() {
         if (resultat == ResultatVilkårperiode.SLETTET) {
@@ -129,13 +146,36 @@ data class Vilkårperiode(
         status = Vilkårstatus.SLETTET,
     )
 
-    fun kopierTilBehandling(nyBehandlingId: BehandlingId): Vilkårperiode {
+    fun kopierTilBehandling(nyBehandlingId: BehandlingId): GeneriskVilkårperiode<T> {
         return copy(
             id = UUID.randomUUID(),
             behandlingId = nyBehandlingId,
             forrigeVilkårperiodeId = forrigeVilkårPeriodeIdForKopiertVilkår(),
             sporbar = Sporbar(),
             status = Vilkårstatus.UENDRET,
+        )
+    }
+
+    fun medVilkårOgVurdering(
+        fom: LocalDate,
+        tom: LocalDate,
+        begrunnelse: String?,
+        faktaOgVurdering: FaktaOgVurdering,
+        resultat: ResultatVilkårperiode,
+    ): GeneriskVilkårperiode<T> {
+        val nyStatus = if (status == Vilkårstatus.NY) {
+            Vilkårstatus.NY
+        } else {
+            Vilkårstatus.ENDRET
+        }
+        @Suppress("UNCHECKED_CAST")
+        return this.copy(
+            fom = fom,
+            tom = tom,
+            begrunnelse = begrunnelse,
+            faktaOgVurdering = faktaOgVurdering as T,
+            status = nyStatus,
+            resultat = resultat,
         )
     }
 

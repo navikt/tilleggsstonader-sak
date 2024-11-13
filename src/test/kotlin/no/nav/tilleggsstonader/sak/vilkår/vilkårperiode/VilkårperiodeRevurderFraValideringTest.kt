@@ -7,18 +7,19 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
-
 class VilkårperiodeRevurderFraValideringTest {
 
     val revurderFra = LocalDate.of(2024, 1, 1)
@@ -114,14 +115,14 @@ class VilkårperiodeRevurderFraValideringTest {
                 val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.minusDays(2), aktivitetsdager = 1)
                 endringUtenRevurderFra(
                     eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.copy(aktivitetsdager = 2),
+                    eksisterendeVilkårperiode.medAktivitetsdager(aktivitetsdager = 2),
                 )
             }
             assertDoesNotThrow {
                 val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.plusDays(1), aktivitetsdager = 1)
                 endringUtenRevurderFra(
                     eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.copy(aktivitetsdager = 2),
+                    eksisterendeVilkårperiode.medAktivitetsdager(aktivitetsdager = 2),
                 )
             }
         }
@@ -166,9 +167,9 @@ class VilkårperiodeRevurderFraValideringTest {
                 resultat = ResultatVilkårperiode.OPPFYLT,
             )
             listOf<(Vilkårperiode) -> Vilkårperiode>(
-                { it.copy(aktivitetsdager = 2) },
+                { it.medAktivitetsdager(aktivitetsdager = 2) },
                 { it.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT) },
-                { it.copy(delvilkår = delvilkårAktivitet(lønnet = vurdering(SvarJaNei.JA))) },
+                { it.medVurdering(delvilkår = delvilkårAktivitet(lønnet = vurdering(SvarJaNei.JA))) },
             ).forEach { endreVilkårperiode ->
                 assertThatThrownBy {
                     endringMedRevurderFra(

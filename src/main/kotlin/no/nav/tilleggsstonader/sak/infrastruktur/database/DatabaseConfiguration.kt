@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
@@ -41,6 +40,7 @@ import org.springframework.transaction.PlatformTransactionManager
 import java.util.Optional
 import javax.sql.DataSource
 import kotlin.reflect.KClass
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 
 @Configuration
 @EnableJdbcAuditing
@@ -121,14 +121,14 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 TilVilkårperiodeTypeConverter(),
                 VilkårperiodeTypeTilStringConverter(),
 
-                DetaljerVilkårperiodeReader(),
-                DetaljerVilkårperiodeWriter(),
-
                 VilkårperioderGrunnlagReader(),
                 VilkårperioderGrunnlagWriter(),
 
                 SkjemaLæremidlerReader(),
                 SkjemaLæremidlerWriter(),
+
+                FaktaOgVurderingReader(),
+                FaktaOgVurderingWriter(),
 
             ) + alleVedtaksstatistikkJsonConverters +
                 alleValueClassConverters,
@@ -249,10 +249,6 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     class ÅrsakOpphørWriter : JsonWriter<ÅrsakOpphør.Wrapper>()
 
-    class DetaljerVilkårperiodeReader : JsonReader<DelvilkårVilkårperiode>(DelvilkårVilkårperiode::class)
-
-    class DetaljerVilkårperiodeWriter : JsonWriter<DelvilkårVilkårperiode>()
-
     class VilkårperioderGrunnlagReader : JsonReader<VilkårperioderGrunnlag>(VilkårperioderGrunnlag::class)
 
     class VilkårperioderGrunnlagWriter : JsonWriter<VilkårperioderGrunnlag>()
@@ -260,4 +256,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class SkjemaLæremidlerReader : JsonReader<SkjemaLæremidler>(SkjemaLæremidler::class)
 
     class SkjemaLæremidlerWriter : JsonWriter<SkjemaLæremidler>()
+
+    class FaktaOgVurderingReader : JsonReader<FaktaOgVurdering>(FaktaOgVurdering::class)
+
+    class FaktaOgVurderingWriter : JsonWriter<FaktaOgVurdering>()
 }

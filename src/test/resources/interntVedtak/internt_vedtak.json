@@ -44,10 +44,7 @@
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
       },
-      "dekketAvAnnetRegelverk" : {
-        "svar" : null,
-        "resultat" : "OPPFYLT"
-      },
+      "dekketAvAnnetRegelverk" : null,
       "lønnet" : null
     },
     "kilde" : "MANUELL",

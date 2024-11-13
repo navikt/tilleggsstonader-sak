@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
+
 enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : VilkårperiodeType {
     AAP(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
     DAGPENGER(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),

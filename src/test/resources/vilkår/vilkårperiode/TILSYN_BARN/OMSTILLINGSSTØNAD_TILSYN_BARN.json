@@ -1,0 +1,10 @@
+{
+  "type": "OMSTILLINGSSTØNAD_TILSYN_BARN",
+  "fakta": {},
+  "vurderinger": {
+    "medlemskap": {
+      "svar": "JA",
+      "resultat": "OPPFYLT"
+    }
+  }
+}

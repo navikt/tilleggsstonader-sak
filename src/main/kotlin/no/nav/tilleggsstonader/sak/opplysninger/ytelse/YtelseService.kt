@@ -72,7 +72,7 @@ class YtelseService(
 
     private fun finnRelevanteYtelsesTyper(type: Stønadstype) =
         when (type) {
-            Stønadstype.BARNETILSYN ->
+            Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER ->
                 listOf(
                     TypeYtelsePeriode.AAP,
                     TypeYtelsePeriode.ENSLIG_FORSØRGER,
