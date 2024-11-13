@@ -12,10 +12,11 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.barn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -112,6 +113,22 @@ class TilsynBarnVedtakControllerTest(
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLAG)
     }
 
+    @Test
+    fun `skal lagre og hente opphør`() {
+        val vedtak = OpphørRequest(
+            årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
+            begrunnelse = "endre utgifter opphør",
+        )
+
+        opphørVedtak(behandling, vedtak)
+
+        val lagretDto = hentVedtak(behandling.id).body!!
+
+        assertThat((lagretDto as OpphørTilsynBarnDto).årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)
+        assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
+        assertThat(lagretDto.type).isEqualTo(TypeVedtak.OPPHØR)
+    }
+
     private fun lagInnvilgeVedtak() = InnvilgelseTilsynBarnRequest(
         beregningsresultat = null,
     )
@@ -133,6 +150,17 @@ class TilsynBarnVedtakControllerTest(
     ) {
         restTemplate.exchange<Map<String, Any>?>(
             localhost("api/vedtak/tilsyn-barn/${behandling.id}/avslag"),
+            HttpMethod.POST,
+            HttpEntity(vedtak, headers),
+        )
+    }
+
+    private fun opphørVedtak(
+        behandling: Behandling,
+        vedtak: OpphørRequest,
+    ) {
+        restTemplate.exchange<Map<String, Any>?>(
+            localhost("api/vedtak/tilsyn-barn/${behandling.id}/opphor"),
             HttpMethod.POST,
             HttpEntity(vedtak, headers),
         )

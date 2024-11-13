@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
@@ -23,6 +24,11 @@ object TilsynBarnTestUtil {
         beregningsresultat: BeregningsresultatTilsynBarnDto? = null,
     ) = InnvilgelseTilsynBarnDto(
         beregningsresultat = beregningsresultat,
+    )
+
+    fun opphørDto() = OpphørTilsynBarnDto(
+        årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
+        begrunnelse = "Nye utgifter",
     )
 
     val vedtakBeregningsresultat = BeregningsresultatTilsynBarn(

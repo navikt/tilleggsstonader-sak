@@ -51,4 +51,31 @@ class VedtakTilsynBarnTest {
                 .hasMessage("Avslag må begrunnes")
         }
     }
+
+    @Nested
+    inner class OpphørtVedtak {
+        @Test
+        fun `skal feile om opphørt vedtak ikke har årsaker`() {
+            assertThatThrownBy {
+                VedtakTilsynBarn(
+                    behandlingId = BehandlingId.random(),
+                    type = TypeVedtak.OPPHØR,
+                    avslagBegrunnelse = "begrunnelse",
+                )
+            }
+                .hasMessage("Må velge minst en årsak for opphør")
+        }
+
+        @Test
+        fun `skal feile om opphørt vedtak ikke har årsak for opphør`() {
+            assertThatThrownBy {
+                VedtakTilsynBarn(
+                    behandlingId = BehandlingId.random(),
+                    type = TypeVedtak.OPPHØR,
+                    årsakerOpphør = ÅrsakOpphør.Wrapper(listOf(ÅrsakOpphør.ENDRING_UTGIFTER)),
+                )
+            }
+                .hasMessage("Opphør må begrunnes")
+        }
+    }
 }

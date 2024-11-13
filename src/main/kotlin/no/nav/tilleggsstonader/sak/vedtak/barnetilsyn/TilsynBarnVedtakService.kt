@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import org.springframework.stereotype.Service
@@ -30,6 +31,11 @@ class TilsynBarnVedtakService(
             TypeVedtak.AVSLAG -> AvslagTilsynBarnDto(
                 årsakerAvslag = vedtak.årsakerAvslag?.årsaker ?: error("Mangler årsak for avslag"),
                 begrunnelse = vedtak.avslagBegrunnelse ?: error("Mangler begrunnelse i avslag"),
+            )
+
+            TypeVedtak.OPPHØR -> OpphørTilsynBarnDto(
+                årsakerOpphør = vedtak.årsakerOpphør?.årsaker ?: error("Mangler årsak for opphør"),
+                begrunnelse = vedtak.opphørBegrunnelse ?: error("Mangler begrunnelse i opphør"),
             )
         }
     }

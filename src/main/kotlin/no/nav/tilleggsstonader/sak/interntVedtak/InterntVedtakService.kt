@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
@@ -184,11 +185,18 @@ class InterntVedtakService(
 
     private fun mapVedtak(vedtak: VedtakTilsynBarn?): VedtakInternt? {
         return vedtak?.let {
-            VedtakInternt(
-                type = it.type,
-                årsakerAvslag = it.årsakerAvslag?.årsaker,
-                avslagBegrunnelse = it.avslagBegrunnelse,
-            )
+            when (vedtak.type) {
+                TypeVedtak.INNVILGELSE -> VedtakInnvilgelseInternt
+                TypeVedtak.AVSLAG -> VedtakAvslagInternt(
+                    årsakerAvslag = it.årsakerAvslag?.årsaker ?: error("Avslag mangler årsaker"),
+                    avslagBegrunnelse = it.avslagBegrunnelse ?: error("Avslag mangler begrunnelse"),
+                )
+
+                TypeVedtak.OPPHØR -> VedtakOpphørInternt(
+                    årsakerOpphør = it.årsakerOpphør?.årsaker ?: error("Opphør mangler årsaker"),
+                    opphørBegrunnelse = it.opphørBegrunnelse ?: error("Opphør mangler begrunnelse"),
+                )
+            }
         }
     }
 

@@ -158,5 +158,6 @@ class VedtaksstatistikkTest : IntegrationTest() {
         stønadstype = StønadstypeDvh.BARNETILSYN,
         kravMottatt = null,
         årsakerAvslag = null,
+        årsakerOpphør = null,
     )
 }

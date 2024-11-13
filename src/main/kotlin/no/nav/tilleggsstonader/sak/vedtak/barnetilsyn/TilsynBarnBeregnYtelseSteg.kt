@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
@@ -38,23 +39,17 @@ class TilsynBarnBeregnYtelseSteg(
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakTilsynBarnDto) {
         when (vedtak) {
-            is InnvilgelseTilsynBarnDto -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
+            is InnvilgelseTilsynBarnDto -> beregnOgLagreInnvilgelse(saksbehandling)
             is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
+            is OpphørTilsynBarnDto -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
-        /*
-        Funksjonalitet som mangler:
-         * Revurdering
-         * Opphør
-
-         Simulering burde kanskje kun gjøres når man går inn på fanen for simulering,
-         og ikke i dette steget for å unngå feil fra simulering
-         */
     }
 
-    private fun beregnOgLagreInnvilgelse(
-        saksbehandling: Saksbehandling,
-        vedtak: InnvilgelseTilsynBarnDto,
-    ) {
+    /**
+     * Brukes både for innvilgelse og opphør
+     * Ved opphør kan det være at man kun opphør 1 barn, men det fortsatt skal utbetales for det andre barnet
+     */
+    private fun beregnOgLagreInnvilgelse(saksbehandling: Saksbehandling) {
         brukerfeilHvis(
             saksbehandling.forrigeBehandlingId != null &&
                 !unleashService.isEnabled(Toggle.REVURDERING_INNVILGE_TIDLIGERE_INNVILGET),
@@ -64,6 +59,20 @@ class TilsynBarnBeregnYtelseSteg(
 
         val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, beregningsresultat))
+        lagreAndeler(saksbehandling, beregningsresultat)
+    }
+
+    private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnDto) {
+        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling)
+        vedtakRepository.insert(
+            VedtakTilsynBarn(
+                behandlingId = saksbehandling.id,
+                type = TypeVedtak.OPPHØR,
+                beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
+                årsakerOpphør = ÅrsakOpphør.Wrapper(årsaker = vedtak.årsakerOpphør),
+                opphørBegrunnelse = vedtak.begrunnelse,
+            ),
+        )
         lagreAndeler(saksbehandling, beregningsresultat)
     }
 

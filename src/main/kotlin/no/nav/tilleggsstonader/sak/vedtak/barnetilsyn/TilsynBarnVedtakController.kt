@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import org.springframework.web.bind.annotation.PathVariable
@@ -40,6 +41,14 @@ class TilsynBarnVedtakController(
     fun avslå(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagRequest,
+    ) {
+        lagreVedtak(behandlingId, vedtak.tilDto())
+    }
+
+    @PostMapping("{behandlingId}/opphor")
+    fun opphør(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: OpphørRequest,
     ) {
         lagreVedtak(behandlingId, vedtak.tilDto())
     }
