@@ -64,6 +64,9 @@ class TilsynBarnBeregnYtelseSteg(
 
     private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnDto) {
         val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling)
+        feilHvis(saksbehandling.forrigeBehandlingId == null) {
+            "Kan ikke opphøre når det ikke finnes en tidligere iverksatt behandling"
+        }
         vedtakRepository.insert(
             VedtakTilsynBarn(
                 behandlingId = saksbehandling.id,

@@ -227,29 +227,27 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
         @Test
         fun `skal lagre vedtak`() {
-            stønadsperiodeRepository.insert(stønadsperiode)
-            vilkårperiodeRepository.insert(aktivitet)
-            lagVilkårForPeriode(saksbehandling, januar, januar, 100)
+            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDto())
+            testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
+            val revurdering = opprettRevurdering(revurderFra = LocalDate.of(2023, 1, 1))
+
+            stønadsperiodeRepository.insert(stønadsperiode.copy(behandlingId = revurdering.id))
+            vilkårperiodeRepository.insert(aktivitet.copy(behandlingId = revurdering.id))
+            lagVilkårForPeriode(revurdering, januar, januar, 100)
 
             val vedtakDto = opphørDto()
-            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
+            steg.utførOgReturnerNesteSteg(revurdering, vedtakDto)
 
-            val vedtak = repository.findByIdOrThrow(saksbehandling.id)
+            val vedtak = repository.findByIdOrThrow(revurdering.id)
 
-            val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse
-
-            assertThat(vedtak.behandlingId).isEqualTo(saksbehandling.id)
+            assertThat(vedtak.behandlingId).isEqualTo(revurdering.id)
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
             assertThat(vedtak.årsakerOpphør?.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
             assertThat(vedtak.opphørBegrunnelse).isEqualTo("Nye utgifter")
-            assertThat(vedtak.beregningsresultat!!.perioder.single().beløpsperioder).containsExactly(
-                Beløpsperiode(
-                    LocalDate.of(2023, 1, 2),
-                    65,
-                    MålgruppeType.AAP,
-                ),
-            )
-            assertThat(tilkjentYtelse).hasSize(1)
+            assertThat(vedtak.beregningsresultat!!.perioder.single().beløpsperioder)
+                .containsExactly(Beløpsperiode(LocalDate.of(2023, 1, 2), 65, MålgruppeType.AAP))
+            assertThat(tilkjentYtelseRepository.findByBehandlingId(revurdering.id)!!.andelerTilkjentYtelse)
+                .hasSize(1)
         }
     }
 
@@ -287,16 +285,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             // Men har kopiert perioder for januar og februar fra forrige behandlingen
             assertHarPerioderForJanuarOgFebruar(revurdering.id)
         }
-
-        private fun opprettRevurdering(revurderFra: LocalDate?) = testoppsettService.lagre(
-            behandling(
-                fagsak = fagsak(id = behandling.fagsakId),
-                type = BehandlingType.REVURDERING,
-                revurderFra = revurderFra,
-                forrigeBehandlingId = behandling.id,
-            ),
-            opprettGrunnlagsdata = false,
-        ).let { testoppsettService.hentSaksbehandling(it.id) }
 
         /**
          * Stønadsperioder jan-mars
@@ -532,6 +520,16 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             }.hasMessageContaining("Kan ikke opprette andel tilkjent ytelse for målgruppe")
         }
     }
+
+    private fun opprettRevurdering(revurderFra: LocalDate?) = testoppsettService.lagre(
+        behandling(
+            fagsak = fagsak(id = behandling.fagsakId),
+            type = BehandlingType.REVURDERING,
+            revurderFra = revurderFra,
+            forrigeBehandlingId = behandling.id,
+        ),
+        opprettGrunnlagsdata = false,
+    ).let { testoppsettService.hentSaksbehandling(it.id) }
 
     private fun lagVilkårForPeriode(
         behandling: Saksbehandling,
