@@ -1,7 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -17,14 +18,16 @@ import org.springframework.stereotype.Service
 class OpphørValidatorService(
     private val vilkårsperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
+    private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
 ) {
 
-    fun validerOpphør(saksbehandling_id: BehandlingId) {
-        val vilkår = vilkårService.hentVilkår(saksbehandling_id)
-        val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling_id)
+    fun validerOpphør(saksbehandling: Saksbehandling) {
+        val vilkår = vilkårService.hentVilkår(saksbehandling.id)
+        val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling.id)
 
         validerIngenOppfylteVilkårEllerVilkårperioderMedStatusNy(vilkår, vilkårperioder)
+        validerIngenUtbetalingEtterOpphør(saksbehandling)
 
         validerVilkår()
         validerVilkårperiode()
@@ -38,6 +41,16 @@ class OpphørValidatorService(
                 vilkårperioder.aktiviteter.any{ it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }
 
         brukerfeilHvis(finnesOppfyltVilkårEllerVilkårperioderMedStatusNy) { "Det er nye vilkår eller vilkårperiode med status NY" }
+    }
+
+    private fun validerIngenUtbetalingEtterOpphør(saksbehandling: Saksbehandling) {
+        val beregningsresultatTilsynBarn = tilsynBarnBeregningService.beregn(saksbehandling)
+        val revurderFraDato = saksbehandling.revurderFra
+        beregningsresultatTilsynBarn.perioder.forEach { periode ->
+            periode.beløpsperioder.forEach {
+                brukerfeilHvis(it.dato > revurderFraDato && it.beløp > 0) { "Det er utbetalinger etter opphørsdato" }
+            }
+        }
     }
 
     private fun validerVilkår() {

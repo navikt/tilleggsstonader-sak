@@ -66,7 +66,7 @@ class TilsynBarnBeregnYtelseSteg(
     }
 
     private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnDto) {
-        opphørValidatorService.validerOpphør(saksbehandling.id)
+        opphørValidatorService.validerOpphør(saksbehandling)
 
         val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling)
         vedtakRepository.insert(
