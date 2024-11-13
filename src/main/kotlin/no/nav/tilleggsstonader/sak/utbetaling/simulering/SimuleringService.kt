@@ -52,13 +52,6 @@ class SimuleringService(
         }
 
         val resultat = simulerMedTilkjentYtelse(saksbehandling)
-        feilHvis(EnvUtil.erIProd() && resultat?.oppsummeringer?.any { it.totalFeilutbetaling > 0 } ?: false) {
-            /**
-             * Kaster foreløpig bare en feil her, då feiler dette steget men vedtaket er lagret.
-             * Økonomi har ennå ikke satt opp tilbakekrevingsløypa i prod ennå
-             */
-            "Vedtak gir tilbakekreving, vi har foreløpig ikke støtte for iverksettinger som gir tilbakekreving"
-        }
 
         simuleringsresultatRepository.deleteById(saksbehandling.id)
         return simuleringsresultatRepository.insert(
