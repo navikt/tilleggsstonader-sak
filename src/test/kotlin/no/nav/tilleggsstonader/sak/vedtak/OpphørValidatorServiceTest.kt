@@ -20,9 +20,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 
 class OpphørValidatorServiceTest {
@@ -32,28 +31,19 @@ class OpphørValidatorServiceTest {
     private val tilsynBarnBeregningService = mockk<TilsynBarnBeregningService>()
 
     val saksbehandling = saksbehandling(revurderFra = osloDateNow(), type = BehandlingType.REVURDERING)
-
     val opphørValidatorService = OpphørValidatorService(vilkårperiodeService, vilkårService, tilsynBarnBeregningService)
 
-    @BeforeEach
-    fun setUp() {
-    }
+    @Test
+    fun kasterIkkeFeilVedKorrektData() {
+        every { vilkårService.hentVilkår(any()) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
+        every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(listOf(VilkårperiodeTestUtil.målgruppe(status = Vilkårstatus.ENDRET)), listOf(VilkårperiodeTestUtil.aktivitet(status = Vilkårstatus.ENDRET)))
+        every { tilsynBarnBeregningService.beregn(any()) } returns vedtakBeregningsresultat
 
-    @AfterEach
-    fun tearDown() {
+        assertDoesNotThrow { opphørValidatorService.validerOpphør(saksbehandling.copy(revurderFra = osloDateNow().plusMonths(2))) }
     }
 
     @Test
-    fun validerOpphørKasterIkkeValideringsfeil() {
-        every { vilkårService.hentVilkår(saksbehandling.id) } returns emptyList()
-        every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), emptyList())
-        every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
-
-        opphørValidatorService.validerOpphør(saksbehandling)
-    }
-
-    @Test
-    fun validerValiderIngenNyeOppfylteVilkårKasterFeil() {
+    fun kasterFeilVedIngenNyeOppfylteVilkår() {
         every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.NY))
         every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), emptyList())
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
@@ -65,7 +55,7 @@ class OpphørValidatorServiceTest {
     }
 
     @Test
-    fun validerValiderIngenNyeOppfylteMålgrupperKasterFeil() {
+    fun kasterFeilVedIngenNyeOppfylteMålgrupper() {
         every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
         every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(listOf(VilkårperiodeTestUtil.målgruppe()), emptyList())
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
@@ -77,7 +67,7 @@ class OpphørValidatorServiceTest {
     }
 
     @Test
-    fun validerValiderIngenNyeOppfylteAktivteterKasterFeil() {
+    fun kasterFeilVedIngenNyeOppfylteAktivteter() {
         every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
         every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), listOf(VilkårperiodeTestUtil.aktivitet()))
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
@@ -89,7 +79,7 @@ class OpphørValidatorServiceTest {
     }
 
     @Test
-    fun validerUtbetalingEtterOpphørKasterFeil() {
+    fun kasterFeilVedUtbetalingEtterOpphør() {
         every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
         every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), emptyList())
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns vedtakBeregningsresultat
@@ -101,7 +91,7 @@ class OpphørValidatorServiceTest {
     }
 
     @Test
-    fun validerTomForMålgruppeFlyttetTilEtterOpphørtDatoKasterFeil() {
+    fun kasterFeilVedMålgruppePeriodeFlyttetTilEtterOpphørtDato() {
         every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
         every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(listOf(VilkårperiodeTestUtil.målgruppe(status = Vilkårstatus.ENDRET)), emptyList())
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
@@ -113,7 +103,7 @@ class OpphørValidatorServiceTest {
     }
 
     @Test
-    fun validerTomForAktivitetFlyttetTilEtterOpphørtDatoKasterFeil() {
+    fun kasterFeilVedAktivitetPeriodeFlyttetTilEtterOpphørtDato() {
         every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
         every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), listOf(VilkårperiodeTestUtil.aktivitet(status = Vilkårstatus.ENDRET)))
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
@@ -125,7 +115,7 @@ class OpphørValidatorServiceTest {
     }
 
     @Test
-    fun validerTomForVilkårFlyttetTilEtterOpphørtDatoKasterFeil() {
+    fun kasterFeilVedVilkårPeriodeFlyttetTilEtterOpphørtDato() {
         every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.ENDRET, tom = osloDateNow().plusMonths(1).tilSisteDagIMåneden()))
         every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), emptyList())
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
