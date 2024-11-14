@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -84,5 +86,17 @@ class OpphørValidatorServiceTest {
             opphørValidatorService.validerOpphør(saksbehandling)
         }
         assertThat(feil.message).isEqualTo("Det er nye vilkår eller vilkårperiode med status NY")
+    }
+
+    @Test
+    fun validerUtbetalingEtterOpphørKasterFeil() {
+        every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
+        every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), emptyList())
+        every { tilsynBarnBeregningService.beregn(saksbehandling) } returns vedtakBeregningsresultat
+
+        val feil: ApiFeil = assertThrows {
+            opphørValidatorService.validerOpphør(saksbehandling)
+        }
+        assertThat(feil.message).isEqualTo("Det er utbetalinger etter opphørsdato")
     }
 }
