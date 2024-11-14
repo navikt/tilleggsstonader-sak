@@ -25,7 +25,7 @@ class OpphørValidatorService(
         val vilkår = vilkårService.hentVilkår(saksbehandling.id)
         val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling.id)
 
-        validerIngenOppfylteVilkårEllerVilkårperioderMedStatusNy(vilkår, vilkårperioder)
+        validerIngenNyeOppfylteVilkårEllerVilkårperioder(vilkår, vilkårperioder)
         validerIngenUtbetalingEtterOpphør(saksbehandling)
         validerIngenEndredePerioderMedTomEtterOpphørsdato(
             vilkårperioder,
@@ -34,7 +34,7 @@ class OpphørValidatorService(
         )
     }
 
-    private fun validerIngenOppfylteVilkårEllerVilkårperioderMedStatusNy(
+    private fun validerIngenNyeOppfylteVilkårEllerVilkårperioder(
         vilkår: List<Vilkår>,
         vilkårperioder: Vilkårperioder,
     ) {
