@@ -14,6 +14,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -49,9 +51,33 @@ class OpphørValidatorServiceTest {
     }
 
     @Test
-    fun validerValiderIngenNyeOppfylteVilkårEllerVilkårperioder() {
+    fun validerValiderIngenNyeOppfylteVilkårKasterFeil() {
         every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.NY))
         every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), emptyList())
+        every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
+
+        val feil: ApiFeil = assertThrows {
+            opphørValidatorService.validerOpphør(saksbehandling)
+        }
+        assertThat(feil.message).isEqualTo("Det er nye vilkår eller vilkårperiode med status NY")
+    }
+
+    @Test
+    fun validerValiderIngenNyeOppfylteMålgrupperKasterFeil() {
+        every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
+        every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(listOf(VilkårperiodeTestUtil.målgruppe()), emptyList())
+        every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
+
+        val feil: ApiFeil = assertThrows {
+            opphørValidatorService.validerOpphør(saksbehandling)
+        }
+        assertThat(feil.message).isEqualTo("Det er nye vilkår eller vilkårperiode med status NY")
+    }
+
+    @Test
+    fun validerValiderIngenNyeOppfylteAktivteterKasterFeil() {
+        every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
+        every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), listOf(VilkårperiodeTestUtil.aktivitet()))
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
 
         val feil: ApiFeil = assertThrows {
