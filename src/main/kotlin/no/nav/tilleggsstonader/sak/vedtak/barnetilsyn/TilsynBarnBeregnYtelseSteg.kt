@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.OpphørValidatorService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
@@ -22,8 +23,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
-import no.nav.tilleggsstonader.sak.vedtak.OpphørValidatorService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 
 @Service
 class TilsynBarnBeregnYtelseSteg(

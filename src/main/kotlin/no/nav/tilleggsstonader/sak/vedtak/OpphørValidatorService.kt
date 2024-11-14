@@ -9,17 +9,16 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class OpphørValidatorService(
     private val vilkårsperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
-    private val vilkårperiodeRepository: VilkårperiodeRepository,
 ) {
 
     fun validerOpphør(saksbehandling: Saksbehandling) {
@@ -28,17 +27,25 @@ class OpphørValidatorService(
 
         validerIngenOppfylteVilkårEllerVilkårperioderMedStatusNy(vilkår, vilkårperioder)
         validerIngenUtbetalingEtterOpphør(saksbehandling)
+        validerIngenEndredePerioderMedTomEtterOpphørsdato(
+            vilkårperioder,
+            vilkår,
+            saksbehandling.revurderFra ?: error("RevurderFra er påkrevd for opphør"),
+        )
 
         validerVilkår()
         validerVilkårperiode()
         validerOverlappsperiode()
     }
 
-
-    private fun validerIngenOppfylteVilkårEllerVilkårperioderMedStatusNy(vilkår: List<Vilkår>, vilkårperioder: Vilkårperioder){
-        val finnesOppfyltVilkårEllerVilkårperioderMedStatusNy = vilkår.any { it.status == VilkårStatus.NY && it.resultat == Vilkårsresultat.OPPFYLT } &&
-                vilkårperioder.målgrupper.any{ it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT } &&
-                vilkårperioder.aktiviteter.any{ it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }
+    private fun validerIngenOppfylteVilkårEllerVilkårperioderMedStatusNy(
+        vilkår: List<Vilkår>,
+        vilkårperioder: Vilkårperioder,
+    ) {
+        val finnesOppfyltVilkårEllerVilkårperioderMedStatusNy =
+            vilkår.any { it.status == VilkårStatus.NY && it.resultat == Vilkårsresultat.OPPFYLT } &&
+                vilkårperioder.målgrupper.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT } &&
+                vilkårperioder.aktiviteter.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }
 
         brukerfeilHvis(finnesOppfyltVilkårEllerVilkårperioderMedStatusNy) { "Det er nye vilkår eller vilkårperiode med status NY" }
     }
@@ -53,27 +60,48 @@ class OpphørValidatorService(
         }
     }
 
-    private fun validerVilkår() {
-        // Resultat kan endre seg fra oppfylt til ikke oppfylt, men ikke motsatt
-        // At TOM er lik eller "forkortet"
-        // Har de samme fom og beløp som tidligere
-        val vilkår = vilkårperiodeRepository
-
-
-        TODO()
+    private fun validerIngenEndredePerioderMedTomEtterOpphørsdato(
+        vilkårperioder: Vilkårperioder,
+        vilkår: List<Vilkår>,
+        opphørsDato: LocalDate,
+    ) {
+        vilkårperioder.målgrupper.forEach { vilkårperiode ->
+            if (vilkårperiode.status == Vilkårstatus.ENDRET) {
+                brukerfeilHvis(vilkårperiode.tom > opphørsDato) { "TOM er etter opphørsdato for endret målgruppe" }
+            }
+        }
+        vilkårperioder.aktiviteter.forEach { vilkårperiode ->
+            if (vilkårperiode.status == Vilkårstatus.ENDRET) {
+                brukerfeilHvis(vilkårperiode.tom > opphørsDato) { "TOM er etter opphørsdato for endret aktivitet" }
+            }
+        }
+        vilkår.forEach { vilkår ->
+            if (vilkår.status == VilkårStatus.ENDRET) {
+                val tom = vilkår.tom ?: error("TOM er påkrevd for endret vilkår")
+                brukerfeilHvis(tom > opphørsDato) { "TOM er etter opphørsdato for endret vilkår" }
+            }
+        }
     }
+}
 
-    private fun validerVilkårperiode() {
-        // Resultat kan endre seg fra oppfylt til ikke oppfylt
-        // At TOM er lik eller "forkortet"
+private fun validerVilkår() {
+    // Resultat kan endre seg fra oppfylt til ikke oppfylt, men ikke motsatt
+    // At TOM er lik eller "forkortet"
+    // Har de samme fom og beløp som tidligere
 
-        //val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
+    TODO()
+}
 
-        TODO()
-    }
+private fun validerVilkårperiode() {
+    // Resultat kan endre seg fra oppfylt til ikke oppfylt
+    // At TOM er lik eller "forkortet"
 
-    private fun validerOverlappsperiode() {
-        // At TOM er lik eller "forkortet"
-        TODO()
-    }
+    // val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
+
+    TODO()
+}
+
+private fun validerOverlappsperiode() {
+    // At TOM er lik eller "forkortet"
+    TODO()
 }
