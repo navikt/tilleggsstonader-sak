@@ -39,8 +39,8 @@ class OpphørValidatorService(
         vilkårperioder: Vilkårperioder,
     ) {
         val finnesOppfyltVilkårEllerVilkårperioderMedStatusNy =
-            vilkår.any { it.status == VilkårStatus.NY && it.resultat == Vilkårsresultat.OPPFYLT } &&
-                vilkårperioder.målgrupper.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT } &&
+            vilkår.any { it.status == VilkårStatus.NY && it.resultat == Vilkårsresultat.OPPFYLT } ||
+                vilkårperioder.målgrupper.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT } ||
                 vilkårperioder.aktiviteter.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }
 
         brukerfeilHvis(finnesOppfyltVilkårEllerVilkårperioderMedStatusNy) { "Det er nye vilkår eller vilkårperiode med status NY" }
