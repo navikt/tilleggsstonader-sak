@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
+import no.nav.tilleggsstonader.sak.vedtak.OpphørValidatorService
 
 class TilsynBarnBeregnYtelseStegTest {
 
@@ -37,6 +38,7 @@ class TilsynBarnBeregnYtelseStegTest {
     private val stønadsperiodeService = mockk<StønadsperiodeRepository>(relaxed = true)
     private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>(relaxed = true)
     private val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>(relaxed = true)
+    private val opphørValidatorService = mockk<OpphørValidatorService>(relaxed = true)
 
     val tilsynBarnBeregningService = TilsynBarnBeregningService(
         stønadsperiodeRepository = stønadsperiodeService,
@@ -51,6 +53,7 @@ class TilsynBarnBeregnYtelseStegTest {
         tilkjentytelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
         unleashService = mockUnleashService(),
+        opphørValidatorService = opphørValidatorService,
     )
 
     val saksbehandling = saksbehandling()
