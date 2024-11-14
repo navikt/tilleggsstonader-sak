@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.tilSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakBeregningsresultat
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -98,5 +100,42 @@ class OpphørValidatorServiceTest {
             opphørValidatorService.validerOpphør(saksbehandling)
         }
         assertThat(feil.message).isEqualTo("Det er utbetalinger etter opphørsdato")
+    }
+
+
+    @Test
+    fun validerTomForMålgruppeFlyttetTilEtterOpphørtDatoKasterFeil() {
+        every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
+        every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(listOf(VilkårperiodeTestUtil.målgruppe(status= Vilkårstatus.ENDRET)), emptyList())
+        every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
+
+        val feil: ApiFeil = assertThrows {
+            opphørValidatorService.validerOpphør(saksbehandling)
+        }
+        assertThat(feil.message).isEqualTo("TOM er etter opphørsdato for endret målgruppe")
+    }
+
+    @Test
+    fun validerTomForAktivitetFlyttetTilEtterOpphørtDatoKasterFeil() {
+        every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
+        every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), listOf(VilkårperiodeTestUtil.aktivitet(status= Vilkårstatus.ENDRET)))
+        every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
+
+        val feil: ApiFeil = assertThrows {
+            opphørValidatorService.validerOpphør(saksbehandling)
+        }
+        assertThat(feil.message).isEqualTo("TOM er etter opphørsdato for endret aktivitet")
+    }
+
+    @Test
+    fun validerTomForVilkårFlyttetTilEtterOpphørtDatoKasterFeil() {
+        every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.ENDRET, tom = osloDateNow().plusMonths(1).tilSisteDagIMåneden()))
+        every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), emptyList())
+        every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
+
+        val feil: ApiFeil = assertThrows {
+            opphørValidatorService.validerOpphør(saksbehandling)
+        }
+        assertThat(feil.message).isEqualTo("TOM er etter opphørsdato for endret vilkår")
     }
 }
