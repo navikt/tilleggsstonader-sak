@@ -35,6 +35,15 @@ class OpphørValidatorServiceTest {
 
 
     @Test
+    fun validerOpphørKasterIkkeValideringsfeil() {
+        every { vilkårService.hentVilkår(saksbehandling.id) } returns emptyList()
+        every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), emptyList())
+        every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
+
+        opphørValidatorService.validerOpphør(saksbehandling)
+    }
+
+    @Test
     fun validerValiderIngenOppfylteVilkårEllerVilkårperioderMedStatusNy() {
         every { vilkårService.hentVilkår(saksbehandling.id) } returns emptyList()
         every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), emptyList())
