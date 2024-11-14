@@ -32,10 +32,6 @@ class OpphørValidatorService(
             vilkår,
             saksbehandling.revurderFra ?: error("RevurderFra er påkrevd for opphør"),
         )
-
-        validerVilkår()
-        validerVilkårperiode()
-        validerOverlappsperiode()
     }
 
     private fun validerIngenOppfylteVilkårEllerVilkårperioderMedStatusNy(
@@ -82,26 +78,4 @@ class OpphørValidatorService(
             }
         }
     }
-}
-
-private fun validerVilkår() {
-    // Resultat kan endre seg fra oppfylt til ikke oppfylt, men ikke motsatt
-    // At TOM er lik eller "forkortet"
-    // Har de samme fom og beløp som tidligere
-
-    TODO()
-}
-
-private fun validerVilkårperiode() {
-    // Resultat kan endre seg fra oppfylt til ikke oppfylt
-    // At TOM er lik eller "forkortet"
-
-    // val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
-
-    TODO()
-}
-
-private fun validerOverlappsperiode() {
-    // At TOM er lik eller "forkortet"
-    TODO()
 }
