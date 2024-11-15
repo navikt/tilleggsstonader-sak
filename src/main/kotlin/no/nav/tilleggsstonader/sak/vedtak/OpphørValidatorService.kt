@@ -43,7 +43,7 @@ class OpphørValidatorService(
                 vilkårperioder.målgrupper.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT } ||
                 vilkårperioder.aktiviteter.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }
 
-        brukerfeilHvis(finnesOppfyltVilkårEllerVilkårperioderMedStatusNy) { "Det er nye vilkår eller vilkårperiode med status NY" }
+        brukerfeilHvis(finnesOppfyltVilkårEllerVilkårperioderMedStatusNy) { "Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT." }
     }
 
     private fun validerIngenUtbetalingEtterOpphør(saksbehandling: Saksbehandling) {

@@ -51,7 +51,7 @@ class OpphørValidatorServiceTest {
         val feil: ApiFeil = assertThrows {
             opphørValidatorService.validerOpphør(saksbehandling)
         }
-        assertThat(feil.message).isEqualTo("Det er nye vilkår eller vilkårperiode med status NY")
+        assertThat(feil.message).isEqualTo("Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT.")
     }
 
     @Test
@@ -63,7 +63,7 @@ class OpphørValidatorServiceTest {
         val feil: ApiFeil = assertThrows {
             opphørValidatorService.validerOpphør(saksbehandling)
         }
-        assertThat(feil.message).isEqualTo("Det er nye vilkår eller vilkårperiode med status NY")
+        assertThat(feil.message).isEqualTo("Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT.")
     }
 
     @Test
@@ -75,7 +75,7 @@ class OpphørValidatorServiceTest {
         val feil: ApiFeil = assertThrows {
             opphørValidatorService.validerOpphør(saksbehandling)
         }
-        assertThat(feil.message).isEqualTo("Det er nye vilkår eller vilkårperiode med status NY")
+        assertThat(feil.message).isEqualTo("Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT.")
     }
 
     @Test
