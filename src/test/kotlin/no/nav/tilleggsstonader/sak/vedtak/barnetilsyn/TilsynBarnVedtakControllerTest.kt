@@ -34,6 +34,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.client.exchange
 import java.time.LocalDate
 import java.time.YearMonth
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 
 class TilsynBarnVedtakControllerTest(
     @Autowired
@@ -64,11 +67,11 @@ class TilsynBarnVedtakControllerTest(
     @BeforeEach
     fun setUp() {
         headers.setBearerAuth(onBehalfOfToken())
-        testoppsettService.opprettBehandlingMedFagsak(behandling)
-        barnRepository.insert(barn)
-        stønadsperiodeRepository.insert(stønadsperiode)
-        vilkårperiodeRepository.insert(aktivitet)
-        vilkårRepository.insert(vilkår)
+//        testoppsettService.opprettBehandlingMedFagsak(behandling)
+//        barnRepository.insert(barn)
+//        stønadsperiodeRepository.insert(stønadsperiode)
+//        vilkårperiodeRepository.insert(aktivitet)
+//        vilkårRepository.insert(vilkår)
     }
 
     @Test
@@ -120,9 +123,39 @@ class TilsynBarnVedtakControllerTest(
             begrunnelse = "endre utgifter opphør",
         )
 
-        opphørVedtak(behandling, vedtak)
+        val behandlingForLagreOpphør = behandling(
+            steg = StegType.BEREGNE_YTELSE,
+            status = BehandlingStatus.UTREDES,
+            revurderFra = LocalDate.of(2023, 2, 1),
+            type = BehandlingType.REVURDERING
+        )
 
-        val lagretDto = hentVedtak(behandling.id).body!!
+        val aktivitetLagreOpphør = aktivitet(
+            behandlingForLagreOpphør.id,
+            fom = LocalDate.of(2023, 1, 1),
+            tom = LocalDate.of(2023, 1, 31),
+            status = Vilkårstatus.ENDRET
+        )
+
+        val vilkårLagreOpphør = vilkår(
+            status = VilkårStatus.ENDRET,
+            behandlingId = behandlingForLagreOpphør.id,
+            barnId = barn.id,
+            type = VilkårType.PASS_BARN,
+            resultat = Vilkårsresultat.OPPFYLT,
+            fom = LocalDate.of(2023, 1, 1),
+            tom = LocalDate.of(2023, 1, 31),
+            utgift = 100,
+        )
+
+        testoppsettService.opprettBehandlingMedFagsak(behandlingForLagreOpphør)
+
+        vilkårperiodeRepository.insert(aktivitetLagreOpphør)
+        vilkårRepository.insert(vilkårLagreOpphør)
+
+        opphørVedtak(behandlingForLagreOpphør, vedtak)
+
+        val lagretDto = hentVedtak(behandlingForLagreOpphør.id).body!!
 
         assertThat((lagretDto as OpphørTilsynBarnDto).årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
