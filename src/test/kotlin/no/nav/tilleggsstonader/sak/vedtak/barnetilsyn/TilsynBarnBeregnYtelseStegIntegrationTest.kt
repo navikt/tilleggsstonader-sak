@@ -41,6 +41,10 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.YearMonth
+import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 
 class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
@@ -225,14 +229,17 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Nested
     inner class Opphør {
 
+        val aktivitetForOpphør = aktivitet.copy(status = Vilkårstatus.ENDRET)
+        val saksbehandlingForOpphør = saksbehandling.copy(revurderFra = LocalDate.of(2023,2,1))
+
         @Test
         fun `skal lagre vedtak`() {
             stønadsperiodeRepository.insert(stønadsperiode)
-            vilkårperiodeRepository.insert(aktivitet)
-            lagVilkårForPeriode(saksbehandling, januar, januar, 100)
+            vilkårperiodeRepository.insert(aktivitetForOpphør)
+            lagVilkårForPeriode(saksbehandling, januar, januar, 100, status = VilkårStatus.ENDRET)
 
             val vedtakDto = opphørDto()
-            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
+            steg.utførOgReturnerNesteSteg(saksbehandlingForOpphør, vedtakDto)
 
             val vedtak = repository.findByIdOrThrow(saksbehandling.id)
 
@@ -242,14 +249,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
             assertThat(vedtak.årsakerOpphør?.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
             assertThat(vedtak.opphørBegrunnelse).isEqualTo("Nye utgifter")
-            assertThat(vedtak.beregningsresultat!!.perioder.single().beløpsperioder).containsExactly(
-                Beløpsperiode(
-                    LocalDate.of(2023, 1, 2),
-                    65,
-                    MålgruppeType.AAP,
-                ),
-            )
-            assertThat(tilkjentYtelse).hasSize(1)
+            assertThat(vedtak.beregningsresultat!!.perioder).isEmpty()
+            assertThat(tilkjentYtelse).isEmpty()
         }
     }
 
@@ -538,6 +539,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         fom: YearMonth,
         tom: YearMonth,
         utgift: Int,
+        status: VilkårStatus = VilkårStatus.NY,
     ) {
         vilkårRepository.insert(
             vilkår(
@@ -548,6 +550,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 fom = fom.atDay(1),
                 tom = tom.atEndOfMonth(),
                 utgift = utgift,
+                status = status
             ),
         )
     }
