@@ -35,6 +35,7 @@ import org.springframework.web.client.exchange
 import java.time.LocalDate
 import java.time.YearMonth
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 
@@ -67,11 +68,11 @@ class TilsynBarnVedtakControllerTest(
     @BeforeEach
     fun setUp() {
         headers.setBearerAuth(onBehalfOfToken())
-//        testoppsettService.opprettBehandlingMedFagsak(behandling)
-//        barnRepository.insert(barn)
-//        stønadsperiodeRepository.insert(stønadsperiode)
-//        vilkårperiodeRepository.insert(aktivitet)
-//        vilkårRepository.insert(vilkår)
+        testoppsettService.opprettBehandlingMedFagsak(behandling)
+        barnRepository.insert(barn)
+        stønadsperiodeRepository.insert(stønadsperiode)
+        vilkårperiodeRepository.insert(aktivitet)
+        vilkårRepository.insert(vilkår)
     }
 
     @Test
@@ -148,7 +149,7 @@ class TilsynBarnVedtakControllerTest(
             utgift = 100,
         )
 
-        testoppsettService.opprettBehandlingMedFagsak(behandlingForLagreOpphør)
+        testoppsettService.opprettBehandlingMedFagsak(behandlingForLagreOpphør, identer = setOf(PersonIdent("42")))
 
         vilkårperiodeRepository.insert(aktivitetLagreOpphør)
         vilkårRepository.insert(vilkårLagreOpphør)

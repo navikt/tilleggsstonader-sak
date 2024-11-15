@@ -43,8 +43,9 @@ class TestoppsettService(
         behandling: Behandling,
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
         opprettGrunnlagsdata: Boolean = true,
+        identer: Set<PersonIdent> = defaultIdenter,
     ): Behandling {
-        val person = opprettPerson(fagsak())
+        val person = opprettPerson(fagsak(identer = identer))
         lagreFagsak(
             fagsak(
                 id = behandling.fagsakId,
