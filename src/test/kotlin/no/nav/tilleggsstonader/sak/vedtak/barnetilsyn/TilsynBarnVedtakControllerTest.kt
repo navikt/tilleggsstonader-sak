@@ -124,7 +124,7 @@ class TilsynBarnVedtakControllerTest(
             begrunnelse = "endre utgifter opphør",
         )
 
-        val behandlingForLagreOpphør = behandling(
+        val behandlingLagreOpphør = behandling(
             steg = StegType.BEREGNE_YTELSE,
             status = BehandlingStatus.UTREDES,
             revurderFra = LocalDate.of(2023, 2, 1),
@@ -132,7 +132,7 @@ class TilsynBarnVedtakControllerTest(
         )
 
         val aktivitetLagreOpphør = aktivitet(
-            behandlingForLagreOpphør.id,
+            behandlingLagreOpphør.id,
             fom = LocalDate.of(2023, 1, 1),
             tom = LocalDate.of(2023, 1, 31),
             status = Vilkårstatus.ENDRET,
@@ -140,7 +140,7 @@ class TilsynBarnVedtakControllerTest(
 
         val vilkårLagreOpphør = vilkår(
             status = VilkårStatus.ENDRET,
-            behandlingId = behandlingForLagreOpphør.id,
+            behandlingId = behandlingLagreOpphør.id,
             barnId = barn.id,
             type = VilkårType.PASS_BARN,
             resultat = Vilkårsresultat.OPPFYLT,
@@ -149,14 +149,13 @@ class TilsynBarnVedtakControllerTest(
             utgift = 100,
         )
 
-        testoppsettService.opprettBehandlingMedFagsak(behandlingForLagreOpphør, identer = setOf(PersonIdent("42")))
-
+        testoppsettService.opprettBehandlingMedFagsak(behandlingLagreOpphør, identer = setOf(PersonIdent("42")))
         vilkårperiodeRepository.insert(aktivitetLagreOpphør)
         vilkårRepository.insert(vilkårLagreOpphør)
 
-        opphørVedtak(behandlingForLagreOpphør, vedtak)
+        opphørVedtak(behandlingLagreOpphør, vedtak)
 
-        val lagretDto = hentVedtak(behandlingForLagreOpphør.id).body!!
+        val lagretDto = hentVedtak(behandlingLagreOpphør.id).body!!
 
         assertThat((lagretDto as OpphørTilsynBarnDto).årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
