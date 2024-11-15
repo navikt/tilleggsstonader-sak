@@ -5,7 +5,9 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -20,10 +22,12 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,10 +38,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.client.exchange
 import java.time.LocalDate
 import java.time.YearMonth
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 
 class TilsynBarnVedtakControllerTest(
     @Autowired
@@ -128,14 +128,14 @@ class TilsynBarnVedtakControllerTest(
             steg = StegType.BEREGNE_YTELSE,
             status = BehandlingStatus.UTREDES,
             revurderFra = LocalDate.of(2023, 2, 1),
-            type = BehandlingType.REVURDERING
+            type = BehandlingType.REVURDERING,
         )
 
         val aktivitetLagreOpphør = aktivitet(
             behandlingForLagreOpphør.id,
             fom = LocalDate.of(2023, 1, 1),
             tom = LocalDate.of(2023, 1, 31),
-            status = Vilkårstatus.ENDRET
+            status = Vilkårstatus.ENDRET,
         )
 
         val vilkårLagreOpphør = vilkår(

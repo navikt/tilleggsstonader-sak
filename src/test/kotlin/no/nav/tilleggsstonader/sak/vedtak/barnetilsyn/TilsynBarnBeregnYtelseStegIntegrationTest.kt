@@ -20,16 +20,17 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
@@ -41,10 +42,6 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.YearMonth
-import no.nav.tilleggsstonader.libs.utils.osloDateNow
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 
 class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
@@ -230,7 +227,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     inner class Opphør {
 
         val aktivitetForOpphør = aktivitet.copy(status = Vilkårstatus.ENDRET)
-        val saksbehandlingForOpphør = saksbehandling.copy(revurderFra = LocalDate.of(2023,2,1))
+        val saksbehandlingForOpphør = saksbehandling.copy(revurderFra = LocalDate.of(2023, 2, 1))
 
         @Test
         fun `skal lagre vedtak`() {
@@ -550,7 +547,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 fom = fom.atDay(1),
                 tom = tom.atEndOfMonth(),
                 utgift = utgift,
-                status = status
+                status = status,
             ),
         )
     }
