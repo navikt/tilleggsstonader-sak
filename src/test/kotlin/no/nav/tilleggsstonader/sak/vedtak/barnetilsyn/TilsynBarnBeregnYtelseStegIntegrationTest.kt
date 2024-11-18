@@ -6,6 +6,8 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
@@ -226,23 +228,32 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Nested
     inner class Opphør {
 
-        val aktivitetForOpphør = aktivitet.copy(status = Vilkårstatus.ENDRET)
-        val saksbehandlingForOpphør = saksbehandling.copy(revurderFra = LocalDate.of(2023, 2, 1))
+        val behandlingForOpphør = behandling(
+            steg = StegType.BEREGNE_YTELSE,
+            status = BehandlingStatus.UTREDES,
+            revurderFra = LocalDate.of(2023, 2, 1),
+            type = BehandlingType.REVURDERING,
+        )
+        val saksbehandlingForOpphør = saksbehandling(behandling = behandlingForOpphør).copy(revurderFra = LocalDate.of(2023, 2, 1))
+        val stønadsperiodeForOpphør =
+            stønadsperiode(behandlingId = behandlingForOpphør.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
+        val aktivitetForOpphør = aktivitet(behandlingForOpphør.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31), status = Vilkårstatus.ENDRET)
 
         @Test
         fun `skal lagre vedtak`() {
-            stønadsperiodeRepository.insert(stønadsperiode)
+            testoppsettService.opprettBehandlingMedFagsak(behandlingForOpphør, identer = setOf(PersonIdent("42")))
+            stønadsperiodeRepository.insert(stønadsperiodeForOpphør)
             vilkårperiodeRepository.insert(aktivitetForOpphør)
-            lagVilkårForPeriode(saksbehandling, januar, januar, 100, status = VilkårStatus.ENDRET)
+            lagVilkårForPeriode(saksbehandlingForOpphør, januar, januar, 100, status = VilkårStatus.ENDRET)
 
             val vedtakDto = opphørDto()
             steg.utførOgReturnerNesteSteg(saksbehandlingForOpphør, vedtakDto)
 
-            val vedtak = repository.findByIdOrThrow(saksbehandling.id)
+            val vedtak = repository.findByIdOrThrow(saksbehandlingForOpphør.id)
 
-            val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse
+            val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(saksbehandlingForOpphør.id)!!.andelerTilkjentYtelse
 
-            assertThat(vedtak.behandlingId).isEqualTo(saksbehandling.id)
+            assertThat(vedtak.behandlingId).isEqualTo(saksbehandlingForOpphør.id)
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
             assertThat(vedtak.årsakerOpphør?.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
             assertThat(vedtak.opphørBegrunnelse).isEqualTo("Nye utgifter")
