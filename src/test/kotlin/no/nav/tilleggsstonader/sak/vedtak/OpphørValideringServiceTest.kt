@@ -55,7 +55,6 @@ class OpphørValideringServiceTest {
 
     @Test
     fun `Kaster feil ved utbetaling etter opphørdato`() {
-
         val saksbehandlingRevurdertFraTilbakeITid =
             saksbehandling.copy(revurderFra = osloDateNow())
         assertThatThrownBy {
