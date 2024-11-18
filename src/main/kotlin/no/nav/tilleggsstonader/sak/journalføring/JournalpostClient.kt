@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequ
 import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.log.NavHttpHeaders
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -28,6 +29,8 @@ class JournalpostClient(
     @Value("\${clients.integrasjoner.uri}") private val integrasjonerBaseUrl: URI,
     @Qualifier("azure") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     private val journalpostUri =
         UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/journalpost").build().toUri()
@@ -58,7 +61,7 @@ class JournalpostClient(
             return postForEntity(dokarkivUri.toString(), arkiverDokumentRequest, headerMedSaksbehandler(saksbehandler))
         } catch (e: Exception) {
             if (e is HttpClientErrorException.Conflict) {
-                håndterConflict(e)
+                håndterConflictArkiverDokument(e)
             }
             throw e
         }
@@ -95,11 +98,18 @@ class JournalpostClient(
     }
 
     fun distribuerJournalpost(request: DistribuerJournalpostRequest, saksbehandler: String? = null): String {
-        return postForEntity<String>(
-            dokdistUri.toString(),
-            request,
-            headerMedSaksbehandler(saksbehandler),
-        )
+        try {
+            return postForEntity<String>(
+                dokdistUri.toString(),
+                request,
+                headerMedSaksbehandler(saksbehandler),
+            )
+        } catch (e: Exception) {
+            if (e is HttpClientErrorException.Conflict) {
+                håndterConflictDistribuerJournalpost(e, request)
+            }
+            throw e
+        }
     }
 
     fun hentDokument(
@@ -112,7 +122,10 @@ class JournalpostClient(
             .pathSegment("hentdokument", "{journalpostId}", "{dokumentInfoId}")
             .queryParam("variantFormat", dokumentVariantformat).encode().toUriString()
 
-        return getForEntity<ByteArray>(uri, uriVariables = mapOf("journalpostId" to journalpostId, "dokumentInfoId" to dokumentInfoId))
+        return getForEntity<ByteArray>(
+            uri,
+            uriVariables = mapOf("journalpostId" to journalpostId, "dokumentInfoId" to dokumentInfoId),
+        )
     }
 
     fun oppdaterLogiskeVedlegg(dokumentInfoId: String, request: BulkOppdaterLogiskVedleggRequest): String {
@@ -140,7 +153,7 @@ class JournalpostClient(
     private fun journalførendeEnhetUriVariables(journalførendeEnhet: String): Map<String, String> =
         mapOf("journalfoerendeEnhet" to journalførendeEnhet)
 
-    private fun håndterConflict(e: HttpClientErrorException.Conflict) {
+    private fun håndterConflictArkiverDokument(e: HttpClientErrorException.Conflict) {
         val response: ArkiverDokumentResponse = try {
             objectMapper.readValue<ArkiverDokumentResponse>(e.responseBodyAsString)
         } catch (ex: Exception) {
@@ -149,5 +162,28 @@ class JournalpostClient(
             throw e
         }
         throw ArkiverDokumentConflictException(response)
+    }
+
+    private fun håndterConflictDistribuerJournalpost(
+        e: HttpClientErrorException.Conflict,
+        request: DistribuerJournalpostRequest,
+    ): String {
+        val body = e.responseBodyAsString
+        if (body.matches(REGEX_KUN_TALL)) {
+            logger.warn("Fikk 409 ved distribuering av journalpost=${request.journalpostId} mottok bestillingId=$body")
+            return body
+        } else {
+            secureLogger.warn(
+                "Klarte ikke å håndtere response om distribuering av journalpost=${request.journalpostId}" +
+                    " body=${e.responseBodyAsString}",
+                e,
+            )
+            // kaster opprinnelig exception
+            throw e
+        }
+    }
+
+    companion object {
+        val REGEX_KUN_TALL = """^\d+$""".toRegex()
     }
 }
