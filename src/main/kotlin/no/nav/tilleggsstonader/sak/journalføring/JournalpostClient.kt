@@ -106,7 +106,7 @@ class JournalpostClient(
             )
         } catch (e: Exception) {
             if (e is HttpClientErrorException.Conflict) {
-                håndterConflictDistribuerJournalpost(e, request)
+                return finnBestillingIdFraConflictBody(e, request)
             }
             throw e
         }
@@ -164,7 +164,7 @@ class JournalpostClient(
         throw ArkiverDokumentConflictException(response)
     }
 
-    private fun håndterConflictDistribuerJournalpost(
+    private fun finnBestillingIdFraConflictBody(
         e: HttpClientErrorException.Conflict,
         request: DistribuerJournalpostRequest,
     ): String {
@@ -187,4 +187,8 @@ class JournalpostClient(
         // Forenklet validering av UUID, inneholder tall, a-z og -
         val REGEX_BESTILLING_ID = """^[\da-z\-]+$""".toRegex()
     }
+}
+
+fun main() {
+    println("d96647f8-f96a-452b-9e3b-d4881269ce73".matches("""^[\da-z\-]+$""".toRegex()))
 }
