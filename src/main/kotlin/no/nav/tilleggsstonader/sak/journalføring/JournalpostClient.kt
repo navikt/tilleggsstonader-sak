@@ -169,7 +169,7 @@ class JournalpostClient(
         request: DistribuerJournalpostRequest,
     ): String {
         val body = e.responseBodyAsString
-        if (body.matches(REGEX_KUN_TALL)) {
+        if (body.matches(REGEX_BESTILLING_ID)) {
             logger.warn("Fikk 409 ved distribuering av journalpost=${request.journalpostId} mottok bestillingId=$body")
             return body
         } else {
@@ -184,6 +184,7 @@ class JournalpostClient(
     }
 
     companion object {
-        val REGEX_KUN_TALL = """^\d+$""".toRegex()
+        // Forenklet validering av UUID, inneholder tall, a-z og -
+        val REGEX_BESTILLING_ID = """^[\da-z\-]+$""".toRegex()
     }
 }
