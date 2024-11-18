@@ -99,7 +99,7 @@ class OpphørValideringServiceTest {
         val feil: ApiFeil = assertThrows {
             opphørValideringService.validerOpphør(saksbehandling)
         }
-        assertThat(feil.message).isEqualTo("TOM er etter opphørsdato for endret målgruppe")
+        assertThat(feil.message).isEqualTo("Til og med dato for endret målgruppe er etter opphørsdato")
     }
 
     @Test
@@ -111,7 +111,7 @@ class OpphørValideringServiceTest {
         val feil: ApiFeil = assertThrows {
             opphørValideringService.validerOpphør(saksbehandling)
         }
-        assertThat(feil.message).isEqualTo("TOM er etter opphørsdato for endret aktivitet")
+        assertThat(feil.message).isEqualTo("Til og med dato for endret aktivitet er etter opphørsdato")
     }
 
     @Test
@@ -123,6 +123,6 @@ class OpphørValideringServiceTest {
         val feil: ApiFeil = assertThrows {
             opphørValideringService.validerOpphør(saksbehandling)
         }
-        assertThat(feil.message).isEqualTo("TOM er etter opphørsdato for endret vilkår")
+        assertThat(feil.message).isEqualTo("Til og med dato for endret vilkår er etter opphørsdato")
     }
 }

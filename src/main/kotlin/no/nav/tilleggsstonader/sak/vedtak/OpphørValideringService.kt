@@ -63,18 +63,18 @@ class OpphørValideringService(
     ) {
         vilkårperioder.målgrupper.forEach { vilkårperiode ->
             if (vilkårperiode.status == Vilkårstatus.ENDRET) {
-                brukerfeilHvis(vilkårperiode.tom > opphørsDato) { "TOM er etter opphørsdato for endret målgruppe" }
+                brukerfeilHvis(vilkårperiode.tom > opphørsDato) { "Til og med dato for endret målgruppe er etter opphørsdato" }
             }
         }
         vilkårperioder.aktiviteter.forEach { vilkårperiode ->
             if (vilkårperiode.status == Vilkårstatus.ENDRET) {
-                brukerfeilHvis(vilkårperiode.tom > opphørsDato) { "TOM er etter opphørsdato for endret aktivitet" }
+                brukerfeilHvis(vilkårperiode.tom > opphørsDato) { "Til og med dato for endret aktivitet er etter opphørsdato" }
             }
         }
         vilkår.forEach { vilkår ->
             if (vilkår.status == VilkårStatus.ENDRET) {
-                val tom = vilkår.tom ?: error("TOM er påkrevd for endret vilkår")
-                brukerfeilHvis(tom > opphørsDato) { "TOM er etter opphørsdato for endret vilkår" }
+                val tom = vilkår.tom ?: error("Til og med dato er påkrevd for endret vilkår")
+                brukerfeilHvis(tom > opphørsDato) { "Til og med dato for endret vilkår er etter opphørsdato" }
             }
         }
     }
