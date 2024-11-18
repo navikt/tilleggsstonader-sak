@@ -5,12 +5,11 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -50,7 +49,8 @@ class TilsynBarnVedtakControllerTest(
     val vilkårRepository: VilkårRepository,
 ) : IntegrationTest() {
 
-    val behandling = behandling(steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
+    val fagsak = fagsak()
+    val behandling = behandling(fagsak = fagsak, steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
     val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")
     val stønadsperiode =
         stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
@@ -124,12 +124,7 @@ class TilsynBarnVedtakControllerTest(
             begrunnelse = "endre utgifter opphør",
         )
 
-        val behandlingLagreOpphør = behandling(
-            steg = StegType.BEREGNE_YTELSE,
-            status = BehandlingStatus.UTREDES,
-            revurderFra = LocalDate.of(2023, 2, 1),
-            type = BehandlingType.REVURDERING,
-        )
+        val behandlingLagreOpphør = testoppsettService.opprettRevurdering(LocalDate.of(2023, 2, 1), behandling, fagsak)
 
         val aktivitetLagreOpphør = aktivitet(
             behandlingLagreOpphør.id,
@@ -149,7 +144,6 @@ class TilsynBarnVedtakControllerTest(
             utgift = 100,
         )
 
-        testoppsettService.opprettBehandlingMedFagsak(behandlingLagreOpphør, identer = setOf(PersonIdent("42")))
         vilkårperiodeRepository.insert(aktivitetLagreOpphør)
         vilkårRepository.insert(vilkårLagreOpphør)
 

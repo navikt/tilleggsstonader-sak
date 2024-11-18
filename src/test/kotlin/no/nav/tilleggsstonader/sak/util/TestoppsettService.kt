@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakIdRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -20,9 +21,15 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakBeregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksdata
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Profile("integrasjonstest")
 @Service
@@ -33,6 +40,7 @@ class TestoppsettService(
     private val behandlingRepository: BehandlingRepository,
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
     private val grunnlagsdataService: GrunnlagsdataService,
+    private val repository: TilsynBarnVedtakRepository,
 ) {
 
     fun hentBehandling(behandlingId: BehandlingId) = behandlingRepository.findByIdOrThrow(behandlingId)
@@ -95,6 +103,28 @@ class TestoppsettService(
         )
         val eksternFagsakId = eksternFagsakIdRepository.insert(EksternFagsakId(fagsakId = fagsak.id))
         return fagsak.tilFagsakMedPerson(person.identer, eksternFagsakId)
+    }
+
+    fun opprettRevurdering(revurderFra: LocalDate, behandling: Behandling, fagsak: Fagsak): Behandling {
+        oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
+        val forrgieVedtak = VedtakTilsynBarn(
+            behandlingId = behandling.id,
+            type = TypeVedtak.INNVILGELSE,
+            beregningsresultat = vedtakBeregningsresultat,
+            vedtak = vedtaksdata,
+        )
+        repository.insert(forrgieVedtak)
+        val revurdering =
+            behandling(
+                fagsak = fagsak,
+                type = BehandlingType.REVURDERING,
+                revurderFra = revurderFra,
+                forrigeBehandlingId = behandling.id,
+                status = BehandlingStatus.UTREDES,
+                steg = StegType.BEREGNE_YTELSE,
+            )
+        lagre(revurdering)
+        return hentBehandling(revurdering.id)
     }
 
     fun lagBehandlingOgRevurdering(): Behandling {
