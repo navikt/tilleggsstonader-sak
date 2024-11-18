@@ -3,34 +3,33 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 sealed interface VurderingerMålgruppe : Vurderinger
 
 sealed interface MedlemskapVurdering : VurderingerMålgruppe {
-    val medlemskap: Vurdering
+    val medlemskap: VurderingMedlemskap
 }
 
 sealed interface DekketAvAnnetRegelverkVurdering : VurderingerMålgruppe {
-    val dekketAvAnnetRegelverk: Vurdering
+    val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk
 }
 
 data class VurderingAAP(
-    override val dekketAvAnnetRegelverk: Vurdering,
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
 ) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering {
-    override val medlemskap: Vurdering = Vurdering.VURDERING_IMPLISITT_OPPFYLT
+    override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
 }
 
 data class VurderingUføretrygd(
-    override val medlemskap: Vurdering,
-    override val dekketAvAnnetRegelverk: Vurdering,
+    override val medlemskap: VurderingMedlemskap,
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
 ) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering
 
 data class VurderingNedsattArbeidsevne(
-    override val medlemskap: Vurdering,
-    override val dekketAvAnnetRegelverk: Vurdering,
+    override val medlemskap: VurderingMedlemskap,
+    override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
 ) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering
 
 data class VurderingOmstillingsstønad(
-    override val medlemskap: Vurdering,
+    override val medlemskap: VurderingMedlemskap,
 ) : MedlemskapVurdering
 
 data object VurderingOvergangsstønad : MedlemskapVurdering {
-    override val medlemskap: Vurdering =
-        Vurdering.VURDERING_IMPLISITT_OPPFYLT
+    override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
 }

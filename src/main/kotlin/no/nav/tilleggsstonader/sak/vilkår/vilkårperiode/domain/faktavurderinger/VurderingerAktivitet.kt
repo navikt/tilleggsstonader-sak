@@ -5,5 +5,5 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 sealed interface VurderingerAktivitet : Vurderinger
 
 sealed interface LønnetVurdering : VurderingerAktivitet {
-    val lønnet: Vurdering
+    val lønnet: VurderingLønnet
 }

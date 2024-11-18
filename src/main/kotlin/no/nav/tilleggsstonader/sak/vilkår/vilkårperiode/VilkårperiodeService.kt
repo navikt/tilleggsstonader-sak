@@ -41,7 +41,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodesta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.EvalueringVilkårperiode.evaulerVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
@@ -242,9 +241,7 @@ class VilkårperiodeService(
         validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
         validerKildeId(vilkårperiode)
 
-        val resultatEvaluering = evaulerVilkårperiode(vilkårperiode.type, vilkårperiode.delvilkår)
-
-        val faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode, resultatEvaluering)
+        val faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode)
         return vilkårperiodeRepository.insert(
             GeneriskVilkårperiode(
                 behandlingId = vilkårperiode.behandlingId,
@@ -318,12 +315,11 @@ class VilkårperiodeService(
             "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
         }
 
-        val resultatEvaluering = evaulerVilkårperiode(eksisterendeVilkårperiode.type, vilkårperiode.delvilkår)
         val oppdatert = eksisterendeVilkårperiode.medVilkårOgVurdering(
             fom = vilkårperiode.fom,
             tom = vilkårperiode.tom,
             begrunnelse = vilkårperiode.begrunnelse,
-            faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode, resultatEvaluering),
+            faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode),
         )
 
         validerEndrePeriodeRevurdering(behandling, eksisterendeVilkårperiode, oppdatert)

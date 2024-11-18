@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 
 enum class AktivitetType : VilkårperiodeType {
     TILTAK,
@@ -16,5 +16,5 @@ enum class AktivitetType : VilkårperiodeType {
 }
 
 data class DelvilkårAktivitet(
-    val lønnet: Vurdering,
+    val lønnet: VurderingLønnet,
 ) : DelvilkårVilkårperiode()

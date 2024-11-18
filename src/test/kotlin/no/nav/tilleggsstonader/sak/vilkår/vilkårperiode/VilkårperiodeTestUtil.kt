@@ -19,14 +19,15 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
@@ -68,8 +69,8 @@ object VilkårperiodeTestUtil {
 
     fun faktaOgVurderingMålgruppe(
         type: MålgruppeType = MålgruppeType.AAP,
-        medlemskap: Vurdering = vurdering(),
-        dekketAvAnnetRegelverk: Vurdering = vurdering(svar = SvarJaNei.NEI),
+        medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
+        dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(),
     ): MålgruppeFaktaOgVurdering = when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
         MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
@@ -101,14 +102,6 @@ object VilkårperiodeTestUtil {
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
     }
 
-    fun vurdering(
-        svar: SvarJaNei? = SvarJaNei.JA_IMPLISITT,
-        resultat: ResultatDelvilkårperiode = ResultatDelvilkårperiode.OPPFYLT,
-    ) = Vurdering(
-        svar = svar,
-        resultat = resultat,
-    )
-
     fun delvilkårMålgruppeDto() = DelvilkårMålgruppeDto(
         medlemskap = VurderingDto(SvarJaNei.JA_IMPLISITT),
         dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.NEI),
@@ -138,7 +131,7 @@ object VilkårperiodeTestUtil {
     fun faktaOgVurderingAktivitet(
         type: AktivitetType = AktivitetType.TILTAK,
         aktivitetsdager: Int? = 5,
-        lønnet: Vurdering = vurdering(svar = SvarJaNei.NEI, resultat = ResultatDelvilkårperiode.OPPFYLT),
+        lønnet: VurderingLønnet = vurderingLønnet(),
     ): AktivitetFaktaOgVurdering = when (type) {
         AktivitetType.TILTAK -> TiltakTilsynBarn(
             vurderinger = VurderingTiltakTilsynBarn(
@@ -157,6 +150,24 @@ object VilkårperiodeTestUtil {
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
     }
+
+    fun vurderingLønnet(
+        svar: SvarJaNei? = SvarJaNei.NEI,
+    ) = VurderingLønnet(
+        svar = svar,
+    )
+
+    fun vurderingMedlemskap(
+        svar: SvarJaNei? = SvarJaNei.JA_IMPLISITT,
+    ) = VurderingMedlemskap(
+        svar = svar,
+    )
+
+    fun vurderingDekketAvAnnetRegelverk(
+        svar: SvarJaNei? = SvarJaNei.NEI,
+    ) = VurderingDekketAvAnnetRegelverk(
+        svar = svar,
+    )
 
     fun delvilkårAktivitetDto() = DelvilkårAktivitetDto(
         lønnet = VurderingDto(SvarJaNei.NEI),
@@ -221,7 +232,7 @@ object VilkårperiodeTestUtil {
     }
 
     fun Vilkårperiode.medLønnet(
-        lønnet: Vurdering,
+        lønnet: VurderingLønnet,
     ): Vilkårperiode {
         val faktaOgVurdering1 = this.faktaOgVurdering
         return when (faktaOgVurdering1) {

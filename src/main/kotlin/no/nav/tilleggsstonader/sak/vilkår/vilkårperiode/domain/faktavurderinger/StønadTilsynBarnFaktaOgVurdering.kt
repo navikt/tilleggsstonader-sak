@@ -89,7 +89,7 @@ data class ReellArbeidsøkerTilsynBarn(
 }
 
 data class VurderingTiltakTilsynBarn(
-    override val lønnet: Vurdering,
+    override val lønnet: VurderingLønnet,
 ) : LønnetVurdering
 
 data class FaktaAktivitetTilsynBarn(

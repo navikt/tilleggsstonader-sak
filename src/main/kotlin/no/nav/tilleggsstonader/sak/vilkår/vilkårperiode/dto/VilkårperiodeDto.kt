@@ -8,9 +8,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -86,17 +83,6 @@ fun FaktaOgVurdering.tilDelvilkårDto(): DelvilkårVilkårperiodeDto {
             lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
         )
     }
-}
-
-fun DelvilkårVilkårperiode.tilDto() = when (this) {
-    is DelvilkårMålgruppe -> DelvilkårMålgruppeDto(
-        medlemskap = medlemskap.tilDto(),
-        dekketAvAnnetRegelverk = dekketAvAnnetRegelverk.tilDto(),
-    )
-
-    is DelvilkårAktivitet -> DelvilkårAktivitetDto(
-        lønnet = lønnet.tilDto(),
-    )
 }
 
 // Returnerer ikke vurdering hvis resultatet er IKKE_AKTUELT

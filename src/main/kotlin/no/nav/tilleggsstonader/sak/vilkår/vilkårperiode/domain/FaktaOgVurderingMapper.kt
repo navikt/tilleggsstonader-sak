@@ -12,41 +12,43 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.ResultatEvaluering
 
 fun mapFaktaOgVurderingDto(
     vilkårperiode: LagreVilkårperiode,
-    resultatEvaluering: ResultatEvaluering,
 ): FaktaOgVurdering {
     return when (vilkårperiode.type) {
-        is AktivitetType -> mapAktiviteter(vilkårperiode, resultatEvaluering)
-        is MålgruppeType -> mapMålgrupper(vilkårperiode, resultatEvaluering)
+        is AktivitetType -> mapAktiviteter(vilkårperiode)
+        is MålgruppeType -> mapMålgrupper(vilkårperiode)
     }
 }
 
 private fun mapAktiviteter(
     vilkårperiode: LagreVilkårperiode,
-    resultatEvaluering: ResultatEvaluering,
 ): AktivitetTilsynBarn {
     val type = vilkårperiode.type
     require(type is AktivitetType)
-    require(resultatEvaluering.delvilkår is DelvilkårAktivitet)
+    val delvilkår = vilkårperiode.delvilkår
+    require(delvilkår is DelvilkårAktivitetDto)
     return when (type) {
         AktivitetType.TILTAK -> {
             TiltakTilsynBarn(
                 fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = vilkårperiode.aktivitetsdager!!),
-                vurderinger = VurderingTiltakTilsynBarn(lønnet = resultatEvaluering.delvilkår.lønnet),
+                vurderinger = VurderingTiltakTilsynBarn(lønnet = mapLønnet(delvilkår)),
             )
         }
 
@@ -67,40 +69,45 @@ private fun mapAktiviteter(
     }
 }
 
+/**
+ * TODO valider at man ikke sender inn vurderinger som ikke er aktuelle for gitt type?
+ * Men frontend sender hele delvilkår, inkl det som har resultat implisitt
+ */
 private fun mapMålgrupper(
     vilkårperiode: LagreVilkårperiode,
-    resultatEvaluering: ResultatEvaluering,
 ): MålgruppeTilsynBarn {
     val type = vilkårperiode.type
     require(type is MålgruppeType)
-    require(resultatEvaluering.delvilkår is DelvilkårMålgruppe)
+    val delvilkår = vilkårperiode.delvilkår
+    require(delvilkår is DelvilkårMålgruppeDto)
     return when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
         MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
         MålgruppeType.OMSTILLINGSSTØNAD -> {
             OmstillingsstønadTilsynBarn(
-                vurderinger = VurderingOmstillingsstønad(medlemskap = resultatEvaluering.delvilkår.medlemskap),
+                vurderinger = VurderingOmstillingsstønad(
+                    medlemskap = mapMedlemskap(delvilkår),
+                ),
             )
         }
 
         MålgruppeType.OVERGANGSSTØNAD -> {
-            require(resultatEvaluering.delvilkår.medlemskap.svar == SvarJaNei.JA_IMPLISITT)
-            require(resultatEvaluering.delvilkår.dekketAvAnnetRegelverk.svar == null)
             OvergangssstønadTilsynBarn
         }
 
         MålgruppeType.AAP -> {
-            require(resultatEvaluering.delvilkår.medlemskap.svar == SvarJaNei.JA_IMPLISITT)
             AAPTilsynBarn(
-                vurderinger = VurderingAAP(dekketAvAnnetRegelverk = resultatEvaluering.delvilkår.dekketAvAnnetRegelverk),
+                vurderinger = VurderingAAP(
+                    dekketAvAnnetRegelverk = mapDekketAvAnnetRegelverk(delvilkår),
+                ),
             )
         }
 
         MålgruppeType.UFØRETRYGD -> {
             UføretrygdTilsynBarn(
                 vurderinger = VurderingUføretrygd(
-                    dekketAvAnnetRegelverk = resultatEvaluering.delvilkår.dekketAvAnnetRegelverk,
-                    medlemskap = resultatEvaluering.delvilkår.medlemskap,
+                    dekketAvAnnetRegelverk = mapDekketAvAnnetRegelverk(delvilkår),
+                    medlemskap = mapMedlemskap(delvilkår),
                 ),
             )
         }
@@ -108,8 +115,8 @@ private fun mapMålgrupper(
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
             NedsattArbeidsevneTilsynBarn(
                 vurderinger = VurderingNedsattArbeidsevne(
-                    dekketAvAnnetRegelverk = resultatEvaluering.delvilkår.dekketAvAnnetRegelverk,
-                    medlemskap = resultatEvaluering.delvilkår.medlemskap,
+                    dekketAvAnnetRegelverk = mapDekketAvAnnetRegelverk(delvilkår),
+                    medlemskap = mapMedlemskap(delvilkår),
                 ),
             )
         }
@@ -117,3 +124,12 @@ private fun mapMålgrupper(
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
     }
 }
+
+private fun mapLønnet(delvilkår: DelvilkårAktivitetDto) =
+    VurderingLønnet(delvilkår.lønnet?.svar)
+
+private fun mapDekketAvAnnetRegelverk(delvilkår: DelvilkårMålgruppeDto) =
+    VurderingDekketAvAnnetRegelverk(delvilkår.dekketAvAnnetRegelverk?.svar)
+
+private fun mapMedlemskap(delvilkår: DelvilkårMålgruppeDto) =
+    VurderingMedlemskap(delvilkår.medlemskap?.svar)
