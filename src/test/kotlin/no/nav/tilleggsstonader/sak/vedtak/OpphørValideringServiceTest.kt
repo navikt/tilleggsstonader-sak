@@ -136,7 +136,12 @@ class OpphørValideringServiceTest {
         fun `Kaster feil ved aktivitet flyttet til etter opphørt dato`() {
             every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(
                 emptyList(),
-                listOf(VilkårperiodeTestUtil.aktivitet(tom = osloDateNow().plusMonths(2), status = Vilkårstatus.ENDRET)),
+                listOf(
+                    VilkårperiodeTestUtil.aktivitet(
+                        tom = osloDateNow().plusMonths(2),
+                        status = Vilkårstatus.ENDRET
+                    )
+                ),
             )
 
             assertThatThrownBy {
