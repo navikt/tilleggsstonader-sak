@@ -69,7 +69,7 @@ class OpphørValideringServiceTest {
 
             assertThatThrownBy {
                 opphørValideringService.validerPerioder(saksbehandling)
-            }.hasMessage("Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT.")
+            }.hasMessage("Det er nye inngangsvilkår eller vilkår som er oppfylt.")
         }
 
         @Test
@@ -78,7 +78,7 @@ class OpphørValideringServiceTest {
 
             assertThatThrownBy {
                 opphørValideringService.validerPerioder(saksbehandling)
-            }.hasMessage("Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT.")
+            }.hasMessage("Det er nye inngangsvilkår eller vilkår som er oppfylt.")
         }
 
         @Test
@@ -87,7 +87,7 @@ class OpphørValideringServiceTest {
 
             assertThatThrownBy {
                 opphørValideringService.validerPerioder(saksbehandling)
-            }.hasMessage("Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT.")
+            }.hasMessage("Det er nye inngangsvilkår eller vilkår som er oppfylt.")
         }
     }
 

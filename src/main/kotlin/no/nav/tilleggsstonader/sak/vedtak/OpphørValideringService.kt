@@ -53,7 +53,7 @@ class OpphørValideringService(
                 vilkårperioder.målgrupper.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT } ||
                 vilkårperioder.aktiviteter.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }
 
-        brukerfeilHvis(finnesOppfyltVilkårEllerVilkårperioderMedStatusNy) { "Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT." }
+        brukerfeilHvis(finnesOppfyltVilkårEllerVilkårperioderMedStatusNy) { "Det er nye inngangsvilkår eller vilkår som er oppfylt." }
     }
 
     private fun validerIngenEndredePerioderMedTomEtterOpphørsdato(
