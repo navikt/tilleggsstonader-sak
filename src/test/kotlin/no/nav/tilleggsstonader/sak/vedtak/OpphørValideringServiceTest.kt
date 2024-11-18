@@ -32,19 +32,30 @@ class OpphørValideringServiceTest {
 
     val saksbehandling = saksbehandling(revurderFra = osloDateNow(), type = BehandlingType.REVURDERING)
     val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)
-    val vilkår = vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET)
+    val vilkår = vilkår(
+        behandlingId = saksbehandling.id,
+        type = VilkårType.PASS_BARN,
+        resultat = Vilkårsresultat.OPPFYLT,
+        status = VilkårStatus.UENDRET,
+    )
 
     @BeforeEach
     fun setUp() {
         every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår)
-        every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), emptyList())
+        every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(
+            emptyList(),
+            emptyList(),
+        )
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
     }
 
     @Test
     fun `Kaster feil ved utbetaling etter opphørdato`() {
         assertThatThrownBy {
-            opphørValideringService.validerIngenUtbetalingEtterOpphør(vedtakBeregningsresultat, saksbehandling.revurderFra)
+            opphørValideringService.validerIngenUtbetalingEtterOpphør(
+                vedtakBeregningsresultat,
+                saksbehandling.revurderFra,
+            )
         }.hasMessage("Det er utbetalinger etter opphørsdato")
     }
 
@@ -53,10 +64,22 @@ class OpphørValideringServiceTest {
 
         @Test
         fun `Kaster ikke feil ved korrekt data`() {
-            every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(listOf(VilkårperiodeTestUtil.målgruppe(status = Vilkårstatus.ENDRET)), listOf(VilkårperiodeTestUtil.aktivitet(status = Vilkårstatus.ENDRET)))
+            every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(
+                listOf(
+                    VilkårperiodeTestUtil.målgruppe(
+                        status = Vilkårstatus.ENDRET,
+                    ),
+                ),
+                listOf(VilkårperiodeTestUtil.aktivitet(status = Vilkårstatus.ENDRET)),
+            )
             every { tilsynBarnBeregningService.beregn(any()) } returns vedtakBeregningsresultat
 
-            assertThatCode { opphørValideringService.validerIngenUtbetalingEtterOpphør(vedtakBeregningsresultat, saksbehandling.revurderFra) }.doesNotThrowAnyException()
+            assertThatCode {
+                opphørValideringService.validerIngenUtbetalingEtterOpphør(
+                    vedtakBeregningsresultat,
+                    saksbehandling.revurderFra,
+                )
+            }.doesNotThrowAnyException()
         }
     }
 
@@ -73,7 +96,12 @@ class OpphørValideringServiceTest {
 
         @Test
         fun `Kaster feil ved nye oppfylte målgrupper`() {
-            every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(listOf(VilkårperiodeTestUtil.målgruppe()), emptyList())
+            every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(
+                listOf(
+                    VilkårperiodeTestUtil.målgruppe(),
+                ),
+                emptyList(),
+            )
 
             assertThatThrownBy {
                 opphørValideringService.validerPerioder(saksbehandling)
@@ -82,7 +110,10 @@ class OpphørValideringServiceTest {
 
         @Test
         fun `Kaster feil ved nye oppfylte aktivteter`() {
-            every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), listOf(VilkårperiodeTestUtil.aktivitet()))
+            every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(
+                emptyList(),
+                listOf(VilkårperiodeTestUtil.aktivitet()),
+            )
 
             assertThatThrownBy {
                 opphørValideringService.validerPerioder(saksbehandling)
@@ -94,7 +125,12 @@ class OpphørValideringServiceTest {
     inner class TomEtterOpphørsdato() {
         @Test
         fun `Kaster feil ved målgruppe flyttet til etter opphørt dato`() {
-            every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(listOf(VilkårperiodeTestUtil.målgruppe(status = Vilkårstatus.ENDRET)), emptyList())
+            every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(
+                listOf(
+                    VilkårperiodeTestUtil.målgruppe(status = Vilkårstatus.ENDRET),
+                ),
+                emptyList(),
+            )
 
             assertThatThrownBy {
                 opphørValideringService.validerPerioder(saksbehandling)
@@ -103,7 +139,10 @@ class OpphørValideringServiceTest {
 
         @Test
         fun `Kaster feil ved aktivitet flyttet til etter opphørt dato`() {
-            every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), listOf(VilkårperiodeTestUtil.aktivitet(status = Vilkårstatus.ENDRET)))
+            every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(
+                emptyList(),
+                listOf(VilkårperiodeTestUtil.aktivitet(status = Vilkårstatus.ENDRET)),
+            )
 
             assertThatThrownBy {
                 opphørValideringService.validerPerioder(saksbehandling)
@@ -112,7 +151,12 @@ class OpphørValideringServiceTest {
 
         @Test
         fun `Kaster feil ved vilkår flyttet til etter opphørt dato`() {
-            every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår.copy(status = VilkårStatus.ENDRET, tom = osloDateNow().plusMonths(1).tilSisteDagIMåneden()))
+            every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(
+                vilkår.copy(
+                    status = VilkårStatus.ENDRET,
+                    tom = osloDateNow().plusMonths(1).tilSisteDagIMåneden(),
+                ),
+            )
 
             assertThatThrownBy {
                 opphørValideringService.validerPerioder(saksbehandling)
