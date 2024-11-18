@@ -256,7 +256,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThat(vedtak.behandlingId).isEqualTo(saksbehandlingForOpphør.id)
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
             assertThat(vedtak.årsakerOpphør?.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
-            assertThat(vedtak.opphørBegrunnelse).isEqualTo("Nye utgifter")
+            assertThat(vedtak.opphørBegrunnelse).isEqualTo("Endring i utgifter")
             assertThat(vedtak.beregningsresultat!!.perioder).isEmpty()
             assertThat(tilkjentYtelse).isEmpty()
         }

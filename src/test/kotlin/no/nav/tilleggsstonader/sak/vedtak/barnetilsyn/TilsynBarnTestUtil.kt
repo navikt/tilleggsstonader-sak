@@ -28,7 +28,7 @@ object TilsynBarnTestUtil {
 
     fun opphørDto() = OpphørTilsynBarnDto(
         årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
-        begrunnelse = "Nye utgifter",
+        begrunnelse = "Endring i utgifter",
     )
 
     val vedtakBeregningsresultat = BeregningsresultatTilsynBarn(
