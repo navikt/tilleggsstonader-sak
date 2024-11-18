@@ -49,7 +49,7 @@ class OpphørValideringServiceTest {
     }
 
     @Nested
-    inner class GyldigData{
+    inner class GyldigData {
 
         @Test
         fun `Kaster ikke feil ved korrekt data`() {
@@ -58,11 +58,10 @@ class OpphørValideringServiceTest {
 
             assertDoesNotThrow { opphørValideringService.validerPerioder(saksbehandling.copy(revurderFra = osloDateNow().plusMonths(2))) }
         }
-
     }
 
     @Nested
-    inner class PerioderMedStatusNyOgResultatOppfylt{
+    inner class PerioderMedStatusNyOgResultatOppfylt {
         @Test
         fun `Kaster feil ved nye oppfylte vilkår`() {
             every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår.copy(status = VilkårStatus.NY))
@@ -92,7 +91,7 @@ class OpphørValideringServiceTest {
     }
 
     @Nested
-    inner class TomEtterOpphørsdato(){
+    inner class TomEtterOpphørsdato() {
         @Test
         fun `Kaster feil ved målgruppe flyttet til etter opphørt dato`() {
             every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(listOf(VilkårperiodeTestUtil.målgruppe(status = Vilkårstatus.ENDRET)), emptyList())

@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.tilgang
 
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.spi.ILoggingEvent
-import ch.qos.logback.core.read.ListAppender
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import org.assertj.core.api.Assertions.assertThat
