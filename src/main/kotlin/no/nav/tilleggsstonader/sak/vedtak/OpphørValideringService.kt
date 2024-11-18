@@ -51,7 +51,7 @@ class OpphørValideringService(
         val revurderFraDato = saksbehandling.revurderFra
         beregningsresultatTilsynBarn.perioder.forEach { periode ->
             periode.beløpsperioder.forEach {
-                brukerfeilHvis(it.dato > revurderFraDato) { "Det er utbetalinger etter opphørsdato" }
+                brukerfeilHvis(it.dato >= revurderFraDato) { "Det er utbetalinger etter opphørsdato" }
             }
         }
     }
