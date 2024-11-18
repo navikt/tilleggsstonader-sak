@@ -30,7 +30,10 @@ class OpphørValideringServiceTest {
     private val tilsynBarnBeregningService = mockk<TilsynBarnBeregningService>()
 
     val saksbehandling =
-        saksbehandling(revurderFra = osloDateNow().plusMonths(1).plusDays(1), type = BehandlingType.REVURDERING)
+        saksbehandling(
+            revurderFra = osloDateNow().plusMonths(1).plusDays(1),
+            type = BehandlingType.REVURDERING,
+        )
     val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)
     val vilkår = vilkår(
         behandlingId = saksbehandling.id,
@@ -122,7 +125,10 @@ class OpphørValideringServiceTest {
         fun `Kaster feil ved målgruppe flyttet til etter opphørt dato`() {
             every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(
                 listOf(
-                    VilkårperiodeTestUtil.målgruppe(tom = osloDateNow().plusMonths(2), status = Vilkårstatus.ENDRET),
+                    VilkårperiodeTestUtil.målgruppe(
+                        tom = osloDateNow().plusMonths(2),
+                        status = Vilkårstatus.ENDRET,
+                    ),
                 ),
                 emptyList(),
             )
@@ -139,8 +145,8 @@ class OpphørValideringServiceTest {
                 listOf(
                     VilkårperiodeTestUtil.aktivitet(
                         tom = osloDateNow().plusMonths(2),
-                        status = Vilkårstatus.ENDRET
-                    )
+                        status = Vilkårstatus.ENDRET,
+                    ),
                 ),
             )
 
