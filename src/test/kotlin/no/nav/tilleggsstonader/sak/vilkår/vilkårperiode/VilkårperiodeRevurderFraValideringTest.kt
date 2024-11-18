@@ -6,9 +6,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medAktivitetsdager
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurdering
@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
+
 class VilkårperiodeRevurderFraValideringTest {
 
     val revurderFra = LocalDate.of(2024, 1, 1)
@@ -112,14 +113,24 @@ class VilkårperiodeRevurderFraValideringTest {
         @Test
         fun `kan oppdatere periode dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
-                val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.minusDays(2), aktivitetsdager = 1)
+                val eksisterendeVilkårperiode = aktivitet(
+                    fom = revurderFra.minusDays(2),
+                    faktaOgVurdering = faktaOgVurderingAktivitet(
+                        aktivitetsdager = 1,
+                    ),
+                )
                 endringUtenRevurderFra(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.medAktivitetsdager(aktivitetsdager = 2),
                 )
             }
             assertDoesNotThrow {
-                val eksisterendeVilkårperiode = aktivitet(fom = revurderFra.plusDays(1), aktivitetsdager = 1)
+                val eksisterendeVilkårperiode = aktivitet(
+                    fom = revurderFra.plusDays(1),
+                    faktaOgVurdering = faktaOgVurderingAktivitet(
+                        aktivitetsdager = 1,
+                    ),
+                )
                 endringUtenRevurderFra(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.medAktivitetsdager(aktivitetsdager = 2),
@@ -162,14 +173,16 @@ class VilkårperiodeRevurderFraValideringTest {
             val eksisterendeVilkårperiode = aktivitet(
                 fom = revurderFra.minusMonths(1),
                 tom = revurderFra.plusMonths(1),
-                aktivitetsdager = 3,
-                delvilkår = delvilkårAktivitet(lønnet = vurdering(SvarJaNei.NEI)),
+                faktaOgVurdering = faktaOgVurderingAktivitet(
+                    aktivitetsdager = 3,
+                    lønnet = vurdering(SvarJaNei.NEI),
+                ),
                 resultat = ResultatVilkårperiode.OPPFYLT,
             )
             listOf<(Vilkårperiode) -> Vilkårperiode>(
                 { it.medAktivitetsdager(aktivitetsdager = 2) },
                 { it.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT) },
-                { it.medVurdering(delvilkår = delvilkårAktivitet(lønnet = vurdering(SvarJaNei.JA))) },
+                { it.medLønnet(lønnet = vurdering(SvarJaNei.JA)) },
             ).forEach { endreVilkårperiode ->
                 assertThatThrownBy {
                     endringMedRevurderFra(

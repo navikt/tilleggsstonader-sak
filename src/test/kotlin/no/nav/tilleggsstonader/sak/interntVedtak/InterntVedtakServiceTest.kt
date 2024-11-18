@@ -42,8 +42,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
@@ -109,21 +109,21 @@ class InterntVedtakServiceTest {
     val vilkårperioder = Vilkårperioder(
         målgrupper = listOf(
             VilkårperiodeTestUtil.målgruppe(
-                type = MålgruppeType.AAP,
                 begrunnelse = "målgruppe aap",
-                delvilkår = delvilkårMålgruppe(
+                faktaOgVurdering = faktaOgVurderingMålgruppe(
+                    type = MålgruppeType.AAP,
                     medlemskap = vurdering(SvarJaNei.JA_IMPLISITT),
-                    dekkesAvAnnetRegelverk = vurdering(SvarJaNei.NEI),
+                    dekketAvAnnetRegelverk = vurdering(SvarJaNei.NEI),
                 ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
             ),
             VilkårperiodeTestUtil.målgruppe(
-                type = MålgruppeType.OVERGANGSSTØNAD,
                 begrunnelse = "målgruppe os",
-                delvilkår = delvilkårMålgruppe(
+                faktaOgVurdering = faktaOgVurderingMålgruppe(
+                    type = MålgruppeType.OVERGANGSSTØNAD,
                     medlemskap = vurdering(SvarJaNei.JA_IMPLISITT),
-                    dekkesAvAnnetRegelverk = vurdering(svar = null),
+                    dekketAvAnnetRegelverk = vurdering(svar = null),
                 ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
@@ -133,7 +133,7 @@ class InterntVedtakServiceTest {
             VilkårperiodeTestUtil.aktivitet(
                 begrunnelse = "aktivitet abd",
                 resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
-                delvilkår = delvilkårAktivitet(
+                faktaOgVurdering = faktaOgVurderingAktivitet(
                     lønnet = vurdering(
                         SvarJaNei.JA,
                         resultat = ResultatDelvilkårperiode.IKKE_OPPFYLT,

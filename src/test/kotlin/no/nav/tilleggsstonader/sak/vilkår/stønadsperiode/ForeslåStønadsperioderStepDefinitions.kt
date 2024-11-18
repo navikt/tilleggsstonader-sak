@@ -11,6 +11,8 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -30,7 +32,10 @@ class ForeslåStønadsperioderStepDefinitions {
             aktivitet(
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                type = AktivitetType.valueOf(rad["type"]!!),
+                faktaOgVurdering = faktaOgVurderingAktivitet(
+                    type = AktivitetType.valueOf(rad["type"]!!),
+                ),
+
             )
         }
     }
@@ -41,7 +46,9 @@ class ForeslåStønadsperioderStepDefinitions {
             målgruppe(
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                type = MålgruppeType.valueOf(rad["type"]!!),
+                faktaOgVurdering = faktaOgVurderingMålgruppe(
+                    type = MålgruppeType.valueOf(rad["type"]!!),
+                ),
             )
         }
     }
@@ -49,13 +56,12 @@ class ForeslåStønadsperioderStepDefinitions {
     @Når("forslag til stønadsperioder lages")
     fun `forslag til stønadsperioder lages`() {
         try {
-            resultat =
-                ForeslåStønadsperiode.finnStønadsperioder(
-                    Vilkårperioder(
-                        målgrupper = målgrupper,
-                        aktiviteter = aktiviteter,
-                    ),
-                )
+            resultat = ForeslåStønadsperiode.finnStønadsperioder(
+                Vilkårperioder(
+                    målgrupper = målgrupper,
+                    aktiviteter = aktiviteter,
+                ),
+            )
         } catch (e: ApiFeil) {
             feil = e
         }

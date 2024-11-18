@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
@@ -71,7 +72,9 @@ class VilkårperiodeTest {
         @Test
         fun `100 prosent sykepenger må inneholde begrunnelse`() {
             assertThatThrownBy {
-                målgruppe(type = MålgruppeType.SYKEPENGER_100_PROSENT)
+                målgruppe(
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.SYKEPENGER_100_PROSENT),
+                )
             }.hasMessageContaining("Mangler begrunnelse for 100% sykepenger")
         }
     }
@@ -99,7 +102,9 @@ class VilkårperiodeTest {
         fun `kopiering av et vilkår med status UENDRET skal peke til forrigeVilkårPeriodeId fordi det var då vilkåret ble vurdert`() {
             val forrigeVilkårperiodeId = UUID.randomUUID()
             val målgruppe = målgruppe(status = Vilkårstatus.UENDRET, forrigeVilkårperiodeId = forrigeVilkårperiodeId)
-            assertThat(målgruppe.kopierTilBehandling(behandlingId).forrigeVilkårperiodeId).isEqualTo(forrigeVilkårperiodeId)
+            assertThat(målgruppe.kopierTilBehandling(behandlingId).forrigeVilkårperiodeId).isEqualTo(
+                forrigeVilkårperiodeId,
+            )
         }
 
         @Test

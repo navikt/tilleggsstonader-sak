@@ -4,9 +4,9 @@ import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
@@ -36,9 +36,9 @@ class VilkårperiodeDtoTest {
         @Test
         fun `skal mappe vurdering fra vilkår`() {
             val målgruppe = målgruppe(
-                type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
                 begrunnelse = "begrunnelse",
-                delvilkår = DelvilkårMålgruppe(
+                faktaOgVurdering = faktaOgVurderingMålgruppe(
+                    type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
                     medlemskap = Vurdering(
                         svar = SvarJaNei.JA,
                         resultat = ResultatDelvilkårperiode.OPPFYLT,

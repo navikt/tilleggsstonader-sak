@@ -9,6 +9,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitetDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -138,12 +140,12 @@ internal class StønadsperiodeValideringUtilTest {
             aktivitet(
                 fom = LocalDate.of(2023, 1, 1),
                 tom = LocalDate.of(2023, 1, 10),
-                type = AktivitetType.TILTAK,
+                faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
             ).tilDto(),
             aktivitet(
                 fom = LocalDate.of(2023, 1, 11),
                 tom = LocalDate.of(2023, 1, 12),
-                type = AktivitetType.TILTAK,
+                faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
             ).tilDto(),
         )
 
@@ -170,12 +172,12 @@ internal class StønadsperiodeValideringUtilTest {
             aktivitet(
                 fom = LocalDate.of(2023, 1, 1),
                 tom = LocalDate.of(2023, 1, 10),
-                type = AktivitetType.TILTAK,
+                faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
             ).tilDto(),
             aktivitet(
                 fom = LocalDate.of(2023, 1, 7),
                 tom = LocalDate.of(2023, 1, 12),
-                type = AktivitetType.TILTAK,
+                faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
             ).tilDto(),
         )
 
@@ -195,8 +197,8 @@ internal class StønadsperiodeValideringUtilTest {
         val stønadsperioder = listOf(
             lagStønadsperiode(målgruppe = MålgruppeType.AAP, aktivitet = AktivitetType.TILTAK, fom = fom, tom = tom),
         )
-        val målgrupper = listOf(målgruppe(type = MålgruppeType.AAP, fom = fom, tom = tom).tilDto())
-        val aktiviteter = listOf(aktivitet(type = AktivitetType.TILTAK, fom = fom, tom = tom).tilDto())
+        val målgrupper = listOf(målgruppe(fom = fom, tom = tom).tilDto())
+        val aktiviteter = listOf(aktivitet(fom = fom, tom = tom).tilDto())
         val vilkårperioder = VilkårperioderDto(målgrupper, aktiviteter)
 
         val dato18årGammel = fom.minusYears(18)
@@ -353,12 +355,10 @@ internal class StønadsperiodeValideringUtilTest {
             målgruppe(
                 fom = LocalDate.of(2023, 1, 8),
                 tom = LocalDate.of(2023, 1, 18),
-                type = MålgruppeType.AAP,
             ),
             målgruppe(
                 fom = LocalDate.of(2023, 1, 20),
                 tom = LocalDate.of(2023, 1, 31),
-                type = MålgruppeType.AAP,
             ),
         ).map(Vilkårperiode::tilDto)
 
@@ -399,35 +399,51 @@ internal class StønadsperiodeValideringUtilTest {
         @Test
         fun `kan ha stønadsperiode før og etter periode som ikke gir rett på stønad`() {
             val målgrupper = listOf(
-                målgruppe(type = MålgruppeType.AAP, fom = jan.atDay(1), tom = jan.atDay(9)),
                 målgruppe(
-                    type = MålgruppeType.SYKEPENGER_100_PROSENT,
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.AAP),
+                    fom = jan.atDay(1),
+                    tom = jan.atDay(9),
+                ),
+                målgruppe(
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.SYKEPENGER_100_PROSENT),
                     fom = fom,
                     tom = tom,
                     begrunnelse = "asd",
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                 ),
                 målgruppe(
-                    type = MålgruppeType.INGEN_MÅLGRUPPE,
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.INGEN_MÅLGRUPPE),
                     fom = fom,
                     tom = tom,
                     begrunnelse = "asd",
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                 ),
-                målgruppe(type = MålgruppeType.AAP, fom = jan.atDay(21), tom = jan.atDay(31)),
+                målgruppe(
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.AAP),
+                    fom = jan.atDay(21),
+                    tom = jan.atDay(31),
+                ),
             ).map { it.tilDto() }
 
             val aktiviteter = listOf(
-                aktivitet(type = AktivitetType.TILTAK, fom = jan.atDay(1), tom = jan.atDay(9)),
                 aktivitet(
-                    type = AktivitetType.INGEN_AKTIVITET,
+                    faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
+                    fom = jan.atDay(1),
+                    tom = jan.atDay(9),
+                ),
+                aktivitet(
+                    faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.INGEN_AKTIVITET),
                     fom = fom,
                     tom = tom,
-                    aktivitetsdager = null,
                     begrunnelse = "asd",
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                 ),
-                aktivitet(type = AktivitetType.TILTAK, fom = jan.atDay(21), tom = jan.atDay(31)),
+                aktivitet(
+                    faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
+                    fom = jan.atDay(21),
+                    tom = jan.atDay(31),
+                ),
+
             ).map { it.tilDto() }
 
             assertThatCode {
@@ -444,7 +460,12 @@ internal class StønadsperiodeValideringUtilTest {
         @Test
         fun `skal kaste feil hvis en stønadsperiode overlapper med 100 prosent sykemelding`() {
             val målgrupper = listOf(
-                målgruppe(type = MålgruppeType.SYKEPENGER_100_PROSENT, fom = fom, tom = tom, begrunnelse = "a"),
+                målgruppe(
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.SYKEPENGER_100_PROSENT),
+                    fom = fom,
+                    tom = tom,
+                    begrunnelse = "a",
+                ),
             ).map { it.tilDto() }
 
             assertThatThrownBy {
@@ -460,7 +481,12 @@ internal class StønadsperiodeValideringUtilTest {
         @Test
         fun `skal kaste feil hvis en stønadsperiode overlapper med INGEN_MÅLGRUPPE`() {
             val målgrupper = listOf(
-                målgruppe(type = MålgruppeType.INGEN_MÅLGRUPPE, fom = fom, tom = tom, begrunnelse = "a"),
+                målgruppe(
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.INGEN_MÅLGRUPPE),
+                    fom = fom,
+                    tom = tom,
+                    begrunnelse = "a",
+                ),
             ).map { it.tilDto() }
 
             assertThatThrownBy {
@@ -477,11 +503,10 @@ internal class StønadsperiodeValideringUtilTest {
         fun `skal kaste feil hvis en stønadsperiode overlapper med INGEN_AKTIVITET`() {
             val aktiviteter = listOf(
                 aktivitet(
-                    type = AktivitetType.INGEN_AKTIVITET,
+                    faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.INGEN_AKTIVITET),
                     fom = fom,
                     tom = tom,
                     begrunnelse = "a",
-                    aktivitetsdager = null,
                 ),
             ).map { it.tilDto() }
             assertThatThrownBy {
@@ -501,7 +526,7 @@ internal class StønadsperiodeValideringUtilTest {
             val målgrupper = listOf(
                 målgruppe(
                     behandlingId = behandlingId,
-                    type = MålgruppeType.INGEN_MÅLGRUPPE,
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.INGEN_MÅLGRUPPE),
                     fom = fom,
                     tom = tom,
                     begrunnelse = "a",
@@ -510,7 +535,7 @@ internal class StønadsperiodeValideringUtilTest {
                 ),
                 målgruppe(
                     behandlingId = behandlingId,
-                    type = MålgruppeType.AAP,
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.AAP),
                     fom = fom,
                     tom = tom,
                 ),
@@ -519,7 +544,7 @@ internal class StønadsperiodeValideringUtilTest {
             val aktiviteter = listOf(
                 aktivitet(
                     behandlingId = behandlingId,
-                    type = AktivitetType.TILTAK,
+                    faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
                     fom = fom,
                     tom = tom,
                 ),
