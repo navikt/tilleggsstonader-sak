@@ -105,7 +105,11 @@ class TestoppsettService(
         return fagsak.tilFagsakMedPerson(person.identer, eksternFagsakId)
     }
 
-    fun opprettRevurdering(revurderFra: LocalDate, behandling: Behandling, fagsak: Fagsak): Behandling {
+    fun opprettRevurdering(
+        revurderFra: LocalDate,
+        behandling: Behandling,
+        fagsak: Fagsak,
+    ): Behandling {
         oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
         val forrgieVedtak = VedtakTilsynBarn(
             behandlingId = behandling.id,
@@ -130,7 +134,8 @@ class TestoppsettService(
     fun lagBehandlingOgRevurdering(): Behandling {
         val fagsak = fagsak()
         lagreFagsak(fagsak)
-        val førsteBehandling = lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET))
+        val førsteBehandling =
+            lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET))
         val revurdering =
             behandling(fagsak = fagsak, forrigeBehandlingId = førsteBehandling.id, type = BehandlingType.REVURDERING)
         return lagre(revurdering)

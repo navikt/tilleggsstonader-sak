@@ -6,8 +6,6 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
@@ -22,6 +20,7 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
@@ -64,7 +63,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     val tilsynBarnVedtakService: TilsynBarnVedtakService,
 ) : IntegrationTest() {
 
-    val behandling = behandling()
+    val fagsak = fagsak()
+    val behandling = behandling(fagsak = fagsak)
     val saksbehandling = saksbehandling(behandling = behandling)
     val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")
     val stønadsperiode =
@@ -228,20 +228,24 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Nested
     inner class Opphør {
 
-        val behandlingForOpphør = behandling(
-            steg = StegType.BEREGNE_YTELSE,
-            status = BehandlingStatus.UTREDES,
-            revurderFra = LocalDate.of(2023, 2, 1),
-            type = BehandlingType.REVURDERING,
-        )
-        val saksbehandlingForOpphør = saksbehandling(behandling = behandlingForOpphør).copy(revurderFra = LocalDate.of(2023, 2, 1))
-        val stønadsperiodeForOpphør =
-            stønadsperiode(behandlingId = behandlingForOpphør.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
-        val aktivitetForOpphør = aktivitet(behandlingForOpphør.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31), status = Vilkårstatus.ENDRET)
-
         @Test
         fun `skal lagre vedtak`() {
-            testoppsettService.opprettBehandlingMedFagsak(behandlingForOpphør, identer = setOf(PersonIdent("42")))
+            val behandlingForOpphør =
+                testoppsettService.opprettRevurdering(LocalDate.of(2023, 2, 1), behandling, fagsak)
+            val saksbehandlingForOpphør = saksbehandling(behandling = behandlingForOpphør)
+            val stønadsperiodeForOpphør =
+                stønadsperiode(
+                    behandlingId = behandlingForOpphør.id,
+                    fom = LocalDate.of(2023, 1, 1),
+                    tom = LocalDate.of(2023, 1, 31),
+                )
+            val aktivitetForOpphør = aktivitet(
+                behandlingForOpphør.id,
+                fom = LocalDate.of(2023, 1, 1),
+                tom = LocalDate.of(2023, 1, 31),
+                status = Vilkårstatus.ENDRET,
+            )
+
             stønadsperiodeRepository.insert(stønadsperiodeForOpphør)
             vilkårperiodeRepository.insert(aktivitetForOpphør)
             lagVilkårForPeriode(saksbehandlingForOpphør, januar, januar, 100, status = VilkårStatus.ENDRET)
@@ -251,7 +255,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
             val vedtak = repository.findByIdOrThrow(saksbehandlingForOpphør.id)
 
-            val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(saksbehandlingForOpphør.id)!!.andelerTilkjentYtelse
+            val tilkjentYtelse =
+                tilkjentYtelseRepository.findByBehandlingId(saksbehandlingForOpphør.id)!!.andelerTilkjentYtelse
 
             assertThat(vedtak.behandlingId).isEqualTo(saksbehandlingForOpphør.id)
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
