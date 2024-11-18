@@ -18,11 +18,11 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
+import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
 
 class OpphørValideringServiceTest {
 
@@ -56,7 +56,7 @@ class OpphørValideringServiceTest {
             every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(listOf(VilkårperiodeTestUtil.målgruppe(status = Vilkårstatus.ENDRET)), listOf(VilkårperiodeTestUtil.aktivitet(status = Vilkårstatus.ENDRET)))
             every { tilsynBarnBeregningService.beregn(any()) } returns vedtakBeregningsresultat
 
-            assertDoesNotThrow { opphørValideringService.validerPerioder(saksbehandling.copy(revurderFra = osloDateNow().plusMonths(2))) }
+            assertThatCode { opphørValideringService.validerIngenUtbetalingEtterOpphør(vedtakBeregningsresultat, saksbehandling.revurderFra) }.doesNotThrowAnyException()
         }
     }
 
