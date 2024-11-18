@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -18,20 +18,30 @@ import java.time.LocalDate
 class OpphørValideringService(
     private val vilkårsperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
-    private val tilsynBarnBeregningService: TilsynBarnBeregningService,
 ) {
 
-    fun validerOpphør(saksbehandling: Saksbehandling) {
+    fun validerPerioder(saksbehandling: Saksbehandling) {
         val vilkår = vilkårService.hentVilkår(saksbehandling.id)
         val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling.id)
 
         validerIngenNyeOppfylteVilkårEllerVilkårperioder(vilkår, vilkårperioder)
-        validerIngenUtbetalingEtterOpphør(saksbehandling)
         validerIngenEndredePerioderMedTomEtterOpphørsdato(
             vilkårperioder,
             vilkår,
-            saksbehandling.revurderFra ?: error("RevurderFra er påkrevd for opphør"),
+            saksbehandling.revurderFra ?: error("Revurder fra er påkrevd for opphør"),
         )
+    }
+
+    fun validerIngenUtbetalingEtterOpphør(
+        beregningsresultatTilsynBarn: BeregningsresultatTilsynBarn,
+        opphørsDato: LocalDate?,
+    ) {
+        brukerfeilHvis(opphørsDato == null) { "Revurder fra dato er påkrevd for opphør" }
+        beregningsresultatTilsynBarn.perioder.forEach { periode ->
+            periode.beløpsperioder.forEach {
+                brukerfeilHvis(it.dato >= opphørsDato) { "Det er utbetalinger etter opphørsdato" }
+            }
+        }
     }
 
     private fun validerIngenNyeOppfylteVilkårEllerVilkårperioder(
@@ -44,16 +54,6 @@ class OpphørValideringService(
                 vilkårperioder.aktiviteter.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }
 
         brukerfeilHvis(finnesOppfyltVilkårEllerVilkårperioderMedStatusNy) { "Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT." }
-    }
-
-    private fun validerIngenUtbetalingEtterOpphør(saksbehandling: Saksbehandling) {
-        val beregningsresultatTilsynBarn = tilsynBarnBeregningService.beregn(saksbehandling)
-        val revurderFraDato = saksbehandling.revurderFra
-        beregningsresultatTilsynBarn.perioder.forEach { periode ->
-            periode.beløpsperioder.forEach {
-                brukerfeilHvis(it.dato >= revurderFraDato) { "Det er utbetalinger etter opphørsdato" }
-            }
-        }
     }
 
     private fun validerIngenEndredePerioderMedTomEtterOpphørsdato(

@@ -31,7 +31,7 @@ class OpphørValideringServiceTest {
     private val tilsynBarnBeregningService = mockk<TilsynBarnBeregningService>()
 
     val saksbehandling = saksbehandling(revurderFra = osloDateNow(), type = BehandlingType.REVURDERING)
-    val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService, tilsynBarnBeregningService)
+    val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)
 
     @Test
     fun kasterIkkeFeilVedKorrektData() {
@@ -39,7 +39,7 @@ class OpphørValideringServiceTest {
         every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(listOf(VilkårperiodeTestUtil.målgruppe(status = Vilkårstatus.ENDRET)), listOf(VilkårperiodeTestUtil.aktivitet(status = Vilkårstatus.ENDRET)))
         every { tilsynBarnBeregningService.beregn(any()) } returns vedtakBeregningsresultat
 
-        assertDoesNotThrow { opphørValideringService.validerOpphør(saksbehandling.copy(revurderFra = osloDateNow().plusMonths(2))) }
+        assertDoesNotThrow { opphørValideringService.validerPerioder(saksbehandling.copy(revurderFra = osloDateNow().plusMonths(2))) }
     }
 
     @Test
@@ -49,7 +49,7 @@ class OpphørValideringServiceTest {
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
 
         val feil: ApiFeil = assertThrows {
-            opphørValideringService.validerOpphør(saksbehandling)
+            opphørValideringService.validerPerioder(saksbehandling)
         }
         assertThat(feil.message).isEqualTo("Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT.")
     }
@@ -61,7 +61,7 @@ class OpphørValideringServiceTest {
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
 
         val feil: ApiFeil = assertThrows {
-            opphørValideringService.validerOpphør(saksbehandling)
+            opphørValideringService.validerPerioder(saksbehandling)
         }
         assertThat(feil.message).isEqualTo("Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT.")
     }
@@ -73,19 +73,15 @@ class OpphørValideringServiceTest {
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
 
         val feil: ApiFeil = assertThrows {
-            opphørValideringService.validerOpphør(saksbehandling)
+            opphørValideringService.validerPerioder(saksbehandling)
         }
         assertThat(feil.message).isEqualTo("Det er vilkår eller vilkårperiode med vilkårstatus NY og resultat OPPFYLT.")
     }
 
     @Test
     fun kasterFeilVedUtbetalingEtterOpphør() {
-        every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår(behandlingId = saksbehandling.id, type = VilkårType.PASS_BARN, resultat = Vilkårsresultat.OPPFYLT, status = VilkårStatus.UENDRET))
-        every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(emptyList(), emptyList())
-        every { tilsynBarnBeregningService.beregn(saksbehandling) } returns vedtakBeregningsresultat
-
         val feil: ApiFeil = assertThrows {
-            opphørValideringService.validerOpphør(saksbehandling)
+            opphørValideringService.validerIngenUtbetalingEtterOpphør(vedtakBeregningsresultat, saksbehandling.revurderFra)
         }
         assertThat(feil.message).isEqualTo("Det er utbetalinger etter opphørsdato")
     }
@@ -97,7 +93,7 @@ class OpphørValideringServiceTest {
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
 
         val feil: ApiFeil = assertThrows {
-            opphørValideringService.validerOpphør(saksbehandling)
+            opphørValideringService.validerPerioder(saksbehandling)
         }
         assertThat(feil.message).isEqualTo("Til og med dato for endret målgruppe er etter opphørsdato")
     }
@@ -109,7 +105,7 @@ class OpphørValideringServiceTest {
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
 
         val feil: ApiFeil = assertThrows {
-            opphørValideringService.validerOpphør(saksbehandling)
+            opphørValideringService.validerPerioder(saksbehandling)
         }
         assertThat(feil.message).isEqualTo("Til og med dato for endret aktivitet er etter opphørsdato")
     }
@@ -121,7 +117,7 @@ class OpphørValideringServiceTest {
         every { tilsynBarnBeregningService.beregn(saksbehandling) } returns BeregningsresultatTilsynBarn(emptyList())
 
         val feil: ApiFeil = assertThrows {
-            opphørValideringService.validerOpphør(saksbehandling)
+            opphørValideringService.validerPerioder(saksbehandling)
         }
         assertThat(feil.message).isEqualTo("Til og med dato for endret vilkår er etter opphørsdato")
     }
