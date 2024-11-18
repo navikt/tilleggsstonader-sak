@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class OpphørValidatorService(
+class OpphørValideringService(
     private val vilkårsperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
