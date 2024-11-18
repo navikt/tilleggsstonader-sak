@@ -244,14 +244,15 @@ class VilkårperiodeService(
 
         val resultatEvaluering = evaulerVilkårperiode(vilkårperiode.type, vilkårperiode.delvilkår)
 
+        val faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode, resultatEvaluering)
         return vilkårperiodeRepository.insert(
             GeneriskVilkårperiode(
                 behandlingId = vilkårperiode.behandlingId,
-                resultat = resultatEvaluering.resultat,
+                resultat = faktaOgVurdering.utledResultat(),
                 status = Vilkårstatus.NY,
                 kildeId = vilkårperiode.kildeId,
                 type = vilkårperiode.type,
-                faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode, resultatEvaluering),
+                faktaOgVurdering = faktaOgVurdering,
                 fom = vilkårperiode.fom,
                 tom = vilkårperiode.tom,
                 begrunnelse = vilkårperiode.begrunnelse,
@@ -323,7 +324,6 @@ class VilkårperiodeService(
             tom = vilkårperiode.tom,
             begrunnelse = vilkårperiode.begrunnelse,
             faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode, resultatEvaluering),
-            resultat = resultatEvaluering.resultat,
         )
 
         validerEndrePeriodeRevurdering(behandling, eksisterendeVilkårperiode, oppdatert)

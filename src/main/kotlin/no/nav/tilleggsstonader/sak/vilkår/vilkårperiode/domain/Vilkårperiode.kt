@@ -161,13 +161,13 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         tom: LocalDate,
         begrunnelse: String?,
         faktaOgVurdering: FaktaOgVurdering,
-        resultat: ResultatVilkårperiode,
     ): GeneriskVilkårperiode<T> {
         val nyStatus = if (status == Vilkårstatus.NY) {
             Vilkårstatus.NY
         } else {
             Vilkårstatus.ENDRET
         }
+        val resultat = faktaOgVurdering.utledResultat()
         @Suppress("UNCHECKED_CAST")
         return this.copy(
             fom = fom,
