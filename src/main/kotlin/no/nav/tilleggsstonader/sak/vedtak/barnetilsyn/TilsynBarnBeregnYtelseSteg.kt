@@ -30,7 +30,7 @@ class TilsynBarnBeregnYtelseSteg(
     vedtakRepository: TilsynBarnVedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-) : BeregnYtelseSteg<VedtakTilsynBarnDto, VedtakTilsynBarn>(
+) : BeregnYtelseSteg<VedtakTilsynBarnDto>(
     stønadstype = Stønadstype.BARNETILSYN,
     vedtakRepository = vedtakRepository,
     tilkjentytelseService = tilkjentytelseService,

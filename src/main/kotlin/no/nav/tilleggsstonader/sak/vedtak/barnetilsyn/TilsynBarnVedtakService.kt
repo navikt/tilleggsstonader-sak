@@ -13,7 +13,7 @@ class TilsynBarnVedtakService(
     stegService: StegService,
     tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
     private val behandlingService: BehandlingService,
-) : VedtakService<VedtakTilsynBarnDto, VedtakTilsynBarn>(stegService, tilsynBarnBeregnYtelseSteg, repository) {
+) : VedtakService<VedtakTilsynBarnDto>(stegService, tilsynBarnBeregnYtelseSteg, repository) {
 
     override fun mapTilDto(vedtak: VedtakTilsynBarn): VedtakTilsynBarnDto {
         val revurderFra = behandlingService.hentSaksbehandling(vedtak.behandlingId).revurderFra
