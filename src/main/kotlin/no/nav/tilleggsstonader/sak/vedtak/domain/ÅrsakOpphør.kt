@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
+package no.nav.tilleggsstonader.sak.vedtak.domain
 
 enum class ÅrsakOpphør {
     ENDRING_AKTIVITET,

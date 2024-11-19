@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import java.time.LocalDate
 
 object VedtakDtoMapper {

@@ -9,11 +9,10 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.StønadstypeDvh.BARNETILSYN
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto

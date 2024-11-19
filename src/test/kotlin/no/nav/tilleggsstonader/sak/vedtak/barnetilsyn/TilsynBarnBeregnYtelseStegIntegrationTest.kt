@@ -23,6 +23,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksdataTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository

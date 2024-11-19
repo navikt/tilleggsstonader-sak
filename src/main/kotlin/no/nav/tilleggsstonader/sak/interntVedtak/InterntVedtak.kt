@@ -5,8 +5,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType

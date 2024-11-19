@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
+package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak

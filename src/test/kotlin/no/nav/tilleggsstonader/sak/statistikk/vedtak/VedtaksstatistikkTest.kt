@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import org.assertj.core.api.Assertions.assertThat

@@ -10,10 +10,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaLæremidler
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksdataTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType

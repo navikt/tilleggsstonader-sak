@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService

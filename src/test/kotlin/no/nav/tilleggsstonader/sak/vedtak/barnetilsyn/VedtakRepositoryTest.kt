@@ -6,6 +6,8 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksdataTilsynBarn
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

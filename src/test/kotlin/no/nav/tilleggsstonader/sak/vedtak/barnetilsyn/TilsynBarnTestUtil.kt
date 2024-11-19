@@ -13,6 +13,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTils
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksdataTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
 import java.time.LocalDate

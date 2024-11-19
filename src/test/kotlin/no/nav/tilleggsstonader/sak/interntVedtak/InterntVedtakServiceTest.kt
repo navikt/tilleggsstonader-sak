@@ -26,10 +26,10 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil

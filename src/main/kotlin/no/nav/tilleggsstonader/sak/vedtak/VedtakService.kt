@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import org.springframework.data.repository.findByIdOrNull
 
 abstract class VedtakService<DTO>(

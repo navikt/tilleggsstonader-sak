@@ -2,10 +2,10 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

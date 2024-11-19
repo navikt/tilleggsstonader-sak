@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.util.max
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
