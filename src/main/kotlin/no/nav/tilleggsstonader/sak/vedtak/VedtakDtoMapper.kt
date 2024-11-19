@@ -5,12 +5,12 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnD
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import java.time.LocalDate
 
 object VedtakDtoMapper {
 
-    fun toDto(vedtak: VedtakTilsynBarn, revurderFra: LocalDate?): VedtakTilsynBarnDto {
+    fun toDto(vedtak: Vedtak, revurderFra: LocalDate?): VedtakTilsynBarnDto {
         return when (vedtak.type) {
             TypeVedtak.INNVILGELSE -> {
                 InnvilgelseTilsynBarnDto(

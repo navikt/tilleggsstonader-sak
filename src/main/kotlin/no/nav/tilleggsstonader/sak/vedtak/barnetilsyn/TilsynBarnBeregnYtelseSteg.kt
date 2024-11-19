@@ -20,7 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
@@ -70,7 +70,7 @@ class TilsynBarnBeregnYtelseSteg(
     private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnDto) {
         val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling)
         vedtakRepository.insert(
-            VedtakTilsynBarn(
+            Vedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.OPPHØR,
                 beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
@@ -86,7 +86,7 @@ class TilsynBarnBeregnYtelseSteg(
         vedtak: AvslagTilsynBarnDto,
     ) {
         vedtakRepository.insert(
-            VedtakTilsynBarn(
+            Vedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.AVSLAG,
                 avslagBegrunnelse = vedtak.begrunnelse,
@@ -123,8 +123,8 @@ class TilsynBarnBeregnYtelseSteg(
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatTilsynBarn,
-    ): VedtakTilsynBarn {
-        return VedtakTilsynBarn(
+    ): Vedtak {
+        return Vedtak(
             behandlingId = behandling.id,
             type = TypeVedtak.INNVILGELSE,
             vedtak = VedtaksdataTilsynBarn(

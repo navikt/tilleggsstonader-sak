@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -25,7 +25,7 @@ class VedtakDtoMapperTest {
 
         @Test
         fun `skal mappe avslått vedtak til dto`() {
-            val vedtak = VedtakTilsynBarn(
+            val vedtak = Vedtak(
                 behandlingId = BehandlingId.random(),
                 type = TypeVedtak.AVSLAG,
                 avslagBegrunnelse = "begrunnelse",

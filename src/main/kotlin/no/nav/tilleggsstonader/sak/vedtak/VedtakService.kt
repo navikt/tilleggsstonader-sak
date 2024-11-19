@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import org.springframework.data.repository.findByIdOrNull
 
 abstract class VedtakService<DTO>(
@@ -15,7 +15,7 @@ abstract class VedtakService<DTO>(
         stegService.håndterSteg(behandlingId, steg, vedtak)
     }
 
-    fun hentVedtak(behandlingId: BehandlingId): VedtakTilsynBarn? {
+    fun hentVedtak(behandlingId: BehandlingId): Vedtak? {
         return repository.findByIdOrNull(behandlingId)
     }
 
@@ -23,5 +23,5 @@ abstract class VedtakService<DTO>(
         return hentVedtak(behandlingId)?.let(::mapTilDto)
     }
 
-    abstract fun mapTilDto(vedtak: VedtakTilsynBarn): DTO
+    abstract fun mapTilDto(vedtak: Vedtak): DTO
 }

@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.util.max
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -100,7 +100,7 @@ class BehandlingsoversiktService(
      * av den grunnen settes tom=max(maksTom, revurderFra)
      */
     private fun utledVedstaksperiodeForBehandling(
-        vedtak: VedtakTilsynBarn,
+        vedtak: Vedtak,
         revurdererFra: LocalDate?,
     ): Vedtaksperiode? {
         val perioder = vedtak.beregningsresultat?.perioder ?: return null

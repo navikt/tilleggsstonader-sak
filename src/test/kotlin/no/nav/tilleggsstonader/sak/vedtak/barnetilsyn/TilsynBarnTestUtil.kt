@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTils
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -83,7 +83,7 @@ object TilsynBarnTestUtil {
         vedtak: VedtaksdataTilsynBarn? = vedtaksdata,
         beregningsresultat: BeregningsresultatTilsynBarn? = vedtakBeregningsresultat,
         behandlingId: BehandlingId = BehandlingId.random(),
-    ) = VedtakTilsynBarn(
+    ) = Vedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
         vedtak = vedtak,

@@ -9,13 +9,15 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
+import org.springframework.data.relational.core.mapping.Table
 
 /**
  * Trenger vi noe mer enn data her? Kan den kanskje dekke alle tilfeller?
  * Eller om ma har vedtak, og beregningsgrunnlag som et eget?
  * Trenger man begrunnelse som eget felt?
  */
-data class VedtakTilsynBarn(
+@Table("vedtak_tilsyn_barn")
+data class Vedtak(
     @Id
     val behandlingId: BehandlingId,
     val type: TypeVedtak,

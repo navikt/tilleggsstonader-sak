@@ -7,7 +7,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-class VedtakTilsynBarnTest {
+class VedtakTest {
     @Nested
     inner class InnvilgetVedtak {
         @Test
@@ -30,7 +30,7 @@ class VedtakTilsynBarnTest {
         @Test
         fun `skal feile om avslått vedtak ikke har årsaker`() {
             assertThatThrownBy {
-                VedtakTilsynBarn(
+                Vedtak(
                     behandlingId = BehandlingId.random(),
                     type = TypeVedtak.AVSLAG,
                     avslagBegrunnelse = "begrunnelse",
@@ -42,7 +42,7 @@ class VedtakTilsynBarnTest {
         @Test
         fun `skal feile om avslått vedtak ikke har årsak for avslag`() {
             assertThatThrownBy {
-                VedtakTilsynBarn(
+                Vedtak(
                     behandlingId = BehandlingId.random(),
                     type = TypeVedtak.AVSLAG,
                     årsakerAvslag = ÅrsakAvslag.Wrapper(listOf(ÅrsakAvslag.INGEN_AKTIVITET)),
@@ -57,7 +57,7 @@ class VedtakTilsynBarnTest {
         @Test
         fun `skal feile om opphørt vedtak ikke har årsaker`() {
             assertThatThrownBy {
-                VedtakTilsynBarn(
+                Vedtak(
                     behandlingId = BehandlingId.random(),
                     type = TypeVedtak.OPPHØR,
                     avslagBegrunnelse = "begrunnelse",
@@ -69,7 +69,7 @@ class VedtakTilsynBarnTest {
         @Test
         fun `skal feile om opphørt vedtak ikke har årsak for opphør`() {
             assertThatThrownBy {
-                VedtakTilsynBarn(
+                Vedtak(
                     behandlingId = BehandlingId.random(),
                     type = TypeVedtak.OPPHØR,
                     årsakerOpphør = ÅrsakOpphør.Wrapper(listOf(ÅrsakOpphør.ENDRING_UTGIFTER)),
