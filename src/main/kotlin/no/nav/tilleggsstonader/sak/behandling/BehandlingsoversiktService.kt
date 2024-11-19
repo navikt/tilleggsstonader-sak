@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.util.max
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -21,7 +21,7 @@ import java.time.LocalDate
 class BehandlingsoversiktService(
     private val fagsakService: FagsakService,
     private val behandlingRepository: BehandlingRepository,
-    private val tilsynBarnVedtakRepository: TilsynBarnVedtakRepository,
+    private val vedtakRepository: VedtakRepository,
 ) {
 
     fun hentOversikt(fagsakPersonId: FagsakPersonId): BehandlingsoversiktDto {
@@ -79,7 +79,7 @@ class BehandlingsoversiktService(
     ): Map<BehandlingId, Vedtaksperiode?> {
         val revurderFraPåBehandlingId = behandlinger.associate { it.id to it.revurderFra }
         return if (fagsak.stønadstype == Stønadstype.BARNETILSYN) {
-            tilsynBarnVedtakRepository.findAllById(behandlinger.map { it.id })
+            vedtakRepository.findAllById(behandlinger.map { it.id })
                 .associateBy { it.behandlingId }
                 .mapValues { (behandlingId, vedtak) ->
                     utledVedstaksperiodeForBehandling(vedtak, revurderFraPåBehandlingId[behandlingId])

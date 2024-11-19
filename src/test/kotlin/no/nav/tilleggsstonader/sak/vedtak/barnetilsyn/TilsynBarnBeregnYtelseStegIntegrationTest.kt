@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
@@ -46,7 +47,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
     val steg: TilsynBarnBeregnYtelseSteg,
     @Autowired
-    val repository: TilsynBarnVedtakRepository,
+    val repository: VedtakRepository,
     @Autowired
     val barnRepository: BarnRepository,
     @Autowired

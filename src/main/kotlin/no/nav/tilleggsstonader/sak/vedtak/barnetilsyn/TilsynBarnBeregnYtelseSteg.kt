@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
@@ -27,7 +28,7 @@ import java.time.DayOfWeek
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     private val unleashService: UnleashService,
-    vedtakRepository: TilsynBarnVedtakRepository,
+    vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<VedtakTilsynBarnDto>(

@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilUke
@@ -46,7 +46,7 @@ class TilsynBarnBeregningService(
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
-    private val repository: TilsynBarnVedtakRepository,
+    private val repository: VedtakRepository,
     private val unleashService: UnleashService,
 ) {
 
