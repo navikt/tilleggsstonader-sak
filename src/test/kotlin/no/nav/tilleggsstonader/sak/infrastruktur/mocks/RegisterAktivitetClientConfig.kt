@@ -3,8 +3,8 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
+import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
