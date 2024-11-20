@@ -1,17 +1,16 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
@@ -50,11 +49,13 @@ class TilsynBarnBeregningService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
     private val repository: VedtakRepository,
-    private val unleashService: UnleashService,
 ) {
 
-    fun beregn(behandling: Saksbehandling): BeregningsresultatTilsynBarn {
-        val perioder = beregnAktuellePerioder(behandling)
+    fun beregn(behandling: Saksbehandling, typeVedtak: TypeVedtak): BeregningsresultatTilsynBarn {
+        feilHvis(typeVedtak == TypeVedtak.AVSLAG) {
+            "Skal ikke beregne for avslag"
+        }
+        val perioder = beregnAktuellePerioder(behandling, typeVedtak)
         val relevantePerioderFraForrigeVedtak = finnRelevantePerioderFraForrigeVedtak(behandling)
         return BeregningsresultatTilsynBarn(relevantePerioderFraForrigeVedtak + perioder)
     }
@@ -63,7 +64,7 @@ class TilsynBarnBeregningService(
      * Dersom behandling er en revurdering beregnes perioder fra og med måneden for revurderFra
      * Ellers beregnes perioder for hele perioden som man har stønadsperioder og utgifter
      */
-    private fun beregnAktuellePerioder(behandling: Saksbehandling): List<BeregningsresultatForMåned> {
+    private fun beregnAktuellePerioder(behandling: Saksbehandling, typeVedtak: TypeVedtak): List<BeregningsresultatForMåned> {
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
         val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandling.id)
             .tilSortertGrunnlagStønadsperiode()
@@ -71,7 +72,7 @@ class TilsynBarnBeregningService(
 
         val aktiviteter = finnAktiviteter(behandling.id)
 
-        validerPerioder(stønadsperioder, aktiviteter, utgifterPerBarn)
+        validerPerioderForInnvilgelse(stønadsperioder, aktiviteter, utgifterPerBarn, typeVedtak)
 
         val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, aktiviteter, utgifterPerBarn)
             .brukPerioderFraOgMedRevurderFra(behandling.revurderFra)
@@ -281,12 +282,13 @@ class TilsynBarnBeregningService(
             .tilAktiviteter()
     }
 
-    private fun validerPerioder(
+    private fun validerPerioderForInnvilgelse(
         stønadsperioder: List<Stønadsperiode>,
         aktiviteter: List<Aktivitet>,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
+        typeVedtak: TypeVedtak,
     ) {
-        if (unleashService.isEnabled(Toggle.OPPHØR_IGNORER_VALIDERING)) {
+        if (typeVedtak == TypeVedtak.OPPHØR) {
             return
         }
         validerStønadsperioder(stønadsperioder)
@@ -296,7 +298,7 @@ class TilsynBarnBeregningService(
 
     private fun validerStønadsperioder(stønadsperioder: List<Stønadsperiode>) {
         brukerfeilHvis(stønadsperioder.isEmpty()) {
-            "Kan ikke innvilge når det ikke finnes noen stønadsperioder"
+            "Kan ikke innvilge når det ikke finnes noen overlappende målgruppe og aktivitet"
         }
     }
 

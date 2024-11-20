@@ -64,7 +64,7 @@ class TilsynBarnBeregnYtelseSteg(
             "Funksjonalitet mangler for å kunne innvilge revurdering når tidligere behandling er innvilget. Sett saken på vent."
         }
 
-        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling, TypeVedtak.INNVILGELSE)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
     }
@@ -72,9 +72,8 @@ class TilsynBarnBeregnYtelseSteg(
     private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnDto) {
         opphørValideringService.validerPerioder(saksbehandling)
 
-        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
         opphørValideringService.validerIngenUtbetalingEtterOpphør(beregningsresultat, saksbehandling.revurderFra)
-
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
