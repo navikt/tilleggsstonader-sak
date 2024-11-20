@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -48,7 +49,8 @@ class TilsynBarnVedtakControllerTest(
     val vilkårRepository: VilkårRepository,
 ) : IntegrationTest() {
 
-    val behandling = behandling(steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
+    val fagsak = fagsak()
+    val behandling = behandling(fagsak = fagsak, steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
     val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")
     val stønadsperiode =
         stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
@@ -117,14 +119,22 @@ class TilsynBarnVedtakControllerTest(
 
     @Test
     fun `skal lagre og hente opphør`() {
+        innvilgeVedtak(behandling, lagInnvilgeVedtak())
+        testoppsettService.ferdigstillBehandling(behandling)
+        val behandlingLagreOpphør = testoppsettService.opprettRevurdering(
+            forrigeBehandling = behandling,
+            revurderFra = LocalDate.now(),
+            fagsak = fagsak,
+        )
+
         val vedtak = OpphørRequest(
             årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
             begrunnelse = "endre utgifter opphør",
         )
 
-        opphørVedtak(behandling, vedtak)
+        opphørVedtak(behandlingLagreOpphør, vedtak)
 
-        val lagretDto = hentVedtak(behandling.id).body!!
+        val lagretDto = hentVedtak(behandlingLagreOpphør.id).body!!
 
         assertThat((lagretDto as OpphørTilsynBarnDto).årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)

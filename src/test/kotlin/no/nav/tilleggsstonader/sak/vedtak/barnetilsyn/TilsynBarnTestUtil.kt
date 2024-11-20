@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
+import kotlin.collections.listOf
 
 object TilsynBarnTestUtil {
 
@@ -31,7 +32,12 @@ object TilsynBarnTestUtil {
 
     fun opphørDto() = OpphørTilsynBarnDto(
         årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
-        begrunnelse = "Nye utgifter",
+        begrunnelse = "Endring i utgifter",
+    )
+
+    val beløpsperioderDefault = listOf(
+        Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = MålgruppeType.AAP),
+        Beløpsperiode(dato = LocalDate.now().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
     )
 
     val vedtakBeregningsresultat = BeregningsresultatTilsynBarn(
@@ -43,6 +49,7 @@ object TilsynBarnTestUtil {
     fun beregningsresultatForMåned(
         måned: YearMonth = YearMonth.now(),
         stønadsperioder: List<StønadsperiodeGrunnlag> = emptyList(),
+        beløpsperioder: List<Beløpsperiode> = beløpsperioderDefault,
     ) = BeregningsresultatForMåned(
         dagsats = BigDecimal.TEN,
         månedsbeløp = 1000,
@@ -54,10 +61,7 @@ object TilsynBarnTestUtil {
             utgifterTotal = 2000,
             antallBarn = 1,
         ),
-        beløpsperioder = listOf(
-            Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = MålgruppeType.AAP),
-            Beløpsperiode(dato = LocalDate.now().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
-        ),
+        beløpsperioder = beløpsperioder,
     )
 
     fun stønadsperiodeGrunnlag(

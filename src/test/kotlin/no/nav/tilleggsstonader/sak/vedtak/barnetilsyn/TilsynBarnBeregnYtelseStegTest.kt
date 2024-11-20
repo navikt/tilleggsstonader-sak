@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
@@ -38,6 +39,7 @@ class TilsynBarnBeregnYtelseStegTest {
     private val stønadsperiodeService = mockk<StønadsperiodeRepository>(relaxed = true)
     private val vilkårperiodeRepository = mockk<VilkårperiodeRepository>(relaxed = true)
     private val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>(relaxed = true)
+    private val opphørValideringService = mockk<OpphørValideringService>(relaxed = true)
 
     val tilsynBarnBeregningService = TilsynBarnBeregningService(
         stønadsperiodeRepository = stønadsperiodeService,
@@ -51,6 +53,7 @@ class TilsynBarnBeregnYtelseStegTest {
         tilkjentytelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
         unleashService = mockUnleashService(),
+        opphørValideringService = opphørValideringService,
     )
 
     val saksbehandling = saksbehandling()
