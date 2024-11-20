@@ -309,8 +309,8 @@ class TilsynBarnBeregningService(
     }
 
     private fun validerUtgifter(utgifter: Map<BarnId, List<UtgiftBeregning>>) {
-        feilHvis(utgifter.values.flatten().isEmpty()) {
-            "Utgiftsperioder mangler"
+        brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
+            "Kan ikke innvilge når det ikke finnes noen utgiftsperioder"
         }
         utgifter.entries.forEach { (_, utgifterForBarn) ->
             feilHvis(utgifterForBarn.overlapper()) {

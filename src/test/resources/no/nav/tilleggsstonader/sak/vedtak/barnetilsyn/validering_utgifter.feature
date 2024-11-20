@@ -18,7 +18,7 @@ Egenskap: Beregning barnetilsyn - validering av utgifter
 
     Når beregner
 
-    Så forvent følgende feil: Utgiftsperioder mangler
+    Så forvent følgende feil: Kan ikke innvilge når det ikke finnes noen utgiftsperioder
 
   Scenario: Sender inn overlappende utgiftsperioder
 
