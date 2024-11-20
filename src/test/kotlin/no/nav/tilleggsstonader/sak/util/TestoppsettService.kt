@@ -25,6 +25,8 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -107,33 +109,33 @@ class TestoppsettService(
     fun lagVedtak(
         behandling: Behandling,
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
-    ): Behandling {
-        val forrigeVedtak = innvilgetVedtak(
+    ): GeneriskVedtak<InnvilgelseTilsynBarn> {
+        val vedtak = innvilgetVedtak(
             behandlingId = behandling.id,
             beregningsresultat = beregningsresultat,
         )
-        repository.insert(forrigeVedtak)
-        return hentBehandling(behandling.id)
+        repository.insert(vedtak)
+        return vedtak
     }
+
+    fun ferdigstillBehandling(behandling: Behandling): Behandling = oppdater(
+        behandling.copy(status = BehandlingStatus.FERDIGSTILT),
+    )
 
     fun opprettRevurdering(
         revurderFra: LocalDate,
         forrigeBehandling: Behandling,
         fagsak: Fagsak,
-    ): Behandling {
-        oppdater(forrigeBehandling.copy(status = BehandlingStatus.FERDIGSTILT))
-        val revurdering =
-            behandling(
-                fagsak = fagsak,
-                type = BehandlingType.REVURDERING,
-                revurderFra = revurderFra,
-                forrigeBehandlingId = forrigeBehandling.id,
-                status = BehandlingStatus.UTREDES,
-                steg = StegType.BEREGNE_YTELSE,
-            )
-        lagre(revurdering)
-        return hentBehandling(revurdering.id)
-    }
+    ): Behandling = lagre(
+        behandling(
+            fagsak = fagsak,
+            type = BehandlingType.REVURDERING,
+            revurderFra = revurderFra,
+            forrigeBehandlingId = forrigeBehandling.id,
+            status = BehandlingStatus.UTREDES,
+            steg = StegType.BEREGNE_YTELSE,
+        ),
+    )
 
     fun lagBehandlingOgRevurdering(): Behandling {
         val fagsak = fagsak()

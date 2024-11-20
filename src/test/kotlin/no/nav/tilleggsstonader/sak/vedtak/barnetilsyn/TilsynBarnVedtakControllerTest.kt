@@ -23,12 +23,10 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -121,34 +119,18 @@ class TilsynBarnVedtakControllerTest(
 
     @Test
     fun `skal lagre og hente opphør`() {
+        innvilgeVedtak(behandling, lagInnvilgeVedtak())
+        testoppsettService.ferdigstillBehandling(behandling)
+        val behandlingLagreOpphør = testoppsettService.opprettRevurdering(
+            forrigeBehandling = behandling,
+            revurderFra = LocalDate.now(),
+            fagsak = fagsak,
+        )
+
         val vedtak = OpphørRequest(
             årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
             begrunnelse = "endre utgifter opphør",
         )
-
-        testoppsettService.lagVedtak(behandling)
-        val behandlingLagreOpphør = testoppsettService.opprettRevurdering(LocalDate.of(2023, 2, 1), behandling, fagsak)
-
-        val aktivitetLagreOpphør = aktivitet(
-            behandlingLagreOpphør.id,
-            fom = LocalDate.of(2023, 1, 1),
-            tom = LocalDate.of(2023, 1, 31),
-            status = Vilkårstatus.ENDRET,
-        )
-
-        val vilkårLagreOpphør = vilkår(
-            status = VilkårStatus.ENDRET,
-            behandlingId = behandlingLagreOpphør.id,
-            barnId = barn.id,
-            type = VilkårType.PASS_BARN,
-            resultat = Vilkårsresultat.OPPFYLT,
-            fom = LocalDate.of(2023, 1, 1),
-            tom = LocalDate.of(2023, 1, 31),
-            utgift = 100,
-        )
-
-        vilkårperiodeRepository.insert(aktivitetLagreOpphør)
-        vilkårRepository.insert(vilkårLagreOpphør)
 
         opphørVedtak(behandlingLagreOpphør, vedtak)
 
