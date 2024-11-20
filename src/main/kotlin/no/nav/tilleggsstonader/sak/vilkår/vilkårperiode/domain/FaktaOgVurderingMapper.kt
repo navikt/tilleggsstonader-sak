@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.LagreAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.LagreAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
@@ -77,7 +77,7 @@ fun mapAktiviteter(
         AktivitetType.TILTAK -> {
             TiltakTilsynBarn(
                 fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitet.aktivitetsdager!!),
-                vurderinger = VurderingTiltakTilsynBarn(lønnet = VurderingLønnet(aktivitet.svarLønnet!!)),
+                vurderinger = VurderingTiltakTilsynBarn(lønnet = VurderingLønnet(aktivitet.svarLønnet)),
             )
         }
 
