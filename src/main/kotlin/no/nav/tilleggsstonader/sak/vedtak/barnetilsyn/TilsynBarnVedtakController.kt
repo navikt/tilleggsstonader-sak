@@ -1,10 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
@@ -12,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -20,14 +22,12 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/vedtak/tilsyn-barn")
+@ProtectedWithClaims(issuer = "azuread")
 class TilsynBarnVedtakController(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
-    tilgangService: TilgangService,
-    private val tilsynBarnVedtakService: TilsynBarnVedtakService,
+    private val tilgangService: TilgangService,
+    private val vedtakService: TilsynBarnVedtakService,
     private val behandlingService: BehandlingService,
-) : VedtakController<VedtakTilsynBarnDto>(
-    tilgangService,
-    tilsynBarnVedtakService,
 ) {
 
     @PostMapping("{behandlingId}/innvilgelse")
@@ -61,5 +61,16 @@ class TilsynBarnVedtakController(
     ): BeregningsresultatTilsynBarnDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         return tilsynBarnBeregningService.beregn(behandling, TypeVedtak.INNVILGELSE).tilDto(behandling.revurderFra)
+    }
+
+    @GetMapping("{behandlingId}")
+    fun hentVedtak(@PathVariable behandlingId: BehandlingId): VedtakTilsynBarnDto? {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
+        return vedtakService.hentVedtakDto(behandlingId)
+    }
+
+    private fun lagreVedtak(behandlingId: BehandlingId, vedtak: VedtakTilsynBarnDto) {
+        tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
+        vedtakService.håndterSteg(behandlingId, vedtak)
     }
 }
