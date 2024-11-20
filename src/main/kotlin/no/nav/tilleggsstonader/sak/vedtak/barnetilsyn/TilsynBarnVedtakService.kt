@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.AbstractVedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import org.springframework.stereotype.Service
@@ -15,7 +15,7 @@ class TilsynBarnVedtakService(
     stegService: StegService,
     tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
     private val behandlingService: BehandlingService,
-) : VedtakService<VedtakTilsynBarnDto>(stegService, tilsynBarnBeregnYtelseSteg, repository) {
+) : AbstractVedtakService<VedtakTilsynBarnDto>(stegService, tilsynBarnBeregnYtelseSteg, repository) {
 
     override fun mapTilDto(vedtak: Vedtak): VedtakTilsynBarnDto {
         val revurderFra = behandlingService.hentSaksbehandling(vedtak.behandlingId).revurderFra

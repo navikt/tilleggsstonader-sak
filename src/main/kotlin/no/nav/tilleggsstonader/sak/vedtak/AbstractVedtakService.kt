@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import org.springframework.data.repository.findByIdOrNull
 
-abstract class VedtakService<DTO>(
+abstract class AbstractVedtakService<DTO>(
     private val stegService: StegService,
     private val steg: BeregnYtelseSteg<DTO>,
     private val repository: VedtakRepository,

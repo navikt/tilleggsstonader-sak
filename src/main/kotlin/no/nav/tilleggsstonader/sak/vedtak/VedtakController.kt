@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 @ProtectedWithClaims(issuer = "azuread")
 abstract class VedtakController<DTO>(
     private val tilgangService: TilgangService,
-    private val vedtakService: VedtakService<DTO>,
+    private val vedtakService: AbstractVedtakService<DTO>,
 ) {
     fun lagreVedtak(behandlingId: BehandlingId, vedtak: DTO) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
