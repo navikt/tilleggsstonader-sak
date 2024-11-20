@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.behandling.GjennbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -8,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakIdRepository
@@ -40,6 +42,7 @@ class TestoppsettService(
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
     private val grunnlagsdataService: GrunnlagsdataService,
     private val repository: VedtakRepository,
+    private val gjennbrukDataRevurderingService: GjennbrukDataRevurderingService,
 ) {
 
     fun hentBehandling(behandlingId: BehandlingId) = behandlingRepository.findByIdOrThrow(behandlingId)
@@ -127,6 +130,28 @@ class TestoppsettService(
             )
         lagre(revurdering)
         return hentBehandling(revurdering.id)
+    }
+
+    fun opprettRevurdering(
+        forrigeBehandling: Behandling,
+        revurderFra: LocalDate,
+        opprettGrunnlagsdata: Boolean = false,
+        gjenbrukData: Boolean = true,
+    ): Saksbehandling {
+        oppdater(forrigeBehandling.copy(status = BehandlingStatus.FERDIGSTILT))
+        val revurdering = lagre(
+            behandling(
+                fagsak = fagsak(id = forrigeBehandling.fagsakId),
+                type = BehandlingType.REVURDERING,
+                revurderFra = revurderFra,
+                forrigeBehandlingId = forrigeBehandling.id,
+            ),
+            opprettGrunnlagsdata = opprettGrunnlagsdata,
+        )
+        if (gjenbrukData) {
+            gjennbrukDataRevurderingService.gjenbrukData(revurdering, forrigeBehandling.id)
+        }
+        return hentSaksbehandling(revurdering.id)
     }
 
     fun lagBehandlingOgRevurdering(): Behandling {

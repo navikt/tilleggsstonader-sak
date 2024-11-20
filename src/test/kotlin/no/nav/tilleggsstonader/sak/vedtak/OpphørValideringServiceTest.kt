@@ -51,7 +51,7 @@ class OpphørValideringServiceTest {
             målgrupper = listOf(målgruppe),
             aktiviteter = listOf(aktivitet),
         )
-        every { tilsynBarnBeregningService.beregn(any()) } returns vedtakBeregningsresultat
+        every { tilsynBarnBeregningService.beregn(any(), TypeVedtak.OPPHØR) } returns vedtakBeregningsresultat
     }
 
     @Test

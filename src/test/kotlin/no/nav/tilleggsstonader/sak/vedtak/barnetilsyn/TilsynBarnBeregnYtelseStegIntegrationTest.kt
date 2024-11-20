@@ -19,10 +19,8 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
@@ -38,7 +36,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
@@ -236,54 +233,27 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
         @Test
         fun `skal lagre vedtak`() {
-            val beløpsperioderFørstegangsbehandling = listOf(
-                Beløpsperiode(dato = LocalDate.of(2022, 12, 1), beløp = 1000, målgruppe = MålgruppeType.AAP),
-                Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 2000, målgruppe = MålgruppeType.AAP),
-            )
-            val vedtakBeregningsresultatFørstegangsbehandling = BeregningsresultatTilsynBarn(
-                perioder = listOf(
-                    beregningsresultatForMåned(beløpsperioder = beløpsperioderFørstegangsbehandling, måned = YearMonth.of(2023, 1)),
-                ),
-            )
-            val behandlingForOpphør =
-                testoppsettService.opprettRevurdering(
-                    revurderFra = LocalDate.of(2023, 2, 1),
-                    forrigeBehandling = behandling,
-                    fagsak = fagsak,
-                    vedtakBeregningsresultatForrigeBehandling = vedtakBeregningsresultatFørstegangsbehandling,
-                )
-            val saksbehandlingForOpphør = saksbehandling(behandling = behandlingForOpphør)
-            val stønadsperiodeForOpphør =
-                stønadsperiode(
-                    behandlingId = behandlingForOpphør.id,
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 31),
-                )
-            val aktivitetForOpphør = aktivitet(
-                behandlingForOpphør.id,
-                fom = LocalDate.of(2023, 1, 1),
-                tom = LocalDate.of(2023, 1, 31),
-                status = Vilkårstatus.ENDRET,
-            )
+            stønadsperiodeRepository.insert(stønadsperiode)
+            vilkårperiodeRepository.insert(aktivitet)
+            lagVilkårForPeriode(saksbehandling, januar, januar, 100)
+            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDto())
 
-            stønadsperiodeRepository.insert(stønadsperiodeForOpphør)
-            vilkårperiodeRepository.insert(aktivitetForOpphør)
-            lagVilkårForPeriode(saksbehandlingForOpphør, januar, januar, 100, status = VilkårStatus.ENDRET)
+            testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
+            val saksbehandlingForOpphør = testoppsettService.opprettRevurdering(behandling, revurderFra = LocalDate.of(2023, 1, 1))
+            vilkårRepository.deleteByBehandlingId(saksbehandlingForOpphør.id)
 
             val vedtakDto = opphørDto()
             steg.utførOgReturnerNesteSteg(saksbehandlingForOpphør, vedtakDto)
 
             val vedtak = repository.findByIdOrThrow(saksbehandlingForOpphør.id).withTypeOrThrow<OpphørTilsynBarn>()
 
-            val tilkjentYtelse =
-                tilkjentYtelseRepository.findByBehandlingId(saksbehandlingForOpphør.id)!!.andelerTilkjentYtelse
-
             assertThat(vedtak.behandlingId).isEqualTo(saksbehandlingForOpphør.id)
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
             assertThat(vedtak.data.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
             assertThat(vedtak.data.begrunnelse).isEqualTo("Endring i utgifter")
-            assertThat(vedtak.data.beregningsresultat.perioder).isEqualTo(vedtakBeregningsresultatFørstegangsbehandling.perioder)
-            assertThat(tilkjentYtelse).hasSize(2)
+            assertThat(vedtak.data.beregningsresultat.perioder).isEmpty()
+            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandlingForOpphør.id)!!.andelerTilkjentYtelse)
+                .isEmpty()
         }
     }
 
