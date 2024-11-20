@@ -104,18 +104,24 @@ class TestoppsettService(
         return fagsak.tilFagsakMedPerson(person.identer, eksternFagsakId)
     }
 
+    fun lagVedtak(
+        behandling: Behandling,
+        beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
+    ): Behandling {
+        val forrigeVedtak = innvilgetVedtak(
+            behandlingId = behandling.id,
+            beregningsresultat = beregningsresultat,
+        )
+        repository.insert(forrigeVedtak)
+        return hentBehandling(behandling.id)
+    }
+
     fun opprettRevurdering(
         revurderFra: LocalDate,
         forrigeBehandling: Behandling,
         fagsak: Fagsak,
-        vedtakBeregningsresultatForrigeBehandling: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
     ): Behandling {
         oppdater(forrigeBehandling.copy(status = BehandlingStatus.FERDIGSTILT))
-        val forrigeVedtak = innvilgetVedtak(
-            behandlingId = forrigeBehandling.id,
-            beregningsresultat = vedtakBeregningsresultatForrigeBehandling,
-        )
-        repository.insert(forrigeVedtak)
         val revurdering =
             behandling(
                 fagsak = fagsak,

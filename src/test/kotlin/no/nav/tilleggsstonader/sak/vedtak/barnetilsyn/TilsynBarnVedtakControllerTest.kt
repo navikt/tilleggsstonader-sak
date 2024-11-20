@@ -126,6 +126,7 @@ class TilsynBarnVedtakControllerTest(
             begrunnelse = "endre utgifter opphør",
         )
 
+        testoppsettService.lagVedtak(behandling)
         val behandlingLagreOpphør = testoppsettService.opprettRevurdering(LocalDate.of(2023, 2, 1), behandling, fagsak)
 
         val aktivitetLagreOpphør = aktivitet(

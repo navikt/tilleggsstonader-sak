@@ -245,12 +245,15 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     beregningsresultatForMåned(beløpsperioder = beløpsperioderFørstegangsbehandling, måned = YearMonth.of(2023, 1)),
                 ),
             )
+            testoppsettService.lagVedtak(
+                behandling = behandling,
+                beregningsresultat = vedtakBeregningsresultatFørstegangsbehandling,
+            )
             val behandlingForOpphør =
                 testoppsettService.opprettRevurdering(
                     revurderFra = LocalDate.of(2023, 2, 1),
                     forrigeBehandling = behandling,
                     fagsak = fagsak,
-                    vedtakBeregningsresultatForrigeBehandling = vedtakBeregningsresultatFørstegangsbehandling,
                 )
             val saksbehandlingForOpphør = saksbehandling(behandling = behandlingForOpphør)
             val stønadsperiodeForOpphør =
