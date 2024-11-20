@@ -236,13 +236,19 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
         @Test
         fun `skal lagre vedtak`() {
-            val beløpsperioderFørstegangsbehandling = listOf(
-                Beløpsperiode(dato = LocalDate.of(2022, 12, 1), beløp = 1000, målgruppe = MålgruppeType.AAP),
-                Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 2000, målgruppe = MålgruppeType.AAP),
-            )
+            val beløpsperioderJanuar =
+                listOf(Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 1000, målgruppe = MålgruppeType.AAP))
+            val beløpsperiodeFebruar =
+                listOf(Beløpsperiode(dato = LocalDate.of(2023, 2, 1), beløp = 2000, målgruppe = MålgruppeType.AAP))
+            val beregningsresultatJanuar =
+                beregningsresultatForMåned(beløpsperioder = beløpsperioderJanuar, måned = YearMonth.of(2023, 1))
+            val beregningsresultatFebruar =
+                beregningsresultatForMåned(beløpsperioder = beløpsperiodeFebruar, måned = YearMonth.of(2023, 2))
+
             val vedtakBeregningsresultatFørstegangsbehandling = BeregningsresultatTilsynBarn(
                 perioder = listOf(
-                    beregningsresultatForMåned(beløpsperioder = beløpsperioderFørstegangsbehandling, måned = YearMonth.of(2023, 1)),
+                    beregningsresultatJanuar,
+                    beregningsresultatFebruar,
                 ),
             )
             testoppsettService.lagVedtak(
@@ -259,19 +265,19 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             val stønadsperiodeForOpphør =
                 stønadsperiode(
                     behandlingId = behandlingForOpphør.id,
-                    fom = LocalDate.of(2023, 1, 1),
+                    fom = LocalDate.of(2023, 1, 2),
                     tom = LocalDate.of(2023, 1, 31),
                 )
             val aktivitetForOpphør = aktivitet(
                 behandlingForOpphør.id,
-                fom = LocalDate.of(2023, 1, 1),
+                fom = LocalDate.of(2023, 1, 2),
                 tom = LocalDate.of(2023, 1, 31),
                 status = Vilkårstatus.ENDRET,
             )
 
             stønadsperiodeRepository.insert(stønadsperiodeForOpphør)
             vilkårperiodeRepository.insert(aktivitetForOpphør)
-            lagVilkårForPeriode(saksbehandlingForOpphør, januar, januar, 100, status = VilkårStatus.ENDRET)
+            lagVilkårForPeriode(saksbehandlingForOpphør, januar, februar, 100, status = VilkårStatus.UENDRET)
 
             val vedtakDto = opphørDto()
             steg.utførOgReturnerNesteSteg(saksbehandlingForOpphør, vedtakDto)
@@ -285,8 +291,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
             assertThat(vedtak.data.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
             assertThat(vedtak.data.begrunnelse).isEqualTo("Endring i utgifter")
-            assertThat(vedtak.data.beregningsresultat.perioder).isEqualTo(vedtakBeregningsresultatFørstegangsbehandling.perioder)
-            assertThat(tilkjentYtelse).hasSize(2)
+            assertThat(vedtak.data.beregningsresultat.perioder.single()).isEqualTo(beregningsresultatJanuar)
+            assertThat(tilkjentYtelse).hasSize(1)
         }
     }
 

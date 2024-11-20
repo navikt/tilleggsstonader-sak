@@ -60,7 +60,7 @@ class OpphørValideringServiceTest {
         @Test
         fun `Kaster ikke feil ved korrekt data`() {
             assertThatCode {
-                opphørValideringService.validerIngenUtbetalingEtterOpphør(
+                opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
                     beregningsresultatTilsynBarn = vedtakBeregningsresultat,
                     revurderFra = saksbehandling.revurderFra,
                 )
@@ -72,7 +72,7 @@ class OpphørValideringServiceTest {
             val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = osloDateNow())
 
             assertThatThrownBy {
-                opphørValideringService.validerIngenUtbetalingEtterOpphør(
+                opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
                     beregningsresultatTilsynBarn = vedtakBeregningsresultat,
                     revurderFra = saksbehandlingRevurdertFraTilbakeITid.revurderFra,
                 )

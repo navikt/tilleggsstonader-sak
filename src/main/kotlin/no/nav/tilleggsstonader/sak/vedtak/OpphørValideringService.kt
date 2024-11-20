@@ -32,7 +32,7 @@ class OpphørValideringService(
         )
     }
 
-    fun validerIngenUtbetalingEtterOpphør(
+    fun validerIngenUtbetalingEtterRevurderFraDato(
         beregningsresultatTilsynBarn: BeregningsresultatTilsynBarn,
         revurderFra: LocalDate?,
     ) {

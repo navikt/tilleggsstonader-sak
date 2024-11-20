@@ -73,7 +73,7 @@ class TilsynBarnBeregnYtelseSteg(
         opphørValideringService.validerPerioder(saksbehandling)
 
         val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
-        opphørValideringService.validerIngenUtbetalingEtterOpphør(beregningsresultat, saksbehandling.revurderFra)
+        opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(beregningsresultat, saksbehandling.revurderFra)
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
