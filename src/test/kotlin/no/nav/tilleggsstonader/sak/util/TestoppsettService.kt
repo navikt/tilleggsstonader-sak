@@ -108,13 +108,13 @@ class TestoppsettService(
 
     fun opprettRevurdering(
         revurderFra: LocalDate,
-        behandling: Behandling,
+        forrigeBehandling: Behandling,
         fagsak: Fagsak,
         vedtakBeregningsresultatFørstegangsbehandling: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
     ): Behandling {
-        oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
+        oppdater(forrigeBehandling.copy(status = BehandlingStatus.FERDIGSTILT))
         val forrgieVedtak = VedtakTilsynBarn(
-            behandlingId = behandling.id,
+            behandlingId = forrigeBehandling.id,
             type = TypeVedtak.INNVILGELSE,
             beregningsresultat = vedtakBeregningsresultatFørstegangsbehandling,
             vedtak = vedtaksdata,
@@ -125,7 +125,7 @@ class TestoppsettService(
                 fagsak = fagsak,
                 type = BehandlingType.REVURDERING,
                 revurderFra = revurderFra,
-                forrigeBehandlingId = behandling.id,
+                forrigeBehandlingId = forrigeBehandling.id,
                 status = BehandlingStatus.UTREDES,
                 steg = StegType.BEREGNE_YTELSE,
             )

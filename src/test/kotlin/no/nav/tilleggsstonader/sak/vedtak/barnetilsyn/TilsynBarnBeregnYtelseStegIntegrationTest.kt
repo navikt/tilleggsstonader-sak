@@ -244,7 +244,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             val behandlingForOpphør =
                 testoppsettService.opprettRevurdering(
                     revurderFra = LocalDate.of(2023, 2, 1),
-                    behandling = behandling,
+                    forrigeBehandling = behandling,
                     fagsak = fagsak,
                     vedtakBeregningsresultatFørstegangsbehandling = vedtakBeregningsresultatFørstegangsbehandling,
                 )
