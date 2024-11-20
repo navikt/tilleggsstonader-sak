@@ -25,7 +25,7 @@ class OpphørValideringService(
         val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling.id)
 
         validerIngenNyeOppfylteVilkårEllerVilkårperioder(vilkår, vilkårperioder)
-        validerIngenEndredePerioderMedTomEtterOpphørsdato(
+        validerIngenEndredePerioderMedTomEtterRevurderFraDato(
             vilkårperioder,
             vilkår,
             saksbehandling.revurderFra ?: error("Revurder fra er påkrevd for opphør"),
@@ -34,12 +34,12 @@ class OpphørValideringService(
 
     fun validerIngenUtbetalingEtterOpphør(
         beregningsresultatTilsynBarn: BeregningsresultatTilsynBarn,
-        opphørsDato: LocalDate?,
+        revurderFra: LocalDate?,
     ) {
-        brukerfeilHvis(opphørsDato == null) { "Revurder fra dato er påkrevd for opphør" }
+        brukerfeilHvis(revurderFra == null) { "Revurder fra dato er påkrevd for opphør" }
         beregningsresultatTilsynBarn.perioder.forEach { periode ->
             periode.beløpsperioder.forEach {
-                brukerfeilHvis(it.dato >= opphørsDato) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger etter opphørsdato." }
+                brukerfeilHvis(it.dato >= revurderFra) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger etter revurder fra dato." }
             }
         }
     }
@@ -59,25 +59,25 @@ class OpphørValideringService(
         }
     }
 
-    private fun validerIngenEndredePerioderMedTomEtterOpphørsdato(
+    private fun validerIngenEndredePerioderMedTomEtterRevurderFraDato(
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
-        opphørsDato: LocalDate,
+        revurderFraDato: LocalDate,
     ) {
         vilkårperioder.målgrupper.forEach { vilkårperiode ->
             if (vilkårperiode.status == Vilkårstatus.ENDRET) {
-                brukerfeilHvis(vilkårperiode.tom > opphørsDato) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret målgruppe er etter opphørsdato." }
+                brukerfeilHvis(vilkårperiode.tom > revurderFraDato) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret målgruppe er etter revurder fra dato." }
             }
         }
         vilkårperioder.aktiviteter.forEach { vilkårperiode ->
             if (vilkårperiode.status == Vilkårstatus.ENDRET) {
-                brukerfeilHvis(vilkårperiode.tom > opphørsDato) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter opphørsdato." }
+                brukerfeilHvis(vilkårperiode.tom > revurderFraDato) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter revurder fra dato." }
             }
         }
         vilkår.forEach { enkeltVilkår ->
             if (enkeltVilkår.status == VilkårStatus.ENDRET) {
                 val tom = enkeltVilkår.tom ?: error("Til og med dato er påkrevd for endret vilkår")
-                brukerfeilHvis(tom > opphørsDato) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter opphørsdato." }
+                brukerfeilHvis(tom > revurderFraDato) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato." }
             }
         }
     }
