@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
-import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetService
+import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -45,8 +45,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.RegisterAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.SlåSammenPeriodeGrunnlagYtelseUtil.slåSammenOverlappendeEllerPåfølgende
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
@@ -68,7 +68,7 @@ class VilkårperiodeService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
-    private val aktivitetService: AktivitetService,
+    private val registerAktivitetService: RegisterAktivitetService,
     private val ytelseService: YtelseService,
     private val søknadService: SøknadService,
     private val tilgangService: TilgangService,
@@ -169,12 +169,12 @@ class VilkårperiodeService(
         fom: LocalDate,
         tom: LocalDate,
     ) = GrunnlagAktivitet(
-        aktiviteter = aktivitetService.hentAktiviteterForGrunnlagsdata(
+        aktiviteter = registerAktivitetService.hentAktiviteterForGrunnlagsdata(
             ident = behandlingService.hentSaksbehandling(behandlingId).ident,
             fom = fom,
             tom = tom,
         ).map {
-            PeriodeGrunnlagAktivitet(
+            RegisterAktivitet(
                 id = it.id,
                 fom = it.fom,
                 tom = it.tom,

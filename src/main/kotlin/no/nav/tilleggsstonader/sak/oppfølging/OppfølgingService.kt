@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
-import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetService
+import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -20,7 +20,7 @@ import java.time.LocalDate
 class OppfølgingService(
     private val behandlingRepository: BehandlingRepository,
     private val stønadsperiodeService: StønadsperiodeService,
-    private val aktivitetService: AktivitetService,
+    private val registerAktivitetService: RegisterAktivitetService,
     private val fagsakService: FagsakService,
 ) {
 
@@ -43,7 +43,7 @@ class OppfølgingService(
 
             val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
 
-            val registerAktivitet = aktivitetService.hentAktiviteter(
+            val registerAktivitet = registerAktivitetService.hentAktiviteter(
                 fagsak.fagsakPersonId,
                 stønadsperioder.minOf { it.fom },
                 stønadsperioder.maxOf { it.tom },

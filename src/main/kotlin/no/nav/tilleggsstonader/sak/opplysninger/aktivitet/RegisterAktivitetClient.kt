@@ -12,7 +12,7 @@ import java.net.URI
 import java.time.LocalDate
 
 @Service
-class AktivitetClient(
+class RegisterAktivitetClient(
     @Value("\${clients.integrasjoner.uri}") private val baseUrl: URI,
     @Qualifier("azureClientCredential") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {

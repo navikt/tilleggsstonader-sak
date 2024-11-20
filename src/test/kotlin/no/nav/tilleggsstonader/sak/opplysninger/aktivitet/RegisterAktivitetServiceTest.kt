@@ -11,12 +11,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-class PeriodeGrunnlagAktivitetServiceTest {
+class RegisterAktivitetServiceTest {
 
-    val aktivitetClient = mockk<AktivitetClient>()
+    val registerAktivitetClient = mockk<RegisterAktivitetClient>()
     val fagsakPersonService = mockk<FagsakPersonService>()
 
-    val service = AktivitetService(fagsakPersonService, aktivitetClient)
+    val service = RegisterAktivitetService(fagsakPersonService, registerAktivitetClient)
 
     val personId = FagsakPersonId.random()
 
@@ -29,7 +29,7 @@ class PeriodeGrunnlagAktivitetServiceTest {
     inner class HentAktiviteter {
         @Test
         fun `henting av aktiviteter skal filtrere vekk typer som ikke er av typen tiltak`() {
-            every { aktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
+            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
                 aktivitetArenaDto(type = TypeAktivitet.AMO.name, erStønadsberettiget = false),
                 aktivitetArenaDto(type = TypeAktivitet.AILOK.name, erStønadsberettiget = false),
             )
@@ -41,7 +41,7 @@ class PeriodeGrunnlagAktivitetServiceTest {
 
         @Test
         fun `skal ignorere typer som ikke er mappet`() {
-            every { aktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
+            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
                 aktivitetArenaDto(type = "FINNER_IKKE", erStønadsberettiget = false),
                 aktivitetArenaDto(type = TypeAktivitet.ARBRRHBAG.name, erStønadsberettiget = false),
             )
@@ -57,7 +57,7 @@ class PeriodeGrunnlagAktivitetServiceTest {
          */
         @Test
         fun `i tilfelle erStønadsberettiget er true så skal de aktivitetene være med, de settes kun til true for tiltak`() {
-            every { aktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
+            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
                 aktivitetArenaDto(type = "FINNER_IKKE", erStønadsberettiget = true),
             )
 

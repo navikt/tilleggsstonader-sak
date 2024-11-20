@@ -29,7 +29,7 @@ data class VilkårperioderGrunnlagDomain(
 )
 
 data class GrunnlagAktivitet(
-    val aktiviteter: List<PeriodeGrunnlagAktivitet>,
+    val aktiviteter: List<RegisterAktivitet>,
 )
 
 data class GrunnlagYtelse(
@@ -39,7 +39,7 @@ data class GrunnlagYtelse(
 /**
  * Kopi av [no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto]
  */
-data class PeriodeGrunnlagAktivitet(
+data class RegisterAktivitet(
     val id: String,
     val fom: LocalDate?,
     val tom: LocalDate?,
