@@ -4,7 +4,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -25,16 +26,17 @@ class VedtakDtoMapperTest {
 
         @Test
         fun `skal mappe avslått vedtak til dto`() {
-            val vedtak = Vedtak(
+            val vedtak = GeneriskVedtak(
                 behandlingId = BehandlingId.random(),
-                type = TypeVedtak.AVSLAG,
-                avslagBegrunnelse = "begrunnelse",
-                årsakerAvslag = ÅrsakAvslag.Wrapper(årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET)),
+                data = AvslagTilsynBarn(
+                    begrunnelse = "begrunnelse",
+                    årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
+                ),
             )
 
             val dto = VedtakDtoMapper.toDto(vedtak, revurderFra = null) as AvslagTilsynBarnDto
 
-            assertThat(dto.begrunnelse).isEqualTo(vedtak.avslagBegrunnelse)
+            assertThat(dto.begrunnelse).isEqualTo(vedtak.data.begrunnelse)
             assertThat(dto.type).isEqualTo(vedtak.type)
         }
     }

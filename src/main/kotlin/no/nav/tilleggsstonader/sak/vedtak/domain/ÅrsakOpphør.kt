@@ -5,9 +5,4 @@ enum class ÅrsakOpphør {
     ENDRING_MÅLGRUPPE,
     ENDRING_UTGIFTER,
     ANNET,
-    ;
-
-    data class Wrapper(
-        val årsaker: List<ÅrsakOpphør>,
-    )
 }

@@ -10,10 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaLæremidler
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksdataTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
@@ -109,14 +106,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 FilTilBytearrayConverter(),
                 BytearrayTilFilConverter(),
 
-                VedtaksdataTilsynBarnReader(),
-                VedtaksdataTilsynBarnWriter(),
-                BeregningsresultatTilsynBarnReader(),
-                BeregningsresultatTilsynBarnWriter(),
-                ÅrsakAvslagReader(),
-                ÅrsakAvslagWriter(),
-                ÅrsakOpphørReader(),
-                ÅrsakOpphørWriter(),
+                VedtaksdataReader(),
+                VedtaksdataWriter(),
 
                 TilVilkårperiodeTypeConverter(),
                 VilkårperiodeTypeTilStringConverter(),
@@ -233,21 +224,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class BarnMedBarnepassReader : JsonReader<BarnMedBarnepass>(BarnMedBarnepass::class)
     class BarnMedBarnepassWriter : JsonWriter<BarnMedBarnepass>()
 
-    class VedtaksdataTilsynBarnReader : JsonReader<VedtaksdataTilsynBarn>(VedtaksdataTilsynBarn::class)
-    class VedtaksdataTilsynBarnWriter : JsonWriter<VedtaksdataTilsynBarn>()
-
-    class BeregningsresultatTilsynBarnReader :
-        JsonReader<BeregningsresultatTilsynBarn>(BeregningsresultatTilsynBarn::class)
-
-    class BeregningsresultatTilsynBarnWriter : JsonWriter<BeregningsresultatTilsynBarn>()
-
-    class ÅrsakAvslagReader : JsonReader<ÅrsakAvslag.Wrapper>(ÅrsakAvslag.Wrapper::class)
-
-    class ÅrsakAvslagWriter : JsonWriter<ÅrsakAvslag.Wrapper>()
-
-    class ÅrsakOpphørReader : JsonReader<ÅrsakOpphør.Wrapper>(ÅrsakOpphør.Wrapper::class)
-
-    class ÅrsakOpphørWriter : JsonWriter<ÅrsakOpphør.Wrapper>()
+    class VedtaksdataReader : JsonReader<Vedtaksdata>(Vedtaksdata::class)
+    class VedtaksdataWriter : JsonWriter<Vedtaksdata>()
 
     class VilkårperioderGrunnlagReader : JsonReader<VilkårperioderGrunnlag>(VilkårperioderGrunnlag::class)
 

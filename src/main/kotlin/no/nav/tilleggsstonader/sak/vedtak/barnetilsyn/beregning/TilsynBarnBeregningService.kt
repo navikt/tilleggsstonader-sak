@@ -26,6 +26,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilSortertGrunnlagStønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -77,7 +80,10 @@ class TilsynBarnBeregningService(
 
     private fun finnRelevantePerioderFraForrigeVedtak(behandling: Saksbehandling): List<BeregningsresultatForMåned> {
         return behandling.forrigeBehandlingId?.let { forrigeBehandlingId ->
-            val beregningsresultat = repository.findByIdOrThrow(forrigeBehandlingId).beregningsresultat
+            val beregningsresultat = repository.findByIdOrThrow(forrigeBehandlingId)
+                .withTypeOrThrow<VedtakTilsynBarn>()
+                .data
+                .beregningsresultat()
                 ?: error("Finner ikke beregningsresultat på vedtak for behandling=$forrigeBehandlingId")
             val revurderFraMåned = behandling.revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN
 

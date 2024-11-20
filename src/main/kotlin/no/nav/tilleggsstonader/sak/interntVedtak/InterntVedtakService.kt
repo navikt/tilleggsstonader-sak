@@ -10,8 +10,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -185,16 +187,17 @@ class InterntVedtakService(
 
     private fun mapVedtak(vedtak: Vedtak?): VedtakInternt? {
         return vedtak?.let {
-            when (vedtak.type) {
-                TypeVedtak.INNVILGELSE -> VedtakInnvilgelseInternt
-                TypeVedtak.AVSLAG -> VedtakAvslagInternt(
-                    årsakerAvslag = it.årsakerAvslag?.årsaker ?: error("Avslag mangler årsaker"),
-                    avslagBegrunnelse = it.avslagBegrunnelse ?: error("Avslag mangler begrunnelse"),
+            when (vedtak.data) {
+                is InnvilgelseTilsynBarn -> VedtakInnvilgelseInternt
+
+                is AvslagTilsynBarn -> VedtakAvslagInternt(
+                    årsakerAvslag = vedtak.data.årsaker,
+                    avslagBegrunnelse = vedtak.data.begrunnelse,
                 )
 
-                TypeVedtak.OPPHØR -> VedtakOpphørInternt(
-                    årsakerOpphør = it.årsakerOpphør?.årsaker ?: error("Opphør mangler årsaker"),
-                    opphørBegrunnelse = it.opphørBegrunnelse ?: error("Opphør mangler begrunnelse"),
+                is OpphørTilsynBarn -> VedtakOpphørInternt(
+                    årsakerOpphør = vedtak.data.årsaker,
+                    opphørBegrunnelse = vedtak.data.begrunnelse,
                 )
             }
         }

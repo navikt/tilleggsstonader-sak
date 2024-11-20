@@ -13,6 +13,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.util.max
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -103,7 +106,11 @@ class BehandlingsoversiktService(
         vedtak: Vedtak,
         revurdererFra: LocalDate?,
     ): Vedtaksperiode? {
-        val perioder = vedtak.beregningsresultat?.perioder ?: return null
+        val perioder = when (vedtak.data) {
+            is InnvilgelseTilsynBarn -> vedtak.data.beregningsresultat
+            is OpphørTilsynBarn -> vedtak.data.beregningsresultat
+            is AvslagTilsynBarn -> return null
+        }.perioder
         val stønadsperioder = perioder.flatMap { it.grunnlag.stønadsperioderGrunnlag }.map { it.stønadsperiode }
         val minFom = stønadsperioder.minOfOrNull { it.fom }
         val maksTom = stønadsperioder.maxOfOrNull { it.tom }
