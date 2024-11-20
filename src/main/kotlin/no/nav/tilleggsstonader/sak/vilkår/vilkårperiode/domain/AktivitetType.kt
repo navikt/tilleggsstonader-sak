@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
-
 enum class AktivitetType : VilkårperiodeType {
     TILTAK,
     UTDANNING,
@@ -14,7 +12,3 @@ enum class AktivitetType : VilkårperiodeType {
     override fun girIkkeRettPåStønadsperiode() =
         this == INGEN_AKTIVITET
 }
-
-data class DelvilkårAktivitet(
-    val lønnet: VurderingLønnet,
-) : DelvilkårVilkårperiode()
