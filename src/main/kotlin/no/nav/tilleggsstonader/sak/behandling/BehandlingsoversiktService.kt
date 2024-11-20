@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDetaljer
@@ -13,6 +12,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.util.max
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
@@ -41,7 +41,7 @@ class BehandlingsoversiktService(
         if (fagsak == null) return null
         val behandlinger = behandlingRepository.findByFagsakId(fagsakId = fagsak.id)
 
-        val vedtaksperioder = hentVedtaksperioder(fagsak, behandlinger)
+        val vedtaksperioder = hentVedtaksperioder(behandlinger)
 
         return FagsakMedBehandlinger(
             fagsakId = fagsak.id,
@@ -77,19 +77,14 @@ class BehandlingsoversiktService(
      * Man burde kanskje haft en vedtaksperiode på behandling eller direkt på vedtaket for å enkelt hente ut informasjonen
      */
     private fun hentVedtaksperioder(
-        fagsak: Fagsak,
         behandlinger: List<Behandling>,
     ): Map<BehandlingId, Vedtaksperiode?> {
         val revurderFraPåBehandlingId = behandlinger.associate { it.id to it.revurderFra }
-        return if (fagsak.stønadstype == Stønadstype.BARNETILSYN) {
-            vedtakRepository.findAllById(behandlinger.map { it.id })
-                .associateBy { it.behandlingId }
-                .mapValues { (behandlingId, vedtak) ->
-                    utledVedstaksperiodeForBehandling(vedtak, revurderFraPåBehandlingId[behandlingId])
-                }
-        } else {
-            emptyMap()
-        }
+        return vedtakRepository.findAllById(behandlinger.map { it.id })
+            .associateBy { it.behandlingId }
+            .mapValues { (behandlingId, vedtak) ->
+                utledVedstaksperiodeForBehandling(vedtak, revurderFraPåBehandlingId[behandlingId])
+            }
     }
 
     /**
@@ -106,11 +101,14 @@ class BehandlingsoversiktService(
         vedtak: Vedtak,
         revurdererFra: LocalDate?,
     ): Vedtaksperiode? {
-        val perioder = when (vedtak.data) {
-            is InnvilgelseTilsynBarn -> vedtak.data.beregningsresultat
-            is OpphørTilsynBarn -> vedtak.data.beregningsresultat
-            is AvslagTilsynBarn -> return null
-        }.perioder
+        return when (vedtak.data) {
+            is InnvilgelseTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
+            is OpphørTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
+            is AvslagTilsynBarn -> null
+        }
+    }
+
+    private fun BeregningsresultatTilsynBarn.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
         val stønadsperioder = perioder.flatMap { it.grunnlag.stønadsperioderGrunnlag }.map { it.stønadsperiode }
         val minFom = stønadsperioder.minOfOrNull { it.fom }
         val maksTom = stønadsperioder.maxOfOrNull { it.tom }
