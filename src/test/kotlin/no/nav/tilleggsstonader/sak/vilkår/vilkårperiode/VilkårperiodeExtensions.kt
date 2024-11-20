@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.DelvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderingOrThrow
@@ -12,9 +10,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivite
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.evaluering.ResultatEvaluering
 
 object VilkårperiodeExtensions {
+
     val Vilkårperiode.medlemskap: Vurdering
         get() = this.faktaOgVurdering.vurderinger
             .takeIfVurderingOrThrow<MedlemskapVurdering>().medlemskap
@@ -34,13 +32,4 @@ object VilkårperiodeExtensions {
 
     val VilkårperiodeDto.lønnet: VurderingDto?
         get() = (this.delvilkår as DelvilkårAktivitetDto).lønnet
-
-    val ResultatEvaluering.medlemskap: Vurdering
-        get() = (this.delvilkår as DelvilkårMålgruppe).medlemskap
-
-    val ResultatEvaluering.dekketAvAnnetRegelverk: Vurdering
-        get() = (this.delvilkår as DelvilkårMålgruppe).dekketAvAnnetRegelverk
-
-    val ResultatEvaluering.lønnet: Vurdering
-        get() = (this.delvilkår as DelvilkårAktivitet).lønnet
 }

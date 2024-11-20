@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 
 @ProtectedWithClaims(issuer = "azuread")
-abstract class VedtakController<DTO, DOMENE>(
+abstract class VedtakController<DTO>(
     private val tilgangService: TilgangService,
-    private val vedtakService: VedtakService<DTO, DOMENE>,
+    private val vedtakService: VedtakService<DTO>,
 ) {
     fun lagreVedtak(behandlingId: BehandlingId, vedtak: DTO) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)

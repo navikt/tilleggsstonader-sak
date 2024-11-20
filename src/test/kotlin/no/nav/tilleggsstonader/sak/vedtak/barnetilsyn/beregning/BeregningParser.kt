@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
@@ -51,8 +52,10 @@ fun mapAktiviteter(behandlingId: BehandlingId, dataTable: DataTable) = dataTable
         behandlingId = behandlingId,
         fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
         tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-        type = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
-            ?: AktivitetType.TILTAK,
-        aktivitetsdager = parseInt(BeregningNøkler.AKTIVITETSDAGER, rad),
+        faktaOgVurdering = faktaOgVurderingAktivitet(
+            type = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
+                ?: AktivitetType.TILTAK,
+            aktivitetsdager = parseInt(BeregningNøkler.AKTIVITETSDAGER, rad),
+        ),
     )
 }

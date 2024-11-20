@@ -26,10 +26,9 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
@@ -42,9 +41,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingLønnet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -65,7 +66,6 @@ import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import java.net.URI
 import java.time.LocalDate
-import java.time.YearMonth
 import java.util.UUID
 
 class InterntVedtakServiceTest {
@@ -109,21 +109,21 @@ class InterntVedtakServiceTest {
     val vilkårperioder = Vilkårperioder(
         målgrupper = listOf(
             VilkårperiodeTestUtil.målgruppe(
-                type = MålgruppeType.AAP,
                 begrunnelse = "målgruppe aap",
-                delvilkår = delvilkårMålgruppe(
-                    medlemskap = vurdering(SvarJaNei.JA_IMPLISITT),
-                    dekkesAvAnnetRegelverk = vurdering(SvarJaNei.NEI),
+                faktaOgVurdering = faktaOgVurderingMålgruppe(
+                    type = MålgruppeType.AAP,
+                    medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
+                    dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.NEI),
                 ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
             ),
             VilkårperiodeTestUtil.målgruppe(
-                type = MålgruppeType.OVERGANGSSTØNAD,
                 begrunnelse = "målgruppe os",
-                delvilkår = delvilkårMålgruppe(
-                    medlemskap = vurdering(SvarJaNei.JA_IMPLISITT),
-                    dekkesAvAnnetRegelverk = vurdering(svar = null),
+                faktaOgVurdering = faktaOgVurderingMålgruppe(
+                    type = MålgruppeType.OVERGANGSSTØNAD,
+                    medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
+                    dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(svar = null),
                 ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
@@ -133,11 +133,8 @@ class InterntVedtakServiceTest {
             VilkårperiodeTestUtil.aktivitet(
                 begrunnelse = "aktivitet abd",
                 resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
-                delvilkår = delvilkårAktivitet(
-                    lønnet = vurdering(
-                        SvarJaNei.JA,
-                        resultat = ResultatDelvilkårperiode.IKKE_OPPFYLT,
-                    ),
+                faktaOgVurdering = faktaOgVurderingAktivitet(
+                    lønnet = vurderingLønnet(SvarJaNei.JA),
                 ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
@@ -212,21 +209,12 @@ class InterntVedtakServiceTest {
         ).tilDto(),
     )
 
-    val vedtak = VedtakTilsynBarn(
+    val vedtak = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
-        vedtak = VedtaksdataTilsynBarn(
-            utgifter = mapOf(
-                barnId to listOf(
-                    Utgift(
-                        fom = YearMonth.of(2024, 1),
-                        tom = YearMonth.of(2024, 2),
-                        utgift = 1399,
-                    ),
-                ),
-            ),
+        data = InnvilgelseTilsynBarn(
+            beregningsresultat = BeregningsresultatTilsynBarn(emptyList()),
         ),
-        beregningsresultat = BeregningsresultatTilsynBarn(emptyList()),
     )
 
     @BeforeEach

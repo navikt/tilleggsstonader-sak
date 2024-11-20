@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
-
 enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : VilkårperiodeType {
     AAP(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
     DAGPENGER(setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING)),
@@ -21,8 +19,3 @@ enum class MålgruppeType(val gyldigeAktiviter: Set<AktivitetType>) : Vilkårper
         this == INGEN_MÅLGRUPPE ||
             this == SYKEPENGER_100_PROSENT
 }
-
-data class DelvilkårMålgruppe(
-    val medlemskap: Vurdering,
-    val dekketAvAnnetRegelverk: Vurdering,
-) : DelvilkårVilkårperiode()

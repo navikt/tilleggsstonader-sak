@@ -12,9 +12,9 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
  * Splitter opp BeregnYtelseSteg for ulike stønadstyper
  * Denne håndterer sletting av tidligere vedtak og andeler
  */
-abstract class BeregnYtelseSteg<DTO, DOMENE>(
+abstract class BeregnYtelseSteg<DTO>(
     private val stønadstype: Stønadstype,
-    open val vedtakRepository: VedtakRepository<DOMENE>,
+    open val vedtakRepository: VedtakRepository,
     open val tilkjentytelseService: TilkjentYtelseService,
     open val simuleringService: SimuleringService,
 ) : BehandlingSteg<DTO> {

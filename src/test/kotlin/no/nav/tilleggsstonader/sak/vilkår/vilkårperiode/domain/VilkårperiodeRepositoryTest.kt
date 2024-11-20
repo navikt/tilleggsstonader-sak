@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -40,7 +41,14 @@ internal class VilkårperiodeRepositoryTest : IntegrationTest() {
 
             val vilkårperiode1 = vilkårperiodeRepository.insert(målgruppe(behandlingId = behandling.id))
             val vilkårperiode2 =
-                vilkårperiodeRepository.insert(målgruppe(behandlingId = behandling.id, type = MålgruppeType.UFØRETRYGD))
+                vilkårperiodeRepository.insert(
+                    målgruppe(
+                        behandlingId = behandling.id,
+                        faktaOgVurdering = faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.UFØRETRYGD,
+                        ),
+                    ),
+                )
 
             assertThat(vilkårperiodeRepository.findByBehandlingId(behandling.id))
                 .containsExactlyInAnyOrder(vilkårperiode1, vilkårperiode2)

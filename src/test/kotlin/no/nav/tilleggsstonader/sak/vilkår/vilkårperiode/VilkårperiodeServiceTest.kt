@@ -545,7 +545,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 fom = now().minusMonths(1),
                 tom = now().plusMonths(1),
-                aktivitetsdager = 5,
             )
             val periode = vilkårperiodeRepository.insert(aktivitet)
 

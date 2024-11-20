@@ -21,11 +21,9 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.tilFagsakMedPerson
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakBeregningsresultat
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksdata
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
@@ -41,7 +39,7 @@ class TestoppsettService(
     private val behandlingRepository: BehandlingRepository,
     private val eksternBehandlingIdRepository: EksternBehandlingIdRepository,
     private val grunnlagsdataService: GrunnlagsdataService,
-    private val repository: TilsynBarnVedtakRepository,
+    private val repository: VedtakRepository,
 ) {
 
     fun hentBehandling(behandlingId: BehandlingId) = behandlingRepository.findByIdOrThrow(behandlingId)
@@ -113,13 +111,11 @@ class TestoppsettService(
         vedtakBeregningsresultatForrigeBehandling: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
     ): Behandling {
         oppdater(forrigeBehandling.copy(status = BehandlingStatus.FERDIGSTILT))
-        val forrgieVedtak = VedtakTilsynBarn(
+        val forrigeVedtak = innvilgetVedtak(
             behandlingId = forrigeBehandling.id,
-            type = TypeVedtak.INNVILGELSE,
             beregningsresultat = vedtakBeregningsresultatForrigeBehandling,
-            vedtak = vedtaksdata,
         )
-        repository.insert(forrgieVedtak)
+        repository.insert(forrigeVedtak)
         val revurdering =
             behandling(
                 fagsak = fagsak,

@@ -13,6 +13,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTils
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -71,24 +74,15 @@ object TilsynBarnTestUtil {
         )
     }
 
-    val vedtaksdata = VedtaksdataTilsynBarn(
-        utgifter = mapOf(
-            barn(
-                BarnId.random(),
-                Utgift(YearMonth.of(2023, 1), YearMonth.of(2023, 1), 100),
-            ),
-        ),
-    )
-
     fun innvilgetVedtak(
-        vedtak: VedtaksdataTilsynBarn? = vedtaksdata,
-        beregningsresultat: BeregningsresultatTilsynBarn? = vedtakBeregningsresultat,
+        beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
         behandlingId: BehandlingId = BehandlingId.random(),
-    ) = VedtakTilsynBarn(
+    ) = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
-        vedtak = vedtak,
-        beregningsresultat = beregningsresultat,
+        data = InnvilgelseTilsynBarn(
+            beregningsresultat = beregningsresultat,
+        ),
     )
 
     fun barn(barnId: BarnId, vararg utgifter: Utgift) = Pair(barnId, utgifter.toList())

@@ -3,7 +3,10 @@ package no.nav.tilleggsstonader.sak.vedtak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
-import org.springframework.data.repository.NoRepositoryBean
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import org.springframework.stereotype.Repository
 
-@NoRepositoryBean
-interface VedtakRepository<T> : RepositoryInterface<T, BehandlingId>, InsertUpdateRepository<T>
+@Repository
+interface VedtakRepository :
+    RepositoryInterface<Vedtak, BehandlingId>,
+    InsertUpdateRepository<Vedtak>
