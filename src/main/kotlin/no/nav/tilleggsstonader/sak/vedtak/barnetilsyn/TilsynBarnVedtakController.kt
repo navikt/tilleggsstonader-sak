@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakController
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
@@ -59,6 +60,6 @@ class TilsynBarnVedtakController(
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        return tilsynBarnBeregningService.beregn(behandling).tilDto(behandling.revurderFra)
+        return tilsynBarnBeregningService.beregn(behandling, TypeVedtak.INNVILGELSE).tilDto(behandling.revurderFra)
     }
 }
