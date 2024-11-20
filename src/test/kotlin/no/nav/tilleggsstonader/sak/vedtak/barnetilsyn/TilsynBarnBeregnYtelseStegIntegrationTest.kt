@@ -1,5 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.LocalDate
+import java.time.YearMonth
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -18,10 +22,12 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -39,10 +45,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.time.LocalDate
-import java.time.YearMonth
 
 class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
@@ -230,8 +232,22 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
 
         @Test
         fun `skal lagre vedtak`() {
+            val beløpsperioderFørstegangsbehandling = listOf(
+                Beløpsperiode(dato = LocalDate.of(2022, 12, 1), beløp = 1000, målgruppe = MålgruppeType.AAP),
+                Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 2000, målgruppe = MålgruppeType.AAP),
+            )
+            val vedtakBeregningsresultatFørstegangsbehandling = BeregningsresultatTilsynBarn(
+                perioder = listOf(
+                    beregningsresultatForMåned(beløpsperioder = beløpsperioderFørstegangsbehandling, måned = YearMonth.of(2023, 1)),
+                )
+            )
             val behandlingForOpphør =
-                testoppsettService.opprettRevurdering(LocalDate.of(2023, 2, 1), behandling, fagsak)
+                testoppsettService.opprettRevurdering(
+                    revurderFra = LocalDate.of(2023, 2, 1),
+                    behandling = behandling,
+                    fagsak = fagsak,
+                    vedtakBeregningsresultatFørstegangsbehandling = vedtakBeregningsresultatFørstegangsbehandling,
+                )
             val saksbehandlingForOpphør = saksbehandling(behandling = behandlingForOpphør)
             val stønadsperiodeForOpphør =
                 stønadsperiode(
@@ -262,8 +278,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
             assertThat(vedtak.årsakerOpphør?.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
             assertThat(vedtak.opphørBegrunnelse).isEqualTo("Endring i utgifter")
-            assertThat(vedtak.beregningsresultat!!.perioder).isEmpty()
-            assertThat(tilkjentYtelse).isEmpty()
+            assertThat(vedtak.beregningsresultat!!.perioder).isEqualTo(vedtakBeregningsresultatFørstegangsbehandling.perioder)
+            assertThat(tilkjentYtelse).hasSize(2)
         }
     }
 

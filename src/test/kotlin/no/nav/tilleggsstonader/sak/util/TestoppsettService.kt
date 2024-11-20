@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 
 @Profile("integrasjonstest")
 @Service
@@ -109,12 +110,13 @@ class TestoppsettService(
         revurderFra: LocalDate,
         behandling: Behandling,
         fagsak: Fagsak,
+        vedtakBeregningsresultatFørstegangsbehandling: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
     ): Behandling {
         oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
         val forrgieVedtak = VedtakTilsynBarn(
             behandlingId = behandling.id,
             type = TypeVedtak.INNVILGELSE,
-            beregningsresultat = vedtakBeregningsresultat,
+            beregningsresultat = vedtakBeregningsresultatFørstegangsbehandling,
             vedtak = vedtaksdata,
         )
         repository.insert(forrgieVedtak)

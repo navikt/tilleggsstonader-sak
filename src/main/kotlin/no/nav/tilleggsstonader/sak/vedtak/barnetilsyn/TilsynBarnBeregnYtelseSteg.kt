@@ -79,6 +79,7 @@ class TilsynBarnBeregnYtelseSteg(
                 opphørBegrunnelse = vedtak.begrunnelse,
             ),
         )
+        //Stemmer dette skal vi oprette tilkjente ytelser for opphør?
         lagreAndeler(saksbehandling, beregningsresultat)
     }
 

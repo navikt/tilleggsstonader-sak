@@ -1,5 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.YearMonth
+import kotlin.collections.listOf
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -14,9 +18,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnD
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.YearMonth
 
 object TilsynBarnTestUtil {
 
@@ -31,6 +32,11 @@ object TilsynBarnTestUtil {
         begrunnelse = "Endring i utgifter",
     )
 
+    val beløpsperioderDefault = listOf(
+        Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = MålgruppeType.AAP),
+        Beløpsperiode(dato = LocalDate.now().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
+    )
+
     val vedtakBeregningsresultat = BeregningsresultatTilsynBarn(
         perioder = listOf(
             beregningsresultatForMåned(),
@@ -40,6 +46,7 @@ object TilsynBarnTestUtil {
     fun beregningsresultatForMåned(
         måned: YearMonth = YearMonth.now(),
         stønadsperioder: List<StønadsperiodeGrunnlag> = emptyList(),
+        beløpsperioder: List<Beløpsperiode> = beløpsperioderDefault,
     ) = BeregningsresultatForMåned(
         dagsats = BigDecimal.TEN,
         månedsbeløp = 1000,
@@ -51,10 +58,7 @@ object TilsynBarnTestUtil {
             utgifterTotal = 2000,
             antallBarn = 1,
         ),
-        beløpsperioder = listOf(
-            Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = MålgruppeType.AAP),
-            Beløpsperiode(dato = LocalDate.now().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
-        ),
+        beløpsperioder = beløpsperioder
     )
 
     fun stønadsperiodeGrunnlag(
