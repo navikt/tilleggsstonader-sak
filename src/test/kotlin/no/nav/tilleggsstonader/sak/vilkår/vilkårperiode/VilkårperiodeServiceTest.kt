@@ -269,7 +269,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         }
 
         @Nested
-        inner class IngenPeriodeGrunnlagAktivitetMålgruppe {
+        inner class IngenRegisterAktivitetMålgruppe {
             @Test
             fun `skal kaste feil ved tom og null begrunnelse på ingen aktivitet`() {
                 val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())

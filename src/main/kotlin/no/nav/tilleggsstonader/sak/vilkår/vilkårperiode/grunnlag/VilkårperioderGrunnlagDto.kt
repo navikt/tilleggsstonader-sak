@@ -44,7 +44,7 @@ fun GrunnlagAktivitet.tilDto() =
         aktiviteter = this.aktiviteter.map { it.tilDto() },
     )
 
-private fun PeriodeGrunnlagAktivitet.tilDto() =
+private fun RegisterAktivitet.tilDto() =
     AktivitetArenaDto(
         id = id,
         fom = fom,

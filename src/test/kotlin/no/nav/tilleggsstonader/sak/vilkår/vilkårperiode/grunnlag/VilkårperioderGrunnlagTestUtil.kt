@@ -22,7 +22,7 @@ object VilkårperioderGrunnlagTestUtil {
         erUtdanning: Boolean? = false,
         arrangør: String? = "Arrangør",
         kilde: Kilde = Kilde.ARENA,
-    ) = PeriodeGrunnlagAktivitet(
+    ) = RegisterAktivitet(
         id = id,
         fom = fom,
         tom = tom,
