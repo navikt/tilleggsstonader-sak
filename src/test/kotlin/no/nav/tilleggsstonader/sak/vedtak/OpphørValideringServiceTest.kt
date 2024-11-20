@@ -54,20 +54,8 @@ class OpphørValideringServiceTest {
         every { tilsynBarnBeregningService.beregn(any(), any()) } returns vedtakBeregningsresultat
     }
 
-    @Test
-    fun `Kaster feil ved utbetaling etter opphørdato`() {
-        val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = osloDateNow())
-
-        assertThatThrownBy {
-            opphørValideringService.validerIngenUtbetalingEtterOpphør(
-                beregningsresultatTilsynBarn = vedtakBeregningsresultat,
-                opphørsDato = saksbehandlingRevurdertFraTilbakeITid.revurderFra,
-            )
-        }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger etter opphørsdato.")
-    }
-
     @Nested
-    inner class GyldigData {
+    inner class `Valider ingen utbetaling etter opphør` {
 
         @Test
         fun `Kaster ikke feil ved korrekt data`() {
@@ -78,10 +66,28 @@ class OpphørValideringServiceTest {
                 )
             }.doesNotThrowAnyException()
         }
+
+        @Test
+        fun `Kaster feil ved utbetaling etter opphørdato`() {
+            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = osloDateNow())
+
+            assertThatThrownBy {
+                opphørValideringService.validerIngenUtbetalingEtterOpphør(
+                    beregningsresultatTilsynBarn = vedtakBeregningsresultat,
+                    opphørsDato = saksbehandlingRevurdertFraTilbakeITid.revurderFra,
+                )
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger etter opphørsdato.")
+        }
     }
 
     @Nested
-    inner class PerioderMedStatusNyOgResultatOppfylt {
+    inner class `Valider perioder` {
+
+        @Test
+        fun `validerPerioder kaster ikke feil ved korrekt data`() {
+            assertThatCode { opphørValideringService.validerPerioder(saksbehandling = saksbehandling) }
+                .doesNotThrowAnyException()
+        }
 
         @Test
         fun `Kaster feil ved nye oppfylte vilkår`() {
@@ -115,10 +121,6 @@ class OpphørValideringServiceTest {
                 opphørValideringService.validerPerioder(saksbehandling)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye inngangsvilkår eller nye utgifter som er oppfylt.")
         }
-    }
-
-    @Nested
-    inner class TomEtterOpphørsdato() {
 
         @Test
         fun `Kaster feil ved målgruppe flyttet til etter opphørt dato`() {
