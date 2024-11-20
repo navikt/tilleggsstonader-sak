@@ -1,9 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.YearMonth
-import kotlin.collections.listOf
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -18,6 +14,10 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnD
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.YearMonth
+import kotlin.collections.listOf
 
 object TilsynBarnTestUtil {
 
@@ -58,7 +58,7 @@ object TilsynBarnTestUtil {
             utgifterTotal = 2000,
             antallBarn = 1,
         ),
-        beløpsperioder = beløpsperioder
+        beløpsperioder = beløpsperioder,
     )
 
     fun stønadsperiodeGrunnlag(
