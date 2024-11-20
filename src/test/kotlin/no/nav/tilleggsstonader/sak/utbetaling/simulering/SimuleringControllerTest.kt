@@ -16,8 +16,8 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,7 +37,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
     private lateinit var simuleringsresultatRepository: SimuleringsresultatRepository
 
     @Autowired
-    private lateinit var tilsynBarnVedtakRepository: TilsynBarnVedtakRepository
+    private lateinit var vedtakRepository: VedtakRepository
 
     @BeforeEach
     fun setUp() {
@@ -104,7 +104,7 @@ internal class SimuleringControllerTest : IntegrationTest() {
     }
 
     private fun opprettVedtak(behandlingId: BehandlingId) {
-        tilsynBarnVedtakRepository.insert(
+        vedtakRepository.insert(
             innvilgetVedtak(behandlingId = behandlingId),
         )
     }

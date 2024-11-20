@@ -13,12 +13,18 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
@@ -27,10 +33,10 @@ import java.time.DayOfWeek
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
     private val unleashService: UnleashService,
-    vedtakRepository: TilsynBarnVedtakRepository,
+    vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-) : BeregnYtelseSteg<VedtakTilsynBarnDto, VedtakTilsynBarn>(
+) : BeregnYtelseSteg<VedtakTilsynBarnDto>(
     stønadstype = Stønadstype.BARNETILSYN,
     vedtakRepository = vedtakRepository,
     tilkjentytelseService = tilkjentytelseService,
@@ -51,8 +57,7 @@ class TilsynBarnBeregnYtelseSteg(
      */
     private fun beregnOgLagreInnvilgelse(saksbehandling: Saksbehandling) {
         brukerfeilHvis(
-            saksbehandling.forrigeBehandlingId != null &&
-                !unleashService.isEnabled(Toggle.REVURDERING_INNVILGE_TIDLIGERE_INNVILGET),
+            saksbehandling.forrigeBehandlingId != null && !unleashService.isEnabled(Toggle.REVURDERING_INNVILGE_TIDLIGERE_INNVILGET),
         ) {
             "Funksjonalitet mangler for å kunne innvilge revurdering når tidligere behandling er innvilget. Sett saken på vent."
         }
@@ -65,12 +70,15 @@ class TilsynBarnBeregnYtelseSteg(
     private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnDto) {
         val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling)
         vedtakRepository.insert(
-            VedtakTilsynBarn(
+            GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.OPPHØR,
-                beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
-                årsakerOpphør = ÅrsakOpphør.Wrapper(årsaker = vedtak.årsakerOpphør),
-                opphørBegrunnelse = vedtak.begrunnelse,
+                data = OpphørTilsynBarn(
+                    beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
+                    årsaker = vedtak.årsakerOpphør,
+                    begrunnelse = vedtak.begrunnelse,
+                ),
+
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -81,11 +89,13 @@ class TilsynBarnBeregnYtelseSteg(
         vedtak: AvslagTilsynBarnDto,
     ) {
         vedtakRepository.insert(
-            VedtakTilsynBarn(
+            GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.AVSLAG,
-                avslagBegrunnelse = vedtak.begrunnelse,
-                årsakerAvslag = ÅrsakAvslag.Wrapper(årsaker = vedtak.årsakerAvslag),
+                data = AvslagTilsynBarn(
+                    årsaker = vedtak.årsakerAvslag,
+                    begrunnelse = vedtak.begrunnelse,
+                ),
             ),
         )
     }
@@ -118,14 +128,13 @@ class TilsynBarnBeregnYtelseSteg(
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatTilsynBarn,
-    ): VedtakTilsynBarn {
-        return VedtakTilsynBarn(
+    ): Vedtak {
+        return GeneriskVedtak(
             behandlingId = behandling.id,
             type = TypeVedtak.INNVILGELSE,
-            vedtak = VedtaksdataTilsynBarn(
-                utgifter = emptyMap(),
+            data = InnvilgelseTilsynBarn(
+                beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
             ),
-            beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
         )
     }
 

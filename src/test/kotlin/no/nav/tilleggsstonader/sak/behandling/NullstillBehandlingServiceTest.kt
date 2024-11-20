@@ -18,8 +18,8 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vedtaksbrev
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
@@ -64,7 +64,7 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
     lateinit var vedtaksbrevRepository: VedtaksbrevRepository
 
     @Autowired
-    lateinit var tilsynBarnVedtakRepository: TilsynBarnVedtakRepository
+    lateinit var vedtakRepository: VedtakRepository
 
     @Autowired
     lateinit var simuleringsresultatRepository: SimuleringsresultatRepository
@@ -145,13 +145,13 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
     @Test
     fun `skal slette vedtak`() {
-        tilsynBarnVedtakRepository.insert(innvilgetVedtak(behandlingId = behandling.id))
-        tilsynBarnVedtakRepository.insert(innvilgetVedtak(behandlingId = revurdering.id))
+        vedtakRepository.insert(innvilgetVedtak(behandlingId = behandling.id))
+        vedtakRepository.insert(innvilgetVedtak(behandlingId = revurdering.id))
 
         nullstillBehandlingService.nullstillBehandling(revurdering.id)
 
-        assertThat(tilsynBarnVedtakRepository.findByIdOrNull(behandling.id)).isNotNull
-        assertThat(tilsynBarnVedtakRepository.findByIdOrNull(revurdering.id)).isNull()
+        assertThat(vedtakRepository.findByIdOrNull(behandling.id)).isNotNull
+        assertThat(vedtakRepository.findByIdOrNull(revurdering.id)).isNull()
     }
 
     @Test

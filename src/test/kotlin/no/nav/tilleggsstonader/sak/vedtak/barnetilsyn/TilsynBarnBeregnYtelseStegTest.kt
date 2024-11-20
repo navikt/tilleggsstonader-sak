@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnUtgiftService
@@ -30,7 +31,7 @@ import java.time.YearMonth
 
 class TilsynBarnBeregnYtelseStegTest {
 
-    private val repository = mockk<TilsynBarnVedtakRepository>(relaxed = true)
+    private val repository = mockk<VedtakRepository>(relaxed = true)
     private val barnService = mockk<BarnService>()
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>(relaxed = true)
     private val simuleringService = mockk<SimuleringService>(relaxed = true)

@@ -8,9 +8,9 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
@@ -27,12 +27,12 @@ class BehandlingsoversiktServiceTest {
 
     val fagsakService = mockk<FagsakService>()
     val behandlingRepository = mockk<BehandlingRepository>()
-    val tilsynBarnVedtakRepository = mockk<TilsynBarnVedtakRepository>()
+    val vedtakRepository = mockk<VedtakRepository>()
 
     val service = BehandlingsoversiktService(
         fagsakService = fagsakService,
         behandlingRepository = behandlingRepository,
-        tilsynBarnVedtakRepository = tilsynBarnVedtakRepository,
+        vedtakRepository = vedtakRepository,
     )
 
     val fagsak = fagsak()
@@ -109,7 +109,7 @@ class BehandlingsoversiktServiceTest {
         )
         val beregningsresultat = BeregningsresultatTilsynBarn(perioder = listOf(beregningsresultatForMåned))
 
-        every { tilsynBarnVedtakRepository.findAllById(any()) } returns listOf(
+        every { vedtakRepository.findAllById(any()) } returns listOf(
             innvilgetVedtak(beregningsresultat = beregningsresultat, behandlingId = behandling.id),
         )
     }

@@ -26,10 +26,9 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtakTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.VedtaksdataTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
@@ -67,7 +66,6 @@ import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import java.net.URI
 import java.time.LocalDate
-import java.time.YearMonth
 import java.util.UUID
 
 class InterntVedtakServiceTest {
@@ -211,21 +209,12 @@ class InterntVedtakServiceTest {
         ).tilDto(),
     )
 
-    val vedtak = VedtakTilsynBarn(
+    val vedtak = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
-        vedtak = VedtaksdataTilsynBarn(
-            utgifter = mapOf(
-                barnId to listOf(
-                    Utgift(
-                        fom = YearMonth.of(2024, 1),
-                        tom = YearMonth.of(2024, 2),
-                        utgift = 1399,
-                    ),
-                ),
-            ),
+        data = InnvilgelseTilsynBarn(
+            beregningsresultat = BeregningsresultatTilsynBarn(emptyList()),
         ),
-        beregningsresultat = BeregningsresultatTilsynBarn(emptyList()),
     )
 
     @BeforeEach

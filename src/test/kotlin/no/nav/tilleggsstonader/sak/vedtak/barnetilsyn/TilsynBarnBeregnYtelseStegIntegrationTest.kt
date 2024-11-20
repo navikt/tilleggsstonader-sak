@@ -18,10 +18,16 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -46,7 +52,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
     val steg: TilsynBarnBeregnYtelseSteg,
     @Autowired
-    val repository: TilsynBarnVedtakRepository,
+    val repository: VedtakRepository,
     @Autowired
     val barnRepository: BarnRepository,
     @Autowired
@@ -98,13 +104,11 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             val vedtakDto = innvilgelseDto()
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
-            val vedtak = repository.findByIdOrThrow(saksbehandling.id)
+            val vedtak = repository.findByIdOrThrow(saksbehandling.id).withTypeOrThrow<InnvilgelseTilsynBarn>()
 
             assertThat(vedtak.behandlingId).isEqualTo(saksbehandling.id)
             assertThat(vedtak.type).isEqualTo(TypeVedtak.INNVILGELSE)
-            assertThat(vedtak.vedtak).isEqualTo(
-                VedtaksdataTilsynBarn(emptyMap()),
-            )
+            assertThat(vedtak.data.beregningsresultat.perioder).hasSize(1)
         }
 
         @Test
@@ -208,7 +212,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 assertThat(this.tom).isEqualTo(juni.atDay(3))
             }
 
-            val beregningsresultat = tilsynBarnVedtakService.hentVedtak(behandling.id)!!.beregningsresultat
+            val beregningsresultat = tilsynBarnVedtakService.hentVedtak(behandling.id)!!
+                .withTypeOrThrow<InnvilgelseTilsynBarn>().data.beregningsresultat
             with(beregningsresultat!!.perioder.single()) {
                 with(this.grunnlag.stønadsperioderGrunnlag.single()) {
                     assertThat(this.stønadsperiode.fom).isEqualTo(juni.atDay(1))
@@ -234,21 +239,16 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             val vedtakDto = opphørDto()
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
 
-            val vedtak = repository.findByIdOrThrow(saksbehandling.id)
+            val vedtak = repository.findByIdOrThrow(saksbehandling.id).withTypeOrThrow<OpphørTilsynBarn>()
 
             val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse
 
             assertThat(vedtak.behandlingId).isEqualTo(saksbehandling.id)
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
-            assertThat(vedtak.årsakerOpphør?.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
-            assertThat(vedtak.opphørBegrunnelse).isEqualTo("Nye utgifter")
-            assertThat(vedtak.beregningsresultat!!.perioder.single().beløpsperioder).containsExactly(
-                Beløpsperiode(
-                    LocalDate.of(2023, 1, 2),
-                    65,
-                    MålgruppeType.AAP,
-                ),
-            )
+            assertThat(vedtak.data.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
+            assertThat(vedtak.data.begrunnelse).isEqualTo("Nye utgifter")
+            assertThat(vedtak.data.beregningsresultat.perioder.single().beløpsperioder)
+                .containsExactly(Beløpsperiode(LocalDate.of(2023, 1, 2), 65, MålgruppeType.AAP))
             assertThat(tilkjentYtelse).hasSize(1)
         }
     }
@@ -353,8 +353,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
          * då det kun finnes overlapp mellom stønadsperioder og vilkår for januar og mars
          */
         private fun assertHarPerioderForJanuarOgFebruar(behandlingId: BehandlingId) {
-            val beregningsresultat = tilsynBarnVedtakService.hentVedtak(behandlingId)!!.beregningsresultat
-            with(beregningsresultat!!.perioder.sortedBy { it.grunnlag.måned }) {
+            val beregningsresultat = hentBeregningsresultat(behandlingId)
+            with(beregningsresultat.perioder.sortedBy { it.grunnlag.måned }) {
                 assertThat(this).hasSize(2)
                 assertHarPerioderForJanuarOgFebruar(this)
             }
@@ -364,8 +364,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
          * For revurdering gjenbrukes perioder for januar og februar, samt oppretter perioder for mars
          */
         private fun assertHarPerioderForJanuarTilMars(behandlingId: BehandlingId) {
-            val beregningsresultat = tilsynBarnVedtakService.hentVedtak(behandlingId)!!.beregningsresultat
-            with(beregningsresultat!!.perioder.sortedBy { it.grunnlag.måned }) {
+            val beregningsresultat = hentBeregningsresultat(behandlingId)
+            with(beregningsresultat.perioder.sortedBy { it.grunnlag.måned }) {
                 assertThat(this).hasSize(3)
                 // Januar og februar beholder fra forrige behandling, selv om det ikke finnes noen perioder for de denne gangen.
                 assertHarPerioderForJanuarOgFebruar(this)
@@ -377,6 +377,13 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                  */
                 assertHarPerioderForMars(this)
             }
+        }
+
+        private fun hentBeregningsresultat(behandlingId: BehandlingId): BeregningsresultatTilsynBarn {
+            return tilsynBarnVedtakService.hentVedtak(behandlingId)!!
+                .withTypeOrThrow<InnvilgelseTilsynBarn>()
+                .data
+                .beregningsresultat
         }
 
         private fun assertHarPerioderForJanuarOgFebruar(beregningsresultat: List<BeregningsresultatForMåned>) {
