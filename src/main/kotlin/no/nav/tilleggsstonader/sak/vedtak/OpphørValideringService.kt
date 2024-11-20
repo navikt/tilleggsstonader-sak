@@ -65,13 +65,13 @@ class OpphørValideringService(
         revurderFraDato: LocalDate,
     ) {
         vilkårperioder.målgrupper.forEach { vilkårperiode ->
-            if (vilkårperiode.status == Vilkårstatus.ENDRET) {
-                brukerfeilHvis(vilkårperiode.tom > revurderFraDato) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret målgruppe er etter revurder fra dato." }
+            brukerfeilHvis(vilkårperiode.status == Vilkårstatus.ENDRET && vilkårperiode.tom > revurderFraDato) {
+                "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret målgruppe er etter revurder fra dato."
             }
         }
         vilkårperioder.aktiviteter.forEach { vilkårperiode ->
-            if (vilkårperiode.status == Vilkårstatus.ENDRET) {
-                brukerfeilHvis(vilkårperiode.tom > revurderFraDato) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter revurder fra dato." }
+            brukerfeilHvis(vilkårperiode.status == Vilkårstatus.ENDRET && vilkårperiode.tom > revurderFraDato) {
+                "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter revurder fra dato."
             }
         }
         vilkår.forEach { enkeltVilkår ->
