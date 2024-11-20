@@ -6,12 +6,13 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensio
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -39,14 +40,8 @@ class VilkårperiodeDtoTest {
                 begrunnelse = "begrunnelse",
                 faktaOgVurdering = faktaOgVurderingMålgruppe(
                     type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                    medlemskap = Vurdering(
-                        svar = SvarJaNei.JA,
-                        resultat = ResultatDelvilkårperiode.OPPFYLT,
-                    ),
-                    dekketAvAnnetRegelverk = Vurdering(
-                        svar = SvarJaNei.JA,
-                        resultat = ResultatDelvilkårperiode.IKKE_OPPFYLT,
-                    ),
+                    medlemskap = vurderingMedlemskap(svar = SvarJaNei.JA),
+                    dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA),
                 ),
             ).tilDto()
 

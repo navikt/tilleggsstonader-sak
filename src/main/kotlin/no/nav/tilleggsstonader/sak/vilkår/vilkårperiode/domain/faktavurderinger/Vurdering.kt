@@ -1,20 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-
-data class Vurdering(
-    val svar: SvarJaNei?,
-    val resultat: ResultatDelvilkårperiode,
-) {
-    init {
-        feilHvis(resultat == ResultatDelvilkårperiode.IKKE_AKTUELT && (svar != null)) {
-            "Ugyldig resultat=$resultat når svar=$svar"
-        }
-    }
-
-    companion object {
-        val VURDERING_IMPLISITT_OPPFYLT = Vurdering(SvarJaNei.JA_IMPLISITT, ResultatDelvilkårperiode.OPPFYLT)
-    }
+sealed interface Vurdering {
+    val svar: SvarJaNei?
+    val resultat: ResultatDelvilkårperiode
 }
 
 enum class SvarJaNei {
@@ -31,4 +19,64 @@ enum class ResultatDelvilkårperiode {
     IKKE_OPPFYLT,
     IKKE_VURDERT,
     IKKE_AKTUELT,
+}
+
+data class VurderingLønnet private constructor(
+    override val svar: SvarJaNei?,
+    override val resultat: ResultatDelvilkårperiode,
+) : Vurdering {
+
+    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+
+    companion object {
+        private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode {
+            return when (svar) {
+                null -> ResultatDelvilkårperiode.IKKE_VURDERT
+                SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+                SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingLønnet::class.simpleName}")
+            }
+        }
+    }
+}
+
+data class VurderingMedlemskap private constructor(
+    override val svar: SvarJaNei?,
+    override val resultat: ResultatDelvilkårperiode,
+) : Vurdering {
+
+    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+
+    companion object {
+        private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode {
+            return when (svar) {
+                null -> ResultatDelvilkårperiode.IKKE_VURDERT
+                SvarJaNei.JA,
+                SvarJaNei.JA_IMPLISITT,
+                -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+            }
+        }
+
+        val IMPLISITT = VurderingMedlemskap(SvarJaNei.JA_IMPLISITT)
+    }
+}
+
+data class VurderingDekketAvAnnetRegelverk private constructor(
+    override val svar: SvarJaNei?,
+    override val resultat: ResultatDelvilkårperiode,
+) : Vurdering {
+
+    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+
+    companion object {
+        private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode {
+            return when (svar) {
+                null -> ResultatDelvilkårperiode.IKKE_VURDERT
+                SvarJaNei.JA -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+                SvarJaNei.NEI -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingDekketAvAnnetRegelverk::class.simpleName}")
+            }
+        }
+    }
 }

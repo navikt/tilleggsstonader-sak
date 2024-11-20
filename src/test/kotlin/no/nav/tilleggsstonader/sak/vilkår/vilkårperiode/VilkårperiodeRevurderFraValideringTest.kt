@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
@@ -175,14 +175,14 @@ class VilkårperiodeRevurderFraValideringTest {
                 tom = revurderFra.plusMonths(1),
                 faktaOgVurdering = faktaOgVurderingAktivitet(
                     aktivitetsdager = 3,
-                    lønnet = vurdering(SvarJaNei.NEI),
+                    lønnet = vurderingLønnet(SvarJaNei.NEI),
                 ),
                 resultat = ResultatVilkårperiode.OPPFYLT,
             )
             listOf<(Vilkårperiode) -> Vilkårperiode>(
                 { it.medAktivitetsdager(aktivitetsdager = 2) },
                 { it.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT) },
-                { it.medLønnet(lønnet = vurdering(SvarJaNei.JA)) },
+                { it.copy(begrunnelse = "en begrunnelse").medLønnet(vurderingLønnet(SvarJaNei.JA)) },
             ).forEach { endreVilkårperiode ->
                 assertThatThrownBy {
                     endringMedRevurderFra(

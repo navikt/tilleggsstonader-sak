@@ -44,7 +44,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingLønnet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -112,8 +114,8 @@ class InterntVedtakServiceTest {
                 begrunnelse = "målgruppe aap",
                 faktaOgVurdering = faktaOgVurderingMålgruppe(
                     type = MålgruppeType.AAP,
-                    medlemskap = vurdering(SvarJaNei.JA_IMPLISITT),
-                    dekketAvAnnetRegelverk = vurdering(SvarJaNei.NEI),
+                    medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
+                    dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.NEI),
                 ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
@@ -122,8 +124,8 @@ class InterntVedtakServiceTest {
                 begrunnelse = "målgruppe os",
                 faktaOgVurdering = faktaOgVurderingMålgruppe(
                     type = MålgruppeType.OVERGANGSSTØNAD,
-                    medlemskap = vurdering(SvarJaNei.JA_IMPLISITT),
-                    dekketAvAnnetRegelverk = vurdering(svar = null),
+                    medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
+                    dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(svar = null),
                 ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
@@ -134,10 +136,7 @@ class InterntVedtakServiceTest {
                 begrunnelse = "aktivitet abd",
                 resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                 faktaOgVurdering = faktaOgVurderingAktivitet(
-                    lønnet = vurdering(
-                        SvarJaNei.JA,
-                        resultat = ResultatDelvilkårperiode.IKKE_OPPFYLT,
-                    ),
+                    lønnet = vurderingLønnet(SvarJaNei.JA),
                 ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
