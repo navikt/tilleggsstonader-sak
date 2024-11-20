@@ -79,7 +79,7 @@ class DefaultRestTemplateConfiguration {
     "mock-featuretoggle",
     "mock-htmlify",
     "mock-arena",
-    "mock-aktivitet",
+    "mock-register-aktivitet",
     "mock-kodeverk",
     "mock-arbeidsfordeling",
     "mock-kafka",

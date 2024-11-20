@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping(path = ["/api/aktivitet"])
 @ProtectedWithClaims(issuer = "azuread")
-class AktivitetController(
+class RegisterAktivitetController(
     private val tilgangService: TilgangService,
-    private val aktivitetService: AktivitetService,
+    private val registerAktivitetService: RegisterAktivitetService,
     private val behandlingService: BehandlingService,
 ) {
 
     @GetMapping("temp/{fagsakPersonId}")
     fun hentAktiviteter(
         @PathVariable fagsakPersonId: FagsakPersonId,
-    ): AktiviteterDto {
+    ): RegisterAktiviteterDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
-        return aktivitetService.hentAktiviteterMedPerioder(fagsakPersonId)
+        return registerAktivitetService.hentAktiviteterMedPerioder(fagsakPersonId)
     }
 
     @Deprecated("Byttes ut med hentAktiviteter, fordi vi trenger informasjon om for hvilken periode vi henter ut data.")
@@ -35,7 +35,7 @@ class AktivitetController(
         @PathVariable fagsakPersonId: FagsakPersonId,
     ): List<AktivitetArenaDto> {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
-        return aktivitetService.hentAktiviteter(fagsakPersonId)
+        return registerAktivitetService.hentAktiviteter(fagsakPersonId)
     }
 
     @Deprecated("Skal fjernes. aktivitet skal hentes med vilkårperioder") // TODO: Fjern når aktivitet hentes med vilkårperioder
@@ -45,6 +45,6 @@ class AktivitetController(
     ): List<AktivitetArenaDto> {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        return aktivitetService.hentAktiviteter(saksbehandling.fagsakPersonId)
+        return registerAktivitetService.hentAktiviteter(saksbehandling.fagsakPersonId)
     }
 }

@@ -15,8 +15,8 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.AktivitetClientConfig.Companion.resetMock
-import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.AktivitetClient
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.RegisterAktivitetClientConfig.Companion.resetMock
+import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
@@ -94,7 +94,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
     lateinit var vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository
 
     @Autowired
-    lateinit var aktivitetClient: AktivitetClient
+    lateinit var registerAktivitetClient: RegisterAktivitetClient
 
     @Autowired
     lateinit var ytelseClient: YtelseClient
@@ -102,7 +102,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
     @AfterEach
     override fun tearDown() {
         super.tearDown()
-        resetMock(aktivitetClient)
+        resetMock(registerAktivitetClient)
     }
 
     @Nested
@@ -816,7 +816,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal kun ta med aktiviteter som er stønadsberettiget i grunnlaget`() {
             val idStønadsberettiget = "1"
             every {
-                aktivitetClient.hentAktiviteter(any(), any(), any())
+                registerAktivitetClient.hentAktiviteter(any(), any(), any())
             } returns listOf(
                 aktivitetArenaDto(id = idStønadsberettiget, erStønadsberettiget = true),
                 aktivitetArenaDto(id = "2", erStønadsberettiget = false),
@@ -1008,7 +1008,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal kunne oppdatere grunnlaget når en behandling redigerbar og i riktig steg`() {
             every {
-                aktivitetClient.hentAktiviteter(any(), any(), any())
+                registerAktivitetClient.hentAktiviteter(any(), any(), any())
             } answers {
                 listOf(aktivitetArenaDto(id = "1", erStønadsberettiget = true))
             } andThenAnswer {

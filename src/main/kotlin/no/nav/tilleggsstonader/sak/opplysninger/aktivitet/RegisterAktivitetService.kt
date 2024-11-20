@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class AktivitetService(
+class RegisterAktivitetService(
     private val fagsakPersonService: FagsakPersonService,
-    private val aktivitetClient: AktivitetClient,
+    private val registerAktivitetClient: RegisterAktivitetClient,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -22,7 +22,7 @@ class AktivitetService(
         fagsakPersonId: FagsakPersonId,
         fom: LocalDate = osloDateNow().minusYears(3),
         tom: LocalDate = osloDateNow().plusYears(1),
-    ): AktiviteterDto = AktiviteterDto(
+    ): RegisterAktiviteterDto = RegisterAktiviteterDto(
         periodeHentetFra = fom,
         periodeHentetTil = tom,
         aktiviteter = hentAktiviteter(fagsakPersonId, fom, tom),
@@ -38,7 +38,7 @@ class AktivitetService(
     }
 
     fun hentAktiviteterForGrunnlagsdata(ident: String, fom: LocalDate, tom: LocalDate): List<AktivitetArenaDto> {
-        return aktivitetClient.hentAktiviteter(
+        return registerAktivitetClient.hentAktiviteter(
             ident = ident,
             fom = fom,
             tom = tom,
@@ -52,7 +52,7 @@ class AktivitetService(
         ident: String,
         fom: LocalDate,
         tom: LocalDate,
-    ) = aktivitetClient.hentAktiviteter(
+    ) = registerAktivitetClient.hentAktiviteter(
         ident = ident,
         fom = fom,
         tom = tom,
