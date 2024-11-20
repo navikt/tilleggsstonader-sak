@@ -246,7 +246,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                     revurderFra = LocalDate.of(2023, 2, 1),
                     forrigeBehandling = behandling,
                     fagsak = fagsak,
-                    vedtakBeregningsresultatFørstegangsbehandling = vedtakBeregningsresultatFørstegangsbehandling,
+                    vedtakBeregningsresultatForrigeBehandling = vedtakBeregningsresultatFørstegangsbehandling,
                 )
             val saksbehandlingForOpphør = saksbehandling(behandling = behandlingForOpphør)
             val stønadsperiodeForOpphør =

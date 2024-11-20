@@ -110,13 +110,13 @@ class TestoppsettService(
         revurderFra: LocalDate,
         forrigeBehandling: Behandling,
         fagsak: Fagsak,
-        vedtakBeregningsresultatFørstegangsbehandling: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
+        vedtakBeregningsresultatForrigeBehandling: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
     ): Behandling {
         oppdater(forrigeBehandling.copy(status = BehandlingStatus.FERDIGSTILT))
         val forrgieVedtak = VedtakTilsynBarn(
             behandlingId = forrigeBehandling.id,
             type = TypeVedtak.INNVILGELSE,
-            beregningsresultat = vedtakBeregningsresultatFørstegangsbehandling,
+            beregningsresultat = vedtakBeregningsresultatForrigeBehandling,
             vedtak = vedtaksdata,
         )
         repository.insert(forrgieVedtak)
