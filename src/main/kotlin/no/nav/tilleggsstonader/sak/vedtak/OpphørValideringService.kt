@@ -48,12 +48,15 @@ class OpphørValideringService(
         vilkår: List<Vilkår>,
         vilkårperioder: Vilkårperioder,
     ) {
-        val finnesOppfyltVilkårEllerVilkårperioderMedStatusNy =
-            vilkår.any { it.status == VilkårStatus.NY && it.resultat == Vilkårsresultat.OPPFYLT } ||
-                vilkårperioder.målgrupper.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT } ||
-                vilkårperioder.aktiviteter.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }
-
-        brukerfeilHvis(finnesOppfyltVilkårEllerVilkårperioderMedStatusNy) { "Opphør er et ugyldig vedtaksresultat fordi det er nye inngangsvilkår eller nye utgifter som er oppfylt." }
+        brukerfeilHvis(vilkår.any { it.status == VilkårStatus.NY && it.resultat == Vilkårsresultat.OPPFYLT }) {
+            "Opphør er et ugyldig vedtaksresultat fordi det er nye utgifter som er oppfylt."
+        }
+        brukerfeilHvis(vilkårperioder.målgrupper.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }) {
+            "Opphør er et ugyldig vedtaksresultat fordi det er nye målgrupper som er oppfylt."
+        }
+        brukerfeilHvis(vilkårperioder.aktiviteter.any { it.status == Vilkårstatus.NY && it.resultat == ResultatVilkårperiode.OPPFYLT }) {
+            "Opphør er et ugyldig vedtaksresultat fordi det er nye aktiviteter som er oppfylt."
+        }
     }
 
     private fun validerIngenEndredePerioderMedTomEtterOpphørsdato(

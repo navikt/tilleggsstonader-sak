@@ -95,7 +95,7 @@ class OpphørValideringServiceTest {
 
             assertThatThrownBy {
                 opphørValideringService.validerPerioder(saksbehandling)
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye inngangsvilkår eller nye utgifter som er oppfylt.")
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye utgifter som er oppfylt.")
         }
 
         @Test
@@ -107,7 +107,7 @@ class OpphørValideringServiceTest {
 
             assertThatThrownBy {
                 opphørValideringService.validerPerioder(saksbehandling)
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye inngangsvilkår eller nye utgifter som er oppfylt.")
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye målgrupper som er oppfylt.")
         }
 
         @Test
@@ -119,7 +119,7 @@ class OpphørValideringServiceTest {
 
             assertThatThrownBy {
                 opphørValideringService.validerPerioder(saksbehandling)
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye inngangsvilkår eller nye utgifter som er oppfylt.")
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye aktiviteter som er oppfylt.")
         }
 
         @Test
