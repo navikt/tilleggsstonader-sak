@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -11,9 +10,7 @@ class VedtaksresultatService(
 ) {
 
     fun hentVedtaksresultat(saksbehandling: Saksbehandling): TypeVedtak {
-        return when (saksbehandling.stønadstype) {
-            Stønadstype.BARNETILSYN -> vedtakRepository.findByIdOrNull(saksbehandling.id)?.type
-            else -> error("Kan ikke hente vedtaksresultat for stønadstype ${saksbehandling.stønadstype}.")
-        } ?: error("Finner ikke vedtaksresultat for behandling=$saksbehandling")
+        return vedtakRepository.findByIdOrNull(saksbehandling.id)?.type
+            ?: error("Finner ikke vedtaksresultat for behandling=$saksbehandling")
     }
 }
