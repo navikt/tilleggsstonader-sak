@@ -137,6 +137,7 @@ class TestoppsettService(
         revurderFra: LocalDate,
         opprettGrunnlagsdata: Boolean = false,
         gjenbrukData: Boolean = true,
+        stegType: StegType = StegType.INNGANGSVILKÅR
     ): Saksbehandling {
         oppdater(forrigeBehandling.copy(status = BehandlingStatus.FERDIGSTILT))
         val revurdering = lagre(
@@ -145,6 +146,8 @@ class TestoppsettService(
                 type = BehandlingType.REVURDERING,
                 revurderFra = revurderFra,
                 forrigeBehandlingId = forrigeBehandling.id,
+                steg = stegType,
+                status = BehandlingStatus.UTREDES,
             ),
             opprettGrunnlagsdata = opprettGrunnlagsdata,
         )

@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
@@ -121,37 +122,21 @@ class TilsynBarnVedtakControllerTest(
 
     @Test
     fun `skal lagre og hente opphør`() {
+        innvilgeVedtak(behandling, lagInnvilgeVedtak())
+        val revurdering = testoppsettService.opprettRevurdering(
+            forrigeBehandling = behandling,
+            stegType = StegType.BEREGNE_YTELSE,
+            revurderFra = LocalDate.now()
+        )
+
         val vedtak = OpphørRequest(
             årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
             begrunnelse = "endre utgifter opphør",
         )
 
-        val behandlingLagreOpphør = testoppsettService.opprettRevurdering(LocalDate.of(2023, 2, 1), behandling, fagsak)
+        opphørVedtak(revurdering, vedtak)
 
-        val aktivitetLagreOpphør = aktivitet(
-            behandlingLagreOpphør.id,
-            fom = LocalDate.of(2023, 1, 1),
-            tom = LocalDate.of(2023, 1, 31),
-            status = Vilkårstatus.ENDRET,
-        )
-
-        val vilkårLagreOpphør = vilkår(
-            status = VilkårStatus.ENDRET,
-            behandlingId = behandlingLagreOpphør.id,
-            barnId = barn.id,
-            type = VilkårType.PASS_BARN,
-            resultat = Vilkårsresultat.OPPFYLT,
-            fom = LocalDate.of(2023, 1, 1),
-            tom = LocalDate.of(2023, 1, 31),
-            utgift = 100,
-        )
-
-        vilkårperiodeRepository.insert(aktivitetLagreOpphør)
-        vilkårRepository.insert(vilkårLagreOpphør)
-
-        opphørVedtak(behandlingLagreOpphør, vedtak)
-
-        val lagretDto = hentVedtak(behandlingLagreOpphør.id).body!!
+        val lagretDto = hentVedtak(revurdering.id).body!!
 
         assertThat((lagretDto as OpphørTilsynBarnDto).årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
@@ -185,7 +170,7 @@ class TilsynBarnVedtakControllerTest(
     }
 
     private fun opphørVedtak(
-        behandling: Behandling,
+        behandling: Saksbehandling,
         vedtak: OpphørRequest,
     ) {
         restTemplate.exchange<Map<String, Any>?>(
