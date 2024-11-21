@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
  * Denne håndterer sletting av tidligere vedtak og andeler
  */
 abstract class BeregnYtelseSteg<DTO>(
-    private val stønadstype: Stønadstype,
+    val stønadstype: Stønadstype,
     open val vedtakRepository: VedtakRepository,
     open val tilkjentytelseService: TilkjentYtelseService,
     open val simuleringService: SimuleringService,
