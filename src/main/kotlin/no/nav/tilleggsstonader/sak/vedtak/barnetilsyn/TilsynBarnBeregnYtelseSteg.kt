@@ -1,11 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -33,7 +30,6 @@ import java.time.DayOfWeek
 @Service
 class TilsynBarnBeregnYtelseSteg(
     private val tilsynBarnBeregningService: TilsynBarnBeregningService,
-    private val unleashService: UnleashService,
     private val opphørValideringService: OpphørValideringService,
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
@@ -53,17 +49,7 @@ class TilsynBarnBeregnYtelseSteg(
         }
     }
 
-    /**
-     * Brukes både for innvilgelse og opphør
-     * Ved opphør kan det være at man kun opphør 1 barn, men det fortsatt skal utbetales for det andre barnet
-     */
     private fun beregnOgLagreInnvilgelse(saksbehandling: Saksbehandling) {
-        brukerfeilHvis(
-            saksbehandling.forrigeBehandlingId != null && !unleashService.isEnabled(Toggle.REVURDERING_INNVILGE_TIDLIGERE_INNVILGET),
-        ) {
-            "Funksjonalitet mangler for å kunne innvilge revurdering når tidligere behandling er innvilget. Sett saken på vent."
-        }
-
         val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling, TypeVedtak.INNVILGELSE)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)

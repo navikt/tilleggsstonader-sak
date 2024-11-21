@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -52,7 +51,6 @@ class TilsynBarnBeregnYtelseStegTest {
         vedtakRepository = repository,
         tilkjentytelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
-        unleashService = mockUnleashService(),
         opphørValideringService = opphørValideringService,
     )
 
