@@ -9,8 +9,9 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequestGammel
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørRequest
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,7 +26,7 @@ class TilsynBarnVedtakController(
     tilgangService: TilgangService,
     private val tilsynBarnVedtakService: TilsynBarnVedtakService,
     private val behandlingService: BehandlingService,
-) : VedtakController<VedtakTilsynBarnDto>(
+) : VedtakController<VedtakTilsynBarnRequest>(
     tilgangService,
     tilsynBarnVedtakService,
 ) {
@@ -33,7 +34,7 @@ class TilsynBarnVedtakController(
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
+        @RequestBody vedtak: InnvilgelseTilsynBarnRequestGammel,
     ) {
         lagreVedtak(behandlingId, vedtak.tilDto())
     }

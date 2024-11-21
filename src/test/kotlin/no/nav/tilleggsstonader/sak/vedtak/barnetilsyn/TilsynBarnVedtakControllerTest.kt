@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
@@ -179,7 +179,7 @@ class TilsynBarnVedtakControllerTest(
     }
 
     private fun hentVedtak(behandlingId: BehandlingId) =
-        restTemplate.exchange<VedtakTilsynBarnDto>(
+        restTemplate.exchange<VedtakTilsynBarnRequest>(
             localhost("api/vedtak/tilsyn-barn/$behandlingId"),
             HttpMethod.GET,
             HttpEntity(null, headers),
