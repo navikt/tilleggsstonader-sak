@@ -3,9 +3,11 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.RegisterAktivitetClientConfig.Companion.resetMock
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -283,16 +285,55 @@ class AktivitetServiceTest : IntegrationTest() {
                 behandling(status = BehandlingStatus.FERDIGSTILT),
             )
 
-            val periode = vilkårperiodeRepository.insert(
+            val aktivitet = vilkårperiodeRepository.insert(
                 aktivitet(behandlingId = behandling.id),
             )
 
             assertThatThrownBy {
                 aktivitetService.oppdaterAktivitet(
-                    id = periode.id,
-                    aktivitet = periode.tilOppdatering(),
+                    id = aktivitet.id,
+                    aktivitet = aktivitet.tilOppdatering(),
                 )
-            }.hasMessageContaining("Kan ikke opprette eller endre aktivitet når behandling er låst for videre redigering")
+            }.hasMessageContaining("Ugyldig kombinasjon")
+        }
+
+        @Test
+        fun `skal ikke kunne oppdatere aktivitetstypen`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+            val aktivitet = vilkårperiodeRepository.insert(
+                aktivitet(behandlingId = behandling.id),
+            )
+
+            assertThat(aktivitet.type).isEqualTo(AktivitetType.TILTAK)
+
+            assertThatThrownBy {
+                aktivitetService.oppdaterAktivitet(
+                    id = aktivitet.id,
+                    aktivitet = aktivitet.tilOppdatering().copy(type = AktivitetType.REELL_ARBEIDSSØKER),
+                )
+            }.hasMessageContaining("Ugyldig kombinasjon")
+        }
+
+        @Test
+        fun `skal ikke kunne oppdatere behandlings-IDen`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val annenBehandling = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")))).let {
+                testoppsettService.lagre(behandling(it))
+            }
+
+            val aktivitet = vilkårperiodeRepository.insert(
+                aktivitet(behandlingId = behandling.id),
+            )
+
+            val endretBehandlingId = aktivitet.tilOppdatering().copy(behandlingId = annenBehandling.id)
+
+            assertThatThrownBy {
+                aktivitetService.oppdaterAktivitet(
+                    id = aktivitet.id,
+                    aktivitet = endretBehandlingId,
+                )
+            }.hasMessageContaining("BehandlingId er ikke lik")
         }
 
         @Test

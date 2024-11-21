@@ -2,10 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
@@ -46,21 +43,6 @@ class AktivitetControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun `skal ikke kunne oppdatere aktivitetstypen`() {
-        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-
-        val eksisterendeAktivitet = VilkårperiodeTestUtil.aktivitet(behandlingId = behandling.id)
-        vilkårperiodeRepository.insert(eksisterendeAktivitet)
-
-        catchProblemDetailException {
-            sendOppdaterAktivitetRequest(
-                lagreAktivitet = utdanning.copy(behandlingId = behandling.id),
-                aktivitetId = eksisterendeAktivitet.id,
-            )
-        }
-    }
-
-    @Test
     fun `skal kunne oppdatere eksisterende aktivitet`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
@@ -77,25 +59,6 @@ class AktivitetControllerTest : IntegrationTest() {
         val oppdatertAktivitet = vilkårperiodeRepository.findByBehandlingId(behandling.id)
 
         assertThat(oppdatertAktivitet.single().fom).isEqualTo(nyFom)
-    }
-
-    @Test
-    fun `skal ikke kunne oppdatere aktivitet som har en annen behandlingId enn den som sendes inn`() {
-        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-        val behandlingForAnnenFagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")))).let {
-            testoppsettService.lagre(behandling(it))
-        }
-
-        val eksisterendeAktivitet = VilkårperiodeTestUtil.aktivitet(behandlingId = behandling.id)
-        vilkårperiodeRepository.insert(eksisterendeAktivitet)
-
-        val exception = catchProblemDetailException {
-            sendOppdaterAktivitetRequest(
-                lagreAktivitet = ulønnetTiltak.copy(behandlingId = behandlingForAnnenFagsak.id),
-                aktivitetId = eksisterendeAktivitet.id,
-            )
-        }
-        assertThat(exception.detail.detail).contains("BehandlingId er ikke lik")
     }
 
     private fun sendOpprettAktivitetRequest(
