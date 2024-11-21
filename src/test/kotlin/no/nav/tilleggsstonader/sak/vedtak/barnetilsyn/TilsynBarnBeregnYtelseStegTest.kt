@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnUtgiftService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
@@ -24,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -96,6 +98,15 @@ class TilsynBarnBeregnYtelseStegTest {
 
         assertThat(saksbehandling.type).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         assertThat(nesteSteg).isEqualTo(StegType.SIMULERING)
+    }
+
+    @Test
+    fun `skal feile dersom man velger opphør på en førstegangsbehandling`() {
+        val vedtak = opphørDto()
+
+        assertThatThrownBy {
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtak)
+        }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling.")
     }
 
     @Test
