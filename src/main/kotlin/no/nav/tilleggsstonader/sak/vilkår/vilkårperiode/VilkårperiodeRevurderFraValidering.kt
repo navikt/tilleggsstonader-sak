@@ -5,17 +5,16 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import java.time.LocalDate
 
 object VilkårperiodeRevurderFraValidering {
 
     fun validerNyPeriodeRevurdering(
         behandling: Saksbehandling,
-        periode: LagreVilkårperiode,
+        fom: LocalDate,
     ) {
-        feilHvis(behandling.revurderFra != null && periode.fom < behandling.revurderFra) {
-            "Kan ikke opprette ${periodeInfo(behandling, periode.fom)}"
+        feilHvis(behandling.revurderFra != null && fom < behandling.revurderFra) {
+            "Kan ikke opprette ${periodeInfo(behandling, fom)}"
         }
     }
 

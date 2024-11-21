@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.LagreAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
@@ -62,6 +63,34 @@ private fun mapAktiviteter(
 
         AktivitetType.INGEN_AKTIVITET -> {
             feilHvis(vilkårperiode.aktivitetsdager != null) {
+                "Kan ikke registrere aktivitetsdager på ingen aktivitet"
+            }
+            IngenAktivitetTilsynBarn
+        }
+    }
+}
+
+fun mapAktiviteter(
+    aktivitet: LagreAktivitet,
+): AktivitetTilsynBarn {
+    return when (aktivitet.type) {
+        AktivitetType.TILTAK -> {
+            TiltakTilsynBarn(
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitet.aktivitetsdager!!),
+                vurderinger = VurderingTiltakTilsynBarn(lønnet = VurderingLønnet(aktivitet.svarLønnet)),
+            )
+        }
+
+        AktivitetType.UTDANNING -> UtdanningTilsynBarn(
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitet.aktivitetsdager!!),
+        )
+
+        AktivitetType.REELL_ARBEIDSSØKER -> ReellArbeidsøkerTilsynBarn(
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitet.aktivitetsdager!!),
+        )
+
+        AktivitetType.INGEN_AKTIVITET -> {
+            feilHvis(aktivitet.aktivitetsdager != null) {
                 "Kan ikke registrere aktivitetsdager på ingen aktivitet"
             }
             IngenAktivitetTilsynBarn

@@ -233,7 +233,7 @@ class VilkårperiodeService(
     fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
-        validerNyPeriodeRevurdering(behandling, vilkårperiode)
+        validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
 
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
