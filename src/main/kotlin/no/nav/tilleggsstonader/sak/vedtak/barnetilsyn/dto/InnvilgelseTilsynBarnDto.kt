@@ -25,12 +25,6 @@ data class InnvilgelseTilsynBarnRequest(
     fun tilDto() = InnvilgelseTilsynBarnDto(beregningsresultat)
 }
 
-data class Utgift(
-    val fom: YearMonth,
-    val tom: YearMonth,
-    val utgift: Int,
-)
-
 data class BeregningsresultatTilsynBarnDto(
     val perioder: List<BeregningsresultatForMånedDto>,
     val vedtaksperioder: List<VedtaksperiodeDto>,

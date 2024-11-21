@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
@@ -12,7 +11,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrun
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.Utgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
@@ -20,7 +18,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
-import kotlin.collections.listOf
 
 object TilsynBarnTestUtil {
 
@@ -84,6 +81,4 @@ object TilsynBarnTestUtil {
             beregningsresultat = beregningsresultat,
         ),
     )
-
-    fun barn(barnId: BarnId, vararg utgifter: Utgift) = Pair(barnId, utgifter.toList())
 }
