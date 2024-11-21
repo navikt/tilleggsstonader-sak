@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.FaktaOgVurderingerAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.LagreAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
@@ -28,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.målgruppe.LagreMålgruppe
 
 fun mapFaktaOgVurderingDto(
     vilkårperiode: LagreVilkårperiode,
@@ -70,27 +73,40 @@ private fun mapAktiviteter(
     }
 }
 
-fun mapAktiviteter(
-    aktivitet: LagreAktivitet,
+fun mapAktiviteter(stønadstype: Stønadstype, aktivitet: LagreAktivitet): AktivitetTilsynBarn {
+    val faktaOgVurderinger = aktivitet.faktaOgVurderinger
+    when (stønadstype) {
+        Stønadstype.BARNETILSYN -> {
+            require(faktaOgVurderinger is FaktaOgVurderingerAktivitetBarnetilsynDto)
+            return mapAktiviteterBarnetilsyn(aktivitet.type, faktaOgVurderinger)
+        }
+
+        Stønadstype.LÆREMIDLER -> error("Vi har ikke implementert inngangsvilkår for læremidler enda.")
+    }
+}
+
+private fun mapAktiviteterBarnetilsyn(
+    aktivitetType: AktivitetType,
+    faktaOgVurderinger: FaktaOgVurderingerAktivitetBarnetilsynDto,
 ): AktivitetTilsynBarn {
-    return when (aktivitet.type) {
+    return when (aktivitetType) {
         AktivitetType.TILTAK -> {
             TiltakTilsynBarn(
-                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitet.aktivitetsdager!!),
-                vurderinger = VurderingTiltakTilsynBarn(lønnet = VurderingLønnet(aktivitet.svarLønnet)),
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgVurderinger.aktivitetsdager!!),
+                vurderinger = VurderingTiltakTilsynBarn(lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet)),
             )
         }
 
         AktivitetType.UTDANNING -> UtdanningTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitet.aktivitetsdager!!),
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgVurderinger.aktivitetsdager!!),
         )
 
         AktivitetType.REELL_ARBEIDSSØKER -> ReellArbeidsøkerTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitet.aktivitetsdager!!),
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgVurderinger.aktivitetsdager!!),
         )
 
         AktivitetType.INGEN_AKTIVITET -> {
-            feilHvis(aktivitet.aktivitetsdager != null) {
+            feilHvis(faktaOgVurderinger.aktivitetsdager != null) {
                 "Kan ikke registrere aktivitetsdager på ingen aktivitet"
             }
             IngenAktivitetTilsynBarn
@@ -146,6 +162,54 @@ private fun mapMålgrupper(
                 vurderinger = VurderingNedsattArbeidsevne(
                     dekketAvAnnetRegelverk = mapDekketAvAnnetRegelverk(delvilkår),
                     medlemskap = mapMedlemskap(delvilkår),
+                ),
+            )
+        }
+
+        MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+    }
+}
+
+fun mapMålgruppe(
+    målgruppe: LagreMålgruppe,
+): MålgruppeTilsynBarn {
+    return when (målgruppe.type) {
+        MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
+        MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
+        MålgruppeType.OMSTILLINGSSTØNAD -> {
+            OmstillingsstønadTilsynBarn(
+                vurderinger = VurderingOmstillingsstønad(
+                    medlemskap = VurderingMedlemskap(målgruppe.svarMedlemskap),
+                ),
+            )
+        }
+
+        MålgruppeType.OVERGANGSSTØNAD -> {
+            OvergangssstønadTilsynBarn
+        }
+
+        MålgruppeType.AAP -> {
+            AAPTilsynBarn(
+                vurderinger = VurderingAAP(
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(målgruppe.svarUtgifterDekketAvAnnetRegelverk),
+                ),
+            )
+        }
+
+        MålgruppeType.UFØRETRYGD -> {
+            UføretrygdTilsynBarn(
+                vurderinger = VurderingUføretrygd(
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(målgruppe.svarUtgifterDekketAvAnnetRegelverk),
+                    medlemskap = VurderingMedlemskap(målgruppe.svarMedlemskap),
+                ),
+            )
+        }
+
+        MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
+            NedsattArbeidsevneTilsynBarn(
+                vurderinger = VurderingNedsattArbeidsevne(
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(målgruppe.svarUtgifterDekketAvAnnetRegelverk),
+                    medlemskap = VurderingMedlemskap(målgruppe.svarMedlemskap),
                 ),
             )
         }
