@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -12,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapAktiviteter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
@@ -33,11 +35,12 @@ class AktivitetService(
     fun opprettAktivitet(aktivitet: LagreAktivitet): Vilkårperiode {
         val behandling = behandlingService.hentSaksbehandling(aktivitet.behandlingId)
         validerBehandlingStatusOgSteg(behandling)
-
-        validerAktivitetsdager(aktivitetType = aktivitet.type, aktivitetsdager = aktivitet.aktivitetsdager)
         validerKildeId(aktivitet)
 
-        val faktaOgVurdering = mapAktiviteter(aktivitet)
+        // TODO: Flytt validering inn i mapper?
+        validerFaktafelter(stønadstype = behandling.stønadstype, aktivitet = aktivitet)
+
+        val faktaOgVurdering = mapAktiviteter(stønadstype = behandling.stønadstype, aktivitet)
 
         return vilkårperiodeRepository.insert(
             GeneriskVilkårperiode(
@@ -61,9 +64,10 @@ class AktivitetService(
         val eksisterendeAktivitet = vilkårperiodeRepository.findByIdOrThrow(id)
         validerOppdatering(aktivitet, eksisterendeAktivitet)
 
-        validerAktivitetsdager(aktivitet.type, aktivitet.aktivitetsdager)
+        // TODO: Flytt validering inn i mapper?
+        validerFaktafelter(stønadstype = behandling.stønadstype, aktivitet = aktivitet)
 
-        val faktaOgVurdering = mapAktiviteter(aktivitet)
+        val faktaOgVurdering = mapAktiviteter(stønadstype = behandling.stønadstype, aktivitet)
 
         val oppdatert = eksisterendeAktivitet.medVilkårOgVurdering(
             fom = aktivitet.fom,
@@ -90,6 +94,19 @@ class AktivitetService(
         }
         feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
             "Kan ikke opprette eller endre aktivitet når behandling ikke er på steg ${StegType.INNGANGSVILKÅR}"
+        }
+    }
+
+    private fun validerFaktafelter(stønadstype: Stønadstype, aktivitet: LagreAktivitet) {
+        when(stønadstype) {
+            Stønadstype.BARNETILSYN -> {
+                require(aktivitet.faktaOgVurderinger is FaktaOgVurderingerAktivitetBarnetilsynDto)
+                validerAktivitetsdager(aktivitet.type, aktivitet.faktaOgVurderinger.aktivitetsdager)
+            }
+            Stønadstype.LÆREMIDLER -> {
+                require(aktivitet.faktaOgVurderinger is FaktaOgVurderingerAktivitetLæremidlerDto)
+                // TODO: Validering av fakta læremidler
+            }
         }
     }
 

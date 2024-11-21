@@ -132,10 +132,11 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 aktivitetService.opprettAktivitet(
-                    ulønnetTiltak.copy(
+                    lagreAktivitet(
+                        type = AktivitetType.TILTAK,
                         svarLønnet = SvarJaNei.JA,
                         behandlingId = behandling.id,
-                        begrunnelse = null
+                        begrunnelse = null,
                     ),
                 )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
@@ -148,9 +149,9 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             listOf("", null).forEach {
                 assertThatThrownBy {
                     aktivitetService.opprettAktivitet(
-                        ulønnetTiltak.copy(
-                            begrunnelse = it,
+                        lagreAktivitet(
                             type = AktivitetType.INGEN_AKTIVITET,
+                            begrunnelse = it,
                             behandlingId = behandling.id,
                             aktivitetsdager = null,
                         ),
@@ -165,10 +166,11 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 aktivitetService.opprettAktivitet(
-                    ingenAktivitet.copy(
-                        aktivitetsdager = 5,
+                    lagreAktivitet(
                         behandlingId = behandling.id,
-                    ),
+                        type = AktivitetType.INGEN_AKTIVITET,
+                        aktivitetsdager = 5,
+                    )
                 )
             }.hasMessageContaining("Kan ikke registrere aktivitetsdager på ingen aktivitet")
         }
@@ -183,11 +185,11 @@ class VilkårperiodeServiceTest : IntegrationTest() {
 
         assertThatThrownBy {
             aktivitetService.opprettAktivitet(
-                ingenAktivitet.copy(
+                lagreAktivitet(
                     behandlingId = behandling.id,
-                    fom = ingenAktivitet.tom.plusDays(1),
-                    aktivitetsdager = null
-                ),
+                    fom = now().plusDays(1),
+                    aktivitetsdager = 5,
+                )
             )
         }.hasMessageContaining("Til-og-med før fra-og-med")
     }
@@ -204,10 +206,10 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             )
 
             val nyDato = LocalDate.parse("2020-01-01")
-            val oppdatering = eksisterendeAktivitet.tilOppdatering().copy(
-                fom = nyDato,
-                tom = nyDato,
-                begrunnelse = "Oppdatert begrunnelse",
+            val oppdatering = eksisterendeAktivitet.tilOppdatering(
+                nyFom = nyDato,
+                nyTom = nyDato,
+                nyBegrunnelse = "Oppdatert begrunnelse",
                 svarLønnet = SvarJaNei.NEI,
             )
 
@@ -270,8 +272,8 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 ulønnetTiltak.copy(behandlingId = behandling.id),
             )
 
-            val oppdatering = tiltak.tilOppdatering().copy(
-                begrunnelse = "",
+            val oppdatering = tiltak.tilOppdatering(
+                nyBegrunnelse = "",
                 svarLønnet = SvarJaNei.JA,
             )
 
@@ -316,21 +318,26 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThatThrownBy {
                 aktivitetService.oppdaterAktivitet(
                     id = aktivitet.id,
-                    aktivitet = aktivitet.tilOppdatering().copy(aktivitetsdager = 3),
+                    aktivitet = aktivitet.tilOppdatering(aktivitetsdager = 3),
                 )
             }.hasMessageContaining("Ugyldig endring på periode")
         }
 
-        private fun Vilkårperiode.tilOppdatering(): LagreAktivitet {
-            return LagreAktivitet(
-                behandlingId = behandlingId,
-                fom = fom,
-                tom = tom,
-                begrunnelse = begrunnelse,
-                type = type as AktivitetType,
-                aktivitetsdager = faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
-                svarLønnet = faktaOgVurdering.vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.svar,
-            )
-        }
+        private fun Vilkårperiode.tilOppdatering(
+            nyFom: LocalDate? = null,
+            nyTom: LocalDate? = null,
+            aktivitetsdager: Int? = null,
+            svarLønnet: SvarJaNei? = null,
+            nyBegrunnelse: String? = null,
+        ): LagreAktivitet = lagreAktivitet(
+            behandlingId = behandlingId,
+            type = type as AktivitetType,
+            fom = nyFom ?: fom,
+            tom = nyTom ?: tom,
+            aktivitetsdager = aktivitetsdager
+                ?: faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
+            svarLønnet = svarLønnet ?: faktaOgVurdering.vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.svar,
+            begrunnelse = nyBegrunnelse ?: begrunnelse,
+        )
     }
 }
