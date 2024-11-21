@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 
 @ProtectedWithClaims(issuer = "azuread")
-abstract class VedtakController<DTO>(
+abstract class VedtakController<DTO : Any>(
     private val tilgangService: TilgangService,
     private val vedtakService: VedtakService<DTO>,
 ) {
