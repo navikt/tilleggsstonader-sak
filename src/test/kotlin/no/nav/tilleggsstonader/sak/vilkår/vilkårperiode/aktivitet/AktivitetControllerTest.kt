@@ -1,17 +1,15 @@
-package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.LagreAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -56,7 +54,7 @@ class AktivitetControllerTest : IntegrationTest() {
 
         catchProblemDetailException {
             sendOppdaterAktivitetRequest(
-                lagreAktivitet = ulønnetTiltak.copy(behandlingId = behandling.id, type = AktivitetType.UTDANNING),
+                lagreAktivitet = utdanning.copy(behandlingId = behandling.id),
                 aktivitetId = eksisterendeAktivitet.id,
             )
         }
@@ -78,9 +76,7 @@ class AktivitetControllerTest : IntegrationTest() {
 
         val oppdatertAktivitet = vilkårperiodeRepository.findByBehandlingId(behandling.id)
 
-        assertThat(oppdatertAktivitet).hasSize(1)
-
-        assertThat(oppdatertAktivitet.first().fom).isEqualTo(nyFom)
+        assertThat(oppdatertAktivitet.single().fom).isEqualTo(nyFom)
     }
 
     @Test
@@ -119,12 +115,3 @@ class AktivitetControllerTest : IntegrationTest() {
         HttpEntity(lagreAktivitet, headers),
     ).body!!
 }
-
-private val ulønnetTiltak = LagreAktivitet(
-    type = AktivitetType.TILTAK,
-    behandlingId = BehandlingId(UUID.randomUUID()),
-    fom = osloDateNow(),
-    tom = osloDateNow(),
-    aktivitetsdager = 5,
-    svarLønnet = SvarJaNei.NEI,
-)
