@@ -294,7 +294,7 @@ class AktivitetServiceTest : IntegrationTest() {
                     id = aktivitet.id,
                     aktivitet = aktivitet.tilOppdatering(),
                 )
-            }.hasMessageContaining("Ugyldig kombinasjon")
+            }.hasMessageContaining("Kan ikke opprette eller endre aktivitet når behandling er låst for videre redigering")
         }
 
         @Test
