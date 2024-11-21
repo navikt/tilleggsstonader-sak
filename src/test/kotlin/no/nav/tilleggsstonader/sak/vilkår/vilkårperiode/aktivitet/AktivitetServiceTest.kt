@@ -38,7 +38,7 @@ import java.time.LocalDate
 import java.time.LocalDate.now
 import java.time.LocalDateTime
 
-class VilkårperiodeServiceTest : IntegrationTest() {
+class AktivitetServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
@@ -85,7 +85,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             }
         }
 
-
         @Test
         fun `skal lagre kildeId på aktivitet`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
@@ -93,7 +92,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val grunnlag = VilkårperioderGrunnlag(
                 aktivitet = GrunnlagAktivitet(aktiviteter = listOf(periodeGrunnlagAktivitet("123"))),
                 ytelse = GrunnlagYtelse(emptyList()),
-                hentetInformasjon = hentetInformasjon
+                hentetInformasjon = hentetInformasjon,
             )
 
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
@@ -114,7 +113,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val grunnlag = VilkårperioderGrunnlag(
                 aktivitet = GrunnlagAktivitet(emptyList()),
                 ytelse = GrunnlagYtelse(emptyList()),
-                hentetInformasjon = hentetInformasjon
+                hentetInformasjon = hentetInformasjon,
             )
 
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
@@ -135,7 +134,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     ulønnetTiltak.copy(
                         svarLønnet = SvarJaNei.JA,
                         behandlingId = behandling.id,
-                        begrunnelse = null
+                        begrunnelse = null,
                     ),
                 )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
@@ -172,7 +171,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 )
             }.hasMessageContaining("Kan ikke registrere aktivitetsdager på ingen aktivitet")
         }
-
     }
 
     @Test
@@ -186,7 +184,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 ingenAktivitet.copy(
                     behandlingId = behandling.id,
                     fom = ingenAktivitet.tom.plusDays(1),
-                    aktivitetsdager = null
+                    aktivitetsdager = null,
                 ),
             )
         }.hasMessageContaining("Til-og-med før fra-og-med")
@@ -200,7 +198,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             val eksisterendeAktivitet = aktivitetService.opprettAktivitet(
-                tiltak.copy(behandlingId = behandling.id)
+                tiltak.copy(behandlingId = behandling.id),
             )
 
             val nyDato = LocalDate.parse("2020-01-01")
@@ -223,7 +221,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
             }
         }
-
 
         @Test
         fun `endring av aktiviteter opprettet i denne behandlingen skal beholde status NY`() {
@@ -283,11 +280,11 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         @Test
         fun `skal ikke kunne oppdatere kommentar hvis behandlingen ikke er under behandling`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(status = BehandlingStatus.FERDIGSTILT)
+                behandling(status = BehandlingStatus.FERDIGSTILT),
             )
 
             val periode = vilkårperiodeRepository.insert(
-                aktivitet(behandlingId = behandling.id)
+                aktivitet(behandlingId = behandling.id),
             )
 
             assertThatThrownBy {
@@ -297,7 +294,6 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 )
             }.hasMessageContaining("Kan ikke opprette eller endre aktivitet når behandling er låst for videre redigering")
         }
-
 
         @Test
         fun `kan ikke oppdatere periode hvis periode begynner før revurderFra`() {
@@ -310,7 +306,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                     behandlingId = behandling.id,
                     fom = now().minusMonths(1),
                     tom = now().plusMonths(1),
-                )
+                ),
             )
 
             assertThatThrownBy {

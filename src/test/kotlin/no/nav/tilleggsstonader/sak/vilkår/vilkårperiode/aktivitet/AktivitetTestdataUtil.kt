@@ -18,10 +18,10 @@ val ulønnetTiltak = tiltak.copy(
 )
 
 val utdanning = tiltak.copy(
-    type = AktivitetType.UTDANNING
+    type = AktivitetType.UTDANNING,
 )
 
 val ingenAktivitet = tiltak.copy(
     type = AktivitetType.INGEN_AKTIVITET,
-    begrunnelse = "Påkrevd begrunnelse"
+    begrunnelse = "Påkrevd begrunnelse",
 )
