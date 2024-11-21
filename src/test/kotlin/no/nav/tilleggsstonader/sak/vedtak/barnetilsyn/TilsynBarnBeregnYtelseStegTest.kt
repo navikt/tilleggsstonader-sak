@@ -106,7 +106,7 @@ class TilsynBarnBeregnYtelseStegTest {
 
         assertThatThrownBy {
             steg.utførOgReturnerNesteSteg(saksbehandling, vedtak)
-        }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling.")
+        }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling")
     }
 
     @Test

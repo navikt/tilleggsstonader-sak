@@ -57,7 +57,10 @@ class TilsynBarnBeregnYtelseSteg(
     }
 
     private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnDto) {
-        brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) { "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling." }
+        brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
+            "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
+        }
+
         opphørValideringService.validerPerioder(saksbehandling)
 
         val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
