@@ -23,7 +23,7 @@ data class LagreVilkårperiodeNy(
     JsonSubTypes.Type(FaktaOgVurderingerAktivitetBarnetilsynDto::class, name = "AKTIVITET_BARNETILSYN"),
     JsonSubTypes.Type(FaktaOgVurderingerAktivitetLæremidlerDto::class, name = "AKTIVITET_LÆREMIDLER"),
 )
-sealed class FaktaOgVurderingerDto;
+sealed class FaktaOgVurderingerDto
 
 data class FaktaOgVurderingerMålgruppeDto(
     val svarMedlemskap: SvarJaNei? = null,

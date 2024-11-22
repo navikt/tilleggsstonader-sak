@@ -11,9 +11,6 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.lagreAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.tiltak
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.ulønnetTiltak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -108,7 +105,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                     behandlingId = behandling.id,
                     kildeId = "123",
 //                    svarLønnet = SvarJaNei.NEI TODO: Nødvendig??
-                )
+                ),
             )
             val lagretAktivitet = vilkårperiodeService.hentVilkårperioder(behandling.id).aktiviteter.single()
             assertThat(lagretAktivitet.kildeId).isEqualTo("123")
@@ -205,8 +202,8 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val eksisterendeAktivitet = aktivitetService.opprettVilkårperiodeNy(
                 lagreVilkårperiodeAktivitet(
-                    behandlingId = behandling.id
-                )
+                    behandlingId = behandling.id,
+                ),
             )
 
             val nyDato = LocalDate.parse("2020-01-01")
@@ -232,7 +229,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         fun `endring av aktiviteter opprettet i denne behandlingen skal beholde status NY`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val aktivitet = aktivitetService.opprettVilkårperiodeNy(
-                ulønnetTiltak.copy(behandlingId = behandling.id),
+                lagreVilkårperiodeAktivitet(behandlingId = behandling.id),
             )
             val oppdatering = aktivitet.tilOppdatering()
             val oppdatertAktivitet = aktivitetService.oppdaterVilkårperiodeNy(aktivitet.id, oppdatering)
@@ -266,7 +263,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 lagreVilkårperiodeAktivitet(
                     behandlingId = behandling.id,
                     svarLønnet = SvarJaNei.NEI,
-                )
+                ),
             )
 
             val oppdatering = tiltak.tilOppdatering(

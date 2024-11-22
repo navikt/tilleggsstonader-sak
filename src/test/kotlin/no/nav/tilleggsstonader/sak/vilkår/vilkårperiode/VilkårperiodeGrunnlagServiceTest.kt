@@ -27,7 +27,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnl
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
@@ -154,7 +153,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                     TypeYtelsePeriode.ENSLIG_FORSØRGER,
                     LocalDate.now(),
                     LocalDate.now(),
-                    aapErFerdigAvklart = null
+                    aapErFerdigAvklart = null,
                 ),
             ),
             hentetInformasjon = emptyList(),
@@ -214,13 +213,13 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                 TypeYtelsePeriode.ENSLIG_FORSØRGER,
                 LocalDate.now(),
                 LocalDate.now(),
-                no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.SKOLEPENGER
+                no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.SKOLEPENGER,
             ),
             PeriodeGrunnlagYtelse(
                 TypeYtelsePeriode.ENSLIG_FORSØRGER,
                 LocalDate.now(),
                 LocalDate.now(),
-                no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.OVERGANGSSTØNAD
+                no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
             ),
         )
     }

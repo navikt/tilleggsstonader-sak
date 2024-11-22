@@ -212,7 +212,7 @@ object VilkårperiodeTestUtil {
         tom = tom,
         faktaOgVurderinger = FaktaOgVurderingerMålgruppeDto(
             svarMedlemskap = svarMedlemskap,
-            svarUtgifterDekketAvAnnetRegelverk = svarDekkesAvAnnetRegelverk
+            svarUtgifterDekketAvAnnetRegelverk = svarDekkesAvAnnetRegelverk,
         ),
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,
@@ -253,7 +253,7 @@ object VilkårperiodeTestUtil {
         tom = tom,
         faktaOgVurderinger = FaktaOgVurderingerAktivitetBarnetilsynDto(
             svarLønnet = svarLønnet,
-            aktivitetsdager = aktivitetsdager
+            aktivitetsdager = aktivitetsdager,
         ),
         kildeId = kildeId,
         begrunnelse = begrunnelse,

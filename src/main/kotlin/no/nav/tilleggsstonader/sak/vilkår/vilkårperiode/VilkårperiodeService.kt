@@ -101,7 +101,7 @@ class VilkårperiodeService(
         validerKildeId(
             behandlingId = vilkårperiode.behandlingId,
             type = vilkårperiode.type,
-            kildeId = vilkårperiode.kildeId
+            kildeId = vilkårperiode.kildeId,
         )
 
         val faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode)
@@ -133,7 +133,7 @@ class VilkårperiodeService(
         validerKildeId(
             behandlingId = vilkårperiode.behandlingId,
             type = vilkårperiode.type,
-            kildeId = vilkårperiode.kildeId
+            kildeId = vilkårperiode.kildeId,
         )
 
         val faktaOgVurdering =
@@ -195,7 +195,7 @@ class VilkårperiodeService(
             begrunnelse = vilkårperiode.begrunnelse,
             faktaOgVurdering = mapFaktaOgVurderingDto(
                 stønadstype = behandling.stønadstype,
-                vilkårperiode = vilkårperiode
+                vilkårperiode = vilkårperiode,
             ),
         )
 

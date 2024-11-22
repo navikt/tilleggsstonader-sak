@@ -26,7 +26,7 @@ import java.util.UUID
 class VilkårperiodeController(
     private val tilgangService: TilgangService,
     private val vilkårperiodeService: VilkårperiodeService,
-    private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService
+    private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
 ) {
 
     @GetMapping("behandling/{behandlingId}")
@@ -102,7 +102,7 @@ class VilkårperiodeController(
 
         return vilkårperiodeService.validerOgLagResponse(
             behandlingId = slettVikårperiode.behandlingId,
-            periode = periode
+            periode = periode,
         )
     }
 }

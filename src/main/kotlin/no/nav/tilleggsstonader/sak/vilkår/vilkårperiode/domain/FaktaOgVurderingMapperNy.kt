@@ -43,12 +43,11 @@ private fun mapAktiviteter(stønadstype: Stønadstype, aktivitet: LagreVilkårpe
     val type = aktivitet.type
     require(type is AktivitetType)
 
-    val faktaOgVurderinger = aktivitet.faktaOgVurderinger;
+    val faktaOgVurderinger = aktivitet.faktaOgVurderinger
     when (stønadstype) {
         Stønadstype.BARNETILSYN -> {
             require(faktaOgVurderinger is FaktaOgVurderingerAktivitetBarnetilsynDto)
             return mapAktiviteterBarnetilsyn(type, faktaOgVurderinger)
-
         }
 
         Stønadstype.LÆREMIDLER -> error("Vi har ikke implementert inngangsvilkår for læremidler enda.")
@@ -90,7 +89,7 @@ private fun mapMålgruppe(
     val type = målgruppe.type
     require(type is MålgruppeType)
 
-    val faktaOgVurderinger = målgruppe.faktaOgVurderinger;
+    val faktaOgVurderinger = målgruppe.faktaOgVurderinger
     require(faktaOgVurderinger is FaktaOgVurderingerMålgruppeDto)
 
     return when (type) {

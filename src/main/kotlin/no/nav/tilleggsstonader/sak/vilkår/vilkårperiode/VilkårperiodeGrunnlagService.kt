@@ -178,7 +178,6 @@ class VilkårperiodeGrunnlagService(
         )
     }
 
-
     private fun behandlingErLåstForVidereRedigering(behandlingId: BehandlingId) =
         behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
 }

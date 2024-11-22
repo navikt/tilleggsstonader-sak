@@ -100,7 +100,6 @@ data class FaktaAktivitetTilsynBarn(
     }
 }
 
-
 sealed interface TypeFaktaOgVurderingTilsynBarn : TypeFaktaOgVurdering
 
 enum class AktivitetTilsynBarnType(
