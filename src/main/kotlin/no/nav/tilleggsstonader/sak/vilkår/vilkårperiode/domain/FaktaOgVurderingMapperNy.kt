@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
@@ -24,44 +25,58 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 
 fun mapFaktaOgVurderingDto(
-    vilkårperiode: LagreVilkårperiode,
+    vilkårperiode: LagreVilkårperiodeNy,
+    stønadstype: Stønadstype,
 ): FaktaOgVurdering {
     return when (vilkårperiode.type) {
-        is AktivitetType -> mapAktiviteter(vilkårperiode)
-        is MålgruppeType -> mapMålgrupper(vilkårperiode)
+        is AktivitetType -> mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode)
+        is MålgruppeType -> mapMålgruppe(vilkårperiode)
     }
 }
 
-private fun mapAktiviteter(
-    vilkårperiode: LagreVilkårperiode,
-): AktivitetTilsynBarn {
-    val type = vilkårperiode.type
+private fun mapAktiviteter(stønadstype: Stønadstype, aktivitet: LagreVilkårperiodeNy): AktivitetTilsynBarn {
+    val type = aktivitet.type
     require(type is AktivitetType)
-    val delvilkår = vilkårperiode.delvilkår
-    require(delvilkår is DelvilkårAktivitetDto)
-    return when (type) {
+
+    val faktaOgVurderinger = aktivitet.faktaOgVurderinger;
+    when (stønadstype) {
+        Stønadstype.BARNETILSYN -> {
+            require(faktaOgVurderinger is FaktaOgVurderingerAktivitetBarnetilsynDto)
+            return mapAktiviteterBarnetilsyn(type, faktaOgVurderinger)
+
+        }
+
+        Stønadstype.LÆREMIDLER -> error("Vi har ikke implementert inngangsvilkår for læremidler enda.")
+    }
+}
+
+private fun mapAktiviteterBarnetilsyn(
+    aktivitetType: AktivitetType,
+    faktaOgVurderinger: FaktaOgVurderingerAktivitetBarnetilsynDto,
+): AktivitetTilsynBarn {
+    return when (aktivitetType) {
         AktivitetType.TILTAK -> {
             TiltakTilsynBarn(
-                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = vilkårperiode.aktivitetsdager!!),
-                vurderinger = VurderingTiltakTilsynBarn(lønnet = mapLønnet(delvilkår)),
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgVurderinger.aktivitetsdager!!),
+                vurderinger = VurderingTiltakTilsynBarn(lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet)),
             )
         }
 
         AktivitetType.UTDANNING -> UtdanningTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = vilkårperiode.aktivitetsdager!!),
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgVurderinger.aktivitetsdager!!),
         )
 
         AktivitetType.REELL_ARBEIDSSØKER -> ReellArbeidsøkerTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = vilkårperiode.aktivitetsdager!!),
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgVurderinger.aktivitetsdager!!),
         )
 
         AktivitetType.INGEN_AKTIVITET -> {
-            feilHvis(vilkårperiode.aktivitetsdager != null) {
+            feilHvis(faktaOgVurderinger.aktivitetsdager != null) {
                 "Kan ikke registrere aktivitetsdager på ingen aktivitet"
             }
             IngenAktivitetTilsynBarn
@@ -69,24 +84,22 @@ private fun mapAktiviteter(
     }
 }
 
-/**
- * TODO valider at man ikke sender inn vurderinger som ikke er aktuelle for gitt type?
- * Men frontend sender hele delvilkår, inkl det som har resultat implisitt
- */
-private fun mapMålgrupper(
-    vilkårperiode: LagreVilkårperiode,
+private fun mapMålgruppe(
+    målgruppe: LagreVilkårperiodeNy,
 ): MålgruppeTilsynBarn {
-    val type = vilkårperiode.type
+    val type = målgruppe.type
     require(type is MålgruppeType)
-    val delvilkår = vilkårperiode.delvilkår
-    require(delvilkår is DelvilkårMålgruppeDto)
+
+    val faktaOgVurderinger = målgruppe.faktaOgVurderinger;
+    require(faktaOgVurderinger is FaktaOgVurderingerMålgruppeDto)
+
     return when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
         MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
         MålgruppeType.OMSTILLINGSSTØNAD -> {
             OmstillingsstønadTilsynBarn(
                 vurderinger = VurderingOmstillingsstønad(
-                    medlemskap = mapMedlemskap(delvilkår),
+                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                 ),
             )
         }
@@ -98,7 +111,7 @@ private fun mapMålgrupper(
         MålgruppeType.AAP -> {
             AAPTilsynBarn(
                 vurderinger = VurderingAAP(
-                    dekketAvAnnetRegelverk = mapDekketAvAnnetRegelverk(delvilkår),
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                 ),
             )
         }
@@ -106,8 +119,8 @@ private fun mapMålgrupper(
         MålgruppeType.UFØRETRYGD -> {
             UføretrygdTilsynBarn(
                 vurderinger = VurderingUføretrygd(
-                    dekketAvAnnetRegelverk = mapDekketAvAnnetRegelverk(delvilkår),
-                    medlemskap = mapMedlemskap(delvilkår),
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                 ),
             )
         }
@@ -115,8 +128,8 @@ private fun mapMålgrupper(
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
             NedsattArbeidsevneTilsynBarn(
                 vurderinger = VurderingNedsattArbeidsevne(
-                    dekketAvAnnetRegelverk = mapDekketAvAnnetRegelverk(delvilkår),
-                    medlemskap = mapMedlemskap(delvilkår),
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                 ),
             )
         }
@@ -124,12 +137,3 @@ private fun mapMålgrupper(
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
     }
 }
-
-private fun mapLønnet(delvilkår: DelvilkårAktivitetDto) =
-    VurderingLønnet(delvilkår.lønnet?.svar)
-
-private fun mapDekketAvAnnetRegelverk(delvilkår: DelvilkårMålgruppeDto) =
-    VurderingDekketAvAnnetRegelverk(delvilkår.dekketAvAnnetRegelverk?.svar)
-
-private fun mapMedlemskap(delvilkår: DelvilkårMålgruppeDto) =
-    VurderingMedlemskap(delvilkår.medlemskap?.svar)
