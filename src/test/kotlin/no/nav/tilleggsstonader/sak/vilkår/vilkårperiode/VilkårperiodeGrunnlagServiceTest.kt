@@ -71,7 +71,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
 
         val response = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
 
-        Assertions.assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)!!.grunnlag.tilDto())
+        Assertions.assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)!!.grunnlag)
             .isEqualTo(
                 response,
             )
