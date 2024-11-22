@@ -123,7 +123,8 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 hentetInformasjon = hentetInformasjon,
             )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
-            val opprettAktivitet = lagreVilkårperiodeAktivitet(behandlingId = behandling.id, kildeId = "123")
+
+            val opprettAktivitet = lagreVilkårperiodeAktivitet(behandlingId = behandling.id, kildeId = "finnesIkke")
             assertThatThrownBy {
                 aktivitetService.opprettVilkårperiodeNy(opprettAktivitet)
             }.hasMessageContaining("Aktivitet med id=finnesIkke finnes ikke i grunnlag")
