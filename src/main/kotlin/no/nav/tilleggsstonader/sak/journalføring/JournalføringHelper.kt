@@ -56,7 +56,6 @@ object JournalføringHelper {
             DokarkivBruker(idType = BrukerIdType.valueOf(it.type.toString()), id = it.id)
         },
         tema = journalpost.tema?.let { Tema.valueOf(it) },
-//        behandlingstema = journalpost.behandlingstema?.let { Behandlingstema.fromValue(it) },
         tittel = journalpost.tittel,
         journalfoerendeEnhet = journalpost.journalforendeEnhet,
         sak = Sak(
