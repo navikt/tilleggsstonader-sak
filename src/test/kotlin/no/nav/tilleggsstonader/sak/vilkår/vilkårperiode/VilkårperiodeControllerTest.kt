@@ -8,9 +8,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
@@ -35,11 +35,11 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
         opprettVilkårperiode(
-            LagreVilkårperiode(
+            LagreVilkårperiodeNy(
                 type = MålgruppeType.AAP,
                 fom = osloDateNow(),
                 tom = osloDateNow(),
-                delvilkår = delvilkårMålgruppeDto(),
+                faktaOgVurderinger = faktaOgVurderingerMålgruppeDto(),
                 behandlingId = behandling.id,
             ),
         )
@@ -54,6 +54,32 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     }
 
     @Test
+    fun `skal kunne oppdatere eksisterende aktivitet`() {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+        val originalLagreRequest = LagreVilkårperiodeNy(
+            type = MålgruppeType.AAP,
+            fom = osloDateNow(),
+            tom = osloDateNow(),
+            faktaOgVurderinger = faktaOgVurderingerMålgruppeDto(),
+            behandlingId = behandling.id,
+        )
+
+        val response = opprettVilkårperiode(originalLagreRequest)
+
+        val nyTom = osloDateNow()
+
+        oppdaterVilkårperiode(
+            lagreVilkårperiode = originalLagreRequest.copy(behandlingId = behandling.id, tom = nyTom),
+            vilkårperiodeId = response.periode!!.id,
+        )
+
+        val lagredeVilkårperioder = hentVilkårperioder(behandling)
+
+        assertThat(lagredeVilkårperioder.målgrupper.single().tom).isEqualTo(nyTom)
+    }
+
+    @Test
     fun `skal feile hvis man ikke sender inn lik behandlingId som det er på vilkårperioden`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
         val behandlingForAnnenFagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")))).let {
@@ -61,11 +87,11 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         }
 
         val response = opprettVilkårperiode(
-            LagreVilkårperiode(
+            LagreVilkårperiodeNy(
                 type = MålgruppeType.AAP,
                 fom = osloDateNow(),
                 tom = osloDateNow(),
-                delvilkår = delvilkårMålgruppeDto(),
+                faktaOgVurderinger = faktaOgVurderingerMålgruppeDto(),
                 behandlingId = behandling.id,
             ),
         )
@@ -101,9 +127,18 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         ).body!!.vilkårperioder
 
     private fun opprettVilkårperiode(
-        lagreVilkårperiode: LagreVilkårperiode,
+        lagreVilkårperiode: LagreVilkårperiodeNy,
     ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
-        localhost("api/vilkarperiode"),
+        localhost("api/vilkarperiode/v2"),
+        HttpMethod.POST,
+        HttpEntity(lagreVilkårperiode, headers),
+    ).body!!
+
+    private fun oppdaterVilkårperiode(
+        lagreVilkårperiode: LagreVilkårperiodeNy,
+        vilkårperiodeId: UUID,
+    ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
+        localhost("api/vilkarperiode/v2/$vilkårperiodeId"),
         HttpMethod.POST,
         HttpEntity(lagreVilkårperiode, headers),
     ).body!!

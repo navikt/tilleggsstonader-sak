@@ -34,7 +34,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import java.time.LocalDate
@@ -105,6 +107,11 @@ object VilkårperiodeTestUtil {
     fun delvilkårMålgruppeDto() = DelvilkårMålgruppeDto(
         medlemskap = VurderingDto(SvarJaNei.JA_IMPLISITT),
         dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.NEI),
+    )
+
+    fun faktaOgVurderingerMålgruppeDto() = FaktaOgVurderingerMålgruppeDto(
+        svarMedlemskap = null,
+        svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.NEI,
     )
 
     fun aktivitet(

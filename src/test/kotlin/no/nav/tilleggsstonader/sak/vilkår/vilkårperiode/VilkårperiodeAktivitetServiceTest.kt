@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -9,8 +9,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClien
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.lagreAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.tiltak
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.ulønnetTiltak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
