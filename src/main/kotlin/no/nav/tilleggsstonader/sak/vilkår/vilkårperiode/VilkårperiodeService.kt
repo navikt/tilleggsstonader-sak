@@ -51,9 +51,6 @@ class VilkårperiodeService(
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
 ) {
-
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
 

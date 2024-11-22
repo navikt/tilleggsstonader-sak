@@ -38,7 +38,6 @@ import java.time.temporal.ChronoUnit
 @Service
 class VilkårperiodeGrunnlagService(
     private val behandlingService: BehandlingService,
-    private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val registerAktivitetService: RegisterAktivitetService,
     private val ytelseService: YtelseService,
@@ -47,15 +46,6 @@ class VilkårperiodeGrunnlagService(
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
-
-    fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
-        val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
-
-        return Vilkårperioder(
-            målgrupper = vilkårsperioder.ofType<MålgruppeFaktaOgVurdering>(),
-            aktiviteter = vilkårsperioder.ofType<AktivitetFaktaOgVurdering>(),
-        )
-    }
 
     @Transactional
     fun oppdaterGrunnlag(behandlingId: BehandlingId) {
