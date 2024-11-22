@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.lagreAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.tiltak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.aktivitet.ulønnetTiltak
@@ -74,7 +75,12 @@ class AktivitetServiceTest : IntegrationTest() {
         fun `skal kunne opprette aktivitet fra scratch`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val opprettetAktivitet =
-                aktivitetService.opprettVilkårperiodeNy(ulønnetTiltak.copy(behandlingId = behandling.id))
+                aktivitetService.opprettVilkårperiodeNy(
+                    lagreVilkårperiodeAktivitet(
+                        behandlingId = behandling.id,
+                        svarLønnet = SvarJaNei.NEI
+                    )
+                )
             with(opprettetAktivitet) {
                 assertThat(type).isEqualTo(opprettetAktivitet.type)
                 assertThat(fom).isEqualTo(opprettetAktivitet.fom)
@@ -97,7 +103,13 @@ class AktivitetServiceTest : IntegrationTest() {
                 hentetInformasjon = hentetInformasjon,
             )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
-            aktivitetService.opprettVilkårperiodeNy(ulønnetTiltak.copy(behandlingId = behandling.id, kildeId = "123"))
+            aktivitetService.opprettVilkårperiodeNy(
+                lagreVilkårperiodeAktivitet(
+                    behandlingId = behandling.id,
+                    kildeId = "123",
+//                    svarLønnet = SvarJaNei.NEI TODO: Nødvendig??
+                )
+            )
             val lagretAktivitet = vilkårperiodeService.hentVilkårperioder(behandling.id).aktiviteter.single()
             assertThat(lagretAktivitet.kildeId).isEqualTo("123")
         }
@@ -114,7 +126,7 @@ class AktivitetServiceTest : IntegrationTest() {
                 hentetInformasjon = hentetInformasjon,
             )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
-            val opprettAktivitet = ulønnetTiltak.copy(kildeId = "finnesIkke", behandlingId = behandling.id)
+            val opprettAktivitet = lagreVilkårperiodeAktivitet(behandlingId = behandling.id, kildeId = "123")
             assertThatThrownBy {
                 aktivitetService.opprettVilkårperiodeNy(opprettAktivitet)
             }.hasMessageContaining("Aktivitet med id=finnesIkke finnes ikke i grunnlag")
@@ -126,7 +138,7 @@ class AktivitetServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 aktivitetService.opprettVilkårperiodeNy(
-                    lagreAktivitet(
+                    lagreVilkårperiodeAktivitet(
                         type = AktivitetType.TILTAK,
                         svarLønnet = SvarJaNei.JA,
                         behandlingId = behandling.id,
@@ -142,7 +154,7 @@ class AktivitetServiceTest : IntegrationTest() {
             listOf("", null).forEach {
                 assertThatThrownBy {
                     aktivitetService.opprettVilkårperiodeNy(
-                        lagreAktivitet(
+                        lagreVilkårperiodeAktivitet(
                             type = AktivitetType.INGEN_AKTIVITET,
                             begrunnelse = it,
                             behandlingId = behandling.id,
@@ -159,7 +171,7 @@ class AktivitetServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 aktivitetService.opprettVilkårperiodeNy(
-                    lagreAktivitet(
+                    lagreVilkårperiodeAktivitet(
                         behandlingId = behandling.id,
                         type = AktivitetType.INGEN_AKTIVITET,
                         aktivitetsdager = 5,
@@ -177,7 +189,7 @@ class AktivitetServiceTest : IntegrationTest() {
 
         assertThatThrownBy {
             aktivitetService.opprettVilkårperiodeNy(
-                lagreAktivitet(
+                lagreVilkårperiodeAktivitet(
                     behandlingId = behandling.id,
                     fom = now().plusDays(1),
                     aktivitetsdager = 5,
@@ -192,7 +204,9 @@ class AktivitetServiceTest : IntegrationTest() {
         fun `skal oppdatere alle felter hvis aktivitet`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val eksisterendeAktivitet = aktivitetService.opprettVilkårperiodeNy(
-                tiltak.copy(behandlingId = behandling.id),
+                lagreVilkårperiodeAktivitet(
+                    behandlingId = behandling.id
+                )
             )
 
             val nyDato = LocalDate.parse("2020-01-01")
@@ -249,7 +263,10 @@ class AktivitetServiceTest : IntegrationTest() {
         fun `skal feile dersom manglende begrunnelse når lønnet endres til ja`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val tiltak = aktivitetService.opprettVilkårperiodeNy(
-                ulønnetTiltak.copy(behandlingId = behandling.id),
+                lagreVilkårperiodeAktivitet(
+                    behandlingId = behandling.id,
+                    svarLønnet = SvarJaNei.NEI,
+                )
             )
 
             val oppdatering = tiltak.tilOppdatering(
@@ -337,7 +354,7 @@ class AktivitetServiceTest : IntegrationTest() {
             aktivitetsdager: Int? = null,
             svarLønnet: SvarJaNei? = null,
             nyBegrunnelse: String? = null,
-        ): LagreVilkårperiodeNy = lagreAktivitet(
+        ): LagreVilkårperiodeNy = lagreVilkårperiodeAktivitet(
             behandlingId = behandlingId,
             type = type as AktivitetType,
             fom = nyFom ?: fom,
