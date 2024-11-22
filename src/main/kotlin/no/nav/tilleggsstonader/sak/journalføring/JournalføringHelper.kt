@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.DokarkivBruker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Sak
-import no.nav.tilleggsstonader.kontrakter.felles.Behandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
@@ -57,7 +56,7 @@ object JournalføringHelper {
             DokarkivBruker(idType = BrukerIdType.valueOf(it.type.toString()), id = it.id)
         },
         tema = journalpost.tema?.let { Tema.valueOf(it) },
-        behandlingstema = journalpost.behandlingstema?.let { Behandlingstema.fromValue(it) },
+//        behandlingstema = journalpost.behandlingstema?.let { Behandlingstema.fromValue(it) },
         tittel = journalpost.tittel,
         journalfoerendeEnhet = journalpost.journalforendeEnhet,
         sak = Sak(
