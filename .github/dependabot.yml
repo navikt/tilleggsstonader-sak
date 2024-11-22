@@ -21,6 +21,9 @@ updates:
   open-pull-requests-limit: 10
   registries:
     - tilleggsstonader-libs
+  ignore:
+    - dependency-name: "io.mockk:mockk"
+      versions: [ "1.13.13" ]
 
 - package-ecosystem: github-actions
   directory: "/"
