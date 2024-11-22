@@ -12,11 +12,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetServi
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
@@ -38,7 +33,6 @@ import java.time.temporal.ChronoUnit
 @Service
 class VilkårperiodeGrunnlagService(
     private val behandlingService: BehandlingService,
-    private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val registerAktivitetService: RegisterAktivitetService,
     private val ytelseService: YtelseService,
@@ -47,15 +41,6 @@ class VilkårperiodeGrunnlagService(
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
-
-    fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
-        val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
-
-        return Vilkårperioder(
-            målgrupper = vilkårsperioder.ofType<MålgruppeFaktaOgVurdering>(),
-            aktiviteter = vilkårsperioder.ofType<AktivitetFaktaOgVurdering>(),
-        )
-    }
 
     @Transactional
     fun oppdaterGrunnlag(behandlingId: BehandlingId) {

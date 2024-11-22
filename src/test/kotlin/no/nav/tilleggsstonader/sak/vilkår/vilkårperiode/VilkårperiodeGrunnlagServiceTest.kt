@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClien
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
@@ -27,7 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnl
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -43,9 +42,6 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService
-
-    @Autowired
-    lateinit var vilkårperiodeRepository: VilkårperiodeRepository
 
     @Autowired
     lateinit var vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository
@@ -66,16 +62,16 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
     internal fun `skal lagre ned grunnlagsadata på aktiviteter når man henter vilkårsperioder`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-        Assertions.assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)).isNull()
+        assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)).isNull()
 
         val response = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
 
-        Assertions.assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)!!.grunnlag)
+        assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)!!.grunnlag)
             .isEqualTo(
                 response,
             )
-        Assertions.assertThat(response!!.aktivitet.aktiviteter).isNotEmpty
-        Assertions.assertThat(response.ytelse.perioder).isNotEmpty
+        assertThat(response!!.aktivitet.aktiviteter).isNotEmpty
+        assertThat(response.ytelse.perioder).isNotEmpty
     }
 
     @Test
@@ -85,7 +81,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
 
         vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
 
-        Assertions.assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)).isNull()
+        assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)).isNull()
     }
 
     @Test
@@ -102,7 +98,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
 
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
-        Assertions.assertThat(grunnlag!!.grunnlag.aktivitet.aktiviteter.map { it.id }).hasSize(1)
+        assertThat(grunnlag!!.grunnlag.aktivitet.aktiviteter.map { it.id }).hasSize(1)
             .contains(idStønadsberettiget)
     }
 
@@ -115,7 +111,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                 vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
             }
         }
-        Assertions.assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
+        assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
     }
 
     @Test
@@ -128,7 +124,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                 vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
             }
         }
-        Assertions.assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
+        assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
     }
 
     @Test
@@ -164,7 +160,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
 
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
         val perioder = grunnlag!!.grunnlag.ytelse.perioder
-        Assertions.assertThat(perioder).containsExactlyInAnyOrder(
+        assertThat(perioder).containsExactlyInAnyOrder(
             PeriodeGrunnlagYtelse(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now()),
             PeriodeGrunnlagYtelse(TypeYtelsePeriode.ENSLIG_FORSØRGER, LocalDate.now(), LocalDate.now()),
         )
@@ -207,7 +203,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
 
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
         val perioder = grunnlag!!.grunnlag.ytelse.perioder
-        Assertions.assertThat(perioder).containsExactlyInAnyOrder(
+        assertThat(perioder).containsExactlyInAnyOrder(
             PeriodeGrunnlagYtelse(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now()),
             PeriodeGrunnlagYtelse(
                 TypeYtelsePeriode.ENSLIG_FORSØRGER,
@@ -247,11 +243,11 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
 
             val grunnlag3 = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)!!
 
-            Assertions.assertThat(grunnlag.aktivitet.aktiviteter.map { it.id }).containsExactly("1")
-            Assertions.assertThat(grunnlag2.aktivitet.aktiviteter.map { it.id }).containsExactly("1")
+            assertThat(grunnlag.aktivitet.aktiviteter.map { it.id }).containsExactly("1")
+            assertThat(grunnlag2.aktivitet.aktiviteter.map { it.id }).containsExactly("1")
 
             // Oppdatert grunnlag inneholder kun id=2
-            Assertions.assertThat(grunnlag3.aktivitet.aktiviteter.map { it.id }).containsExactly("2")
+            assertThat(grunnlag3.aktivitet.aktiviteter.map { it.id }).containsExactly("2")
         }
 
         @Test
@@ -269,10 +265,10 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                 vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id)
             }
             with(vilkårperioderGrunnlagRepository.findByIdOrThrow(behandling.id)) {
-                Assertions.assertThat(sporbar.opprettetAv).isEqualTo("VL")
-                Assertions.assertThat(sporbar.endret.endretAv).isEqualTo("beh1")
-                Assertions.assertThat(grunnlag.hentetInformasjon.fom).isEqualTo(fomFørsteGangHentet)
-                Assertions.assertThat(grunnlag.hentetInformasjon.tom)
+                assertThat(sporbar.opprettetAv).isEqualTo("VL")
+                assertThat(sporbar.endret.endretAv).isEqualTo("beh1")
+                assertThat(grunnlag.hentetInformasjon.fom).isEqualTo(fomFørsteGangHentet)
+                assertThat(grunnlag.hentetInformasjon.tom)
                     .isEqualTo(YearMonth.now().plusYears(1).atEndOfMonth())
             }
         }
@@ -280,8 +276,9 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         @Test
         fun `skal ikke kunne oppdatere dataen når behandlingen har feil steg`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.VILKÅR))
-            val feil = org.junit.jupiter.api.assertThrows<Feil> { vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id) }
-            Assertions.assertThat(feil.frontendFeilmelding)
+            val feil =
+                org.junit.jupiter.api.assertThrows<Feil> { vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id) }
+            assertThat(feil.frontendFeilmelding)
                 .isEqualTo("Kan ikke oppdatere grunnlag når behandlingen er i annet steg enn vilkår.")
         }
 
@@ -289,8 +286,9 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         fun `skal ikke kunne oppdatere dataen når behandlingen er låst`() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
-            val feil = org.junit.jupiter.api.assertThrows<Feil> { vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id) }
-            Assertions.assertThat(feil.frontendFeilmelding)
+            val feil =
+                org.junit.jupiter.api.assertThrows<Feil> { vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id) }
+            assertThat(feil.frontendFeilmelding)
                 .isEqualTo("Kan ikke oppdatere grunnlag når behandlingen er låst")
         }
     }
