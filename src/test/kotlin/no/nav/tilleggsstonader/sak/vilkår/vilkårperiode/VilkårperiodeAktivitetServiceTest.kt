@@ -44,7 +44,7 @@ import java.time.LocalDate
 import java.time.LocalDate.now
 import java.time.LocalDateTime
 
-class AktivitetServiceTest : IntegrationTest() {
+class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
 
