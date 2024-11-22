@@ -149,7 +149,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                     TypeYtelsePeriode.ENSLIG_FORSØRGER,
                     LocalDate.now(),
                     LocalDate.now(),
-                    aapErFerdigAvklart = null
+                    aapErFerdigAvklart = null,
                 ),
             ),
             hentetInformasjon = emptyList(),
@@ -209,13 +209,13 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                 TypeYtelsePeriode.ENSLIG_FORSØRGER,
                 LocalDate.now(),
                 LocalDate.now(),
-                no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.SKOLEPENGER
+                no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.SKOLEPENGER,
             ),
             PeriodeGrunnlagYtelse(
                 TypeYtelsePeriode.ENSLIG_FORSØRGER,
                 LocalDate.now(),
                 LocalDate.now(),
-                no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.OVERGANGSSTØNAD
+                no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
             ),
         )
     }
