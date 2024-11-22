@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -62,18 +63,18 @@ class AktivitetControllerTest : IntegrationTest() {
     }
 
     private fun sendOpprettAktivitetRequest(
-        lagreAktivitet: LagreAktivitet,
+        lagreAktivitet: LagreVilkårperiodeNy,
     ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
-        localhost("api/vilkarperiode2/aktivitet"),
+        localhost("api/vilkarperiode/v2"),
         HttpMethod.POST,
         HttpEntity(lagreAktivitet, headers),
     ).body!!
 
     private fun sendOppdaterAktivitetRequest(
-        lagreAktivitet: LagreAktivitet,
+        lagreAktivitet: LagreVilkårperiodeNy,
         aktivitetId: UUID,
     ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
-        localhost("api/vilkarperiode2/aktivitet/$aktivitetId"),
+        localhost("api/vilkarperiode/v2/$aktivitetId"),
         HttpMethod.POST,
         HttpEntity(lagreAktivitet, headers),
     ).body!!
