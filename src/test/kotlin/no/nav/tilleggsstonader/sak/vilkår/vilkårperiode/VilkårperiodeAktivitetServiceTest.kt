@@ -78,8 +78,8 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 aktivitetService.opprettVilkårperiodeNy(
                     lagreVilkårperiodeAktivitet(
                         behandlingId = behandling.id,
-                        svarLønnet = SvarJaNei.NEI
-                    )
+                        svarLønnet = SvarJaNei.NEI,
+                    ),
                 )
             with(opprettetAktivitet) {
                 assertThat(type).isEqualTo(opprettetAktivitet.type)
