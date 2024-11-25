@@ -225,9 +225,7 @@ class VilkårperiodeService(
     }
 
     private fun validerKildeId(behandlingId: BehandlingId, type: VilkårperiodeType, kildeId: String?) {
-        val behandlingId = behandlingId
-        val kildeId = kildeId ?: return
-        feilHvis(type is MålgruppeType) {
+        feilHvis(type is MålgruppeType && !kildeId.isNullOrEmpty()) {
             "Kan ikke sende inn kildeId på målgruppe, då målgruppeperioder ikke direkt har en id som aktivitet"
         }
 
