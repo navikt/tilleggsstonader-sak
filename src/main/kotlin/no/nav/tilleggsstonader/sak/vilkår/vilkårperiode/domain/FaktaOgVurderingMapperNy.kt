@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
@@ -26,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 
@@ -50,7 +52,11 @@ private fun mapAktiviteter(stønadstype: Stønadstype, aktivitet: LagreVilkårpe
             return mapAktiviteterBarnetilsyn(type, faktaOgVurderinger)
         }
 
-        Stønadstype.LÆREMIDLER -> error("Vi har ikke implementert inngangsvilkår for læremidler enda.")
+        Stønadstype.LÆREMIDLER -> {
+            require(faktaOgVurderinger is FaktaOgVurderingerAktivitetLæremidlerDto)
+//            return mapAktiviteterLæremidler(type, faktaOgVurderinger)
+            TODO()
+        }
     }
 }
 
@@ -80,6 +86,21 @@ private fun mapAktiviteterBarnetilsyn(
             }
             IngenAktivitetTilsynBarn
         }
+    }
+}
+
+fun mapAktiviteterLæremidler(
+    type: AktivitetType,
+    faktaOgVurderinger: FaktaOgVurderingerAktivitetLæremidlerDto,
+): AktivitetLæremidler {
+    when (type) {
+        AktivitetType.TILTAK -> {
+            TODO()
+        }
+
+        AktivitetType.UTDANNING -> TODO()
+        AktivitetType.REELL_ARBEIDSSØKER -> TODO()
+        AktivitetType.INGEN_AKTIVITET -> TODO()
     }
 }
 

@@ -27,6 +27,18 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(UføretrygdTilsynBarn::class, name = "UFØRETRYGD_TILSYN_BARN"),
     JsonSubTypes.Type(SykepengerTilsynBarn::class, name = "SYKEPENGER_100_PROSENT_TILSYN_BARN"),
     JsonSubTypes.Type(IngenMålgruppeTilsynBarn::class, name = "INGEN_MÅLGRUPPE_TILSYN_BARN"),
+
+    JsonSubTypes.Type(UtdanningLæremidler::class, name = "UTDANNING_LÆREMIDLER"),
+    JsonSubTypes.Type(TiltakLæremidler::class, name = "TILTAK_LÆREMIDLER"),
+    JsonSubTypes.Type(IngenAktivitetLæremidler::class, name = "INGEN_AKTIVITET_LÆREMIDLER"),
+
+    JsonSubTypes.Type(AAPLæremidler::class, name = "AAP_LÆREMIDLER"),
+    JsonSubTypes.Type(OmstillingsstønadLæremidler::class, name = "OMSTILLINGSSTØNAD_LÆREMIDLER"),
+    JsonSubTypes.Type(OvergangssstønadLæremidler::class, name = "OVERGANGSSTØNAD_LÆREMIDLER"),
+    JsonSubTypes.Type(NedsattArbeidsevneLæremidler::class, name = "NEDSATT_ARBEIDSEVNE_LÆREMIDLER"),
+    JsonSubTypes.Type(UføretrygdLæremidler::class, name = "UFØRETRYGD_LÆREMIDLER"),
+    JsonSubTypes.Type(SykepengerLæremidler::class, name = "SYKEPENGER_100_PROSENT_LÆREMIDLER"),
+    JsonSubTypes.Type(IngenMålgruppeLæremidler::class, name = "INGEN_MÅLGRUPPE_LÆREMIDLER"),
     failOnRepeatedNames = true,
 )
 sealed interface FaktaOgVurderingJson
