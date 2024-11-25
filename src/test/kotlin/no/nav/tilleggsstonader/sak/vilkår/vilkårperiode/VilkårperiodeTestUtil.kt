@@ -34,7 +34,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import java.time.LocalDate
@@ -105,6 +108,11 @@ object VilkårperiodeTestUtil {
     fun delvilkårMålgruppeDto() = DelvilkårMålgruppeDto(
         medlemskap = VurderingDto(SvarJaNei.JA_IMPLISITT),
         dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.NEI),
+    )
+
+    fun faktaOgVurderingerMålgruppeDto() = FaktaOgVurderingerMålgruppeDto(
+        svarMedlemskap = null,
+        svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.NEI,
     )
 
     fun aktivitet(
@@ -190,6 +198,26 @@ object VilkårperiodeTestUtil {
         behandlingId = behandlingId,
     )
 
+    fun lagreVilkårperiodeMålgruppe(
+        type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,
+        fom: LocalDate = osloDateNow(),
+        tom: LocalDate = osloDateNow(),
+        svarMedlemskap: SvarJaNei? = null,
+        svarDekkesAvAnnetRegelverk: SvarJaNei? = null,
+        begrunnelse: String? = null,
+        behandlingId: BehandlingId = BehandlingId.random(),
+    ) = LagreVilkårperiodeNy(
+        type = type,
+        fom = fom,
+        tom = tom,
+        faktaOgVurderinger = FaktaOgVurderingerMålgruppeDto(
+            svarMedlemskap = svarMedlemskap,
+            svarUtgifterDekketAvAnnetRegelverk = svarDekkesAvAnnetRegelverk,
+        ),
+        begrunnelse = begrunnelse,
+        behandlingId = behandlingId,
+    )
+
     fun opprettVilkårperiodeAktivitet(
         type: AktivitetType = AktivitetType.TILTAK,
         fom: LocalDate = osloDateNow(),
@@ -208,6 +236,28 @@ object VilkårperiodeTestUtil {
         behandlingId = behandlingId,
         aktivitetsdager = aktivitetsdager,
         kildeId = kildeId,
+    )
+
+    fun lagreVilkårperiodeAktivitet(
+        type: AktivitetType = AktivitetType.TILTAK,
+        fom: LocalDate = osloDateNow(),
+        tom: LocalDate = osloDateNow(),
+        svarLønnet: SvarJaNei? = null,
+        begrunnelse: String? = null,
+        behandlingId: BehandlingId = BehandlingId.random(),
+        aktivitetsdager: Int? = 5,
+        kildeId: String? = null,
+    ) = LagreVilkårperiodeNy(
+        type = type,
+        fom = fom,
+        tom = tom,
+        faktaOgVurderinger = FaktaOgVurderingerAktivitetBarnetilsynDto(
+            svarLønnet = svarLønnet,
+            aktivitetsdager = aktivitetsdager,
+        ),
+        kildeId = kildeId,
+        begrunnelse = begrunnelse,
+        behandlingId = behandlingId,
     )
 
     fun Vilkårperiode.medAktivitetsdager(

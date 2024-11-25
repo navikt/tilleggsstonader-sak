@@ -8,9 +8,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.ProblemDetailUtil.catchProblemDetailException
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
@@ -34,17 +34,17 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     fun `skal kunne lagre og hente vilkarperioder for AAP`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-        opprettVilkårperiode(
-            LagreVilkårperiode(
+        kallOpprettVilkårperiode(
+            LagreVilkårperiodeNy(
                 type = MålgruppeType.AAP,
                 fom = osloDateNow(),
                 tom = osloDateNow(),
-                delvilkår = delvilkårMålgruppeDto(),
+                faktaOgVurderinger = faktaOgVurderingerMålgruppeDto(),
                 behandlingId = behandling.id,
             ),
         )
 
-        val hentedeVilkårperioder = hentVilkårperioder(behandling)
+        val hentedeVilkårperioder = kallHentVilkårperioder(behandling)
 
         assertThat(hentedeVilkårperioder.målgrupper).hasSize(1)
         assertThat(hentedeVilkårperioder.aktiviteter).isEmpty()
@@ -54,23 +54,49 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     }
 
     @Test
+    fun `skal kunne oppdatere eksisterende aktivitet`() {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+
+        val originalLagreRequest = LagreVilkårperiodeNy(
+            type = MålgruppeType.AAP,
+            fom = osloDateNow(),
+            tom = osloDateNow(),
+            faktaOgVurderinger = faktaOgVurderingerMålgruppeDto(),
+            behandlingId = behandling.id,
+        )
+
+        val response = kallOpprettVilkårperiode(originalLagreRequest)
+
+        val nyTom = osloDateNow()
+
+        kallOppdaterVikårperiode(
+            lagreVilkårperiode = originalLagreRequest.copy(behandlingId = behandling.id, tom = nyTom),
+            vilkårperiodeId = response.periode!!.id,
+        )
+
+        val lagredeVilkårperioder = kallHentVilkårperioder(behandling)
+
+        assertThat(lagredeVilkårperioder.målgrupper.single().tom).isEqualTo(nyTom)
+    }
+
+    @Test
     fun `skal feile hvis man ikke sender inn lik behandlingId som det er på vilkårperioden`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
         val behandlingForAnnenFagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")))).let {
             testoppsettService.lagre(behandling(it))
         }
 
-        val response = opprettVilkårperiode(
-            LagreVilkårperiode(
+        val response = kallOpprettVilkårperiode(
+            LagreVilkårperiodeNy(
                 type = MålgruppeType.AAP,
                 fom = osloDateNow(),
                 tom = osloDateNow(),
-                delvilkår = delvilkårMålgruppeDto(),
+                faktaOgVurderinger = faktaOgVurderingerMålgruppeDto(),
                 behandlingId = behandling.id,
             ),
         )
         val exception = catchProblemDetailException {
-            slettVilkårperiode(
+            kallSlettVilkårperiode(
                 vilkårperiodeId = response.periode!!.id,
                 SlettVikårperiode(behandlingForAnnenFagsak.id, "test"),
             )
@@ -86,29 +112,38 @@ class VilkårperiodeControllerTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             headers.setBearerAuth(onBehalfOfToken(rolleConfig.veilederRolle))
             val exception = catchProblemDetailException {
-                oppdaterGrunnlag(behandling.id)
+                kallOppdaterGrunnlag(behandling.id)
             }
             assertThat(exception.detail.detail)
                 .contains("Mangler nødvendig saksbehandlerrolle for å utføre handlingen")
         }
     }
 
-    private fun hentVilkårperioder(behandling: Behandling) =
+    private fun kallHentVilkårperioder(behandling: Behandling) =
         restTemplate.exchange<VilkårperioderResponse>(
             localhost("api/vilkarperiode/behandling/${behandling.id}"),
             HttpMethod.GET,
             HttpEntity(null, headers),
         ).body!!.vilkårperioder
 
-    private fun opprettVilkårperiode(
-        lagreVilkårperiode: LagreVilkårperiode,
+    private fun kallOpprettVilkårperiode(
+        lagreVilkårperiode: LagreVilkårperiodeNy,
     ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
-        localhost("api/vilkarperiode"),
+        localhost("api/vilkarperiode/v2"),
         HttpMethod.POST,
         HttpEntity(lagreVilkårperiode, headers),
     ).body!!
 
-    private fun slettVilkårperiode(
+    private fun kallOppdaterVikårperiode(
+        lagreVilkårperiode: LagreVilkårperiodeNy,
+        vilkårperiodeId: UUID,
+    ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
+        localhost("api/vilkarperiode/v2/$vilkårperiodeId"),
+        HttpMethod.POST,
+        HttpEntity(lagreVilkårperiode, headers),
+    ).body!!
+
+    private fun kallSlettVilkårperiode(
         vilkårperiodeId: UUID,
         slettVikårperiode: SlettVikårperiode,
     ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
@@ -117,7 +152,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         HttpEntity(slettVikårperiode, headers),
     ).body!!
 
-    private fun oppdaterGrunnlag(
+    private fun kallOppdaterGrunnlag(
         behandlingId: BehandlingId,
     ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
         localhost("api/vilkarperiode/behandling/$behandlingId/oppdater-grunnlag"),

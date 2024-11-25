@@ -94,7 +94,11 @@ data class VurderingTiltakTilsynBarn(
 
 data class FaktaAktivitetTilsynBarn(
     override val aktivitetsdager: Int,
-) : Fakta, FaktaAktivitetsdager
+) : Fakta, FaktaAktivitetsdager {
+    init {
+        require(aktivitetsdager in 1..5) { "Aktivitetsdager må være mellom 1 og 5" }
+    }
+}
 
 sealed interface TypeFaktaOgVurderingTilsynBarn : TypeFaktaOgVurdering
 

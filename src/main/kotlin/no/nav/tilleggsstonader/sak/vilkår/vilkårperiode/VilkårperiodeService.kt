@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapFaktaOgVurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
@@ -82,6 +83,7 @@ class VilkårperiodeService(
         )
     }
 
+    // TODO: Slett når nytt endepunkt er implementert
     @Transactional
     fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
@@ -92,7 +94,11 @@ class VilkårperiodeService(
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
         }
         validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
-        validerKildeId(vilkårperiode)
+        validerKildeIdFinnesIGrunnlaget(
+            behandlingId = vilkårperiode.behandlingId,
+            type = vilkårperiode.type,
+            kildeId = vilkårperiode.kildeId,
+        )
 
         val faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode)
         return vilkårperiodeRepository.insert(
@@ -110,52 +116,40 @@ class VilkårperiodeService(
         )
     }
 
-    private fun validerKildeId(vilkårperiode: LagreVilkårperiode) {
-        val behandlingId = vilkårperiode.behandlingId
-        val kildeId = vilkårperiode.kildeId ?: return
-        feilHvis(vilkårperiode.type is MålgruppeType) {
-            "Kan ikke sende inn kildeId på målgruppe, då målgruppeperioder ikke direkt har en id som aktivitet"
+    @Transactional
+    fun opprettVilkårperiodeNy(vilkårperiode: LagreVilkårperiodeNy): Vilkårperiode {
+        val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
+        validerBehandling(behandling)
+        validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
+
+        if (vilkårperiode.type is MålgruppeType) {
+            validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
         }
 
-        val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)
-            ?: error("Finner ikke grunnlag til behandling=$behandlingId")
-        val idIGrunnlag = grunnlag.grunnlag.aktivitet.aktiviteter.map { it.id }
-        feilHvis(kildeId !in idIGrunnlag) {
-            "Aktivitet med id=$kildeId finnes ikke i grunnlag"
-        }
+        validerKildeIdFinnesIGrunnlaget(
+            behandlingId = vilkårperiode.behandlingId,
+            type = vilkårperiode.type,
+            kildeId = vilkårperiode.kildeId,
+        )
+
+        val faktaOgVurdering =
+            mapFaktaOgVurderingDto(stønadstype = behandling.stønadstype, vilkårperiode = vilkårperiode)
+        return vilkårperiodeRepository.insert(
+            GeneriskVilkårperiode(
+                behandlingId = vilkårperiode.behandlingId,
+                resultat = faktaOgVurdering.utledResultat(),
+                status = Vilkårstatus.NY,
+                kildeId = vilkårperiode.kildeId,
+                type = vilkårperiode.type,
+                faktaOgVurdering = faktaOgVurdering,
+                fom = vilkårperiode.fom,
+                tom = vilkårperiode.tom,
+                begrunnelse = vilkårperiode.begrunnelse,
+            ),
+        )
     }
 
-    private fun validerBehandling(behandling: Saksbehandling) {
-        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
-            "Kan ikke opprette eller endre vilkårperiode når behandling er låst for videre redigering"
-        }
-        feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
-            "Kan ikke opprette eller endre vilkårperiode når behandling ikke er på steg ${StegType.INNGANGSVILKÅR}"
-        }
-    }
-
-    private fun validerAktivitetsdager(vilkårPeriodeType: VilkårperiodeType, aktivitetsdager: Int?) {
-        if (vilkårPeriodeType is AktivitetType) {
-            brukerfeilHvis(vilkårPeriodeType != AktivitetType.INGEN_AKTIVITET && aktivitetsdager !in 1..5) {
-                "Aktivitetsdager må være et heltall mellom 1 og 5"
-            }
-        } else if (vilkårPeriodeType is MålgruppeType) {
-            brukerfeilHvisIkke(aktivitetsdager == null) { "Kan ikke registrere aktivitetsdager på målgrupper" }
-        }
-    }
-
-    private fun validerStønadsperioder(behandlingId: BehandlingId): Result<Unit> {
-        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
-        val vilkårperioder = hentVilkårperioder(behandlingId)
-
-        return kotlin.runCatching {
-            StønadsperiodeValideringUtil.validerStønadsperioderVedEndringAvVilkårperiode(
-                stønadsperioder,
-                vilkårperioder.tilDto(),
-            )
-        }
-    }
-
+    // TODO: Slett når nytt endepunkt er tatt i bruk
     fun oppdaterVilkårperiode(id: UUID, vilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val eksisterendeVilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
@@ -173,6 +167,32 @@ class VilkårperiodeService(
             tom = vilkårperiode.tom,
             begrunnelse = vilkårperiode.begrunnelse,
             faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode),
+        )
+
+        validerEndrePeriodeRevurdering(behandling, eksisterendeVilkårperiode, oppdatert)
+        return vilkårperiodeRepository.update(oppdatert)
+    }
+
+    @Transactional
+    fun oppdaterVilkårperiodeNy(id: UUID, vilkårperiode: LagreVilkårperiodeNy): Vilkårperiode {
+        val eksisterendeVilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
+
+        val behandling = behandlingService.hentSaksbehandling(eksisterendeVilkårperiode.behandlingId)
+        validerBehandlingIdErLik(vilkårperiode.behandlingId, eksisterendeVilkårperiode.behandlingId)
+        validerBehandling(behandling)
+
+        feilHvis(eksisterendeVilkårperiode.kildeId != vilkårperiode.kildeId) {
+            "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
+        }
+
+        val oppdatert = eksisterendeVilkårperiode.medVilkårOgVurdering(
+            fom = vilkårperiode.fom,
+            tom = vilkårperiode.tom,
+            begrunnelse = vilkårperiode.begrunnelse,
+            faktaOgVurdering = mapFaktaOgVurderingDto(
+                stønadstype = behandling.stønadstype,
+                vilkårperiode = vilkårperiode,
+            ),
         )
 
         validerEndrePeriodeRevurdering(behandling, eksisterendeVilkårperiode, oppdatert)
@@ -202,5 +222,51 @@ class VilkårperiodeService(
 
         val kopiertePerioderMedReferanse = eksisterendeVilkårperioder.map { it.kopierTilBehandling(nyBehandlingId) }
         vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)
+    }
+
+    private fun validerKildeIdFinnesIGrunnlaget(behandlingId: BehandlingId, type: VilkårperiodeType, kildeId: String?) {
+        val kildeId = kildeId ?: return
+
+        feilHvis(type is MålgruppeType) {
+            "Kan ikke sende inn kildeId på målgruppe, då målgruppeperioder ikke direkt har en id som aktivitet"
+        }
+
+        val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)
+            ?: error("Finner ikke grunnlag til behandling=$behandlingId")
+        val idIGrunnlag = grunnlag.grunnlag.aktivitet.aktiviteter.map { it.id }
+        feilHvis(kildeId !in idIGrunnlag) {
+            "Aktivitet med id=$kildeId finnes ikke i grunnlag"
+        }
+    }
+
+    private fun validerBehandling(behandling: Saksbehandling) {
+        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
+            "Kan ikke opprette eller endre periode når behandling er låst for videre redigering"
+        }
+        feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
+            "Kan ikke opprette eller endre periode når behandling ikke er på steg ${StegType.INNGANGSVILKÅR}"
+        }
+    }
+
+    private fun validerAktivitetsdager(vilkårPeriodeType: VilkårperiodeType, aktivitetsdager: Int?) {
+        if (vilkårPeriodeType is AktivitetType) {
+            brukerfeilHvis(vilkårPeriodeType != AktivitetType.INGEN_AKTIVITET && aktivitetsdager !in 1..5) {
+                "Aktivitetsdager må være et heltall mellom 1 og 5"
+            }
+        } else if (vilkårPeriodeType is MålgruppeType) {
+            brukerfeilHvisIkke(aktivitetsdager == null) { "Kan ikke registrere aktivitetsdager på målgrupper" }
+        }
+    }
+
+    private fun validerStønadsperioder(behandlingId: BehandlingId): Result<Unit> {
+        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
+        val vilkårperioder = hentVilkårperioder(behandlingId)
+
+        return kotlin.runCatching {
+            StønadsperiodeValideringUtil.validerStønadsperioderVedEndringAvVilkårperiode(
+                stønadsperioder,
+                vilkårperioder.tilDto(),
+            )
+        }
     }
 }
