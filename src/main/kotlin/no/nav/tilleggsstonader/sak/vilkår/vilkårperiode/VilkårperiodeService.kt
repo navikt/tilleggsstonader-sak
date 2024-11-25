@@ -94,7 +94,7 @@ class VilkårperiodeService(
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
         }
         validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
-        validerKildeId(
+        validerKildeIdFinnesIGrunnlaget(
             behandlingId = vilkårperiode.behandlingId,
             type = vilkårperiode.type,
             kildeId = vilkårperiode.kildeId,
@@ -126,7 +126,7 @@ class VilkårperiodeService(
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
         }
 
-        validerKildeId(
+        validerKildeIdFinnesIGrunnlaget(
             behandlingId = vilkårperiode.behandlingId,
             type = vilkårperiode.type,
             kildeId = vilkårperiode.kildeId,
@@ -224,8 +224,10 @@ class VilkårperiodeService(
         vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)
     }
 
-    private fun validerKildeId(behandlingId: BehandlingId, type: VilkårperiodeType, kildeId: String?) {
-        feilHvis(type is MålgruppeType && !kildeId.isNullOrEmpty()) {
+    private fun validerKildeIdFinnesIGrunnlaget(behandlingId: BehandlingId, type: VilkårperiodeType, kildeId: String?) {
+        val kildeId = kildeId ?: return
+
+        feilHvis(type is MålgruppeType) {
             "Kan ikke sende inn kildeId på målgruppe, då målgruppeperioder ikke direkt har en id som aktivitet"
         }
 
