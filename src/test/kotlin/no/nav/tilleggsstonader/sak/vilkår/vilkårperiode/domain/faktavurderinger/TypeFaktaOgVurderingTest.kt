@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test
 val alleEnumTyperFaktaOgVurdering: List<Pair<Stønadstype, TypeFaktaOgVurdering>> = listOf(
     Stønadstype.BARNETILSYN to AktivitetTilsynBarnType.entries,
     Stønadstype.BARNETILSYN to MålgruppeTilsynBarnType.entries,
+    Stønadstype.LÆREMIDLER to AktivitetLæremidlerType.entries,
+    Stønadstype.LÆREMIDLER to MålgruppeLæremidlerType.entries,
 ).flatMap { (stønadstype, enums) -> enums.map { stønadstype to it } }
 
 class TypeFaktaOgVurderingTest {
@@ -25,16 +27,20 @@ class TypeFaktaOgVurderingTest {
         alleEnumTyperFaktaOgVurdering.forEach { (stønadstype, type) ->
             when (type) {
                 is TypeFaktaOgVurderingTilsynBarn -> type.assertHarRiktigNavn(stønadstype)
+                is TypeFaktaOgVurderingLæremidler -> type.assertHarRiktigNavn(stønadstype)
             }
         }
     }
 
     @Test
-    fun `sjekker at det feiler hvis man bruker feil stønadstype på tilsyn barn`() {
+    fun `sjekker at det feiler hvis man bruker feil stønadstype`() {
         assertThatThrownBy {
             alleEnumTyperFaktaOgVurdering.forEach { (_, type) ->
                 if (type == AktivitetTilsynBarnType.UTDANNING_TILSYN_BARN) {
                     type.assertHarRiktigNavn(Stønadstype.LÆREMIDLER)
+                }
+                if (type == AktivitetLæremidlerType.UTDANNING_LÆREMIDLER) {
+                    type.assertHarRiktigNavn(Stønadstype.BARNETILSYN)
                 }
             }
         }.hasMessageContaining("but was: \"UTDANNING_TILSYN_BARN\"")

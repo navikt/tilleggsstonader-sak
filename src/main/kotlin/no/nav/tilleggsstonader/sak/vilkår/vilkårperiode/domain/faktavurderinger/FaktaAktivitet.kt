@@ -7,5 +7,3 @@ sealed interface FaktaAktivitetsdager : Fakta {
 sealed interface FaktaProsent : Fakta {
     val prosent: Int
 }
-
-

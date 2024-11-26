@@ -141,27 +141,61 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
         )
     """
 
-    private fun forventetType(type: TypeFaktaOgVurdering): Class<out FaktaOgVurderingTilsynBarn> = when (type) {
-        is MålgruppeTilsynBarnType -> {
-            when (type) {
-                MålgruppeTilsynBarnType.SYKEPENGER_100_PROSENT_TILSYN_BARN -> SykepengerTilsynBarn::class
-                MålgruppeTilsynBarnType.INGEN_MÅLGRUPPE_TILSYN_BARN -> IngenMålgruppeTilsynBarn::class
-                MålgruppeTilsynBarnType.OMSTILLINGSSTØNAD_TILSYN_BARN -> OmstillingsstønadTilsynBarn::class
-                MålgruppeTilsynBarnType.OVERGANGSSTØNAD_TILSYN_BARN -> OvergangssstønadTilsynBarn::class
-                MålgruppeTilsynBarnType.AAP_TILSYN_BARN -> AAPTilsynBarn::class
-                MålgruppeTilsynBarnType.UFØRETRYGD_TILSYN_BARN -> UføretrygdTilsynBarn::class
-                MålgruppeTilsynBarnType.NEDSATT_ARBEIDSEVNE_TILSYN_BARN -> NedsattArbeidsevneTilsynBarn::class
-            }
+    private fun forventetType(type: TypeFaktaOgVurdering): Class<out FaktaOgVurdering> {
+        if (type is TypeFaktaOgVurderingTilsynBarn) {
+            return forventetTypeTilsynBarn(type)
+        } else if (type is TypeFaktaOgVurderingLæremidler) {
+            return forventetTypeLæremidler(type)
         }
-        is AktivitetTilsynBarnType -> {
-            when (type) {
-                AktivitetTilsynBarnType.UTDANNING_TILSYN_BARN -> UtdanningTilsynBarn::class
-                AktivitetTilsynBarnType.TILTAK_TILSYN_BARN -> TiltakTilsynBarn::class
-                AktivitetTilsynBarnType.REELL_ARBEIDSSØKER_TILSYN_BARN -> ReellArbeidsøkerTilsynBarn::class
-                AktivitetTilsynBarnType.INGEN_AKTIVITET_TILSYN_BARN -> IngenAktivitetTilsynBarn::class
+        error("Ukjent type")
+    }
+
+    private fun forventetTypeTilsynBarn(type: TypeFaktaOgVurderingTilsynBarn): Class<out FaktaOgVurderingTilsynBarn> =
+        when (type) {
+            is MålgruppeTilsynBarnType -> {
+                when (type) {
+                    MålgruppeTilsynBarnType.SYKEPENGER_100_PROSENT_TILSYN_BARN -> SykepengerTilsynBarn::class
+                    MålgruppeTilsynBarnType.INGEN_MÅLGRUPPE_TILSYN_BARN -> IngenMålgruppeTilsynBarn::class
+                    MålgruppeTilsynBarnType.OMSTILLINGSSTØNAD_TILSYN_BARN -> OmstillingsstønadTilsynBarn::class
+                    MålgruppeTilsynBarnType.OVERGANGSSTØNAD_TILSYN_BARN -> OvergangssstønadTilsynBarn::class
+                    MålgruppeTilsynBarnType.AAP_TILSYN_BARN -> AAPTilsynBarn::class
+                    MålgruppeTilsynBarnType.UFØRETRYGD_TILSYN_BARN -> UføretrygdTilsynBarn::class
+                    MålgruppeTilsynBarnType.NEDSATT_ARBEIDSEVNE_TILSYN_BARN -> NedsattArbeidsevneTilsynBarn::class
+                }
             }
-        }
-    }.java
+
+            is AktivitetTilsynBarnType -> {
+                when (type) {
+                    AktivitetTilsynBarnType.UTDANNING_TILSYN_BARN -> UtdanningTilsynBarn::class
+                    AktivitetTilsynBarnType.TILTAK_TILSYN_BARN -> TiltakTilsynBarn::class
+                    AktivitetTilsynBarnType.REELL_ARBEIDSSØKER_TILSYN_BARN -> ReellArbeidsøkerTilsynBarn::class
+                    AktivitetTilsynBarnType.INGEN_AKTIVITET_TILSYN_BARN -> IngenAktivitetTilsynBarn::class
+                }
+            }
+        }.java
+
+    private fun forventetTypeLæremidler(type: TypeFaktaOgVurderingLæremidler): Class<out FaktaOgVurderingLæremidler> =
+        when (type) {
+            is MålgruppeLæremidlerType -> {
+                when (type) {
+                    MålgruppeLæremidlerType.AAP_LÆREMIDLER -> AAPLæremidler::class
+                    MålgruppeLæremidlerType.UFØRETRYGD_LÆREMIDLER -> UføretrygdLæremidler::class
+                    MålgruppeLæremidlerType.NEDSATT_ARBEIDSEVNE_LÆREMIDLER -> NedsattArbeidsevneLæremidler::class
+                    MålgruppeLæremidlerType.OMSTILLINGSSTØNAD_LÆREMIDLER -> OmstillingsstønadLæremidler::class
+                    MålgruppeLæremidlerType.OVERGANGSSTØNAD_LÆREMIDLER -> OvergangssstønadLæremidler::class
+                    MålgruppeLæremidlerType.INGEN_MÅLGRUPPE_LÆREMIDLER -> IngenMålgruppeLæremidler::class
+                    MålgruppeLæremidlerType.SYKEPENGER_100_PROSENT_LÆREMIDLER -> SykepengerLæremidler::class
+                }
+            }
+
+            is AktivitetLæremidlerType -> {
+                when (type) {
+                    AktivitetLæremidlerType.UTDANNING_LÆREMIDLER -> UtdanningLæremidler::class
+                    AktivitetLæremidlerType.TILTAK_LÆREMIDLER -> TiltakLæremidler::class
+                    AktivitetLæremidlerType.INGEN_AKTIVITET_LÆREMIDLER -> IngenAktivitetLæremidler::class
+                }
+            }
+        }.java
 
     companion object {
         @JvmStatic

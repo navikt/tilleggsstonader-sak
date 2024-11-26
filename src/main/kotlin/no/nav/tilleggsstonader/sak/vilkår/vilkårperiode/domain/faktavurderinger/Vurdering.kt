@@ -72,7 +72,7 @@ data class VurderingMedlemskap private constructor(
                 null -> ResultatDelvilkårperiode.IKKE_VURDERT
                 SvarJaNei.JA,
                 SvarJaNei.JA_IMPLISITT,
-                    -> ResultatDelvilkårperiode.OPPFYLT
+                -> ResultatDelvilkårperiode.OPPFYLT
 
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
             }

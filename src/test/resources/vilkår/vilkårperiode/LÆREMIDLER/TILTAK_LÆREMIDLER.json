@@ -1,0 +1,12 @@
+{
+  "type": "TILTAK_LÆREMIDLER",
+  "fakta": {
+    "prosent": 70
+  },
+  "vurderinger": {
+    "harUtgifter": {
+      "svar": "JA",
+      "resultat": "OPPFYLT"
+    }
+  }
+}
