@@ -273,11 +273,6 @@ data class Folkeregisterpersonstatus(
     val metadata: Metadata,
 )
 
-enum class MotpartsRolle {
-    FULLMAKTSGIVER,
-    FULLMEKTIG,
-}
-
 data class Navn(
     val fornavn: String,
     val mellomnavn: String?,

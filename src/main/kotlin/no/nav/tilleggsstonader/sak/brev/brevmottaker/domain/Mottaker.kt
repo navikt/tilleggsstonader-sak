@@ -23,7 +23,7 @@ data class Mottaker(
 enum class MottakerRolle {
     BRUKER,
     VERGE,
-    FULLMAKT,
+    FULLMEKTIG,
 }
 
 enum class MottakerType {
