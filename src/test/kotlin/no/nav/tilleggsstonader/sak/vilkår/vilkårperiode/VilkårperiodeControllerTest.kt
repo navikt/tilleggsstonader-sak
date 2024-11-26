@@ -39,7 +39,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
                 type = MålgruppeType.AAP,
                 fom = osloDateNow(),
                 tom = osloDateNow(),
-                faktaOgVurderinger = faktaOgVurderingerMålgruppeDto(),
+                faktaOgSvar = faktaOgVurderingerMålgruppeDto(),
                 behandlingId = behandling.id,
             ),
         )
@@ -61,7 +61,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
             type = MålgruppeType.AAP,
             fom = osloDateNow(),
             tom = osloDateNow(),
-            faktaOgVurderinger = faktaOgVurderingerMålgruppeDto(),
+            faktaOgSvar = faktaOgVurderingerMålgruppeDto(),
             behandlingId = behandling.id,
         )
 
@@ -91,7 +91,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
                 type = MålgruppeType.AAP,
                 fom = osloDateNow(),
                 tom = osloDateNow(),
-                faktaOgVurderinger = faktaOgVurderingerMålgruppeDto(),
+                faktaOgSvar = faktaOgVurderingerMålgruppeDto(),
                 behandlingId = behandling.id,
             ),
         )

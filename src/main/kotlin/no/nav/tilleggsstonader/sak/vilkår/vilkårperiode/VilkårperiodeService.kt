@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapFaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapFaktaOgVurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
@@ -133,7 +134,7 @@ class VilkårperiodeService(
         )
 
         val faktaOgVurdering =
-            mapFaktaOgVurderingDto(stønadstype = behandling.stønadstype, vilkårperiode = vilkårperiode)
+            mapFaktaOgSvarDto(stønadstype = behandling.stønadstype, vilkårperiode = vilkårperiode)
         return vilkårperiodeRepository.insert(
             GeneriskVilkårperiode(
                 behandlingId = vilkårperiode.behandlingId,
@@ -189,7 +190,7 @@ class VilkårperiodeService(
             fom = vilkårperiode.fom,
             tom = vilkårperiode.tom,
             begrunnelse = vilkårperiode.begrunnelse,
-            faktaOgVurdering = mapFaktaOgVurderingDto(
+            faktaOgVurdering = mapFaktaOgSvarDto(
                 stønadstype = behandling.stønadstype,
                 vilkårperiode = vilkårperiode,
             ),

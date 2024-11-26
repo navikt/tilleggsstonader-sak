@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -34,8 +33,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerAktivitetBarnetilsynDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
@@ -110,7 +109,7 @@ object VilkårperiodeTestUtil {
         dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.NEI),
     )
 
-    fun faktaOgVurderingerMålgruppeDto() = FaktaOgVurderingerMålgruppeDto(
+    fun faktaOgVurderingerMålgruppeDto() = FaktaOgSvarMålgruppeDto(
         svarMedlemskap = null,
         svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.NEI,
     )
@@ -210,7 +209,7 @@ object VilkårperiodeTestUtil {
         type = type,
         fom = fom,
         tom = tom,
-        faktaOgVurderinger = FaktaOgVurderingerMålgruppeDto(
+        faktaOgSvar = FaktaOgSvarMålgruppeDto(
             svarMedlemskap = svarMedlemskap,
             svarUtgifterDekketAvAnnetRegelverk = svarDekkesAvAnnetRegelverk,
         ),
@@ -251,7 +250,7 @@ object VilkårperiodeTestUtil {
         type = type,
         fom = fom,
         tom = tom,
-        faktaOgVurderinger = FaktaOgVurderingerAktivitetBarnetilsynDto(
+        faktaOgSvar = FaktaOgSvarAktivitetBarnetilsynDto(
             svarLønnet = svarLønnet,
             aktivitetsdager = aktivitetsdager,
         ),
