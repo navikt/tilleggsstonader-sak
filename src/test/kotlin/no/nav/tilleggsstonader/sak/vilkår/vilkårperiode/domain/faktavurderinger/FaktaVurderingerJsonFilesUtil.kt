@@ -20,6 +20,7 @@ object FaktaVurderingerJsonFilesUtil {
      */
     fun Stønadstype.tilTypeFaktaOgVurderingSuffix() = when (this) {
         Stønadstype.BARNETILSYN -> "TILSYN_BARN"
+        Stønadstype.LÆREMIDLER -> "LÆREMIDLER"
         else -> name
     }
 

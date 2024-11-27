@@ -40,6 +40,25 @@ data class VurderingLønnet private constructor(
     }
 }
 
+data class VurderingHarUtgifter private constructor(
+    override val svar: SvarJaNei?,
+    override val resultat: ResultatDelvilkårperiode,
+) : Vurdering {
+
+    constructor(svar: SvarJaNei?) : this(svar, utledResultat(svar))
+
+    companion object {
+        private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode {
+            return when (svar) {
+                null -> ResultatDelvilkårperiode.IKKE_VURDERT
+                SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+                SvarJaNei.JA_IMPLISITT -> error("$svar er ugyldig for ${VurderingHarUtgifter::class.simpleName}")
+            }
+        }
+    }
+}
+
 data class VurderingMedlemskap private constructor(
     override val svar: SvarJaNei?,
     override val resultat: ResultatDelvilkårperiode,
@@ -54,6 +73,7 @@ data class VurderingMedlemskap private constructor(
                 SvarJaNei.JA,
                 SvarJaNei.JA_IMPLISITT,
                 -> ResultatDelvilkårperiode.OPPFYLT
+
                 SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
             }
         }
