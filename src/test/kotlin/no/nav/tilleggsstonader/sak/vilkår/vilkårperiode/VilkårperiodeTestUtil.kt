@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
@@ -173,6 +174,12 @@ object VilkårperiodeTestUtil {
     fun vurderingDekketAvAnnetRegelverk(
         svar: SvarJaNei? = SvarJaNei.NEI,
     ) = VurderingDekketAvAnnetRegelverk(
+        svar = svar,
+    )
+
+    fun vurderingHarUtgifter(
+        svar: SvarJaNei? = SvarJaNei.JA,
+    ) = VurderingHarUtgifter(
         svar = svar,
     )
 

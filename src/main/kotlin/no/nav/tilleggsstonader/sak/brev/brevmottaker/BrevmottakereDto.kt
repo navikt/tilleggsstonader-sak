@@ -61,7 +61,7 @@ fun BrevmottakerDto.tilMottaker() = when (this) {
 }
 
 private fun BrevmottakerOrganisasjonDto.tilMottaker() = Mottaker(
-    mottakerRolle = MottakerRolle.FULLMAKT,
+    mottakerRolle = MottakerRolle.FULLMEKTIG,
     mottakerType = MottakerType.ORGANISASJON,
     ident = organisasjonsnummer,
     mottakerNavn = navnHosOrganisasjon,

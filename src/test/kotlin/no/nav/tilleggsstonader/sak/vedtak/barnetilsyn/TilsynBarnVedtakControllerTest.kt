@@ -13,10 +13,9 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
@@ -93,7 +92,7 @@ class TilsynBarnVedtakControllerTest(
 
     @Test
     fun `Ved innvilgelse skal utgifter på vedtaket være likt det man sender inn`() {
-        val vedtak = lagInnvilgeVedtak()
+        val vedtak = innvilgelseDto()
         innvilgeVedtak(behandling, vedtak)
 
         val lagretDto = hentVedtak(behandling.id).body!!
@@ -103,7 +102,7 @@ class TilsynBarnVedtakControllerTest(
 
     @Test
     fun `skal lagre og hente avslag`() {
-        val vedtak = AvslagRequest(
+        val vedtak = AvslagTilsynBarnDto(
             årsakerAvslag = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
             begrunnelse = "begrunnelse",
         )
@@ -119,7 +118,7 @@ class TilsynBarnVedtakControllerTest(
 
     @Test
     fun `skal lagre og hente opphør`() {
-        innvilgeVedtak(behandling, lagInnvilgeVedtak())
+        innvilgeVedtak(behandling, innvilgelseDto())
         testoppsettService.ferdigstillBehandling(behandling)
         val behandlingLagreOpphør = testoppsettService.opprettRevurdering(
             forrigeBehandling = behandling,
@@ -127,7 +126,7 @@ class TilsynBarnVedtakControllerTest(
             fagsak = fagsak,
         )
 
-        val vedtak = OpphørRequest(
+        val vedtak = OpphørTilsynBarnDto(
             årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
             begrunnelse = "endre utgifter opphør",
         )
@@ -140,10 +139,6 @@ class TilsynBarnVedtakControllerTest(
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.OPPHØR)
     }
-
-    private fun lagInnvilgeVedtak() = InnvilgelseTilsynBarnRequest(
-        beregningsresultat = null,
-    )
 
     private fun innvilgeVedtak(
         behandling: Behandling,
@@ -158,7 +153,7 @@ class TilsynBarnVedtakControllerTest(
 
     private fun avslåVedtak(
         behandling: Behandling,
-        vedtak: AvslagRequest,
+        vedtak: AvslagTilsynBarnDto,
     ) {
         restTemplate.exchange<Map<String, Any>?>(
             localhost("api/vedtak/tilsyn-barn/${behandling.id}/avslag"),
@@ -169,7 +164,7 @@ class TilsynBarnVedtakControllerTest(
 
     private fun opphørVedtak(
         behandling: Behandling,
-        vedtak: OpphørRequest,
+        vedtak: OpphørTilsynBarnDto,
     ) {
         restTemplate.exchange<Map<String, Any>?>(
             localhost("api/vedtak/tilsyn-barn/${behandling.id}/opphor"),

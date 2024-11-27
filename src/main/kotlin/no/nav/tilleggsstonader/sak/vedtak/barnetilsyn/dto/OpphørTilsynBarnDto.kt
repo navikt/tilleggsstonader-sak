@@ -6,11 +6,4 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 data class OpphørTilsynBarnDto(
     val årsakerOpphør: List<ÅrsakOpphør>,
     val begrunnelse: String,
-) : VedtakTilsynBarnDto(TypeVedtak.OPPHØR)
-
-data class OpphørRequest(
-    val årsakerOpphør: List<ÅrsakOpphør>,
-    val begrunnelse: String,
-) {
-    fun tilDto() = OpphørTilsynBarnDto(årsakerOpphør, begrunnelse)
-}
+) : VedtakTilsynBarnRequest, VedtakTilsynBarnResponse, VedtakTilsynBarnDto(TypeVedtak.OPPHØR)

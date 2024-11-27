@@ -76,7 +76,7 @@ class OpphørValideringServiceTest {
                     beregningsresultatTilsynBarn = vedtakBeregningsresultat,
                     revurderFra = saksbehandlingRevurdertFraTilbakeITid.revurderFra,
                 )
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger etter revurder fra dato")
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato")
         }
     }
 
