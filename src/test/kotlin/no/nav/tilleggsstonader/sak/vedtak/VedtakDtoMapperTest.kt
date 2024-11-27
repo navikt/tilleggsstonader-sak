@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
@@ -21,7 +21,7 @@ class VedtakDtoMapperTest {
 
             val dto = VedtakDtoMapper.toDto(vedtak, revurderFra = null)
 
-            assertThat(dto).isInstanceOf(InnvilgelseTilsynBarnDto::class.java)
+            assertThat(dto).isInstanceOf(InnvilgelseTilsynBarnResponse::class.java)
         }
 
         @Test

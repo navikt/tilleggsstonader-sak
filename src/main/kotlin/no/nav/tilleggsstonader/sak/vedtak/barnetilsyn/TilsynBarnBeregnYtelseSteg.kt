@@ -16,9 +16,9 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
@@ -35,16 +35,16 @@ class TilsynBarnBeregnYtelseSteg(
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-) : BeregnYtelseSteg<VedtakTilsynBarnDto>(
+) : BeregnYtelseSteg<VedtakTilsynBarnRequest>(
     stønadstype = Stønadstype.BARNETILSYN,
     vedtakRepository = vedtakRepository,
     tilkjentytelseService = tilkjentytelseService,
     simuleringService = simuleringService,
 ) {
 
-    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakTilsynBarnDto) {
+    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakTilsynBarnRequest) {
         when (vedtak) {
-            is InnvilgelseTilsynBarnDto -> beregnOgLagreInnvilgelse(saksbehandling)
+            is InnvilgelseTilsynBarnRequest -> beregnOgLagreInnvilgelse(saksbehandling)
             is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
             is OpphørTilsynBarnDto -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }

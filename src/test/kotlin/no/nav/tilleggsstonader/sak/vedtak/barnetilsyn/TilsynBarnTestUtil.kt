@@ -8,8 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
@@ -21,11 +20,7 @@ import java.time.YearMonth
 
 object TilsynBarnTestUtil {
 
-    fun innvilgelseDto(
-        beregningsresultat: BeregningsresultatTilsynBarnDto? = null,
-    ) = InnvilgelseTilsynBarnDto(
-        beregningsresultat = beregningsresultat,
-    )
+    fun innvilgelseDto() = InnvilgelseTilsynBarnRequest
 
     fun opphørDto() = OpphørTilsynBarnDto(
         årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),

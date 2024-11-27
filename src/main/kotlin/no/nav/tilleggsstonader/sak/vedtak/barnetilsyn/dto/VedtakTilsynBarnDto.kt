@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -11,9 +13,12 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
     visible = true,
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(InnvilgelseTilsynBarnDto::class, name = "INNVILGELSE"),
+    JsonSubTypes.Type(InnvilgelseTilsynBarnRequest::class, name = "INNVILGELSE"),
     JsonSubTypes.Type(AvslagTilsynBarnDto::class, name = "AVSLAG"),
     JsonSubTypes.Type(OpphørTilsynBarnDto::class, name = "OPPHØR"),
     failOnRepeatedNames = true,
 )
 sealed class VedtakTilsynBarnDto(open val type: TypeVedtak)
+
+sealed interface VedtakTilsynBarnRequest : VedtakRequest
+sealed interface VedtakTilsynBarnResponse : VedtakResponse

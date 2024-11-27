@@ -20,7 +20,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -257,10 +257,8 @@ class StegServiceTest(
         )
     }
 
-    private fun opprettVedtakTilsynBarn(): InnvilgelseTilsynBarnDto {
-        return InnvilgelseTilsynBarnDto(
-            beregningsresultat = null,
-        )
+    private fun opprettVedtakTilsynBarn(): InnvilgelseTilsynBarnRequest {
+        return InnvilgelseTilsynBarnRequest
     }
 
     private fun behandlingSomIverksettes(): Behandling {
