@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -22,10 +23,12 @@ import no.nav.tilleggsstonader.sak.util.fagsakpersoner
 import no.nav.tilleggsstonader.sak.util.tilFagsakDomain
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDateTime
 
 class FagsakRepositoryTest : IntegrationTest() {
 
@@ -267,6 +270,46 @@ class FagsakRepositoryTest : IntegrationTest() {
         assertThat(
             fagsakRepository.findBySøkerIdent(fagsakMedFlereIdenter.personIdenter.map { it.ident }.toSet()),
         ).hasSize(1)
+    }
+
+    @Nested
+    inner class HentFagsakMetadata {
+
+        @Test
+        fun `en fagsak med 2 identer skal hente site opprettede`() {
+            val sporbar1ÅrSiden = Sporbar(
+                opprettetTid = LocalDateTime.now().minusYears(1),
+                endret = Endret(endretTid = LocalDateTime.now().minusYears(1)),
+            )
+            val identer = setOf(
+                PersonIdent("1", sporbar1ÅrSiden),
+                PersonIdent("2"),
+                PersonIdent("3", sporbar1ÅrSiden),
+            )
+            val fagsak = testoppsettService.lagreFagsak(fagsak(identer))
+
+            val metadata = fagsakRepository.hentFagsakMetadata(fagsakIder = setOf(fagsak.id))
+            assertThat(metadata).hasSize(1)
+            assertThat(metadata.single().ident).isEqualTo("2")
+        }
+
+        @Test
+        fun `henter alle som finnes`() {
+            val fagsak1 = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1"))))
+            val fagsak2 = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("2"))))
+
+            val metadata = fagsakRepository.hentFagsakMetadata(fagsakIder = setOf(fagsak1.id, fagsak2.id))
+            assertThat(metadata).hasSize(2)
+            assertThat(metadata.map { it.id }).containsExactlyInAnyOrder(fagsak1.id, fagsak2.id)
+        }
+
+        @Test
+        fun `fagsak finnes ikke`() {
+            testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1"))))
+
+            val metadata = fagsakRepository.hentFagsakMetadata(fagsakIder = setOf(FagsakId.random()))
+            assertThat(metadata).isEmpty()
+        }
     }
 
     private fun opprettFagsakMedFlereIdenter(ident: String = "1", ident2: String = "2", ident3: String = "3"): Fagsak {

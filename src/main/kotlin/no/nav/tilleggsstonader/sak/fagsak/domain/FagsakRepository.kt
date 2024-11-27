@@ -78,4 +78,19 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, FagsakId>, Insert
               LIMIT 1""",
     )
     fun harLøpendeUtbetaling(fagsakId: FagsakId): Boolean
+
+    @Query(
+        """
+        SELECT DISTINCT
+         f.id, 
+         fe.id AS ekstern_fagsak_id,
+         f.stonadstype,
+         FIRST_VALUE(ident) OVER (PARTITION BY pi.fagsak_person_id ORDER BY pi.endret_tid DESC) AS ident
+         FROM fagsak f
+         JOIN fagsak_ekstern fe ON fe.fagsak_id = f.id
+         JOIN person_ident pi ON pi.fagsak_person_id = f.fagsak_person_id
+         WHERE f.id IN (:fagsakIder)
+    """,
+    )
+    fun hentFagsakMetadata(fagsakIder: Set<FagsakId>): List<FagsakMetadata>
 }
