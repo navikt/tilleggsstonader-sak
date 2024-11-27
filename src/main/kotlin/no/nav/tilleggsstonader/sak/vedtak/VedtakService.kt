@@ -22,10 +22,4 @@ abstract class VedtakService<DTO : Any>(
     fun hentVedtak(behandlingId: BehandlingId): Vedtak? {
         return repository.findByIdOrNull(behandlingId)
     }
-
-    fun hentVedtakDto(behandlingId: BehandlingId): DTO? {
-        return hentVedtak(behandlingId)?.let(::mapTilDto)
-    }
-
-    abstract fun mapTilDto(vedtak: Vedtak): DTO
 }
