@@ -16,11 +16,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -461,11 +460,14 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         medlemskap: SvarJaNei? = null,
         dekkesAvAnnetRegelverk: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: BehandlingId = BehandlingId.random(),
-    ) = LagreVilkårperiode(
+    ) = LagreVilkårperiodeNy(
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårMålgruppeDto(VurderingDto(medlemskap), VurderingDto(dekkesAvAnnetRegelverk)),
+        faktaOgSvar = FaktaOgSvarMålgruppeDto(
+            svarMedlemskap = medlemskap,
+            svarUtgifterDekketAvAnnetRegelverk = dekkesAvAnnetRegelverk,
+        ),
         behandlingId = behandlingId,
     )
 
@@ -476,13 +478,15 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         lønnet: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: BehandlingId = BehandlingId.random(),
         aktivitetsdager: Int = 5,
-    ) = LagreVilkårperiode(
+    ) = LagreVilkårperiodeNy(
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårAktivitetDto(VurderingDto(lønnet)),
+        faktaOgSvar = FaktaOgSvarAktivitetBarnetilsynDto(
+            aktivitetsdager = aktivitetsdager,
+            svarLønnet = lønnet,
+        ),
         behandlingId = behandlingId,
-        aktivitetsdager = aktivitetsdager,
     )
 
     private fun stønadsperiodeDto(
@@ -501,8 +505,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         status = status,
     )
 
-    private fun opprettVilkårperiode(periode: LagreVilkårperiode): LagreVilkårperiodeResponse {
-        val oppdatertPeriode = vilkårperiodeService.opprettVilkårperiode(periode)
+    private fun opprettVilkårperiode(periode: LagreVilkårperiodeNy): LagreVilkårperiodeResponse {
+        val oppdatertPeriode = vilkårperiodeService.opprettVilkårperiodeNy(periode)
         return vilkårperiodeService.validerOgLagResponse(
             behandlingId = oppdatertPeriode.behandlingId,
             periode = oppdatertPeriode,

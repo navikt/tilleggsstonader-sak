@@ -11,10 +11,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -57,30 +56,27 @@ class StønadsperiodeControllerTest : IntegrationTest() {
     }
 
     private fun opprettMålgruppe(behandling: Behandling): Vilkårperiode =
-        vilkårperiodeService.opprettVilkårperiode(
-            LagreVilkårperiode(
+        vilkårperiodeService.opprettVilkårperiodeNy(
+            LagreVilkårperiodeNy(
                 type = MålgruppeType.AAP,
                 fom = dagensDato,
                 tom = dagensDato,
-                delvilkår = DelvilkårMålgruppeDto(
-                    medlemskap = null,
-                    dekketAvAnnetRegelverk = VurderingDto(SvarJaNei.NEI),
-                ),
+                faktaOgSvar = FaktaOgSvarMålgruppeDto(svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.NEI),
                 behandlingId = behandling.id,
             ),
         )
 
     private fun opprettAktivitet(behandling: Behandling): Vilkårperiode =
-        vilkårperiodeService.opprettVilkårperiode(
-            LagreVilkårperiode(
+        vilkårperiodeService.opprettVilkårperiodeNy(
+            LagreVilkårperiodeNy(
                 type = AktivitetType.TILTAK,
                 fom = dagensDato,
                 tom = dagensDato,
-                delvilkår = DelvilkårAktivitetDto(
-                    lønnet = VurderingDto(SvarJaNei.NEI),
+                faktaOgSvar = FaktaOgSvarAktivitetBarnetilsynDto(
+                    svarLønnet = SvarJaNei.NEI,
+                    aktivitetsdager = 5,
                 ),
                 behandlingId = behandling.id,
-                aktivitetsdager = 5,
             ),
         )
 

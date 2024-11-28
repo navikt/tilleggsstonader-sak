@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.lagreVilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -73,7 +73,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val opprettetAktivitet =
                 aktivitetService.opprettVilkårperiodeNy(
-                    lagreVilkårperiodeAktivitet(
+                    dummyVilkårperiodeAktivitet(
                         behandlingId = behandling.id,
                         svarLønnet = SvarJaNei.NEI,
                     ),
@@ -101,7 +101,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
             aktivitetService.opprettVilkårperiodeNy(
-                lagreVilkårperiodeAktivitet(
+                dummyVilkårperiodeAktivitet(
                     behandlingId = behandling.id,
                     kildeId = "123",
 //                    svarLønnet = SvarJaNei.NEI TODO: Nødvendig??
@@ -124,7 +124,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
 
-            val opprettAktivitet = lagreVilkårperiodeAktivitet(behandlingId = behandling.id, kildeId = "finnesIkke")
+            val opprettAktivitet = dummyVilkårperiodeAktivitet(behandlingId = behandling.id, kildeId = "finnesIkke")
             assertThatThrownBy {
                 aktivitetService.opprettVilkårperiodeNy(opprettAktivitet)
             }.hasMessageContaining("Aktivitet med id=finnesIkke finnes ikke i grunnlag")
@@ -136,7 +136,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 aktivitetService.opprettVilkårperiodeNy(
-                    lagreVilkårperiodeAktivitet(
+                    dummyVilkårperiodeAktivitet(
                         type = AktivitetType.TILTAK,
                         svarLønnet = SvarJaNei.JA,
                         behandlingId = behandling.id,
@@ -152,7 +152,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             listOf("", null).forEach {
                 assertThatThrownBy {
                     aktivitetService.opprettVilkårperiodeNy(
-                        lagreVilkårperiodeAktivitet(
+                        dummyVilkårperiodeAktivitet(
                             type = AktivitetType.INGEN_AKTIVITET,
                             begrunnelse = it,
                             behandlingId = behandling.id,
@@ -169,7 +169,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 aktivitetService.opprettVilkårperiodeNy(
-                    lagreVilkårperiodeAktivitet(
+                    dummyVilkårperiodeAktivitet(
                         behandlingId = behandling.id,
                         type = AktivitetType.INGEN_AKTIVITET,
                         aktivitetsdager = 5,
@@ -187,7 +187,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
 
         assertThatThrownBy {
             aktivitetService.opprettVilkårperiodeNy(
-                lagreVilkårperiodeAktivitet(
+                dummyVilkårperiodeAktivitet(
                     behandlingId = behandling.id,
                     fom = now().plusDays(1),
                     aktivitetsdager = 5,
@@ -199,10 +199,10 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
     @Nested
     inner class OppdaterAktivitet {
         @Test
-        fun `skal oppdatere alle felter hvis aktivitet`() {
+        fun `skal oppdatere alle felter på aktivitet`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val eksisterendeAktivitet = aktivitetService.opprettVilkårperiodeNy(
-                lagreVilkårperiodeAktivitet(
+                dummyVilkårperiodeAktivitet(
                     behandlingId = behandling.id,
                 ),
             )
@@ -230,7 +230,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         fun `endring av aktiviteter opprettet i denne behandlingen skal beholde status NY`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val aktivitet = aktivitetService.opprettVilkårperiodeNy(
-                lagreVilkårperiodeAktivitet(behandlingId = behandling.id),
+                dummyVilkårperiodeAktivitet(behandlingId = behandling.id),
             )
             val oppdatering = aktivitet.tilOppdatering()
             val oppdatertAktivitet = aktivitetService.oppdaterVilkårperiodeNy(aktivitet.id, oppdatering)
@@ -261,7 +261,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         fun `skal feile dersom manglende begrunnelse når lønnet endres til ja`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val tiltak = aktivitetService.opprettVilkårperiodeNy(
-                lagreVilkårperiodeAktivitet(
+                dummyVilkårperiodeAktivitet(
                     behandlingId = behandling.id,
                     svarLønnet = SvarJaNei.NEI,
                 ),
@@ -352,7 +352,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             aktivitetsdager: Int? = null,
             svarLønnet: SvarJaNei? = null,
             nyBegrunnelse: String? = null,
-        ): LagreVilkårperiodeNy = lagreVilkårperiodeAktivitet(
+        ): LagreVilkårperiodeNy = dummyVilkårperiodeAktivitet(
             behandlingId = behandlingId,
             type = type as AktivitetType,
             fom = nyFom ?: fom,

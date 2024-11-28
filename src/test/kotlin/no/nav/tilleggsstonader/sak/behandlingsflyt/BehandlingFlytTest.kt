@@ -44,14 +44,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.delvilkårAktivitetDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.opprettVilkårperiodeMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -268,22 +266,22 @@ class BehandlingFlytTest(
         val fom = LocalDate.of(2024, 1, 1)
         val tom = LocalDate.of(2024, 1, 31)
 
-        vilkårperiodeService.opprettVilkårperiode(
-            opprettVilkårperiodeMålgruppe(
+        vilkårperiodeService.opprettVilkårperiodeNy(
+            dummyVilkårperiodeMålgruppe(
                 behandlingId = behandlingId,
                 fom = fom,
                 tom = tom,
                 type = MålgruppeType.AAP,
-                dekkesAvAnnetRegelverk = VurderingDto(svar = SvarJaNei.NEI),
+                dekkesAvAnnetRegelverk = SvarJaNei.NEI,
             ),
         )
-        vilkårperiodeService.opprettVilkårperiode(
-            LagreVilkårperiode(
+        vilkårperiodeService.opprettVilkårperiodeNy(
+            dummyVilkårperiodeAktivitet(
                 behandlingId = behandlingId,
                 fom = fom,
                 tom = tom,
                 type = AktivitetType.TILTAK,
-                delvilkår = delvilkårAktivitetDto(),
+                svarLønnet = SvarJaNei.NEI,
                 aktivitetsdager = 5,
             ),
         )
@@ -319,7 +317,12 @@ class BehandlingFlytTest(
     }
 
     private fun opprettBehandling(personIdent: String): BehandlingId {
-        val behandlingId = opprettTestBehandlingController.opprettBehandling(TestBehandlingRequest(personIdent, stønadstype = Stønadstype.BARNETILSYN))
+        val behandlingId = opprettTestBehandlingController.opprettBehandling(
+            TestBehandlingRequest(
+                personIdent,
+                stønadstype = Stønadstype.BARNETILSYN,
+            ),
+        )
         testoppsettService.opprettGrunnlagsdata(behandlingId)
         kjørTasks()
         return behandlingId

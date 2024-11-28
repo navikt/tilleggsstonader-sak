@@ -6,8 +6,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
@@ -16,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.v
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -28,8 +25,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapFaktaOgSvarDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapFaktaOgVurderingDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
@@ -84,39 +79,6 @@ class VilkårperiodeService(
         )
     }
 
-    // TODO: Slett når nytt endepunkt er implementert
-    @Transactional
-    fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): Vilkårperiode {
-        val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
-        validerBehandling(behandling)
-        validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
-
-        if (vilkårperiode.type is MålgruppeType) {
-            validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
-        }
-        validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
-        validerKildeIdFinnesIGrunnlaget(
-            behandlingId = vilkårperiode.behandlingId,
-            type = vilkårperiode.type,
-            kildeId = vilkårperiode.kildeId,
-        )
-
-        val faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode)
-        return vilkårperiodeRepository.insert(
-            GeneriskVilkårperiode(
-                behandlingId = vilkårperiode.behandlingId,
-                resultat = faktaOgVurdering.utledResultat(),
-                status = Vilkårstatus.NY,
-                kildeId = vilkårperiode.kildeId,
-                type = vilkårperiode.type,
-                faktaOgVurdering = faktaOgVurdering,
-                fom = vilkårperiode.fom,
-                tom = vilkårperiode.tom,
-                begrunnelse = vilkårperiode.begrunnelse,
-            ),
-        )
-    }
-
     @Transactional
     fun opprettVilkårperiodeNy(vilkårperiode: LagreVilkårperiodeNy): Vilkårperiode {
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
@@ -148,30 +110,6 @@ class VilkårperiodeService(
                 begrunnelse = vilkårperiode.begrunnelse,
             ),
         )
-    }
-
-    // TODO: Slett når nytt endepunkt er tatt i bruk
-    fun oppdaterVilkårperiode(id: UUID, vilkårperiode: LagreVilkårperiode): Vilkårperiode {
-        val eksisterendeVilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
-
-        val behandling = behandlingService.hentSaksbehandling(eksisterendeVilkårperiode.behandlingId)
-        validerBehandlingIdErLik(vilkårperiode.behandlingId, eksisterendeVilkårperiode.behandlingId)
-        validerBehandling(behandling)
-
-        validerAktivitetsdager(vilkårPeriodeType = vilkårperiode.type, aktivitetsdager = vilkårperiode.aktivitetsdager)
-        feilHvis(eksisterendeVilkårperiode.kildeId != vilkårperiode.kildeId) {
-            "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
-        }
-
-        val oppdatert = eksisterendeVilkårperiode.medVilkårOgVurdering(
-            fom = vilkårperiode.fom,
-            tom = vilkårperiode.tom,
-            begrunnelse = vilkårperiode.begrunnelse,
-            faktaOgVurdering = mapFaktaOgVurderingDto(vilkårperiode),
-        )
-
-        validerEndrePeriodeRevurdering(behandling, eksisterendeVilkårperiode, oppdatert)
-        return vilkårperiodeRepository.update(oppdatert)
     }
 
     @Transactional
@@ -246,16 +184,6 @@ class VilkårperiodeService(
         }
         feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
             "Kan ikke opprette eller endre periode når behandling ikke er på steg ${StegType.INNGANGSVILKÅR}"
-        }
-    }
-
-    private fun validerAktivitetsdager(vilkårPeriodeType: VilkårperiodeType, aktivitetsdager: Int?) {
-        if (vilkårPeriodeType is AktivitetType) {
-            brukerfeilHvis(vilkårPeriodeType != AktivitetType.INGEN_AKTIVITET && aktivitetsdager !in 1..5) {
-                "Aktivitetsdager må være et heltall mellom 1 og 5"
-            }
-        } else if (vilkårPeriodeType is MålgruppeType) {
-            brukerfeilHvisIkke(aktivitetsdager == null) { "Kan ikke registrere aktivitetsdager på målgrupper" }
         }
     }
 
