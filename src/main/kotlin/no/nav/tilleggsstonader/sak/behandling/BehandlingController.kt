@@ -87,7 +87,7 @@ class BehandlingController(
         )
     }
 
-    @PostMapping("person/harBehandling")
+    @PostMapping("harBehandling")
     fun hentBehandlingStatusForPersonMedStønadstype(@RequestBody identStønadstype: IdentStønadstype): Boolean {
         tilgangService.validerTilgangTilPersonMedBarn(identStønadstype.ident, AuditLoggerEvent.ACCESS)
         val behandlinger = fagsakService.hentBehandlingerForPersonOgStønadstype(
