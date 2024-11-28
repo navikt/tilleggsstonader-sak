@@ -11,10 +11,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -130,7 +133,10 @@ class InterntVedtakService(
         val vurderinger = faktaOgVurdering.vurderinger
         return DelvilkårVilkårperiode(
             medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.let { mapVurdering(it) },
-            dekketAvAnnetRegelverk = vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.let { mapVurdering(it) },
+            dekketAvAnnetRegelverk = vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
+                ?.dekketAvAnnetRegelverk?.let {
+                    mapVurdering(it)
+                },
             lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.let { mapVurdering(it) },
         )
     }
@@ -188,19 +194,33 @@ class InterntVedtakService(
     private fun mapVedtak(vedtak: Vedtak?): VedtakInternt? {
         return vedtak?.let {
             when (vedtak.data) {
-                is InnvilgelseTilsynBarn -> VedtakInnvilgelseInternt
+                is VedtakTilsynBarn -> mapVedtakTilsynBarn(vedtak.data)
 
-                is AvslagTilsynBarn -> VedtakAvslagInternt(
-                    årsakerAvslag = vedtak.data.årsaker,
-                    avslagBegrunnelse = vedtak.data.begrunnelse,
-                )
-
-                is OpphørTilsynBarn -> VedtakOpphørInternt(
-                    årsakerOpphør = vedtak.data.årsaker,
-                    opphørBegrunnelse = vedtak.data.begrunnelse,
-                )
+                is VedtakLæremidler -> mapVedtakLæremidler(vedtak.data)
             }
         }
+    }
+
+    private fun mapVedtakTilsynBarn(
+        vedtak: VedtakTilsynBarn,
+    ) = when (vedtak) {
+        is InnvilgelseTilsynBarn -> VedtakInnvilgelseInternt
+        is AvslagTilsynBarn -> VedtakAvslagInternt(
+            årsakerAvslag = vedtak.årsaker,
+            avslagBegrunnelse = vedtak.begrunnelse,
+        )
+
+        is OpphørTilsynBarn -> VedtakOpphørInternt(
+            årsakerOpphør = vedtak.årsaker,
+            opphørBegrunnelse = vedtak.begrunnelse,
+        )
+    }
+
+    private fun mapVedtakLæremidler(vedtak: VedtakLæremidler) = when (vedtak) {
+        is AvslagLæremidler -> VedtakAvslagInternt(
+            årsakerAvslag = vedtak.årsaker,
+            avslagBegrunnelse = vedtak.begrunnelse,
+        )
     }
 
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {

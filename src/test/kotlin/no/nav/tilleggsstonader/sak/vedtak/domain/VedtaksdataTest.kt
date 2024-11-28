@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
  */
 val alleEnumTypeVedtaksdata: List<Pair<Stønadstype, TypeVedtaksdata>> = listOf(
     Stønadstype.BARNETILSYN to TypeVedtakTilsynBarn.entries,
+    Stønadstype.LÆREMIDLER to TypeVedtakLæremidler.entries,
 ).flatMap { (stønadstype, enums) -> enums.map { stønadstype to it } }
 
 class VedtaksdataTest {
@@ -24,6 +25,7 @@ class VedtaksdataTest {
         alleEnumTypeVedtaksdata.forEach { (stønadstype, type) ->
             when (type) {
                 is TypeVedtakTilsynBarn -> type.assertHarRiktigNavn(stønadstype)
+                is TypeVedtakLæremidler -> type.assertHarRiktigNavn(stønadstype)
             }
         }
     }
