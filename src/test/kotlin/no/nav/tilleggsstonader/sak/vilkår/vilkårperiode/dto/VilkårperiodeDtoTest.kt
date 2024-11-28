@@ -9,8 +9,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
-
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -20,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -79,8 +78,8 @@ class VilkårperiodeDtoTest {
             assertThat(målgruppe.faktaOgVurderinger).isEqualTo(
                 MålgruppeFaktaOgVurderingerDto(
                     medlemskap = VurderingDto(svar = SvarJaNei.JA, resultat = OPPFYLT),
-                    utgifterDekketAvAnnetRegelverk = VurderingDto(SvarJaNei.JA, resultat = IKKE_OPPFYLT)
-                )
+                    utgifterDekketAvAnnetRegelverk = VurderingDto(SvarJaNei.JA, resultat = IKKE_OPPFYLT),
+                ),
             )
         }
 
@@ -97,8 +96,8 @@ class VilkårperiodeDtoTest {
             assertThat(tiltakTilsynBarn.faktaOgVurderinger).isEqualTo(
                 AktivitetBarnetilsynFaktaOgVurderingerDto(
                     aktivitetsdager = 3,
-                    lønnet = VurderingDto(SvarJaNei.NEI, resultat = OPPFYLT)
-                )
+                    lønnet = VurderingDto(SvarJaNei.NEI, resultat = OPPFYLT),
+                ),
             )
         }
 
@@ -106,12 +105,12 @@ class VilkårperiodeDtoTest {
         fun `mapper ut faktaOgVurderinger for utdanning læremidler`() {
             val utdanningLæremidler = VilkårperiodeTestUtil.aktivitet(
                 faktaOgVurdering = UtdanningLæremidler(
-                    fakta = FaktaAktivitetLæremidler(prosent = 60)
+                    fakta = FaktaAktivitetLæremidler(prosent = 60),
                 ),
             ).tilDto()
 
             assertThat(utdanningLæremidler.faktaOgVurderinger).isEqualTo(
-                AktivitetLæremidlerFaktaOgVurderingerDto(prosent = 60)
+                AktivitetLæremidlerFaktaOgVurderingerDto(prosent = 60),
             )
         }
     }
