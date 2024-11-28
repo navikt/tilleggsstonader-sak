@@ -43,12 +43,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerAktivitetBarnetilsynDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerAktivitetLæremidlerDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 
-fun mapFaktaOgVurderingDto(
+fun mapFaktaOgSvarDto(
     vilkårperiode: LagreVilkårperiodeNy,
     stønadstype: Stønadstype,
 ): FaktaOgVurdering {
@@ -62,16 +62,16 @@ private fun mapAktiviteter(stønadstype: Stønadstype, aktivitet: LagreVilkårpe
     val type = aktivitet.type
     require(type is AktivitetType)
 
-    val faktaOgVurderinger = aktivitet.faktaOgVurderinger
+    val faktaOgSvar = aktivitet.faktaOgSvar
     when (stønadstype) {
         Stønadstype.BARNETILSYN -> {
-            require(faktaOgVurderinger is FaktaOgVurderingerAktivitetBarnetilsynDto)
-            return mapAktiviteterBarnetilsyn(type, faktaOgVurderinger)
+            require(faktaOgSvar is FaktaOgSvarAktivitetBarnetilsynDto)
+            return mapAktiviteterBarnetilsyn(type, faktaOgSvar)
         }
 
         Stønadstype.LÆREMIDLER -> {
-            require(faktaOgVurderinger is FaktaOgVurderingerAktivitetLæremidlerDto)
-            return mapAktiviteterLæremidler(type, faktaOgVurderinger)
+            require(faktaOgSvar is FaktaOgSvarAktivitetLæremidlerDto)
+            return mapAktiviteterLæremidler(type, faktaOgSvar)
         }
     }
 }
@@ -80,42 +80,42 @@ private fun mapMålgruppe(stønadstype: Stønadstype, målgruppe: LagreVilkårpe
     val type = målgruppe.type
     require(type is MålgruppeType)
 
-    val faktaOgVurderinger = målgruppe.faktaOgVurderinger
-    require(faktaOgVurderinger is FaktaOgVurderingerMålgruppeDto)
+    val faktaOgSvar = målgruppe.faktaOgSvar
+    require(faktaOgSvar is FaktaOgSvarMålgruppeDto)
 
-    when (stønadstype) {
+    return when (stønadstype) {
         Stønadstype.BARNETILSYN -> {
-            return mapMålgruppeBarnetilsyn(type, faktaOgVurderinger)
+            mapMålgruppeBarnetilsyn(type, faktaOgSvar)
         }
 
         Stønadstype.LÆREMIDLER -> {
-            return mapMålgruppeLæremidler(type, faktaOgVurderinger)
+            mapMålgruppeLæremidler(type, faktaOgSvar)
         }
     }
 }
 
 private fun mapAktiviteterBarnetilsyn(
     aktivitetType: AktivitetType,
-    faktaOgVurderinger: FaktaOgVurderingerAktivitetBarnetilsynDto,
+    faktaOgSvar: FaktaOgSvarAktivitetBarnetilsynDto,
 ): AktivitetTilsynBarn {
     return when (aktivitetType) {
         AktivitetType.TILTAK -> {
             TiltakTilsynBarn(
-                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgVurderinger.aktivitetsdager!!),
-                vurderinger = VurderingTiltakTilsynBarn(lønnet = VurderingLønnet(faktaOgVurderinger.svarLønnet)),
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
+                vurderinger = VurderingTiltakTilsynBarn(lønnet = VurderingLønnet(faktaOgSvar.svarLønnet)),
             )
         }
 
         AktivitetType.UTDANNING -> UtdanningTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgVurderinger.aktivitetsdager!!),
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
         )
 
         AktivitetType.REELL_ARBEIDSSØKER -> ReellArbeidsøkerTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgVurderinger.aktivitetsdager!!),
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
         )
 
         AktivitetType.INGEN_AKTIVITET -> {
-            feilHvis(faktaOgVurderinger.aktivitetsdager != null) {
+            feilHvis(faktaOgSvar.aktivitetsdager != null) {
                 "Kan ikke registrere aktivitetsdager på ingen aktivitet"
             }
             IngenAktivitetTilsynBarn
@@ -125,16 +125,16 @@ private fun mapAktiviteterBarnetilsyn(
 
 fun mapAktiviteterLæremidler(
     type: AktivitetType,
-    faktaOgVurderinger: FaktaOgVurderingerAktivitetLæremidlerDto,
+    faktaOgSvar: FaktaOgSvarAktivitetLæremidlerDto,
 ): AktivitetLæremidler {
     return when (type) {
         AktivitetType.TILTAK -> TiltakLæremidler(
-            fakta = FaktaAktivitetLæremidler(prosent = faktaOgVurderinger.prosent!!),
-            vurderinger = VurderingTiltakLæremidler(harUtgifter = VurderingHarUtgifter(faktaOgVurderinger.svarHarUtgifter)),
+            fakta = FaktaAktivitetLæremidler(prosent = faktaOgSvar.prosent!!),
+            vurderinger = VurderingTiltakLæremidler(harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter)),
         )
 
         AktivitetType.UTDANNING -> UtdanningLæremidler(
-            fakta = FaktaAktivitetLæremidler(prosent = faktaOgVurderinger.prosent!!),
+            fakta = FaktaAktivitetLæremidler(prosent = faktaOgSvar.prosent!!),
         )
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetLæremidler
@@ -145,7 +145,7 @@ fun mapAktiviteterLæremidler(
 
 private fun mapMålgruppeBarnetilsyn(
     type: MålgruppeType,
-    faktaOgVurderinger: FaktaOgVurderingerMålgruppeDto,
+    faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
 ): MålgruppeTilsynBarn {
     return when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
@@ -194,7 +194,7 @@ private fun mapMålgruppeBarnetilsyn(
 
 private fun mapMålgruppeLæremidler(
     type: MålgruppeType,
-    faktaOgVurderinger: FaktaOgVurderingerMålgruppeDto,
+    faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
 ): MålgruppeLæremidler {
     return when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeLæremidler

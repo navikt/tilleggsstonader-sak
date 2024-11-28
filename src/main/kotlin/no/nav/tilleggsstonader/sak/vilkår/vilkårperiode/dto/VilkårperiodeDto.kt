@@ -17,8 +17,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaProsent
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.HarUtgifterVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
@@ -48,6 +52,7 @@ data class VilkårperiodeDto(
     val forrigeVilkårperiodeId: UUID?,
     val status: Vilkårstatus?,
     val kildeId: String?,
+    val faktaOgVurderinger: FaktaOgVurderingerDto,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -71,6 +76,7 @@ fun Vilkårperiode.tilDto() =
         forrigeVilkårperiodeId = this.forrigeVilkårperiodeId,
         status = this.status,
         kildeId = this.kildeId,
+        faktaOgVurderinger = this.faktaOgVurdering.tilFaktaOgVurderingDto(),
     )
 
 fun FaktaOgVurdering.tilDelvilkårDto(): DelvilkårVilkårperiodeDto {
@@ -113,6 +119,52 @@ fun List<VilkårperiodeDto>.mergeSammenhengendeOppfylteVilkårperioder(): Map<Vi
             it.value.map { Datoperiode(it.fom, it.tom) }
                 .mergeSammenhengende { a, b -> a.overlapper(b) || a.tom.plusDays(1) == b.fom }
         }
+}
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes(
+    JsonSubTypes.Type(MålgruppeFaktaOgVurderingerDto::class, name = "MÅLGRUPPE"),
+    JsonSubTypes.Type(AktivitetBarnetilsynFaktaOgVurderingerDto::class, name = "AKTIVITET_BARNETILSYN"),
+    JsonSubTypes.Type(AktivitetLæremidlerFaktaOgVurderingerDto::class, name = "AKTIVITET_LÆREMIDLER"),
+)
+sealed class FaktaOgVurderingerDto
+
+data class MålgruppeFaktaOgVurderingerDto(
+    val medlemskap: VurderingDto? = null,
+    val utgifterDekketAvAnnetRegelverk: VurderingDto? = null,
+) : FaktaOgVurderingerDto()
+
+data class AktivitetBarnetilsynFaktaOgVurderingerDto(
+    val aktivitetsdager: Int? = null,
+    val lønnet: VurderingDto? = null,
+) : FaktaOgVurderingerDto()
+
+data class AktivitetLæremidlerFaktaOgVurderingerDto(
+    val prosent: Int? = null,
+    val harUtgifter: VurderingDto? = null,
+) : FaktaOgVurderingerDto()
+
+fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto {
+    return when (this) {
+        is MålgruppeFaktaOgVurdering -> MålgruppeFaktaOgVurderingerDto(
+            medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
+            utgifterDekketAvAnnetRegelverk = vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.tilDto(),
+        )
+
+        is AktivitetFaktaOgVurdering -> {
+            when (this) {
+                is FaktaOgVurderingTilsynBarn -> AktivitetBarnetilsynFaktaOgVurderingerDto(
+                    aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
+                    lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
+                )
+
+                is FaktaOgVurderingLæremidler -> AktivitetLæremidlerFaktaOgVurderingerDto(
+                    prosent = fakta.takeIfFakta<FaktaProsent>()?.prosent,
+                    harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
+                )
+            }
+        }
+    }
 }
 
 data class LagreVilkårperiode(

@@ -14,28 +14,29 @@ data class LagreVilkårperiodeNy(
     val tom: LocalDate,
     val begrunnelse: String? = null,
     val kildeId: String? = null,
-    val faktaOgVurderinger: FaktaOgVurderingerDto,
+    val faktaOgVurderinger: FaktaOgSvarDto? = null,
+    val faktaOgSvar: FaktaOgSvarDto? = null,
 )
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
-    JsonSubTypes.Type(FaktaOgVurderingerMålgruppeDto::class, name = "MÅLGRUPPE"),
-    JsonSubTypes.Type(FaktaOgVurderingerAktivitetBarnetilsynDto::class, name = "AKTIVITET_BARNETILSYN"),
-    JsonSubTypes.Type(FaktaOgVurderingerAktivitetLæremidlerDto::class, name = "AKTIVITET_LÆREMIDLER"),
+    JsonSubTypes.Type(FaktaOgSvarMålgruppeDto::class, name = "MÅLGRUPPE"),
+    JsonSubTypes.Type(FaktaOgSvarAktivitetBarnetilsynDto::class, name = "AKTIVITET_BARNETILSYN"),
+    JsonSubTypes.Type(FaktaOgSvarAktivitetLæremidlerDto::class, name = "AKTIVITET_LÆREMIDLER"),
 )
-sealed class FaktaOgVurderingerDto
+sealed class FaktaOgSvarDto
 
-data class FaktaOgVurderingerMålgruppeDto(
+data class FaktaOgSvarMålgruppeDto(
     val svarMedlemskap: SvarJaNei? = null,
     val svarUtgifterDekketAvAnnetRegelverk: SvarJaNei? = null,
-) : FaktaOgVurderingerDto()
+) : FaktaOgSvarDto()
 
-data class FaktaOgVurderingerAktivitetBarnetilsynDto(
+data class FaktaOgSvarAktivitetBarnetilsynDto(
     val aktivitetsdager: Int? = null,
     val svarLønnet: SvarJaNei? = null,
-) : FaktaOgVurderingerDto()
+) : FaktaOgSvarDto()
 
-data class FaktaOgVurderingerAktivitetLæremidlerDto(
+data class FaktaOgSvarAktivitetLæremidlerDto(
     val prosent: Int? = null,
     val svarHarUtgifter: SvarJaNei? = null,
-) : FaktaOgVurderingerDto()
+) : FaktaOgSvarDto()
