@@ -34,7 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import java.time.LocalDate
 import java.util.UUID
@@ -182,7 +182,7 @@ object VilkårperiodeTestUtil {
         dekkesAvAnnetRegelverk: SvarJaNei? = null,
         begrunnelse: String? = null,
         behandlingId: BehandlingId = BehandlingId.random(),
-    ) = LagreVilkårperiodeNy(
+    ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
@@ -203,7 +203,7 @@ object VilkårperiodeTestUtil {
         behandlingId: BehandlingId = BehandlingId.random(),
         aktivitetsdager: Int? = 5,
         kildeId: String? = null,
-    ) = LagreVilkårperiodeNy(
+    ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,

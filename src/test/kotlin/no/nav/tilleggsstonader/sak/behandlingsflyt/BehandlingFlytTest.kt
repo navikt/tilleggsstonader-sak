@@ -266,7 +266,7 @@ class BehandlingFlytTest(
         val fom = LocalDate.of(2024, 1, 1)
         val tom = LocalDate.of(2024, 1, 31)
 
-        vilkårperiodeService.opprettVilkårperiodeNy(
+        vilkårperiodeService.opprettVilkårperiode(
             dummyVilkårperiodeMålgruppe(
                 behandlingId = behandlingId,
                 fom = fom,
@@ -275,7 +275,7 @@ class BehandlingFlytTest(
                 dekkesAvAnnetRegelverk = SvarJaNei.NEI,
             ),
         )
-        vilkårperiodeService.opprettVilkårperiodeNy(
+        vilkårperiodeService.opprettVilkårperiode(
             dummyVilkårperiodeAktivitet(
                 behandlingId = behandlingId,
                 fom = fom,

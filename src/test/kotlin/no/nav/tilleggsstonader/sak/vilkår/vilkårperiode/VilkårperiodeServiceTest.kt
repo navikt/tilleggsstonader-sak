@@ -175,7 +175,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal validere stønadsperioder ved opprettelse av vilkårperiode - ingen stønadsperioder`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val periode = vilkårperiodeService.opprettVilkårperiodeNy(
+            val periode = vilkårperiodeService.opprettVilkårperiode(
                 dummyVilkårperiodeMålgruppe(
                     type = MålgruppeType.AAP,
                     fom = osloDateNow(),
@@ -203,7 +203,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val fom2 = LocalDate.of(2024, 2, 1)
             val tom2 = LocalDate.of(2024, 3, 1)
 
-            val opprettetMålgruppe = vilkårperiodeService.opprettVilkårperiodeNy(
+            val opprettetMålgruppe = vilkårperiodeService.opprettVilkårperiode(
                 dummyVilkårperiodeMålgruppe(
                     type = MålgruppeType.AAP,
                     fom = fom1,
@@ -231,7 +231,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 behandlingId = behandling.id,
                 aktivitetsdager = 5,
             )
-            val opprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiodeNy(ulønnetTiltak)
+            val opprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiode(ulønnetTiltak)
             assertThat(
                 vilkårperiodeService.validerOgLagResponse(
                     behandlingId = behandling.id,
@@ -242,7 +242,7 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             )
             stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyStønadsperiode(fom1, tom1)))
 
-            vilkårperiodeService.oppdaterVilkårperiodeNy(
+            vilkårperiodeService.oppdaterVilkårperiode(
                 id = opprettetTiltakPeriode.id,
                 vilkårperiode = ulønnetTiltak.copy(fom = fom2, tom = tom2),
             )

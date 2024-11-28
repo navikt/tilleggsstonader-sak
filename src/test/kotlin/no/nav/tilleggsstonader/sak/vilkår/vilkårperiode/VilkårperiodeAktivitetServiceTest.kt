@@ -22,7 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
@@ -72,7 +72,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         fun `skal kunne opprette aktivitet fra scratch`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             val opprettetAktivitet =
-                aktivitetService.opprettVilkårperiodeNy(
+                aktivitetService.opprettVilkårperiode(
                     dummyVilkårperiodeAktivitet(
                         behandlingId = behandling.id,
                         svarLønnet = SvarJaNei.NEI,
@@ -100,7 +100,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 hentetInformasjon = hentetInformasjon,
             )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
-            aktivitetService.opprettVilkårperiodeNy(
+            aktivitetService.opprettVilkårperiode(
                 dummyVilkårperiodeAktivitet(
                     behandlingId = behandling.id,
                     kildeId = "123",
@@ -126,7 +126,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
 
             val opprettAktivitet = dummyVilkårperiodeAktivitet(behandlingId = behandling.id, kildeId = "finnesIkke")
             assertThatThrownBy {
-                aktivitetService.opprettVilkårperiodeNy(opprettAktivitet)
+                aktivitetService.opprettVilkårperiode(opprettAktivitet)
             }.hasMessageContaining("Aktivitet med id=finnesIkke finnes ikke i grunnlag")
         }
 
@@ -135,7 +135,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             assertThatThrownBy {
-                aktivitetService.opprettVilkårperiodeNy(
+                aktivitetService.opprettVilkårperiode(
                     dummyVilkårperiodeAktivitet(
                         type = AktivitetType.TILTAK,
                         svarLønnet = SvarJaNei.JA,
@@ -151,7 +151,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             listOf("", null).forEach {
                 assertThatThrownBy {
-                    aktivitetService.opprettVilkårperiodeNy(
+                    aktivitetService.opprettVilkårperiode(
                         dummyVilkårperiodeAktivitet(
                             type = AktivitetType.INGEN_AKTIVITET,
                             begrunnelse = it,
@@ -168,7 +168,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             assertThatThrownBy {
-                aktivitetService.opprettVilkårperiodeNy(
+                aktivitetService.opprettVilkårperiode(
                     dummyVilkårperiodeAktivitet(
                         behandlingId = behandling.id,
                         type = AktivitetType.INGEN_AKTIVITET,
@@ -186,7 +186,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         )
 
         assertThatThrownBy {
-            aktivitetService.opprettVilkårperiodeNy(
+            aktivitetService.opprettVilkårperiode(
                 dummyVilkårperiodeAktivitet(
                     behandlingId = behandling.id,
                     fom = now().plusDays(1),
@@ -201,7 +201,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         @Test
         fun `skal oppdatere alle felter på aktivitet`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val eksisterendeAktivitet = aktivitetService.opprettVilkårperiodeNy(
+            val eksisterendeAktivitet = aktivitetService.opprettVilkårperiode(
                 dummyVilkårperiodeAktivitet(
                     behandlingId = behandling.id,
                 ),
@@ -215,7 +215,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 svarLønnet = SvarJaNei.NEI,
             )
 
-            aktivitetService.oppdaterVilkårperiodeNy(eksisterendeAktivitet.id, oppdatering)
+            aktivitetService.oppdaterVilkårperiode(eksisterendeAktivitet.id, oppdatering)
             val oppdatertAktivitet = vilkårperiodeService.hentVilkårperioder(behandling.id).aktiviteter.single()
             with(oppdatertAktivitet) {
                 assertThat(lønnet.svar).isEqualTo(SvarJaNei.NEI)
@@ -229,11 +229,11 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         @Test
         fun `endring av aktiviteter opprettet i denne behandlingen skal beholde status NY`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val aktivitet = aktivitetService.opprettVilkårperiodeNy(
+            val aktivitet = aktivitetService.opprettVilkårperiode(
                 dummyVilkårperiodeAktivitet(behandlingId = behandling.id),
             )
             val oppdatering = aktivitet.tilOppdatering()
-            val oppdatertAktivitet = aktivitetService.oppdaterVilkårperiodeNy(aktivitet.id, oppdatering)
+            val oppdatertAktivitet = aktivitetService.oppdaterVilkårperiode(aktivitet.id, oppdatering)
             assertThat(aktivitet.status).isEqualTo(Vilkårstatus.NY)
             assertThat(oppdatertAktivitet.status).isEqualTo(Vilkårstatus.NY)
         }
@@ -248,7 +248,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             )
             vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
             val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
-            val oppdatertPeriode = aktivitetService.oppdaterVilkårperiodeNy(
+            val oppdatertPeriode = aktivitetService.oppdaterVilkårperiode(
                 id = vilkårperiode.id,
                 vilkårperiode = vilkårperiode.tilOppdatering(),
             )
@@ -260,7 +260,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         @Test
         fun `skal feile dersom manglende begrunnelse når lønnet endres til ja`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val tiltak = aktivitetService.opprettVilkårperiodeNy(
+            val tiltak = aktivitetService.opprettVilkårperiode(
                 dummyVilkårperiodeAktivitet(
                     behandlingId = behandling.id,
                     svarLønnet = SvarJaNei.NEI,
@@ -273,7 +273,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             )
 
             assertThatThrownBy {
-                aktivitetService.oppdaterVilkårperiodeNy(tiltak.id, oppdatering)
+                aktivitetService.oppdaterVilkårperiode(tiltak.id, oppdatering)
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
         }
 
@@ -286,7 +286,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 aktivitet(behandlingId = behandling.id),
             )
             assertThatThrownBy {
-                aktivitetService.oppdaterVilkårperiodeNy(
+                aktivitetService.oppdaterVilkårperiode(
                     id = aktivitet.id,
                     vilkårperiode = aktivitet.tilOppdatering(),
                 )
@@ -301,7 +301,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             )
             assertThat(aktivitet.type).isEqualTo(AktivitetType.TILTAK)
             assertThatThrownBy {
-                aktivitetService.oppdaterVilkårperiodeNy(
+                aktivitetService.oppdaterVilkårperiode(
                     id = aktivitet.id,
                     vilkårperiode = aktivitet.tilOppdatering().copy(type = AktivitetType.REELL_ARBEIDSSØKER),
                 )
@@ -319,7 +319,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             )
             val endretBehandlingId = aktivitet.tilOppdatering().copy(behandlingId = annenBehandling.id)
             assertThatThrownBy {
-                aktivitetService.oppdaterVilkårperiodeNy(
+                aktivitetService.oppdaterVilkårperiode(
                     id = aktivitet.id,
                     vilkårperiode = endretBehandlingId,
                 )
@@ -339,7 +339,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 ),
             )
             assertThatThrownBy {
-                aktivitetService.oppdaterVilkårperiodeNy(
+                aktivitetService.oppdaterVilkårperiode(
                     id = aktivitet.id,
                     vilkårperiode = aktivitet.tilOppdatering(aktivitetsdager = 3),
                 )
@@ -352,7 +352,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             aktivitetsdager: Int? = null,
             svarLønnet: SvarJaNei? = null,
             nyBegrunnelse: String? = null,
-        ): LagreVilkårperiodeNy = dummyVilkårperiodeAktivitet(
+        ): LagreVilkårperiode = dummyVilkårperiodeAktivitet(
             behandlingId = behandlingId,
             type = type as AktivitetType,
             fom = nyFom ?: fom,

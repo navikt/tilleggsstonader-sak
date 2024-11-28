@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -56,8 +56,8 @@ class StønadsperiodeControllerTest : IntegrationTest() {
     }
 
     private fun opprettMålgruppe(behandling: Behandling): Vilkårperiode =
-        vilkårperiodeService.opprettVilkårperiodeNy(
-            LagreVilkårperiodeNy(
+        vilkårperiodeService.opprettVilkårperiode(
+            LagreVilkårperiode(
                 type = MålgruppeType.AAP,
                 fom = dagensDato,
                 tom = dagensDato,
@@ -67,8 +67,8 @@ class StønadsperiodeControllerTest : IntegrationTest() {
         )
 
     private fun opprettAktivitet(behandling: Behandling): Vilkårperiode =
-        vilkårperiodeService.opprettVilkårperiodeNy(
-            LagreVilkårperiodeNy(
+        vilkårperiodeService.opprettVilkårperiode(
+            LagreVilkårperiode(
                 type = AktivitetType.TILTAK,
                 fom = dagensDato,
                 tom = dagensDato,

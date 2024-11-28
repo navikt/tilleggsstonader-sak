@@ -46,10 +46,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 
 fun mapFaktaOgSvarDto(
-    vilkårperiode: LagreVilkårperiodeNy,
+    vilkårperiode: LagreVilkårperiode,
     stønadstype: Stønadstype,
 ): FaktaOgVurdering {
     return when (vilkårperiode.type) {
@@ -58,7 +58,7 @@ fun mapFaktaOgSvarDto(
     }
 }
 
-private fun mapAktiviteter(stønadstype: Stønadstype, aktivitet: LagreVilkårperiodeNy): AktivitetFaktaOgVurdering {
+private fun mapAktiviteter(stønadstype: Stønadstype, aktivitet: LagreVilkårperiode): AktivitetFaktaOgVurdering {
     val type = aktivitet.type
     require(type is AktivitetType)
 
@@ -76,7 +76,7 @@ private fun mapAktiviteter(stønadstype: Stønadstype, aktivitet: LagreVilkårpe
     }
 }
 
-private fun mapMålgruppe(stønadstype: Stønadstype, målgruppe: LagreVilkårperiodeNy): MålgruppeFaktaOgVurdering {
+private fun mapMålgruppe(stønadstype: Stønadstype, målgruppe: LagreVilkårperiode): MålgruppeFaktaOgVurdering {
     val type = målgruppe.type
     require(type is MålgruppeType)
 

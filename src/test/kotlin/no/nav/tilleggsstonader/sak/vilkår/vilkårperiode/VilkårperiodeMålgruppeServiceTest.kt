@@ -20,7 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
@@ -52,7 +52,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                 begrunnelse = "begrunnelse målgruppe",
                 behandlingId = behandling.id,
             )
-            val vilkårperiode = vilkårperiodeService.opprettVilkårperiodeNy(målgruppeSomSkalOpprettes)
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(målgruppeSomSkalOpprettes)
 
             assertThat(vilkårperiode.type).isEqualTo(målgruppeSomSkalOpprettes.type)
             assertThat(vilkårperiode.kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
@@ -76,7 +76,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             )
 
             assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiodeNy(opprettVilkårperiode)
+                vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiode)
             }.hasMessageContaining("målgruppe=DAGPENGER er ikke gyldig for ${Stønadstype.BARNETILSYN}")
         }
 
@@ -85,7 +85,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiodeNy(
+                vilkårperiodeService.opprettVilkårperiode(
                     dummyVilkårperiodeMålgruppe(
                         begrunnelse = "",
                         medlemskap = SvarJaNei.NEI,
@@ -100,7 +100,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiodeNy(
+                vilkårperiodeService.opprettVilkårperiode(
                     dummyVilkårperiodeMålgruppe(
                         type = MålgruppeType.AAP,
                         begrunnelse = "",
@@ -116,7 +116,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiodeNy(
+                vilkårperiodeService.opprettVilkårperiode(
                     dummyVilkårperiodeMålgruppe(
                         begrunnelse = "",
                         type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
@@ -131,7 +131,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
             assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiodeNy(
+                vilkårperiodeService.opprettVilkårperiode(
                     dummyVilkårperiodeMålgruppe(
                         begrunnelse = "",
                         type = MålgruppeType.INGEN_MÅLGRUPPE,
@@ -141,7 +141,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             }.hasMessageContaining("Mangler begrunnelse for ingen målgruppe")
 
             assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiodeNy(
+                vilkårperiodeService.opprettVilkårperiode(
                     dummyVilkårperiodeMålgruppe(
                         begrunnelse = null,
                         type = MålgruppeType.INGEN_MÅLGRUPPE,
@@ -158,7 +158,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             )
 
             assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiodeNy(
+                vilkårperiodeService.opprettVilkårperiode(
                     dummyVilkårperiodeMålgruppe(
                         begrunnelse = "Begrunnelse",
                         type = MålgruppeType.AAP,
@@ -177,7 +177,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         fun `skal oppdatere alle felter på målgruppe`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val eksisterendeMålgruppe = vilkårperiodeService.opprettVilkårperiodeNy(
+            val eksisterendeMålgruppe = vilkårperiodeService.opprettVilkårperiode(
                 dummyVilkårperiodeMålgruppe(
                     medlemskap = null,
                     behandlingId = behandling.id,
@@ -194,7 +194,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                     svarUtgifterDekketAvAnnetRegelverk = null,
                 ),
             )
-            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiodeNy(eksisterendeMålgruppe.id, oppdatering)
+            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(eksisterendeMålgruppe.id, oppdatering)
 
             assertThat(eksisterendeMålgruppe.resultat).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
             assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
@@ -210,7 +210,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         fun `skal oppdatere felter for periode som er lagt til av system`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val vilkårperiode = vilkårperiodeService.opprettVilkårperiodeNy(
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(
                 dummyVilkårperiodeMålgruppe(
                     begrunnelse = "Begrunnelse",
                     medlemskap = SvarJaNei.JA,
@@ -225,7 +225,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                     svarUtgifterDekketAvAnnetRegelverk = null,
                 ),
             )
-            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiodeNy(vilkårperiode.id, oppdatering)
+            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
 
             assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
             assertThat(oppdatertPeriode.resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
@@ -241,14 +241,14 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         fun `endring av vilkårperioder opprettet i denne behandlingen skal beholde status NY`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val vilkårperiode = vilkårperiodeService.opprettVilkårperiodeNy(
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(
                 dummyVilkårperiodeMålgruppe(
                     medlemskap = null,
                     behandlingId = behandling.id,
                 ),
             )
             val oppdatering = vilkårperiode.tilOppdatering()
-            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiodeNy(vilkårperiode.id, oppdatering)
+            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
             assertThat(vilkårperiode.status).isEqualTo(Vilkårstatus.NY)
             assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.NY)
         }
@@ -266,7 +266,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
 
             val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
-            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiodeNy(
+            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(
                 vilkårperiode.id,
                 vilkårperiode.tilOppdatering(),
             )
@@ -280,7 +280,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         fun `skal feile dersom manglende begrunnelse når dekket av annet regelverk endres til ja`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val vilkårperiode = vilkårperiodeService.opprettVilkårperiodeNy(
+            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(
                 dummyVilkårperiodeMålgruppe(
                     type = MålgruppeType.UFØRETRYGD,
                     dekkesAvAnnetRegelverk = SvarJaNei.NEI,
@@ -296,7 +296,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
                 ),
             )
             assertThatThrownBy {
-                vilkårperiodeService.oppdaterVilkårperiodeNy(vilkårperiode.id, oppdatering)
+                vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
             }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
         }
 
@@ -309,7 +309,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             val periode = vilkårperiodeRepository.insert(målgruppe)
 
             assertThatThrownBy {
-                vilkårperiodeService.oppdaterVilkårperiodeNy(
+                vilkårperiodeService.oppdaterVilkårperiode(
                     periode.id,
                     periode.tilOppdatering(),
                 )
@@ -331,7 +331,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
             val periode = vilkårperiodeRepository.insert(målgruppe)
 
             assertThatThrownBy {
-                vilkårperiodeService.oppdaterVilkårperiodeNy(
+                vilkårperiodeService.oppdaterVilkårperiode(
                     periode.id,
                     periode.tilOppdatering()
                         .copy(faktaOgSvar = FaktaOgSvarMålgruppeDto(svarMedlemskap = SvarJaNei.JA)),
@@ -340,7 +340,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         }
 
         private fun Vilkårperiode.tilOppdatering() =
-            LagreVilkårperiodeNy(
+            LagreVilkårperiode(
                 behandlingId = behandlingId,
                 fom = fom,
                 tom = tom,

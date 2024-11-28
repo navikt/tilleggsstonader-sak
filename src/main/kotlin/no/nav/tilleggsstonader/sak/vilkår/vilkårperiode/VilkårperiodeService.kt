@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapFaktaOgSvarDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
@@ -80,7 +80,7 @@ class VilkårperiodeService(
     }
 
     @Transactional
-    fun opprettVilkårperiodeNy(vilkårperiode: LagreVilkårperiodeNy): Vilkårperiode {
+    fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
         validerNyPeriodeRevurdering(behandling, vilkårperiode.fom)
@@ -113,7 +113,7 @@ class VilkårperiodeService(
     }
 
     @Transactional
-    fun oppdaterVilkårperiodeNy(id: UUID, vilkårperiode: LagreVilkårperiodeNy): Vilkårperiode {
+    fun oppdaterVilkårperiode(id: UUID, vilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val eksisterendeVilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
         val behandling = behandlingService.hentSaksbehandling(eksisterendeVilkårperiode.behandlingId)

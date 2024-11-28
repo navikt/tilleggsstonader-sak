@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -460,7 +460,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         medlemskap: SvarJaNei? = null,
         dekkesAvAnnetRegelverk: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: BehandlingId = BehandlingId.random(),
-    ) = LagreVilkårperiodeNy(
+    ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
@@ -478,7 +478,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         lønnet: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: BehandlingId = BehandlingId.random(),
         aktivitetsdager: Int = 5,
-    ) = LagreVilkårperiodeNy(
+    ) = LagreVilkårperiode(
         type = type,
         fom = fom,
         tom = tom,
@@ -505,8 +505,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         status = status,
     )
 
-    private fun opprettVilkårperiode(periode: LagreVilkårperiodeNy): LagreVilkårperiodeResponse {
-        val oppdatertPeriode = vilkårperiodeService.opprettVilkårperiodeNy(periode)
+    private fun opprettVilkårperiode(periode: LagreVilkårperiode): LagreVilkårperiodeResponse {
+        val oppdatertPeriode = vilkårperiodeService.opprettVilkårperiode(periode)
         return vilkårperiodeService.validerOgLagResponse(
             behandlingId = oppdatertPeriode.behandlingId,
             periode = oppdatertPeriode,

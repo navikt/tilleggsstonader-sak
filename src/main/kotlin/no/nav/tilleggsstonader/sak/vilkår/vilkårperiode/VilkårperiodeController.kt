@@ -4,7 +4,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
@@ -45,24 +45,24 @@ class VilkårperiodeController(
 
     @PostMapping("/v2", "")
     fun opprettVilkårperiode(
-        @RequestBody vilkårperiode: LagreVilkårperiodeNy,
+        @RequestBody vilkårperiode: LagreVilkårperiode,
     ): LagreVilkårperiodeResponse {
         tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        val periode = vilkårperiodeService.opprettVilkårperiodeNy(vilkårperiode)
+        val periode = vilkårperiodeService.opprettVilkårperiode(vilkårperiode)
         return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.behandlingId, periode = periode)
     }
 
     @PostMapping("/v2/{id}", "/{id}")
     fun oppdaterVilkårperiode(
         @PathVariable("id") id: UUID,
-        @RequestBody vilkårperiode: LagreVilkårperiodeNy,
+        @RequestBody vilkårperiode: LagreVilkårperiode,
     ): LagreVilkårperiodeResponse {
         tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        val periode = vilkårperiodeService.oppdaterVilkårperiodeNy(id, vilkårperiode)
+        val periode = vilkårperiodeService.oppdaterVilkårperiode(id, vilkårperiode)
         return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.behandlingId, periode = periode)
     }
 
