@@ -14,7 +14,6 @@ data class LagreVilkårperiodeNy(
     val tom: LocalDate,
     val begrunnelse: String? = null,
     val kildeId: String? = null,
-    val faktaOgVurderinger: FaktaOgSvarDto? = null,
     val faktaOgSvar: FaktaOgSvarDto? = null,
 )
 
