@@ -26,9 +26,9 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/vedtak/tilsyn-barn")
 @ProtectedWithClaims(issuer = "azuread")
 class TilsynBarnVedtakController(
-    private val tilsynBarnBeregningService: TilsynBarnBeregningService,
+    private val beregningService: TilsynBarnBeregningService,
     private val tilgangService: TilgangService,
-    private val tilsynBarnVedtakService: TilsynBarnVedtakService,
+    private val vedtakService: TilsynBarnVedtakService,
     private val behandlingService: BehandlingService,
 ) {
 
@@ -58,7 +58,7 @@ class TilsynBarnVedtakController(
 
     fun lagreVedtak(behandlingId: BehandlingId, vedtak: VedtakTilsynBarnRequest) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
-        tilsynBarnVedtakService.håndterSteg(behandlingId, vedtak)
+        vedtakService.håndterSteg(behandlingId, vedtak)
     }
 
     @PostMapping("{behandlingId}/beregn")
@@ -67,7 +67,7 @@ class TilsynBarnVedtakController(
         @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
     ): BeregningsresultatTilsynBarnDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        return tilsynBarnBeregningService.beregn(behandling, TypeVedtak.INNVILGELSE).tilDto(behandling.revurderFra)
+        return beregningService.beregn(behandling, TypeVedtak.INNVILGELSE).tilDto(behandling.revurderFra)
     }
 
     /**
@@ -78,7 +78,7 @@ class TilsynBarnVedtakController(
     fun hentVedtak(@PathVariable behandlingId: BehandlingId): VedtakResponse? {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
-        val vedtak = tilsynBarnVedtakService.hentVedtak(behandlingId) ?: return null
+        val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return VedtakDtoMapper.toDto(vedtak, revurderFra)
     }
 }

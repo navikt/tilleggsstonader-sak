@@ -30,7 +30,7 @@ import java.time.DayOfWeek
 
 @Service
 class TilsynBarnBeregnYtelseSteg(
-    private val tilsynBarnBeregningService: TilsynBarnBeregningService,
+    private val beregningService: TilsynBarnBeregningService,
     private val opphørValideringService: OpphørValideringService,
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
@@ -51,7 +51,7 @@ class TilsynBarnBeregnYtelseSteg(
     }
 
     private fun beregnOgLagreInnvilgelse(saksbehandling: Saksbehandling) {
-        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling, TypeVedtak.INNVILGELSE)
+        val beregningsresultat = beregningService.beregn(saksbehandling, TypeVedtak.INNVILGELSE)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
     }
@@ -63,7 +63,7 @@ class TilsynBarnBeregnYtelseSteg(
 
         opphørValideringService.validerPerioder(saksbehandling)
 
-        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
+        val beregningsresultat = beregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
         opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(beregningsresultat, saksbehandling.revurderFra)
         vedtakRepository.insert(
             GeneriskVedtak(
