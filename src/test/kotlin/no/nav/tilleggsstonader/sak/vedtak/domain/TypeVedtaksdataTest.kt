@@ -9,6 +9,7 @@ class TypeVedtaksdataTest {
     fun `typerVedtaksdata må inneholde unike navn`() {
         val alleEnums = listOf(
             TypeVedtakTilsynBarn.entries,
+            TypeVedtakLæremidler.entries,
         ).flatten()
         assertThat(typerVedtaksdata.keys)
             .hasSize(alleEnums.size)

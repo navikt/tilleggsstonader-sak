@@ -10,5 +10,5 @@ import org.springframework.stereotype.Service
 class TilsynBarnVedtakService(
     repository: VedtakRepository,
     stegService: StegService,
-    tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
-) : VedtakService<VedtakTilsynBarnRequest>(stegService, tilsynBarnBeregnYtelseSteg, repository)
+    beregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
+) : VedtakService<VedtakTilsynBarnRequest>(stegService, beregnYtelseSteg, repository)

@@ -49,7 +49,7 @@ class TilsynBarnBeregnYtelseStegTest {
         repository = repository,
     )
     val steg = TilsynBarnBeregnYtelseSteg(
-        tilsynBarnBeregningService = tilsynBarnBeregningService,
+        beregningService = tilsynBarnBeregningService,
         vedtakRepository = repository,
         tilkjentytelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
