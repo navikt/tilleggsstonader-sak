@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -17,10 +18,14 @@ import org.springframework.data.repository.findByIdOrNull
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MellomlagringBrevServiceTest {
 
+    private val behandlingService = mockk<BehandlingService>()
     private val mellomlagerBrevRepository = mockk<MellomlagerBrevRepository>()
     private val mellomlagerFrittståendeBrevRepository = mockk<MellomlagerFrittståendeBrevRepository>()
-    private val mellomlagringBrevService =
-        MellomlagringBrevService(mellomlagerBrevRepository, mellomlagerFrittståendeBrevRepository)
+    private val mellomlagringBrevService = MellomlagringBrevService(
+        behandlingService = behandlingService,
+        mellomlagerBrevRepository = mellomlagerBrevRepository,
+        mellomlagerFrittståendeBrevRepository = mellomlagerFrittståendeBrevRepository,
+    )
 
     @BeforeAll
     fun setUp() {
@@ -60,7 +65,9 @@ class MellomlagringBrevServiceTest {
             brevmal = mellomlagretBrev.brevmal,
         )
 
-        every { mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsakId, any()) } returns brev
+        every {
+            mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsakId, any())
+        } returns brev
 
         assertThat(mellomlagringBrevService.hentMellomlagretFrittståendeSanitybrev(fagsakId)).isEqualTo(
             MellomlagreBrevDto(
