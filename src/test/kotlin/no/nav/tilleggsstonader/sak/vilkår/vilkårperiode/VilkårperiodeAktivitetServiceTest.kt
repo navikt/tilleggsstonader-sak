@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -22,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
@@ -104,7 +106,6 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 dummyVilkårperiodeAktivitet(
                     behandlingId = behandling.id,
                     kildeId = "123",
-//                    svarLønnet = SvarJaNei.NEI TODO: Nødvendig??
                 ),
             )
             val lagretAktivitet = vilkårperiodeService.hentVilkårperioder(behandling.id).aktiviteter.single()
@@ -177,23 +178,45 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 )
             }.hasMessageContaining("Kan ikke registrere aktivitetsdager på ingen aktivitet")
         }
-    }
 
-    @Test
-    fun `kan ikke opprette aktivitet hvis periode begynner før revurderFra`() {
-        val behandling = testoppsettService.oppdater(
-            testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
-        )
-
-        assertThatThrownBy {
-            aktivitetService.opprettVilkårperiode(
-                dummyVilkårperiodeAktivitet(
-                    behandlingId = behandling.id,
-                    fom = now().plusDays(1),
-                    aktivitetsdager = 5,
-                ),
+        @Test
+        fun `kan ikke opprette aktivitet hvis periode begynner før revurderFra`() {
+            val behandling = testoppsettService.oppdater(
+                testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
             )
-        }.hasMessageContaining("Til-og-med før fra-og-med")
+
+            assertThatThrownBy {
+                aktivitetService.opprettVilkårperiode(
+                    dummyVilkårperiodeAktivitet(
+                        behandlingId = behandling.id,
+                        fom = now().plusDays(1),
+                        aktivitetsdager = 5,
+                    ),
+                )
+            }.hasMessageContaining("Til-og-med før fra-og-med")
+        }
+
+        @Test
+        fun `skal ikke kunne lage aktivitet med type reell arbeidssøker for søknad om læremidler`() {
+            val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.LÆREMIDLER))
+
+            val behandling = testoppsettService.lagre(behandling(fagsak))
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(
+                    LagreVilkårperiode(
+                        type = AktivitetType.REELL_ARBEIDSSØKER,
+                        behandlingId = behandling.id,
+                        fom = now(),
+                        tom = now(),
+                        faktaOgSvar = FaktaOgSvarAktivitetLæremidlerDto(
+                            prosent = 50,
+                            svarHarUtgifter = SvarJaNei.JA,
+                        ),
+                    ),
+                )
+            }.hasMessageContaining("Reell arbeidssøker er ikke en gyldig aktivitet for læremidler")
+        }
     }
 
     @Nested

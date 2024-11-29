@@ -152,7 +152,7 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `kan ikke opprette målgruppe hvis den begyner før revurderFra`() {
+        fun `kan ikke opprette målgruppe hvis den begynner før revurderFra`() {
             val behandling = testoppsettService.oppdater(
                 testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
             )
