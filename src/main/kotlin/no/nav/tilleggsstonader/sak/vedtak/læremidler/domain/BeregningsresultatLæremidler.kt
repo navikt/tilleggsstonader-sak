@@ -30,8 +30,3 @@ data class BeregningPeriode(
         validatePeriode()
     }
 }
-
-enum class Studienivå {
-    VIDEREGÅENDE,
-    HØYERE_UTDANNING,
-}

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
@@ -87,7 +88,8 @@ data class VurderingTiltakLæremidler(
 
 data class FaktaAktivitetLæremidler(
     override val prosent: Int,
-) : Fakta, FaktaProsent {
+    override val studienivå: Studienivå,
+) : Fakta, FaktaProsent, FaktaStudienivå {
     init {
         require(prosent in 1..100) { "Prosent må være mellom 1 og 100" }
     }
