@@ -2,10 +2,12 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
@@ -23,8 +25,10 @@ import org.springframework.web.bind.annotation.RestController
 class LæremidlerVedtakController(
     private val beregningService: LæremidlerBeregningService,
     private val tilgangService: TilgangService,
-    private val vedtakService: LæremidlerVedtakService,
+    private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
+    private val stegService: StegService,
+    private val steg: LæremidlerBeregnYtelseSteg,
 ) {
 
     /*
@@ -57,7 +61,7 @@ class LæremidlerVedtakController(
 
     fun lagreVedtak(behandlingId: BehandlingId, vedtak: VedtakLæremidlerRequest) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
-        vedtakService.håndterSteg(behandlingId, vedtak)
+        stegService.håndterSteg(behandlingId, steg, vedtak)
     }
 
     /*

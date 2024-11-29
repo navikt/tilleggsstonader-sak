@@ -2,25 +2,39 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
-import org.slf4j.LoggerFactory
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Service
 
-abstract class VedtakService<DTO : VedtakRequest>(
-    private val stegService: StegService,
-    private val steg: BeregnYtelseSteg<DTO>,
+@Service
+class VedtakService(
     private val repository: VedtakRepository,
+    private val stegService: StegService,
+    private val tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
+    private val læremidlerBeregnYtelseSteg: LæremidlerBeregnYtelseSteg,
 ) {
-
-    private val logger = LoggerFactory.getLogger(javaClass)
-
-    fun håndterSteg(behandlingId: BehandlingId, vedtak: DTO) {
-        logger.info("Lagrer vedtak for behandling=$behandlingId vedtak=${vedtak::class.simpleName}")
-        stegService.håndterSteg(behandlingId, steg, vedtak)
-    }
 
     fun hentVedtak(behandlingId: BehandlingId): Vedtak? {
         return repository.findByIdOrNull(behandlingId)
+    }
+
+    @JvmName("hentTypetVedtak")
+    final inline fun <reified T : Vedtaksdata> hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<T>? {
+        return hentVedtak(behandlingId)?.withTypeOrThrow<T>()
+    }
+
+    fun håndterSteg(behandling: BehandlingId, data: VedtakTilsynBarnRequest) {
+        stegService.håndterSteg(behandling, tilsynBarnBeregnYtelseSteg, data)
+    }
+
+    fun håndterSteg(behandling: BehandlingId, data: VedtakLæremidlerRequest) {
+        stegService.håndterSteg(behandling, læremidlerBeregnYtelseSteg, data)
     }
 }

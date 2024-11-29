@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController
 class TilsynBarnVedtakController(
     private val beregningService: TilsynBarnBeregningService,
     private val tilgangService: TilgangService,
-    private val vedtakService: TilsynBarnVedtakService,
+    private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
 ) {
 

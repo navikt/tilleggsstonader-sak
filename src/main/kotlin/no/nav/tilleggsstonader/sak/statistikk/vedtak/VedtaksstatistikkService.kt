@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
@@ -30,7 +30,7 @@ class VedtaksstatistikkService(
     private val behandlingBarnService: BarnService,
     private val iverksettService: IverksettService,
     private val stønadsperiodeService: StønadsperiodeService,
-    private val tilsynBarnVedtakService: TilsynBarnVedtakService,
+    private val vedtakService: VedtakService,
 
 ) {
     fun lagreVedtaksstatistikk(behandlingId: BehandlingId, fagsakId: FagsakId, hendelseTidspunkt: LocalDateTime) {
@@ -40,7 +40,7 @@ class VedtaksstatistikkService(
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
-        val vedtak = tilsynBarnVedtakService.hentVedtak(behandlingId)
+        val vedtak = vedtakService.hentVedtak(behandlingId)
 
         feilHvis(vedtak != null && vedtak.data !is VedtakTilsynBarn) {
             "Har ikke håndtert vedtak for ${vedtak?.data?.let { it::class.simpleName }}"

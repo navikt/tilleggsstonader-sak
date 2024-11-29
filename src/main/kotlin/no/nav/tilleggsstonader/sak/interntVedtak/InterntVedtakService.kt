@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
@@ -46,7 +46,7 @@ class InterntVedtakService(
     private val stønadsperiodeService: StønadsperiodeService,
     private val søknadService: SøknadService,
     private val vilkårService: VilkårService,
-    private val tilsynBarnVedtakService: TilsynBarnVedtakService,
+    private val vedtakService: VedtakService,
 ) {
 
     fun lagInterntVedtak(behandlingId: BehandlingId): InterntVedtak {
@@ -54,7 +54,7 @@ class InterntVedtakService(
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag
         val behandlingbarn = mapBarnPåBarnId(behandlingId, grunnlag)
-        val vedtak = tilsynBarnVedtakService.hentVedtak(behandlingId)
+        val vedtak = vedtakService.hentVedtak(behandlingId)
         return InterntVedtak(
             behandling = mapBehandlingsinformasjon(behandling),
             søknad = mapSøknadsinformasjon(behandling),

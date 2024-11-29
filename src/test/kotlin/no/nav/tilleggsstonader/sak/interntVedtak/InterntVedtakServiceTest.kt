@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
@@ -78,7 +78,7 @@ class InterntVedtakServiceTest {
     private val grunnlagsdataService = mockk<GrunnlagsdataService>()
     private val barnService = mockk<BarnService>()
     private val vilkårService = mockk<VilkårService>()
-    private val tilsynBarnVedtakService = mockk<TilsynBarnVedtakService>()
+    private val vedtakService = mockk<VedtakService>()
 
     val service = InterntVedtakService(
         behandlingService = behandlingService,
@@ -89,7 +89,7 @@ class InterntVedtakServiceTest {
         grunnlagsdataService = grunnlagsdataService,
         barnService = barnService,
         vilkårService = vilkårService,
-        tilsynBarnVedtakService = tilsynBarnVedtakService,
+        vedtakService = vedtakService,
     )
 
     val vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay()
@@ -227,7 +227,7 @@ class InterntVedtakServiceTest {
         every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns behandlingBarn
         every { vilkårService.hentVilkårsett(behandlingId) } returns vilkår
-        every { tilsynBarnVedtakService.hentVedtak(behandlingId) } returns vedtak
+        every { vedtakService.hentVedtak(behandlingId) } returns vedtak
     }
 
     @Test
