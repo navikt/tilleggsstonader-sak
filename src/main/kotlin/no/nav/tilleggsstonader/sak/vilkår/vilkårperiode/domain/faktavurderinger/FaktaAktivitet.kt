@@ -11,5 +11,5 @@ sealed interface FaktaProsent : Fakta {
 }
 
 sealed interface FaktaStudienivå : Fakta {
-    val studienivå: Studienivå
+    val studienivå: Studienivå?
 }
