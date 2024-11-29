@@ -19,8 +19,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -107,11 +109,20 @@ class VilkårperiodeDtoTest {
             val utdanningLæremidler = VilkårperiodeTestUtil.aktivitet(
                 faktaOgVurdering = UtdanningLæremidler(
                     fakta = FaktaAktivitetLæremidler(prosent = 60, studienivå = Studienivå.VIDEREGÅENDE),
+                    vurderinger = VurderingerUtdanningLæremidler(
+                        harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(
+                            SvarJaNei.NEI
+                        )
+                    )
                 ),
             ).tilDto()
 
             assertThat(utdanningLæremidler.faktaOgVurderinger).isEqualTo(
-                AktivitetLæremidlerFaktaOgVurderingerDto(prosent = 60, studienivå = Studienivå.VIDEREGÅENDE),
+                AktivitetLæremidlerFaktaOgVurderingerDto(
+                    prosent = 60,
+                    studienivå = Studienivå.VIDEREGÅENDE,
+                    harRettTilStudiestipend = VurderingDto(svar = SvarJaNei.NEI, resultat = OPPFYLT)
+                ),
             )
         }
     }

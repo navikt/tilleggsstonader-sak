@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
@@ -152,27 +153,23 @@ object VilkårperiodeTestUtil {
 
     fun vurderingLønnet(
         svar: SvarJaNei? = SvarJaNei.NEI,
-    ) = VurderingLønnet(
-        svar = svar,
-    )
+    ) = VurderingLønnet(svar = svar)
+
+    fun vurderingHarRettTilUtstyrsstipend(
+        svar: SvarJaNei? = SvarJaNei.NEI,
+    ) = VurderingHarRettTilUtstyrsstipend(svar = svar)
 
     fun vurderingMedlemskap(
         svar: SvarJaNei? = SvarJaNei.JA_IMPLISITT,
-    ) = VurderingMedlemskap(
-        svar = svar,
-    )
+    ) = VurderingMedlemskap(svar = svar)
 
     fun vurderingDekketAvAnnetRegelverk(
         svar: SvarJaNei? = SvarJaNei.NEI,
-    ) = VurderingDekketAvAnnetRegelverk(
-        svar = svar,
-    )
+    ) = VurderingDekketAvAnnetRegelverk(svar = svar)
 
     fun vurderingHarUtgifter(
         svar: SvarJaNei? = SvarJaNei.JA,
-    ) = VurderingHarUtgifter(
-        svar = svar,
-    )
+    ) = VurderingHarUtgifter(svar = svar)
 
     fun dummyVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,

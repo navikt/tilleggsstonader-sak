@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
@@ -43,6 +44,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
@@ -133,7 +135,10 @@ fun mapAktiviteterLæremidler(
                 prosent = faktaOgSvar.prosent!!,
                 studienivå = faktaOgSvar.studienivå, // TODO: Det er ikke obligatorisk å sende inn studienivå for tiltak av variant "Høyere utdanning". Må deale med det.
             ),
-            vurderinger = VurderingTiltakLæremidler(harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter)),
+            vurderinger = VurderingTiltakLæremidler(
+                harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
+                harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(faktaOgSvar.svarHarRettTilUtstyrsstipend),
+            ),
         )
 
         AktivitetType.UTDANNING -> UtdanningLæremidler(
@@ -141,6 +146,9 @@ fun mapAktiviteterLæremidler(
                 prosent = faktaOgSvar.prosent!!,
                 studienivå = faktaOgSvar.studienivå,
             ),
+            vurderinger = VurderingerUtdanningLæremidler(
+                harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(faktaOgSvar.svarHarRettTilUtstyrsstipend),
+            )
         )
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetLæremidler

@@ -9,3 +9,7 @@ sealed interface LønnetVurdering : VurderingerAktivitet {
 sealed interface HarUtgifterVurdering : VurderingerAktivitet {
     val harUtgifter: VurderingHarUtgifter
 }
+
+sealed interface HarRettTilUtstyrsstipendVurdering : VurderingerAktivitet {
+    val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend
+}
