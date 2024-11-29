@@ -57,6 +57,10 @@ enum class StønadstypeIverksetting {
     TILSYN_BARN_ENSLIG_FORSØRGER,
     TILSYN_BARN_AAP,
     TILSYN_BARN_ETTERLATTE,
+
+    LÆREMIDLER_ENSLIG_FORSØRGER,
+    LÆREMIDLER_AAP,
+    LÆREMIDLER_ETTERLATTE,
 }
 
 @Suppress("unused")
