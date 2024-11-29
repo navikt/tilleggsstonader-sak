@@ -7,19 +7,23 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
+import org.slf4j.LoggerFactory
 
 /**
  * Splitter opp BeregnYtelseSteg for ulike stønadstyper
  * Denne håndterer sletting av tidligere vedtak og andeler
  */
-abstract class BeregnYtelseSteg<DTO>(
+abstract class BeregnYtelseSteg<DTO : Any>(
     private val stønadstype: Stønadstype,
     open val vedtakRepository: VedtakRepository,
     open val tilkjentytelseService: TilkjentYtelseService,
     open val simuleringService: SimuleringService,
 ) : BehandlingSteg<DTO> {
 
+    val logger = LoggerFactory.getLogger(javaClass)
+
     override fun utførSteg(saksbehandling: Saksbehandling, data: DTO) {
+        logger.info("Lagrer vedtak for behandling=${saksbehandling.id} vedtak=${data::class.simpleName}")
         validerStønadstype(saksbehandling)
         nullstillEksisterendeVedtakPåBehandling(saksbehandling)
         lagreVedtak(saksbehandling, data)

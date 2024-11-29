@@ -28,7 +28,7 @@ class BrevMellomlagerController(
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return mellomlagringBrevService.mellomLagreBrev(
+        return mellomlagringBrevService.mellomlagreBrev(
             behandlingId,
             mellomlagretBrev.brevverdier,
             mellomlagretBrev.brevmal,

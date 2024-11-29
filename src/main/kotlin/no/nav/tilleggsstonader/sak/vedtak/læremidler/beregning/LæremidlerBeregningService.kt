@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningPeriode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
+import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.YearMonth
@@ -12,6 +13,7 @@ import java.time.YearMonth
 private val PROSENT_50 = BigDecimal(0.5)
 private val PROSENTGRENSE_HALV_SATS = 50
 
+@Service
 class LæremidlerBeregningService {
     /**
      * Beregning av læremidler er foreløpig kun basert på antakelser.

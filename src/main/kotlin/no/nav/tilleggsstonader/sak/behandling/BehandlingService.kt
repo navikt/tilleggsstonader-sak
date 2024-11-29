@@ -276,4 +276,11 @@ class BehandlingService(
         val behandlinger = hentBehandlinger(fagsakId)
         return utledBehandlingType(behandlinger)
     }
+
+    /**
+     * Brukes i de tilfellene man ikke har generellt behov for behandling, men ønsker kun å sjekke om den er låst
+     */
+    fun behandlingErLåstForVidereRedigering(behandlingId: BehandlingId): Boolean {
+        return behandlingRepository.findByIdOrThrow(behandlingId).status.behandlingErLåstForVidereRedigering()
+    }
 }

@@ -1,18 +1,26 @@
 package no.nav.tilleggsstonader.sak.brev.mellomlager
 
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class MellomlagringBrevService(
+    private val behandlingService: BehandlingService,
     private val mellomlagerBrevRepository: MellomlagerBrevRepository,
     private val mellomlagerFrittståendeBrevRepository: MellomlagerFrittståendeBrevRepository,
 ) {
 
-    fun mellomLagreBrev(behandlingId: BehandlingId, brevverdier: String, brevmal: String): BehandlingId {
+    @Transactional
+    fun mellomlagreBrev(behandlingId: BehandlingId, brevverdier: String, brevmal: String): BehandlingId {
+        feilHvis(behandlingService.behandlingErLåstForVidereRedigering(behandlingId)) {
+            "Kan ikke mellomlagre brev for behandling=$behandlingId når behandlingen er låst."
+        }
         slettMellomlagringHvisFinnes(behandlingId)
         val mellomlagretBrev = MellomlagretBrev(
             behandlingId,
@@ -22,6 +30,7 @@ class MellomlagringBrevService(
         return mellomlagerBrevRepository.insert(mellomlagretBrev).behandlingId
     }
 
+    @Transactional
     fun mellomLagreFrittståendeSanitybrev(
         fagsakId: FagsakId,
         brevverdier: String,

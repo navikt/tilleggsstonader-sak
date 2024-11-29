@@ -1,95 +1,84 @@
-package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
+package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import org.springframework.stereotype.Service
-import java.time.DayOfWeek
 
 @Service
-class TilsynBarnBeregnYtelseSteg(
-    private val beregningService: TilsynBarnBeregningService,
+class LæremidlerBeregnYtelseSteg(
+    private val beregningService: LæremidlerBeregningService,
     private val opphørValideringService: OpphørValideringService,
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-) : BeregnYtelseSteg<VedtakTilsynBarnRequest>(
-    stønadstype = Stønadstype.BARNETILSYN,
+) : BeregnYtelseSteg<VedtakLæremidlerRequest>(
+    stønadstype = Stønadstype.LÆREMIDLER,
     vedtakRepository = vedtakRepository,
     tilkjentytelseService = tilkjentytelseService,
     simuleringService = simuleringService,
 ) {
 
-    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakTilsynBarnRequest) {
+    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakLæremidlerRequest) {
         when (vedtak) {
-            is InnvilgelseTilsynBarnRequest -> beregnOgLagreInnvilgelse(saksbehandling)
-            is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
-            is OpphørTilsynBarnDto -> beregnOgLagreOpphør(saksbehandling, vedtak)
+            // is InnvilgelseLæremidlerRequest -> beregnOgLagreInnvilgelse(saksbehandling)
+            is AvslagLæremidlerDto -> lagreAvslag(saksbehandling, vedtak)
+            // is OpphørLæremidlerDto -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
     }
 
+    /*
     private fun beregnOgLagreInnvilgelse(saksbehandling: Saksbehandling) {
-        val beregningsresultat = beregningService.beregn(saksbehandling, TypeVedtak.INNVILGELSE)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling, TypeVedtak.INNVILGELSE)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
     }
 
-    private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnDto) {
+    private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørLæremidlerDto) {
         brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
 
         opphørValideringService.validerPerioder(saksbehandling)
 
-        val beregningsresultat = beregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
+        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
         opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(beregningsresultat, saksbehandling.revurderFra)
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.OPPHØR,
-                data = OpphørTilsynBarn(
-                    beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
+                data = OpphørLæremidler(
+                    beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
                     årsaker = vedtak.årsakerOpphør,
                     begrunnelse = vedtak.begrunnelse,
                 ),
 
-            ),
+                ),
         )
 
         lagreAndeler(saksbehandling, beregningsresultat)
     }
+     */
 
     private fun lagreAvslag(
         saksbehandling: Saksbehandling,
-        vedtak: AvslagTilsynBarnDto,
+        vedtak: AvslagLæremidlerDto,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.AVSLAG,
-                data = AvslagTilsynBarn(
+                data = AvslagLæremidler(
                     årsaker = vedtak.årsakerAvslag,
                     begrunnelse = vedtak.begrunnelse,
                 ),
@@ -97,9 +86,10 @@ class TilsynBarnBeregnYtelseSteg(
         )
     }
 
+    /*
     private fun lagreAndeler(
         saksbehandling: Saksbehandling,
-        beregningsresultat: BeregningsresultatTilsynBarn,
+        beregningsresultat: BeregningsresultatLæremidler,
     ) {
         val andelerTilkjentYtelse = beregningsresultat.perioder.flatMap {
             it.beløpsperioder.map { beløpsperiode ->
@@ -124,23 +114,24 @@ class TilsynBarnBeregnYtelseSteg(
 
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
-        beregningsresultat: BeregningsresultatTilsynBarn,
+        beregningsresultat: BeregningsresultatLæremidler,
     ): Vedtak {
         return GeneriskVedtak(
             behandlingId = behandling.id,
             type = TypeVedtak.INNVILGELSE,
-            data = InnvilgelseTilsynBarn(
-                beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
+            data = InnvilgelseLæremidler(
+                beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
             ),
         )
     }
 
     private fun MålgruppeType.tilTypeAndel(): TypeAndel {
         return when (this) {
-            MålgruppeType.AAP, MålgruppeType.UFØRETRYGD, MålgruppeType.NEDSATT_ARBEIDSEVNE -> TypeAndel.TILSYN_BARN_AAP
-            MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER
-            MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.TILSYN_BARN_ETTERLATTE
+            MålgruppeType.AAP, MålgruppeType.UFØRETRYGD, MålgruppeType.NEDSATT_ARBEIDSEVNE -> TypeAndel.LÆREMIDLER_AAP
+            MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER
+            MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.LÆREMIDLER_ETTERLATTE
             else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
         }
     }
+     */
 }

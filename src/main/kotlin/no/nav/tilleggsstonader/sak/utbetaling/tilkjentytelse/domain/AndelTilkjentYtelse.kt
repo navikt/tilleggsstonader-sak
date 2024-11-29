@@ -55,6 +55,11 @@ data class AndelTilkjentYtelse(
             TypeAndel.TILSYN_BARN_ETTERLATTE,
             -> validerTilsynBarn()
 
+            TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER,
+            TypeAndel.LÆREMIDLER_AAP,
+            TypeAndel.LÆREMIDLER_ETTERLATTE,
+            -> validerLæremidler()
+
             TypeAndel.UGYLDIG -> {}
         }
     }
@@ -65,6 +70,10 @@ data class AndelTilkjentYtelse(
         feilHvis(satstype == Satstype.DAG && fom.erLørdagEllerSøndag()) {
             "Dagsats som begynner en lørdag eller søndag vil ikke bli utbetalt"
         }
+    }
+
+    private fun validerLæremidler() {
+        error("Har ikke lagt inn validering av andeler for læremidler ennå")
     }
 
     private fun validerSatstype(forventetSatstype: Satstype) {
@@ -95,6 +104,11 @@ enum class TypeAndel {
     TILSYN_BARN_ENSLIG_FORSØRGER,
     TILSYN_BARN_AAP,
     TILSYN_BARN_ETTERLATTE,
+
+    LÆREMIDLER_ENSLIG_FORSØRGER,
+    LÆREMIDLER_AAP,
+    LÆREMIDLER_ETTERLATTE,
+
     UGYLDIG,
 }
 

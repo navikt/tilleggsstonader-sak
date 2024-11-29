@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
@@ -67,7 +68,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
     @Autowired
     val vilkårRepository: VilkårRepository,
     @Autowired
-    val tilsynBarnVedtakService: TilsynBarnVedtakService,
+    val vedtakService: VedtakService,
 ) : IntegrationTest() {
 
     val fagsak = fagsak()
@@ -216,8 +217,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
                 assertThat(this.tom).isEqualTo(juni.atDay(3))
             }
 
-            val beregningsresultat = tilsynBarnVedtakService.hentVedtak(behandling.id)!!
-                .withTypeOrThrow<InnvilgelseTilsynBarn>().data.beregningsresultat
+            val beregningsresultat = vedtakService.hentVedtak<InnvilgelseTilsynBarn>(behandling.id)!!
+                .data.beregningsresultat
             with(beregningsresultat!!.perioder.single()) {
                 with(this.grunnlag.stønadsperioderGrunnlag.single()) {
                     assertThat(this.stønadsperiode.fom).isEqualTo(juni.atDay(1))
@@ -424,8 +425,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
         }
 
         private fun hentBeregningsresultat(behandlingId: BehandlingId): BeregningsresultatTilsynBarn {
-            return tilsynBarnVedtakService.hentVedtak(behandlingId)!!
-                .withTypeOrThrow<InnvilgelseTilsynBarn>()
+            return vedtakService.hentVedtak<InnvilgelseTilsynBarn>(behandlingId)!!
                 .data
                 .beregningsresultat
         }
