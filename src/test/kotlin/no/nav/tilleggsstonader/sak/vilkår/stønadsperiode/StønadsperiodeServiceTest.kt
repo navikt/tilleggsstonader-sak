@@ -16,11 +16,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -465,7 +464,10 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårMålgruppeDto(VurderingDto(medlemskap), VurderingDto(dekkesAvAnnetRegelverk)),
+        faktaOgSvar = FaktaOgSvarMålgruppeDto(
+            svarMedlemskap = medlemskap,
+            svarUtgifterDekketAvAnnetRegelverk = dekkesAvAnnetRegelverk,
+        ),
         behandlingId = behandlingId,
     )
 
@@ -480,9 +482,11 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         type = type,
         fom = fom,
         tom = tom,
-        delvilkår = DelvilkårAktivitetDto(VurderingDto(lønnet)),
+        faktaOgSvar = FaktaOgSvarAktivitetBarnetilsynDto(
+            aktivitetsdager = aktivitetsdager,
+            svarLønnet = lønnet,
+        ),
         behandlingId = behandlingId,
-        aktivitetsdager = aktivitetsdager,
     )
 
     private fun stønadsperiodeDto(

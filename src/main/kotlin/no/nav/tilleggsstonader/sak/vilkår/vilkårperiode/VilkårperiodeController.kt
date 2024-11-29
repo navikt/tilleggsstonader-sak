@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
@@ -44,8 +43,8 @@ class VilkårperiodeController(
         vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandlingId)
     }
 
-    @PostMapping
-    fun opprettVilkårMedPeriode(
+    @PostMapping("/v2", "")
+    fun opprettVilkårperiode(
         @RequestBody vilkårperiode: LagreVilkårperiode,
     ): LagreVilkårperiodeResponse {
         tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
@@ -55,19 +54,8 @@ class VilkårperiodeController(
         return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.behandlingId, periode = periode)
     }
 
-    @PostMapping("/v2")
-    fun opprettVilkårMedPeriodeV2(
-        @RequestBody vilkårperiode: LagreVilkårperiodeNy,
-    ): LagreVilkårperiodeResponse {
-        tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
-
-        val periode = vilkårperiodeService.opprettVilkårperiodeNy(vilkårperiode)
-        return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.behandlingId, periode = periode)
-    }
-
-    @PostMapping("{id}")
-    fun oppdaterPeriode(
+    @PostMapping("/v2/{id}", "/{id}")
+    fun oppdaterVilkårperiode(
         @PathVariable("id") id: UUID,
         @RequestBody vilkårperiode: LagreVilkårperiode,
     ): LagreVilkårperiodeResponse {
@@ -75,18 +63,6 @@ class VilkårperiodeController(
         tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.oppdaterVilkårperiode(id, vilkårperiode)
-        return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.behandlingId, periode = periode)
-    }
-
-    @PostMapping("/v2/{id}")
-    fun oppdaterPeriodeV2(
-        @PathVariable("id") id: UUID,
-        @RequestBody vilkårperiode: LagreVilkårperiodeNy,
-    ): LagreVilkårperiodeResponse {
-        tilgangService.validerTilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
-
-        val periode = vilkårperiodeService.oppdaterVilkårperiodeNy(id, vilkårperiode)
         return vilkårperiodeService.validerOgLagResponse(behandlingId = periode.behandlingId, periode = periode)
     }
 

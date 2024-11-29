@@ -7,14 +7,13 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeT
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import java.time.LocalDate
 
-data class LagreVilkårperiodeNy(
+data class LagreVilkårperiode(
     val behandlingId: BehandlingId,
     val type: VilkårperiodeType,
     val fom: LocalDate,
     val tom: LocalDate,
     val begrunnelse: String? = null,
     val kildeId: String? = null,
-    val faktaOgVurderinger: FaktaOgSvarDto? = null,
     val faktaOgSvar: FaktaOgSvarDto? = null,
 )
 

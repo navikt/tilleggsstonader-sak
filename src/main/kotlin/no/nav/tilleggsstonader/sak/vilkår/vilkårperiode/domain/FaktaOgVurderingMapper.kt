@@ -1,67 +1,121 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårMålgruppeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 
-fun mapFaktaOgVurderingDto(
+fun mapFaktaOgSvarDto(
     vilkårperiode: LagreVilkårperiode,
+    stønadstype: Stønadstype,
 ): FaktaOgVurdering {
     return when (vilkårperiode.type) {
-        is AktivitetType -> mapAktiviteter(vilkårperiode)
-        is MålgruppeType -> mapMålgrupper(vilkårperiode)
+        is AktivitetType -> mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode)
+        is MålgruppeType -> mapMålgruppe(stønadstype = stønadstype, målgruppe = vilkårperiode)
     }
 }
 
-private fun mapAktiviteter(
-    vilkårperiode: LagreVilkårperiode,
-): AktivitetTilsynBarn {
-    val type = vilkårperiode.type
+private fun mapAktiviteter(stønadstype: Stønadstype, aktivitet: LagreVilkårperiode): AktivitetFaktaOgVurdering {
+    val type = aktivitet.type
     require(type is AktivitetType)
-    val delvilkår = vilkårperiode.delvilkår
-    require(delvilkår is DelvilkårAktivitetDto)
-    return when (type) {
+
+    val faktaOgSvar = aktivitet.faktaOgSvar
+    when (stønadstype) {
+        Stønadstype.BARNETILSYN -> {
+            require(faktaOgSvar is FaktaOgSvarAktivitetBarnetilsynDto)
+            return mapAktiviteterBarnetilsyn(type, faktaOgSvar)
+        }
+
+        Stønadstype.LÆREMIDLER -> {
+            require(faktaOgSvar is FaktaOgSvarAktivitetLæremidlerDto)
+            return mapAktiviteterLæremidler(type, faktaOgSvar)
+        }
+    }
+}
+
+private fun mapMålgruppe(stønadstype: Stønadstype, målgruppe: LagreVilkårperiode): MålgruppeFaktaOgVurdering {
+    val type = målgruppe.type
+    require(type is MålgruppeType)
+
+    val faktaOgSvar = målgruppe.faktaOgSvar
+    require(faktaOgSvar is FaktaOgSvarMålgruppeDto)
+
+    return when (stønadstype) {
+        Stønadstype.BARNETILSYN -> {
+            mapMålgruppeBarnetilsyn(type, faktaOgSvar)
+        }
+
+        Stønadstype.LÆREMIDLER -> {
+            mapMålgruppeLæremidler(type, faktaOgSvar)
+        }
+    }
+}
+
+private fun mapAktiviteterBarnetilsyn(
+    aktivitetType: AktivitetType,
+    faktaOgSvar: FaktaOgSvarAktivitetBarnetilsynDto,
+): AktivitetTilsynBarn {
+    return when (aktivitetType) {
         AktivitetType.TILTAK -> {
             TiltakTilsynBarn(
-                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = vilkårperiode.aktivitetsdager!!),
-                vurderinger = VurderingTiltakTilsynBarn(lønnet = mapLønnet(delvilkår)),
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
+                vurderinger = VurderingTiltakTilsynBarn(lønnet = VurderingLønnet(faktaOgSvar.svarLønnet)),
             )
         }
 
         AktivitetType.UTDANNING -> UtdanningTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = vilkårperiode.aktivitetsdager!!),
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
         )
 
         AktivitetType.REELL_ARBEIDSSØKER -> ReellArbeidsøkerTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = vilkårperiode.aktivitetsdager!!),
+            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
         )
 
         AktivitetType.INGEN_AKTIVITET -> {
-            feilHvis(vilkårperiode.aktivitetsdager != null) {
+            feilHvis(faktaOgSvar.aktivitetsdager != null) {
                 "Kan ikke registrere aktivitetsdager på ingen aktivitet"
             }
             IngenAktivitetTilsynBarn
@@ -69,24 +123,37 @@ private fun mapAktiviteter(
     }
 }
 
-/**
- * TODO valider at man ikke sender inn vurderinger som ikke er aktuelle for gitt type?
- * Men frontend sender hele delvilkår, inkl det som har resultat implisitt
- */
-private fun mapMålgrupper(
-    vilkårperiode: LagreVilkårperiode,
+fun mapAktiviteterLæremidler(
+    type: AktivitetType,
+    faktaOgSvar: FaktaOgSvarAktivitetLæremidlerDto,
+): AktivitetLæremidler {
+    return when (type) {
+        AktivitetType.TILTAK -> TiltakLæremidler(
+            fakta = FaktaAktivitetLæremidler(prosent = faktaOgSvar.prosent!!),
+            vurderinger = VurderingTiltakLæremidler(harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter)),
+        )
+
+        AktivitetType.UTDANNING -> UtdanningLæremidler(
+            fakta = FaktaAktivitetLæremidler(prosent = faktaOgSvar.prosent!!),
+        )
+
+        AktivitetType.INGEN_AKTIVITET -> IngenAktivitetLæremidler
+
+        AktivitetType.REELL_ARBEIDSSØKER -> brukerfeil("Reell arbeidssøker er ikke en gyldig aktivitet for læremidler")
+    }
+}
+
+private fun mapMålgruppeBarnetilsyn(
+    type: MålgruppeType,
+    faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
 ): MålgruppeTilsynBarn {
-    val type = vilkårperiode.type
-    require(type is MålgruppeType)
-    val delvilkår = vilkårperiode.delvilkår
-    require(delvilkår is DelvilkårMålgruppeDto)
     return when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
         MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
         MålgruppeType.OMSTILLINGSSTØNAD -> {
             OmstillingsstønadTilsynBarn(
                 vurderinger = VurderingOmstillingsstønad(
-                    medlemskap = mapMedlemskap(delvilkår),
+                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                 ),
             )
         }
@@ -98,7 +165,7 @@ private fun mapMålgrupper(
         MålgruppeType.AAP -> {
             AAPTilsynBarn(
                 vurderinger = VurderingAAP(
-                    dekketAvAnnetRegelverk = mapDekketAvAnnetRegelverk(delvilkår),
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
                 ),
             )
         }
@@ -106,8 +173,8 @@ private fun mapMålgrupper(
         MålgruppeType.UFØRETRYGD -> {
             UføretrygdTilsynBarn(
                 vurderinger = VurderingUføretrygd(
-                    dekketAvAnnetRegelverk = mapDekketAvAnnetRegelverk(delvilkår),
-                    medlemskap = mapMedlemskap(delvilkår),
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                 ),
             )
         }
@@ -115,8 +182,8 @@ private fun mapMålgrupper(
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
             NedsattArbeidsevneTilsynBarn(
                 vurderinger = VurderingNedsattArbeidsevne(
-                    dekketAvAnnetRegelverk = mapDekketAvAnnetRegelverk(delvilkår),
-                    medlemskap = mapMedlemskap(delvilkår),
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
                 ),
             )
         }
@@ -125,11 +192,51 @@ private fun mapMålgrupper(
     }
 }
 
-private fun mapLønnet(delvilkår: DelvilkårAktivitetDto) =
-    VurderingLønnet(delvilkår.lønnet?.svar)
+private fun mapMålgruppeLæremidler(
+    type: MålgruppeType,
+    faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
+): MålgruppeLæremidler {
+    return when (type) {
+        MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeLæremidler
+        MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerLæremidler
+        MålgruppeType.OMSTILLINGSSTØNAD -> {
+            OmstillingsstønadLæremidler(
+                vurderinger = VurderingOmstillingsstønad(
+                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                ),
+            )
+        }
 
-private fun mapDekketAvAnnetRegelverk(delvilkår: DelvilkårMålgruppeDto) =
-    VurderingDekketAvAnnetRegelverk(delvilkår.dekketAvAnnetRegelverk?.svar)
+        MålgruppeType.OVERGANGSSTØNAD -> {
+            OvergangssstønadLæremidler
+        }
 
-private fun mapMedlemskap(delvilkår: DelvilkårMålgruppeDto) =
-    VurderingMedlemskap(delvilkår.medlemskap?.svar)
+        MålgruppeType.AAP -> {
+            AAPLæremidler(
+                vurderinger = VurderingAAP(
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                ),
+            )
+        }
+
+        MålgruppeType.UFØRETRYGD -> {
+            UføretrygdLæremidler(
+                vurderinger = VurderingUføretrygd(
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                ),
+            )
+        }
+
+        MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
+            NedsattArbeidsevneLæremidler(
+                vurderinger = VurderingNedsattArbeidsevne(
+                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                ),
+            )
+        }
+
+        MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+    }
+}

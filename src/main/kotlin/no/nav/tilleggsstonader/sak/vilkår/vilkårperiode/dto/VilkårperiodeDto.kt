@@ -167,17 +167,6 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto {
     }
 }
 
-data class LagreVilkårperiode(
-    val behandlingId: BehandlingId,
-    val type: VilkårperiodeType,
-    val fom: LocalDate,
-    val tom: LocalDate,
-    val aktivitetsdager: Int? = null,
-    val delvilkår: DelvilkårVilkårperiodeDto,
-    val begrunnelse: String? = null,
-    val kildeId: String? = null,
-)
-
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
     JsonSubTypes.Type(DelvilkårMålgruppeDto::class, name = "MÅLGRUPPE"),

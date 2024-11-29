@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeNy
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
@@ -35,7 +35,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
         kallOpprettVilkårperiode(
-            LagreVilkårperiodeNy(
+            LagreVilkårperiode(
                 type = MålgruppeType.AAP,
                 fom = osloDateNow(),
                 tom = osloDateNow(),
@@ -57,7 +57,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     fun `skal kunne oppdatere eksisterende aktivitet`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-        val originalLagreRequest = LagreVilkårperiodeNy(
+        val originalLagreRequest = LagreVilkårperiode(
             type = MålgruppeType.AAP,
             fom = osloDateNow(),
             tom = osloDateNow(),
@@ -87,7 +87,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         }
 
         val response = kallOpprettVilkårperiode(
-            LagreVilkårperiodeNy(
+            LagreVilkårperiode(
                 type = MålgruppeType.AAP,
                 fom = osloDateNow(),
                 tom = osloDateNow(),
@@ -127,7 +127,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
         ).body!!.vilkårperioder
 
     private fun kallOpprettVilkårperiode(
-        lagreVilkårperiode: LagreVilkårperiodeNy,
+        lagreVilkårperiode: LagreVilkårperiode,
     ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
         localhost("api/vilkarperiode/v2"),
         HttpMethod.POST,
@@ -135,7 +135,7 @@ class VilkårperiodeControllerTest : IntegrationTest() {
     ).body!!
 
     private fun kallOppdaterVikårperiode(
-        lagreVilkårperiode: LagreVilkårperiodeNy,
+        lagreVilkårperiode: LagreVilkårperiode,
         vilkårperiodeId: UUID,
     ) = restTemplate.exchange<LagreVilkårperiodeResponse>(
         localhost("api/vilkarperiode/v2/$vilkårperiodeId"),
