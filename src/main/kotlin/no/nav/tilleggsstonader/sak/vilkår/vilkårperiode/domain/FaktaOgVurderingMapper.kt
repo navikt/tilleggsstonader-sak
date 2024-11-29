@@ -131,7 +131,7 @@ fun mapAktiviteterLæremidler(
         AktivitetType.TILTAK -> TiltakLæremidler(
             fakta = FaktaAktivitetLæremidler(
                 prosent = faktaOgSvar.prosent!!,
-                studienivå = faktaOgSvar.studienivå, // TODO: Det er ikke obligatorisk å sende inn studienivå for tiltak av variant "Høyere utdanning". Må deale med det.
+                studienivå = faktaOgSvar.studienivå!!,
             ),
             vurderinger = VurderingTiltakLæremidler(harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter)),
         )
@@ -139,7 +139,7 @@ fun mapAktiviteterLæremidler(
         AktivitetType.UTDANNING -> UtdanningLæremidler(
             fakta = FaktaAktivitetLæremidler(
                 prosent = faktaOgSvar.prosent!!,
-                studienivå = faktaOgSvar.studienivå,
+                studienivå = faktaOgSvar.studienivå!!,
             ),
         )
 
