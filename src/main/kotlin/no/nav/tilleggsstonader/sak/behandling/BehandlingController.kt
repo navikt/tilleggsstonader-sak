@@ -103,9 +103,10 @@ class BehandlingController(
                 BehandlingStatus.SATT_PÅ_VENT,
             )
             val behandlingStatus = behandlinger.map { it.status }
-            return behandlingStatus.any { it in validStatuses }
+            //return behandlingStatus.any { it in validStatuses }
+            return false
         }
-        return false
+        return true
     }
 
     @PostMapping("{behandlingId}/henlegg")
