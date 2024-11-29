@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.norskFormat
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -22,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaProsent
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaStudienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.HarUtgifterVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
@@ -141,6 +143,7 @@ data class AktivitetBarnetilsynFaktaOgVurderingerDto(
 
 data class AktivitetLæremidlerFaktaOgVurderingerDto(
     val prosent: Int? = null,
+    val studienivå: Studienivå? = null,
     val harUtgifter: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
@@ -160,6 +163,7 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto {
 
                 is FaktaOgVurderingLæremidler -> AktivitetLæremidlerFaktaOgVurderingerDto(
                     prosent = fakta.takeIfFakta<FaktaProsent>()?.prosent,
+                    studienivå = fakta.takeIfFakta<FaktaStudienivå>()?.studienivå,
                     harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
                 )
             }

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
@@ -105,12 +106,12 @@ class VilkårperiodeDtoTest {
         fun `mapper ut faktaOgVurderinger for utdanning læremidler`() {
             val utdanningLæremidler = VilkårperiodeTestUtil.aktivitet(
                 faktaOgVurdering = UtdanningLæremidler(
-                    fakta = FaktaAktivitetLæremidler(prosent = 60),
+                    fakta = FaktaAktivitetLæremidler(prosent = 60, studienivå = Studienivå.VIDEREGÅENDE),
                 ),
             ).tilDto()
 
             assertThat(utdanningLæremidler.faktaOgVurderinger).isEqualTo(
-                AktivitetLæremidlerFaktaOgVurderingerDto(prosent = 60),
+                AktivitetLæremidlerFaktaOgVurderingerDto(prosent = 60, studienivå = Studienivå.VIDEREGÅENDE),
             )
         }
     }

@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.RegisterAktivitetClientCo
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.lønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
@@ -17,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårspe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
@@ -196,26 +198,52 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             }.hasMessageContaining("Til-og-med før fra-og-med")
         }
 
-        @Test
-        fun `skal ikke kunne lage aktivitet med type reell arbeidssøker for søknad om læremidler`() {
-            val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.LÆREMIDLER))
+        @Nested
+        inner class Læremidler {
+            @Test
+            fun `skal ikke kunne lage aktivitet med type reell arbeidssøker for søknad om læremidler`() {
+                val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.LÆREMIDLER))
+                val behandling = testoppsettService.lagre(behandling(fagsak))
 
-            val behandling = testoppsettService.lagre(behandling(fagsak))
+                assertThatThrownBy {
+                    vilkårperiodeService.opprettVilkårperiode(
+                        LagreVilkårperiode(
+                            type = AktivitetType.REELL_ARBEIDSSØKER,
+                            behandlingId = behandling.id,
+                            fom = now(),
+                            tom = now(),
+                            faktaOgSvar = FaktaOgSvarAktivitetLæremidlerDto(
+                                prosent = 50,
+                                svarHarUtgifter = SvarJaNei.JA,
+                            ),
+                        ),
+                    )
+                }.hasMessageContaining("Reell arbeidssøker er ikke en gyldig aktivitet for læremidler")
+            }
 
-            assertThatThrownBy {
-                vilkårperiodeService.opprettVilkårperiode(
+            @Test
+            fun `Skal kunne sende inn og hente ut utdanningsnivå`() {
+                val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.LÆREMIDLER))
+                val behandling = testoppsettService.lagre(behandling(fagsak))
+
+                val persistertAktivitet = vilkårperiodeService.opprettVilkårperiode(
                     LagreVilkårperiode(
-                        type = AktivitetType.REELL_ARBEIDSSØKER,
+                        type = AktivitetType.UTDANNING,
                         behandlingId = behandling.id,
                         fom = now(),
                         tom = now(),
                         faktaOgSvar = FaktaOgSvarAktivitetLæremidlerDto(
                             prosent = 50,
+                            studienivå = Studienivå.HØYERE_UTDANNING,
                             svarHarUtgifter = SvarJaNei.JA,
                         ),
                     ),
                 )
-            }.hasMessageContaining("Reell arbeidssøker er ikke en gyldig aktivitet for læremidler")
+
+                val studienivå =
+                    persistertAktivitet.faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetLæremidler>()?.studienivå
+                assertThat(studienivå).isEqualTo(Studienivå.HØYERE_UTDANNING)
+            }
         }
     }
 

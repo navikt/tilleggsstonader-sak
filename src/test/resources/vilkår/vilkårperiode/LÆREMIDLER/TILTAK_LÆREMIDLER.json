@@ -1,7 +1,8 @@
 {
   "type": "TILTAK_LÆREMIDLER",
   "fakta": {
-    "prosent": 70
+    "prosent": 70,
+    "studienivå": "VIDEREGÅENDE"
   },
   "vurderinger": {
     "harUtgifter": {
