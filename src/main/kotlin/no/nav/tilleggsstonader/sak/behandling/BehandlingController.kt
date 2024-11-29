@@ -86,6 +86,26 @@ class BehandlingController(
             identStønadstype.stønadstype,
         )
     }
+    @PostMapping("harBehandling")
+    fun hentBehandlingStatusForPersonMedStønadstype(@RequestBody identStønadstype: IdentStønadstype): Boolean {
+        tilgangService.validerTilgangTilPersonMedBarn(identStønadstype.ident, AuditLoggerEvent.ACCESS)
+        val behandlinger = fagsakService.hentBehandlingerForPersonOgStønadstype(
+            identStønadstype.ident,
+            identStønadstype.stønadstype,
+        )
+        if (behandlinger.isNotEmpty()) {
+            val validStatuses = listOf(
+                BehandlingStatus.OPPRETTET,
+                BehandlingStatus.UTREDES,
+                BehandlingStatus.FATTER_VEDTAK,
+                BehandlingStatus.SATT_PÅ_VENT,
+            )
+            val behandlingStatus = behandlinger.map { it.status }
+            return behandlingStatus.any { it in validStatuses }
+        }
+        return false
+    }
+
 
     @PostMapping("{behandlingId}/henlegg")
     fun henleggBehandling(@PathVariable behandlingId: BehandlingId, @RequestBody henlagt: HenlagtDto): BehandlingDto {
