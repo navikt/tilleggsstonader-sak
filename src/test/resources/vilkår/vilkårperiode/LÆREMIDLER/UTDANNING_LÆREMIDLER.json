@@ -1,7 +1,8 @@
 {
   "type": "UTDANNING_LÆREMIDLER",
   "fakta": {
-    "prosent": 70
+    "prosent": 70,
+    "studienivå": "HØYERE_UTDANNING"
   },
   "vurderinger": {}
 }

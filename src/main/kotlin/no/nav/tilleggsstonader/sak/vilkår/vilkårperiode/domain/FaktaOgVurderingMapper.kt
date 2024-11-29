@@ -129,12 +129,18 @@ fun mapAktiviteterLæremidler(
 ): AktivitetLæremidler {
     return when (type) {
         AktivitetType.TILTAK -> TiltakLæremidler(
-            fakta = FaktaAktivitetLæremidler(prosent = faktaOgSvar.prosent!!),
+            fakta = FaktaAktivitetLæremidler(
+                prosent = faktaOgSvar.prosent!!, // TODO: Det er ikke obligatorisk å sende inn studienivå for tiltak av variant "Høyere utdanning". Må deale med det.
+                studienivå = faktaOgSvar.studienivå!!,
+            ),
             vurderinger = VurderingTiltakLæremidler(harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter)),
         )
 
         AktivitetType.UTDANNING -> UtdanningLæremidler(
-            fakta = FaktaAktivitetLæremidler(prosent = faktaOgSvar.prosent!!),
+            fakta = FaktaAktivitetLæremidler(
+                prosent = faktaOgSvar.prosent!!,
+                studienivå = faktaOgSvar.studienivå!!,
+            ),
         )
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetLæremidler

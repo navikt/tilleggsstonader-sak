@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import java.time.LocalDate
@@ -37,5 +38,6 @@ data class FaktaOgSvarAktivitetBarnetilsynDto(
 
 data class FaktaOgSvarAktivitetLæremidlerDto(
     val prosent: Int? = null,
+    val studienivå: Studienivå? = null,
     val svarHarUtgifter: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
