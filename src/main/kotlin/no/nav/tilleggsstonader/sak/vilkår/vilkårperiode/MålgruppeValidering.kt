@@ -8,7 +8,7 @@ object MålgruppeValidering {
 
     fun validerKanLeggeTilMålgruppeManuelt(stønadstype: Stønadstype, målgruppeType: MålgruppeType) {
         val gyldig = when (stønadstype) {
-            Stønadstype.BARNETILSYN -> when (målgruppeType) {
+            Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER -> when (målgruppeType) {
                 MålgruppeType.AAP -> true
                 MålgruppeType.DAGPENGER -> false
                 MålgruppeType.NEDSATT_ARBEIDSEVNE -> true
@@ -18,7 +18,6 @@ object MålgruppeValidering {
                 MålgruppeType.SYKEPENGER_100_PROSENT -> true
                 MålgruppeType.INGEN_MÅLGRUPPE -> true
             }
-            else -> error("Målgruppevalidering for stønadstype=$stønadstype er ikke implementert")
         }
         feilHvisIkke(gyldig) {
             "målgruppe=$målgruppeType er ikke gyldig for $stønadstype"
