@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -89,10 +90,13 @@ class BehandlingController(
     @PostMapping("harBehandling")
     fun hentBehandlingStatusForPersonMedStønadstype(@RequestBody identStønadstype: IdentStønadstype): Boolean {
         tilgangService.validerTilgangTilPersonMedBarn(identStønadstype.ident, AuditLoggerEvent.ACCESS)
+        logger.info("hello the fødselsnummmer is fødselsnummer" +identStønadstype.ident,)
+        logger.info("hello the fødselsnummmer is fødselsnummer" +identStønadstype.stønadstype,)
         val behandlinger = fagsakService.hentBehandlingerForPersonOgStønadstype(
             identStønadstype.ident,
             identStønadstype.stønadstype,
         )
+        logger.info("behandlinger is" +behandlinger[0])
         if (behandlinger.isNotEmpty()) {
             val validStatuses = listOf(
                 BehandlingStatus.OPPRETTET,
@@ -101,6 +105,7 @@ class BehandlingController(
                 BehandlingStatus.SATT_PÅ_VENT,
             )
             val behandlingStatus = behandlinger.map { it.status }
+            logger.info("behandlinger status" +behandlingStatus)
             return behandlingStatus.any { it in validStatuses }
         }
         return false
