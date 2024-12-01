@@ -88,6 +88,7 @@ class BehandlingController(
         )
     }
     @PostMapping("harBehandling")
+    @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun hentBehandlingStatusForPersonMedStønadstype(@RequestBody identStønadstype: IdentStønadstype): Boolean {
         tilgangService.validerTilgangTilPersonMedBarn(identStønadstype.ident, AuditLoggerEvent.ACCESS)
         logger.info("hello the fødselsnummmer is fødselsnummer" +identStønadstype.ident,)
