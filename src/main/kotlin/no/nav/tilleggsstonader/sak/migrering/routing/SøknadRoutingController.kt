@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping(path = ["/api/ekstern/routing-soknad"])
+@RequestMapping(path = ["/api/ekstern"])
 @ProtectedWithClaims(issuer = "azuread")
 class SøknadRoutingController(
     private val søknadRoutingService: SøknadRoutingService,
     private val fagsakService: FagsakService,
 ) {
 
-    @PostMapping
+    @PostMapping("routing-soknad")
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun sjekkRoutingForPerson(@RequestBody request: IdentStønadstype): SøknadRoutingResponse {
         feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
