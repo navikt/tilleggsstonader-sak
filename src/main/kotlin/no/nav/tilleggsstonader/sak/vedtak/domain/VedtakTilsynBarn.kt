@@ -13,34 +13,31 @@ sealed interface VedtakTilsynBarn : Vedtaksdata
 
 data class InnvilgelseTilsynBarn(
     val beregningsresultat: BeregningsresultatTilsynBarn,
-) : VedtakTilsynBarn {
+) : VedtakTilsynBarn, Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN
 }
 
 data class AvslagTilsynBarn(
-    val årsaker: List<ÅrsakAvslag>,
-    val begrunnelse: String,
-) : VedtakTilsynBarn {
-
+    override val årsaker: List<ÅrsakAvslag>,
+    override val begrunnelse: String,
+) : VedtakTilsynBarn, Avslag {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.AVSLAG_TILSYN_BARN
 
     init {
-        require(årsaker.isNotEmpty()) { "Må velge minst en årsak for avslag" }
-        require(begrunnelse.isNotBlank()) { "Avslag må begrunnes" }
+        this.validerÅrsakerOgBegrunnelse()
     }
 }
 
 data class OpphørTilsynBarn(
     val beregningsresultat: BeregningsresultatTilsynBarn,
-    val årsaker: List<ÅrsakOpphør>,
-    val begrunnelse: String,
-) : VedtakTilsynBarn {
+    override val årsaker: List<ÅrsakOpphør>,
+    override val begrunnelse: String,
+) : VedtakTilsynBarn, Opphør {
 
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.OPPHØR_TILSYN_BARN
 
     init {
-        require(årsaker.isNotEmpty()) { "Må velge minst en årsak for opphør" }
-        require(begrunnelse.isNotBlank()) { "Opphør må begrunnes" }
+        this.validerÅrsakerOgBegrunnelse()
     }
 }
 

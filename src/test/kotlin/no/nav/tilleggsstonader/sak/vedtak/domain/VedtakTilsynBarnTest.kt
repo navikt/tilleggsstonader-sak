@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakBeregningsresultat
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -30,6 +31,17 @@ class VedtakTilsynBarnTest {
             }
                 .hasMessage("Avslag må begrunnes")
         }
+
+        /**
+         * I tilfelle man setter opp Avslag/sealed class feil så er de ikke like
+         */
+        @Test
+        fun `2 like avslag skal være like`() {
+            val avslagTilsynBarn = AvslagTilsynBarn(listOf(ÅrsakAvslag.INGEN_AKTIVITET), "asd")
+            val avslagTilsynBarn2 = AvslagTilsynBarn(listOf(ÅrsakAvslag.INGEN_AKTIVITET), "asd")
+
+            assertThat(avslagTilsynBarn).isEqualTo(avslagTilsynBarn2)
+        }
     }
 
     @Nested
@@ -56,6 +68,19 @@ class VedtakTilsynBarnTest {
                 )
             }
                 .hasMessage("Opphør må begrunnes")
+        }
+
+        /**
+         * I tilfelle man setter opp Avslag/sealed class feil så er de ikke like
+         */
+        @Test
+        fun `2 like opphør skal være like`() {
+            val avslagTilsynBarn =
+                OpphørTilsynBarn(vedtakBeregningsresultat, listOf(ÅrsakOpphør.ENDRING_UTGIFTER), "asd")
+            val avslagTilsynBarn2 =
+                OpphørTilsynBarn(vedtakBeregningsresultat, listOf(ÅrsakOpphør.ENDRING_UTGIFTER), "asd")
+
+            assertThat(avslagTilsynBarn).isEqualTo(avslagTilsynBarn2)
         }
     }
 }

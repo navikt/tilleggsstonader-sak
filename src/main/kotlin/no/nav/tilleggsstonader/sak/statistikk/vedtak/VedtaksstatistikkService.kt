@@ -5,14 +5,12 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -42,10 +40,6 @@ class VedtaksstatistikkService(
         val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId)
 
-        feilHvis(vedtak != null && vedtak.data !is VedtakTilsynBarn) {
-            "Har ikke håndtert vedtak for ${vedtak?.data?.let { it::class.simpleName }}"
-        }
-
         vedtaksstatistikkRepository.insert(
             Vedtaksstatistikk(
                 fagsakId = fagsakId,
@@ -67,8 +61,8 @@ class VedtaksstatistikkService(
                 vedtaksperioder = VedtaksperioderDvh.fraDomene(stønadsperioder),
                 utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse),
                 kravMottatt = behandling.kravMottatt,
-                årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak?.takeIfType<AvslagTilsynBarn>()?.data?.årsaker),
-                årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak?.takeIfType<OpphørTilsynBarn>()?.data?.årsaker),
+                årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak?.takeIfType<Avslag>()?.data?.årsaker),
+                årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak?.takeIfType<Opphør>()?.data?.årsaker),
             ),
         )
     }

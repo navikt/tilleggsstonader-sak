@@ -14,35 +14,33 @@ sealed interface VedtakLæremidler : Vedtaksdata
 /*
 data class InnvilgelseLæremidler(
     val beregningsresultat: BeregningsresultatLæremidler,
-) : VedtakLæremidler {
+) : VedtakLæremidler, Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakLæremidler.INNVILGELSE_LÆREMIDLER
 }*/
 
 data class AvslagLæremidler(
-    val årsaker: List<ÅrsakAvslag>,
-    val begrunnelse: String,
-) : VedtakLæremidler {
+    override val årsaker: List<ÅrsakAvslag>,
+    override val begrunnelse: String,
+) : VedtakLæremidler, Avslag {
 
     override val type: TypeVedtaksdata = TypeVedtakLæremidler.AVSLAG_LÆREMIDLER
 
     init {
-        require(årsaker.isNotEmpty()) { "Må velge minst en årsak for avslag" }
-        require(begrunnelse.isNotBlank()) { "Avslag må begrunnes" }
+        this.validerÅrsakerOgBegrunnelse()
     }
 }
 
 /*
 data class OpphørLæremidler(
     val beregningsresultat: BeregningsresultatLæremidler,
-    val årsaker: List<ÅrsakOpphør>,
-    val begrunnelse: String,
-) : VedtakLæremidler {
+    override val årsaker: List<ÅrsakOpphør>,
+    override val begrunnelse: String,
+) : VedtakLæremidler, Opphør {
 
     override val type: TypeVedtaksdata = TypeVedtakLæremidler.OPPHØR_LÆREMIDLER
 
     init {
-        require(årsaker.isNotEmpty()) { "Må velge minst en årsak for opphør" }
-        require(begrunnelse.isNotBlank()) { "Opphør må begrunnes" }
+        this.validerÅrsakerOgBegrunnelse()
     }
 }
 */

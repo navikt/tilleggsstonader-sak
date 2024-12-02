@@ -15,3 +15,25 @@ sealed interface Vedtaksdata : VedtaksdataJson {
 sealed interface TypeVedtaksdata {
     val typeVedtak: TypeVedtak
 }
+
+sealed interface Innvilgelse : Vedtaksdata
+
+sealed interface Opphør : Vedtaksdata {
+    val årsaker: List<ÅrsakOpphør>
+    val begrunnelse: String
+}
+
+sealed interface Avslag : Vedtaksdata {
+    val årsaker: List<ÅrsakAvslag>
+    val begrunnelse: String
+}
+
+fun Avslag.validerÅrsakerOgBegrunnelse() {
+    require(årsaker.isNotEmpty()) { "Må velge minst en årsak for avslag" }
+    require(begrunnelse.isNotBlank()) { "Avslag må begrunnes" }
+}
+
+fun Opphør.validerÅrsakerOgBegrunnelse() {
+    require(årsaker.isNotEmpty()) { "Må velge minst en årsak for opphør" }
+    require(begrunnelse.isNotBlank()) { "Opphør må begrunnes" }
+}
