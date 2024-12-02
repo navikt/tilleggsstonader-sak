@@ -7,8 +7,6 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
-import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -32,7 +30,6 @@ class SøknadRoutingController(
         return søknadRoutingService.sjekkRoutingForPerson(request)
     }
 
-
     @PostMapping("harBehandling")
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun hentBehandlingStatusForPersonMedStønadstype(@RequestBody identStønadstype: IdentStønadstype): Boolean {
@@ -53,4 +50,3 @@ class SøknadRoutingController(
         return false
     }
 }
-
