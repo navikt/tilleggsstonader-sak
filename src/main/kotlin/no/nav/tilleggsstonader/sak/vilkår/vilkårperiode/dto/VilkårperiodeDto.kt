@@ -147,7 +147,7 @@ data class AktivitetLæremidlerFaktaOgVurderingerDto(
     val prosent: Int? = null,
     val studienivå: Studienivå? = null,
     val harUtgifter: VurderingDto? = null,
-    val harRettTilStudiestipend: VurderingDto? = null,
+    val harRettTilUtstyrsstipend: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto {
@@ -168,7 +168,7 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto {
                     prosent = fakta.takeIfFakta<FaktaProsent>()?.prosent,
                     studienivå = fakta.takeIfFakta<FaktaStudienivå>()?.studienivå,
                     harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
-                    harRettTilStudiestipend = vurderinger.takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()?.harRettTilUtstyrsstipend?.tilDto(),
+                    harRettTilUtstyrsstipend = vurderinger.takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()?.harRettTilUtstyrsstipend?.tilDto(),
                 )
             }
         }

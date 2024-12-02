@@ -32,7 +32,7 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto {
                 is FaktaOgVurderingLæremidler -> FaktaOgSvarAktivitetLæremidlerDto(
                     prosent = fakta.takeIfFakta<FaktaProsent>()?.prosent,
                     svarHarUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.svar,
-                    svarHarRettTilUtstyrsstipend = vurderinger.takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()?.harRettTilUtstyrsstipend?.svar
+                    svarHarRettTilUtstyrsstipend = vurderinger.takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()?.harRettTilUtstyrsstipend?.svar,
                 )
             }
         }

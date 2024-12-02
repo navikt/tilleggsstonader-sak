@@ -148,7 +148,7 @@ fun mapAktiviteterLæremidler(
             ),
             vurderinger = VurderingerUtdanningLæremidler(
                 harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(faktaOgSvar.svarHarRettTilUtstyrsstipend),
-            )
+            ),
         )
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetLæremidler

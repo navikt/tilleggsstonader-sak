@@ -111,9 +111,9 @@ class VilkårperiodeDtoTest {
                     fakta = FaktaAktivitetLæremidler(prosent = 60, studienivå = Studienivå.VIDEREGÅENDE),
                     vurderinger = VurderingerUtdanningLæremidler(
                         harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(
-                            SvarJaNei.NEI
-                        )
-                    )
+                            SvarJaNei.NEI,
+                        ),
+                    ),
                 ),
             ).tilDto()
 
@@ -121,7 +121,7 @@ class VilkårperiodeDtoTest {
                 AktivitetLæremidlerFaktaOgVurderingerDto(
                     prosent = 60,
                     studienivå = Studienivå.VIDEREGÅENDE,
-                    harRettTilStudiestipend = VurderingDto(svar = SvarJaNei.NEI, resultat = OPPFYLT)
+                    harRettTilUtstyrsstipend = VurderingDto(svar = SvarJaNei.NEI, resultat = OPPFYLT),
                 ),
             )
         }
