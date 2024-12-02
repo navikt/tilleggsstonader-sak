@@ -17,27 +17,8 @@ sealed interface FaktaOgVurdering : FaktaOgVurderingJson {
         if (type.vilkårperiodeType.girIkkeRettPåStønadsperiode()) {
             return ResultatVilkårperiode.IKKE_OPPFYLT
         }
-        return this.utledResultat(this.vurderinger.utledDelresultater())
+        return this.vurderinger.utledResultat()
     }
-
-    private fun utledResultat(resultater: List<ResultatDelvilkårperiode>) =
-        when {
-            resultater.contains(ResultatDelvilkårperiode.IKKE_VURDERT) -> {
-                ResultatVilkårperiode.IKKE_VURDERT
-            }
-
-            resultater.contains(ResultatDelvilkårperiode.IKKE_OPPFYLT) -> {
-                ResultatVilkårperiode.IKKE_OPPFYLT
-            }
-
-            resultater.all { it == ResultatDelvilkårperiode.OPPFYLT } -> {
-                ResultatVilkårperiode.OPPFYLT
-            }
-
-            else -> {
-                error("Ugyldig resultat ($resultater)")
-            }
-        }
 }
 
 sealed interface MålgruppeFaktaOgVurdering : FaktaOgVurdering
@@ -70,9 +51,9 @@ data object IngenFakta : Fakta
  * Vurderinger, som kan inneholde ulike vurderinger, eks lønnet
  */
 sealed interface Vurderinger {
-    fun utledDelresultater(): List<ResultatDelvilkårperiode>
+    fun utledResultat(): ResultatVilkårperiode
 }
 
 data object IngenVurderinger : Vurderinger {
-    override fun utledDelresultater() = emptyList<ResultatDelvilkårperiode>()
+    override fun utledResultat() = ResultatVilkårperiode.OPPFYLT
 }

@@ -92,7 +92,7 @@ data class VurderingTiltakTilsynBarn(
     override val lønnet: VurderingLønnet,
 ) : LønnetVurdering {
 
-    override fun utledDelresultater() = listOf(lønnet.resultat)
+    override fun utledResultat() = sammenstillDelresultater(lønnet.resultat)
 }
 
 data class FaktaAktivitetTilsynBarn(

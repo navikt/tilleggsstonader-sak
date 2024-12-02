@@ -15,7 +15,7 @@ data class VurderingAAP(
 ) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
 
-    override fun utledDelresultater() = listOf(medlemskap.resultat)
+    override fun utledResultat() = sammenstillDelresultater(medlemskap.resultat)
 }
 
 data class VurderingUføretrygd(
@@ -23,7 +23,9 @@ data class VurderingUføretrygd(
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
 ) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering {
 
-    override fun utledDelresultater() = listOf(medlemskap.resultat, dekketAvAnnetRegelverk.resultat)
+    override fun utledResultat() = sammenstillDelresultater(
+        medlemskap.resultat, dekketAvAnnetRegelverk.resultat
+    )
 }
 
 data class VurderingNedsattArbeidsevne(
@@ -31,17 +33,19 @@ data class VurderingNedsattArbeidsevne(
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
 ) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering {
 
-    override fun utledDelresultater() = listOf(medlemskap.resultat, dekketAvAnnetRegelverk.resultat)
+    override fun utledResultat() = sammenstillDelresultater(
+        medlemskap.resultat, dekketAvAnnetRegelverk.resultat
+    )
 }
 
 data class VurderingOmstillingsstønad(
     override val medlemskap: VurderingMedlemskap,
 ) : MedlemskapVurdering {
-    override fun utledDelresultater() = listOf(medlemskap.resultat)
+    override fun utledResultat() = sammenstillDelresultater(medlemskap.resultat)
 }
 
 data object VurderingOvergangsstønad : MedlemskapVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
 
-    override fun utledDelresultater() = listOf(medlemskap.resultat)
+    override fun utledResultat() = sammenstillDelresultater(medlemskap.resultat)
 }

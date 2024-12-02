@@ -87,15 +87,16 @@ data class VurderingTiltakLæremidler(
     override val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend,
 ) : HarUtgifterVurdering, HarRettTilUtstyrsstipendVurdering {
 
-    override fun utledDelresultater(): List<ResultatDelvilkårperiode> =
-        listOf(harUtgifter.resultat, harRettTilUtstyrsstipend.resultat)
+    override fun utledResultat() = sammenstillDelresultater(
+        harUtgifter.resultat, harRettTilUtstyrsstipend.resultat
+    )
 }
 
 data class VurderingerUtdanningLæremidler(
     override val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend,
 ) : HarRettTilUtstyrsstipendVurdering {
 
-    override fun utledDelresultater() = listOf(harRettTilUtstyrsstipend.resultat)
+    override fun utledResultat() = sammenstillDelresultater(harRettTilUtstyrsstipend.resultat)
 }
 
 data class FaktaAktivitetLæremidler(
