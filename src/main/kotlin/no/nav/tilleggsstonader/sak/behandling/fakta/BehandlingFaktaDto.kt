@@ -59,6 +59,7 @@ data class SøknadsgrunnlagUtdanning(
     val aktiviteter: List<String>?,
     val annenUtdanning: AnnenUtdanningType?,
     val erLærlingEllerLiknende: JaNei?,
+    val harTidligereFullførtVgs: JaNei?,
     val harFunksjonsnedsettelse: JaNei,
 )
 

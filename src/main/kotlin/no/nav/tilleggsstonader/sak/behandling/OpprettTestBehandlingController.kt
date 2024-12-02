@@ -154,7 +154,7 @@ class OpprettTestBehandlingController(
                 aktiviteter = EnumFlereValgFelt(
                     "Hvilken utdanning eller opplæring søker du om støtte til læremidler for",
                     listOf(
-                        VerdiFelt("1", "Høyere utdfanning: 25. februar 2024 - 25. juli 2024"),
+                        VerdiFelt("1", "Høyere utdanning: 25. februar 2024 - 25. juli 2024"),
                     ),
                     listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
                 ),
@@ -165,6 +165,7 @@ class OpprettTestBehandlingController(
                     emptyList(),
                 ),
                 erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
+                harTidligereFullførtVgs = EnumFelt("Har du tidligere fullført videregående skole?", JaNei.JA, "Ja", emptyList()),
                 harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
             ),
             dokumentasjon = emptyList(),

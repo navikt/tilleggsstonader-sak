@@ -97,6 +97,7 @@ data class UtdanningAvsnitt(
     val aktiviteter: List<ValgtAktivitet>?,
     val annenUtdanning: AnnenUtdanningType?,
     val erLærlingEllerLiknende: JaNei?,
+    val harTidligereFullførtVgs: JaNei?,
     val harFunksjonsnedsettelse: JaNei,
 )
 data class HovedytelseAvsnitt(

@@ -93,6 +93,7 @@ object SøknadUtil {
                 ),
                 annenUtdanning = EnumFelt("Annen utdanning tekst", AnnenUtdanningType.INGEN_UTDANNING, "Ja", emptyList()),
                 erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
+                harTidligereFullførtVgs = EnumFelt("Har du tidligere fullført videregående skole?", JaNei.JA, "Ja", emptyList()),
                 harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
             ),
         )

@@ -105,6 +105,7 @@ class BehandlingFaktaService(
                     aktiviteter = it.aktiviteter?.map { it.label },
                     annenUtdanning = it.annenUtdanning,
                     erLærlingEllerLiknende = it.erLærlingEllerLiknende,
+                    harTidligereFullførtVgs = it.harTidligereFullførtVgs,
                     harFunksjonsnedsettelse = it.harFunksjonsnedsettelse,
                 )
             },
