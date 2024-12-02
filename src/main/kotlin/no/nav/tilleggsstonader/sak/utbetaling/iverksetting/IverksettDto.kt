@@ -65,6 +65,7 @@ enum class StønadstypeIverksetting {
 
 @Suppress("unused")
 enum class IverksettStatus {
+    IKKE_PÅBEGYNT,
     SENDT_TIL_OPPDRAG,
     FEILET_MOT_OPPDRAG,
     OK,
