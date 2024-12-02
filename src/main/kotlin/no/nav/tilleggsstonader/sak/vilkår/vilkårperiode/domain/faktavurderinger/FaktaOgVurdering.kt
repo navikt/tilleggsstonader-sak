@@ -67,6 +67,12 @@ sealed interface Vurderinger {
         if (this is DekketAvAnnetRegelverkVurdering) {
             resultater.add(dekketAvAnnetRegelverk.resultat)
         }
+        if (this is HarUtgifterVurdering) {
+            resultater.add(harUtgifter.resultat)
+        }
+        if (this is HarRettTilUtstyrsstipendVurdering) {
+            resultater.add(harRettTilUtstyrsstipend.resultat)
+        }
         return resultater
     }
 
