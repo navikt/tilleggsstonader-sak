@@ -24,7 +24,8 @@ data class VurderingUføretrygd(
 ) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering {
 
     override fun utledResultat() = sammenstillDelresultater(
-        medlemskap.resultat, dekketAvAnnetRegelverk.resultat
+        medlemskap.resultat,
+        dekketAvAnnetRegelverk.resultat,
     )
 }
 
@@ -34,7 +35,8 @@ data class VurderingNedsattArbeidsevne(
 ) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering {
 
     override fun utledResultat() = sammenstillDelresultater(
-        medlemskap.resultat, dekketAvAnnetRegelverk.resultat
+        medlemskap.resultat,
+        dekketAvAnnetRegelverk.resultat,
     )
 }
 

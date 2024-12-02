@@ -88,7 +88,8 @@ data class VurderingTiltakLæremidler(
 ) : HarUtgifterVurdering, HarRettTilUtstyrsstipendVurdering {
 
     override fun utledResultat() = sammenstillDelresultater(
-        harUtgifter.resultat, harRettTilUtstyrsstipend.resultat
+        harUtgifter.resultat,
+        harRettTilUtstyrsstipend.resultat,
     )
 }
 
