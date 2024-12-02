@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaProsent
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaStudienivå
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.HarRettTilUtstyrsstipendVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.HarUtgifterVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
@@ -87,6 +88,7 @@ fun FaktaOgVurdering.tilDelvilkårDto(): DelvilkårVilkårperiodeDto {
             medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
             dekketAvAnnetRegelverk = vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.tilDto(),
         )
+
         is AktivitetFaktaOgVurdering -> DelvilkårAktivitetDto(
             lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
         )
@@ -145,6 +147,7 @@ data class AktivitetLæremidlerFaktaOgVurderingerDto(
     val prosent: Int? = null,
     val studienivå: Studienivå? = null,
     val harUtgifter: VurderingDto? = null,
+    val harRettTilUtstyrsstipend: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto {
@@ -165,6 +168,7 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto {
                     prosent = fakta.takeIfFakta<FaktaProsent>()?.prosent,
                     studienivå = fakta.takeIfFakta<FaktaStudienivå>()?.studienivå,
                     harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
+                    harRettTilUtstyrsstipend = vurderinger.takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()?.harRettTilUtstyrsstipend?.tilDto(),
                 )
             }
         }

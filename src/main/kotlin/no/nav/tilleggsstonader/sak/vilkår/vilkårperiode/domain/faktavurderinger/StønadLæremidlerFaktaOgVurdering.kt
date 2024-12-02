@@ -71,9 +71,9 @@ data class TiltakLæremidler(
 
 data class UtdanningLæremidler(
     override val fakta: FaktaAktivitetLæremidler,
+    override val vurderinger: VurderingerUtdanningLæremidler,
 ) : AktivitetLæremidler {
     override val type: AktivitetLæremidlerType = AktivitetLæremidlerType.UTDANNING_LÆREMIDLER
-    override val vurderinger: IngenVurderinger = IngenVurderinger
 }
 
 data object IngenAktivitetLæremidler : AktivitetLæremidler {
@@ -84,7 +84,12 @@ data object IngenAktivitetLæremidler : AktivitetLæremidler {
 
 data class VurderingTiltakLæremidler(
     override val harUtgifter: VurderingHarUtgifter,
-) : HarUtgifterVurdering
+    override val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend,
+) : HarUtgifterVurdering, HarRettTilUtstyrsstipendVurdering
+
+data class VurderingerUtdanningLæremidler(
+    override val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend,
+) : HarRettTilUtstyrsstipendVurdering
 
 data class FaktaAktivitetLæremidler(
     override val prosent: Int,

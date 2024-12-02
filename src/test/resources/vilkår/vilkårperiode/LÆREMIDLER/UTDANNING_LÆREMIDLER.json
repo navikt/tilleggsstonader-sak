@@ -4,5 +4,10 @@
     "prosent": 70,
     "studienivå": "HØYERE_UTDANNING"
   },
-  "vurderinger": {}
+  "vurderinger": {
+    "harRettTilUtstyrsstipend": {
+      "svar": "NEI",
+      "resultat": "OPPFYLT"
+    }
+  }
 }

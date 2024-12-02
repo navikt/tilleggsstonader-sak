@@ -40,4 +40,5 @@ data class FaktaOgSvarAktivitetLæremidlerDto(
     val prosent: Int? = null,
     val studienivå: Studienivå? = null,
     val svarHarUtgifter: SvarJaNei? = null,
+    val svarHarRettTilUtstyrsstipend: SvarJaNei? = null,
 ) : FaktaOgSvarDto()

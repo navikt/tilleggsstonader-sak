@@ -22,6 +22,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.HarRettTilUtstyrsstipendVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.HarUtgifterVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
@@ -222,13 +224,13 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             }
 
             @Test
-            fun `Skal kunne sende inn og hente ut utdanningsnivå`() {
+            fun `Skal kunne sende inn og hente ut felter spesifikke for læremidler`() {
                 val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.LÆREMIDLER))
                 val behandling = testoppsettService.lagre(behandling(fagsak))
 
                 val persistertAktivitet = vilkårperiodeService.opprettVilkårperiode(
                     LagreVilkårperiode(
-                        type = AktivitetType.UTDANNING,
+                        type = AktivitetType.TILTAK,
                         behandlingId = behandling.id,
                         fom = now(),
                         tom = now(),
@@ -236,13 +238,21 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                             prosent = 50,
                             studienivå = Studienivå.HØYERE_UTDANNING,
                             svarHarUtgifter = SvarJaNei.JA,
+                            svarHarRettTilUtstyrsstipend = SvarJaNei.NEI,
                         ),
                     ),
                 )
 
                 val studienivå =
                     persistertAktivitet.faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetLæremidler>()?.studienivå
+                val harUtgifter =
+                    persistertAktivitet.faktaOgVurdering.vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter
+                val harRettTilUtstyrsstipend =
+                    persistertAktivitet.faktaOgVurdering.vurderinger.takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()?.harRettTilUtstyrsstipend
+
                 assertThat(studienivå).isEqualTo(Studienivå.HØYERE_UTDANNING)
+                assertThat(harUtgifter?.svar).isEqualTo(SvarJaNei.JA)
+                assertThat(harRettTilUtstyrsstipend?.svar).isEqualTo(SvarJaNei.NEI)
             }
         }
     }

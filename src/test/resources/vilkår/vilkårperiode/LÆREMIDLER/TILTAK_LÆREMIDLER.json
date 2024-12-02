@@ -8,6 +8,10 @@
     "harUtgifter": {
       "svar": "JA",
       "resultat": "OPPFYLT"
+    },
+    "harRettTilUtstyrsstipend": {
+      "svar": "NEI",
+      "resultat": "OPPFYLT"
     }
   }
 }
