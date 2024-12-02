@@ -88,7 +88,6 @@ class BehandlingController(
         )
     }
 
-
     @PostMapping("{behandlingId}/henlegg")
     fun henleggBehandling(@PathVariable behandlingId: BehandlingId, @RequestBody henlagt: HenlagtDto): BehandlingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)

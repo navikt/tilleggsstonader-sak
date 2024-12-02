@@ -36,14 +36,10 @@ class SøknadRoutingController(
     @PostMapping("harBehandling")
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun hentBehandlingStatusForPersonMedStønadstype(@RequestBody identStønadstype: IdentStønadstype): Boolean {
-        //tilgangService.validerTilgangTilPersonMedBarn(identStønadstype.ident, AuditLoggerEvent.ACCESS)
-        logger.info("hello the fødselsnummmer is fødselsnummer" +identStønadstype.ident,)
-        logger.info("hello the fødselsnummmer is fødselsnummer" +identStønadstype.stønadstype,)
         val behandlinger = fagsakService.hentBehandlingerForPersonOgStønadstype(
             identStønadstype.ident,
             identStønadstype.stønadstype,
         )
-        logger.info("behandlinger is" +behandlinger[0])
         if (behandlinger.isNotEmpty()) {
             val validStatuses = listOf(
                 BehandlingStatus.OPPRETTET,
@@ -52,7 +48,6 @@ class SøknadRoutingController(
                 BehandlingStatus.SATT_PÅ_VENT,
             )
             val behandlingStatus = behandlinger.map { it.status }
-            logger.info("behandlinger status" +behandlingStatus)
             return behandlingStatus.any { it in validStatuses }
         }
         return false
