@@ -31,7 +31,7 @@ object SøknadskjemaLæremidlerMapper {
             utdanning = UtdanningAvsnitt(
                 aktiviteter = skjema.utdanning.aktiviteter?.verdier?.map { ValgtAktivitet(id = it.verdi, label = it.label) },
                 annenUtdanning = skjema.utdanning.annenUtdanning?.verdi,
-                mottarUtstyrsstipend = skjema.utdanning.mottarUtstyrsstipend?.verdi,
+                erLærlingEllerLiknende = skjema.utdanning.erLærlingEllerLiknende?.verdi,
                 harFunksjonsnedsettelse = skjema.utdanning.harFunksjonsnedsettelse.verdi,
             ),
             dokumentasjon = mapDokumentasjon(skjema, journalpost),

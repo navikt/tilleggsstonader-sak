@@ -92,7 +92,7 @@ object SøknadUtil {
                     listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
                 ),
                 annenUtdanning = EnumFelt("Annen utdanning tekst", AnnenUtdanningType.INGEN_UTDANNING, "Ja", emptyList()),
-                mottarUtstyrsstipend = EnumFelt("Har mottarUtstyrsstipend?", JaNei.JA, "Ja", emptyList()),
+                erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
                 harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
             ),
         )

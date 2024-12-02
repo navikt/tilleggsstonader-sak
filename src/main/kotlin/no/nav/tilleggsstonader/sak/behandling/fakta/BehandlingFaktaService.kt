@@ -104,7 +104,7 @@ class BehandlingFaktaService(
                 SøknadsgrunnlagUtdanning(
                     aktiviteter = it.aktiviteter?.map { it.label },
                     annenUtdanning = it.annenUtdanning,
-                    mottarUtstyrsstipend = it.mottarUtstyrsstipend,
+                    erLærlingEllerLiknende = it.erLærlingEllerLiknende,
                     harFunksjonsnedsettelse = it.harFunksjonsnedsettelse,
                 )
             },

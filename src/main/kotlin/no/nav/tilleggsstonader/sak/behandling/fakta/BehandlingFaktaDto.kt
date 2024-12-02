@@ -58,7 +58,7 @@ data class SøknadsgrunnlagHovedytelse(
 data class SøknadsgrunnlagUtdanning(
     val aktiviteter: List<String>?,
     val annenUtdanning: AnnenUtdanningType?,
-    val mottarUtstyrsstipend: JaNei?,
+    val erLærlingEllerLiknende: JaNei?,
     val harFunksjonsnedsettelse: JaNei,
 )
 

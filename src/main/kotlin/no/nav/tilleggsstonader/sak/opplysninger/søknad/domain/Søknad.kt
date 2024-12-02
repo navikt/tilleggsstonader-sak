@@ -96,7 +96,7 @@ data class SkjemaLæremidler(
 data class UtdanningAvsnitt(
     val aktiviteter: List<ValgtAktivitet>?,
     val annenUtdanning: AnnenUtdanningType?,
-    val mottarUtstyrsstipend: JaNei?,
+    val erLærlingEllerLiknende: JaNei?,
     val harFunksjonsnedsettelse: JaNei,
 )
 data class HovedytelseAvsnitt(

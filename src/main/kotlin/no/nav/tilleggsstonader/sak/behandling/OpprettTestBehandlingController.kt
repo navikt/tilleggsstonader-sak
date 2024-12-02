@@ -164,7 +164,7 @@ class OpprettTestBehandlingController(
                     "Ja",
                     emptyList(),
                 ),
-                mottarUtstyrsstipend = EnumFelt("Har mottarUtstyrsstipend?", JaNei.JA, "Ja", emptyList()),
+                erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
                 harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
             ),
             dokumentasjon = emptyList(),
