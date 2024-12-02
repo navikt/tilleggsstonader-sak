@@ -90,7 +90,10 @@ data class ReellArbeidsøkerTilsynBarn(
 
 data class VurderingTiltakTilsynBarn(
     override val lønnet: VurderingLønnet,
-) : LønnetVurdering
+) : LønnetVurdering {
+
+    override fun utledDelresultater() = listOf(lønnet.resultat)
+}
 
 data class FaktaAktivitetTilsynBarn(
     override val aktivitetsdager: Int,

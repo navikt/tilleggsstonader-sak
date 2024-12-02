@@ -17,8 +17,27 @@ sealed interface FaktaOgVurdering : FaktaOgVurderingJson {
         if (type.vilkårperiodeType.girIkkeRettPåStønadsperiode()) {
             return ResultatVilkårperiode.IKKE_OPPFYLT
         }
-        return this.vurderinger.resultatVurderinger()
+        return this.utledResultat(this.vurderinger.utledDelresultater())
     }
+
+    private fun utledResultat(resultater: List<ResultatDelvilkårperiode>) =
+        when {
+            resultater.contains(ResultatDelvilkårperiode.IKKE_VURDERT) -> {
+                ResultatVilkårperiode.IKKE_VURDERT
+            }
+
+            resultater.contains(ResultatDelvilkårperiode.IKKE_OPPFYLT) -> {
+                ResultatVilkårperiode.IKKE_OPPFYLT
+            }
+
+            resultater.all { it == ResultatDelvilkårperiode.OPPFYLT } -> {
+                ResultatVilkårperiode.OPPFYLT
+            }
+
+            else -> {
+                error("Ugyldig resultat ($resultater)")
+            }
+        }
 }
 
 sealed interface MålgruppeFaktaOgVurdering : FaktaOgVurdering
@@ -51,49 +70,9 @@ data object IngenFakta : Fakta
  * Vurderinger, som kan inneholde ulike vurderinger, eks lønnet
  */
 sealed interface Vurderinger {
-    fun resultatVurderinger(): ResultatVilkårperiode {
-        val resultater = finnResultatetFraVurderinger()
-        return utledResultat(resultater)
-    }
-
-    private fun finnResultatetFraVurderinger(): MutableList<ResultatDelvilkårperiode> {
-        val resultater = mutableListOf<ResultatDelvilkårperiode>()
-        if (this is LønnetVurdering) {
-            resultater.add(lønnet.resultat)
-        }
-        if (this is MedlemskapVurdering) {
-            resultater.add(medlemskap.resultat)
-        }
-        if (this is DekketAvAnnetRegelverkVurdering) {
-            resultater.add(dekketAvAnnetRegelverk.resultat)
-        }
-        if (this is HarUtgifterVurdering) {
-            resultater.add(harUtgifter.resultat)
-        }
-        if (this is HarRettTilUtstyrsstipendVurdering) {
-            resultater.add(harRettTilUtstyrsstipend.resultat)
-        }
-        return resultater
-    }
-
-    private fun utledResultat(resultater: List<ResultatDelvilkårperiode>) =
-        when {
-            resultater.contains(ResultatDelvilkårperiode.IKKE_VURDERT) -> {
-                ResultatVilkårperiode.IKKE_VURDERT
-            }
-
-            resultater.contains(ResultatDelvilkårperiode.IKKE_OPPFYLT) -> {
-                ResultatVilkårperiode.IKKE_OPPFYLT
-            }
-
-            resultater.all { it == ResultatDelvilkårperiode.OPPFYLT } -> {
-                ResultatVilkårperiode.OPPFYLT
-            }
-
-            else -> {
-                error("Ugyldig resultat ($resultater)")
-            }
-        }
+    fun utledDelresultater(): List<ResultatDelvilkårperiode>
 }
 
-data object IngenVurderinger : Vurderinger
+data object IngenVurderinger : Vurderinger {
+    override fun utledDelresultater() = emptyList<ResultatDelvilkårperiode>()
+}
