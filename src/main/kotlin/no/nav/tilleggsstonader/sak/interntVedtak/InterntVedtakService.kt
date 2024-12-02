@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -101,16 +100,12 @@ class InterntVedtakService(
     private fun mapSøknadsinformasjon(
         behandling: Saksbehandling,
     ): Søknadsinformasjon? {
-        val søknad = when (behandling.stønadstype) {
-            Stønadstype.BARNETILSYN -> søknadService.hentSøknadBarnetilsyn(behandling.id)
-            else -> error("Kan ikke hente søknad for stønadstype ${behandling.stønadstype}")
+        val søknad = søknadService.hentSøknadMetadata(behandling.id)
+        return søknad?.let {
+            Søknadsinformasjon(
+                mottattTidspunkt = it.mottattTidspunkt,
+            )
         }
-        if (søknad == null) {
-            return null
-        }
-        return Søknadsinformasjon(
-            mottattTidspunkt = søknad.mottattTidspunkt,
-        )
     }
 
     private fun mapVilkårperioder(vilkårperioder: List<VilkårperiodeDomain>): List<Vilkårperiode> {

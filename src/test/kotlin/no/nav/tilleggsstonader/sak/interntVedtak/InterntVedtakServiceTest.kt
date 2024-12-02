@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
+import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -13,12 +14,12 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import no.nav.tilleggsstonader.sak.util.FileUtil.skrivTilFil
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -66,6 +67,7 @@ import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import java.net.URI
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class InterntVedtakServiceTest {
@@ -167,7 +169,11 @@ class InterntVedtakServiceTest {
     )
     val behandlingId = behandling.id
     val totrinnskontroll = TotrinnskontrollUtil.totrinnskontroll(TotrinnInternStatus.GODKJENT, beslutter = "saksbeh2")
-    val søknad = SøknadBarnetilsynUtil.søknadBarnetilsyn()
+    val søknadMetadata = SøknadMetadata(
+        journalpostId = "journalpostId",
+        mottattTidspunkt = LocalDate.of(2023, 1, 1).atStartOfDay().truncatedTo(ChronoUnit.MILLIS),
+        språk = Språkkode.NB,
+    )
     val barn = listOf(
         GrunnlagsdataUtil.lagGrunnlagsdataBarn(ident = "1", fødselsdato = LocalDate.of(2024, 5, 15)),
         GrunnlagsdataUtil.lagGrunnlagsdataBarn(ident = "2", fødselsdato = LocalDate.of(2024, 10, 15)),
@@ -223,7 +229,7 @@ class InterntVedtakServiceTest {
         every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns vilkårperioder
         every { stønadsperiodeService.hentStønadsperioder(behandlingId) } returns stønadsperioder
         every { totrinnskontrollService.hentTotrinnskontroll(behandlingId) } returns totrinnskontroll
-        every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknad
+        every { søknadService.hentSøknadMetadata(behandlingId) } returns søknadMetadata
         every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns behandlingBarn
         every { vilkårService.hentVilkårsett(behandlingId) } returns vilkår
