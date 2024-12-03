@@ -31,7 +31,7 @@ import java.time.YearMonth
 import java.util.UUID
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet as aktivitet1
 
-internal class StønadsperiodeValideringUtilTest {
+internal class StønadsperiodeValideringTest {
     val målgrupper: Map<VilkårperiodeType, List<Datoperiode>> = mapOf(
         MålgruppeType.AAP to listOf(
             Datoperiode(
@@ -55,7 +55,7 @@ internal class StønadsperiodeValideringUtilTest {
         val stønadsperiode = lagStønadsperiode()
 
         assertThatCode {
-            validerStønadsperiode(
+            validerEnkeltperiode(
                 stønadsperiode,
                 målgrupper,
                 aktiviteter,
@@ -69,7 +69,7 @@ internal class StønadsperiodeValideringUtilTest {
             lagStønadsperiode(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.TILTAK)
 
         assertThatThrownBy {
-            validerStønadsperiode(
+            validerEnkeltperiode(
                 stønadsperiode,
                 målgrupper,
                 aktiviteter,
@@ -82,7 +82,7 @@ internal class StønadsperiodeValideringUtilTest {
         val stønadsperiode = lagStønadsperiode(målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE)
 
         assertThatThrownBy {
-            validerStønadsperiode(
+            validerEnkeltperiode(
                 stønadsperiode,
                 målgrupper,
                 aktiviteter,
@@ -95,7 +95,7 @@ internal class StønadsperiodeValideringUtilTest {
         val stønadsperiode = lagStønadsperiode(aktivitet = AktivitetType.UTDANNING)
 
         assertThatThrownBy {
-            validerStønadsperiode(
+            validerEnkeltperiode(
                 stønadsperiode,
                 målgrupper,
                 aktiviteter,
@@ -108,7 +108,7 @@ internal class StønadsperiodeValideringUtilTest {
         val stønadsperiode = lagStønadsperiode(fom = LocalDate.of(2022, 12, 1))
 
         assertThatThrownBy {
-            validerStønadsperiode(
+            validerEnkeltperiode(
                 stønadsperiode,
                 målgrupper,
                 aktiviteter,
@@ -121,7 +121,7 @@ internal class StønadsperiodeValideringUtilTest {
         val stønadsperiode = lagStønadsperiode(tom = LocalDate.of(2023, 1, 11))
 
         assertThatThrownBy {
-            validerStønadsperiode(
+            validerEnkeltperiode(
                 stønadsperiode,
                 målgrupper,
                 aktiviteter,
@@ -153,7 +153,7 @@ internal class StønadsperiodeValideringUtilTest {
         )
 
         assertThatCode {
-            validerStønadsperioder(
+            valider(
                 listOf(stønadsperiode),
                 VilkårperioderDto(målgrupper, aktiviteter),
             )
@@ -185,7 +185,7 @@ internal class StønadsperiodeValideringUtilTest {
         )
 
         assertThatCode {
-            validerStønadsperioder(
+            valider(
                 listOf(stønadsperiode),
                 VilkårperioderDto(målgrupper, aktiviteter),
             )
@@ -210,32 +210,32 @@ internal class StønadsperiodeValideringUtilTest {
         @Test
         fun `skal kaste feil dersom nedsatt arbeidsevne og personen er under 18 år`() {
             assertThatThrownBy {
-                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.plusDays(1))
+                valider(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.plusDays(1))
             }.hasMessageContaining("Periode kan ikke begynne før søker fyller 18 år")
         }
 
         @Test
         fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er over 18 år`() {
             assertThatCode {
-                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel)
-                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.minusDays(1))
+                valider(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel)
+                valider(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.minusDays(1))
             }.doesNotThrowAnyException()
         }
 
         @Test
         fun `skal kaste feil dersom nedsatt arbeidsevne og personen er over 67 år`() {
             assertThatThrownBy {
-                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel)
+                valider(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel)
             }.hasMessageContaining("Periode kan ikke slutte etter søker fylt 67 år")
             assertThatThrownBy {
-                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.minusDays(1))
+                valider(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.minusDays(1))
             }.hasMessageContaining("Periode kan ikke slutte etter søker fylt 67 år")
         }
 
         @Test
         fun `skal ikke kaste feil dersom nedsatt arbeidsevne og personen er under 67 år`() {
             assertThatCode {
-                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.plusDays(1))
+                valider(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.plusDays(1))
             }.doesNotThrowAnyException()
         }
 
@@ -250,8 +250,8 @@ internal class StønadsperiodeValideringUtilTest {
             )
 
             assertThatCode {
-                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.minusYears(1))
-                validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.plusYears(1))
+                valider(stønadsperioder, vilkårperioder, fødselsdato = dato18årGammel.minusYears(1))
+                valider(stønadsperioder, vilkårperioder, fødselsdato = dato67årGammel.plusYears(1))
             }.doesNotThrowAnyException()
         }
     }
@@ -266,7 +266,7 @@ internal class StønadsperiodeValideringUtilTest {
             val stønadsperiode = lagStønadsperiode(fom = fom, tom = tom)
 
             assertThatThrownBy {
-                validerStønadsperioder(
+                valider(
                     listOf(stønadsperiode, stønadsperiode),
                     mockk(),
                 )
@@ -279,14 +279,14 @@ internal class StønadsperiodeValideringUtilTest {
             val stønadsperiode2 = lagStønadsperiode(fom = LocalDate.of(2023, 1, 5), tom = LocalDate.of(2023, 1, 10))
 
             assertThatThrownBy {
-                validerStønadsperioder(
+                valider(
                     listOf(stønadsperiode1, stønadsperiode2),
                     mockk(),
                 )
             }.hasMessageContaining("overlapper")
 
             assertThatThrownBy {
-                validerStønadsperioder(
+                valider(
                     listOf(stønadsperiode2, stønadsperiode1),
                     mockk(),
                 )
@@ -299,14 +299,14 @@ internal class StønadsperiodeValideringUtilTest {
             val stønadsperiode2 = lagStønadsperiode(fom = LocalDate.of(2023, 1, 5), tom = LocalDate.of(2023, 1, 5))
 
             assertThatThrownBy {
-                validerStønadsperioder(
+                valider(
                     listOf(stønadsperiode1, stønadsperiode2),
                     mockk(),
                 )
             }.hasMessageContaining("overlapper")
 
             assertThatThrownBy {
-                validerStønadsperioder(
+                valider(
                     listOf(stønadsperiode2, stønadsperiode1),
                     mockk(),
                 )
@@ -339,7 +339,7 @@ internal class StønadsperiodeValideringUtilTest {
             val stønadsperiode = lagStønadsperiode(fom = fom, tom = tom)
 
             assertThatThrownBy {
-                validerStønadsperioder(
+                valider(
                     listOf(stønadsperiode),
                     VilkårperioderDto(målgrupper, aktiviteter),
                 )
@@ -379,7 +379,7 @@ internal class StønadsperiodeValideringUtilTest {
             val stønadsperiode = lagStønadsperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 10))
 
             assertThatCode {
-                validerStønadsperioder(
+                valider(
                     listOf(stønadsperiode),
                     VilkårperioderDto(målgrupper, aktiviteter),
                 )
@@ -391,7 +391,7 @@ internal class StønadsperiodeValideringUtilTest {
             val stønadsperiode = lagStønadsperiode(fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 21))
 
             assertThatThrownBy {
-                validerStønadsperioder(
+                valider(
                     listOf(stønadsperiode),
                     VilkårperioderDto(målgrupper, aktiviteter),
                 )
@@ -457,7 +457,7 @@ internal class StønadsperiodeValideringUtilTest {
             ).map { it.tilDto() }
 
             assertThatCode {
-                validerStønadsperioder(
+                valider(
                     listOf(
                         lagStønadsperiode(fom = jan.atDay(1), tom = jan.atDay(9)),
                         lagStønadsperiode(fom = jan.atDay(21), tom = jan.atDay(31)),
@@ -479,7 +479,7 @@ internal class StønadsperiodeValideringUtilTest {
             ).map { it.tilDto() }
 
             assertThatThrownBy {
-                validerStønadsperioder(
+                valider(
                     stønadsperioder = listOf(lagStønadsperiode(fom = jan.atDay(1), tom = jan.atEndOfMonth())),
                     vilkårperioder = VilkårperioderDto(målgrupper, emptyList()),
                 )
@@ -500,7 +500,7 @@ internal class StønadsperiodeValideringUtilTest {
             ).map { it.tilDto() }
 
             assertThatThrownBy {
-                validerStønadsperioder(
+                valider(
                     stønadsperioder = listOf(lagStønadsperiode(fom = jan.atDay(1), tom = jan.atDay(15))),
                     vilkårperioder = VilkårperioderDto(målgrupper, emptyList()),
                 )
@@ -520,7 +520,7 @@ internal class StønadsperiodeValideringUtilTest {
                 ),
             ).map { it.tilDto() }
             assertThatThrownBy {
-                validerStønadsperioder(
+                valider(
                     stønadsperioder = listOf(lagStønadsperiode(fom = jan.atDay(15), tom = jan.atDay(15))),
                     vilkårperioder = VilkårperioderDto(emptyList(), aktiviteter),
                 )
@@ -571,7 +571,7 @@ internal class StønadsperiodeValideringUtilTest {
             )
 
             assertThatCode {
-                validerStønadsperioder(
+                valider(
                     stønadsperioder = stønadsperioder,
                     vilkårperioder = VilkårperioderDto(aktiviteter = aktiviteter, målgrupper = målgrupper),
                 )
@@ -720,22 +720,22 @@ internal class StønadsperiodeValideringUtilTest {
         }
     }
 
-    fun validerStønadsperioder(
+    fun valider(
         stønadsperioder: List<StønadsperiodeDto>,
         vilkårperioder: VilkårperioderDto,
         fødselsdato: LocalDate? = null,
-    ) = StønadsperiodeValideringUtil.validerStønadsperioder(
+    ) = StønadsperiodeValidering.valider(
         stønadsperioder = stønadsperioder,
         vilkårperioder = vilkårperioder,
         fødselsdato = fødselsdato,
     )
 
-    fun validerStønadsperiode(
+    fun validerEnkeltperiode(
         stønadsperiode: StønadsperiodeDto,
         målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
         fødselsdato: LocalDate? = null,
-    ) = StønadsperiodeValideringUtil.validerStønadsperiode(
+    ) = StønadsperiodeValidering.validerEnkeltperiode(
         stønadsperiode = stønadsperiode,
         målgruppePerioderPerType = målgruppePerioderPerType,
         aktivitetPerioderPerType = aktivitetPerioderPerType,

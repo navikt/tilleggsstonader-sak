@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import java.time.LocalDate
 
-object StønadsperiodeValideringUtil {
+object StønadsperiodeValidering {
 
     /**
      * Validering av stønadsperioder som kjøres når man endrer vilkårperiode trenger ikke å validere fødselsdatoet.
@@ -23,12 +23,12 @@ object StønadsperiodeValideringUtil {
     fun validerStønadsperioderVedEndringAvVilkårperiode(
         stønadsperioder: List<StønadsperiodeDto>,
         vilkårperioder: VilkårperioderDto,
-    ) = validerStønadsperioder(stønadsperioder, vilkårperioder, null)
+    ) = valider(stønadsperioder, vilkårperioder, null)
 
     /**
      * @param fødselsdato er nullable då alle behandlinger ikke har [fødselsdato] i grunnlagsdata fra før
      */
-    fun validerStønadsperioder(
+    fun valider(
         stønadsperioder: List<StønadsperiodeDto>,
         vilkårperioder: VilkårperioderDto,
         fødselsdato: LocalDate?,
@@ -38,7 +38,7 @@ object StønadsperiodeValideringUtil {
         val aktiviteter = vilkårperioder.aktiviteter.mergeSammenhengendeOppfylteVilkårperioder()
 
         validerAtStønadsperioderIkkeOverlapperMedVilkårPeriodeUtenRett(vilkårperioder, stønadsperioder)
-        stønadsperioder.forEach { validerStønadsperiode(it, målgrupper, aktiviteter, fødselsdato) }
+        stønadsperioder.forEach { validerEnkeltperiode(it, målgrupper, aktiviteter, fødselsdato) }
     }
 
     private fun validerIkkeOverlappendeStønadsperioder(stønadsperioder: List<StønadsperiodeDto>) {
@@ -53,7 +53,7 @@ object StønadsperiodeValideringUtil {
         }
     }
 
-    fun validerStønadsperiode(
+    fun validerEnkeltperiode(
         stønadsperiode: StønadsperiodeDto,
         målgruppePerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<VilkårperiodeType, List<Datoperiode>>,

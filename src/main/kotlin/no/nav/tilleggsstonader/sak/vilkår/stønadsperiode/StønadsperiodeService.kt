@@ -152,7 +152,7 @@ class StønadsperiodeService(
         val fødselsdato = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag.fødsel
             ?.fødselsdatoEller1JanForFødselsår()
 
-        StønadsperiodeValideringUtil.validerStønadsperioder(stønadsperioder, vilkårperioder, fødselsdato)
+        StønadsperiodeValidering.valider(stønadsperioder, vilkårperioder, fødselsdato)
     }
 
     fun gjenbrukStønadsperioder(forrigeBehandlingId: BehandlingId, nyBehandlingId: BehandlingId) {

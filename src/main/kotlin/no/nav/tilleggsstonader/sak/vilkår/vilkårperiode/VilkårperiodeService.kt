@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValideringUtil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeValidering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
@@ -192,7 +192,7 @@ class VilkårperiodeService(
         val vilkårperioder = hentVilkårperioder(behandlingId)
 
         return kotlin.runCatching {
-            StønadsperiodeValideringUtil.validerStønadsperioderVedEndringAvVilkårperiode(
+            StønadsperiodeValidering.validerStønadsperioderVedEndringAvVilkårperiode(
                 stønadsperioder,
                 vilkårperioder.tilDto(),
             )
