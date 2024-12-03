@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
+import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.HarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.UtdanningAvsnitt
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -164,8 +165,10 @@ class OpprettTestBehandlingController(
                     "Ja",
                     emptyList(),
                 ),
-                erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
-                harTidligereFullførtVgs = EnumFelt("Har du tidligere fullført videregående skole?", JaNei.JA, "Ja", emptyList()),
+                harRettTilUtstyrsstipend = HarRettTilUtstyrsstipend(
+                    erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
+                    harTidligereFullførtVgs = EnumFelt("Har du tidligere fullført videregående skole?", JaNei.JA, "Ja", emptyList()),
+                ),
                 harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
             ),
             dokumentasjon = emptyList(),
