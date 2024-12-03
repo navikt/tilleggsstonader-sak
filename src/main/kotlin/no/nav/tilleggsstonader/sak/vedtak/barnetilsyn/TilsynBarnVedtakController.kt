@@ -83,7 +83,7 @@ class TilsynBarnVedtakController(
         return VedtakDtoMapper.toDto(vedtak, revurderFra)
     }
 
-    @GetMapping("/historisk/{behandlingId}")
+    @GetMapping("/fullstendig-oversikt/{behandlingId}")
     fun hentHistoriskVedtak(@PathVariable behandlingId: BehandlingId): VedtakResponse? {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
