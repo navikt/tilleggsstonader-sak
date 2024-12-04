@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
-import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.HarRettTilUtstyrsstipendDto
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -61,6 +60,11 @@ data class SøknadsgrunnlagUtdanning(
     val annenUtdanning: AnnenUtdanningType?,
     val harRettTilUtstyrsstipend: HarRettTilUtstyrsstipendDto?,
     val harFunksjonsnedsettelse: JaNei,
+)
+
+data class HarRettTilUtstyrsstipendDto(
+    val erLærlingEllerLiknende: JaNei?,
+    val harTidligereFullførtVgs: JaNei?,
 )
 
 data class FaktaArbeidOgOpphold(

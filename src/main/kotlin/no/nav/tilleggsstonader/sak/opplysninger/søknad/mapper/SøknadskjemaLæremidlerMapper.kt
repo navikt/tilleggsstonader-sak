@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
-import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.HarRettTilUtstyrsstipendDto
+import no.nav.tilleggsstonader.sak.behandling.fakta.HarRettTilUtstyrsstipendDto
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
