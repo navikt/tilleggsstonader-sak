@@ -16,8 +16,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBarnetilsynFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Datoperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.DelvilkårAktivitetDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
@@ -368,9 +368,7 @@ internal class StønadsperiodeValideringTest {
         val aktiviteter = målgrupper.map {
             it.copy(
                 type = AktivitetType.TILTAK,
-                delvilkår = DelvilkårAktivitetDto(
-                    lønnet = VurderingDto(SvarJaNei.NEI),
-                ),
+                faktaOgVurderinger = AktivitetBarnetilsynFaktaOgVurderingerDto(lønnet = VurderingDto(SvarJaNei.NEI)),
             )
         }
 

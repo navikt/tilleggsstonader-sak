@@ -2,8 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.dekketAvAnnetRegelverk
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeExtensions.medlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
@@ -53,12 +51,16 @@ class VilkårperiodeDtoTest {
                 ),
             ).tilDto()
 
-            assertThat(målgruppe.medlemskap).isNotNull
-            assertThat(målgruppe.medlemskap?.svar).isEqualTo(SvarJaNei.JA)
-            assertThat(målgruppe.medlemskap?.resultat).isEqualTo(OPPFYLT)
-            assertThat(målgruppe.dekketAvAnnetRegelverk).isNotNull
-            assertThat(målgruppe.dekketAvAnnetRegelverk?.svar).isEqualTo(SvarJaNei.JA)
-            assertThat(målgruppe.dekketAvAnnetRegelverk?.resultat).isEqualTo(IKKE_OPPFYLT)
+            val faktaOgVurderinger = (målgruppe.faktaOgVurderinger as MålgruppeFaktaOgVurderingerDto)
+
+            with(faktaOgVurderinger) {
+                assertThat(medlemskap).isNotNull
+                assertThat(medlemskap?.svar).isEqualTo(SvarJaNei.JA)
+                assertThat(medlemskap?.resultat).isEqualTo(OPPFYLT)
+                assertThat(utgifterDekketAvAnnetRegelverk).isNotNull
+                assertThat(utgifterDekketAvAnnetRegelverk?.svar).isEqualTo(SvarJaNei.JA)
+                assertThat(utgifterDekketAvAnnetRegelverk?.resultat).isEqualTo(IKKE_OPPFYLT)
+            }
         }
     }
 

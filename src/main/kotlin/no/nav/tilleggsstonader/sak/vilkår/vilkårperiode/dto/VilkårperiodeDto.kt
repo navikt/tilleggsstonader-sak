@@ -43,13 +43,11 @@ data class VilkårperiodeDto(
     val type: VilkårperiodeType,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val delvilkår: DelvilkårVilkårperiodeDto,
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,
     val kilde: KildeVilkårsperiode,
     val slettetKommentar: String?,
     val sistEndret: LocalDateTime,
-    val aktivitetsdager: Int? = null,
     val forrigeVilkårperiodeId: UUID?,
     val status: Vilkårstatus?,
     val kildeId: String?,
@@ -66,12 +64,9 @@ fun Vilkårperiode.tilDto() =
         type = this.type,
         fom = this.fom,
         tom = this.tom,
-        delvilkår = faktaOgVurdering.tilDelvilkårDto(),
         resultat = this.resultat,
         begrunnelse = this.begrunnelse,
         kilde = this.kilde,
-        aktivitetsdager = this.faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()
-            ?.aktivitetsdager,
         slettetKommentar = this.slettetKommentar,
         sistEndret = this.sporbar.endret.endretTid,
         forrigeVilkårperiodeId = this.forrigeVilkårperiodeId,
@@ -79,19 +74,6 @@ fun Vilkårperiode.tilDto() =
         kildeId = this.kildeId,
         faktaOgVurderinger = this.faktaOgVurdering.tilFaktaOgVurderingDto(),
     )
-
-fun FaktaOgVurdering.tilDelvilkårDto(): DelvilkårVilkårperiodeDto {
-    return when (this) {
-        is MålgruppeFaktaOgVurdering -> DelvilkårMålgruppeDto(
-            medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
-            dekketAvAnnetRegelverk = vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.tilDto(),
-        )
-
-        is AktivitetFaktaOgVurdering -> DelvilkårAktivitetDto(
-            lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
-        )
-    }
-}
 
 // Returnerer ikke vurdering hvis resultatet er IKKE_AKTUELT
 fun Vurdering.tilDto() =
