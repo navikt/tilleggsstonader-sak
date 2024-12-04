@@ -40,6 +40,7 @@ class BehandlingFaktaService(
             else -> error("Uthenting av Fakta er ikke implementert for stønadstype=$stønadstype")
         }
     }
+
     fun hentFaktaDTOForBarneTilsyn(
         behandlingId: BehandlingId,
     ): BehandlingFaktaTilsynBarnDto {
@@ -54,6 +55,7 @@ class BehandlingFaktaService(
             arena = arenaFakta(grunnlagsdata),
         )
     }
+
     fun hentFaktaDTOForLæremidler(
         behandlingId: BehandlingId,
     ): BehandlingFaktaLæremidlerDto {
@@ -97,6 +99,7 @@ class BehandlingFaktaService(
                 )
             },
         )
+
     private fun mapUtdanning(utdanningAvsnitt: UtdanningAvsnitt?) =
         FaktaUtdanning(
             søknadsgrunnlag =
@@ -104,8 +107,12 @@ class BehandlingFaktaService(
                 SøknadsgrunnlagUtdanning(
                     aktiviteter = it.aktiviteter?.map { it.label },
                     annenUtdanning = it.annenUtdanning,
-                    erLærlingEllerLiknende = it.erLærlingEllerLiknende,
-                    harTidligereFullførtVgs = it.harTidligereFullførtVgs,
+                    harRettTilUtstyrsstipend = it.harRettTilUtstyrsstipend?.let {
+                        HarRettTilUtstyrsstipendDto(
+                            erLærlingEllerLiknende = it.erLærlingEllerLiknende,
+                            harTidligereFullførtVgs = it.harTidligereFullførtVgs,
+                        )
+                    },
                     harFunksjonsnedsettelse = it.harFunksjonsnedsettelse,
                 )
             },
@@ -164,7 +171,11 @@ class BehandlingFaktaService(
         return null
     }
 
-    private fun mapDokumentasjon(dokumentasjonListe: List<no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon>, journalpostId: String, grunnlagsdata: Grunnlagsdata): FaktaDokumentasjon {
+    private fun mapDokumentasjon(
+        dokumentasjonListe: List<no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon>,
+        journalpostId: String,
+        grunnlagsdata: Grunnlagsdata,
+    ): FaktaDokumentasjon {
         val navn = grunnlagsdata.grunnlag.barn.associate { it.ident to it.navn.fornavn }
         val dokumentasjon = dokumentasjonListe.map { dokumentasjon ->
             val navnBarn = dokumentasjon.identBarn?.let { navn[it] }?.let { " - $it" } ?: ""

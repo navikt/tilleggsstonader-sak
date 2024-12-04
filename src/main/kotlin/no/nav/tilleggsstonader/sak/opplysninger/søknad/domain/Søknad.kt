@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
+import no.nav.tilleggsstonader.sak.behandling.fakta.HarRettTilUtstyrsstipendDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
@@ -96,8 +97,7 @@ data class SkjemaLæremidler(
 data class UtdanningAvsnitt(
     val aktiviteter: List<ValgtAktivitet>?,
     val annenUtdanning: AnnenUtdanningType?,
-    val erLærlingEllerLiknende: JaNei?,
-    val harTidligereFullførtVgs: JaNei?,
+    val harRettTilUtstyrsstipend: HarRettTilUtstyrsstipendDto?,
     val harFunksjonsnedsettelse: JaNei,
 )
 data class HovedytelseAvsnitt(

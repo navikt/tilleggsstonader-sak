@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
+import no.nav.tilleggsstonader.sak.behandling.fakta.HarRettTilUtstyrsstipendDto
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
@@ -31,8 +32,10 @@ object SøknadskjemaLæremidlerMapper {
             utdanning = UtdanningAvsnitt(
                 aktiviteter = skjema.utdanning.aktiviteter?.verdier?.map { ValgtAktivitet(id = it.verdi, label = it.label) },
                 annenUtdanning = skjema.utdanning.annenUtdanning?.verdi,
-                erLærlingEllerLiknende = skjema.utdanning.erLærlingEllerLiknende?.verdi,
-                harTidligereFullførtVgs = skjema.utdanning.harTidligereFullførtVgs?.verdi,
+                harRettTilUtstyrsstipend = HarRettTilUtstyrsstipendDto(
+                    erLærlingEllerLiknende = skjema.utdanning.harRettTilUtstyrsstipend?.erLærlingEllerLiknende?.verdi,
+                    harTidligereFullførtVgs = skjema.utdanning.harRettTilUtstyrsstipend?.harTidligereFullførtVgs?.verdi,
+                ),
                 harFunksjonsnedsettelse = skjema.utdanning.harFunksjonsnedsettelse.verdi,
             ),
             dokumentasjon = mapDokumentasjon(skjema, journalpost),
