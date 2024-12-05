@@ -28,10 +28,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
-import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
@@ -53,7 +51,6 @@ internal class HåndterSøknadServiceTest {
     val personService: PersonService = mockk()
     val arbeidsfordelingService: ArbeidsfordelingService = mockk()
     val journalpostService: JournalpostService = mockk()
-    val grunnlagsdataService: GrunnlagsdataService = mockk()
     val søknadService: SøknadService = mockk()
     val taskService: TaskService = mockk()
     val barnService: BarnService = mockk()
@@ -66,7 +63,6 @@ internal class HåndterSøknadServiceTest {
         journalføringService = journalføringService,
         fagsakService = fagsakService,
         behandlingService = behandlingService,
-        unleashService = mockUnleashService(),
         arbeidsfordelingService = arbeidsfordelingService,
     )
 

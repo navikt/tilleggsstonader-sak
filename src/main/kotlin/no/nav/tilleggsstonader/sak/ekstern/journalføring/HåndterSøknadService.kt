@@ -5,15 +5,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.journalføring.HåndterSøknadRequest
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
@@ -31,7 +28,6 @@ class HåndterSøknadService(
     private val journalføringService: JournalføringService,
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
-    private val unleashService: UnleashService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
 
@@ -61,12 +57,6 @@ class HåndterSøknadService(
         return if (fagsak == null) {
             true
         } else {
-            val nesteBehandlingstype = behandlingService.utledNesteBehandlingstype(fagsak.id)
-
-            if (nesteBehandlingstype === BehandlingType.REVURDERING && !unleashService.isEnabled(Toggle.AUTOMATISK_JOURNALFORING_REVURDERING)) {
-                return false
-            }
-
             val behandlinger = behandlingService.hentBehandlinger(fagsak.id)
             !harÅpenBehandling(behandlinger)
         }
