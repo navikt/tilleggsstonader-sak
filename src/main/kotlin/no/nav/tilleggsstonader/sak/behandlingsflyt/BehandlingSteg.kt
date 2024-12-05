@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
@@ -14,10 +15,10 @@ interface BehandlingSteg<T> {
      */
     fun utførOgReturnerNesteSteg(saksbehandling: Saksbehandling, data: T): StegType {
         utførSteg(saksbehandling, data)
-        return nesteSteg()
+        return nesteSteg(stønadstype = saksbehandling.stønadstype)
     }
 
-    fun nesteSteg() = stegType().hentNesteSteg()
+    fun nesteSteg(stønadstype: Stønadstype) = stegType().hentNesteSteg(stønadstype)
 
     fun utførSteg(saksbehandling: Saksbehandling, data: T)
 
@@ -99,10 +100,13 @@ enum class StegType(
         return this.gyldigIKombinasjonMedStatus.contains(behandlingStatus)
     }
 
-    fun hentNesteSteg(): StegType {
+    fun hentNesteSteg(stønadstype: Stønadstype): StegType {
         return when (this) {
             REVURDERING_ÅRSAK -> INNGANGSVILKÅR
-            INNGANGSVILKÅR -> VILKÅR
+            INNGANGSVILKÅR -> when (stønadstype) {
+                Stønadstype.LÆREMIDLER -> BEREGNE_YTELSE
+                else -> VILKÅR
+            }
             VILKÅR -> BEREGNE_YTELSE
             BEREGNE_YTELSE -> SIMULERING
             SIMULERING -> SEND_TIL_BESLUTTER
