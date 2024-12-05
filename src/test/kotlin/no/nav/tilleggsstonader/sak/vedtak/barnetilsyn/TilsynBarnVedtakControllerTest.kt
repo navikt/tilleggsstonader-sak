@@ -14,10 +14,7 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.*
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
@@ -126,7 +123,7 @@ class TilsynBarnVedtakControllerTest(
             fagsak = fagsak,
         )
 
-        val vedtak = OpphørTilsynBarnDto(
+        val vedtak = OpphørTilsynBarnRequest(
             årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
             begrunnelse = "endre utgifter opphør",
         )
@@ -135,7 +132,7 @@ class TilsynBarnVedtakControllerTest(
 
         val lagretDto = hentVedtak(behandlingLagreOpphør.id).body!!
 
-        assertThat((lagretDto as OpphørTilsynBarnDto).årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)
+        assertThat((lagretDto as OpphørTilsynBarnRequest).årsakerOpphør).isEqualTo(vedtak.årsakerOpphør)
         assertThat(lagretDto.begrunnelse).isEqualTo(vedtak.begrunnelse)
         assertThat(lagretDto.type).isEqualTo(TypeVedtak.OPPHØR)
     }
@@ -164,7 +161,7 @@ class TilsynBarnVedtakControllerTest(
 
     private fun opphørVedtak(
         behandling: Behandling,
-        vedtak: OpphørTilsynBarnDto,
+        vedtak: OpphørTilsynBarnRequest,
     ) {
         restTemplate.exchange<Map<String, Any>?>(
             localhost("api/vedtak/tilsyn-barn/${behandling.id}/opphor"),

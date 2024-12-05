@@ -17,6 +17,7 @@ data class InnvilgelseTilsynBarn(
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN
 }
 
+//AvslagTilsynBarn har ingen informasjon om beregningsresultat. Dersom forrige-behandling var Avslag så vil man ikke få ut noe Vedtakshistorikk
 data class AvslagTilsynBarn(
     val årsaker: List<ÅrsakAvslag>,
     val begrunnelse: String,
