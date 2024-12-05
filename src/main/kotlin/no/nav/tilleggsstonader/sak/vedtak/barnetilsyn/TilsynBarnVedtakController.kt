@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
@@ -52,7 +52,7 @@ class TilsynBarnVedtakController(
     @PostMapping("{behandlingId}/opphor")
     fun opphør(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: OpphørTilsynBarnDto,
+        @RequestBody vedtak: OpphørTilsynBarnRequest,
     ) {
         lagreVedtak(behandlingId, vedtak)
     }

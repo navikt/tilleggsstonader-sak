@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
@@ -35,7 +35,8 @@ object VedtakDtoMapper {
             beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
         )
 
-        is OpphørTilsynBarn -> OpphørTilsynBarnDto(
+        is OpphørTilsynBarn -> OpphørTilsynBarnResponse(
+            beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
             årsakerOpphør = data.årsaker,
             begrunnelse = data.begrunnelse,
         )
