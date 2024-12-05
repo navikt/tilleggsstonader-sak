@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInforma
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.RegisterAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.SlåSammenPeriodeGrunnlagYtelseUtil.slåSammenOverlappendeEllerPåfølgende
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.StatusHentetInformasjon
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
@@ -138,6 +140,14 @@ class VilkårperiodeGrunnlagService(
                 kilde = it.kilde,
             )
         },
+        hentetInformasjon = mapHentetInformasjon(),
+    )
+
+    private fun mapHentetInformasjon() = listOf(
+        GrunnlagAktivitet.HentetAktivitet(
+            type = GrunnlagAktivitet.HentetAktivitetType.ARENA,
+            status = StatusHentetInformasjon.OK,
+        ),
     )
 
     private fun hentGrunnlagYtelse(
@@ -160,8 +170,17 @@ class VilkårperiodeGrunnlagService(
                     )
                 }
                 .slåSammenOverlappendeEllerPåfølgende(),
+            hentetInformasjon = mapHentetInformasjon(ytelserFraRegister),
         )
     }
+
+    private fun mapHentetInformasjon(ytelserFraRegister: YtelsePerioderDto) =
+        ytelserFraRegister.hentetInformasjon.map {
+            GrunnlagYtelse.HentetYtelse(
+                type = GrunnlagYtelse.TypeHentetYtelse.from(it.type),
+                status = StatusHentetInformasjon.from(it.status),
+            )
+        }
 
     private fun behandlingErLåstForVidereRedigering(behandlingId: BehandlingId) =
         behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()

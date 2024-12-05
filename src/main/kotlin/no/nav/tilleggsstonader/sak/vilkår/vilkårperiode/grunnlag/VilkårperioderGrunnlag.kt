@@ -12,6 +12,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype as EnsligForsørgerStønadstypeKontrakter
+import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon as StatusHentetInformasjonKontrakter
 
 data class VilkårperioderGrunnlag(
     val aktivitet: GrunnlagAktivitet,
@@ -28,13 +29,62 @@ data class VilkårperioderGrunnlagDomain(
     val sporbar: Sporbar = Sporbar(),
 )
 
+/**
+ * @param hentetInformasjon har default emptylist for bakoverkompatibilitet pga hentedeYtelser tidligere ikke ble lagret
+ */
 data class GrunnlagAktivitet(
     val aktiviteter: List<RegisterAktivitet>,
-)
+    val hentetInformasjon: List<HentetAktivitet>,
+) {
+    data class HentetAktivitet(
+        val type: HentetAktivitetType,
+        val status: StatusHentetInformasjon,
+    )
 
+    enum class HentetAktivitetType {
+        ARENA,
+    }
+}
+
+/**
+ * @param hentetInformasjon har default emptylist for bakoverkompatibilitet pga hentedeYtelser tidligere ikke ble lagret
+ */
 data class GrunnlagYtelse(
     val perioder: List<PeriodeGrunnlagYtelse>,
-)
+    val hentetInformasjon: List<HentetYtelse> = emptyList(),
+) {
+    data class HentetYtelse(
+        val type: TypeHentetYtelse,
+        val status: StatusHentetInformasjon,
+    )
+
+    enum class TypeHentetYtelse {
+        AAP,
+        ENSLIG_FORSØRGER,
+        OMSTILLINGSSTØNAD,
+        ;
+
+        companion object {
+            fun from(type: TypeYtelsePeriode) = when (type) {
+                TypeYtelsePeriode.AAP -> AAP
+                TypeYtelsePeriode.ENSLIG_FORSØRGER -> ENSLIG_FORSØRGER
+                TypeYtelsePeriode.OMSTILLINGSSTØNAD -> OMSTILLINGSSTØNAD
+            }
+        }
+    }
+}
+
+enum class StatusHentetInformasjon {
+    OK,
+    FEILET,
+    ;
+    companion object {
+        fun from(status: StatusHentetInformasjonKontrakter) = when (status) {
+            StatusHentetInformasjonKontrakter.OK -> OK
+            StatusHentetInformasjonKontrakter.FEILET -> FEILET
+        }
+    }
+}
 
 /**
  * Kopi av [no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto]

@@ -101,8 +101,11 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
             val hentetInformasjon = HentetInformasjon(fom = now(), tom = now(), tidspunktHentet = LocalDateTime.now())
             val grunnlag = VilkårperioderGrunnlag(
-                aktivitet = GrunnlagAktivitet(aktiviteter = listOf(periodeGrunnlagAktivitet("123"))),
-                ytelse = GrunnlagYtelse(emptyList()),
+                aktivitet = GrunnlagAktivitet(
+                    aktiviteter = listOf(periodeGrunnlagAktivitet("123")),
+                    hentetInformasjon = listOf(),
+                ),
+                ytelse = GrunnlagYtelse(emptyList(), emptyList()),
                 hentetInformasjon = hentetInformasjon,
             )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
@@ -123,8 +126,8 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             val hentetInformasjon =
                 HentetInformasjon(fom = now(), tom = now(), tidspunktHentet = LocalDateTime.now())
             val grunnlag = VilkårperioderGrunnlag(
-                aktivitet = GrunnlagAktivitet(emptyList()),
-                ytelse = GrunnlagYtelse(emptyList()),
+                aktivitet = GrunnlagAktivitet(emptyList(), emptyList()),
+                ytelse = GrunnlagYtelse(emptyList(), emptyList()),
                 hentetInformasjon = hentetInformasjon,
             )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
