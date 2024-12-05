@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
+import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -32,9 +33,29 @@ data class GrunnlagAktivitet(
     val aktiviteter: List<RegisterAktivitet>,
 )
 
+// TODO hvordan håndtere de som allerede finnes i basen?
+
 data class GrunnlagYtelse(
     val perioder: List<PeriodeGrunnlagYtelse>,
-)
+    val hentedeYtelser: List<HentetYtelse>,
+) {
+    data class HentetYtelse(
+        val type: TypeYtelsePeriode,
+        val status: StatusHentetInformasjon
+    )
+
+    enum class StatusHentetInformasjon {
+        OK,
+        FEILET,
+        ;
+        companion object {
+            fun from(status: no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon) = when (status) {
+                no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon.OK -> OK
+                no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon.FEILET -> FEILET
+            }
+        }
+    }
+}
 
 /**
  * Kopi av [no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto]

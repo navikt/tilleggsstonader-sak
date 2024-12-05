@@ -55,6 +55,7 @@ internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
                             tom = LocalDate.now().plusDays(1),
                         ),
                     ),
+                    hentedeYtelser = emptyList()
                 ),
                 hentetInformasjon = hentetInformasjon(),
             )
@@ -72,14 +73,14 @@ internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
     }
 
     private fun grunnlagYtelse() = GrunnlagYtelse(
-        perioder =
-        listOf(
+        perioder = listOf(
             PeriodeGrunnlagYtelse(
                 type = TypeYtelsePeriode.AAP,
                 fom = LocalDate.now(),
                 tom = LocalDate.now().plusDays(1),
             ),
         ),
+        hentedeYtelser = emptyList(),
     )
 
     private fun grunnlagAktivitet() = GrunnlagAktivitet(

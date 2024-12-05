@@ -258,7 +258,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                 val hentetInformasjon =
                     HentetInformasjon(fom = fomFørsteGangHentet, tom = LocalDate.now(), LocalDateTime.now())
                 val aktivitet = GrunnlagAktivitet(emptyList())
-                val grunnlag = VilkårperioderGrunnlag(aktivitet, GrunnlagYtelse(emptyList()), hentetInformasjon)
+                val grunnlag = VilkårperioderGrunnlag(aktivitet, GrunnlagYtelse(emptyList(), emptyList()), hentetInformasjon)
                 vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(it.id, grunnlag))
             }
             BrukerContextUtil.testWithBrukerContext("beh1", listOf(rolleConfig.saksbehandlerRolle)) {

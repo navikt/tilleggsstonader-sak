@@ -160,6 +160,12 @@ class VilkårperiodeGrunnlagService(
                     )
                 }
                 .slåSammenOverlappendeEllerPåfølgende(),
+            hentedeYtelser = ytelserFraRegister.hentetInformasjon.map {
+                GrunnlagYtelse.HentetYtelse(
+                    type = it.type,
+                    status = GrunnlagYtelse.StatusHentetInformasjon.from(it.status)
+                )
+            },
         )
     }
 
