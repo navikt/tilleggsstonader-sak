@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
@@ -22,7 +22,7 @@ object TilsynBarnTestUtil {
 
     fun innvilgelseDto() = InnvilgelseTilsynBarnRequest
 
-    fun opphørDto() = OpphørTilsynBarnRequest(
+    fun opphørDto() = OpphørTilsynBarnDto(
         årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
         begrunnelse = "Endring i utgifter",
     )

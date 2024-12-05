@@ -15,7 +15,10 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.*
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
@@ -43,7 +46,7 @@ class TilsynBarnBeregnYtelseSteg(
         when (vedtak) {
             is InnvilgelseTilsynBarnRequest -> beregnOgLagreInnvilgelse(saksbehandling)
             is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
-            is OpphørTilsynBarnRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
+            is OpphørTilsynBarnDto -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
     }
 
@@ -53,7 +56,7 @@ class TilsynBarnBeregnYtelseSteg(
         lagreAndeler(saksbehandling, beregningsresultat)
     }
 
-    private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnRequest) {
+    private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnDto) {
         brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
