@@ -1,0 +1,224 @@
+{
+  "behandling" : {
+    "behandlingId" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e31",
+    "eksternFagsakId" : 1673,
+    "stønadstype" : "BARNETILSYN",
+    "årsak" : "SØKNAD",
+    "ident" : "15",
+    "opprettetTidspunkt" : "2024-02-05T00:00:00",
+    "resultat" : "INNVILGET",
+    "vedtakstidspunkt" : "2024-01-01T00:00:00",
+    "saksbehandler" : "saksbehandler",
+    "beslutter" : "saksbeh2",
+    "revurderFra" : "2024-01-01"
+  },
+  "søknad" : {
+    "mottattTidspunkt" : "2023-01-01T00:00:00"
+  },
+  "målgrupper" : [ {
+    "type" : "AAP",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
+    "faktaOgVurdering" : {
+      "@type" : "MÅLGRUPPE",
+      "medlemskap" : {
+        "svar" : "JA_IMPLISITT",
+        "resultat" : "OPPFYLT"
+      },
+      "utgifterDekketAvAnnetRegelverk" : {
+        "svar" : "NEI",
+        "resultat" : "OPPFYLT"
+      }
+    },
+    "delvilkår" : {
+      "medlemskap" : {
+        "svar" : "JA_IMPLISITT",
+        "resultat" : "OPPFYLT"
+      },
+      "dekketAvAnnetRegelverk" : {
+        "svar" : "NEI",
+        "resultat" : "OPPFYLT"
+      },
+      "lønnet" : null
+    },
+    "kilde" : "MANUELL",
+    "resultat" : "OPPFYLT",
+    "begrunnelse" : "målgruppe aap",
+    "slettetKommentar" : null
+  }, {
+    "type" : "OVERGANGSSTØNAD",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
+    "faktaOgVurdering" : {
+      "@type" : "MÅLGRUPPE",
+      "medlemskap" : {
+        "svar" : "JA_IMPLISITT",
+        "resultat" : "OPPFYLT"
+      },
+      "utgifterDekketAvAnnetRegelverk" : null
+    },
+    "delvilkår" : {
+      "medlemskap" : {
+        "svar" : "JA_IMPLISITT",
+        "resultat" : "OPPFYLT"
+      },
+      "dekketAvAnnetRegelverk" : null,
+      "lønnet" : null
+    },
+    "kilde" : "MANUELL",
+    "resultat" : "OPPFYLT",
+    "begrunnelse" : "målgruppe os",
+    "slettetKommentar" : null
+  } ],
+  "aktiviteter" : [ {
+    "type" : "TILTAK",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
+    "faktaOgVurdering" : {
+      "@type" : "AKTIVITET_BARNETILSYN",
+      "aktivitetsdager" : 5,
+      "lønnet" : {
+        "svar" : "JA",
+        "resultat" : "IKKE_OPPFYLT"
+      }
+    },
+    "delvilkår" : {
+      "medlemskap" : null,
+      "dekketAvAnnetRegelverk" : null,
+      "lønnet" : {
+        "svar" : "JA",
+        "resultat" : "IKKE_OPPFYLT"
+      }
+    },
+    "kilde" : "MANUELL",
+    "resultat" : "IKKE_OPPFYLT",
+    "begrunnelse" : "aktivitet abd",
+    "slettetKommentar" : null
+  }, {
+    "type" : "TILTAK",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
+    "faktaOgVurdering" : {
+      "@type" : "AKTIVITET_BARNETILSYN",
+      "aktivitetsdager" : 5,
+      "lønnet" : {
+        "svar" : "NEI",
+        "resultat" : "OPPFYLT"
+      }
+    },
+    "delvilkår" : {
+      "medlemskap" : null,
+      "dekketAvAnnetRegelverk" : null,
+      "lønnet" : {
+        "svar" : "NEI",
+        "resultat" : "OPPFYLT"
+      }
+    },
+    "kilde" : "MANUELL",
+    "resultat" : "SLETTET",
+    "begrunnelse" : null,
+    "slettetKommentar" : "kommentar slettet"
+  } ],
+  "stønadsperioder" : [ {
+    "målgruppe" : "AAP",
+    "aktivitet" : "TILTAK",
+    "fom" : "2024-02-01",
+    "tom" : "2024-03-31"
+  }, {
+    "målgruppe" : "NEDSATT_ARBEIDSEVNE",
+    "aktivitet" : "REELL_ARBEIDSSØKER",
+    "fom" : "2024-02-01",
+    "tom" : "2024-03-31"
+  } ],
+  "vilkår" : [ {
+    "type" : "PASS_BARN",
+    "resultat" : "OPPFYLT",
+    "delvilkår" : [ {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har bruker dokumenterte utgifter til pass?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Mottar den andre forelderen støtte til pass av barnet?",
+        "svar" : "Nei",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Er barnet ferdig med 4. skoleår?",
+        "svar" : "Nei",
+        "begrunnelse" : "en begrunnelse"
+      } ]
+    } ],
+    "fødselsdatoBarn" : "2024-05-15",
+    "fom" : "2024-02-01",
+    "tom" : "2024-02-29",
+    "utgift" : 100
+  }, {
+    "type" : "PASS_BARN",
+    "resultat" : "OPPFYLT",
+    "delvilkår" : [ {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har bruker dokumenterte utgifter til pass?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Mottar den andre forelderen støtte til pass av barnet?",
+        "svar" : "Nei",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Er barnet ferdig med 4. skoleår?",
+        "svar" : "Nei",
+        "begrunnelse" : "en begrunnelse"
+      } ]
+    } ],
+    "fødselsdatoBarn" : "2024-05-15",
+    "fom" : "2024-02-01",
+    "tom" : "2024-02-29",
+    "utgift" : 200
+  }, {
+    "type" : "PASS_BARN",
+    "resultat" : "OPPFYLT",
+    "delvilkår" : [ {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Har bruker dokumenterte utgifter til pass?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Mottar den andre forelderen støtte til pass av barnet?",
+        "svar" : "Nei",
+        "begrunnelse" : null
+      } ]
+    }, {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Er barnet ferdig med 4. skoleår?",
+        "svar" : "Nei",
+        "begrunnelse" : "en begrunnelse"
+      } ]
+    } ],
+    "fødselsdatoBarn" : "2024-10-15",
+    "fom" : "2024-02-01",
+    "tom" : "2024-02-29",
+    "utgift" : 200
+  } ],
+  "vedtak" : {
+    "type" : "INNVILGELSE"
+  }
+}
