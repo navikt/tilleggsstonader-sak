@@ -5,12 +5,16 @@ import java.math.RoundingMode
 import java.time.LocalDate
 import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilSortertGrunnlagStønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -40,7 +44,22 @@ class LæremidlerBeregningService(
             .tilAktiviteter()
     }
 
-    // ANTAR: En vedtaksperiode
+    // En vedtaksperiode er alltid innenfor en overlappsperiode
+
+    // Overlapp = fom, tom, aktivitetType, målgruppeType
+
+    // utdanning + aap
+    // utdanning + enslig
+
+    // tiltak + aap (2 aktiviteter som overlapper eller starter rett etter hverandre)
+
+    // OS + utdanning
+    // OS + reell arbeidssøker
+
+    // vedtaksperiode må være mulig å fylle med en eller flere overlappsperioder
+
+
+    // ANTAR: En vedtaksperiode -> liste
     // ANTAR: En aktitivet hele vedtaksperioden
     // ANTAR: En aktivitet og en målgruppe i stønadsperioden
     // ANTAR: En stønadsperiode
@@ -65,6 +84,14 @@ class LæremidlerBeregningService(
         return BeregningsresultatLæremidler(
             perioder = beregningsgrunnlagPerMåned,
         )
+    }
+
+    fun validerVedtaksperiode(vedtaksperiode: VedtaksPeriode, behandlingId: BehandlingId): Stønadsperiode? {
+        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId)
+            .tilSortertGrunnlagStønadsperiode()
+            .mergeSammenhengende(skalMerges = {a,b -> a.tom.plusDays(1) == b.fom}, merge = {a,b -> a.copy(tom = b.tom)})
+
+        return stønadsperioder.find { it.inneholder(vedtaksperiode) }
     }
 
     //TODO flytt til Kontrakter

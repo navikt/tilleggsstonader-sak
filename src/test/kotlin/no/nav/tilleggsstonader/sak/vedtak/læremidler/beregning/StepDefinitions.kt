@@ -15,11 +15,14 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import java.util.UUID
@@ -42,6 +45,8 @@ class StepDefinitions {
 
     var vedtaksPerioder: List<VedtaksPeriode> = emptyList()
     var resultat: BeregningsresultatLæremidler? = null
+
+    var resultatValidering: Stønadsperiode? = null
 
     @Gitt("følgende vedtaksperioder for læremidler")
     fun `følgende beregningsperiode for læremidler`(dataTable: DataTable) {
@@ -72,6 +77,7 @@ class StepDefinitions {
         } returns mapStønadsperioder(behandlingId, dataTable)
     }
 
+
     @Når("beregner stønad for læremidler")
     fun `beregner stønad for læremidler`() {
         resultat = læremidlerBeregningService.beregn(vedtaksPerioder!!, behandlingId)
@@ -96,5 +102,26 @@ class StepDefinitions {
             perioder = perioder,
         )
         assertThat(resultat).isEqualTo(forventetBeregningsresultat)
+    }
+
+    @Når("validerer vedtaksperiode for læremidler")
+    fun `validerer vedtaksperiode for læremidler`() {
+        val vedtaksperiode = vedtaksPerioder!!.single()
+        resultatValidering = læremidlerBeregningService.validerVedtaksperiode(vedtaksperiode, behandlingId)
+    }
+
+    @Så("skal resultat fra validering være")
+    fun `skal resultat fra validering være`(dataTable: DataTable) {
+        val stønadsperiode = dataTable.mapRad { rad ->
+            Stønadsperiode(
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                aktivitet = AktivitetType.TILTAK,
+                målgruppe = MålgruppeType.AAP,
+            )
+        }.single()
+
+        assertThat(resultatValidering?.fom).isEqualTo(stønadsperiode.fom)
+        assertThat(resultatValidering?.tom).isEqualTo(stønadsperiode.tom)
     }
 }
