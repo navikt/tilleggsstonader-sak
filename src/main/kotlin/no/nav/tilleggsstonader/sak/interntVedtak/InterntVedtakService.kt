@@ -51,6 +51,7 @@ class InterntVedtakService(
     private val vedtakService: VedtakService,
 ) {
 
+    @Deprecated("Skal erstattes av InterntVedtakV2", ReplaceWith("lagInterntVedtakV2"))
     fun lagInterntVedtak(behandlingId: BehandlingId): InterntVedtak {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
@@ -73,6 +74,7 @@ class InterntVedtakService(
         }
     }
 
+    @Deprecated("Skal erstattes av InterntVedtakV2", ReplaceWith("lagInterntVedtakTilsynBarnV2"))
     fun lagInterntVedtakTilsynBarn(
         behandling: Saksbehandling,
         vilkårperioder: Vilkårperioder,
@@ -152,6 +154,7 @@ class InterntVedtakService(
         }
     }
 
+    @Deprecated("Skal erstattes av InterntVedtakV2", ReplaceWith("mapVilkårperioderV2"))
     private fun mapVilkårperioder(vilkårperioder: List<Vilkårperiode>): List<VilkårperiodeInterntVedtak> {
         return vilkårperioder.map {
             VilkårperiodeInterntVedtak(
