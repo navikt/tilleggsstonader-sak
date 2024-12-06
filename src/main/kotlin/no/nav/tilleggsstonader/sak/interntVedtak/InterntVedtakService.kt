@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -22,6 +23,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeServic
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
@@ -33,7 +36,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode as VilkårperiodeDomain
 
 @Service
 class InterntVedtakService(
@@ -50,17 +52,29 @@ class InterntVedtakService(
 
     fun lagInterntVedtak(behandlingId: BehandlingId): InterntVedtak {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
-        val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag
-        val behandlingbarn = mapBarnPåBarnId(behandlingId, grunnlag)
-        val vedtak = vedtakService.hentVedtak(behandlingId)
+        val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
+        val vedtak = vedtakService.hentVedtak(behandling.id)
+
+        return when (behandling.stønadstype) {
+            Stønadstype.BARNETILSYN -> lagInterntVedtakTilsynBarn(behandling, vilkårsperioder, vedtak)
+            Stønadstype.LÆREMIDLER -> TODO()
+        }
+    }
+
+    fun lagInterntVedtakTilsynBarn(
+        behandling: Saksbehandling,
+        vilkårperioder: Vilkårperioder,
+        vedtak: Vedtak?,
+    ): InterntVedtak {
+        val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandling.id).grunnlag
+        val behandlingbarn = mapBarnPåBarnId(behandling.id, grunnlag)
         return InterntVedtak(
             behandling = mapBehandlingsinformasjon(behandling),
             søknad = mapSøknadsinformasjon(behandling),
-            målgrupper = mapVilkårperioder(vilkårsperioder.målgrupper),
-            aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
-            stønadsperioder = mapStønadsperioder(behandlingId),
-            vilkår = mapVilkår(behandlingId, behandlingbarn),
+            målgrupper = mapVilkårperioder(vilkårperioder.målgrupper), // TODO læremidler
+            aktiviteter = mapVilkårperioder(vilkårperioder.aktiviteter), // TODO læremidler
+            stønadsperioder = mapStønadsperioder(behandling.id),
+            vilkår = mapVilkår(behandling.id, behandlingbarn), // TODO læremidler
             vedtak = mapVedtak(vedtak),
         )
     }
