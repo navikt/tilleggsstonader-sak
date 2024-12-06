@@ -34,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -61,6 +62,17 @@ class InterntVedtakService(
         }
     }
 
+    fun lagInterntVedtakV2(behandlingId: BehandlingId): InterntVedtakV2 {
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
+        val vedtak = vedtakService.hentVedtak(behandling.id)
+
+        return when (behandling.stønadstype) {
+            Stønadstype.BARNETILSYN -> lagInterntVedtakTilsynBarnV2(behandling, vilkårsperioder, vedtak)
+            Stønadstype.LÆREMIDLER -> TODO()
+        }
+    }
+
     fun lagInterntVedtakTilsynBarn(
         behandling: Saksbehandling,
         vilkårperioder: Vilkårperioder,
@@ -71,8 +83,26 @@ class InterntVedtakService(
         return InterntVedtak(
             behandling = mapBehandlingsinformasjon(behandling),
             søknad = mapSøknadsinformasjon(behandling),
-            målgrupper = mapVilkårperioder(vilkårperioder.målgrupper), // TODO læremidler
-            aktiviteter = mapVilkårperioder(vilkårperioder.aktiviteter), // TODO læremidler
+            målgrupper = mapVilkårperioder(vilkårperioder.målgrupper),
+            aktiviteter = mapVilkårperioder(vilkårperioder.aktiviteter),
+            stønadsperioder = mapStønadsperioder(behandling.id),
+            vilkår = mapVilkår(behandling.id, behandlingbarn),
+            vedtak = mapVedtak(vedtak),
+        )
+    }
+
+    fun lagInterntVedtakTilsynBarnV2(
+        behandling: Saksbehandling,
+        vilkårperioder: Vilkårperioder,
+        vedtak: Vedtak?,
+    ): InterntVedtakV2 {
+        val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandling.id).grunnlag
+        val behandlingbarn = mapBarnPåBarnId(behandling.id, grunnlag)
+        return InterntVedtakV2(
+            behandling = mapBehandlingsinformasjon(behandling),
+            søknad = mapSøknadsinformasjon(behandling),
+            målgrupper = mapVilkårperioderV2(vilkårperioder.målgrupper), // TODO læremidler
+            aktiviteter = mapVilkårperioderV2(vilkårperioder.aktiviteter), // TODO læremidler
             stønadsperioder = mapStønadsperioder(behandling.id),
             vilkår = mapVilkår(behandling.id, behandlingbarn), // TODO læremidler
             vedtak = mapVedtak(vedtak),
@@ -134,6 +164,22 @@ class InterntVedtakService(
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
                 aktivitetsdager = it.faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
+            )
+        }
+    }
+
+    private fun mapVilkårperioderV2(vilkårperioder: List<Vilkårperiode>): List<VilkårperiodeInterntVedtakV2> {
+        return vilkårperioder.map {
+            VilkårperiodeInterntVedtakV2(
+                type = it.type,
+                fom = it.fom,
+                tom = it.tom,
+                faktaOgVurdering = it.faktaOgVurdering.tilFaktaOgVurderingDto(),
+                delvilkår = mapDelvilkår(it.faktaOgVurdering),
+                kilde = it.kilde,
+                resultat = it.resultat,
+                begrunnelse = it.begrunnelse,
+                slettetKommentar = it.slettetKommentar,
             )
         }
     }

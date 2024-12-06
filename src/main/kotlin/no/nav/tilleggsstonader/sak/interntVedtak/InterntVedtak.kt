@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -26,6 +27,16 @@ data class InterntVedtak(
     val søknad: Søknadsinformasjon?,
     val målgrupper: List<VilkårperiodeInterntVedtak>,
     val aktiviteter: List<VilkårperiodeInterntVedtak>,
+    val stønadsperioder: List<Stønadsperiode>,
+    val vilkår: List<VilkårInternt>,
+    val vedtak: VedtakInternt?,
+)
+
+data class InterntVedtakV2(
+    val behandling: Behandlinginfo,
+    val søknad: Søknadsinformasjon?,
+    val målgrupper: List<VilkårperiodeInterntVedtakV2>,
+    val aktiviteter: List<VilkårperiodeInterntVedtakV2>,
     val stønadsperioder: List<Stønadsperiode>,
     val vilkår: List<VilkårInternt>,
     val vedtak: VedtakInternt?,
@@ -81,6 +92,18 @@ data class VilkårperiodeInterntVedtak(
     val begrunnelse: String?,
     val slettetKommentar: String?,
     val aktivitetsdager: Int?,
+)
+
+data class VilkårperiodeInterntVedtakV2(
+    val type: VilkårperiodeType,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val faktaOgVurdering: FaktaOgVurderingerDto,
+    val delvilkår: DelvilkårVilkårperiode,
+    val kilde: KildeVilkårsperiode,
+    val resultat: ResultatVilkårperiode,
+    val begrunnelse: String?,
+    val slettetKommentar: String?,
 )
 
 data class DelvilkårVilkårperiode(

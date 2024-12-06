@@ -23,4 +23,12 @@ class HtmlifyClient(
             httpHeaders = HttpHeaders(),
         )
     }
+
+    fun generateHtml(interntVedtak: InterntVedtakV2): String {
+        return postForEntity<String>(
+            UriComponentsBuilder.fromUri(uri).pathSegment("api", "internt-vedtak-v2").toUriString(),
+            interntVedtak,
+            httpHeaders = HttpHeaders(),
+        )
+    }
 }
