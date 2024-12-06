@@ -54,6 +54,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBarnetilsynFaktaOgVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.MålgruppeFaktaOgVurderingerDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -237,6 +239,7 @@ class InterntVedtakServiceTest {
     }
 
     @Test
+    @Deprecated("Skal erstattes av InterntVedtakV2")
     fun `felter skal bli riktig mappede`() {
         val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
         assertBehandling(interntVedtak.behandling)
@@ -247,9 +250,26 @@ class InterntVedtakServiceTest {
     }
 
     @Test
+    fun `felter skal bli riktig mappede i v2`() {
+        val interntVedtak = service.lagInterntVedtakV2(behandlingId = behandlingId)
+        assertBehandling(interntVedtak.behandling)
+        assertSøknad(interntVedtak.søknad)
+        assertMålgrupperV2(interntVedtak.målgrupper)
+        assertAktiviteterV2(interntVedtak.aktiviteter)
+        assertStønadsperioder(interntVedtak.stønadsperioder)
+    }
+
+    @Test
+    @Deprecated("Skal erstattes av InterntVedtakV2")
     fun `json til htmlify er riktig`() {
         val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
         assertFileIsEqual("interntVedtak/internt_vedtak.json", interntVedtak)
+    }
+
+    @Test
+    fun `json til htmlify er riktig i V2`() {
+        val interntVedtak = service.lagInterntVedtakV2(behandlingId = behandlingId)
+        assertFileIsEqual("interntVedtak/internt_vedtak_v2.json", interntVedtak)
     }
 
     /**
@@ -266,9 +286,34 @@ class InterntVedtakServiceTest {
         generatePdf(html, "interntVedtak/internt_vedtak.pdf")
     }
 
+    /**
+     * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
+     * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
+     * Formatter htmlfil etter generering for å unngå stor diff
+     */
     @Test
+    @Disabled("Enable når internt-vedtak-v2 har blitt implementert i htmlify")
+    fun `lager html og pdf V2`() {
+        val interntVedtak = service.lagInterntVedtakV2(behandlingId = behandlingId)
+        val html = lagHtmlifyClient().generateHtml(interntVedtak)
+        skrivTilFil("interntVedtak/internt_vedtak_v2.json", html)
+        generatePdf(html, "interntVedtak/internt_vedtak_v2.pdf")
+    }
+
+
+    @Test
+    @Deprecated("Skal erstattes av InterntVedtakV2")
     fun `html skal være formattert for å enklere kunne sjekke diff`() {
         val erIkkeFormatert = FileUtil.readFile("interntVedtak/internt_vedtak.html").split("\n")
+            .none { it.contains("<body") && it.contains("<div") }
+
+        assertThat(erIkkeFormatert).isTrue()
+    }
+
+    @Test
+    @Disabled("Fjernes når internt-vedtak-v2 har blitt implementert i htmlify")
+    fun `html skal være formattert for å enklere kunne sjekke diff V2`() {
+        val erIkkeFormatert = FileUtil.readFile("interntVedtak/internt_vedtak_v2.html").split("\n")
             .none { it.contains("<body") && it.contains("<div") }
 
         assertThat(erIkkeFormatert).isTrue()
@@ -311,6 +356,7 @@ class InterntVedtakServiceTest {
         }
     }
 
+    @Deprecated("Skal erstattes av InterntVedtakV2")
     private fun assertMålgrupper(målgrupper: List<VilkårperiodeInterntVedtak>) {
         assertThat(målgrupper).hasSize(2)
 
@@ -330,6 +376,25 @@ class InterntVedtakServiceTest {
         }
     }
 
+    private fun assertMålgrupperV2(målgrupper: List<VilkårperiodeInterntVedtakV2>) {
+        assertThat(målgrupper).hasSize(2)
+
+        val målgruppe = vilkårperioder.målgrupper.single { it.type == MålgruppeType.AAP }
+        with(målgrupper.single { it.type == MålgruppeType.AAP }) {
+            assertThat(type).isEqualTo(MålgruppeType.AAP)
+            assertThat(fom).isEqualTo(målgruppe.fom)
+            assertThat(tom).isEqualTo(målgruppe.tom)
+            assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
+            assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+            assertThat(begrunnelse).isEqualTo("målgruppe aap")
+            with((faktaOgVurdering as MålgruppeFaktaOgVurderingerDto).medlemskap!!) {
+                assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT)
+                assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+            }
+        }
+    }
+
+    @Deprecated("Skal erstattes av InterntVedtakV2")
     private fun assertAktiviteter(aktiviteter: List<VilkårperiodeInterntVedtak>) {
         assertThat(aktiviteter).hasSize(2)
         val aktivitet = vilkårperioder.aktiviteter.single { it.resultat != ResultatVilkårperiode.SLETTET }
@@ -345,6 +410,29 @@ class InterntVedtakServiceTest {
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
             }
             assertThat(delvilkår.medlemskap).isNull()
+        }
+
+        val aktivitetSlettet = vilkårperioder.aktiviteter.single { it.resultat == ResultatVilkårperiode.SLETTET }
+        with(aktiviteter.single { it.resultat == ResultatVilkårperiode.SLETTET }) {
+            assertThat(resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
+            assertThat(slettetKommentar).isEqualTo("kommentar slettet")
+        }
+    }
+
+    private fun assertAktiviteterV2(aktiviteter: List<VilkårperiodeInterntVedtakV2>) {
+        assertThat(aktiviteter).hasSize(2)
+        val aktivitet = vilkårperioder.aktiviteter.single { it.resultat != ResultatVilkårperiode.SLETTET }
+        with(aktiviteter.single { it.resultat != ResultatVilkårperiode.SLETTET }) {
+            assertThat(type).isEqualTo(AktivitetType.TILTAK)
+            assertThat(fom).isEqualTo(aktivitet.fom)
+            assertThat(tom).isEqualTo(aktivitet.tom)
+            assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
+            assertThat(resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+            assertThat(begrunnelse).isEqualTo("aktivitet abd")
+            with((faktaOgVurdering as AktivitetBarnetilsynFaktaOgVurderingerDto).lønnet!!) {
+                assertThat(svar).isEqualTo(SvarJaNei.JA)
+                assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+            }
         }
 
         val aktivitetSlettet = vilkårperioder.aktiviteter.single { it.resultat == ResultatVilkårperiode.SLETTET }
