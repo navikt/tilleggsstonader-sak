@@ -99,7 +99,6 @@ data class VilkårperiodeInterntVedtakV2(
     val fom: LocalDate,
     val tom: LocalDate,
     val faktaOgVurdering: FaktaOgVurderingerDto,
-    val delvilkår: DelvilkårVilkårperiode,
     val kilde: KildeVilkårsperiode,
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,

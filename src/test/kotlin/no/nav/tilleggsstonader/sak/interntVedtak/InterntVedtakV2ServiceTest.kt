@@ -54,6 +54,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBarnetilsynFaktaOgVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.MålgruppeFaktaOgVurderingerDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -323,11 +325,10 @@ class InterntVedtakV2ServiceTest {
             assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
             assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
             assertThat(begrunnelse).isEqualTo("målgruppe aap")
-            with(delvilkår.medlemskap!!) {
-                assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT.name)
+            with((faktaOgVurdering as MålgruppeFaktaOgVurderingerDto).medlemskap!!) {
+                assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT)
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             }
-            assertThat(delvilkår.lønnet).isNull()
         }
     }
 
@@ -341,11 +342,10 @@ class InterntVedtakV2ServiceTest {
             assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
             assertThat(resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
             assertThat(begrunnelse).isEqualTo("aktivitet abd")
-            with(delvilkår.lønnet!!) {
-                assertThat(svar).isEqualTo(SvarJaNei.JA.name)
+            with((faktaOgVurdering as AktivitetBarnetilsynFaktaOgVurderingerDto).lønnet!!) {
+                assertThat(svar).isEqualTo(SvarJaNei.JA)
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
             }
-            assertThat(delvilkår.medlemskap).isNull()
         }
 
         val aktivitetSlettet = vilkårperioder.aktiviteter.single { it.resultat == ResultatVilkårperiode.SLETTET }
