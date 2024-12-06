@@ -311,7 +311,7 @@ class InterntVedtakServiceTest {
         }
     }
 
-    private fun assertMålgrupper(målgrupper: List<Vilkårperiode>) {
+    private fun assertMålgrupper(målgrupper: List<VilkårperiodeInterntVedtak>) {
         assertThat(målgrupper).hasSize(2)
 
         val målgruppe = vilkårperioder.målgrupper.single { it.type == MålgruppeType.AAP }
@@ -330,7 +330,7 @@ class InterntVedtakServiceTest {
         }
     }
 
-    private fun assertAktiviteter(aktiviteter: List<Vilkårperiode>) {
+    private fun assertAktiviteter(aktiviteter: List<VilkårperiodeInterntVedtak>) {
         assertThat(aktiviteter).hasSize(2)
         val aktivitet = vilkårperioder.aktiviteter.single { it.resultat != ResultatVilkårperiode.SLETTET }
         with(aktiviteter.single { it.resultat != ResultatVilkårperiode.SLETTET }) {

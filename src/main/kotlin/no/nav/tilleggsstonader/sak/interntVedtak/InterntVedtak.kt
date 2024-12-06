@@ -24,8 +24,8 @@ import java.time.LocalDateTime
 data class InterntVedtak(
     val behandling: Behandlinginfo,
     val søknad: Søknadsinformasjon?,
-    val målgrupper: List<Vilkårperiode>,
-    val aktiviteter: List<Vilkårperiode>,
+    val målgrupper: List<VilkårperiodeInterntVedtak>,
+    val aktiviteter: List<VilkårperiodeInterntVedtak>,
     val stønadsperioder: List<Stønadsperiode>,
     val vilkår: List<VilkårInternt>,
     val vedtak: VedtakInternt?,
@@ -71,7 +71,7 @@ data class Utgift(
     val tom: LocalDate,
 )
 
-data class Vilkårperiode(
+data class VilkårperiodeInterntVedtak(
     val type: VilkårperiodeType,
     val fom: LocalDate,
     val tom: LocalDate,

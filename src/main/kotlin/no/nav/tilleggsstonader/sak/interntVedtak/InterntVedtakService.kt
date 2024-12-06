@@ -122,9 +122,9 @@ class InterntVedtakService(
         }
     }
 
-    private fun mapVilkårperioder(vilkårperioder: List<VilkårperiodeDomain>): List<Vilkårperiode> {
+    private fun mapVilkårperioder(vilkårperioder: List<Vilkårperiode>): List<VilkårperiodeInterntVedtak> {
         return vilkårperioder.map {
-            Vilkårperiode(
+            VilkårperiodeInterntVedtak(
                 type = it.type,
                 fom = it.fom,
                 tom = it.tom,
