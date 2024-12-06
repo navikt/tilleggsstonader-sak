@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerNyPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeRevurderFraValidering.validerSlettPeriodeRevurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.medLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
@@ -113,7 +113,7 @@ class VilkårperiodeRevurderFraValideringTest {
             assertDoesNotThrow {
                 val eksisterendeVilkårperiode = aktivitet(
                     fom = revurderFra.minusDays(2),
-                    faktaOgVurdering = faktaOgVurderingAktivitet(
+                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(
                         aktivitetsdager = 1,
                     ),
                 )
@@ -125,7 +125,7 @@ class VilkårperiodeRevurderFraValideringTest {
             assertDoesNotThrow {
                 val eksisterendeVilkårperiode = aktivitet(
                     fom = revurderFra.plusDays(1),
-                    faktaOgVurdering = faktaOgVurderingAktivitet(
+                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(
                         aktivitetsdager = 1,
                     ),
                 )
@@ -171,7 +171,7 @@ class VilkårperiodeRevurderFraValideringTest {
             val eksisterendeVilkårperiode = aktivitet(
                 fom = revurderFra.minusMonths(1),
                 tom = revurderFra.plusMonths(1),
-                faktaOgVurdering = faktaOgVurderingAktivitet(
+                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(
                     aktivitetsdager = 3,
                     lønnet = vurderingLønnet(SvarJaNei.NEI),
                 ),

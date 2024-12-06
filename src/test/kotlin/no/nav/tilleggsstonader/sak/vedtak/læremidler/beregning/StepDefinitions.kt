@@ -4,52 +4,77 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
+import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
-import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
-import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningPeriode
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
+import java.util.UUID
 
 enum class BeregningNøkler(
     override val nøkkel: String,
 ) : Domenenøkkel {
     STUDIENIVÅ("Studienivå"),
     STUDIEPROSENT("Studieprosent"),
-    MÅNED("Måned"),
     SATS("Sats"),
+    AKTIVITET("Aktivitet"),
 }
 
 class StepDefinitions {
-    val læremidlerBeregningService = LæremidlerBeregningService()
+    val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
+    val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
+    val læremidlerBeregningService = LæremidlerBeregningService(vilkårperiodeRepository, stønadsperiodeRepository)
 
-    var beregningPeriode: BeregningPeriode? = null
+    val behandlingId = BehandlingId(UUID.randomUUID())
+
+    var vedtaksPerioder: List<VedtaksPeriode> = emptyList()
     var resultat: BeregningsresultatLæremidler? = null
 
-    @Gitt("følgende beregningsperiode for læremidler")
+    @Gitt("følgende vedtaksperioder for læremidler")
     fun `følgende beregningsperiode for læremidler`(dataTable: DataTable) {
-        beregningPeriode = dataTable.mapRad { rad ->
-            BeregningPeriode(
-                fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
-                tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-                studienivå = parseValgfriEnum<Studienivå>(BeregningNøkler.STUDIENIVÅ, rad)
-                    ?: Studienivå.HØYERE_UTDANNING,
-                studieprosent = parseInt(BeregningNøkler.STUDIEPROSENT, rad),
+        vedtaksPerioder = dataTable.mapRad { rad ->
+            VedtaksPeriode(
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
             )
-        }.first()
+        }
+    }
+
+    @Gitt("følgende aktiviteter for læremidler")
+    fun `følgende aktiviteter`(dataTable: DataTable) {
+        every {
+            vilkårperiodeRepository.findByBehandlingIdAndResultat(
+                any(),
+                any(),
+            )
+        } returns mapAktiviteter(behandlingId, dataTable)
+    }
+
+    @Gitt("følgende stønadsperioder for læremidler")
+    fun `følgende stønadsperioder`(dataTable: DataTable) {
+        every {
+            stønadsperiodeRepository.findAllByBehandlingId(
+                any(),
+            )
+        } returns mapStønadsperioder(behandlingId, dataTable)
     }
 
     @Når("beregner stønad for læremidler")
     fun `beregner stønad for læremidler`() {
-        resultat = læremidlerBeregningService.beregn(beregningPeriode!!)
+        resultat = læremidlerBeregningService.beregn(vedtaksPerioder!!, behandlingId)
     }
 
     @Så("skal stønaden være")
@@ -58,7 +83,8 @@ class StepDefinitions {
             BeregningsresultatForMåned(
                 beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
                 grunnlag = Beregningsgrunnlag(
-                    måned = parseÅrMåned(BeregningNøkler.MÅNED, rad),
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
                     studienivå = parseValgfriEnum<Studienivå>(BeregningNøkler.STUDIENIVÅ, rad)
                         ?: Studienivå.HØYERE_UTDANNING,
                     studieprosent = parseInt(BeregningNøkler.STUDIEPROSENT, rad),

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
@@ -22,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
@@ -33,6 +36,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -111,7 +115,7 @@ object VilkårperiodeTestUtil {
         behandlingId: BehandlingId = BehandlingId.random(),
         fom: LocalDate = osloDateNow(),
         tom: LocalDate = osloDateNow().plusDays(5),
-        faktaOgVurdering: AktivitetFaktaOgVurdering = faktaOgVurderingAktivitet(),
+        faktaOgVurdering: AktivitetFaktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(),
         begrunnelse: String? = null,
         resultat: ResultatVilkårperiode = faktaOgVurdering.utledResultat(),
         slettetKommentar: String? = null,
@@ -128,7 +132,7 @@ object VilkårperiodeTestUtil {
         faktaOgVurdering = faktaOgVurdering,
     )
 
-    fun faktaOgVurderingAktivitet(
+    fun faktaOgVurderingAktivitetTilsynBarn(
         type: AktivitetType = AktivitetType.TILTAK,
         aktivitetsdager: Int? = 5,
         lønnet: VurderingLønnet = vurderingLønnet(),
@@ -150,6 +154,29 @@ object VilkårperiodeTestUtil {
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
     }
+
+    fun faktaOgVurderingAktivitetLæremidler(
+        type: AktivitetType = AktivitetType.UTDANNING,
+        prosent: Int = 100,
+        studienivå: Studienivå = Studienivå.HØYERE_UTDANNING,
+    ): AktivitetFaktaOgVurdering = when (type) {
+        AktivitetType.TILTAK -> TODO()
+
+        AktivitetType.UTDANNING -> UtdanningLæremidler(
+            fakta = FaktaAktivitetLæremidler(studienivå = studienivå, prosent = prosent),
+            vurderinger = vurderingerUtdanningLæremidler(),
+        )
+
+        AktivitetType.REELL_ARBEIDSSØKER -> TODO()
+
+        AktivitetType.INGEN_AKTIVITET -> TODO()
+    }
+
+    fun vurderingerUtdanningLæremidler(
+        harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend = vurderingHarRettTilUtstyrsstipend(),
+    ): VurderingerUtdanningLæremidler = VurderingerUtdanningLæremidler(
+        harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
+    )
 
     fun vurderingLønnet(
         svar: SvarJaNei? = SvarJaNei.NEI,
