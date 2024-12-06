@@ -300,7 +300,6 @@ class InterntVedtakServiceTest {
         generatePdf(html, "interntVedtak/internt_vedtak_v2.pdf")
     }
 
-
     @Test
     @Deprecated("Skal erstattes av InterntVedtakV2")
     fun `html skal være formattert for å enklere kunne sjekke diff`() {
