@@ -118,7 +118,7 @@ class InterntVedtakService(
                 fom = it.fom,
                 tom = it.tom,
                 delvilkår = mapDelvilkår(it.faktaOgVurdering),
-                faktaOgVurdering = it.faktaOgVurdering.tilFaktaOgVurderingDto(),
+                faktaOgVurderinger = it.faktaOgVurdering.tilFaktaOgVurderingDto(),
                 kilde = it.kilde,
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,

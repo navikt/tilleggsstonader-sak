@@ -30,7 +30,7 @@
       },
       "lønnet" : null
     },
-    "faktaOgVurdering" : {
+    "faktaOgVurderinger" : {
       "@type" : "MÅLGRUPPE",
       "medlemskap" : {
         "svar" : "JA_IMPLISITT",
@@ -58,7 +58,7 @@
       "dekketAvAnnetRegelverk" : null,
       "lønnet" : null
     },
-    "faktaOgVurdering" : {
+    "faktaOgVurderinger" : {
       "@type" : "MÅLGRUPPE",
       "medlemskap" : {
         "svar" : "JA_IMPLISITT",
@@ -84,7 +84,7 @@
         "resultat" : "IKKE_OPPFYLT"
       }
     },
-    "faktaOgVurdering" : {
+    "faktaOgVurderinger" : {
       "@type" : "AKTIVITET_BARNETILSYN",
       "aktivitetsdager" : 5,
       "lønnet" : {
@@ -109,7 +109,7 @@
         "resultat" : "OPPFYLT"
       }
     },
-    "faktaOgVurdering" : {
+    "faktaOgVurderinger" : {
       "@type" : "AKTIVITET_BARNETILSYN",
       "aktivitetsdager" : 5,
       "lønnet" : {

@@ -77,7 +77,7 @@ data class VilkårperiodeInterntVedtak(
     val fom: LocalDate,
     val tom: LocalDate,
     val delvilkår: DelvilkårVilkårperiode, // TODO: Fjernes når htmlify bruker faktaOgVurdering
-    val faktaOgVurdering: FaktaOgVurderingerDto,
+    val faktaOgVurderinger: FaktaOgVurderingerDto,
     val kilde: KildeVilkårsperiode,
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,

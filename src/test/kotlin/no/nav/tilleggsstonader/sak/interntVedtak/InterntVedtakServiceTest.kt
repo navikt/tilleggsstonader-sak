@@ -330,7 +330,7 @@ class InterntVedtakServiceTest {
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             }
             assertThat(delvilkår.lønnet).isNull()
-            with((faktaOgVurdering as MålgruppeFaktaOgVurderingerDto).medlemskap!!) {
+            with((faktaOgVurderinger as MålgruppeFaktaOgVurderingerDto).medlemskap!!) {
                 assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT)
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             }
@@ -352,7 +352,7 @@ class InterntVedtakServiceTest {
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
             }
             assertThat(delvilkår.medlemskap).isNull()
-            with((faktaOgVurdering as AktivitetBarnetilsynFaktaOgVurderingerDto).lønnet!!) {
+            with((faktaOgVurderinger as AktivitetBarnetilsynFaktaOgVurderingerDto).lønnet!!) {
                 assertThat(svar).isEqualTo(SvarJaNei.JA)
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
             }
