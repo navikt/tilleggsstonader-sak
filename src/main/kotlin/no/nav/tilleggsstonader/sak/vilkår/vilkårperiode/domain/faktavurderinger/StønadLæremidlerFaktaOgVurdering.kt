@@ -85,11 +85,20 @@ data object IngenAktivitetLæremidler : AktivitetLæremidler {
 data class VurderingTiltakLæremidler(
     override val harUtgifter: VurderingHarUtgifter,
     override val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend,
-) : HarUtgifterVurdering, HarRettTilUtstyrsstipendVurdering
+) : HarUtgifterVurdering, HarRettTilUtstyrsstipendVurdering {
+
+    override fun utledResultat() = sammenstillDelresultater(
+        harUtgifter.resultat,
+        harRettTilUtstyrsstipend.resultat,
+    )
+}
 
 data class VurderingerUtdanningLæremidler(
     override val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend,
-) : HarRettTilUtstyrsstipendVurdering
+) : HarRettTilUtstyrsstipendVurdering {
+
+    override fun utledResultat() = sammenstillDelresultater(harRettTilUtstyrsstipend.resultat)
+}
 
 data class FaktaAktivitetLæremidler(
     override val prosent: Int,
