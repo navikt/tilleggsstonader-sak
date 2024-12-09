@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import java.util.UUID
+import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 
 enum class BeregningNøkler(
     override val nøkkel: String,
@@ -34,6 +35,8 @@ enum class BeregningNøkler(
     STUDIEPROSENT("Studieprosent"),
     SATS("Sats"),
     AKTIVITET("Aktivitet"),
+    UTBETALINGSMÅNED("Utbetalingsmåned"),
+    MÅLGRUPPE("Målgruppe"),
 }
 
 class StepDefinitions {
@@ -95,6 +98,9 @@ class StepDefinitions {
                         ?: Studienivå.HØYERE_UTDANNING,
                     studieprosent = parseInt(BeregningNøkler.STUDIEPROSENT, rad),
                     sats = parseBigDecimal(BeregningNøkler.SATS, rad).toInt(),
+                    utbetalingsMåned = parseÅrMåned(BeregningNøkler.UTBETALINGSMÅNED, rad),
+                    målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad)
+                        ?: MålgruppeType.AAP,
                 ),
             )
         }
@@ -104,11 +110,11 @@ class StepDefinitions {
         assertThat(resultat).isEqualTo(forventetBeregningsresultat)
     }
 
-    @Når("validerer vedtaksperiode for læremidler")
-    fun `validerer vedtaksperiode for læremidler`() {
-        val vedtaksperiode = vedtaksPerioder!!.single()
-        resultatValidering = læremidlerBeregningService.validerVedtaksperiode(vedtaksperiode, behandlingId)
-    }
+//    @Når("validerer vedtaksperiode for læremidler")
+//    fun `validerer vedtaksperiode for læremidler`() {
+//        val vedtaksperiode = vedtaksPerioder!!.single()
+//        resultatValidering = læremidlerBeregningService.validerVedtaksperiodeInnenforStønadsperioder(vedtaksperiode, behandlingId)
+//    }
 
     @Så("skal resultat fra validering være")
     fun `skal resultat fra validering være`(dataTable: DataTable) {

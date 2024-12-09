@@ -43,6 +43,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import java.time.LocalDate
 import java.util.UUID
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
 
 object VilkårperiodeTestUtil {
 
@@ -160,7 +162,13 @@ object VilkårperiodeTestUtil {
         prosent: Int = 100,
         studienivå: Studienivå = Studienivå.HØYERE_UTDANNING,
     ): AktivitetFaktaOgVurdering = when (type) {
-        AktivitetType.TILTAK -> TODO()
+        AktivitetType.TILTAK -> TiltakLæremidler(
+            fakta = FaktaAktivitetLæremidler(studienivå = studienivå, prosent = prosent),
+            vurderinger = VurderingTiltakLæremidler(
+                harRettTilUtstyrsstipend = vurderingHarRettTilUtstyrsstipend(),
+                harUtgifter = vurderingHarUtgifter()
+            )
+        )
 
         AktivitetType.UTDANNING -> UtdanningLæremidler(
             fakta = FaktaAktivitetLæremidler(studienivå = studienivå, prosent = prosent),
@@ -173,6 +181,12 @@ object VilkårperiodeTestUtil {
     }
 
     fun vurderingerUtdanningLæremidler(
+        harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend = vurderingHarRettTilUtstyrsstipend(),
+    ): VurderingerUtdanningLæremidler = VurderingerUtdanningLæremidler(
+        harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
+    )
+
+    fun vurderingerTiltakLæremidler(
         harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend = vurderingHarRettTilUtstyrsstipend(),
     ): VurderingerUtdanningLæremidler = VurderingerUtdanningLæremidler(
         harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
