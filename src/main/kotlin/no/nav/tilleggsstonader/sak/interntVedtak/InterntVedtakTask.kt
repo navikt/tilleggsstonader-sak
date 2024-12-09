@@ -32,16 +32,17 @@ class InterntVedtakTask(
         val interntVedtak = interntVedtakService.lagInterntVedtak(behandlingId)
         val html = htmlifyClient.generateHtml(interntVedtak)
         val pdf = dokumentClient.genererPdf(html)
-        arkiver(interntVedtak, pdf)
+        arkiver(interntVedtak.behandling, pdf)
     }
 
-    private fun arkiver(interntVedtak: InterntVedtak, pdf: ByteArray) {
-        val behandlingId = interntVedtak.behandling.behandlingId
-        val stønadstype = interntVedtak.behandling.stønadstype
-        val enhet = arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(interntVedtak.behandling.ident)
+    private fun arkiver(behandlingInfo: Behandlinginfo, pdf: ByteArray) {
+        val behandlingId = behandlingInfo.behandlingId
+        val stønadstype = behandlingInfo.stønadstype
+        val enhet =
+            arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(behandlingInfo.ident)
         journalpostService.opprettJournalpost(
             ArkiverDokumentRequest(
-                fnr = interntVedtak.behandling.ident,
+                fnr = behandlingInfo.ident,
                 forsøkFerdigstill = true,
                 hoveddokumentvarianter = listOf(
                     Dokument(
@@ -52,7 +53,7 @@ class InterntVedtakTask(
                         dokumenttype = stønadstype.dokumentTypeInterntVedtak(),
                     ),
                 ),
-                fagsakId = interntVedtak.behandling.eksternFagsakId.toString(),
+                fagsakId = behandlingInfo.eksternFagsakId.toString(),
                 avsenderMottaker = null,
                 journalførendeEnhet = enhet,
                 eksternReferanseId = "$behandlingId-blankett",
@@ -64,7 +65,10 @@ class InterntVedtakTask(
         const val TYPE = "lagInterntVedtak"
 
         fun lagTask(behandlingId: BehandlingId): Task {
-            return Task(TYPE, behandlingId.toString())
+            return Task(
+                type = TYPE,
+                payload = behandlingId.toString(),
+            )
         }
     }
 }

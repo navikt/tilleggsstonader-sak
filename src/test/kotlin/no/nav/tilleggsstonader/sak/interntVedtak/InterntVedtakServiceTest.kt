@@ -54,6 +54,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBarnetilsynFaktaOgVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.MålgruppeFaktaOgVurderingerDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -257,6 +259,7 @@ class InterntVedtakServiceTest {
      * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
      * Formatter htmlfil etter generering for å unngå stor diff
      */
+    // TODO: Oppdater med ny HTML når htmlify har tatt i bruk vedtakOgBeregning-feltet
     @Disabled
     @Test
     fun `lager html og pdf`() {
@@ -327,6 +330,10 @@ class InterntVedtakServiceTest {
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
             }
             assertThat(delvilkår.lønnet).isNull()
+            with((faktaOgVurderinger as MålgruppeFaktaOgVurderingerDto).medlemskap!!) {
+                assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT)
+                assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+            }
         }
     }
 
@@ -345,6 +352,10 @@ class InterntVedtakServiceTest {
                 assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
             }
             assertThat(delvilkår.medlemskap).isNull()
+            with((faktaOgVurderinger as AktivitetBarnetilsynFaktaOgVurderingerDto).lønnet!!) {
+                assertThat(svar).isEqualTo(SvarJaNei.JA)
+                assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
+            }
         }
 
         val aktivitetSlettet = vilkårperioder.aktiviteter.single { it.resultat == ResultatVilkårperiode.SLETTET }

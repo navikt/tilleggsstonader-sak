@@ -30,6 +30,17 @@
       },
       "lønnet" : null
     },
+    "faktaOgVurderinger" : {
+      "@type" : "MÅLGRUPPE",
+      "medlemskap" : {
+        "svar" : "JA_IMPLISITT",
+        "resultat" : "OPPFYLT"
+      },
+      "utgifterDekketAvAnnetRegelverk" : {
+        "svar" : "NEI",
+        "resultat" : "OPPFYLT"
+      }
+    },
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe aap",
@@ -46,6 +57,14 @@
       },
       "dekketAvAnnetRegelverk" : null,
       "lønnet" : null
+    },
+    "faktaOgVurderinger" : {
+      "@type" : "MÅLGRUPPE",
+      "medlemskap" : {
+        "svar" : "JA_IMPLISITT",
+        "resultat" : "OPPFYLT"
+      },
+      "utgifterDekketAvAnnetRegelverk" : null
     },
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
@@ -65,6 +84,14 @@
         "resultat" : "IKKE_OPPFYLT"
       }
     },
+    "faktaOgVurderinger" : {
+      "@type" : "AKTIVITET_BARNETILSYN",
+      "aktivitetsdager" : 5,
+      "lønnet" : {
+        "svar" : "JA",
+        "resultat" : "IKKE_OPPFYLT"
+      }
+    },
     "kilde" : "MANUELL",
     "resultat" : "IKKE_OPPFYLT",
     "begrunnelse" : "aktivitet abd",
@@ -77,6 +104,14 @@
     "delvilkår" : {
       "medlemskap" : null,
       "dekketAvAnnetRegelverk" : null,
+      "lønnet" : {
+        "svar" : "NEI",
+        "resultat" : "OPPFYLT"
+      }
+    },
+    "faktaOgVurderinger" : {
+      "@type" : "AKTIVITET_BARNETILSYN",
+      "aktivitetsdager" : 5,
       "lønnet" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
