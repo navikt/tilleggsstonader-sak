@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.time.YearMonth
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
 data class BeregningsresultatLæremidler(
     val perioder: List<BeregningsresultatForMåned>,
@@ -23,4 +23,3 @@ data class Beregningsgrunnlag(
     val sats: Int,
     val målgruppe: MålgruppeType,
 ) : Periode<LocalDate>
-

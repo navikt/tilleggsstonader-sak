@@ -1,10 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.time.LocalDate
-import java.time.YearMonth
-import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
@@ -28,6 +23,11 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFaktaOrThrow
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.LocalDate
+import java.time.YearMonth
+import java.util.UUID
 
 private val PROSENT_50 = BigDecimal(0.5)
 private val PROSENTGRENSE_HALV_SATS = 50
@@ -59,38 +59,25 @@ class LæremidlerBeregningService(
 
         val vedtaksPerioderMedStøndsperioder = finnVedtaksperioderMedStønadsperioder(vedtaksPeriode, stønadsperioder)
 
-        val beregningsresultatForMåned = vedtaksPerioderMedStøndsperioder.flatMap { vedtaksPeriode ->
+        val beregningsresultatForMåned = vedtaksPerioderMedStøndsperioder.flatMap { vedtaksPeriodeMedStønadsperioder ->
             val aktivitet =
-                finnAktiviteter(behandlingId).filter { aktivitet -> aktivitet.type == vedtaksPeriode.stønadsperiode.single().aktivitet }
+                finnAktiviteter(behandlingId).filter { aktivitet -> aktivitet.type == vedtaksPeriodeMedStønadsperioder.stønadsperiode.single().aktivitet }
                     .single()
 
-            val perioderDeltIMåneder = vedtaksPeriode.delIÅr { fom, tom -> VedtaksPeriode(fom, tom) }
-                .flatMap { periode ->
-                    periode.delIDatoTilDatoMånder { fom, tom ->
-                        UtbetalingsPeriode(
-                            fom = fom,
-                            tom = tom,
-                            utbetalingsMåned = periode.fom.toYearMonth()
-                        )
-                    }
-                }
+            val utbetalingsperioder = delVedtaksperioderForLæremidler(vedtaksPeriodeMedStønadsperioder)
 
-            perioderDeltIMåneder.map { periode ->
+            utbetalingsperioder.map { utbetalingsperiode ->
                 val grunnlagsdata =
-                    lagBeregningsGrunnlag(periode, aktivitet, vedtaksPeriode.stønadsperiode.single().målgruppe)
+                    lagBeregningsGrunnlag(utbetalingsperiode, aktivitet, vedtaksPeriodeMedStønadsperioder.stønadsperiode.single().målgruppe)
                 BeregningsresultatForMåned(
                     beløp = finnBeløpForStudieprosent(grunnlagsdata.sats, aktivitet.prosent),
                     grunnlag = grunnlagsdata,
                 )
             }
-
         }
 
         return BeregningsresultatLæremidler(beregningsresultatForMåned)
-
     }
-
-
 
     private fun validerVedtaksperioder(
         vedtaksperioder: List<VedtaksPeriode>,
@@ -103,17 +90,19 @@ class LæremidlerBeregningService(
         val sammenslåtteStønadsperioder = stønadsperioder
             .mergeSammenhengende(
                 skalMerges = { a, b -> a.tom.plusDays(1) == b.fom },
-                merge = { a, b -> a.copy(tom = b.tom) })
+                merge = { a, b -> a.copy(tom = b.tom) },
+            )
 
-        feilHvis(vedtaksperioder.any { vedtaksperiode ->
-            sammenslåtteStønadsperioder.none { it.inneholder(vedtaksperiode) }
-        }) {
+        feilHvis(
+            vedtaksperioder.any { vedtaksperiode ->
+                sammenslåtteStønadsperioder.none { it.inneholder(vedtaksperiode) }
+            },
+        ) {
             "Vedtaksperiode er ikke innenfor en stønadsperiode"
         }
-
     }
 
-    fun finnVedtaksperioderMedStønadsperioder(
+    private fun finnVedtaksperioderMedStønadsperioder(
         vedtaksperioder: List<VedtaksPeriode>,
         stønadsperioder: List<Stønadsperiode>,
     ): List<VedtaksPeriodeMedStøndasperioder> {
@@ -123,7 +112,43 @@ class LæremidlerBeregningService(
         }
     }
 
-    //TODO flytt til Kontrakter
+    private fun delVedtaksperioderForLæremidler(vedtaksperiodeMedStønadsperioder: VedtaksPeriodeMedStøndasperioder): List<UtbetalingsPeriode> {
+        return vedtaksperiodeMedStønadsperioder.delIÅr { fom, tom -> VedtaksPeriode(fom, tom) }
+            .flatMap { periode ->
+                periode.delIDatoTilDatoMånder { fom, tom ->
+                    UtbetalingsPeriode(
+                        fom = fom,
+                        tom = tom,
+                        utbetalingsMåned = periode.fom.toYearMonth(),
+                    )
+                }
+            }
+    }
+
+    private fun lagBeregningsGrunnlag(
+        periode: UtbetalingsPeriode,
+        aktivitet: Aktivitet,
+        målgruppe: MålgruppeType,
+    ): Beregningsgrunnlag {
+        return Beregningsgrunnlag(
+            fom = periode.fom,
+            tom = periode.tom,
+            studienivå = aktivitet.studienivå!!,
+            studieprosent = aktivitet.prosent,
+            sats = finnSatsForStudienivå(periode, aktivitet.studienivå),
+            utbetalingsMåned = periode.utbetalingsMåned,
+            målgruppe = målgruppe,
+        )
+    }
+
+    private fun finnBeløpForStudieprosent(sats: Int, studieprosent: Int): Int {
+        if (studieprosent <= PROSENTGRENSE_HALV_SATS) {
+            return BigDecimal(sats).multiply(PROSENT_50).setScale(0, RoundingMode.HALF_UP).toInt()
+        }
+        return sats
+    }
+
+    // TODO flytt til Kontrakter
     fun <P : Periode<LocalDate>, VAL> P.delIDatoTilDatoMånder(value: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
         val perioder = mutableListOf<VAL>()
         var gjeldeneFom = fom
@@ -135,7 +160,7 @@ class LæremidlerBeregningService(
         return perioder
     }
 
-    //TODO flytt til Kontrakter
+    // TODO flytt til Kontrakter
     fun <P : Periode<LocalDate>> P.delIÅr(value: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
         val perioder = mutableListOf<P>()
         var gjeldeneFom = fom
@@ -145,29 +170,6 @@ class LæremidlerBeregningService(
             gjeldeneFom = LocalDate.of(gjeldeneFom.year + 1, 1, 1)
         }
         return perioder
-    }
-
-    fun lagBeregningsGrunnlag(
-        periode: UtbetalingsPeriode,
-        aktivitet: Aktivitet,
-        målgruppe: MålgruppeType
-    ): Beregningsgrunnlag {
-        return Beregningsgrunnlag(
-            fom = periode.fom,
-            tom = periode.tom,
-            studienivå = aktivitet.studienivå!!,
-            studieprosent = aktivitet.prosent,
-            sats = finnSatsForStudienivå(periode, aktivitet.studienivå),
-            utbetalingsMåned = periode.utbetalingsMåned,
-            målgruppe = målgruppe
-        )
-    }
-
-    fun finnBeløpForStudieprosent(sats: Int, studieprosent: Int): Int {
-        if (studieprosent <= PROSENTGRENSE_HALV_SATS) {
-            return BigDecimal(sats).multiply(PROSENT_50).setScale(0, RoundingMode.HALF_UP).toInt()
-        }
-        return sats
     }
 }
 
@@ -197,11 +199,10 @@ fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
         }
 }
 
-
 data class VedtaksPeriodeMedStøndasperioder(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val stønadsperiode: List<Stønadsperiode>
+    val stønadsperiode: List<Stønadsperiode>,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
@@ -228,4 +229,3 @@ data class UtbetalingsPeriode(
         validatePeriode()
     }
 }
-

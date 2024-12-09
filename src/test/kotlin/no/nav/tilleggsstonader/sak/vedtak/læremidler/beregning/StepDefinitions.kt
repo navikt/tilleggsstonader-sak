@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
+import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
@@ -26,7 +27,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import java.util.UUID
-import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 
 enum class BeregningNøkler(
     override val nøkkel: String,
@@ -79,7 +79,6 @@ class StepDefinitions {
             )
         } returns mapStønadsperioder(behandlingId, dataTable)
     }
-
 
     @Når("beregner stønad for læremidler")
     fun `beregner stønad for læremidler`() {
