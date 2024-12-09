@@ -31,7 +31,7 @@ import java.time.LocalDate
 @RestController
 @RequestMapping(path = ["/api/aap-sjekk"])
 @ProtectedWithClaims(issuer = "azuread")
-class AAPSjekk(
+class AAPSjekkController(
     private val behandlingService: BehandlingService,
     private val behandlingRepository: BehandlingRepository,
     private val vedtakService: VedtakService,
@@ -50,7 +50,7 @@ class AAPSjekk(
             .filter { it.erAvsluttet() }
             .filter { it.resultat == BehandlingResultat.INNVILGET || it.resultat == BehandlingResultat.OPPHØRT }
             .groupBy { it.fagsakId }
-            .mapValues { it.value.minByOrNull { it.vedtakstidspunkt!! }!! }
+            .mapValues { it.value.maxBy { it.vedtakstidspunkt!! }!! }
             .values.chunked(5).flatMap {
                 it.map { finnAvvik(it) }.parallelt()
             }
