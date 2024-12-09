@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -24,7 +23,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
@@ -51,62 +49,21 @@ class InterntVedtakService(
     private val vedtakService: VedtakService,
 ) {
 
-    @Deprecated("Skal erstattes av InterntVedtakV2", ReplaceWith("lagInterntVedtakV2"))
     fun lagInterntVedtak(behandlingId: BehandlingId): InterntVedtak {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
         val vedtak = vedtakService.hentVedtak(behandling.id)
 
-        return when (behandling.stønadstype) {
-            Stønadstype.BARNETILSYN -> lagInterntVedtakTilsynBarn(behandling, vilkårsperioder, vedtak)
-            Stønadstype.LÆREMIDLER -> TODO()
-        }
-    }
-
-    fun lagInterntVedtakV2(behandlingId: BehandlingId): InterntVedtakV2 {
-        val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
-        val vedtak = vedtakService.hentVedtak(behandling.id)
-
-        return when (behandling.stønadstype) {
-            Stønadstype.BARNETILSYN -> lagInterntVedtakTilsynBarnV2(behandling, vilkårsperioder, vedtak)
-            Stønadstype.LÆREMIDLER -> TODO()
-        }
-    }
-
-    @Deprecated("Skal erstattes av InterntVedtakV2", ReplaceWith("lagInterntVedtakTilsynBarnV2"))
-    fun lagInterntVedtakTilsynBarn(
-        behandling: Saksbehandling,
-        vilkårperioder: Vilkårperioder,
-        vedtak: Vedtak?,
-    ): InterntVedtak {
         val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandling.id).grunnlag
         val behandlingbarn = mapBarnPåBarnId(behandling.id, grunnlag)
+
         return InterntVedtak(
             behandling = mapBehandlingsinformasjon(behandling),
             søknad = mapSøknadsinformasjon(behandling),
-            målgrupper = mapVilkårperioder(vilkårperioder.målgrupper),
-            aktiviteter = mapVilkårperioder(vilkårperioder.aktiviteter),
+            målgrupper = mapVilkårperioder(vilkårsperioder.målgrupper),
+            aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
             stønadsperioder = mapStønadsperioder(behandling.id),
             vilkår = mapVilkår(behandling.id, behandlingbarn),
-            vedtak = mapVedtak(vedtak),
-        )
-    }
-
-    fun lagInterntVedtakTilsynBarnV2(
-        behandling: Saksbehandling,
-        vilkårperioder: Vilkårperioder,
-        vedtak: Vedtak?,
-    ): InterntVedtakV2 {
-        val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandling.id).grunnlag
-        val behandlingbarn = mapBarnPåBarnId(behandling.id, grunnlag)
-        return InterntVedtakV2(
-            behandling = mapBehandlingsinformasjon(behandling),
-            søknad = mapSøknadsinformasjon(behandling),
-            målgrupper = mapVilkårperioderV2(vilkårperioder.målgrupper), // TODO læremidler
-            aktiviteter = mapVilkårperioderV2(vilkårperioder.aktiviteter), // TODO læremidler
-            stønadsperioder = mapStønadsperioder(behandling.id),
-            vilkår = mapVilkår(behandling.id, behandlingbarn), // TODO læremidler
             vedtak = mapVedtak(vedtak),
         )
     }
@@ -154,7 +111,6 @@ class InterntVedtakService(
         }
     }
 
-    @Deprecated("Skal erstattes av InterntVedtakV2", ReplaceWith("mapVilkårperioderV2"))
     private fun mapVilkårperioder(vilkårperioder: List<Vilkårperiode>): List<VilkårperiodeInterntVedtak> {
         return vilkårperioder.map {
             VilkårperiodeInterntVedtak(
@@ -162,26 +118,12 @@ class InterntVedtakService(
                 fom = it.fom,
                 tom = it.tom,
                 delvilkår = mapDelvilkår(it.faktaOgVurdering),
-                kilde = it.kilde,
-                resultat = it.resultat,
-                begrunnelse = it.begrunnelse,
-                slettetKommentar = it.slettetKommentar,
-                aktivitetsdager = it.faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
-            )
-        }
-    }
-
-    private fun mapVilkårperioderV2(vilkårperioder: List<Vilkårperiode>): List<VilkårperiodeInterntVedtakV2> {
-        return vilkårperioder.map {
-            VilkårperiodeInterntVedtakV2(
-                type = it.type,
-                fom = it.fom,
-                tom = it.tom,
                 faktaOgVurdering = it.faktaOgVurdering.tilFaktaOgVurderingDto(),
                 kilde = it.kilde,
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
+                aktivitetsdager = it.faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
             )
         }
     }

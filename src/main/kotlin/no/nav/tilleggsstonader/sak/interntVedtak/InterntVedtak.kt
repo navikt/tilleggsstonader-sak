@@ -32,16 +32,6 @@ data class InterntVedtak(
     val vedtak: VedtakInternt?,
 )
 
-data class InterntVedtakV2(
-    val behandling: Behandlinginfo,
-    val søknad: Søknadsinformasjon?,
-    val målgrupper: List<VilkårperiodeInterntVedtakV2>,
-    val aktiviteter: List<VilkårperiodeInterntVedtakV2>,
-    val stønadsperioder: List<Stønadsperiode>,
-    val vilkår: List<VilkårInternt>,
-    val vedtak: VedtakInternt?,
-)
-
 data class Behandlinginfo(
     val behandlingId: BehandlingId,
     val eksternFagsakId: Long,
@@ -86,23 +76,13 @@ data class VilkårperiodeInterntVedtak(
     val type: VilkårperiodeType,
     val fom: LocalDate,
     val tom: LocalDate,
-    val delvilkår: DelvilkårVilkårperiode,
-    val kilde: KildeVilkårsperiode,
-    val resultat: ResultatVilkårperiode,
-    val begrunnelse: String?,
-    val slettetKommentar: String?,
-    val aktivitetsdager: Int?,
-)
-
-data class VilkårperiodeInterntVedtakV2(
-    val type: VilkårperiodeType,
-    val fom: LocalDate,
-    val tom: LocalDate,
+    val delvilkår: DelvilkårVilkårperiode, // TODO: Fjernes når htmlify bruker faktaOgVurdering
     val faktaOgVurdering: FaktaOgVurderingerDto,
     val kilde: KildeVilkårsperiode,
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,
     val slettetKommentar: String?,
+    val aktivitetsdager: Int?, // TODO: Fjernes når htmlify bruker faktaOgVurdering
 )
 
 data class DelvilkårVilkårperiode(

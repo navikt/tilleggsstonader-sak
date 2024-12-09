@@ -6,8 +6,6 @@ enum class Toggle(override val toggleId: String) : ToggleId {
     KAN_OPPRETTE_BEHANDLING("sak.kan-opprette-behandling"),
     KAN_OPPRETTE_REVURDERING("sak.kan-opprette-revurdering"),
 
-    BRUK_INTERNT_VEDTAK_V2("sak.bruk-internt-vedtak-v2"),
-
     ADMIN_KAN_OPPRETTE_BEHANDLING("sak.admin-kan-opprette-behandling"),
 
     HENT_BEHANDLINGER_FOR_OPPFØLGING("sak.hent-behandlinger-for-oppfoelging"),

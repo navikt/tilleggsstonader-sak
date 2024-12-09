@@ -5,11 +5,9 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -22,9 +20,8 @@ class FerdigstillBehandlingStegTest {
 
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val taskService = mockk<TaskService>()
-    private val unleashService = mockk<UnleashService>()
 
-    private val steg = FerdigstillBehandlingSteg(behandlingService, taskService, unleashService)
+    private val steg = FerdigstillBehandlingSteg(behandlingService, taskService)
 
     private val taskSlot = mutableListOf<Task>()
     private val fagsak = fagsak()
@@ -34,7 +31,6 @@ class FerdigstillBehandlingStegTest {
     internal fun setUp() {
         taskSlot.clear()
         every { taskService.save(capture(taskSlot)) } answers { firstArg() }
-        every { unleashService.isEnabled(Toggle.BRUK_INTERNT_VEDTAK_V2) } returns false
     }
 
     @Test
