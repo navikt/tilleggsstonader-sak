@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilSortertDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -64,14 +63,22 @@ class LæremidlerBeregningService(
     // ANTAR: En aktivitet og en målgruppe i stønadsperioden
     // ANTAR: En stønadsperiode
     // ANTAR: Støndsperioden omfatter hele vedtaksperioden
-    // ANTAR: Innenfor semester
+    // ANTAR: Krysser ikke sommeren
     // ANTAR: Sats ikke endrer seg i perioden
     fun beregn(vedtaksPeriode: List<VedtaksPeriode>, behandlingId: BehandlingId): BeregningsresultatLæremidler {
         val stønadsperiode = stønadsperiodeRepository.findAllByBehandlingId(behandlingId).single()
         val aktivitet =
             finnAktiviteter(behandlingId).filter { aktivitet -> aktivitet.type == stønadsperiode.aktivitet }.single()
 
-        val perioderDeltIMåneder = vedtaksPeriode.single().delIDatoTilDatoMånder{fom, tom -> VedtaksPeriode(fom, tom)}
+        val perioderDeltIMåneder = vedtaksPeriode.single().delIÅr { fom, tom -> VedtaksPeriode(fom, tom) }
+            .flatMap { periode ->
+                periode.delIDatoTilDatoMånder { fom, tom ->
+                    VedtaksPeriode(
+                        fom,
+                        tom
+                    )
+                }
+            } //TOOD ikke flatMap? Ønsker vi en annen struktur?
 
         val beregningsgrunnlagPerMåned = perioderDeltIMåneder.map { periode ->
             val grunnlagsdata = lagBeregningsGrunnlag(periode, aktivitet)
@@ -89,7 +96,9 @@ class LæremidlerBeregningService(
     fun validerVedtaksperiode(vedtaksperiode: VedtaksPeriode, behandlingId: BehandlingId): Stønadsperiode? {
         val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandlingId)
             .tilSortertGrunnlagStønadsperiode()
-            .mergeSammenhengende(skalMerges = {a,b -> a.tom.plusDays(1) == b.fom}, merge = {a,b -> a.copy(tom = b.tom)})
+            .mergeSammenhengende(
+                skalMerges = { a, b -> a.tom.plusDays(1) == b.fom },
+                merge = { a, b -> a.copy(tom = b.tom) })
 
         return stønadsperioder.find { it.inneholder(vedtaksperiode) }
     }
@@ -102,6 +111,18 @@ class LæremidlerBeregningService(
             val nyTom = minOf(gjeldeneFom.plusMonths(1).minusDays(1), tom)
             perioder.add(value(gjeldeneFom, nyTom))
             gjeldeneFom = gjeldeneFom.plusMonths(1)
+        }
+        return perioder
+    }
+
+    //TODO flytt til Kontrakter
+    fun <P : Periode<LocalDate>> P.delIÅr(value: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
+        val perioder = mutableListOf<P>()
+        var gjeldeneFom = fom
+        while (gjeldeneFom < tom) {
+            val nyTom = minOf(LocalDate.of(gjeldeneFom.year, 12, 31), tom)
+            perioder.add(value(gjeldeneFom, nyTom))
+            gjeldeneFom = LocalDate.of(gjeldeneFom.year + 1, 1, 1)
         }
         return perioder
     }
