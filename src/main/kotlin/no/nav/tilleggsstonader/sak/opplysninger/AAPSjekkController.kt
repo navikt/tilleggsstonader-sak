@@ -101,11 +101,11 @@ class AAPSjekkController(
         }
         return perioder.perioder
             .map { AAPPeriode(fom = it.fom, tom = it.tom!!, ferdigAvklart = it.aapErFerdigAvklart ?: false) }
+            .sorted()
             .mergeSammenhengende(
                 { a, b -> a.overlapperEllerPåfølgesAv(b) && a.ferdigAvklart == b.ferdigAvklart },
                 { a, b -> a.copy(fom = minOf(a.fom, b.fom), tom = maxOf(a.tom, b.tom)) },
             )
-            .sorted()
     }
 
     private fun perioderFraVedtak(
@@ -123,11 +123,12 @@ class AAPSjekkController(
                 .filter { it.stønadsperiode.målgruppe == MålgruppeType.AAP }
                 .map { SPeriode(it.stønadsperiode.fom, it.stønadsperiode.tom) }
         }
-        return perioder.mergeSammenhengende(
-            { a, b -> a.overlapperEllerPåfølgesAv(b) },
-            { a, b -> SPeriode(fom = minOf(a.fom, b.fom), tom = maxOf(a.tom, b.tom)) },
-        )
+        return perioder
             .sorted()
+            .mergeSammenhengende(
+                { a, b -> a.overlapperEllerPåfølgesAv(b) },
+                { a, b -> SPeriode(fom = minOf(a.fom, b.fom), tom = maxOf(a.tom, b.tom)) },
+            )
     }
 
     data class SPeriode(
