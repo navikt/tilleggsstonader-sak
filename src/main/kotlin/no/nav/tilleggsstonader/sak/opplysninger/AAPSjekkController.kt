@@ -53,12 +53,12 @@ class AAPSjekkController(
             .mapValues { it.value.maxBy { it.vedtakstidspunkt!! }!! }
             .values.chunked(5).flatMap {
                 it.map { finnAvvik(it) }.parallelt()
-            }
+            }.mapNotNull { it }
         secureLogger.info("Antall avvik=${response.size}")
         return response
     }
 
-    private fun finnAvvik(behandling: Behandling): () -> Map<String, Any> = {
+    private fun finnAvvik(behandling: Behandling): () -> Map<String, Any>? = {
         val perioder = perioderFraVedtak(behandling.id)
         if (perioder.isNotEmpty()) {
             val saksbehandling = behandlingService.hentSaksbehandling(behandling.id)
@@ -75,10 +75,10 @@ class AAPSjekkController(
                     "ytelsesperioder" to ytelser,
                 )
             } else {
-                emptyMap()
+                null
             }
         } else {
-            emptyMap()
+            null
         }
     }
 
