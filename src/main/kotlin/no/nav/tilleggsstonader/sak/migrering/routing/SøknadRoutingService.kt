@@ -27,7 +27,7 @@ class SøknadRoutingService(
 
     fun sjekkRoutingForPerson(request: IdentStønadstype): SøknadRoutingResponse {
         val skalBehandlesINyLøsning = skalBehandlesINyLøsning(request)
-        logger.info("routing - skalBehandlesINyLøsning=$skalBehandlesINyLøsning")
+        logger.info("routing - stønadstype=${request.stønadstype} skalBehandlesINyLøsning=$skalBehandlesINyLøsning")
         return SøknadRoutingResponse(skalBehandlesINyLøsning = skalBehandlesINyLøsning)
     }
 
@@ -38,7 +38,7 @@ class SøknadRoutingService(
 
     private fun skalBehandlesINyLøsning(request: IdentStønadstype): Boolean {
         if (harLagretRouting(request)) {
-            logger.info("routing - harLagretRouting=true")
+            logger.info("routing - stønadstype=${request.stønadstype} harLagretRouting=true")
             return true
         }
 
@@ -70,7 +70,7 @@ class SøknadRoutingService(
     private fun maksAntallErNådd(stønadstype: Stønadstype): Boolean {
         val maksAntall = maksAntall(stønadstype)
         val antall = søknadRoutingRepository.countByType(stønadstype)
-        logger.info("routing - antallIDatabase=$antall toggleMaksAntall=$maksAntall")
+        logger.info("routing - stønadstype=$stønadstype antallIDatabase=$antall toggleMaksAntall=$maksAntall")
         return antall >= maksAntall
     }
 
@@ -93,7 +93,7 @@ class SøknadRoutingService(
             Stønadstype.LÆREMIDLER -> !harVedtak
         }
 
-        logger.info("routing - harGyldigStatusArena=$harGyldigStatus - harAktivSakUtenVedtak=$harAktivSakUtenVedtak harVedtak=$harVedtak harAktivtVedtak=$harAktivtVedtak harVedtakUtenUtfall=$harVedtakUtenUtfall")
+        logger.info("routing - stønadstype=$stønadstype harGyldigStatusArena=$harGyldigStatus - harAktivSakUtenVedtak=$harAktivSakUtenVedtak harVedtak=$harVedtak harAktivtVedtak=$harAktivtVedtak harVedtakUtenUtfall=$harVedtakUtenUtfall")
         return harGyldigStatus
     }
 
@@ -115,7 +115,7 @@ class SøknadRoutingService(
                 ?.let { behandlingService.hentBehandlinger(it.id).isNotEmpty() }
                 ?: false
             )
-        logger.info("routing - harBehandling=$harBehandling")
+        logger.info("routing - stønadstype=${request.stønadstype} harBehandling=$harBehandling")
         return harBehandling
     }
 }
