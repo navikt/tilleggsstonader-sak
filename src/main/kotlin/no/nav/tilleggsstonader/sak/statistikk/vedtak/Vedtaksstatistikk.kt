@@ -426,6 +426,8 @@ enum class ÅrsakAvslagDvh {
     IKKE_I_MÅLGRUPPE,
     INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE,
     MANGELFULL_DOKUMENTASJON,
+    HAR_IKKE_UTGIFTER,
+    RETT_TIL_UTSTYRSSTIPEND,
     ANNET,
     ;
 
@@ -447,6 +449,8 @@ enum class ÅrsakAvslagDvh {
             ÅrsakAvslag.IKKE_I_MÅLGRUPPE -> IKKE_I_MÅLGRUPPE
             ÅrsakAvslag.INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE -> INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE
             ÅrsakAvslag.MANGELFULL_DOKUMENTASJON -> MANGELFULL_DOKUMENTASJON
+            ÅrsakAvslag.HAR_IKKE_UTGIFTER -> HAR_IKKE_UTGIFTER
+            ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND -> RETT_TIL_UTSTYRSSTIPEND
             ÅrsakAvslag.ANNET -> ANNET
         }
     }
