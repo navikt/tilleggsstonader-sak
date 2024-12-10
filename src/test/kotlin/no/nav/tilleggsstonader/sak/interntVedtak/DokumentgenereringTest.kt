@@ -55,15 +55,15 @@ class DokumentgenereringTest : IntegrationTest() {
 
     @BeforeEach
     fun setUp() {
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.behandling
-        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.vilkårperioderTilsynBarn
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.TilsynBarn.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.TilsynBarn.vilkårperioder
         every { stønadsperiodeService.hentStønadsperioder(behandlingId) } returns Testdata.stønadsperioder
         every { totrinnskontrollService.hentTotrinnskontroll(behandlingId) } returns Testdata.totrinnskontroll
         every { søknadService.hentSøknadMetadata(behandlingId) } returns Testdata.søknadMetadata
-        every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.grunnlagsdata
-        every { barnService.finnBarnPåBehandling(behandlingId) } returns Testdata.behandlingBarn
-        every { vilkårService.hentVilkårsett(behandlingId) } returns Testdata.vilkår
-        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.vedtak
+        every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.TilsynBarn.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns Testdata.TilsynBarn.behandlingBarn
+        every { vilkårService.hentVilkårsett(behandlingId) } returns Testdata.TilsynBarn.vilkår
+        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.TilsynBarn.vedtak
     }
 
     @Test
