@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -75,12 +76,13 @@ data class VilkårperiodeInterntVedtak(
     val type: VilkårperiodeType,
     val fom: LocalDate,
     val tom: LocalDate,
-    val delvilkår: DelvilkårVilkårperiode,
+    val delvilkår: DelvilkårVilkårperiode, // TODO: Fjernes når htmlify bruker faktaOgVurdering
+    val faktaOgVurderinger: FaktaOgVurderingerDto,
     val kilde: KildeVilkårsperiode,
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,
     val slettetKommentar: String?,
-    val aktivitetsdager: Int?,
+    val aktivitetsdager: Int?, // TODO: Fjernes når htmlify bruker faktaOgVurdering
 )
 
 data class DelvilkårVilkårperiode(
