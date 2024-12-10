@@ -27,6 +27,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit.DAYS
 import java.util.UUID
 
 private val PROSENT_50 = BigDecimal(0.5)
@@ -68,12 +69,16 @@ class LæremidlerBeregningService(
             val utbetalingsperioder = vedtaksperiodeMedStønadsperioder.delTilUtbetalingsPerioder()
 
             utbetalingsperioder.map { utbetalingsperiode ->
-                val aktivitetForBeregningsGrunnlag = finnAktivitetForBeregningsGrunnlag(utbetalingsperiode, aktiviteterForVedtaksperiode)
+                val aktivitetForBeregningsGrunnlag =
+                    finnAktivitetForBeregningsGrunnlag(utbetalingsperiode, aktiviteterForVedtaksperiode)
                 val grunnlagsdata =
                     lagBeregningsGrunnlag(
                         periode = utbetalingsperiode,
                         aktivitet = aktivitetForBeregningsGrunnlag,
-                        målgruppe = vedtaksperiodeMedStønadsperioder.stønadsperiode.single().målgruppe,
+                        målgruppe = finnMålgruppeForBeregningsGrunnlag(
+                            utbetalingsperiode,
+                            vedtaksperiodeMedStønadsperioder,
+                        ),
                     )
                 BeregningsresultatForMåned(
                     beløp = finnBeløpForStudieprosent(grunnlagsdata.sats, aktivitetForBeregningsGrunnlag.prosent),
@@ -85,11 +90,21 @@ class LæremidlerBeregningService(
         return BeregningsresultatLæremidler(beregningsresultatForMåned)
     }
 
+    private fun finnMålgruppeForBeregningsGrunnlag(
+        utbetalingsperiode: UtbetalingsPeriode,
+        vedtaksperiodeMedStønadsperioder: VedtaksperiodeMedStøndasperioder,
+    ): MålgruppeType {
+        return vedtaksperiodeMedStønadsperioder.stønadsperiode
+            .maxByOrNull { it.finnAntallDagerOverlapp(utbetalingsperiode) }
+            ?.målgruppe ?: throw IllegalStateException("Ingen overlappende stønadsperiode funnet")
+    }
+
     private fun finnAktivitetForBeregningsGrunnlag(
         utbetalingsperiode: UtbetalingsPeriode,
         aktiviteter: List<Aktivitet>,
     ): Aktivitet {
-        return aktiviteter.filter { aktivitet -> aktivitet.inneholder(utbetalingsperiode) }.single() //TODO bedre feilmelding
+        return aktiviteter.filter { aktivitet -> aktivitet.inneholder(utbetalingsperiode) }
+            .single() // TODO bedre feilmelding
     }
 
     private fun validerVedtaksperioder(
@@ -226,6 +241,14 @@ data class VedtaksperiodeMedStøndasperioder(
         }
         return perioder
     }
+}
+
+// TODO flytt til Kontrakter
+fun Periode<LocalDate>.finnAntallDagerOverlapp(other: Periode<LocalDate>): Int {
+    if (!this.overlapper(other)) {
+        return 0
+    }
+    return DAYS.between(maxOf(this.fom, other.fom), minOf(this.tom, other.tom)).toInt() + 1
 }
 
 data class Vedtaksperiode(
