@@ -171,7 +171,6 @@ fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
         }
 }
 
-
 fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<UtbetalingsPeriode> {
     return delIÅr { fom, tom -> Vedtaksperiode(fom, tom) }
         .flatMap { periode ->

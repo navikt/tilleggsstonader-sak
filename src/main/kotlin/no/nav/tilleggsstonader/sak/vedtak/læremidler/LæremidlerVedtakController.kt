@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import org.springframework.web.bind.annotation.GetMapping
@@ -70,8 +70,8 @@ class LæremidlerVedtakController(
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtaksperioder: List<Vedtaksperiode>,
-    ): BeregningsresultatLæremidler {
-        return beregningService.beregn(vedtaksperioder, behandlingId)
+    ): BeregningsresultatLæremidlerDto {
+        return beregningService.beregn(vedtaksperioder, behandlingId).tilDto()
     }
 
     /**
