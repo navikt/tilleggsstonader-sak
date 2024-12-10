@@ -69,9 +69,9 @@ class LæremidlerVedtakController(
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtakPerioder: List<Vedtaksperiode>,
+        @RequestBody vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatLæremidler {
-        return beregningService.beregn(vedtakPerioder, behandlingId)
+        return beregningService.beregn(vedtaksperioder, behandlingId)
     }
 
     /**
