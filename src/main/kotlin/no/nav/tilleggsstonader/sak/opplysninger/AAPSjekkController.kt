@@ -70,7 +70,7 @@ class AAPSjekkController(
             if (!ytelseInneholderVedtaksperiode) {
                 mapOf(
                     "behandlingId" to behandling.id,
-                    "sakId" to saksbehandling.eksternId.toString(),
+                    "sakId" to saksbehandling.eksternFagsakId.toString(),
                     "vedtaksperioder" to perioder,
                     "ytelsesperioder" to ytelser,
                 )
