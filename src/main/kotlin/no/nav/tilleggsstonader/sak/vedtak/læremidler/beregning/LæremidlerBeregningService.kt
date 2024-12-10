@@ -48,17 +48,15 @@ class LæremidlerBeregningService(
     // ANTAR: En aktitivet hele vedtaksperioden
     // ANTAR: En stønadsperiode per vedtaksperiode
     // ANTAR: Sats ikke endrer seg i perioden
-    fun beregn(vedtaksPeriode: List<Vedtaksperiode>, behandlingId: BehandlingId): BeregningsresultatLæremidler {
+    fun beregn(vedtaksperioder: List<Vedtaksperiode>, behandlingId: BehandlingId): BeregningsresultatLæremidler {
         val stønadsperioder =
             stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertGrunnlagStønadsperiode()
         val aktiviteter = finnAktiviteter(behandlingId)
 
-        validerVedtaksperioder(vedtaksPeriode, stønadsperioder)
+        validerVedtaksperioder(vedtaksperioder, stønadsperioder)
 
-        val vedtaksperioderMedStøndsperioder = finnVedtaksperioderMedStønadsperioder(vedtaksPeriode, stønadsperioder)
-
-        val beregningsresultatForMåned = vedtaksperioderMedStøndsperioder.flatMap { vedtaksperiodeMedStønadsperioder ->
-            val utbetalingsperioder = vedtaksperiodeMedStønadsperioder.delTilUtbetalingsPerioder()
+        val beregningsresultatForMåned = vedtaksperioder.flatMap { vedtaksperiode ->
+            val utbetalingsperioder = vedtaksperiode.delTilUtbetalingsPerioder()
 
             utbetalingsperioder.map { utbetalingsperiode ->
                 val relevantStønadsperiode = utbetalingsperiode.finnRelevantStønadsperiode(stønadsperioder)
@@ -68,7 +66,7 @@ class LæremidlerBeregningService(
                     stønadsperiode = relevantStønadsperiode,
                     aktivitet = utbetalingsperiode.finnRelevantAktivitet(
                         aktiviteter = aktiviteter,
-                        aktivitetType = relevantStønadsperiode.aktivitet
+                        aktivitetType = relevantStønadsperiode.aktivitet,
                     ),
                 )
             }
@@ -95,45 +93,25 @@ class LæremidlerBeregningService(
         )
     }
 
+    private fun lagBeregningsGrunnlag(
+        periode: UtbetalingsPeriode,
+        aktivitet: Aktivitet,
+        målgruppe: MålgruppeType,
+    ): Beregningsgrunnlag {
+        return Beregningsgrunnlag(
+            fom = periode.fom,
+            tom = periode.tom,
+            studienivå = aktivitet.studienivå ?: throw IllegalStateException("Studienivå finnes ikke på aktiviteten"),
+            studieprosent = aktivitet.prosent,
+            sats = finnSatsForStudienivå(periode, aktivitet.studienivå),
+            utbetalingsMåned = periode.utbetalingsMåned,
+            målgruppe = målgruppe,
+        )
+    }
+
     private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
         return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
             .tilAktiviteter()
-    }
-
-    private fun UtbetalingsPeriode.finnRelevantStønadsperiode(stønadsperioder: List<Stønadsperiode>): Stønadsperiode {
-        val relevanteStønadsperioderForPeriode = stønadsperioder
-            .mergeSammenhengende(
-                skalMerges = { a, b -> a.tom.plusDays(1) == b.fom && a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet },
-                merge = { a, b -> a.copy(tom = b.tom) },
-            )
-            .filter { it.inneholder(this) }
-
-        feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {
-            "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
-        }
-
-        feilHvis(relevanteStønadsperioderForPeriode.size > 1) {
-            "Det er for mange stønadsperioder som inneholder utbetalingsperioden ${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
-        }
-
-        return relevanteStønadsperioderForPeriode.single()
-    }
-
-    private fun UtbetalingsPeriode.finnRelevantAktivitet(
-        aktiviteter: List<Aktivitet>,
-        aktivitetType: AktivitetType
-    ): Aktivitet {
-        val relevanteAktiviteter = aktiviteter.filter { it.type == aktivitetType && it.inneholder(this) }
-
-        brukerfeilHvis(relevanteAktiviteter.isEmpty()) {
-            "Det finnes ingen aktiviteter av type $aktivitetType som varer i hele perioden ${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
-        }
-
-        brukerfeilHvis(relevanteAktiviteter.size > 1) {
-            "Det finnes mer enn 1 aktivitet i perioden ${this.fom.norskFormat()} - ${this.tom.norskFormat()}. Dette støttes ikke enda. Ta kontakt med TS-sak teamet."
-        }
-
-        return relevanteAktiviteter.single()
     }
 
     private fun validerVedtaksperioder(
@@ -157,32 +135,6 @@ class LæremidlerBeregningService(
         ) {
             "Vedtaksperiode er ikke innenfor en stønadsperiode"
         }
-    }
-
-    private fun finnVedtaksperioderMedStønadsperioder(
-        vedtaksperioder: List<Vedtaksperiode>,
-        stønadsperioder: List<Stønadsperiode>,
-    ): List<VedtaksperiodeMedStøndasperioder> {
-        return vedtaksperioder.map { vedtaksperiode ->
-            val overlappendeStøndasperioder = stønadsperioder.filter { it.overlapper(vedtaksperiode) }
-            VedtaksperiodeMedStøndasperioder(vedtaksperiode, overlappendeStøndasperioder)
-        }
-    }
-
-    private fun lagBeregningsGrunnlag(
-        periode: UtbetalingsPeriode,
-        aktivitet: Aktivitet,
-        målgruppe: MålgruppeType,
-    ): Beregningsgrunnlag {
-        return Beregningsgrunnlag(
-            fom = periode.fom,
-            tom = periode.tom,
-            studienivå = aktivitet.studienivå ?: throw IllegalStateException("Studienivå finnes ikke på aktiviteten"),
-            studieprosent = aktivitet.prosent,
-            sats = finnSatsForStudienivå(periode, aktivitet.studienivå),
-            utbetalingsMåned = periode.utbetalingsMåned,
-            målgruppe = målgruppe,
-        )
     }
 
     private fun finnBeløpForStudieprosent(sats: Int, studieprosent: Int): Int {
@@ -219,6 +171,44 @@ fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
         }
 }
 
+
+fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<UtbetalingsPeriode> {
+    return delIÅr { fom, tom -> Vedtaksperiode(fom, tom) }
+        .flatMap { periode ->
+            periode.delIDatoTilDatoMåneder { fom, tom ->
+                UtbetalingsPeriode(
+                    fom = fom,
+                    tom = tom,
+                    utbetalingsMåned = periode.fom.toYearMonth(),
+                )
+            }
+        }
+}
+
+// TODO flytt til Kontrakter
+fun <P : Periode<LocalDate>, VAL> P.delIDatoTilDatoMåneder(value: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
+    val perioder = mutableListOf<VAL>()
+    var gjeldeneFom = fom
+    while (gjeldeneFom < tom) {
+        val nyTom = minOf(gjeldeneFom.plusMonths(1).minusDays(1), tom)
+        perioder.add(value(gjeldeneFom, nyTom))
+        gjeldeneFom = gjeldeneFom.plusMonths(1)
+    }
+    return perioder
+}
+
+// TODO flytt til Kontrakter
+fun <P : Periode<LocalDate>> P.delIÅr(value: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
+    val perioder = mutableListOf<P>()
+    var gjeldeneFom = fom
+    while (gjeldeneFom < tom) {
+        val nyTom = minOf(LocalDate.of(gjeldeneFom.year, 12, 31), tom)
+        perioder.add(value(gjeldeneFom, nyTom))
+        gjeldeneFom = LocalDate.of(gjeldeneFom.year + 1, 1, 1)
+    }
+    return perioder
+}
+
 data class VedtaksperiodeMedStøndasperioder(
     override val fom: LocalDate,
     override val tom: LocalDate,
@@ -233,43 +223,6 @@ data class VedtaksperiodeMedStøndasperioder(
         vedtaksPeriode.tom,
         stønadsperiode,
     )
-
-    fun delTilUtbetalingsPerioder(): List<UtbetalingsPeriode> {
-        return delIÅr { fom, tom -> Vedtaksperiode(fom, tom) }
-            .flatMap { periode ->
-                periode.delIDatoTilDatoMåneder { fom, tom ->
-                    UtbetalingsPeriode(
-                        fom = fom,
-                        tom = tom,
-                        utbetalingsMåned = periode.fom.toYearMonth(),
-                    )
-                }
-            }
-    }
-
-    // TODO flytt til Kontrakter
-    fun <P : Periode<LocalDate>, VAL> P.delIDatoTilDatoMåneder(value: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
-        val perioder = mutableListOf<VAL>()
-        var gjeldeneFom = fom
-        while (gjeldeneFom < tom) {
-            val nyTom = minOf(gjeldeneFom.plusMonths(1).minusDays(1), tom)
-            perioder.add(value(gjeldeneFom, nyTom))
-            gjeldeneFom = gjeldeneFom.plusMonths(1)
-        }
-        return perioder
-    }
-
-    // TODO flytt til Kontrakter
-    fun <P : Periode<LocalDate>> P.delIÅr(value: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
-        val perioder = mutableListOf<P>()
-        var gjeldeneFom = fom
-        while (gjeldeneFom < tom) {
-            val nyTom = minOf(LocalDate.of(gjeldeneFom.year, 12, 31), tom)
-            perioder.add(value(gjeldeneFom, nyTom))
-            gjeldeneFom = LocalDate.of(gjeldeneFom.year + 1, 1, 1)
-        }
-        return perioder
-    }
 }
 
 data class Vedtaksperiode(
@@ -288,5 +241,41 @@ data class UtbetalingsPeriode(
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
+    }
+
+    fun finnRelevantAktivitet(
+        aktiviteter: List<Aktivitet>,
+        aktivitetType: AktivitetType,
+    ): Aktivitet {
+        val relevanteAktiviteter = aktiviteter.filter { it.type == aktivitetType && it.inneholder(this) }
+
+        brukerfeilHvis(relevanteAktiviteter.isEmpty()) {
+            "Det finnes ingen aktiviteter av type $aktivitetType som varer i hele perioden ${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
+        }
+
+        brukerfeilHvis(relevanteAktiviteter.size > 1) {
+            "Det finnes mer enn 1 aktivitet i perioden ${this.fom.norskFormat()} - ${this.tom.norskFormat()}. Dette støttes ikke enda. Ta kontakt med TS-sak teamet."
+        }
+
+        return relevanteAktiviteter.single()
+    }
+
+    fun finnRelevantStønadsperiode(stønadsperioder: List<Stønadsperiode>): Stønadsperiode {
+        val relevanteStønadsperioderForPeriode = stønadsperioder
+            .mergeSammenhengende(
+                skalMerges = { a, b -> a.tom.plusDays(1) == b.fom && a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet },
+                merge = { a, b -> a.copy(tom = b.tom) },
+            )
+            .filter { it.inneholder(this) }
+
+        feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {
+            "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
+        }
+
+        feilHvis(relevanteStønadsperioderForPeriode.size > 1) {
+            "Det er for mange stønadsperioder som inneholder utbetalingsperioden ${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
+        }
+
+        return relevanteStønadsperioderForPeriode.single()
     }
 }
