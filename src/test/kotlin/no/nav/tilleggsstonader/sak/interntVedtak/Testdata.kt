@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
@@ -16,8 +17,11 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
@@ -27,8 +31,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -65,6 +71,7 @@ object Testdata {
     )
 
     val totrinnskontroll = TotrinnskontrollUtil.totrinnskontroll(TotrinnInternStatus.GODKJENT, beslutter = "saksbeh2")
+
     val søknadMetadata = SøknadMetadata(
         journalpostId = "journalpostId",
         mottattTidspunkt = LocalDate.of(2023, 1, 1).atStartOfDay().truncatedTo(ChronoUnit.MILLIS),
@@ -186,28 +193,50 @@ object Testdata {
         )
     }
 
+    object Læremidler {
+        val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.LÆREMIDLER)
 
+        val behandling = saksbehandling(
+            behandling = behandling(
+                id = behandlingId,
+                vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay(),
+                opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
+                fagsak = TilsynBarn.fagsak,
+                resultat = BehandlingResultat.INNVILGET,
+                type = BehandlingType.REVURDERING,
+                revurderFra = LocalDate.of(2024, 1, 1),
+            ),
+            fagsak = fagsak,
+        )
 
-//    private val aktivitetererLæremidler = listOf(
-//        VilkårperiodeTestUtil.aktivitet(
-//            begrunnelse = "aktivitet abd",
-//            resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
-//            faktaOgVurdering = faktaOgVurderingAktivitet(
-//                lønnet = vurderingLønnet(SvarJaNei.JA),
-//            ),
-//            fom = LocalDate.of(2024, 2, 5),
-//            tom = LocalDate.of(2024, 2, 10),
-//        ),
-//        VilkårperiodeTestUtil.aktivitet(
-//            resultat = ResultatVilkårperiode.SLETTET,
-//            slettetKommentar = "kommentar slettet",
-//            fom = LocalDate.of(2024, 2, 5),
-//            tom = LocalDate.of(2024, 2, 10),
-//        ),
-//    )
-//
-//    val vilkårperioderLæremidler = Vilkårperioder(
-//        målgrupper = målgrupper,
-//        aktiviteter = aktivitetLæremidler,
-//    )
+        val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = emptyList()))
+
+        val avslåttVedtak = GeneriskVedtak(
+            behandlingId = behandlingId,
+            type = TypeVedtak.AVSLAG,
+            data = AvslagLæremidler(
+                årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
+                begrunnelse = "Begrunelse for avslag",
+            ),
+        )
+
+        private val aktivitetererLæremidler = listOf(
+            VilkårperiodeTestUtil.aktivitet(
+                faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
+            ),
+            VilkårperiodeTestUtil.aktivitet(
+                resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
+                faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(
+                    type = AktivitetType.UTDANNING,
+                    harUtgifter = vurderingHarUtgifter(SvarJaNei.NEI),
+                    studienivå = Studienivå.VIDEREGÅENDE,
+                ),
+            ),
+        )
+
+        val vilkårperioder = Vilkårperioder(
+            målgrupper = målgrupper,
+            aktiviteter = aktivitetererLæremidler,
+        )
+    }
 }
