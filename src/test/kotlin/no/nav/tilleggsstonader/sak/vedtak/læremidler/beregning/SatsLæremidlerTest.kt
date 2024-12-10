@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate

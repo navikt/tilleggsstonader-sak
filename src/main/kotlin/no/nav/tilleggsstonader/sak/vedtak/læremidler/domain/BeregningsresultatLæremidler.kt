@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
-import java.time.LocalDate
-import java.time.YearMonth
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import java.time.LocalDate
+import java.time.YearMonth
 
 data class BeregningsresultatLæremidler(
     val perioder: List<BeregningsresultatForMåned>,
@@ -36,10 +36,10 @@ data class BeregningsresultatLæremidler(
         nestePeriode: BeregningsresultatForPeriodeDto,
     ): Boolean {
         return gjeldenePeriode.studienivå == nestePeriode.studienivå &&
-                gjeldenePeriode.studieprosent == nestePeriode.studieprosent &&
-                gjeldenePeriode.sats == nestePeriode.sats &&
-                gjeldenePeriode.utbetalingsmåned == nestePeriode.utbetalingsmåned &&
-                gjeldenePeriode.påfølgesAv(nestePeriode)
+            gjeldenePeriode.studieprosent == nestePeriode.studieprosent &&
+            gjeldenePeriode.sats == nestePeriode.sats &&
+            gjeldenePeriode.utbetalingsmåned == nestePeriode.utbetalingsmåned &&
+            gjeldenePeriode.påfølgesAv(nestePeriode)
     }
 }
 

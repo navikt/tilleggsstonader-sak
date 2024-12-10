@@ -17,10 +17,12 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -51,6 +53,8 @@ class StepDefinitions {
     var exception: Exception? = null
 
     var resultatValidering: Stønadsperiode? = null
+
+    var vedtaksperioderSplittet: List<UtbetalingsPeriode> = emptyList()
 
     @Gitt("følgende vedtaksperioder for læremidler")
     fun `følgende beregningsperiode for læremidler`(dataTable: DataTable) {
@@ -88,6 +92,11 @@ class StepDefinitions {
         } catch (e: Exception) {
             exception = e
         }
+    }
+
+    @Når("splitter vedtaksperioder for læremidler")
+    fun `splitter vedtaksperioder for læremidler`() {
+        vedtaksperioderSplittet = vedtaksPerioder!!.flatMap { it.delTilUtbetalingsPerioder() }
     }
 
     @Så("skal stønaden være")
@@ -138,5 +147,17 @@ class StepDefinitions {
 
         assertThat(resultatValidering?.fom).isEqualTo(stønadsperiode.fom)
         assertThat(resultatValidering?.tom).isEqualTo(stønadsperiode.tom)
+    }
+
+    @Så("forvent følgende utbetalingsperioder")
+    fun `forvent følgende utbetalingsperioder`(dataTable: DataTable) {
+        val forventedePerioder = dataTable.mapRad { rad ->
+            UtbetalingsPeriode(
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                utbetalingsMåned = parseÅrMåned(BeregningNøkler.UTBETALINGSMÅNED, rad),
+            )
+        }
+        assertThat(vedtaksperioderSplittet).containsExactlyElementsOf(forventedePerioder)
     }
 }

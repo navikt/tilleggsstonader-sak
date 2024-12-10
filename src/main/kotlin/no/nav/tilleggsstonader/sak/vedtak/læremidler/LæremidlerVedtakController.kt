@@ -10,8 +10,8 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidlerDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import org.springframework.web.bind.annotation.GetMapping
