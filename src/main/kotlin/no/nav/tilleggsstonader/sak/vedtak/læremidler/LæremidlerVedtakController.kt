@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.VedtaksPeriode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
@@ -69,7 +69,7 @@ class LæremidlerVedtakController(
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtakPerioder: List<VedtaksPeriode>,
+        @RequestBody vedtakPerioder: List<Vedtaksperiode>,
     ): BeregningsresultatLæremidler {
         return beregningService.beregn(vedtakPerioder, behandlingId)
     }

@@ -10,7 +10,7 @@ class SatsLæremidlerTest {
     @Test
     fun `høyere utdanning 2024`() {
         val sats = finnSatsForStudienivå(
-            VedtaksPeriode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 2, 1)),
+            Vedtaksperiode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 2, 1)),
             Studienivå.HØYERE_UTDANNING,
         )
         assertThat(sats).isEqualTo(875)
@@ -19,7 +19,7 @@ class SatsLæremidlerTest {
     @Test
     fun `høyere utdanning 2023`() {
         val sats = finnSatsForStudienivå(
-            VedtaksPeriode(LocalDate.of(2023, 3, 1), LocalDate.of(2023, 5, 1)),
+            Vedtaksperiode(LocalDate.of(2023, 3, 1), LocalDate.of(2023, 5, 1)),
             Studienivå.HØYERE_UTDANNING,
         )
         assertThat(sats).isEqualTo(822)
@@ -28,7 +28,7 @@ class SatsLæremidlerTest {
     @Test
     fun `videregående utdanning 2024`() {
         val sats = finnSatsForStudienivå(
-            VedtaksPeriode(LocalDate.of(2024, 11, 1), LocalDate.of(2024, 12, 1)),
+            Vedtaksperiode(LocalDate.of(2024, 11, 1), LocalDate.of(2024, 12, 1)),
             Studienivå.VIDEREGÅENDE,
         )
         assertThat(sats).isEqualTo(438)
@@ -37,7 +37,7 @@ class SatsLæremidlerTest {
     @Test
     fun `videregående utdanning 2023`() {
         val sats = finnSatsForStudienivå(
-            VedtaksPeriode(LocalDate.of(2023, 10, 1), LocalDate.of(2023, 12, 1)),
+            Vedtaksperiode(LocalDate.of(2023, 10, 1), LocalDate.of(2023, 12, 1)),
             Studienivå.VIDEREGÅENDE,
         )
         assertThat(sats).isEqualTo(411)

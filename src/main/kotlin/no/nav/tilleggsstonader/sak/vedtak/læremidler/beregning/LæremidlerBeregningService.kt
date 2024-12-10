@@ -51,26 +51,32 @@ class LæremidlerBeregningService(
     // ANTAR: En aktitivet hele vedtaksperioden
     // ANTAR: En stønadsperiode per vedtaksperiode
     // ANTAR: Sats ikke endrer seg i perioden
-    fun beregn(vedtaksPeriode: List<VedtaksPeriode>, behandlingId: BehandlingId): BeregningsresultatLæremidler {
+    fun beregn(vedtaksPeriode: List<Vedtaksperiode>, behandlingId: BehandlingId): BeregningsresultatLæremidler {
         val stønadsperioder =
             stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertGrunnlagStønadsperiode()
+        val aktiviteter = finnAktiviteter(behandlingId)
 
         validerVedtaksperioder(vedtaksPeriode, stønadsperioder)
 
-        val vedtaksPerioderMedStøndsperioder = finnVedtaksperioderMedStønadsperioder(vedtaksPeriode, stønadsperioder)
+        val vedtaksperioderMedStøndsperioder = finnVedtaksperioderMedStønadsperioder(vedtaksPeriode, stønadsperioder)
 
-        val beregningsresultatForMåned = vedtaksPerioderMedStøndsperioder.flatMap { vedtaksPeriodeMedStønadsperioder ->
-            val aktivitet =
-                finnAktiviteter(behandlingId).filter { aktivitet -> aktivitet.type == vedtaksPeriodeMedStønadsperioder.stønadsperiode.single().aktivitet }
-                    .single()
+        val beregningsresultatForMåned = vedtaksperioderMedStøndsperioder.flatMap { vedtaksperiodeMedStønadsperioder ->
+            val aktiviteterForVedtaksperiode = aktiviteter.filter { aktivitet ->
+                vedtaksperiodeMedStønadsperioder.stønadsperiode.map { it.aktivitet }.contains(aktivitet.type)
+            }
 
-            val utbetalingsperioder = delVedtaksperioderForLæremidler(vedtaksPeriodeMedStønadsperioder)
+            val utbetalingsperioder = vedtaksperiodeMedStønadsperioder.delTilUtbetalingsPerioder()
 
             utbetalingsperioder.map { utbetalingsperiode ->
+                val aktivitetForBeregningsGrunnlag = finnAktivitetForBeregningsGrunnlag(utbetalingsperiode, aktiviteterForVedtaksperiode)
                 val grunnlagsdata =
-                    lagBeregningsGrunnlag(utbetalingsperiode, aktivitet, vedtaksPeriodeMedStønadsperioder.stønadsperiode.single().målgruppe)
+                    lagBeregningsGrunnlag(
+                        periode = utbetalingsperiode,
+                        aktivitet = aktivitetForBeregningsGrunnlag,
+                        målgruppe = vedtaksperiodeMedStønadsperioder.stønadsperiode.single().målgruppe,
+                    )
                 BeregningsresultatForMåned(
-                    beløp = finnBeløpForStudieprosent(grunnlagsdata.sats, aktivitet.prosent),
+                    beløp = finnBeløpForStudieprosent(grunnlagsdata.sats, aktivitetForBeregningsGrunnlag.prosent),
                     grunnlag = grunnlagsdata,
                 )
             }
@@ -79,8 +85,15 @@ class LæremidlerBeregningService(
         return BeregningsresultatLæremidler(beregningsresultatForMåned)
     }
 
+    private fun finnAktivitetForBeregningsGrunnlag(
+        utbetalingsperiode: UtbetalingsPeriode,
+        aktiviteter: List<Aktivitet>,
+    ): Aktivitet {
+        return aktiviteter.filter { aktivitet -> aktivitet.inneholder(utbetalingsperiode) }.single() //TODO bedre feilmelding
+    }
+
     private fun validerVedtaksperioder(
-        vedtaksperioder: List<VedtaksPeriode>,
+        vedtaksperioder: List<Vedtaksperiode>,
         stønadsperioder: List<Stønadsperiode>,
     ) {
         feilHvis(vedtaksperioder.overlapper()) {
@@ -103,26 +116,13 @@ class LæremidlerBeregningService(
     }
 
     private fun finnVedtaksperioderMedStønadsperioder(
-        vedtaksperioder: List<VedtaksPeriode>,
+        vedtaksperioder: List<Vedtaksperiode>,
         stønadsperioder: List<Stønadsperiode>,
-    ): List<VedtaksPeriodeMedStøndasperioder> {
+    ): List<VedtaksperiodeMedStøndasperioder> {
         return vedtaksperioder.map { vedtaksperiode ->
             val overlappendeStøndasperioder = stønadsperioder.filter { it.overlapper(vedtaksperiode) }
-            VedtaksPeriodeMedStøndasperioder(vedtaksperiode, overlappendeStøndasperioder)
+            VedtaksperiodeMedStøndasperioder(vedtaksperiode, overlappendeStøndasperioder)
         }
-    }
-
-    private fun delVedtaksperioderForLæremidler(vedtaksperiodeMedStønadsperioder: VedtaksPeriodeMedStøndasperioder): List<UtbetalingsPeriode> {
-        return vedtaksperiodeMedStønadsperioder.delIÅr { fom, tom -> VedtaksPeriode(fom, tom) }
-            .flatMap { periode ->
-                periode.delIDatoTilDatoMånder { fom, tom ->
-                    UtbetalingsPeriode(
-                        fom = fom,
-                        tom = tom,
-                        utbetalingsMåned = periode.fom.toYearMonth(),
-                    )
-                }
-            }
     }
 
     private fun lagBeregningsGrunnlag(
@@ -146,30 +146,6 @@ class LæremidlerBeregningService(
             return BigDecimal(sats).multiply(PROSENT_50).setScale(0, RoundingMode.HALF_UP).toInt()
         }
         return sats
-    }
-
-    // TODO flytt til Kontrakter
-    fun <P : Periode<LocalDate>, VAL> P.delIDatoTilDatoMånder(value: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
-        val perioder = mutableListOf<VAL>()
-        var gjeldeneFom = fom
-        while (gjeldeneFom < tom) {
-            val nyTom = minOf(gjeldeneFom.plusMonths(1).minusDays(1), tom)
-            perioder.add(value(gjeldeneFom, nyTom))
-            gjeldeneFom = gjeldeneFom.plusMonths(1)
-        }
-        return perioder
-    }
-
-    // TODO flytt til Kontrakter
-    fun <P : Periode<LocalDate>> P.delIÅr(value: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
-        val perioder = mutableListOf<P>()
-        var gjeldeneFom = fom
-        while (gjeldeneFom < tom) {
-            val nyTom = minOf(LocalDate.of(gjeldeneFom.year, 12, 31), tom)
-            perioder.add(value(gjeldeneFom, nyTom))
-            gjeldeneFom = LocalDate.of(gjeldeneFom.year + 1, 1, 1)
-        }
-        return perioder
     }
 }
 
@@ -199,7 +175,7 @@ fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
         }
 }
 
-data class VedtaksPeriodeMedStøndasperioder(
+data class VedtaksperiodeMedStøndasperioder(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val stønadsperiode: List<Stønadsperiode>,
@@ -208,10 +184,51 @@ data class VedtaksPeriodeMedStøndasperioder(
         validatePeriode()
     }
 
-    constructor(vedtaksPeriode: VedtaksPeriode, stønadsperiode: List<Stønadsperiode>) : this(vedtaksPeriode.fom, vedtaksPeriode.tom, stønadsperiode)
+    constructor(vedtaksPeriode: Vedtaksperiode, stønadsperiode: List<Stønadsperiode>) : this(
+        vedtaksPeriode.fom,
+        vedtaksPeriode.tom,
+        stønadsperiode,
+    )
+
+    fun delTilUtbetalingsPerioder(): List<UtbetalingsPeriode> {
+        return delIÅr { fom, tom -> Vedtaksperiode(fom, tom) }
+            .flatMap { periode ->
+                periode.delIDatoTilDatoMånder { fom, tom ->
+                    UtbetalingsPeriode(
+                        fom = fom,
+                        tom = tom,
+                        utbetalingsMåned = periode.fom.toYearMonth(),
+                    )
+                }
+            }
+    }
+
+    // TODO flytt til Kontrakter
+    fun <P : Periode<LocalDate>, VAL> P.delIDatoTilDatoMånder(value: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
+        val perioder = mutableListOf<VAL>()
+        var gjeldeneFom = fom
+        while (gjeldeneFom < tom) {
+            val nyTom = minOf(gjeldeneFom.plusMonths(1).minusDays(1), tom)
+            perioder.add(value(gjeldeneFom, nyTom))
+            gjeldeneFom = gjeldeneFom.plusMonths(1)
+        }
+        return perioder
+    }
+
+    // TODO flytt til Kontrakter
+    fun <P : Periode<LocalDate>> P.delIÅr(value: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
+        val perioder = mutableListOf<P>()
+        var gjeldeneFom = fom
+        while (gjeldeneFom < tom) {
+            val nyTom = minOf(LocalDate.of(gjeldeneFom.year, 12, 31), tom)
+            perioder.add(value(gjeldeneFom, nyTom))
+            gjeldeneFom = LocalDate.of(gjeldeneFom.year + 1, 1, 1)
+        }
+        return perioder
+    }
 }
 
-data class VedtaksPeriode(
+data class Vedtaksperiode(
     override val fom: LocalDate,
     override val tom: LocalDate,
 ) : Periode<LocalDate> {

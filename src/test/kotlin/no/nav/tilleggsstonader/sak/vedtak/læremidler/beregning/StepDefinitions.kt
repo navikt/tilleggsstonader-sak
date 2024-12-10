@@ -46,7 +46,7 @@ class StepDefinitions {
 
     val behandlingId = BehandlingId(UUID.randomUUID())
 
-    var vedtaksPerioder: List<VedtaksPeriode> = emptyList()
+    var vedtaksPerioder: List<Vedtaksperiode> = emptyList()
     var resultat: BeregningsresultatLæremidler? = null
 
     var resultatValidering: Stønadsperiode? = null
@@ -54,7 +54,7 @@ class StepDefinitions {
     @Gitt("følgende vedtaksperioder for læremidler")
     fun `følgende beregningsperiode for læremidler`(dataTable: DataTable) {
         vedtaksPerioder = dataTable.mapRad { rad ->
-            VedtaksPeriode(
+            Vedtaksperiode(
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
             )
