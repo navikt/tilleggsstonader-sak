@@ -201,7 +201,7 @@ object Testdata {
                 id = behandlingId,
                 vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay(),
                 opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
-                fagsak = TilsynBarn.fagsak,
+                fagsak = fagsak,
                 resultat = BehandlingResultat.INNVILGET,
                 type = BehandlingType.REVURDERING,
                 revurderFra = LocalDate.of(2024, 1, 1),

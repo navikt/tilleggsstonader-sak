@@ -44,7 +44,7 @@ class JournalpostClientConfig {
     companion object {
         const val journalpostIdMedFeil = "journalpostIdMedFeil"
 
-        private val dummyPdf = this::class.java.classLoader.getResource("interntVedtak/internt_vedtak.pdf")!!.readBytes()
+        private val dummyPdf = this::class.java.classLoader.getResource("interntVedtak/BARNETILSYN/internt_vedtak.pdf")!!.readBytes()
 
         private fun avsenderMottaker() = AvsenderMottaker(
             id = "12345678910",

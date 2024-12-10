@@ -19,6 +19,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.postForEntity
@@ -55,43 +57,92 @@ class DokumentgenereringTest : IntegrationTest() {
 
     @BeforeEach
     fun setUp() {
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.TilsynBarn.behandling
-        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.TilsynBarn.vilkårperioder
         every { stønadsperiodeService.hentStønadsperioder(behandlingId) } returns Testdata.stønadsperioder
         every { totrinnskontrollService.hentTotrinnskontroll(behandlingId) } returns Testdata.totrinnskontroll
         every { søknadService.hentSøknadMetadata(behandlingId) } returns Testdata.søknadMetadata
-        every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.TilsynBarn.grunnlagsdata
-        every { barnService.finnBarnPåBehandling(behandlingId) } returns Testdata.TilsynBarn.behandlingBarn
-        every { vilkårService.hentVilkårsett(behandlingId) } returns Testdata.TilsynBarn.vilkår
-        every { vedtakService.hentVedtak(behandlingId) } returns Testdata.TilsynBarn.vedtak
     }
 
-    @Test
-    fun `json til htmlify er riktig`() {
-        val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-        assertFileIsEqual("interntVedtak/internt_vedtak.json", interntVedtak)
+    @Nested
+    inner class GenererDokumenterTilsynBarn {
+        @BeforeEach
+        fun setUp() {
+            every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.TilsynBarn.behandling
+            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.TilsynBarn.vilkårperioder
+            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.TilsynBarn.grunnlagsdata
+            every { barnService.finnBarnPåBehandling(behandlingId) } returns Testdata.TilsynBarn.behandlingBarn
+            every { vilkårService.hentVilkårsett(behandlingId) } returns Testdata.TilsynBarn.vilkår
+            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.TilsynBarn.vedtak
+        }
+
+        @Test
+        fun `json til htmlify er riktig`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            assertFileIsEqual("interntVedtak/BARNETILSYN/internt_vedtak.json", interntVedtak)
+        }
+
+        /**
+         * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
+         * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
+         * Formatter htmlfil etter generering for å unngå stor diff
+         */
+        // TODO: Oppdater med ny HTML når feltene delvilkår og aktivitetsdager har blitt fjernet fra VilkårperiodeInterntVedtak
+        @Test
+        @Disabled
+        fun `lager html og pdf`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            val html = lagHtmlifyClient().generateHtml(interntVedtak)
+            skrivTilFil("interntVedtak/BARNETILSYN/internt_vedtak.html", html)
+            generatePdf(html, "interntVedtak/BARNETILSYN/internt_vedtak.pdf")
+        }
+
+        @Test
+        fun `html skal være formatert for å enklere kunne sjekke diff`() {
+            val erIkkeFormatert = FileUtil.readFile("interntVedtak/BARNETILSYN/internt_vedtak.html").split("\n")
+                .none { it.contains("<body") && it.contains("<div") }
+
+            assertThat(erIkkeFormatert).isTrue()
+        }
     }
 
-    /**
-     * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
-     * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
-     * Formatter htmlfil etter generering for å unngå stor diff
-     */
-    // TODO: Oppdater med ny HTML når htmlify har tatt i bruk vedtakOgBeregning-feltet
-    @Test
-    fun `lager html og pdf`() {
-        val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-        val html = lagHtmlifyClient().generateHtml(interntVedtak)
-        skrivTilFil("interntVedtak/internt_vedtak.html", html)
-        generatePdf(html, "interntVedtak/internt_vedtak.pdf")
-    }
+    @Nested
+    inner class GenererDokumenterLæremidler {
+        @BeforeEach
+        fun setUp() {
+            every { behandlingService.hentSaksbehandling(behandlingId) } returns Testdata.Læremidler.behandling
+            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns Testdata.Læremidler.vilkårperioder
+            every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Læremidler.grunnlagsdata
+            every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+            every { vilkårService.hentVilkårsett(behandlingId) } returns emptyList()
+            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.avslåttVedtak
+        }
 
-    @Test
-    fun `html skal være formattert for å enklere kunne sjekke diff`() {
-        val erIkkeFormatert = FileUtil.readFile("interntVedtak/internt_vedtak.html").split("\n")
-            .none { it.contains("<body") && it.contains("<div") }
+        @Test
+        fun `json til htmlify er riktig`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            assertFileIsEqual("interntVedtak/LÆREMIDLER/internt_vedtak.json", interntVedtak)
+        }
 
-        assertThat(erIkkeFormatert).isTrue()
+        /**
+         * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
+         * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
+         * Formatter htmlfil etter generering for å unngå stor diff
+         */
+        @Test
+        @Disabled
+        fun `lager html og pdf`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            val html = lagHtmlifyClient().generateHtml(interntVedtak)
+            skrivTilFil("interntVedtak/LÆREMIDLER/internt_vedtak.html", html)
+            generatePdf(html, "interntVedtak/LÆREMIDLER/internt_vedtak.pdf")
+        }
+
+        @Test
+        fun `html skal være formattert for å enklere kunne sjekke diff`() {
+            val erIkkeFormatert = FileUtil.readFile("interntVedtak/LÆREMIDLER/internt_vedtak.html").split("\n")
+                .none { it.contains("<body") && it.contains("<div") }
+
+            assertThat(erIkkeFormatert).isTrue()
+        }
     }
 
     private fun lagHtmlifyClient(): HtmlifyClient {
