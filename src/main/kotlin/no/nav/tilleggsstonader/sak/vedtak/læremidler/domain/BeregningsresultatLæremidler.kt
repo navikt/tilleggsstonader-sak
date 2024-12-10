@@ -1,41 +1,45 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.time.YearMonth
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
 data class BeregningsresultatLæremidler(
     val perioder: List<BeregningsresultatForMåned>,
 ) {
     fun tilDto(): BeregningsresultatLæremidlerDto {
+        val perioderDto = perioder.map { it.tilDto() }
         return BeregningsresultatLæremidlerDto(
-            perioder = perioder.fold(mutableListOf()) { acc, periode ->
-                val forrigePeriode = acc.lastOrNull()
-                if (forrigePeriode != null && skalSlåsSammen(forrigePeriode, periode)) {
-                    val nyBeregningsresultatForPeriodeDto = forrigePeriode.copy(
-                        tom = periode.grunnlag.tom,
-                        stønadsbeløp = forrigePeriode.stønadsbeløp + periode.beløp,
-                        antallMåneder = forrigePeriode.antallMåneder + 1,
-                    )
-                    acc.removeLast()
-                    acc.add(nyBeregningsresultatForPeriodeDto)
-                } else {
-                    acc.add(periode.tilDto())
-                }
-                return@fold acc
-            },
+            perioder = perioderDto.mergeSammenhengende(
+                skalMerges = { v1, v2 -> kanSlåsSammen(v1, v2) },
+                merge = { v1, v2 -> slåSammen(v1, v2) },
+            ),
         )
     }
 
-    private fun skalSlåsSammen(
+    private fun slåSammen(
         gjeldenePeriode: BeregningsresultatForPeriodeDto,
-        nestePeriode: BeregningsresultatForMåned,
+        nestePeriode: BeregningsresultatForPeriodeDto,
+    ): BeregningsresultatForPeriodeDto {
+        return gjeldenePeriode.copy(
+            tom = nestePeriode.tom,
+            stønadsbeløp = gjeldenePeriode.stønadsbeløp + nestePeriode.stønadsbeløp,
+            antallMåneder = gjeldenePeriode.antallMåneder + 1,
+        )
+    }
+
+    private fun kanSlåsSammen(
+        gjeldenePeriode: BeregningsresultatForPeriodeDto,
+        nestePeriode: BeregningsresultatForPeriodeDto,
     ): Boolean {
-        return gjeldenePeriode.studienivå == nestePeriode.grunnlag.studienivå &&
-            gjeldenePeriode.studieprosent == nestePeriode.grunnlag.studieprosent &&
-            gjeldenePeriode.sats == nestePeriode.grunnlag.sats &&
-            gjeldenePeriode.utbetalingsmåned == nestePeriode.grunnlag.utbetalingsMåned
+        return gjeldenePeriode.studienivå == nestePeriode.studienivå &&
+                gjeldenePeriode.studieprosent == nestePeriode.studieprosent &&
+                gjeldenePeriode.sats == nestePeriode.sats &&
+                gjeldenePeriode.utbetalingsmåned == nestePeriode.utbetalingsmåned &&
+                gjeldenePeriode.påfølgesAv(nestePeriode)
     }
 }
 
@@ -72,12 +76,12 @@ data class BeregningsresultatLæremidlerDto(
 )
 
 data class BeregningsresultatForPeriodeDto(
-    val fom: LocalDate,
-    val tom: LocalDate,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val antallMåneder: Int,
     val studienivå: Studienivå,
     val studieprosent: Int,
     val sats: Int,
     val stønadsbeløp: Int,
     val utbetalingsmåned: YearMonth,
-)
+) : Periode<LocalDate>
