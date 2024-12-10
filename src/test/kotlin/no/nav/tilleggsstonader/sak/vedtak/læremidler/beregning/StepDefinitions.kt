@@ -48,6 +48,7 @@ class StepDefinitions {
 
     var vedtaksPerioder: List<Vedtaksperiode> = emptyList()
     var resultat: BeregningsresultatLæremidler? = null
+    var exception: Exception? = null
 
     var resultatValidering: Stønadsperiode? = null
 
@@ -82,7 +83,11 @@ class StepDefinitions {
 
     @Når("beregner stønad for læremidler")
     fun `beregner stønad for læremidler`() {
-        resultat = læremidlerBeregningService.beregn(vedtaksPerioder!!, behandlingId)
+        try {
+            resultat = læremidlerBeregningService.beregn(vedtaksPerioder!!, behandlingId)
+        } catch (e: Exception) {
+            exception = e
+        }
     }
 
     @Så("skal stønaden være")
@@ -107,6 +112,11 @@ class StepDefinitions {
             perioder = perioder,
         )
         assertThat(resultat).isEqualTo(forventetBeregningsresultat)
+    }
+
+    @Så("forvent følgende feil fra læremidlerberegning: {}")
+    fun `forvent følgende feil`(forventetFeil: String) {
+        assertThat(exception!!).hasMessageContaining(forventetFeil)
     }
 
 //    @Når("validerer vedtaksperiode for læremidler")
