@@ -7,7 +7,9 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import java.time.LocalDate
+import java.time.YearMonth
 
 object TilkjentYtelseUtil {
 
@@ -30,6 +32,7 @@ object TilkjentYtelseUtil {
         type: TypeAndel = TypeAndel.TILSYN_BARN_AAP,
         statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
         iverksetting: Iverksetting? = null,
+        utbetalingsmåned: YearMonth = fom.toYearMonth(),
     ) = AndelTilkjentYtelse(
         beløp = beløp,
         fom = fom,
@@ -39,5 +42,6 @@ object TilkjentYtelseUtil {
         kildeBehandlingId = kildeBehandlingId,
         statusIverksetting = statusIverksetting,
         iverksetting = iverksetting,
+        utbetalingsmåned = utbetalingsmåned,
     )
 }

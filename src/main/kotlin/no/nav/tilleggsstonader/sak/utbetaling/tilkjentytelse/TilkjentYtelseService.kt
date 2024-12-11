@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverks
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import org.springframework.stereotype.Service
 import java.time.YearMonth
 
@@ -58,6 +59,9 @@ class TilkjentYtelseService(
      * Legger til en nullandel ved første iverksetting for en behandling, dersom det ikke finnes andeler som skal iverksettes
      * for forrige måned. Dette er for å kunne sjekke status på iverksetting uten utbetalinger.
      *
+     * Nullandels fom settes til måneden det minste av måneden det iverksettes for eller måneden før første andelen dersom en andel
+     * Eks hvis man i januar innvilger noe for jan-mai som ikke har sats, då legges en nullandel for desember inn.
+     *
      * @return den nye nullandelen som man kan sjekke status på iverksetting for
      */
     fun leggTilNullAndel(
@@ -65,10 +69,11 @@ class TilkjentYtelseService(
         iverksetting: Iverksetting,
         måned: YearMonth,
     ): AndelTilkjentYtelse {
+        val månedForNullutbetaling = minOf(måned, finnMånedFørFørsteAndel(tilkjentYtelse) ?: måned)
         val nullAndel = AndelTilkjentYtelse(
             beløp = 0,
-            fom = måned.atDay(1),
-            tom = måned.atDay(1),
+            fom = månedForNullutbetaling.atDay(1),
+            tom = månedForNullutbetaling.atDay(1),
             satstype = Satstype.UGYLDIG,
             type = TypeAndel.UGYLDIG,
             kildeBehandlingId = tilkjentYtelse.behandlingId,
@@ -79,4 +84,10 @@ class TilkjentYtelseService(
         tilkjentYtelseRepository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = tilkjentYtelse.andelerTilkjentYtelse + nullAndel))
         return nullAndel
     }
+
+    private fun finnMånedFørFørsteAndel(tilkjentYtelse: TilkjentYtelse): YearMonth? =
+        tilkjentYtelse.andelerTilkjentYtelse
+            .minOfOrNull { it.fom }
+            ?.toYearMonth()
+            ?.minusMonths(1)
 }
