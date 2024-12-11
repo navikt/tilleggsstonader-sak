@@ -222,9 +222,13 @@ object Testdata {
 
         private val aktivitetererLæremidler = listOf(
             VilkårperiodeTestUtil.aktivitet(
+                fom = LocalDate.of(2024, 12, 10),
+                tom = LocalDate.of(2024, 12, 15),
                 faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
             ),
             VilkårperiodeTestUtil.aktivitet(
+                fom = LocalDate.of(2024, 12, 10),
+                tom = LocalDate.of(2024, 12, 15),
                 resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                 faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(
                     type = AktivitetType.UTDANNING,
