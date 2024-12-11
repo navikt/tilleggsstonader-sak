@@ -23,9 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBarnetilsynFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetLæremidlerFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.MålgruppeFaktaOgVurderingerDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.ObjectAssert
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -114,7 +112,7 @@ class InterntVedtakServiceTest {
                 assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
                 assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
                 assertThat(begrunnelse).isEqualTo("målgruppe aap")
-                with<VurderingDto, ObjectAssert<ResultatDelvilkårperiode?>?>((faktaOgVurderinger as MålgruppeFaktaOgVurderingerDto).medlemskap!!) {
+                with((faktaOgVurderinger as MålgruppeFaktaOgVurderingerDto).medlemskap!!) {
                     assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT)
                     assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
                 }
@@ -136,7 +134,7 @@ class InterntVedtakServiceTest {
                 assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
                 assertThat(resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
                 assertThat(begrunnelse).isEqualTo("aktivitet abd")
-                with<VurderingDto, ObjectAssert<ResultatDelvilkårperiode?>?>((faktaOgVurderinger as AktivitetBarnetilsynFaktaOgVurderingerDto).lønnet!!) {
+                with((faktaOgVurderinger as AktivitetBarnetilsynFaktaOgVurderingerDto).lønnet!!) {
                     assertThat(svar).isEqualTo(SvarJaNei.JA)
                     assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
                 }
