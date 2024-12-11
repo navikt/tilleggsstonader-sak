@@ -39,9 +39,10 @@ class LæremidlerBeregningService(
     fun beregn(vedtaksperioder: List<Vedtaksperiode>, behandlingId: BehandlingId): BeregningsresultatLæremidler {
         val stønadsperioder =
             stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertGrunnlagStønadsperiode()
-        val aktiviteter = finnAktiviteter(behandlingId)
 
         validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+
+        val aktiviteter = finnAktiviteter(behandlingId)
 
         val beregningsresultatForMåned = vedtaksperioder.flatMap { vedtaksperiode ->
             val utbetalingsperioder = vedtaksperiode.delTilUtbetalingsPerioder()

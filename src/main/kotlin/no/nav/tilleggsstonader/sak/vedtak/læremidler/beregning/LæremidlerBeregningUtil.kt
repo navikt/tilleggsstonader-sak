@@ -28,7 +28,7 @@ object LæremidlerBeregningUtil {
     }
 
     // TODO flytt til Kontrakter
-    fun <P : Periode<LocalDate>, VAL> P.delIDatoTilDatoMåneder(value: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
+    private fun <P : Periode<LocalDate>, VAL> P.delIDatoTilDatoMåneder(value: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
         val perioder = mutableListOf<VAL>()
         var gjeldeneFom = fom
         while (gjeldeneFom < tom) {
@@ -40,7 +40,7 @@ object LæremidlerBeregningUtil {
     }
 
     // TODO flytt til Kontrakter
-    fun <P : Periode<LocalDate>> P.delIÅr(value: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
+    private fun <P : Periode<LocalDate>> P.delIÅr(value: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
         val perioder = mutableListOf<P>()
         var gjeldeneFom = fom
         while (gjeldeneFom < tom) {

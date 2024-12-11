@@ -39,3 +39,6 @@ Egenskap: Splitt vedtaksperioder til utbetalingsperioder
       | 15.11.2024 | 14.12.2024 | 11.2024          |
       | 15.12.2024 | 31.12.2024 | 11.2024          |
       | 01.01.2025 | 14.01.2025 | 01.2025          |
+
+    # TODO: Rundt februar
+# TODO: En test med flere vedtaksperioder (stopp på sommer)
