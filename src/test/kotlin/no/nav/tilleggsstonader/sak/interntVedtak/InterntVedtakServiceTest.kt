@@ -114,11 +114,6 @@ class InterntVedtakServiceTest {
                 assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
                 assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
                 assertThat(begrunnelse).isEqualTo("målgruppe aap")
-                with(delvilkår.medlemskap!!) {
-                    assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT.name)
-                    assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
-                }
-                assertThat(delvilkår.lønnet).isNull()
                 with<VurderingDto, ObjectAssert<ResultatDelvilkårperiode?>?>((faktaOgVurderinger as MålgruppeFaktaOgVurderingerDto).medlemskap!!) {
                     assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT)
                     assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
@@ -141,11 +136,6 @@ class InterntVedtakServiceTest {
                 assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
                 assertThat(resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
                 assertThat(begrunnelse).isEqualTo("aktivitet abd")
-                with(delvilkår.lønnet!!) {
-                    assertThat(svar).isEqualTo(SvarJaNei.JA.name)
-                    assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
-                }
-                assertThat(delvilkår.medlemskap).isNull()
                 with<VurderingDto, ObjectAssert<ResultatDelvilkårperiode?>?>((faktaOgVurderinger as AktivitetBarnetilsynFaktaOgVurderingerDto).lønnet!!) {
                     assertThat(svar).isEqualTo(SvarJaNei.JA)
                     assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)

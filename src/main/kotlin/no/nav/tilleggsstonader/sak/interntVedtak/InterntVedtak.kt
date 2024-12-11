@@ -19,9 +19,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderinger
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-/**
- * TODO: Vurder å ta med fakta
- */
 data class InterntVedtak(
     val behandling: Behandlinginfo,
     val søknad: Søknadsinformasjon?,
@@ -76,13 +73,11 @@ data class VilkårperiodeInterntVedtak(
     val type: VilkårperiodeType,
     val fom: LocalDate,
     val tom: LocalDate,
-    val delvilkår: DelvilkårVilkårperiode, // TODO: Fjernes når htmlify bruker faktaOgVurdering
     val faktaOgVurderinger: FaktaOgVurderingerDto,
     val kilde: KildeVilkårsperiode,
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,
     val slettetKommentar: String?,
-    val aktivitetsdager: Int?, // TODO: Fjernes når htmlify bruker faktaOgVurdering
 )
 
 data class DelvilkårVilkårperiode(

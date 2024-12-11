@@ -134,7 +134,7 @@ class DokumentgenereringTest {
     @ParameterizedTest
     @EnumSource(Stønadstype::class)
     fun `html skal være formatert for å enklere kunne sjekke diff`(stønadstype: Stønadstype) {
-        Stønadstype.entries.forEach {  }
+        Stønadstype.entries.forEach { }
         val erIkkeFormatert = FileUtil.readFile("interntVedtak/$stønadstype/internt_vedtak.html").split("\n")
             .none { it.contains("<body") && it.contains("<div") }
 
