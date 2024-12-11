@@ -1,6 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import java.time.LocalDate
+import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.util.tilSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
@@ -10,8 +13,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFaktaOrThrow
-import java.time.LocalDate
-import java.util.UUID
 
 object LæremidlerBeregningUtil {
     fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<UtbetalingsPeriode> {
@@ -30,11 +31,15 @@ object LæremidlerBeregningUtil {
     // TODO flytt til Kontrakter
     private fun <P : Periode<LocalDate>, VAL> P.delIDatoTilDatoMåneder(value: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
         val perioder = mutableListOf<VAL>()
-        var gjeldeneFom = fom
-        while (gjeldeneFom < tom) {
-            val nyTom = minOf(gjeldeneFom.plusMonths(1).minusDays(1), tom)
-            perioder.add(value(gjeldeneFom, nyTom))
-            gjeldeneFom = gjeldeneFom.plusMonths(1)
+        var gjeldendeFom = fom
+        while (gjeldendeFom < tom) {
+            val nyTom = gjeldendeFom.plusMonths(1).let {
+                if (gjeldendeFom.dayOfMonth >= it.lengthOfMonth()) it.tilSisteDagIMåneden() else it.minusDays(1)
+            }.coerceAtMost(tom)
+
+            perioder.add(value(gjeldendeFom, nyTom))
+
+            gjeldendeFom = nyTom.plusDays(1)
         }
         return perioder
     }
@@ -44,7 +49,7 @@ object LæremidlerBeregningUtil {
         val perioder = mutableListOf<P>()
         var gjeldeneFom = fom
         while (gjeldeneFom < tom) {
-            val nyTom = minOf(LocalDate.of(gjeldeneFom.year, 12, 31), tom)
+            val nyTom = LocalDate.of(gjeldeneFom.year, 12, 31).coerceAtMost(tom)
             perioder.add(value(gjeldeneFom, nyTom))
             gjeldeneFom = LocalDate.of(gjeldeneFom.year + 1, 1, 1)
         }
