@@ -114,8 +114,8 @@
       "studienivå" : "VIDEREGÅENDE",
       "harUtgifter" : null,
       "harRettTilUtstyrsstipend" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
+        "svar" : "JA",
+        "resultat" : "IKKE_OPPFYLT"
       }
     },
     "kilde" : "MANUELL",

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
@@ -21,6 +22,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.http.HttpEntity
@@ -93,14 +96,6 @@ class DokumentgenereringTest {
             skrivTilFil("interntVedtak/BARNETILSYN/internt_vedtak.html", html)
             generatePdf(html, "interntVedtak/BARNETILSYN/internt_vedtak.pdf")
         }
-
-        @Test
-        fun `html skal være formatert for å enklere kunne sjekke diff`() {
-            val erIkkeFormatert = FileUtil.readFile("interntVedtak/BARNETILSYN/internt_vedtak.html").split("\n")
-                .none { it.contains("<body") && it.contains("<div") }
-
-            assertThat(erIkkeFormatert).isTrue()
-        }
     }
 
     @Nested
@@ -134,14 +129,16 @@ class DokumentgenereringTest {
             skrivTilFil("interntVedtak/LÆREMIDLER/internt_vedtak.html", html)
             generatePdf(html, "interntVedtak/LÆREMIDLER/internt_vedtak.pdf")
         }
+    }
 
-        @Test
-        fun `html skal være formattert for å enklere kunne sjekke diff`() {
-            val erIkkeFormatert = FileUtil.readFile("interntVedtak/LÆREMIDLER/internt_vedtak.html").split("\n")
-                .none { it.contains("<body") && it.contains("<div") }
+    @ParameterizedTest
+    @EnumSource(Stønadstype::class)
+    fun `html skal være formatert for å enklere kunne sjekke diff`(stønadstype: Stønadstype) {
+        Stønadstype.entries.forEach {  }
+        val erIkkeFormatert = FileUtil.readFile("interntVedtak/$stønadstype/internt_vedtak.html").split("\n")
+            .none { it.contains("<body") && it.contains("<div") }
 
-            assertThat(erIkkeFormatert).isTrue()
-        }
+        assertThat(erIkkeFormatert).isTrue()
     }
 
     private fun lagHtmlifyClient(): HtmlifyClient {
