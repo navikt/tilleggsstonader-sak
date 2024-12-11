@@ -35,6 +35,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.PlatformTransactionManager
+import java.sql.Date
+import java.time.LocalDate
+import java.time.YearMonth
 import java.util.Optional
 import javax.sql.DataSource
 import kotlin.reflect.KClass
@@ -85,6 +88,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
                 PGobjectTilJsonWrapperConverter(),
                 JsonWrapperTilPGobjectConverter(),
+
+                YearMonthTilLocalDateConverter(),
+                LocalDateTilYearMonthConverter(),
 
                 PGobjectTilDelvilkårConverter(),
                 DelvilkårTilPGobjectConverter(),
@@ -173,6 +179,25 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
         override fun convert(bytes: ByteArray): Fil {
             return Fil(bytes)
+        }
+    }
+
+    @WritingConverter
+    class YearMonthTilLocalDateConverter : Converter<YearMonth?, LocalDate> {
+        override fun convert(yearMonth: YearMonth): LocalDate {
+            return yearMonth.atDay(1)
+        }
+    }
+
+    @ReadingConverter
+    class LocalDateTilYearMonthConverter : Converter<Date, YearMonth> {
+        override fun convert(date: Date): YearMonth {
+            return date.toLocalDate().let {
+                require(it.dayOfMonth == 1) {
+                    "Forventer at datoet er første dagen i gitt måned ($it)"
+                }
+                YearMonth.of(it.year, it.month)
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.erLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
@@ -20,6 +21,7 @@ import java.util.UUID
  * Når man fått kvittering fra økonomi oppdateres [statusIverksetting] på nytt
  *
  * @param iverksetting når vi iverksetter en andel så oppdateres dette feltet med id og tidspunkt
+ * @param utbetalingsmåned måneden perioden skal iverksettes
  */
 data class AndelTilkjentYtelse(
     @Id
@@ -36,6 +38,8 @@ data class AndelTilkjentYtelse(
     val statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     val iverksetting: Iverksetting? = null,
+    @Column("utbetalingsmaned")
+    val utbetalingsmåned: YearMonth = fom.toYearMonth(),
     @LastModifiedDate
     val endretTid: LocalDateTime = SporbarUtils.now(),
 ) {
@@ -43,6 +47,9 @@ data class AndelTilkjentYtelse(
     init {
         feilHvis(YearMonth.from(fom) != YearMonth.from(tom)) {
             "For å unngå at man iverksetter frem i tiden skal perioder kun løpe over 1 måned"
+        }
+        feilHvis(utbetalingsmåned > fom.toYearMonth()) {
+            "Finnes ingen grunn til å sette utbetalingsdato etter gjeldende dato for perioden"
         }
 
         validerDataForType()
@@ -135,6 +142,7 @@ enum class StatusIverksetting {
     OK,
     OK_UTEN_UTBETALING,
     UAKTUELL,
+    VENTER_PÅ_SATS_ENDRING,
     ;
 
     fun erOk() = this == StatusIverksetting.OK || this == StatusIverksetting.OK_UTEN_UTBETALING
