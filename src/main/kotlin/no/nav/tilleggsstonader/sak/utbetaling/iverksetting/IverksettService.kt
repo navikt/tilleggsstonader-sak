@@ -152,9 +152,10 @@ class IverksettService(
         iverksettingId: UUID,
         måned: YearMonth,
     ): List<AndelTilkjentYtelse> {
+        val sisteDagenIMåneden = måned.atEndOfMonth()
         val iverksetting = Iverksetting(iverksettingId, osloNow())
         val aktuelleAndeler = tilkjentYtelse.andelerTilkjentYtelse
-            .filter { it.utbetalingsmåned <= måned }
+            .filter { it.tom <= sisteDagenIMåneden }
             .filter { it.statusIverksetting != StatusIverksetting.VENTER_PÅ_SATS_ENDRING }
             .map {
                 if (it.statusIverksetting == StatusIverksetting.UBEHANDLET) {

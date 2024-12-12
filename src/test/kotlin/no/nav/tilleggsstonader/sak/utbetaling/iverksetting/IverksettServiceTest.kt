@@ -379,41 +379,6 @@ class IverksettServiceTest : IntegrationTest() {
     }
 
     @Nested
-    inner class IverksettingUtbetalingsdato {
-        val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER)
-
-        val behandling =
-            behandling(fagsak, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT)
-
-        @BeforeEach
-        fun setUp() {
-            testoppsettService.lagreFagsak(fagsak)
-            testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
-            lagreTotrinnskontroll(behandling)
-        }
-
-        /**
-         * Ikke et reellt case, ønsker å teste at man forholder seg til utbetalingsdato og ikke fom på perioden
-         */
-        @Test
-        fun `skal iverksette perioder baser på utbetalingsdato og ikke fom, for å kunne iverksette beløp på forskudd`() {
-            val tilkjentYtelse = tilkjentYtelse(
-                behandlingId = behandling.id,
-                lagAndel(behandling, forrigeMåned, utbetalingsmåned = forrigeMåned),
-                lagAndel(behandling, nesteMåned, utbetalingsmåned = forrigeMåned),
-            )
-            tilkjentYtelseRepository.insert(tilkjentYtelse)
-
-            iverksettService.iverksettBehandlingFørsteGang(behandling.id)
-
-            with(hentAndeler(behandling)) {
-                forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
-                forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
-            }
-        }
-    }
-
-    @Nested
     inner class IverksettingNullperioder {
         val fagsak = fagsak()
 
@@ -538,7 +503,6 @@ class IverksettServiceTest : IntegrationTest() {
         måned: YearMonth,
         beløp: Int = 10,
         statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
-        utbetalingsmåned: YearMonth = måned,
     ): AndelTilkjentYtelse {
         val fom = måned.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag()
         return andelTilkjentYtelse(
@@ -547,7 +511,6 @@ class IverksettServiceTest : IntegrationTest() {
             tom = fom,
             beløp = beløp,
             statusIverksetting = statusIverksetting,
-            utbetalingsmåned = utbetalingsmåned,
         )
     }
 }
