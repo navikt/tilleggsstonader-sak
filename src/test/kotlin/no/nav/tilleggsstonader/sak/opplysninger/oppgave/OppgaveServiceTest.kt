@@ -86,8 +86,8 @@ internal class OppgaveServiceTest {
         every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(
             2,
             listOf(
-                MappeDto(OppgaveClientConfig.MAPPE_ID_KLAR, OppgaveMappe.KLAR.navn, "4462"),
-                MappeDto(OppgaveClientConfig.MAPPE_ID_PÅ_VENT, OppgaveMappe.PÅ_VENT.navn, "4462"),
+                MappeDto(OppgaveClientConfig.MAPPE_ID_KLAR, OppgaveMappe.KLAR.navn.first(), "4462"),
+                MappeDto(OppgaveClientConfig.MAPPE_ID_PÅ_VENT, OppgaveMappe.PÅ_VENT.navn.first(), "4462"),
             ),
         )
         mockkObject(OppgaveUtil)
