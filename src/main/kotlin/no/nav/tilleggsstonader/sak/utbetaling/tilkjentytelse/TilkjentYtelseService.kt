@@ -56,11 +56,15 @@ class TilkjentYtelseService(
     }
 
     /**
-     * Legger til en nullandel ved første iverksetting for en behandling, dersom det ikke finnes andeler som skal iverksettes
-     * for forrige måned. Dette er for å kunne sjekke status på iverksetting uten utbetalinger.
+     * Legger til en nullandel ved første iverksetting i en behandling,
+     * om det ikke finnes andeler som skal iverksettes på innvilgelsestidspunktet.
+     * Brukes for å sjekke status på iverksetting uten utbetalinger.
      *
-     * Nullandel fom settes til måneden for det minste av måneden det iverksettes for eller måneden før første andelen
-     * Eks hvis man i januar innvilger noe for jan-mai som ikke har sats, då legges en nullandel for desember inn.
+     * Dette gjelder dersom det ikke finnes noe å iverksette, kun finnes andeler fremover i tid, eller om det kun
+     * eksisterer andeler som venter på satsendring før de skal iverksettes.
+     *
+     * Fom på nullandelen settes til det minste av måneden man iverksetter i og måneden før første andel.
+     * Eksempel: Hvis man i januar innvilger noe for jan-mai som ikke har sats, legges en nullandel for desember inn.
      *
      * @return den nye nullandelen som man kan sjekke status på iverksetting for
      */
