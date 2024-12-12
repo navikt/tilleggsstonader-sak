@@ -81,7 +81,6 @@ class IverksettService(
 
         return andelerTilIverksetting.ifEmpty {
             val iverksetting = Iverksetting(iverksettingId, osloNow())
-
             listOf(tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned))
         }
     }
@@ -157,6 +156,7 @@ class IverksettService(
         val iverksetting = Iverksetting(iverksettingId, osloNow())
         val aktuelleAndeler = tilkjentYtelse.andelerTilkjentYtelse
             .filter { it.tom <= sisteDagenIMåneden }
+            .filter { it.statusIverksetting != StatusIverksetting.VENTER_PÅ_SATS_ENDRING }
             .map {
                 if (it.statusIverksetting == StatusIverksetting.UBEHANDLET) {
                     it.copy(

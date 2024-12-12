@@ -23,6 +23,7 @@ import java.util.UUID
  * Når man fått kvittering fra økonomi oppdateres [statusIverksetting] på nytt
  *
  * @param iverksetting når vi iverksetter en andel så oppdateres dette feltet med id og tidspunkt
+ * @param utbetalingsmåned måneden perioden skal iverksettes
  */
 data class AndelTilkjentYtelse(
     @Id
@@ -153,6 +154,7 @@ enum class StatusIverksetting {
     OK,
     OK_UTEN_UTBETALING,
     UAKTUELL,
+    VENTER_PÅ_SATS_ENDRING,
     ;
 
     fun erOk() = this == StatusIverksetting.OK || this == StatusIverksetting.OK_UTEN_UTBETALING

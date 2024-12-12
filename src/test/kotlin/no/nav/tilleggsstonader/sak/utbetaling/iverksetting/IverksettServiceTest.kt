@@ -8,6 +8,7 @@ import io.mockk.verify
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -23,6 +24,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -318,16 +320,79 @@ class IverksettServiceTest : IntegrationTest() {
     }
 
     @Nested
+    inner class IverksettFlytMedAndelerSomIkkeSkalUtbetales {
+
+        val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER)
+
+        val behandling =
+            behandling(fagsak, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT)
+
+        @BeforeEach
+        fun setUp() {
+            testoppsettService.lagreFagsak(fagsak)
+            testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
+            lagreTotrinnskontroll(behandling)
+        }
+
+        @Test
+        fun `skal ikke sende andeler som har status=VENTER_PÅ_SATS_ENDRING som skal satsjusteres før de blir iverksatte`() {
+            val tilkjentYtelse = tilkjentYtelse(
+                behandlingId = behandling.id,
+                lagAndel(behandling, forrigeMåned),
+                lagAndel(behandling, nesteMåned),
+                lagAndel(behandling, nestNesteMåned, statusIverksetting = StatusIverksetting.VENTER_PÅ_SATS_ENDRING),
+            )
+            tilkjentYtelseRepository.insert(tilkjentYtelse)
+
+            iverksettService.iverksettBehandlingFørsteGang(behandling.id)
+            with(hentAndeler(behandling)) {
+                forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
+                forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+                forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.VENTER_PÅ_SATS_ENDRING)
+            }
+            oppdaterAndelerTilOk(behandling, StatusIverksetting.OK)
+
+            val iverksettingId = UUID.randomUUID()
+            iverksettService.iverksett(behandling.id, iverksettingId, nestNesteMåned.plusMonths(1))
+            with(hentAndeler(behandling)) {
+                forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
+                forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
+                forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.VENTER_PÅ_SATS_ENDRING)
+            }
+        }
+
+        @Test
+        fun `skal ikke iverksette noen perioder hvis man innvilget en periode bak i tiden som fortsatt status=VENTER_PÅ_SATS_ENDRING`() {
+            val tilkjentYtelse = tilkjentYtelse(
+                behandlingId = behandling.id,
+                lagAndel(behandling, forrigeMåned, statusIverksetting = StatusIverksetting.VENTER_PÅ_SATS_ENDRING),
+            )
+            tilkjentYtelseRepository.insert(tilkjentYtelse)
+            iverksettService.iverksettBehandlingFørsteGang(behandling.id)
+
+            with(hentAndeler(behandling)) {
+                verifiserHarLagtTilNullPeriode(forrigeMåned.minusMonths(1))
+                forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.VENTER_PÅ_SATS_ENDRING)
+                assertThat(this).hasSize(2)
+            }
+        }
+    }
+
+    @Nested
     inner class IverksettingNullperioder {
         val fagsak = fagsak()
 
         val behandling =
             behandling(fagsak, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT)
 
-        @Test
-        fun `skal iverksette uten utbetalinger når første periode er fremover i tid`() {
+        @BeforeEach
+        fun setUp() {
             testoppsettService.opprettBehandlingMedFagsak(behandling)
             lagreTotrinnskontroll(behandling)
+        }
+
+        @Test
+        fun `skal iverksette uten utbetalinger når første periode er fremover i tid`() {
             tilkjentYtelseRepository.insert(
                 tilkjentYtelse(
                     behandlingId = behandling.id,
@@ -348,8 +413,6 @@ class IverksettServiceTest : IntegrationTest() {
 
         @Test
         fun `skal iverksette måned 2 når status er OK_UTEN_UTBETALING for første måned`() {
-            testoppsettService.opprettBehandlingMedFagsak(behandling)
-            lagreTotrinnskontroll(behandling)
             tilkjentYtelseRepository.insert(
                 tilkjentYtelse(
                     behandlingId = behandling.id,
@@ -410,6 +473,14 @@ class IverksettServiceTest : IntegrationTest() {
         assertThat(this.iverksetting?.iverksettingId).isEqualTo(iverksettingId)
     }
 
+    private fun Set<AndelTilkjentYtelse>.verifiserHarLagtTilNullPeriode(yearMonth: YearMonth) {
+        with(forMåned(yearMonth)) {
+            assertThat(beløp).isEqualTo(0)
+            assertThat(statusIverksetting).isEqualTo(StatusIverksetting.SENDT)
+            assertThat(type).isEqualTo(TypeAndel.UGYLDIG)
+        }
+    }
+
     private fun oppdaterAndelerTilOk(
         behandling: Behandling,
         statusIverksetting: StatusIverksetting = StatusIverksetting.OK,
@@ -427,13 +498,19 @@ class IverksettServiceTest : IntegrationTest() {
         lagAndel(behandling, nestNesteMåned),
     )
 
-    private fun lagAndel(behandling: Behandling, måned: YearMonth, beløp: Int = 10): AndelTilkjentYtelse {
+    private fun lagAndel(
+        behandling: Behandling,
+        måned: YearMonth,
+        beløp: Int = 10,
+        statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
+    ): AndelTilkjentYtelse {
         val fom = måned.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag()
         return andelTilkjentYtelse(
             kildeBehandlingId = behandling.id,
             fom = fom,
             tom = fom,
             beløp = beløp,
+            statusIverksetting = statusIverksetting,
         )
     }
 }

@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverks
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import org.springframework.stereotype.Service
 import java.time.YearMonth
 
@@ -55,8 +56,15 @@ class TilkjentYtelseService(
     }
 
     /**
-     * Legger til en nullandel ved første iverksetting for en behandling, dersom det ikke finnes andeler som skal iverksettes
-     * for forrige måned. Dette er for å kunne sjekke status på iverksetting uten utbetalinger.
+     * Legger til en nullandel ved første iverksetting i en behandling,
+     * om det ikke finnes andeler som skal iverksettes på innvilgelsestidspunktet.
+     * Brukes for å sjekke status på iverksetting uten utbetalinger.
+     *
+     * Dette gjelder dersom det ikke finnes noe å iverksette, kun finnes andeler fremover i tid, eller om det kun
+     * eksisterer andeler som venter på satsendring før de skal iverksettes.
+     *
+     * Fom på nullandelen settes til det minste av måneden man iverksetter i og måneden før første andel.
+     * Eksempel: Hvis man i januar innvilger noe for jan-mai som ikke har sats, legges en nullandel for desember inn.
      *
      * @return den nye nullandelen som man kan sjekke status på iverksetting for
      */
@@ -65,10 +73,11 @@ class TilkjentYtelseService(
         iverksetting: Iverksetting,
         måned: YearMonth,
     ): AndelTilkjentYtelse {
+        val månedForNullutbetaling = minOf(måned, finnMånedFørFørsteAndel(tilkjentYtelse) ?: måned)
         val nullAndel = AndelTilkjentYtelse(
             beløp = 0,
-            fom = måned.atDay(1),
-            tom = måned.atDay(1),
+            fom = månedForNullutbetaling.atDay(1),
+            tom = månedForNullutbetaling.atDay(1),
             satstype = Satstype.UGYLDIG,
             type = TypeAndel.UGYLDIG,
             kildeBehandlingId = tilkjentYtelse.behandlingId,
@@ -79,4 +88,10 @@ class TilkjentYtelseService(
         tilkjentYtelseRepository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = tilkjentYtelse.andelerTilkjentYtelse + nullAndel))
         return nullAndel
     }
+
+    private fun finnMånedFørFørsteAndel(tilkjentYtelse: TilkjentYtelse): YearMonth? =
+        tilkjentYtelse.andelerTilkjentYtelse
+            .minOfOrNull { it.fom }
+            ?.toYearMonth()
+            ?.minusMonths(1)
 }
