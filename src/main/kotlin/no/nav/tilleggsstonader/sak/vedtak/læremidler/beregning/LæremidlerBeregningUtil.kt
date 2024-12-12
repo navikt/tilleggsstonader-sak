@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import java.time.LocalDate
-import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.tilSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.toYearMonth
@@ -13,6 +11,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFaktaOrThrow
+import java.time.LocalDate
+import java.util.UUID
 
 object LæremidlerBeregningUtil {
     fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<UtbetalingsPeriode> {

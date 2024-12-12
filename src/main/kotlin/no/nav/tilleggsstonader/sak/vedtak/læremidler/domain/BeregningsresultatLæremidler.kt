@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.time.YearMonth

@@ -6,6 +6,7 @@ import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
+import java.lang.reflect.InvocationTargetException
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
@@ -15,16 +16,17 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilSortertGrunnlagStønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -49,10 +51,11 @@ class StepDefinitions {
     val behandlingId = BehandlingId(UUID.randomUUID())
 
     var vedtaksPerioder: List<Vedtaksperiode> = emptyList()
+    var stønadsperioder: List<Stønadsperiode> = emptyList()
     var resultat: BeregningsresultatLæremidler? = null
-    var exception: Exception? = null
 
-    var resultatValidering: Stønadsperiode? = null
+    var beregningException: Exception? = null
+    var valideringException: Exception? = null
 
     var vedtaksperioderSplittet: List<UtbetalingsPeriode> = emptyList()
 
@@ -83,20 +86,36 @@ class StepDefinitions {
                 any(),
             )
         } returns mapStønadsperioder(behandlingId, dataTable)
+        stønadsperioder = mapStønadsperioder(behandlingId, dataTable)
     }
 
     @Når("beregner stønad for læremidler")
     fun `beregner stønad for læremidler`() {
         try {
-            resultat = læremidlerBeregningService.beregn(vedtaksPerioder!!, behandlingId)
+            resultat = læremidlerBeregningService.beregn(vedtaksPerioder, behandlingId)
         } catch (e: Exception) {
-            exception = e
+            beregningException = e
         }
     }
 
     @Når("splitter vedtaksperioder for læremidler")
     fun `splitter vedtaksperioder for læremidler`() {
-        vedtaksperioderSplittet = vedtaksPerioder!!.flatMap { it.delTilUtbetalingsPerioder() }
+        vedtaksperioderSplittet = vedtaksPerioder.flatMap { it.delTilUtbetalingsPerioder() }
+    }
+
+    @Når("validerer vedtaksperiode for læremidler")
+    fun `validerer vedtaksperiode for læremidler`() {
+        try {
+            val valider = læremidlerBeregningService.javaClass.getDeclaredMethod(
+                "validerVedtaksperioder",
+                List::class.java,
+                List::class.java,
+            )
+            valider.isAccessible = true
+            valider.invoke(læremidlerBeregningService, vedtaksPerioder, stønadsperioder.tilSortertGrunnlagStønadsperiode())
+        } catch (e: InvocationTargetException) {
+            valideringException = e.targetException as Exception
+        }
     }
 
     @Så("skal stønaden være")
@@ -125,28 +144,12 @@ class StepDefinitions {
 
     @Så("forvent følgende feil fra læremidlerberegning: {}")
     fun `forvent følgende feil`(forventetFeil: String) {
-        assertThat(exception!!).hasMessageContaining(forventetFeil)
+        assertThat(beregningException!!).hasMessageContaining(forventetFeil)
     }
 
-//    @Når("validerer vedtaksperiode for læremidler")
-//    fun `validerer vedtaksperiode for læremidler`() {
-//        val vedtaksperiode = vedtaksPerioder!!.single()
-//        resultatValidering = læremidlerBeregningService.validerVedtaksperiodeInnenforStønadsperioder(vedtaksperiode, behandlingId)
-//    }
-
-    @Så("skal resultat fra validering være")
-    fun `skal resultat fra validering være`(dataTable: DataTable) {
-        val stønadsperiode = dataTable.mapRad { rad ->
-            Stønadsperiode(
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                aktivitet = AktivitetType.TILTAK,
-                målgruppe = MålgruppeType.AAP,
-            )
-        }.single()
-
-        assertThat(resultatValidering?.fom).isEqualTo(stønadsperiode.fom)
-        assertThat(resultatValidering?.tom).isEqualTo(stønadsperiode.tom)
+    @Så("forvent følgende feil fra vedtaksperiode validering: {}")
+    fun `skal resultat fra validering være`(forventetFeil: String) {
+        assertThat(valideringException!!).hasMessage(forventetFeil)
     }
 
     @Så("forvent følgende utbetalingsperioder")

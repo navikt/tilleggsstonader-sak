@@ -37,10 +37,10 @@ data class BeregningsresultatForPeriodeDto(
         nestePeriode: BeregningsresultatForPeriodeDto,
     ): Boolean {
         return this.studienivå == nestePeriode.studienivå &&
-                this.studieprosent == nestePeriode.studieprosent &&
-                this.sats == nestePeriode.sats &&
-                this.utbetalingsmåned == nestePeriode.utbetalingsmåned &&
-                this.påfølgesAv(nestePeriode)
+            this.studieprosent == nestePeriode.studieprosent &&
+            this.sats == nestePeriode.sats &&
+            this.utbetalingsmåned == nestePeriode.utbetalingsmåned &&
+            this.påfølgesAv(nestePeriode)
     }
 }
 
@@ -66,5 +66,3 @@ fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto {
         utbetalingsmåned = grunnlag.utbetalingsMåned,
     )
 }
-
-
