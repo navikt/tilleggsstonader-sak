@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsperiode
 
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -46,7 +46,7 @@ object StønadsperiodeValidering {
             val last = acc.lastOrNull()
             if (last != null) {
                 brukerfeilHvis(last.tom >= periode.fom) {
-                    "Stønadsperiode ${last.formattertPeriodeNorskFormat()} og ${periode.formattertPeriodeNorskFormat()} overlapper"
+                    "Stønadsperiode ${last.formatertPeriodeNorskFormat()} og ${periode.formatertPeriodeNorskFormat()} overlapper"
                 }
             }
             acc + periode
@@ -63,15 +63,15 @@ object StønadsperiodeValidering {
             "Kombinasjonen av ${stønadsperiode.målgruppe} og ${stønadsperiode.aktivitet} er ikke gyldig"
         }
 
-        val målgrupper = målgruppePerioderPerType[stønadsperiode.målgruppe]
+        val målgrupper = målgruppePerioderPerType[stønadsperiode.målgruppe]?.takeIf { it.isNotEmpty() }
             ?: brukerfeil("Finner ingen perioder hvor vilkår for ${stønadsperiode.målgruppe} er oppfylt")
-        val aktiviteter = aktivitetPerioderPerType[stønadsperiode.aktivitet]
+        val aktiviteter = aktivitetPerioderPerType[stønadsperiode.aktivitet]?.takeIf { it.isNotEmpty() }
             ?: brukerfeil("Finner ingen perioder hvor vilkår for ${stønadsperiode.aktivitet} er oppfylt")
 
         målgrupper.firstOrNull { it.inneholder(stønadsperiode) }
-            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.målgruppe} i perioden ${stønadsperiode.formattertPeriodeNorskFormat()}")
+            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.målgruppe} i perioden ${stønadsperiode.formatertPeriodeNorskFormat()}")
         aktiviteter.firstOrNull { it.inneholder(stønadsperiode) }
-            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.aktivitet} i perioden ${stønadsperiode.formattertPeriodeNorskFormat()}")
+            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.aktivitet} i perioden ${stønadsperiode.formatertPeriodeNorskFormat()}")
 
         validerStønadsperiodeErInnenfor18og67år(fødselsdato, stønadsperiode)
     }
@@ -97,8 +97,8 @@ object StønadsperiodeValidering {
             .firstOrNull { vilkårperiode -> vilkårperiode.overlapper(stønadsperiode) }
             ?.let {
                 brukerfeil(
-                    "Stønadsperiode ${stønadsperiode.formattertPeriodeNorskFormat()} overlapper " +
-                        "med ${it.type}(${it.formattertPeriodeNorskFormat()}) som ikke gir rett på stønad",
+                    "Stønadsperiode ${stønadsperiode.formatertPeriodeNorskFormat()} overlapper " +
+                        "med ${it.type}(${it.formatertPeriodeNorskFormat()}) som ikke gir rett på stønad",
                 )
             }
     }
@@ -119,8 +119,6 @@ object StønadsperiodeValidering {
         }
     }
 }
-
-private fun Periode<LocalDate>.formattertPeriodeNorskFormat() = "${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
 
 /**
  *  @return En sortert map kategorisert på periodetype med de oppfylte vilkårsperiodene. Periodene slåes sammen dersom

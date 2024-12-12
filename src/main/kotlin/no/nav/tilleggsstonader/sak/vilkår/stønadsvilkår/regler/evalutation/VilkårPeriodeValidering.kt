@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
+import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import java.time.LocalDate
 
@@ -24,7 +25,11 @@ object VilkårPeriodeValidering {
     private fun validerIkkeOverlappende(vilkårliste: List<Datoperiode>) {
         val overlappendePeriode = vilkårliste.førsteOverlappendePeriode()
         if (overlappendePeriode != null) {
-            brukerfeil("Periode=${overlappendePeriode.first} og ${overlappendePeriode.second} overlapper.")
+            brukerfeil(
+                "Det er ikke gyldig med overlappende perioder for et barn. " +
+                    "Periode ${overlappendePeriode.first.formatertPeriodeNorskFormat()} " +
+                    "overlapper med ${overlappendePeriode.second.formatertPeriodeNorskFormat()}. ",
+            )
         }
     }
 
