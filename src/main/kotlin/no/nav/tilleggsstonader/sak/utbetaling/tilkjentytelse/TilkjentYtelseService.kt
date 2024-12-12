@@ -59,7 +59,7 @@ class TilkjentYtelseService(
      * Legger til en nullandel ved første iverksetting for en behandling, dersom det ikke finnes andeler som skal iverksettes
      * for forrige måned. Dette er for å kunne sjekke status på iverksetting uten utbetalinger.
      *
-     * Nullandels fom settes til måneden det minste av måneden det iverksettes for eller måneden før første andelen dersom en andel
+     * Nullandel fom settes til måneden for det minste av måneden det iverksettes for eller måneden før første andelen
      * Eks hvis man i januar innvilger noe for jan-mai som ikke har sats, då legges en nullandel for desember inn.
      *
      * @return den nye nullandelen som man kan sjekke status på iverksetting for
