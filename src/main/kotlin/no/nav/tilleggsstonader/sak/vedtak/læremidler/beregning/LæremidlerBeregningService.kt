@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import no.nav.tilleggsstonader.kontrakter.arena.sak.Målgruppe
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -62,7 +63,7 @@ class LæremidlerBeregningService(
                 val relevantStønadsperiode = utbetalingsperiode.finnRelevantStønadsperiode(stønadsperioder)
                 lagBeregningsresultatForMåned(
                     utbetalingsperiode = utbetalingsperiode,
-                    stønadsperiode = relevantStønadsperiode,
+                    målgruppe = relevantStønadsperiode.målgruppe,
                     aktivitet = utbetalingsperiode.finnRelevantAktivitet(
                         aktiviteter = aktiviteter,
                         aktivitetType = relevantStønadsperiode.aktivitet,
@@ -72,14 +73,14 @@ class LæremidlerBeregningService(
 
     private fun lagBeregningsresultatForMåned(
         utbetalingsperiode: UtbetalingsPeriode,
-        stønadsperiode: Stønadsperiode,
+        målgruppe: MålgruppeType,
         aktivitet: Aktivitet,
     ): BeregningsresultatForMåned {
         val grunnlagsdata =
             lagBeregningsGrunnlag(
                 periode = utbetalingsperiode,
                 aktivitet = aktivitet,
-                målgruppe = stønadsperiode.målgruppe,
+                målgruppe = målgruppe,
             )
 
         return BeregningsresultatForMåned(
