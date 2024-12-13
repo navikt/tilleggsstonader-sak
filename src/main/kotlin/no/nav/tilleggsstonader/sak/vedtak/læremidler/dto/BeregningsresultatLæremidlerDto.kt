@@ -19,7 +19,7 @@ data class BeregningsresultatForPeriodeDto(
     val antallMåneder: Int,
     val studienivå: Studienivå,
     val studieprosent: Int,
-    val sats: Int,
+    val beløp: Int,
     val stønadsbeløp: Int,
     val utbetalingsmåned: YearMonth,
 ) : Periode<LocalDate> {
@@ -38,14 +38,14 @@ data class BeregningsresultatForPeriodeDto(
     ): Boolean {
         return this.studienivå == nestePeriode.studienivå &&
             this.studieprosent == nestePeriode.studieprosent &&
-            this.sats == nestePeriode.sats &&
+            this.beløp == nestePeriode.beløp &&
             this.utbetalingsmåned == nestePeriode.utbetalingsmåned &&
             this.påfølgesAv(nestePeriode)
     }
 }
 
 fun BeregningsresultatLæremidler.tilDto(): BeregningsresultatLæremidlerDto {
-    val perioderDto = perioder.map { it.tilDto() }
+    val perioderDto = perioder.map { it.tilDto() }.sorted()
     return BeregningsresultatLæremidlerDto(
         perioder = perioderDto.mergeSammenhengende(
             skalMerges = { v1, v2 -> v1.kanSlåsSammen(v2) },
@@ -61,7 +61,7 @@ fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto {
         antallMåneder = 1,
         studienivå = grunnlag.studienivå,
         studieprosent = grunnlag.studieprosent,
-        sats = grunnlag.sats,
+        beløp = beløp,
         stønadsbeløp = beløp,
         utbetalingsmåned = grunnlag.utbetalingsMåned,
     )
