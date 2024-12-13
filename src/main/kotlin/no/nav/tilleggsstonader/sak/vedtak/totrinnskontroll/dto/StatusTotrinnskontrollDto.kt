@@ -32,6 +32,7 @@ enum class TotrinnkontrollStatus {
 }
 
 enum class ÅrsakUnderkjent {
+    INNGANGSVILKÅR,
     VEDTAK_OG_BEREGNING,
     VEDTAKSBREV,
     RETUR_ETTER_ØNSKE_FRA_SAKSBEHANDLER,

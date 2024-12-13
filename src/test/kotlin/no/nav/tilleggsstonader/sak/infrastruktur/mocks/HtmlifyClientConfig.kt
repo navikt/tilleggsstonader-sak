@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
+import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtak
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -16,7 +17,7 @@ class HtmlifyClientConfig {
     @Primary
     fun htmlifyClient(): HtmlifyClient {
         val client = mockk<HtmlifyClient>()
-        every { client.generateHtml(any()) } returns "<body>body</body>"
+        every { client.generateHtml(any<InterntVedtak>()) } returns "<body>body</body>"
         return client
     }
 }

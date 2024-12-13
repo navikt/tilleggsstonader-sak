@@ -44,12 +44,18 @@ fun Behandlingshistorikk.tilDto(): BehandlingshistorikkDto {
 fun Behandlingshistorikk.tilHendelseshistorikkDto(saksbehandling: Saksbehandling): HendelseshistorikkDto {
     val hendelse: Hendelse = mapUtfallTilHendelse() ?: mapStegTilHendelse(saksbehandling)
 
+    val metadata = this.metadata.tilJson()?.toMutableMap()?.apply {
+        if (saksbehandling.status.iverksetterEllerFerdigstilt() && hendelse.sattEllerTattAvVent()) {
+            this.remove("kommentarSettPåVent")
+            this.remove("kommentar")
+        }
+    }
     return HendelseshistorikkDto(
         behandlingId = this.behandlingId,
         hendelse = hendelse,
         endretAvNavn = this.opprettetAvNavn,
         endretTid = this.endretTid,
-        metadata = this.metadata.tilJson(),
+        metadata = metadata,
     )
 }
 

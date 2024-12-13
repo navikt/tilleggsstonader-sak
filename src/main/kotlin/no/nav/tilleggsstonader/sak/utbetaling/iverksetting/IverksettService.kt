@@ -81,7 +81,6 @@ class IverksettService(
 
         return andelerTilIverksetting.ifEmpty {
             val iverksetting = Iverksetting(iverksettingId, osloNow())
-
             listOf(tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned))
         }
     }
@@ -106,9 +105,13 @@ class IverksettService(
 
         val totrinnskontroll = hentTotrinnskontroll(behandlingId)
 
+        val andelerTilkjentYtelse = finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, måned)
+        feilHvis(andelerTilkjentYtelse.isEmpty()) {
+            "Månedsjobbet forventer å finne andeler for iverksetting av behandling=$behandlingId måned=$måned"
+        }
         val dto = IverksettDtoMapper.map(
             behandling = behandling,
-            andelerTilkjentYtelse = finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, måned),
+            andelerTilkjentYtelse = andelerTilkjentYtelse,
             totrinnskontroll = totrinnskontroll,
             iverksettingId = iverksettingId,
             forrigeIverksetting = forrigeIverksetting(behandling, tilkjentYtelse),
@@ -153,6 +156,7 @@ class IverksettService(
         val iverksetting = Iverksetting(iverksettingId, osloNow())
         val aktuelleAndeler = tilkjentYtelse.andelerTilkjentYtelse
             .filter { it.tom <= sisteDagenIMåneden }
+            .filter { it.statusIverksetting != StatusIverksetting.VENTER_PÅ_SATS_ENDRING }
             .map {
                 if (it.statusIverksetting == StatusIverksetting.UBEHANDLET) {
                     it.copy(
@@ -168,13 +172,8 @@ class IverksettService(
                 }
             }
 
-        return if (aktuelleAndeler.isNotEmpty()) {
-            oppdaterAndeler(aktuelleAndeler, iverksetting)
-            aktuelleAndeler
-        } else {
-            tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned)
-            emptyList()
-        }
+        oppdaterAndeler(aktuelleAndeler, iverksetting)
+        return aktuelleAndeler
     }
 
     /**
@@ -185,10 +184,6 @@ class IverksettService(
         iverksetting: Iverksetting,
     ) {
         val andelerSomSkalOppdateres = aktuelleAndeler.filter { it.iverksetting == iverksetting }
-
-        feilHvis(andelerSomSkalOppdateres.isEmpty()) {
-            "Forventet å oppdatere noen andeler"
-        }
         andelTilkjentYtelseRepository.updateAll(andelerSomSkalOppdateres)
     }
 

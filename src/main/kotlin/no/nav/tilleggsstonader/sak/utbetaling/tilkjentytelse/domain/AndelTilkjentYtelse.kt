@@ -3,7 +3,10 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
@@ -20,6 +23,7 @@ import java.util.UUID
  * Når man fått kvittering fra økonomi oppdateres [statusIverksetting] på nytt
  *
  * @param iverksetting når vi iverksetter en andel så oppdateres dette feltet med id og tidspunkt
+ * @param utbetalingsmåned måneden perioden skal iverksettes
  */
 data class AndelTilkjentYtelse(
     @Id
@@ -42,7 +46,10 @@ data class AndelTilkjentYtelse(
 
     init {
         feilHvis(YearMonth.from(fom) != YearMonth.from(tom)) {
-            "For å unngå at man iverksetter frem i tiden skal perioder kun løpe over 1 måned"
+            "Forventer at fom($fom) og tom($tom) er i den samme måneden"
+        }
+        feilHvisIkke(fom <= tom) {
+            "Forventer at fom($fom) er mindre eller lik tom($tom)"
         }
 
         validerDataForType()
@@ -73,18 +80,30 @@ data class AndelTilkjentYtelse(
     }
 
     private fun validerLæremidler() {
-        error("Har ikke lagt inn validering av andeler for læremidler ennå")
+        validerSatstype(Satstype.MÅNED)
     }
 
     private fun validerSatstype(forventetSatstype: Satstype) {
         feilHvis(satstype != forventetSatstype) {
-            "Forventer at satstype=$satstype er av type=$forventetSatstype"
+            "Ugyldig satstype=$satstype forventetSatsType=$forventetSatstype for type=$type"
+        }
+        if (satstype == Satstype.MÅNED) {
+            validerFørsteOgSisteIMåneden()
         }
     }
 
     private fun validerLikFomOgTom() {
         feilHvis(fom != tom) {
-            "Forventer at fom=tom for type=$type"
+            "Forventer at fom($fom) er lik tom($tom) for type=$type"
+        }
+    }
+
+    private fun validerFørsteOgSisteIMåneden() {
+        feilHvisIkke(fom.erFørsteDagIMåneden()) {
+            "Forventer at fom($fom) er første dagen i måneden for type=$type"
+        }
+        feilHvisIkke(tom.erSisteDagIMåneden()) {
+            "Forventer at tom($tom) er siste dagen i måneden for type=$type"
         }
     }
 }
@@ -135,6 +154,7 @@ enum class StatusIverksetting {
     OK,
     OK_UTEN_UTBETALING,
     UAKTUELL,
+    VENTER_PÅ_SATS_ENDRING,
     ;
 
     fun erOk() = this == StatusIverksetting.OK || this == StatusIverksetting.OK_UTEN_UTBETALING

@@ -19,47 +19,45 @@
     "type" : "AAP",
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
-    "delvilkår" : {
+    "faktaOgVurderinger" : {
+      "@type" : "MÅLGRUPPE",
       "medlemskap" : {
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
       },
-      "dekketAvAnnetRegelverk" : {
+      "utgifterDekketAvAnnetRegelverk" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
-      },
-      "lønnet" : null
+      }
     },
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe aap",
-    "slettetKommentar" : null,
-    "aktivitetsdager" : null
+    "slettetKommentar" : null
   }, {
     "type" : "OVERGANGSSTØNAD",
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
-    "delvilkår" : {
+    "faktaOgVurderinger" : {
+      "@type" : "MÅLGRUPPE",
       "medlemskap" : {
         "svar" : "JA_IMPLISITT",
         "resultat" : "OPPFYLT"
       },
-      "dekketAvAnnetRegelverk" : null,
-      "lønnet" : null
+      "utgifterDekketAvAnnetRegelverk" : null
     },
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe os",
-    "slettetKommentar" : null,
-    "aktivitetsdager" : null
+    "slettetKommentar" : null
   } ],
   "aktiviteter" : [ {
     "type" : "TILTAK",
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
-    "delvilkår" : {
-      "medlemskap" : null,
-      "dekketAvAnnetRegelverk" : null,
+    "faktaOgVurderinger" : {
+      "@type" : "AKTIVITET_BARNETILSYN",
+      "aktivitetsdager" : 5,
       "lønnet" : {
         "svar" : "JA",
         "resultat" : "IKKE_OPPFYLT"
@@ -68,15 +66,14 @@
     "kilde" : "MANUELL",
     "resultat" : "IKKE_OPPFYLT",
     "begrunnelse" : "aktivitet abd",
-    "slettetKommentar" : null,
-    "aktivitetsdager" : 5
+    "slettetKommentar" : null
   }, {
     "type" : "TILTAK",
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
-    "delvilkår" : {
-      "medlemskap" : null,
-      "dekketAvAnnetRegelverk" : null,
+    "faktaOgVurderinger" : {
+      "@type" : "AKTIVITET_BARNETILSYN",
+      "aktivitetsdager" : 5,
       "lønnet" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
@@ -85,8 +82,7 @@
     "kilde" : "MANUELL",
     "resultat" : "SLETTET",
     "begrunnelse" : null,
-    "slettetKommentar" : "kommentar slettet",
-    "aktivitetsdager" : 5
+    "slettetKommentar" : "kommentar slettet"
   } ],
   "stønadsperioder" : [ {
     "målgruppe" : "AAP",

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.util.DatoFormat.DATE_FORMAT_NORSK
@@ -110,3 +111,5 @@ fun LocalDate.erFørsteDagIMåneden() = this.dayOfMonth == 1
 fun LocalDate.erSisteDagIMåneden() = this.dayOfMonth == YearMonth.from(this).atEndOfMonth().dayOfMonth
 fun LocalDate.tilFørsteDagIMåneden() = YearMonth.from(this).atDay(1)
 fun LocalDate.tilSisteDagIMåneden() = YearMonth.from(this).atEndOfMonth()
+
+fun Periode<LocalDate>.formatertPeriodeNorskFormat() = "${this.fom.norskFormat()} - ${this.tom.norskFormat()}"

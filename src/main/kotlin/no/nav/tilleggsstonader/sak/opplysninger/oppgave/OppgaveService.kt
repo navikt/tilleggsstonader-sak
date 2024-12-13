@@ -321,13 +321,15 @@ class OppgaveService(
     }
 
     fun finnMappe(enhet: String, oppgaveMappe: OppgaveMappe) = finnMapper(enhet)
-        .filter { it.navn.endsWith(oppgaveMappe.navn, ignoreCase = true) }
-        .let {
-            if (it.size != 1) {
-                secureLogger.error("Finner ${it.size} mapper for enhet=$enhet navn=$oppgaveMappe - mapper=$it")
+        .let { alleMapper ->
+            val aktuelleMapper = alleMapper.filter { mappe ->
+                oppgaveMappe.navn.any { mappe.navn.endsWith(it, ignoreCase = true) }
+            }
+            if (aktuelleMapper.size != 1) {
+                secureLogger.error("Finner ${aktuelleMapper.size} mapper for enhet=$enhet navn=$oppgaveMappe - mapper=$alleMapper")
                 error("Finner ikke mapper for enhet=$enhet navn=$oppgaveMappe. Se secure logs for mer info")
             }
-            it.single()
+            aktuelleMapper.single()
         }
 
     fun finnMapper(enheter: List<String>): List<MappeDto> {

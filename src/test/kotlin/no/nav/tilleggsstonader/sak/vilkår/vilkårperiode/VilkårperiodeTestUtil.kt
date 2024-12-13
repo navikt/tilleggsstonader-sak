@@ -158,39 +158,32 @@ object VilkårperiodeTestUtil {
     }
 
     fun faktaOgVurderingAktivitetLæremidler(
-        type: AktivitetType = AktivitetType.UTDANNING,
-        prosent: Int = 100,
+        type: AktivitetType = AktivitetType.TILTAK,
+        prosent: Int = 80,
         studienivå: Studienivå = Studienivå.HØYERE_UTDANNING,
+        harUtgifter: VurderingHarUtgifter = vurderingHarUtgifter(),
+        harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend = vurderingHarRettTilUtstyrsstipend(),
     ): AktivitetFaktaOgVurdering = when (type) {
         AktivitetType.TILTAK -> TiltakLæremidler(
-            fakta = FaktaAktivitetLæremidler(studienivå = studienivå, prosent = prosent),
             vurderinger = VurderingTiltakLæremidler(
-                harRettTilUtstyrsstipend = vurderingHarRettTilUtstyrsstipend(),
-                harUtgifter = vurderingHarUtgifter(),
+                harUtgifter = harUtgifter,
+                harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
             ),
+            fakta = FaktaAktivitetLæremidler(prosent, studienivå),
         )
 
         AktivitetType.UTDANNING -> UtdanningLæremidler(
-            fakta = FaktaAktivitetLæremidler(studienivå = studienivå, prosent = prosent),
-            vurderinger = vurderingerUtdanningLæremidler(),
+            fakta = FaktaAktivitetLæremidler(prosent, studienivå),
+            vurderinger = VurderingerUtdanningLæremidler(
+                harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
+            ),
         )
 
-        AktivitetType.REELL_ARBEIDSSØKER -> TODO()
-
-        AktivitetType.INGEN_AKTIVITET -> TODO()
+        AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
+        else -> {
+            throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for læremidler")
+        }
     }
-
-    fun vurderingerUtdanningLæremidler(
-        harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend = vurderingHarRettTilUtstyrsstipend(),
-    ): VurderingerUtdanningLæremidler = VurderingerUtdanningLæremidler(
-        harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
-    )
-
-    fun vurderingerTiltakLæremidler(
-        harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend = vurderingHarRettTilUtstyrsstipend(),
-    ): VurderingerUtdanningLæremidler = VurderingerUtdanningLæremidler(
-        harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
-    )
 
     fun vurderingLønnet(
         svar: SvarJaNei? = SvarJaNei.NEI,

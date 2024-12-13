@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -24,16 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -55,26 +45,16 @@ class InterntVedtakService(
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
         val vedtak = vedtakService.hentVedtak(behandling.id)
 
-        return when (behandling.stønadstype) {
-            Stønadstype.BARNETILSYN -> lagInterntVedtakTilsynBarn(behandling, vilkårsperioder, vedtak)
-            Stønadstype.LÆREMIDLER -> TODO()
-        }
-    }
-
-    fun lagInterntVedtakTilsynBarn(
-        behandling: Saksbehandling,
-        vilkårperioder: Vilkårperioder,
-        vedtak: Vedtak?,
-    ): InterntVedtak {
         val grunnlag = grunnlagsdataService.hentGrunnlagsdata(behandling.id).grunnlag
         val behandlingbarn = mapBarnPåBarnId(behandling.id, grunnlag)
+
         return InterntVedtak(
             behandling = mapBehandlingsinformasjon(behandling),
             søknad = mapSøknadsinformasjon(behandling),
-            målgrupper = mapVilkårperioder(vilkårperioder.målgrupper), // TODO læremidler
-            aktiviteter = mapVilkårperioder(vilkårperioder.aktiviteter), // TODO læremidler
+            målgrupper = mapVilkårperioder(vilkårsperioder.målgrupper),
+            aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
             stønadsperioder = mapStønadsperioder(behandling.id),
-            vilkår = mapVilkår(behandling.id, behandlingbarn), // TODO læremidler
+            vilkår = mapVilkår(behandling.id, behandlingbarn),
             vedtak = mapVedtak(vedtak),
         )
     }
@@ -128,36 +108,13 @@ class InterntVedtakService(
                 type = it.type,
                 fom = it.fom,
                 tom = it.tom,
-                delvilkår = mapDelvilkår(it.faktaOgVurdering),
+                faktaOgVurderinger = it.faktaOgVurdering.tilFaktaOgVurderingDto(),
                 kilde = it.kilde,
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
-                aktivitetsdager = it.faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
             )
         }
-    }
-
-    private fun mapDelvilkår(faktaOgVurdering: FaktaOgVurdering): DelvilkårVilkårperiode {
-        val vurderinger = faktaOgVurdering.vurderinger
-        return DelvilkårVilkårperiode(
-            medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.let { mapVurdering(it) },
-            dekketAvAnnetRegelverk = vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
-                ?.dekketAvAnnetRegelverk?.let {
-                    mapVurdering(it)
-                },
-            lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.let { mapVurdering(it) },
-        )
-    }
-
-    private fun mapVurdering(vurdering: Vurdering?): VurderingVilkårperiode? {
-        if (vurdering == null || vurdering.resultat == ResultatDelvilkårperiode.IKKE_AKTUELT) {
-            return null
-        }
-        return VurderingVilkårperiode(
-            svar = vurdering.svar?.name,
-            resultat = vurdering.resultat,
-        )
     }
 
     private fun mapStønadsperioder(behandlingId: BehandlingId): List<Stønadsperiode> {

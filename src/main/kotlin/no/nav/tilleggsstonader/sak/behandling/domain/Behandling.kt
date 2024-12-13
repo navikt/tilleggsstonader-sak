@@ -118,6 +118,8 @@ enum class BehandlingStatus {
 
     fun behandlingErLåstForVidereRedigering(): Boolean =
         setOf(FATTER_VEDTAK, IVERKSETTER_VEDTAK, FERDIGSTILT, SATT_PÅ_VENT).contains(this)
+
+    fun iverksetterEllerFerdigstilt() = this == IVERKSETTER_VEDTAK || this == FERDIGSTILT
 }
 
 @Table("behandling_ekstern")

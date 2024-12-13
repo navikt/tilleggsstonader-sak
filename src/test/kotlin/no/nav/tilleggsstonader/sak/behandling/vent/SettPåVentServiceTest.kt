@@ -1,21 +1,21 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
-import io.mockk.every
-import io.mockk.mockkObject
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
+import no.nav.tilleggsstonader.sak.behandling.historikk.dto.Hendelse
+import no.nav.tilleggsstonader.sak.behandling.historikk.dto.HendelseshistorikkDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_KLAR
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_PÅ_VENT
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -71,9 +71,7 @@ class SettPåVentServiceTest : IntegrationTest() {
 
         @Test
         fun `skal sette behandling på vent`() {
-            mockkObject(SikkerhetContext) {
-                every { SikkerhetContext.hentSaksbehandlerEllerSystembruker() } returns dummySaksbehandler
-
+            testWithBrukerContext(dummySaksbehandler) {
                 settPåVentService.settPåVent(behandling.id, settPåVentDto)
 
                 assertThat(testoppsettService.hentBehandling(behandling.id).status)
@@ -112,8 +110,7 @@ class SettPåVentServiceTest : IntegrationTest() {
     inner class OppdaterSettPåVent {
         @Test
         fun `skal kunne oppdatere settPåVent`() {
-            mockkObject(SikkerhetContext) {
-                every { SikkerhetContext.hentSaksbehandlerEllerSystembruker() } returns dummySaksbehandler
+            testWithBrukerContext(dummySaksbehandler) {
                 settPåVentService.settPåVent(behandling.id, settPåVentDto)
                 settPåVentService.oppdaterSettPåVent(behandling.id, oppdaterSettPåVentDto.copy(oppgaveVersjon = 2))
 
@@ -161,7 +158,10 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal ta av vent og fortsette behandling - med kommentar`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.taAvVent(behandling.id, TaAvVentDto(skalTilordnesRessurs = true, kommentar = "kommentar"))
+                settPåVentService.taAvVent(
+                    behandling.id,
+                    TaAvVentDto(skalTilordnesRessurs = true, kommentar = "kommentar"),
+                )
             }
 
             validerTattAvVent(behandling.id, kommentar = "kommentar")
@@ -183,7 +183,10 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal ta av vent og markere oppgave som ufordelt - med kommentar`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.taAvVent(behandling.id, TaAvVentDto(skalTilordnesRessurs = false, kommentar = "kommentar"))
+                settPåVentService.taAvVent(
+                    behandling.id,
+                    TaAvVentDto(skalTilordnesRessurs = false, kommentar = "kommentar"),
+                )
             }
 
             validerTattAvVent(behandling.id, kommentar = "kommentar")
@@ -200,6 +203,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             assertThat(testoppsettService.hentBehandling(behandlingId).status)
                 .isEqualTo(BehandlingStatus.UTREDES)
         }
+
         private fun validerOppdatertOppgave(oppgaveId: Long, tilordnetRessurs: String?) {
             with(oppgaveService.hentOppgave(oppgaveId)) {
                 assertThat(tilordnetRessurs).isEqualTo(tilordnetRessurs)
@@ -218,6 +222,63 @@ class SettPåVentServiceTest : IntegrationTest() {
                     assertThat(metadata).isNull()
                 }
             }
+        }
+    }
+
+    @Nested
+    inner class Historikk {
+
+        @Test
+        fun `skal returnere kommentar fra historikk når behandlingen ikke ennå er sendt til iverksetting eller ferdigstilt`() {
+            val saksbehandling = saksbehandling(behandling = behandling)
+            val taAvVentDto = TaAvVentDto(skalTilordnesRessurs = false, kommentar = "tatt av")
+
+            testWithBrukerContext(dummySaksbehandler) {
+                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.taAvVent(behandling.id, taAvVentDto)
+            }
+
+            val historikk = behandlingshistorikkService.finnHendelseshistorikk(saksbehandling)
+            historikk.finnMetadata(Hendelse.SATT_PÅ_VENT).assertMetadataInneholderEksakt(
+                mapOf(
+                    "kommentarSettPåVent" to "ny beskrivelse",
+                    "årsaker" to listOf(ÅrsakSettPåVent.ANNET.name),
+                ),
+            )
+            historikk.finnMetadata(Hendelse.TATT_AV_VENT).assertMetadataInneholderEksakt(
+                mapOf(
+                    "kommentar" to "tatt av",
+                ),
+            )
+        }
+
+        @Test
+        fun `skal skjule kommentarer fra vent-hendelser fra dto når en behandling er ferdigstilt for å ikke vise intern kommunikasjon for saksbehandler`() {
+            val saksbehandling = saksbehandling(behandling = behandling)
+            val taAvVentDto = TaAvVentDto(skalTilordnesRessurs = false, kommentar = "tatt av")
+
+            testWithBrukerContext(dummySaksbehandler) {
+                settPåVentService.settPåVent(behandling.id, settPåVentDto)
+                settPåVentService.taAvVent(behandling.id, taAvVentDto)
+            }
+
+            val ferdigstiltBehandling = saksbehandling.copy(status = BehandlingStatus.FERDIGSTILT)
+            val historikk = behandlingshistorikkService.finnHendelseshistorikk(ferdigstiltBehandling)
+            historikk.finnMetadata(Hendelse.SATT_PÅ_VENT).assertMetadataInneholderEksakt(
+                mapOf(
+                    "årsaker" to listOf(ÅrsakSettPåVent.ANNET.name),
+                ),
+            )
+            historikk.finnMetadata(Hendelse.TATT_AV_VENT).assertMetadataInneholderEksakt(emptyMap())
+        }
+
+        private fun List<HendelseshistorikkDto>.finnMetadata(hendelse: Hendelse) =
+            this.single { it.hendelse == hendelse }
+
+        private fun HendelseshistorikkDto.assertMetadataInneholderEksakt(
+            map: Map<String, Any>,
+        ) {
+            assertThat(this.metadata).containsExactlyInAnyOrderEntriesOf(map)
         }
     }
 }
