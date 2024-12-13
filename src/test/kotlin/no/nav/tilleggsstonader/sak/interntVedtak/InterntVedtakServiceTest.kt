@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 
 import io.mockk.every
 import io.mockk.mockk
-import java.time.LocalDate
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -28,6 +27,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class InterntVedtakServiceTest {
 

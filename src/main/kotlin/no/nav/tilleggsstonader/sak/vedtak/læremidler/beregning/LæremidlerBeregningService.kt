@@ -1,10 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.overlapper
-import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilSortertGrunnlagStønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.beregnBeløp

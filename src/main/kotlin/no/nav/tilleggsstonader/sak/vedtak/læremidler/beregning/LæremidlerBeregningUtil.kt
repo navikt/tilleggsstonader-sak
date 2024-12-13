@@ -75,7 +75,7 @@ data class Aktivitet(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val prosent: Int,
-    val studienivå: Studienivå
+    val studienivå: Studienivå,
 ) : Periode<LocalDate>
 
 fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
