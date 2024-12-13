@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.norskFormat
@@ -37,12 +36,7 @@ data class UtbetalingsPeriode(
     }
 
     fun finnRelevantStønadsperiode(stønadsperioder: List<Stønadsperiode>): Stønadsperiode {
-        val relevanteStønadsperioderForPeriode = stønadsperioder
-            .mergeSammenhengende(
-                skalMerges = { a, b -> a.tom.plusDays(1) == b.fom && a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet },
-                merge = { a, b -> a.copy(tom = b.tom) },
-            )
-            .filter { it.inneholder(this) }
+        val relevanteStønadsperioderForPeriode = stønadsperioder.filter { it.inneholder(this) }
 
         feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {
             "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.fom.norskFormat()} - ${this.tom.norskFormat()}"

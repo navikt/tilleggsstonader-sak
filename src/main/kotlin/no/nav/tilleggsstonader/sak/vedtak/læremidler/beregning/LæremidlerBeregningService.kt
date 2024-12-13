@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilSortertGrunnlagStønadsperiode
@@ -31,8 +33,7 @@ class LæremidlerBeregningService(
     // ANTAR: En stønadsperiode per vedtaksperiode
     // ANTAR: Sats ikke endrer seg i perioden
     fun beregn(vedtaksperioder: List<Vedtaksperiode>, behandlingId: BehandlingId): BeregningsresultatLæremidler {
-        val stønadsperioder =
-            stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertGrunnlagStønadsperiode()
+        val stønadsperioder = hentStønadsperioder(behandlingId).slåSammenSammenhengende()
 
         validerVedtaksperioder(vedtaksperioder, stønadsperioder)
 
@@ -41,6 +42,15 @@ class LæremidlerBeregningService(
 
         return BeregningsresultatLæremidler(beregningsresultatForMåned)
     }
+
+    private fun hentStønadsperioder(behandlingId: BehandlingId): List<Stønadsperiode> =
+        stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertGrunnlagStønadsperiode()
+
+    private fun List<Stønadsperiode>.slåSammenSammenhengende(): List<Stønadsperiode> =
+        mergeSammenhengende(
+            skalMerges = { a, b -> a.påfølgesAv(b) && a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet },
+            merge = { a, b -> a.copy(tom = b.tom) },
+        )
 
     private fun beregnLæremidlerPerMåned(
         vedtaksperioder: List<Vedtaksperiode>,

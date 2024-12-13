@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
@@ -25,14 +23,8 @@ object VedtaksperiodeUtil {
         }
     }
 
-    private fun List<Stønadsperiode>.slåSammenSammenhengende(): List<Stønadsperiode> =
-        mergeSammenhengende(
-            skalMerges = { a, b -> a.påfølgesAv(b) },
-            merge = { a, b -> a.copy(tom = b.tom) },
-        )
-
     private fun List<Vedtaksperiode>.ingenOmfattesAvStønadsperioder(stønadsperioder: List<Stønadsperiode>): Boolean =
         any { vedtaksperiode ->
-            stønadsperioder.slåSammenSammenhengende().none { it.inneholder(vedtaksperiode) }
+            stønadsperioder.none { it.inneholder(vedtaksperiode) }
         }
 }

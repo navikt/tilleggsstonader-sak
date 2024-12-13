@@ -56,7 +56,7 @@ Egenskap: Beregning
       | 01.09.2024 | 30.09.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | DAGPENGER | 08.2024          |
 
 
-  Scenario: To uilke målgrupper samme aktivitet funker i månedskiftet
+  Scenario: To uilke målgrupper samme aktivitet feiler i månedskiftet
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        |
       | 01.04.2024 | 31.05.2024 |
@@ -73,10 +73,8 @@ Egenskap: Beregning
 
     Når beregner stønad for læremidler
 
-    Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsmåned |
-      | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 04.2024          |
-      | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | DAGPENGER | 04.2024          |
+    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en stønadsperiode
+
 
 
   Scenario: To uilke målgrupper samme aktivitet feiler når ikke i månedskiftet
@@ -96,7 +94,7 @@ Egenskap: Beregning
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden
+    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en stønadsperiode
 
   Scenario: Flere stønadsperioder som unneholder utbeatlingsperioden
     Gitt følgende vedtaksperioder for læremidler
