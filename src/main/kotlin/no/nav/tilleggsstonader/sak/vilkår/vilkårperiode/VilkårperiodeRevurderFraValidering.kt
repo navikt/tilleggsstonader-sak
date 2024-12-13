@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -13,8 +15,13 @@ object VilkårperiodeRevurderFraValidering {
         behandling: Saksbehandling,
         fom: LocalDate,
     ) {
-        feilHvis(behandling.revurderFra != null && fom < behandling.revurderFra) {
-            "Kan ikke opprette ${periodeInfo(behandling, fom)}"
+        if (behandling.type == BehandlingType.REVURDERING) {
+            brukerfeilHvis(behandling.revurderFra == null) {
+                "Revurder fra-dato må settes før du kan gjøre endringer på inngangvilkårene"
+            }
+            feilHvis(fom < behandling.revurderFra) {
+                "Kan ikke opprette ${periodeInfo(behandling, fom)}"
+            }
         }
     }
 
@@ -32,7 +39,15 @@ object VilkårperiodeRevurderFraValidering {
         eksisterendePeriode: Vilkårperiode,
         oppdatertPeriode: Vilkårperiode,
     ) {
-        val revurderFra = behandling.revurderFra ?: return
+        if (behandling.type != BehandlingType.REVURDERING) {
+            return
+        }
+
+        val revurderFra = behandling.revurderFra
+
+        brukerfeilHvis(revurderFra == null) {
+            "Revurder fra-dato må settes før du kan gjøre endringer på inngangvilkårene"
+        }
 
         if (eksisterendePeriode.fom >= revurderFra) {
             feilHvis(oppdatertPeriode.fom < revurderFra) {
