@@ -123,7 +123,7 @@ class StepDefinitions {
                         ?: Studienivå.HØYERE_UTDANNING,
                     studieprosent = parseInt(BeregningNøkler.STUDIEPROSENT, rad),
                     sats = parseBigDecimal(BeregningNøkler.SATS, rad).toInt(),
-                    utbetalingsMåned = parseÅrMåned(BeregningNøkler.UTBETALINGSMÅNED, rad),
+                    utbetalingsmåned = parseÅrMåned(BeregningNøkler.UTBETALINGSMÅNED, rad),
                     målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad)
                         ?: MålgruppeType.AAP,
                 ),
@@ -151,7 +151,7 @@ class StepDefinitions {
             UtbetalingsPeriode(
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                utbetalingsMåned = parseÅrMåned(BeregningNøkler.UTBETALINGSMÅNED, rad),
+                utbetalingsmåned = parseÅrMåned(BeregningNøkler.UTBETALINGSMÅNED, rad),
             )
         }
         assertThat(vedtaksperioderSplittet).containsExactlyElementsOf(forventedePerioder)

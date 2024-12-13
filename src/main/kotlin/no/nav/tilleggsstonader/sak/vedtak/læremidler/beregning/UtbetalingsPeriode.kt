@@ -12,7 +12,7 @@ import java.time.YearMonth
 data class UtbetalingsPeriode(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val utbetalingsMåned: YearMonth,
+    val utbetalingsmåned: YearMonth,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()

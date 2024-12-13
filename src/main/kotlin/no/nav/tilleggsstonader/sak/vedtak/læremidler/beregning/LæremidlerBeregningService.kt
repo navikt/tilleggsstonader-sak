@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import no.nav.tilleggsstonader.kontrakter.arena.sak.Målgruppe
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -100,7 +99,7 @@ class LæremidlerBeregningService(
             studienivå = aktivitet.studienivå,
             studieprosent = aktivitet.prosent,
             sats = finnSatsForStudienivå(periode, aktivitet.studienivå),
-            utbetalingsMåned = periode.utbetalingsMåned,
+            utbetalingsmåned = periode.utbetalingsmåned,
             målgruppe = målgruppe,
         )
     }

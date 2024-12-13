@@ -24,7 +24,7 @@ object LæremidlerBeregningUtil {
                     UtbetalingsPeriode(
                         fom = fom,
                         tom = tom,
-                        utbetalingsMåned = periode.fom.toYearMonth(),
+                        utbetalingsmåned = periode.fom.toYearMonth(),
                     )
                 }
             }

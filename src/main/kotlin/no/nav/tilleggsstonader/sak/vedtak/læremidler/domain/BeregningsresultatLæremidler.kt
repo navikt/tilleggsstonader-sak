@@ -17,7 +17,7 @@ data class BeregningsresultatForMåned(
 data class Beregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val utbetalingsMåned: YearMonth,
+    val utbetalingsmåned: YearMonth,
     val studienivå: Studienivå,
     val studieprosent: Int,
     val sats: Int,

@@ -21,7 +21,7 @@ object LæremidlerTestUtil {
             grunnlag = Beregningsgrunnlag(
                 fom = fom,
                 tom = tom,
-                utbetalingsMåned = utbetalingMåned,
+                utbetalingsmåned = utbetalingMåned,
                 studienivå = Studienivå.HØYERE_UTDANNING,
                 studieprosent = 100,
                 sats = 875,

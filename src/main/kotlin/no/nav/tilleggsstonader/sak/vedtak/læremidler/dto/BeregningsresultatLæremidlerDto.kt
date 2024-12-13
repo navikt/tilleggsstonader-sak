@@ -63,6 +63,6 @@ fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto {
         studieprosent = grunnlag.studieprosent,
         beløp = beløp,
         stønadsbeløp = beløp,
-        utbetalingsmåned = grunnlag.utbetalingsMåned,
+        utbetalingsmåned = grunnlag.utbetalingsmåned,
     )
 }
