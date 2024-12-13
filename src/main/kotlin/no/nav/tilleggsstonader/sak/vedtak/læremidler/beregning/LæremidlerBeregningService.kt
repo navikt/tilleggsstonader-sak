@@ -100,27 +100,4 @@ class LæremidlerBeregningService(
         return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
             .tilAktiviteter()
     }
-
-    private fun validerVedtaksperioderOld(
-        vedtaksperioder: List<Vedtaksperiode>,
-        stønadsperioder: List<Stønadsperiode>,
-    ) {
-        feilHvis(vedtaksperioder.overlapper()) {
-            "Vedtaksperioder overlapper"
-        }
-
-        val sammenslåtteStønadsperioder = stønadsperioder
-            .mergeSammenhengende(
-                skalMerges = { a, b -> a.påfølgesAv(b) },
-                merge = { a, b -> a.copy(tom = b.tom) },
-            )
-
-        feilHvis(
-            vedtaksperioder.any { vedtaksperiode ->
-                sammenslåtteStønadsperioder.none { it.inneholder(vedtaksperiode) }
-            },
-        ) {
-            "Vedtaksperiode er ikke innenfor en stønadsperiode"
-        }
-    }
 }
