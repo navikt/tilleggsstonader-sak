@@ -107,7 +107,7 @@ class StepDefinitions {
     fun `validerer vedtaksperiode for læremidler`() {
         try {
             validerVedtaksperioder(vedtaksPerioder, stønadsperioder.tilSortertGrunnlagStønadsperiode())
-        } catch (feil: Feil) {
+        } catch (feil: Exception) {
             valideringException = feil
         }
     }
@@ -143,7 +143,7 @@ class StepDefinitions {
 
     @Så("forvent følgende feil fra vedtaksperiode validering: {}")
     fun `skal resultat fra validering være`(forventetFeil: String) {
-        assertThat(valideringException!!).hasMessage(forventetFeil)
+        assertThat(valideringException!!).hasMessageContaining(forventetFeil)
     }
 
     @Så("forvent følgende utbetalingsperioder")

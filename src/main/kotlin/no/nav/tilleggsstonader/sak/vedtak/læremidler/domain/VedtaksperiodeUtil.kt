@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 
 object VedtaksperiodeUtil {
@@ -11,8 +13,9 @@ object VedtaksperiodeUtil {
         vedtaksperioder: List<Vedtaksperiode>,
         stønadsperioder: List<Stønadsperiode>,
     ) {
-        feilHvis(vedtaksperioder.overlapper()) {
-            "Vedtaksperioder overlapper"
+        val overlappendePeriode = vedtaksperioder.førsteOverlappendePeriode()
+        if (overlappendePeriode != null) {
+            brukerfeil("Periode=${overlappendePeriode.first.formatertPeriodeNorskFormat()} og ${overlappendePeriode.second.formatertPeriodeNorskFormat()} overlapper.")
         }
 
         feilHvis(
