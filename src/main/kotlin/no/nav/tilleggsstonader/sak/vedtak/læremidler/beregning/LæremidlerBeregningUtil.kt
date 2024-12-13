@@ -1,7 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.LocalDate
+import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.sak.util.tilSisteDagIMåneden
+import no.nav.tilleggsstonader.kontrakter.felles.splitPerLøpendeMåneder
+import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
@@ -11,16 +16,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFaktaOrThrow
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.time.LocalDate
-import java.util.UUID
 
 object LæremidlerBeregningUtil {
     fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<UtbetalingsPeriode> {
-        return delIÅr { fom, tom -> Vedtaksperiode(fom, tom) }
+        return splitPerÅr { fom, tom -> Vedtaksperiode(fom, tom) }
             .flatMap { periode ->
-                periode.delIDatoTilDatoMåneder { fom, tom ->
+                periode.splitPerLøpendeMåneder { fom, tom ->
                     UtbetalingsPeriode(
                         fom = fom,
                         tom = tom,
@@ -38,34 +39,6 @@ object LæremidlerBeregningUtil {
             return BigDecimal(sats).multiply(PROSENT_50).setScale(0, RoundingMode.HALF_UP).toInt()
         }
         return sats
-    }
-
-    // TODO flytt til Kontrakter
-    private fun <P : Periode<LocalDate>, VAL> P.delIDatoTilDatoMåneder(value: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
-        val perioder = mutableListOf<VAL>()
-        var gjeldendeFom = fom
-        while (gjeldendeFom < tom) {
-            val nyTom = gjeldendeFom.plusMonths(1).let {
-                if (gjeldendeFom.dayOfMonth >= it.lengthOfMonth()) it.tilSisteDagIMåneden() else it.minusDays(1)
-            }.coerceAtMost(tom)
-
-            perioder.add(value(gjeldendeFom, nyTom))
-
-            gjeldendeFom = nyTom.plusDays(1)
-        }
-        return perioder
-    }
-
-    // TODO flytt til Kontrakter
-    private fun <P : Periode<LocalDate>> P.delIÅr(value: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
-        val perioder = mutableListOf<P>()
-        var gjeldeneFom = fom
-        while (gjeldeneFom < tom) {
-            val nyTom = LocalDate.of(gjeldeneFom.year, 12, 31).coerceAtMost(tom)
-            perioder.add(value(gjeldeneFom, nyTom))
-            gjeldeneFom = LocalDate.of(gjeldeneFom.year + 1, 1, 1)
-        }
-        return perioder
     }
 }
 
