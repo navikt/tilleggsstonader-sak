@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
-import io.mockk.every
-import io.mockk.mockkObject
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
@@ -11,7 +9,6 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_KLAR
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientConfig.Companion.MAPPE_ID_PÅ_VENT
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
@@ -71,9 +68,7 @@ class SettPåVentServiceTest : IntegrationTest() {
 
         @Test
         fun `skal sette behandling på vent`() {
-            mockkObject(SikkerhetContext) {
-                every { SikkerhetContext.hentSaksbehandlerEllerSystembruker() } returns dummySaksbehandler
-
+            testWithBrukerContext(dummySaksbehandler) {
                 settPåVentService.settPåVent(behandling.id, settPåVentDto)
 
                 assertThat(testoppsettService.hentBehandling(behandling.id).status)
@@ -112,8 +107,7 @@ class SettPåVentServiceTest : IntegrationTest() {
     inner class OppdaterSettPåVent {
         @Test
         fun `skal kunne oppdatere settPåVent`() {
-            mockkObject(SikkerhetContext) {
-                every { SikkerhetContext.hentSaksbehandlerEllerSystembruker() } returns dummySaksbehandler
+            testWithBrukerContext(dummySaksbehandler) {
                 settPåVentService.settPåVent(behandling.id, settPåVentDto)
                 settPåVentService.oppdaterSettPåVent(behandling.id, oppdaterSettPåVentDto.copy(oppgaveVersjon = 2))
 
@@ -161,7 +155,10 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal ta av vent og fortsette behandling - med kommentar`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.taAvVent(behandling.id, TaAvVentDto(skalTilordnesRessurs = true, kommentar = "kommentar"))
+                settPåVentService.taAvVent(
+                    behandling.id,
+                    TaAvVentDto(skalTilordnesRessurs = true, kommentar = "kommentar"),
+                )
             }
 
             validerTattAvVent(behandling.id, kommentar = "kommentar")
@@ -183,7 +180,10 @@ class SettPåVentServiceTest : IntegrationTest() {
         @Test
         fun `skal ta av vent og markere oppgave som ufordelt - med kommentar`() {
             testWithBrukerContext(dummySaksbehandler) {
-                settPåVentService.taAvVent(behandling.id, TaAvVentDto(skalTilordnesRessurs = false, kommentar = "kommentar"))
+                settPåVentService.taAvVent(
+                    behandling.id,
+                    TaAvVentDto(skalTilordnesRessurs = false, kommentar = "kommentar"),
+                )
             }
 
             validerTattAvVent(behandling.id, kommentar = "kommentar")
@@ -200,6 +200,7 @@ class SettPåVentServiceTest : IntegrationTest() {
             assertThat(testoppsettService.hentBehandling(behandlingId).status)
                 .isEqualTo(BehandlingStatus.UTREDES)
         }
+
         private fun validerOppdatertOppgave(oppgaveId: Long, tilordnetRessurs: String?) {
             with(oppgaveService.hentOppgave(oppgaveId)) {
                 assertThat(tilordnetRessurs).isEqualTo(tilordnetRessurs)
