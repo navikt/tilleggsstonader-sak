@@ -1,9 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.time.LocalDate
-import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerLøpendeMåneder
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
@@ -16,10 +12,14 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFaktaOrThrow
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.LocalDate
+import java.util.UUID
 
 object LæremidlerBeregningUtil {
-    fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<UtbetalingsPeriode> {
-        return splitPerÅr { fom, tom -> Vedtaksperiode(fom, tom) }
+    fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<UtbetalingsPeriode> =
+        splitPerÅr { fom, tom -> Vedtaksperiode(fom, tom) }
             .flatMap { periode ->
                 periode.splitPerLøpendeMåneder { fom, tom ->
                     UtbetalingsPeriode(
@@ -29,7 +29,6 @@ object LæremidlerBeregningUtil {
                     )
                 }
             }
-    }
 
     fun beregnBeløp(sats: Int, studieprosent: Int): Int {
         val PROSENT_50 = BigDecimal(0.5)

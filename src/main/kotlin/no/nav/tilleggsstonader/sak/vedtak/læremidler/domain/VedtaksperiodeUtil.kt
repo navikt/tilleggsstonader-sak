@@ -25,16 +25,14 @@ object VedtaksperiodeUtil {
         }
     }
 
-    private fun List<Stønadsperiode>.slåSammenSammenhengende(): List<Stønadsperiode> {
-        return this.mergeSammenhengende(
+    private fun List<Stønadsperiode>.slåSammenSammenhengende(): List<Stønadsperiode> =
+        mergeSammenhengende(
             skalMerges = { a, b -> a.påfølgesAv(b) },
             merge = { a, b -> a.copy(tom = b.tom) },
         )
-    }
 
-    private fun List<Vedtaksperiode>.ingenOmfattesAvStønadsperioder(stønadsperioder: List<Stønadsperiode>): Boolean {
-        return this.any { vedtaksperiode ->
+    private fun List<Vedtaksperiode>.ingenOmfattesAvStønadsperioder(stønadsperioder: List<Stønadsperiode>): Boolean =
+        any { vedtaksperiode ->
             stønadsperioder.slåSammenSammenhengende().none { it.inneholder(vedtaksperiode) }
         }
-    }
 }
