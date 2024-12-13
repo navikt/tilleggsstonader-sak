@@ -23,4 +23,7 @@ enum class Hendelse {
     HENLAGT,
     UKJENT,
     ANGRE_SEND_TIL_BESLUTTER,
+    ;
+
+    fun sattEllerTattAvVent() = this == SATT_PÅ_VENT || this == TATT_AV_VENT
 }
