@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
+import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
@@ -109,7 +110,7 @@ class LæremidlerBeregningService(
 
         val sammenslåtteStønadsperioder = stønadsperioder
             .mergeSammenhengende(
-                skalMerges = { a, b -> a.tom.plusDays(1) == b.fom },
+                skalMerges = { a, b -> a.påfølgesAv(b)},
                 merge = { a, b -> a.copy(tom = b.tom) },
             )
 
