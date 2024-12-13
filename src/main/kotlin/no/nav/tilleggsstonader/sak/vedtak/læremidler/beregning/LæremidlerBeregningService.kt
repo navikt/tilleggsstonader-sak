@@ -37,13 +37,19 @@ class LæremidlerBeregningService(
         validerVedtaksperioder(vedtaksperioder, stønadsperioder)
 
         val aktiviteter = finnAktiviteter(behandlingId)
+        val beregningsresultatForMåned = beregnLæremidlerPerMåned(vedtaksperioder, stønadsperioder, aktiviteter)
 
-        val beregningsresultatForMåned = vedtaksperioder.flatMap { vedtaksperiode ->
-            val utbetalingsperioder = vedtaksperiode.delTilUtbetalingsPerioder()
+        return BeregningsresultatLæremidler(beregningsresultatForMåned)
+    }
 
-            utbetalingsperioder.map { utbetalingsperiode ->
+    private fun beregnLæremidlerPerMåned(
+        vedtaksperioder: List<Vedtaksperiode>,
+        stønadsperioder: List<Stønadsperiode>,
+        aktiviteter: List<Aktivitet>,
+    ): List<BeregningsresultatForMåned> =
+        vedtaksperioder.flatMap { it.delTilUtbetalingsPerioder() }
+            .map { utbetalingsperiode ->
                 val relevantStønadsperiode = utbetalingsperiode.finnRelevantStønadsperiode(stønadsperioder)
-
                 lagBeregningsresultatForMåned(
                     utbetalingsperiode = utbetalingsperiode,
                     stønadsperiode = relevantStønadsperiode,
@@ -53,10 +59,6 @@ class LæremidlerBeregningService(
                     ),
                 )
             }
-        }
-
-        return BeregningsresultatLæremidler(beregningsresultatForMåned)
-    }
 
     private fun lagBeregningsresultatForMåned(
         utbetalingsperiode: UtbetalingsPeriode,
