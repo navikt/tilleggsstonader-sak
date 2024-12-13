@@ -88,7 +88,7 @@ class LæremidlerBeregningService(
         return Beregningsgrunnlag(
             fom = periode.fom,
             tom = periode.tom,
-            studienivå = aktivitet.studienivå ?: throw IllegalStateException("Studienivå finnes ikke på aktiviteten"),
+            studienivå = aktivitet.studienivå,
             studieprosent = aktivitet.prosent,
             sats = finnSatsForStudienivå(periode, aktivitet.studienivå),
             utbetalingsMåned = periode.utbetalingsMåned,
