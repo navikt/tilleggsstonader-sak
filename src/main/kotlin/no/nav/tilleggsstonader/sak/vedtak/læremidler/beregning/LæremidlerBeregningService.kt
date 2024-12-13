@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -100,7 +101,7 @@ class LæremidlerBeregningService(
             .tilAktiviteter()
     }
 
-    private fun validerVedtaksperioder(
+    private fun validerVedtaksperioderOld(
         vedtaksperioder: List<Vedtaksperiode>,
         stønadsperioder: List<Stønadsperiode>,
     ) {
@@ -110,7 +111,7 @@ class LæremidlerBeregningService(
 
         val sammenslåtteStønadsperioder = stønadsperioder
             .mergeSammenhengende(
-                skalMerges = { a, b -> a.påfølgesAv(b)},
+                skalMerges = { a, b -> a.påfølgesAv(b) },
                 merge = { a, b -> a.copy(tom = b.tom) },
             )
 

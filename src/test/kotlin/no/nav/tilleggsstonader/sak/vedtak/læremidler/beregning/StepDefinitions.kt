@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilSortertGrunnlagStønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
@@ -23,12 +24,12 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
-import java.lang.reflect.InvocationTargetException
 import java.util.UUID
 
 enum class BeregningNøkler(
@@ -105,15 +106,9 @@ class StepDefinitions {
     @Når("validerer vedtaksperiode for læremidler")
     fun `validerer vedtaksperiode for læremidler`() {
         try {
-            val valider = læremidlerBeregningService.javaClass.getDeclaredMethod(
-                "validerVedtaksperioder",
-                List::class.java,
-                List::class.java,
-            )
-            valider.isAccessible = true
-            valider.invoke(læremidlerBeregningService, vedtaksPerioder, stønadsperioder.tilSortertGrunnlagStønadsperiode())
-        } catch (e: InvocationTargetException) {
-            valideringException = e.targetException as Exception
+            validerVedtaksperioder(vedtaksPerioder, stønadsperioder.tilSortertGrunnlagStønadsperiode())
+        } catch (feil: Feil) {
+            valideringException = feil
         }
     }
 
