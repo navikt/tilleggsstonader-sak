@@ -11,6 +11,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFaktaOrThrow
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 import java.util.UUID
 
@@ -26,6 +28,16 @@ object LæremidlerBeregningUtil {
                     )
                 }
             }
+    }
+
+    fun beregnBeløp(sats: Int, studieprosent: Int): Int {
+        val PROSENT_50 = BigDecimal(0.5)
+        val PROSENTGRENSE_HALV_SATS = 50
+
+        if (studieprosent <= PROSENTGRENSE_HALV_SATS) {
+            return BigDecimal(sats).multiply(PROSENT_50).setScale(0, RoundingMode.HALF_UP).toInt()
+        }
+        return sats
     }
 
     // TODO flytt til Kontrakter

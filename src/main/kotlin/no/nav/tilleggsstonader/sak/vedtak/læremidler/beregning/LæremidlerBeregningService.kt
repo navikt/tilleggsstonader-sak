@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilSortertGrunnlagStønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.beregnBeløp
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
@@ -16,11 +17,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
-import java.math.RoundingMode
-
-private val PROSENT_50 = BigDecimal(0.5)
-private val PROSENTGRENSE_HALV_SATS = 50
 
 @Service
 class LæremidlerBeregningService(
@@ -77,7 +73,7 @@ class LæremidlerBeregningService(
             )
 
         return BeregningsresultatForMåned(
-            beløp = finnBeløpForStudieprosent(grunnlagsdata.sats, grunnlagsdata.studieprosent),
+            beløp = beregnBeløp(grunnlagsdata.sats, grunnlagsdata.studieprosent),
             grunnlag = grunnlagsdata,
         )
     }
@@ -124,12 +120,5 @@ class LæremidlerBeregningService(
         ) {
             "Vedtaksperiode er ikke innenfor en stønadsperiode"
         }
-    }
-
-    private fun finnBeløpForStudieprosent(sats: Int, studieprosent: Int): Int {
-        if (studieprosent <= PROSENTGRENSE_HALV_SATS) {
-            return BigDecimal(sats).multiply(PROSENT_50).setScale(0, RoundingMode.HALF_UP).toInt()
-        }
-        return sats
     }
 }
