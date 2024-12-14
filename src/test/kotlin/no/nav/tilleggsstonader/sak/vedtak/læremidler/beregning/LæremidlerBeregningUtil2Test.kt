@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.FileUtil
+import no.nav.tilleggsstonader.sak.util.tilSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -30,6 +31,129 @@ class LæremidlerBeregningUtil2Test {
         println("Antall Avvik: $antallAvvik")
 
         skriv("avvik_v2.txt")
+    }
+
+    @Test
+    fun `antall som begynner og slutter i samma dato`() {
+        val rader = FileUtil.readFile("laremidler_datoer.csv").split("\n")
+            .drop(1)
+        rader.forEach { rad ->
+            //"VEDTAK_ID","VEDTAKTYPEKODE","FRA_DATO","TIL_DATO","TOTALBELOP","ANTALL_MND","OPPRINNELIG_TIL_DATO","ANTALL_DAGER"
+            try {
+                val kolumner = rad.split(",")
+                val type = kolumner[1].replace("\"", "")
+                if (type == "S") {
+                    return
+                }
+                val fom = kolumner[2].let { LocalDate.parse(it, formatter) }
+                val tom = kolumner[6].let { LocalDate.parse(it, formatter) }
+                val antallMnd = kolumner[5].toInt()
+
+                if (fom.dayOfMonth == fom.lengthOfMonth() && tom.dayOfMonth == tom.lengthOfMonth()) {
+                    println("fom=$fom tom=$tom")
+                }
+
+                if (fom.dayOfMonth == tom.dayOfMonth) {
+                    println("fom=$fom tom=$tom")
+                }
+
+            } catch (e: Exception) {
+                throw RuntimeException("Feil ved prosessering av $rad", e)
+            }
+        }
+    }
+
+    @Test
+    fun `arena-beregning antall mnd`() {
+        val rader = FileUtil.readFile("laremidler_datoer.csv").split("\n")
+            .drop(1)
+        rader.forEach { rad ->
+            //"VEDTAK_ID","VEDTAKTYPEKODE","FRA_DATO","TIL_DATO","TOTALBELOP","ANTALL_MND","OPPRINNELIG_TIL_DATO","ANTALL_DAGER"
+            try {
+                val kolumner = rad.split(",")
+                val vedtakId = kolumner[0]
+                val type = kolumner[1].replace("\"", "")
+                if (type == "S") {
+                    return
+                }
+                val fom = kolumner[2].let { LocalDate.parse(it, formatter) }
+                val tom = kolumner[6].let { LocalDate.parse(it, formatter) }
+                val antallMnd = kolumner[5].toInt()
+
+                val utbetalingsperiode = Vedtaksperiode(fom, tom).split2 { fom, tom -> Vedtaksperiode(fom, tom) }
+
+                if (utbetalingsperiode.size != antallMnd) {
+                    //println("vedtak=$vedtakId type=$type fom=$fom tom=$tom beløp=$beløp antallMnd=$antallMnd beregnet=${utbetalingsperiode.size}")
+                    val avvik = "fom=$fom tom=$tom antallMnd=$antallMnd beregnet=${utbetalingsperiode.size}"
+                    println(avvik)
+                    liste.add(avvik)
+                    antallAvvik++
+                }
+
+
+            } catch (e: Exception) {
+                throw RuntimeException("Feil ved prosessering av $rad", e)
+            }
+        }
+    }
+
+    @Test
+    fun testSplit() {
+        val vedtaksperiode = Vedtaksperiode(
+            LocalDate.parse("2022-09-30"),
+            LocalDate.parse("2022-12-31")
+        )
+        vedtaksperiode.split { fom, tom -> Vedtaksperiode(fom, tom) }.forEach { println(it) }
+        println("...")
+        vedtaksperiode.split2 { fom, tom -> Vedtaksperiode(fom, tom) }.forEach { println(it) }
+    }
+
+    @Test
+    fun testSplit2() {
+        val vedtaksperiode = Vedtaksperiode(
+            LocalDate.parse("2023-01-25"),
+            LocalDate.parse("2023-06-25")
+        )
+        vedtaksperiode.split { fom, tom -> Vedtaksperiode(fom, tom) }.forEach { println(it) }
+        println("...")
+        vedtaksperiode.split2 { fom, tom -> Vedtaksperiode(fom, tom) }.forEach { println(it) }
+    }
+
+    fun <P : Periode<LocalDate>, VAL> P.split(medNyPeriode: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
+        val perioder = mutableListOf<VAL>()
+        var gjeldendeFom = fom
+        while (gjeldendeFom <= tom) {
+            val nyTom = if (gjeldendeFom.dayOfMonth == gjeldendeFom.lengthOfMonth()) {
+                gjeldendeFom.plusMonths(1).tilSisteDagIMåneden()
+            } else {
+                gjeldendeFom.plusMonths(1)
+            }.minusDays(1)
+                .let { minOf(it, tom) }
+
+            perioder.add(medNyPeriode(gjeldendeFom, nyTom))
+
+            gjeldendeFom = nyTom.plusDays(1)
+        }
+        return perioder
+    }
+
+    fun <P : Periode<LocalDate>, VAL> P.split2(medNyPeriode: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
+        val perioder = mutableListOf<VAL>()
+        var gjeldendeFom = fom
+        while (gjeldendeFom <= tom) {
+            val nyTom =
+                if (fom.dayOfMonth == fom.lengthOfMonth()) {
+                    gjeldendeFom.plusMonths(1).tilSisteDagIMåneden()
+                } else {
+                    gjeldendeFom.plusMonths(1)
+                }.minusDays(1)
+                    .let { minOf(it, tom) }
+
+            perioder.add(medNyPeriode(gjeldendeFom, nyTom))
+
+            gjeldendeFom = nyTom.plusDays(1)
+        }
+        return perioder
     }
 
     @Test
