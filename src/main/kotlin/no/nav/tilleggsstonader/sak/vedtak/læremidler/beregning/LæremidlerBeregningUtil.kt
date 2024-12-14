@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.splitPerLøpendeMåneder
+import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
@@ -64,41 +66,3 @@ fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
             )
         }
 }
-
-// TODO bruk disse fra kontrakter når nyeste version er merget inn:
-fun <P : Periode<LocalDate>> P.splitPerÅr(medNyPeriode: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
-    val perioder = mutableListOf<P>()
-    var gjeldeneFom = fom
-    while (gjeldeneFom <= tom) {
-        val nyTom = minOf(gjeldeneFom.sisteDagIÅret(), tom)
-        perioder.add(medNyPeriode(gjeldeneFom, nyTom))
-        gjeldeneFom = gjeldeneFom.førsteDagNesteÅr()
-    }
-    return perioder
-}
-
-fun <P : Periode<LocalDate>, VAL> P.splitPerLøpendeMåneder(medNyPeriode: (fom: LocalDate, tom: LocalDate) -> VAL): List<VAL> {
-    val perioder = mutableListOf<VAL>()
-    var gjeldendeFom = fom
-    while (gjeldendeFom <= tom) {
-        val nyTom = minOf(gjeldendeFom.sisteDagenILøpendeMåned(), tom)
-
-        perioder.add(medNyPeriode(gjeldendeFom, nyTom))
-
-        gjeldendeFom = nyTom.plusDays(1)
-    }
-    return perioder
-}
-
-fun LocalDate.sisteDagenILøpendeMåned(): LocalDate {
-    val nesteMåned = this.plusMonths(1)
-    return if (this.dayOfMonth >= nesteMåned.lengthOfMonth()) {
-        nesteMåned.tilSisteDagIMåneden()
-    } else {
-        nesteMåned.minusDays(1)
-    }
-}
-
-fun LocalDate.tilSisteDagIMåneden() = YearMonth.from(this).atEndOfMonth()
-fun LocalDate.sisteDagIÅret() = LocalDate.of(year, 12, 31)
-fun LocalDate.førsteDagNesteÅr() = LocalDate.of(year + 1, 1, 1)
