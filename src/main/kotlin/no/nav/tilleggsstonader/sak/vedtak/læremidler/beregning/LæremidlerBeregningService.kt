@@ -1,12 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilSortertGrunnlagStønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.beregnBeløp
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.slåSammenSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -45,11 +44,10 @@ class LæremidlerBeregningService(
     private fun hentStønadsperioder(behandlingId: BehandlingId): List<Stønadsperiode> =
         stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertGrunnlagStønadsperiode()
 
-    private fun List<Stønadsperiode>.slåSammenSammenhengende(): List<Stønadsperiode> =
-        mergeSammenhengende(
-            skalMerges = { a, b -> a.påfølgesAv(b) && a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet },
-            merge = { a, b -> a.copy(tom = b.tom) },
-        )
+    private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
+        return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
+            .tilAktiviteter()
+    }
 
     private fun beregnLæremidlerPerMåned(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -70,7 +68,7 @@ class LæremidlerBeregningService(
             }
 
     private fun lagBeregningsresultatForMåned(
-        utbetalingsperiode: UtbetalingsPeriode,
+        utbetalingsperiode: UtbetalingPeriode,
         målgruppe: MålgruppeType,
         aktivitet: Aktivitet,
     ): BeregningsresultatForMåned {
@@ -88,7 +86,7 @@ class LæremidlerBeregningService(
     }
 
     private fun lagBeregningsGrunnlag(
-        periode: UtbetalingsPeriode,
+        periode: UtbetalingPeriode,
         aktivitet: Aktivitet,
         målgruppe: MålgruppeType,
     ): Beregningsgrunnlag {
@@ -101,10 +99,5 @@ class LæremidlerBeregningService(
             utbetalingsmåned = periode.utbetalingsmåned,
             målgruppe = målgruppe,
         )
-    }
-
-    private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
-        return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
-            .tilAktiviteter()
     }
 }

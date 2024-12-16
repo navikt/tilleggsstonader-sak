@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -17,17 +20,23 @@ import java.time.YearMonth
 import java.util.UUID
 
 object LæremidlerBeregningUtil {
-    fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<UtbetalingsPeriode> =
+    fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<UtbetalingPeriode> =
         splitPerÅr { fom, tom -> Vedtaksperiode(fom, tom) }
             .flatMap { periode ->
                 periode.splitPerLøpendeMåneder { fom, tom ->
-                    UtbetalingsPeriode(
+                    UtbetalingPeriode(
                         fom = fom,
                         tom = tom,
                         utbetalingsmåned = periode.fom.toYearMonth(),
                     )
                 }
             }
+
+    fun List<Stønadsperiode>.slåSammenSammenhengende(): List<Stønadsperiode> =
+        mergeSammenhengende(
+            skalMerges = { a, b -> a.påfølgesAv(b) && a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet },
+            merge = { a, b -> a.copy(tom = b.tom) },
+        )
 
     fun beregnBeløp(sats: Int, studieprosent: Int): Int {
         val PROSENT_50 = BigDecimal(0.5)
@@ -49,9 +58,8 @@ data class Aktivitet(
     val studienivå: Studienivå,
 ) : Periode<LocalDate>
 
-fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
-    return this
-        .ofType<AktivitetLæremidler>()
+fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> =
+    ofType<AktivitetLæremidler>()
         .map {
             val fakta = it.faktaOgVurdering.fakta
             Aktivitet(
@@ -63,7 +71,6 @@ fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
                 studienivå = fakta.takeIfFaktaOrThrow<FaktaAktivitetLæremidler>().studienivå,
             )
         }
-}
 
 // TODO bruk disse fra kontrakter når nyeste version er merget inn:
 fun <P : Periode<LocalDate>> P.splitPerÅr(medNyPeriode: (fom: LocalDate, tom: LocalDate) -> P): List<P> {

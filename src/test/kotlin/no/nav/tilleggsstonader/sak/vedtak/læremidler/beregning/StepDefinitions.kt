@@ -56,7 +56,7 @@ class StepDefinitions {
     var beregningException: Exception? = null
     var valideringException: Exception? = null
 
-    var vedtaksperioderSplittet: List<UtbetalingsPeriode> = emptyList()
+    var vedtaksperioderSplittet: List<UtbetalingPeriode> = emptyList()
 
     @Gitt("følgende vedtaksperioder for læremidler")
     fun `følgende beregningsperiode for læremidler`(dataTable: DataTable) {
@@ -148,7 +148,7 @@ class StepDefinitions {
     @Så("forvent følgende utbetalingsperioder")
     fun `forvent følgende utbetalingsperioder`(dataTable: DataTable) {
         val forventedePerioder = dataTable.mapRad { rad ->
-            UtbetalingsPeriode(
+            UtbetalingPeriode(
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 utbetalingsmåned = parseÅrMåned(BeregningNøkler.UTBETALINGSMÅNED, rad),
