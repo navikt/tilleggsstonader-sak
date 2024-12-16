@@ -1,6 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
+import no.nav.tilleggsstonader.kontrakter.felles.sisteDagenILøpendeMåned
+import no.nav.tilleggsstonader.libs.utils.VirkedagerProvider
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.tilSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
@@ -80,7 +83,7 @@ class LæremidlerBeregningUtil2Test {
                 val tom = kolumner[6].let { LocalDate.parse(it, formatter) }
                 val antallMnd = kolumner[5].toInt()
 
-                val utbetalingsperiode = Vedtaksperiode(fom, tom).split2 { fom, tom -> Vedtaksperiode(fom, tom) }
+                val utbetalingsperiode = Vedtaksperiode(fom, tom).split2MedHelg { fom, tom -> Vedtaksperiode(fom, tom) }
 
                 if (utbetalingsperiode.size != antallMnd) {
                     //println("vedtak=$vedtakId type=$type fom=$fom tom=$tom beløp=$beløp antallMnd=$antallMnd beregnet=${utbetalingsperiode.size}")
@@ -100,12 +103,14 @@ class LæremidlerBeregningUtil2Test {
     @Test
     fun testSplit() {
         val vedtaksperiode = Vedtaksperiode(
-            LocalDate.parse("2022-09-30"),
-            LocalDate.parse("2022-12-31")
+            LocalDate.parse("2024-01-10"),
+            LocalDate.parse("2024-02-11")
         )
         vedtaksperiode.split { fom, tom -> Vedtaksperiode(fom, tom) }.forEach { println(it) }
         println("...")
         vedtaksperiode.split2 { fom, tom -> Vedtaksperiode(fom, tom) }.forEach { println(it) }
+        println("...")
+        vedtaksperiode.v2MedHelg { fom, tom -> Vedtaksperiode(fom, tom) }.forEach { println(it) }
     }
 
     @Test
@@ -150,6 +155,46 @@ class LæremidlerBeregningUtil2Test {
                     .let { minOf(it, tom) }
 
             perioder.add(medNyPeriode(gjeldendeFom, nyTom))
+
+            gjeldendeFom = nyTom.plusDays(1)
+        }
+        return perioder
+    }
+
+    fun <P : Periode<LocalDate>> P.split2MedHelg(medNyPeriode: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
+        val perioder = mutableListOf<P>()
+        var gjeldendeFom = fom
+        while (gjeldendeFom <= tom) {
+            val nyTom =
+                if (fom.dayOfMonth == fom.lengthOfMonth()) {
+                    gjeldendeFom.plusMonths(1).tilSisteDagIMåneden()
+                } else {
+                    gjeldendeFom.plusMonths(1)
+                }.minusDays(1)
+                    .let { minOf(it, tom) }
+
+            val element = medNyPeriode(gjeldendeFom, nyTom)
+
+            if(element.alleDatoer().any { !VirkedagerProvider.erHelgEllerHelligdag(it) }) {
+                perioder.add(element)
+            }
+
+            gjeldendeFom = nyTom.plusDays(1)
+        }
+        return perioder
+    }
+
+    fun <P : Periode<LocalDate>> P.v2MedHelg(medNyPeriode: (fom: LocalDate, tom: LocalDate) -> P): List<P> {
+        val perioder = mutableListOf<P>()
+        var gjeldendeFom = fom
+        while (gjeldendeFom <= tom) {
+            val nyTom = minOf(gjeldendeFom.sisteDagenILøpendeMåned(), tom)
+
+            val element = medNyPeriode(gjeldendeFom, nyTom)
+            if (element.alleDatoer().any { !VirkedagerProvider.erHelgEllerHelligdag(it) }) {
+                perioder.add(element)
+
+            }
 
             gjeldendeFom = nyTom.plusDays(1)
         }
