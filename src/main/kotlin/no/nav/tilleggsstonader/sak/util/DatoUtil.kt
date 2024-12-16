@@ -112,4 +112,6 @@ fun LocalDate.erSisteDagIMåneden() = this.dayOfMonth == YearMonth.from(this).at
 fun LocalDate.tilFørsteDagIMåneden() = YearMonth.from(this).atDay(1)
 fun LocalDate.tilSisteDagIMåneden() = YearMonth.from(this).atEndOfMonth()
 
+fun LocalDate.lørdagEllerSøndag() = this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY
+
 fun Periode<LocalDate>.formatertPeriodeNorskFormat() = "${this.fom.norskFormat()} - ${this.tom.norskFormat()}"
