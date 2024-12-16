@@ -90,4 +90,23 @@ class DatoUtilTest {
             assertThat(LocalDate.of(2024, 2, 4).tilSisteDagIMåneden()).isEqualTo(LocalDate.of(2024, 2, 29))
         }
     }
+
+    @Nested
+    inner class LørdagEllerSøndag {
+        @Test
+        fun `ukesdager skal gi false`() {
+            assertThat(LocalDate.of(2025, 1, 1).lørdagEllerSøndag()).isFalse() // onsdag rød dag
+            assertThat(LocalDate.of(2025, 1, 2).lørdagEllerSøndag()).isFalse() // torsdag
+            assertThat(LocalDate.of(2025, 1, 3).lørdagEllerSøndag()).isFalse() // fredag
+
+            assertThat(LocalDate.of(2025, 2, 3).lørdagEllerSøndag()).isFalse() // mandag
+            assertThat(LocalDate.of(2025, 2, 4).lørdagEllerSøndag()).isFalse() // tirsdag
+        }
+
+        @Test
+        fun `lørdag og søndag skal gi true`() {
+            assertThat(LocalDate.of(2025, 1, 4).lørdagEllerSøndag()).isTrue() // lørdag
+            assertThat(LocalDate.of(2025, 1, 5).lørdagEllerSøndag()).isTrue() // søndag
+        }
+    }
 }
