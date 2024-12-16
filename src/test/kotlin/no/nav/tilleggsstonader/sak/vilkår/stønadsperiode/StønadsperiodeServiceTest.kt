@@ -47,8 +47,11 @@ class StønadsperiodeServiceTest : IntegrationTest() {
     val FOM = LocalDate.of(2023, 1, 1)
     val TOM = LocalDate.of(2023, 1, 31)
 
+    val enMånedSiden: LocalDate = now().minusMonths(1)
+    val enMånedFram: LocalDate = now().plusMonths(1)
+
     @Nested
-    inner class LagreStønadsperidoder {
+    inner class LagreStønadsperioder {
 
         @Test
         fun `skal feile hvis man prøver å opprette en støndsperiode med id`() {
@@ -237,13 +240,10 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
         val behandling = behandling(type = BehandlingType.REVURDERING)
 
-        val fom = now().minusMonths(1)
-        val tom = now().plusMonths(1)
-
         val eksisterendeStønadsperiode = stønadsperiode(
             behandlingId = behandling.id,
-            fom = fom,
-            tom = tom,
+            fom = enMånedSiden,
+            tom = enMånedFram,
             målgruppe = MålgruppeType.AAP,
             aktivitet = AktivitetType.TILTAK,
             status = StønadsperiodeStatus.UENDRET,
@@ -251,15 +251,15 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
         @BeforeEach
         fun setUp() {
-            val revurdering = testoppsettService.opprettBehandlingMedFagsak(behandling)
-            opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = fom, tom = tom))
-//            opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = fom, tom = tom))
-            opprettVilkårperiode(aktivitet(behandlingId = revurdering.id, fom = fom, tom = tom))
+            val revurdering =
+                testoppsettService.opprettBehandlingMedFagsak(behandling.copy(revurderFra = enMånedSiden))
+            opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = enMånedSiden, tom = enMånedFram))
+            opprettVilkårperiode(aktivitet(behandlingId = revurdering.id, fom = enMånedSiden, tom = enMånedFram))
             opprettVilkårperiode(
                 aktivitet(
                     behandlingId = revurdering.id,
-                    fom = fom,
-                    tom = tom,
+                    fom = enMånedSiden,
+                    tom = enMånedFram,
                     type = AktivitetType.UTDANNING,
                     lønnet = null,
                 ),
@@ -267,17 +267,17 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `kan ikke opprette periode hvis revurderFra begynner før periode`() {
+        fun `kan ikke opprette periode som starter før revurderFra`() {
             testoppsettService.oppdater(behandling.copy(revurderFra = now()))
 
             assertThatThrownBy {
-                val stønadsperiode = stønadsperiodeDto(fom = now().minusDays(1), tom = now().minusDays(1))
-                stønadsperiodeService.lagreStønadsperioder(behandlingId = behandling.id, listOf(stønadsperiode))
+                val endretStønadsperiode = stønadsperiodeDto(fom = now().minusDays(1), tom = now().minusDays(1))
+                stønadsperiodeService.lagreStønadsperioder(behandlingId = behandling.id, listOf(endretStønadsperiode))
             }.hasMessageContaining("Kan ikke opprette periode")
         }
 
         @Test
-        fun `kan ikke oppdatere periode hvis revurderFra begynner før periode`() {
+        fun `kan ikke oppdatere periode som begynner før revurderFra`() {
             testoppsettService.oppdater(behandling.copy(revurderFra = now()))
             stønadsperiodeRepository.insert(eksisterendeStønadsperiode)
 
@@ -289,7 +289,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `kan ikke slette periode hvis revurderFra begynner før periode`() {
+        fun `kan ikke slette periode som begynner før revurderFra`() {
             stønadsperiodeRepository.insert(eksisterendeStønadsperiode)
             testoppsettService.oppdater(behandling.copy(revurderFra = now()))
 
@@ -359,7 +359,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                     aktivitet = AktivitetType.TILTAK,
                 ),
                 stønadsperiode(
-                    behandlingId = revurdering.forrigeBehandlingId!!,
+                    behandlingId = revurdering.forrigeBehandlingId,
                     fom = LocalDate.of(2024, 2, 1),
                     tom = LocalDate.of(2024, 1, 10),
                     målgruppe = MålgruppeType.OVERGANGSSTØNAD,
@@ -369,7 +369,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
             stønadsperiodeRepository.insertAll(eksisterendeStønadsperidoder)
 
             stønadsperiodeService.gjenbrukStønadsperioder(
-                forrigeBehandlingId = revurdering.forrigeBehandlingId!!,
+                forrigeBehandlingId = revurdering.forrigeBehandlingId,
                 nyBehandlingId = revurdering.id,
             )
 
@@ -393,15 +393,12 @@ class StønadsperiodeServiceTest : IntegrationTest() {
     @Nested
     inner class StatusStønadsperioder {
 
-        val behandling = behandling(type = BehandlingType.REVURDERING)
-
-        val fom = now().minusMonths(1)
-        val tom = now().plusMonths(1)
+        val behandling = behandling(type = BehandlingType.REVURDERING, revurderFra = enMånedSiden)
 
         val eksisterendeStønadsperiode = stønadsperiode(
             behandlingId = behandling.id,
-            fom = fom,
-            tom = tom,
+            fom = enMånedSiden,
+            tom = enMånedFram,
             målgruppe = MålgruppeType.AAP,
             aktivitet = AktivitetType.TILTAK,
             status = StønadsperiodeStatus.UENDRET,
@@ -410,8 +407,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         @BeforeEach
         fun setUp() {
             val revurdering = testoppsettService.opprettBehandlingMedFagsak(behandling)
-            opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = fom, tom = tom))
-            opprettVilkårperiode(aktivitet(behandlingId = revurdering.id, fom = fom, tom = tom))
+            opprettVilkårperiode(målgruppe(behandlingId = revurdering.id, fom = enMånedSiden, tom = enMånedFram))
+            opprettVilkårperiode(aktivitet(behandlingId = revurdering.id, fom = enMånedSiden, tom = enMånedFram))
             stønadsperiodeRepository.insert(eksisterendeStønadsperiode)
         }
 
