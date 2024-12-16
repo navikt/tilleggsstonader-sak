@@ -23,24 +23,20 @@ import java.time.LocalDate
 class VilkårperiodeRevurderFraValideringTest {
 
     val revurderFra = LocalDate.of(2024, 1, 1)
-    val behandling = saksbehandling(revurderFra = null, type = BehandlingType.REVURDERING)
+    val behandlingUtenRevurderFra = saksbehandling(revurderFra = null, type = BehandlingType.REVURDERING)
     val behandlingMedRevurderFra = saksbehandling(revurderFra = revurderFra, type = BehandlingType.REVURDERING)
 
     @Nested
     inner class NyPeriode {
 
         @Test
-        fun `kan legge inn periode med valgfritt dato dersom revurder-fra ikke er satt`() {
-            assertDoesNotThrow {
+        fun `kan ikke gjøre endringer på periode dato dersom revurder-fra ikke er satt`() {
+            assertThatThrownBy {
                 validerNyPeriodeRevurdering(
-                    behandling = behandling,
+                    behandling = behandlingUtenRevurderFra,
                     fom = revurderFra.minusDays(1),
                 )
-                validerNyPeriodeRevurdering(
-                    behandling = behandling,
-                    fom = revurderFra.plusDays(1),
-                )
-            }
+            }.hasMessageContaining("Revurder fra-dato må settes før du kan gjøre endringer på inngangvilkårene")
         }
 
         @Test
@@ -72,11 +68,11 @@ class VilkårperiodeRevurderFraValideringTest {
         fun `kan slette periode med valgfritt dato dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
                 validerSlettPeriodeRevurdering(
-                    behandling,
+                    behandlingUtenRevurderFra,
                     målgruppe(fom = revurderFra.minusDays(1)),
                 )
                 validerSlettPeriodeRevurdering(
-                    behandling,
+                    behandlingUtenRevurderFra,
                     målgruppe(fom = revurderFra.plusDays(1)),
                 )
             }
@@ -109,19 +105,7 @@ class VilkårperiodeRevurderFraValideringTest {
     inner class OppdateringAvPeriode {
 
         @Test
-        fun `kan oppdatere periode dersom revurder-fra ikke er satt`() {
-            assertDoesNotThrow {
-                val eksisterendeVilkårperiode = aktivitet(
-                    fom = revurderFra.minusDays(2),
-                    faktaOgVurdering = faktaOgVurderingAktivitet(
-                        aktivitetsdager = 1,
-                    ),
-                )
-                endringUtenRevurderFra(
-                    eksisterendeVilkårperiode,
-                    eksisterendeVilkårperiode.medAktivitetsdager(aktivitetsdager = 2),
-                )
-            }
+        fun `kan oppdatere periode hvis revurder-fra er satt`() {
             assertDoesNotThrow {
                 val eksisterendeVilkårperiode = aktivitet(
                     fom = revurderFra.plusDays(1),
@@ -129,7 +113,7 @@ class VilkårperiodeRevurderFraValideringTest {
                         aktivitetsdager = 1,
                     ),
                 )
-                endringUtenRevurderFra(
+                endringMedRevurderFra(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.medAktivitetsdager(aktivitetsdager = 2),
                 )
@@ -210,7 +194,7 @@ class VilkårperiodeRevurderFraValideringTest {
             oppdatertVilkårperiode: Vilkårperiode,
         ) {
             validerEndrePeriodeRevurdering(
-                behandling,
+                behandlingUtenRevurderFra,
                 eksisterendeVilkårperiode,
                 oppdatertVilkårperiode,
             )
