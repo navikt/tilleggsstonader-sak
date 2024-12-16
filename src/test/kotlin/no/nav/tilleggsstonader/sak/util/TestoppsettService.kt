@@ -124,9 +124,10 @@ class TestoppsettService(
     )
 
     fun opprettRevurdering(
-        revurderFra: LocalDate,
+        revurderFra: LocalDate?,
         forrigeBehandling: Behandling,
         fagsak: Fagsak,
+        steg: StegType = StegType.BEREGNE_YTELSE,
     ): Behandling = lagre(
         behandling(
             fagsak = fagsak,
@@ -134,7 +135,7 @@ class TestoppsettService(
             revurderFra = revurderFra,
             forrigeBehandlingId = forrigeBehandling.id,
             status = BehandlingStatus.UTREDES,
-            steg = StegType.BEREGNE_YTELSE,
+            steg = steg,
         ),
     )
 
