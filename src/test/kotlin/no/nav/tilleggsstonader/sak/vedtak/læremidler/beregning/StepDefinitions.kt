@@ -6,6 +6,7 @@ import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
@@ -29,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.slf4j.LoggerFactory
 import java.util.UUID
 
 enum class BeregningNøkler(
@@ -43,6 +45,9 @@ enum class BeregningNøkler(
 }
 
 class StepDefinitions {
+
+    val logger = LoggerFactory.getLogger(javaClass)
+
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
     val læremidlerBeregningService = LæremidlerBeregningService(vilkårperiodeRepository, stønadsperiodeRepository)
@@ -132,7 +137,17 @@ class StepDefinitions {
         val forventetBeregningsresultat = BeregningsresultatLæremidler(
             perioder = perioder,
         )
-        assertThat(resultat).isEqualTo(forventetBeregningsresultat)
+
+        forventetBeregningsresultat.perioder.forEachIndexed { index, periode ->
+            try {
+                assertThat(periode).isEqualTo(resultat!!.perioder[index])
+            } catch (e: Throwable) {
+                val acutal = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(periode)
+                logger.error("Feilet validering av rad ${index + 1} $acutal")
+                throw e
+            }
+        }
+        assertThat(forventetBeregningsresultat.perioder).hasSize(resultat!!.perioder.size)
     }
 
     @Så("forvent følgende feil fra læremidlerberegning: {}")
