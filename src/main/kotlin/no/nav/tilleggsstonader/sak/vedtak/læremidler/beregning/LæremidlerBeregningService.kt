@@ -24,14 +24,13 @@ class LæremidlerBeregningService(
     private val stønadsperiodeRepository: StønadsperiodeRepository,
 ) {
     /**
-     * Beregning av læremidler er foreløpig kun basert på antakelser.
-     * Nå beregnes det med hele måneder, splittet i månedsskifte, men dette er ikke avklart som korrekt.
-     * Det er ikke tatt hensyn til begrensninger på semester og maks antall måneder i et år som skal dekkes.
+     * Beregning av læremidler har foreløpig noen begrensninger.
+     * Vi antar kun en aktivitet gjennom hele vedtaksperioden
+     * Vi antar kun en stønadsperiode per vedtaksperiode for å kunne velge ut rett målgruppe
+     * Vi antar at satsen ikke endrer seg i vedtaksperioden
+     * Programmet kaster feil dersom antagelsene ikke stemmer
      */
 
-    // ANTAR: En aktitivet hele vedtaksperioden
-    // ANTAR: En stønadsperiode per vedtaksperiode
-    // ANTAR: Sats ikke endrer seg i perioden
     fun beregn(vedtaksperioder: List<Vedtaksperiode>, behandlingId: BehandlingId): BeregningsresultatLæremidler {
         val stønadsperioder = hentStønadsperioder(behandlingId).slåSammenSammenhengende()
 
