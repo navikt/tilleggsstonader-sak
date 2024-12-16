@@ -30,6 +30,6 @@ val satser: List<SatsLæremidler> = listOf(
 )
 
 fun finnSatsForStudienivå(periode: Periode<LocalDate>, studienivå: Studienivå): Int {
-    val sats = satser.find { it.overlapper(periode) } ?: error("Finner ikke satser for $periode")
+    val sats = satser.find { it.inneholder(periode) } ?: error("Finner ikke satser for $periode")
     return sats.beløp[studienivå] ?: error("Kan ikke håndtere satser for studienivå=$studienivå")
 }
