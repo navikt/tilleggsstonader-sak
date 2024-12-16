@@ -67,31 +67,14 @@ Egenskap: Splitt vedtaksperioder til utbetalingsperioder
 
     Så forvent følgende utbetalingsperioder
       | Fom        | Tom        | Utbetalingsmåned |
-      | 31.01.2024 | 29.02.2024 | 01.2024          |
-      | 01.03.2024 | 31.03.2024 | 01.2024          |
-      | 01.04.2024 | 30.04.2024 | 01.2024          |
-      | 01.05.2024 | 31.05.2024 | 01.2024          |
-      | 01.06.2024 | 30.06.2024 | 01.2024          |
-      | 01.07.2024 | 31.07.2024 | 01.2024          |
-      | 01.08.2024 | 31.08.2024 | 01.2024          |
-
-  Scenario: Treffer rundt månedsskifte februar-mars - håndter spesialtilfelle 2
-    Gitt følgende vedtaksperioder for læremidler
-      | Fom        | Tom        |
-      | 29.01.2024 | 31.08.2024 |
-
-    Når splitter vedtaksperioder for læremidler
-
-    Så forvent følgende utbetalingsperioder
-      | Fom        | Tom        | Utbetalingsmåned |
-      | 29.01.2024 | 29.02.2024 | 01.2024          |
-      | 01.03.2024 | 31.03.2024 | 01.2024          |
-      | 01.04.2024 | 30.04.2024 | 01.2024          |
-      | 01.05.2024 | 31.05.2024 | 01.2024          |
-      | 01.06.2024 | 30.06.2024 | 01.2024          |
-      | 01.07.2024 | 31.07.2024 | 01.2024          |
-      | 01.08.2024 | 31.08.2024 | 01.2024          |
-
+      | 31.01.2024 | 28.02.2024 | 01.2024          |
+      | 29.02.2024 | 28.03.2024 | 01.2024          |
+      | 29.03.2024 | 28.04.2024 | 01.2024          |
+      | 29.04.2024 | 28.05.2024 | 01.2024          |
+      | 29.05.2024 | 28.06.2024 | 01.2024          |
+      | 29.06.2024 | 28.07.2024 | 01.2024          |
+      | 29.07.2024 | 28.08.2024 | 01.2024          |
+      | 29.08.2024 | 31.08.2024 | 01.2024          |
 
   Scenario: Treffer rundt månedsskifte februar-mars - ingen spesialtilfelle
     Gitt følgende vedtaksperioder for læremidler
@@ -116,7 +99,8 @@ Egenskap: Splitt vedtaksperioder til utbetalingsperioder
 
     Så forvent følgende utbetalingsperioder
       | Fom        | Tom        | Utbetalingsmåned |
-      | 31.03.2024 | 30.04.2024 | 03.2024          |
-      | 01.05.2024 | 31.05.2024 | 03.2024          |
-      | 01.06.2024 | 30.06.2024 | 03.2024          |
-      | 01.07.2024 | 31.07.2024 | 03.2024          |
+      | 31.03.2024 | 29.04.2024 | 03.2024          |
+      | 30.04.2024 | 29.05.2024 | 03.2024          |
+      | 30.05.2024 | 29.06.2024 | 03.2024          |
+      | 30.06.2024 | 29.07.2024 | 03.2024          |
+      | 30.07.2024 | 31.07.2024 | 03.2024          |
