@@ -65,17 +65,13 @@ class VilkårperiodeRevurderFraValideringTest {
     inner class SlettPeriode {
 
         @Test
-        fun `kan slette periode med valgfritt dato dersom revurder-fra ikke er satt`() {
-            assertDoesNotThrow {
-                validerSlettPeriodeRevurdering(
-                    behandlingUtenRevurderFra,
-                    målgruppe(fom = revurderFra.minusDays(1)),
-                )
+        fun `kan ikke slette periode med valgfritt dato dersom revurder-fra ikke er satt`() {
+            assertThatThrownBy {
                 validerSlettPeriodeRevurdering(
                     behandlingUtenRevurderFra,
                     målgruppe(fom = revurderFra.plusDays(1)),
                 )
-            }
+            }.hasMessageContaining("Revurder fra-dato må settes før du kan gjøre endringer på inngangvilkårene")
         }
 
         @Test
@@ -187,17 +183,6 @@ class VilkårperiodeRevurderFraValideringTest {
                     eksisterendeVilkårperiode.copy(fom = revurderFra.minusDays(2)),
                 )
             }.hasMessageContaining("Kan ikke sette fom før revurderingsdato")
-        }
-
-        private fun endringUtenRevurderFra(
-            eksisterendeVilkårperiode: Vilkårperiode,
-            oppdatertVilkårperiode: Vilkårperiode,
-        ) {
-            validerEndrePeriodeRevurdering(
-                behandlingUtenRevurderFra,
-                eksisterendeVilkårperiode,
-                oppdatertVilkårperiode,
-            )
         }
 
         private fun endringMedRevurderFra(

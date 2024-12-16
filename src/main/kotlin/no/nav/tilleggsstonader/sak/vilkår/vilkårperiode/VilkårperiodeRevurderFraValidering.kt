@@ -8,6 +8,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import java.time.LocalDate
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 object VilkårperiodeRevurderFraValidering {
 
@@ -16,9 +18,7 @@ object VilkårperiodeRevurderFraValidering {
         fom: LocalDate,
     ) {
         if (behandling.type == BehandlingType.REVURDERING) {
-            brukerfeilHvis(behandling.revurderFra == null) {
-                "Revurder fra-dato må settes før du kan gjøre endringer på inngangvilkårene"
-            }
+            validerRevurderFraErSatt(behandling.revurderFra)
             feilHvis(fom < behandling.revurderFra) {
                 "Kan ikke opprette ${periodeInfo(behandling, fom)}"
             }
@@ -29,8 +29,11 @@ object VilkårperiodeRevurderFraValidering {
         behandling: Saksbehandling,
         periode: Vilkårperiode,
     ) {
-        feilHvis(behandling.revurderFra != null && periode.fom < behandling.revurderFra) {
-            "Kan ikke slette ${periodeInfo(behandling, periode.fom)}"
+        if (behandling.type == BehandlingType.REVURDERING) {
+            validerRevurderFraErSatt(behandling.revurderFra)
+            feilHvis(periode.fom < behandling.revurderFra) {
+                "Kan ikke slette ${periodeInfo(behandling, periode.fom)}"
+            }
         }
     }
 
@@ -45,9 +48,7 @@ object VilkårperiodeRevurderFraValidering {
 
         val revurderFra = behandling.revurderFra
 
-        brukerfeilHvis(revurderFra == null) {
-            "Revurder fra-dato må settes før du kan gjøre endringer på inngangvilkårene"
-        }
+        validerRevurderFraErSatt(revurderFra)
 
         if (eksisterendePeriode.fom >= revurderFra) {
             feilHvis(oppdatertPeriode.fom < revurderFra) {
@@ -67,6 +68,16 @@ object VilkårperiodeRevurderFraValidering {
                     " oppdatertPeriode=$oppdatertPeriode",
             )
             "Ugyldig endring på ${periodeInfo(behandling, eksisterendePeriode.fom)}"
+        }
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    private fun validerRevurderFraErSatt(revurderFra: LocalDate?) {
+        contract {
+            returns() implies (revurderFra != null)
+        }
+        brukerfeilHvis(revurderFra == null) {
+            "Revurder fra-dato må settes før du kan gjøre endringer på inngangvilkårene"
         }
     }
 
