@@ -117,7 +117,7 @@ object VilkårperiodeTestUtil {
         behandlingId: BehandlingId = BehandlingId.random(),
         fom: LocalDate = osloDateNow(),
         tom: LocalDate = osloDateNow().plusDays(5),
-        faktaOgVurdering: AktivitetFaktaOgVurdering = faktaOgVurderingAktivitet(),
+        faktaOgVurdering: AktivitetFaktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(),
         begrunnelse: String? = null,
         resultat: ResultatVilkårperiode = faktaOgVurdering.utledResultat(),
         slettetKommentar: String? = null,
@@ -134,7 +134,7 @@ object VilkårperiodeTestUtil {
         faktaOgVurdering = faktaOgVurdering,
     )
 
-    fun faktaOgVurderingAktivitet(
+    fun faktaOgVurderingAktivitetTilsynBarn(
         type: AktivitetType = AktivitetType.TILTAK,
         aktivitetsdager: Int? = 5,
         lønnet: VurderingLønnet = vurderingLønnet(),
