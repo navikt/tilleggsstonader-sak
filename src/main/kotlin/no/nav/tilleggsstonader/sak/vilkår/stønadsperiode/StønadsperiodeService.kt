@@ -148,7 +148,7 @@ class StønadsperiodeService(
     }
 
     fun validerStønadsperioder(behandlingId: BehandlingId, stønadsperioder: List<StønadsperiodeDto>) {
-        val vilkårperioder = vilkårperiodeService.hentVilkårperioderDto(behandlingId)
+        val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         val fødselsdato = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag.fødsel
             ?.fødselsdatoEller1JanForFødselsår()
 

@@ -9,9 +9,9 @@ import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
 
 object StønadsperiodeValidering {
@@ -22,7 +22,7 @@ object StønadsperiodeValidering {
      */
     fun validerStønadsperioderVedEndringAvVilkårperiode(
         stønadsperioder: List<StønadsperiodeDto>,
-        vilkårperioder: VilkårperioderDto,
+        vilkårperioder: Vilkårperioder,
     ) = valider(stønadsperioder, vilkårperioder, null)
 
     /**
@@ -30,7 +30,7 @@ object StønadsperiodeValidering {
      */
     fun valider(
         stønadsperioder: List<StønadsperiodeDto>,
-        vilkårperioder: VilkårperioderDto,
+        vilkårperioder: Vilkårperioder,
         fødselsdato: LocalDate?,
     ) {
         validerIkkeOverlappendeStønadsperioder(stønadsperioder)
@@ -81,7 +81,7 @@ object StønadsperiodeValidering {
      * eks 100% sykepenger eller INGEN_MÅLGRUPPE
      */
     private fun validerAtStønadsperioderIkkeOverlapperMedVilkårPeriodeUtenRett(
-        vilkårperioder: VilkårperioderDto,
+        vilkårperioder: Vilkårperioder,
         stønadsperioder: List<StønadsperiodeDto>,
     ) {
         val perioderSomIkkeGirRett = (vilkårperioder.målgrupper + vilkårperioder.aktiviteter)
@@ -90,7 +90,7 @@ object StønadsperiodeValidering {
     }
 
     private fun validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(
-        vilkårperioder: List<VilkårperiodeDto>,
+        vilkårperioder: List<Vilkårperiode>,
         stønadsperiode: StønadsperiodeDto,
     ) {
         vilkårperioder
@@ -124,7 +124,7 @@ object StønadsperiodeValidering {
  *  @return En sortert map kategorisert på periodetype med de oppfylte vilkårsperiodene. Periodene slåes sammen dersom
  *  de er sammenhengende, også selv om de har overlapp.
  */
-fun List<VilkårperiodeDto>.mergeSammenhengendeOppfylteVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> {
+fun List<Vilkårperiode>.mergeSammenhengendeOppfylteVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> {
     return this.sorted().filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
         .mapValues {
             it.value.map { Datoperiode(it.fom, it.tom) }

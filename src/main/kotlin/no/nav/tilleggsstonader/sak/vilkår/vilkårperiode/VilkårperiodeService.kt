@@ -29,7 +29,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.Stønadsperiodestatus
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -60,13 +59,9 @@ class VilkårperiodeService(
         val grunnlagsdataVilkårsperioder = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandlingId)
 
         return VilkårperioderResponse(
-            vilkårperioder = hentVilkårperioderDto(behandlingId),
+            vilkårperioder = hentVilkårperioder(behandlingId).tilDto(),
             grunnlag = grunnlagsdataVilkårsperioder?.tilDto(),
         )
-    }
-
-    fun hentVilkårperioderDto(behandlingId: BehandlingId): VilkårperioderDto {
-        return hentVilkårperioder(behandlingId).tilDto()
     }
 
     fun validerOgLagResponse(behandlingId: BehandlingId, periode: Vilkårperiode? = null): LagreVilkårperiodeResponse {
@@ -194,7 +189,7 @@ class VilkårperiodeService(
         return kotlin.runCatching {
             StønadsperiodeValidering.validerStønadsperioderVedEndringAvVilkårperiode(
                 stønadsperioder,
-                vilkårperioder.tilDto(),
+                vilkårperioder,
             )
         }
     }

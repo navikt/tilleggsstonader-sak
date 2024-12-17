@@ -14,12 +14,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBarnetilsynFaktaOgVurderingerDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
@@ -137,25 +135,25 @@ internal class StønadsperiodeValideringTest {
             målgruppe(
                 fom = LocalDate.of(2023, 1, 1),
                 tom = LocalDate.of(2023, 1, 31),
-            ).tilDto(),
+            ),
         )
         val aktiviteter = listOf(
             aktivitet1(
                 fom = LocalDate.of(2023, 1, 1),
                 tom = LocalDate.of(2023, 1, 10),
                 faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
-            ).tilDto(),
+            ),
             aktivitet1(
                 fom = LocalDate.of(2023, 1, 11),
                 tom = LocalDate.of(2023, 1, 12),
                 faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
-            ).tilDto(),
+            ),
         )
 
         assertThatCode {
             valider(
                 listOf(stønadsperiode),
-                VilkårperioderDto(målgrupper, aktiviteter),
+                Vilkårperioder(målgrupper, aktiviteter),
             )
         }.doesNotThrowAnyException()
     }
@@ -168,7 +166,7 @@ internal class StønadsperiodeValideringTest {
             målgruppe(
                 fom = LocalDate.of(2023, 1, 1),
                 tom = LocalDate.of(2023, 1, 31),
-            ).tilDto(),
+            ),
         )
 
         val aktiviteter = listOf(
@@ -176,18 +174,18 @@ internal class StønadsperiodeValideringTest {
                 fom = LocalDate.of(2023, 1, 1),
                 tom = LocalDate.of(2023, 1, 10),
                 faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
-            ).tilDto(),
+            ),
             aktivitet1(
                 fom = LocalDate.of(2023, 1, 7),
                 tom = LocalDate.of(2023, 1, 12),
                 faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
-            ).tilDto(),
+            ),
         )
 
         assertThatCode {
             valider(
                 listOf(stønadsperiode),
-                VilkårperioderDto(målgrupper, aktiviteter),
+                Vilkårperioder(målgrupper, aktiviteter),
             )
         }.doesNotThrowAnyException()
     }
@@ -200,9 +198,9 @@ internal class StønadsperiodeValideringTest {
         val stønadsperioder = listOf(
             lagStønadsperiode(målgruppe = MålgruppeType.AAP, aktivitet = AktivitetType.TILTAK, fom = fom, tom = tom),
         )
-        val målgrupper = listOf(målgruppe(fom = fom, tom = tom).tilDto())
-        val aktiviteter = listOf(aktivitet1(fom = fom, tom = tom).tilDto())
-        val vilkårperioder = VilkårperioderDto(målgrupper, aktiviteter)
+        val målgrupper = listOf(målgruppe(fom = fom, tom = tom))
+        val aktiviteter = listOf(aktivitet1(fom = fom, tom = tom))
+        val vilkårperioder = Vilkårperioder(målgrupper, aktiviteter)
 
         val dato18årGammel = fom.minusYears(18)
         val dato67årGammel = tom.minusYears(67)
@@ -245,8 +243,20 @@ internal class StønadsperiodeValideringTest {
                 it.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD, aktivitet = AktivitetType.UTDANNING)
             }
             val vilkårperioder = vilkårperioder.copy(
-                målgrupper = målgrupper.map { it.copy(type = MålgruppeType.OVERGANGSSTØNAD) },
-                aktiviteter = målgrupper.map { it.copy(type = AktivitetType.UTDANNING) },
+                målgrupper = målgrupper.map {
+                    målgruppe(
+                        fom = it.fom,
+                        tom = it.tom,
+                        faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.OVERGANGSSTØNAD),
+                    )
+                },
+                aktiviteter = aktiviteter.map {
+                    aktivitet1(
+                        fom = it.fom,
+                        tom = it.tom,
+                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.UTDANNING),
+                    )
+                },
             )
 
             assertThatCode {
@@ -324,14 +334,14 @@ internal class StønadsperiodeValideringTest {
                 fom = fom,
                 tom = tom,
                 resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
-            ).tilDto(),
+            ),
         )
         val aktiviteter = listOf(
             aktivitet1(
                 fom = fom,
                 tom = tom,
                 resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
-            ).tilDto(),
+            ),
         )
 
         @Test
@@ -341,7 +351,7 @@ internal class StønadsperiodeValideringTest {
             assertThatThrownBy {
                 valider(
                     listOf(stønadsperiode),
-                    VilkårperioderDto(målgrupper, aktiviteter),
+                    Vilkårperioder(målgrupper, aktiviteter),
                 )
             }.hasMessageContaining("Finner ingen perioder hvor vilkår for ${stønadsperiode.målgruppe} er oppfylt")
         }
@@ -363,12 +373,16 @@ internal class StønadsperiodeValideringTest {
                 fom = LocalDate.of(2023, 1, 20),
                 tom = LocalDate.of(2023, 1, 31),
             ),
-        ).map(Vilkårperiode::tilDto)
+        )
 
         val aktiviteter = målgrupper.map {
-            it.copy(
-                type = AktivitetType.TILTAK,
-                faktaOgVurderinger = AktivitetBarnetilsynFaktaOgVurderingerDto(lønnet = VurderingDto(SvarJaNei.NEI)),
+            aktivitet1(
+                fom = it.fom,
+                tom = it.tom,
+                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(
+                    type = AktivitetType.TILTAK,
+                    lønnet = VurderingLønnet(SvarJaNei.NEI),
+                ),
             )
         }
 
@@ -379,7 +393,7 @@ internal class StønadsperiodeValideringTest {
             assertThatCode {
                 valider(
                     listOf(stønadsperiode),
-                    VilkårperioderDto(målgrupper, aktiviteter),
+                    Vilkårperioder(målgrupper, aktiviteter),
                 )
             }.doesNotThrowAnyException()
         }
@@ -391,7 +405,7 @@ internal class StønadsperiodeValideringTest {
             assertThatThrownBy {
                 valider(
                     listOf(stønadsperiode),
-                    VilkårperioderDto(målgrupper, aktiviteter),
+                    Vilkårperioder(målgrupper, aktiviteter),
                 )
             }.hasMessageContaining(feilmeldingIkkeOverlappendePeriode(stønadsperiode, stønadsperiode.målgruppe))
         }
@@ -431,7 +445,7 @@ internal class StønadsperiodeValideringTest {
                     fom = jan.atDay(21),
                     tom = jan.atDay(31),
                 ),
-            ).map { it.tilDto() }
+            )
 
             val aktiviteter = listOf(
                 aktivitet1(
@@ -452,7 +466,7 @@ internal class StønadsperiodeValideringTest {
                     tom = jan.atDay(31),
                 ),
 
-            ).map { it.tilDto() }
+            )
 
             assertThatCode {
                 valider(
@@ -460,7 +474,7 @@ internal class StønadsperiodeValideringTest {
                         lagStønadsperiode(fom = jan.atDay(1), tom = jan.atDay(9)),
                         lagStønadsperiode(fom = jan.atDay(21), tom = jan.atDay(31)),
                     ),
-                    VilkårperioderDto(målgrupper, aktiviteter),
+                    Vilkårperioder(målgrupper, aktiviteter),
                 )
             }.doesNotThrowAnyException()
         }
@@ -474,12 +488,12 @@ internal class StønadsperiodeValideringTest {
                     tom = tom,
                     begrunnelse = "a",
                 ),
-            ).map { it.tilDto() }
+            )
 
             assertThatThrownBy {
                 valider(
                     stønadsperioder = listOf(lagStønadsperiode(fom = jan.atDay(1), tom = jan.atEndOfMonth())),
-                    vilkårperioder = VilkårperioderDto(målgrupper, emptyList()),
+                    vilkårperioder = Vilkårperioder(målgrupper, emptyList()),
                 )
             }.hasMessage(
                 "Stønadsperiode 01.01.2024 - 31.01.2024 overlapper med SYKEPENGER_100_PROSENT(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
@@ -495,12 +509,12 @@ internal class StønadsperiodeValideringTest {
                     tom = tom,
                     begrunnelse = "a",
                 ),
-            ).map { it.tilDto() }
+            )
 
             assertThatThrownBy {
                 valider(
                     stønadsperioder = listOf(lagStønadsperiode(fom = jan.atDay(1), tom = jan.atDay(15))),
-                    vilkårperioder = VilkårperioderDto(målgrupper, emptyList()),
+                    vilkårperioder = Vilkårperioder(målgrupper, emptyList()),
                 )
             }.hasMessage(
                 "Stønadsperiode 01.01.2024 - 15.01.2024 overlapper med INGEN_MÅLGRUPPE(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
@@ -516,11 +530,11 @@ internal class StønadsperiodeValideringTest {
                     tom = tom,
                     begrunnelse = "a",
                 ),
-            ).map { it.tilDto() }
+            )
             assertThatThrownBy {
                 valider(
                     stønadsperioder = listOf(lagStønadsperiode(fom = jan.atDay(15), tom = jan.atDay(15))),
-                    vilkårperioder = VilkårperioderDto(emptyList(), aktiviteter),
+                    vilkårperioder = Vilkårperioder(emptyList(), aktiviteter),
                 )
             }.hasMessage(
                 "Stønadsperiode 15.01.2024 - 15.01.2024 overlapper med INGEN_AKTIVITET(10.01.2024 - 20.01.2024) som ikke gir rett på stønad",
@@ -547,7 +561,7 @@ internal class StønadsperiodeValideringTest {
                     fom = fom,
                     tom = tom,
                 ),
-            ).map { it.tilDto() }
+            )
 
             val aktiviteter = listOf(
                 aktivitet1(
@@ -556,7 +570,7 @@ internal class StønadsperiodeValideringTest {
                     fom = fom,
                     tom = tom,
                 ),
-            ).map { it.tilDto() }
+            )
 
             val stønadsperioder = listOf(
                 stønadsperiode(
@@ -571,7 +585,7 @@ internal class StønadsperiodeValideringTest {
             assertThatCode {
                 valider(
                     stønadsperioder = stønadsperioder,
-                    vilkårperioder = VilkårperioderDto(aktiviteter = aktiviteter, målgrupper = målgrupper),
+                    vilkårperioder = Vilkårperioder(aktiviteter = aktiviteter, målgrupper = målgrupper),
                 )
             }.doesNotThrowAnyException()
         }
@@ -586,15 +600,15 @@ internal class StønadsperiodeValideringTest {
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 4),
-                ).tilDto(),
+                ),
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 8),
-                ).tilDto(),
+                ),
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 2),
                     tom = LocalDate.of(2023, 1, 10),
-                ).tilDto(),
+                ),
             )
 
             assertThat(perioder.mergeSammenhengendeOppfylteVilkårperioder()[AktivitetType.TILTAK]!!.first()).isEqualTo(
@@ -608,11 +622,11 @@ internal class StønadsperiodeValideringTest {
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 4),
-                ).tilDto(),
+                ),
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 5),
                     tom = LocalDate.of(2023, 1, 10),
-                ).tilDto(),
+                ),
             )
 
             assertThat(perioder.mergeSammenhengendeOppfylteVilkårperioder()[AktivitetType.TILTAK]!!.first()).isEqualTo(
@@ -626,19 +640,19 @@ internal class StønadsperiodeValideringTest {
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 4),
-                ).tilDto(),
+                ),
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 5),
                     tom = LocalDate.of(2023, 1, 10),
-                ).tilDto(),
+                ),
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 12),
                     tom = LocalDate.of(2023, 1, 20),
-                ).tilDto(),
+                ),
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 16),
                     tom = LocalDate.of(2023, 1, 24),
-                ).tilDto(),
+                ),
             )
 
             val mergetPerioder = perioder.mergeSammenhengendeOppfylteVilkårperioder()[AktivitetType.TILTAK]!!
@@ -664,16 +678,16 @@ internal class StønadsperiodeValideringTest {
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 4),
-                ).tilDto(),
+                ),
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 3),
                     tom = LocalDate.of(2023, 1, 10),
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
-                ).tilDto(),
+                ),
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 11),
                     tom = LocalDate.of(2023, 1, 20),
-                ).tilDto(),
+                ),
             )
 
             val mergetPerioder = perioder.mergeSammenhengendeOppfylteVilkårperioder()[AktivitetType.TILTAK]!!
@@ -699,11 +713,11 @@ internal class StønadsperiodeValideringTest {
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 10),
-                ).tilDto(),
+                ),
                 aktivitet1(
                     fom = LocalDate.of(2023, 1, 3),
                     tom = LocalDate.of(2023, 1, 8),
-                ).tilDto(),
+                ),
             )
 
             val mergetPerioder = perioder.mergeSammenhengendeOppfylteVilkårperioder()[AktivitetType.TILTAK]!!
@@ -720,7 +734,7 @@ internal class StønadsperiodeValideringTest {
 
     fun valider(
         stønadsperioder: List<StønadsperiodeDto>,
-        vilkårperioder: VilkårperioderDto,
+        vilkårperioder: Vilkårperioder,
         fødselsdato: LocalDate? = null,
     ) = StønadsperiodeValidering.valider(
         stønadsperioder = stønadsperioder,
