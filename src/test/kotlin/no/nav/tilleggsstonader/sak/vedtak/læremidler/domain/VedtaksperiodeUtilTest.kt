@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilGrunnlagStønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilGrunnlagStønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
