@@ -51,6 +51,9 @@ data class AndelTilkjentYtelse(
         feilHvisIkke(fom <= tom) {
             "Forventer at fom($fom) er mindre eller lik tom($tom)"
         }
+        if (satstype == Satstype.MÅNED) {
+            validerFørsteOgSisteIMåneden()
+        }
 
         validerDataForType()
     }
@@ -74,21 +77,24 @@ data class AndelTilkjentYtelse(
     private fun validerTilsynBarn() {
         validerSatstype(Satstype.DAG)
         validerLikFomOgTom()
-        feilHvis(satstype == Satstype.DAG && fom.erLørdagEllerSøndag()) {
-            "Dagsats som begynner en lørdag eller søndag vil ikke bli utbetalt"
-        }
+        validerFomIkkeLørdagEllerSøndag()
     }
 
     private fun validerLæremidler() {
-        validerSatstype(Satstype.MÅNED)
+        validerSatstype(Satstype.DAG)
+        validerLikFomOgTom()
+        validerFomIkkeLørdagEllerSøndag()
+    }
+
+    private fun validerFomIkkeLørdagEllerSøndag() {
+        feilHvis(fom.erLørdagEllerSøndag()) {
+            "Dagsats som begynner en lørdag eller søndag vil ikke bli utbetalt"
+        }
     }
 
     private fun validerSatstype(forventetSatstype: Satstype) {
         feilHvis(satstype != forventetSatstype) {
             "Ugyldig satstype=$satstype forventetSatsType=$forventetSatstype for type=$type"
-        }
-        if (satstype == Satstype.MÅNED) {
-            validerFørsteOgSisteIMåneden()
         }
     }
 
