@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
     JsonSubTypes.Type(InnvilgelseTilsynBarn::class, name = "INNVILGELSE_TILSYN_BARN"),
     JsonSubTypes.Type(OpphørTilsynBarn::class, name = "OPPHØR_TILSYN_BARN"),
     JsonSubTypes.Type(AvslagTilsynBarn::class, name = "AVSLAG_TILSYN_BARN"),
+    JsonSubTypes.Type(InnvilgelseLæremidler::class, name = "INNVILGELSE_LÆREMIDLER"),
     JsonSubTypes.Type(AvslagLæremidler::class, name = "AVSLAG_LÆREMIDLER"),
     failOnRepeatedNames = true,
 )
