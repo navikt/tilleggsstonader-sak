@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRespon
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
@@ -14,7 +15,9 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerResponse
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import java.time.LocalDate
 
 object VedtakDtoMapper {
@@ -49,6 +52,12 @@ object VedtakDtoMapper {
 
     private fun mapVedtakLæremidler(data: VedtakLæremidler, revurderFra: LocalDate?): VedtakLæremidlerResponse =
         when (data) {
+            is InnvilgelseLæremidler -> InnvilgelseLæremidlerResponse(
+                vedtaksperioder = data.vedtaksperioder.tilDto(),
+                beregningsresultat = data.beregningsresultat.tilDto(),
+                gjelderFraOgMed = data.vedtaksperioder.minOf { it.fom },
+                gjelderTilOgMed = data.vedtaksperioder.maxOf { it.tom },
+            )
             is AvslagLæremidler -> AvslagLæremidlerDto(
                 årsakerAvslag = data.årsaker,
                 begrunnelse = data.begrunnelse,

@@ -116,6 +116,7 @@ class VedtakRepositoryJsonTest : IntegrationTest() {
         TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN -> InnvilgelseTilsynBarn::class
         TypeVedtakTilsynBarn.AVSLAG_TILSYN_BARN -> AvslagTilsynBarn::class
         TypeVedtakTilsynBarn.OPPHØR_TILSYN_BARN -> OpphørTilsynBarn::class
+        TypeVedtakLæremidler.INNVILGELSE_LÆREMIDLER -> InnvilgelseLæremidler::class
         TypeVedtakLæremidler.AVSLAG_LÆREMIDLER -> AvslagLæremidler::class
     }.java
 

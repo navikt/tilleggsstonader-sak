@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -143,12 +143,12 @@ internal class StønadsperiodeValideringTest {
             aktivitet1(
                 fom = LocalDate.of(2023, 1, 1),
                 tom = LocalDate.of(2023, 1, 10),
-                faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
+                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
             ).tilDto(),
             aktivitet1(
                 fom = LocalDate.of(2023, 1, 11),
                 tom = LocalDate.of(2023, 1, 12),
-                faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
+                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
             ).tilDto(),
         )
 
@@ -175,12 +175,12 @@ internal class StønadsperiodeValideringTest {
             aktivitet1(
                 fom = LocalDate.of(2023, 1, 1),
                 tom = LocalDate.of(2023, 1, 10),
-                faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
+                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
             ).tilDto(),
             aktivitet1(
                 fom = LocalDate.of(2023, 1, 7),
                 tom = LocalDate.of(2023, 1, 12),
-                faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
+                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
             ).tilDto(),
         )
 
@@ -435,19 +435,19 @@ internal class StønadsperiodeValideringTest {
 
             val aktiviteter = listOf(
                 aktivitet1(
-                    faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
+                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
                     fom = jan.atDay(1),
                     tom = jan.atDay(9),
                 ),
                 aktivitet1(
-                    faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.INGEN_AKTIVITET),
+                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.INGEN_AKTIVITET),
                     fom = fom,
                     tom = tom,
                     begrunnelse = "asd",
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                 ),
                 aktivitet1(
-                    faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
+                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
                     fom = jan.atDay(21),
                     tom = jan.atDay(31),
                 ),
@@ -511,7 +511,7 @@ internal class StønadsperiodeValideringTest {
         fun `skal kaste feil hvis en stønadsperiode overlapper med INGEN_AKTIVITET`() {
             val aktiviteter = listOf(
                 aktivitet1(
-                    faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.INGEN_AKTIVITET),
+                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.INGEN_AKTIVITET),
                     fom = fom,
                     tom = tom,
                     begrunnelse = "a",
@@ -552,7 +552,7 @@ internal class StønadsperiodeValideringTest {
             val aktiviteter = listOf(
                 aktivitet1(
                     behandlingId = behandlingId,
-                    faktaOgVurdering = faktaOgVurderingAktivitet(type = AktivitetType.TILTAK),
+                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
                     fom = fom,
                     tom = tom,
                 ),

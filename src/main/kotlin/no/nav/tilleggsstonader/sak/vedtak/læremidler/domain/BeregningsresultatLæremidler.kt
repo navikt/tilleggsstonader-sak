@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -14,19 +15,12 @@ data class BeregningsresultatForMåned(
 )
 
 data class Beregningsgrunnlag(
-    val måned: YearMonth,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val utbetalingsmåned: YearMonth,
     val studienivå: Studienivå,
     val studieprosent: Int,
     val sats: Int,
-)
-
-data class BeregningPeriode(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    val studienivå: Studienivå,
-    val studieprosent: Int,
-) : Periode<LocalDate> {
-    init {
-        validatePeriode()
-    }
-}
+    val satsBekreftet: Boolean,
+    val målgruppe: MålgruppeType,
+) : Periode<LocalDate>
