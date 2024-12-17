@@ -192,7 +192,7 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
                 when (type) {
                     AktivitetLæremidlerType.UTDANNING_LÆREMIDLER -> UtdanningLæremidler::class
                     AktivitetLæremidlerType.TILTAK_LÆREMIDLER -> TiltakLæremidler::class
-                    AktivitetLæremidlerType.INGEN_AKTIVITET_LÆREMIDLER -> IngenAktivitetLæremidler::class
+                    AktivitetLæremidlerType.INGEN_UTDANNING_LÆREMIDLER -> IngenUtdanningLæremidler::class
                 }
             }
         }.java

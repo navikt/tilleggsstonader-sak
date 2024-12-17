@@ -76,8 +76,8 @@ data class UtdanningLæremidler(
     override val type: AktivitetLæremidlerType = AktivitetLæremidlerType.UTDANNING_LÆREMIDLER
 }
 
-data object IngenAktivitetLæremidler : AktivitetLæremidler {
-    override val type: AktivitetLæremidlerType = AktivitetLæremidlerType.INGEN_AKTIVITET_LÆREMIDLER
+data object IngenUtdanningLæremidler : AktivitetLæremidler {
+    override val type: AktivitetLæremidlerType = AktivitetLæremidlerType.INGEN_UTDANNING_LÆREMIDLER
     override val fakta: Fakta = IngenFakta
     override val vurderinger: Vurderinger = IngenVurderinger
 }
@@ -108,7 +108,7 @@ enum class AktivitetLæremidlerType(
 
     UTDANNING_LÆREMIDLER(AktivitetType.UTDANNING),
     TILTAK_LÆREMIDLER(AktivitetType.TILTAK),
-    INGEN_AKTIVITET_LÆREMIDLER(AktivitetType.INGEN_AKTIVITET),
+    INGEN_UTDANNING_LÆREMIDLER(AktivitetType.INGEN_UTDANNING),
 }
 
 enum class MålgruppeLæremidlerType(

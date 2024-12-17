@@ -5,10 +5,11 @@ enum class AktivitetType : VilkårperiodeType {
     UTDANNING,
     REELL_ARBEIDSSØKER,
     INGEN_AKTIVITET,
+    INGEN_UTDANNING,
     ;
 
     override fun tilDbType(): String = this.name
 
     override fun girIkkeRettPåStønadsperiode() =
-        this == INGEN_AKTIVITET
+        this == INGEN_AKTIVITET || this == INGEN_UTDANNING
 }

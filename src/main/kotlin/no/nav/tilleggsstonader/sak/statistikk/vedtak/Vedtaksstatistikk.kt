@@ -326,6 +326,7 @@ enum class AktivitetTypeDvh {
     UTDANNING,
     REELL_ARBEIDSSØKER,
     INGEN_AKTIVITET,
+    INGEN_UTDANNING,
     ;
 
     companion object {
@@ -334,6 +335,7 @@ enum class AktivitetTypeDvh {
             AktivitetType.UTDANNING -> UTDANNING
             AktivitetType.REELL_ARBEIDSSØKER -> REELL_ARBEIDSSØKER
             AktivitetType.INGEN_AKTIVITET -> INGEN_AKTIVITET
+            AktivitetType.INGEN_UTDANNING -> INGEN_UTDANNING // TODO Burde denne mappes til ingen aktivitet?
 
             is MålgruppeType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type aktivitet.")
         }

@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 
     JsonSubTypes.Type(UtdanningLæremidler::class, name = "UTDANNING_LÆREMIDLER"),
     JsonSubTypes.Type(TiltakLæremidler::class, name = "TILTAK_LÆREMIDLER"),
-    JsonSubTypes.Type(IngenAktivitetLæremidler::class, name = "INGEN_AKTIVITET_LÆREMIDLER"),
+    JsonSubTypes.Type(IngenUtdanningLæremidler::class, name = "INGEN_UTDANNING_LÆREMIDLER"),
 
     JsonSubTypes.Type(AAPLæremidler::class, name = "AAP_LÆREMIDLER"),
     JsonSubTypes.Type(OmstillingsstønadLæremidler::class, name = "OMSTILLINGSSTØNAD_LÆREMIDLER"),

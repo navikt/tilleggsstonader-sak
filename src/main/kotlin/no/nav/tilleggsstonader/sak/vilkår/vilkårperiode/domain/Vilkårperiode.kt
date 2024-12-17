@@ -69,7 +69,7 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         validerBegrunnelse()
 
         feilHvis(faktaOgVurdering.type.vilkårperiodeType != type) {
-            "Ugyldig kombinasjon - type($type) må være lik faktaOgVurdering($faktaOgVurdering)"
+            "Ugyldig kombinasjon - type($type) må være lik faktaOgVurdering($faktaOgVurdering) som er ${faktaOgVurdering.type.vilkårperiodeType}"
         }
 
         // TODO endre aktivitetsdager til value class og legg inn sjekk der

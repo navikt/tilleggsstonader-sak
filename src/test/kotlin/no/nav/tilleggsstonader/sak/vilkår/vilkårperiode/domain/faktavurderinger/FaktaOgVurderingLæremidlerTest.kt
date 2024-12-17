@@ -21,7 +21,7 @@ class FaktaOgVurderingLæremidlerTest {
 
         @Test
         fun `resultatet skal ikke være oppfylt hvis ikke aktivitetstypen gir rett på stønaden`() {
-            listOf(IngenAktivitetLæremidler).forEach { faktaOgVurdering ->
+            listOf(IngenUtdanningLæremidler).forEach { faktaOgVurdering ->
                 assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
             }
         }

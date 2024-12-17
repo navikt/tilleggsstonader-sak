@@ -11,10 +11,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeTilsynBarn
@@ -122,6 +122,10 @@ private fun mapAktiviteterBarnetilsyn(
             }
             IngenAktivitetTilsynBarn
         }
+
+        AktivitetType.INGEN_UTDANNING -> {
+            error("Skal ikke kunne velge ingen utdanning/opplæringstiltak på tilsyn barn")
+        }
     }
 }
 
@@ -151,7 +155,9 @@ fun mapAktiviteterLæremidler(
             ),
         )
 
-        AktivitetType.INGEN_AKTIVITET -> IngenAktivitetLæremidler
+        AktivitetType.INGEN_AKTIVITET -> error("Skal ikke kunne velge ingen aktivitet på læremidler")
+
+        AktivitetType.INGEN_UTDANNING -> IngenUtdanningLæremidler
 
         AktivitetType.REELL_ARBEIDSSØKER -> brukerfeil("Reell arbeidssøker er ikke en gyldig aktivitet for læremidler")
     }

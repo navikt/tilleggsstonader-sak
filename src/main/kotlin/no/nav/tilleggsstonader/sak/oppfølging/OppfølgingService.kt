@@ -82,6 +82,7 @@ class OppfølgingService(
         return when (stønadsperiode.aktivitet) {
             AktivitetType.REELL_ARBEIDSSØKER -> false
             AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
+            AktivitetType.INGEN_UTDANNING -> error("Skal ikke være mulig å ha en stønadsperiode med ingen utdanning")
             AktivitetType.TILTAK -> {
                 val tiltak = finnOverlappendePerioder(registerAktivitet.filterNot(::tiltakErUtdanning), stønadsperiode)
 

@@ -155,6 +155,8 @@ object VilkårperiodeTestUtil {
         )
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
+
+        AktivitetType.INGEN_UTDANNING -> error("Skal ikke kunne velge ingen utdanning/opplæringstiltak for tilsyn barn")
     }
 
     fun faktaOgVurderingAktivitetLæremidler(
