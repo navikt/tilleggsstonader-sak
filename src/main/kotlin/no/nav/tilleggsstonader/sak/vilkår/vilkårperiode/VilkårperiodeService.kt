@@ -58,8 +58,11 @@ class VilkårperiodeService(
     fun hentVilkårperioderResponse(behandlingId: BehandlingId): VilkårperioderResponse {
         val grunnlagsdataVilkårsperioder = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandlingId)
 
+        val aktiviteterPåId = grunnlagsdataVilkårsperioder?.aktivitet?.aktiviteter?.associateBy { it.id } ?: emptyMap()
+
+        val vilkårperioder = hentVilkårperioder(behandlingId)
         return VilkårperioderResponse(
-            vilkårperioder = hentVilkårperioder(behandlingId).tilDto(),
+            vilkårperioder = vilkårperioder.tilDto(aktiviteterPåId),
             grunnlag = grunnlagsdataVilkårsperioder?.tilDto(),
         )
     }

@@ -31,6 +31,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.RegisterAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDto
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -51,13 +52,22 @@ data class VilkårperiodeDto(
     val status: Vilkårstatus?,
     val kildeId: String?,
     val faktaOgVurderinger: FaktaOgVurderingerDto,
+    val grunnlagAktivitet: GrunnlagAktivitetVilkårperiodeDto?
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
     }
 }
 
-fun Vilkårperiode.tilDto() =
+/**
+ * @param type tiltak, eks AMO Kurs
+ */
+data class GrunnlagAktivitetVilkårperiodeDto(
+    val type: String?,
+    val arrangør: String?,
+)
+
+fun Vilkårperiode.tilDto(grunnlagAktivitet: GrunnlagAktivitetVilkårperiodeDto? = null) =
     VilkårperiodeDto(
         id = this.id,
         type = this.type,
@@ -72,6 +82,7 @@ fun Vilkårperiode.tilDto() =
         status = this.status,
         kildeId = this.kildeId,
         faktaOgVurderinger = this.faktaOgVurdering.tilFaktaOgVurderingDto(),
+        grunnlagAktivitet = grunnlagAktivitet
     )
 
 // Returnerer ikke vurdering hvis resultatet er IKKE_AKTUELT
@@ -167,7 +178,12 @@ data class VilkårperioderResponse(
     val grunnlag: VilkårperioderGrunnlagDto?,
 )
 
-fun Vilkårperioder.tilDto() = VilkårperioderDto(
-    målgrupper = målgrupper.map(Vilkårperiode::tilDto),
-    aktiviteter = aktiviteter.map(Vilkårperiode::tilDto),
+fun Vilkårperioder.tilDto(registerAktiviteter: Map<String, RegisterAktivitet>) = VilkårperioderDto(
+    målgrupper = målgrupper.map{ it.tilDto() },
+    aktiviteter = aktiviteter.map { aktivitet ->
+        val registerAktivitet = aktivitet.kildeId?.let {
+            registerAktiviteter[it] ?: error("Finner ikke registeraktivitet for kildeId=$it")
+        }?.let { GrunnlagAktivitetVilkårperiodeDto(type = it.typeNavn, arrangør =  it.arrangør) }
+        aktivitet.tilDto(registerAktivitet)
+    },
 )
