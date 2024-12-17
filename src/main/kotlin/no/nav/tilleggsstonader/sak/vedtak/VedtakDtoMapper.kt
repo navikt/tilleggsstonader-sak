@@ -53,7 +53,7 @@ object VedtakDtoMapper {
     private fun mapVedtakLæremidler(data: VedtakLæremidler, revurderFra: LocalDate?): VedtakLæremidlerResponse =
         when (data) {
             is InnvilgelseLæremidler -> InnvilgelseLæremidlerResponse(
-                vedtaksperioder = data.vedtaksperioder,
+                vedtaksperioder = data.vedtaksperioder.tilDto(),
                 beregningsresultat = data.beregningsresultat.tilDto(),
             )
             is AvslagLæremidler -> AvslagLæremidlerDto(

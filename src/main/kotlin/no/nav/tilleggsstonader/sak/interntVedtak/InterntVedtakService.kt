@@ -184,7 +184,7 @@ class InterntVedtakService(
     }
 
     private fun mapVedtakLæremidler(vedtak: VedtakLæremidler) = when (vedtak) {
-        is InnvilgelseLæremidler -> VedtakInnvilgelseInternt // TODO: Burde den inneholde vedtaksperioder?
+        is InnvilgelseLæremidler -> VedtakInnvilgelseInternt
         is AvslagLæremidler -> VedtakAvslagInternt(
             årsakerAvslag = vedtak.årsaker,
             avslagBegrunnelse = vedtak.begrunnelse,

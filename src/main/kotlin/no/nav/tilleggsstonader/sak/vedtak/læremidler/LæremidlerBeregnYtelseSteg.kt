@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 
@@ -44,7 +45,7 @@ class LæremidlerBeregnYtelseSteg(
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakLæremidlerRequest) {
         when (vedtak) {
-            is InnvilgelseLæremidlerRequest -> beregnOgLagreInnvilgelse(vedtak.vedtaksperioder, saksbehandling)
+            is InnvilgelseLæremidlerRequest -> beregnOgLagreInnvilgelse(vedtak.vedtaksperioder.tilDomene(), saksbehandling)
             is AvslagLæremidlerDto -> lagreAvslag(saksbehandling, vedtak)
             // is OpphørLæremidlerDto -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }

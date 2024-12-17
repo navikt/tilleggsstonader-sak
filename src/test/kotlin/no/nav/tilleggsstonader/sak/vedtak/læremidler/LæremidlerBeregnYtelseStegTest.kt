@@ -10,8 +10,8 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
@@ -66,7 +66,7 @@ class LæremidlerBeregnYtelseStegTest(
     fun `skal splitte andeler i 2, en for høsten og en for våren som ikke har bekreftet sats ennå`() {
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = Vedtaksperiode(fom = AUG_15, tom = APRIL_30_NESTE_ÅR)
+        val vedtaksperiode = VedtaksperiodeDto(fom = AUG_15, tom = APRIL_30_NESTE_ÅR)
         val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
         steg.utførSteg(saksbehandling, innvilgelse)
 
@@ -96,7 +96,7 @@ class LæremidlerBeregnYtelseStegTest(
     fun `Skal utbetale første ukedag i måneden dersom første dagen i måneden er lørdag eller søndag`() {
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = Vedtaksperiode(fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31))
+        val vedtaksperiode = VedtaksperiodeDto(fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31))
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
