@@ -25,6 +25,7 @@ object LæremidlerTestUtil {
                 studienivå = Studienivå.HØYERE_UTDANNING,
                 studieprosent = 100,
                 sats = 875,
+                satsBekreftet = true,
                 målgruppe = MålgruppeType.AAP,
             ),
         )

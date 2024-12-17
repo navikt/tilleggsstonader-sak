@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBereg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatLæremidlerDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import org.springframework.web.bind.annotation.GetMapping
@@ -34,15 +35,13 @@ class LæremidlerVedtakController(
     private val steg: LæremidlerBeregnYtelseSteg,
 ) {
 
-    /*
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseTilsynBarnRequest,
+        @RequestBody vedtak: InnvilgelseLæremidlerRequest,
     ) {
         lagreVedtak(behandlingId, vedtak)
     }
-     */
 
     @PostMapping("{behandlingId}/avslag")
     fun avslå(
