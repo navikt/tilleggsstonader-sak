@@ -11,6 +11,10 @@ object VedtaksperiodeUtil {
         vedtaksperioder: List<Vedtaksperiode>,
         stønadsperioder: List<Stønadsperiode>,
     ) {
+        feilHvis(vedtaksperioder.size > 1) {
+            "Foreløbig støtter vi kun beregning for læremidler med en vedtaksperiode"
+        }
+
         val overlappendePeriode = vedtaksperioder.førsteOverlappendePeriode()
         if (overlappendePeriode != null) {
             brukerfeil("Periode=${overlappendePeriode.first.formatertPeriodeNorskFormat()} og ${overlappendePeriode.second.formatertPeriodeNorskFormat()} overlapper.")
