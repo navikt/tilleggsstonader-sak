@@ -73,7 +73,55 @@ class VedtaksperiodeUtilTest {
             feil = e
         }
 
-        assertThat(feil).hasMessageContaining("overlapper")
+        assertThat(feil).hasMessageContaining("Foreløbig støtter vi kun en vedtaksperiode per kalendermåned")
+    }
+
+    @Test
+    fun `Flere vedtaksperioder i samme kalendermåned kaster feil - en måned`() {
+        vedtaksperioder = listOf(
+            Vedtaksperiode(
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 1, 12),
+            ),
+            Vedtaksperiode(
+                fom = LocalDate.of(2024, 1, 15),
+                tom = LocalDate.of(2024, 2, 28),
+            ),
+        )
+
+        var feil: Exception? = null
+
+        try {
+            validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+        } catch (e: Exception) {
+            feil = e
+        }
+
+        assertThat(feil).hasMessageContaining("Foreløbig støtter vi kun en vedtaksperiode per kalendermåned")
+    }
+
+    @Test
+    fun `Flere vedtaksperioder i samme kalendermåned kaster feil - flere måneder`() {
+        vedtaksperioder = listOf(
+            Vedtaksperiode(
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 2, 12),
+            ),
+            Vedtaksperiode(
+                fom = LocalDate.of(2024, 2, 15),
+                tom = LocalDate.of(2024, 3, 28),
+            ),
+        )
+
+        var feil: Exception? = null
+
+        try {
+            validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+        } catch (e: Exception) {
+            feil = e
+        }
+
+        assertThat(feil).hasMessageContaining("Foreløbig støtter vi kun en vedtaksperiode per kalendermåned")
     }
 
     @Test

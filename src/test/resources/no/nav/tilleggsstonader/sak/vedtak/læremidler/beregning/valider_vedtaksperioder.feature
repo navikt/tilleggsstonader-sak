@@ -16,7 +16,7 @@ Egenskap: Validering av vedtaksperioder for læremidler
 
     Når validerer vedtaksperiode for læremidler
 
-    Så forvent følgende feil fra vedtaksperiode validering: overlapper
+    Så forvent følgende feil fra vedtaksperiode validering: Foreløbig støtter vi kun en vedtaksperiode per kalendermåned
 
   Scenario: Vedtaksperioder er ikke innenfor en stønadsperiode - mangler dag i midten
     Gitt følgende vedtaksperioder for læremidler
