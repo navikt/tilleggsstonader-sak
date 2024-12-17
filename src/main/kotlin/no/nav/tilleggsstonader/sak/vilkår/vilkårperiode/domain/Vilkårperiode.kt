@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
@@ -14,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.VilkårperiodeTypeDeserializer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -30,6 +32,8 @@ interface IVilkårperiode<FAKTA_VURDERING : FaktaOgVurdering> : Periode<LocalDat
 }
 
 typealias Vilkårperiode = GeneriskVilkårperiode<out FaktaOgVurdering>
+typealias VilkårperiodeMålgruppe = GeneriskVilkårperiode<MålgruppeFaktaOgVurdering>
+typealias VilkårperiodeAktivitet = GeneriskVilkårperiode<AktivitetFaktaOgVurdering>
 
 /**
  *
@@ -219,6 +223,6 @@ val vilkårperiodetyper: Map<String, VilkårperiodeType> =
     listOf(MålgruppeType.entries, AktivitetType.entries).flatten().associateBy { it.name }
 
 data class Vilkårperioder(
-    val målgrupper: List<Vilkårperiode>,
-    val aktiviteter: List<Vilkårperiode>,
+    val målgrupper: List<VilkårperiodeMålgruppe>,
+    val aktiviteter: List<VilkårperiodeAktivitet>,
 )

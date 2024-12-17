@@ -7,10 +7,11 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import java.time.LocalDate
 
 object ForeslåStønadsperiode {
@@ -94,7 +95,9 @@ object ForeslåStønadsperiode {
         }
     }
 
-    private fun slåSammenVilkårsperioderSomErLikeEtterHverandre(vilkårperioder: List<Vilkårperiode>): List<Vilkårperiode> {
+    private inline fun <T : FaktaOgVurdering> slåSammenVilkårsperioderSomErLikeEtterHverandre(
+        vilkårperioder: List<GeneriskVilkårperiode<T>>,
+    ): List<GeneriskVilkårperiode<T>> {
         return vilkårperioder
             .sorted()
             .mergeSammenhengende(

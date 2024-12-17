@@ -40,7 +40,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import java.time.LocalDate
@@ -78,7 +78,7 @@ object Testdata {
         språk = Språkkode.NB,
     )
 
-    private val målgrupper: List<Vilkårperiode> = listOf(
+    private val målgrupper: List<VilkårperiodeMålgruppe> = listOf(
         VilkårperiodeTestUtil.målgruppe(
             begrunnelse = "målgruppe aap",
             faktaOgVurdering = faktaOgVurderingMålgruppe(

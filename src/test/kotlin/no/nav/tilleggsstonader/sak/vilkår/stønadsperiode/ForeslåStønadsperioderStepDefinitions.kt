@@ -16,13 +16,14 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 
 class ForeslåStønadsperioderStepDefinitions {
-    var aktiviteter: List<Vilkårperiode> = emptyList()
-    var målgrupper: List<Vilkårperiode> = emptyList()
+    var aktiviteter: List<VilkårperiodeAktivitet> = emptyList()
+    var målgrupper: List<VilkårperiodeMålgruppe> = emptyList()
     var resultat: List<StønadsperiodeDto> = emptyList()
     var feil: ApiFeil? = null
 
