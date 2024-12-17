@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -81,15 +80,6 @@ fun Vurdering.tilDto() =
         ?.let {
             VurderingDto(svar = svar, resultat = resultat)
         }
-
-data class Datoperiode(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-) : Periode<LocalDate>, Mergeable<LocalDate, Datoperiode> {
-    override fun merge(other: Datoperiode): Datoperiode {
-        return this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
-    }
-}
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(

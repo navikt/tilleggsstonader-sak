@@ -1,11 +1,10 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import java.time.LocalDate
 
 object VilkårPeriodeValidering {
 
@@ -41,9 +40,4 @@ object VilkårPeriodeValidering {
                 Datoperiode(fom = it.fom, tom = it.tom)
             }
         }
-
-    private data class Datoperiode(
-        override val fom: LocalDate,
-        override val tom: LocalDate,
-    ) : Periode<LocalDate>
 }
