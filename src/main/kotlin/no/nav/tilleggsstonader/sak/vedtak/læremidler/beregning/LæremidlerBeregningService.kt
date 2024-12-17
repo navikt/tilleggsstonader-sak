@@ -90,12 +90,15 @@ class LæremidlerBeregningService(
         aktivitet: Aktivitet,
         målgruppe: MålgruppeType,
     ): Beregningsgrunnlag {
+        val sats = finnSatsForPeriode(periode)
+
         return Beregningsgrunnlag(
             fom = periode.fom,
             tom = periode.tom,
             studienivå = aktivitet.studienivå,
             studieprosent = aktivitet.prosent,
-            sats = finnSatsForStudienivå(periode, aktivitet.studienivå),
+            sats = finnSatsForStudienivå(sats, aktivitet.studienivå),
+            satsBekreftet = sats.bekreftet,
             utbetalingsmåned = periode.utbetalingsmåned,
             målgruppe = målgruppe,
         )

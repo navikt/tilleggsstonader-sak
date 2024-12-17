@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -42,6 +43,7 @@ enum class BeregningNøkler(
     AKTIVITET("Aktivitet"),
     UTBETALINGSMÅNED("Utbetalingsmåned"),
     MÅLGRUPPE("Målgruppe"),
+    BEKREFTET_SATS("Bekreftet sats"),
 }
 
 class StepDefinitions {
@@ -128,6 +130,7 @@ class StepDefinitions {
                         ?: Studienivå.HØYERE_UTDANNING,
                     studieprosent = parseInt(BeregningNøkler.STUDIEPROSENT, rad),
                     sats = parseBigDecimal(BeregningNøkler.SATS, rad).toInt(),
+                    satsBekreftet = parseValgfriBoolean(BeregningNøkler.BEKREFTET_SATS, rad) ?: true,
                     utbetalingsmåned = parseÅrMåned(BeregningNøkler.UTBETALINGSMÅNED, rad),
                     målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad)
                         ?: MålgruppeType.AAP,

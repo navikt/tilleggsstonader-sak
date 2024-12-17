@@ -10,8 +10,9 @@ class SatsLæremidlerTest {
 
     @Test
     fun `høyere utdanning 2024`() {
+        val periode = Vedtaksperiode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 2, 1))
         val sats = finnSatsForStudienivå(
-            Vedtaksperiode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 2, 1)),
+            finnSatsForPeriode(periode),
             Studienivå.HØYERE_UTDANNING,
         )
         assertThat(sats).isEqualTo(875)
@@ -19,8 +20,9 @@ class SatsLæremidlerTest {
 
     @Test
     fun `høyere utdanning 2023`() {
+        val periode = Vedtaksperiode(LocalDate.of(2023, 3, 1), LocalDate.of(2023, 5, 1))
         val sats = finnSatsForStudienivå(
-            Vedtaksperiode(LocalDate.of(2023, 3, 1), LocalDate.of(2023, 5, 1)),
+            finnSatsForPeriode(periode),
             Studienivå.HØYERE_UTDANNING,
         )
         assertThat(sats).isEqualTo(822)
@@ -28,8 +30,9 @@ class SatsLæremidlerTest {
 
     @Test
     fun `videregående utdanning 2024`() {
+        val periode = Vedtaksperiode(LocalDate.of(2024, 11, 1), LocalDate.of(2024, 12, 1))
         val sats = finnSatsForStudienivå(
-            Vedtaksperiode(LocalDate.of(2024, 11, 1), LocalDate.of(2024, 12, 1)),
+            finnSatsForPeriode(periode),
             Studienivå.VIDEREGÅENDE,
         )
         assertThat(sats).isEqualTo(438)
@@ -37,10 +40,18 @@ class SatsLæremidlerTest {
 
     @Test
     fun `videregående utdanning 2023`() {
+        val periode = Vedtaksperiode(LocalDate.of(2023, 10, 1), LocalDate.of(2023, 12, 1))
         val sats = finnSatsForStudienivå(
-            Vedtaksperiode(LocalDate.of(2023, 10, 1), LocalDate.of(2023, 12, 1)),
+            finnSatsForPeriode(periode),
             Studienivå.VIDEREGÅENDE,
         )
         assertThat(sats).isEqualTo(411)
+    }
+
+    @Test
+    fun `skal kun ha 1 sats som er ubekreftet, for å kunne markere perioder etter nyttår som at de ikke skal utbetales ennå`() {
+        val ubekreftedeSatser = satser.filterNot { it.bekreftet }
+
+        assertThat(ubekreftedeSatser).hasSize(1)
     }
 }

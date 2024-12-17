@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
@@ -105,6 +106,7 @@ class BehandlingsoversiktService(
         return when (vedtak.data) {
             is InnvilgelseTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
             is OpphørTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
+            is InnvilgelseLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
             is AvslagTilsynBarn -> null
             is AvslagLæremidler -> null
         }
@@ -114,6 +116,12 @@ class BehandlingsoversiktService(
         val stønadsperioder = perioder.flatMap { it.grunnlag.stønadsperioderGrunnlag }.map { it.stønadsperiode }
         val minFom = stønadsperioder.minOfOrNull { it.fom }
         val maksTom = stønadsperioder.maxOfOrNull { it.tom }
+        return Vedtaksperiode(fom = max(minFom, revurdererFra), tom = max(maksTom, revurdererFra))
+    }
+
+    private fun InnvilgelseLæremidler.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
+        val minFom = vedtaksperioder.minOfOrNull { it.fom }
+        val maksTom = vedtaksperioder.maxOfOrNull { it.tom }
         return Vedtaksperiode(fom = max(minFom, revurdererFra), tom = max(maksTom, revurdererFra))
     }
 }

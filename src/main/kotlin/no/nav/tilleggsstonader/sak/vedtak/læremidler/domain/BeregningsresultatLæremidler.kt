@@ -21,5 +21,6 @@ data class Beregningsgrunnlag(
     val studienivå: Studienivå,
     val studieprosent: Int,
     val sats: Int,
+    val satsBekreftet: Boolean,
     val målgruppe: MålgruppeType,
 ) : Periode<LocalDate>

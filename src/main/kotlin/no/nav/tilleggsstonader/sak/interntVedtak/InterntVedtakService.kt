@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
@@ -183,6 +184,7 @@ class InterntVedtakService(
     }
 
     private fun mapVedtakLæremidler(vedtak: VedtakLæremidler) = when (vedtak) {
+        is InnvilgelseLæremidler -> VedtakInnvilgelseInternt // TODO: Burde den inneholde vedtaksperioder?
         is AvslagLæremidler -> VedtakAvslagInternt(
             årsakerAvslag = vedtak.årsaker,
             avslagBegrunnelse = vedtak.begrunnelse,
