@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -40,11 +41,14 @@ class OpprettRevurderingBehandlingService(
     val fagsakService: FagsakService,
 ) {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     @Transactional
     fun opprettBehandling(request: OpprettBehandlingDto): BehandlingId {
         feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING)) {
             "Feature toggle for å kunne opprette revurdering er slått av"
         }
+        logger.info("Oppretter revurdering for fagsak=${request.fagsakId}")
 
         val fagsakId = request.fagsakId
         val behandling = behandlingService.opprettBehandling(
