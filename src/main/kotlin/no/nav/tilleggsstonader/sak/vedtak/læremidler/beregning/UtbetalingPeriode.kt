@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
-import no.nav.tilleggsstonader.sak.vedtak.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.time.YearMonth
@@ -35,7 +35,7 @@ data class UtbetalingPeriode(
         return relevanteAktiviteter.single()
     }
 
-    fun finnRelevantStønadsperiode(stønadsperioder: List<Stønadsperiode>): Stønadsperiode {
+    fun finnRelevantStønadsperiode(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>): StønadsperiodeBeregningsgrunnlag {
         val relevanteStønadsperioderForPeriode = stønadsperioder.filter { it.inneholder(this) }
 
         feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {

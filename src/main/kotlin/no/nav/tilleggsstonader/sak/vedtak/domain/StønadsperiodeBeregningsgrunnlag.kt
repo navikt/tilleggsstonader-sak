@@ -1,13 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.util.UUID
-import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode as StønadsperiodeInngangsvilkår
 
-data class Stønadsperiode(
+data class StønadsperiodeBeregningsgrunnlag(
     val id: UUID? = null,
     override val fom: LocalDate,
     override val tom: LocalDate,
@@ -19,7 +19,7 @@ data class Stønadsperiode(
     }
 }
 
-fun StønadsperiodeInngangsvilkår.tilGrunnlagStønadsperiode() = Stønadsperiode(
+fun Stønadsperiode.tilStønadsperiodeBeregningsgrunnlag() = StønadsperiodeBeregningsgrunnlag(
     id = this.id,
     fom = this.fom,
     tom = this.tom,
@@ -27,5 +27,5 @@ fun StønadsperiodeInngangsvilkår.tilGrunnlagStønadsperiode() = Stønadsperiod
     aktivitet = this.aktivitet,
 )
 
-fun List<StønadsperiodeInngangsvilkår>.tilSortertGrunnlagStønadsperiode() =
-    this.map { it.tilGrunnlagStønadsperiode() }.sortedBy { it.fom }
+fun List<Stønadsperiode>.tilSortertStønadsperiodeBeregningsgrunnlag() =
+    this.map { it.tilStønadsperiodeBeregningsgrunnlag() }.sortedBy { it.fom }

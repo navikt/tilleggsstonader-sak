@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
@@ -57,7 +57,7 @@ object TilsynBarnTestUtil {
     )
 
     fun stønadsperiodeGrunnlag(
-        stønadsperiode: Stønadsperiode,
+        stønadsperiode: StønadsperiodeBeregningsgrunnlag,
     ): StønadsperiodeGrunnlag {
         return StønadsperiodeGrunnlag(
             stønadsperiode = stønadsperiode,

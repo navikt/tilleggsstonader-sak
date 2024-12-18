@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.vedtak.domain.Stønadsperiode
-import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertGrunnlagStønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.beregnBeløp
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.slåSammenSammenhengende
@@ -41,8 +41,8 @@ class LæremidlerBeregningService(
         return BeregningsresultatLæremidler(beregningsresultatForMåned)
     }
 
-    private fun hentStønadsperioder(behandlingId: BehandlingId): List<Stønadsperiode> =
-        stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertGrunnlagStønadsperiode()
+    private fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeBeregningsgrunnlag> =
+        stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertStønadsperiodeBeregningsgrunnlag()
 
     private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
         return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
@@ -51,7 +51,7 @@ class LæremidlerBeregningService(
 
     private fun beregnLæremidlerPerMåned(
         vedtaksperioder: List<Vedtaksperiode>,
-        stønadsperioder: List<Stønadsperiode>,
+        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         aktiviteter: List<Aktivitet>,
     ): List<BeregningsresultatForMåned> =
         vedtaksperioder.flatMap { it.delTilUtbetalingsPerioder() }

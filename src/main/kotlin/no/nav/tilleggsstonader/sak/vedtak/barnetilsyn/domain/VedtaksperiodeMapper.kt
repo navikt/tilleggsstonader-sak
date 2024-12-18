@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.sak.vedtak.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -38,7 +38,7 @@ data class Vedtaksperiode(
         validatePeriode()
     }
 
-    constructor(stønadsperiode: Stønadsperiode, antallBarn: Int) : this(
+    constructor(stønadsperiode: StønadsperiodeBeregningsgrunnlag, antallBarn: Int) : this(
         fom = stønadsperiode.fom,
         tom = stønadsperiode.tom,
         målgruppe = stønadsperiode.målgruppe,
