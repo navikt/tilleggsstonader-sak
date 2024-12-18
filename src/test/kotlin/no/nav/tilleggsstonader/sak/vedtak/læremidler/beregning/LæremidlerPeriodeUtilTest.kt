@@ -22,7 +22,7 @@ class LæremidlerPeriodeUtilTest {
         @Test
         fun `skal splitte periode i løpende måneder 2024-01-01 til 2024-02-01`() {
             val datoperiode = Datoperiode(FØRSTE_JAN_2024, FØRSTE_FEB_2024)
-            assertThat(datoperiode.splitPerLøpendeMåneder { fom, tom -> Datoperiode(fom = fom, tom = tom) })
+            assertThat(datoperiode.splitPerLøpendeMåneder({ fom, tom -> Datoperiode(fom = fom, tom = tom) }))
                 .containsExactly(
                     Datoperiode(FØRSTE_JAN_2024, SISTE_JAN_2024),
                     Datoperiode(FØRSTE_FEB_2024, FØRSTE_FEB_2024),
@@ -33,7 +33,7 @@ class LæremidlerPeriodeUtilTest {
         fun `skal splitte periode i løpende måneder 2024-01-01 til 2024-03-15`() {
             val tom = LocalDate.of(2024, 3, 15)
             val datoperiode = Datoperiode(FØRSTE_JAN_2024, tom)
-            assertThat(datoperiode.splitPerLøpendeMåneder { fom, tom -> Datoperiode(fom = fom, tom = tom) })
+            assertThat(datoperiode.splitPerLøpendeMåneder({ fom, tom -> Datoperiode(fom = fom, tom = tom) }))
                 .containsExactly(
                     Datoperiode(FØRSTE_JAN_2024, SISTE_JAN_2024),
                     Datoperiode(FØRSTE_FEB_2024, SISTE_FEB_2024),
@@ -44,7 +44,7 @@ class LæremidlerPeriodeUtilTest {
         @Test
         fun `fra første dag i måneden`() {
             val datoperiode = Datoperiode(FØRSTE_JAN_2024, SISTE_MARS_2024)
-            assertThat(datoperiode.splitPerLøpendeMåneder { fom, tom -> Datoperiode(fom = fom, tom = tom) })
+            assertThat(datoperiode.splitPerLøpendeMåneder({ fom, tom -> Datoperiode(fom = fom, tom = tom) }))
                 .containsExactly(
                     Datoperiode(FØRSTE_JAN_2024, SISTE_JAN_2024),
                     Datoperiode(FØRSTE_FEB_2024, SISTE_FEB_2024),
@@ -55,7 +55,7 @@ class LæremidlerPeriodeUtilTest {
         @Test
         fun `fra midt i måneden`() {
             val datoperiode = Datoperiode(LocalDate.of(2024, 1, 15), SISTE_APRIL_2024)
-            assertThat(datoperiode.splitPerLøpendeMåneder { fom, tom -> Datoperiode(fom = fom, tom = tom) })
+            assertThat(datoperiode.splitPerLøpendeMåneder({ fom, tom -> Datoperiode(fom = fom, tom = tom) }))
                 .containsExactly(
                     Datoperiode(LocalDate.of(2024, 1, 15), LocalDate.of(2024, 2, 14)),
                     Datoperiode(LocalDate.of(2024, 2, 15), LocalDate.of(2024, 3, 14)),
@@ -68,7 +68,7 @@ class LæremidlerPeriodeUtilTest {
         @Test
         fun `fra sluttet på måneden`() {
             val datoperiode = Datoperiode(SISTE_JAN_2024, SISTE_APRIL_2024)
-            assertThat(datoperiode.splitPerLøpendeMåneder { fom, tom -> Datoperiode(fom = fom, tom = tom) })
+            assertThat(datoperiode.splitPerLøpendeMåneder({ fom, tom -> Datoperiode(fom = fom, tom = tom) }))
                 .containsExactly(
                     Datoperiode(SISTE_JAN_2024, SISTE_FEB_2024.minusDays(1)),
                     Datoperiode(SISTE_FEB_2024, LocalDate.of(2024, 3, 28)),
@@ -82,7 +82,7 @@ class LæremidlerPeriodeUtilTest {
         @Test
         fun `siste dagen i januar skal løpe til nest siste dagen i februar sånn at man får innvilget for siste dagen i februar og`() {
             val datoperiode = Datoperiode(LocalDate.of(2025, 1, 28), LocalDate.of(2025, 3, 31))
-            assertThat(datoperiode.splitPerLøpendeMåneder { fom, tom -> Datoperiode(fom = fom, tom = tom) })
+            assertThat(datoperiode.splitPerLøpendeMåneder({ fom, tom -> Datoperiode(fom = fom, tom = tom) }))
                 .containsExactly(
                     Datoperiode(LocalDate.of(2025, 1, 28), LocalDate.of(2025, 2, 27)),
                     Datoperiode(LocalDate.of(2025, 2, 28), LocalDate.of(2025, 3, 27)),
@@ -96,7 +96,7 @@ class LæremidlerPeriodeUtilTest {
             @Test
             fun `periode som kun gjelder rød dag men ikke helg får innvilget`() {
                 val datoperiode = Datoperiode(FØRSTE_JAN_2024, FØRSTE_JAN_2024)
-                assertThat(datoperiode.splitPerLøpendeMåneder { fom, tom -> Datoperiode(fom = fom, tom = tom) })
+                assertThat(datoperiode.splitPerLøpendeMåneder({ fom, tom -> Datoperiode(fom = fom, tom = tom) }))
                     .containsExactly(
                         datoperiode,
                     )
@@ -106,21 +106,21 @@ class LæremidlerPeriodeUtilTest {
             @Test
             fun `periode som gjelder helg får ikke innvilget`() {
                 val datoperiode = Datoperiode(LocalDate.of(2025, 1, 4), LocalDate.of(2025, 1, 5))
-                assertThat(datoperiode.splitPerLøpendeMåneder { fom, tom -> Datoperiode(fom = fom, tom = tom) })
+                assertThat(datoperiode.splitPerLøpendeMåneder({ fom, tom -> Datoperiode(fom = fom, tom = tom) }))
                     .isEmpty()
             }
 
             @Test
             fun `skal ikke splitte periode som som har fom = tom`() {
                 val datoperiode = Datoperiode(FØRSTE_FEB_2024, FØRSTE_FEB_2024)
-                assertThat(datoperiode.splitPerLøpendeMåneder { fom, tom -> Datoperiode(fom = fom, tom = tom) })
+                assertThat(datoperiode.splitPerLøpendeMåneder({ fom, tom -> Datoperiode(fom = fom, tom = tom) }))
                     .containsExactly(datoperiode)
             }
 
             @Test
             fun `skal ikke splitte periode som er i samme måned`() {
                 val datoperiode = Datoperiode(FØRSTE_JAN_2024, SISTE_JAN_2024)
-                assertThat(datoperiode.splitPerLøpendeMåneder { fom, tom -> Datoperiode(fom = fom, tom = tom) })
+                assertThat(datoperiode.splitPerLøpendeMåneder({ fom, tom -> Datoperiode(fom = fom, tom = tom) }))
                     .containsExactly(datoperiode)
             }
         }

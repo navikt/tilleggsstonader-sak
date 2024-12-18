@@ -24,13 +24,13 @@ object LæremidlerBeregningUtil {
     fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<UtbetalingPeriode> =
         splitPerÅr { fom, tom -> Vedtaksperiode(fom, tom) }
             .flatMap { periode ->
-                periode.splitPerLøpendeMåneder { fom, tom ->
+                periode.splitPerLøpendeMåneder({ fom, tom ->
                     UtbetalingPeriode(
                         fom = fom,
                         tom = tom,
                         utbetalingsmåned = periode.fom.toYearMonth(),
                     )
-                }
+                })
             }
 
     fun List<StønadsperiodeBeregningsgrunnlag>.slåSammenSammenhengende(): List<StønadsperiodeBeregningsgrunnlag> =
