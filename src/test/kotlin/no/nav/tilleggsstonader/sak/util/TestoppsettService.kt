@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDate.now
 
 @Profile("integrasjonstest")
 @Service
@@ -123,9 +124,10 @@ class TestoppsettService(
     )
 
     fun opprettRevurdering(
-        revurderFra: LocalDate,
+        revurderFra: LocalDate?,
         forrigeBehandling: Behandling,
         fagsak: Fagsak,
+        steg: StegType = StegType.BEREGNE_YTELSE,
     ): Behandling = lagre(
         behandling(
             fagsak = fagsak,
@@ -133,7 +135,7 @@ class TestoppsettService(
             revurderFra = revurderFra,
             forrigeBehandlingId = forrigeBehandling.id,
             status = BehandlingStatus.UTREDES,
-            steg = StegType.BEREGNE_YTELSE,
+            steg = steg,
         ),
     )
 
@@ -143,7 +145,12 @@ class TestoppsettService(
         val førsteBehandling =
             lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET))
         val revurdering =
-            behandling(fagsak = fagsak, forrigeBehandlingId = førsteBehandling.id, type = BehandlingType.REVURDERING)
+            behandling(
+                fagsak = fagsak,
+                forrigeBehandlingId = førsteBehandling.id,
+                type = BehandlingType.REVURDERING,
+                revurderFra = now(),
+            )
         return lagre(revurdering)
     }
 

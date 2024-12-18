@@ -16,12 +16,14 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -48,6 +50,8 @@ class StegServiceTest(
     val barnRepository: BarnRepository,
     @Autowired
     val tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
+    @Autowired
+    val inngangsvilkårSteg: InngangsvilkårSteg,
     @Autowired
     val stønadsperiodeRepository: StønadsperiodeRepository,
     @Autowired
@@ -143,6 +147,27 @@ class StegServiceTest(
                 )
             }
             assertThat(exception).hasMessage("Kan ikke utføre 'Beregne ytelse' når behandlingstatus er Opprettet")
+        }
+
+        @Test
+        internal fun `skal ikke kunne gå videre fra inngangsvilkår dersom revurder fra-dato mangler i revurdering`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(
+                behandling(steg = StegType.BEHANDLING_FERDIGSTILT, status = BehandlingStatus.FERDIGSTILT),
+            )
+            val revurdering = testoppsettService.opprettRevurdering(
+                revurderFra = null,
+                forrigeBehandling = behandling,
+                fagsak = fagsak(id = behandling.fagsakId),
+                steg = StegType.INNGANGSVILKÅR,
+            )
+
+            val exception = catchThrowableOfType<ApiFeil> {
+                stegService.håndterSteg(
+                    saksbehandling(behandling = revurdering),
+                    inngangsvilkårSteg,
+                )
+            }
+            assertThat(exception).hasMessage("Du må sette revurder fra-dato før du kan gå videre")
         }
 
         @Disabled
