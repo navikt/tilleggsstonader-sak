@@ -93,7 +93,14 @@ class SøknadRoutingService(
             Stønadstype.LÆREMIDLER -> !harVedtak
         }
 
-        logger.info("routing - stønadstype=$stønadstype harGyldigStatusArena=$harGyldigStatus - harAktivSakUtenVedtak=$harAktivSakUtenVedtak harVedtak=$harVedtak harAktivtVedtak=$harAktivtVedtak harVedtakUtenUtfall=$harVedtakUtenUtfall")
+        logger.info(
+            "routing - stønadstype=$stønadstype harGyldigStatusArena=$harGyldigStatus - " +
+                "harAktivSakUtenVedtak=$harAktivSakUtenVedtak " +
+                "harVedtak=$harVedtak " +
+                "harAktivtVedtak=$harAktivtVedtak " +
+                "harVedtakUtenUtfall=$harVedtakUtenUtfall" +
+                "vedtakTom=${arenaStatus.vedtak.vedtakTom}",
+        )
         return harGyldigStatus
     }
 
