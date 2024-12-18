@@ -62,19 +62,15 @@ class BehandlingFaktaService(
     ): BehandlingFaktaLæremidlerDto {
         val søknad = søknadService.hentSøknadLæremidler(behandlingId)
         val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
+        val fødselsdato = grunnlagsdata.grunnlag.fødsel?.fødselsdatoEller1JanForFødselsår()
         return BehandlingFaktaLæremidlerDto(
             søknadMottattTidspunkt = søknad?.mottattTidspunkt,
             hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
             dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata) },
             arena = arenaFakta(grunnlagsdata),
             utdanning = søknad?.data?.utdanning.let { mapUtdanning(it) },
-            alder = hentAlder(behandlingId),
+            alder = antallÅrSiden(fødselsdato),
         )
-    }
-    fun hentAlder(behandlingId: BehandlingId): Int {
-        val fødselsdato = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag.fødsel
-            ?.fødselsdatoEller1JanForFødselsår()
-        return antallÅrSiden(fødselsdato)!!
     }
 
     private fun arenaFakta(grunnlagsdata: Grunnlagsdata): ArenaFakta? {

@@ -41,7 +41,7 @@ data class BehandlingFaktaLæremidlerDto(
     override val dokumentasjon: FaktaDokumentasjon?,
     override val arena: ArenaFakta?,
     val utdanning: FaktaUtdanning,
-    val alder: Int,
+    val alder: Int?,
 ) : BehandlingFaktaDto
 
 data class FaktaHovedytelse(
