@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnit
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
+import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -61,12 +62,14 @@ class BehandlingFaktaService(
     ): BehandlingFaktaLæremidlerDto {
         val søknad = søknadService.hentSøknadLæremidler(behandlingId)
         val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
+        val fødselsdato = grunnlagsdata.grunnlag.fødsel?.fødselsdatoEller1JanForFødselsår()
         return BehandlingFaktaLæremidlerDto(
             søknadMottattTidspunkt = søknad?.mottattTidspunkt,
             hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
             dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata) },
             arena = arenaFakta(grunnlagsdata),
             utdanning = søknad?.data?.utdanning.let { mapUtdanning(it) },
+            alder = antallÅrSiden(fødselsdato),
         )
     }
 
