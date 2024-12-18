@@ -4,12 +4,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 
 object VedtaksperiodeUtil {
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
-        stønadsperioder: List<Stønadsperiode>,
+        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
     ) {
         val overlappendePeriode = vedtaksperioder.førsteOverlappendePeriode()
         if (overlappendePeriode != null) {
@@ -23,7 +23,7 @@ object VedtaksperiodeUtil {
         }
     }
 
-    private fun List<Vedtaksperiode>.ingenOmfattesAvStønadsperioder(stønadsperioder: List<Stønadsperiode>): Boolean =
+    private fun List<Vedtaksperiode>.ingenOmfattesAvStønadsperioder(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>): Boolean =
         any { vedtaksperiode ->
             stønadsperioder.none { it.inneholder(vedtaksperiode) }
         }

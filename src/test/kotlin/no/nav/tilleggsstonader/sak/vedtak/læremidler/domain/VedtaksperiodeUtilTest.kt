@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Stønadsperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.tilGrunnlagStønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -14,7 +14,7 @@ import java.util.UUID
 class VedtaksperiodeUtilTest {
 
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
-    var stønadsperioder: List<Stønadsperiode> = emptyList()
+    var stønadsperioder: List<StønadsperiodeBeregningsgrunnlag> = emptyList()
     var feil: Exception? = null
 
     @BeforeEach
@@ -36,7 +36,7 @@ class VedtaksperiodeUtilTest {
                 behandlingId = behandlingId,
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 28),
-            ).tilGrunnlagStønadsperiode(),
+            ).tilStønadsperiodeBeregningsgrunnlag(),
         )
         feil = null
     }
@@ -84,7 +84,7 @@ class VedtaksperiodeUtilTest {
                 behandlingId = behandlingId,
                 fom = LocalDate.of(2024, 1, 2),
                 tom = LocalDate.of(2024, 1, 31),
-            ).tilGrunnlagStønadsperiode(),
+            ).tilStønadsperiodeBeregningsgrunnlag(),
         )
 
         var feil: Exception? = null

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -10,14 +11,14 @@ import java.time.LocalDate
 
 class VedtaksperiodeMapperTest {
 
-    val periode1 = Stønadsperiode(
+    val periode1 = StønadsperiodeBeregningsgrunnlag(
         fom = LocalDate.of(2024, 1, 1),
         tom = LocalDate.of(2024, 1, 1),
         målgruppe = MålgruppeType.AAP,
         aktivitet = AktivitetType.TILTAK,
     )
 
-    val periode2 = Stønadsperiode(
+    val periode2 = StønadsperiodeBeregningsgrunnlag(
         fom = LocalDate.of(2024, 1, 2),
         tom = LocalDate.of(2024, 1, 2),
         målgruppe = MålgruppeType.AAP,
@@ -106,7 +107,7 @@ class VedtaksperiodeMapperTest {
     }
 
     private fun beregningsresultat(
-        vararg stønadsperioder: Stønadsperiode,
+        vararg stønadsperioder: StønadsperiodeBeregningsgrunnlag,
         antallBarn: Int = 2,
     ): BeregningsresultatForMåned {
         return beregningsresultatForMåned(
