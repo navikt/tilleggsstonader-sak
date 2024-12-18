@@ -93,7 +93,7 @@ data class VurderingerUtdanningLæremidler(
 
 data class FaktaAktivitetLæremidler(
     override val prosent: Int,
-    override val studienivå: Studienivå,
+    override val studienivå: Studienivå?,
 ) : Fakta, FaktaProsent, FaktaStudienivå {
     init {
         require(prosent in 1..100) { "Prosent må være mellom 1 og 100" }

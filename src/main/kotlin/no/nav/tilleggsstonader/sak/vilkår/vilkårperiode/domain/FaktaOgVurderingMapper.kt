@@ -133,7 +133,7 @@ fun mapAktiviteterLæremidler(
         AktivitetType.TILTAK -> TiltakLæremidler(
             fakta = FaktaAktivitetLæremidler(
                 prosent = faktaOgSvar.prosent!!,
-                studienivå = faktaOgSvar.studienivå!!,
+                studienivå = faktaOgSvar.studienivå,
             ),
             vurderinger = VurderingTiltakLæremidler(
                 harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
