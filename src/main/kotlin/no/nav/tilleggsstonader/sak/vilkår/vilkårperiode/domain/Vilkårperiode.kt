@@ -125,7 +125,7 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
             MålgruppeType.NEDSATT_ARBEIDSEVNE -> "Mangler begrunnelse for nedsatt arbeidsevne"
             MålgruppeType.INGEN_MÅLGRUPPE -> "Mangler begrunnelse for ingen målgruppe"
             MålgruppeType.SYKEPENGER_100_PROSENT -> "Mangler begrunnelse for 100% sykepenger"
-            AktivitetType.INGEN_AKTIVITET -> "Mangler begrunnelse for ingen aktivitet"
+            AktivitetType.INGEN_AKTIVITET -> "Mangler begrunnelse for ingen relevant aktivitet"
             else -> null
         }?.let { brukerfeil(it) }
     }

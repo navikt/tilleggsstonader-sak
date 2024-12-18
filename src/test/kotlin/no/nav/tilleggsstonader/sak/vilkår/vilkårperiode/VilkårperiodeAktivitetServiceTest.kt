@@ -164,7 +164,7 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                             aktivitetsdager = null,
                         ),
                     )
-                }.hasMessageContaining("Mangler begrunnelse for ingen aktivitet")
+                }.hasMessageContaining("Mangler begrunnelse for ingen relevant aktivitet")
             }
         }
 
