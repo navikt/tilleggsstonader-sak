@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
@@ -110,6 +111,7 @@ class VilkårperiodeDtoTest {
                 faktaOgVurdering = UtdanningLæremidler(
                     fakta = FaktaAktivitetLæremidler(prosent = 60, studienivå = Studienivå.VIDEREGÅENDE),
                     vurderinger = VurderingerUtdanningLæremidler(
+                        harUtgifter = VurderingHarUtgifter(SvarJaNei.JA),
                         harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(
                             SvarJaNei.NEI,
                         ),
@@ -121,6 +123,7 @@ class VilkårperiodeDtoTest {
                 AktivitetLæremidlerFaktaOgVurderingerDto(
                     prosent = 60,
                     studienivå = Studienivå.VIDEREGÅENDE,
+                    harUtgifter = VurderingDto(svar = SvarJaNei.JA, resultat = OPPFYLT),
                     harRettTilUtstyrsstipend = VurderingDto(svar = SvarJaNei.NEI, resultat = OPPFYLT),
                 ),
             )

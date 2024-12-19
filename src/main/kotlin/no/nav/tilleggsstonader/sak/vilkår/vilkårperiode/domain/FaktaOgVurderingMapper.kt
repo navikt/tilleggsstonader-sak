@@ -144,9 +144,10 @@ fun mapAktiviteterLæremidler(
         AktivitetType.UTDANNING -> UtdanningLæremidler(
             fakta = FaktaAktivitetLæremidler(
                 prosent = faktaOgSvar.prosent!!,
-                studienivå = faktaOgSvar.studienivå!!,
+                studienivå = faktaOgSvar.studienivå,
             ),
             vurderinger = VurderingerUtdanningLæremidler(
+                harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                 harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(faktaOgSvar.svarHarRettTilUtstyrsstipend),
             ),
         )

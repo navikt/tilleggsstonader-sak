@@ -88,8 +88,9 @@ data class VurderingTiltakLæremidler(
 ) : HarUtgifterVurdering, HarRettTilUtstyrsstipendVurdering
 
 data class VurderingerUtdanningLæremidler(
+    override val harUtgifter: VurderingHarUtgifter,
     override val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend,
-) : HarRettTilUtstyrsstipendVurdering
+) : HarUtgifterVurdering, HarRettTilUtstyrsstipendVurdering
 
 data class FaktaAktivitetLæremidler(
     override val prosent: Int,
