@@ -37,7 +37,7 @@ object VedtaksperiodeUtil {
 
     private fun List<Vedtaksperiode>.erFlereISammeLøpendeMåned(): Boolean {
         return flatMap {
-            it.splitPerLøpendeMåneder({ fom, tom -> Vedtaksperiode(fom, tom) }, false)
+            it.splitPerLøpendeMåneder(false) { fom, tom -> Vedtaksperiode(fom, tom) }
         }.overlapper()
     }
 }

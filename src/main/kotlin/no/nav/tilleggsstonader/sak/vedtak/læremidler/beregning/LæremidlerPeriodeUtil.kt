@@ -11,11 +11,21 @@ object LæremidlerPeriodeUtil {
      * Splitter en periode i løpende måneder. Løpende måned er fra dagens dato og en måned frem i tiden.
      * eks 05.01.2024-29.02.24 blir listOf( P(fom=05.01.2024,tom=04.02.2024), P(fom=05.02.2024,tom=29.02.2024) )
      */
-    fun <P : Periode<LocalDate>, VAL : Periode<LocalDate>> P.splitPerLøpendeMåneder(medNyPeriode: (fom: LocalDate, tom: LocalDate) -> VAL, skalKutteSistePeriode: Boolean = true): List<VAL> {
+    fun <P : Periode<LocalDate>, VAL : Periode<LocalDate>> P.splitPerLøpendeMåneder(
+        skalKutteSistePeriode: Boolean = true,
+        medNyPeriode: (fom: LocalDate, tom: LocalDate) -> VAL,
+    ): List<VAL> {
         val perioder = mutableListOf<VAL>()
         var gjeldendeFom = fom
         while (gjeldendeFom <= tom) {
-            val nyTom = if (skalKutteSistePeriode) minOf(gjeldendeFom.sisteDagenILøpendeMåned(), tom) else gjeldendeFom.sisteDagenILøpendeMåned()
+            val nyTom = if (skalKutteSistePeriode) {
+                minOf(
+                    gjeldendeFom.sisteDagenILøpendeMåned(),
+                    tom,
+                )
+            } else {
+                gjeldendeFom.sisteDagenILøpendeMåned()
+            }
 
             val nyPeriode = medNyPeriode(gjeldendeFom, nyTom)
             if (nyPeriode.harDatoerIUkedager()) {
