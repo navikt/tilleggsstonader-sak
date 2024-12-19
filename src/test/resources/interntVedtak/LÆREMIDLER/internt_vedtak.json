@@ -80,7 +80,10 @@
       "@type" : "AKTIVITET_LÆREMIDLER",
       "prosent" : 80,
       "studienivå" : "VIDEREGÅENDE",
-      "harUtgifter" : null,
+      "harUtgifter" : {
+        "svar" : "JA",
+        "resultat" : "OPPFYLT"
+      },
       "harRettTilUtstyrsstipend" : {
         "svar" : "JA",
         "resultat" : "IKKE_OPPFYLT"

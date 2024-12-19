@@ -175,6 +175,7 @@ object VilkårperiodeTestUtil {
         AktivitetType.UTDANNING -> UtdanningLæremidler(
             fakta = FaktaAktivitetLæremidler(prosent, studienivå),
             vurderinger = VurderingerUtdanningLæremidler(
+                harUtgifter = harUtgifter,
                 harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
             ),
         )
