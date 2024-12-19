@@ -79,7 +79,7 @@ data class TiltakLæremidler(
             return ResultatVilkårperiode.OPPFYLT
         }
 
-        return vurderinger.resultatVurderinger()
+        return super.utledResultat()
     }
 }
 
@@ -97,7 +97,7 @@ data class UtdanningLæremidler(
             return ResultatVilkårperiode.OPPFYLT
         }
 
-        return vurderinger.resultatVurderinger()
+        return super.utledResultat()
     }
 }
 
