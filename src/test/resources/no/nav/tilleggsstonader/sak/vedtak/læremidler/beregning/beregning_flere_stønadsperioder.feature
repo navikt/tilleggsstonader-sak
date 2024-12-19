@@ -73,7 +73,7 @@ Egenskap: Beregning
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en stønadsperiode
+    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en overlappsperiode
 
 
 
@@ -94,7 +94,7 @@ Egenskap: Beregning
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en stønadsperiode
+    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en overlappsperiode
 
   Scenario: Flere stønadsperioder som unneholder utbeatlingsperioden
     Gitt følgende vedtaksperioder for læremidler

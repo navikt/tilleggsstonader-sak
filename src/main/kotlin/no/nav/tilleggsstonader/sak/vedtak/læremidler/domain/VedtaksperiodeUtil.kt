@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerPeriodeUtil.splitPerLøpendeMåneder
@@ -23,10 +22,10 @@ object VedtaksperiodeUtil {
             brukerfeil("Periode=${overlappendePeriode.first.formatertPeriodeNorskFormat()} og ${overlappendePeriode.second.formatertPeriodeNorskFormat()} overlapper.")
         }
 
-        feilHvis(
+        brukerfeilHvis(
             vedtaksperioder.ingenOmfattesAvStønadsperioder(stønadsperioder),
         ) {
-            "Vedtaksperiode er ikke innenfor en stønadsperiode"
+            "Vedtaksperiode er ikke innenfor en overlappsperiode"
         }
     }
 
