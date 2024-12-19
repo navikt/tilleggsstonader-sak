@@ -5,9 +5,10 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
 import java.util.UUID
 
@@ -15,7 +16,6 @@ class VedtaksperiodeUtilTest {
 
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
     var stønadsperioder: List<StønadsperiodeBeregningsgrunnlag> = emptyList()
-    var feil: Exception? = null
 
     @BeforeEach
     fun `Set up`() {
@@ -38,18 +38,13 @@ class VedtaksperiodeUtilTest {
                 tom = LocalDate.of(2024, 2, 28),
             ).tilStønadsperiodeBeregningsgrunnlag(),
         )
-        feil = null
     }
 
     @Test
     fun `Kaster ikke feil ved gyldig data`() {
-        try {
+        assertDoesNotThrow {
             validerVedtaksperioder(vedtaksperioder, stønadsperioder)
-        } catch (e: Exception) {
-            feil = e
         }
-
-        assertThat(feil).isNull()
     }
 
     @Test
@@ -65,15 +60,45 @@ class VedtaksperiodeUtilTest {
             ),
         )
 
-        var feil: Exception? = null
-
-        try {
+        assertThatThrownBy {
             validerVedtaksperioder(vedtaksperioder, stønadsperioder)
-        } catch (e: Exception) {
-            feil = e
-        }
+        }.hasMessageContaining("Foreløbig støtter vi kun en vedtaksperiode per løpende måned")
+    }
 
-        assertThat(feil).hasMessageContaining("overlapper")
+    @Test
+    fun `Flere vedtaksperioder i samme løpende måned kaster feil`() {
+        vedtaksperioder = listOf(
+            Vedtaksperiode(
+                fom = LocalDate.of(2024, 1, 12),
+                tom = LocalDate.of(2024, 2, 5),
+            ),
+            Vedtaksperiode(
+                fom = LocalDate.of(2024, 2, 6),
+                tom = LocalDate.of(2024, 3, 12),
+            ),
+        )
+
+        assertThatThrownBy {
+            validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+        }.hasMessageContaining("Foreløbig støtter vi kun en vedtaksperiode per løpende måned")
+    }
+
+    @Test
+    fun `Flere vedtaksperioder i samme kalendermåned men forskjellig løpende måned`() {
+        vedtaksperioder = listOf(
+            Vedtaksperiode(
+                fom = LocalDate.of(2024, 1, 15),
+                tom = LocalDate.of(2024, 2, 14),
+            ),
+            Vedtaksperiode(
+                fom = LocalDate.of(2024, 2, 15),
+                tom = LocalDate.of(2024, 2, 28),
+            ),
+        )
+
+        assertDoesNotThrow {
+            validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+        }
     }
 
     @Test
@@ -87,14 +112,8 @@ class VedtaksperiodeUtilTest {
             ).tilStønadsperiodeBeregningsgrunnlag(),
         )
 
-        var feil: Exception? = null
-
-        try {
+        assertThatThrownBy {
             validerVedtaksperioder(vedtaksperioder, stønadsperioder)
-        } catch (e: Exception) {
-            feil = e
-        }
-
-        assertThat(feil).hasMessageContaining("Vedtaksperiode er ikke innenfor en stønadsperiode")
+        }.hasMessageContaining("Vedtaksperiode er ikke innenfor en stønadsperiode")
     }
 }
