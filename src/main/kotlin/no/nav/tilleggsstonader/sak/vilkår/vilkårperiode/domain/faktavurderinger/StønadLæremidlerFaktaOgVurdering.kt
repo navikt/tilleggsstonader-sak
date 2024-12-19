@@ -3,6 +3,9 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurdering
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode.IKKE_OPPFYLT
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode.OPPFYLT
 
 sealed interface FaktaOgVurderingLæremidler : FaktaOgVurdering {
     override val type: TypeFaktaOgVurderingLæremidler
@@ -67,6 +70,17 @@ data class TiltakLæremidler(
     override val vurderinger: VurderingTiltakLæremidler,
 ) : AktivitetLæremidler {
     override val type: AktivitetLæremidlerType = AktivitetLæremidlerType.TILTAK_LÆREMIDLER
+    override fun utledResultat(): ResultatVilkårperiode {
+        if (vurderinger.harUtgifter.resultat == IKKE_OPPFYLT) {
+            return ResultatVilkårperiode.IKKE_OPPFYLT
+        }
+
+        if (vurderinger.harUtgifter.resultat == OPPFYLT && fakta.studienivå == Studienivå.HØYERE_UTDANNING) {
+            return ResultatVilkårperiode.OPPFYLT
+        }
+
+        return vurderinger.resultatVurderinger()
+    }
 }
 
 data class UtdanningLæremidler(
@@ -74,6 +88,17 @@ data class UtdanningLæremidler(
     override val vurderinger: VurderingerUtdanningLæremidler,
 ) : AktivitetLæremidler {
     override val type: AktivitetLæremidlerType = AktivitetLæremidlerType.UTDANNING_LÆREMIDLER
+    override fun utledResultat(): ResultatVilkårperiode {
+        if (vurderinger.harUtgifter.resultat == IKKE_OPPFYLT) {
+            return ResultatVilkårperiode.IKKE_OPPFYLT
+        }
+
+        if (vurderinger.harUtgifter.resultat == OPPFYLT && fakta.studienivå == Studienivå.HØYERE_UTDANNING) {
+            return ResultatVilkårperiode.OPPFYLT
+        }
+
+        return vurderinger.resultatVurderinger()
+    }
 }
 
 data object IngenAktivitetLæremidler : AktivitetLæremidler {
