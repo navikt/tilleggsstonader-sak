@@ -18,13 +18,6 @@ class FaktaOgVurderingLæremidlerTest {
                 assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
             }
         }
-
-        @Test
-        fun `resultatet skal ikke være oppfylt hvis ikke aktivitetstypen gir rett på stønaden`() {
-            listOf(IngenAktivitetLæremidler).forEach { faktaOgVurdering ->
-                assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
-            }
-        }
     }
 
     @Nested
