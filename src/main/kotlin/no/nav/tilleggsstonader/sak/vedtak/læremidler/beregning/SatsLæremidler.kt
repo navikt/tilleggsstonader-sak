@@ -25,10 +25,15 @@ private val MAX = LocalDate.of(2099, 12, 31)
 
 val satser: List<SatsLæremidler> = listOf(
     SatsLæremidler(
-        fom = LocalDate.of(2025, 1, 1),
+        fom = LocalDate.of(2026, 1, 1),
         tom = MAX,
         beløp = mapOf(Studienivå.VIDEREGÅENDE to 438, Studienivå.HØYERE_UTDANNING to 875),
         bekreftet = false,
+    ),
+    SatsLæremidler(
+        fom = LocalDate.of(2025, 1, 1),
+        tom = LocalDate.of(2025, 12, 31),
+        beløp = mapOf(Studienivå.VIDEREGÅENDE to 451, Studienivå.HØYERE_UTDANNING to 901),
     ),
     SatsLæremidler(
         fom = LocalDate.of(2024, 1, 1),

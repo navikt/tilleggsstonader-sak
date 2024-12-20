@@ -35,38 +35,26 @@ class LæremidlerBeregnYtelseStegTest(
     val vilkårperiodeRepository: VilkårperiodeRepository,
 ) : IntegrationTest() {
 
-    val AUG_1 = LocalDate.of(2024, 8, 1)
-    val AUG_15 = LocalDate.of(2024, 8, 15)
-    val JAN_1_NESTE_ÅR = LocalDate.of(2025, 1, 1)
-    val APRIL_30_NESTE_ÅR = LocalDate.of(2025, 4, 30)
-
     val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER)
     val behandling = behandling(fagsak = fagsak)
-    val stønadsperiode = stønadsperiode(
-        behandlingId = behandling.id,
-        fom = AUG_15,
-        tom = APRIL_30_NESTE_ÅR,
-    )
-    val aktivitet = aktivitet(
-        behandlingId = behandling.id,
-        fom = AUG_15,
-        tom = APRIL_30_NESTE_ÅR,
-        faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
-    )
 
     @BeforeEach
     fun setUp() {
         testoppsettService.lagreFagsak(fagsak)
         testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
-        stønadsperiodeRepository.insert(stønadsperiode)
-        vilkårperiodeRepository.insert(aktivitet)
     }
 
     @Test
     fun `skal splitte andeler i 2, en for høsten og en for våren som ikke har bekreftet sats ennå`() {
+        val fom = LocalDate.of(2025, 8, 15)
+        val tom = LocalDate.of(2026, 4, 30)
+        val datoUtbetalingDel1 = LocalDate.of(2025, 8, 1)
+        val datoUtbetalingDel2 = LocalDate.of(2026, 1, 1)
+
+        lagreAktivitetOgStønadsperiode(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(fom = AUG_15, tom = APRIL_30_NESTE_ÅR)
+        val vedtaksperiode = VedtaksperiodeDto(fom = fom, tom = tom)
         val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
         steg.utførSteg(saksbehandling, innvilgelse)
 
@@ -74,16 +62,16 @@ class LæremidlerBeregnYtelseStegTest(
             .andelerTilkjentYtelse.sortedBy { it.fom }
 
         with(andeler[0]) {
-            assertThat(fom).isEqualTo(AUG_1)
-            assertThat(tom).isEqualTo(AUG_1)
-            assertThat(beløp).isEqualTo(4375)
+            assertThat(this.fom).isEqualTo(datoUtbetalingDel1)
+            assertThat(this.tom).isEqualTo(datoUtbetalingDel1)
+            assertThat(beløp).isEqualTo(4505)
             assertThat(type).isEqualTo(TypeAndel.LÆREMIDLER_AAP)
             assertThat(statusIverksetting).isEqualTo(StatusIverksetting.UBEHANDLET)
             assertThat(satstype).isEqualTo(Satstype.DAG)
         }
         with(andeler[1]) {
-            assertThat(fom).isEqualTo(JAN_1_NESTE_ÅR)
-            assertThat(tom).isEqualTo(JAN_1_NESTE_ÅR)
+            assertThat(this.fom).isEqualTo(datoUtbetalingDel2)
+            assertThat(this.tom).isEqualTo(datoUtbetalingDel2)
             assertThat(beløp).isEqualTo(3500)
             assertThat(type).isEqualTo(TypeAndel.LÆREMIDLER_AAP)
             assertThat(statusIverksetting).isEqualTo(StatusIverksetting.VENTER_PÅ_SATS_ENDRING)
@@ -94,6 +82,11 @@ class LæremidlerBeregnYtelseStegTest(
 
     @Test
     fun `Skal utbetale første ukedag i måneden dersom første dagen i måneden er lørdag eller søndag`() {
+        val fom = LocalDate.of(2024, 8, 1)
+        val tom = LocalDate.of(2025, 4, 30)
+        val mandagEtterFom = LocalDate.of(2024, 12, 2)
+
+        lagreAktivitetOgStønadsperiode(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
         val vedtaksperiode = VedtaksperiodeDto(fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31))
@@ -101,15 +94,29 @@ class LæremidlerBeregnYtelseStegTest(
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
             .andelerTilkjentYtelse.sortedBy { it.fom }
-
-        val mandagEtterFom = LocalDate.of(2024, 12, 2)
         with(andeler.single()) {
-            assertThat(fom).isEqualTo(mandagEtterFom)
-            assertThat(tom).isEqualTo(mandagEtterFom)
+            assertThat(this.fom).isEqualTo(mandagEtterFom)
+            assertThat(this.tom).isEqualTo(mandagEtterFom)
             assertThat(beløp).isEqualTo(875)
             assertThat(type).isEqualTo(TypeAndel.LÆREMIDLER_AAP)
             assertThat(statusIverksetting).isEqualTo(StatusIverksetting.UBEHANDLET)
             assertThat(satstype).isEqualTo(Satstype.DAG)
         }
+    }
+
+    fun lagreAktivitetOgStønadsperiode(fom: LocalDate, tom: LocalDate) {
+        val stønadsperiode = stønadsperiode(
+            behandlingId = behandling.id,
+            fom = fom,
+            tom = tom,
+        )
+        val aktivitet = aktivitet(
+            behandlingId = behandling.id,
+            fom = fom,
+            tom = tom,
+            faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
+        )
+        stønadsperiodeRepository.insert(stønadsperiode)
+        vilkårperiodeRepository.insert(aktivitet)
     }
 }

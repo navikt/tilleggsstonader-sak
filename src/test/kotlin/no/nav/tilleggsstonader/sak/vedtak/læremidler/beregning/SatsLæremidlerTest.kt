@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import org.assertj.core.api.Assertions.assertThat
@@ -53,5 +54,18 @@ class SatsLæremidlerTest {
         val ubekreftedeSatser = satser.filterNot { it.bekreftet }
 
         assertThat(ubekreftedeSatser).hasSize(1)
+    }
+
+    @Test
+    fun `skal ikke ha overlappende satser`() {
+        val overlappendePeriode = satser.førsteOverlappendePeriode()
+        assertThat(overlappendePeriode).isNull()
+    }
+
+    @Test
+    fun `perioder skal være påfølgende`() {
+        satser.sorted().zipWithNext().forEach { (sats1, sats2) ->
+            assertThat(sats1.tom.plusDays(1)).isEqualTo(sats2.fom)
+        }
     }
 }
