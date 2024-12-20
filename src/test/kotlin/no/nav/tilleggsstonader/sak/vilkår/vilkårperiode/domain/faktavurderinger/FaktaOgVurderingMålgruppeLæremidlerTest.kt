@@ -7,7 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-class FaktaOgVurderingLæremidlerTest {
+class FaktaOgVurderingMålgruppeLæremidlerTest {
 
     @Nested
     inner class UtledningAvResultatBasertPåType {
@@ -15,13 +15,6 @@ class FaktaOgVurderingLæremidlerTest {
         @Test
         fun `resultatet skal ikke være oppfylt hvis ikke målgruppen gir rett på stønaden`() {
             listOf(IngenMålgruppeLæremidler).forEach { faktaOgVurdering ->
-                assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
-            }
-        }
-
-        @Test
-        fun `resultatet skal ikke være oppfylt hvis ikke aktivitetstypen gir rett på stønaden`() {
-            listOf(IngenAktivitetLæremidler).forEach { faktaOgVurdering ->
                 assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
             }
         }

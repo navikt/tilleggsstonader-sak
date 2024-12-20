@@ -69,6 +69,6 @@ fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> =
                 fom = it.fom,
                 tom = it.tom,
                 prosent = fakta.takeIfFaktaOrThrow<FaktaAktivitetLæremidler>().prosent,
-                studienivå = fakta.takeIfFaktaOrThrow<FaktaAktivitetLæremidler>().studienivå,
+                studienivå = fakta.takeIfFaktaOrThrow<FaktaAktivitetLæremidler>().studienivå!!,
             )
         }
