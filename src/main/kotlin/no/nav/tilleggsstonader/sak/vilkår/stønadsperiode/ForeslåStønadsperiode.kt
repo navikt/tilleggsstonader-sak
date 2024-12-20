@@ -95,7 +95,7 @@ object ForeslåStønadsperiode {
         }
     }
 
-    private inline fun <T : FaktaOgVurdering> slåSammenVilkårsperioderSomErLikeEtterHverandre(
+    private fun <T : FaktaOgVurdering> slåSammenVilkårsperioderSomErLikeEtterHverandre(
         vilkårperioder: List<GeneriskVilkårperiode<T>>,
     ): List<GeneriskVilkårperiode<T>> {
         return vilkårperioder

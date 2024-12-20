@@ -46,6 +46,7 @@ inline fun feilHvis(
     }
 }
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun brukerfeil(
     feil: String,
     httpStatus: HttpStatus = HttpStatus.BAD_REQUEST,

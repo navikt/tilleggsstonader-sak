@@ -366,7 +366,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
             listOf(UTREDES, OPPRETTET, FATTER_VEDTAK, IVERKSETTER_VEDTAK).forEach { status ->
                 val cause = assertThatThrownBy {
                     testoppsettService.lagre(behandling(fagsak, status = status))
-                }.cause
+                }.cause()
                 cause.isInstanceOf(DuplicateKeyException::class.java)
                 cause.hasMessageContaining("duplicate key value violates unique constraint \"idx_behandlinger_i_arbeid\"")
             }
@@ -391,7 +391,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
             val cause = assertThatThrownBy {
                 behandlingRepository.update(påVent.copy(status = UTREDES))
-            }.cause
+            }.cause()
             cause.isInstanceOf(DuplicateKeyException::class.java)
             cause.hasMessageContaining("duplicate key value violates unique constraint \"idx_behandlinger_i_arbeid\"")
         }

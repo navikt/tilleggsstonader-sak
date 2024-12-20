@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.config
 
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import org.assertj.core.api.Assertions.assertThat
@@ -48,7 +48,7 @@ class ObjectMapperProviderTest {
     fun `skal feile hvis et felt mangler verdi`() {
         assertThatThrownBy {
             objectMapper.readValue<ElementMedOptionalFelt>("""{}""")
-        }.isInstanceOf(MissingKotlinParameterException::class.java)
+        }.isInstanceOf(MismatchedInputException::class.java)
     }
 
     @Test

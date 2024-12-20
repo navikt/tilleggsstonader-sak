@@ -120,7 +120,7 @@ class IverksettStatusServiceTest : IntegrationTest() {
     ) = tilkjentYtelseRepository.insert(
         tilkjentYtelse(
             behandlingId = behandling.id,
-            andeler = *andel,
+            andeler = andel,
         ),
     )
 }
