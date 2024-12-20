@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.YearMonth
@@ -37,6 +38,19 @@ class MakssatsTilsynBarnTest {
         )
         val måneder = listOf(YearMonth.of(2023, 1), YearMonth.of(2023, 6))
         validerVerdier(måneder, verdier)
+    }
+
+    @Test
+    fun `skal ikke ha overlappende satser`() {
+        val overlappendePeriode = satser.førsteOverlappendePeriode()
+        assertThat(overlappendePeriode).isNull()
+    }
+
+    @Test
+    fun `perioder skal være påfølgende`() {
+        satser.sorted().zipWithNext().forEach { (sats1, sats2) ->
+            assertThat(sats1.tom.plusMonths(1)).isEqualTo(sats2.fom)
+        }
     }
 
     fun validerVerdier(måneder: List<YearMonth>, verdier: Map<Int, Int>) {
