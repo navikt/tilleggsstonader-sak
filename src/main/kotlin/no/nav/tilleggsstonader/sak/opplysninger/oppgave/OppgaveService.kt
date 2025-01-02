@@ -209,7 +209,7 @@ class OppgaveService(
             return null
         }
         if (enhetsnummer == null) {
-            error("Mangler enhetsnummer for oppgave for ident=$ident oppgavetype=$oppgave.oppgavetype")
+            error("Mangler enhetsnummer for oppgave for ident=$ident oppgavetype=${oppgave.oppgavetype}")
         }
         return finnMappe(enhetsnummer, OppgaveMappe.KLAR).id
     }

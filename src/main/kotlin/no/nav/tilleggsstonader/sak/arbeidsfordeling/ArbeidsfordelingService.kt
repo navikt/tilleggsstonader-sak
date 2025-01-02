@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.config.getNullable
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -26,6 +27,7 @@ class ArbeidsfordelingService(
 
     companion object {
         const val MASKINELL_JOURNALFOERENDE_ENHET = "9999"
+        const val GEOGRAFISK_TILKNYTTING_OSLO = "0301"
     }
 
     fun hentNavEnhetId(ident: String, oppgavetype: Oppgavetype, tema: Tema = Tema.TSO) = when (oppgavetype) {
@@ -67,7 +69,7 @@ class ArbeidsfordelingService(
         return ArbeidsfordelingKriterie(
             tema = arbeidsfordelingstema.name,
             diskresjonskode = diskresjonskode,
-            geografiskOmraade = geografiskTilknytning,
+            geografiskOmraade = geografiskTilknytning ?: GEOGRAFISK_TILKNYTTING_OSLO,
             skjermet = egenAnsattService.erEgenAnsatt(personIdent),
             oppgavetype = oppgavetype,
         )
@@ -78,8 +80,12 @@ class ArbeidsfordelingService(
             when (it.gtType) {
                 GeografiskTilknytningType.BYDEL -> it.gtBydel
                 GeografiskTilknytningType.KOMMUNE -> it.gtKommune
-                GeografiskTilknytningType.UTLAND -> null
-                GeografiskTilknytningType.UDEFINERT -> null
+                GeografiskTilknytningType.UTLAND,
+                GeografiskTilknytningType.UDEFINERT,
+                -> {
+                    secureLogger.info("Geografisk tilknytting=${it.gtType}")
+                    null
+                }
             }
         }
     }
