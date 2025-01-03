@@ -72,16 +72,13 @@ class JournalføringService(
                 journalførendeEnhet = journalføringRequest.journalførendeEnhet,
                 dokumentTitler = journalføringRequest.dokumentTitler,
                 logiskVedlegg = journalføringRequest.logiskeVedlegg,
+                avsenderMottaker = journalføringRequest.nyAvsender?.tilAvsenderMottaker(),
             )
         } else if (journalføringRequest.skalJournalføreTilNyBehandling() && journalføringRequest.gjelderKlage()) {
             journalførTilNyKlage(
-                journalpostId = journalpost.journalpostId,
+                journalpost = journalpost,
                 personIdent = journalpostService.hentIdentFraJournalpost(journalpost),
-                stønadstype = journalføringRequest.stønadstype,
-                behandlingÅrsak = journalføringRequest.årsak.behandlingsårsak,
-                journalførendeEnhet = journalføringRequest.journalførendeEnhet,
-                dokumentTitler = journalføringRequest.dokumentTitler,
-                logiskVedlegg = journalføringRequest.logiskeVedlegg,
+                journalføringRequest = journalføringRequest,
             )
         } else {
             journalførUtenNyBehandling(journalføringRequest, journalpost)
@@ -114,6 +111,7 @@ class JournalføringService(
         journalførendeEnhet: String,
         dokumentTitler: Map<String, String>? = null,
         logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
+        avsenderMottaker: AvsenderMottaker? = null,
     ) {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
 
@@ -137,7 +135,14 @@ class JournalføringService(
             lagreSøknadOgNyeBarn(journalpost, behandling, stønadstype)
         }
 
-        ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
+        ferdigstillJournalpost(
+            journalpost = journalpost,
+            journalførendeEnhet = journalførendeEnhet,
+            fagsak = fagsak,
+            dokumentTitler = dokumentTitler,
+            logiskVedlegg = logiskVedlegg,
+            avsenderMottaker = avsenderMottaker,
+        )
 
         taskService.save(
             OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
@@ -151,18 +156,12 @@ class JournalføringService(
     }
 
     fun journalførTilNyKlage(
-        journalpostId: String,
+        journalpost: Journalpost,
         personIdent: String,
-        stønadstype: Stønadstype,
-        behandlingÅrsak: BehandlingÅrsak,
-        oppgaveBeskrivelse: String? = null,
-        journalførendeEnhet: String,
-        dokumentTitler: Map<String, String>? = null,
-        logiskVedlegg: Map<String, List<LogiskVedlegg>>? = null,
+        journalføringRequest: JournalføringRequest,
     ) {
-        val journalpost = journalpostService.hentJournalpost(journalpostId)
-
-        val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, stønadstype)
+        val behandlingÅrsak = journalføringRequest.årsak.behandlingsårsak
+        val fagsak = hentEllerOpprettFagsakIEgenTransaksjon(personIdent, journalføringRequest.stønadstype)
 
         validerKanOppretteBehandling(journalpost, fagsak, behandlingÅrsak, gjelderKlage = true)
 
@@ -170,7 +169,14 @@ class JournalføringService(
 
         klageService.opprettKlage(fagsakId = fagsak.id, OpprettKlageDto(journalpost.datoMottatt?.toLocalDate() ?: osloDateNow()))
 
-        ferdigstillJournalpost(journalpost, journalførendeEnhet, fagsak, dokumentTitler, logiskVedlegg)
+        ferdigstillJournalpost(
+            journalpost = journalpost,
+            journalførendeEnhet = journalføringRequest.journalførendeEnhet,
+            fagsak = fagsak,
+            dokumentTitler = journalføringRequest.dokumentTitler,
+            logiskVedlegg = journalføringRequest.logiskeVedlegg,
+            avsenderMottaker = journalføringRequest.nyAvsender?.tilAvsenderMottaker(),
+        )
     }
 
     private fun journalførUtenNyBehandling(journalføringRequest: JournalføringRequest, journalpost: Journalpost) {
@@ -181,12 +187,12 @@ class JournalføringService(
             )
 
         ferdigstillJournalpost(
-            journalpost,
-            journalføringRequest.journalførendeEnhet,
-            fagsak,
-            journalføringRequest.dokumentTitler,
-            journalføringRequest.logiskeVedlegg,
-            journalføringRequest.nyAvsender?.tilAvsenderMottaker(),
+            journalpost = journalpost,
+            journalførendeEnhet = journalføringRequest.journalførendeEnhet,
+            fagsak = fagsak,
+            dokumentTitler = journalføringRequest.dokumentTitler,
+            logiskVedlegg = journalføringRequest.logiskeVedlegg,
+            avsenderMottaker = journalføringRequest.nyAvsender?.tilAvsenderMottaker(),
         )
     }
 
