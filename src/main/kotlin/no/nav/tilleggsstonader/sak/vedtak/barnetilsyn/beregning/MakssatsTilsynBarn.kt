@@ -26,8 +26,13 @@ private val MAX = YearMonth.of(2099, 12)
 val satser: List<MakssatsTilsynBarn> =
     listOf(
         MakssatsTilsynBarn(
-            fom = YearMonth.of(2024, 1),
+            fom = YearMonth.of(2025, 1),
             tom = MAX,
+            beløp = mapOf(1 to 4790, 2 to 6248, 3 to 7081),
+        ),
+        MakssatsTilsynBarn(
+            fom = YearMonth.of(2024, 1),
+            tom = YearMonth.of(2024, 12),
             beløp = mapOf(1 to 4650, 2 to 6066, 3 to 6875),
         ),
         MakssatsTilsynBarn(
