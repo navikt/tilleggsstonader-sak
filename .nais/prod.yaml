@@ -41,7 +41,7 @@ spec:
       cpu: 500m
   gcp:
     sqlInstances:
-      - type: POSTGRES_15
+      - type: POSTGRES_17
         tier: db-custom-1-3840
         flags:
           - name: cloudsql.logical_decoding # trengs for å bruke replication slots i databasen.
