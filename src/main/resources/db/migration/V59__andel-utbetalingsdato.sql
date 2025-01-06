@@ -4,6 +4,8 @@
  */
 ALTER TABLE andel_tilkjent_ytelse
     ADD COLUMN utbetalingsdato DATE;
+
+-- noinspection SqlWithoutWhere
 UPDATE andel_tilkjent_ytelse
 SET utbetalingsdato=
         CASE
@@ -18,5 +20,12 @@ SET utbetalingsdato=
 ALTER TABLE andel_tilkjent_ytelse
     ALTER COLUMN utbetalingsdato SET NOT NULL;
 
--- TODO må oppdatere task med riktig dato som den skal kjøres?
---UPDATE task set WHERE type = 'IverksettMåned' AND status = '';
+/**
+  Endrer neste kjøring fra månedskjøring til daglig kjøring sånn at den kjører hver dag i stedet
+ */
+UPDATE TASK
+SET type        = 'DagligIverksett',
+    payload     = current_date,
+    trigger_tid = current_timestamp + interval '1 hour'
+WHERE type = 'IverksettMåned'
+  AND status = 'UBEHANDLET';

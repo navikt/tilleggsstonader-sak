@@ -14,26 +14,32 @@ import java.util.Properties
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = IverksettMånedTask.TYPE,
+    taskStepType = DagligIverksettTask.TYPE,
     maxAntallFeil = 3,
     settTilManuellOppfølgning = true,
     triggerTidVedFeilISekunder = 60L,
-    beskrivelse = "Oppretter en task for hver iverksetting av en måned.",
+    beskrivelse = """
+        Jobb som kjøres hver dag som oppretter en ny task for hver behandling 
+        som har andeler som skal iverksettes den dagen
+        """,
 )
-class IverksettMånedTask(
+class DagligIverksettTask(
     private val taskService: TaskService,
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
 ) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
-        // finn alle behandlinger som skal iverksettes for gitt dato
-        val utbetalingsdato = LocalDate.parse(task.payload)
+        /**
+         * Skal bruke dagens dato som utbetalingsdato.
+         * Trenger ikke å bruke utbetalingsdato fra metadata eller payload, eks i tilfelle tasken feiler og kjører neste dag så skal nytt dagens dato brukes
+         */
+        val utbetalingsdato = LocalDate.now()
 
         val behandlinger =
             andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(utbetalingsdato = utbetalingsdato)
 
         behandlinger.forEach {
-            taskService.save(IverksettBehandlingMånedTask.opprettTask(behandlingId = it, utbetalingsdato = utbetalingsdato))
+            taskService.save(DagligIverksettBehandlingTask.opprettTask(behandlingId = it, utbetalingsdato = utbetalingsdato))
         }
     }
 
@@ -49,10 +55,11 @@ class IverksettMånedTask(
                 setProperty(MDCConstants.MDC_CALL_ID, IdUtils.generateId())
             }
 
-            return Task(TYPE, utbetalingsdato.toString()).copy(metadataWrapper = PropertiesWrapper(properties))
+            return Task(TYPE, utbetalingsdato.toString())
+                .copy(metadataWrapper = PropertiesWrapper(properties))
                 .medTriggerTid(utbetalingsdato.atTime(6, 4))
         }
 
-        const val TYPE = "IverksettMåned"
+        const val TYPE = "DagligIverksett"
     }
 }

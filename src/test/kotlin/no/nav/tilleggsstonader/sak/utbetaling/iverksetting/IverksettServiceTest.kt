@@ -321,6 +321,55 @@ class IverksettServiceTest : IntegrationTest() {
     }
 
     @Nested
+    inner class HåndteringAvAndelSomSkalUtbetalesUlikeDager {
+
+        val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER)
+        val behandling =
+            behandling(fagsak, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT)
+
+        @BeforeEach
+        fun setUp() {
+            testoppsettService.lagreFagsak(fagsak)
+            testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
+            lagreTotrinnskontroll(behandling)
+        }
+
+        @Test
+        fun `Skal kun iverksette andeler innenfor en måned som gjelder for gitt utbetalingsdato`() {
+            val andel1 = andelTilkjentYtelse(
+                kildeBehandlingId = behandling.id,
+                fom = nåværendeMåned.atDay(1),
+            )
+            val andel2 = andelTilkjentYtelse(
+                kildeBehandlingId = behandling.id,
+                fom = nesteMåned.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+            )
+            val andel3 = andelTilkjentYtelse(
+                kildeBehandlingId = behandling.id,
+                fom = nesteMåned.atDay(15).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+            )
+            tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id, andel1, andel2, andel3))
+
+            iverksettService.iverksettBehandlingFørsteGang(behandling.id)
+            with(hentAndeler(behandling)) {
+                single { it.id == andel1.id }.assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
+                single { it.id == andel2.id }.assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+                single { it.id == andel3.id }.assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+            }
+
+            oppdaterAndelerTilOk(behandling, StatusIverksetting.OK)
+
+            // iverksetter med utbetalingsdato for andel2, som er den samme måneden som andel3, men andel 3 er senere den måneden
+            iverksettService.iverksett(behandling.id, andel2.id, utbetalingsdato = andel2.fom)
+            with(hentAndeler(behandling)) {
+                single { it.id == andel1.id }.assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
+                single { it.id == andel2.id }.assertHarStatusOgId(StatusIverksetting.SENDT, andel2.id)
+                single { it.id == andel3.id }.assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
+            }
+        }
+    }
+
+    @Nested
     inner class IverksettFlytMedAndelerSomIkkeSkalUtbetales {
 
         val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER)

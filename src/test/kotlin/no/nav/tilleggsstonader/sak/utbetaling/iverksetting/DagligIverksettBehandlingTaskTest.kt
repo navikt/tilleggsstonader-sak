@@ -14,11 +14,11 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.UUID
 
-class IverksettBehandlingMånedTaskTest {
+class DagligIverksettBehandlingTaskTest {
 
     private val behandlingService = mockk<BehandlingService>()
     private val iverksettService = mockk<IverksettService>(relaxed = true)
-    private val taskStep = IverksettBehandlingMånedTask(behandlingService, iverksettService)
+    private val taskStep = DagligIverksettBehandlingTask(behandlingService, iverksettService)
 
     val fagsak = fagsak()
     val behandling = behandling(fagsak, vedtakstidspunkt = osloNow().minusDays(1))
@@ -33,7 +33,7 @@ class IverksettBehandlingMånedTaskTest {
     @Test
     fun `skal kalle på iverksetting`() {
         mockFinnSisteIverksatteBehandling(behandling)
-        val task = IverksettBehandlingMånedTask.opprettTask(behandling.id, utbetalingsdato)
+        val task = DagligIverksettBehandlingTask.opprettTask(behandling.id, utbetalingsdato)
         val iverksettingId = UUID.fromString(task.metadata.getProperty("iverksettingId"))
 
         taskStep.doTask(task)
@@ -45,7 +45,7 @@ class IverksettBehandlingMånedTaskTest {
     fun `skal feile hvis det finnes en behandling som er iverksatt etter behandlingen for tasken`() {
         mockFinnSisteIverksatteBehandling(behandling2)
 
-        val task = IverksettBehandlingMånedTask.opprettTask(behandlingId = behandling.id, utbetalingsdato)
+        val task = DagligIverksettBehandlingTask.opprettTask(behandlingId = behandling.id, utbetalingsdato)
         assertThatThrownBy {
             taskStep.doTask(task)
         }.hasMessageContaining("En revurdering har erstattet denne behandlingen.")

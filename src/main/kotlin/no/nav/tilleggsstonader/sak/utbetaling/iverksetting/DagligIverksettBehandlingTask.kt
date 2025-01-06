@@ -18,13 +18,13 @@ import java.util.*
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = IverksettBehandlingMånedTask.TYPE,
+    taskStepType = DagligIverksettBehandlingTask.TYPE,
     maxAntallFeil = 3,
     settTilManuellOppfølgning = true,
     triggerTidVedFeilISekunder = 60L,
-    beskrivelse = "Iverksetter behandling for en måned.",
+    beskrivelse = "Iverksetter behandling som har andeler til utbetaling. Trigges av DagligIverksettingTask",
 )
-class IverksettBehandlingMånedTask(
+class DagligIverksettBehandlingTask(
     private val behandlingService: BehandlingService,
     private val iverksettService: IverksettService,
 ) : AsyncTaskStep {
@@ -37,7 +37,7 @@ class IverksettBehandlingMånedTask(
 
         val utbetalingsdato = taskData.utbetalingsdato
         feilHvis(utbetalingsdato > LocalDate.now()) {
-            "Kan ikke iverksette for måned=$utbetalingsdato som er frem i tiden"
+            "Kan ikke iverksette for utbetalingsdato=$utbetalingsdato som er frem i tiden"
         }
         iverksettService.iverksett(taskData.behandlingId, UUID.fromString(iverksettingId), utbetalingsdato)
     }
@@ -72,9 +72,12 @@ class IverksettBehandlingMånedTask(
             return Task(TYPE, payload).copy(metadataWrapper = PropertiesWrapper(properties))
         }
 
-        const val TYPE = "IverksettBehandlingMåned"
+        const val TYPE = "DagligIverksettBehandling"
     }
 
+    /**
+     * Trenger [utbetalingsdato] for å få unik payload
+     */
     private data class TaskData(
         val behandlingId: BehandlingId,
         val utbetalingsdato: LocalDate,

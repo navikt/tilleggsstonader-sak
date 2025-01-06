@@ -168,5 +168,5 @@ enum class StatusIverksetting {
     VENTER_PÅ_SATS_ENDRING,
     ;
 
-    fun erOk() = this == StatusIverksetting.OK || this == StatusIverksetting.OK_UTEN_UTBETALING
+    fun erOk() = this == OK || this == OK_UTEN_UTBETALING
 }
