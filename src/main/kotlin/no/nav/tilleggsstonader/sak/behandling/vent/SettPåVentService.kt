@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.Optional
 
@@ -56,14 +57,16 @@ class SettPåVentService(
         opprettHistorikkInnslag(behandling, StegUtfall.SATT_PÅ_VENT, årsaker = dto.årsaker, kommentar = dto.kommentar)
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 
-        val oppdatertOppgave = settOppgavePåVent(behandlingId, dto)
+        val oppgave = hentOppgave(behandlingId)
         val settPåVent = SettPåVent(
             behandlingId = behandlingId,
-            oppgaveId = oppdatertOppgave.oppgaveId,
+            oppgaveId = oppgave.id,
             årsaker = dto.årsaker,
             kommentar = dto.kommentar,
         )
         settPåVentRepository.insert(settPåVent)
+
+        val oppdatertOppgave = settOppgavePåVent(oppgave, settPåVent, dto.frist)
 
         taskService.save(
             BehandlingsstatistikkTask.opprettVenterTask(behandlingId),
@@ -157,10 +160,10 @@ class SettPåVentService(
             ?: error("Finner ikke settPåVent for behandling=$behandlingId")
 
     private fun settOppgavePåVent(
-        behandlingId: BehandlingId,
-        dto: SettPåVentDto,
+        oppgave: Oppgave,
+        settPåVent: SettPåVent,
+        frist: LocalDate,
     ): OppdatertOppgaveResponse {
-        val oppgave = hentOppgave(behandlingId)
 
         val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
         val mappe = oppgaveService.finnMappe(enhet, OppgaveMappe.PÅ_VENT)
@@ -168,8 +171,8 @@ class SettPåVentService(
             id = oppgave.id,
             versjon = oppgave.versjon,
             tilordnetRessurs = "",
-            fristFerdigstillelse = dto.frist,
-            beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, dto.frist),
+            fristFerdigstillelse = frist,
+            beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, frist),
             mappeId = Optional.of(mappe.id),
         )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
