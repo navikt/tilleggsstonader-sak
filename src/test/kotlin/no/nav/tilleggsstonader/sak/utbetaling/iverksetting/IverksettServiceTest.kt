@@ -38,6 +38,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
@@ -80,8 +81,8 @@ class IverksettServiceTest : IntegrationTest() {
         clearMock(iverksettClient)
     }
 
-    private fun IverksettService.iverksett(behandlingId: BehandlingId, iverksettingId: BehandlingId, måned: YearMonth) {
-        this.iverksett(behandlingId, iverksettingId.id, måned)
+    private fun IverksettService.iverksett(behandlingId: BehandlingId, iverksettingId: BehandlingId, utbetalingsdato: LocalDate) {
+        this.iverksett(behandlingId, iverksettingId.id, utbetalingsdato)
     }
 
     @Test
@@ -89,7 +90,7 @@ class IverksettServiceTest : IntegrationTest() {
         val behandling =
             testoppsettService.opprettBehandlingMedFagsak(behandling(resultat = BehandlingResultat.AVSLÅTT))
 
-        iverksettService.iverksett(behandling.id, behandling.id, nesteMåned)
+        iverksettService.iverksett(behandling.id, behandling.id, nesteMåned.atEndOfMonth())
 
         verify(exactly = 0) { iverksettClient.iverksett(any()) }
     }
@@ -101,7 +102,7 @@ class IverksettServiceTest : IntegrationTest() {
         lagreTotrinnskontroll(behandling)
         val tilkjentYtelse = tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
 
-        iverksettService.iverksett(behandling.id, behandling.id, nesteMåned)
+        iverksettService.iverksett(behandling.id, behandling.id, nesteMåned.atEndOfMonth())
 
         verify(exactly = 1) { iverksettClient.iverksett(any()) }
 
@@ -169,7 +170,7 @@ class IverksettServiceTest : IntegrationTest() {
         fun `første behandling  - andre iverksetting`() {
             val iverksettingId = UUID.randomUUID()
             oppdaterAndelerTilOk(behandling)
-            iverksettService.iverksett(behandling.id, iverksettingId, nesteMåned)
+            iverksettService.iverksett(behandling.id, iverksettingId, nesteMåned.atEndOfMonth())
 
             val andeler = hentAndeler(behandling)
 
@@ -211,7 +212,7 @@ class IverksettServiceTest : IntegrationTest() {
         fun `andre behandling - første iverksetting med 2 iverksettinger`() {
             val iverksettingIdBehandling1 = UUID.randomUUID()
             oppdaterAndelerTilOk(behandling)
-            iverksettService.iverksett(behandling.id, iverksettingIdBehandling1, nesteMåned)
+            iverksettService.iverksett(behandling.id, iverksettingIdBehandling1, nesteMåned.atEndOfMonth())
 
             testoppsettService.lagre(behandling2)
             tilkjentYtelseRepository.insert(tilkjentYtelse2)
@@ -245,7 +246,7 @@ class IverksettServiceTest : IntegrationTest() {
 
             iverksettService.iverksettBehandlingFørsteGang(behandling2.id)
             oppdaterAndelerTilOk(behandling2)
-            iverksettService.iverksett(behandling2.id, iverksettingId, nesteMåned)
+            iverksettService.iverksett(behandling2.id, iverksettingId, nesteMåned.atEndOfMonth())
 
             val andeler = hentAndeler(behandling2)
 
@@ -285,7 +286,7 @@ class IverksettServiceTest : IntegrationTest() {
         fun `skal feile hvis forrige iverksetting ikke er ferdigstilt`() {
             val iverksettingId = UUID.randomUUID()
             assertThatThrownBy {
-                iverksettService.iverksett(behandling.id, iverksettingId, nåværendeMåned)
+                iverksettService.iverksett(behandling.id, iverksettingId, nåværendeMåned.atEndOfMonth())
             }.hasMessageContaining("det finnes tidligere andeler med annen status enn OK/UBEHANDLET")
         }
 
@@ -353,7 +354,7 @@ class IverksettServiceTest : IntegrationTest() {
             oppdaterAndelerTilOk(behandling, StatusIverksetting.OK)
 
             val iverksettingId = UUID.randomUUID()
-            iverksettService.iverksett(behandling.id, iverksettingId, nestNesteMåned.plusMonths(1))
+            iverksettService.iverksett(behandling.id, iverksettingId, nestNesteMåned.plusMonths(1).atEndOfMonth())
             with(hentAndeler(behandling)) {
                 forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
                 forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
@@ -423,7 +424,7 @@ class IverksettServiceTest : IntegrationTest() {
             oppdaterAndelerTilOk(behandling, StatusIverksetting.OK_UTEN_UTBETALING)
 
             val iverksettingId = UUID.randomUUID()
-            iverksettService.iverksett(behandling.id, iverksettingId, nesteMåned)
+            iverksettService.iverksett(behandling.id, iverksettingId, nesteMåned.atEndOfMonth())
 
             val andeler = hentAndeler(behandling)
             val andelForrigeMåned = andeler.forMåned(nåværendeMåned)

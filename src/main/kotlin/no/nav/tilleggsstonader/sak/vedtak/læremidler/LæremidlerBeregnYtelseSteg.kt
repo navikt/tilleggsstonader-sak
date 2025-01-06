@@ -126,6 +126,7 @@ class LæremidlerBeregnYtelseSteg(
                     type = målgruppe.tilTypeAndel(),
                     kildeBehandlingId = saksbehandling.id,
                     statusIverksetting = statusIverksettingForSatsBekreftet(satsBekreftet),
+                    utbetalingsdato = utbetalingsdato,
                 )
             }
         tilkjentytelseService.opprettTilkjentYtelse(saksbehandling, andeler)
