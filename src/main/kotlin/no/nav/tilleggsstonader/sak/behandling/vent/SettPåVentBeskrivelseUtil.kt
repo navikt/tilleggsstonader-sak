@@ -12,15 +12,18 @@ object SettPåVentBeskrivelseUtil {
 
     fun settPåVent(
         oppgave: Oppgave,
+        settPåVent: SettPåVent,
         frist: LocalDate,
         tidspunkt: LocalDateTime = osloNow(),
     ): String {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
+        val kommentarRad = "Kommentar: ${settPåVent.kommentar}"
         return utledBeskrivelsePrefix(tidspunkt) +
-            utledOppgavefristBeskrivelse(oppgave, frist).påNyRadEllerTomString() +
-            tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
-            nåværendeBeskrivelse(oppgave)
+                utledOppgavefristBeskrivelse(oppgave, frist).påNyRadEllerTomString() +
+                tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+                kommentarRad.påNyRadEllerTomString() +
+                nåværendeBeskrivelse(oppgave)
     }
 
     fun oppdaterSettPåVent(
@@ -35,18 +38,18 @@ object SettPåVentBeskrivelseUtil {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
         return utledBeskrivelsePrefix(tidspunkt) +
-            fristBeskrivelse.påNyRadEllerTomString() +
-            tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
-            nåværendeBeskrivelse(oppgave)
+                fristBeskrivelse.påNyRadEllerTomString() +
+                tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+                nåværendeBeskrivelse(oppgave)
     }
 
     fun taAvVent(oppgave: Oppgave, tidspunkt: LocalDateTime = osloNow()): String {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, SikkerhetContext.hentSaksbehandlerEllerSystembruker())
         return utledBeskrivelsePrefix(tidspunkt) +
-            "\nTatt av vent" +
-            tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
-            nåværendeBeskrivelse(oppgave)
+                "\nTatt av vent" +
+                tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+                nåværendeBeskrivelse(oppgave)
     }
 
     private fun String?.påNyRadEllerTomString(): String =

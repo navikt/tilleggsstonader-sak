@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.clearBrukerContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
+import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVent
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -26,12 +28,14 @@ class SettPåVentBeskrivelseUtilTest {
     }
 
     @Nested
-    inner class SettPåVent {
+    inner class SettPåVentFlyt {
 
         @Test
         fun `skal oppdatere beskrivelse med ny info og beholde eksisterende beskrivelse`() {
+            val kommentar = "En kommentar"
             val beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(
                 Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", tilordnetRessurs = "a100"),
+                SettPåVent(behandlingId = BehandlingId.random(), oppgaveId = 1L, årsaker = listOf(ÅrsakSettPåVent.DOKUMENTASJON_FRA_BRUKER), kommentar = kommentar),
                 LocalDate.of(2023, 1, 1),
                 tidspunkt,
             )
@@ -40,6 +44,7 @@ class SettPåVentBeskrivelseUtilTest {
                 --- 05.03.2024 18:00 a100 (a100) ---
                 Oppgave endret frist fra <ingen> til 01.01.2023
                 Oppgave flyttet fra saksbehandler a100 til <ingen>
+                Kommentar: En kommentar
                 
                 tidligere beskrivelse
                 """.trimIndent(),

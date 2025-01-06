@@ -172,7 +172,7 @@ class SettPåVentService(
             versjon = oppgave.versjon,
             tilordnetRessurs = "",
             fristFerdigstillelse = frist,
-            beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, frist),
+            beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, settPåVent, frist),
             mappeId = Optional.of(mappe.id),
         )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
