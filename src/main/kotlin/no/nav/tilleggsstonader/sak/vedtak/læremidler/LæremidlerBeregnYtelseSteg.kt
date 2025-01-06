@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -104,26 +103,25 @@ class LæremidlerBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         beregningsresultat: BeregningsresultatLæremidler,
     ) {
-        val andeler = beregningsresultat.perioder.groupBy { it.grunnlag.utbetalingsmåned }
+        val andeler = beregningsresultat.perioder.groupBy { it.grunnlag.utbetalingsdato }
             .entries
-            .sortedBy { (utbetalingsmåned, _) -> utbetalingsmåned }
-            .map { (utbetalingsmåned, perioder) ->
+            .sortedBy { (utbetalingsdato, _) -> utbetalingsdato }
+            .map { (utbetalingsdato, perioder) ->
                 val førstePerioden = perioder.first()
                 val satsBekreftet = førstePerioden.grunnlag.satsBekreftet
                 val målgruppe = førstePerioden.grunnlag.målgruppe
 
                 feilHvisIkke(perioder.all { it.grunnlag.satsBekreftet == satsBekreftet }) {
-                    "Alle perioder for en utbetalingsmåned må være bekreftet eller ikke bekreftet"
+                    "Alle perioder for et utbetalingsdato må være bekreftet eller ikke bekreftet"
                 }
 
                 feilHvisIkke(perioder.all { it.grunnlag.målgruppe == målgruppe }) {
-                    "Alle perioder for en utbetalingsmåned må ha den samme målgruppen"
+                    "Alle perioder for et utbetalingsdato må ha den samme målgruppen"
                 }
-                val fom = utbetalingsmåned.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag()
                 AndelTilkjentYtelse(
                     beløp = perioder.sumOf { it.beløp },
-                    fom = fom,
-                    tom = fom,
+                    fom = utbetalingsdato,
+                    tom = utbetalingsdato,
                     satstype = Satstype.DAG,
                     type = målgruppe.tilTypeAndel(),
                     kildeBehandlingId = saksbehandling.id,
