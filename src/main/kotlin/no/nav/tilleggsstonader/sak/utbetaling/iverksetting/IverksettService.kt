@@ -52,9 +52,9 @@ class IverksettService(
             logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
             return
         }
-        markerAndelerFraForrieBehandlingSomUaktuelle(behandling)
+        markerAndelerFraForrigeBehandlingSomUaktuelle(behandling)
 
-        val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
+        val tilkjentYtelse = tilkjentYtelseService.hentForBehandlingMedLås(behandlingId)
         val andeler = andelerForFørsteIverksettingAvBehandling(tilkjentYtelse)
 
         val totrinnskontroll = hentTotrinnskontroll(behandlingId)
@@ -101,7 +101,7 @@ class IverksettService(
             logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
             return
         }
-        val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
+        val tilkjentYtelse = tilkjentYtelseService.hentForBehandlingMedLås(behandlingId)
 
         val totrinnskontroll = hentTotrinnskontroll(behandlingId)
 
@@ -120,7 +120,15 @@ class IverksettService(
         iverksettClient.iverksett(dto)
     }
 
-    private fun markerAndelerFraForrieBehandlingSomUaktuelle(behandling: Saksbehandling) {
+    /**
+     * Når man iverksetter en revurdering markeres andeler for forrige behandling som uaktuelle
+     * Dette gjøres sånn at de andelene ikke skal plukkes opp og iverksettes,
+     * når revurderingen er den nye gjeldende behandlingen
+     *
+     * Hvis forrige behandling har en andel som har blitt sendt til iverksetting men ikke fått kvittering
+     * får man ikke iverksatt revurderingen, man må vente på en OK kvittering
+     */
+    private fun markerAndelerFraForrigeBehandlingSomUaktuelle(behandling: Saksbehandling) {
         if (behandling.forrigeBehandlingId == null) {
             return
         }

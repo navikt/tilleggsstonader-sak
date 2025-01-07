@@ -29,6 +29,11 @@ class TilkjentYtelseService(
             ?: error("Fant ikke tilkjent ytelse med behandlingsid $behandlingId")
     }
 
+    fun hentForBehandlingMedLås(behandlingId: BehandlingId): TilkjentYtelse {
+        return tilkjentYtelseRepository.findByBehandlingIdForUpdate(behandlingId)
+            ?: error("Fant ikke tilkjent ytelse med behandlingsid $behandlingId")
+    }
+
     fun opprettTilkjentYtelse(
         saksbehandling: Saksbehandling,
         andeler: List<AndelTilkjentYtelse>,
