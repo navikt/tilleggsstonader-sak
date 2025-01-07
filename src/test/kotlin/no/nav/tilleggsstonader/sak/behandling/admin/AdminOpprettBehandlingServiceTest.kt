@@ -55,8 +55,8 @@ class AdminOpprettBehandlingServiceTest {
         every { personService.hentPersonMedBarn(ident) } returns
             SøkerMedBarn(ident, mockk(), barn = mapOf(identBarn to mockk()))
 
-        every { fagsakService.finnFagsak(any(), Stønadstype.BARNETILSYN) } returns fagsak
-        every { fagsakService.hentEllerOpprettFagsak(personIdent = ident, Stønadstype.BARNETILSYN) } returns fagsak
+        every { fagsakService.finnFagsak(any(), any<Stønadstype>()) } returns fagsak
+        every { fagsakService.hentEllerOpprettFagsak(personIdent = ident, any<Stønadstype>()) } returns fagsak
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns emptyList()
         every { behandlingService.opprettBehandling(fagsak.id, any(), any(), any(), any()) } returns behandling
         every { barnService.opprettBarn(capture(opprettedeBarnSlot)) } answers { firstArg() }
@@ -64,7 +64,7 @@ class AdminOpprettBehandlingServiceTest {
 
     @Test
     fun `skal opprette behandling med barn`() {
-        service.opprettFørstegangsbehandling(ident, setOf(identBarn), true)
+        service.opprettFørstegangsbehandling(stønadstype = Stønadstype.BARNETILSYN, ident, setOf(identBarn), true)
 
         with(opprettedeBarnSlot.captured.single()) {
             assertThat(this.ident).isEqualTo(identBarn)
@@ -80,7 +80,7 @@ class AdminOpprettBehandlingServiceTest {
 
     @Test
     fun `skal opprette behandling uten brev`() {
-        service.opprettFørstegangsbehandling(ident, setOf(identBarn), false)
+        service.opprettFørstegangsbehandling(Stønadstype.BARNETILSYN, ident, setOf(identBarn), false)
 
         with(opprettedeBarnSlot.captured.single()) {
             assertThat(this.ident).isEqualTo(identBarn)
@@ -95,18 +95,38 @@ class AdminOpprettBehandlingServiceTest {
     }
 
     @Test
+    fun `skal opprette behandling for læremidler`() {
+        service.opprettFørstegangsbehandling(Stønadstype.LÆREMIDLER, ident, setOf(), false)
+
+        assertThat(opprettedeBarnSlot.isCaptured).isFalse()
+        verify(exactly = 1) {
+            behandlingService.opprettBehandling(
+                fagsakId = fagsak.id,
+                behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
+            )
+        }
+    }
+
+    @Test
     fun `skal feile hvis det finnes behandlinger fra før`() {
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(behandling())
 
         assertThatThrownBy {
-            service.opprettFørstegangsbehandling(ident, setOf(identBarn), true)
+            service.opprettFørstegangsbehandling(stønadstype = Stønadstype.BARNETILSYN, ident, setOf(identBarn), true)
         }.hasMessageContaining("Det finnes allerede en behandling på personen")
     }
 
     @Test
     fun `skal feile hvis barnen ikke finnes på personen`() {
         assertThatThrownBy {
-            service.opprettFørstegangsbehandling(ident, setOf(identBarn, "annenIdent"), true)
+            service.opprettFørstegangsbehandling(Stønadstype.BARNETILSYN, ident, setOf(identBarn, "annenIdent"), true)
         }.hasMessageContaining("Barn finnes ikke på person")
+    }
+
+    @Test
+    fun `skal feile hvis stønadstype ikke forventer barn`() {
+        assertThatThrownBy {
+            service.opprettFørstegangsbehandling(Stønadstype.LÆREMIDLER, ident, setOf(identBarn, "annenIdent"), true)
+        }.hasMessageContaining("skal ikke ha barn")
     }
 }

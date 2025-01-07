@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -35,10 +36,15 @@ class AdminOpprettBehandlingService(
 ) {
 
     @Transactional
-    fun opprettFørstegangsbehandling(ident: String, valgteBarn: Set<String>, medBrev: Boolean): BehandlingId {
-        validerOpprettelseAvBehandling(ident, valgteBarn)
+    fun opprettFørstegangsbehandling(
+        stønadstype: Stønadstype,
+        ident: String,
+        valgteBarn: Set<String>,
+        medBrev: Boolean,
+    ): BehandlingId {
+        validerOpprettelseAvBehandling(stønadstype, ident, valgteBarn)
 
-        val fagsak = fagsakService.hentEllerOpprettFagsak(ident, Stønadstype.BARNETILSYN)
+        val fagsak = fagsakService.hentEllerOpprettFagsak(ident, stønadstype)
         val behandlingsårsak =
             if (medBrev) BehandlingÅrsak.MANUELT_OPPRETTET else BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV
         val behandling = behandlingService.opprettBehandling(
@@ -46,33 +52,40 @@ class AdminOpprettBehandlingService(
             behandlingsårsak = behandlingsårsak,
         )
 
-        val behandlingBarn = valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) }
-        barnService.opprettBarn(behandlingBarn)
+        if (valgteBarn.isNotEmpty()) {
+            val behandlingBarn = valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) }
+            barnService.opprettBarn(behandlingBarn)
+        }
 
         opprettBehandleSakOppgave(behandling)
 
         return behandling.id
     }
 
-    private fun validerOpprettelseAvBehandling(ident: String, barn: Set<String>) {
+    private fun validerOpprettelseAvBehandling(stønadstype: Stønadstype, ident: String, barn: Set<String>) {
         brukerfeilHvisIkke(unleashService.isEnabled(Toggle.ADMIN_KAN_OPPRETTE_BEHANDLING)) {
             "Feature toggle for å kunne opprette behandling er slått av"
         }
-        feilHvis(barn.isEmpty()) {
+        feilHvis(stønadstype.gjelderBarn() && barn.isEmpty()) {
             "Må velge minimum 1 barn"
+        }
+
+        feilHvis(!stønadstype.gjelderBarn() && barn.isNotEmpty()) {
+            "Stønadstype=$stønadstype skal ikke ha barn"
         }
 
         val person = personService.hentPersonMedBarn(ident)
 
         validerAtBarnFinnesPåPerson(person, barn)
-        validerAtDetIkkeFinnesBehandlingFraFør(ident)
+        validerAtDetIkkeFinnesBehandlingFraFør(stønadstype, ident)
     }
 
-    fun hentPerson(ident: String): PersoninfoDto {
-        validerAtDetIkkeFinnesBehandlingFraFør(ident)
+    fun hentPerson(stønadstype: Stønadstype, ident: String): PersoninfoDto {
+        validerAtDetIkkeFinnesBehandlingFraFør(stønadstype, ident)
 
         val person = personService.hentPersonMedBarn(ident)
         return PersoninfoDto(
+            navn = person.søker.navn.gjeldende().visningsnavn(),
             barn = person.barn.map {
                 Barn(
                     ident = it.key,
@@ -99,9 +112,9 @@ class AdminOpprettBehandlingService(
         }
     }
 
-    private fun validerAtDetIkkeFinnesBehandlingFraFør(ident: String) {
+    private fun validerAtDetIkkeFinnesBehandlingFraFør(stønadstype: Stønadstype, ident: String) {
         val personIdenter = personService.hentPersonIdenter(ident)
-        val fagsak = fagsakService.finnFagsak(personIdenter.identer(), Stønadstype.BARNETILSYN)
+        val fagsak = fagsakService.finnFagsak(personIdenter.identer(), stønadstype)
         val behandlinger = fagsak?.let { behandlingService.hentBehandlinger(it.id) } ?: emptyList()
         brukerfeilHvis(behandlinger.isNotEmpty()) {
             "Det finnes allerede en behandling på personen. Gå til behandlingsoversikten og opprett endring derifra."
