@@ -13,18 +13,18 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import org.springframework.stereotype.Service
-import java.time.YearMonth
+import java.time.LocalDate
 import java.util.*
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = IverksettBehandlingMånedTask.TYPE,
+    taskStepType = DagligIverksettBehandlingTask.TYPE,
     maxAntallFeil = 3,
     settTilManuellOppfølgning = true,
     triggerTidVedFeilISekunder = 60L,
-    beskrivelse = "Iverksetter behandling for en måned.",
+    beskrivelse = "Iverksetter behandling som har andeler til utbetaling. Trigges av DagligIverksettingTask",
 )
-class IverksettBehandlingMånedTask(
+class DagligIverksettBehandlingTask(
     private val behandlingService: BehandlingService,
     private val iverksettService: IverksettService,
 ) : AsyncTaskStep {
@@ -35,11 +35,11 @@ class IverksettBehandlingMånedTask(
 
         validerErSisteBehandling(taskData.behandlingId)
 
-        val måned = taskData.måned
-        feilHvis(måned > YearMonth.now()) {
-            "Kan ikke iverksette for måned=$måned som er frem i tiden"
+        val utbetalingsdato = taskData.utbetalingsdato
+        feilHvis(utbetalingsdato > LocalDate.now()) {
+            "Kan ikke iverksette for utbetalingsdato=$utbetalingsdato som er frem i tiden"
         }
-        iverksettService.iverksett(taskData.behandlingId, UUID.fromString(iverksettingId), måned)
+        iverksettService.iverksett(taskData.behandlingId, UUID.fromString(iverksettingId), utbetalingsdato)
     }
 
     private fun validerErSisteBehandling(behandlingId: BehandlingId) {
@@ -59,24 +59,27 @@ class IverksettBehandlingMånedTask(
 
     companion object {
 
-        fun opprettTask(behandlingId: BehandlingId, måned: YearMonth): Task {
+        fun opprettTask(behandlingId: BehandlingId, utbetalingsdato: LocalDate): Task {
             val properties = Properties().apply {
                 setProperty("behandlingId", behandlingId.toString())
                 setProperty("iverksettingId", UUID.randomUUID().toString())
-                setProperty("måned", måned.toString())
+                setProperty("utbetalingsdato", utbetalingsdato.toString())
                 setProperty(MDCConstants.MDC_CALL_ID, IdUtils.generateId())
             }
 
-            val payload = objectMapper.writeValueAsString(TaskData(behandlingId, måned))
+            val payload = objectMapper.writeValueAsString(TaskData(behandlingId, utbetalingsdato))
 
             return Task(TYPE, payload).copy(metadataWrapper = PropertiesWrapper(properties))
         }
 
-        const val TYPE = "IverksettBehandlingMåned"
+        const val TYPE = "DagligIverksettBehandling"
     }
 
+    /**
+     * Trenger [utbetalingsdato] for å få unik payload
+     */
     private data class TaskData(
         val behandlingId: BehandlingId,
-        val måned: YearMonth,
+        val utbetalingsdato: LocalDate,
     )
 }

@@ -9,51 +9,57 @@ import no.nav.familie.prosessering.util.IdUtils
 import no.nav.familie.prosessering.util.MDCConstants
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
 import org.springframework.stereotype.Service
-import java.time.YearMonth
+import java.time.LocalDate
 import java.util.Properties
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = IverksettMånedTask.TYPE,
+    taskStepType = DagligIverksettTask.TYPE,
     maxAntallFeil = 3,
     settTilManuellOppfølgning = true,
     triggerTidVedFeilISekunder = 60L,
-    beskrivelse = "Oppretter en task for hver iverksetting av en måned.",
+    beskrivelse = """
+        Jobb som kjøres hver dag som oppretter en ny task for hver behandling 
+        som har andeler som skal iverksettes den dagen
+        """,
 )
-class IverksettMånedTask(
+class DagligIverksettTask(
     private val taskService: TaskService,
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
 ) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
-        // finn alle behandlinger som skal iverksettes for denne måneden som har andeler
-
-        val måned = YearMonth.parse(task.payload)
+        /**
+         * Skal bruke dagens dato som utbetalingsdato.
+         * Trenger ikke å bruke utbetalingsdato fra metadata eller payload, eks i tilfelle tasken feiler og kjører neste dag så skal nytt dagens dato brukes
+         */
+        val utbetalingsdato = LocalDate.now()
 
         val behandlinger =
-            andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(sisteDatoIMåned = måned.atEndOfMonth())
+            andelTilkjentYtelseRepository.finnBehandlingerForIverksetting(utbetalingsdato = utbetalingsdato)
 
         behandlinger.forEach {
-            taskService.save(IverksettBehandlingMånedTask.opprettTask(behandlingId = it, måned = måned))
+            taskService.save(DagligIverksettBehandlingTask.opprettTask(behandlingId = it, utbetalingsdato = utbetalingsdato))
         }
     }
 
     override fun onCompletion(task: Task) {
-        taskService.save(opprettTask(YearMonth.parse(task.payload).plusMonths(1)))
+        taskService.save(opprettTask(LocalDate.now().plusDays(1)))
     }
 
     companion object {
 
-        fun opprettTask(måned: YearMonth): Task {
+        fun opprettTask(utbetalingsdato: LocalDate): Task {
             val properties = Properties().apply {
-                setProperty("måned", måned.toString())
+                setProperty("utbetalingsdato", utbetalingsdato.toString())
                 setProperty(MDCConstants.MDC_CALL_ID, IdUtils.generateId())
             }
 
-            return Task(TYPE, måned.toString()).copy(metadataWrapper = PropertiesWrapper(properties))
-                .medTriggerTid(måned.atDay(1).atTime(6, 4))
+            return Task(TYPE, utbetalingsdato.toString())
+                .copy(metadataWrapper = PropertiesWrapper(properties))
+                .medTriggerTid(utbetalingsdato.atTime(6, 4))
         }
 
-        const val TYPE = "IverksettMåned"
+        const val TYPE = "DagligIverksett"
     }
 }
