@@ -7,12 +7,11 @@ import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
-import java.time.YearMonth
 
 data class UtbetalingPeriode(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val utbetalingsmåned: YearMonth,
+    val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()

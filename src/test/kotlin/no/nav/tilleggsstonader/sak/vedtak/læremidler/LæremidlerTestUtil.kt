@@ -1,27 +1,25 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
-import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
-import java.time.YearMonth
 
 object LæremidlerTestUtil {
 
     fun beregningsresultatForMåned(
         fom: LocalDate,
         tom: LocalDate,
-        utbetalingMåned: YearMonth,
+        utbetalingsdato: LocalDate = fom,
     ): BeregningsresultatForMåned {
         return BeregningsresultatForMåned(
             beløp = 875,
             grunnlag = Beregningsgrunnlag(
                 fom = fom,
                 tom = tom,
-                utbetalingsmåned = utbetalingMåned,
+                utbetalingsdato = utbetalingsdato,
                 studienivå = Studienivå.HØYERE_UTDANNING,
                 studieprosent = 100,
                 sats = 875,
@@ -36,6 +34,7 @@ object LæremidlerTestUtil {
         tom: LocalDate,
         antallMåneder: Int = 1,
         stønadsbeløp: Int = 875,
+        utbetalingsdato: LocalDate = fom,
     ): BeregningsresultatForPeriodeDto {
         return BeregningsresultatForPeriodeDto(
             fom = fom,
@@ -45,7 +44,7 @@ object LæremidlerTestUtil {
             studieprosent = 100,
             beløp = 875,
             stønadsbeløp = stønadsbeløp,
-            utbetalingsmåned = fom.toYearMonth(),
+            utbetalingsdato = utbetalingsdato,
         )
     }
 }

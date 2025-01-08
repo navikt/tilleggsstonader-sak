@@ -99,7 +99,7 @@ class LæremidlerBeregningService(
             studieprosent = aktivitet.prosent,
             sats = finnSatsForStudienivå(sats, aktivitet.studienivå),
             satsBekreftet = sats.bekreftet,
-            utbetalingsmåned = periode.utbetalingsmåned,
+            utbetalingsdato = periode.utbetalingsdato,
             målgruppe = målgruppe,
         )
     }

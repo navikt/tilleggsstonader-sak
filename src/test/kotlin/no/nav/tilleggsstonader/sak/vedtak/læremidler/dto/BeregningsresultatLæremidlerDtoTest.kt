@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatL
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.time.YearMonth
 
 class BeregningsresultatLæremidlerDtoTest {
 
@@ -17,17 +16,15 @@ class BeregningsresultatLæremidlerDtoTest {
                 beregningsresultatForMåned(
                     LocalDate.of(2024, 1, 1),
                     LocalDate.of(2024, 1, 31),
-                    YearMonth.of(2024, 1),
                 ),
                 beregningsresultatForMåned(
                     LocalDate.of(2024, 2, 1),
                     LocalDate.of(2024, 2, 29),
-                    YearMonth.of(2024, 1),
+                    utbetalingsdato = LocalDate.of(2024, 1, 1),
                 ),
                 beregningsresultatForMåned(
                     LocalDate.of(2024, 5, 1),
                     LocalDate.of(2024, 5, 31),
-                    YearMonth.of(2024, 5),
                 ),
             ),
         ).tilDto()

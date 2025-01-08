@@ -30,6 +30,7 @@ object TilkjentYtelseUtil {
         type: TypeAndel = TypeAndel.TILSYN_BARN_AAP,
         statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
         iverksetting: Iverksetting? = null,
+        utbetalingsdato: LocalDate = fom,
     ) = AndelTilkjentYtelse(
         beløp = beløp,
         fom = fom,
@@ -39,5 +40,6 @@ object TilkjentYtelseUtil {
         kildeBehandlingId = kildeBehandlingId,
         statusIverksetting = statusIverksetting,
         iverksetting = iverksetting,
+        utbetalingsdato = utbetalingsdato,
     )
 }

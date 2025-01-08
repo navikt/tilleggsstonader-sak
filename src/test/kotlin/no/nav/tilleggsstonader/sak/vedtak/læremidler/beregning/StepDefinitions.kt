@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
-import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
@@ -41,7 +40,7 @@ enum class BeregningNøkler(
     STUDIEPROSENT("Studieprosent"),
     SATS("Sats"),
     AKTIVITET("Aktivitet"),
-    UTBETALINGSMÅNED("Utbetalingsmåned"),
+    UTBETALINGSDATO("Utbetalingsdato"),
     MÅLGRUPPE("Målgruppe"),
     BEKREFTET_SATS("Bekreftet sats"),
 }
@@ -131,7 +130,7 @@ class StepDefinitions {
                     studieprosent = parseInt(BeregningNøkler.STUDIEPROSENT, rad),
                     sats = parseBigDecimal(BeregningNøkler.SATS, rad).toInt(),
                     satsBekreftet = parseValgfriBoolean(BeregningNøkler.BEKREFTET_SATS, rad) ?: true,
-                    utbetalingsmåned = parseÅrMåned(BeregningNøkler.UTBETALINGSMÅNED, rad),
+                    utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),
                     målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad)
                         ?: MålgruppeType.AAP,
                 ),
@@ -169,7 +168,7 @@ class StepDefinitions {
             UtbetalingPeriode(
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                utbetalingsmåned = parseÅrMåned(BeregningNøkler.UTBETALINGSMÅNED, rad),
+                utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),
             )
         }
         assertThat(vedtaksperioderSplittet).containsExactlyElementsOf(forventedePerioder)

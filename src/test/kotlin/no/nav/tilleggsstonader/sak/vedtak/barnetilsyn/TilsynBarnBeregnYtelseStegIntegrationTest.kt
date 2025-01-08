@@ -157,42 +157,49 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             val dagsatsForUtgift200 = BigDecimal("5.91")
 
             val forventedeAndeler = listOf(
-                Pair(
-                    stønadsperiode1.medLikTomSomFom(),
-                    finnTotalbeløp(dagsatsForUtgift100, 5),
-                ),
-                Pair(
-                    stønadsperiode2.medLikTomSomFom(),
-                    finnTotalbeløp(dagsatsForUtgift100, 2),
-                ),
-                Pair(
-                    stønadsperiode3.medLikTomSomFom(),
-                    finnTotalbeløp(dagsatsForUtgift100, 6),
-                ),
-                Pair(
-                    stønadsperiode3.copy(fom = februar.atDay(1), tom = februar.atDay(1)),
-                    finnTotalbeløp(dagsatsForUtgift100, 3),
-                ),
-                Pair(
-                    stønadsperiode4.medLikTomSomFom(),
-                    finnTotalbeløp(dagsatsForUtgift100, 1),
-                ),
-                Pair(
-                    stønadsperiode4.copy(fom = mars.atDay(1), tom = mars.atDay(1)),
-                    finnTotalbeløp(dagsatsForUtgift200, 23),
-                ),
-                Pair(
-                    stønadsperiode4.copy(fom = april.atDay(3), tom = april.atDay(3)),
-                    finnTotalbeløp(dagsatsForUtgift200, 1),
-                ),
-            ).map {
                 andelTilkjentYtelse(
-                    fom = it.first.fom,
-                    tom = it.first.tom,
-                    beløp = it.second,
                     kildeBehandlingId = behandling.id,
-                )
-            }
+                    fom = stønadsperiode1.fom,
+                    beløp = finnTotalbeløp(dagsatsForUtgift100, 5),
+                    utbetalingsdato = januar.atDay(2),
+                ),
+                andelTilkjentYtelse(
+                    kildeBehandlingId = behandling.id,
+                    fom = stønadsperiode2.fom,
+                    beløp = finnTotalbeløp(dagsatsForUtgift100, 2),
+                    utbetalingsdato = januar.atDay(2),
+                ),
+                andelTilkjentYtelse(
+                    kildeBehandlingId = behandling.id,
+                    fom = stønadsperiode3.fom,
+                    beløp = finnTotalbeløp(dagsatsForUtgift100, 6),
+                    utbetalingsdato = januar.atDay(2),
+                ),
+                andelTilkjentYtelse(
+                    kildeBehandlingId = behandling.id,
+                    fom = februar.atDay(1),
+                    beløp = finnTotalbeløp(dagsatsForUtgift100, 3),
+                    utbetalingsdato = februar.atDay(1),
+                ),
+                andelTilkjentYtelse(
+                    kildeBehandlingId = behandling.id,
+                    fom = stønadsperiode4.fom,
+                    beløp = finnTotalbeløp(dagsatsForUtgift100, 1),
+                    utbetalingsdato = februar.atDay(1),
+                ),
+                andelTilkjentYtelse(
+                    kildeBehandlingId = behandling.id,
+                    fom = mars.atDay(1),
+                    beløp = finnTotalbeløp(dagsatsForUtgift200, 23),
+                    utbetalingsdato = mars.atDay(1),
+                ),
+                andelTilkjentYtelse(
+                    kildeBehandlingId = behandling.id,
+                    fom = april.atDay(3),
+                    beløp = finnTotalbeløp(dagsatsForUtgift200, 1),
+                    utbetalingsdato = april.atDay(3),
+                ),
+            )
             assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
                 .containsExactlyElementsOf(forventedeAndeler)

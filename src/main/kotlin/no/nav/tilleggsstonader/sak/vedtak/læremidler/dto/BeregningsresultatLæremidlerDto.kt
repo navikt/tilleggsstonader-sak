@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import java.time.LocalDate
-import java.time.YearMonth
 
 data class BeregningsresultatLæremidlerDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
@@ -21,7 +20,7 @@ data class BeregningsresultatForPeriodeDto(
     val studieprosent: Int,
     val beløp: Int,
     val stønadsbeløp: Int,
-    val utbetalingsmåned: YearMonth,
+    val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
     fun slåSammen(
         nestePeriode: BeregningsresultatForPeriodeDto,
@@ -39,7 +38,7 @@ data class BeregningsresultatForPeriodeDto(
         return this.studienivå == nestePeriode.studienivå &&
             this.studieprosent == nestePeriode.studieprosent &&
             this.beløp == nestePeriode.beløp &&
-            this.utbetalingsmåned == nestePeriode.utbetalingsmåned &&
+            this.utbetalingsdato == nestePeriode.utbetalingsdato &&
             this.påfølgesAv(nestePeriode)
     }
 }
@@ -63,6 +62,6 @@ fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto {
         studieprosent = grunnlag.studieprosent,
         beløp = beløp,
         stønadsbeløp = beløp,
-        utbetalingsmåned = grunnlag.utbetalingsmåned,
+        utbetalingsdato = grunnlag.utbetalingsdato,
     )
 }

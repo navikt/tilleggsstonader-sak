@@ -11,19 +11,19 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.YearMonth
+import java.time.LocalDate
 import java.util.UUID
 
-class IverksettBehandlingMånedTaskTest {
+class DagligIverksettBehandlingTaskTest {
 
     private val behandlingService = mockk<BehandlingService>()
     private val iverksettService = mockk<IverksettService>(relaxed = true)
-    private val taskStep = IverksettBehandlingMånedTask(behandlingService, iverksettService)
+    private val taskStep = DagligIverksettBehandlingTask(behandlingService, iverksettService)
 
     val fagsak = fagsak()
     val behandling = behandling(fagsak, vedtakstidspunkt = osloNow().minusDays(1))
     val behandling2 = behandling(fagsak, forrigeBehandlingId = behandling.id, vedtakstidspunkt = osloNow())
-    val måned = YearMonth.now()
+    val utbetalingsdato = LocalDate.now()
 
     @BeforeEach
     fun setUp() {
@@ -33,19 +33,19 @@ class IverksettBehandlingMånedTaskTest {
     @Test
     fun `skal kalle på iverksetting`() {
         mockFinnSisteIverksatteBehandling(behandling)
-        val task = IverksettBehandlingMånedTask.opprettTask(behandling.id, måned)
+        val task = DagligIverksettBehandlingTask.opprettTask(behandling.id, utbetalingsdato)
         val iverksettingId = UUID.fromString(task.metadata.getProperty("iverksettingId"))
 
         taskStep.doTask(task)
 
-        verify(exactly = 1) { iverksettService.iverksett(behandling.id, iverksettingId, måned) }
+        verify(exactly = 1) { iverksettService.iverksett(behandling.id, iverksettingId, utbetalingsdato) }
     }
 
     @Test
     fun `skal feile hvis det finnes en behandling som er iverksatt etter behandlingen for tasken`() {
         mockFinnSisteIverksatteBehandling(behandling2)
 
-        val task = IverksettBehandlingMånedTask.opprettTask(behandlingId = behandling.id, måned)
+        val task = DagligIverksettBehandlingTask.opprettTask(behandlingId = behandling.id, utbetalingsdato)
         assertThatThrownBy {
             taskStep.doTask(task)
         }.hasMessageContaining("En revurdering har erstattet denne behandlingen.")

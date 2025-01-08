@@ -88,6 +88,7 @@ class TilkjentYtelseService(
             kildeBehandlingId = tilkjentYtelse.behandlingId,
             iverksetting = iverksetting,
             statusIverksetting = StatusIverksetting.SENDT,
+            utbetalingsdato = månedForNullutbetaling.atDay(1),
         )
 
         tilkjentYtelseRepository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = tilkjentYtelse.andelerTilkjentYtelse + nullAndel))

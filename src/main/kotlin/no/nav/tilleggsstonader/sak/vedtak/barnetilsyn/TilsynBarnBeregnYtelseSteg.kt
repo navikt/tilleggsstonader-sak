@@ -9,6 +9,8 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -108,6 +110,8 @@ class TilsynBarnBeregnYtelseSteg(
                 feilHvis(ukedag == DayOfWeek.SATURDAY || ukedag == DayOfWeek.SUNDAY) {
                     "Skal ikke opprette perioder som begynner på en helgdag for satstype=$satstype"
                 }
+                val førsteDagIMåneden =
+                    beløpsperiode.dato.toYearMonth().atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag()
                 AndelTilkjentYtelse(
                     beløp = beløpsperiode.beløp,
                     fom = beløpsperiode.dato,
@@ -115,6 +119,7 @@ class TilsynBarnBeregnYtelseSteg(
                     satstype = satstype,
                     type = beløpsperiode.målgruppe.tilTypeAndel(),
                     kildeBehandlingId = saksbehandling.id,
+                    utbetalingsdato = førsteDagIMåneden,
                 )
             }
         }

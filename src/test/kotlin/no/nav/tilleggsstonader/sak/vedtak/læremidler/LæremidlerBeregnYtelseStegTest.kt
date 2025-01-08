@@ -48,7 +48,7 @@ class LæremidlerBeregnYtelseStegTest(
     fun `skal splitte andeler i 2, en for høsten og en for våren som ikke har bekreftet sats ennå`() {
         val fom = LocalDate.of(2025, 8, 15)
         val tom = LocalDate.of(2026, 4, 30)
-        val datoUtbetalingDel1 = LocalDate.of(2025, 8, 1)
+        val datoUtbetalingDel1 = LocalDate.of(2025, 8, 15)
         val datoUtbetalingDel2 = LocalDate.of(2026, 1, 1)
 
         lagreAktivitetOgStønadsperiode(fom, tom)

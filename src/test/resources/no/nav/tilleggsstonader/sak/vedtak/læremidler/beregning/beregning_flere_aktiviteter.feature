@@ -21,11 +21,11 @@ Egenskap: Beregning læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe | Utbetalingsmåned |
-      | 01.01.2024 | 31.01.2024 | 438   | VIDEREGÅENDE     | 100           | 438  | AAP       | 01.2024          |
-      | 01.02.2024 | 29.02.2024 | 438   | VIDEREGÅENDE     | 100           | 438  | AAP       | 01.2024          |
-      | 01.03.2024 | 31.03.2024 | 438   | HØYERE_UTDANNING | 50           | 875  | AAP       | 01.2024          |
-      | 01.04.2024 | 30.04.2024 | 438   | HØYERE_UTDANNING | 50           | 875  | AAP       | 01.2024          |
+      | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 01.01.2024 | 31.01.2024 | 438   | VIDEREGÅENDE     | 100           | 438  | AAP       | 01.01.2024         |
+      | 01.02.2024 | 29.02.2024 | 438   | VIDEREGÅENDE     | 100           | 438  | AAP       | 01.01.2024         |
+      | 01.03.2024 | 31.03.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 01.01.2024         |
+      | 01.04.2024 | 30.04.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 01.01.2024         |
 
   Scenario: Flere aktiviteter i samme måned - overlappende hele måneden
     Gitt følgende vedtaksperioder for læremidler
@@ -83,6 +83,6 @@ Egenskap: Beregning læremidler - flere aktiviteter
     Når beregner stønad for læremidler
 
     Så skal stønaden være
-      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsmåned |
-      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 08.2024          |
-      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 08.2024          |
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024         |
+      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024         |
