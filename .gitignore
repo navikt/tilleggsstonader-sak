@@ -7,3 +7,5 @@ build
 /out/
 
 .kotlin
+
+.DS_Store
