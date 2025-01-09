@@ -6,7 +6,12 @@ import java.time.LocalDate
 
 data class BeregningsresultatLæremidler(
     val perioder: List<BeregningsresultatForMåned>,
-)
+) {
+    fun filtrerFraOgMed(dato: LocalDate?): BeregningsresultatLæremidler {
+        if (dato == null) return this
+        return BeregningsresultatLæremidler(perioder.filter { it.grunnlag.tom >= dato })
+    }
+}
 
 data class BeregningsresultatForMåned(
     val beløp: Int,

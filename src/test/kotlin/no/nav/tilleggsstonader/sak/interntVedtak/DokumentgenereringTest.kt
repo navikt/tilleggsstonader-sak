@@ -107,7 +107,7 @@ class DokumentgenereringTest {
             every { grunnlagsdataService.hentGrunnlagsdata(behandlingId) } returns Testdata.Læremidler.grunnlagsdata
             every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
             every { vilkårService.hentVilkårsett(behandlingId) } returns emptyList()
-            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.avslåttVedtak
+            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.innvilgetVedtak
         }
 
         @Test
