@@ -29,7 +29,7 @@ object TilsynBarnTestUtil {
 
     val beløpsperioderDefault = listOf(
         Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = MålgruppeType.AAP),
-        Beløpsperiode(dato = LocalDate.now().plusMonths(1), beløp = 2000, målgruppe = MålgruppeType.AAP),
+        Beløpsperiode(dato = LocalDate.now().plusDays(7), beløp = 2000, målgruppe = MålgruppeType.OVERGANGSSTØNAD),
     )
 
     val vedtakBeregningsresultat = BeregningsresultatTilsynBarn(
@@ -44,13 +44,13 @@ object TilsynBarnTestUtil {
         beløpsperioder: List<Beløpsperiode> = beløpsperioderDefault,
     ) = BeregningsresultatForMåned(
         dagsats = BigDecimal.TEN,
-        månedsbeløp = 1000,
+        månedsbeløp = 3000,
         grunnlag = Beregningsgrunnlag(
             måned = måned,
-            makssats = 1000,
+            makssats = 3000,
             stønadsperioderGrunnlag = stønadsperioder,
             utgifter = emptyList(),
-            utgifterTotal = 2000,
+            utgifterTotal = 5000,
             antallBarn = 1,
         ),
         beløpsperioder = beløpsperioder,
