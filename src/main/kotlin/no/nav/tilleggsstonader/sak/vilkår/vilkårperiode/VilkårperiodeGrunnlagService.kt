@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -67,33 +69,45 @@ class VilkårperiodeGrunnlagService(
     fun hentEllerOpprettGrunnlag(behandlingId: BehandlingId): VilkårperioderGrunnlag? {
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)?.grunnlag
 
-        return if (grunnlag != null) {
-            grunnlag
-        } else if (behandlingErLåstForVidereRedigering(behandlingId)) {
+        if (grunnlag != null) {
+            return grunnlag
+        }
+
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        return if (behandling.status.behandlingErLåstForVidereRedigering()) {
             null
         } else {
-            opprettGrunnlagsdata(behandlingId).grunnlag
+            opprettGrunnlagsdata(behandling).grunnlag
         }
     }
 
-    private fun opprettGrunnlagsdata(behandlingId: BehandlingId): VilkårperioderGrunnlagDomain {
+    private fun opprettGrunnlagsdata(behandling: Saksbehandling): VilkårperioderGrunnlagDomain {
         brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
             "Behandlingen er ikke påbegynt. Kan ikke opprette vilkårperiode hvis man ikke er saksbehandler"
         }
 
-        val søknadMetadata = søknadService.hentSøknadMetadata(behandlingId)
+        val søknadMetadata = søknadService.hentSøknadMetadata(behandling.id)
         val utgangspunktDato = søknadMetadata?.mottattTidspunkt?.toLocalDate() ?: LocalDate.now()
 
-        val fom = YearMonth.from(utgangspunktDato).minusMonths(3).atDay(1)
+        val antallMånederBakITiden = behandling.stønadstype.antallMånederBakITiden()
+        val fom = YearMonth.from(utgangspunktDato).minusMonths(antallMånederBakITiden).atDay(1)
         val tom = YearMonth.from(utgangspunktDato).plusYears(1).atEndOfMonth()
 
-        val grunnlag = hentGrunnlagsdata(behandlingId, fom, tom)
+        val grunnlag = hentGrunnlagsdata(behandling.id, fom, tom)
         return vilkårperioderGrunnlagRepository.insert(
             VilkårperioderGrunnlagDomain(
-                behandlingId = behandlingId,
+                behandlingId = behandling.id,
                 grunnlag = grunnlag,
             ),
         )
+    }
+
+    /**
+     * Ulike stønader har ulikt behov for antall måneder bak i tiden som skal hentes
+     */
+    private fun Stønadstype.antallMånederBakITiden(): Long = when (this) {
+        Stønadstype.BARNETILSYN -> 3
+        Stønadstype.LÆREMIDLER -> 6
     }
 
     private fun hentGrunnlagsdata(
@@ -162,7 +176,4 @@ class VilkårperiodeGrunnlagService(
                 .slåSammenOverlappendeEllerPåfølgende(),
         )
     }
-
-    private fun behandlingErLåstForVidereRedigering(behandlingId: BehandlingId) =
-        behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
 }
