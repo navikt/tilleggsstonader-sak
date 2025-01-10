@@ -87,7 +87,7 @@ class VilkårperiodeGrunnlagService(
         }
 
         val søknadMetadata = søknadService.hentSøknadMetadata(behandling.id)
-        val utgangspunktDato = søknadMetadata?.mottattTidspunkt?.toLocalDate() ?: LocalDate.now()
+        val utgangspunktDato = søknadMetadata?.mottattTidspunkt ?: behandling.opprettetTid
 
         val antallMånederBakITiden = behandling.stønadstype.antallMånederBakITiden()
         val fom = YearMonth.from(utgangspunktDato).minusMonths(antallMånederBakITiden).atDay(1)
