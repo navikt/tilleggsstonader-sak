@@ -90,7 +90,7 @@ class SøknadRoutingService(
 
         val harGyldigStatus = when (stønadstype) {
             Stønadstype.BARNETILSYN -> !harAktivtVedtak
-            Stønadstype.LÆREMIDLER -> !harVedtak
+            Stønadstype.LÆREMIDLER -> !harAktivtVedtak
         }
 
         logger.info(

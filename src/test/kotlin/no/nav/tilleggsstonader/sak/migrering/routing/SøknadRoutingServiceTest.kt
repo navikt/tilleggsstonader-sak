@@ -180,7 +180,7 @@ class SøknadRoutingServiceTest {
         }
 
         @Test
-        fun `skal ikke route læremidler dersom det finnes noe vedtak uansett om det er aktivt eller ikke`() {
+        fun `skal ikke route læremidler dersom det ikke finnes aktivt vedtak`() {
             unleashService.mockGetVariant(SØKNAD_ROUTING_LÆREMIDLER, søknadRoutingVariant(10))
             every { arenaService.hentStatus(any(), any()) } returns arenaStatusUtenAktivtVedtak()
             every { søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER) } returns 0
