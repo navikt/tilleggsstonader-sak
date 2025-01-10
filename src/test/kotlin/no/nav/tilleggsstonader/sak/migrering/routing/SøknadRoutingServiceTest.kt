@@ -64,7 +64,7 @@ class SøknadRoutingServiceTest {
         every { søknadRoutingRepository.insert(any()) } answers { firstArg() }
         every { fagsakService.finnFagsak(any(), any()) } returns null
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns emptyList()
-        every { arenaService.hentStatus(any(), any()) } returns arenaStatusKanIkkeRoutes()
+        every { arenaService.hentStatus(any(), any()) } returns arenaStatusAktivtVedtak()
         every { personService.hentPersonIdenter(any()) } answers { PdlIdenter(listOf(PdlIdent(firstArg(), false))) }
         unmockkObject(unleashService)
     }
@@ -180,9 +180,9 @@ class SøknadRoutingServiceTest {
         }
 
         @Test
-        fun `skal ikke route læremidler dersom det ikke finnes aktivt vedtak`() {
+        fun `skal ikke route læremidler dersom det finnes noe aktivt vedtak`() {
             unleashService.mockGetVariant(SØKNAD_ROUTING_LÆREMIDLER, søknadRoutingVariant(10))
-            every { arenaService.hentStatus(any(), any()) } returns arenaStatusUtenAktivtVedtak()
+            every { arenaService.hentStatus(any(), any()) } returns arenaStatusAktivtVedtak()
             every { søknadRoutingRepository.countByType(Stønadstype.LÆREMIDLER) } returns 0
 
             assertThat(skalBehandlesINyLøsning(IdentStønadstype(ident, Stønadstype.LÆREMIDLER))).isFalse
@@ -240,7 +240,7 @@ class SøknadRoutingServiceTest {
         }
     }
 
-    private fun arenaStatusKanIkkeRoutes() = ArenaStatusDto(
+    private fun arenaStatusAktivtVedtak() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = true),
         vedtakStatus(harVedtak = true, harAktivtVedtak = true, harVedtakUtenUtfall = false),
     )
