@@ -8,6 +8,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.familie.prosessering.util.IdUtils
 import no.nav.familie.prosessering.util.MDCConstants
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.Properties
@@ -44,7 +45,7 @@ class DagligIverksettTask(
     }
 
     override fun onCompletion(task: Task) {
-        taskService.save(opprettTask(LocalDate.now().plusDays(1)))
+        taskService.save(opprettTask(LocalDate.now().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag()))
     }
 
     companion object {
