@@ -165,7 +165,7 @@ class IverksettService(
     ): List<AndelTilkjentYtelse> {
         val iverksetting = Iverksetting(iverksettingId, osloNow())
         val aktuelleAndeler = tilkjentYtelse.andelerTilkjentYtelse
-            .filter { it.fom <= utbetalingsdato }
+            .filter { it.utbetalingsdato <= utbetalingsdato }
             .filter { it.statusIverksetting != StatusIverksetting.VENTER_PÅ_SATS_ENDRING }
             .map {
                 if (it.statusIverksetting == StatusIverksetting.UBEHANDLET) {
