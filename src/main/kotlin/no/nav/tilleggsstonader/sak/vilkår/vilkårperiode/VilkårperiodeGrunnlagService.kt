@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetServi
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.util.tilFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
@@ -86,12 +87,8 @@ class VilkårperiodeGrunnlagService(
             "Behandlingen er ikke påbegynt. Kan ikke opprette vilkårperiode hvis man ikke er saksbehandler"
         }
 
-        val søknadMetadata = søknadService.hentSøknadMetadata(behandling.id)
-        val utgangspunktDato = søknadMetadata?.mottattTidspunkt ?: behandling.opprettetTid
-
-        val antallMånederBakITiden = behandling.stønadstype.antallMånederBakITiden()
-        val fom = YearMonth.from(utgangspunktDato).minusMonths(antallMånederBakITiden).atDay(1)
-        val tom = YearMonth.from(utgangspunktDato).plusYears(1).atEndOfMonth()
+        val fom = antallMånederBakITiden(behandling)
+        val tom = YearMonth.now().plusYears(1).atEndOfMonth()
 
         val grunnlag = hentGrunnlagsdata(behandling.id, fom, tom)
         return vilkårperioderGrunnlagRepository.insert(
@@ -100,6 +97,22 @@ class VilkårperiodeGrunnlagService(
                 grunnlag = grunnlag,
             ),
         )
+    }
+
+    /**
+     * Vid en førstegangsbehandling skal man bruke mottatt tidspunkt minus antall måneder for gitt stønadstype
+     * Når man revurderer skal man hente grunnlag fra og med datoet man revurderer fra, uavhengig når man søker fra
+     */
+    private fun antallMånederBakITiden(behandling: Saksbehandling): LocalDate {
+        if (behandling.revurderFra != null) {
+            return behandling.revurderFra
+        }
+        val mottattTidspunkt = søknadService.hentSøknadMetadata(behandling.id)?.mottattTidspunkt
+            ?: behandling.opprettetTid
+
+        return mottattTidspunkt.toLocalDate()
+            .minusMonths(behandling.stønadstype.antallMånederBakITiden())
+            .tilFørsteDagIMåneden()
     }
 
     /**
