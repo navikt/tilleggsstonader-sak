@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.
 import no.nav.tilleggsstonader.sak.util.behandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.platform.commons.logging.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import java.util.concurrent.CountDownLatch
@@ -77,9 +78,9 @@ internal class TilkjentYtelseRepositoryTest : IntegrationTest() {
         val beløpJob2 = 2
 
         val job1 = executor.submit {
-            latch.countDown() // sier ifra at job1 startet
             transactionHandler.runInNewTransaction {
                 val tilkjentYtelse = repository.findByBehandlingIdForUpdate(behandling.id)!!
+                latch.countDown() // sier ifra at job1 startet
                 Thread.sleep(500)
                 val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = beløpJob1)
                 repository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = setOf(andel)))
