@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -46,7 +47,7 @@ class VilkårperiodeGrunnlagService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun oppdaterGrunnlag(behandlingId: BehandlingId) {
+    fun oppdaterGrunnlag(behandlingId: BehandlingId, henteFom: LocalDate? = null) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke oppdatere grunnlag når behandlingen er låst"
@@ -54,10 +55,13 @@ class VilkårperiodeGrunnlagService(
         feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
             "Kan ikke oppdatere grunnlag når behandlingen er i annet steg enn vilkår."
         }
+        feilHvis(behandling.type != BehandlingType.FØRSTEGANGSBEHANDLING && henteFom != null) {
+            "Kan ikke sette henteFom når behandlingtype = ${behandling.type}"
+        }
 
         val eksisterendeGrunnlag = vilkårperioderGrunnlagRepository.findByIdOrThrow(behandlingId)
 
-        val eksisterendeHentetFom = eksisterendeGrunnlag.grunnlag.hentetInformasjon.fom
+        val eksisterendeHentetFom = henteFom ?: eksisterendeGrunnlag.grunnlag.hentetInformasjon.fom
         val tom = YearMonth.now().plusYears(1).atEndOfMonth()
 
         val nyGrunnlagsdata = hentGrunnlagsdata(behandlingId, eksisterendeHentetFom, tom)

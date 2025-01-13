@@ -274,6 +274,19 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         }
 
         @Test
+        fun `skal kunne hente grunnlagsdata i førstegangsbehandlinger fra annet dato`() {
+            val henteFom = LocalDate.of(2023, 1, 1)
+
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.INNGANGSVILKÅR))
+            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+
+            vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id, henteFom)
+            val grunnlag = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+
+            assertThat(grunnlag!!.hentetInformasjon.fom).isEqualTo(henteFom)
+        }
+
+        @Test
         fun `skal ikke kunne oppdatere dataen når behandlingen har feil steg`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.VILKÅR))
             val feil =
