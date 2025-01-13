@@ -107,8 +107,19 @@
   } ],
   "vilkår" : [ ],
   "vedtak" : {
-    "årsakerAvslag" : [ "MANGELFULL_DOKUMENTASJON", "RETT_TIL_UTSTYRSSTIPEND" ],
-    "avslagBegrunnelse" : "Begrunelse for avslag",
-    "type" : "AVSLAG"
+    "type" : "INNVILGELSE"
+  },
+  "beregningsresultat" : {
+    "tilsynBarn" : null,
+    "læremidler" : [ {
+      "fom" : "2024-01-01",
+      "tom" : "2024-02-29",
+      "antallMåneder" : 2,
+      "studienivå" : "HØYERE_UTDANNING",
+      "studieprosent" : 100,
+      "beløp" : 951,
+      "stønadsbeløp" : 1902,
+      "utbetalingsdato" : "2024-01-01"
+    } ]
   }
 }

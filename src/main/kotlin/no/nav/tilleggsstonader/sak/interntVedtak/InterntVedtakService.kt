@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -57,7 +59,26 @@ class InterntVedtakService(
             stønadsperioder = mapStønadsperioder(behandling.id),
             vilkår = mapVilkår(behandling.id, behandlingbarn),
             vedtak = mapVedtak(vedtak),
+            beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, behandling),
         )
+    }
+
+    private fun mapBeregningsresultatForStønadstype(
+        vedtak: Vedtak?,
+        behandling: Saksbehandling,
+    ): BeregningsresultatInterntVedtakDto? = vedtak?.data?.let { data ->
+        when (data) {
+            is InnvilgelseTilsynBarn -> BeregningsresultatInterntVedtakDto(
+                tilsynBarn = data.beregningsresultat.tilDto(behandling.revurderFra).perioder,
+            )
+
+            is InnvilgelseLæremidler -> BeregningsresultatInterntVedtakDto(
+                læremidler = data.beregningsresultat.filtrerFraOgMed(behandling.revurderFra)
+                    .tilDto().perioder,
+            )
+
+            else -> null
+        }
     }
 
     private fun mapBarnPåBarnId(
