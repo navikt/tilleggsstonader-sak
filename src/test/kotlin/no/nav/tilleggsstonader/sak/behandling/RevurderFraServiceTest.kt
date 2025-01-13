@@ -71,6 +71,7 @@ class RevurderFraServiceTest {
 
             assertThat(oppdaterBehandlingSlot.captured.revurderFra).isEqualTo(revurderFra)
             verify(exactly = 0) { nullstillBehandlingService.nullstillBehandling(any()) }
+            verify(exactly = 1) { nullstillBehandlingService.slettVilkårperiodegrunnlag(any()) }
         }
     }
 

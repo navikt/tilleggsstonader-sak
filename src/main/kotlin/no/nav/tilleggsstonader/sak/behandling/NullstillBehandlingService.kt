@@ -11,7 +11,9 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeGrunnlagService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,6 +23,8 @@ class NullstillBehandlingService(
     private val behandlingService: BehandlingService,
     private val gjennbrukDataRevurderingService: GjennbrukDataRevurderingService,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
+    private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
+    private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
     private val vilkårRepository: VilkårRepository,
     private val vedtakRepository: VedtakRepository,
@@ -45,6 +49,22 @@ class NullstillBehandlingService(
         slettDataIBehandling(behandlingId)
 
         gjenbrukData(behandling)
+    }
+
+    /**
+     * Sletting av vilkårperiodegrunnlag gjøres i en egen metode då det alltid skal gjøres når endrer revurder-fra-datoet
+     * sånn at man får hentet data fra nytt revurder-fra-dato
+     * Gjøres direkte via repository for å ikke lage en publik metode som gjør det mulig å slette grunnlaget i
+     */
+    @Transactional
+    fun slettVilkårperiodegrunnlag(behandlingId: BehandlingId) {
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
+            "Behandling er låst for videre redigering og endres på"
+        }
+        logger.info("Sletter vilkårperiodegrunnlag behandling=$behandlingId")
+
+        vilkårperioderGrunnlagRepository.deleteById(behandlingId)
     }
 
     /**
