@@ -4,8 +4,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.beregnBeløp
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.slåSammenSammenhengende
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerPeriodeUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -56,7 +56,7 @@ class LæremidlerBeregningService(
     ): List<BeregningsresultatForMåned> =
         vedtaksperioder
             .sorted()
-            .flatMap { it.delTilUtbetalingsPerioder() }
+            .grupperVedtaksperioderPerLøpendeMåned()
             .map { utbetalingsperiode ->
                 val målgruppeOgAktivitet = utbetalingsperiode.finnMålgruppeOgAktivitet(stønadsperioder, aktiviteter)
 
@@ -94,7 +94,7 @@ class LæremidlerBeregningService(
 
         return Beregningsgrunnlag(
             fom = periode.fom,
-            tom = periode.tom,
+            tom = periode.vedtaksperioder.maxOf { it.tom },
             studienivå = aktivitet.studienivå,
             studieprosent = aktivitet.prosent,
             sats = finnSatsForStudienivå(sats, aktivitet.studienivå),
