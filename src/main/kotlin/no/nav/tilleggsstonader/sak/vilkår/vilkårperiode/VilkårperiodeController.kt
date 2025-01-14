@@ -39,7 +39,7 @@ class VilkårperiodeController(
     @PostMapping("behandling/{behandlingId}/oppdater-grunnlag")
     fun oppdaterGrunnlag(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody oppdaterGrunnlag: OppdaterGrunnlagDto,
+        @RequestBody oppdaterGrunnlag: OppdaterGrunnlagDto?,
     ) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
