@@ -47,7 +47,7 @@ class VilkårperiodeGrunnlagService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun oppdaterGrunnlag(behandlingId: BehandlingId, henteFom: LocalDate? = null) {
+    fun oppdaterGrunnlag(behandlingId: BehandlingId, hentGrunnlagFom: LocalDate? = null) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke oppdatere grunnlag når behandlingen er låst"
@@ -55,13 +55,13 @@ class VilkårperiodeGrunnlagService(
         feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
             "Kan ikke oppdatere grunnlag når behandlingen er i annet steg enn vilkår."
         }
-        feilHvis(behandling.type != BehandlingType.FØRSTEGANGSBEHANDLING && henteFom != null) {
+        feilHvis(behandling.type != BehandlingType.FØRSTEGANGSBEHANDLING && hentGrunnlagFom != null) {
             "Kan ikke sette henteFom når behandlingtype = ${behandling.type}"
         }
 
         val eksisterendeGrunnlag = vilkårperioderGrunnlagRepository.findByIdOrThrow(behandlingId)
 
-        val eksisterendeHentetFom = henteFom ?: eksisterendeGrunnlag.grunnlag.hentetInformasjon.fom
+        val eksisterendeHentetFom = hentGrunnlagFom ?: eksisterendeGrunnlag.grunnlag.hentetInformasjon.fom
         val tom = YearMonth.now().plusYears(1).atEndOfMonth()
 
         val nyGrunnlagsdata = hentGrunnlagsdata(behandlingId, eksisterendeHentetFom, tom)
