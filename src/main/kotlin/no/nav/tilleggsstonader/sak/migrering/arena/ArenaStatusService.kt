@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -33,12 +34,13 @@ class ArenaStatusService(
     private fun finnesPerson(request: ArenaFinnesPersonRequest): Boolean {
         val identer = personService.hentPersonIdenter(request.ident).identer().toSet()
 
-        if (harBehandling(identer, request.stønadstype)) {
+        val fagsak = fagsakService.finnFagsak(identer, request.stønadstype)
+        if (skalKunneOppretteSakIArenaForPerson(fagsak)) {
+            return false
+        }
+        if (harBehandling(fagsak)) {
             logger.info("Sjekker om person finnes i ny løsning finnes=true harBehandling")
             return true
-        }
-        if (skalKunneOppretteSakIArenaForPerson(identer, request.stønadstype)) {
-            return false
         }
         if (skalBehandlesITsSak(request.stønadstype)) {
             logger.info("Skal ikke behandle ${request.stønadstype} i Arena")
@@ -51,8 +53,8 @@ class ArenaStatusService(
         return false
     }
 
-    private fun skalKunneOppretteSakIArenaForPerson(identer: Set<String>, stønadstype: Stønadstype): Boolean {
-        val fagsakId = fagsakService.finnFagsak(identer, stønadstype)?.id
+    private fun skalKunneOppretteSakIArenaForPerson(fagsak: Fagsak?): Boolean {
+        val fagsakId = fagsak?.id
         return fagsakId in setOf(FagsakId.fromString("cae26abb-19c7-41b0-88c1-021d7312b55f"))
     }
 
@@ -66,10 +68,9 @@ class ArenaStatusService(
     }
 
     private fun harBehandling(
-        identer: Set<String>,
-        stønadstype: Stønadstype,
+        fagsak: Fagsak?,
     ): Boolean {
-        return fagsakService.finnFagsak(identer, stønadstype)
+        return fagsak
             ?.let { behandlingService.finnesBehandlingForFagsak(it.id) }
             ?: false
     }
