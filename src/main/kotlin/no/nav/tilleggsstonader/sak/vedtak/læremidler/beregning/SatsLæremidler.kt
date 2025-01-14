@@ -23,13 +23,7 @@ data class SatsLæremidler(
 
 private val MAX = LocalDate.of(2099, 12, 31)
 
-val satser: List<SatsLæremidler> = listOf(
-    SatsLæremidler(
-        fom = LocalDate.of(2026, 1, 1),
-        tom = MAX,
-        beløp = mapOf(Studienivå.VIDEREGÅENDE to 438, Studienivå.HØYERE_UTDANNING to 875),
-        bekreftet = false,
-    ),
+private val bekreftedeSatser = listOf(
     SatsLæremidler(
         fom = LocalDate.of(2025, 1, 1),
         tom = LocalDate.of(2025, 12, 31),
@@ -46,6 +40,16 @@ val satser: List<SatsLæremidler> = listOf(
         beløp = mapOf(Studienivå.VIDEREGÅENDE to 411, Studienivå.HØYERE_UTDANNING to 822),
     ),
 )
+
+val satser: List<SatsLæremidler> = listOf(
+    bekreftedeSatser.first().let {
+        it.copy(
+            fom = it.tom.plusDays(1),
+            tom = MAX,
+            bekreftet = false,
+        )
+    },
+) + bekreftedeSatser
 
 fun finnSatsForPeriode(periode: Periode<LocalDate>): SatsLæremidler {
     return satser.find { it.inneholder(periode) } ?: error("Finner ikke satser for $periode")

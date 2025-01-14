@@ -72,7 +72,7 @@ class LæremidlerBeregnYtelseStegTest(
         with(andeler[1]) {
             assertThat(this.fom).isEqualTo(datoUtbetalingDel2)
             assertThat(this.tom).isEqualTo(datoUtbetalingDel2)
-            assertThat(beløp).isEqualTo(3500)
+            assertThat(beløp).isEqualTo(3604)
             assertThat(type).isEqualTo(TypeAndel.LÆREMIDLER_AAP)
             assertThat(statusIverksetting).isEqualTo(StatusIverksetting.VENTER_PÅ_SATS_ENDRING)
             assertThat(satstype).isEqualTo(Satstype.DAG)

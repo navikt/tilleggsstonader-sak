@@ -52,8 +52,12 @@ class SatsLæremidlerTest {
     @Test
     fun `skal kun ha 1 sats som er ubekreftet, for å kunne markere perioder etter nyttår som at de ikke skal utbetales ennå`() {
         val ubekreftedeSatser = satser.filterNot { it.bekreftet }
+        val sisteBekreftetSats = satser.filter { it.bekreftet }.maxBy { it.tom }
 
         assertThat(ubekreftedeSatser).hasSize(1)
+        assertThat(ubekreftedeSatser[0].fom).isEqualTo(LocalDate.of(2026, 1, 1))
+        assertThat(ubekreftedeSatser[0].tom).isEqualTo(LocalDate.of(2099, 12, 31))
+        assertThat(ubekreftedeSatser[0].fom).isEqualTo(sisteBekreftetSats.tom.plusDays(1))
     }
 
     @Test
