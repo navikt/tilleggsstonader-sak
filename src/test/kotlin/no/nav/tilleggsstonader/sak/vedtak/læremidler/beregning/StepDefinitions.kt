@@ -18,7 +18,6 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -62,8 +61,6 @@ class StepDefinitions {
     var beregningException: Exception? = null
     var valideringException: Exception? = null
 
-    var vedtaksperioderSplittet: List<UtbetalingPeriode> = emptyList()
-
     @Gitt("følgende vedtaksperioder for læremidler")
     fun `følgende beregningsperiode for læremidler`(dataTable: DataTable) {
         vedtaksPerioder = dataTable.mapRad { rad ->
@@ -101,11 +98,6 @@ class StepDefinitions {
         } catch (e: Exception) {
             beregningException = e
         }
-    }
-
-    @Når("splitter vedtaksperioder for læremidler")
-    fun `splitter vedtaksperioder for læremidler`() {
-        vedtaksperioderSplittet = vedtaksPerioder.flatMap { it.delTilUtbetalingsPerioder() }
     }
 
     @Når("validerer vedtaksperiode for læremidler")
@@ -160,17 +152,5 @@ class StepDefinitions {
     @Så("forvent følgende feil fra vedtaksperiode validering: {}")
     fun `skal resultat fra validering være`(forventetFeil: String) {
         assertThat(valideringException!!).hasMessageContaining(forventetFeil)
-    }
-
-    @Så("forvent følgende utbetalingsperioder")
-    fun `forvent følgende utbetalingsperioder`(dataTable: DataTable) {
-        val forventedePerioder = dataTable.mapRad { rad ->
-            UtbetalingPeriode(
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),
-            )
-        }
-        assertThat(vedtaksperioderSplittet).containsExactlyElementsOf(forventedePerioder)
     }
 }
