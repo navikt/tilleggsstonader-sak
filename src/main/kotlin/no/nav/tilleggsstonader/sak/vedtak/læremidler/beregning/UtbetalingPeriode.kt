@@ -17,7 +17,16 @@ data class UtbetalingPeriode(
         validatePeriode()
     }
 
-    fun finnRelevantAktivitet(
+    fun finnMålgruppeOgAktivitet(
+        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+        aktiviteter: List<Aktivitet>,
+    ): MålgruppeOgAktivitet {
+        val stønadsperiode = finnRelevantStønadsperiode(stønadsperioder)
+        val aktivitet = finnRelevantAktivitet(aktiviteter, stønadsperiode.aktivitet)
+        return MålgruppeOgAktivitet(stønadsperiode.målgruppe, aktivitet)
+    }
+
+    private fun finnRelevantAktivitet(
         aktiviteter: List<Aktivitet>,
         aktivitetType: AktivitetType,
     ): Aktivitet {
@@ -34,7 +43,7 @@ data class UtbetalingPeriode(
         return relevanteAktiviteter.single()
     }
 
-    fun finnRelevantStønadsperiode(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>): StønadsperiodeBeregningsgrunnlag {
+    private fun finnRelevantStønadsperiode(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>): StønadsperiodeBeregningsgrunnlag {
         val relevanteStønadsperioderForPeriode = stønadsperioder.filter { it.inneholder(this) }
 
         feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {

@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerPerio
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
@@ -64,6 +65,11 @@ data class Aktivitet(
     val prosent: Int,
     val studienivå: Studienivå,
 ) : Periode<LocalDate>
+
+data class MålgruppeOgAktivitet(
+    val målgruppe: MålgruppeType,
+    val aktivitet: Aktivitet,
+)
 
 fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> =
     ofType<AktivitetLæremidler>()

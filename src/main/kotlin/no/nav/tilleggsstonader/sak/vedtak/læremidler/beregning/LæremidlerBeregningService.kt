@@ -54,16 +54,16 @@ class LæremidlerBeregningService(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         aktiviteter: List<Aktivitet>,
     ): List<BeregningsresultatForMåned> =
-        vedtaksperioder.flatMap { it.delTilUtbetalingsPerioder() }
+        vedtaksperioder
+            .sorted()
+            .flatMap { it.delTilUtbetalingsPerioder() }
             .map { utbetalingsperiode ->
-                val relevantStønadsperiode = utbetalingsperiode.finnRelevantStønadsperiode(stønadsperioder)
+                val målgruppeOgAktivitet = utbetalingsperiode.finnMålgruppeOgAktivitet(stønadsperioder, aktiviteter)
+
                 lagBeregningsresultatForMåned(
                     utbetalingsperiode = utbetalingsperiode,
-                    målgruppe = relevantStønadsperiode.målgruppe,
-                    aktivitet = utbetalingsperiode.finnRelevantAktivitet(
-                        aktiviteter = aktiviteter,
-                        aktivitetType = relevantStønadsperiode.aktivitet,
-                    ),
+                    målgruppe = målgruppeOgAktivitet.målgruppe,
+                    aktivitet = målgruppeOgAktivitet.aktivitet,
                 )
             }
 
