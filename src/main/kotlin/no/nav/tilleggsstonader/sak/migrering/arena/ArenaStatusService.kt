@@ -53,7 +53,7 @@ class ArenaStatusService(
 
     private fun skalKunneOppretteSakIArenaForPerson(identer: Set<String>, stønadstype: Stønadstype): Boolean {
         val fagsakId = fagsakService.finnFagsak(identer, stønadstype)?.id
-        return fagsakId in setOf<FagsakId>()
+        return fagsakId in setOf(FagsakId.fromString("cae26abb-19c7-41b0-88c1-021d7312b55f"))
     }
 
     /**
