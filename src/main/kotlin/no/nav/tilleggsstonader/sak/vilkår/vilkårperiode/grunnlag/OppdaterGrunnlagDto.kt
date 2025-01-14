@@ -7,5 +7,5 @@ import java.time.LocalDate
  * I en revurdering vil vi bruke revurder-fra-datoet
  */
 data class OppdaterGrunnlagDto(
-    val henteFom: LocalDate,
+    val henteFom: LocalDate? = null,
 )
