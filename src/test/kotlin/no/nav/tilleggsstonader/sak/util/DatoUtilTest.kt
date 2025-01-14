@@ -92,6 +92,16 @@ class DatoUtilTest {
     }
 
     @Nested
+    inner class TilSisteDagenIÅret {
+
+        @Test
+        fun `tilSisteDagenIÅret skal gi siste dagen i året`() {
+            assertThat(LocalDate.of(2024, 1, 12).tilSisteDagenIÅret()).isEqualTo(LocalDate.of(2024, 12, 31))
+            assertThat(LocalDate.of(2025, 12, 31).tilSisteDagenIÅret()).isEqualTo(LocalDate.of(2025, 12, 31))
+        }
+    }
+
+    @Nested
     inner class LørdagEllerSøndag {
         @Test
         fun `ukesdager skal gi false`() {
