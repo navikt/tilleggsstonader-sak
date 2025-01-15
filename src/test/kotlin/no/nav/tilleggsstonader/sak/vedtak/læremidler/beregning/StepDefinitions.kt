@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.delTilUtbetalingsPerioder
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -100,7 +100,7 @@ class StepDefinitions {
 
     @Når("splitter vedtaksperioder for læremidler")
     fun `splitter vedtaksperioder for læremidler`() {
-        vedtaksperioderSplittet = vedtaksPerioder.flatMap { it.delTilUtbetalingsPerioder() }
+        vedtaksperioderSplittet = vedtaksPerioder.grupperVedtaksperioderPerLøpendeMåned()
     }
 
     @Når("validerer vedtaksperiode for læremidler")
