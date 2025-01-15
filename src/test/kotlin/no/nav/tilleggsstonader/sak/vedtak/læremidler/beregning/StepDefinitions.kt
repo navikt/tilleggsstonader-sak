@@ -77,19 +77,14 @@ class StepDefinitions {
     @Gitt("følgende aktiviteter for læremidler")
     fun `følgende aktiviteter`(dataTable: DataTable) {
         every {
-            vilkårperiodeRepository.findByBehandlingIdAndResultat(
-                any(),
-                any(),
-            )
+            vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any())
         } returns mapAktiviteter(behandlingId, dataTable)
     }
 
     @Gitt("følgende stønadsperioder for læremidler")
     fun `følgende stønadsperioder`(dataTable: DataTable) {
         every {
-            stønadsperiodeRepository.findAllByBehandlingId(
-                any(),
-            )
+            stønadsperiodeRepository.findAllByBehandlingId(any())
         } returns mapStønadsperioder(behandlingId, dataTable)
         stønadsperioder = mapStønadsperioder(behandlingId, dataTable)
     }

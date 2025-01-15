@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -47,6 +49,13 @@ class SatsLæremidlerTest {
             Studienivå.VIDEREGÅENDE,
         )
         assertThat(sats).isEqualTo(411)
+    }
+
+    @Test
+    fun `skal ikke kunne hente sats for en periode som strekker seg over periode for sats`() {
+        assertThatThrownBy {
+            finnSatsForPeriode(Datoperiode(LocalDate.of(2024, 12, 31), LocalDate.of(2025, 1, 1)))
+        }.hasMessageContaining("Finner ikke satser for")
     }
 
     @Test
