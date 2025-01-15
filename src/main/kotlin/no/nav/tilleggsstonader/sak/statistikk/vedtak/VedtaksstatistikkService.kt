@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import java.time.LocalDateTime
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -19,14 +18,13 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
-import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 
 //For tilsyn barn:
@@ -114,7 +112,7 @@ class VedtaksstatistikkService(
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
                 behandlingÅrsak = BehandlingÅrsakDvh.Companion.fraDomene(behandling.årsak),
                 vedtakResultat = VedtakResultatDvh.Companion.fraDomene(behandling.resultat),
-                vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak?.takeIfType<InnvilgelseTilsynBarn>()?.data?.beregningsresultat?.perioder),
+                vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak),
                 utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse),
                 kravMottatt = behandling.kravMottatt,
                 årsakerAvslag = ÅrsakAvslagDvh.Companion.fraDomene(vedtak?.takeIfType<Avslag>()?.data?.årsaker),
