@@ -1,6 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
-enum class Studienivå {
-    VIDEREGÅENDE,
-    HØYERE_UTDANNING,
+/**
+ * @param prioritet lavest er den som har høyest prioritet
+ */
+enum class Studienivå(val prioritet: Int) {
+    HØYERE_UTDANNING(0),
+    VIDEREGÅENDE(1),
 }
