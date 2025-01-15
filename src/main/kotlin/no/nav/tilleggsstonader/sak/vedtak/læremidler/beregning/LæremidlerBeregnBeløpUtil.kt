@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -19,8 +18,3 @@ object LæremidlerBeregnBeløpUtil {
         return sats
     }
 }
-
-data class MålgruppeOgAktivitet(
-    val målgruppe: MålgruppeType,
-    val aktivitet: AktivitetLæremidlerBeregningGrunnlag,
-)

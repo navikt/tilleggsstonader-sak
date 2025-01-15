@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 data class UtbetalingPeriode(
@@ -57,3 +58,8 @@ data class UtbetalingPeriode(
         return relevanteStønadsperioderForPeriode.single()
     }
 }
+
+data class MålgruppeOgAktivitet(
+    val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetLæremidlerBeregningGrunnlag,
+)
