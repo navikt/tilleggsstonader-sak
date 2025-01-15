@@ -1,14 +1,14 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerPeriodeUtil.sisteDagenILøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerPeriodeUtil.splitPerLøpendeMåneder
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerSplitPerLøpendeMånedUtil.sisteDagenILøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerSplitPerLøpendeMånedUtil.splitPerLøpendeMåneder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class LæremidlerPeriodeUtilTest {
+class LæremidlerSplitPerLøpendeMånedUtilTest {
     private val FØRSTE_JAN_2024 = LocalDate.of(2024, 1, 1)
     private val SISTE_JAN_2024 = LocalDate.of(2024, 1, 31)
     private val FØRSTE_FEB_2024 = LocalDate.of(2024, 2, 1)

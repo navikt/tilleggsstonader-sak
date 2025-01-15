@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
 import java.time.LocalDate
 
-object LæremidlerPeriodeUtil {
+object LæremidlerSplitPerLøpendeMånedUtil {
 
     /**
      * Splitter en periode i løpende måneder. Løpende måned er fra dagens dato og en måned frem i tiden.
