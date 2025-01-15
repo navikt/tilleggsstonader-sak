@@ -244,6 +244,7 @@ object Testdata {
                         sats = 951,
                         satsBekreftet = true,
                         målgruppe = MålgruppeType.AAP,
+                        aktivitet = AktivitetType.UTDANNING,
                     ),
                 ),
                 BeregningsresultatForMåned(
@@ -257,9 +258,9 @@ object Testdata {
                         sats = 951,
                         satsBekreftet = true,
                         målgruppe = MålgruppeType.AAP,
+                        aktivitet = AktivitetType.UTDANNING,
                     ),
                 ),
-
             ),
         )
 

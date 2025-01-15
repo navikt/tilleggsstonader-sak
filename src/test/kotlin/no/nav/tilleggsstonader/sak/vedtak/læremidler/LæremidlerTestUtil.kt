@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
@@ -25,6 +26,7 @@ object LæremidlerTestUtil {
                 sats = 875,
                 satsBekreftet = true,
                 målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.UTDANNING,
             ),
         )
     }

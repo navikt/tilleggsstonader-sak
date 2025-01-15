@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
@@ -27,4 +28,5 @@ data class Beregningsgrunnlag(
     val sats: Int,
     val satsBekreftet: Boolean,
     val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType
 ) : Periode<LocalDate>
