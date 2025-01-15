@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 class VedtaksstatistikkTest : IntegrationTest() {
 
     @Autowired
-    lateinit var vedtakstatistikkRepository: VedtakstatistikkRepository
+    lateinit var vedtakstatistikkRepository: VedtaksstatistikkRepository
 
     @Autowired
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
