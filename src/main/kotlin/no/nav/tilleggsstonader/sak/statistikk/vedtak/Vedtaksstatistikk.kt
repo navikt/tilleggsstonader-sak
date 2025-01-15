@@ -4,6 +4,13 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
@@ -22,13 +29,6 @@ import org.springframework.data.relational.core.mapping.Column
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 
 // TODO: Vurder om dette bør flyttes til kontrakter
 
@@ -258,12 +258,15 @@ enum class AktivitetTypeDvh {
 
     companion object {
         fun fraDomene(vilkårsperiodeType: VilkårperiodeType) = when (vilkårsperiodeType) {
+            is AktivitetType -> fraDomene(aktivitetType = vilkårsperiodeType)
+            is MålgruppeType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type aktivitet.")
+        }
+
+        fun fraDomene(aktivitetType: AktivitetType) = when (aktivitetType) {
             AktivitetType.TILTAK -> TILTAK
             AktivitetType.UTDANNING -> UTDANNING
             AktivitetType.REELL_ARBEIDSSØKER -> REELL_ARBEIDSSØKER
             AktivitetType.INGEN_AKTIVITET -> INGEN_AKTIVITET
-
-            is MålgruppeType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type aktivitet.")
         }
     }
 }
@@ -281,6 +284,11 @@ enum class MålgruppeTypeDvh {
 
     companion object {
         fun fraDomene(vilkårsperiodeType: VilkårperiodeType) = when (vilkårsperiodeType) {
+            is MålgruppeType -> fraDomene(målgruppeType = vilkårsperiodeType)
+            is AktivitetType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type målgruppe.")
+        }
+
+        fun fraDomene(målgruppeType: MålgruppeType) = when (målgruppeType) {
             MålgruppeType.AAP -> AAP
             MålgruppeType.DAGPENGER -> DAGPENGER
             MålgruppeType.OMSTILLINGSSTØNAD -> OMSTILLINGSSTØNAD
@@ -289,8 +297,6 @@ enum class MålgruppeTypeDvh {
             MålgruppeType.UFØRETRYGD -> UFØRETRYGD
             MålgruppeType.INGEN_MÅLGRUPPE -> INGEN_MÅLGRUPPE
             MålgruppeType.SYKEPENGER_100_PROSENT -> SYKEPENGER_100_PROSENT
-
-            is AktivitetType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type målgruppe.")
         }
     }
 }

@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import org.springframework.data.annotation.Id
@@ -36,7 +37,7 @@ data class VedtaksstatistikkV2(
     @Column("behandling_arsak")
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
-    val vedtaksperioder: VedtaksperioderDvh.JsonWrapper, //TODO oppdater
+    val vedtaksperioder: VedtaksperioderDvhV2.JsonWrapper,
     val utbetalinger: UtbetalingerDvh.JsonWrapper, //TODO mulig oppdater
     @Column("stonadstype")
     val stønadstype: StønadstypeDvh,
