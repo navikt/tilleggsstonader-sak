@@ -1,11 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerPeriodeUtil.splitPerLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
@@ -39,12 +36,6 @@ object LæremidlerBeregningUtil {
                     )
                 }
             }
-
-    fun List<StønadsperiodeBeregningsgrunnlag>.slåSammenSammenhengende(): List<StønadsperiodeBeregningsgrunnlag> =
-        mergeSammenhengende(
-            skalMerges = { a, b -> a.påfølgesAv(b) && a.målgruppe == b.målgruppe && a.aktivitet == b.aktivitet },
-            merge = { a, b -> a.copy(tom = b.tom) },
-        )
 
     fun beregnBeløp(sats: Int, studieprosent: Int): Int {
         val PROSENT_50 = BigDecimal(0.5)

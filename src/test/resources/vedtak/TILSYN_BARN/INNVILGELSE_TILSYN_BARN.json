@@ -9,7 +9,6 @@
         "makssats" : 200,
         "stønadsperioderGrunnlag" : [ {
           "stønadsperiode" : {
-            "id" : "a3b4061d-52d7-46b1-9107-6eae7cec0887",
             "fom" : "2024-01-01",
             "tom" : "2024-01-02",
             "målgruppe" : "AAP",
