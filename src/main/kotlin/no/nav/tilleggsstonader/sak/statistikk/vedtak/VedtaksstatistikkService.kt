@@ -18,6 +18,22 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
+
+//For tilsyn barn:
+//Vedtaksperioder kan finnes med å summere opp betalingsperioder fra og til
+//Målgruppe og aktivitet ligger på vedtaksperiodeDto som ligger på beregnigsresultatDto
+//Antall barn ligger på vedtaksperiodeDto
+//Faktisk barn Fnr ligger på utgifter og må legges til i betalingsperioder etc. for å kunne brukes
+
+//Ligger nok likk jobb i å skrive om til vedtaksperiode dto funksjoner til å kunne gjenbrukes
+
+
+//For læremidler:
+//Fom og tom ligger på Beregningsgrunnlag
+//Målgruppe ligger på beregningsgrunnlag
+//Aktivitet må legges til på beregningsgrunnlag (bør være greit)
+//Sats ligger på beregningsgrunnlag
+
 @Service
 class VedtaksstatistikkService(
     private val vedtaksstatistikkRepository: VedtakstatistikkRepository,
