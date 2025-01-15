@@ -14,11 +14,11 @@ object LæremidlerBeregnUtil {
      * Dette for å kunne lage en periode for våren som ikke utbetales direkte, men når satsen for det nye året er satt.
      * Eks 2024-08-15 - 2025-06-20 blir 2024-08-15 - 2024-12-31 og 2025-01-01 - 2025-06-20
      */
-    fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<UtbetalingPeriode> =
+    fun Periode<LocalDate>.delTilUtbetalingsPerioder(): List<GrunnlagForUtbetalingPeriode> =
         splitPerÅr { fom, tom -> Vedtaksperiode(fom, tom) }
             .flatMap { periode ->
                 periode.splitPerLøpendeMåneder { fom, tom ->
-                    UtbetalingPeriode(
+                    GrunnlagForUtbetalingPeriode(
                         fom = fom,
                         tom = tom,
                         utbetalingsdato = periode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),

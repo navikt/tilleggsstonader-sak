@@ -62,7 +62,7 @@ class StepDefinitions {
     var beregningException: Exception? = null
     var valideringException: Exception? = null
 
-    var vedtaksperioderSplittet: List<UtbetalingPeriode> = emptyList()
+    var vedtaksperioderSplittet: List<GrunnlagForUtbetalingPeriode> = emptyList()
 
     @Gitt("følgende vedtaksperioder for læremidler")
     fun `følgende beregningsperiode for læremidler`(dataTable: DataTable) {
@@ -140,6 +140,8 @@ class StepDefinitions {
             perioder = perioder,
         )
 
+        assertThat(beregningException).isNull()
+
         forventetBeregningsresultat.perioder.forEachIndexed { index, periode ->
             try {
                 assertThat(resultat!!.perioder[index]).isEqualTo(periode)
@@ -165,7 +167,7 @@ class StepDefinitions {
     @Så("forvent følgende utbetalingsperioder")
     fun `forvent følgende utbetalingsperioder`(dataTable: DataTable) {
         val forventedePerioder = dataTable.mapRad { rad ->
-            UtbetalingPeriode(
+            GrunnlagForUtbetalingPeriode(
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),

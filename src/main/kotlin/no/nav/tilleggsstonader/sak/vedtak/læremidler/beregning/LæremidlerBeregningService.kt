@@ -12,7 +12,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatL
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.springframework.stereotype.Service
@@ -59,50 +58,33 @@ class LæremidlerBeregningService(
         vedtaksperioder
             .sorted()
             .flatMap { it.delTilUtbetalingsPerioder() }
-            .map { utbetalingsperiode ->
-                val målgruppeOgAktivitet = utbetalingsperiode.finnMålgruppeOgAktivitet(stønadsperioder, aktiviteter)
+            .map { it.tilUtbetalingPeriode(stønadsperioder, aktiviteter) }
+            .beregn()
 
-                lagBeregningsresultatForMåned(
-                    utbetalingsperiode = utbetalingsperiode,
-                    målgruppe = målgruppeOgAktivitet.målgruppe,
-                    aktivitet = målgruppeOgAktivitet.aktivitet,
-                )
-            }
+    private fun List<UtbetalingPeriode>.beregn(): List<BeregningsresultatForMåned> = this
+        .map { utbetalingPeriode ->
+            val grunnlagsdata = lagBeregningsGrunnlag(periode = utbetalingPeriode)
 
-    private fun lagBeregningsresultatForMåned(
-        utbetalingsperiode: UtbetalingPeriode,
-        målgruppe: MålgruppeType,
-        aktivitet: AktivitetLæremidlerBeregningGrunnlag,
-    ): BeregningsresultatForMåned {
-        val grunnlagsdata =
-            lagBeregningsGrunnlag(
-                periode = utbetalingsperiode,
-                aktivitet = aktivitet,
-                målgruppe = målgruppe,
+            BeregningsresultatForMåned(
+                beløp = beregnBeløp(grunnlagsdata.sats, grunnlagsdata.studieprosent),
+                grunnlag = grunnlagsdata,
             )
-
-        return BeregningsresultatForMåned(
-            beløp = beregnBeløp(grunnlagsdata.sats, grunnlagsdata.studieprosent),
-            grunnlag = grunnlagsdata,
-        )
-    }
+        }
 
     private fun lagBeregningsGrunnlag(
         periode: UtbetalingPeriode,
-        aktivitet: AktivitetLæremidlerBeregningGrunnlag,
-        målgruppe: MålgruppeType,
     ): Beregningsgrunnlag {
         val sats = finnSatsForPeriode(periode)
 
         return Beregningsgrunnlag(
             fom = periode.fom,
             tom = periode.tom,
-            studienivå = aktivitet.studienivå,
-            studieprosent = aktivitet.prosent,
-            sats = finnSatsForStudienivå(sats, aktivitet.studienivå),
+            studienivå = periode.studienivå,
+            studieprosent = periode.prosent,
+            sats = finnSatsForStudienivå(sats, periode.studienivå),
             satsBekreftet = sats.bekreftet,
             utbetalingsdato = periode.utbetalingsdato,
-            målgruppe = målgruppe,
+            målgruppe = periode.målgruppe,
         )
     }
 }

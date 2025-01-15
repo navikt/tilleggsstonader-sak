@@ -5,11 +5,26 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 data class UtbetalingPeriode(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType,
+    val studienivå: Studienivå,
+    val prosent: Int,
+    val utbetalingsdato: LocalDate,
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+    }
+}
+
+data class GrunnlagForUtbetalingPeriode(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val utbetalingsdato: LocalDate,
@@ -18,13 +33,21 @@ data class UtbetalingPeriode(
         validatePeriode()
     }
 
-    fun finnMålgruppeOgAktivitet(
+    fun tilUtbetalingPeriode(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
-    ): MålgruppeOgAktivitet {
+    ): UtbetalingPeriode {
         val stønadsperiode = finnRelevantStønadsperiode(stønadsperioder)
         val aktivitet = finnRelevantAktivitet(aktiviteter, stønadsperiode.aktivitet)
-        return MålgruppeOgAktivitet(stønadsperiode.målgruppe, aktivitet)
+        return UtbetalingPeriode(
+            fom = fom,
+            tom = tom,
+            målgruppe = stønadsperiode.målgruppe,
+            aktivitet = aktivitet.type,
+            studienivå = aktivitet.studienivå,
+            prosent = aktivitet.prosent,
+            utbetalingsdato = utbetalingsdato,
+        )
     }
 
     private fun finnRelevantAktivitet(
@@ -57,9 +80,9 @@ data class UtbetalingPeriode(
 
         return relevanteStønadsperioderForPeriode.single()
     }
-}
 
-data class MålgruppeOgAktivitet(
-    val målgruppe: MålgruppeType,
-    val aktivitet: AktivitetLæremidlerBeregningGrunnlag,
-)
+    private class MålgruppeOgAktivitet(
+        val målgruppe: MålgruppeType,
+        val aktivitet: AktivitetLæremidlerBeregningGrunnlag,
+    )
+}
