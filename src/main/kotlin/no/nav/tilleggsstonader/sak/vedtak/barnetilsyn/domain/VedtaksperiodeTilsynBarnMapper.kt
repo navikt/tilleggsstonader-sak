@@ -8,11 +8,11 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
-object VedtaksperiodeMapper {
+object VedtaksperiodeTilsynBarnMapper {
 
     fun mapTilVedtaksperiode(
         beregningsresultatForMåned: List<BeregningsresultatForMåned>,
-    ): List<Vedtaksperiode> {
+    ): List<VedtaksperiodeTilsynBarn> {
         return beregningsresultatForMåned
             .flatMap { tilVedtaksperioder(it) }
             .sorted()
@@ -23,16 +23,16 @@ object VedtaksperiodeMapper {
         it: BeregningsresultatForMåned,
     ) = it.grunnlag.stønadsperioderGrunnlag
         .map { it.stønadsperiode }
-        .map { stønadsperiode -> Vedtaksperiode(stønadsperiode, it.grunnlag.antallBarn) }
+        .map { stønadsperiode -> VedtaksperiodeTilsynBarn(stønadsperiode, it.grunnlag.antallBarn) }
 }
 
-data class Vedtaksperiode(
+data class VedtaksperiodeTilsynBarn(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
     val antallBarn: Int,
-) : Periode<LocalDate>, Mergeable<LocalDate, Vedtaksperiode> {
+) : Periode<LocalDate>, Mergeable<LocalDate, VedtaksperiodeTilsynBarn> {
 
     init {
         validatePeriode()
@@ -49,11 +49,11 @@ data class Vedtaksperiode(
     /**
      * Ettersom stønadsperiode ikke overlapper er det tilstrekkelig å kun merge TOM
      */
-    override fun merge(other: Vedtaksperiode): Vedtaksperiode {
+    override fun merge(other: VedtaksperiodeTilsynBarn): VedtaksperiodeTilsynBarn {
         return this.copy(tom = other.tom)
     }
 
-    fun erLikOgPåfølgesAv(other: Vedtaksperiode): Boolean {
+    fun erLikOgPåfølgesAv(other: VedtaksperiodeTilsynBarn): Boolean {
         val erLik = this.aktivitet == other.aktivitet &&
             this.målgruppe == other.målgruppe &&
             this.antallBarn == other.antallBarn
