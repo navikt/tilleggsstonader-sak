@@ -142,14 +142,14 @@ class StepDefinitions {
 
         forventetBeregningsresultat.perioder.forEachIndexed { index, periode ->
             try {
-                assertThat(periode).isEqualTo(resultat!!.perioder[index])
+                assertThat(resultat!!.perioder[index]).isEqualTo(periode)
             } catch (e: Throwable) {
                 val acutal = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(periode)
                 logger.error("Feilet validering av rad ${index + 1} $acutal")
                 throw e
             }
         }
-        assertThat(forventetBeregningsresultat.perioder).hasSize(resultat!!.perioder.size)
+        assertThat(resultat!!.perioder).hasSize(forventetBeregningsresultat.perioder.size)
     }
 
     @Så("forvent følgende feil fra læremidlerberegning: {}")
