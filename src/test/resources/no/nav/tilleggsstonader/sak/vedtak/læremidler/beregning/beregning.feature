@@ -21,9 +21,9 @@ Egenskap: Beregning av læremidler
 
     Så skal stønaden være
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2024 | 31.01.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.01.2024          |
-      | 01.02.2024 | 29.02.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.01.2024          |
-      | 01.03.2024 | 31.03.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.01.2024          |
+      | 01.01.2024 | 31.01.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.01.2024      |
+      | 01.02.2024 | 29.02.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.01.2024      |
+      | 01.03.2024 | 31.03.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.01.2024      |
 
   Scenario: VGS - 25%
     Gitt følgende vedtaksperioder for læremidler
@@ -43,9 +43,9 @@ Egenskap: Beregning av læremidler
 
     Så skal stønaden være
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2024 | 31.01.2024 | 219   | VIDEREGÅENDE | 25            | 438  | AAP       | 01.01.2024          |
-      | 01.02.2024 | 29.02.2024 | 219   | VIDEREGÅENDE | 25            | 438  | AAP       | 01.01.2024          |
-      | 01.03.2024 | 31.03.2024 | 219   | VIDEREGÅENDE | 25            | 438  | AAP       | 01.01.2024          |
+      | 01.01.2024 | 31.01.2024 | 219   | VIDEREGÅENDE | 25            | 438  | AAP       | 01.01.2024      |
+      | 01.02.2024 | 29.02.2024 | 219   | VIDEREGÅENDE | 25            | 438  | AAP       | 01.01.2024      |
+      | 01.03.2024 | 31.03.2024 | 219   | VIDEREGÅENDE | 25            | 438  | AAP       | 01.01.2024      |
 
   Scenario: HØYERE_UTDANNING - 51%
     Gitt følgende vedtaksperioder for læremidler
@@ -65,9 +65,9 @@ Egenskap: Beregning av læremidler
 
     Så skal stønaden være
       | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2024 | 31.01.2024 | 875   | HØYERE_UTDANNING | 51            | 875  | AAP       | 01.01.2024          |
-      | 01.02.2024 | 29.02.2024 | 875   | HØYERE_UTDANNING | 51            | 875  | AAP       | 01.01.2024          |
-      | 01.03.2024 | 31.03.2024 | 875   | HØYERE_UTDANNING | 51            | 875  | AAP       | 01.01.2024          |
+      | 01.01.2024 | 31.01.2024 | 875   | HØYERE_UTDANNING | 51            | 875  | AAP       | 01.01.2024      |
+      | 01.02.2024 | 29.02.2024 | 875   | HØYERE_UTDANNING | 51            | 875  | AAP       | 01.01.2024      |
+      | 01.03.2024 | 31.03.2024 | 875   | HØYERE_UTDANNING | 51            | 875  | AAP       | 01.01.2024      |
 
   Scenario: HØYERE_UTDANNING - 50%
     Gitt følgende vedtaksperioder for læremidler
@@ -87,9 +87,9 @@ Egenskap: Beregning av læremidler
 
     Så skal stønaden være
       | Fom        | Tom        | Beløp | Studienivå       | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.01.2024 | 31.01.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 01.01.2024          |
-      | 01.02.2024 | 29.02.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 01.01.2024          |
-      | 01.03.2024 | 31.03.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 01.01.2024          |
+      | 01.01.2024 | 31.01.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 01.01.2024      |
+      | 01.02.2024 | 29.02.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 01.01.2024      |
+      | 01.03.2024 | 31.03.2024 | 438   | HØYERE_UTDANNING | 50            | 875  | AAP       | 01.01.2024      |
 
   Scenario: Flere vedtaksperioder
     Gitt følgende vedtaksperioder for læremidler
@@ -110,7 +110,7 @@ Egenskap: Beregning av læremidler
 
     Så skal stønaden være
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024          |
-      | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024          |
-      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024          |
-      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024          |
+      | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
+      | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
+      | 15.08.2024 | 14.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
+      | 15.09.2024 | 30.09.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
