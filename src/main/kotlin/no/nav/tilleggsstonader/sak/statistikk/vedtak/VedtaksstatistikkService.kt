@@ -17,6 +17,13 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 
 
 //For tilsyn barn:
@@ -59,7 +66,7 @@ class VedtaksstatistikkService(
         vedtaksstatistikkRepository.insert(
             Vedtaksstatistikk(
                 fagsakId = fagsakId,
-                stønadstype = StønadstypeDvh.fraDomene(behandling.stønadstype),
+                stønadstype = StønadstypeDvh.Companion.fraDomene(behandling.stønadstype),
                 behandlingId = behandlingId,
                 eksternFagsakId = behandling.eksternFagsakId,
                 eksternBehandlingId = behandling.eksternId,
@@ -72,18 +79,18 @@ class VedtaksstatistikkService(
                 person = personIdent,
                 barn = BarnDvh.fraDomene(behandlingBarnService.finnBarnPåBehandling(behandlingId)),
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
-                behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
-                vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
+                behandlingÅrsak = BehandlingÅrsakDvh.Companion.fraDomene(behandling.årsak),
+                vedtakResultat = VedtakResultatDvh.Companion.fraDomene(behandling.resultat),
                 vedtaksperioder = VedtaksperioderDvh.fraDomene(stønadsperioder),
                 utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse),
                 kravMottatt = behandling.kravMottatt,
-                årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak?.takeIfType<Avslag>()?.data?.årsaker),
-                årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak?.takeIfType<Opphør>()?.data?.årsaker),
+                årsakerAvslag = ÅrsakAvslagDvh.Companion.fraDomene(vedtak?.takeIfType<Avslag>()?.data?.årsaker),
+                årsakerOpphør = ÅrsakOpphørDvh.Companion.fraDomene(vedtak?.takeIfType<Opphør>()?.data?.årsaker),
             ),
         )
     }
 
-    private fun hentAdressebeskyttelse(personIdent: String) = AdressebeskyttelseDvh.fraDomene(
+    private fun hentAdressebeskyttelse(personIdent: String) = AdressebeskyttelseDvh.Companion.fraDomene(
         personService.hentPersonKortBolk(
             listOf(personIdent),
         ).values.single().adressebeskyttelse.gradering(),

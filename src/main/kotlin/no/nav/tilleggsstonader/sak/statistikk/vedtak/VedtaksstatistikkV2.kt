@@ -6,6 +6,13 @@ import java.util.UUID
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.relational.core.mapping.Column

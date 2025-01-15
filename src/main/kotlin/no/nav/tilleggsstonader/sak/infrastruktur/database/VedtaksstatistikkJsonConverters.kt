@@ -8,8 +8,8 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgrupperDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.UtbetalingerDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VilkårsvurderingerDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.ÅrsakAvslagDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.ÅrsakOpphørDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import org.postgresql.util.PGobject
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter

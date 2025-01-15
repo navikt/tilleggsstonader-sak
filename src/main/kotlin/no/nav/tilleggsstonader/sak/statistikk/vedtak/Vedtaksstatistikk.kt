@@ -1,18 +1,11 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
@@ -29,6 +22,13 @@ import org.springframework.data.relational.core.mapping.Column
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 
 // TODO: Vurder om dette bør flyttes til kontrakter
 
@@ -75,22 +75,6 @@ data class Vedtaksstatistikk(
     init {
         feilHvis(endretTid < opprettetTid) {
             "EndretTid=$endretTid kan ikke være før opprettetTid=$opprettetTid"
-        }
-    }
-}
-
-enum class StønadstypeDvh {
-    BARNETILSYN,
-    LÆREMIDLER,
-    ;
-
-    companion object {
-        fun fraDomene(stønadstype: Stønadstype): StønadstypeDvh {
-            return when (stønadstype) {
-                Stønadstype.BARNETILSYN -> BARNETILSYN
-                Stønadstype.LÆREMIDLER -> LÆREMIDLER
-                else -> error("Har ikke mapping for $stønadstype")
-            }
         }
     }
 }
@@ -161,62 +145,6 @@ data class VedtaksperioderDvh(
     }
 }
 
-enum class VedtakResultatDvh {
-    INNVILGET,
-    AVSLÅTT,
-    OPPHØRT,
-    ;
-
-    companion object {
-        fun fraDomene(behandlingResultat: BehandlingResultat): VedtakResultatDvh {
-            return when (behandlingResultat) {
-                BehandlingResultat.INNVILGET -> INNVILGET
-                BehandlingResultat.OPPHØRT -> OPPHØRT
-                BehandlingResultat.AVSLÅTT -> AVSLÅTT
-                BehandlingResultat.IKKE_SATT, BehandlingResultat.HENLAGT ->
-                    throw IllegalStateException("Skal ikke sende vedtaksstatistikk når resultat=$behandlingResultat.")
-            }
-        }
-    }
-}
-
-enum class BehandlingÅrsakDvh {
-    KLAGE,
-    NYE_OPPLYSNINGER,
-    SØKNAD,
-    PAPIRSØKNAD,
-    MANUELT_OPPRETTET,
-    MANUELT_OPPRETTET_UTEN_BREV,
-    KORRIGERING_UTEN_BREV,
-    SATSENDRING,
-    ;
-
-    companion object {
-        fun fraDomene(årsak: BehandlingÅrsak) = when (årsak) {
-            BehandlingÅrsak.KLAGE -> KLAGE
-            BehandlingÅrsak.NYE_OPPLYSNINGER -> NYE_OPPLYSNINGER
-            BehandlingÅrsak.SØKNAD -> SØKNAD
-            BehandlingÅrsak.PAPIRSØKNAD -> PAPIRSØKNAD
-            BehandlingÅrsak.MANUELT_OPPRETTET -> MANUELT_OPPRETTET
-            BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV -> MANUELT_OPPRETTET_UTEN_BREV
-            BehandlingÅrsak.KORRIGERING_UTEN_BREV -> KORRIGERING_UTEN_BREV
-            BehandlingÅrsak.SATSENDRING -> SATSENDRING
-        }
-    }
-}
-
-enum class BehandlingTypeDvh {
-    FØRSTEGANGSBEHANDLING,
-    REVURDERING,
-    ;
-
-    companion object {
-        fun fraDomene(type: BehandlingType) = when (type) {
-            BehandlingType.FØRSTEGANGSBEHANDLING -> FØRSTEGANGSBEHANDLING
-            BehandlingType.REVURDERING -> REVURDERING
-        }
-    }
-}
 
 data class BarnDvh(
     val fnr: String,
@@ -403,84 +331,3 @@ data class DelvilkårDvh(
     }
 }
 
-enum class AdressebeskyttelseDvh {
-    STRENGT_FORTROLIG,
-    STRENGT_FORTROLIG_UTLAND,
-    FORTROLIG,
-    UGRADERT,
-    ;
-
-    companion object {
-        fun fraDomene(adressebeskyttelse: AdressebeskyttelseGradering) =
-            when (adressebeskyttelse) {
-                AdressebeskyttelseGradering.STRENGT_FORTROLIG -> STRENGT_FORTROLIG
-                AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND -> STRENGT_FORTROLIG_UTLAND
-                AdressebeskyttelseGradering.FORTROLIG -> FORTROLIG
-                AdressebeskyttelseGradering.UGRADERT -> UGRADERT
-            }
-    }
-}
-
-enum class ÅrsakAvslagDvh {
-    INGEN_AKTIVITET,
-    IKKE_I_MÅLGRUPPE,
-    INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE,
-    MANGELFULL_DOKUMENTASJON,
-    HAR_IKKE_UTGIFTER,
-    RETT_TIL_UTSTYRSSTIPEND,
-    ANNET,
-    ;
-
-    data class JsonWrapper(
-        val årsaker: List<ÅrsakAvslagDvh>,
-    )
-
-    companion object {
-        fun fraDomene(årsaker: List<ÅrsakAvslag>?): JsonWrapper? {
-            return årsaker?.let {
-                JsonWrapper(
-                    årsaker.map { typeFraDomene(it) },
-                )
-            }
-        }
-
-        private fun typeFraDomene(årsak: ÅrsakAvslag) = when (årsak) {
-            ÅrsakAvslag.INGEN_AKTIVITET -> INGEN_AKTIVITET
-            ÅrsakAvslag.IKKE_I_MÅLGRUPPE -> IKKE_I_MÅLGRUPPE
-            ÅrsakAvslag.INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE -> INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE
-            ÅrsakAvslag.MANGELFULL_DOKUMENTASJON -> MANGELFULL_DOKUMENTASJON
-            ÅrsakAvslag.HAR_IKKE_UTGIFTER -> HAR_IKKE_UTGIFTER
-            ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND -> RETT_TIL_UTSTYRSSTIPEND
-            ÅrsakAvslag.ANNET -> ANNET
-        }
-    }
-}
-
-enum class ÅrsakOpphørDvh {
-    ENDRING_AKTIVITET,
-    ENDRING_MÅLGRUPPE,
-    ENDRING_UTGIFTER,
-    ANNET,
-    ;
-
-    data class JsonWrapper(
-        val årsaker: List<ÅrsakOpphørDvh>,
-    )
-
-    companion object {
-        fun fraDomene(årsaker: List<ÅrsakOpphør>?): JsonWrapper? {
-            return årsaker?.let {
-                JsonWrapper(
-                    årsaker.map { typeFraDomene(it) },
-                )
-            }
-        }
-
-        private fun typeFraDomene(årsak: ÅrsakOpphør) = when (årsak) {
-            ÅrsakOpphør.ENDRING_AKTIVITET -> ENDRING_AKTIVITET
-            ÅrsakOpphør.ENDRING_MÅLGRUPPE -> ENDRING_MÅLGRUPPE
-            ÅrsakOpphør.ENDRING_UTGIFTER -> ENDRING_UTGIFTER
-            ÅrsakOpphør.ANNET -> ANNET
-        }
-    }
-}

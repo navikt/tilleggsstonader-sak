@@ -15,6 +15,12 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.temporal.ChronoUnit
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 
 class VedtaksstatistikkTest : IntegrationTest() {
 
@@ -89,7 +95,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     @Test
     fun `årsakAvslag kan mappes mellom databaseobjekt og domeneobjekt`() {
-        val årsakerAvslag = ÅrsakAvslagDvh.fraDomene(listOf(ÅrsakAvslag.INGEN_AKTIVITET))
+        val årsakerAvslag = ÅrsakAvslagDvh.Companion.fraDomene(listOf(ÅrsakAvslag.INGEN_AKTIVITET))
 
         vedtakstatistikkRepository.insert(
             vedtaksstatistikk().copy(
