@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.beregnBeløp
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnBeløpUtil.beregnBeløp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-class LæremidlerBeregningUtilTest {
+class LæremidlerBeregnBeløpUtilTest {
 
     @Nested
     inner class BeregnBeløp {

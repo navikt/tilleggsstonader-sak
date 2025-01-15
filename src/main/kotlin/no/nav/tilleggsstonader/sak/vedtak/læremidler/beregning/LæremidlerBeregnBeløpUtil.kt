@@ -10,7 +10,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 
-object LæremidlerBeregningUtil {
+object LæremidlerBeregnBeløpUtil {
 
     /**
      * Splitter vedtaksperiode per år. Sånn at man får en periode for høstterminen og en for vårterminen
