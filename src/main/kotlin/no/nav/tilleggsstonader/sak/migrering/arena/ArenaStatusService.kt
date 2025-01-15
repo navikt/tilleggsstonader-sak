@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.migrering.arena
 
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -35,19 +36,26 @@ class ArenaStatusService(
         val identer = personService.hentPersonIdenter(request.ident).identer().toSet()
 
         val fagsak = fagsakService.finnFagsak(identer, request.stønadstype)
+        val eksternFagsakId = fagsak?.eksternId?.id
+
+        logger.info("Sjekker om person skal låses i Arena stønadstype=${request.stønadstype} fagsak=$eksternFagsakId")
+        secureLogger.info("Sjekker om person skal låses i Arena stønadstype=${request.stønadstype} ident=${request.ident} fagsak=$eksternFagsakId")
+
+        val logPrefix = "Sjekker om person finnes i ny løsning stønadstype=${request.stønadstype}"
         if (skalKunneOppretteSakIArenaForPerson(fagsak)) {
+            logger.info("$logPrefix unntakFagsakSjekk")
             return false
         }
         if (harBehandling(fagsak)) {
-            logger.info("Sjekker om person finnes i ny løsning finnes=true harBehandling")
+            logger.info("$logPrefix finnes=true harRouting harBehandling")
             return true
         }
         if (skalBehandlesITsSak(request.stønadstype)) {
-            logger.info("Skal ikke behandle ${request.stønadstype} i Arena")
+            logger.info("$logPrefix finnes=true skalAlltidBehandlesITsSak")
             return true
         }
         if (harRouting(identer, request.stønadstype)) {
-            logger.info("Sjekker om person finnes i ny løsning finnes=true harRouting")
+            logger.info("$logPrefix finnes=true harRouting")
             return true
         }
         return false
