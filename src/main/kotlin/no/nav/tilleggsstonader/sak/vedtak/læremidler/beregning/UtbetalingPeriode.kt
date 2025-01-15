@@ -84,6 +84,9 @@ data class GrunnlagForUtbetalingPeriode(
         return this
     }
 
+    /**
+     * Finner hvilken stønadsperiode og aktivitet som skal brukes for den aktuelle utbetalingsperioden
+     */
     fun tilUtbetalingPeriode(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
