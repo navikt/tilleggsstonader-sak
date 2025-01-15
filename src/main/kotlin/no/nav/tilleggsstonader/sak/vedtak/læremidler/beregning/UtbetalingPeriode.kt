@@ -5,8 +5,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 /**
@@ -20,23 +22,39 @@ import java.time.LocalDate
  * @param vedtaksperioder inneholder de vedtaksperioder som er innvilget innenfor en UtbetalingPeriode
  * Implementert som private backing property for å ikke kunne legge til perioder direkt til listen uten å validere den
  */
-data class UtbetalingPeriode private constructor(
+data class UtbetalingPeriode(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetType,
+    val studienivå: Studienivå,
+    val prosent: Int,
+    val utbetalingsdato: LocalDate,
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+    }
+}
+
+class GrunnlagForUtbetalingPeriode private constructor(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val utbetalingsdato: LocalDate,
+    // TODO vedtaksperiode med målgruppe og aktivitet
     private val _vedtaksperioder: MutableList<Vedtaksperiode>,
 ) : Periode<LocalDate> {
-
-    val vedtaksperioder: List<Vedtaksperiode> get() = _vedtaksperioder
-
     init {
         validatePeriode()
     }
 
-    constructor(fom: LocalDate, tom: LocalDate, utbetalingsdato: LocalDate) :
-        this(fom = fom, tom = tom, utbetalingsdato = utbetalingsdato, _vedtaksperioder = mutableListOf())
+    constructor(fom: LocalDate, tom: LocalDate, utbetalingsdato: LocalDate) : this(
+        fom = fom,
+        tom = tom,
+        utbetalingsdato = utbetalingsdato,
+        mutableListOf()
+    )
 
-    fun medVedtaksperiode(vedtaksperiode: Vedtaksperiode): UtbetalingPeriode {
+    fun medVedtaksperiode(vedtaksperiode: Vedtaksperiode): GrunnlagForUtbetalingPeriode {
         require(inneholder(vedtaksperiode)) {
             "Vedtaksperiode(${vedtaksperiode.formatertPeriodeNorskFormat()}) kan ikke gå utenfor utbetalingsperiode(${this.formatertPeriodeNorskFormat()})"
         }
@@ -47,8 +65,8 @@ data class UtbetalingPeriode private constructor(
     fun finnMålgruppeOgAktivitet(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         aktiviteter: List<Aktivitet>,
-    ): MålgruppeOgAktivitet {
-        val målgruppeOgAktiviteter = this.vedtaksperioder
+    ): UtbetalingPeriode {
+        val målgruppeOgAktiviteter = this._vedtaksperioder
             .map { vedtaksperiode ->
                 val stønadsperiode = vedtaksperiode.finnRelevantStønadsperiode(stønadsperioder)
                 val aktivitet = vedtaksperiode.finnRelevantAktivitet(aktiviteter, stønadsperiode.aktivitet)
@@ -63,7 +81,15 @@ data class UtbetalingPeriode private constructor(
             "Alle målgrupper innenfor en utbetalingsperiode må være av samme typen"
         }
         val aktivitet = målgruppeOgAktiviteter.map { it.aktivitet }.distinct().single()
-        return MålgruppeOgAktivitet(målgruppe, aktivitet)
+        return UtbetalingPeriode(
+            fom = fom,
+            tom = tom,
+            målgruppe = målgruppe,
+            aktivitet = aktivitet.type,
+            studienivå = aktivitet.studienivå,
+            prosent = aktivitet.prosent,
+            utbetalingsdato = utbetalingsdato
+        )
     }
 
     private fun Vedtaksperiode.finnRelevantAktivitet(
@@ -96,4 +122,10 @@ data class UtbetalingPeriode private constructor(
 
         return relevanteStønadsperioderForPeriode.single()
     }
+
+    private class MålgruppeOgAktivitet(
+        val målgruppe: MålgruppeType,
+        val aktivitet: Aktivitet,
+    )
+
 }

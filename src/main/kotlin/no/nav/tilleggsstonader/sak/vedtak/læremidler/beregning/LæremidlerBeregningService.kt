@@ -4,15 +4,15 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.beregnBeløp
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.slåSammenSammenhengende
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerPeriodeUtil.grupperVedtaksperioderPerLøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.tilUtbetalingPeriode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.springframework.stereotype.Service
@@ -57,50 +57,33 @@ class LæremidlerBeregningService(
         vedtaksperioder
             .sorted()
             .grupperVedtaksperioderPerLøpendeMåned()
-            .map { utbetalingsperiode ->
-                val målgruppeOgAktivitet = utbetalingsperiode.finnMålgruppeOgAktivitet(stønadsperioder, aktiviteter)
+            .tilUtbetalingPeriode(stønadsperioder, aktiviteter)
+            .beregn()
 
-                lagBeregningsresultatForMåned(
-                    utbetalingsperiode = utbetalingsperiode,
-                    målgruppe = målgruppeOgAktivitet.målgruppe,
-                    aktivitet = målgruppeOgAktivitet.aktivitet,
-                )
-            }
+    private fun List<UtbetalingPeriode>.beregn(): List<BeregningsresultatForMåned> = this
+        .map { periode ->
+            val grunnlagsdata = lagBeregningsGrunnlag(periode)
 
-    private fun lagBeregningsresultatForMåned(
-        utbetalingsperiode: UtbetalingPeriode,
-        målgruppe: MålgruppeType,
-        aktivitet: Aktivitet,
-    ): BeregningsresultatForMåned {
-        val grunnlagsdata =
-            lagBeregningsGrunnlag(
-                periode = utbetalingsperiode,
-                aktivitet = aktivitet,
-                målgruppe = målgruppe,
+            BeregningsresultatForMåned(
+                beløp = beregnBeløp(grunnlagsdata.sats, grunnlagsdata.studieprosent),
+                grunnlag = grunnlagsdata,
             )
-
-        return BeregningsresultatForMåned(
-            beløp = beregnBeløp(grunnlagsdata.sats, grunnlagsdata.studieprosent),
-            grunnlag = grunnlagsdata,
-        )
-    }
+        }
 
     private fun lagBeregningsGrunnlag(
         periode: UtbetalingPeriode,
-        aktivitet: Aktivitet,
-        målgruppe: MålgruppeType,
     ): Beregningsgrunnlag {
         val sats = finnSatsForPeriode(periode)
 
         return Beregningsgrunnlag(
             fom = periode.fom,
-            tom = periode.vedtaksperioder.maxOf { it.tom },
-            studienivå = aktivitet.studienivå,
-            studieprosent = aktivitet.prosent,
-            sats = finnSatsForStudienivå(sats, aktivitet.studienivå),
+            tom = periode.tom,
+            studienivå = periode.studienivå,
+            studieprosent = periode.prosent,
+            sats = finnSatsForStudienivå(sats, periode.studienivå),
             satsBekreftet = sats.bekreftet,
             utbetalingsdato = periode.utbetalingsdato,
-            målgruppe = målgruppe,
+            målgruppe = periode.målgruppe,
         )
     }
 }
