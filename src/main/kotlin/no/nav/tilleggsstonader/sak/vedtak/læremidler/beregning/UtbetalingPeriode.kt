@@ -6,10 +6,20 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
+/**
+ * Utbetalingperiode for løpende måned
+ * Eks 5jan - 4feb
+ *
+ * @param utbetalingsdato utbetalingsdato for når en utbetalingsperiode skal utbetales.
+ * Eks hvis man innvilger jan-juni så skal man utbetale hele beløpet for fom i første utbetalingsperioden,
+ * dvs 5 jan i tidligere eksemplet
+ *
+ */
 data class UtbetalingPeriode(
     override val fom: LocalDate,
     override val tom: LocalDate,
@@ -29,8 +39,27 @@ data class GrunnlagForUtbetalingPeriode(
     override val tom: LocalDate,
     val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
+
+    /**
+     * backing property for vedtaksperioder.
+     * Inneholder de vedtaksperioder som er innvilget innenfor en UtbetalingPeriode
+     * Implementert som private backing property for å ikke kunne legge til perioder direkte til listen uten å validere den
+     */
+    private val _vedtaksperioder: MutableList<Vedtaksperiode> = mutableListOf()
+
+    val vedtaksperioder: List<Vedtaksperiode> get() = _vedtaksperioder
+
     init {
         validatePeriode()
+        _vedtaksperioder.forEach { this.inneholder(it) }
+    }
+
+    fun medVedtaksperiode(vedtaksperiode: Vedtaksperiode): GrunnlagForUtbetalingPeriode {
+        require(inneholder(vedtaksperiode)) {
+            "Vedtaksperiode(${vedtaksperiode.formatertPeriodeNorskFormat()}) kan ikke gå utenfor utbetalingsperiode(${this.formatertPeriodeNorskFormat()})"
+        }
+        _vedtaksperioder.add(vedtaksperiode)
+        return this
     }
 
     fun tilUtbetalingPeriode(
@@ -80,9 +109,4 @@ data class GrunnlagForUtbetalingPeriode(
 
         return relevanteStønadsperioderForPeriode.single()
     }
-
-    private class MålgruppeOgAktivitet(
-        val målgruppe: MålgruppeType,
-        val aktivitet: AktivitetLæremidlerBeregningGrunnlag,
-    )
 }
