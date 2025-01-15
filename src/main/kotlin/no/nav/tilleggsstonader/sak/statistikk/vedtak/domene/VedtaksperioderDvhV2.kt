@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
+import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgruppeTypeDvh
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeMapper
-import java.time.LocalDate
 
 data class VedtaksperioderDvhV2(
     val fom: LocalDate,
@@ -21,16 +21,21 @@ data class VedtaksperioderDvhV2(
     // TODO: Mapper for læremidler også
 
     companion object {
-        fun fraDomene(beregningsresultat: List<BeregningsresultatForMåned>) = JsonWrapper(
-            vedtaksperioder = VedtaksperiodeMapper.mapTilVedtaksperiode(beregningsresultat).map {
-                VedtaksperioderDvhV2(
-                    fom = it.fom,
-                    tom = it.tom,
-                    målgruppe = MålgruppeTypeDvh.fraDomene(it.målgruppe),
-                    aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
-                    antallBarn = it.antallBarn,
-                )
+        fun fraDomene(beregningsresultat: List<BeregningsresultatForMåned>?): JsonWrapper {
+            if (beregningsresultat == null) {
+                return JsonWrapper(vedtaksperioder = emptyList())
             }
-        )
+            return JsonWrapper(
+                vedtaksperioder = VedtaksperiodeMapper.mapTilVedtaksperiode(beregningsresultat).map {
+                    VedtaksperioderDvhV2(
+                        fom = it.fom,
+                        tom = it.tom,
+                        målgruppe = MålgruppeTypeDvh.fraDomene(it.målgruppe),
+                        aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                        antallBarn = it.antallBarn,
+                    )
+                }
+            )
+        }
     }
 }

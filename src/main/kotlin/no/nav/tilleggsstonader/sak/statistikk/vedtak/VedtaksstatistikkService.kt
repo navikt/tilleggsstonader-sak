@@ -13,11 +13,14 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
@@ -95,7 +98,6 @@ class VedtaksstatistikkService(
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId)
 
         vedtaksstatistikkRepositoryV2.insert(
@@ -112,7 +114,7 @@ class VedtaksstatistikkService(
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
                 behandlingÅrsak = BehandlingÅrsakDvh.Companion.fraDomene(behandling.årsak),
                 vedtakResultat = VedtakResultatDvh.Companion.fraDomene(behandling.resultat),
-                vedtaksperioder = VedtaksperioderDvh.fraDomene(stønadsperioder),
+                vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak?.takeIfType<InnvilgelseTilsynBarn>()?.data?.beregningsresultat?.perioder),
                 utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse),
                 kravMottatt = behandling.kravMottatt,
                 årsakerAvslag = ÅrsakAvslagDvh.Companion.fraDomene(vedtak?.takeIfType<Avslag>()?.data?.årsaker),
