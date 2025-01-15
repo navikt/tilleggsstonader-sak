@@ -6,12 +6,15 @@ import java.math.RoundingMode
 
 object LæremidlerBeregnBeløpUtil {
 
-    fun beregnBeløp(sats: Int, studieprosent: Int): Int {
-        val PROSENT_50 = BigDecimal(0.5)
-        val PROSENTGRENSE_HALV_SATS = 50
+    private val PROSENT_50 = BigDecimal(0.5)
+    private val PROSENTGRENSE_HALV_SATS = 50
 
+    fun beregnBeløp(sats: Int, studieprosent: Int): Int {
         if (studieprosent <= PROSENTGRENSE_HALV_SATS) {
-            return BigDecimal(sats).multiply(PROSENT_50).setScale(0, RoundingMode.HALF_UP).toInt()
+            return BigDecimal(sats)
+                .multiply(PROSENT_50)
+                .setScale(0, RoundingMode.HALF_UP)
+                .toInt()
         }
         return sats
     }
