@@ -46,7 +46,7 @@ class LæremidlerBeregningService(
             .tilSortertStønadsperiodeBeregningsgrunnlag()
             .slåSammenSammenhengende()
 
-    private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
+    private fun finnAktiviteter(behandlingId: BehandlingId): List<AktivitetLæremidlerBeregningGrunnlag> {
         return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
             .tilAktiviteter()
     }
@@ -54,7 +54,7 @@ class LæremidlerBeregningService(
     private fun beregnLæremidlerPerMåned(
         vedtaksperioder: List<Vedtaksperiode>,
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-        aktiviteter: List<Aktivitet>,
+        aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
     ): List<BeregningsresultatForMåned> =
         vedtaksperioder
             .sorted()
@@ -72,7 +72,7 @@ class LæremidlerBeregningService(
     private fun lagBeregningsresultatForMåned(
         utbetalingsperiode: UtbetalingPeriode,
         målgruppe: MålgruppeType,
-        aktivitet: Aktivitet,
+        aktivitet: AktivitetLæremidlerBeregningGrunnlag,
     ): BeregningsresultatForMåned {
         val grunnlagsdata =
             lagBeregningsGrunnlag(
@@ -89,7 +89,7 @@ class LæremidlerBeregningService(
 
     private fun lagBeregningsGrunnlag(
         periode: UtbetalingPeriode,
-        aktivitet: Aktivitet,
+        aktivitet: AktivitetLæremidlerBeregningGrunnlag,
         målgruppe: MålgruppeType,
     ): Beregningsgrunnlag {
         val sats = finnSatsForPeriode(periode)

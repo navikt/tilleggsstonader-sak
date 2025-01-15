@@ -4,19 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerPeriodeUtil.splitPerLøpendeMåneder
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFaktaOrThrow
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
-import java.util.UUID
 
 object LæremidlerBeregningUtil {
 
@@ -48,30 +40,7 @@ object LæremidlerBeregningUtil {
     }
 }
 
-data class Aktivitet(
-    val id: UUID,
-    val type: AktivitetType,
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    val prosent: Int,
-    val studienivå: Studienivå,
-) : Periode<LocalDate>
-
 data class MålgruppeOgAktivitet(
     val målgruppe: MålgruppeType,
-    val aktivitet: Aktivitet,
+    val aktivitet: AktivitetLæremidlerBeregningGrunnlag,
 )
-
-fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> =
-    ofType<AktivitetLæremidler>()
-        .map {
-            val fakta = it.faktaOgVurdering.fakta
-            Aktivitet(
-                id = it.id,
-                type = it.faktaOgVurdering.type.vilkårperiodeType,
-                fom = it.fom,
-                tom = it.tom,
-                prosent = fakta.takeIfFaktaOrThrow<FaktaAktivitetLæremidler>().prosent,
-                studienivå = fakta.takeIfFaktaOrThrow<FaktaAktivitetLæremidler>().studienivå!!,
-            )
-        }

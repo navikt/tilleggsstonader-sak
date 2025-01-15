@@ -19,7 +19,7 @@ data class UtbetalingPeriode(
 
     fun finnMålgruppeOgAktivitet(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-        aktiviteter: List<Aktivitet>,
+        aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
     ): MålgruppeOgAktivitet {
         val stønadsperiode = finnRelevantStønadsperiode(stønadsperioder)
         val aktivitet = finnRelevantAktivitet(aktiviteter, stønadsperiode.aktivitet)
@@ -27,9 +27,9 @@ data class UtbetalingPeriode(
     }
 
     private fun finnRelevantAktivitet(
-        aktiviteter: List<Aktivitet>,
+        aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
         aktivitetType: AktivitetType,
-    ): Aktivitet {
+    ): AktivitetLæremidlerBeregningGrunnlag {
         val relevanteAktiviteter = aktiviteter.filter { it.type == aktivitetType && it.inneholder(this) }
 
         brukerfeilHvis(relevanteAktiviteter.isEmpty()) {
