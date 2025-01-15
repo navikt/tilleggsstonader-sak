@@ -104,3 +104,42 @@ Egenskap: Splitt vedtaksperioder til utbetalingsperioder
       | 30.05.2024 | 29.06.2024 | 01.04.2024      |
       | 30.06.2024 | 29.07.2024 | 01.04.2024      |
       | 30.07.2024 | 29.08.2024 | 01.04.2024      |
+
+  Scenario: Flere vedtaksperioder innenfor en måned
+    Gitt følgende vedtaksperioder for læremidler
+      | Fom        | Tom        |
+      | 03.01.2025 | 03.01.2025 |
+      | 07.01.2025 | 07.01.2025 |
+
+    Når splitter vedtaksperioder for læremidler
+
+    Så forvent følgende utbetalingsperioder
+      | Fom        | Tom        | Utbetalingsdato |
+      | 03.01.2025 | 02.02.2025 | 03.01.2025      |
+
+  Scenario: Flere vedtaksperioder, der vedtaksperiode 2 løper i første og andre måned
+    Gitt følgende vedtaksperioder for læremidler
+      | Fom        | Tom        |
+      | 03.01.2025 | 03.01.2025 |
+      | 07.01.2025 | 07.02.2025 |
+
+    Når splitter vedtaksperioder for læremidler
+
+    Så forvent følgende utbetalingsperioder
+      | Fom        | Tom        | Utbetalingsdato |
+      | 03.01.2025 | 02.02.2025 | 03.01.2025      |
+      | 03.02.2025 | 02.03.2025 | 03.02.2025      |
+
+  Scenario: Flere vedtaksperioder, der vedtaksperiode 2 løper fra første til tredje måned
+    Gitt følgende vedtaksperioder for læremidler
+      | Fom        | Tom        |
+      | 03.01.2025 | 03.01.2025 |
+      | 07.01.2025 | 07.03.2025 |
+
+    Når splitter vedtaksperioder for læremidler
+
+    Så forvent følgende utbetalingsperioder
+      | Fom        | Tom        | Utbetalingsdato |
+      | 03.01.2025 | 02.02.2025 | 03.01.2025      |
+      | 03.02.2025 | 02.03.2025 | 03.02.2025      |
+      | 03.03.2025 | 02.04.2025 | 03.02.2025      |
