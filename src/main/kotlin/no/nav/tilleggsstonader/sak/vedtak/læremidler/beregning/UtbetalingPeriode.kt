@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerSplitPerLøpendeMånedUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -14,6 +15,9 @@ import java.time.LocalDate
 /**
  * Utbetalingperiode for løpende måned
  * Eks 5jan - 4feb
+ *
+ * @param tom er maks dato for vedtaksperiode inne i en løpende måned.
+ * I de tilfeller man kun har en vedtaksperiode som gjelder 5 jan - 7 jan så vil tom= 7 jan.
  *
  * @param utbetalingsdato utbetalingsdato for når en utbetalingsperiode skal utbetales.
  * Eks hvis man innvilger jan-juni så skal man utbetale hele beløpet for fom i første utbetalingsperioden,
@@ -29,9 +33,27 @@ data class UtbetalingPeriode(
     val prosent: Int,
     val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
+
     init {
         validatePeriode()
+        require(tom <= fom.sisteDagenILøpendeMåned()) {
+            "UtbetalingPeriode kan ikke løpe lengre enn en løpende måned"
+        }
     }
+
+    constructor(
+        grunnlagForUtbetalingPeriode: GrunnlagForUtbetalingPeriode,
+        stønadsperiode: StønadsperiodeBeregningsgrunnlag,
+        aktivitet: AktivitetLæremidlerBeregningGrunnlag,
+    ) : this(
+        fom = grunnlagForUtbetalingPeriode.fom,
+        tom = grunnlagForUtbetalingPeriode.vedtaksperioder.maxOf { it.tom },
+        målgruppe = stønadsperiode.målgruppe,
+        aktivitet = stønadsperiode.aktivitet,
+        studienivå = aktivitet.studienivå,
+        prosent = aktivitet.prosent,
+        utbetalingsdato = grunnlagForUtbetalingPeriode.utbetalingsdato,
+    )
 }
 
 data class GrunnlagForUtbetalingPeriode(
@@ -68,15 +90,7 @@ data class GrunnlagForUtbetalingPeriode(
     ): UtbetalingPeriode {
         val stønadsperiode = finnRelevantStønadsperiode(stønadsperioder)
         val aktivitet = finnRelevantAktivitet(aktiviteter, stønadsperiode.aktivitet)
-        return UtbetalingPeriode(
-            fom = fom,
-            tom = tom,
-            målgruppe = stønadsperiode.målgruppe,
-            aktivitet = aktivitet.type,
-            studienivå = aktivitet.studienivå,
-            prosent = aktivitet.prosent,
-            utbetalingsdato = utbetalingsdato,
-        )
+        return UtbetalingPeriode(this, stønadsperiode, aktivitet)
     }
 
     private fun finnRelevantAktivitet(
