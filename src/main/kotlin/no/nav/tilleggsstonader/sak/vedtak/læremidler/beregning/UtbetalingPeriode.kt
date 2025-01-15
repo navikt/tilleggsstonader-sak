@@ -97,7 +97,9 @@ data class GrunnlagForUtbetalingPeriode(
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
         aktivitetType: AktivitetType,
     ): AktivitetLæremidlerBeregningGrunnlag {
-        val relevanteAktiviteter = aktiviteter.filter { it.type == aktivitetType && it.inneholder(this) }
+        val relevanteAktiviteter = aktiviteter
+            .filter { it.type == aktivitetType }
+            .filter { it.overlapper(this) }
 
         brukerfeilHvis(relevanteAktiviteter.isEmpty()) {
             "Det finnes ingen aktiviteter av type $aktivitetType som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
@@ -111,7 +113,8 @@ data class GrunnlagForUtbetalingPeriode(
     }
 
     private fun finnRelevantStønadsperiode(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>): StønadsperiodeBeregningsgrunnlag {
-        val relevanteStønadsperioderForPeriode = stønadsperioder.filter { it.inneholder(this) }
+        val relevanteStønadsperioderForPeriode = stønadsperioder
+            .filter { it.overlapper(this) }
 
         feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {
             "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.formatertPeriodeNorskFormat()}"

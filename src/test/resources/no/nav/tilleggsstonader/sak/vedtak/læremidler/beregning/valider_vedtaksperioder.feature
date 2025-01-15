@@ -16,7 +16,7 @@ Egenskap: Validering av vedtaksperioder for læremidler
 
     Når validerer vedtaksperiode for læremidler
 
-    Så forvent følgende feil fra vedtaksperiode validering: Foreløbig støtter vi kun en vedtaksperiode per løpende måned
+    Så forvent følgende feil fra vedtaksperiode validering: Periode=01.01.2024 - 31.03.2024 og 31.03.2024 - 30.04.2024 overlapper.
 
   Scenario: Vedtaksperioder er ikke innenfor en stønadsperiode - mangler dag i midten
     Gitt følgende vedtaksperioder for læremidler

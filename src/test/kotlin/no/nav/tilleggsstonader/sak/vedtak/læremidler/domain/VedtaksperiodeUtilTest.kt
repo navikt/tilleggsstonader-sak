@@ -55,32 +55,14 @@ class VedtaksperiodeUtilTest {
                 tom = LocalDate.of(2024, 1, 31),
             ),
             Vedtaksperiode(
-                fom = LocalDate.of(2024, 1, 30),
+                fom = LocalDate.of(2024, 1, 31),
                 tom = LocalDate.of(2024, 2, 28),
             ),
         )
 
         assertThatThrownBy {
             validerVedtaksperioder(vedtaksperioder, stønadsperioder)
-        }.hasMessageContaining("Foreløbig støtter vi kun en vedtaksperiode per løpende måned")
-    }
-
-    @Test
-    fun `Flere vedtaksperioder i samme løpende måned kaster feil`() {
-        vedtaksperioder = listOf(
-            Vedtaksperiode(
-                fom = LocalDate.of(2024, 1, 12),
-                tom = LocalDate.of(2024, 2, 5),
-            ),
-            Vedtaksperiode(
-                fom = LocalDate.of(2024, 2, 6),
-                tom = LocalDate.of(2024, 3, 12),
-            ),
-        )
-
-        assertThatThrownBy {
-            validerVedtaksperioder(vedtaksperioder, stønadsperioder)
-        }.hasMessageContaining("Foreløbig støtter vi kun en vedtaksperiode per løpende måned")
+        }.hasMessageContaining("overlapper")
     }
 
     @Test
