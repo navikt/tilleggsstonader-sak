@@ -2,10 +2,10 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.slåSammenSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.beregnBeløp
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.slåSammenSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -31,7 +31,7 @@ class LæremidlerBeregningService(
      */
 
     fun beregn(vedtaksperioder: List<Vedtaksperiode>, behandlingId: BehandlingId): BeregningsresultatLæremidler {
-        val stønadsperioder = hentStønadsperioder(behandlingId).slåSammenSammenhengende()
+        val stønadsperioder = hentStønadsperioder(behandlingId)
 
         validerVedtaksperioder(vedtaksperioder, stønadsperioder)
 
@@ -42,7 +42,9 @@ class LæremidlerBeregningService(
     }
 
     private fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeBeregningsgrunnlag> =
-        stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertStønadsperiodeBeregningsgrunnlag()
+        stønadsperiodeRepository.findAllByBehandlingId(behandlingId)
+            .tilSortertStønadsperiodeBeregningsgrunnlag()
+            .slåSammenSammenhengende()
 
     private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
         return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
