@@ -46,3 +46,26 @@ Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter
     Så skal stønaden være
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
       | 15.08.2024 | 15.08.2024 | 219   | VIDEREGÅENDE | 50            | 438  | AAP       | 15.08.2024      |
+
+  Scenario: Flere målgrupper, skal prioritere målgruppe med høyest prioritet
+    Gitt følgende vedtaksperioder for læremidler
+      | Fom        | Tom        |
+      | 01.01.2024 | 15.01.2024 |
+
+    Gitt følgende aktiviteter for læremidler
+      | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
+      | 01.01.2024 | 03.01.2024 | UTDANNING | VIDEREGÅENDE | 100           |
+      | 04.01.2024 | 07.01.2024 | TILTAK    | VIDEREGÅENDE | 100           |
+      | 08.01.2024 | 15.01.2024 | UTDANNING | VIDEREGÅENDE | 100           |
+
+    Gitt følgende stønadsperioder for læremidler
+      | Fom        | Tom        | Målgruppe       | Aktivitet |
+      | 01.01.2024 | 04.01.2024 | OVERGANGSSTØNAD | UTDANNING |
+      | 05.01.2024 | 07.01.2024 | AAP             | TILTAK    |
+      | 08.01.2024 | 15.01.2024 | OVERGANGSSTØNAD | UTDANNING |
+
+    Når beregner stønad for læremidler
+
+    Så skal stønaden være
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 01.01.2024 | 15.01.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.01.2024      |
