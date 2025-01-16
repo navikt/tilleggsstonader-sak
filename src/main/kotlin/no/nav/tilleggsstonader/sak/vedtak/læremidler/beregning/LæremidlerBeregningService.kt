@@ -84,7 +84,7 @@ class LæremidlerBeregningService(
             sats = finnSatsForStudienivå(sats, periode.studienivå),
             satsBekreftet = sats.bekreftet,
             utbetalingsdato = periode.utbetalingsdato,
-            målgruppe = periode.målgruppe,
+            målgruppe = periode.målgruppe.faktiskMålgruppe,
         )
     }
 }

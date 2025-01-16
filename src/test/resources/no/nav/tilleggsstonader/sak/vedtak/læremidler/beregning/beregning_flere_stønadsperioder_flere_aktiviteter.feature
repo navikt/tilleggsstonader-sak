@@ -25,5 +25,5 @@ Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter
     Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en overlappsperiode
 
     #Så skal stønaden være
-    #  | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-    #  | 07.01.2025 | 08.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 06.01.2025      |
+    #  | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe           | Utbetalingsdato |
+    #  | 07.01.2025 | 08.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | NEDSATT_ARBEIDSEVNE | 06.01.2025      |

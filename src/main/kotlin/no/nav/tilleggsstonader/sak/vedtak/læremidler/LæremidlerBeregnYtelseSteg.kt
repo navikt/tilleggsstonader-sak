@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.FaktiskMålgruppe
 import org.springframework.stereotype.Service
 
 @Service
@@ -158,11 +158,11 @@ class LæremidlerBeregnYtelseSteg(
         return StatusIverksetting.UBEHANDLET
     }
 
-    private fun MålgruppeType.tilTypeAndel(): TypeAndel {
+    private fun FaktiskMålgruppe.tilTypeAndel(): TypeAndel {
         return when (this) {
-            MålgruppeType.AAP, MålgruppeType.UFØRETRYGD, MålgruppeType.NEDSATT_ARBEIDSEVNE -> TypeAndel.LÆREMIDLER_AAP
-            MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER
-            MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.LÆREMIDLER_ETTERLATTE
+            FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE -> TypeAndel.LÆREMIDLER_AAP
+            FaktiskMålgruppe.ENSLIG_FORSØRGER -> TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER
+            FaktiskMålgruppe.GJENLEVENDE -> TypeAndel.LÆREMIDLER_ETTERLATTE
             else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
         }
     }

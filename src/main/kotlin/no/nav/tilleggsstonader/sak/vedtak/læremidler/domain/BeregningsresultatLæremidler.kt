@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.FaktiskMålgruppe
 import java.time.LocalDate
 
 data class BeregningsresultatLæremidler(
@@ -26,5 +26,5 @@ data class Beregningsgrunnlag(
     val studieprosent: Int,
     val sats: Int,
     val satsBekreftet: Boolean,
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
 ) : Periode<LocalDate>

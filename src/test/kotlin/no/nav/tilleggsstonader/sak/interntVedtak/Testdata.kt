@@ -46,6 +46,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
@@ -243,7 +244,7 @@ object Testdata {
                         studieprosent = 100,
                         sats = 951,
                         satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
+                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     ),
                 ),
                 BeregningsresultatForMåned(
@@ -256,7 +257,7 @@ object Testdata {
                         studieprosent = 100,
                         sats = 951,
                         satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
+                        målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     ),
                 ),
 

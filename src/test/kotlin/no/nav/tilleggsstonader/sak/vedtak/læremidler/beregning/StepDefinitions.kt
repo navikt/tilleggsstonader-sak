@@ -27,7 +27,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
@@ -126,8 +126,8 @@ class StepDefinitions {
                     sats = parseBigDecimal(BeregningNøkler.SATS, rad).toInt(),
                     satsBekreftet = parseValgfriBoolean(BeregningNøkler.BEKREFTET_SATS, rad) ?: true,
                     utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),
-                    målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad)
-                        ?: MålgruppeType.AAP,
+                    målgruppe = parseValgfriEnum<FaktiskMålgruppe>(BeregningNøkler.MÅLGRUPPE, rad)
+                        ?: FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 ),
             )
         }
