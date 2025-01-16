@@ -10,9 +10,18 @@ import java.time.LocalDate
 import java.util.UUID
 
 class MålgruppeOgAktivitetTest {
-
     @Nested
     inner class Sortering {
+
+        @Test
+        fun `prioritet på målgruppe trumfer`() {
+            val aap = målgruppeOgAktivitet(målgruppe = MålgruppeType.AAP)
+            val overgangsstønad = målgruppeOgAktivitet(målgruppe = MålgruppeType.OVERGANGSSTØNAD)
+
+            val aktiviteter = listOf(aap, overgangsstønad)
+
+            aktiviteter.assertSortIsEqualTo(aap)
+        }
 
         @Test
         fun `høyest utdanning trumfer`() {
@@ -42,6 +51,34 @@ class MålgruppeOgAktivitetTest {
             val aktiviteter = listOf(aktivitet1, aktivitet2)
 
             aktiviteter.assertSortIsEqualTo(aktivitet2)
+        }
+
+        @Test
+        fun `skal først sortere etter studienivå, prosent og målgruppe`() {
+            val forventetTreff = målgruppeOgAktivitet(
+                prosent = 61,
+                studienivå = Studienivå.HØYERE_UTDANNING,
+                målgruppe = MålgruppeType.AAP,
+            )
+            val aktiviteter = listOf(
+                målgruppeOgAktivitet(
+                    prosent = 100,
+                    studienivå = Studienivå.VIDEREGÅENDE,
+                    målgruppe = MålgruppeType.AAP,
+                ),
+                målgruppeOgAktivitet(
+                    prosent = 51,
+                    studienivå = Studienivå.HØYERE_UTDANNING,
+                    målgruppe = MålgruppeType.AAP,
+                ),
+                målgruppeOgAktivitet(
+                    prosent = 61,
+                    studienivå = Studienivå.HØYERE_UTDANNING,
+                    målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                ),
+                forventetTreff,
+            )
+            aktiviteter.assertSortIsEqualTo(forventetTreff)
         }
 
         private fun List<MålgruppeOgAktivitet>.assertSortIsEqualTo(expected: MålgruppeOgAktivitet) {

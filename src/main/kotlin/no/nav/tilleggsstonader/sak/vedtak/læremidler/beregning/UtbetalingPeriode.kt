@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
@@ -42,15 +43,14 @@ data class UtbetalingPeriode(
 
     constructor(
         løpendeMåned: LøpendeMåned,
-        stønadsperiode: StønadsperiodeBeregningsgrunnlag,
-        aktivitet: AktivitetLæremidlerBeregningGrunnlag,
+        målgruppeOgAktivitet: MålgruppeOgAktivitet,
     ) : this(
         fom = løpendeMåned.fom,
         tom = løpendeMåned.vedtaksperioder.maxOf { it.tom },
-        målgruppe = stønadsperiode.målgruppe,
-        aktivitet = stønadsperiode.aktivitet,
-        studienivå = aktivitet.studienivå,
-        prosent = aktivitet.prosent,
+        målgruppe = målgruppeOgAktivitet.målgruppe,
+        aktivitet = målgruppeOgAktivitet.aktivitet.type,
+        studienivå = målgruppeOgAktivitet.aktivitet.studienivå,
+        prosent = målgruppeOgAktivitet.aktivitet.prosent,
         utbetalingsdato = løpendeMåned.utbetalingsdato,
     )
 }
@@ -93,22 +93,31 @@ data class LøpendeMåned(
         require(vedtaksperioder.isNotEmpty()) {
             "Kan ikke lage UtbetalingPeriode når vedtaksperioder er tom"
         }
-        val stønadsperiode = finnRelevantStønadsperiode(stønadsperioder)
-        val aktiviteter = finnRelevanteAktivitet(aktiviteter, stønadsperiode)
-            .map { MålgruppeOgAktivitet(stønadsperiode.målgruppe, it) }
+        val sorterteMålgruppeOgAktivitet = vedtaksperioder
+            .flatMap { vedtaksperiode -> vedtaksperiode.finnRelevantMålgruppeOgAktivitet(stønadsperioder, aktiviteter) }
             .sorted()
 
-        return UtbetalingPeriode(this, stønadsperiode, aktiviteter.first().aktivitet)
+        return UtbetalingPeriode(this, sorterteMålgruppeOgAktivitet.first())
     }
 
-    private fun finnRelevanteAktivitet(
+    private fun VedtaksperiodeInnenforLøpendeMåned.finnRelevantMålgruppeOgAktivitet(
+        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+        aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
+    ) = this.finnRelevantStønadsperiode(stønadsperioder)
+        .flatMap { stønadsperiode ->
+            this
+                .finnRelevanteAktivitet(aktiviteter, stønadsperiode)
+                .map { aktivitet -> MålgruppeOgAktivitet(stønadsperiode.målgruppe, aktivitet) }
+        }
+
+    private fun VedtaksperiodeInnenforLøpendeMåned.finnRelevanteAktivitet(
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
         stønadsperiode: StønadsperiodeBeregningsgrunnlag,
     ): List<AktivitetLæremidlerBeregningGrunnlag> {
         val relevanteAktiviteter = aktiviteter
             .filter { it.type == stønadsperiode.aktivitet }
-            .mapNotNull { it.snitt(stønadsperiode) }
-            .mapNotNull { it.snitt(this) }
+            .mapNotNull { it.beregnSnitt(stønadsperiode) }
+            .mapNotNull { it.beregnSnitt(this) }
 
         brukerfeilHvis(relevanteAktiviteter.isEmpty()) {
             "Det finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
@@ -117,9 +126,11 @@ data class LøpendeMåned(
         return relevanteAktiviteter
     }
 
-    private fun finnRelevantStønadsperiode(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>): StønadsperiodeBeregningsgrunnlag {
+    private fun VedtaksperiodeInnenforLøpendeMåned.finnRelevantStønadsperiode(
+        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+    ): List<StønadsperiodeBeregningsgrunnlag> {
         val relevanteStønadsperioderForPeriode = stønadsperioder
-            .mapNotNull { it.snitt(this) }
+            .mapNotNull { it.beregnSnitt(this) }
 
         feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {
             "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.formatertPeriodeNorskFormat()}"
@@ -129,7 +140,7 @@ data class LøpendeMåned(
             "Det er for mange stønadsperioder som inneholder utbetalingsperioden ${this.formatertPeriodeNorskFormat()}"
         }
 
-        return relevanteStønadsperioderForPeriode.single()
+        return relevanteStønadsperioderForPeriode
     }
 }
 
@@ -145,5 +156,6 @@ data class MålgruppeOgAktivitet(
     companion object {
         val COMPARE_BY = compareBy<MålgruppeOgAktivitet> { it.aktivitet.studienivå.prioritet }
             .thenByDescending { it.aktivitet.prosent }
+            .thenBy { it.målgruppe.prioritet() }
     }
 }

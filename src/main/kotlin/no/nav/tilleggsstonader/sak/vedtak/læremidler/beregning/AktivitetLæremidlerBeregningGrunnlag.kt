@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -19,10 +19,10 @@ data class AktivitetLæremidlerBeregningGrunnlag(
     override val tom: LocalDate,
     val prosent: Int,
     val studienivå: Studienivå,
-) : Periode<LocalDate> {
+) : Periode<LocalDate>, KopierPeriode<AktivitetLæremidlerBeregningGrunnlag> {
 
-    fun snitt(other: Periode<LocalDate>): AktivitetLæremidlerBeregningGrunnlag? {
-        return this.beregnSnitt(other)?.let { this.copy(fom = it.fom, tom = it.tom) }
+    override fun medPeriode(fom: LocalDate, tom: LocalDate): AktivitetLæremidlerBeregningGrunnlag {
+        return this.copy(fom = fom, tom = tom)
     }
 }
 
