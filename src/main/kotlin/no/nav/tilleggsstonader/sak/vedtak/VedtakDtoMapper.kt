@@ -5,14 +5,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.*
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
@@ -62,5 +55,7 @@ object VedtakDtoMapper {
                 årsakerAvslag = data.årsaker,
                 begrunnelse = data.begrunnelse,
             )
+
+            is OpphørLæremidler -> TODO()
         }
 }

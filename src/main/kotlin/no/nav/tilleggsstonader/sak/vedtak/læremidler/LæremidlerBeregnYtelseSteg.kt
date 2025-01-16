@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -15,18 +16,12 @@ import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.*
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.*
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -49,7 +44,7 @@ class LæremidlerBeregnYtelseSteg(
         when (vedtak) {
             is InnvilgelseLæremidlerRequest -> beregnOgLagreInnvilgelse(vedtak.vedtaksperioder.tilDomene(), saksbehandling)
             is AvslagLæremidlerDto -> lagreAvslag(saksbehandling, vedtak)
-            // is OpphørLæremidlerDto -> beregnOgLagreOpphør(saksbehandling, vedtak)
+            is OpphørLæremidlerRequest -> beregnOgLagreOpphør(vedtak.vedtaksperioder.tilDomene(), saksbehandling)
         }
     }
 
@@ -62,15 +57,14 @@ class LæremidlerBeregnYtelseSteg(
         lagreAndeler(saksbehandling, beregningsresultat)
     }
 
-    /*
-    private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørLæremidlerDto) {
+    private fun beregnOgLagreOpphør(vedtaksperioder: List<Vedtaksperiode>, saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
 
         opphørValideringService.validerPerioder(saksbehandling)
 
-        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
+        val beregningsresultat = beregningService.beregn(vedtaksperioder, saksbehandling.id)
         opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(beregningsresultat, saksbehandling.revurderFra)
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -78,8 +72,8 @@ class LæremidlerBeregnYtelseSteg(
                 type = TypeVedtak.OPPHØR,
                 data = OpphørLæremidler(
                     beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
-                    årsaker = vedtak.årsakerOpphør,
-                    begrunnelse = vedtak.begrunnelse,
+                    årsaker = emptyList(),
+                    begrunnelse = "",
                 ),
 
                 ),
@@ -87,7 +81,6 @@ class LæremidlerBeregnYtelseSteg(
 
         lagreAndeler(saksbehandling, beregningsresultat)
     }
-     */
 
     private fun lagreAvslag(
         saksbehandling: Saksbehandling,

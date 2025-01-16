@@ -118,6 +118,7 @@ class VedtakRepositoryJsonTest : IntegrationTest() {
         TypeVedtakTilsynBarn.OPPHØR_TILSYN_BARN -> OpphørTilsynBarn::class
         TypeVedtakLæremidler.INNVILGELSE_LÆREMIDLER -> InnvilgelseLæremidler::class
         TypeVedtakLæremidler.AVSLAG_LÆREMIDLER -> AvslagLæremidler::class
+        TypeVedtakLæremidler.OPPHØR_LÆREMIDLER -> OpphørLæremidler::class
     }.java
 
     companion object {

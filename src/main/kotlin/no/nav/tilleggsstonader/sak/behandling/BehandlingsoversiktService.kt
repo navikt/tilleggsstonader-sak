@@ -14,12 +14,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.util.max
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.*
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -112,6 +107,7 @@ class BehandlingsoversiktService(
             is InnvilgelseLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
             is AvslagTilsynBarn -> null
             is AvslagLæremidler -> null
+            is OpphørLæremidler -> null
         }
     }
 

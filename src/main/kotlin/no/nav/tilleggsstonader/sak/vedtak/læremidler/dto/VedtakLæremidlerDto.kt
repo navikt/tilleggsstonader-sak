@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 @JsonSubTypes(
     JsonSubTypes.Type(AvslagLæremidlerDto::class, name = "AVSLAG"),
     JsonSubTypes.Type(InnvilgelseLæremidlerRequest::class, name = "INNVILGELSE"),
+    JsonSubTypes.Type(OpphørLæremidlerRequest::class, name = "OPPHØR"),
     failOnRepeatedNames = true,
 )
 sealed class VedtakLæremidlerDto(open val type: TypeVedtak)
