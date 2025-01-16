@@ -136,10 +136,6 @@ data class LøpendeMåned(
             "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.formatertPeriodeNorskFormat()}"
         }
 
-        feilHvis(relevanteStønadsperioderForPeriode.size > 1) {
-            "Det er for mange stønadsperioder som inneholder utbetalingsperioden ${this.formatertPeriodeNorskFormat()}"
-        }
-
         return relevanteStønadsperioderForPeriode
     }
 }

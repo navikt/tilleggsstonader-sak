@@ -71,17 +71,13 @@ Egenskap: Beregning av læremidler - flere stønadsperioder
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en overlappsperiode
-
-    #Så skal stønaden være
-    #  | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Utbetalingsdato |
-    #  | 01.01.2025 | 31.01.2025 | 438   | VIDEREGÅENDE | 100           | 438  | AAP             | 01.01.2025      |
-    #  | 01.02.2025 | 28.02.2025 | 438   | VIDEREGÅENDE | 100           | 438  | OVERGANGSSTØNAD | 03.02.2025      |
+    Så skal stønaden være
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP             | 01.01.2025      |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | OVERGANGSSTØNAD | 03.02.2025      |
 
 
-  Scenario: To uilke målgrupper samme aktivitet feiler i månedskiftet
-    # TODO når man støtter flere målgrupper
-    #  Scenario: To ulike målgrupper samme aktivitet
+  Scenario: To ulike målgrupper samme aktivitet
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        |
       | 01.04.2024 | 31.05.2024 |
@@ -97,12 +93,10 @@ Egenskap: Beregning av læremidler - flere stønadsperioder
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en overlappsperiode
-    # TODO når man støtter flere målgrupper
-    # Så skal stønaden være
-    #  | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-    #  | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
-    #  | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | DAGPENGER | 01.05.2024      |
+    Så skal stønaden være
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
+      | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | DAGPENGER | 01.05.2024      |
 
 
   Scenario: To ulike målgrupper samme aktivitet feiler når ikke i månedskiftet
@@ -133,16 +127,14 @@ Egenskap: Beregning av læremidler - flere stønadsperioder
       | 01.01.2024 | 31.05.2024 | TILTAK    | VIDEREGÅENDE | 100           |
 
     Gitt følgende stønadsperioder for læremidler
-      | Fom        | Tom        | Målgruppe | Aktivitet |
-      | 01.04.2024 | 31.04.2024 | AAP       | TILTAK    |
-      | 01.05.2024 | 31.05.2024 | DAGPENGER | TILTAK    |
-      | 01.04.2024 | 31.05.2024 | DAGPENGER | TILTAK    |
+      | Fom        | Tom        | Målgruppe       | Aktivitet |
+      | 01.04.2024 | 31.04.2024 | AAP             | TILTAK    |
+      | 01.05.2024 | 31.05.2024 | OVERGANGSSTØNAD | TILTAK    |
+      | 01.04.2024 | 31.05.2024 | OVERGANGSSTØNAD | TILTAK    |
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Det er for mange stønadsperioder som inneholder utbetalingsperioden
-    # TODO når man støtter flere målgrupper
-    # Så skal stønaden være
-    #  | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-    #  | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
-    #  | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
+    Så skal stønaden være
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe       | Utbetalingsdato |
+      | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP             | 01.04.2024      |
+      | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | OVERGANGSSTØNAD | 01.05.2024      |

@@ -73,6 +73,4 @@ Egenskap: Validering av vedtaksperioder for læremidler
 
     Når validerer vedtaksperiode for læremidler
 
-    # TODO
-    #Så forvent ingen feil fra vedtaksperiode validering
-    Så forvent følgende feil fra vedtaksperiode validering: Vedtaksperiode er ikke innenfor en overlappsperiode
+    Så forvent ingen feil fra vedtaksperiode validering
