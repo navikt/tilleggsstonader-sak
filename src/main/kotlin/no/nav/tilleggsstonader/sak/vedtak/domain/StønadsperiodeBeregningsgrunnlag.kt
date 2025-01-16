@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.FaktiskMålgruppe
 import java.time.LocalDate
 
 /**
@@ -14,18 +14,18 @@ import java.time.LocalDate
 data class StønadsperiodeBeregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val målgruppe: MålgruppeType,
+    val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
     }
 }
-
+ // TODO burde man endre stønadsperiode til å kun forholde seg til faktisk målgruppe?
 fun Stønadsperiode.tilStønadsperiodeBeregningsgrunnlag() = StønadsperiodeBeregningsgrunnlag(
     fom = this.fom,
     tom = this.tom,
-    målgruppe = this.målgruppe,
+    målgruppe = this.målgruppe.faktiskMålgruppe,
     aktivitet = this.aktivitet,
 )
 
