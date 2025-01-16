@@ -94,32 +94,32 @@ data class LøpendeMåned(
             "Kan ikke lage UtbetalingPeriode når vedtaksperioder er tom"
         }
         val stønadsperiode = finnRelevantStønadsperiode(stønadsperioder)
-        val aktivitet = finnRelevantAktivitet(aktiviteter, stønadsperiode.aktivitet)
-        return UtbetalingPeriode(this, stønadsperiode, aktivitet)
+        val aktiviteter = finnRelevanteAktivitet(aktiviteter, stønadsperiode)
+            .map { MålgruppeOgAktivitet(stønadsperiode.målgruppe, it) }
+            .sorted()
+
+        return UtbetalingPeriode(this, stønadsperiode, aktiviteter.first().aktivitet)
     }
 
-    private fun finnRelevantAktivitet(
+    private fun finnRelevanteAktivitet(
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
-        aktivitetType: AktivitetType,
-    ): AktivitetLæremidlerBeregningGrunnlag {
+        stønadsperiode: StønadsperiodeBeregningsgrunnlag,
+    ): List<AktivitetLæremidlerBeregningGrunnlag> {
         val relevanteAktiviteter = aktiviteter
-            .filter { it.type == aktivitetType }
-            .filter { it.overlapper(this) }
+            .filter { it.type == stønadsperiode.aktivitet }
+            .mapNotNull { it.snitt(stønadsperiode) }
+            .mapNotNull { it.snitt(this) }
 
         brukerfeilHvis(relevanteAktiviteter.isEmpty()) {
-            "Det finnes ingen aktiviteter av type $aktivitetType som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
+            "Det finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
         }
 
-        brukerfeilHvis(relevanteAktiviteter.size > 1) {
-            "Det finnes mer enn 1 aktivitet i perioden ${this.formatertPeriodeNorskFormat()}. Dette støttes ikke enda. Ta kontakt med TS-sak teamet."
-        }
-
-        return relevanteAktiviteter.single()
+        return relevanteAktiviteter
     }
 
     private fun finnRelevantStønadsperiode(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>): StønadsperiodeBeregningsgrunnlag {
         val relevanteStønadsperioderForPeriode = stønadsperioder
-            .filter { it.overlapper(this) }
+            .mapNotNull { it.snitt(this) }
 
         feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {
             "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.formatertPeriodeNorskFormat()}"
@@ -130,5 +130,20 @@ data class LøpendeMåned(
         }
 
         return relevanteStønadsperioderForPeriode.single()
+    }
+}
+
+data class MålgruppeOgAktivitet(
+    val målgruppe: MålgruppeType,
+    val aktivitet: AktivitetLæremidlerBeregningGrunnlag,
+) : Comparable<MålgruppeOgAktivitet> {
+
+    override fun compareTo(other: MålgruppeOgAktivitet): Int {
+        return COMPARE_BY.compare(this, other)
+    }
+
+    companion object {
+        val COMPARE_BY = compareBy<MålgruppeOgAktivitet> { it.aktivitet.studienivå.prioritet }
+            .thenByDescending { it.aktivitet.prosent }
     }
 }

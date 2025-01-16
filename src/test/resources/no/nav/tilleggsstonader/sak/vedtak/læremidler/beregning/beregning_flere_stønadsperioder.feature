@@ -1,7 +1,7 @@
 # language: no
 # encoding: UTF-8
 
-Egenskap: Beregning
+Egenskap: Beregning av læremidler - flere stønadsperioder
 
   Scenario: Flere stønadsperioder
     Gitt følgende vedtaksperioder for læremidler
@@ -80,6 +80,8 @@ Egenskap: Beregning
 
 
   Scenario: To uilke målgrupper samme aktivitet feiler i månedskiftet
+    # TODO når man støtter flere målgrupper
+    #  Scenario: To ulike målgrupper samme aktivitet
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        |
       | 01.04.2024 | 31.05.2024 |
@@ -93,13 +95,17 @@ Egenskap: Beregning
       | 01.04.2024 | 31.04.2024 | AAP       | TILTAK    |
       | 01.05.2024 | 31.05.2024 | DAGPENGER | TILTAK    |
 
-
     Når beregner stønad for læremidler
 
     Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en overlappsperiode
+    # TODO når man støtter flere målgrupper
+    # Så skal stønaden være
+    #  | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+    #  | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
+    #  | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | DAGPENGER | 01.05.2024      |
 
 
-  Scenario: To uilke målgrupper samme aktivitet feiler når ikke i månedskiftet
+  Scenario: To ulike målgrupper samme aktivitet feiler når ikke i månedskiftet
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        |
       | 01.04.2024 | 31.05.2024 |
@@ -113,12 +119,11 @@ Egenskap: Beregning
       | 01.04.2024 | 04.05.2024 | AAP       | TILTAK    |
       | 05.05.2024 | 31.05.2024 | DAGPENGER | TILTAK    |
 
-
     Når beregner stønad for læremidler
 
     Så forvent følgende feil fra læremidlerberegning: Vedtaksperiode er ikke innenfor en overlappsperiode
 
-  Scenario: Flere stønadsperioder som unneholder utbeatlingsperioden
+  Scenario: Stønadsperioder i ulike løpende måneder
     Gitt følgende vedtaksperioder for læremidler
       | Fom        | Tom        |
       | 01.04.2024 | 31.05.2024 |
@@ -127,14 +132,17 @@ Egenskap: Beregning
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
       | 01.01.2024 | 31.05.2024 | TILTAK    | VIDEREGÅENDE | 100           |
 
-
     Gitt følgende stønadsperioder for læremidler
       | Fom        | Tom        | Målgruppe | Aktivitet |
       | 01.04.2024 | 31.04.2024 | AAP       | TILTAK    |
       | 01.05.2024 | 31.05.2024 | DAGPENGER | TILTAK    |
       | 01.04.2024 | 31.05.2024 | DAGPENGER | TILTAK    |
 
-
     Når beregner stønad for læremidler
 
     Så forvent følgende feil fra læremidlerberegning: Det er for mange stønadsperioder som inneholder utbetalingsperioden
+    # TODO når man støtter flere målgrupper
+    # Så skal stønaden være
+    #  | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+    #  | 01.04.2024 | 30.04.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |
+    #  | 01.05.2024 | 31.05.2024 | 438   | VIDEREGÅENDE | 100           | 438  | AAP       | 01.04.2024      |

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
+import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -19,6 +20,10 @@ data class StønadsperiodeBeregningsgrunnlag(
 ) : Periode<LocalDate> {
     init {
         validatePeriode()
+    }
+
+    fun snitt(other: Periode<LocalDate>): StønadsperiodeBeregningsgrunnlag? {
+        return this.beregnSnitt(other)?.let { this.copy(fom = it.fom, tom = it.tom) }
     }
 }
 
