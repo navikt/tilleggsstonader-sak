@@ -240,6 +240,27 @@ class SøknadRoutingServiceTest {
         }
     }
 
+    @Nested
+    inner class SkalRuteAlleUtenÅSjekkeFeatureToggle {
+
+        @Test
+        fun `skal rute alle til ny løsning`() {
+            val resultat = skalBehandlesINyLøsning(sjekkSkalRuteAlleSøkere = true)
+            assertThat(resultat).isTrue()
+
+            verify {
+                søknadRoutingRepository.findByIdentAndType(ident, stønadstype)
+
+                fagsakService wasNot called
+                behandlingService wasNot called
+                arenaService wasNot called
+            }
+            verify(exactly = 1) {
+                søknadRoutingRepository.insert(any())
+            }
+        }
+    }
+
     private fun arenaStatusAktivtVedtak() = ArenaStatusDto(
         SakStatus(harAktivSakUtenVedtak = true),
         vedtakStatus(harVedtak = true, harAktivtVedtak = true, harVedtakUtenUtfall = false),
@@ -260,8 +281,11 @@ class SøknadRoutingServiceTest {
         vedtakStatus(harVedtak = true, harAktivtVedtak = false, harVedtakUtenUtfall = true),
     )
 
-    private fun skalBehandlesINyLøsning(request: IdentStønadstype = IdentStønadstype(ident, stønadstype)) =
-        service.sjekkRoutingForPerson(request).skalBehandlesINyLøsning
+    private fun skalBehandlesINyLøsning(
+        request: IdentStønadstype = IdentStønadstype(ident, stønadstype),
+        sjekkSkalRuteAlleSøkere: Boolean = false,
+    ) =
+        service.sjekkRoutingForPerson(request, sjekkSkalRuteAlleSøkere).skalBehandlesINyLøsning
 
     private fun søknadRoutingVariant(antall: Int = 1000, enabled: Boolean = true): Variant =
         Variant("antall", antall.toString(), enabled)

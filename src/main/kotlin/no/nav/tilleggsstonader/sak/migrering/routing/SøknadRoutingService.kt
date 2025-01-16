@@ -25,8 +25,8 @@ class SøknadRoutingService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun sjekkRoutingForPerson(request: IdentStønadstype): SøknadRoutingResponse {
-        val skalBehandlesINyLøsning = skalBehandlesINyLøsning(request)
+    fun sjekkRoutingForPerson(request: IdentStønadstype, sjekkSkalRuteAlleSøkere: Boolean = true): SøknadRoutingResponse {
+        val skalBehandlesINyLøsning = skalBehandlesINyLøsning(request, sjekkSkalRuteAlleSøkere)
         logger.info("routing - stønadstype=${request.stønadstype} skalBehandlesINyLøsning=$skalBehandlesINyLøsning")
         return SøknadRoutingResponse(skalBehandlesINyLøsning = skalBehandlesINyLøsning)
     }
@@ -36,9 +36,14 @@ class SøknadRoutingService(
         return søknadRouting != null
     }
 
-    private fun skalBehandlesINyLøsning(request: IdentStønadstype): Boolean {
+    private fun skalBehandlesINyLøsning(request: IdentStønadstype, sjekkSkalRuteAlleSøkere: Boolean): Boolean {
         if (harLagretRouting(request)) {
             logger.info("routing - stønadstype=${request.stønadstype} harLagretRouting=true")
+            return true
+        }
+
+        if (sjekkSkalRuteAlleSøkere && skalRuteAlleSøkereTilNyLøsning(request.stønadstype)) {
+            lagreRouting(request, mapOf("ruterAlleSøkere" to true))
             return true
         }
 
@@ -57,6 +62,18 @@ class SøknadRoutingService(
             return true
         }
         return false
+    }
+
+    /**
+     * Ønsker å sette at alle skal rutes til ny løsning, uten å sjekke status i Arena då det tar unødvendig lang tid
+     */
+    private fun skalRuteAlleSøkereTilNyLøsning(stønadstype: Stønadstype): Boolean {
+        val skalRutes = when (stønadstype) {
+            Stønadstype.BARNETILSYN -> true
+            Stønadstype.LÆREMIDLER -> true
+        }
+        logger.info("routing - stønadstype=$stønadstype skalRuteAlleSøkere=true")
+        return skalRutes
     }
 
     private fun skalStoppesPgaFeatureToggle(stønadstype: Stønadstype): Boolean {
@@ -98,7 +115,7 @@ class SøknadRoutingService(
                 "harAktivSakUtenVedtak=$harAktivSakUtenVedtak " +
                 "harVedtak=$harVedtak " +
                 "harAktivtVedtak=$harAktivtVedtak " +
-                "harVedtakUtenUtfall=$harVedtakUtenUtfall" +
+                "harVedtakUtenUtfall=$harVedtakUtenUtfall " +
                 "vedtakTom=${arenaStatus.vedtak.vedtakTom}",
         )
         return harGyldigStatus
