@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.YearMonth
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
@@ -13,10 +16,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.YearMonth
 
 object TilsynBarnTestUtil {
 
@@ -38,6 +39,21 @@ object TilsynBarnTestUtil {
         ),
     )
 
+    val defaultStønadsperiodeBeregningsgrunnlag = StønadsperiodeBeregningsgrunnlag(
+        fom = LocalDate.of(2024, 1, 1),
+        tom = LocalDate.of(2024, 1, 7),
+        målgruppe = MålgruppeType.AAP,
+        aktivitet = AktivitetType.TILTAK,
+    )
+
+    val defaultInnvilgelseTilsynBarn = InnvilgelseTilsynBarn(
+        beregningsresultat = BeregningsresultatTilsynBarn(
+            perioder = listOf(
+                beregningsresultatForMåned(stønadsperioder = listOf(stønadsperiodeGrunnlag()))
+            )
+        )
+    )
+
     fun beregningsresultatForMåned(
         måned: YearMonth = YearMonth.now(),
         stønadsperioder: List<StønadsperiodeGrunnlag> = emptyList(),
@@ -56,8 +72,14 @@ object TilsynBarnTestUtil {
         beløpsperioder = beløpsperioder,
     )
 
+    fun innvilgelse(data: InnvilgelseTilsynBarn = defaultInnvilgelseTilsynBarn) = GeneriskVedtak(
+        behandlingId = BehandlingId.random(),
+        type = TypeVedtak.INNVILGELSE,
+        data = data,
+    )
+
     fun stønadsperiodeGrunnlag(
-        stønadsperiode: StønadsperiodeBeregningsgrunnlag,
+        stønadsperiode: StønadsperiodeBeregningsgrunnlag = defaultStønadsperiodeBeregningsgrunnlag,
     ): StønadsperiodeGrunnlag {
         return StønadsperiodeGrunnlag(
             stønadsperiode = stønadsperiode,
