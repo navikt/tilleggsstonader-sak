@@ -44,7 +44,7 @@ object LæremidlerBeregnUtil {
         vedtaksperiode: VedtaksperiodeInnenforÅr,
     ) {
         if (vedtaksperiode.fom <= this.tom) {
-            val overlappendeVedtaksperiode = Vedtaksperiode(
+            val overlappendeVedtaksperiode = VedtaksperiodeInnenforLøpendeMåned(
                 fom = vedtaksperiode.fom,
                 tom = minOf(this.tom, vedtaksperiode.tom),
             )
@@ -83,7 +83,7 @@ object LæremidlerBeregnUtil {
                 fom = fom,
                 tom = minOf(fom.sisteDagenILøpendeMåned(), this.tom.sisteDagIÅret()),
                 utbetalingsdato = this.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
-            ).medVedtaksperiode(Vedtaksperiode(fom = fom, tom = tom))
+            ).medVedtaksperiode(VedtaksperiodeInnenforLøpendeMåned(fom = fom, tom = tom))
         }
     }
 }

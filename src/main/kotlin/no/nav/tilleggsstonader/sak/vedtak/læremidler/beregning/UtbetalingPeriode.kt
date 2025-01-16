@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
@@ -67,16 +66,16 @@ data class LøpendeMåned(
      * Inneholder de vedtaksperioder som er innvilget innenfor en UtbetalingPeriode
      * Implementert som private backing property for å ikke kunne legge til perioder direkte til listen uten å validere den
      */
-    private val _vedtaksperioder: MutableList<Vedtaksperiode> = mutableListOf()
+    private val _vedtaksperioder: MutableList<VedtaksperiodeInnenforLøpendeMåned> = mutableListOf()
 
-    val vedtaksperioder: List<Vedtaksperiode> get() = _vedtaksperioder
+    val vedtaksperioder: List<VedtaksperiodeInnenforLøpendeMåned> get() = _vedtaksperioder
 
     init {
         validatePeriode()
         _vedtaksperioder.forEach { this.inneholder(it) }
     }
 
-    fun medVedtaksperiode(vedtaksperiode: Vedtaksperiode): LøpendeMåned {
+    fun medVedtaksperiode(vedtaksperiode: VedtaksperiodeInnenforLøpendeMåned): LøpendeMåned {
         require(inneholder(vedtaksperiode)) {
             "Vedtaksperiode(${vedtaksperiode.formatertPeriodeNorskFormat()}) kan ikke gå utenfor utbetalingsperiode(${this.formatertPeriodeNorskFormat()})"
         }

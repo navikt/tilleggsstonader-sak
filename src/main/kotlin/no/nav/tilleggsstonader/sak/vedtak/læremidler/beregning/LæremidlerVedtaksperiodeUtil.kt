@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import java.time.LocalDate
 
@@ -62,6 +63,21 @@ data class VedtaksperiodeInnenforÅr(
         validatePeriode()
         require(fom.year == tom.year) {
             "Kan ikke være 2 ulike år (${fom.year}, ${tom.year}})"
+        }
+    }
+}
+
+/**
+ * Tydligere at en vedtaksperiode er delt sånn at den skal være innenfor en [LøpendeMåned]
+ */
+data class VedtaksperiodeInnenforLøpendeMåned(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+        require(tom <= fom.sisteDagenILøpendeMåned()) {
+            "${this::class.simpleName} må være innenfor en løpende måned"
         }
     }
 }

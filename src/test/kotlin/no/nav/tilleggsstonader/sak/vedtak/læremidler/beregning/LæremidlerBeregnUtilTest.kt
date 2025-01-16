@@ -24,14 +24,14 @@ class LæremidlerBeregnUtilTest {
             assertThat(fom).isEqualTo(LocalDate.of(2024, 12, 5))
             assertThat(tom).isEqualTo(LocalDate.of(2024, 12, 31))
             assertThat(this.vedtaksperioder).containsExactly(
-                Vedtaksperiode(LocalDate.of(2024, 12, 5), LocalDate.of(2024, 12, 31)),
+                VedtaksperiodeInnenforLøpendeMåned(LocalDate.of(2024, 12, 5), LocalDate.of(2024, 12, 31)),
             )
         }
         with(perioder[1]) {
             assertThat(fom).isEqualTo(LocalDate.of(2025, 1, 1))
             assertThat(tom).isEqualTo(LocalDate.of(2025, 1, 31))
             assertThat(this.vedtaksperioder).containsExactly(
-                Vedtaksperiode(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 4)),
+                VedtaksperiodeInnenforLøpendeMåned(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 4)),
             )
         }
     }
@@ -50,7 +50,7 @@ class LæremidlerBeregnUtilTest {
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 5))
                 assertThat(tom).isEqualTo(LocalDate.of(2024, 2, 4))
                 assertThat(this.vedtaksperioder).containsExactly(
-                    vedtaksperioder[0],
+                    vedtaksperioder[0].forLøpendeMåned(),
                 )
             }
         }
@@ -67,14 +67,14 @@ class LæremidlerBeregnUtilTest {
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 5))
                 assertThat(tom).isEqualTo(LocalDate.of(2024, 2, 4))
                 assertThat(this.vedtaksperioder).containsExactly(
-                    vedtaksperioder[0],
+                    vedtaksperioder[0].forLøpendeMåned(),
                 )
             }
             with(perioder[1]) {
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 2, 7))
                 assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 6))
                 assertThat(this.vedtaksperioder).containsExactly(
-                    vedtaksperioder[1],
+                    vedtaksperioder[1].forLøpendeMåned(),
                 )
             }
         }
@@ -91,7 +91,7 @@ class LæremidlerBeregnUtilTest {
                 assertThat(fom).isEqualTo(FØRSTE_JAN_2024)
                 assertThat(tom).isEqualTo(SISTE_JAN_2024)
                 assertThat(this.vedtaksperioder).containsExactlyElementsOf(
-                    vedtaksperioder,
+                    vedtaksperioder.forLøpendeMåned(),
                 )
             }
         }
@@ -108,7 +108,7 @@ class LæremidlerBeregnUtilTest {
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 5))
                 assertThat(tom).isEqualTo(LocalDate.of(2024, 2, 4))
                 assertThat(this.vedtaksperioder).containsExactlyElementsOf(
-                    vedtaksperioder,
+                    vedtaksperioder.forLøpendeMåned(),
                 )
             }
         }
@@ -125,7 +125,7 @@ class LæremidlerBeregnUtilTest {
                 assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 5))
                 assertThat(tom).isEqualTo(LocalDate.of(2024, 2, 4))
                 assertThat(this.vedtaksperioder).containsExactlyElementsOf(
-                    vedtaksperioder,
+                    vedtaksperioder.forLøpendeMåned(),
                 )
             }
         }
@@ -143,8 +143,8 @@ class LæremidlerBeregnUtilTest {
                 assertThat(tom).isEqualTo(LocalDate.of(2024, 2, 4))
                 assertThat(this.utbetalingsdato).isEqualTo(LocalDate.of(2024, 1, 5))
                 assertThat(this.vedtaksperioder).containsExactly(
-                    vedtaksperioder[0],
-                    Vedtaksperiode(LocalDate.of(2024, 2, 1), LocalDate.of(2024, 2, 4)),
+                    vedtaksperioder[0].forLøpendeMåned(),
+                    VedtaksperiodeInnenforLøpendeMåned(LocalDate.of(2024, 2, 1), LocalDate.of(2024, 2, 4)),
                 )
             }
             with(perioder[1]) {
@@ -153,9 +153,15 @@ class LæremidlerBeregnUtilTest {
                 // Utbetalingsdato for periode 2 blir i neste måned fordi det blir en ny vedtaksperiode
                 assertThat(this.utbetalingsdato).isEqualTo(LocalDate.of(2024, 2, 5))
                 assertThat(this.vedtaksperioder).containsExactly(
-                    Vedtaksperiode(LocalDate.of(2024, 2, 5), LocalDate.of(2024, 2, 28)),
+                    VedtaksperiodeInnenforLøpendeMåned(LocalDate.of(2024, 2, 5), LocalDate.of(2024, 2, 28)),
                 )
             }
         }
     }
+
+    private fun Vedtaksperiode.forLøpendeMåned() =
+        VedtaksperiodeInnenforLøpendeMåned(fom = fom, tom = tom)
+
+    private fun List<Vedtaksperiode>.forLøpendeMåned() =
+        this.map { it.forLøpendeMåned() }
 }

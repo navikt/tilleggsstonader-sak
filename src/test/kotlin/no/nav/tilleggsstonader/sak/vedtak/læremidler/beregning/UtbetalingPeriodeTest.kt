@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -41,7 +40,7 @@ class UtbetalingPeriodeTest {
     fun `skal bruke tom fra siste vedtaksperiode for en utbetalingsperiode`() {
         val jan5 = LocalDate.of(2025, 1, 5)
 
-        val vedtaksperiode = Vedtaksperiode(fom = JAN_FØRSTE, tom = jan5)
+        val vedtaksperiode = VedtaksperiodeInnenforLøpendeMåned(fom = JAN_FØRSTE, tom = jan5)
 
         val utbetalingPeriode = UtbetalingPeriode(
             løpendeMåned = grunnlagForUtbetalingPeriode.medVedtaksperiode(vedtaksperiode),
