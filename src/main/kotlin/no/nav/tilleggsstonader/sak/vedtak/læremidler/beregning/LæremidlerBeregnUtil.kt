@@ -34,28 +34,29 @@ object LæremidlerBeregnUtil {
     private fun VedtaksperiodeInnenforÅr.håndterNyUtbetalingsperiode(
         acc: List<GrunnlagForUtbetalingPeriode>,
     ): List<GrunnlagForUtbetalingPeriode> {
-        val forrigeUtbetalingsperide = acc.last()
-        this.overlappendeDelMed(forrigeUtbetalingsperide)?.let {
-            forrigeUtbetalingsperide.medVedtaksperiode(it)
-        }
-        return this
-            .delEtterUtbetalingsperiode(forrigeUtbetalingsperide)
-            .delTilUtbetalingPerioder()
+        val forrigeUtbetalingsperiode = acc.last()
+        forrigeUtbetalingsperiode.leggTilOverlappendeDel(this)
+
+        return lagUtbetalingPerioderEtterForrigeUtbetalingperiode(forrigeUtbetalingsperiode)
     }
 
-    /**
-     * Splitter en vedtaksperiode i forrige utbetalingsperiode hvis de overlapper
-     */
-    private fun VedtaksperiodeInnenforÅr.overlappendeDelMed(utbetalingPeriode: GrunnlagForUtbetalingPeriode): Vedtaksperiode? {
-        return if (this.fom <= utbetalingPeriode.tom) {
-            Vedtaksperiode(
-                fom = utbetalingPeriode.fom,
-                tom = minOf(utbetalingPeriode.tom, this.tom),
+    private fun GrunnlagForUtbetalingPeriode.leggTilOverlappendeDel(
+        vedtaksperiode: VedtaksperiodeInnenforÅr,
+    ) {
+        if (vedtaksperiode.fom <= this.tom) {
+            val overlappendeVedtaksperiode = Vedtaksperiode(
+                fom = this.fom,
+                tom = minOf(this.tom, vedtaksperiode.tom),
             )
-        } else {
-            null
+            this.medVedtaksperiode(overlappendeVedtaksperiode)
         }
     }
+
+    private fun VedtaksperiodeInnenforÅr.lagUtbetalingPerioderEtterForrigeUtbetalingperiode(
+        forrigeUtbetalingsperiode: GrunnlagForUtbetalingPeriode,
+    ) = this
+        .delEtterUtbetalingsperiode(forrigeUtbetalingsperiode)
+        .delTilUtbetalingPerioder()
 
     /**
      * Splitter vedtaksperiode som løper etter forrige utbetalingsperiode til nye vedtaksperioder

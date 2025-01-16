@@ -91,6 +91,9 @@ data class GrunnlagForUtbetalingPeriode(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
     ): UtbetalingPeriode {
+        require(vedtaksperioder.isNotEmpty()) {
+            "Kan ikke lage UtbetalingPeriode når vedtaksperioder er tom"
+        }
         val stønadsperiode = finnRelevantStønadsperiode(stønadsperioder)
         val aktivitet = finnRelevantAktivitet(aktiviteter, stønadsperiode.aktivitet)
         return UtbetalingPeriode(this, stønadsperiode, aktivitet)
