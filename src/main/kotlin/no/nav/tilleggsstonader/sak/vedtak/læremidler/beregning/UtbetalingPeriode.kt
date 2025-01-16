@@ -42,21 +42,21 @@ data class UtbetalingPeriode(
     }
 
     constructor(
-        grunnlagForUtbetalingPeriode: GrunnlagForUtbetalingPeriode,
+        løpendeMåned: LøpendeMåned,
         stønadsperiode: StønadsperiodeBeregningsgrunnlag,
         aktivitet: AktivitetLæremidlerBeregningGrunnlag,
     ) : this(
-        fom = grunnlagForUtbetalingPeriode.fom,
-        tom = grunnlagForUtbetalingPeriode.vedtaksperioder.maxOf { it.tom },
+        fom = løpendeMåned.fom,
+        tom = løpendeMåned.vedtaksperioder.maxOf { it.tom },
         målgruppe = stønadsperiode.målgruppe,
         aktivitet = stønadsperiode.aktivitet,
         studienivå = aktivitet.studienivå,
         prosent = aktivitet.prosent,
-        utbetalingsdato = grunnlagForUtbetalingPeriode.utbetalingsdato,
+        utbetalingsdato = løpendeMåned.utbetalingsdato,
     )
 }
 
-data class GrunnlagForUtbetalingPeriode(
+data class LøpendeMåned(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val utbetalingsdato: LocalDate,
@@ -76,7 +76,7 @@ data class GrunnlagForUtbetalingPeriode(
         _vedtaksperioder.forEach { this.inneholder(it) }
     }
 
-    fun medVedtaksperiode(vedtaksperiode: Vedtaksperiode): GrunnlagForUtbetalingPeriode {
+    fun medVedtaksperiode(vedtaksperiode: Vedtaksperiode): LøpendeMåned {
         require(inneholder(vedtaksperiode)) {
             "Vedtaksperiode(${vedtaksperiode.formatertPeriodeNorskFormat()}) kan ikke gå utenfor utbetalingsperiode(${this.formatertPeriodeNorskFormat()})"
         }

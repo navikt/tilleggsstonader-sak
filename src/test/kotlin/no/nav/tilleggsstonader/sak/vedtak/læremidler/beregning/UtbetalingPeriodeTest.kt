@@ -16,7 +16,7 @@ class UtbetalingPeriodeTest {
     private val JAN_FØRSTE = LocalDate.of(2025, 1, 1)
     private val JAN_SISTE = LocalDate.of(2025, 1, 31)
 
-    val grunnlagForUtbetalingPeriode = GrunnlagForUtbetalingPeriode(
+    val grunnlagForUtbetalingPeriode = LøpendeMåned(
         fom = JAN_FØRSTE,
         tom = JAN_SISTE,
         utbetalingsdato = JAN_FØRSTE,
@@ -44,7 +44,7 @@ class UtbetalingPeriodeTest {
         val vedtaksperiode = Vedtaksperiode(fom = JAN_FØRSTE, tom = jan5)
 
         val utbetalingPeriode = UtbetalingPeriode(
-            grunnlagForUtbetalingPeriode = grunnlagForUtbetalingPeriode.medVedtaksperiode(vedtaksperiode),
+            løpendeMåned = grunnlagForUtbetalingPeriode.medVedtaksperiode(vedtaksperiode),
             stønadsperiode = stønadsperiode,
             aktivitet = aktivitet,
         )

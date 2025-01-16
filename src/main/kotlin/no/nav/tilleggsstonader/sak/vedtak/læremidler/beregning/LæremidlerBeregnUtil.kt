@@ -13,10 +13,10 @@ object LæremidlerBeregnUtil {
      * Grupperer vedtaksperioder innenfor en løpende måned
      * Hvis en vedtaksperiode løper lengre enn første måned vil det bli en ny periode, med nytt utbetalingsdatum
      */
-    fun List<Vedtaksperiode>.grupperVedtaksperioderPerLøpendeMåned(): List<GrunnlagForUtbetalingPeriode> = this
+    fun List<Vedtaksperiode>.grupperVedtaksperioderPerLøpendeMåned(): List<LøpendeMåned> = this
         .sorted()
         .splitVedtaksperiodePerÅr()
-        .fold(listOf<GrunnlagForUtbetalingPeriode>()) { acc, vedtaksperiode ->
+        .fold(listOf<LøpendeMåned>()) { acc, vedtaksperiode ->
             if (acc.isEmpty()) {
                 val nyeUtbetalingsperioder = vedtaksperiode.delTilUtbetalingPerioder()
                 acc + nyeUtbetalingsperioder
@@ -32,15 +32,15 @@ object LæremidlerBeregnUtil {
      * Returnerer utbetalingsperioder som løper etter forrige utbetalingsperiode
      */
     private fun VedtaksperiodeInnenforÅr.håndterNyUtbetalingsperiode(
-        acc: List<GrunnlagForUtbetalingPeriode>,
-    ): List<GrunnlagForUtbetalingPeriode> {
+        acc: List<LøpendeMåned>,
+    ): List<LøpendeMåned> {
         val forrigeUtbetalingsperiode = acc.last()
         forrigeUtbetalingsperiode.leggTilOverlappendeDel(this)
 
         return lagUtbetalingPerioderEtterForrigeUtbetalingperiode(forrigeUtbetalingsperiode)
     }
 
-    private fun GrunnlagForUtbetalingPeriode.leggTilOverlappendeDel(
+    private fun LøpendeMåned.leggTilOverlappendeDel(
         vedtaksperiode: VedtaksperiodeInnenforÅr,
     ) {
         if (vedtaksperiode.fom <= this.tom) {
@@ -53,7 +53,7 @@ object LæremidlerBeregnUtil {
     }
 
     private fun VedtaksperiodeInnenforÅr.lagUtbetalingPerioderEtterForrigeUtbetalingperiode(
-        forrigeUtbetalingsperiode: GrunnlagForUtbetalingPeriode,
+        forrigeUtbetalingsperiode: LøpendeMåned,
     ) = this
         .delEtterUtbetalingsperiode(forrigeUtbetalingsperiode)
         .delTilUtbetalingPerioder()
@@ -62,7 +62,7 @@ object LæremidlerBeregnUtil {
      * Splitter vedtaksperiode som løper etter forrige utbetalingsperiode til nye vedtaksperioder
      */
     private fun VedtaksperiodeInnenforÅr.delEtterUtbetalingsperiode(
-        utbetalingPeriode: GrunnlagForUtbetalingPeriode,
+        utbetalingPeriode: LøpendeMåned,
     ): VedtaksperiodeInnenforÅr? {
         return if (this.tom > utbetalingPeriode.tom) {
             this.copy(fom = maxOf(this.fom, utbetalingPeriode.tom.plusDays(1)))
@@ -74,12 +74,12 @@ object LæremidlerBeregnUtil {
     /**
      * tom settes til minOf tom og årets tom for å håndtere at den ikke går over 2 år
      */
-    private fun VedtaksperiodeInnenforÅr?.delTilUtbetalingPerioder(): List<GrunnlagForUtbetalingPeriode> {
+    private fun VedtaksperiodeInnenforÅr?.delTilUtbetalingPerioder(): List<LøpendeMåned> {
         if (this == null) {
             return emptyList()
         }
         return this.splitPerLøpendeMåneder { fom, tom ->
-            GrunnlagForUtbetalingPeriode(
+            LøpendeMåned(
                 fom = fom,
                 tom = minOf(fom.sisteDagenILøpendeMåned(), this.tom.sisteDagIÅret()),
                 utbetalingsdato = this.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
