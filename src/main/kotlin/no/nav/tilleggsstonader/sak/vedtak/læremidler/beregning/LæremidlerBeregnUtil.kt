@@ -45,7 +45,7 @@ object LæremidlerBeregnUtil {
     ) {
         if (vedtaksperiode.fom <= this.tom) {
             val overlappendeVedtaksperiode = Vedtaksperiode(
-                fom = this.fom,
+                fom = vedtaksperiode.fom,
                 tom = minOf(this.tom, vedtaksperiode.tom),
             )
             this.medVedtaksperiode(overlappendeVedtaksperiode)
@@ -63,13 +63,21 @@ object LæremidlerBeregnUtil {
      */
     private fun VedtaksperiodeInnenforÅr.delEtterUtbetalingsperiode(
         utbetalingPeriode: GrunnlagForUtbetalingPeriode,
-    ): VedtaksperiodeInnenforÅr =
-        this.copy(fom = maxOf(this.fom, utbetalingPeriode.tom.plusDays(1)))
+    ): VedtaksperiodeInnenforÅr? {
+        return if (this.tom > utbetalingPeriode.tom) {
+            this.copy(fom = maxOf(this.fom, utbetalingPeriode.tom.plusDays(1)))
+        } else {
+            null
+        }
+    }
 
     /**
      * tom settes til minOf tom og årets tom for å håndtere at den ikke går over 2 år
      */
-    private fun VedtaksperiodeInnenforÅr.delTilUtbetalingPerioder(): List<GrunnlagForUtbetalingPeriode> {
+    private fun VedtaksperiodeInnenforÅr?.delTilUtbetalingPerioder(): List<GrunnlagForUtbetalingPeriode> {
+        if (this == null) {
+            return emptyList()
+        }
         return this.splitPerLøpendeMåneder { fom, tom ->
             GrunnlagForUtbetalingPeriode(
                 fom = fom,
