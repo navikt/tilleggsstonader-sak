@@ -47,4 +47,4 @@ Egenskap: Beregning læremidler - flere målgrupper - flere aktiviteter
 
     Så skal stønaden være
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
-      | 15.08.2024 | 15.08.2024 | 219   | VIDEREGÅENDE | 100           | 438  | AAP       | 15.08.2024      |
+      | 15.08.2024 | 15.08.2024 | 219   | VIDEREGÅENDE | 50           | 438  | AAP       | 15.08.2024      |

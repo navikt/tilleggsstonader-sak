@@ -41,7 +41,6 @@ Egenskap: Beregning av læremidler - flere vedtaksperioder
       | Fom        | Tom        | Målgruppe | Aktivitet |
       | 01.01.2024 | 31.03.2025 | AAP       | TILTAK    |
 
-
     Når beregner stønad for læremidler
 
     Så skal stønaden være
