@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
+import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgruppeTypeDvh
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper
@@ -8,7 +9,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper
-import java.time.LocalDate
 
 data class VedtaksperioderDvhV2(
     val fom: LocalDate,
@@ -17,7 +17,7 @@ data class VedtaksperioderDvhV2(
     val aktivitet: AktivitetTypeDvh,
     val antallBarn: Int? = null,
 //    val barn: BarnDvh.JsonWrapper,
-//    val studienivå: StudienivåDvh,
+    val studienivå: StudienivåDvh? = null,
 ) {
     data class JsonWrapper(
         val vedtaksperioder: List<VedtaksperioderDvhV2>,
@@ -35,7 +35,7 @@ data class VedtaksperioderDvhV2(
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             antallBarn = it.antallBarn,
                         )
-                    }
+                    },
                 )
             }
 
@@ -47,8 +47,9 @@ data class VedtaksperioderDvhV2(
                             tom = it.tom,
                             målgruppe = MålgruppeTypeDvh.fraDomene(it.målgruppe),
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                            studienivå = StudienivåDvh.fraDomene(it.studienivå),
                         )
-                    }
+                    },
                 )
             }
 
