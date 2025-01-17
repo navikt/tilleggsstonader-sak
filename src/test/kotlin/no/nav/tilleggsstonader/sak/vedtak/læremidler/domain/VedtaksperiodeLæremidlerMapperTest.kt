@@ -1,12 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
+import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper.VedtaksperiodeLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
 
 class VedtaksperiodeLæremidlerMapperTest {
@@ -41,7 +40,6 @@ class VedtaksperiodeLæremidlerMapperTest {
                 fom = beregningsresultatPeriode1.grunnlag.fom,
                 tom = beregningsresultatPeriode2.grunnlag.tom,
                 målgruppe = beregningsresultatPeriode1.grunnlag.målgruppe,
-                aktivitet = beregningsresultatPeriode1.grunnlag.aktivitet,
                 studienivå = beregningsresultatPeriode1.grunnlag.studienivå,
             ),
         )
@@ -54,18 +52,6 @@ class VedtaksperiodeLæremidlerMapperTest {
             beregningsresultatForMåned = listOf(
                 beregningsresultatPeriode1,
                 beregningsresultatPeriode2.copy(grunnlag = beregningsresultatPeriode2.grunnlag.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD)),
-            ),
-        )
-
-        assertThat(vedtaksperioder).hasSize(2)
-    }
-
-    @Test
-    fun `skal ikke slå sammen perioder hvis de ikke har samme aktivitet`() {
-        val vedtaksperioder = VedtaksperiodeLæremidlerMapper.mapTilVedtaksperiode(
-            beregningsresultatForMåned = listOf(
-                beregningsresultatPeriode1,
-                beregningsresultatPeriode2.copy(grunnlag = beregningsresultatPeriode2.grunnlag.copy(aktivitet = AktivitetType.TILTAK)),
             ),
         )
 

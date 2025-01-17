@@ -14,7 +14,7 @@ data class VedtaksperioderDvhV2(
     val fom: LocalDate,
     val tom: LocalDate,
     val målgruppe: MålgruppeTypeDvh,
-    val aktivitet: AktivitetTypeDvh,
+    val aktivitet: AktivitetTypeDvh? = null,
     val antallBarn: Int? = null,
 //    val barn: BarnDvh.JsonWrapper,
     val studienivå: StudienivåDvh? = null,
@@ -46,7 +46,6 @@ data class VedtaksperioderDvhV2(
                             fom = it.fom,
                             tom = it.tom,
                             målgruppe = MålgruppeTypeDvh.fraDomene(it.målgruppe),
-                            aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             studienivå = StudienivåDvh.fraDomene(it.studienivå),
                         )
                     },

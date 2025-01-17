@@ -85,7 +85,6 @@ class LæremidlerBeregningService(
             satsBekreftet = sats.bekreftet,
             utbetalingsdato = periode.utbetalingsdato,
             målgruppe = periode.målgruppe,
-            aktivitet = periode.aktivitet
         )
     }
 }

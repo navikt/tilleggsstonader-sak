@@ -4,7 +4,6 @@ import java.time.LocalDate
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
 object VedtaksperiodeLæremidlerMapper {
@@ -23,7 +22,6 @@ object VedtaksperiodeLæremidlerMapper {
         override val fom: LocalDate,
         override val tom: LocalDate,
         val målgruppe: MålgruppeType,
-        val aktivitet: AktivitetType,
         val studienivå: Studienivå,
     ) : Periode<LocalDate>, Mergeable<LocalDate, VedtaksperiodeLæremidler> {
 
@@ -36,7 +34,6 @@ object VedtaksperiodeLæremidlerMapper {
                     fom = beregningsgrunnlag.fom,
                     tom = beregningsgrunnlag.tom,
                     målgruppe = beregningsgrunnlag.målgruppe,
-                    aktivitet = beregningsgrunnlag.aktivitet,
                     studienivå = beregningsgrunnlag.studienivå,
                 )
 
@@ -48,8 +45,7 @@ object VedtaksperiodeLæremidlerMapper {
         }
 
         fun erLikOgPåfølgesAv(other: VedtaksperiodeLæremidler): Boolean {
-            val erLik = this.aktivitet == other.aktivitet &&
-                    this.målgruppe == other.målgruppe &&
+            val erLik = this.målgruppe == other.målgruppe &&
                     this.studienivå == other.studienivå
             val påfølgesAv = this.tom.plusDays(1) == other.fom
             return erLik && påfølgesAv
