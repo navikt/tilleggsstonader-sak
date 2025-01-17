@@ -123,6 +123,11 @@ data class LøpendeMåned(
             "Det finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
         }
 
+        feilHvis(relevanteAktiviteter.size > 1) {
+            "Det er foreløpig ikke støtte for flere aktiviteter som overlapper (gjelder perioden ${this.formatertPeriodeNorskFormat()}). " +
+                "Ta kontakt med utviklerteamet for å forstå situasjonen og om det burde legges til støtte for det."
+        }
+
         return relevanteAktiviteter
     }
 
