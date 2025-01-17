@@ -103,14 +103,14 @@ data class LøpendeMåned(
     private fun VedtaksperiodeInnenforLøpendeMåned.finnRelevantMålgruppeOgAktivitet(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
-    ) = this.finnRelevantStønadsperiode(stønadsperioder)
+    ) = this.finnSnittAvRelevanteStønadsperioder(stønadsperioder)
         .flatMap { stønadsperiode ->
             this
-                .finnRelevanteAktivitet(aktiviteter, stønadsperiode)
+                .finnSnittAvRelevanteAktiviteter(aktiviteter, stønadsperiode)
                 .map { aktivitet -> MålgruppeOgAktivitet(stønadsperiode.målgruppe, aktivitet) }
         }
 
-    private fun VedtaksperiodeInnenforLøpendeMåned.finnRelevanteAktivitet(
+    private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteAktiviteter(
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
         stønadsperiode: StønadsperiodeBeregningsgrunnlag,
     ): List<AktivitetLæremidlerBeregningGrunnlag> {
@@ -126,7 +126,7 @@ data class LøpendeMåned(
         return relevanteAktiviteter
     }
 
-    private fun VedtaksperiodeInnenforLøpendeMåned.finnRelevantStønadsperiode(
+    private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteStønadsperioder(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
     ): List<StønadsperiodeBeregningsgrunnlag> {
         val relevanteStønadsperioderForPeriode = stønadsperioder
