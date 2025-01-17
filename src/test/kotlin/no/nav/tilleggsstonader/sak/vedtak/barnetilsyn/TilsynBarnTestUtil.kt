@@ -55,7 +55,7 @@ object TilsynBarnTestUtil {
     )
 
     fun beregningsresultatForMåned(
-        måned: YearMonth = YearMonth.now(),
+        måned: YearMonth = YearMonth.of(2024, 1),
         stønadsperioder: List<StønadsperiodeGrunnlag> = emptyList(),
         beløpsperioder: List<Beløpsperiode> = beløpsperioderDefault,
     ) = BeregningsresultatForMåned(

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import io.mockk.every
 import io.mockk.mockk
+import java.time.LocalDate
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -69,7 +70,7 @@ class OpphørValideringServiceTest {
 
         @Test
         fun `Kaster feil ved utbetaling etter opphørdato`() {
-            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = osloDateNow())
+            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = LocalDate.of(2024,1,1))
 
             assertThatThrownBy {
                 opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
