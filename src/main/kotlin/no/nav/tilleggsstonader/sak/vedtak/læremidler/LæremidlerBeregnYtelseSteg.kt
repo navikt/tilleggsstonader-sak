@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerReque
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class LæremidlerBeregnYtelseSteg(
@@ -115,6 +116,7 @@ class LæremidlerBeregnYtelseSteg(
                     "Alle perioder for et utbetalingsdato må være bekreftet eller ikke bekreftet"
                 }
 
+                // TODO skal en annen målgruppe ha samme utbetalingsdato eller utbetales et annet dato?
                 feilHvisIkke(perioder.all { it.grunnlag.målgruppe == målgruppe }) {
                     "Alle perioder for et utbetalingsdato må ha den samme målgruppen"
                 }

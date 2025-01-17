@@ -73,6 +73,9 @@ object LæremidlerBeregnUtil {
 
     /**
      * tom settes til minOf tom og årets tom for å håndtere at den ikke går over 2 år
+     *
+     * I tilfelle man har 2 ulike målgrupper innenfor et og samme år, så vil begge resultere i at man betaler ut begge samme dato
+     * Men det vil gjøres som 2 ulike andeler då det skal regnskapsføres riktig mot økonomi.
      */
     private fun VedtaksperiodeInnenforÅr?.delTilUtbetalingPerioder(): List<LøpendeMåned> {
         if (this == null) {
