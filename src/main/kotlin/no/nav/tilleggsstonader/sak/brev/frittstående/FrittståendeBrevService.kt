@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagringBrevService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.journalføring.FamilieDokumentClient
 import org.springframework.stereotype.Service
@@ -39,6 +40,9 @@ class FrittståendeBrevService(
         request: FrittståendeBrevDto,
     ) {
         val saksbehandler = SikkerhetContext.hentSaksbehandler()
+        feilHvis(request.tittel.isBlank()) {
+            "Kan ikke sende frittstående brev uten tittel"
+        }
 
         val frittståendeBrev = frittståendeBrevRepository.insert(
             FrittståendeBrev(
