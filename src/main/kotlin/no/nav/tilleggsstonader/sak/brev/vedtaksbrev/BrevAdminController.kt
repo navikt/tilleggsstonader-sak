@@ -34,7 +34,7 @@ class BrevAdminController(
         utførEndringSomSystem()
 
         val id = namedParameterJdbcTemplate.query(
-            "select id from brevmottakere where journalpostid=:journalpostId",
+            "select id from brevmottaker where journalpost_id=:journalpostId",
             mapOf("journalpostId" to journalpostId),
         ) { rs, _ -> UUID.fromString(rs.getString("id")) }
             .single()
