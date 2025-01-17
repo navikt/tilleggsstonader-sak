@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -7,6 +10,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDv
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
@@ -14,9 +18,6 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.relational.core.mapping.Column
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.UUID
 
 /**
  * @param endretTid skal oppdateres i tilfelle man må patche data på en behandling.
@@ -38,7 +39,7 @@ data class VedtaksstatistikkV2(
     val behandlingÅrsak: BehandlingÅrsakDvh,
     val vedtakResultat: VedtakResultatDvh,
     val vedtaksperioder: VedtaksperioderDvhV2.JsonWrapper,
-    val utbetalinger: UtbetalingerDvh.JsonWrapper, //TODO mulig oppdater
+    val utbetalinger: UtbetalingerDvhV2.JsonWrapper,
     @Column("stonadstype")
     val stønadstype: StønadstypeDvh,
     val kravMottatt: LocalDate?,

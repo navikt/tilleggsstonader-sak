@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
+import java.time.LocalDateTime
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -11,6 +12,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDv
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
@@ -24,7 +26,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeServic
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 
 //For tilsyn barn:
@@ -113,7 +114,7 @@ class VedtaksstatistikkService(
                 behandlingÅrsak = BehandlingÅrsakDvh.Companion.fraDomene(behandling.årsak),
                 vedtakResultat = VedtakResultatDvh.Companion.fraDomene(behandling.resultat),
                 vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak),
-                utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse),
+                utbetalinger = UtbetalingerDvhV2.fraDomene(andelTilkjentYtelse, vedtak),
                 kravMottatt = behandling.kravMottatt,
                 årsakerAvslag = ÅrsakAvslagDvh.Companion.fraDomene(vedtak?.takeIfType<Avslag>()?.data?.årsaker),
                 årsakerOpphør = ÅrsakOpphørDvh.Companion.fraDomene(vedtak?.takeIfType<Opphør>()?.data?.årsaker),
