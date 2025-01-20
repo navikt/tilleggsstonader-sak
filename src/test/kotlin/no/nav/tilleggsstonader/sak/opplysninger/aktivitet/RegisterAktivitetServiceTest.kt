@@ -10,6 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class RegisterAktivitetServiceTest {
 
@@ -19,10 +20,11 @@ class RegisterAktivitetServiceTest {
     val service = RegisterAktivitetService(fagsakPersonService, registerAktivitetClient)
 
     val personId = FagsakPersonId.random()
+    val ident = "ident"
 
     @BeforeEach
     fun setUp() {
-        every { fagsakPersonService.hentAktivIdent(personId) } returns "ident"
+        every { fagsakPersonService.hentAktivIdent(personId) } returns ident
     }
 
     @Nested
@@ -64,6 +66,32 @@ class RegisterAktivitetServiceTest {
             val aktivteter = service.hentAktiviteter(personId)
             assertThat(aktivteter).hasSize(1)
             assertThat(aktivteter.map { it.type }).containsExactly("FINNER_IKKE")
+        }
+    }
+
+    @Nested
+    inner class HentAktiviteterForGrunnlagsdata {
+
+        @Test
+        fun `skal gi aktiviteter som er stønadsberettighet`() {
+            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
+                aktivitetArenaDto(type = TypeAktivitet.ENKELAMO.name, erStønadsberettiget = true),
+            )
+
+            val aktivteter = service.hentAktiviteterForGrunnlagsdata(ident, LocalDate.now(), LocalDate.now())
+
+            assertThat(aktivteter).hasSize(1)
+        }
+
+        @Test
+        fun `skal ikke gi aktiviteter som ikke er stønadsberettighet`() {
+            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
+                aktivitetArenaDto(type = TypeAktivitet.EKSPEBIST.name, erStønadsberettiget = false),
+            )
+
+            val aktivteter = service.hentAktiviteterForGrunnlagsdata(ident, LocalDate.now(), LocalDate.now())
+
+            assertThat(aktivteter).isEmpty()
         }
     }
 }
