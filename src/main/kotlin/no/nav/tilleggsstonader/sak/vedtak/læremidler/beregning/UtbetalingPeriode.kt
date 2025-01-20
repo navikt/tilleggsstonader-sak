@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -123,7 +124,7 @@ data class LøpendeMåned(
             "Det finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
         }
 
-        feilHvis(relevanteAktiviteter.size > 1) {
+        feilHvis(relevanteAktiviteter.overlapper()) {
             "Det er foreløpig ikke støtte for flere aktiviteter som overlapper (gjelder perioden ${this.formatertPeriodeNorskFormat()}). " +
                 "Ta kontakt med utviklerteamet for å forstå situasjonen og om det burde legges til støtte for det."
         }
