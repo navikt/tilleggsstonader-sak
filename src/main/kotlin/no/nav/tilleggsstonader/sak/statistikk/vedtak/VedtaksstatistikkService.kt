@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -55,6 +56,7 @@ class VedtaksstatistikkService(
     private val iverksettService: IverksettService,
     private val stønadsperiodeService: StønadsperiodeService,
     private val vedtakService: VedtakService,
+    private val barnRepository: BarnRepository
 
     ) {
     fun lagreVedtaksstatistikk(behandlingId: BehandlingId, fagsakId: FagsakId, hendelseTidspunkt: LocalDateTime) {
@@ -98,6 +100,8 @@ class VedtaksstatistikkService(
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId)
+        val vilkår = vilkårService.hentOppfyltePassBarnVilkår(behandlingId)
+        val barn = barnRepository.findByBehandlingId(behandlingId)
 
         vedtaksstatistikkRepositoryV2.insert(
             VedtaksstatistikkV2(
@@ -113,7 +117,7 @@ class VedtaksstatistikkService(
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
                 behandlingÅrsak = BehandlingÅrsakDvh.Companion.fraDomene(behandling.årsak),
                 vedtakResultat = VedtakResultatDvh.Companion.fraDomene(behandling.resultat),
-                vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak),
+                vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak, vilkår, barn),
                 utbetalinger = UtbetalingerDvhV2.fraDomene(andelTilkjentYtelse, vedtak),
                 kravMottatt = behandling.kravMottatt,
                 årsakerAvslag = ÅrsakAvslagDvh.Companion.fraDomene(vedtak?.takeIfType<Avslag>()?.data?.årsaker),

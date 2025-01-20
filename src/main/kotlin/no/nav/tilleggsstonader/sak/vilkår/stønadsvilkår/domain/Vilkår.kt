@@ -15,6 +15,7 @@ import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.time.LocalDateTime
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 
 /**
  * En vilkårsvurdering per type [VilkårType].
@@ -104,6 +105,13 @@ data class Vilkår(
             barnId = barnIdINyBehandling,
             opphavsvilkår = opphavsvilkårForKopiertVilkår(),
         )
+    }
+
+    fun overlapper(other: Periode<LocalDate>): Boolean {
+        if (fom == null || tom == null) {
+            return false
+        }
+        return this.tom >= other.fom && this.fom <= other.tom
     }
 
     /**
