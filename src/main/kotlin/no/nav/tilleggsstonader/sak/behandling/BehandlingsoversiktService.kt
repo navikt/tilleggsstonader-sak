@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDetaljer
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingsoversiktDto
 import no.nav.tilleggsstonader.sak.behandling.dto.FagsakMedBehandlinger
@@ -67,7 +68,7 @@ class BehandlingsoversiktService(
                     vedtaksdato = it.vedtakstidspunkt,
                     henlagtÅrsak = it.henlagtÅrsak,
                     revurderFra = it.revurderFra,
-                    vedtaksperiode = vedtaksperioder[it.id],
+                    vedtaksperiode = if (it.resultat != BehandlingResultat.HENLAGT) vedtaksperioder[it.id] else null,
                 )
             },
         )
