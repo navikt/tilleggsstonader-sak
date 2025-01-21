@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
@@ -16,9 +17,13 @@ data class StønadsperiodeBeregningsgrunnlag(
     override val tom: LocalDate,
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
-) : Periode<LocalDate> {
+) : Periode<LocalDate>, KopierPeriode<StønadsperiodeBeregningsgrunnlag> {
     init {
         validatePeriode()
+    }
+
+    override fun medPeriode(fom: LocalDate, tom: LocalDate): StønadsperiodeBeregningsgrunnlag {
+        return this.copy(fom = fom, tom = tom)
     }
 }
 

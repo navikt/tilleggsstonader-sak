@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -18,7 +19,12 @@ data class AktivitetLæremidlerBeregningGrunnlag(
     override val tom: LocalDate,
     val prosent: Int,
     val studienivå: Studienivå,
-) : Periode<LocalDate>
+) : Periode<LocalDate>, KopierPeriode<AktivitetLæremidlerBeregningGrunnlag> {
+
+    override fun medPeriode(fom: LocalDate, tom: LocalDate): AktivitetLæremidlerBeregningGrunnlag {
+        return this.copy(fom = fom, tom = tom)
+    }
+}
 
 fun List<Vilkårperiode>.tilAktiviteter(): List<AktivitetLæremidlerBeregningGrunnlag> =
     ofType<AktivitetLæremidler>()

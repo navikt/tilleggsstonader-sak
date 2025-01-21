@@ -146,17 +146,22 @@ class StepDefinitions {
                 throw e
             }
         }
-        assertThat(resultat!!.perioder).hasSize(forventetBeregningsresultat.perioder.size)
+        assertThat(resultat?.perioder).hasSize(forventetBeregningsresultat.perioder.size)
     }
 
     @Så("forvent følgende feil fra læremidlerberegning: {}")
     fun `forvent følgende feil`(forventetFeil: String) {
-        assertThat(beregningException!!).hasMessageContaining(forventetFeil)
+        assertThat(beregningException).hasMessageContaining(forventetFeil)
     }
 
     @Så("forvent følgende feil fra vedtaksperiode validering: {}")
     fun `skal resultat fra validering være`(forventetFeil: String) {
-        assertThat(valideringException!!).hasMessageContaining(forventetFeil)
+        assertThat(valideringException).hasMessageContaining(forventetFeil)
+    }
+
+    @Så("forvent ingen feil fra vedtaksperiode validering")
+    fun `forvent ingen feil fra vedtaksperiode validering`() {
+        assertThat(valideringException).isNull()
     }
 
     @Så("forvent følgende utbetalingsperioder")
