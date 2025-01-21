@@ -5,11 +5,24 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
+/**
+ * Utbetalingperiode for løpende måned
+ * Eks 5jan - 4feb
+ *
+ * @param tom er maks dato for vedtaksperiode inne i en løpende måned.
+ * I de tilfeller man kun har en vedtaksperiode som gjelder 5 jan - 7 jan så vil tom= 7 jan.
+ *
+ * @param utbetalingsdato utbetalingsdato for når en utbetalingsperiode skal utbetales.
+ * Eks hvis man innvilger jan-juni så skal man utbetale hele beløpet for fom i første utbetalingsperioden,
+ * dvs 5 jan i tidligere eksemplet
+ *
+ */
 data class UtbetalingPeriode(
     override val fom: LocalDate,
     override val tom: LocalDate,
@@ -19,42 +32,79 @@ data class UtbetalingPeriode(
     val prosent: Int,
     val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
+
     init {
         validatePeriode()
+        require(tom <= fom.sisteDagenILøpendeMåned()) {
+            "UtbetalingPeriode kan ikke løpe lengre enn en løpende måned"
+        }
     }
+
+    constructor(
+        løpendeMåned: LøpendeMåned,
+        stønadsperiode: StønadsperiodeBeregningsgrunnlag,
+        aktivitet: AktivitetLæremidlerBeregningGrunnlag,
+    ) : this(
+        fom = løpendeMåned.fom,
+        tom = løpendeMåned.vedtaksperioder.maxOf { it.tom },
+        målgruppe = stønadsperiode.målgruppe,
+        aktivitet = stønadsperiode.aktivitet,
+        studienivå = aktivitet.studienivå,
+        prosent = aktivitet.prosent,
+        utbetalingsdato = løpendeMåned.utbetalingsdato,
+    )
 }
 
-data class GrunnlagForUtbetalingPeriode(
+data class LøpendeMåned(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
+
+    /**
+     * backing property for vedtaksperioder.
+     * Inneholder de vedtaksperioder som er innvilget innenfor en UtbetalingPeriode
+     * Implementert som private backing property for å ikke kunne legge til perioder direkte til listen uten å validere den
+     */
+    private val _vedtaksperioder: MutableList<VedtaksperiodeInnenforLøpendeMåned> = mutableListOf()
+
+    val vedtaksperioder: List<VedtaksperiodeInnenforLøpendeMåned> get() = _vedtaksperioder
+
     init {
         validatePeriode()
+        _vedtaksperioder.forEach { this.inneholder(it) }
     }
 
+    fun medVedtaksperiode(vedtaksperiode: VedtaksperiodeInnenforLøpendeMåned): LøpendeMåned {
+        require(inneholder(vedtaksperiode)) {
+            "Vedtaksperiode(${vedtaksperiode.formatertPeriodeNorskFormat()}) kan ikke gå utenfor utbetalingsperiode(${this.formatertPeriodeNorskFormat()})"
+        }
+        _vedtaksperioder.add(vedtaksperiode)
+        return this
+    }
+
+    /**
+     * Finner hvilken stønadsperiode og aktivitet som skal brukes for den aktuelle utbetalingsperioden
+     */
     fun tilUtbetalingPeriode(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
     ): UtbetalingPeriode {
+        require(vedtaksperioder.isNotEmpty()) {
+            "Kan ikke lage UtbetalingPeriode når vedtaksperioder er tom"
+        }
         val stønadsperiode = finnRelevantStønadsperiode(stønadsperioder)
         val aktivitet = finnRelevantAktivitet(aktiviteter, stønadsperiode.aktivitet)
-        return UtbetalingPeriode(
-            fom = fom,
-            tom = tom,
-            målgruppe = stønadsperiode.målgruppe,
-            aktivitet = aktivitet.type,
-            studienivå = aktivitet.studienivå,
-            prosent = aktivitet.prosent,
-            utbetalingsdato = utbetalingsdato,
-        )
+        return UtbetalingPeriode(this, stønadsperiode, aktivitet)
     }
 
     private fun finnRelevantAktivitet(
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
         aktivitetType: AktivitetType,
     ): AktivitetLæremidlerBeregningGrunnlag {
-        val relevanteAktiviteter = aktiviteter.filter { it.type == aktivitetType && it.inneholder(this) }
+        val relevanteAktiviteter = aktiviteter
+            .filter { it.type == aktivitetType }
+            .filter { it.overlapper(this) }
 
         brukerfeilHvis(relevanteAktiviteter.isEmpty()) {
             "Det finnes ingen aktiviteter av type $aktivitetType som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
@@ -68,7 +118,8 @@ data class GrunnlagForUtbetalingPeriode(
     }
 
     private fun finnRelevantStønadsperiode(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>): StønadsperiodeBeregningsgrunnlag {
-        val relevanteStønadsperioderForPeriode = stønadsperioder.filter { it.inneholder(this) }
+        val relevanteStønadsperioderForPeriode = stønadsperioder
+            .filter { it.overlapper(this) }
 
         feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {
             "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.formatertPeriodeNorskFormat()}"
@@ -80,9 +131,4 @@ data class GrunnlagForUtbetalingPeriode(
 
         return relevanteStønadsperioderForPeriode.single()
     }
-
-    private class MålgruppeOgAktivitet(
-        val målgruppe: MålgruppeType,
-        val aktivitet: AktivitetLæremidlerBeregningGrunnlag,
-    )
 }

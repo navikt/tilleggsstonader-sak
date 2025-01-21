@@ -1,14 +1,16 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerSplitPerLøpendeMånedUtil.sisteDagenILøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerSplitPerLøpendeMånedUtil.splitPerLøpendeMåneder
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitPerLøpendeMåneder
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitVedtaksperiodePerÅr
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class LæremidlerSplitPerLøpendeMånedUtilTest {
+class LæremidlerVedtaksperiodeUtilTest {
     private val FØRSTE_JAN_2024 = LocalDate.of(2024, 1, 1)
     private val SISTE_JAN_2024 = LocalDate.of(2024, 1, 31)
     private val FØRSTE_FEB_2024 = LocalDate.of(2024, 2, 1)
@@ -16,6 +18,41 @@ class LæremidlerSplitPerLøpendeMånedUtilTest {
     private val FØRSTE_MARS_2024 = LocalDate.of(2024, 3, 1)
     private val SISTE_MARS_2024 = LocalDate.of(2024, 3, 31)
     private val SISTE_APRIL_2024 = LocalDate.of(2024, 4, 30)
+    private val SISTE_DES_2024 = LocalDate.of(2024, 12, 31)
+
+    @Nested
+    inner class SplitVedtaksperiodePerÅr {
+
+        @Test
+        fun `skal ikke splitte periode som er innenfor samme år`() {
+            val periode = Vedtaksperiode(FØRSTE_JAN_2024, SISTE_DES_2024)
+
+            assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
+                VedtaksperiodeInnenforÅr(FØRSTE_JAN_2024, SISTE_DES_2024),
+            )
+        }
+
+        @Test
+        fun `skal splitte periode som løper over 2 år`() {
+            val periode = Vedtaksperiode(SISTE_DES_2024, SISTE_DES_2024.plusDays(1))
+
+            assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
+                VedtaksperiodeInnenforÅr(SISTE_DES_2024, SISTE_DES_2024),
+                VedtaksperiodeInnenforÅr(SISTE_DES_2024.plusDays(1), SISTE_DES_2024.plusDays(1)),
+            )
+        }
+
+        @Test
+        fun `skal splitte periode som løper over 3 år`() {
+            val periode = Vedtaksperiode(SISTE_DES_2024, LocalDate.of(2026, 2, 3))
+
+            assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
+                VedtaksperiodeInnenforÅr(SISTE_DES_2024, SISTE_DES_2024),
+                VedtaksperiodeInnenforÅr(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31)),
+                VedtaksperiodeInnenforÅr(LocalDate.of(2026, 1, 1), LocalDate.of(2026, 2, 3)),
+            )
+        }
+    }
 
     @Nested
     inner class SplitPerLøpendeMåneder {

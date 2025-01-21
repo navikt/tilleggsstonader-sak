@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.delTilUtbetalingsPerioder
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -62,7 +62,7 @@ class StepDefinitions {
     var beregningException: Exception? = null
     var valideringException: Exception? = null
 
-    var vedtaksperioderSplittet: List<GrunnlagForUtbetalingPeriode> = emptyList()
+    var vedtaksperioderSplittet: List<LøpendeMåned> = emptyList()
 
     @Gitt("følgende vedtaksperioder for læremidler")
     fun `følgende beregningsperiode for læremidler`(dataTable: DataTable) {
@@ -100,7 +100,7 @@ class StepDefinitions {
 
     @Når("splitter vedtaksperioder for læremidler")
     fun `splitter vedtaksperioder for læremidler`() {
-        vedtaksperioderSplittet = vedtaksPerioder.flatMap { it.delTilUtbetalingsPerioder() }
+        vedtaksperioderSplittet = vedtaksPerioder.grupperVedtaksperioderPerLøpendeMåned()
     }
 
     @Når("validerer vedtaksperiode for læremidler")
@@ -162,7 +162,7 @@ class StepDefinitions {
     @Så("forvent følgende utbetalingsperioder")
     fun `forvent følgende utbetalingsperioder`(dataTable: DataTable) {
         val forventedePerioder = dataTable.mapRad { rad ->
-            GrunnlagForUtbetalingPeriode(
+            LøpendeMåned(
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),

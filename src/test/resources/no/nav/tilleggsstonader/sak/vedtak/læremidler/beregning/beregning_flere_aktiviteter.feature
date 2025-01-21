@@ -63,7 +63,7 @@ Egenskap: Beregning læremidler - flere aktiviteter
 
     Når beregner stønad for læremidler
 
-    Så forvent følgende feil fra læremidlerberegning: Det finnes ingen aktiviteter av type TILTAK som varer i hele perioden
+    Så forvent følgende feil fra læremidlerberegning: Det finnes mer enn 1 aktivitet i perioden
 
   Scenario: Flere aktiviteter i samme måned - kun en gyldig type
     Gitt følgende vedtaksperioder for læremidler
