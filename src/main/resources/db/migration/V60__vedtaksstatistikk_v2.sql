@@ -19,5 +19,5 @@ CREATE TABLE vedtaksstatistikk_v2
     arsaker_avslag         JSON,
     arsaker_opphor         JSON,
     opprettet_tid          TIMESTAMP NOT NULL,
-    endretTid              TIMESTAMP NOT NULL
+    endret_tid             TIMESTAMP NOT NULL
 );
