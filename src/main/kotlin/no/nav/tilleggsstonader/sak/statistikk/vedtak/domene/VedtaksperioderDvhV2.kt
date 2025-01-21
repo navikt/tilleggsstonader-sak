@@ -62,7 +62,7 @@ data class VedtaksperioderDvhV2(
             return JsonWrapper(vedtaksperioder = emptyList())
         }
 
-        private fun List<Vilkår>.finnBarnFnr(
+        fun List<Vilkår>.finnBarnFnr(
             vedtaksperiode: VedtaksperiodeTilsynBarn,
             barn: List<BehandlingBarn>
         ): List<String> =

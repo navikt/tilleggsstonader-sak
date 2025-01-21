@@ -1,82 +1,44 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
-import io.mockk.mockk
-import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgruppeTypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2.Companion.finnBarnFnr
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.behandlingBarn
-import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.EksempelRegel
+import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtils.opprettVilkårsvurderinger
+import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtils.tilBehandlingBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.time.YearMonth
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelse as innvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse as innvilgelseLæremidler
 
 class VedtaksperioderDvhV2Test {
+    val fom = LocalDate.of(2024, 1, 1)
+    val tom = LocalDate.of(2024, 1, 31)
 
-    fun opprettVilkårsvurderinger(
-        behandling: Behandling,
-        barn: List<BehandlingBarn>,
-        fom: LocalDate? = YearMonth.now().atDay(1),
-        tom: LocalDate? = YearMonth.now().atEndOfMonth(),
-        status: VilkårStatus = VilkårStatus.NY,
-    ): List<Vilkår> {
-        val hovedregelMetadata =
-            HovedregelMetadata(
-                barn = barn,
-                behandling = mockk(),
-            )
-        val delvilkårsett = EksempelRegel().initiereDelvilkår(hovedregelMetadata)
-        val vilkårsett = listOf(
-            vilkår(
-                fom = fom,
-                tom = tom,
-                status = status,
-                resultat = Vilkårsresultat.OPPFYLT,
-                type = VilkårType.PASS_BARN,
-                behandlingId = behandling.id,
-                barnId = barn.first().id,
-                delvilkår = delvilkårsett,
-            ),
-        )
-        return vilkårsett
-    }
+    val behandling = behandling()
 
-    fun List<String>.tilBehandlingBarn(behandling: Behandling) =
-        this.map { behandlingBarn(behandlingId = behandling.id, personIdent = it) }
-
+    val barn1 = listOf("99999999999").tilBehandlingBarn(behandling)
+    val barn2 = listOf("11111111111").tilBehandlingBarn(behandling)
+    val alleBarn = barn1 + barn2
 
     @Test
     fun `fraDomene kan mappe for InnvilgelseTilsynBarn`() {
-
-        val fom = LocalDate.of(2024, 1, 1)
-        val tom = LocalDate.of(2024, 1, 31)
-
-        val behandling = behandling()
-
-        val barna = listOf("99999999999")
-        val barnDetSøkesFor = barna.tilBehandlingBarn(behandling)
-
         val vilkår =
-            opprettVilkårsvurderinger(behandling, barn = barnDetSøkesFor, fom = fom, tom = tom)
+            opprettVilkårsvurderinger(behandling, barn = barn1, fom = fom, tom = tom)
 
         val resultat = VedtaksperioderDvhV2.fraDomene(
             innvilgelseTilsynBarn(),
             vilkår = vilkår,
-            barnFakta = barnDetSøkesFor,
+            barnFakta = barn1,
         ).vedtaksperioder
 
         val forventetResultat = listOf(
@@ -87,7 +49,7 @@ class VedtaksperioderDvhV2Test {
                 lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
                 aktivitet = AktivitetTypeDvh.TILTAK,
                 antallBarn = 1,
-                barn = BarnDvh.JsonWrapper(barna.map { BarnDvh(it) }),
+                barn = BarnDvh.JsonWrapper(barn1.map { BarnDvh(it.ident) }),
             )
         )
 
@@ -135,5 +97,44 @@ class VedtaksperioderDvhV2Test {
         )
 
         assertThat(resultat).isEqualTo(forventetResultat)
+    }
+
+    @Nested
+    inner class FinnBarnFnr {
+        @Test
+        fun `finnBarnFnr skal finne fødselsnummeret til barn i vilkåret når det er ett barn`() {
+            val vilkår = opprettVilkårsvurderinger(behandling, barn = barn1, fom = fom, tom = tom)
+
+            val vedtaksperiode = VedtaksperiodeTilsynBarn(
+                fom = fom,
+                tom = tom,
+                målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.TILTAK,
+                antallBarn = 1
+            )
+
+            val resultat = vilkår.finnBarnFnr(vedtaksperiode, alleBarn)
+
+            assertThat(resultat).isEqualTo(barn1.map { it.ident })
+        }
+
+        @Test
+        fun `finnBarnFnr skal finne fødselsnummeret til barn i vilkåret når det er flere barn`() {
+            val vilkårBarn1 = opprettVilkårsvurderinger(behandling, barn = barn1, fom = fom, tom = tom)
+            val vilkårBarn2 = opprettVilkårsvurderinger(behandling, barn = barn2, fom = fom, tom = tom)
+            val vilkår = vilkårBarn1 + vilkårBarn2
+
+            val vedtaksperiode = VedtaksperiodeTilsynBarn(
+                fom = fom,
+                tom = tom,
+                målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.TILTAK,
+                antallBarn = 2
+            )
+
+            val resultat = vilkår.finnBarnFnr(vedtaksperiode, alleBarn)
+
+            assertThat(resultat).isEqualTo(alleBarn.map { it.ident })
+        }
     }
 }
