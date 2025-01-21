@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
+@Deprecated(message = "Slettes når team Spenn og Familie har tatt i bruk VedtaksstatstikkV2")
 interface VedtaksstatistikkRepository :
     RepositoryInterface<Vedtaksstatistikk, UUID>,
     InsertUpdateRepository<Vedtaksstatistikk>

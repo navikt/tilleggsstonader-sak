@@ -30,12 +30,11 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-// TODO: Vurder om dette bør flyttes til kontrakter
-
 /**
  * @param endretTid skal oppdateres i tilfelle man må patche data på en behandling.
  * Man skal då beholde den samme raden for å beholde opprettet_tid, men oppdatere felter og oppdatere
  */
+@Deprecated(message = "Slettes når team Spenn og Familie har tatt i bruk VedtaksstatstikkV2")
 data class Vedtaksstatistikk(
     @Id
     val id: UUID = UUID.randomUUID(),
@@ -144,7 +143,6 @@ data class VedtaksperioderDvh(
         )
     }
 }
-
 
 data class BarnDvh(
     val fnr: String,
@@ -336,4 +334,3 @@ data class DelvilkårDvh(
         }
     }
 }
-

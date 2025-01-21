@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import java.time.LocalDateTime
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -27,22 +26,21 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeServic
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
+// For tilsyn barn:
+// Vedtaksperioder kan finnes med å summere opp betalingsperioder fra og til
+// Målgruppe og aktivitet ligger på vedtaksperiodeDto som ligger på beregnigsresultatDto
+// Antall barn ligger på vedtaksperiodeDto
+// Faktisk barn Fnr ligger på utgifter og må legges til i betalingsperioder etc. for å kunne brukes
 
-//For tilsyn barn:
-//Vedtaksperioder kan finnes med å summere opp betalingsperioder fra og til
-//Målgruppe og aktivitet ligger på vedtaksperiodeDto som ligger på beregnigsresultatDto
-//Antall barn ligger på vedtaksperiodeDto
-//Faktisk barn Fnr ligger på utgifter og må legges til i betalingsperioder etc. for å kunne brukes
+// Ligger nok likk jobb i å skrive om til vedtaksperiode dto funksjoner til å kunne gjenbrukes
 
-//Ligger nok likk jobb i å skrive om til vedtaksperiode dto funksjoner til å kunne gjenbrukes
-
-
-//For læremidler:
-//Fom og tom ligger på Beregningsgrunnlag
-//Målgruppe ligger på beregningsgrunnlag
-//Aktivitet må legges til på beregningsgrunnlag (bør være greit)
-//Sats ligger på beregningsgrunnlag
+// For læremidler:
+// Fom og tom ligger på Beregningsgrunnlag
+// Målgruppe ligger på beregningsgrunnlag
+// Aktivitet må legges til på beregningsgrunnlag (bør være greit)
+// Sats ligger på beregningsgrunnlag
 
 @Service
 class VedtaksstatistikkService(
@@ -56,9 +54,10 @@ class VedtaksstatistikkService(
     private val iverksettService: IverksettService,
     private val stønadsperiodeService: StønadsperiodeService,
     private val vedtakService: VedtakService,
-    private val barnRepository: BarnRepository
+    private val barnRepository: BarnRepository,
 
 ) {
+    @Deprecated(message = "Slettes når team Spenn og Familie har tatt i bruk VedtaksstatstikkV2")
     fun lagreVedtaksstatistikk(behandlingId: BehandlingId, fagsakId: FagsakId, hendelseTidspunkt: LocalDateTime) {
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
