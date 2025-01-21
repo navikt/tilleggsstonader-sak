@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import io.mockk.every
 import io.mockk.mockk
-import java.time.LocalDate
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -23,6 +22,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class OpphørValideringServiceTest {
 
@@ -70,7 +70,7 @@ class OpphørValideringServiceTest {
 
         @Test
         fun `Kaster feil ved utbetaling etter opphørdato`() {
-            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = LocalDate.of(2024,1,1))
+            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = LocalDate.of(2024, 1, 1))
 
             assertThatThrownBy {
                 opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(

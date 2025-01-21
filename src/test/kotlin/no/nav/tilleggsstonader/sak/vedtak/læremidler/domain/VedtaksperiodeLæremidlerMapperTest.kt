@@ -1,12 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
-import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper.VedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-
+import java.time.LocalDate
 
 class VedtaksperiodeLæremidlerMapperTest {
 
@@ -16,13 +15,13 @@ class VedtaksperiodeLæremidlerMapperTest {
     val beregningsresultatPeriode1 = beregningsresultatForMåned(
         fom = FØRSTE_JAN,
         tom = FØRSTE_JAN,
-        utbetalingsdato = FØRSTE_JAN
+        utbetalingsdato = FØRSTE_JAN,
     )
 
     val beregningsresultatPeriode2 = beregningsresultatForMåned(
         fom = ANDRE_JAN,
         tom = ANDRE_JAN,
-        utbetalingsdato = ANDRE_JAN
+        utbetalingsdato = ANDRE_JAN,
     )
 
     @Test
@@ -32,7 +31,7 @@ class VedtaksperiodeLæremidlerMapperTest {
                 beregningsresultatForMåned = listOf(
                     beregningsresultatPeriode1,
                     beregningsresultatPeriode2,
-                )
+                ),
             )
 
         assertThat(vedtaksperioder).containsExactly(
@@ -44,7 +43,6 @@ class VedtaksperiodeLæremidlerMapperTest {
             ),
         )
     }
-
 
     @Test
     fun `skal ikke slå sammen perioder hvis de ikke har samme målgruppe`() {
@@ -80,7 +78,7 @@ class VedtaksperiodeLæremidlerMapperTest {
                     grunnlag = beregningsresultatPeriode2.grunnlag.copy(
                         fom = FJERDE_JAN,
                         tom = FJERDE_JAN,
-                    )
+                    ),
                 ),
             ),
         )

@@ -13,8 +13,8 @@ enum class LovverketsMålgruppeDvh {
         fun fraDomene(målgruppe: MålgruppeType) = when (målgruppe) {
             MålgruppeType.AAP,
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
-            MålgruppeType.UFØRETRYGD
-                -> NEDSATT_ARBEIDSEVNE
+            MålgruppeType.UFØRETRYGD,
+            -> NEDSATT_ARBEIDSEVNE
 
             MålgruppeType.OVERGANGSSTØNAD -> ENSLIG_FORSØRGER
 
@@ -22,8 +22,8 @@ enum class LovverketsMålgruppeDvh {
 
             MålgruppeType.DAGPENGER,
             MålgruppeType.SYKEPENGER_100_PROSENT,
-            MålgruppeType.INGEN_MÅLGRUPPE
-                -> INGEN_MÅLGRUPPE
+            MålgruppeType.INGEN_MÅLGRUPPE,
+            -> INGEN_MÅLGRUPPE
         }
     }
 }

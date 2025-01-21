@@ -36,9 +36,8 @@ val alleVedtaksstatistikkJsonConverters = listOf(
     ÅrsakerOpphørDvhWriter(),
 
     VedtaksperioderDvhV2Writer(),
-    UtbetalingerDvhV2Writer()
+    UtbetalingerDvhV2Writer(),
 )
-
 
 @WritingConverter
 private class VedtaksperioderDvhV2Writer : Converter<VedtaksperioderDvhV2.JsonWrapper, PGobject> {

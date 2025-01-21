@@ -1,8 +1,5 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.*
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -18,6 +15,9 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.relational.core.mapping.Column
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.UUID
 
 /**
  * @param endretTid skal oppdateres i tilfelle man må patche data på en behandling.

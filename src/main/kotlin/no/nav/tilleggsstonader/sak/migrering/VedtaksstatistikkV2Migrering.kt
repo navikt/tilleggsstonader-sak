@@ -16,7 +16,7 @@ class VedtaksstatistikkV2Migrering(
     private val vedtaksRepository: VedtakRepository,
     private val behandlingRepository: BehandlingRepository,
     private val vedtaksstatistikkRepositoryV2: VedtaksstatistikkRepositoryV2,
-    private val vedtaksstatistikkService: VedtaksstatistikkService
+    private val vedtaksstatistikkService: VedtaksstatistikkService,
 ) {
 
     val logger = LoggerFactory.getLogger(javaClass)
@@ -45,5 +45,4 @@ class VedtaksstatistikkV2Migrering(
 
         logger.info("vedtaksstatistikk v2 migrasjon ferdig 🚀")
     }
-
 }

@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
-import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AndelstypeDvh
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -9,7 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.finnMakssats
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
-
+import java.time.LocalDate
 
 data class UtbetalingerDvhV2(
     val fraOgMed: LocalDate,
@@ -17,7 +16,7 @@ data class UtbetalingerDvhV2(
     val type: AndelstypeDvh,
     val beløp: Int,
     val makssats: Int? = null,
-    val erMakssats: Boolean? = null
+    val erMakssats: Boolean? = null,
 ) {
     data class JsonWrapper(
         val utbetalinger: List<UtbetalingerDvhV2>,
@@ -35,7 +34,7 @@ data class UtbetalingerDvhV2(
                     type = AndelstypeDvh.fraDomene(andelTilkjentYtelse.type),
                     beløp = andelTilkjentYtelse.beløp,
                     makssats = makssats,
-                    erMakssats = makssats?.let { makssats <= andelTilkjentYtelse.beløp }
+                    erMakssats = makssats?.let { makssats <= andelTilkjentYtelse.beløp },
                 )
             },
         )
@@ -48,7 +47,7 @@ data class UtbetalingerDvhV2(
             return antallBarn?.let {
                 finnMakssats(
                     this.fom.toYearMonth(),
-                    antallBarn
+                    antallBarn,
                 )
             }
         }

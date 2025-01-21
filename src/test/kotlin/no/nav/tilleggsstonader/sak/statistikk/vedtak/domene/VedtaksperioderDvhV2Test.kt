@@ -51,7 +51,7 @@ class VedtaksperioderDvhV2Test {
                 aktivitet = AktivitetTypeDvh.TILTAK,
                 antallBarn = 1,
                 barn = BarnDvh.JsonWrapper(barn1.map { BarnDvh(it.ident) }),
-            )
+            ),
         )
 
         assertThat(resultat).isEqualTo(forventetResultat)
@@ -62,7 +62,7 @@ class VedtaksperioderDvhV2Test {
         val resultat = VedtaksperioderDvhV2.fraDomene(
             vedtak = innvilgelseLæremidler(),
             vilkår = emptyList(),
-            barnFakta = emptyList()
+            barnFakta = emptyList(),
         )
 
         val forventetResultat = VedtaksperioderDvhV2.JsonWrapper(
@@ -72,9 +72,9 @@ class VedtaksperioderDvhV2Test {
                     tom = LocalDate.of(2024, 1, 7),
                     målgruppe = MålgruppeTypeDvh.AAP,
                     lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
-                    studienivå = StudienivåDvh.HØYERE_UTDANNING
-                )
-            )
+                    studienivå = StudienivåDvh.HØYERE_UTDANNING,
+                ),
+            ),
         )
 
         assertThat(resultat).isEqualTo(forventetResultat)
@@ -94,7 +94,7 @@ class VedtaksperioderDvhV2Test {
         val resultat = VedtaksperioderDvhV2.fraDomene(vedtak = avslag, vilkår = emptyList(), barnFakta = emptyList())
 
         val forventetResultat = VedtaksperioderDvhV2.JsonWrapper(
-            vedtaksperioder = emptyList()
+            vedtaksperioder = emptyList(),
         )
 
         assertThat(resultat).isEqualTo(forventetResultat)
@@ -111,7 +111,7 @@ class VedtaksperioderDvhV2Test {
                 tom = tom,
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
-                antallBarn = 1
+                antallBarn = 1,
             )
 
             val resultat = vedtaksperiode.finnOverlappendeVilkårperioder(vilkår).finnBarnasFødselsnumre(alleBarn)
@@ -130,7 +130,7 @@ class VedtaksperioderDvhV2Test {
                 tom = tom,
                 målgruppe = MålgruppeType.AAP,
                 aktivitet = AktivitetType.TILTAK,
-                antallBarn = 2
+                antallBarn = 2,
             )
 
             val resultat = vedtaksperiode

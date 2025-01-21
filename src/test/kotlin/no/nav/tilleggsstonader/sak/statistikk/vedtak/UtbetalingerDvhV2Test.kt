@@ -1,13 +1,12 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelse as innvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse as innvilgelseLæremidler
-
 
 class UtbetalingerDvhV2Test {
 
@@ -26,13 +25,12 @@ class UtbetalingerDvhV2Test {
                     type = AndelstypeDvh.TILSYN_BARN_AAP,
                     beløp = 1000,
                     makssats = 4650,
-                    erMakssats = false
-                )
-            )
+                    erMakssats = false,
+                ),
+            ),
         )
 
         assertThat(resultat).isEqualTo(forventetResultat)
-
     }
 
     @Test
@@ -50,13 +48,12 @@ class UtbetalingerDvhV2Test {
                     type = AndelstypeDvh.TILSYN_BARN_AAP,
                     beløp = 11554,
                     makssats = 4650,
-                    erMakssats = true
-                )
-            )
+                    erMakssats = true,
+                ),
+            ),
         )
 
         assertThat(resultat).isEqualTo(forventetResultat)
-
     }
 
     @Test
@@ -73,12 +70,10 @@ class UtbetalingerDvhV2Test {
                     tilOgMed = LocalDate.of(2024, 1, 1),
                     type = AndelstypeDvh.TILSYN_BARN_AAP,
                     beløp = 11554,
-                )
-            )
+                ),
+            ),
         )
 
         assertThat(resultat).isEqualTo(forventetResultat)
-
     }
-
 }

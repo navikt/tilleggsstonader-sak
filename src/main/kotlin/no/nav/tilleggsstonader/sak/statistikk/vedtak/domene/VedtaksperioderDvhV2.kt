@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
-import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgruppeTypeDvh
@@ -13,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import java.time.LocalDate
 
 data class VedtaksperioderDvhV2(
     val fom: LocalDate,
@@ -42,8 +42,8 @@ data class VedtaksperioderDvhV2(
                             antallBarn = it.antallBarn,
                             barn = BarnDvh.fraDomene(
                                 it.finnOverlappendeVilkårperioder(vilkår)
-                                    .finnBarnasFødselsnumre(barnFakta)
-                            )
+                                    .finnBarnasFødselsnumre(barnFakta),
+                            ),
                         )
                     },
                 )
@@ -61,8 +61,8 @@ data class VedtaksperioderDvhV2(
                             antallBarn = it.antallBarn,
                             barn = BarnDvh.fraDomene(
                                 it.finnOverlappendeVilkårperioder(vilkår)
-                                    .finnBarnasFødselsnumre(barnFakta)
-                            )
+                                    .finnBarnasFødselsnumre(barnFakta),
+                            ),
                         )
                     },
                 )

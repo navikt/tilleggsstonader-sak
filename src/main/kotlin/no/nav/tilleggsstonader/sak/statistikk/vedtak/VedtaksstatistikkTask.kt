@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import java.time.LocalDateTime
-import java.util.*
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
@@ -12,6 +10,8 @@ import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
+import java.util.Properties
 
 @Service
 @TaskStepBeskrivelse(

@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
-import java.time.LocalDate
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import java.time.LocalDate
 
 object VedtaksperiodeLæremidlerMapper {
 
@@ -16,7 +16,6 @@ object VedtaksperiodeLæremidlerMapper {
             .sorted()
             .mergeSammenhengende { s1, s2 -> s1.erLikOgPåfølgesAv(s2) }
     }
-
 
     data class VedtaksperiodeLæremidler(
         override val fom: LocalDate,
@@ -30,12 +29,12 @@ object VedtaksperiodeLæremidlerMapper {
         }
 
         constructor(beregningsgrunnlag: Beregningsgrunnlag) :
-                this(
-                    fom = beregningsgrunnlag.fom,
-                    tom = beregningsgrunnlag.tom,
-                    målgruppe = beregningsgrunnlag.målgruppe,
-                    studienivå = beregningsgrunnlag.studienivå,
-                )
+            this(
+                fom = beregningsgrunnlag.fom,
+                tom = beregningsgrunnlag.tom,
+                målgruppe = beregningsgrunnlag.målgruppe,
+                studienivå = beregningsgrunnlag.studienivå,
+            )
 
         /**
          * Ettersom stønadsperiode ikke overlapper er det tilstrekkelig å kun merge TOM
@@ -46,7 +45,7 @@ object VedtaksperiodeLæremidlerMapper {
 
         fun erLikOgPåfølgesAv(other: VedtaksperiodeLæremidler): Boolean {
             val erLik = this.målgruppe == other.målgruppe &&
-                    this.studienivå == other.studienivå
+                this.studienivå == other.studienivå
             val påfølgesAv = this.tom.plusDays(1) == other.fom
             return erLik && påfølgesAv
         }

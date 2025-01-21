@@ -12,7 +12,6 @@ enum class StønadstypeDvh {
             return when (stønadstype) {
                 Stønadstype.BARNETILSYN -> BARNETILSYN
                 Stønadstype.LÆREMIDLER -> LÆREMIDLER
-                else -> error("Har ikke mapping for $stønadstype")
             }
         }
     }

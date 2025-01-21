@@ -49,9 +49,9 @@ object TilsynBarnTestUtil {
     val defaultInnvilgelseTilsynBarn = InnvilgelseTilsynBarn(
         beregningsresultat = BeregningsresultatTilsynBarn(
             perioder = listOf(
-                beregningsresultatForMåned(stønadsperioder = listOf(stønadsperiodeGrunnlag()))
-            )
-        )
+                beregningsresultatForMåned(stønadsperioder = listOf(stønadsperiodeGrunnlag())),
+            ),
+        ),
     )
 
     fun beregningsresultatForMåned(
