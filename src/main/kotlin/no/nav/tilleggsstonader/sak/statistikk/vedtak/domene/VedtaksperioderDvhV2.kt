@@ -17,7 +17,7 @@ data class VedtaksperioderDvhV2(
     val fom: LocalDate,
     val tom: LocalDate,
     val målgruppe: MålgruppeTypeDvh,
-    val faktiskMålgruppe: FaktiskMålgruppeDvh,
+    val lovverketsMålgruppe: LovverketsMålgruppeDvh,
     val aktivitet: AktivitetTypeDvh? = null,
     val antallBarn: Int? = null,
     val barn: BarnDvh.JsonWrapper? = null,
@@ -44,7 +44,7 @@ data class VedtaksperioderDvhV2(
                             fom = it.fom,
                             tom = it.tom,
                             målgruppe = MålgruppeTypeDvh.fraDomene(it.målgruppe),
-                            faktiskMålgruppe = FaktiskMålgruppeDvh.fraDomene(it.målgruppe),
+                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             antallBarn = it.antallBarn,
                             barn = BarnDvh.fraDomene(vilkår.finnBarnFnr(it, barnFakta))
@@ -60,7 +60,7 @@ data class VedtaksperioderDvhV2(
                             fom = it.fom,
                             tom = it.tom,
                             målgruppe = MålgruppeTypeDvh.fraDomene(it.målgruppe),
-                            faktiskMålgruppe = FaktiskMålgruppeDvh.fraDomene(it.målgruppe),
+                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                             studienivå = StudienivåDvh.fraDomene(it.studienivå),
                         )
                     },
