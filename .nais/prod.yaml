@@ -46,6 +46,10 @@ spec:
         flags:
           - name: cloudsql.logical_decoding # trengs for å bruke replication slots i databasen.
             value: "on"
+          - name: cloudsql.enable_pgaudit
+            value: "true"
+          - name: pgaudit.log'
+            value: "all"
         diskAutoresize: true
         cascadingDelete: false
         highAvailability: true
