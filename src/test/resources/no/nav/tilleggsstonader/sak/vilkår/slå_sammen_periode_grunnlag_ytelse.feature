@@ -96,23 +96,32 @@ Egenskap: Slå sammen periode grunnlag ytelse
       | 14.01.2024 |            | AAP               |
 
 
-  Scenario: Perioder med ulik enslig forsørger stønadstype
+  Scenario: Perioder med lik enslig forsørger stønadstype skal slåes sammen
 
     Gitt Følgende grunnlagsperioderfor ytelse
-      | Fom        | Tom        | Type              | Enslig forsørger stønadstype |
-      | 01.01.2024 | 20.01.2024 | AAP               | OVERGANGSSTØNAD              |
-      | 14.01.2024 | 01.02.2024 | ENSLIG_FORSØRGER  |                              |
-      | 20.01.2024 | 01.02.2024 | AAP               | SKOLEPENGER                  |
-      | 01.01.2024 | 01.02.2024 | OMSTILLINGSSTØNAD |                              |
+      | Fom        | Tom        | Type             | Enslig forsørger stønadstype |
+      | 01.01.2024 | 09.01.2024 | ENSLIG_FORSØRGER | OVERGANGSSTØNAD              |
+      | 10.01.2024 | 19.01.2024 | ENSLIG_FORSØRGER | OVERGANGSSTØNAD              |
 
     Når Slår sammen grunnlagsperioder
 
     Så Forvent grunnlagsperioderfor ytelse
-      | Fom        | Tom        | Type              | Enslig forsørger stønadstype |
-      | 01.01.2024 | 20.01.2024 | AAP               | OVERGANGSSTØNAD              |
-      | 01.01.2024 | 01.02.2024 | OMSTILLINGSSTØNAD |                              |
-      | 14.01.2024 | 01.02.2024 | ENSLIG_FORSØRGER  |                              |
-      | 20.01.2024 | 01.02.2024 | AAP               | SKOLEPENGER                  |
+      | Fom        | Tom        | Type             | Enslig forsørger stønadstype |
+      | 01.01.2024 | 19.01.2024 | ENSLIG_FORSØRGER | OVERGANGSSTØNAD              |
+
+  Scenario: Perioder med ulik enslig forsørger stønadstype skal ikke slåes sammen
+
+    Gitt Følgende grunnlagsperioderfor ytelse
+      | Fom        | Tom        | Type             | Enslig forsørger stønadstype |
+      | 01.01.2024 | 09.01.2024 | ENSLIG_FORSØRGER | OVERGANGSSTØNAD              |
+      | 10.01.2024 | 19.01.2024 | ENSLIG_FORSØRGER | SKOLEPENGER                  |
+
+    Når Slår sammen grunnlagsperioder
+
+    Så Forvent grunnlagsperioderfor ytelse
+      | Fom        | Tom        | Type             | Enslig forsørger stønadstype |
+      | 01.01.2024 | 09.01.2024 | ENSLIG_FORSØRGER | OVERGANGSSTØNAD              |
+      | 10.01.2024 | 19.01.2024 | ENSLIG_FORSØRGER | SKOLEPENGER                  |
 
 
 

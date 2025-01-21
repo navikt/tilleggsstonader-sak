@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
@@ -60,7 +61,14 @@ data class PeriodeGrunnlagYtelse(
     val fom: LocalDate,
     val tom: LocalDate?,
     val ensligForsørgerStønadstype: EnsligForsørgerStønadstype? = null,
-)
+) {
+
+    init {
+        feilHvis(type != TypeYtelsePeriode.ENSLIG_FORSØRGER && ensligForsørgerStønadstype != null) {
+            "Kan ikke sette ensligForsørgerStønadstype for type=$type"
+        }
+    }
+}
 
 data class HentetInformasjon(
     val fom: LocalDate,
