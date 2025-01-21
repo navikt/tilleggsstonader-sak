@@ -2,7 +2,8 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgruppeTypeDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2.Companion.finnBarnFnr
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2.Companion.finnBarnasFødselsnumre
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2.Companion.finnOverlappendeVilkårperioder
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarn
@@ -100,7 +101,7 @@ class VedtaksperioderDvhV2Test {
     }
 
     @Nested
-    inner class FinnBarnFnr {
+    inner class FinnFødselsnumreIVedtaksperiode {
         @Test
         fun `finnBarnFnr skal finne fødselsnummeret til barn i vilkåret når det er ett barn`() {
             val vilkår = opprettVilkårsvurderinger(behandling, barn = barn1, fom = fom, tom = tom)
@@ -113,7 +114,7 @@ class VedtaksperioderDvhV2Test {
                 antallBarn = 1
             )
 
-            val resultat = vilkår.finnBarnFnr(vedtaksperiode, alleBarn)
+            val resultat = vedtaksperiode.finnOverlappendeVilkårperioder(vilkår).finnBarnasFødselsnumre(alleBarn)
 
             assertThat(resultat).isEqualTo(barn1.map { it.ident })
         }
@@ -132,7 +133,9 @@ class VedtaksperioderDvhV2Test {
                 antallBarn = 2
             )
 
-            val resultat = vilkår.finnBarnFnr(vedtaksperiode, alleBarn)
+            val resultat = vedtaksperiode
+                .finnOverlappendeVilkårperioder(vilkår)
+                .finnBarnasFødselsnumre(alleBarn)
 
             assertThat(resultat).isEqualTo(alleBarn.map { it.ident })
         }

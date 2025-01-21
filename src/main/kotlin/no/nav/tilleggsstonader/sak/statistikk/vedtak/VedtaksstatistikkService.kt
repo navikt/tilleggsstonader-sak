@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import java.time.LocalDateTime
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -27,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeServic
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 
 //For tilsyn barn:

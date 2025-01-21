@@ -39,7 +39,10 @@ data class VedtaksperioderDvhV2(
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             antallBarn = it.antallBarn,
-                            barn = BarnDvh.fraDomene(vilkår.finnBarnFnr(it, barnFakta))
+                            barn = BarnDvh.fraDomene(
+                                it.finnOverlappendeVilkårperioder(vilkår)
+                                    .finnBarnasFødselsnumre(barnFakta)
+                            )
                         )
                     },
                 )
@@ -62,12 +65,11 @@ data class VedtaksperioderDvhV2(
             return JsonWrapper(vedtaksperioder = emptyList())
         }
 
-        fun List<Vilkår>.finnBarnFnr(
-            vedtaksperiode: VedtaksperiodeTilsynBarn,
-            barn: List<BehandlingBarn>
-        ): List<String> =
-            this.filter { vilkår -> vilkår.overlapper(vedtaksperiode) }.mapNotNull { barnId ->
-                barn.find { barnId.barnId == it.id }?.ident
-            }
+        fun VedtaksperiodeTilsynBarn.finnOverlappendeVilkårperioder(vilkårperioder: List<Vilkår>) =
+            vilkårperioder.filter { it.overlapper(this) }
+
+        fun List<Vilkår>.finnBarnasFødselsnumre(barn: List<BehandlingBarn>) = this.mapNotNull { vilkår ->
+            barn.find { vilkår.barnId == it.id }?.ident
+        }
     }
 }
