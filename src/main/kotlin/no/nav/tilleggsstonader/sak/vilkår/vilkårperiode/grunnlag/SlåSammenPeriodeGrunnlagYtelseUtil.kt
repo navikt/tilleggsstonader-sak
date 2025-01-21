@@ -41,6 +41,8 @@ object SlåSammenPeriodeGrunnlagYtelseUtil {
             )
 
         fun kanSlåsSammen(other: PeriodeGrunnlagYtelseHolder): Boolean =
-            ytelse.type == other.ytelse.type && ytelse.ensligForsørgerStønadstype == other.ytelse.ensligForsørgerStønadstype && overlapperEllerPåfølgesAv(other)
+            ytelse.type == other.ytelse.type &&
+                ytelse.subtype == other.ytelse.subtype &&
+                overlapperEllerPåfølgesAv(other)
     }
 }

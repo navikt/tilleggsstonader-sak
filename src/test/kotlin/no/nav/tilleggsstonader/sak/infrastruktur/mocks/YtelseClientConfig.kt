@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.HentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.StatusHentetInformasjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
@@ -27,8 +28,19 @@ class YtelseClientConfig {
         every { client.hentYtelser(any()) } answers {
             val request = firstArg<YtelsePerioderRequest>()
 
-            val perioder = request.typer.map {
-                YtelsePeriode(type = it, fom = LocalDate.now(), tom = LocalDate.now())
+            val perioder = request.typer.map { type ->
+                val ensligForsørgerStønadstype =
+                    if (type == TypeYtelsePeriode.ENSLIG_FORSØRGER) {
+                        EnsligForsørgerStønadstype.OVERGANGSSTØNAD
+                    } else {
+                        null
+                    }
+                YtelsePeriode(
+                    type = type,
+                    fom = LocalDate.now(),
+                    tom = LocalDate.now(),
+                    ensligForsørgerStønadstype = ensligForsørgerStønadstype,
+                )
             }.toMutableList()
             if (request.typer.contains(TypeYtelsePeriode.AAP)) {
                 perioder += YtelsePeriode(

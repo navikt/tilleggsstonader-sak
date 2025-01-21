@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.SlåSammenPer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDomenetype
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilYtelseSubtype
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -180,14 +180,13 @@ class VilkårperiodeGrunnlagService(
 
         return GrunnlagYtelse(
             perioder = ytelserFraRegister.perioder
-                .filter { it.aapErFerdigAvklart != true }
                 .filter { it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN }
                 .map {
                     PeriodeGrunnlagYtelse(
                         type = it.type,
                         fom = it.fom,
                         tom = it.tom,
-                        ensligForsørgerStønadstype = it.ensligForsørgerStønadstype?.tilDomenetype(),
+                        subtype = it.tilYtelseSubtype(),
                     )
                 }
                 .slåSammenOverlappendeEllerPåfølgende(),

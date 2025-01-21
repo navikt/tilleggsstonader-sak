@@ -68,7 +68,7 @@ internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
 
         val lagretGrunnlag = vilkårperioderGrunnlagRepository.findByIdOrThrow(behandling.id)
         assertThat(lagretGrunnlag.behandlingId).isEqualTo(behandling.id)
-        assertThat(lagretGrunnlag.grunnlag.ytelse.perioder.first().ensligForsørgerStønadstype).isNull()
+        assertThat(lagretGrunnlag.grunnlag.ytelse.perioder.first().subtype).isNull()
     }
 
     private fun grunnlagYtelse() = GrunnlagYtelse(

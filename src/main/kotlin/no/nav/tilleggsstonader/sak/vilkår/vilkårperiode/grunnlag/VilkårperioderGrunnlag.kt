@@ -13,6 +13,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype as EnsligForsørgerStønadstypeKontrakter
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode as YtelsePeriodeKontrakter
 
 data class VilkårperioderGrunnlag(
     val aktivitet: GrunnlagAktivitet,
@@ -60,13 +61,25 @@ data class PeriodeGrunnlagYtelse(
     val type: TypeYtelsePeriode,
     val fom: LocalDate,
     val tom: LocalDate?,
-    val ensligForsørgerStønadstype: EnsligForsørgerStønadstype? = null,
+    val subtype: YtelseSubtype? = null,
 ) {
 
     init {
-        feilHvis(type != TypeYtelsePeriode.ENSLIG_FORSØRGER && ensligForsørgerStønadstype != null) {
-            "Kan ikke sette ensligForsørgerStønadstype for type=$type"
+        feilHvis(subtype != null && subtype.gyldigSammenMed != type) {
+            "Ugyldig kombinasjon av type=$type og subtype=$subtype"
         }
+    }
+
+    /**
+     * [YtelseSubtype] brukes for ev ekstrainformasjon om en periode
+     *
+     * @param AAP_FERDIG_AVKLART brukes når AAP-periode har status ferdig avklart.
+     * Den skal ikke være valgbart då det er en AAP-periode som ikke gir rett på stønad
+     */
+    enum class YtelseSubtype(val gyldigSammenMed: TypeYtelsePeriode) {
+        AAP_FERDIG_AVKLART(TypeYtelsePeriode.AAP),
+        OVERGANGSSTØNAD(TypeYtelsePeriode.ENSLIG_FORSØRGER),
+        SKOLEPENGER(TypeYtelsePeriode.ENSLIG_FORSØRGER),
     }
 }
 
@@ -76,15 +89,23 @@ data class HentetInformasjon(
     val tidspunktHentet: LocalDateTime,
 )
 
-enum class EnsligForsørgerStønadstype {
-    OVERGANGSSTØNAD,
-    SKOLEPENGER,
-}
+fun YtelsePeriodeKontrakter.tilYtelseSubtype(): PeriodeGrunnlagYtelse.YtelseSubtype? {
+    return when (this.type) {
+        TypeYtelsePeriode.ENSLIG_FORSØRGER -> {
+            when (this.ensligForsørgerStønadstype) {
+                EnsligForsørgerStønadstypeKontrakter.OVERGANGSSTØNAD -> PeriodeGrunnlagYtelse.YtelseSubtype.OVERGANGSSTØNAD
+                EnsligForsørgerStønadstypeKontrakter.SKOLEPENGER -> PeriodeGrunnlagYtelse.YtelseSubtype.SKOLEPENGER
+                else -> error("Skal ikke mappe grunnlag for ${this.ensligForsørgerStønadstype}")
+            }
+        }
 
-fun EnsligForsørgerStønadstypeKontrakter.tilDomenetype(): EnsligForsørgerStønadstype {
-    return when (this) {
-        EnsligForsørgerStønadstypeKontrakter.OVERGANGSSTØNAD -> EnsligForsørgerStønadstype.OVERGANGSSTØNAD
-        EnsligForsørgerStønadstypeKontrakter.SKOLEPENGER -> EnsligForsørgerStønadstype.SKOLEPENGER
-        EnsligForsørgerStønadstypeKontrakter.BARNETILSYN -> error("BARNETILSYN skal ikke brukes i vilkårperioder grunnlag")
+        TypeYtelsePeriode.AAP -> {
+            when (this.aapErFerdigAvklart) {
+                true -> PeriodeGrunnlagYtelse.YtelseSubtype.AAP_FERDIG_AVKLART
+                else -> null
+            }
+        }
+
+        else -> null
     }
 }
