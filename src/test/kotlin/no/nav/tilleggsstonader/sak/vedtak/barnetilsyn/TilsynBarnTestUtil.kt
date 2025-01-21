@@ -1,8 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.YearMonth
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
@@ -18,6 +15,9 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnl
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.YearMonth
 
 object TilsynBarnTestUtil {
 
@@ -41,7 +41,7 @@ object TilsynBarnTestUtil {
 
     val defaultStønadsperiodeBeregningsgrunnlag = StønadsperiodeBeregningsgrunnlag(
         fom = LocalDate.of(2024, 1, 1),
-        tom = LocalDate.of(2024, 1, 7),
+        tom = LocalDate.of(2024, 1, 31),
         målgruppe = MålgruppeType.AAP,
         aktivitet = AktivitetType.TILTAK,
     )

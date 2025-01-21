@@ -215,7 +215,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         }
     }
 
-    private fun opprettVilkårsvurderinger(
+    fun opprettVilkårsvurderinger(
         behandling: Behandling,
         barn: List<BehandlingBarn>,
         fom: LocalDate? = YearMonth.now().atDay(1),

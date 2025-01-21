@@ -28,14 +28,6 @@ data class VedtaksperioderDvhV2(
     )
 
     companion object {
-        fun List<Vilkår>.finnBarnFnr(
-            vedtaksperiode: VedtaksperiodeTilsynBarn,
-            barn: List<BehandlingBarn>
-        ): List<String> =
-            this.filter { vilkår -> vilkår.overlapper(vedtaksperiode) }.mapNotNull { barnId ->
-                barn.find { barnId.barnId == it.id }?.ident
-            }
-
         fun fraDomene(vedtak: Vedtak?, vilkår: List<Vilkår>, barnFakta: List<BehandlingBarn>): JsonWrapper {
             vedtak?.takeIfType<InnvilgelseTilsynBarn>()?.data?.beregningsresultat?.perioder?.let {
                 return JsonWrapper(
@@ -69,5 +61,13 @@ data class VedtaksperioderDvhV2(
 
             return JsonWrapper(vedtaksperioder = emptyList())
         }
+
+        private fun List<Vilkår>.finnBarnFnr(
+            vedtaksperiode: VedtaksperiodeTilsynBarn,
+            barn: List<BehandlingBarn>
+        ): List<String> =
+            this.filter { vilkår -> vilkår.overlapper(vedtaksperiode) }.mapNotNull { barnId ->
+                barn.find { barnId.barnId == it.id }?.ident
+            }
     }
 }
