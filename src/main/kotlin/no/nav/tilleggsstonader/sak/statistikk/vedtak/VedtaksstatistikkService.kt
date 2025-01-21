@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
+import java.time.LocalDateTime
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -26,7 +27,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeServic
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 
 //For tilsyn barn:
@@ -58,7 +58,7 @@ class VedtaksstatistikkService(
     private val vedtakService: VedtakService,
     private val barnRepository: BarnRepository
 
-    ) {
+) {
     fun lagreVedtaksstatistikk(behandlingId: BehandlingId, fagsakId: FagsakId, hendelseTidspunkt: LocalDateTime) {
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
@@ -95,11 +95,12 @@ class VedtaksstatistikkService(
         )
     }
 
-    fun lagreVedtaksstatistikkV2(behandlingId: BehandlingId, fagsakId: FagsakId, hendelseTidspunkt: LocalDateTime) {
+    fun lagreVedtaksstatistikkV2(behandlingId: BehandlingId, fagsakId: FagsakId) {
+        val vedtak = vedtakService.hentVedtak(behandlingId)
+            ?: throw IllegalStateException("Kan ikke sende vedtaksstatistikk uten vedtak")
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val vedtak = vedtakService.hentVedtak(behandlingId)
         val vilkår = vilkårService.hentOppfyltePassBarnVilkår(behandlingId)
         val barn = barnRepository.findByBehandlingId(behandlingId)
 
@@ -112,7 +113,7 @@ class VedtaksstatistikkService(
                 eksternBehandlingId = behandling.eksternId,
                 relatertBehandlingId = hentRelatertBehandlingId(behandling),
                 adressebeskyttelse = hentAdressebeskyttelse(personIdent),
-                tidspunktVedtak = hendelseTidspunkt,
+                tidspunktVedtak = vedtak.sporbar.opprettetTid,
                 person = personIdent,
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
                 behandlingÅrsak = BehandlingÅrsakDvh.Companion.fraDomene(behandling.årsak),
@@ -120,8 +121,8 @@ class VedtaksstatistikkService(
                 vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak, vilkår, barn),
                 utbetalinger = UtbetalingerDvhV2.fraDomene(andelTilkjentYtelse, vedtak),
                 kravMottatt = behandling.kravMottatt,
-                årsakerAvslag = ÅrsakAvslagDvh.Companion.fraDomene(vedtak?.takeIfType<Avslag>()?.data?.årsaker),
-                årsakerOpphør = ÅrsakOpphørDvh.Companion.fraDomene(vedtak?.takeIfType<Opphør>()?.data?.årsaker),
+                årsakerAvslag = ÅrsakAvslagDvh.Companion.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
+                årsakerOpphør = ÅrsakOpphørDvh.Companion.fraDomene(vedtak.takeIfType<Opphør>()?.data?.årsaker),
             ),
         )
     }
