@@ -46,7 +46,6 @@ class OpphørValideringService(
         }
     }
 
-    //MÅ TILLATE FOR LÆREMIDLER!!
     fun validerIngenUtbetalingEtterRevurderFraDatoTilsynBarn(
         beregningsresultatTilsynBarn: BeregningsresultatTilsynBarn,
         revurderFra: LocalDate?,

@@ -7,10 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRespon
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.*
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerResponse
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.*
 import java.time.LocalDate
 
 object VedtakDtoMapper {
@@ -56,6 +53,10 @@ object VedtakDtoMapper {
                 begrunnelse = data.begrunnelse,
             )
 
-            is OpphørLæremidler -> TODO()
+            is OpphørLæremidler -> OpphørLæremidlerResponse(
+                beregningsresultat = data.beregningsresultat.tilDto(),
+                årsakerOpphør = data.årsaker,
+                begrunnelse = data.begrunnelse,
+            )
         }
 }

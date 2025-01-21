@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.behandling.RevurderFraService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -17,12 +18,14 @@ import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.*
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.*
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -33,6 +36,7 @@ class LæremidlerBeregnYtelseSteg(
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
+    private val revurderFraService: RevurderFraService,
 ) : BeregnYtelseSteg<VedtakLæremidlerRequest>(
     stønadstype = Stønadstype.LÆREMIDLER,
     vedtakRepository = vedtakRepository,
@@ -44,7 +48,7 @@ class LæremidlerBeregnYtelseSteg(
         when (vedtak) {
             is InnvilgelseLæremidlerRequest -> beregnOgLagreInnvilgelse(vedtak.vedtaksperioder.tilDomene(), saksbehandling)
             is AvslagLæremidlerDto -> lagreAvslag(saksbehandling, vedtak)
-            is OpphørLæremidlerRequest -> beregnOgLagreOpphør(vedtak.vedtaksperioder.tilDomene(), saksbehandling)
+            is OpphørLæremidlerRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
     }
 
@@ -57,29 +61,45 @@ class LæremidlerBeregnYtelseSteg(
         lagreAndeler(saksbehandling, beregningsresultat)
     }
 
-    private fun beregnOgLagreOpphør(vedtaksperioder: List<Vedtaksperiode>, saksbehandling: Saksbehandling) {
+    private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørLæremidlerRequest) {
         brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
 
-        opphørValideringService.validerPerioder(saksbehandling)
+        val forrigeBehandling = vedtakRepository.findByIdOrNull(saksbehandling.forrigeBehandlingId)
+        val kuttedePerioder: List<BeregningsresultatForMåned> =  emptyList()
+        if (forrigeBehandling != null) {
+            when (forrigeBehandling.type) {
 
-        val beregningsresultat = beregningService.beregn(vedtaksperioder, saksbehandling.id)
-        opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(beregningsresultat, saksbehandling.revurderFra)
+                TypeVedtak.INNVILGELSE -> {
+                    val forrigeVedtak = forrigeBehandling.withTypeOrThrow<InnvilgelseLæremidler>()
+                    forrigeVedtak.data.beregningsresultat.perioder.forEach {
+                        if(it.grunnlag.tom < saksbehandling.revurderFra){
+                            kuttedePerioder.plus(it)
+                            //Mangler de siste dagene i den ene perioden som har fom før revurderingsdato og tom etter revurderFradato
+                        }
+                    }
+                }
+                else -> error("Opphør er et ugyldig vedtaksresultat fordi forrige vedtak er av typen ${forrigeBehandling.type}")
+            }
+        }
+
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.OPPHØR,
                 data = OpphørLæremidler(
-                    beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
-                    årsaker = emptyList(),
-                    begrunnelse = "",
+                    beregningsresultat = BeregningsresultatLæremidler(kuttedePerioder),
+                    årsaker = vedtak.årsakerOpphør,
+                    begrunnelse = vedtak.begrunnelse,
                 ),
 
                 ),
         )
 
-        lagreAndeler(saksbehandling, beregningsresultat)
+        val beregningsresultatLæremidler = BeregningsresultatLæremidler(kuttedePerioder)
+
+        lagreAndeler(saksbehandling, beregningsresultatLæremidler)
     }
 
     private fun lagreAvslag(
