@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.migrering
 
+import no.nav.security.token.support.core.api.Unprotected
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -8,11 +9,14 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksstatistikkRepository
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksstatistikkService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Component
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
-@Component
-class VedtaksstatistikkV2Migrering(
+@RestController
+@RequestMapping("/admin/statistikk/migrering")
+@Unprotected
+class VedtaksstatistikkV2MigreringController(
     private val behandlingRepository: BehandlingRepository,
     private val vedtaksstatistikkRepositoryV2: VedtaksstatistikkRepositoryV2,
     private val vedtaksstatistikkService: VedtaksstatistikkService,
@@ -20,7 +24,7 @@ class VedtaksstatistikkV2Migrering(
 
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    @Scheduled(initialDelay = 5000)
+    @GetMapping
     fun migrerStatistikkData() {
         logger.info("starter vedtakssatistikk v2-migrasjon")
 
