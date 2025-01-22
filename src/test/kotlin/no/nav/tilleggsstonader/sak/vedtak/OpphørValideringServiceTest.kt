@@ -57,22 +57,22 @@ class OpphørValideringServiceTest {
     @Nested
     inner class `Valider ingen utbetaling etter opphør` {
 
-        @Test
-        fun `Kaster ikke feil ved korrekt data`() {
-            assertThatCode {
-                opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
-                    beregningsresultat = vedtakBeregningsresultat,
-                    revurderFra = saksbehandling.revurderFra,
-                )
-            }.doesNotThrowAnyException()
-        }
+@Test
+fun `Kaster ikke feil ved korrekt data`() {
+    assertThatCode {
+        opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
+            beregningsresultatTilsynBarn = vedtakBeregningsresultat,
+            revurderFra = saksbehandling.revurderFra,
+        )
+    }.doesNotThrowAnyException()
+}
 
         @Test
         fun `Kaster feil ved utbetaling etter opphørdato`() {
             val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = osloDateNow())
 
             assertThatThrownBy {
-                opphørValideringService.validerIngenUtbetalingEtterRevurderFraDatoTilsynBarn(
+                opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
                     beregningsresultatTilsynBarn = vedtakBeregningsresultat,
                     revurderFra = saksbehandlingRevurdertFraTilbakeITid.revurderFra,
                 )

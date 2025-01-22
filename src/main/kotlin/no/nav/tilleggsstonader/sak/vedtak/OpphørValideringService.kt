@@ -35,21 +35,11 @@ class OpphørValideringService(
     }
 
     fun validerIngenUtbetalingEtterRevurderFraDato(
-        beregningsresultat: Any,
+        beregningsresultatTilsynBarn: BeregningsresultatTilsynBarn,
         revurderFra: LocalDate?,
     ) {
         brukerfeilHvis(revurderFra == null) { "Revurder fra dato er påkrevd for opphør" }
 
-        when (beregningsresultat) {
-            is BeregningsresultatTilsynBarn -> validerIngenUtbetalingEtterRevurderFraDatoTilsynBarn(beregningsresultat, revurderFra)
-            is BeregningsresultatLæremidler -> validerIngenUtbetalingEtterRevurderFraDatoLæremidler(beregningsresultat, revurderFra)
-        }
-    }
-
-    fun validerIngenUtbetalingEtterRevurderFraDatoTilsynBarn(
-        beregningsresultatTilsynBarn: BeregningsresultatTilsynBarn,
-        revurderFra: LocalDate?,
-    ) {
         beregningsresultatTilsynBarn.perioder.forEach { periode ->
             periode.beløpsperioder.forEach {
                 brukerfeilHvis(it.dato >= revurderFra) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
@@ -57,10 +47,12 @@ class OpphørValideringService(
         }
     }
 
-    fun validerIngenUtbetalingEtterRevurderFraDatoLæremidler(
+    fun validerIngenUtbetalingEtterRevurderFraDato(
         beregningsresultatLæremidler: BeregningsresultatLæremidler,
         revurderFra: LocalDate?,
     ) {
+        brukerfeilHvis(revurderFra == null) { "Revurder fra dato er påkrevd for opphør" }
+
         beregningsresultatLæremidler.perioder.forEach { periode ->
             brukerfeilHvis(periode.grunnlag.tom >= revurderFra) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
         }
