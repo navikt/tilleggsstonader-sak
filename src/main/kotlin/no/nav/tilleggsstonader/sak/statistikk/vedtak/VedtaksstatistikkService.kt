@@ -95,11 +95,13 @@ class VedtaksstatistikkService(
     }
 
     fun lagreVedtaksstatistikkV2(behandlingId: BehandlingId, fagsakId: FagsakId) {
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId)
             ?: throw IllegalStateException("Kan ikke sende vedtaksstatistikk uten vedtak")
+        val vedtakstidspunkt = behandling.vedtakstidspunkt
+            ?: throw IllegalStateException("Behandlingen må ha et vedtakstidspunkt for å sende vedtaksstatistikk")
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
-        val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vilkår = vilkårService.hentOppfyltePassBarnVilkår(behandlingId)
         val barn = barnRepository.findByBehandlingId(behandlingId)
 
@@ -112,7 +114,7 @@ class VedtaksstatistikkService(
                 eksternBehandlingId = behandling.eksternId,
                 relatertBehandlingId = hentRelatertBehandlingId(behandling),
                 adressebeskyttelse = hentAdressebeskyttelse(personIdent),
-                tidspunktVedtak = vedtak.sporbar.opprettetTid,
+                tidspunktVedtak = vedtakstidspunkt,
                 person = personIdent,
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
                 behandlingÅrsak = BehandlingÅrsakDvh.Companion.fraDomene(behandling.årsak),
