@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingDetaljer
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingsoversiktDto
 import no.nav.tilleggsstonader.sak.behandling.dto.FagsakMedBehandlinger
@@ -81,7 +82,9 @@ class BehandlingsoversiktService(
     private fun hentVedtaksperioder(
         behandlinger: List<Behandling>,
     ): Map<BehandlingId, Vedtaksperiode?> {
-        val revurderFraPåBehandlingId = behandlinger.associate { it.id to it.revurderFra }
+        val revurderFraPåBehandlingId = behandlinger
+            .filter { it.resultat != BehandlingResultat.HENLAGT }
+            .associate { it.id to it.revurderFra }
         return vedtakRepository.findAllById(behandlinger.map { it.id })
             .associateBy { it.behandlingId }
             .mapValues { (behandlingId, vedtak) ->
