@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -53,6 +54,9 @@ class LæremidlerBeregnYtelseSteg(
     }
 
     private fun beregnOgLagreInnvilgelse(vedtaksperioder: List<Vedtaksperiode>, saksbehandling: Saksbehandling) {
+        feilHvis(saksbehandling.forrigeBehandlingId != null) {
+            "Har foreløpig ikke støtte for innvilgelse av revurdering"
+        }
         val beregningsresultat = beregningService.beregn(vedtaksperioder, saksbehandling.id)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling.id, vedtaksperioder, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
