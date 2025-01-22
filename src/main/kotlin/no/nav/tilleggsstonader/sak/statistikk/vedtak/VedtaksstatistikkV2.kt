@@ -24,9 +24,8 @@ import java.util.UUID
  */
 data class VedtaksstatistikkV2(
     @Id
-    val id: UUID = UUID.randomUUID(),
-    val fagsakId: FagsakId,
     val behandlingId: BehandlingId,
+    val fagsakId: FagsakId,
     val eksternFagsakId: Long,
     val eksternBehandlingId: Long,
     val relatertBehandlingId: Long?, // Ekstern behandlingsid på relatert behandling

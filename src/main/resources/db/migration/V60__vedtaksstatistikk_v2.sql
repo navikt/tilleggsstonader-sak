@@ -1,8 +1,7 @@
 CREATE TABLE vedtaksstatistikk_v2
 (
-    id                     UUID PRIMARY KEY,
+    behandling_id          UUID         NOT NULL PRIMARY KEY,
     fagsak_id              UUID         NOT NULL,
-    behandling_id          UUID         NOT NULL,
     ekstern_fagsak_id      VARCHAR      NOT NULL,
     ekstern_behandling_id  VARCHAR      NOT NULL,
     relatert_behandling_id VARCHAR,
