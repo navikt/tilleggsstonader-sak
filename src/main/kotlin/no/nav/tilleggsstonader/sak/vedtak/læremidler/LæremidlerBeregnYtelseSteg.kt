@@ -73,28 +73,28 @@ class LæremidlerBeregnYtelseSteg(
         brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
-
         val forrigeBehandling = vedtakRepository.findByIdOrNull(saksbehandling.forrigeBehandlingId)
-        val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
+            ?: error("Opphør må ha en forrige behandling")
         if (saksbehandling.revurderFra == null) {
             error("revurderFra-dato er påkrevd for opphør")
         }
-        if (forrigeBehandling != null) {
-            when (forrigeBehandling.type) {
-                TypeVedtak.INNVILGELSE -> {
-                    val forrigeVedtak = forrigeBehandling.withTypeOrThrow<InnvilgelseLæremidler>()
-                    forrigeVedtak.data.beregningsresultat.perioder.forEach {
-                        if (it.grunnlag.tom < saksbehandling.revurderFra) {
-                            kuttedePerioder.plus(it)
-                            // Mangler de siste dagene i den ene perioden som har fom før revurderingsdato og tom etter revurderFradato
-                        } else if (it.grunnlag.fom < saksbehandling.revurderFra) {
-                            kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = saksbehandling.revurderFra.minusDays(1))))
-                        }
+
+        opphørValideringService.validerPerioder(saksbehandling)
+        val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
+        when (forrigeBehandling.type) {
+            TypeVedtak.INNVILGELSE -> {
+                val forrigeVedtak = forrigeBehandling.withTypeOrThrow<InnvilgelseLæremidler>()
+                forrigeVedtak.data.beregningsresultat.perioder.forEach {
+                    if (it.grunnlag.tom < saksbehandling.revurderFra) {
+                        kuttedePerioder.plus(it)
+                        // Mangler de siste dagene i den ene perioden som har fom før revurderingsdato og tom etter revurderFradato
+                    } else if (it.grunnlag.fom < saksbehandling.revurderFra) {
+                        kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = saksbehandling.revurderFra.minusDays(1))))
                     }
                 }
-                TypeVedtak.AVSLAG -> TODO()
-                TypeVedtak.OPPHØR -> TODO()
             }
+            TypeVedtak.AVSLAG -> TODO()
+            TypeVedtak.OPPHØR -> TODO()
         }
 
         vedtakRepository.insert(
