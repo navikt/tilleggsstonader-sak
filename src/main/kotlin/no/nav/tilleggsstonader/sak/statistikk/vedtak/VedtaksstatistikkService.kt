@@ -86,7 +86,7 @@ class VedtaksstatistikkService(
             ?: throw IllegalStateException("Kan ikke sende vedtaksstatistikk uten vedtak")
         val vedtakstidspunkt = behandling.vedtakstidspunkt
             ?: throw IllegalStateException("Behandlingen må ha et vedtakstidspunkt for å sende vedtaksstatistikk")
-        val personIdent = behandlingService.hentAktivIdent(behandlingId)
+        val søkerIdent = behandlingService.hentAktivIdent(behandlingId)
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
         val vilkår = vilkårService.hentOppfyltePassBarnVilkår(behandlingId)
         val barn = barnRepository.findByBehandlingId(behandlingId)
@@ -99,9 +99,9 @@ class VedtaksstatistikkService(
                 eksternFagsakId = behandling.eksternFagsakId,
                 eksternBehandlingId = behandling.eksternId,
                 relatertBehandlingId = hentRelatertBehandlingId(behandling),
-                adressebeskyttelse = hentAdressebeskyttelse(personIdent),
+                adressebeskyttelse = hentAdressebeskyttelse(søkerIdent),
                 tidspunktVedtak = vedtakstidspunkt,
-                person = personIdent,
+                søkerIdent = søkerIdent,
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
                 behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
                 vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),

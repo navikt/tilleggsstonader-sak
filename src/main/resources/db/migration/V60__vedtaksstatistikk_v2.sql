@@ -8,7 +8,7 @@ CREATE TABLE vedtaksstatistikk_v2
     relatert_behandling_id VARCHAR,
     adressebeskyttelse     VARCHAR      NOT NULL,
     tidspunkt_vedtak       TIMESTAMP(3) NOT NULL,
-    person                 VARCHAR      NOT NULL,
+    soker_ident            VARCHAR      NOT NULL,
     behandling_type        VARCHAR      NOT NULL,
     behandling_arsak       VARCHAR      NOT NULL,
     vedtak_resultat        VARCHAR      NOT NULL,

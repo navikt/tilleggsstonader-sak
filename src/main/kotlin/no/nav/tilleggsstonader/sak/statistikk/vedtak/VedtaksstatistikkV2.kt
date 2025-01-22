@@ -33,7 +33,8 @@ data class VedtaksstatistikkV2(
     val relatertBehandlingId: Long?, // Ekstern behandlingsid på relatert behandling
     val adressebeskyttelse: AdressebeskyttelseDvh,
     val tidspunktVedtak: LocalDateTime,
-    val person: String,
+    @Column("soker_ident")
+    val søkerIdent: String,
     val behandlingType: BehandlingTypeDvh,
     @Column("behandling_arsak")
     val behandlingÅrsak: BehandlingÅrsakDvh,
