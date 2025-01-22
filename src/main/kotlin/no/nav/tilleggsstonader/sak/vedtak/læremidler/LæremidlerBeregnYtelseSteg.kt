@@ -79,30 +79,7 @@ class LæremidlerBeregnYtelseSteg(
             error("revurderFra-dato er påkrevd for opphør")
         }
 
-        val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
-        when (forrigeBehandling.type) {
-            TypeVedtak.INNVILGELSE -> {
-                val forrigeVedtak = forrigeBehandling.withTypeOrThrow<InnvilgelseLæremidler>()
-                forrigeVedtak.data.beregningsresultat.perioder.forEach {
-                    if (it.grunnlag.tom < saksbehandling.revurderFra) {
-                        kuttedePerioder.plus(it)
-                    } else if (it.grunnlag.fom < saksbehandling.revurderFra) {
-                        kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = saksbehandling.revurderFra.minusDays(1))))
-                    }
-                }
-            }
-            TypeVedtak.OPPHØR -> {
-                val forrigeVedtak = forrigeBehandling.withTypeOrThrow<OpphørLæremidler>()
-                forrigeVedtak.data.beregningsresultat.perioder.forEach {
-                    if (it.grunnlag.tom < saksbehandling.revurderFra) {
-                        kuttedePerioder.plus(it)
-                    } else if (it.grunnlag.fom < saksbehandling.revurderFra) {
-                        kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = saksbehandling.revurderFra.minusDays(1))))
-                    }
-                }
-            }
-            TypeVedtak.AVSLAG -> TODO()
-        }
+        val kuttedePerioder: List<BeregningsresultatForMåned> = kuttePerioderVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
 
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -119,6 +96,35 @@ class LæremidlerBeregnYtelseSteg(
         val beregningsresultatLæremidler = BeregningsresultatLæremidler(kuttedePerioder)
 
         lagreAndeler(saksbehandling, beregningsresultatLæremidler)
+    }
+
+    private fun kuttePerioderVedOpphør(forrigeBehandling: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
+        val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
+
+        when (forrigeBehandling.type) {
+            TypeVedtak.INNVILGELSE -> {
+                val forrigeVedtak = forrigeBehandling.withTypeOrThrow<InnvilgelseLæremidler>()
+                forrigeVedtak.data.beregningsresultat.perioder.forEach {
+                    if (it.grunnlag.tom < revurderFra) {
+                        kuttedePerioder.plus(it)
+                    } else if (it.grunnlag.fom < revurderFra) {
+                        kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
+                    }
+                }
+            }
+            TypeVedtak.OPPHØR -> {
+                val forrigeVedtak = forrigeBehandling.withTypeOrThrow<OpphørLæremidler>()
+                forrigeVedtak.data.beregningsresultat.perioder.forEach {
+                    if (it.grunnlag.tom < revurderFra) {
+                        kuttedePerioder.plus(it)
+                    } else if (it.grunnlag.fom < revurderFra) {
+                        kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
+                    }
+                }
+            }
+            TypeVedtak.AVSLAG -> TODO()
+        }
+        return  kuttedePerioder
     }
 
     private fun lagreAvslag(
