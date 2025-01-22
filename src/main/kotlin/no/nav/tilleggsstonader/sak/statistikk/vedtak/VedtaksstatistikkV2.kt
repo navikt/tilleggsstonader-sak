@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
@@ -51,10 +50,4 @@ data class VedtaksstatistikkV2(
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
     @LastModifiedDate
     val endretTid: LocalDateTime = opprettetTid,
-) {
-    init {
-        feilHvis(endretTid < opprettetTid) {
-            "EndretTid=$endretTid kan ikke være før opprettetTid=$opprettetTid"
-        }
-    }
-}
+)
