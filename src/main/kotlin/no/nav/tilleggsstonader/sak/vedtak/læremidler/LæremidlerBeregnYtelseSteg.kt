@@ -76,6 +76,9 @@ class LæremidlerBeregnYtelseSteg(
 
         val forrigeBehandling = vedtakRepository.findByIdOrNull(saksbehandling.forrigeBehandlingId)
         val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
+        if(saksbehandling.revurderFra == null) {
+            error("revurderFra-dato er påkrevd for opphør")
+        }
         if (forrigeBehandling != null) {
             when (forrigeBehandling.type) {
                 TypeVedtak.INNVILGELSE -> {
@@ -84,6 +87,9 @@ class LæremidlerBeregnYtelseSteg(
                         if (it.grunnlag.tom < saksbehandling.revurderFra) {
                             kuttedePerioder.plus(it)
                             // Mangler de siste dagene i den ene perioden som har fom før revurderingsdato og tom etter revurderFradato
+                        }
+                        else if (it.grunnlag.fom < saksbehandling.revurderFra) {
+                            kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = saksbehandling.revurderFra.minusDays(1))))
                         }
                     }
                 }
