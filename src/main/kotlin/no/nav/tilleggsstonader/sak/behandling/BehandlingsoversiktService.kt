@@ -111,9 +111,9 @@ class BehandlingsoversiktService(
             is InnvilgelseTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
             is OpphørTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
             is InnvilgelseLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
-            is AvslagTilsynBarn -> null
-            is AvslagLæremidler -> null
-            is OpphørLæremidler -> null
+            is AvslagTilsynBarn -> TODO()
+            is AvslagLæremidler -> TODO()
+            is OpphørLæremidler -> TODO()
         }
     }
 
