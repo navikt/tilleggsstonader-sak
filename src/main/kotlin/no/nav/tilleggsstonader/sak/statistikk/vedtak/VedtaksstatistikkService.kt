@@ -70,7 +70,7 @@ class VedtaksstatistikkService(
         vedtaksstatistikkRepository.insert(
             Vedtaksstatistikk(
                 fagsakId = fagsakId,
-                stønadstype = StønadstypeDvh.Companion.fraDomene(behandling.stønadstype),
+                stønadstype = StønadstypeDvh.fraDomene(behandling.stønadstype),
                 behandlingId = behandlingId,
                 eksternFagsakId = behandling.eksternFagsakId,
                 eksternBehandlingId = behandling.eksternId,
@@ -83,13 +83,13 @@ class VedtaksstatistikkService(
                 person = personIdent,
                 barn = BarnDvh.fraDomene(behandlingBarnService.finnBarnPåBehandling(behandlingId)),
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
-                behandlingÅrsak = BehandlingÅrsakDvh.Companion.fraDomene(behandling.årsak),
-                vedtakResultat = VedtakResultatDvh.Companion.fraDomene(behandling.resultat),
+                behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
+                vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
                 vedtaksperioder = VedtaksperioderDvh.fraDomene(stønadsperioder),
                 utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse),
                 kravMottatt = behandling.kravMottatt,
-                årsakerAvslag = ÅrsakAvslagDvh.Companion.fraDomene(vedtak?.takeIfType<Avslag>()?.data?.årsaker),
-                årsakerOpphør = ÅrsakOpphørDvh.Companion.fraDomene(vedtak?.takeIfType<Opphør>()?.data?.årsaker),
+                årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak?.takeIfType<Avslag>()?.data?.årsaker),
+                årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak?.takeIfType<Opphør>()?.data?.årsaker),
             ),
         )
     }
@@ -108,7 +108,7 @@ class VedtaksstatistikkService(
         vedtaksstatistikkRepositoryV2.insert(
             VedtaksstatistikkV2(
                 fagsakId = fagsakId,
-                stønadstype = StønadstypeDvh.Companion.fraDomene(behandling.stønadstype),
+                stønadstype = StønadstypeDvh.fraDomene(behandling.stønadstype),
                 behandlingId = behandlingId,
                 eksternFagsakId = behandling.eksternFagsakId,
                 eksternBehandlingId = behandling.eksternId,
@@ -117,18 +117,18 @@ class VedtaksstatistikkService(
                 tidspunktVedtak = vedtakstidspunkt,
                 person = personIdent,
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
-                behandlingÅrsak = BehandlingÅrsakDvh.Companion.fraDomene(behandling.årsak),
-                vedtakResultat = VedtakResultatDvh.Companion.fraDomene(behandling.resultat),
+                behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
+                vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
                 vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak, vilkår, barn),
                 utbetalinger = UtbetalingerDvhV2.fraDomene(andelTilkjentYtelse, vedtak),
                 kravMottatt = behandling.kravMottatt,
-                årsakerAvslag = ÅrsakAvslagDvh.Companion.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
-                årsakerOpphør = ÅrsakOpphørDvh.Companion.fraDomene(vedtak.takeIfType<Opphør>()?.data?.årsaker),
+                årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
+                årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak.takeIfType<Opphør>()?.data?.årsaker),
             ),
         )
     }
 
-    private fun hentAdressebeskyttelse(personIdent: String) = AdressebeskyttelseDvh.Companion.fraDomene(
+    private fun hentAdressebeskyttelse(personIdent: String) = AdressebeskyttelseDvh.fraDomene(
         personService.hentPersonKortBolk(
             listOf(personIdent),
         ).values.single().adressebeskyttelse.gradering(),
