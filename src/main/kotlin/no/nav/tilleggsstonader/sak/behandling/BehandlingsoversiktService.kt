@@ -68,7 +68,7 @@ class BehandlingsoversiktService(
                     vedtaksdato = it.vedtakstidspunkt,
                     henlagtÅrsak = it.henlagtÅrsak,
                     revurderFra = it.revurderFra,
-                    vedtaksperiode = if (it.resultat != BehandlingResultat.HENLAGT) vedtaksperioder[it.id] else null,
+                    vedtaksperiode = vedtaksperioder[it.id],
                 )
             },
         )
@@ -82,7 +82,9 @@ class BehandlingsoversiktService(
     private fun hentVedtaksperioder(
         behandlinger: List<Behandling>,
     ): Map<BehandlingId, Vedtaksperiode?> {
-        val revurderFraPåBehandlingId = behandlinger.associate { it.id to it.revurderFra }
+        val revurderFraPåBehandlingId = behandlinger
+            .filter { it.resultat != BehandlingResultat.HENLAGT }
+            .associate { it.id to it.revurderFra }
         return vedtakRepository.findAllById(behandlinger.map { it.id })
             .associateBy { it.behandlingId }
             .mapValues { (behandlingId, vedtak) ->
