@@ -6,7 +6,7 @@ CREATE TABLE vedtaksstatistikk_v2
     ekstern_fagsak_id      VARCHAR      NOT NULL,
     ekstern_behandling_id  VARCHAR      NOT NULL,
     relatert_behandling_id VARCHAR,
-    adressebeskyttelse     VARCHAR,
+    adressebeskyttelse     VARCHAR      NOT NULL,
     tidspunkt_vedtak       TIMESTAMP(3) NOT NULL,
     person                 VARCHAR      NOT NULL,
     behandling_type        VARCHAR      NOT NULL,
