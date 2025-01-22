@@ -124,7 +124,7 @@ class LæremidlerBeregnYtelseSteg(
             }
             TypeVedtak.AVSLAG -> TODO()
         }
-        return  kuttedePerioder
+        return kuttedePerioder
     }
 
     private fun lagreAvslag(
