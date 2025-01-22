@@ -87,7 +87,8 @@ class LæremidlerBeregnYtelseSteg(
                         }
                     }
                 }
-                else -> error("Opphør er et ugyldig vedtaksresultat fordi forrige vedtak er av typen ${forrigeBehandling.type}")
+                TypeVedtak.AVSLAG -> TODO()
+                TypeVedtak.OPPHØR -> TODO()
             }
         }
 
