@@ -212,7 +212,10 @@ class InterntVedtakService(
             avslagBegrunnelse = vedtak.begrunnelse,
         )
 
-        is OpphørLæremidler -> TODO()
+        is OpphørLæremidler -> VedtakOpphørInternt(
+            årsakerOpphør = vedtak.årsaker,
+            opphørBegrunnelse = vedtak.begrunnelse,
+        )
     }
 
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {
