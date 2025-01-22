@@ -4,8 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.RevurderFraService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -76,7 +76,7 @@ class LæremidlerBeregnYtelseSteg(
 
         val forrigeBehandling = vedtakRepository.findByIdOrNull(saksbehandling.forrigeBehandlingId)
         val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
-        if(saksbehandling.revurderFra == null) {
+        if (saksbehandling.revurderFra == null) {
             error("revurderFra-dato er påkrevd for opphør")
         }
         if (forrigeBehandling != null) {
@@ -87,8 +87,7 @@ class LæremidlerBeregnYtelseSteg(
                         if (it.grunnlag.tom < saksbehandling.revurderFra) {
                             kuttedePerioder.plus(it)
                             // Mangler de siste dagene i den ene perioden som har fom før revurderingsdato og tom etter revurderFradato
-                        }
-                        else if (it.grunnlag.fom < saksbehandling.revurderFra) {
+                        } else if (it.grunnlag.fom < saksbehandling.revurderFra) {
                             kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = saksbehandling.revurderFra.minusDays(1))))
                         }
                     }
