@@ -15,7 +15,7 @@ enum class VedtakResultatDvh {
                 BehandlingResultat.OPPHØRT -> OPPHØRT
                 BehandlingResultat.AVSLÅTT -> AVSLÅTT
                 BehandlingResultat.IKKE_SATT, BehandlingResultat.HENLAGT ->
-                    throw IllegalStateException("Skal ikke sende vedtaksstatistikk når resultat=$behandlingResultat.")
+                    error("Skal ikke sende vedtaksstatistikk når resultat=$behandlingResultat.")
             }
         }
     }
