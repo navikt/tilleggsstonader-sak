@@ -86,14 +86,22 @@ class LæremidlerBeregnYtelseSteg(
                 forrigeVedtak.data.beregningsresultat.perioder.forEach {
                     if (it.grunnlag.tom < saksbehandling.revurderFra) {
                         kuttedePerioder.plus(it)
-                        // Mangler de siste dagene i den ene perioden som har fom før revurderingsdato og tom etter revurderFradato
+                    } else if (it.grunnlag.fom < saksbehandling.revurderFra) {
+                        kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = saksbehandling.revurderFra.minusDays(1))))
+                    }
+                }
+            }
+            TypeVedtak.OPPHØR -> {
+                val forrigeVedtak = forrigeBehandling.withTypeOrThrow<OpphørLæremidler>()
+                forrigeVedtak.data.beregningsresultat.perioder.forEach {
+                    if (it.grunnlag.tom < saksbehandling.revurderFra) {
+                        kuttedePerioder.plus(it)
                     } else if (it.grunnlag.fom < saksbehandling.revurderFra) {
                         kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = saksbehandling.revurderFra.minusDays(1))))
                     }
                 }
             }
             TypeVedtak.AVSLAG -> TODO()
-            TypeVedtak.OPPHØR -> TODO()
         }
 
         vedtakRepository.insert(
@@ -105,7 +113,6 @@ class LæremidlerBeregnYtelseSteg(
                     årsaker = vedtak.årsakerOpphør,
                     begrunnelse = vedtak.begrunnelse,
                 ),
-
             ),
         )
 
