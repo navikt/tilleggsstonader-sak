@@ -79,7 +79,6 @@ class LæremidlerBeregnYtelseSteg(
             error("revurderFra-dato er påkrevd for opphør")
         }
 
-        opphørValideringService.validerPerioder(saksbehandling)
         val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
         when (forrigeBehandling.type) {
             TypeVedtak.INNVILGELSE -> {
