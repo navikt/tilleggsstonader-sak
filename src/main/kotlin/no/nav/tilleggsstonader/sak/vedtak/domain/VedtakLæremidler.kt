@@ -31,7 +31,6 @@ data class AvslagLæremidler(
     }
 }
 
-
 data class OpphørLæremidler(
     val beregningsresultat: BeregningsresultatLæremidler,
     override val årsaker: List<ÅrsakOpphør>,
@@ -48,7 +47,7 @@ data class OpphørLæremidler(
 fun VedtakLæremidler.beregningsresultat(): BeregningsresultatLæremidler? {
     return when (this) {
         is InnvilgelseLæremidler -> this.beregningsresultat
-         is OpphørLæremidler -> this.beregningsresultat
+        is OpphørLæremidler -> this.beregningsresultat
         is AvslagLæremidler -> null
     }
 }

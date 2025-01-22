@@ -62,7 +62,7 @@ class OpphørValideringService(
         revurderFra: LocalDate?,
     ) {
         beregningsresultatLæremidler.perioder.forEach { periode ->
-                brukerfeilHvis(periode.grunnlag.tom >= revurderFra) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
+            brukerfeilHvis(periode.grunnlag.tom >= revurderFra) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
         }
     }
 

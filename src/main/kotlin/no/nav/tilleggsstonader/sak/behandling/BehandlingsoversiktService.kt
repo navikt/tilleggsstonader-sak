@@ -14,7 +14,13 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.util.max
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.*
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 

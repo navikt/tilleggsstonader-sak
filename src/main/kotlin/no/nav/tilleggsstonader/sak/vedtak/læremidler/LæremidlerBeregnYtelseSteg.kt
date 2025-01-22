@@ -17,13 +17,21 @@ import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.domain.*
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.*
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -67,16 +75,15 @@ class LæremidlerBeregnYtelseSteg(
         }
 
         val forrigeBehandling = vedtakRepository.findByIdOrNull(saksbehandling.forrigeBehandlingId)
-        val kuttedePerioder: List<BeregningsresultatForMåned> =  emptyList()
+        val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
         if (forrigeBehandling != null) {
             when (forrigeBehandling.type) {
-
                 TypeVedtak.INNVILGELSE -> {
                     val forrigeVedtak = forrigeBehandling.withTypeOrThrow<InnvilgelseLæremidler>()
                     forrigeVedtak.data.beregningsresultat.perioder.forEach {
-                        if(it.grunnlag.tom < saksbehandling.revurderFra){
+                        if (it.grunnlag.tom < saksbehandling.revurderFra) {
                             kuttedePerioder.plus(it)
-                            //Mangler de siste dagene i den ene perioden som har fom før revurderingsdato og tom etter revurderFradato
+                            // Mangler de siste dagene i den ene perioden som har fom før revurderingsdato og tom etter revurderFradato
                         }
                     }
                 }
@@ -94,7 +101,7 @@ class LæremidlerBeregnYtelseSteg(
                     begrunnelse = vedtak.begrunnelse,
                 ),
 
-                ),
+            ),
         )
 
         val beregningsresultatLæremidler = BeregningsresultatLæremidler(kuttedePerioder)
