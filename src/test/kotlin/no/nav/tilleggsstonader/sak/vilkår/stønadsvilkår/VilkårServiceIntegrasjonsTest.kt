@@ -212,7 +212,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         }
     }
 
-    fun lagreVilkårsvurderinger(
+    private fun lagreVilkårsvurderinger(
         behandling: Behandling,
         barn: List<BehandlingBarn>,
         fom: LocalDate? = YearMonth.now().atDay(1),
