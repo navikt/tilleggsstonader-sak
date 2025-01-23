@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.dto
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import java.time.LocalDate
 
 data class InnvilgelseLæremidlerResponse(
@@ -14,4 +13,3 @@ data class InnvilgelseLæremidlerResponse(
 data class InnvilgelseLæremidlerRequest(
     val vedtaksperioder: List<VedtaksperiodeDto>,
 ) : VedtakLæremidlerRequest, VedtakLæremidlerDto(TypeVedtak.INNVILGELSE)
-
