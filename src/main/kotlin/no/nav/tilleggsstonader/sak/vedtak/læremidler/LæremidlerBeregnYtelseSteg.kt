@@ -102,10 +102,10 @@ class LæremidlerBeregnYtelseSteg(
     private fun kuttePerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
         val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
 
-        when (forrigeBehandling.type) {
+        when (forrigeVedtak.type) {
             TypeVedtak.INNVILGELSE -> {
-                val forrigeVedtak = forrigeBehandling.withTypeOrThrow<InnvilgelseLæremidler>()
-                forrigeVedtak.data.beregningsresultat.perioder.forEach {
+                val forrigeVedtakInnvilgelse = forrigeVedtak.withTypeOrThrow<InnvilgelseLæremidler>()
+                forrigeVedtakInnvilgelse.data.beregningsresultat.perioder.forEach {
                     if (it.grunnlag.tom < revurderFra) {
                         kuttedePerioder.plus(it)
                     } else if (it.grunnlag.fom < revurderFra) {
@@ -114,8 +114,8 @@ class LæremidlerBeregnYtelseSteg(
                 }
             }
             TypeVedtak.OPPHØR -> {
-                val forrigeVedtak = forrigeBehandling.withTypeOrThrow<OpphørLæremidler>()
-                forrigeVedtak.data.beregningsresultat.perioder.forEach {
+                val forrigeVedtakOpphør = forrigeVedtak.withTypeOrThrow<OpphørLæremidler>()
+                forrigeVedtakOpphør.data.beregningsresultat.perioder.forEach {
                     if (it.grunnlag.tom < revurderFra) {
                         kuttedePerioder.plus(it)
                     } else if (it.grunnlag.fom < revurderFra) {
