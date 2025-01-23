@@ -67,6 +67,7 @@ object TilsynBarnTestUtil {
         måned: YearMonth = YearMonth.of(2024, 1),
         stønadsperioder: List<StønadsperiodeGrunnlag> = emptyList(),
         beløpsperioder: List<Beløpsperiode> = beløpsperioderDefault,
+        utgifterTotal: Int = 5000,
     ) = BeregningsresultatForMåned(
         dagsats = BigDecimal.TEN,
         månedsbeløp = 3000,
@@ -75,7 +76,7 @@ object TilsynBarnTestUtil {
             makssats = 3000,
             stønadsperioderGrunnlag = stønadsperioder,
             utgifter = listOf(UtgiftBarn(defaultBarn1.id, 1000)),
-            utgifterTotal = 5000,
+            utgifterTotal = utgifterTotal,
             antallBarn = 1,
         ),
         beløpsperioder = beløpsperioder,

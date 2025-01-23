@@ -2,6 +2,10 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -12,7 +16,18 @@ class UtbetalingerDvhV2Test {
 
     @Test
     fun `fraDomene mapper til UtbetalingerDvh for tillsynBarn ikke makssats`() {
-        val innvilgelse = innvilgelseTilsynBarn()
+        val innvilgelse = innvilgelseTilsynBarn(
+            InnvilgelseTilsynBarn(
+                beregningsresultat = BeregningsresultatTilsynBarn(
+                    perioder = listOf(
+                        beregningsresultatForMåned(
+                            stønadsperioder = listOf(stønadsperiodeGrunnlag()),
+                            utgifterTotal = 4000,
+                        ),
+                    ),
+                ),
+            ),
+        )
         val andlelerTilkjentYtelse = listOf(andelTilkjentYtelse(fom = LocalDate.of(2024, 1, 1), beløp = 1000))
 
         val resultat = UtbetalingerDvhV2.fraDomene(andlelerTilkjentYtelse, innvilgelse)
@@ -24,8 +39,8 @@ class UtbetalingerDvhV2Test {
                     tilOgMed = LocalDate.of(2024, 1, 1),
                     type = AndelstypeDvh.TILSYN_BARN_AAP,
                     beløp = 1000,
-                    makssats = 4650,
-                    erMakssats = false,
+                    makssats = 3000,
+                    beløpErBegrensetAvMakssats = false,
                 ),
             ),
         )
@@ -36,6 +51,7 @@ class UtbetalingerDvhV2Test {
     @Test
     fun `fraDomene mapper til UtbetalingerDvh for tillsynBarn makssats`() {
         val innvilgelse = innvilgelseTilsynBarn()
+
         val andlelerTilkjentYtelse = listOf(andelTilkjentYtelse(fom = LocalDate.of(2024, 1, 1)))
 
         val resultat = UtbetalingerDvhV2.fraDomene(andlelerTilkjentYtelse, innvilgelse)
@@ -47,8 +63,8 @@ class UtbetalingerDvhV2Test {
                     tilOgMed = LocalDate.of(2024, 1, 1),
                     type = AndelstypeDvh.TILSYN_BARN_AAP,
                     beløp = 11554,
-                    makssats = 4650,
-                    erMakssats = true,
+                    makssats = 3000,
+                    beløpErBegrensetAvMakssats = true,
                 ),
             ),
         )

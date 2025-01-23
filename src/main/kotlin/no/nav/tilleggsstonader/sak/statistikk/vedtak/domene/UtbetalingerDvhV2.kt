@@ -4,7 +4,8 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.AndelstypeDvh
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.toYearMonth
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.finnMakssats
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.DEKNINGSGRAD_TILSYN_BARN
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
@@ -20,7 +21,7 @@ data class UtbetalingerDvhV2(
     val type: AndelstypeDvh,
     val beløp: Int,
     val makssats: Int? = null,
-    val erMakssats: Boolean? = null,
+    val beløpErBegrensetAvMakssats: Boolean? = null,
 ) {
     data class JsonWrapper(
         val utbetalinger: List<UtbetalingerDvhV2>,
@@ -30,37 +31,43 @@ data class UtbetalingerDvhV2(
         fun fraDomene(ytelser: List<AndelTilkjentYtelse>, vedtak: Vedtak) = JsonWrapper(
             ytelser.filterNot { it.type == TypeAndel.UGYLDIG }.map { andelTilkjentYtelse ->
 
-                val makssats = andelTilkjentYtelse.finnMakssats(vedtak)
+                val beregningsgrunnlag = andelTilkjentYtelse.finnGrunnlag(vedtak)
 
                 UtbetalingerDvhV2(
                     fraOgMed = andelTilkjentYtelse.fom,
                     tilOgMed = andelTilkjentYtelse.tom,
                     type = AndelstypeDvh.fraDomene(andelTilkjentYtelse.type),
                     beløp = andelTilkjentYtelse.beløp,
-                    makssats = makssats,
-                    erMakssats = makssats?.let { makssats <= andelTilkjentYtelse.beløp },
+                    makssats = beregningsgrunnlag?.makssats,
+                    beløpErBegrensetAvMakssats = erBeløpBegrensetAvMakssats(beregningsgrunnlag),
                 )
             },
         )
 
-        private fun AndelTilkjentYtelse.finnMakssats(vedtak: Vedtak): Int? {
+        private fun AndelTilkjentYtelse.finnGrunnlag(vedtak: Vedtak): Beregningsgrunnlag? {
             return when (vedtak.data) {
                 is AvslagLæremidler -> null
                 is AvslagTilsynBarn -> null
                 is InnvilgelseLæremidler -> null
-                is InnvilgelseTilsynBarn -> vedtak.data.finnMakssats(this.fom.toYearMonth())
-                is OpphørTilsynBarn -> vedtak.data.finnMakssats(this.fom.toYearMonth())
+                is InnvilgelseTilsynBarn -> vedtak.data.finnGrunnlag(this.fom.toYearMonth())
+                is OpphørTilsynBarn -> vedtak.data.finnGrunnlag(this.fom.toYearMonth())
             }
         }
 
-        private fun InnvilgelseTilsynBarn.finnMakssats(måned: YearMonth): Int? {
-            val antallBarn = this.beregningsresultat.perioder.find { it.grunnlag.måned == måned }?.grunnlag?.antallBarn
-            return antallBarn?.let { finnMakssats(måned = måned, antallBarn = antallBarn) }
-        }
+        private fun InnvilgelseTilsynBarn.finnGrunnlag(måned: YearMonth): Beregningsgrunnlag =
+            this.beregningsresultat.perioder.find { it.grunnlag.måned == måned }?.grunnlag
+                ?: error("Skal ha beregningsgrunnlag hvis andeler eksisterer")
 
-        private fun OpphørTilsynBarn.finnMakssats(måned: YearMonth): Int? {
-            val antallBarn = this.beregningsresultat.perioder.find { it.grunnlag.måned == måned }?.grunnlag?.antallBarn
-            return antallBarn?.let { finnMakssats(måned = måned, antallBarn = antallBarn) }
-        }
+        private fun OpphørTilsynBarn.finnGrunnlag(måned: YearMonth): Beregningsgrunnlag =
+            this.beregningsresultat.perioder.find { it.grunnlag.måned == måned }?.grunnlag
+                ?: error("Skal ha beregningsgrunnlag hvis andeler eksisterer")
+
+        private fun erBeløpBegrensetAvMakssats(beregningsgrunnlag: Beregningsgrunnlag?): Boolean? =
+            beregningsgrunnlag?.let {
+                val utgifterSomDekkes = (beregningsgrunnlag.utgifterTotal.toBigDecimal()).multiply(
+                    DEKNINGSGRAD_TILSYN_BARN,
+                )
+                utgifterSomDekkes > beregningsgrunnlag.makssats.toBigDecimal()
+            }
     }
 }
