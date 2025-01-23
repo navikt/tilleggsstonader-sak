@@ -35,14 +35,14 @@ data class Beregningsgrunnlag(
 ) : Periode<LocalDate>
 
 fun kuttePerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
-    val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
+    var kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
 
     when (forrigeVedtak.type) {
         TypeVedtak.INNVILGELSE -> {
             val forrigeVedtakInnvilgelse = forrigeVedtak.withTypeOrThrow<InnvilgelseLæremidler>()
             forrigeVedtakInnvilgelse.data.beregningsresultat.perioder.forEach {
                 if (it.grunnlag.tom < revurderFra) {
-                    kuttedePerioder.plus(it)
+                    kuttedePerioder = kuttedePerioder.plus(it)
                 } else if (it.grunnlag.fom < revurderFra) {
                     kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
                 }
@@ -52,9 +52,9 @@ fun kuttePerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List
             val forrigeVedtakOpphør = forrigeVedtak.withTypeOrThrow<OpphørLæremidler>()
             forrigeVedtakOpphør.data.beregningsresultat.perioder.forEach {
                 if (it.grunnlag.tom < revurderFra) {
-                    kuttedePerioder.plus(it)
+                    kuttedePerioder = kuttedePerioder.plus(it)
                 } else if (it.grunnlag.fom < revurderFra) {
-                    kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
+                    kuttedePerioder = kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
                 }
             }
         }

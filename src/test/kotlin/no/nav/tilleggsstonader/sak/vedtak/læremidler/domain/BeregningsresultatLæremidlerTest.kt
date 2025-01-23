@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -38,5 +40,27 @@ class BeregningsresultatLæremidlerTest {
         val result = beregningsresultat.filtrerFraOgMed(LocalDate.of(2024, 1, 1))
 
         assertThat(result).isEqualTo(beregningsresultat)
+    }
+
+
+    @Test
+    fun `perioder før Revurder-fra blir ikke fjernet`() {
+
+        val forrigeVedtak = LæremidlerTestUtil.innvilgelse()
+        val kuttePerioderVedOpphør = kuttePerioderVedOpphør(forrigeVedtak, LocalDate.of(2024, 1, 20))
+
+        assertThat(kuttePerioderVedOpphør).isEqualTo(listOf<BeregningsresultatForMåned>(BeregningsresultatForMåned(
+            beløp = 875,
+            grunnlag = Beregningsgrunnlag(
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 1, 7),
+                utbetalingsdato = LocalDate.of(2024, 1, 1),
+                studienivå = Studienivå.HØYERE_UTDANNING,
+                studieprosent = 100,
+                sats = 875,
+                satsBekreftet = true,
+                målgruppe = MålgruppeType.AAP,
+            )
+        )))
     }
 }
