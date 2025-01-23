@@ -27,7 +27,7 @@ data class UtbetalingerDvhV2(
     )
 
     companion object {
-        fun fraDomene(ytelser: List<AndelTilkjentYtelse>, vedtak: Vedtak?) = JsonWrapper(
+        fun fraDomene(ytelser: List<AndelTilkjentYtelse>, vedtak: Vedtak) = JsonWrapper(
             ytelser.filterNot { it.type == TypeAndel.UGYLDIG }.map { andelTilkjentYtelse ->
 
                 val makssats = andelTilkjentYtelse.finnMakssats(vedtak)
@@ -43,14 +43,13 @@ data class UtbetalingerDvhV2(
             },
         )
 
-        private fun AndelTilkjentYtelse.finnMakssats(vedtak: Vedtak?): Int? {
-            return when (vedtak?.data) {
+        private fun AndelTilkjentYtelse.finnMakssats(vedtak: Vedtak): Int? {
+            return when (vedtak.data) {
                 is AvslagLæremidler -> null
                 is AvslagTilsynBarn -> null
                 is InnvilgelseLæremidler -> null
                 is InnvilgelseTilsynBarn -> vedtak.data.finnMakssats(this.fom.toYearMonth())
                 is OpphørTilsynBarn -> vedtak.data.finnMakssats(this.fom.toYearMonth())
-                else -> TODO("Har ikke implementert finnMakssats for denne vedtakstypen")
             }
         }
 

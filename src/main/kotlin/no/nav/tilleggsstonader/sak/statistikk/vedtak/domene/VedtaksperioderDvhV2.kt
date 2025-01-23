@@ -28,8 +28,8 @@ data class VedtaksperioderDvhV2(
     )
 
     companion object {
-        fun fraDomene(vedtak: Vedtak?, barnFakta: List<BehandlingBarn>): JsonWrapper {
-            vedtak?.takeIfType<InnvilgelseTilsynBarn>()?.data?.beregningsresultat?.perioder?.let {
+        fun fraDomene(vedtak: Vedtak, barnFakta: List<BehandlingBarn>): JsonWrapper {
+            vedtak.takeIfType<InnvilgelseTilsynBarn>()?.data?.beregningsresultat?.perioder?.let {
                 return JsonWrapper(
                     vedtaksperioder = VedtaksperiodeTilsynBarnMapper.mapTilVedtaksperiode(it).map {
                         VedtaksperioderDvhV2(
@@ -45,7 +45,7 @@ data class VedtaksperioderDvhV2(
                 )
             }
 
-            vedtak?.takeIfType<OpphørTilsynBarn>()?.data?.beregningsresultat?.perioder?.let {
+            vedtak.takeIfType<OpphørTilsynBarn>()?.data?.beregningsresultat?.perioder?.let {
                 return JsonWrapper(
                     vedtaksperioder = VedtaksperiodeTilsynBarnMapper.mapTilVedtaksperiode(it).map {
                         VedtaksperioderDvhV2(
@@ -61,7 +61,7 @@ data class VedtaksperioderDvhV2(
                 )
             }
 
-            vedtak?.takeIfType<InnvilgelseLæremidler>()?.data?.beregningsresultat?.perioder?.let {
+            vedtak.takeIfType<InnvilgelseLæremidler>()?.data?.beregningsresultat?.perioder?.let {
                 return JsonWrapper(
                     vedtaksperioder = VedtaksperiodeLæremidlerMapper.mapTilVedtaksperiode(it).map {
                         VedtaksperioderDvhV2(
