@@ -338,7 +338,7 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
             assertThatThrownBy {
                 service.opprettBehandling(request)
-            }.hasMessage("Behandling må opprettes med minimum 1 barn")
+            }.hasMessage("Behandling må opprettes med minimum 1 barn. Dersom alle tidligere behandlinger er henlagt, må ny behandling opprettes som søknad eller papirsøknad.")
         }
     }
 
