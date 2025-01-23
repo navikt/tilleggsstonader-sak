@@ -6,8 +6,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeMapper
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper.VedtaksperiodeTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.math.BigDecimal
@@ -51,7 +51,7 @@ fun BeregningsresultatTilsynBarn.tilDto(
     val filtrertPerioder = this.perioder
         .filterNot { it.grunnlag.måned < (revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN) }
 
-    val vedtaksperioder = VedtaksperiodeMapper.mapTilVedtaksperiode(this.perioder)
+    val vedtaksperioder = VedtaksperiodeTilsynBarnMapper.mapTilVedtaksperiode(this.perioder)
         .filtrerStønadsperioderFra(revurderFra)
         .map { it.tilDto() }
 
@@ -63,7 +63,7 @@ fun BeregningsresultatTilsynBarn.tilDto(
     )
 }
 
-private fun Vedtaksperiode.tilDto() = VedtaksperiodeDto(
+private fun VedtaksperiodeTilsynBarn.tilDto() = VedtaksperiodeDto(
     fom = fom,
     tom = tom,
     målgruppe = målgruppe,
@@ -103,9 +103,9 @@ private fun List<Beløpsperiode>.filtrerBeløpsperioderFra(revurderFra: LocalDat
  * Skal kun ha med stønadsperioder som er etter [revurderFra]
  * Dersom stønadsperioden overlapper med [revurderFra] så skal den avkortes fra og med revurderFra-dato
  */
-private fun List<Vedtaksperiode>.filtrerStønadsperioderFra(
+private fun List<VedtaksperiodeTilsynBarn>.filtrerStønadsperioderFra(
     revurderFra: LocalDate?,
-): List<Vedtaksperiode> = mapNotNull {
+): List<VedtaksperiodeTilsynBarn> = mapNotNull {
     when {
         revurderFra == null -> it
         it.tom < revurderFra -> null

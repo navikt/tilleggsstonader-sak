@@ -259,7 +259,6 @@ object Testdata {
                         målgruppe = MålgruppeType.AAP,
                     ),
                 ),
-
             ),
         )
 

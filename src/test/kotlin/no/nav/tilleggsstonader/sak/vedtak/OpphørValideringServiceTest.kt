@@ -22,6 +22,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class OpphørValideringServiceTest {
 
@@ -69,7 +70,7 @@ class OpphørValideringServiceTest {
 
         @Test
         fun `Kaster feil ved utbetaling etter opphørdato`() {
-            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = osloDateNow())
+            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = LocalDate.of(2024, 1, 1))
 
             assertThatThrownBy {
                 opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(

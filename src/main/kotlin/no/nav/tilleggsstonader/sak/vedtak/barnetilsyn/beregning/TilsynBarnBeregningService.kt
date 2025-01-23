@@ -40,7 +40,7 @@ import java.time.LocalDate
 /**
  * Stønaden dekker 64% av utgifterne til barnetilsyn
  */
-private val DEKNINGSGRAD = BigDecimal("0.64")
+val DEKNINGSGRAD_TILSYN_BARN = BigDecimal("0.64")
 private val SNITT_ANTALL_VIRKEDAGER_PER_MÅNED = BigDecimal("21.67")
 
 @Service
@@ -130,7 +130,7 @@ class TilsynBarnBeregningService(
      */
     private fun beregnDagsats(grunnlag: Beregningsgrunnlag): BigDecimal {
         val utgifter = grunnlag.utgifterTotal.toBigDecimal()
-        val utgifterSomDekkes = utgifter.multiply(DEKNINGSGRAD)
+        val utgifterSomDekkes = utgifter.multiply(DEKNINGSGRAD_TILSYN_BARN)
             .setScale(0, RoundingMode.HALF_UP)
             .toInt()
         val satsjusterteUtgifter = minOf(utgifterSomDekkes, grunnlag.makssats).toBigDecimal()
