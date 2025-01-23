@@ -86,6 +86,7 @@ class LæremidlerBeregnYtelseSteg(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.OPPHØR,
                 data = OpphørLæremidler(
+                    vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                     beregningsresultat = BeregningsresultatLæremidler(kuttedePerioder),
                     årsaker = vedtak.årsakerOpphør,
                     begrunnelse = vedtak.begrunnelse,

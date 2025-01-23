@@ -10,6 +10,7 @@ data class OpphørLæremidlerResponse(
 ) : VedtakLæremidlerResponse, VedtakLæremidlerDto(TypeVedtak.OPPHØR)
 
 data class OpphørLæremidlerRequest(
+    val vedtaksperioder: List<VedtaksperiodeDto>,
     val årsakerOpphør: List<ÅrsakOpphør>,
     val begrunnelse: String,
 ) : VedtakLæremidlerRequest, VedtakLæremidlerDto(TypeVedtak.OPPHØR)

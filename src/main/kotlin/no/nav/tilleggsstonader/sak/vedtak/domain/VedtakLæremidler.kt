@@ -32,6 +32,7 @@ data class AvslagLæremidler(
 }
 
 data class OpphørLæremidler(
+    val vedtaksperioder: List<Vedtaksperiode>,
     val beregningsresultat: BeregningsresultatLæremidler,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
