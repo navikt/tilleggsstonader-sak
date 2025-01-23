@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
@@ -46,8 +47,7 @@ object VedtaksperiodeLæremidlerMapper {
         fun erLikOgPåfølgesAv(other: VedtaksperiodeLæremidler): Boolean {
             val erLik = this.målgruppe == other.målgruppe &&
                 this.studienivå == other.studienivå
-            val påfølgesAv = this.tom.plusDays(1) == other.fom
-            return erLik && påfølgesAv
+            return erLik && this.påfølgesAv(other)
         }
     }
 }
