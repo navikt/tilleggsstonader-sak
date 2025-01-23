@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgruppeTypeDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2.Companion.finnBarnasFødselsnumre
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2.Companion.finnFødselsnumre
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
@@ -32,7 +32,7 @@ class VedtaksperioderDvhV2Test {
     fun `fraDomene kan mappe for InnvilgelseTilsynBarn`() {
         val resultat = VedtaksperioderDvhV2.fraDomene(
             innvilgelseTilsynBarn(),
-            barnFakta = barn1,
+            barn = barn1,
         ).vedtaksperioder
 
         val forventetResultat = listOf(
@@ -54,7 +54,7 @@ class VedtaksperioderDvhV2Test {
     fun `fraDomene kan mappe for InnvilgelseLæremidler`() {
         val resultat = VedtaksperioderDvhV2.fraDomene(
             vedtak = innvilgelseLæremidler(),
-            barnFakta = emptyList(),
+            barn = emptyList(),
         )
 
         val forventetResultat = VedtaksperioderDvhV2.JsonWrapper(
@@ -83,7 +83,7 @@ class VedtaksperioderDvhV2Test {
             ),
         )
 
-        val resultat = VedtaksperioderDvhV2.fraDomene(vedtak = avslag, barnFakta = emptyList())
+        val resultat = VedtaksperioderDvhV2.fraDomene(vedtak = avslag, barn = emptyList())
 
         val forventetResultat = VedtaksperioderDvhV2.JsonWrapper(
             vedtaksperioder = emptyList(),
@@ -96,14 +96,14 @@ class VedtaksperioderDvhV2Test {
     inner class FinnFødselsnumre {
         @Test
         fun `finnBarnasFødselsnumre skal finne fødselsnummeret til barn når det er ett barn`() {
-            val resultat = barn1.map { it.id }.finnBarnasFødselsnumre(alleBarn)
+            val resultat = barn1.map { it.id }.finnFødselsnumre(alleBarn)
 
             assertThat(resultat).isEqualTo(barn1.map { it.ident })
         }
 
         @Test
         fun `finnBarnasFødselsnumre skal finne fødselsnummeret til barn når det er flere barn`() {
-            val resultat = alleBarn.map { it.id }.finnBarnasFødselsnumre(alleBarn)
+            val resultat = alleBarn.map { it.id }.finnFødselsnumre(alleBarn)
 
             assertThat(resultat).isEqualTo(alleBarn.map { it.ident })
         }
