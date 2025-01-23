@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import kotlin.collections.emptyList
 
 class BeregningsresultatLæremidlerTest {
     val beregningsresultat = BeregningsresultatLæremidler(
@@ -42,25 +43,59 @@ class BeregningsresultatLæremidlerTest {
         assertThat(result).isEqualTo(beregningsresultat)
     }
 
-
     @Test
     fun `perioder før Revurder-fra blir ikke fjernet`() {
-
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse()
         val kuttePerioderVedOpphør = kuttePerioderVedOpphør(forrigeVedtak, LocalDate.of(2024, 1, 20))
 
-        assertThat(kuttePerioderVedOpphør).isEqualTo(listOf<BeregningsresultatForMåned>(BeregningsresultatForMåned(
-            beløp = 875,
-            grunnlag = Beregningsgrunnlag(
-                fom = LocalDate.of(2024, 1, 1),
-                tom = LocalDate.of(2024, 1, 7),
-                utbetalingsdato = LocalDate.of(2024, 1, 1),
-                studienivå = Studienivå.HØYERE_UTDANNING,
-                studieprosent = 100,
-                sats = 875,
-                satsBekreftet = true,
-                målgruppe = MålgruppeType.AAP,
-            )
-        )))
+        assertThat(kuttePerioderVedOpphør).isEqualTo(
+            listOf<BeregningsresultatForMåned>(
+                BeregningsresultatForMåned(
+                    beløp = 875,
+                    grunnlag = Beregningsgrunnlag(
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 1, 7),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                        studienivå = Studienivå.HØYERE_UTDANNING,
+                        studieprosent = 100,
+                        sats = 875,
+                        satsBekreftet = true,
+                        målgruppe = MålgruppeType.AAP,
+                    ),
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `perioder midt i Revurder-fra blir kuttet`() {
+        val forrigeVedtak = LæremidlerTestUtil.innvilgelse()
+        val kuttePerioderVedOpphør = kuttePerioderVedOpphør(forrigeVedtak, LocalDate.of(2024, 1, 5))
+
+        assertThat(kuttePerioderVedOpphør).isEqualTo(
+            listOf<BeregningsresultatForMåned>(
+                BeregningsresultatForMåned(
+                    beløp = 875,
+                    grunnlag = Beregningsgrunnlag(
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 1, 4),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                        studienivå = Studienivå.HØYERE_UTDANNING,
+                        studieprosent = 100,
+                        sats = 875,
+                        satsBekreftet = true,
+                        målgruppe = MålgruppeType.AAP,
+                    ),
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `perioder etter Revurder-fra blir fjernet`() {
+        val forrigeVedtak = LæremidlerTestUtil.innvilgelse()
+        val kuttePerioderVedOpphør = kuttePerioderVedOpphør(forrigeVedtak, LocalDate.of(2023, 12, 1))
+
+        assertThat(kuttePerioderVedOpphør).isEqualTo(emptyList<BeregningsresultatForMåned>())
     }
 }

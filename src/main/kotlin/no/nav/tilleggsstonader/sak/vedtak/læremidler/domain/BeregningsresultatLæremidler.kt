@@ -44,7 +44,7 @@ fun kuttePerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List
                 if (it.grunnlag.tom < revurderFra) {
                     kuttedePerioder = kuttedePerioder.plus(it)
                 } else if (it.grunnlag.fom < revurderFra) {
-                    kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
+                    kuttedePerioder = kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
                 }
             }
         }
