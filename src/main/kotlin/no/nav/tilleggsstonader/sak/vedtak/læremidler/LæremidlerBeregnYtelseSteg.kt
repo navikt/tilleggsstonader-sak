@@ -78,7 +78,11 @@ class LæremidlerBeregnYtelseSteg(
         if (saksbehandling.revurderFra == null) {
             error("revurderFra-dato er påkrevd for opphør")
         }
+            feilHvis(forrigeBehandling.type !== TypeVedtak.INNVILGELSE)  {
+                "Opphør er et ugyldig vedtaksresultat fordi forrige behandling ikke er en innvilgelse"
+            }
 
+        val innvilgelseLæremidler = forrigeBehandling.data as InnvilgelseLæremidler
         val kuttedePerioder: List<BeregningsresultatForMåned> = kuttePerioderVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
 
         vedtakRepository.insert(
@@ -86,7 +90,7 @@ class LæremidlerBeregnYtelseSteg(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.OPPHØR,
                 data = OpphørLæremidler(
-                    vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
+                    vedtaksperioder = innvilgelseLæremidler.vedtaksperioder,
                     beregningsresultat = BeregningsresultatLæremidler(kuttedePerioder),
                     årsaker = vedtak.årsakerOpphør,
                     begrunnelse = vedtak.begrunnelse,
