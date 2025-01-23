@@ -5,10 +5,14 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.finnMakssats
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import java.time.LocalDate
+import java.time.YearMonth
 
 data class UtbetalingerDvhV2(
     val fraOgMed: LocalDate,
@@ -40,16 +44,24 @@ data class UtbetalingerDvhV2(
         )
 
         private fun AndelTilkjentYtelse.finnMakssats(vedtak: Vedtak?): Int? {
-            val vedtakBeregningsresultatForMåned =
-                vedtak?.takeIfType<InnvilgelseTilsynBarn>()?.data?.beregningsresultat?.perioder
-            val antallBarn =
-                vedtakBeregningsresultatForMåned?.find { it.grunnlag.måned == this.fom.toYearMonth() }?.grunnlag?.antallBarn
-            return antallBarn?.let {
-                finnMakssats(
-                    this.fom.toYearMonth(),
-                    antallBarn,
-                )
+            return when (vedtak?.data) {
+                is AvslagLæremidler -> null
+                is AvslagTilsynBarn -> null
+                is InnvilgelseLæremidler -> null
+                is InnvilgelseTilsynBarn -> vedtak.data.finnMakssats(this.fom.toYearMonth())
+                is OpphørTilsynBarn -> vedtak.data.finnMakssats(this.fom.toYearMonth())
+                else -> TODO("Har ikke implementert finnMakssats for denne vedtakstypen")
             }
+        }
+
+        private fun InnvilgelseTilsynBarn.finnMakssats(måned: YearMonth): Int? {
+            val antallBarn = this.beregningsresultat.perioder.find { it.grunnlag.måned == måned }?.grunnlag?.antallBarn
+            return antallBarn?.let { finnMakssats(måned = måned, antallBarn = antallBarn) }
+        }
+
+        private fun OpphørTilsynBarn.finnMakssats(måned: YearMonth): Int? {
+            val antallBarn = this.beregningsresultat.perioder.find { it.grunnlag.måned == måned }?.grunnlag?.antallBarn
+            return antallBarn?.let { finnMakssats(måned = måned, antallBarn = antallBarn) }
         }
     }
 }
