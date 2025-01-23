@@ -106,7 +106,6 @@ class VedtaksstatistikkService(
                 vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
                 vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak, barn),
                 utbetalinger = UtbetalingerDvhV2.fraDomene(andelTilkjentYtelse, vedtak),
-                kravMottatt = behandling.kravMottatt,
                 årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
                 årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak.takeIfType<Opphør>()?.data?.årsaker),
             ),

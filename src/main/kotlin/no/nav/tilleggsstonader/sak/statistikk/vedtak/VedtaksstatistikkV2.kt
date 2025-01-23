@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.relational.core.mapping.Column
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
@@ -40,7 +39,6 @@ data class VedtaksstatistikkV2(
     val utbetalinger: UtbetalingerDvhV2.JsonWrapper,
     @Column("stonadstype")
     val stønadstype: StønadstypeDvh,
-    val kravMottatt: LocalDate?,
     @Column("arsaker_avslag")
     val årsakerAvslag: ÅrsakAvslagDvh.JsonWrapper?,
     @Column("arsaker_opphor")
