@@ -18,7 +18,6 @@ object VedtaksdataFilesUtil {
      */
     fun Stønadstype.tilTypeVedtaksdataSuffix() = when (this) {
         Stønadstype.BARNETILSYN -> "TILSYN_BARN"
-        Stønadstype.LÆREMIDLER -> "LÆREMIDLER"
         else -> name
     }
 
