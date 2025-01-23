@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper.VedtaksperiodeTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -9,7 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class VedtaksperiodeMapperTest {
+class VedtaksperiodeTilsynBarnMapperTest {
 
     val periode1 = StønadsperiodeBeregningsgrunnlag(
         fom = LocalDate.of(2024, 1, 1),
@@ -27,15 +29,16 @@ class VedtaksperiodeMapperTest {
 
     @Test
     fun `skal slå sammen perioder hvis de er like og sammenhengende`() {
-        val vedtaksperioder = VedtaksperiodeMapper.mapTilVedtaksperiode(listOf(beregningsresultat(periode1, periode2)))
+        val vedtaksperioder = VedtaksperiodeTilsynBarnMapper.mapTilVedtaksperiode(listOf(beregningsresultat(periode1, periode2)))
 
         assertThat(vedtaksperioder).containsExactly(
-            Vedtaksperiode(
+            VedtaksperiodeTilsynBarn(
                 fom = periode1.fom,
                 tom = periode2.tom,
                 målgruppe = periode1.målgruppe,
                 aktivitet = periode1.aktivitet,
-                antallBarn = 2,
+                antallBarn = 1,
+                barn = listOf(defaultBarn1.id),
             ),
         )
     }
@@ -46,7 +49,7 @@ class VedtaksperiodeMapperTest {
     @Test
     fun `skal slå sammen perioder tvers ulike måneder`() {
         val periode2Tom = LocalDate.of(2024, 2, 10)
-        val vedtaksperioder = VedtaksperiodeMapper.mapTilVedtaksperiode(
+        val vedtaksperioder = VedtaksperiodeTilsynBarnMapper.mapTilVedtaksperiode(
             listOf(
                 beregningsresultat(periode1.copy(fom = LocalDate.of(2024, 1, 1), tom = LocalDate.of(2024, 1, 31))),
                 beregningsresultat(periode1.copy(fom = LocalDate.of(2024, 2, 1), tom = periode2Tom)),
@@ -54,19 +57,20 @@ class VedtaksperiodeMapperTest {
         )
 
         assertThat(vedtaksperioder).containsExactly(
-            Vedtaksperiode(
+            VedtaksperiodeTilsynBarn(
                 fom = periode1.fom,
                 tom = periode2Tom,
                 målgruppe = periode1.målgruppe,
                 aktivitet = periode1.aktivitet,
-                antallBarn = 2,
+                antallBarn = 1,
+                barn = listOf(defaultBarn1.id),
             ),
         )
     }
 
     @Test
     fun `skal ikke slå sammen perioder hvis de ikke har samme målgruppe`() {
-        val vedtaksperioder = VedtaksperiodeMapper.mapTilVedtaksperiode(
+        val vedtaksperioder = VedtaksperiodeTilsynBarnMapper.mapTilVedtaksperiode(
             listOf(
                 beregningsresultat(
                     periode1,
@@ -80,7 +84,7 @@ class VedtaksperiodeMapperTest {
 
     @Test
     fun `skal ikke slå sammen perioder hvis de ikke har samme aktivitet`() {
-        val vedtaksperioder = VedtaksperiodeMapper.mapTilVedtaksperiode(
+        val vedtaksperioder = VedtaksperiodeTilsynBarnMapper.mapTilVedtaksperiode(
             listOf(
                 beregningsresultat(
                     periode1,
@@ -94,7 +98,7 @@ class VedtaksperiodeMapperTest {
 
     @Test
     fun `skal ikke slå sammen perioder hvis de ikke er sammenhengende`() {
-        val vedtaksperioder = VedtaksperiodeMapper.mapTilVedtaksperiode(
+        val vedtaksperioder = VedtaksperiodeTilsynBarnMapper.mapTilVedtaksperiode(
             listOf(
                 beregningsresultat(
                     periode1,

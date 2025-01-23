@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
-import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
@@ -16,7 +15,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientConfig
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtils
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -24,8 +23,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.HovedregelMetadata
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.EksempelRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -77,7 +74,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
         @Test
         internal fun `kopierVilkårsettTilNyBehandling - skal kopiere vilkår til ny behandling`() {
-            val vilkårForBehandling = opprettVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling).first()
+            val vilkårForBehandling = lagreVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling).first()
 
             vilkårService.kopierVilkårsettTilNyBehandling(
                 forrigeBehandlingId = førstegangsbehandling.id,
@@ -103,7 +100,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
         @Test
         internal fun `kopierVilkårsettTilNyBehandling - skal ikke kopiere vilkår som mangler periode`() {
-            opprettVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling, fom = null, tom = null).first()
+            lagreVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling, fom = null, tom = null).first()
 
             vilkårService.kopierVilkårsettTilNyBehandling(
                 forrigeBehandlingId = førstegangsbehandling.id,
@@ -118,7 +115,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
         @Test
         internal fun `kopierVilkårsettTilNyBehandling - skal ikke kopiere vilkår som er slettet`() {
-            opprettVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling, status = VilkårStatus.SLETTET).first()
+            lagreVilkårsvurderinger(førstegangsbehandling, barnFørsteBehandling, status = VilkårStatus.SLETTET).first()
 
             vilkårService.kopierVilkårsettTilNyBehandling(
                 forrigeBehandlingId = førstegangsbehandling.id,
@@ -215,36 +212,15 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         }
     }
 
-    private fun opprettVilkårsvurderinger(
+    private fun lagreVilkårsvurderinger(
         behandling: Behandling,
         barn: List<BehandlingBarn>,
         fom: LocalDate? = YearMonth.now().atDay(1),
         tom: LocalDate? = YearMonth.now().atEndOfMonth(),
         status: VilkårStatus = VilkårStatus.NY,
     ): List<Vilkår> {
-        val hovedregelMetadata =
-            HovedregelMetadata(
-                barn = barn,
-                behandling = mockk(),
-            )
-        val delvilkårsett = EksempelRegel().initiereDelvilkår(hovedregelMetadata)
-        val vilkårsett = listOf(
-            vilkår(
-                fom = fom,
-                tom = tom,
-                status = status,
-                resultat = Vilkårsresultat.OPPFYLT,
-                type = VilkårType.PASS_BARN,
-                behandlingId = behandling.id,
-                barnId = barn.first().id,
-                delvilkår = delvilkårsett,
-            ),
-        )
-        return vilkårRepository.insertAll(vilkårsett)
+        return vilkårRepository.insertAll(VilkårTestUtils.opprettVilkårsvurderinger(behandling, barn, fom, tom, status))
     }
-
-    fun List<String>.tilBehandlingBarn(behandling: Behandling) =
-        this.map { behandlingBarn(behandlingId = behandling.id, personIdent = it) }
 
     private fun assertVilkårErGjenbrukt(
         vilkårForBehandling: Vilkår,

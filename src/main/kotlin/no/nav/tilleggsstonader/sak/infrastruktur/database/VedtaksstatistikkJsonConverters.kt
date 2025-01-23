@@ -8,8 +8,10 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgrupperDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.UtbetalingerDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VilkårsvurderingerDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.ÅrsakAvslagDvh
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.ÅrsakOpphørDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvhV2
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import org.postgresql.util.PGobject
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
@@ -32,7 +34,28 @@ val alleVedtaksstatistikkJsonConverters = listOf(
     VilkårsvurderingDvhWriter(),
     ÅrsakerAvslagDvhWriter(),
     ÅrsakerOpphørDvhWriter(),
+
+    VedtaksperioderDvhV2Writer(),
+    UtbetalingerDvhV2Writer(),
 )
+
+@WritingConverter
+private class VedtaksperioderDvhV2Writer : Converter<VedtaksperioderDvhV2.JsonWrapper, PGobject> {
+    override fun convert(data: VedtaksperioderDvhV2.JsonWrapper) =
+        PGobject().apply {
+            type = "json"
+            value = objectMapper.writeValueAsString(data.vedtaksperioder)
+        }
+}
+
+@WritingConverter
+private class UtbetalingerDvhV2Writer : Converter<UtbetalingerDvhV2.JsonWrapper, PGobject> {
+    override fun convert(data: UtbetalingerDvhV2.JsonWrapper) =
+        PGobject().apply {
+            type = "json"
+            value = objectMapper.writeValueAsString(data.utbetalinger)
+        }
+}
 
 @WritingConverter
 private class VedtaksperioderDvhWriter : Converter<VedtaksperioderDvh.JsonWrapper, PGobject> {
