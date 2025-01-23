@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -44,17 +43,6 @@ class OpphørValideringService(
             periode.beløpsperioder.forEach {
                 brukerfeilHvis(it.dato >= revurderFra) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
             }
-        }
-    }
-
-    fun validerIngenUtbetalingEtterRevurderFraDato(
-        beregningsresultatLæremidler: BeregningsresultatLæremidler,
-        revurderFra: LocalDate?,
-    ) {
-        brukerfeilHvis(revurderFra == null) { "Revurder fra dato er påkrevd for opphør" }
-
-        beregningsresultatLæremidler.perioder.forEach { periode ->
-            brukerfeilHvis(periode.grunnlag.tom >= revurderFra) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
         }
     }
 
