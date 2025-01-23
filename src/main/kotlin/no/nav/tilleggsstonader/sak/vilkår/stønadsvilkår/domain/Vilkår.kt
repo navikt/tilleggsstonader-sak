@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -106,13 +105,6 @@ data class Vilkår(
             barnId = barnIdINyBehandling,
             opphavsvilkår = opphavsvilkårForKopiertVilkår(),
         )
-    }
-
-    fun overlapper(other: Periode<LocalDate>): Boolean {
-        if (fom == null || tom == null) {
-            return false
-        }
-        return this.tom >= other.fom && this.fom <= other.tom
     }
 
     /**
