@@ -100,9 +100,8 @@ class OpprettRevurderingBehandlingService(
         feilHvis(!valgbareIdenter.containsAll(request.valgteBarn)) {
             "Kan ikke velge barn som ikke er valgbare."
         }
-
         feilHvis(behandlingIdForGjenbruk == null && request.valgteBarn.isEmpty()) {
-            "Behandling må opprettes med minimum 1 barn"
+            "Behandling må opprettes med minimum 1 barn. Dersom alle tidligere behandlinger er henlagt, må ny behandling opprettes som søknad eller papirsøknad."
         }
     }
 
