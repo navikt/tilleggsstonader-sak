@@ -1,5 +1,11 @@
 {
   "type": "OPPHØR_LÆREMIDLER",
+  "vedtaksperioder": [
+    {
+      "fom": "2024-01-01",
+      "tom": "2024-01-31"
+    }
+  ],
   "årsaker": ["ENDRING_AKTIVITET"],
   "begrunnelse": "En begrunnelse",
   "beregningsresultat": {

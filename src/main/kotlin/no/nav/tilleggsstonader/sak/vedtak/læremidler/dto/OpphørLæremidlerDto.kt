@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 
 data class OpphørLæremidlerResponse(
+    val vedtaksperioder: List<VedtaksperiodeDto>,
     val beregningsresultat: BeregningsresultatLæremidlerDto,
     val årsakerOpphør: List<ÅrsakOpphør>,
     val begrunnelse: String,

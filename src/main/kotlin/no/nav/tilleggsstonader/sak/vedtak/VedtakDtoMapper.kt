@@ -69,6 +69,7 @@ object VedtakDtoMapper {
                 beregningsresultat = data.beregningsresultat.tilDto(),
                 årsakerOpphør = data.årsaker,
                 begrunnelse = data.begrunnelse,
+                vedtaksperioder = data.vedtaksperioder.tilDto(),
             )
         }
 }
