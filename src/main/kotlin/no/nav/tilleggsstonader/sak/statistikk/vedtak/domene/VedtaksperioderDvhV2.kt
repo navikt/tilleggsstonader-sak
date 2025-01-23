@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
@@ -43,8 +44,10 @@ data class VedtaksperioderDvhV2(
                         ?: error("Vedtaket mangler beregningsresultat"),
                     barnIBehandlingen = barn,
                 )
-
-                is InnvilgelseLæremidler -> mapVedtaksperioderLæremidler(data.beregningsresultat)
+                is InnvilgelseLæremidler, is OpphørLæremidler -> mapVedtaksperioderLæremidler(
+                    beregningsresultat = data.beregningsresultat()
+                        ?: error("Vedtaket mangler beregningsresultat"),
+                )
                 is AvslagLæremidler, is AvslagTilsynBarn -> JsonWrapper(vedtaksperioder = emptyList())
             }
         }
