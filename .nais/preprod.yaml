@@ -27,10 +27,10 @@ spec:
     max: 4
   resources:
     limits:
-      memory: 2048Mi
+      memory: 1Gi # Settes lik request som beste praksis
     requests:
-      memory: 512Mi
-      cpu: 500m
+      memory: 1Gi
+      cpu: 200m
   observability:
     logging:
       destinations:
@@ -44,7 +44,7 @@ spec:
       - type: POSTGRES_17
         tier: db-f1-micro
         flags:
-          - name: cloudsql.logical_decoding  # trengs for å bruke replication slots i databasen.
+          - name: cloudsql.logical_decoding  # trengs for å bruke replication slots i databasen, som igjen brukes av datastream
             value: "on"
         diskAutoresize: true
         cascadingDelete: false
