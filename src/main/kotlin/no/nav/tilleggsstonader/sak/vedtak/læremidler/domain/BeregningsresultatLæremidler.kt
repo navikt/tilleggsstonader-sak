@@ -1,6 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
@@ -28,3 +33,32 @@ data class Beregningsgrunnlag(
     val satsBekreftet: Boolean,
     val målgruppe: MålgruppeType,
 ) : Periode<LocalDate>
+
+fun kuttePerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
+    val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
+
+    when (forrigeVedtak.type) {
+        TypeVedtak.INNVILGELSE -> {
+            val forrigeVedtakInnvilgelse = forrigeVedtak.withTypeOrThrow<InnvilgelseLæremidler>()
+            forrigeVedtakInnvilgelse.data.beregningsresultat.perioder.forEach {
+                if (it.grunnlag.tom < revurderFra) {
+                    kuttedePerioder.plus(it)
+                } else if (it.grunnlag.fom < revurderFra) {
+                    kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
+                }
+            }
+        }
+        TypeVedtak.OPPHØR -> {
+            val forrigeVedtakOpphør = forrigeVedtak.withTypeOrThrow<OpphørLæremidler>()
+            forrigeVedtakOpphør.data.beregningsresultat.perioder.forEach {
+                if (it.grunnlag.tom < revurderFra) {
+                    kuttedePerioder.plus(it)
+                } else if (it.grunnlag.fom < revurderFra) {
+                    kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
+                }
+            }
+        }
+        TypeVedtak.AVSLAG -> TODO()
+    }
+    return kuttedePerioder
+}

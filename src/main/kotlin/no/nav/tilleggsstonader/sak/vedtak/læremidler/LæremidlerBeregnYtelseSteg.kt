@@ -22,11 +22,11 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.kuttePerioderVedOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
@@ -97,35 +97,6 @@ class LæremidlerBeregnYtelseSteg(
         val beregningsresultatLæremidler = BeregningsresultatLæremidler(kuttedePerioder)
 
         lagreAndeler(saksbehandling, beregningsresultatLæremidler)
-    }
-
-    private fun kuttePerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
-        val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
-
-        when (forrigeVedtak.type) {
-            TypeVedtak.INNVILGELSE -> {
-                val forrigeVedtakInnvilgelse = forrigeVedtak.withTypeOrThrow<InnvilgelseLæremidler>()
-                forrigeVedtakInnvilgelse.data.beregningsresultat.perioder.forEach {
-                    if (it.grunnlag.tom < revurderFra) {
-                        kuttedePerioder.plus(it)
-                    } else if (it.grunnlag.fom < revurderFra) {
-                        kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
-                    }
-                }
-            }
-            TypeVedtak.OPPHØR -> {
-                val forrigeVedtakOpphør = forrigeVedtak.withTypeOrThrow<OpphørLæremidler>()
-                forrigeVedtakOpphør.data.beregningsresultat.perioder.forEach {
-                    if (it.grunnlag.tom < revurderFra) {
-                        kuttedePerioder.plus(it)
-                    } else if (it.grunnlag.fom < revurderFra) {
-                        kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
-                    }
-                }
-            }
-            TypeVedtak.AVSLAG -> TODO()
-        }
-        return kuttedePerioder
     }
 
     private fun lagreAvslag(
