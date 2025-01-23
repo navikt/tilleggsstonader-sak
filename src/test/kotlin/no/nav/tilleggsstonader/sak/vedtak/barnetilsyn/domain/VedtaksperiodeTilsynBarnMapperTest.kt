@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper.VedtaksperiodeTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -35,7 +37,8 @@ class VedtaksperiodeTilsynBarnMapperTest {
                 tom = periode2.tom,
                 målgruppe = periode1.målgruppe,
                 aktivitet = periode1.aktivitet,
-                antallBarn = 2,
+                antallBarn = 1,
+                barn = listOf(defaultBarn1.id),
             ),
         )
     }
@@ -59,7 +62,8 @@ class VedtaksperiodeTilsynBarnMapperTest {
                 tom = periode2Tom,
                 målgruppe = periode1.målgruppe,
                 aktivitet = periode1.aktivitet,
-                antallBarn = 2,
+                antallBarn = 1,
+                barn = listOf(defaultBarn1.id),
             ),
         )
     }

@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgruppeTypeDvh
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import java.time.LocalDate
 
 data class VedtaksperioderDvhV2(
@@ -29,7 +28,7 @@ data class VedtaksperioderDvhV2(
     )
 
     companion object {
-        fun fraDomene(vedtak: Vedtak?, vilkår: List<Vilkår>, barnFakta: List<BehandlingBarn>): JsonWrapper {
+        fun fraDomene(vedtak: Vedtak?, barnFakta: List<BehandlingBarn>): JsonWrapper {
             vedtak?.takeIfType<InnvilgelseTilsynBarn>()?.data?.beregningsresultat?.perioder?.let {
                 return JsonWrapper(
                     vedtaksperioder = VedtaksperiodeTilsynBarnMapper.mapTilVedtaksperiode(it).map {
@@ -40,10 +39,7 @@ data class VedtaksperioderDvhV2(
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             antallBarn = it.antallBarn,
-                            barn = BarnDvh.fraDomene(
-                                it.finnOverlappendeVilkårperioder(vilkår)
-                                    .finnBarnasFødselsnumre(barnFakta),
-                            ),
+                            barn = BarnDvh.fraDomene(it.barn.finnBarnasFødselsnumre(barnFakta)),
                         )
                     },
                 )
@@ -59,10 +55,7 @@ data class VedtaksperioderDvhV2(
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             antallBarn = it.antallBarn,
-                            barn = BarnDvh.fraDomene(
-                                it.finnOverlappendeVilkårperioder(vilkår)
-                                    .finnBarnasFødselsnumre(barnFakta),
-                            ),
+                            barn = BarnDvh.fraDomene(it.barn.finnBarnasFødselsnumre(barnFakta)),
                         )
                     },
                 )
@@ -85,11 +78,8 @@ data class VedtaksperioderDvhV2(
             return JsonWrapper(vedtaksperioder = emptyList())
         }
 
-        fun VedtaksperiodeTilsynBarn.finnOverlappendeVilkårperioder(vilkårperioder: List<Vilkår>) =
-            vilkårperioder.filter { it.overlapper(this) }
-
-        fun List<Vilkår>.finnBarnasFødselsnumre(barn: List<BehandlingBarn>) = this.mapNotNull { vilkår ->
-            barn.find { vilkår.barnId == it.id }?.ident
+        fun List<BarnId>.finnBarnasFødselsnumre(barn: List<BehandlingBarn>) = this.mapNotNull { barnId ->
+            barn.find { barnId == it.id }?.ident
         }
     }
 }

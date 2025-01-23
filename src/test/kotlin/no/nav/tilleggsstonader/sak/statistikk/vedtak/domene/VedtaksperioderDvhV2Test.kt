@@ -3,17 +3,14 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.MålgruppeTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2.Companion.finnBarnasFødselsnumre
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvhV2.Companion.finnOverlappendeVilkårperioder
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBehandling
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtils.opprettVilkårsvurderinger
-import no.nav.tilleggsstonader.sak.vilkår.VilkårTestUtils.tilBehandlingBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -22,23 +19,19 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse as innvilgelseLæremidler
 
 class VedtaksperioderDvhV2Test {
-    val fom = LocalDate.of(2024, 1, 1)
-    val tom = LocalDate.of(2024, 1, 31)
+    val fom: LocalDate = LocalDate.of(2024, 1, 1)
+    val tom: LocalDate = LocalDate.of(2024, 1, 31)
 
-    val behandling = behandling()
+    val behandling = defaultBehandling
 
-    val barn1 = listOf("99999999999").tilBehandlingBarn(behandling)
-    val barn2 = listOf("11111111111").tilBehandlingBarn(behandling)
+    val barn1 = listOf(defaultBarn1)
+    val barn2 = listOf(defaultBarn2)
     val alleBarn = barn1 + barn2
 
     @Test
     fun `fraDomene kan mappe for InnvilgelseTilsynBarn`() {
-        val vilkår =
-            opprettVilkårsvurderinger(behandling, barn = barn1, fom = fom, tom = tom)
-
         val resultat = VedtaksperioderDvhV2.fraDomene(
             innvilgelseTilsynBarn(),
-            vilkår = vilkår,
             barnFakta = barn1,
         ).vedtaksperioder
 
@@ -61,7 +54,6 @@ class VedtaksperioderDvhV2Test {
     fun `fraDomene kan mappe for InnvilgelseLæremidler`() {
         val resultat = VedtaksperioderDvhV2.fraDomene(
             vedtak = innvilgelseLæremidler(),
-            vilkår = emptyList(),
             barnFakta = emptyList(),
         )
 
@@ -91,7 +83,7 @@ class VedtaksperioderDvhV2Test {
             ),
         )
 
-        val resultat = VedtaksperioderDvhV2.fraDomene(vedtak = avslag, vilkår = emptyList(), barnFakta = emptyList())
+        val resultat = VedtaksperioderDvhV2.fraDomene(vedtak = avslag, barnFakta = emptyList())
 
         val forventetResultat = VedtaksperioderDvhV2.JsonWrapper(
             vedtaksperioder = emptyList(),
@@ -101,41 +93,17 @@ class VedtaksperioderDvhV2Test {
     }
 
     @Nested
-    inner class FinnFødselsnumreIVedtaksperiode {
+    inner class FinnFødselsnumre {
         @Test
-        fun `finnBarnFnr skal finne fødselsnummeret til barn i vilkåret når det er ett barn`() {
-            val vilkår = opprettVilkårsvurderinger(behandling, barn = barn1, fom = fom, tom = tom)
-
-            val vedtaksperiode = VedtaksperiodeTilsynBarn(
-                fom = fom,
-                tom = tom,
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-                antallBarn = 1,
-            )
-
-            val resultat = vedtaksperiode.finnOverlappendeVilkårperioder(vilkår).finnBarnasFødselsnumre(alleBarn)
+        fun `finnBarnasFødselsnumre skal finne fødselsnummeret til barn når det er ett barn`() {
+            val resultat = barn1.map { it.id }.finnBarnasFødselsnumre(alleBarn)
 
             assertThat(resultat).isEqualTo(barn1.map { it.ident })
         }
 
         @Test
-        fun `finnBarnFnr skal finne fødselsnummeret til barn i vilkåret når det er flere barn`() {
-            val vilkårBarn1 = opprettVilkårsvurderinger(behandling, barn = barn1, fom = fom, tom = tom)
-            val vilkårBarn2 = opprettVilkårsvurderinger(behandling, barn = barn2, fom = fom, tom = tom)
-            val vilkår = vilkårBarn1 + vilkårBarn2
-
-            val vedtaksperiode = VedtaksperiodeTilsynBarn(
-                fom = fom,
-                tom = tom,
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-                antallBarn = 2,
-            )
-
-            val resultat = vedtaksperiode
-                .finnOverlappendeVilkårperioder(vilkår)
-                .finnBarnasFødselsnumre(alleBarn)
+        fun `finnBarnasFødselsnumre skal finne fødselsnummeret til barn når det er flere barn`() {
+            val resultat = alleBarn.map { it.id }.finnBarnasFødselsnumre(alleBarn)
 
             assertThat(resultat).isEqualTo(alleBarn.map { it.ident })
         }

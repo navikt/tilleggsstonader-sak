@@ -1,12 +1,16 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.interntVedtak.Testdata.behandlingId
+import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.StønadsperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
@@ -28,15 +32,14 @@ object TilsynBarnTestUtil {
         begrunnelse = "Endring i utgifter",
     )
 
+    val defaultBehandling = behandling()
+
+    val defaultBarn1 = BehandlingBarn(behandlingId = behandlingId, ident = "1")
+    val defaultBarn2 = BehandlingBarn(behandlingId = behandlingId, ident = "2")
+
     val beløpsperioderDefault = listOf(
         Beløpsperiode(dato = LocalDate.now(), beløp = 1000, målgruppe = MålgruppeType.AAP),
         Beløpsperiode(dato = LocalDate.now().plusDays(7), beløp = 2000, målgruppe = MålgruppeType.OVERGANGSSTØNAD),
-    )
-
-    val vedtakBeregningsresultat = BeregningsresultatTilsynBarn(
-        perioder = listOf(
-            beregningsresultatForMåned(),
-        ),
     )
 
     val defaultStønadsperiodeBeregningsgrunnlag = StønadsperiodeBeregningsgrunnlag(
@@ -54,6 +57,12 @@ object TilsynBarnTestUtil {
         ),
     )
 
+    val vedtakBeregningsresultat = BeregningsresultatTilsynBarn(
+        perioder = listOf(
+            beregningsresultatForMåned(),
+        ),
+    )
+
     fun beregningsresultatForMåned(
         måned: YearMonth = YearMonth.of(2024, 1),
         stønadsperioder: List<StønadsperiodeGrunnlag> = emptyList(),
@@ -65,7 +74,7 @@ object TilsynBarnTestUtil {
             måned = måned,
             makssats = 3000,
             stønadsperioderGrunnlag = stønadsperioder,
-            utgifter = emptyList(),
+            utgifter = listOf(UtgiftBarn(defaultBarn1.id, 1000)),
             utgifterTotal = 5000,
             antallBarn = 1,
         ),
@@ -73,7 +82,7 @@ object TilsynBarnTestUtil {
     )
 
     fun innvilgelse(data: InnvilgelseTilsynBarn = defaultInnvilgelseTilsynBarn) = GeneriskVedtak(
-        behandlingId = BehandlingId.random(),
+        behandlingId = defaultBehandling.id,
         type = TypeVedtak.INNVILGELSE,
         data = data,
     )
@@ -90,7 +99,7 @@ object TilsynBarnTestUtil {
 
     fun innvilgetVedtak(
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
-        behandlingId: BehandlingId = BehandlingId.random(),
+        behandlingId: BehandlingId = defaultBehandling.id,
     ) = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -23,41 +24,45 @@ object VedtaksperiodeTilsynBarnMapper {
         it: BeregningsresultatForMåned,
     ) = it.grunnlag.stønadsperioderGrunnlag
         .map { it.stønadsperiode }
-        .map { stønadsperiode -> VedtaksperiodeTilsynBarn(stønadsperiode, it.grunnlag.antallBarn) }
-}
+        .map { stønadsperiode ->
+            VedtaksperiodeTilsynBarn(stønadsperiode, it.grunnlag.utgifter.map { it.barnId })
+        }
 
-data class VedtaksperiodeTilsynBarn(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    val målgruppe: MålgruppeType,
-    val aktivitet: AktivitetType,
-    val antallBarn: Int,
-) : Periode<LocalDate>, Mergeable<LocalDate, VedtaksperiodeTilsynBarn> {
+    data class VedtaksperiodeTilsynBarn(
+        override val fom: LocalDate,
+        override val tom: LocalDate,
+        val målgruppe: MålgruppeType,
+        val aktivitet: AktivitetType,
+        val antallBarn: Int,
+        val barn: List<BarnId>,
+    ) : Periode<LocalDate>, Mergeable<LocalDate, VedtaksperiodeTilsynBarn> {
 
-    init {
-        validatePeriode()
-    }
+        init {
+            validatePeriode()
+        }
 
-    constructor(stønadsperiode: StønadsperiodeBeregningsgrunnlag, antallBarn: Int) : this(
-        fom = stønadsperiode.fom,
-        tom = stønadsperiode.tom,
-        målgruppe = stønadsperiode.målgruppe,
-        aktivitet = stønadsperiode.aktivitet,
-        antallBarn = antallBarn,
-    )
+        constructor(stønadsperiode: StønadsperiodeBeregningsgrunnlag, barn: List<BarnId>) : this(
+            fom = stønadsperiode.fom,
+            tom = stønadsperiode.tom,
+            målgruppe = stønadsperiode.målgruppe,
+            aktivitet = stønadsperiode.aktivitet,
+            antallBarn = barn.size,
+            barn = barn,
+        )
 
-    /**
-     * Ettersom stønadsperiode ikke overlapper er det tilstrekkelig å kun merge TOM
-     */
-    override fun merge(other: VedtaksperiodeTilsynBarn): VedtaksperiodeTilsynBarn {
-        return this.copy(tom = other.tom)
-    }
+        /**
+         * Ettersom stønadsperiode ikke overlapper er det tilstrekkelig å kun merge TOM
+         */
+        override fun merge(other: VedtaksperiodeTilsynBarn): VedtaksperiodeTilsynBarn {
+            return this.copy(tom = other.tom)
+        }
 
-    fun erLikOgPåfølgesAv(other: VedtaksperiodeTilsynBarn): Boolean {
-        val erLik = this.aktivitet == other.aktivitet &&
-            this.målgruppe == other.målgruppe &&
-            this.antallBarn == other.antallBarn
-        val påfølgesAv = this.tom.plusDays(1) == other.fom
-        return erLik && påfølgesAv
+        fun erLikOgPåfølgesAv(other: VedtaksperiodeTilsynBarn): Boolean {
+            val erLik = this.aktivitet == other.aktivitet &&
+                this.målgruppe == other.målgruppe &&
+                this.antallBarn == other.antallBarn
+            val påfølgesAv = this.tom.plusDays(1) == other.fom
+            return erLik && påfølgesAv
+        }
     }
 }

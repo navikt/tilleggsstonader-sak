@@ -88,7 +88,6 @@ class VedtaksstatistikkService(
             ?: throw IllegalStateException("Behandlingen må ha et vedtakstidspunkt for å sende vedtaksstatistikk")
         val søkerIdent = behandlingService.hentAktivIdent(behandlingId)
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
-        val vilkår = vilkårService.hentOppfyltePassBarnVilkår(behandlingId)
         val barn = barnRepository.findByBehandlingId(behandlingId)
 
         vedtaksstatistikkRepositoryV2.insert(
@@ -105,7 +104,7 @@ class VedtaksstatistikkService(
                 behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
                 behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
                 vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
-                vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak, vilkår, barn),
+                vedtaksperioder = VedtaksperioderDvhV2.fraDomene(vedtak, barn),
                 utbetalinger = UtbetalingerDvhV2.fraDomene(andelTilkjentYtelse, vedtak),
                 kravMottatt = behandling.kravMottatt,
                 årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
