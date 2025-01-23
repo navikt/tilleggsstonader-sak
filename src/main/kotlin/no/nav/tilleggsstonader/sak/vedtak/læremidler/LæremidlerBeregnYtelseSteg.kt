@@ -98,7 +98,7 @@ class LæremidlerBeregnYtelseSteg(
         lagreAndeler(saksbehandling, beregningsresultatLæremidler)
     }
 
-    private fun kuttePerioderVedOpphør(forrigeBehandling: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
+    private fun kuttePerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
         val kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
 
         when (forrigeBehandling.type) {
