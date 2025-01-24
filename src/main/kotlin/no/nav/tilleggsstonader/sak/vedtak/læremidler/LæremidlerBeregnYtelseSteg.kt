@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortBeregningsresultatVedOpphør
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortVedtaksperiodeVedOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
@@ -82,15 +83,16 @@ class LæremidlerBeregnYtelseSteg(
 
         opphørValideringService.validerVilkårsPerioder(saksbehandling)
 
-        val forrigeBehandlingData = forrigeBehandling.data
         val avkortetBeregningsresultat: List<BeregningsresultatForMåned> = avkortBeregningsresultatVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
+        val avkortetVedtaksperioder: List<Vedtaksperiode> =
+            avkortVedtaksperiodeVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
 
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.OPPHØR,
                 data = OpphørLæremidler(
-                    vedtaksperioder = emptyList(),
+                    vedtaksperioder = avkortetVedtaksperioder,
                     beregningsresultat = BeregningsresultatLæremidler(avkortetBeregningsresultat),
                     årsaker = vedtak.årsakerOpphør,
                     begrunnelse = vedtak.begrunnelse,

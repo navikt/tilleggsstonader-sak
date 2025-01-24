@@ -74,7 +74,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         vedtakRepository = vedtakRepository,
         tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
         simuleringService = simuleringService,
-        revurderFraService = mockk(),
     )
 
     @Gitt("følgende aktiviteter for læremidler behandling={}")
