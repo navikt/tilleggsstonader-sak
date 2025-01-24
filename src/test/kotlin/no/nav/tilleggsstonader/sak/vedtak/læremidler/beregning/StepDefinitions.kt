@@ -10,24 +10,16 @@ import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapp
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
-import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
-import no.nav.tilleggsstonader.sak.cucumber.parseInt
-import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBoolean
-import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
@@ -114,39 +106,20 @@ class StepDefinitions {
 
     @Så("skal stønaden være")
     fun `skal stønaden være`(dataTable: DataTable) {
-        val perioder = dataTable.mapRad { rad ->
-            BeregningsresultatForMåned(
-                beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
-                grunnlag = Beregningsgrunnlag(
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    studienivå = parseValgfriEnum<Studienivå>(BeregningNøkler.STUDIENIVÅ, rad)
-                        ?: Studienivå.HØYERE_UTDANNING,
-                    studieprosent = parseInt(BeregningNøkler.STUDIEPROSENT, rad),
-                    sats = parseBigDecimal(BeregningNøkler.SATS, rad).toInt(),
-                    satsBekreftet = parseValgfriBoolean(BeregningNøkler.BEKREFTET_SATS, rad) ?: true,
-                    utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),
-                    målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad)
-                        ?: MålgruppeType.AAP,
-                ),
-            )
-        }
-        val forventetBeregningsresultat = BeregningsresultatLæremidler(
-            perioder = perioder,
-        )
+        val forventedeBeregningsperioder = mapBeregningsresultat(dataTable)
 
         assertThat(beregningException).isNull()
 
-        forventetBeregningsresultat.perioder.forEachIndexed { index, periode ->
+        forventedeBeregningsperioder.forEachIndexed { index, periode ->
             try {
                 assertThat(resultat!!.perioder[index]).isEqualTo(periode)
             } catch (e: Throwable) {
-                val acutal = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(periode)
-                logger.error("Feilet validering av rad ${index + 1} $acutal")
+                val actual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(periode)
+                logger.error("Feilet validering av rad ${index + 1} $actual")
                 throw e
             }
         }
-        assertThat(resultat?.perioder).hasSize(forventetBeregningsresultat.perioder.size)
+        assertThat(resultat?.perioder).hasSize(forventedeBeregningsperioder.size)
     }
 
     @Så("forvent følgende feil fra læremidlerberegning: {}")
