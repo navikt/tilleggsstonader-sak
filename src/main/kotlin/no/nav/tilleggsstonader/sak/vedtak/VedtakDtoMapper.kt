@@ -66,7 +66,6 @@ object VedtakDtoMapper {
             )
 
             is OpphørLæremidler -> OpphørLæremidlerResponse(
-                beregningsresultat = data.beregningsresultat.tilDto(),
                 årsakerOpphør = data.årsaker,
                 begrunnelse = data.begrunnelse,
                 vedtaksperioder = data.vedtaksperioder.tilDto(),
