@@ -34,7 +34,7 @@ data class Beregningsgrunnlag(
     val målgruppe: MålgruppeType,
 ) : Periode<LocalDate>
 
-fun kuttePerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
+fun avkortPerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
     var kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
 
     when (forrigeVedtak.type) {

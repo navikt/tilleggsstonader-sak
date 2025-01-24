@@ -26,7 +26,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBereg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.kuttePerioderVedOpphør
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortPerioderVedOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
@@ -83,7 +83,7 @@ class LæremidlerBeregnYtelseSteg(
         }
 
         val innvilgelseLæremidler = forrigeBehandling.data as InnvilgelseLæremidler
-        val kuttedePerioder: List<BeregningsresultatForMåned> = kuttePerioderVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
+        val kuttedePerioder: List<BeregningsresultatForMåned> = avkortPerioderVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
 
         vedtakRepository.insert(
             GeneriskVedtak(
