@@ -32,7 +32,7 @@ object RepositoryMockUtil {
             map[getId(firstArg)] = firstArg
             firstArg
         }
-        every { mockk.insertAll(any()) } answers  {
+        every { mockk.insertAll(any()) } answers {
             firstArg<List<TYPE>>().map { mockk.insert(it) }
         }
         every { mockk.deleteAll() } answers { map.clear() }

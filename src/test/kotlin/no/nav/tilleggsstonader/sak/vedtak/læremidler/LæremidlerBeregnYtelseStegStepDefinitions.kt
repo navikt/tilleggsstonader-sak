@@ -37,7 +37,6 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
@@ -125,8 +124,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             dummyBehandling(behandlingId, revurderFra = revurderFra),
             OpphørLæremidlerRequest(
                 årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
-                begrunnelse = "begrunnelse"
-            )
+                begrunnelse = "begrunnelse",
+            ),
         )
     }
 
