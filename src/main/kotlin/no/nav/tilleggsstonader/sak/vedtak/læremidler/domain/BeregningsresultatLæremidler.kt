@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
-
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
@@ -35,30 +36,34 @@ data class Beregningsgrunnlag(
 ) : Periode<LocalDate>
 
 fun avkortPerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
-    var kuttedePerioder: List<BeregningsresultatForMåned> = emptyList()
+    var avkortedePerioder: List<BeregningsresultatForMåned> = emptyList()
+
+    fun avkortFjernELlerVidereførBergeningsresultatForMåned(periode: BeregningsresultatForMåned) {
+        val avkortetDatoPeriode = Datoperiode(periode.grunnlag.fom, periode.grunnlag.tom).avkortFraOgMed(revurderFra.minusDays(1))
+        if(avkortetDatoPeriode !== null) {
+            avkortedePerioder = avkortedePerioder.plus(
+                BeregningsresultatForMåned(
+                    periode.beløp,
+                    periode.grunnlag.copy(fom = avkortetDatoPeriode.fom, tom = avkortetDatoPeriode.tom)
+                )
+            )
+        }
+    }
 
     when (forrigeVedtak.type) {
         TypeVedtak.INNVILGELSE -> {
             val forrigeVedtakInnvilgelse = forrigeVedtak.withTypeOrThrow<InnvilgelseLæremidler>()
             forrigeVedtakInnvilgelse.data.beregningsresultat.perioder.forEach {
-                if (it.grunnlag.tom < revurderFra) {
-                    kuttedePerioder = kuttedePerioder.plus(it)
-                } else if (it.grunnlag.fom < revurderFra) {
-                    kuttedePerioder = kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
-                }
+                avkortFjernELlerVidereførBergeningsresultatForMåned(it)
             }
         }
         TypeVedtak.OPPHØR -> {
             val forrigeVedtakOpphør = forrigeVedtak.withTypeOrThrow<OpphørLæremidler>()
             forrigeVedtakOpphør.data.beregningsresultat.perioder.forEach {
-                if (it.grunnlag.tom < revurderFra) {
-                    kuttedePerioder = kuttedePerioder.plus(it)
-                } else if (it.grunnlag.fom < revurderFra) {
-                    kuttedePerioder = kuttedePerioder.plus(it.copy(grunnlag = it.grunnlag.copy(tom = revurderFra.minusDays(1))))
-                }
+                avkortFjernELlerVidereførBergeningsresultatForMåned(it)
             }
         }
         TypeVedtak.AVSLAG -> TODO()
     }
-    return kuttedePerioder
+    return avkortedePerioder
 }
