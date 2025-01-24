@@ -91,6 +91,51 @@ class BeregningsresultatLæremidlerTest {
         )
     }
 
+
+    @Test
+    fun `perioder midt i Revurder-fra blir kuttet - tester med lengre periode - kutter i maanedsskiftet februar-mars i skuddåret 2024`() {
+        val innvilgelseLæremidlerMedLangPeriode = InnvilgelseLæremidler(
+            vedtaksperioder = listOf(
+                Vedtaksperiode(
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 5, 1),
+                ),
+            ),
+            beregningsresultat = BeregningsresultatLæremidler(
+                perioder = listOf(
+                    beregningsresultatForMåned(
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 5, 1),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                    ),
+                ),
+            ),
+        )
+
+        val forrigeVedtak = LæremidlerTestUtil.innvilgelse(innvilgelseLæremidlerMedLangPeriode)
+
+        val revurderFra = LocalDate.of(2024, 3, 1)
+        val kuttePerioderVedOpphør = kuttePerioderVedOpphør(forrigeVedtak, revurderFra)
+
+        assertThat(kuttePerioderVedOpphør).isEqualTo(
+            listOf<BeregningsresultatForMåned>(
+                BeregningsresultatForMåned(
+                    beløp = 875,
+                    grunnlag = Beregningsgrunnlag(
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 2, 29),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                        studienivå = Studienivå.HØYERE_UTDANNING,
+                        studieprosent = 100,
+                        sats = 875,
+                        satsBekreftet = true,
+                        målgruppe = MålgruppeType.AAP,
+                    ),
+                ),
+            ),
+        )
+    }
+
     @Test
     fun `perioder etter Revurder-fra blir fjernet`() {
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse()
