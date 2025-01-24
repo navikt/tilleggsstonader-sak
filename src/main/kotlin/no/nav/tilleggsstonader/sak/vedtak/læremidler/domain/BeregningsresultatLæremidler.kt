@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
@@ -40,12 +40,12 @@ fun avkortPerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): Lis
 
     fun avkortFjernELlerVidereførBergeningsresultatForMåned(periode: BeregningsresultatForMåned) {
         val avkortetDatoPeriode = Datoperiode(periode.grunnlag.fom, periode.grunnlag.tom).avkortFraOgMed(revurderFra.minusDays(1))
-        if(avkortetDatoPeriode !== null) {
+        if (avkortetDatoPeriode !== null) {
             avkortedePerioder = avkortedePerioder.plus(
                 BeregningsresultatForMåned(
                     periode.beløp,
-                    periode.grunnlag.copy(fom = avkortetDatoPeriode.fom, tom = avkortetDatoPeriode.tom)
-                )
+                    periode.grunnlag.copy(fom = avkortetDatoPeriode.fom, tom = avkortetDatoPeriode.tom),
+                ),
             )
         }
     }
