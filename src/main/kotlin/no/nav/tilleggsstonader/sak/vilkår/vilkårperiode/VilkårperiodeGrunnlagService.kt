@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -12,6 +15,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetServi
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.util.tilFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
@@ -21,7 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.SlåSammenPer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDomenetype
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilYtelseSubtype
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -43,7 +47,7 @@ class VilkårperiodeGrunnlagService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun oppdaterGrunnlag(behandlingId: BehandlingId) {
+    fun oppdaterGrunnlag(behandlingId: BehandlingId, hentGrunnlagFom: LocalDate? = null) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke oppdatere grunnlag når behandlingen er låst"
@@ -51,10 +55,13 @@ class VilkårperiodeGrunnlagService(
         feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
             "Kan ikke oppdatere grunnlag når behandlingen er i annet steg enn vilkår."
         }
+        feilHvis(behandling.type != BehandlingType.FØRSTEGANGSBEHANDLING && hentGrunnlagFom != null) {
+            "Kan ikke sette henteFom når behandlingtype = ${behandling.type}"
+        }
 
         val eksisterendeGrunnlag = vilkårperioderGrunnlagRepository.findByIdOrThrow(behandlingId)
 
-        val eksisterendeHentetFom = eksisterendeGrunnlag.grunnlag.hentetInformasjon.fom
+        val eksisterendeHentetFom = hentGrunnlagFom ?: eksisterendeGrunnlag.grunnlag.hentetInformasjon.fom
         val tom = YearMonth.now().plusYears(1).atEndOfMonth()
 
         val nyGrunnlagsdata = hentGrunnlagsdata(behandlingId, eksisterendeHentetFom, tom)
@@ -67,33 +74,57 @@ class VilkårperiodeGrunnlagService(
     fun hentEllerOpprettGrunnlag(behandlingId: BehandlingId): VilkårperioderGrunnlag? {
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)?.grunnlag
 
-        return if (grunnlag != null) {
-            grunnlag
-        } else if (behandlingErLåstForVidereRedigering(behandlingId)) {
+        if (grunnlag != null) {
+            return grunnlag
+        }
+
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        return if (behandling.status.behandlingErLåstForVidereRedigering()) {
             null
         } else {
-            opprettGrunnlagsdata(behandlingId).grunnlag
+            opprettGrunnlagsdata(behandling).grunnlag
         }
     }
 
-    private fun opprettGrunnlagsdata(behandlingId: BehandlingId): VilkårperioderGrunnlagDomain {
+    private fun opprettGrunnlagsdata(behandling: Saksbehandling): VilkårperioderGrunnlagDomain {
         brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
             "Behandlingen er ikke påbegynt. Kan ikke opprette vilkårperiode hvis man ikke er saksbehandler"
         }
 
-        val søknadMetadata = søknadService.hentSøknadMetadata(behandlingId)
-        val utgangspunktDato = søknadMetadata?.mottattTidspunkt?.toLocalDate() ?: LocalDate.now()
+        val fom = antallMånederBakITiden(behandling)
+        val tom = YearMonth.now().plusYears(1).atEndOfMonth()
 
-        val fom = YearMonth.from(utgangspunktDato).minusMonths(3).atDay(1)
-        val tom = YearMonth.from(utgangspunktDato).plusYears(1).atEndOfMonth()
-
-        val grunnlag = hentGrunnlagsdata(behandlingId, fom, tom)
+        val grunnlag = hentGrunnlagsdata(behandling.id, fom, tom)
         return vilkårperioderGrunnlagRepository.insert(
             VilkårperioderGrunnlagDomain(
-                behandlingId = behandlingId,
+                behandlingId = behandling.id,
                 grunnlag = grunnlag,
             ),
         )
+    }
+
+    /**
+     * Vid en førstegangsbehandling skal man bruke mottatt tidspunkt minus antall måneder for gitt stønadstype
+     * Når man revurderer skal man hente grunnlag fra og med datoet man revurderer fra, uavhengig når man søker fra
+     */
+    private fun antallMånederBakITiden(behandling: Saksbehandling): LocalDate {
+        if (behandling.revurderFra != null) {
+            return behandling.revurderFra
+        }
+        val mottattTidspunkt = søknadService.hentSøknadMetadata(behandling.id)?.mottattTidspunkt
+            ?: behandling.opprettetTid
+
+        return mottattTidspunkt.toLocalDate()
+            .minusMonths(behandling.stønadstype.antallMånederBakITiden())
+            .tilFørsteDagIMåneden()
+    }
+
+    /**
+     * Ulike stønader har ulikt behov for antall måneder bak i tiden som skal hentes
+     */
+    private fun Stønadstype.antallMånederBakITiden(): Long = when (this) {
+        Stønadstype.BARNETILSYN -> 3
+        Stønadstype.LÆREMIDLER -> 6
     }
 
     private fun hentGrunnlagsdata(
@@ -149,20 +180,16 @@ class VilkårperiodeGrunnlagService(
 
         return GrunnlagYtelse(
             perioder = ytelserFraRegister.perioder
-                .filter { it.aapErFerdigAvklart != true }
                 .filter { it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN }
                 .map {
                     PeriodeGrunnlagYtelse(
                         type = it.type,
                         fom = it.fom,
                         tom = it.tom,
-                        ensligForsørgerStønadstype = it.ensligForsørgerStønadstype?.tilDomenetype(),
+                        subtype = it.tilYtelseSubtype(),
                     )
                 }
                 .slåSammenOverlappendeEllerPåfølgende(),
         )
     }
-
-    private fun behandlingErLåstForVidereRedigering(behandlingId: BehandlingId) =
-        behandlingService.hentBehandling(behandlingId).status.behandlingErLåstForVidereRedigering()
 }

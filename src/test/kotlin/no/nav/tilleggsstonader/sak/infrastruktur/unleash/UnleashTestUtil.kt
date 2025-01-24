@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.unleash
 import io.getunleash.Variant
 import io.mockk.clearMocks
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 
@@ -20,6 +21,7 @@ fun resetMock(mockk: UnleashService, isEnabled: Boolean = true) {
     clearMocks(mockk)
     every { mockk.isEnabled(any()) } returns isEnabled
     every { mockk.isEnabled(any(), any<Boolean>()) } returns isEnabled
+    justRun { mockk.destroy() }
 }
 
 fun UnleashService.mockIsEnabled(toggle: Toggle, value: Boolean = false): UnleashService {

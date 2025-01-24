@@ -24,6 +24,11 @@ class VedtaksstatistikkTask(
     override fun doTask(task: Task) {
         val (behandlingId, fagsakId, hendelseTidspunkt) = objectMapper.readValue<VedtaksstatistikkTaskPayload>(task.payload)
 
+        vedtaksstatistikkService.lagreVedtaksstatistikkV2(
+            behandlingId,
+            fagsakId,
+        )
+
         vedtaksstatistikkService.lagreVedtaksstatistikk(
             behandlingId,
             fagsakId,

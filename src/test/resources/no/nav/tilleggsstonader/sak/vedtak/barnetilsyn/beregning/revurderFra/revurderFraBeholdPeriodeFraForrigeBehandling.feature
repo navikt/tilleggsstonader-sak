@@ -27,7 +27,7 @@ Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
 
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
-      | 01.2024 | 10      | 0            | 2000   | 1000        |
+      | 01.2024 | 10      | 0            | 5000   | 3000        |
       | 02.2024 | 29.53   | 3            | 1000   | 89          |
 
 
@@ -56,5 +56,5 @@ Egenskap: Beregning - med revurderFra - behold perioder fra forrige behandling
     Så forvent følgende beregningsresultat
       | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
       # antall dager 0 er pga dummy-oppsett fra "beregningsperioder fra forrige behandling"
-      | 01.2024 | 10      | 0            | 2000   | 1000        |
+      | 01.2024 | 10      | 0            | 5000   | 3000        |
       | 02.2024 | 29.53   | 3            | 1000   | 89          |

@@ -28,6 +28,7 @@ class RevurderFraService(
         if (skalNullstilleBehandling(behandling, revurderFra)) {
             nullstillBehandlingService.nullstillBehandling(behandlingId)
         }
+        nullstillBehandlingService.slettVilkårperiodegrunnlag(behandlingId)
 
         return behandlingRepository.finnSaksbehandling(behandlingId)
     }

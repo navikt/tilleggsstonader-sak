@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.arena.vedtak.Rettighet
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -15,10 +16,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-@Disabled // Denne virker ikke når alle kall mot TILSYN_BARN settes til true
 class ArenaStatusServiceTest {
 
     private val personService = mockk<PersonService>()
@@ -34,9 +33,9 @@ class ArenaStatusServiceTest {
     )
 
     val ident = "ident"
-    val fagsak = fagsak(identer = setOf(PersonIdent(ident)))
+    val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER, identer = setOf(PersonIdent(ident)))
 
-    val request = ArenaFinnesPersonRequest(ident, Rettighet.TILSYN_BARN.kodeArena)
+    val request = ArenaFinnesPersonRequest(ident, Rettighet.LÆREMIDLER.kodeArena)
 
     @BeforeEach
     fun setUp() {

@@ -2,17 +2,16 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.slåSammenSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.beregnBeløp
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.delTilUtbetalingsPerioder
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningUtil.slåSammenSammenhengende
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnBeløpUtil.beregnBeløp
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.springframework.stereotype.Service
@@ -31,7 +30,7 @@ class LæremidlerBeregningService(
      */
 
     fun beregn(vedtaksperioder: List<Vedtaksperiode>, behandlingId: BehandlingId): BeregningsresultatLæremidler {
-        val stønadsperioder = hentStønadsperioder(behandlingId).slåSammenSammenhengende()
+        val stønadsperioder = hentStønadsperioder(behandlingId)
 
         validerVedtaksperioder(vedtaksperioder, stønadsperioder)
 
@@ -42,9 +41,11 @@ class LæremidlerBeregningService(
     }
 
     private fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeBeregningsgrunnlag> =
-        stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertStønadsperiodeBeregningsgrunnlag()
+        stønadsperiodeRepository.findAllByBehandlingId(behandlingId)
+            .tilSortertStønadsperiodeBeregningsgrunnlag()
+            .slåSammenSammenhengende()
 
-    private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
+    private fun finnAktiviteter(behandlingId: BehandlingId): List<AktivitetLæremidlerBeregningGrunnlag> {
         return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
             .tilAktiviteter()
     }
@@ -52,55 +53,38 @@ class LæremidlerBeregningService(
     private fun beregnLæremidlerPerMåned(
         vedtaksperioder: List<Vedtaksperiode>,
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-        aktiviteter: List<Aktivitet>,
+        aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
     ): List<BeregningsresultatForMåned> =
-        vedtaksperioder.flatMap { it.delTilUtbetalingsPerioder() }
-            .map { utbetalingsperiode ->
-                val relevantStønadsperiode = utbetalingsperiode.finnRelevantStønadsperiode(stønadsperioder)
-                lagBeregningsresultatForMåned(
-                    utbetalingsperiode = utbetalingsperiode,
-                    målgruppe = relevantStønadsperiode.målgruppe,
-                    aktivitet = utbetalingsperiode.finnRelevantAktivitet(
-                        aktiviteter = aktiviteter,
-                        aktivitetType = relevantStønadsperiode.aktivitet,
-                    ),
-                )
-            }
+        vedtaksperioder
+            .sorted()
+            .grupperVedtaksperioderPerLøpendeMåned()
+            .map { it.tilUtbetalingPeriode(stønadsperioder, aktiviteter) }
+            .beregn()
 
-    private fun lagBeregningsresultatForMåned(
-        utbetalingsperiode: UtbetalingPeriode,
-        målgruppe: MålgruppeType,
-        aktivitet: Aktivitet,
-    ): BeregningsresultatForMåned {
-        val grunnlagsdata =
-            lagBeregningsGrunnlag(
-                periode = utbetalingsperiode,
-                aktivitet = aktivitet,
-                målgruppe = målgruppe,
+    private fun List<UtbetalingPeriode>.beregn(): List<BeregningsresultatForMåned> = this
+        .map { utbetalingPeriode ->
+            val grunnlagsdata = lagBeregningsGrunnlag(periode = utbetalingPeriode)
+
+            BeregningsresultatForMåned(
+                beløp = beregnBeløp(grunnlagsdata.sats, grunnlagsdata.studieprosent),
+                grunnlag = grunnlagsdata,
             )
-
-        return BeregningsresultatForMåned(
-            beløp = beregnBeløp(grunnlagsdata.sats, grunnlagsdata.studieprosent),
-            grunnlag = grunnlagsdata,
-        )
-    }
+        }
 
     private fun lagBeregningsGrunnlag(
         periode: UtbetalingPeriode,
-        aktivitet: Aktivitet,
-        målgruppe: MålgruppeType,
     ): Beregningsgrunnlag {
         val sats = finnSatsForPeriode(periode)
 
         return Beregningsgrunnlag(
             fom = periode.fom,
             tom = periode.tom,
-            studienivå = aktivitet.studienivå,
-            studieprosent = aktivitet.prosent,
-            sats = finnSatsForStudienivå(sats, aktivitet.studienivå),
+            studienivå = periode.studienivå,
+            studieprosent = periode.prosent,
+            sats = finnSatsForStudienivå(sats, periode.studienivå),
             satsBekreftet = sats.bekreftet,
-            utbetalingsmåned = periode.utbetalingsmåned,
-            målgruppe = målgruppe,
+            utbetalingsdato = periode.utbetalingsdato,
+            målgruppe = periode.målgruppe,
         )
     }
 }

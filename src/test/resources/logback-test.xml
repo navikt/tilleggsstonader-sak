@@ -3,7 +3,7 @@
 
     <!-- override spring base logging pattern -->
     <property name="CONSOLE_LOG_PATTERN"
-              value="%d [%-5level] [%thread] %logger{5} %replace(- [%X{consumerId}, %X{callId}, %X{userId}] ){'- \[, , \] ',''}- %m%n"/>
+              value="%d [%-5level] [%thread] %logger{5} %replace(- [consumerId=%X{consumerId}, callId=%X{callId}] ){'- \[, , \] ',''}- %m%n"/>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
 

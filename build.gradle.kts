@@ -1,10 +1,11 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.io.ByteArrayOutputStream
 
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20241112093526_694e258"
-val tilleggsstønaderLibsVersion = "2024.12.11-15.08.d370f00e88e3"
-val tilleggsstønaderKontrakterVersion = "2024.12.17-15.15.ac0fb506b089"
+val tilleggsstønaderLibsVersion = "2025.01.21-10.26.933160d62458"
+val tilleggsstønaderKontrakterVersion = "2025.01.16-08.34.10d3c882ca46"
 val tokenSupportVersion = "5.0.11"
 val wiremockVersion = "3.9.2"
 val mockkVersion = "1.13.12"
@@ -151,6 +152,9 @@ tasks.test {
     useJUnitPlatform()
     testLogging {
         events = setOf(TestLogEvent.FAILED)
+        exceptionFormat = TestExceptionFormat.FULL
+        showStackTraces = false
+        showCauses = false
     }
     // Work around. Gradle does not include enough information to disambiguate
     // between different examples and scenarios.

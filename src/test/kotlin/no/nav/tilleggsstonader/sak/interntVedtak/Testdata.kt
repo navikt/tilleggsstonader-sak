@@ -16,12 +16,20 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.stønadsperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
@@ -161,11 +169,22 @@ object Testdata {
             ).tilDto(),
         )
 
+        val stønadsperiodeBeregningsgrunnlag = StønadsperiodeBeregningsgrunnlag(
+            fom = LocalDate.of(2024, 1, 1),
+            tom = LocalDate.of(2024, 2, 1),
+            målgruppe = MålgruppeType.AAP,
+            aktivitet = AktivitetType.TILTAK,
+        )
+
         val vedtak = GeneriskVedtak(
             behandlingId = behandlingId,
             type = TypeVedtak.INNVILGELSE,
             data = InnvilgelseTilsynBarn(
-                beregningsresultat = BeregningsresultatTilsynBarn(emptyList()),
+                beregningsresultat = BeregningsresultatTilsynBarn(
+                    perioder = listOf(
+                        beregningsresultatForMåned(stønadsperioder = listOf(stønadsperiodeGrunnlag(stønadsperiode = stønadsperiodeBeregningsgrunnlag))),
+                    ),
+                ),
             ),
         )
 
@@ -210,6 +229,47 @@ object Testdata {
         )
 
         val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = emptyList()))
+
+        val vedtaksperioder = listOf(Vedtaksperiode(fom = LocalDate.of(2024, 1, 1), tom = LocalDate.of(2024, 3, 31)))
+        val beregningsresultat = BeregningsresultatLæremidler(
+            perioder = listOf(
+                BeregningsresultatForMåned(
+                    beløp = 951,
+                    grunnlag = Beregningsgrunnlag(
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 1, 31),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                        studienivå = Studienivå.HØYERE_UTDANNING,
+                        studieprosent = 100,
+                        sats = 951,
+                        satsBekreftet = true,
+                        målgruppe = MålgruppeType.AAP,
+                    ),
+                ),
+                BeregningsresultatForMåned(
+                    beløp = 951,
+                    grunnlag = Beregningsgrunnlag(
+                        fom = LocalDate.of(2024, 2, 1),
+                        tom = LocalDate.of(2024, 2, 29),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                        studienivå = Studienivå.HØYERE_UTDANNING,
+                        studieprosent = 100,
+                        sats = 951,
+                        satsBekreftet = true,
+                        målgruppe = MålgruppeType.AAP,
+                    ),
+                ),
+            ),
+        )
+
+        val innvilgetVedtak = GeneriskVedtak(
+            behandlingId = behandlingId,
+            type = TypeVedtak.INNVILGELSE,
+            data = InnvilgelseLæremidler(
+                vedtaksperioder = vedtaksperioder,
+                beregningsresultat = beregningsresultat,
+            ),
+        )
 
         val avslåttVedtak = GeneriskVedtak(
             behandlingId = behandlingId,

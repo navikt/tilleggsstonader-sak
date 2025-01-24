@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
-import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.barn.NyttBarnId
 import no.nav.tilleggsstonader.sak.behandling.barn.TidligereBarnId
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -305,21 +304,5 @@ class VilkårService(
     fun hentPassBarnVilkår(behandlingId: BehandlingId): List<Vilkår> {
         return vilkårRepository.findByBehandlingId(behandlingId)
             .filter { it.type == VilkårType.PASS_BARN }
-    }
-
-    companion object {
-
-        fun byggBarnMapFraTidligereTilNyId(
-            barnPåForrigeBehandling: List<BehandlingBarn>,
-            barnPåGjeldendeBehandling: List<BehandlingBarn>,
-        ): Map<BarnId, BehandlingBarn> {
-            val barnFraForrigeBehandlingMap = barnPåForrigeBehandling.associateBy { it.id }.toMutableMap()
-            return barnPåGjeldendeBehandling.mapNotNull { nyttBarn ->
-                val forrigeBarnId =
-                    barnFraForrigeBehandlingMap.entries.firstOrNull { nyttBarn.erMatchendeBarn(it.value) }?.key
-                barnFraForrigeBehandlingMap.remove(forrigeBarnId)
-                forrigeBarnId?.let { Pair(forrigeBarnId, nyttBarn) }
-            }.associate { it.first to it.second }
-        }
     }
 }

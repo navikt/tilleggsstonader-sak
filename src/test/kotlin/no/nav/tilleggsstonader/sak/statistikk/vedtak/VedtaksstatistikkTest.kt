@@ -4,6 +4,12 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingTypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BehandlingÅrsakDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -19,7 +25,7 @@ import java.time.temporal.ChronoUnit
 class VedtaksstatistikkTest : IntegrationTest() {
 
     @Autowired
-    lateinit var vedtakstatistikkRepository: VedtakstatistikkRepository
+    lateinit var vedtakstatistikkRepository: VedtaksstatistikkRepository
 
     @Autowired
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
@@ -89,7 +95,7 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     @Test
     fun `årsakAvslag kan mappes mellom databaseobjekt og domeneobjekt`() {
-        val årsakerAvslag = ÅrsakAvslagDvh.fraDomene(listOf(ÅrsakAvslag.INGEN_AKTIVITET))
+        val årsakerAvslag = ÅrsakAvslagDvh.Companion.fraDomene(listOf(ÅrsakAvslag.INGEN_AKTIVITET))
 
         vedtakstatistikkRepository.insert(
             vedtaksstatistikk().copy(

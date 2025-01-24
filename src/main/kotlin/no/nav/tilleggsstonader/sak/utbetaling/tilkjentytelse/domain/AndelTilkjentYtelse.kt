@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
@@ -42,6 +43,7 @@ data class AndelTilkjentYtelse(
     val iverksetting: Iverksetting? = null,
     @LastModifiedDate
     val endretTid: LocalDateTime = SporbarUtils.now(),
+    val utbetalingsdato: LocalDate,
 ) {
 
     init {
@@ -56,6 +58,9 @@ data class AndelTilkjentYtelse(
         }
 
         validerDataForType()
+        feilHvisIkke(utbetalingsdato.toYearMonth() == fom.toYearMonth()) {
+            "Må sette utbetalingsdato($utbetalingsdato) i den måned(${fom.toYearMonth()}) andelen gjelder for"
+        }
     }
 
     private fun validerDataForType() {
@@ -163,5 +168,5 @@ enum class StatusIverksetting {
     VENTER_PÅ_SATS_ENDRING,
     ;
 
-    fun erOk() = this == StatusIverksetting.OK || this == StatusIverksetting.OK_UTEN_UTBETALING
+    fun erOk() = this == OK || this == OK_UTEN_UTBETALING
 }

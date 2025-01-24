@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -148,6 +149,21 @@ class InterntVedtakServiceTest {
         }
 
         @Test
+        fun `beregningsfelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+
+            val forventet = Testdata.TilsynBarn.vedtak.data.beregningsresultat.perioder.single()
+
+            with(interntVedtak.beregningsresultat!!.tilsynBarn!!.single()) {
+                assertThat(månedsbeløp).isEqualTo(forventet.månedsbeløp)
+                assertThat(dagsats).isEqualTo(forventet.dagsats)
+                assertThat(grunnlag.måned).isEqualTo(forventet.grunnlag.måned)
+                assertThat(grunnlag.utgifterTotal).isEqualTo(forventet.grunnlag.utgifterTotal)
+                assertThat(grunnlag.antallBarn).isEqualTo(forventet.grunnlag.antallBarn)
+            }
+        }
+
+        @Test
         fun `stønadsperiodefelter skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
@@ -207,6 +223,24 @@ class InterntVedtakServiceTest {
                     assertThat(prosent).isEqualTo(80)
                     assertThat(studienivå).isEqualTo(Studienivå.VIDEREGÅENDE)
                 }
+            }
+        }
+
+        @Test
+        fun `beregningsfelter skal bli riktig mappet`() {
+            every { vedtakService.hentVedtak(behandlingId) } returns Testdata.Læremidler.innvilgetVedtak
+
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+
+            val forventet = Testdata.Læremidler.beregningsresultat.tilDto().perioder.single()
+
+            with(interntVedtak.beregningsresultat!!.læremidler!!.single()) {
+                assertThat(fom).isEqualTo(forventet.fom)
+                assertThat(tom).isEqualTo(forventet.tom)
+                assertThat(antallMåneder).isEqualTo(forventet.antallMåneder)
+                assertThat(beløp).isEqualTo(forventet.beløp)
+                assertThat(stønadsbeløp).isEqualTo(forventet.stønadsbeløp)
+                assertThat(utbetalingsdato).isEqualTo(forventet.utbetalingsdato)
             }
         }
 

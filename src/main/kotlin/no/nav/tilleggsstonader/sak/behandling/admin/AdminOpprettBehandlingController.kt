@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.admin
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.IdentRequest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -19,11 +18,11 @@ class AdminOpprettBehandlingController(
 ) {
 
     @PostMapping("hent-person")
-    fun hentPerson(@RequestBody identRequest: IdentRequest): PersoninfoDto {
+    fun hentPerson(@RequestBody request: AdminOpprettFørstegangsbehandlingHentPersonDto): PersoninfoDto {
         tilgangService.validerHarSaksbehandlerrolle()
-        tilgangService.validerTilgangTilPersonMedBarn(identRequest.ident, AuditLoggerEvent.ACCESS)
+        tilgangService.validerTilgangTilPersonMedBarn(request.ident, AuditLoggerEvent.ACCESS)
 
-        return adminOpprettBehandlingService.hentPerson(ident = identRequest.ident)
+        return adminOpprettBehandlingService.hentPerson(stønadstype = request.stønadstype, ident = request.ident)
     }
 
     @PostMapping("opprett-foerstegangsbehandling")
@@ -32,6 +31,7 @@ class AdminOpprettBehandlingController(
         tilgangService.validerTilgangTilPersonMedBarn(request.ident, AuditLoggerEvent.CREATE)
 
         return adminOpprettBehandlingService.opprettFørstegangsbehandling(
+            stønadstype = request.stønadstype,
             ident = request.ident,
             valgteBarn = request.valgteBarn,
             medBrev = request.medBrev,

@@ -13,7 +13,7 @@
         "grunnlag": {
           "fom": "2024-01-01",
           "tom": "2024-01-31",
-          "utbetalingsmåned": "2024-01",
+          "utbetalingsdato": "2024-01-01",
           "studienivå": "HØYERE_UTDANNING",
           "studieprosent": 100,
           "sats": 875,

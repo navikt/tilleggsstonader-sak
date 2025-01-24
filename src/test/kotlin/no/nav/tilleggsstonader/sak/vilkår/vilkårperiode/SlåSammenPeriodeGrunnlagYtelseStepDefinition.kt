@@ -12,7 +12,6 @@ import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDato
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.SlåSammenPeriodeGrunnlagYtelseUtil.slåSammenOverlappendeEllerPåfølgende
 import org.assertj.core.api.Assertions.assertThat
@@ -21,7 +20,7 @@ enum class PeriodeGrunnlagYtelseNøkler(
     override val nøkkel: String,
 ) : Domenenøkkel {
     TYPE("Type"),
-    ENSLIG_FORSØRGER_STØNADSTYPE("Enslig forsørger stønadstype"),
+    SUBTYPE("Subtype"),
 }
 
 class SlåSammenPeriodeGrunnlagYtelseStepDefinition {
@@ -36,7 +35,10 @@ class SlåSammenPeriodeGrunnlagYtelseStepDefinition {
                 type = parseEnum<TypeYtelsePeriode>(PeriodeGrunnlagYtelseNøkler.TYPE, rad),
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad),
-                ensligForsørgerStønadstype = parseValgfriEnum<EnsligForsørgerStønadstype>(PeriodeGrunnlagYtelseNøkler.ENSLIG_FORSØRGER_STØNADSTYPE, rad),
+                subtype = parseValgfriEnum<PeriodeGrunnlagYtelse.YtelseSubtype>(
+                    PeriodeGrunnlagYtelseNøkler.SUBTYPE,
+                    rad,
+                ),
             )
         }
     }
@@ -53,7 +55,10 @@ class SlåSammenPeriodeGrunnlagYtelseStepDefinition {
                 type = parseEnum<TypeYtelsePeriode>(PeriodeGrunnlagYtelseNøkler.TYPE, rad),
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad),
-                ensligForsørgerStønadstype = parseValgfriEnum<EnsligForsørgerStønadstype>(PeriodeGrunnlagYtelseNøkler.ENSLIG_FORSØRGER_STØNADSTYPE, rad),
+                subtype = parseValgfriEnum<PeriodeGrunnlagYtelse.YtelseSubtype>(
+                    PeriodeGrunnlagYtelseNøkler.SUBTYPE,
+                    rad,
+                ),
             )
         }
         assertThat(resultat).isEqualTo(forventet)

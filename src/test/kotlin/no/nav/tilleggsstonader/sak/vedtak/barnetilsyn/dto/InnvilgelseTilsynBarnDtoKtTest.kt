@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class InnvilgelseTilsynBarnDtoKtTest {
 
@@ -150,7 +149,6 @@ class InnvilgelseTilsynBarnDtoKtTest {
         tom: LocalDate,
     ) = StønadsperiodeGrunnlag(
         stønadsperiode = StønadsperiodeBeregningsgrunnlag(
-            id = UUID.randomUUID(),
             fom = fom,
             tom = tom,
             målgruppe = MålgruppeType.AAP,

@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktiv
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.HentetInformasjon
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse.YtelseSubtype
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagDomain
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
@@ -137,7 +138,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
     }
 
     @Test
-    fun `skal ikke ta ta med ferdig avklarte perioder fra AAP som grunnlag`() {
+    fun `skal ta ta med ferdig avklarte perioder fra AAP som grunnlag`() {
         val nesteDag = LocalDate.now().plusDays(1) // for å få 2 ulike AAP-perioder
         every {
             ytelseClient.hentYtelser(any())
@@ -150,6 +151,7 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                     LocalDate.now(),
                     LocalDate.now(),
                     aapErFerdigAvklart = null,
+                    ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
                 ),
             ),
             hentetInformasjon = emptyList(),
@@ -162,7 +164,18 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         val perioder = grunnlag!!.grunnlag.ytelse.perioder
         assertThat(perioder).containsExactlyInAnyOrder(
             PeriodeGrunnlagYtelse(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now()),
-            PeriodeGrunnlagYtelse(TypeYtelsePeriode.ENSLIG_FORSØRGER, LocalDate.now(), LocalDate.now()),
+            PeriodeGrunnlagYtelse(
+                TypeYtelsePeriode.AAP,
+                nesteDag,
+                nesteDag,
+                subtype = YtelseSubtype.AAP_FERDIG_AVKLART,
+            ),
+            PeriodeGrunnlagYtelse(
+                TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                LocalDate.now(),
+                LocalDate.now(),
+                subtype = YtelseSubtype.OVERGANGSSTØNAD,
+            ),
         )
     }
 
@@ -209,13 +222,13 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                 TypeYtelsePeriode.ENSLIG_FORSØRGER,
                 LocalDate.now(),
                 LocalDate.now(),
-                no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.SKOLEPENGER,
+                YtelseSubtype.SKOLEPENGER,
             ),
             PeriodeGrunnlagYtelse(
                 TypeYtelsePeriode.ENSLIG_FORSØRGER,
                 LocalDate.now(),
                 LocalDate.now(),
-                no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
+                YtelseSubtype.OVERGANGSSTØNAD,
             ),
         )
     }
@@ -271,6 +284,19 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
                 assertThat(grunnlag.hentetInformasjon.tom)
                     .isEqualTo(YearMonth.now().plusYears(1).atEndOfMonth())
             }
+        }
+
+        @Test
+        fun `skal kunne hente grunnlagsdata i førstegangsbehandlinger fra annet dato`() {
+            val henteFom = LocalDate.of(2023, 1, 1)
+
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.INNGANGSVILKÅR))
+            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+
+            vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id, henteFom)
+            val grunnlag = vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+
+            assertThat(grunnlag!!.hentetInformasjon.fom).isEqualTo(henteFom)
         }
 
         @Test

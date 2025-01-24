@@ -1,0 +1,1 @@
+ALTER TABLE vedtaksstatistikk_v2 DROP COLUMN krav_mottatt;

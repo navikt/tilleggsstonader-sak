@@ -28,13 +28,16 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeGrunnlagService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
@@ -47,6 +50,12 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
     @Autowired
     lateinit var vilkårperiodeRepository: VilkårperiodeRepository
+
+    @Autowired
+    lateinit var vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository
+
+    @Autowired
+    lateinit var vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService
 
     @Autowired
     lateinit var stønadsperiodeRepository: StønadsperiodeRepository
@@ -181,6 +190,26 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         assertThatThrownBy {
             nullstillBehandlingService.nullstillBehandling(behandling.id)
         }.hasMessageContaining("Behandling er låst for videre redigering og kan ikke nullstilles")
+    }
+
+    @Nested
+    inner class SlettVilkårperiodegrunnlag {
+
+        @Test
+        fun `skal ikke kunne slette for ferdigstilt behandling`() {
+            assertThatThrownBy {
+                nullstillBehandlingService.slettVilkårperiodegrunnlag(behandling.id)
+            }.hasMessageContaining("Behandling er låst for videre redigering og endres på")
+        }
+
+        @Test
+        fun `skal slette grunnlag for behandling under arbeid`() {
+            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(revurdering.id)
+
+            nullstillBehandlingService.slettVilkårperiodegrunnlag(revurdering.id)
+
+            assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(revurdering.id)).isNull()
+        }
     }
 
     private fun assertVilkårPeriodeErGjenbrukt(vilkårperiode: Vilkårperiode) {

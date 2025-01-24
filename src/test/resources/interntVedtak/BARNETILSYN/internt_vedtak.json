@@ -185,5 +185,17 @@
   } ],
   "vedtak" : {
     "type" : "INNVILGELSE"
+  },
+  "beregningsresultat" : {
+    "tilsynBarn" : [ {
+      "dagsats" : 10,
+      "månedsbeløp" : 3000,
+      "grunnlag" : {
+        "måned" : "2024-01",
+        "utgifterTotal" : 5000,
+        "antallBarn" : 1
+      }
+    } ],
+    "læremidler" : null
   }
 }

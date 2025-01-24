@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
@@ -52,9 +53,9 @@ class IverksettService(
             logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
             return
         }
-        markerAndelerFraForrieBehandlingSomUaktuelle(behandling)
+        markerAndelerFraForrigeBehandlingSomUaktuelle(behandling)
 
-        val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
+        val tilkjentYtelse = tilkjentYtelseService.hentForBehandlingMedLås(behandlingId)
         val andeler = andelerForFørsteIverksettingAvBehandling(tilkjentYtelse)
 
         val totrinnskontroll = hentTotrinnskontroll(behandlingId)
@@ -77,7 +78,8 @@ class IverksettService(
     private fun andelerForFørsteIverksettingAvBehandling(tilkjentYtelse: TilkjentYtelse): Collection<AndelTilkjentYtelse> {
         val måned = YearMonth.now()
         val iverksettingId = tilkjentYtelse.behandlingId.id
-        val andelerTilIverksetting = finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, måned)
+        val andelerTilIverksetting =
+            finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, utbetalingsdato = LocalDate.now())
 
         return andelerTilIverksetting.ifEmpty {
             val iverksetting = Iverksetting(iverksettingId, osloNow())
@@ -95,19 +97,20 @@ class IverksettService(
      * Når man iverksetter samme behandling neste gang skal man bruke inneværende måned for å iverksette aktuell måned
      */
     @Transactional
-    fun iverksett(behandlingId: BehandlingId, iverksettingId: UUID, måned: YearMonth) {
+    fun iverksett(behandlingId: BehandlingId, iverksettingId: UUID, utbetalingsdato: LocalDate) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         if (!behandling.resultat.skalIverksettes) {
             logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
             return
         }
-        val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId)
+        val tilkjentYtelse = tilkjentYtelseService.hentForBehandlingMedLås(behandlingId)
 
         val totrinnskontroll = hentTotrinnskontroll(behandlingId)
 
-        val andelerTilkjentYtelse = finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, måned)
+        val andelerTilkjentYtelse =
+            finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, utbetalingsdato = utbetalingsdato)
         feilHvis(andelerTilkjentYtelse.isEmpty()) {
-            "Månedsjobbet forventer å finne andeler for iverksetting av behandling=$behandlingId måned=$måned"
+            "Iverksetting forventer å finne andeler for iverksetting av behandling=$behandlingId utbetalingsdato=$utbetalingsdato"
         }
         val dto = IverksettDtoMapper.map(
             behandling = behandling,
@@ -120,7 +123,15 @@ class IverksettService(
         iverksettClient.iverksett(dto)
     }
 
-    private fun markerAndelerFraForrieBehandlingSomUaktuelle(behandling: Saksbehandling) {
+    /**
+     * Når man iverksetter en revurdering markeres andeler for forrige behandling som uaktuelle
+     * Dette gjøres sånn at de andelene ikke skal plukkes opp og iverksettes,
+     * når revurderingen er den nye gjeldende behandlingen
+     *
+     * Hvis forrige behandling har en andel som har blitt sendt til iverksetting men ikke fått kvittering
+     * får man ikke iverksatt revurderingen, man må vente på en OK kvittering
+     */
+    private fun markerAndelerFraForrigeBehandlingSomUaktuelle(behandling: Saksbehandling) {
         if (behandling.forrigeBehandlingId == null) {
             return
         }
@@ -150,12 +161,11 @@ class IverksettService(
     private fun finnAndelerTilIverksetting(
         tilkjentYtelse: TilkjentYtelse,
         iverksettingId: UUID,
-        måned: YearMonth,
+        utbetalingsdato: LocalDate,
     ): List<AndelTilkjentYtelse> {
-        val sisteDagenIMåneden = måned.atEndOfMonth()
         val iverksetting = Iverksetting(iverksettingId, osloNow())
         val aktuelleAndeler = tilkjentYtelse.andelerTilkjentYtelse
-            .filter { it.tom <= sisteDagenIMåneden }
+            .filter { it.utbetalingsdato <= utbetalingsdato }
             .filter { it.statusIverksetting != StatusIverksetting.VENTER_PÅ_SATS_ENDRING }
             .map {
                 if (it.statusIverksetting == StatusIverksetting.UBEHANDLET) {
