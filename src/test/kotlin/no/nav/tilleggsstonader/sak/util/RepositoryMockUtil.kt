@@ -32,6 +32,9 @@ object RepositoryMockUtil {
             map[getId(firstArg)] = firstArg
             firstArg
         }
+        every { mockk.insertAll(any()) } answers  {
+            firstArg<List<TYPE>>().map { mockk.insert(it) }
+        }
         every { mockk.deleteAll() } answers { map.clear() }
         every { mockk.deleteById(any()) } answers { map.remove(firstArg()) }
         every { mockk.findAll() } answers { map.values }
@@ -57,12 +60,7 @@ object RepositoryMockUtil {
             }
         }
 
-    fun mockVedtakRepository() = mockRepository<VedtakRepository, Vedtak, BehandlingId> { it.behandlingId }.apply {
-        val repo = this
-        /*every { repo.findById(any()) } answers {
-            findAll().singleOrNull { it.behandlingId.id == firstArg() }
-        }*/
-    }
+    fun mockVedtakRepository() = mockRepository<VedtakRepository, Vedtak, BehandlingId> { it.behandlingId }
 
     fun mockTilkjentYtelseRepository() =
         mockRepository<TilkjentYtelseRepository, TilkjentYtelse, UUID> { it.id }.apply {
