@@ -38,7 +38,7 @@ data class Beregningsgrunnlag(
 fun avkortPerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
     var avkortedePerioder: List<BeregningsresultatForMåned> = emptyList()
 
-    fun avkortFjernELlerVidereførBergeningsresultatForMåned(periode: BeregningsresultatForMåned) {
+    fun avkortFjernEllerVidereførBergeningsresultatForMåned(periode: BeregningsresultatForMåned) {
         val avkortetDatoPeriode = Datoperiode(periode.grunnlag.fom, periode.grunnlag.tom).avkortFraOgMed(revurderFra.minusDays(1))
         if (avkortetDatoPeriode !== null) {
             avkortedePerioder = avkortedePerioder.plus(
@@ -54,13 +54,13 @@ fun avkortPerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): Lis
         TypeVedtak.INNVILGELSE -> {
             val forrigeVedtakInnvilgelse = forrigeVedtak.withTypeOrThrow<InnvilgelseLæremidler>()
             forrigeVedtakInnvilgelse.data.beregningsresultat.perioder.forEach {
-                avkortFjernELlerVidereførBergeningsresultatForMåned(it)
+                avkortFjernEllerVidereførBergeningsresultatForMåned(it)
             }
         }
         TypeVedtak.OPPHØR -> {
             val forrigeVedtakOpphør = forrigeVedtak.withTypeOrThrow<OpphørLæremidler>()
             forrigeVedtakOpphør.data.beregningsresultat.perioder.forEach {
-                avkortFjernELlerVidereførBergeningsresultatForMåned(it)
+                avkortFjernEllerVidereførBergeningsresultatForMåned(it)
             }
         }
         TypeVedtak.AVSLAG -> TODO()
