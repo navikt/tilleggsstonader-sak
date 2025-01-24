@@ -100,7 +100,19 @@ class BeregningsresultatLæremidlerTest {
             vedtaksperioder = listOf(
                 Vedtaksperiode(
                     fom = LocalDate.of(2024, 1, 1),
-                    tom = LocalDate.of(2024, 5, 1),
+                    tom = LocalDate.of(2024, 1, 31),
+                ),
+                Vedtaksperiode(
+                    fom = LocalDate.of(2024, 2, 1),
+                    tom = LocalDate.of(2024, 2, 29),
+                ),
+                Vedtaksperiode(
+                    fom = LocalDate.of(2024, 3, 1),
+                    tom = LocalDate.of(2024, 3, 31),
+                ),
+                Vedtaksperiode(
+                    fom = LocalDate.of(2024, 4, 1),
+                    tom = LocalDate.of(2024, 4, 30),
                 ),
             ),
             beregningsresultat = BeregningsresultatLæremidler(
