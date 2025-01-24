@@ -44,7 +44,6 @@ class LæremidlerBeregnYtelseSteg(
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-    private val revurderFraService: RevurderFraService,
 ) : BeregnYtelseSteg<VedtakLæremidlerRequest>(
     stønadstype = Stønadstype.LÆREMIDLER,
     vedtakRepository = vedtakRepository,
