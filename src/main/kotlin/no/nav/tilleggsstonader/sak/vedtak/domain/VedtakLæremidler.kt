@@ -56,7 +56,7 @@ fun VedtakLæremidler.beregningsresultat(): BeregningsresultatLæremidler? {
 fun VedtakLæremidler.vedtaksperioder(): List<Vedtaksperiode>? {
     return when (this) {
         is InnvilgelseLæremidler -> this.vedtaksperioder
-        // is OpphørLæremidler -> this.vedtaksperioder
+        is OpphørLæremidler -> this.vedtaksperioder
         is AvslagLæremidler -> null
     }
 }
