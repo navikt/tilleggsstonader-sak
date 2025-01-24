@@ -35,13 +35,13 @@ data class Beregningsgrunnlag(
     val målgruppe: MålgruppeType,
 ) : Periode<LocalDate>
 
-fun avkortPerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
-    var avkortedePerioder: List<BeregningsresultatForMåned> = emptyList()
+fun avkortBeregningsresultatVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
+    var avkortetBeregningsresultat: List<BeregningsresultatForMåned> = emptyList()
 
     fun avkortFraOgMedBergeningsresultatForMåned(periode: BeregningsresultatForMåned) {
         val avkortetDatoPeriode = Datoperiode(periode.grunnlag.fom, periode.grunnlag.tom).avkortFraOgMed(revurderFra.minusDays(1))
         if (avkortetDatoPeriode !== null) {
-            avkortedePerioder = avkortedePerioder.plus(
+            avkortetBeregningsresultat = avkortetBeregningsresultat.plus(
                 BeregningsresultatForMåned(
                     periode.beløp,
                     periode.grunnlag.copy(fom = avkortetDatoPeriode.fom, tom = avkortetDatoPeriode.tom),
@@ -65,5 +65,5 @@ fun avkortPerioderVedOpphør(forrigeVedtak: Vedtak, revurderFra: LocalDate): Lis
         }
         TypeVedtak.AVSLAG -> TODO()
     }
-    return avkortedePerioder
+    return avkortetBeregningsresultat
 }

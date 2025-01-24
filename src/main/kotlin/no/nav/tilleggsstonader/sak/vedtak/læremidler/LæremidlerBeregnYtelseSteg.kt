@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.behandling.RevurderFraService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -26,7 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBereg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortPerioderVedOpphør
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortBeregningsresultatVedOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
@@ -77,29 +76,29 @@ class LæremidlerBeregnYtelseSteg(
         if (saksbehandling.revurderFra == null) {
             error("revurderFra-dato er påkrevd for opphør")
         }
-        feilHvis(forrigeBehandling.type !== TypeVedtak.INNVILGELSE) {
-            "Opphør er et ugyldig vedtaksresultat fordi forrige behandling ikke er en innvilgelse"
+        feilHvis(forrigeBehandling.type == TypeVedtak.AVSLAG) {
+            "Opphør er et ugyldig vedtaksresultat fordi forrige behandling var et avslag"
         }
 
         opphørValideringService.validerVilkårsPerioder(saksbehandling)
 
-        val innvilgelseLæremidler = forrigeBehandling.data as InnvilgelseLæremidler
-        val avkortedePerioder: List<BeregningsresultatForMåned> = avkortPerioderVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
+        val forrigeBehandlingData = forrigeBehandling.data
+        val avkortetBeregningsresultat: List<BeregningsresultatForMåned> = avkortBeregningsresultatVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
 
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.OPPHØR,
                 data = OpphørLæremidler(
-                    vedtaksperioder = innvilgelseLæremidler.vedtaksperioder,
-                    beregningsresultat = BeregningsresultatLæremidler(avkortedePerioder),
+                    vedtaksperioder = emptyList(),
+                    beregningsresultat = BeregningsresultatLæremidler(avkortetBeregningsresultat),
                     årsaker = vedtak.årsakerOpphør,
                     begrunnelse = vedtak.begrunnelse,
                 ),
             ),
         )
 
-        val beregningsresultatLæremidler = BeregningsresultatLæremidler(avkortedePerioder)
+        val beregningsresultatLæremidler = BeregningsresultatLæremidler(avkortetBeregningsresultat)
 
         lagreAndeler(saksbehandling, beregningsresultatLæremidler)
     }
