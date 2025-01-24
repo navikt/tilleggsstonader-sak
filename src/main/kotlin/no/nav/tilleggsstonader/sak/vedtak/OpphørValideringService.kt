@@ -21,7 +21,7 @@ class OpphørValideringService(
     private val vilkårService: VilkårService,
 ) {
 
-    fun validerPerioder(saksbehandling: Saksbehandling) {
+    fun validerVilkårsPerioder(saksbehandling: Saksbehandling) {
         val vilkår = vilkårService.hentVilkår(saksbehandling.id)
         val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling.id)
 

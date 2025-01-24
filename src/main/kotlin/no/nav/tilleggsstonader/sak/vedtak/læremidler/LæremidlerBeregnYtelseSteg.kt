@@ -82,6 +82,8 @@ class LæremidlerBeregnYtelseSteg(
             "Opphør er et ugyldig vedtaksresultat fordi forrige behandling ikke er en innvilgelse"
         }
 
+        opphørValideringService.validerVilkårsPerioder(saksbehandling)
+
         val innvilgelseLæremidler = forrigeBehandling.data as InnvilgelseLæremidler
         val kuttedePerioder: List<BeregningsresultatForMåned> = avkortPerioderVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
 
