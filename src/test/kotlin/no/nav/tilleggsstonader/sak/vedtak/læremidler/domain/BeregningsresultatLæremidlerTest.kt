@@ -119,7 +119,22 @@ class BeregningsresultatLæremidlerTest {
                 perioder = listOf(
                     beregningsresultatForMåned(
                         fom = LocalDate.of(2024, 1, 1),
-                        tom = LocalDate.of(2024, 5, 1),
+                        tom = LocalDate.of(2024, 1, 31),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                    ),
+                    beregningsresultatForMåned(
+                        fom = LocalDate.of(2024, 2, 1),
+                        tom = LocalDate.of(2024, 2, 29),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                    ),
+                    beregningsresultatForMåned(
+                        fom = LocalDate.of(2024, 3, 1),
+                        tom = LocalDate.of(2024, 3, 31),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                    ),
+                    beregningsresultatForMåned(
+                        fom = LocalDate.of(2024, 4, 1),
+                        tom = LocalDate.of(2024, 4, 30),
                         utbetalingsdato = LocalDate.of(2024, 1, 1),
                     ),
                 ),
@@ -137,6 +152,19 @@ class BeregningsresultatLæremidlerTest {
                     beløp = 875,
                     grunnlag = Beregningsgrunnlag(
                         fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 1, 31),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                        studienivå = Studienivå.HØYERE_UTDANNING,
+                        studieprosent = 100,
+                        sats = 875,
+                        satsBekreftet = true,
+                        målgruppe = MålgruppeType.AAP,
+                    ),
+                ),
+                BeregningsresultatForMåned(
+                    beløp = 875,
+                    grunnlag = Beregningsgrunnlag(
+                        fom = LocalDate.of(2024, 2, 1),
                         tom = LocalDate.of(2024, 2, 29),
                         utbetalingsdato = LocalDate.of(2024, 1, 1),
                         studienivå = Studienivå.HØYERE_UTDANNING,
