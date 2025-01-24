@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -46,7 +47,8 @@ class BeregningsresultatLæremidlerTest {
     @Test
     fun `perioder før Revurder-fra blir ikke fjernet`() {
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse()
-        val kuttePerioderVedOpphør = kuttePerioderVedOpphør(forrigeVedtak, LocalDate.of(2024, 1, 20))
+        val revurderFra = LocalDate.of(2024, 1, 20)
+        val kuttePerioderVedOpphør = kuttePerioderVedOpphør(forrigeVedtak, revurderFra)
 
         assertThat(kuttePerioderVedOpphør).isEqualTo(
             listOf<BeregningsresultatForMåned>(
@@ -70,7 +72,8 @@ class BeregningsresultatLæremidlerTest {
     @Test
     fun `perioder midt i Revurder-fra blir kuttet`() {
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse()
-        val kuttePerioderVedOpphør = kuttePerioderVedOpphør(forrigeVedtak, LocalDate.of(2024, 1, 5))
+        val revurderFra = LocalDate.of(2024, 1, 5)
+        val kuttePerioderVedOpphør = kuttePerioderVedOpphør(forrigeVedtak, revurderFra)
 
         assertThat(kuttePerioderVedOpphør).isEqualTo(
             listOf<BeregningsresultatForMåned>(
@@ -139,7 +142,8 @@ class BeregningsresultatLæremidlerTest {
     @Test
     fun `perioder etter Revurder-fra blir fjernet`() {
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse()
-        val kuttePerioderVedOpphør = kuttePerioderVedOpphør(forrigeVedtak, LocalDate.of(2023, 12, 1))
+        val revurderFra = LocalDate.of(2023, 12, 1)
+        val kuttePerioderVedOpphør = kuttePerioderVedOpphør(forrigeVedtak, revurderFra)
 
         assertThat(kuttePerioderVedOpphør).isEqualTo(emptyList<BeregningsresultatForMåned>())
     }
