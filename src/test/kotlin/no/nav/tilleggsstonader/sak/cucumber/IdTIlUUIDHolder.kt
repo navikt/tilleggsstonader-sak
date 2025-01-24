@@ -1,18 +1,18 @@
 package no.nav.tilleggsstonader.sak.cucumber
 
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import java.util.UUID
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 
 object IdTIlUUIDHolder {
 
-    val behandlingIdTilUUID = (1..10).associateWith { UUID.randomUUID() }
+    val behandlingIdTilUUID = (1..10).associateWith { BehandlingId.random() }
 
-    fun behandlingIdFraUUID(id: UUID) = behandlingIdTilUUID.entries.single { it.value == id }.key
+    fun behandlingIdFraUUID(id: BehandlingId) = behandlingIdTilUUID.entries.single { it.value == id }.key
 
     /**
      * behandlingId to ident, to barnId
      */
     val barnIder = (1..10).associateWith { BarnId.random() }
 
-    fun barnIdFraUUID(id: UUID) = behandlingIdTilUUID.entries.single { it.value == id }.key
+    fun barnIdFraUUID(id: BarnId) = barnIder.entries.single { it.value == id }.key
 }
