@@ -94,7 +94,6 @@ class BeregningsresultatLæremidlerTest {
         )
     }
 
-
     @Test
     fun `perioder midt i Revurder-fra blir kuttet - tester med lengre periode - kutter i maanedsskiftet februar-mars i skuddåret 2024`() {
         val innvilgelseLæremidlerMedLangPeriode = InnvilgelseLæremidler(
