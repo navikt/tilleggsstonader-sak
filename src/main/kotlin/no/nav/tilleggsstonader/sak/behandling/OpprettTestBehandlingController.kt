@@ -64,10 +64,11 @@ class OpprettTestBehandlingController(
     private val søknadService: SøknadService,
     private val taskService: TaskService,
 ) {
-
     @Transactional
     @PostMapping
-    fun opprettBehandling(@RequestBody testBehandlingRequest: TestBehandlingRequest): BehandlingId {
+    fun opprettBehandling(
+        @RequestBody testBehandlingRequest: TestBehandlingRequest,
+    ): BehandlingId {
         val fagsak: Fagsak = lagFagsak(testBehandlingRequest)
         val behandling = lagBehandling(fagsak)
         opprettSøknad(fagsak, behandling)
@@ -82,11 +83,13 @@ class OpprettTestBehandlingController(
             behandlingsårsak = BehandlingÅrsak.SØKNAD,
         )
 
-    private fun opprettSøknad(fagsak: Fagsak, behandling: Behandling) {
+    private fun opprettSøknad(
+        fagsak: Fagsak,
+        behandling: Behandling,
+    ) {
         when (fagsak.stønadstype) {
             Stønadstype.BARNETILSYN -> opprettSøknadBarnetilsyn(fagsak, behandling)
             Stønadstype.LÆREMIDLER -> opprettSøknadLæremidler(fagsak, behandling)
-            else -> error("Kan ikke opprette søknad for stønadstype ${fagsak.stønadstype}.")
         }
     }
 
@@ -95,48 +98,56 @@ class OpprettTestBehandlingController(
         behandling: Behandling,
     ) {
         val pdlBarn = personService.hentPersonMedBarn(fagsak.hentAktivIdent()).barn
-        val barnMedBarnepass = pdlBarn.entries.map { (ident, barn) ->
-            BarnMedBarnepass(
-                ident = TekstFelt("", ident),
-                navn = TekstFelt("", "navn"),
-                type = EnumFelt("", TypeBarnepass.BARNEHAGE_SFO_AKS, "", emptyList()),
-                startetIFemte = null,
-                årsak = null,
-            )
-        }
-        val skjemaBarnetilsyn = SøknadsskjemaBarnetilsyn(
-            hovedytelse = HovedytelseAvsnitt(
-                hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
-                arbeidOgOpphold = arbeidOgOpphold(),
-            ),
-            aktivitet = AktivitetAvsnitt(
-                aktiviteter = EnumFlereValgFelt(
-                    "Hvilken aktivitet søker du om støtte i forbindelse med?",
-                    listOf(
-                        VerdiFelt("ANNET", "Annet"),
-                        VerdiFelt("1", "Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
+        val barnMedBarnepass =
+            pdlBarn.entries.map { (ident, _) ->
+                BarnMedBarnepass(
+                    ident = TekstFelt("", ident),
+                    navn = TekstFelt("", "navn"),
+                    type = EnumFelt("", TypeBarnepass.BARNEHAGE_SFO_AKS, "", emptyList()),
+                    startetIFemte = null,
+                    årsak = null,
+                )
+            }
+        val skjemaBarnetilsyn =
+            SøknadsskjemaBarnetilsyn(
+                hovedytelse =
+                    HovedytelseAvsnitt(
+                        hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
+                        arbeidOgOpphold = arbeidOgOpphold(),
                     ),
-                    listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
-                ),
-                annenAktivitet = EnumFelt(
-                    "Hvilken arbeidsrettet aktivitet har du? ",
-                    AnnenAktivitetType.TILTAK,
-                    "Tiltak / arbeidsrettet aktivitet",
-                    listOf(),
-                ),
-                lønnetAktivitet = EnumFelt("Mottar du lønn gjennom ett tiltak?", JaNei.NEI, "Nei", listOf()),
-            ),
-            barn = BarnAvsnitt(
-                barnMedBarnepass = barnMedBarnepass,
-            ),
-            dokumentasjon = emptyList(),
-        )
-        val skjema = Søknadsskjema(
-            ident = fagsak.hentAktivIdent(),
-            mottattTidspunkt = osloNow(),
-            språk = Språkkode.NB,
-            skjema = skjemaBarnetilsyn,
-        )
+                aktivitet =
+                    AktivitetAvsnitt(
+                        aktiviteter =
+                            EnumFlereValgFelt(
+                                "Hvilken aktivitet søker du om støtte i forbindelse med?",
+                                listOf(
+                                    VerdiFelt("ANNET", "Annet"),
+                                    VerdiFelt("1", "Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
+                                ),
+                                listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
+                            ),
+                        annenAktivitet =
+                            EnumFelt(
+                                "Hvilken arbeidsrettet aktivitet har du? ",
+                                AnnenAktivitetType.TILTAK,
+                                "Tiltak / arbeidsrettet aktivitet",
+                                listOf(),
+                            ),
+                        lønnetAktivitet = EnumFelt("Mottar du lønn gjennom ett tiltak?", JaNei.NEI, "Nei", listOf()),
+                    ),
+                barn =
+                    BarnAvsnitt(
+                        barnMedBarnepass = barnMedBarnepass,
+                    ),
+                dokumentasjon = emptyList(),
+            )
+        val skjema =
+            Søknadsskjema(
+                ident = fagsak.hentAktivIdent(),
+                mottattTidspunkt = osloNow(),
+                språk = Språkkode.NB,
+                skjema = skjemaBarnetilsyn,
+            )
         val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
         val søknad = søknadService.lagreSøknad(behandling.id, journalpost, skjema)
         opprettBarn(behandling, søknad as SøknadBarnetilsyn)
@@ -146,92 +157,115 @@ class OpprettTestBehandlingController(
         fagsak: Fagsak,
         behandling: Behandling,
     ) {
-        val skjemaLæremidler = SøknadsskjemaLæremidler(
-            hovedytelse = HovedytelseAvsnitt(
-                hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
-                arbeidOgOpphold = arbeidOgOpphold(),
-            ),
-            utdanning = UtdanningAvsnitt(
-                aktiviteter = EnumFlereValgFelt(
-                    "Hvilken utdanning eller opplæring søker du om støtte til læremidler for",
-                    listOf(
-                        VerdiFelt("1", "Høyere utdanning: 25. februar 2024 - 25. juli 2024"),
+        val skjemaLæremidler =
+            SøknadsskjemaLæremidler(
+                hovedytelse =
+                    HovedytelseAvsnitt(
+                        hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
+                        arbeidOgOpphold = arbeidOgOpphold(),
                     ),
-                    listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
-                ),
-                annenUtdanning = EnumFelt(
-                    "Annen utdanning tekst",
-                    AnnenUtdanningType.INGEN_UTDANNING,
-                    "Ja",
-                    emptyList(),
-                ),
-                harRettTilUtstyrsstipend = HarRettTilUtstyrsstipend(
-                    erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
-                    harTidligereFullførtVgs = EnumFelt("Har du tidligere fullført videregående skole?", JaNei.JA, "Ja", emptyList()),
-                ),
-                harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
-            ),
-            dokumentasjon = emptyList(),
-        )
-        val skjema = Søknadsskjema(
-            ident = fagsak.hentAktivIdent(),
-            mottattTidspunkt = osloNow(),
-            språk = Språkkode.NB,
-            skjema = skjemaLæremidler,
-        )
+                utdanning =
+                    UtdanningAvsnitt(
+                        aktiviteter =
+                            EnumFlereValgFelt(
+                                "Hvilken utdanning eller opplæring søker du om støtte til læremidler for",
+                                listOf(
+                                    VerdiFelt("1", "Høyere utdanning: 25. februar 2024 - 25. juli 2024"),
+                                ),
+                                listOf("Arbeidstrening: 25. februar 2024 - 25. juli 2024"),
+                            ),
+                        annenUtdanning =
+                            EnumFelt(
+                                "Annen utdanning tekst",
+                                AnnenUtdanningType.INGEN_UTDANNING,
+                                "Ja",
+                                emptyList(),
+                            ),
+                        harRettTilUtstyrsstipend =
+                            HarRettTilUtstyrsstipend(
+                                erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
+                                harTidligereFullførtVgs =
+                                    EnumFelt(
+                                        "Har du tidligere fullført videregående skole?",
+                                        JaNei.JA,
+                                        "Ja",
+                                        emptyList(),
+                                    ),
+                            ),
+                        harFunksjonsnedsettelse = EnumFelt("Har funksjonsnedsettelse?", JaNei.JA, "Ja", emptyList()),
+                    ),
+                dokumentasjon = emptyList(),
+            )
+        val skjema =
+            Søknadsskjema(
+                ident = fagsak.hentAktivIdent(),
+                mottattTidspunkt = osloNow(),
+                språk = Språkkode.NB,
+                skjema = skjemaLæremidler,
+            )
         val journalpost = Journalpost("TESTJPID", Journalposttype.I, Journalstatus.FERDIGSTILT)
         søknadService.lagreSøknad(behandling.id, journalpost, skjema)
     }
 
-    private fun arbeidOgOpphold() = ArbeidOgOpphold(
-        jobberIAnnetLand = EnumFelt("Jobber du i et annet land enn Norge?", JaNei.JA, "Ja", emptyList()),
-        jobbAnnetLand = SelectFelt("Hvilket land jobber du i?", "SWE", "Sverige"),
-        harPengestøtteAnnetLand = EnumFlereValgFelt(
-            "Mottar du pengestøtte fra et annet land enn Norge?",
-            listOf(
-                VerdiFelt(
-                    TypePengestøtte.SYKEPENGER,
-                    "Sykepenger",
+    private fun arbeidOgOpphold() =
+        ArbeidOgOpphold(
+            jobberIAnnetLand = EnumFelt("Jobber du i et annet land enn Norge?", JaNei.JA, "Ja", emptyList()),
+            jobbAnnetLand = SelectFelt("Hvilket land jobber du i?", "SWE", "Sverige"),
+            harPengestøtteAnnetLand =
+                EnumFlereValgFelt(
+                    "Mottar du pengestøtte fra et annet land enn Norge?",
+                    listOf(
+                        VerdiFelt(
+                            TypePengestøtte.SYKEPENGER,
+                            "Sykepenger",
+                        ),
+                    ),
+                    emptyList(),
                 ),
-            ),
-            emptyList(),
-        ),
-        pengestøtteAnnetLand = SelectFelt("Hvilket land mottar du pengestøtte fra?", "SWE", "Sverige"),
-        harOppholdUtenforNorgeSiste12mnd = EnumFelt(
-            "Jobber du i et annet land enn Norge?",
-            JaNei.JA,
-            "Ja",
-            emptyList(),
-        ),
-        oppholdUtenforNorgeSiste12mnd = listOf(oppholdUtenforNorge()),
-        harOppholdUtenforNorgeNeste12mnd = EnumFelt(
-            "Jobber du i et annet land enn Norge?",
-            JaNei.JA,
-            "Ja",
-            emptyList(),
-        ),
-        oppholdUtenforNorgeNeste12mnd = listOf(oppholdUtenforNorge()),
-    )
+            pengestøtteAnnetLand = SelectFelt("Hvilket land mottar du pengestøtte fra?", "SWE", "Sverige"),
+            harOppholdUtenforNorgeSiste12mnd =
+                EnumFelt(
+                    "Jobber du i et annet land enn Norge?",
+                    JaNei.JA,
+                    "Ja",
+                    emptyList(),
+                ),
+            oppholdUtenforNorgeSiste12mnd = listOf(oppholdUtenforNorge()),
+            harOppholdUtenforNorgeNeste12mnd =
+                EnumFelt(
+                    "Jobber du i et annet land enn Norge?",
+                    JaNei.JA,
+                    "Ja",
+                    emptyList(),
+                ),
+            oppholdUtenforNorgeNeste12mnd = listOf(oppholdUtenforNorge()),
+        )
 
-    private fun oppholdUtenforNorge() = OppholdUtenforNorge(
-        land = SelectFelt("Hvilket land har du oppholdt deg i?", "SWE", "Sverige"),
-        årsak = EnumFlereValgFelt(
-            "Hva gjorde du i dette landet?",
-            listOf(VerdiFelt(ÅrsakOppholdUtenforNorge.JOBB, "Jobb")),
-            alternativer = emptyList(),
-        ),
-        fom = DatoFelt("Fom", LocalDate.of(2024, 1, 1)),
-        tom = DatoFelt("Fom", LocalDate.of(2024, 1, 1)),
-    )
+    private fun oppholdUtenforNorge() =
+        OppholdUtenforNorge(
+            land = SelectFelt("Hvilket land har du oppholdt deg i?", "SWE", "Sverige"),
+            årsak =
+                EnumFlereValgFelt(
+                    "Hva gjorde du i dette landet?",
+                    listOf(VerdiFelt(ÅrsakOppholdUtenforNorge.JOBB, "Jobb")),
+                    alternativer = emptyList(),
+                ),
+            fom = DatoFelt("Fom", LocalDate.of(2024, 1, 1)),
+            tom = DatoFelt("Fom", LocalDate.of(2024, 1, 1)),
+        )
 
     // Oppretter BehandlingBarn for alle barn fra PDL for å få et vilkår per barn
-    private fun opprettBarn(behandling: Behandling, søknad: SøknadBarnetilsyn) {
-        val behandlingBarn = søknad.barn.map { barn ->
-            BehandlingBarn(
-                behandlingId = behandling.id,
-                ident = barn.ident,
-            )
-        }
+    private fun opprettBarn(
+        behandling: Behandling,
+        søknad: SøknadBarnetilsyn,
+    ) {
+        val behandlingBarn =
+            søknad.barn.map { barn ->
+                BehandlingBarn(
+                    behandlingId = behandling.id,
+                    ident = barn.ident,
+                )
+            }
         barnService.opprettBarn(behandlingBarn)
     }
 

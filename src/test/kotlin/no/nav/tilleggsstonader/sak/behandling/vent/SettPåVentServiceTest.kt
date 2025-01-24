@@ -26,7 +26,6 @@ import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
 class SettPåVentServiceTest : IntegrationTest() {
-
     @Autowired
     lateinit var settPåVentService: SettPåVentService
 
@@ -42,33 +41,35 @@ class SettPåVentServiceTest : IntegrationTest() {
     val behandling = behandling()
     var oppgaveId: Long? = null
 
-    val settPåVentDto = SettPåVentDto(
-        årsaker = listOf(ÅrsakSettPåVent.ANNET),
-        frist = osloDateNow().plusDays(3),
-        kommentar = "ny beskrivelse",
-    )
+    val settPåVentDto =
+        SettPåVentDto(
+            årsaker = listOf(ÅrsakSettPåVent.ANNET),
+            frist = osloDateNow().plusDays(3),
+            kommentar = "ny beskrivelse",
+        )
 
-    val oppdaterSettPåVentDto = OppdaterSettPåVentDto(
-        årsaker = listOf(ÅrsakSettPåVent.ANTALL_DAGER_PÅ_TILTAK),
-        frist = osloDateNow().plusDays(5),
-        kommentar = "oppdatert beskrivelse",
-        oppgaveVersjon = 1,
-    )
+    val oppdaterSettPåVentDto =
+        OppdaterSettPåVentDto(
+            årsaker = listOf(ÅrsakSettPåVent.ANTALL_DAGER_PÅ_TILTAK),
+            frist = osloDateNow().plusDays(5),
+            kommentar = "oppdatert beskrivelse",
+            oppgaveVersjon = 1,
+        )
 
     val dummySaksbehandler = "saksbehandler1"
 
     @BeforeEach
     fun setUp() {
         testoppsettService.opprettBehandlingMedFagsak(behandling)
-        oppgaveId = oppgaveService.opprettOppgave(
-            behandling.id,
-            OpprettOppgave(Oppgavetype.BehandleSak, tilordnetNavIdent = "123"),
-        )
+        oppgaveId =
+            oppgaveService.opprettOppgave(
+                behandling.id,
+                OpprettOppgave(Oppgavetype.BehandleSak, tilordnetNavIdent = "123"),
+            )
     }
 
     @Nested
     inner class SettPåVent {
-
         @Test
         fun `skal sette behandling på vent`() {
             testWithBrukerContext(dummySaksbehandler) {
@@ -194,7 +195,10 @@ class SettPåVentServiceTest : IntegrationTest() {
             validerHistorikkInnslag(behandling.id, skalHaMetadata = true)
         }
 
-        private fun validerTattAvVent(behandlingId: BehandlingId, kommentar: String? = null) {
+        private fun validerTattAvVent(
+            behandlingId: BehandlingId,
+            kommentar: String? = null,
+        ) {
             with(settPåVentRepository.findAll().single()) {
                 assertThat(aktiv).isFalse()
                 assertThat(taAvVentKommentar).isEqualTo(kommentar)
@@ -204,7 +208,10 @@ class SettPåVentServiceTest : IntegrationTest() {
                 .isEqualTo(BehandlingStatus.UTREDES)
         }
 
-        private fun validerOppdatertOppgave(oppgaveId: Long, tilordnetRessurs: String?) {
+        private fun validerOppdatertOppgave(
+            oppgaveId: Long,
+            tilordnetRessurs: String?,
+        ) {
             with(oppgaveService.hentOppgave(oppgaveId)) {
                 assertThat(tilordnetRessurs).isEqualTo(tilordnetRessurs)
                 assertThat(beskrivelse).contains("Tatt av vent")
@@ -213,7 +220,10 @@ class SettPåVentServiceTest : IntegrationTest() {
             }
         }
 
-        private fun validerHistorikkInnslag(behandlingId: BehandlingId, skalHaMetadata: Boolean) {
+        private fun validerHistorikkInnslag(
+            behandlingId: BehandlingId,
+            skalHaMetadata: Boolean,
+        ) {
             with(behandlingshistorikkService.finnSisteBehandlingshistorikk(behandlingId)) {
                 assertThat(utfall).isEqualTo(StegUtfall.TATT_AV_VENT)
                 if (skalHaMetadata) {
@@ -227,7 +237,6 @@ class SettPåVentServiceTest : IntegrationTest() {
 
     @Nested
     inner class Historikk {
-
         @Test
         fun `skal returnere kommentar fra historikk når behandlingen ikke ennå er sendt til iverksetting eller ferdigstilt`() {
             val saksbehandling = saksbehandling(behandling = behandling)
@@ -252,8 +261,12 @@ class SettPåVentServiceTest : IntegrationTest() {
             )
         }
 
+        /*
+         * skal skjule kommentarer fra vent-hendelser fra dto når en behandling er ferdigstilt for å ikke vise intern
+         * kommunikasjon for saksbehandler
+         */
         @Test
-        fun `skal skjule kommentarer fra vent-hendelser fra dto når en behandling er ferdigstilt for å ikke vise intern kommunikasjon for saksbehandler`() {
+        fun `skal skjule kommentarer fra vent-hendelser fra dto når en behandling er ferdigstilt`() {
             val saksbehandling = saksbehandling(behandling = behandling)
             val taAvVentDto = TaAvVentDto(skalTilordnesRessurs = false, kommentar = "tatt av")
 
@@ -272,12 +285,9 @@ class SettPåVentServiceTest : IntegrationTest() {
             historikk.finnMetadata(Hendelse.TATT_AV_VENT).assertMetadataInneholderEksakt(emptyMap())
         }
 
-        private fun List<HendelseshistorikkDto>.finnMetadata(hendelse: Hendelse) =
-            this.single { it.hendelse == hendelse }
+        private fun List<HendelseshistorikkDto>.finnMetadata(hendelse: Hendelse) = this.single { it.hendelse == hendelse }
 
-        private fun HendelseshistorikkDto.assertMetadataInneholderEksakt(
-            map: Map<String, Any>,
-        ) {
+        private fun HendelseshistorikkDto.assertMetadataInneholderEksakt(map: Map<String, Any>) {
             assertThat(this.metadata).containsExactlyInAnyOrderEntriesOf(map)
         }
     }

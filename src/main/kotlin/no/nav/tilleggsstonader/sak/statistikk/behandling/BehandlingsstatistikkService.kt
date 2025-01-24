@@ -34,7 +34,6 @@ class BehandlingsstatistikkService(
     private val totrinnskontrollService: TotrinnskontrollService,
     private val søknadService: SøknadService,
 ) {
-
     @Transactional
     fun sendBehandlingstatistikk(
         behandlingId: BehandlingId,
@@ -45,15 +44,16 @@ class BehandlingsstatistikkService(
         behandlingMetode: BehandlingMetode?,
     ) {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        val behandlingDVH = mapTilBehandlingDVH(
-            behandlingId = behandlingId,
-            hendelse = hendelse,
-            hendelseTidspunkt = hendelseTidspunkt,
-            gjeldendeSaksbehandler = gjeldendeSaksbehandler,
-            oppgaveId = oppgaveId,
-            behandlingMetode = behandlingMetode,
-            saksbehandling = saksbehandling,
-        )
+        val behandlingDVH =
+            mapTilBehandlingDVH(
+                behandlingId = behandlingId,
+                hendelse = hendelse,
+                hendelseTidspunkt = hendelseTidspunkt,
+                gjeldendeSaksbehandler = gjeldendeSaksbehandler,
+                oppgaveId = oppgaveId,
+                behandlingMetode = behandlingMetode,
+                saksbehandling = saksbehandling,
+            )
         behandlingsstatistikkProducer.sendBehandling(behandlingDVH, saksbehandling.stønadstype)
     }
 
@@ -82,21 +82,24 @@ class BehandlingsstatistikkService(
             endretTid = if (Hendelse.MOTTATT == hendelse) henvendelseTidspunkt else hendelseTidspunkt,
             tekniskTid = osloNow(),
             behandlingStatus = hendelse.name,
-            opprettetAv = maskerVerdiHvisStrengtFortrolig(
-                erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
-                verdi = saksbehandling.opprettetAv,
-            ),
+            opprettetAv =
+                maskerVerdiHvisStrengtFortrolig(
+                    erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                    verdi = saksbehandling.opprettetAv,
+                ),
             saksnummer = saksbehandling.eksternFagsakId.toString(),
             mottattTid = henvendelseTidspunkt,
             kravMottatt = saksbehandling.kravMottatt,
-            saksbehandler = maskerVerdiHvisStrengtFortrolig(
-                erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
-                verdi = saksbehandlerId,
-            ),
-            ansvarligEnhet = maskerVerdiHvisStrengtFortrolig(
-                erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
-                verdi = sisteOppgaveForBehandling?.tildeltEnhetsnr ?: MASKINELL_JOURNALFOERENDE_ENHET,
-            ),
+            saksbehandler =
+                maskerVerdiHvisStrengtFortrolig(
+                    erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                    verdi = saksbehandlerId,
+                ),
+            ansvarligEnhet =
+                maskerVerdiHvisStrengtFortrolig(
+                    erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+                    verdi = sisteOppgaveForBehandling?.tildeltEnhetsnr ?: MASKINELL_JOURNALFOERENDE_ENHET,
+                ),
             behandlingMetode = behandlingMetode?.name ?: "MANUELL",
             behandlingÅrsak = saksbehandling.årsak.name,
             avsender = "Nav Tilleggstønader",
@@ -122,17 +125,22 @@ class BehandlingsstatistikkService(
     private fun utledRelatertBehandling(saksbehandling: Saksbehandling) =
         saksbehandling.forrigeBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).id.toString() }
 
-    private fun finnAnsvarligBeslutter(beslutterId: String?, søkerHarStrengtFortroligAdresse: Boolean) =
-        if (!beslutterId.isNullOrEmpty()) {
-            maskerVerdiHvisStrengtFortrolig(
-                erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
-                verdi = beslutterId.toString(),
-            )
-        } else {
-            null
-        }
+    private fun finnAnsvarligBeslutter(
+        beslutterId: String?,
+        søkerHarStrengtFortroligAdresse: Boolean,
+    ) = if (!beslutterId.isNullOrEmpty()) {
+        maskerVerdiHvisStrengtFortrolig(
+            erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
+            verdi = beslutterId.toString(),
+        )
+    } else {
+        null
+    }
 
-    private fun finnSisteOppgaveForBehandlingen(behandlingId: BehandlingId, oppgaveId: Long?): Oppgave? {
+    private fun finnSisteOppgaveForBehandlingen(
+        behandlingId: BehandlingId,
+        oppgaveId: Long?,
+    ): Oppgave? {
         val gsakOppgaveId = oppgaveId ?: oppgaveService.finnSisteOppgaveForBehandling(behandlingId)?.gsakOppgaveId
 
         return gsakOppgaveId?.let { oppgaveService.hentOppgave(it) }
@@ -142,8 +150,8 @@ class BehandlingsstatistikkService(
         hendelse: Hendelse,
         gjeldendeSaksbehandler: String?,
         totrinnskontroll: Totrinnskontroll?,
-    ): String {
-        return when (hendelse) {
+    ): String =
+        when (hendelse) {
             Hendelse.MOTTATT, Hendelse.PÅBEGYNT, Hendelse.VENTER ->
                 gjeldendeSaksbehandler ?: error("Mangler saksbehandler for hendelse=$hendelse")
 
@@ -151,33 +159,40 @@ class BehandlingsstatistikkService(
                 totrinnskontroll?.saksbehandler ?: gjeldendeSaksbehandler
                     ?: error("Mangler totrinnskontroll for hendelse=$hendelse")
         }
-    }
 
-    private fun finnHenvendelsestidspunkt(saksbehandling: Saksbehandling): LocalDateTime {
-        return when (saksbehandling.type) {
+    private fun finnHenvendelsestidspunkt(saksbehandling: Saksbehandling): LocalDateTime =
+        when (saksbehandling.type) {
             BehandlingType.FØRSTEGANGSBEHANDLING ->
                 søknadService.hentSøknadMetadata(saksbehandling.id)?.mottattTidspunkt ?: saksbehandling.opprettetTid
+
             BehandlingType.REVURDERING -> saksbehandling.opprettetTid
         }
-    }
 
     private fun evaluerAdresseBeskyttelseStrengtFortrolig(personIdent: String): Boolean {
         val adresseStatus =
-            personService.hentPersonKortBolk(listOf(personIdent)).values.single().adressebeskyttelse.gradering()
+            personService
+                .hentPersonKortBolk(listOf(personIdent))
+                .values
+                .single()
+                .adressebeskyttelse
+                .gradering()
         return when (adresseStatus) {
             AdressebeskyttelseGradering.STRENGT_FORTROLIG, AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND -> true
             AdressebeskyttelseGradering.FORTROLIG, AdressebeskyttelseGradering.UGRADERT -> false
         }
     }
 
-    private fun maskerVerdiHvisStrengtFortrolig(erStrengtFortrolig: Boolean, verdi: String) =
-        if (erStrengtFortrolig) "-5" else verdi // -5 er ein kode som dvh forstår som maskert med årsak i strengtfortrolig, og behandler datasettet deretter.
+    private fun maskerVerdiHvisStrengtFortrolig(
+        erStrengtFortrolig: Boolean,
+        verdi: String,
+    ) = if (erStrengtFortrolig) "-5" else verdi // -5 er ein kode som dvh forstår som maskert med årsak i strengtfortrolig
 
-    private fun mapTilStreng(kategori: BehandlingKategori?) = when (kategori) {
-        BehandlingKategori.EØS -> "Utland"
-        BehandlingKategori.NASJONAL -> "Nasjonal"
-        null -> "Nasjonal"
-    }
+    private fun mapTilStreng(kategori: BehandlingKategori?) =
+        when (kategori) {
+            BehandlingKategori.EØS -> "Utland"
+            BehandlingKategori.NASJONAL -> "Nasjonal"
+            null -> "Nasjonal"
+        }
 
     private fun utledResultatBegrunnelse(behandling: Saksbehandling): String? =
         when (behandling.resultat) {

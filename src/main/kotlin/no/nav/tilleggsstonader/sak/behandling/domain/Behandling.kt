@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak.MANUELT_OPPRETTET
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -23,7 +25,6 @@ data class Behandling(
     val forrigeBehandlingId: BehandlingId? = null,
     // @Version ?
     val versjon: Int = 0,
-
     val type: BehandlingType,
     val status: BehandlingStatus,
     val steg: StegType,
@@ -31,23 +32,19 @@ data class Behandling(
     @Column("arsak")
     val årsak: BehandlingÅrsak,
     val kravMottatt: LocalDate? = null,
-
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     val resultat: BehandlingResultat,
     @Column("henlagt_arsak")
     val henlagtÅrsak: HenlagtÅrsak? = null,
     val vedtakstidspunkt: LocalDateTime? = null,
-
     val revurderFra: LocalDate? = null,
 ) {
-
     fun kanHenlegges(): Boolean = !status.behandlingErLåstForVidereRedigering()
 
     fun erAvsluttet(): Boolean = status == BehandlingStatus.FERDIGSTILT
 
-    fun vedtakstidspunktEllerFeil(): LocalDateTime =
-        this.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt for behandling=$id")
+    fun vedtakstidspunktEllerFeil(): LocalDateTime = this.vedtakstidspunkt ?: error("Mangler vedtakstidspunkt for behandling=$id")
 
     init {
         if (resultat == BehandlingResultat.HENLAGT) {
@@ -83,16 +80,22 @@ enum class BehandlingÅrsak {
     fun erSøknadEllerPapirsøknad() = this == SØKNAD || this == PAPIRSØKNAD
 }
 
-enum class BehandlingType(val visningsnavn: String) {
+enum class BehandlingType(
+    val visningsnavn: String,
+) {
     FØRSTEGANGSBEHANDLING("Førstegangsbehandling"),
     REVURDERING("Revurdering"),
 }
 
 /**
- * Sjekkes sammen med vedtakstidspunkt i [behandling_resultat_vedtakstidspunkt_check]
+ * Sjekkes sammen med vedtakstidspunkt i behandling_resultat_vedtakstidspunkt_check
+ * // TODO: Legg i kontrakter.
  */
-// TODO: Legg i kontrakter.
-enum class BehandlingResultat(val displayName: String, val skalIverksettes: Boolean = false) {
+
+enum class BehandlingResultat(
+    val displayName: String,
+    val skalIverksettes: Boolean = false,
+) {
     INNVILGET(displayName = "Innvilget", true),
     OPPHØRT(displayName = "Opphørt", true),
     AVSLÅTT(displayName = "Avslått"),
@@ -110,12 +113,13 @@ enum class BehandlingStatus {
 
     ;
 
-    fun visningsnavn(): String {
-        return this.name.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() }
-    }
+    fun visningsnavn(): String =
+        this.name
+            .replace('_', ' ')
+            .lowercase()
+            .replaceFirstChar { it.uppercase() }
 
-    fun behandlingErLåstForVidereRedigering(): Boolean =
-        setOf(FATTER_VEDTAK, IVERKSETTER_VEDTAK, FERDIGSTILT, SATT_PÅ_VENT).contains(this)
+    fun behandlingErLåstForVidereRedigering(): Boolean = setOf(FATTER_VEDTAK, IVERKSETTER_VEDTAK, FERDIGSTILT, SATT_PÅ_VENT).contains(this)
 
     fun iverksetterEllerFerdigstilt() = this == IVERKSETTER_VEDTAK || this == FERDIGSTILT
 }

@@ -25,7 +25,7 @@ import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 interface IVilkårperiode<FAKTA_VURDERING : FaktaOgVurdering> : Periode<LocalDate> {
     val faktaOgVurdering: FAKTA_VURDERING
@@ -45,22 +45,17 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     val behandlingId: BehandlingId,
     @Column("forrige_vilkarperiode_id")
     val forrigeVilkårperiodeId: UUID? = null,
-
     val type: VilkårperiodeType,
     override val fom: LocalDate,
     override val tom: LocalDate,
     override val faktaOgVurdering: T,
     val begrunnelse: String?,
-
     val resultat: ResultatVilkårperiode,
     val slettetKommentar: String? = null,
     val status: Vilkårstatus? = null,
-
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
-
     val kildeId: String? = null,
-
     // TODO kilde burde kunne fjernes, den brukes aldri til noe annet enn manuell. Må fjernes i frontend og.
     @InsertOnlyProperty
     val kilde: KildeVilkårsperiode = KildeVilkårsperiode.MANUELL,
@@ -144,21 +139,21 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
 
     fun kanSlettesPermanent() = this.forrigeVilkårperiodeId == null
 
-    fun markerSlettet(slettetKommentar: String?) = this.copy(
-        resultat = ResultatVilkårperiode.SLETTET,
-        slettetKommentar = slettetKommentar,
-        status = Vilkårstatus.SLETTET,
-    )
+    fun markerSlettet(slettetKommentar: String?) =
+        this.copy(
+            resultat = ResultatVilkårperiode.SLETTET,
+            slettetKommentar = slettetKommentar,
+            status = Vilkårstatus.SLETTET,
+        )
 
-    fun kopierTilBehandling(nyBehandlingId: BehandlingId): GeneriskVilkårperiode<T> {
-        return copy(
+    fun kopierTilBehandling(nyBehandlingId: BehandlingId): GeneriskVilkårperiode<T> =
+        copy(
             id = UUID.randomUUID(),
             behandlingId = nyBehandlingId,
             forrigeVilkårperiodeId = forrigeVilkårPeriodeIdForKopiertVilkår(),
             sporbar = Sporbar(),
             status = Vilkårstatus.UENDRET,
         )
-    }
 
     fun medVilkårOgVurdering(
         fom: LocalDate,
@@ -166,11 +161,12 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         begrunnelse: String?,
         faktaOgVurdering: FaktaOgVurdering,
     ): GeneriskVilkårperiode<T> {
-        val nyStatus = if (status == Vilkårstatus.NY) {
-            Vilkårstatus.NY
-        } else {
-            Vilkårstatus.ENDRET
-        }
+        val nyStatus =
+            if (status == Vilkårstatus.NY) {
+                Vilkårstatus.NY
+            } else {
+                Vilkårstatus.ENDRET
+            }
         val resultat = faktaOgVurdering.utledResultat()
         @Suppress("UNCHECKED_CAST")
         return this.copy(
@@ -186,8 +182,8 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     /**
      * Liknende som [no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår.opprettOpphavsvilkår]
      */
-    private fun forrigeVilkårPeriodeIdForKopiertVilkår(): UUID {
-        return when (status) {
+    private fun forrigeVilkårPeriodeIdForKopiertVilkår(): UUID =
+        when (status) {
             Vilkårstatus.SLETTET -> error("Skal ikke kopiere vilkårperiode som er slettet")
             Vilkårstatus.UENDRET ->
                 forrigeVilkårperiodeId
@@ -198,7 +194,6 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
             Vilkårstatus.ENDRET,
             -> id
         }
-    }
 }
 
 enum class KildeVilkårsperiode {

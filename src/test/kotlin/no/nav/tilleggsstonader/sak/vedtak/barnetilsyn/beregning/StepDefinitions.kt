@@ -43,19 +43,20 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
+@Suppress("unused", "ktlint:standard:function-naming")
 class StepDefinitions {
-
     private val logger = LoggerFactory.getLogger(javaClass)
     val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
     val repository = mockk<VedtakRepository>(relaxed = true)
-    val service = TilsynBarnBeregningService(
-        stønadsperiodeRepository = stønadsperiodeRepository,
-        vilkårperiodeRepository = vilkårperiodeRepository,
-        tilsynBarnUtgiftService = tilsynBarnUtgiftService,
-        repository = repository,
-    )
+    val service =
+        TilsynBarnBeregningService(
+            stønadsperiodeRepository = stønadsperiodeRepository,
+            vilkårperiodeRepository = vilkårperiodeRepository,
+            tilsynBarnUtgiftService = tilsynBarnUtgiftService,
+            repository = repository,
+        )
 
     var exception: Exception? = null
 
@@ -87,30 +88,35 @@ class StepDefinitions {
     }
 
     @Gitt("følgende utgifter for barn med id: {}")
-    fun `følgende utgifter`(barnId: Int, dataTable: DataTable) {
+    fun `følgende utgifter`(
+        barnId: Int,
+        dataTable: DataTable,
+    ) {
         val barnUuid = barnIder[barnId]!!
         assertThat(utgifter).doesNotContainKey(barnUuid)
-        utgifter[barnUuid] = dataTable.mapRad { rad ->
-            UtgiftBeregning(
-                fom = parseÅrMåned(DomenenøkkelFelles.FOM, rad),
-                tom = parseÅrMåned(DomenenøkkelFelles.TOM, rad),
-                utgift = parseInt(BeregningNøkler.UTGIFT, rad),
-            )
-        }
+        utgifter[barnUuid] =
+            dataTable.mapRad { rad ->
+                UtgiftBeregning(
+                    fom = parseÅrMåned(DomenenøkkelFelles.FOM, rad),
+                    tom = parseÅrMåned(DomenenøkkelFelles.TOM, rad),
+                    utgift = parseInt(BeregningNøkler.UTGIFT, rad),
+                )
+            }
     }
 
     @Gitt("beregningsperioder fra forrige behandling")
     fun `perioder fra forrige behandling`(dataTable: DataTable) {
-        val perioder = dataTable.mapRad {
-            val måned = parseÅrMåned(BeregningNøkler.MÅNED, it)
-            beregningsresultatForMåned(måned)
-        }
+        val perioder =
+            dataTable.mapRad {
+                val måned = parseÅrMåned(BeregningNøkler.MÅNED, it)
+                beregningsresultatForMåned(måned)
+            }
         every { repository.findByIdOrThrow(any()) } returns
             innvilgetVedtak(beregningsresultat = BeregningsresultatTilsynBarn(perioder = perioder))
     }
 
     @Når("beregner")
-    fun `beregner`() {
+    fun beregner() {
         beregn(saksbehandling(id = behandlingId))
     }
 
@@ -147,19 +153,21 @@ class StepDefinitions {
             logger.error("Feilet beregning", exception)
         }
         assertThat(exception).isNull()
-        val forventetBeregningsresultat = dataTable.mapRad { rad ->
-            ForventetBeregningsresultat(
-                dagsats = parseBigDecimal(BeregningNøkler.DAGSATS, rad),
-                månedsbeløp = parseValgfriInt(BeregningNøkler.MÅNEDSBELØP, rad),
-                grunnlag = ForventetBeregningsgrunnlag(
-                    måned = parseÅrMåned(BeregningNøkler.MÅNED, rad),
-                    makssats = parseValgfriInt(BeregningNøkler.MAKSSATS, rad),
-                    antallDagerTotal = parseValgfriInt(BeregningNøkler.ANTALL_DAGER, rad),
-                    utgifterTotal = parseValgfriInt(BeregningNøkler.UTGIFT, rad),
-                    antallBarn = parseValgfriInt(BeregningNøkler.ANTALL_BARN, rad),
-                ),
-            )
-        }
+        val forventetBeregningsresultat =
+            dataTable.mapRad { rad ->
+                ForventetBeregningsresultat(
+                    dagsats = parseBigDecimal(BeregningNøkler.DAGSATS, rad),
+                    månedsbeløp = parseValgfriInt(BeregningNøkler.MÅNEDSBELØP, rad),
+                    grunnlag =
+                        ForventetBeregningsgrunnlag(
+                            måned = parseÅrMåned(BeregningNøkler.MÅNED, rad),
+                            makssats = parseValgfriInt(BeregningNøkler.MAKSSATS, rad),
+                            antallDagerTotal = parseValgfriInt(BeregningNøkler.ANTALL_DAGER, rad),
+                            utgifterTotal = parseValgfriInt(BeregningNøkler.UTGIFT, rad),
+                            antallBarn = parseValgfriInt(BeregningNøkler.ANTALL_BARN, rad),
+                        ),
+                )
+            }
 
         val perioder = beregningsresultat!!.perioder
         perioder.forEachIndexed { index, resultat ->
@@ -207,14 +215,22 @@ class StepDefinitions {
     }
 
     @Så("forvent følgende stønadsperioder for: {}")
-    fun `forvent følgende stønadsperioder`(månedStr: String, dataTable: DataTable) {
+    fun `forvent følgende stønadsperioder`(
+        månedStr: String,
+        dataTable: DataTable,
+    ) {
         assertThat(exception).isNull()
         val måned = parseÅrMåned(månedStr)
         val forventeteStønadsperioder = mapStønadsperioder(behandlingId, dataTable)
 
-        val perioder = beregningsresultat!!.perioder.find { it.grunnlag.måned == måned }
-            ?.grunnlag?.stønadsperioderGrunnlag?.map { it.stønadsperiode }
-            ?: error("Finner ikke beregningsresultat for $måned")
+        val perioder =
+            beregningsresultat!!
+                .perioder
+                .find { it.grunnlag.måned == måned }
+                ?.grunnlag
+                ?.stønadsperioderGrunnlag
+                ?.map { it.stønadsperiode }
+                ?: error("Finner ikke beregningsresultat for $måned")
 
         perioder.forEachIndexed { index, resultat ->
             val forventetResultat = forventeteStønadsperioder[index]
@@ -233,14 +249,21 @@ class StepDefinitions {
     }
 
     @Så("forvent følgende stønadsperiodeGrunnlag for: {}")
-    fun `forvent følgende stønadsperiodeGrunnlag`(månedStr: String, dataTable: DataTable) {
+    fun `forvent følgende stønadsperiodeGrunnlag`(
+        månedStr: String,
+        dataTable: DataTable,
+    ) {
         assertThat(exception).isNull()
         val måned = parseÅrMåned(månedStr)
         val forventeteStønadsperioder = parseForventedeStønadsperioder(dataTable)
 
-        val perioder = beregningsresultat!!.perioder.find { it.grunnlag.måned == måned }
-            ?.grunnlag?.stønadsperioderGrunnlag
-            ?: error("Finner ikke beregningsresultat for $måned")
+        val perioder =
+            beregningsresultat!!
+                .perioder
+                .find { it.grunnlag.måned == måned }
+                ?.grunnlag
+                ?.stønadsperioderGrunnlag
+                ?: error("Finner ikke beregningsresultat for $måned")
 
         perioder.forEachIndexed { index, resultat ->
             val forventetResultat = forventeteStønadsperioder[index]
@@ -252,22 +275,24 @@ class StepDefinitions {
                 assertThat(resultat.aktiviteter.size).isEqualTo(forventetResultat.antallAktiviteter)
                 assertThat(resultat.antallDager).isEqualTo(forventetResultat.antallDager)
             } catch (e: Throwable) {
-                val actual = listOf(
-                    resultat.stønadsperiode.fom,
-                    resultat.stønadsperiode.tom,
-                    resultat.stønadsperiode.målgruppe,
-                    resultat.stønadsperiode.aktivitet,
-                    resultat.aktiviteter.size,
-                    resultat.antallDager,
-                ).joinToString(" | ")
-                val expected = listOf(
-                    forventetResultat.fom,
-                    forventetResultat.tom,
-                    forventetResultat.målgruppe,
-                    forventetResultat.aktivitet,
-                    forventetResultat.antallAktiviteter,
-                    forventetResultat.antallDager,
-                ).joinToString(" | ")
+                val actual =
+                    listOf(
+                        resultat.stønadsperiode.fom,
+                        resultat.stønadsperiode.tom,
+                        resultat.stønadsperiode.målgruppe,
+                        resultat.stønadsperiode.aktivitet,
+                        resultat.aktiviteter.size,
+                        resultat.antallDager,
+                    ).joinToString(" | ")
+                val expected =
+                    listOf(
+                        forventetResultat.fom,
+                        forventetResultat.tom,
+                        forventetResultat.målgruppe,
+                        forventetResultat.aktivitet,
+                        forventetResultat.antallAktiviteter,
+                        forventetResultat.antallDager,
+                    ).joinToString(" | ")
                 logger.error(
                     "Feilet validering av rad ${index + 1}\n" +
                         "expected = $expected\n" +
@@ -279,14 +304,20 @@ class StepDefinitions {
     }
 
     @Så("forvent følgende beløpsperioder for: {}")
-    fun `forvent følgende beløpsperioder`(månedStr: String, dataTable: DataTable) {
+    fun `forvent følgende beløpsperioder`(
+        månedStr: String,
+        dataTable: DataTable,
+    ) {
         assertThat(exception).isNull()
         val måned = parseÅrMåned(månedStr)
         val forventedeBeløpsperioder = parseForventedeBeløpsperioder(dataTable)
 
-        val beløpsperioder = beregningsresultat!!.perioder.find { it.grunnlag.måned == måned }
-            ?.beløpsperioder
-            ?: error("Finner ikke beregningsresultat for $måned")
+        val beløpsperioder =
+            beregningsresultat!!
+                .perioder
+                .find { it.grunnlag.måned == måned }
+                ?.beløpsperioder
+                ?: error("Finner ikke beregningsresultat for $måned")
 
         beløpsperioder.forEachIndexed { index, resultat ->
             val forventetResultat = forventedeBeløpsperioder[index]
@@ -302,29 +333,28 @@ class StepDefinitions {
         assertThat(beløpsperioder).hasSize(forventedeBeløpsperioder.size)
     }
 
-    private fun parseForventedeStønadsperioder(dataTable: DataTable): List<ForventedeStønadsperioder> {
-        return dataTable.mapRad { rad ->
+    private fun parseForventedeStønadsperioder(dataTable: DataTable): List<ForventedeStønadsperioder> =
+        dataTable.mapRad { rad ->
             ForventedeStønadsperioder(
                 fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
                 tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
                 målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
-                aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
-                    ?: AktivitetType.TILTAK,
+                aktivitet =
+                    parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
+                        ?: AktivitetType.TILTAK,
                 antallAktiviteter = parseInt(BeregningNøkler.ANTALL_AKTIVITETER, rad),
                 antallDager = parseInt(BeregningNøkler.ANTALL_DAGER, rad),
             )
         }
-    }
 
-    private fun parseForventedeBeløpsperioder(dataTable: DataTable): List<Beløpsperiode> {
-        return dataTable.mapRad { rad ->
+    private fun parseForventedeBeløpsperioder(dataTable: DataTable): List<Beløpsperiode> =
+        dataTable.mapRad { rad ->
             Beløpsperiode(
                 dato = parseÅrMånedEllerDato(BeregningNøkler.DATO, rad).datoEllerFørsteDagenIMåneden(),
                 målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
                 beløp = parseInt(BeregningNøkler.BELØP, rad),
             )
         }
-    }
 }
 
 data class ForventetBeregningsresultat(

@@ -52,8 +52,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
+@Suppress("unused", "ktlint:standard:function-naming")
 class LæremidlerBeregnYtelseStegStepDefinitions {
-
     val logger = LoggerFactory.getLogger(javaClass)
 
     val vilkårperiodeRepository = VilkårperiodeRepositoryFake()
@@ -61,41 +61,54 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val vedtakRepository = VedtakRepositoryFake()
     val tilkjentYtelseRepository = TilkjentYtelseRepositoryFake()
 
-    val simuleringService = mockk<SimuleringService>().apply {
-        justRun { slettSimuleringForBehandling(any()) }
-    }
-    val steg = LæremidlerBeregnYtelseSteg(
-        beregningService = LæremidlerBeregningService(
-            vilkårperiodeRepository = vilkårperiodeRepository,
-            stønadsperiodeRepository = stønadsperiodeRepository,
-        ),
-        opphørValideringService = mockk<OpphørValideringService>(relaxed = true),
-        vedtakRepository = vedtakRepository,
-        tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
-        simuleringService = simuleringService,
-    )
+    val simuleringService =
+        mockk<SimuleringService>().apply {
+            justRun { slettSimuleringForBehandling(any()) }
+        }
+    val steg =
+        LæremidlerBeregnYtelseSteg(
+            beregningService =
+                LæremidlerBeregningService(
+                    vilkårperiodeRepository = vilkårperiodeRepository,
+                    stønadsperiodeRepository = stønadsperiodeRepository,
+                ),
+            opphørValideringService = mockk<OpphørValideringService>(relaxed = true),
+            vedtakRepository = vedtakRepository,
+            tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
+            simuleringService = simuleringService,
+        )
 
     @Gitt("følgende aktiviteter for læremidler behandling={}")
-    fun `følgende aktiviteter`(behandlingIdTall: Int, dataTable: DataTable) {
+    fun `følgende aktiviteter`(
+        behandlingIdTall: Int,
+        dataTable: DataTable,
+    ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         vilkårperiodeRepository.insertAll(mapAktiviteter(behandlingId, dataTable))
     }
 
     @Gitt("følgende stønadsperioder for læremidler behandling={}")
-    fun `følgende stønadsperioder`(behandlingIdTall: Int, dataTable: DataTable) {
+    fun `følgende stønadsperioder`(
+        behandlingIdTall: Int,
+        dataTable: DataTable,
+    ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         stønadsperiodeRepository.insertAll(mapStønadsperioder(behandlingId, dataTable))
     }
 
     @Når("innvilger vedtaksperioder for behandling={}")
-    fun `følgende vedtaksperioder`(behandlingIdTall: Int, dataTable: DataTable) {
+    fun `følgende vedtaksperioder`(
+        behandlingIdTall: Int,
+        dataTable: DataTable,
+    ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        val vedtaksperioder = dataTable.mapRad { rad ->
-            VedtaksperiodeDto(
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-            )
-        }
+        val vedtaksperioder =
+            dataTable.mapRad { rad ->
+                VedtaksperiodeDto(
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                )
+            }
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
     }
 
@@ -111,7 +124,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     }
 
     @Når("opphør behandling={} med revurderFra={}")
-    fun `opphør med revurderFra`(behandlingIdTall: Int, revurderFraStr: String) {
+    fun `opphør med revurderFra`(
+        behandlingIdTall: Int,
+        revurderFraStr: String,
+    ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val revurderFra = parseDato(revurderFraStr)
         steg.utførSteg(
@@ -124,7 +140,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     }
 
     @Så("forvent beregningsresultatet for behandling={}")
-    fun `forvent beregningsresultatet`(behandlingIdTall: Int, dataTable: DataTable) {
+    fun `forvent beregningsresultatet`(
+        behandlingIdTall: Int,
+        dataTable: DataTable,
+    ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val forventedeBeregningsperioder = mapBeregningsresultat(dataTable)
 
@@ -143,27 +162,34 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     }
 
     @Så("forvent andeler for behandling={}")
-    fun `forvent andeler`(behandlingIdTall: Int, dataTable: DataTable) {
+    fun `forvent andeler`(
+        behandlingIdTall: Int,
+        dataTable: DataTable,
+    ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
 
-        val forventedeAndeler = dataTable.mapRad { rad ->
-            ForenkletAndel(
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad) ?: parseDato(DomenenøkkelFelles.FOM, rad),
-                beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
-                satstype = parseValgfriEnum<Satstype>(DomenenøkkelAndelTilkjentYtelse.SATS, rad) ?: Satstype.DAG,
-                type = parseEnum(DomenenøkkelAndelTilkjentYtelse.TYPE, rad),
-                utbetalingsdato = parseDato(DomenenøkkelAndelTilkjentYtelse.UTBETALINGSDATO, rad),
-                statusIverksetting = parseValgfriEnum<StatusIverksetting>(
-                    domenebegrep = DomenenøkkelAndelTilkjentYtelse.STATUS_IVERKSETTING,
-                    rad = rad,
-                ) ?: StatusIverksetting.UBEHANDLET,
-            )
-        }
+        val forventedeAndeler =
+            dataTable.mapRad { rad ->
+                ForenkletAndel(
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad) ?: parseDato(DomenenøkkelFelles.FOM, rad),
+                    beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
+                    satstype = parseValgfriEnum<Satstype>(DomenenøkkelAndelTilkjentYtelse.SATS, rad) ?: Satstype.DAG,
+                    type = parseEnum(DomenenøkkelAndelTilkjentYtelse.TYPE, rad),
+                    utbetalingsdato = parseDato(DomenenøkkelAndelTilkjentYtelse.UTBETALINGSDATO, rad),
+                    statusIverksetting =
+                        parseValgfriEnum<StatusIverksetting>(
+                            domenebegrep = DomenenøkkelAndelTilkjentYtelse.STATUS_IVERKSETTING,
+                            rad = rad,
+                        ) ?: StatusIverksetting.UBEHANDLET,
+                )
+            }
 
-        val andeler = tilkjentYtelseRepository.findByBehandlingId(behandlingId)!!
-            .andelerTilkjentYtelse
-            .sortedBy { it.fom }
+        val andeler =
+            tilkjentYtelseRepository
+                .findByBehandlingId(behandlingId)!!
+                .andelerTilkjentYtelse
+                .sortedBy { it.fom }
 
         andeler.map { ForenkletAndel(it) }.forEachIndexed { index, andel ->
             try {
@@ -178,17 +204,21 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     }
 
     @Så("forvent vedtaksperioder for behandling={}")
-    fun `forvent vedtaksperioder`(behandlingIdTall: Int, dataTable: DataTable) {
+    fun `forvent vedtaksperioder`(
+        behandlingIdTall: Int,
+        dataTable: DataTable,
+    ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
 
         val vedtaksperioder = hentVedtak(behandlingId).vedtaksperioder()!!
 
-        val forventedeVedtaksperioder = dataTable.mapRad { rad ->
-            Vedtaksperiode(
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-            )
-        }
+        val forventedeVedtaksperioder =
+            dataTable.mapRad { rad ->
+                Vedtaksperiode(
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                )
+            }
 
         forventedeVedtaksperioder.forEachIndexed { index, periode ->
             try {
@@ -203,7 +233,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     }
 
     private fun hentVedtak(behandlingId: BehandlingId): VedtakLæremidler =
-        vedtakRepository.findByIdOrThrow(behandlingId)
+        vedtakRepository
+            .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<VedtakLæremidler>()
             .data
 
@@ -227,7 +258,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         )
     }
 
-    private fun dummyBehandling(behandlingId: BehandlingId, revurderFra: LocalDate? = null): Saksbehandling {
+    private fun dummyBehandling(
+        behandlingId: BehandlingId,
+        revurderFra: LocalDate? = null,
+    ): Saksbehandling {
         val forrigeBehandlingId = forrigeBehandlingId(behandlingId)
         return saksbehandling(
             id = behandlingId,

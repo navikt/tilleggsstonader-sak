@@ -15,19 +15,19 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 
 class SimuleringStegServiceTest {
-
     val stegService = mockk<StegService>()
     val simuleringService = mockk<SimuleringService>()
     val tilgangService = mockk<TilgangService>()
 
-    val simuleringStegService = SimuleringStegService(
-        stegService = stegService,
-        simuleringService = simuleringService,
-        tilgangService = tilgangService,
-    )
+    val simuleringStegService =
+        SimuleringStegService(
+            stegService = stegService,
+            simuleringService = simuleringService,
+            tilgangService = tilgangService,
+        )
 
     val fagsak = fagsak()
 
@@ -45,7 +45,14 @@ class SimuleringStegServiceTest {
                 status = BehandlingStatus.FATTER_VEDTAK,
             )
 
-        every { simuleringService.hentLagretSimulering(any()) } returns Simuleringsresultat(behandlingId = BehandlingId(UUID.randomUUID()), data = null)
+        every { simuleringService.hentLagretSimulering(any()) } returns
+            Simuleringsresultat(
+                behandlingId =
+                    BehandlingId(
+                        UUID.randomUUID(),
+                    ),
+                data = null,
+            )
         val simuleringsresultatDto = simuleringStegService.hentEllerOpprettSimuleringsresultat(saksbehandling)
 
         verify { stegService wasNot Called }

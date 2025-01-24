@@ -30,7 +30,6 @@ import org.springframework.web.client.RestClientException
 @Configuration
 @Profile("mock-journalpost")
 class JournalpostClientConfig {
-
     @Bean
     @Primary
     fun journalpostClient(): JournalpostClient {
@@ -42,22 +41,26 @@ class JournalpostClientConfig {
     }
 
     companion object {
-        const val journalpostIdMedFeil = "journalpostIdMedFeil"
+        const val JOURNALPOST_ID_MED_FEIL = "journalpostIdMedFeil"
 
-        private val dummyPdf = this::class.java.classLoader.getResource("interntVedtak/BARNETILSYN/internt_vedtak.pdf")!!.readBytes()
+        private val dummyPdf =
+            this::class.java.classLoader
+                .getResource("interntVedtak/BARNETILSYN/internt_vedtak.pdf")!!
+                .readBytes()
 
-        private fun avsenderMottaker() = AvsenderMottaker(
-            id = "12345678910",
-            type = AvsenderMottakerIdType.FNR,
-            navn = "Ola Nordmann",
-            land = "NOR",
-            erLikBruker = true,
-        )
+        private fun avsenderMottaker() =
+            AvsenderMottaker(
+                id = "12345678910",
+                type = AvsenderMottakerIdType.FNR,
+                navn = "Ola Nordmann",
+                land = "NOR",
+                erLikBruker = true,
+            )
 
         private fun mockFeiletDistribusjon(journalpostClient: JournalpostClient) {
             every {
                 journalpostClient.distribuerJournalpost(
-                    match { it.journalpostId == journalpostIdMedFeil },
+                    match { it.journalpostId == JOURNALPOST_ID_MED_FEIL },
                     any(),
                 )
             } throws RestClientException("noe feilet")
@@ -74,44 +77,51 @@ class JournalpostClientConfig {
                 bruker = Bruker("12345678910", BrukerIdType.FNR),
                 avsenderMottaker = avsenderMottaker(),
                 journalforendeEnhet = "tilleggsstonader-sak",
-                relevanteDatoer = listOf(
-                    RelevantDato(osloNow().minusDays(7), "DATO_REGISTRERT"),
-                    RelevantDato(osloNow(), "DATO_JOURNALFOERT"),
-                ),
-                dokumenter = listOf(
-                    DokumentInfo(
-                        dokumentInfoId = "1",
-                        tittel = "Dummy dokument 1",
-                        logiskeVedlegg = listOf(
-                            LogiskVedlegg("1", "Dokumentasjon på sykdom"),
-                            LogiskVedlegg("2", "Inntektsendring"),
-                            LogiskVedlegg("3", "Samværsmelding"),
+                relevanteDatoer =
+                    listOf(
+                        RelevantDato(osloNow().minusDays(7), "DATO_REGISTRERT"),
+                        RelevantDato(osloNow(), "DATO_JOURNALFOERT"),
+                    ),
+                dokumenter =
+                    listOf(
+                        DokumentInfo(
+                            dokumentInfoId = "1",
+                            tittel = "Dummy dokument 1",
+                            logiskeVedlegg =
+                                listOf(
+                                    LogiskVedlegg("1", "Dokumentasjon på sykdom"),
+                                    LogiskVedlegg("2", "Inntektsendring"),
+                                    LogiskVedlegg("3", "Samværsmelding"),
+                                ),
+                            dokumentvarianter =
+                                listOf(
+                                    Dokumentvariant(
+                                        variantformat = Dokumentvariantformat.ARKIV,
+                                        saksbehandlerHarTilgang = true,
+                                    ),
+                                ),
                         ),
-                        dokumentvarianter = listOf(
-                            Dokumentvariant(
-                                variantformat = Dokumentvariantformat.ARKIV,
-                                saksbehandlerHarTilgang = true,
-                            ),
+                        DokumentInfo(
+                            dokumentInfoId = "2",
+                            tittel = "Dummy dokument 2",
+                            dokumentvarianter =
+                                listOf(
+                                    Dokumentvariant(
+                                        variantformat = Dokumentvariantformat.ARKIV,
+                                        saksbehandlerHarTilgang = true,
+                                    ),
+                                ),
                         ),
                     ),
-                    DokumentInfo(
-                        dokumentInfoId = "2",
-                        tittel = "Dummy dokument 2",
-                        dokumentvarianter = listOf(
-                            Dokumentvariant(
-                                variantformat = Dokumentvariantformat.ARKIV,
-                                saksbehandlerHarTilgang = true,
-                            ),
-                        ),
-                    ),
-                ),
             )
 
         fun resetMock(journalpostClient: JournalpostClient) {
             clearMocks(journalpostClient)
 
-            val journalposter: MutableMap<Long, Journalpost> = listOf(journalpost).associateBy { it.journalpostId.toLong() }
-                .toMutableMap()
+            val journalposter: MutableMap<Long, Journalpost> =
+                listOf(journalpost)
+                    .associateBy { it.journalpostId.toLong() }
+                    .toMutableMap()
 
             every { journalpostClient.hentJournalpost(any()) } answers {
                 val journalpostId = firstArg<String>()
@@ -139,82 +149,92 @@ class JournalpostClientConfig {
             every { journalpostClient.oppdaterJournalpost(any(), any(), any()) } returns mockk()
             every { journalpostClient.oppdaterLogiskeVedlegg(any(), any()) } answers { firstArg() }
             every { journalpostClient.finnJournalposterForBruker(any()) } answers {
-                journalposter.values.filter { it.bruker?.id == firstArg<JournalposterForBrukerRequest>().brukerId.id } + listOf(
-                    Journalpost(
-                        "2",
-                        Journalposttype.I,
-                        journalstatus = Journalstatus.MOTTATT,
-                        tema = Tema.TSO.toString(),
-                        behandlingstema = "ab0300",
-                        tittel = "Søknad om barnetilsyn",
-                        bruker = Bruker("12345678910", BrukerIdType.FNR),
-                        avsenderMottaker = avsenderMottaker(),
-                        journalforendeEnhet = "tilleggsstonader-sak",
-                        relevanteDatoer = listOf(
-                            RelevantDato(osloNow().minusDays(7), "DATO_REGISTRERT"),
-                            RelevantDato(osloNow(), "DATO_JOURNALFOERT"),
-                        ),
-                        dokumenter = listOf(
-                            DokumentInfo(
-                                dokumentInfoId = "1",
-                                tittel = "Dummy dokument 1",
-                                logiskeVedlegg = listOf(
-                                    LogiskVedlegg("1", "Dokumentasjon på sykdom"),
-                                    LogiskVedlegg("2", "Inntektsendring"),
-                                    LogiskVedlegg("3", "Samværsmelding"),
+                journalposter.values.filter { it.bruker?.id == firstArg<JournalposterForBrukerRequest>().brukerId.id } +
+                    listOf(
+                        Journalpost(
+                            "2",
+                            Journalposttype.I,
+                            journalstatus = Journalstatus.MOTTATT,
+                            tema = Tema.TSO.toString(),
+                            behandlingstema = "ab0300",
+                            tittel = "Søknad om barnetilsyn",
+                            bruker = Bruker("12345678910", BrukerIdType.FNR),
+                            avsenderMottaker = avsenderMottaker(),
+                            journalforendeEnhet = "tilleggsstonader-sak",
+                            relevanteDatoer =
+                                listOf(
+                                    RelevantDato(osloNow().minusDays(7), "DATO_REGISTRERT"),
+                                    RelevantDato(osloNow(), "DATO_JOURNALFOERT"),
                                 ),
-                                dokumentvarianter = listOf(
-                                    Dokumentvariant(
-                                        variantformat = Dokumentvariantformat.ARKIV,
-                                        saksbehandlerHarTilgang = true,
+                            dokumenter =
+                                listOf(
+                                    DokumentInfo(
+                                        dokumentInfoId = "1",
+                                        tittel = "Dummy dokument 1",
+                                        logiskeVedlegg =
+                                            listOf(
+                                                LogiskVedlegg("1", "Dokumentasjon på sykdom"),
+                                                LogiskVedlegg("2", "Inntektsendring"),
+                                                LogiskVedlegg("3", "Samværsmelding"),
+                                            ),
+                                        dokumentvarianter =
+                                            listOf(
+                                                Dokumentvariant(
+                                                    variantformat = Dokumentvariantformat.ARKIV,
+                                                    saksbehandlerHarTilgang = true,
+                                                ),
+                                            ),
+                                    ),
+                                    DokumentInfo(
+                                        dokumentInfoId = "2",
+                                        tittel = "Dummy dokument 2",
+                                        dokumentvarianter =
+                                            listOf(
+                                                Dokumentvariant(
+                                                    variantformat = Dokumentvariantformat.ARKIV,
+                                                    saksbehandlerHarTilgang = true,
+                                                ),
+                                            ),
                                     ),
                                 ),
-                            ),
-                            DokumentInfo(
-                                dokumentInfoId = "2",
-                                tittel = "Dummy dokument 2",
-                                dokumentvarianter = listOf(
-                                    Dokumentvariant(
-                                        variantformat = Dokumentvariantformat.ARKIV,
-                                        saksbehandlerHarTilgang = true,
+                        ),
+                        Journalpost(
+                            "1",
+                            Journalposttype.I,
+                            journalstatus = Journalstatus.MOTTATT,
+                            tema = Tema.TSO.toString(),
+                            behandlingstema = "ab0300",
+                            tittel = "Søknad om barnetilsyn",
+                            bruker = Bruker("12345678910", BrukerIdType.FNR),
+                            avsenderMottaker = avsenderMottaker(),
+                            journalforendeEnhet = "tilleggsstonader-sak",
+                            relevanteDatoer =
+                                listOf(
+                                    RelevantDato(osloNow().minusDays(7), "DATO_REGISTRERT"),
+                                    RelevantDato(osloNow(), "DATO_JOURNALFOERT"),
+                                ),
+                            dokumenter =
+                                listOf(
+                                    DokumentInfo(
+                                        dokumentInfoId = "3",
+                                        tittel = "Dummy dokument 3",
+                                        logiskeVedlegg =
+                                            listOf(
+                                                LogiskVedlegg("1", "Dokumentasjon på sykdom"),
+                                                LogiskVedlegg("2", "Inntektsendring"),
+                                                LogiskVedlegg("3", "Samværsmelding"),
+                                            ),
+                                        dokumentvarianter =
+                                            listOf(
+                                                Dokumentvariant(
+                                                    variantformat = Dokumentvariantformat.ARKIV,
+                                                    saksbehandlerHarTilgang = true,
+                                                ),
+                                            ),
                                     ),
                                 ),
-                            ),
                         ),
-                    ),
-                    Journalpost(
-                        "1",
-                        Journalposttype.I,
-                        journalstatus = Journalstatus.MOTTATT,
-                        tema = Tema.TSO.toString(),
-                        behandlingstema = "ab0300",
-                        tittel = "Søknad om barnetilsyn",
-                        bruker = Bruker("12345678910", BrukerIdType.FNR),
-                        avsenderMottaker = avsenderMottaker(),
-                        journalforendeEnhet = "tilleggsstonader-sak",
-                        relevanteDatoer = listOf(
-                            RelevantDato(osloNow().minusDays(7), "DATO_REGISTRERT"),
-                            RelevantDato(osloNow(), "DATO_JOURNALFOERT"),
-                        ),
-                        dokumenter = listOf(
-                            DokumentInfo(
-                                dokumentInfoId = "3",
-                                tittel = "Dummy dokument 3",
-                                logiskeVedlegg = listOf(
-                                    LogiskVedlegg("1", "Dokumentasjon på sykdom"),
-                                    LogiskVedlegg("2", "Inntektsendring"),
-                                    LogiskVedlegg("3", "Samværsmelding"),
-                                ),
-                                dokumentvarianter = listOf(
-                                    Dokumentvariant(
-                                        variantformat = Dokumentvariantformat.ARKIV,
-                                        saksbehandlerHarTilgang = true,
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                )
+                    )
             }
         }
     }

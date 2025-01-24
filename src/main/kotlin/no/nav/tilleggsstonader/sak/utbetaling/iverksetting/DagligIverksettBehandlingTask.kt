@@ -14,7 +14,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.*
+import java.util.Properties
+import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -28,7 +29,6 @@ class DagligIverksettBehandlingTask(
     private val behandlingService: BehandlingService,
     private val iverksettService: IverksettService,
 ) : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         val taskData = objectMapper.readValue<TaskData>(task.payload)
         val iverksettingId = task.metadata.getProperty("iverksettingId") ?: error("Mangler iverksettingId")
@@ -58,14 +58,17 @@ class DagligIverksettBehandlingTask(
     }
 
     companion object {
-
-        fun opprettTask(behandlingId: BehandlingId, utbetalingsdato: LocalDate): Task {
-            val properties = Properties().apply {
-                setProperty("behandlingId", behandlingId.toString())
-                setProperty("iverksettingId", UUID.randomUUID().toString())
-                setProperty("utbetalingsdato", utbetalingsdato.toString())
-                setProperty(MDCConstants.MDC_CALL_ID, IdUtils.generateId())
-            }
+        fun opprettTask(
+            behandlingId: BehandlingId,
+            utbetalingsdato: LocalDate,
+        ): Task {
+            val properties =
+                Properties().apply {
+                    setProperty("behandlingId", behandlingId.toString())
+                    setProperty("iverksettingId", UUID.randomUUID().toString())
+                    setProperty("utbetalingsdato", utbetalingsdato.toString())
+                    setProperty(MDCConstants.MDC_CALL_ID, IdUtils.generateId())
+                }
 
             val payload = objectMapper.writeValueAsString(TaskData(behandlingId, utbetalingsdato))
 

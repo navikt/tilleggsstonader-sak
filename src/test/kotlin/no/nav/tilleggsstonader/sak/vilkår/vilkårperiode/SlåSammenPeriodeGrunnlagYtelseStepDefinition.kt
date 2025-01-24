@@ -23,24 +23,26 @@ enum class PeriodeGrunnlagYtelseNøkler(
     SUBTYPE("Subtype"),
 }
 
+@Suppress("ktlint:standard:function-naming", "unused")
 class SlåSammenPeriodeGrunnlagYtelseStepDefinition {
-
     var grunnlagsperioderforYtelse: List<PeriodeGrunnlagYtelse> = emptyList()
     var resultat = emptyList<PeriodeGrunnlagYtelse>()
 
     @Gitt("Følgende grunnlagsperioderfor ytelse")
     fun `Følgende grunnlagsperioderfor ytelse`(dataTable: DataTable) {
-        grunnlagsperioderforYtelse = dataTable.mapRad { rad ->
-            PeriodeGrunnlagYtelse(
-                type = parseEnum<TypeYtelsePeriode>(PeriodeGrunnlagYtelseNøkler.TYPE, rad),
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad),
-                subtype = parseValgfriEnum<PeriodeGrunnlagYtelse.YtelseSubtype>(
-                    PeriodeGrunnlagYtelseNøkler.SUBTYPE,
-                    rad,
-                ),
-            )
-        }
+        grunnlagsperioderforYtelse =
+            dataTable.mapRad { rad ->
+                PeriodeGrunnlagYtelse(
+                    type = parseEnum<TypeYtelsePeriode>(PeriodeGrunnlagYtelseNøkler.TYPE, rad),
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad),
+                    subtype =
+                        parseValgfriEnum<PeriodeGrunnlagYtelse.YtelseSubtype>(
+                            PeriodeGrunnlagYtelseNøkler.SUBTYPE,
+                            rad,
+                        ),
+                )
+            }
     }
 
     @Når("Slår sammen grunnlagsperioder")
@@ -50,17 +52,19 @@ class SlåSammenPeriodeGrunnlagYtelseStepDefinition {
 
     @Så("Forvent grunnlagsperioderfor ytelse")
     fun `Forvent grunnlagsperioderfor ytelse`(dataTable: DataTable) {
-        val forventet = dataTable.mapRad { rad ->
-            PeriodeGrunnlagYtelse(
-                type = parseEnum<TypeYtelsePeriode>(PeriodeGrunnlagYtelseNøkler.TYPE, rad),
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad),
-                subtype = parseValgfriEnum<PeriodeGrunnlagYtelse.YtelseSubtype>(
-                    PeriodeGrunnlagYtelseNøkler.SUBTYPE,
-                    rad,
-                ),
-            )
-        }
+        val forventet =
+            dataTable.mapRad { rad ->
+                PeriodeGrunnlagYtelse(
+                    type = parseEnum<TypeYtelsePeriode>(PeriodeGrunnlagYtelseNøkler.TYPE, rad),
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad),
+                    subtype =
+                        parseValgfriEnum<PeriodeGrunnlagYtelse.YtelseSubtype>(
+                            PeriodeGrunnlagYtelseNøkler.SUBTYPE,
+                            rad,
+                        ),
+                )
+            }
         assertThat(resultat).isEqualTo(forventet)
     }
 }

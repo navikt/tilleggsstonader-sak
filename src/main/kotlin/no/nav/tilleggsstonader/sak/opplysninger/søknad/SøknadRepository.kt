@@ -14,16 +14,20 @@ import java.util.UUID
 
 /**
  * Alle repositories her henter data fra den samme tabellen, "soknad"
- * Men for at mapping skal virke med feltet [data] på [Søknad] så må(kan)
+ * Men for at mapping skal virke med feltet [Søknad.data] så må(kan)
  * man ha ulike repositories for å hente ut søknaden
  */
+
+@Repository
+interface SøknadBarnetilsynRepository :
+    RepositoryInterface<SøknadBarnetilsyn, UUID>,
+    InsertUpdateRepository<SøknadBarnetilsyn>
 
 /**
  * Brukes kun for å hente ut metadata fra [SøknadMetadata]
  */
 @Repository
 interface SøknadMetadataRepository : org.springframework.data.repository.Repository<SøknadMetadata, UUID> {
-
     @Query(
         """
         SELECT s.* FROM soknad s
@@ -35,13 +39,11 @@ interface SøknadMetadataRepository : org.springframework.data.repository.Reposi
 }
 
 @Repository
-interface SøknadBarnetilsynRepository :
-    RepositoryInterface<SøknadBarnetilsyn, UUID>, InsertUpdateRepository<SøknadBarnetilsyn>
-
-@Repository
 interface SøknadLæremidlerRepository :
-    RepositoryInterface<SøknadLæremidler, UUID>, InsertUpdateRepository<SøknadLæremidler>
+    RepositoryInterface<SøknadLæremidler, UUID>,
+    InsertUpdateRepository<SøknadLæremidler>
 
 @Repository
 interface SøknadBehandlingRepository :
-    RepositoryInterface<SøknadBehandling, BehandlingId>, InsertUpdateRepository<SøknadBehandling>
+    RepositoryInterface<SøknadBehandling, BehandlingId>,
+    InsertUpdateRepository<SøknadBehandling>

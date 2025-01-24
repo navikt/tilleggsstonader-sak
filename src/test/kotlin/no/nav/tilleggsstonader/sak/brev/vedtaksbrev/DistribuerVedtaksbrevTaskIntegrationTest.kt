@@ -43,7 +43,7 @@ class DistribuerVedtaksbrevTaskIntegrationTest : IntegrationTest() {
                             mottakerRolle = MottakerRolle.VERGE,
                             ident = "identAnnenMottaker",
                         ),
-                    journalpostId = JournalpostClientConfig.journalpostIdMedFeil,
+                    journalpostId = JournalpostClientConfig.JOURNALPOST_ID_MED_FEIL,
                     bestillingId = null,
                 ),
             ),

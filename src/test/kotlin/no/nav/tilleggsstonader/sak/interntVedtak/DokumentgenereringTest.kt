@@ -34,7 +34,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import java.net.URI
 
 class DokumentgenereringTest {
-
     private val behandlingService = mockk<BehandlingService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>()
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
@@ -45,17 +44,18 @@ class DokumentgenereringTest {
     private val vilkårService = mockk<VilkårService>()
     private val vedtakService = mockk<VedtakService>()
 
-    val service = InterntVedtakService(
-        behandlingService = behandlingService,
-        totrinnskontrollService = totrinnskontrollService,
-        vilkårperiodeService = vilkårperiodeService,
-        stønadsperiodeService = stønadsperiodeService,
-        søknadService = søknadService,
-        grunnlagsdataService = grunnlagsdataService,
-        barnService = barnService,
-        vilkårService = vilkårService,
-        vedtakService = vedtakService,
-    )
+    val service =
+        InterntVedtakService(
+            behandlingService = behandlingService,
+            totrinnskontrollService = totrinnskontrollService,
+            vilkårperiodeService = vilkårperiodeService,
+            stønadsperiodeService = stønadsperiodeService,
+            søknadService = søknadService,
+            grunnlagsdataService = grunnlagsdataService,
+            barnService = barnService,
+            vilkårService = vilkårService,
+            vedtakService = vedtakService,
+        )
 
     @BeforeEach
     fun setUp() {
@@ -87,7 +87,6 @@ class DokumentgenereringTest {
          * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
          * Formatter htmlfil etter generering for å unngå stor diff
          */
-        // TODO: Oppdater med ny HTML når feltene delvilkår og aktivitetsdager har blitt fjernet fra VilkårperiodeInterntVedtak
         @Test
         @Disabled
         fun `lager html og pdf`() {
@@ -135,29 +134,37 @@ class DokumentgenereringTest {
     @EnumSource(Stønadstype::class)
     fun `html skal være formatert for å enklere kunne sjekke diff`(stønadstype: Stønadstype) {
         Stønadstype.entries.forEach { }
-        val erIkkeFormatert = FileUtil.readFile("interntVedtak/$stønadstype/internt_vedtak.html").split("\n")
-            .none { it.contains("<body") && it.contains("<div") }
+        val erIkkeFormatert =
+            FileUtil
+                .readFile("interntVedtak/$stønadstype/internt_vedtak.html")
+                .split("\n")
+                .none { it.contains("<body") && it.contains("<div") }
 
         assertThat(erIkkeFormatert).isTrue()
     }
 
     private fun lagHtmlifyClient(): HtmlifyClient {
         val restTemplate = TestRestTemplate().restTemplate
-        restTemplate.messageConverters = listOf(
-            StringHttpMessageConverter(),
-            MappingJackson2HttpMessageConverter(ObjectMapperProvider.objectMapper),
-        )
+        restTemplate.messageConverters =
+            listOf(
+                StringHttpMessageConverter(),
+                MappingJackson2HttpMessageConverter(ObjectMapperProvider.objectMapper),
+            )
         return HtmlifyClient(URI.create("http://localhost:8001"), restTemplate)
     }
 
-    private fun generatePdf(html: String, name: String) {
+    private fun generatePdf(
+        html: String,
+        name: String,
+    ) {
         val url = "https://familie-dokument.intern.dev.nav.no/api/html-til-pdf"
-        val request = HttpEntity(
-            html,
-            HttpHeaders().apply {
-                accept = listOf(MediaType.APPLICATION_PDF)
-            },
-        )
+        val request =
+            HttpEntity(
+                html,
+                HttpHeaders().apply {
+                    accept = listOf(MediaType.APPLICATION_PDF)
+                },
+            )
         val pdf = TestRestTemplate().postForEntity<ByteArray>(url, request).body!!
         skrivTilFil(name, pdf)
     }

@@ -36,7 +36,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
-
     @Autowired
     lateinit var vilkårRepository: VilkårRepository
 
@@ -131,7 +130,7 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
     @Disabled // TODO
     @Test
-    internal fun `oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger - skal kaste feil dersom behandlingen er låst for videre behandling`() {
+    internal fun `oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger skal kaste feil dersom behandlingen er låst for videre behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
         assertThat(catchThrowable { vilkårService.oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandling.id) })
@@ -140,19 +139,19 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
 
     @Nested
     inner class OpprettVilkår {
-
         val behandling = behandling(status = BehandlingStatus.UTREDES, steg = StegType.VILKÅR)
-        val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.barnFnr)
+        val barn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR)
 
-        val opprettOppfyltDelvilkår = OpprettVilkårDto(
-            vilkårType = VilkårType.PASS_BARN,
-            barnId = barn.id,
-            behandlingId = behandling.id,
-            delvilkårsett = oppfylteDelvilkårPassBarnDto(),
-            fom = LocalDate.of(2024, 1, 1),
-            tom = LocalDate.of(2024, 1, 31),
-            utgift = 1,
-        )
+        val opprettOppfyltDelvilkår =
+            OpprettVilkårDto(
+                vilkårType = VilkårType.PASS_BARN,
+                barnId = barn.id,
+                behandlingId = behandling.id,
+                delvilkårsett = oppfylteDelvilkårPassBarnDto(),
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 1, 31),
+                utgift = 1,
+            )
 
         @BeforeEach
         fun setUp() {
@@ -218,15 +217,14 @@ internal class VilkårServiceIntegrasjonsTest : IntegrationTest() {
         fom: LocalDate? = YearMonth.now().atDay(1),
         tom: LocalDate? = YearMonth.now().atEndOfMonth(),
         status: VilkårStatus = VilkårStatus.NY,
-    ): List<Vilkår> {
-        return vilkårRepository.insertAll(VilkårTestUtils.opprettVilkårsvurderinger(behandling, barn, fom, tom, status))
-    }
+    ): List<Vilkår> = vilkårRepository.insertAll(VilkårTestUtils.opprettVilkårsvurderinger(behandling, barn, fom, tom, status))
 
     private fun assertVilkårErGjenbrukt(
         vilkårForBehandling: Vilkår,
         vilkårForRevurdering: Vilkår,
     ) {
-        assertThat(vilkårForBehandling).usingRecursiveComparison()
+        assertThat(vilkårForBehandling)
+            .usingRecursiveComparison()
             .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår", "status")
             .isEqualTo(vilkårForRevurdering)
 

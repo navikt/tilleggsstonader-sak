@@ -6,7 +6,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Properties
 
 @Service
 @TaskStepBeskrivelse(
@@ -14,25 +14,25 @@ import java.util.*
     beskrivelse = "Avslutt journalføringsoppgave oppgave i oppgave systemet",
     maxAntallFeil = 3,
 )
-class FerdigstillJournalføringsoppgaveTask(private val oppgaveService: OppgaveService) : AsyncTaskStep {
-
+class FerdigstillJournalføringsoppgaveTask(
+    private val oppgaveService: OppgaveService,
+) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val oppgaveId = task.payload
         oppgaveService.ferdigstillOppgave(oppgaveId.toLong())
     }
 
     companion object {
-
-        fun opprettTask(oppgaveId: String): Task {
-            return Task(
+        fun opprettTask(oppgaveId: String): Task =
+            Task(
                 type = TYPE,
                 payload = oppgaveId,
-                properties = Properties().apply {
-                    setProperty("saksbehandler", SikkerhetContext.hentSaksbehandlerEllerSystembruker())
-                    setProperty("oppgaveId", oppgaveId)
-                },
+                properties =
+                    Properties().apply {
+                        setProperty("saksbehandler", SikkerhetContext.hentSaksbehandlerEllerSystembruker())
+                        setProperty("oppgaveId", oppgaveId)
+                    },
             )
-        }
 
         const val TYPE = "ferdigstillJournalføringsoppgave"
     }

@@ -56,251 +56,296 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 object Testdata {
-
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
 
-    val stønadsperioder = listOf(
-        StønadsperiodeDto(
-            id = UUID.randomUUID(),
-            fom = LocalDate.of(2024, 2, 1),
-            tom = LocalDate.of(2024, 3, 31),
-            målgruppe = MålgruppeType.AAP,
-            aktivitet = AktivitetType.TILTAK,
-            status = StønadsperiodeStatus.NY,
-        ),
-        StønadsperiodeDto(
-            id = UUID.randomUUID(),
-            fom = LocalDate.of(2024, 2, 1),
-            tom = LocalDate.of(2024, 3, 31),
-            målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-            aktivitet = AktivitetType.REELL_ARBEIDSSØKER,
-            status = StønadsperiodeStatus.NY,
-        ),
-    )
+    val stønadsperioder =
+        listOf(
+            StønadsperiodeDto(
+                id = UUID.randomUUID(),
+                fom = LocalDate.of(2024, 2, 1),
+                tom = LocalDate.of(2024, 3, 31),
+                målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.TILTAK,
+                status = StønadsperiodeStatus.NY,
+            ),
+            StønadsperiodeDto(
+                id = UUID.randomUUID(),
+                fom = LocalDate.of(2024, 2, 1),
+                tom = LocalDate.of(2024, 3, 31),
+                målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                aktivitet = AktivitetType.REELL_ARBEIDSSØKER,
+                status = StønadsperiodeStatus.NY,
+            ),
+        )
 
     val totrinnskontroll = TotrinnskontrollUtil.totrinnskontroll(TotrinnInternStatus.GODKJENT, beslutter = "saksbeh2")
 
-    val søknadMetadata = SøknadMetadata(
-        journalpostId = "journalpostId",
-        mottattTidspunkt = LocalDate.of(2023, 1, 1).atStartOfDay().truncatedTo(ChronoUnit.MILLIS),
-        språk = Språkkode.NB,
-    )
+    val søknadMetadata =
+        SøknadMetadata(
+            journalpostId = "journalpostId",
+            mottattTidspunkt = LocalDate.of(2023, 1, 1).atStartOfDay().truncatedTo(ChronoUnit.MILLIS),
+            språk = Språkkode.NB,
+        )
 
-    private val målgrupper: List<VilkårperiodeMålgruppe> = listOf(
-        VilkårperiodeTestUtil.målgruppe(
-            begrunnelse = "målgruppe aap",
-            faktaOgVurdering = faktaOgVurderingMålgruppe(
-                type = MålgruppeType.AAP,
-                medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
-                dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.NEI),
+    private val målgrupper: List<VilkårperiodeMålgruppe> =
+        listOf(
+            VilkårperiodeTestUtil.målgruppe(
+                begrunnelse = "målgruppe aap",
+                faktaOgVurdering =
+                    faktaOgVurderingMålgruppe(
+                        type = MålgruppeType.AAP,
+                        medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
+                        dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.NEI),
+                    ),
+                fom = LocalDate.of(2024, 2, 5),
+                tom = LocalDate.of(2024, 2, 10),
             ),
-            fom = LocalDate.of(2024, 2, 5),
-            tom = LocalDate.of(2024, 2, 10),
-        ),
-        VilkårperiodeTestUtil.målgruppe(
-            begrunnelse = "målgruppe os",
-            faktaOgVurdering = faktaOgVurderingMålgruppe(
-                type = MålgruppeType.OVERGANGSSTØNAD,
-                medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
-                dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(svar = null),
+            VilkårperiodeTestUtil.målgruppe(
+                begrunnelse = "målgruppe os",
+                faktaOgVurdering =
+                    faktaOgVurderingMålgruppe(
+                        type = MålgruppeType.OVERGANGSSTØNAD,
+                        medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
+                        dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(svar = null),
+                    ),
+                fom = LocalDate.of(2024, 2, 5),
+                tom = LocalDate.of(2024, 2, 10),
             ),
-            fom = LocalDate.of(2024, 2, 5),
-            tom = LocalDate.of(2024, 2, 10),
-        ),
-    )
+        )
 
     object TilsynBarn {
         val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()))
 
-        val behandling = saksbehandling(
-            behandling = behandling(
-                id = behandlingId,
-                vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay(),
-                opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
+        val behandling =
+            saksbehandling(
+                behandling =
+                    behandling(
+                        id = behandlingId,
+                        vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay(),
+                        opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
+                        fagsak = fagsak,
+                        resultat = BehandlingResultat.INNVILGET,
+                        type = BehandlingType.REVURDERING,
+                        revurderFra = LocalDate.of(2024, 1, 1),
+                    ),
                 fagsak = fagsak,
-                resultat = BehandlingResultat.INNVILGET,
-                type = BehandlingType.REVURDERING,
-                revurderFra = LocalDate.of(2024, 1, 1),
-            ),
-            fagsak = fagsak,
-        )
+            )
 
-        val barn = listOf(
-            GrunnlagsdataUtil.lagGrunnlagsdataBarn(ident = "1", fødselsdato = LocalDate.of(2024, 5, 15)),
-            GrunnlagsdataUtil.lagGrunnlagsdataBarn(ident = "2", fødselsdato = LocalDate.of(2024, 10, 15)),
-        )
+        val barn =
+            listOf(
+                GrunnlagsdataUtil.lagGrunnlagsdataBarn(ident = "1", fødselsdato = LocalDate.of(2024, 5, 15)),
+                GrunnlagsdataUtil.lagGrunnlagsdataBarn(ident = "2", fødselsdato = LocalDate.of(2024, 10, 15)),
+            )
 
         val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = barn))
 
-        val behandlingBarn = listOf(
-            behandlingBarn(personIdent = grunnlagsdata.grunnlag.barn.first().ident),
-            behandlingBarn(personIdent = grunnlagsdata.grunnlag.barn.last().ident),
-        )
+        val behandlingBarn =
+            listOf(
+                behandlingBarn(
+                    personIdent =
+                        grunnlagsdata.grunnlag.barn
+                            .first()
+                            .ident,
+                ),
+                behandlingBarn(
+                    personIdent =
+                        grunnlagsdata.grunnlag.barn
+                            .last()
+                            .ident,
+                ),
+            )
         val barnId = behandlingBarn[0].id
         val barnId2 = behandlingBarn[1].id
 
-        val vilkår = listOf(
-            vilkår(
-                behandlingId = behandlingId,
-                type = VilkårType.PASS_BARN,
-                delvilkår = oppfylteDelvilkårPassBarn(),
-                barnId = barnId,
-                fom = LocalDate.of(2024, 2, 1),
-                tom = LocalDate.of(2024, 2, 29),
-                utgift = 100,
-            ).tilDto(),
-            vilkår(
-                behandlingId = behandlingId,
-                type = VilkårType.PASS_BARN,
-                delvilkår = oppfylteDelvilkårPassBarn(),
-                barnId = barnId,
-                fom = LocalDate.of(2024, 2, 1),
-                tom = LocalDate.of(2024, 2, 29),
-                utgift = 200,
-            ).tilDto(),
-            vilkår(
-                behandlingId = behandlingId,
-                type = VilkårType.PASS_BARN,
-                delvilkår = oppfylteDelvilkårPassBarn(),
-                barnId = barnId2,
-                fom = LocalDate.of(2024, 2, 1),
-                tom = LocalDate.of(2024, 2, 29),
-                utgift = 200,
-            ).tilDto(),
-        )
+        val vilkår =
+            listOf(
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.PASS_BARN,
+                    delvilkår = oppfylteDelvilkårPassBarn(),
+                    barnId = barnId,
+                    fom = LocalDate.of(2024, 2, 1),
+                    tom = LocalDate.of(2024, 2, 29),
+                    utgift = 100,
+                ).tilDto(),
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.PASS_BARN,
+                    delvilkår = oppfylteDelvilkårPassBarn(),
+                    barnId = barnId,
+                    fom = LocalDate.of(2024, 2, 1),
+                    tom = LocalDate.of(2024, 2, 29),
+                    utgift = 200,
+                ).tilDto(),
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.PASS_BARN,
+                    delvilkår = oppfylteDelvilkårPassBarn(),
+                    barnId = barnId2,
+                    fom = LocalDate.of(2024, 2, 1),
+                    tom = LocalDate.of(2024, 2, 29),
+                    utgift = 200,
+                ).tilDto(),
+            )
 
-        val stønadsperiodeBeregningsgrunnlag = StønadsperiodeBeregningsgrunnlag(
-            fom = LocalDate.of(2024, 1, 1),
-            tom = LocalDate.of(2024, 2, 1),
-            målgruppe = MålgruppeType.AAP,
-            aktivitet = AktivitetType.TILTAK,
-        )
+        val stønadsperiodeBeregningsgrunnlag =
+            StønadsperiodeBeregningsgrunnlag(
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 2, 1),
+                målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.TILTAK,
+            )
 
-        val vedtak = GeneriskVedtak(
-            behandlingId = behandlingId,
-            type = TypeVedtak.INNVILGELSE,
-            data = InnvilgelseTilsynBarn(
-                beregningsresultat = BeregningsresultatTilsynBarn(
-                    perioder = listOf(
-                        beregningsresultatForMåned(stønadsperioder = listOf(stønadsperiodeGrunnlag(stønadsperiode = stønadsperiodeBeregningsgrunnlag))),
+        val vedtak =
+            GeneriskVedtak(
+                behandlingId = behandlingId,
+                type = TypeVedtak.INNVILGELSE,
+                data =
+                    InnvilgelseTilsynBarn(
+                        beregningsresultat =
+                            BeregningsresultatTilsynBarn(
+                                perioder =
+                                    listOf(
+                                        beregningsresultatForMåned(
+                                            stønadsperioder =
+                                                listOf(
+                                                    stønadsperiodeGrunnlag(stønadsperiode = stønadsperiodeBeregningsgrunnlag),
+                                                ),
+                                        ),
+                                    ),
+                            ),
                     ),
-                ),
-            ),
-        )
+            )
 
-        private val aktiviteterTilsynBarn = listOf(
-            VilkårperiodeTestUtil.aktivitet(
-                begrunnelse = "aktivitet abd",
-                resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
-                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(
-                    lønnet = vurderingLønnet(SvarJaNei.JA),
+        private val aktiviteterTilsynBarn =
+            listOf(
+                VilkårperiodeTestUtil.aktivitet(
+                    begrunnelse = "aktivitet abd",
+                    resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
+                    faktaOgVurdering =
+                        faktaOgVurderingAktivitetTilsynBarn(
+                            lønnet = vurderingLønnet(SvarJaNei.JA),
+                        ),
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
                 ),
-                fom = LocalDate.of(2024, 2, 5),
-                tom = LocalDate.of(2024, 2, 10),
-            ),
-            VilkårperiodeTestUtil.aktivitet(
-                resultat = ResultatVilkårperiode.SLETTET,
-                slettetKommentar = "kommentar slettet",
-                fom = LocalDate.of(2024, 2, 5),
-                tom = LocalDate.of(2024, 2, 10),
-            ),
-        )
+                VilkårperiodeTestUtil.aktivitet(
+                    resultat = ResultatVilkårperiode.SLETTET,
+                    slettetKommentar = "kommentar slettet",
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
+                ),
+            )
 
-        val vilkårperioder = Vilkårperioder(
-            målgrupper = målgrupper,
-            aktiviteter = aktiviteterTilsynBarn,
-        )
+        val vilkårperioder =
+            Vilkårperioder(
+                målgrupper = målgrupper,
+                aktiviteter = aktiviteterTilsynBarn,
+            )
     }
 
     object Læremidler {
         val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.LÆREMIDLER)
 
-        val behandling = saksbehandling(
-            behandling = behandling(
-                id = behandlingId,
-                vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay(),
-                opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
+        val behandling =
+            saksbehandling(
+                behandling =
+                    behandling(
+                        id = behandlingId,
+                        vedtakstidspunkt = LocalDate.of(2024, 1, 1).atStartOfDay(),
+                        opprettetTid = LocalDate.of(2024, 2, 5).atStartOfDay(),
+                        fagsak = fagsak,
+                        resultat = BehandlingResultat.INNVILGET,
+                        type = BehandlingType.REVURDERING,
+                        revurderFra = LocalDate.of(2024, 1, 1),
+                    ),
                 fagsak = fagsak,
-                resultat = BehandlingResultat.INNVILGET,
-                type = BehandlingType.REVURDERING,
-                revurderFra = LocalDate.of(2024, 1, 1),
-            ),
-            fagsak = fagsak,
-        )
+            )
 
         val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = emptyList()))
 
         val vedtaksperioder = listOf(Vedtaksperiode(fom = LocalDate.of(2024, 1, 1), tom = LocalDate.of(2024, 3, 31)))
-        val beregningsresultat = BeregningsresultatLæremidler(
-            perioder = listOf(
-                BeregningsresultatForMåned(
-                    beløp = 951,
-                    grunnlag = Beregningsgrunnlag(
-                        fom = LocalDate.of(2024, 1, 1),
-                        tom = LocalDate.of(2024, 1, 31),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                        studienivå = Studienivå.HØYERE_UTDANNING,
-                        studieprosent = 100,
-                        sats = 951,
-                        satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
+        val beregningsresultat =
+            BeregningsresultatLæremidler(
+                perioder =
+                    listOf(
+                        BeregningsresultatForMåned(
+                            beløp = 951,
+                            grunnlag =
+                                Beregningsgrunnlag(
+                                    fom = LocalDate.of(2024, 1, 1),
+                                    tom = LocalDate.of(2024, 1, 31),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                    studienivå = Studienivå.HØYERE_UTDANNING,
+                                    studieprosent = 100,
+                                    sats = 951,
+                                    satsBekreftet = true,
+                                    målgruppe = MålgruppeType.AAP,
+                                ),
+                        ),
+                        BeregningsresultatForMåned(
+                            beløp = 951,
+                            grunnlag =
+                                Beregningsgrunnlag(
+                                    fom = LocalDate.of(2024, 2, 1),
+                                    tom = LocalDate.of(2024, 2, 29),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                    studienivå = Studienivå.HØYERE_UTDANNING,
+                                    studieprosent = 100,
+                                    sats = 951,
+                                    satsBekreftet = true,
+                                    målgruppe = MålgruppeType.AAP,
+                                ),
+                        ),
                     ),
-                ),
-                BeregningsresultatForMåned(
-                    beløp = 951,
-                    grunnlag = Beregningsgrunnlag(
-                        fom = LocalDate.of(2024, 2, 1),
-                        tom = LocalDate.of(2024, 2, 29),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                        studienivå = Studienivå.HØYERE_UTDANNING,
-                        studieprosent = 100,
-                        sats = 951,
-                        satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
+            )
+
+        val innvilgetVedtak =
+            GeneriskVedtak(
+                behandlingId = behandlingId,
+                type = TypeVedtak.INNVILGELSE,
+                data =
+                    InnvilgelseLæremidler(
+                        vedtaksperioder = vedtaksperioder,
+                        beregningsresultat = beregningsresultat,
                     ),
+            )
+
+        val avslåttVedtak =
+            GeneriskVedtak(
+                behandlingId = behandlingId,
+                type = TypeVedtak.AVSLAG,
+                data =
+                    AvslagLæremidler(
+                        årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
+                        begrunnelse = "Begrunelse for avslag",
+                    ),
+            )
+
+        private val aktivitetererLæremidler =
+            listOf(
+                VilkårperiodeTestUtil.aktivitet(
+                    fom = LocalDate.of(2024, 12, 10),
+                    tom = LocalDate.of(2024, 12, 15),
+                    faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
                 ),
-            ),
-        )
-
-        val innvilgetVedtak = GeneriskVedtak(
-            behandlingId = behandlingId,
-            type = TypeVedtak.INNVILGELSE,
-            data = InnvilgelseLæremidler(
-                vedtaksperioder = vedtaksperioder,
-                beregningsresultat = beregningsresultat,
-            ),
-        )
-
-        val avslåttVedtak = GeneriskVedtak(
-            behandlingId = behandlingId,
-            type = TypeVedtak.AVSLAG,
-            data = AvslagLæremidler(
-                årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
-                begrunnelse = "Begrunelse for avslag",
-            ),
-        )
-
-        private val aktivitetererLæremidler = listOf(
-            VilkårperiodeTestUtil.aktivitet(
-                fom = LocalDate.of(2024, 12, 10),
-                tom = LocalDate.of(2024, 12, 15),
-                faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
-            ),
-            VilkårperiodeTestUtil.aktivitet(
-                fom = LocalDate.of(2024, 12, 10),
-                tom = LocalDate.of(2024, 12, 15),
-                resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
-                faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(
-                    type = AktivitetType.UTDANNING,
-                    harRettTilUtstyrsstipend = vurderingHarRettTilUtstyrsstipend(SvarJaNei.JA),
-                    studienivå = Studienivå.VIDEREGÅENDE,
+                VilkårperiodeTestUtil.aktivitet(
+                    fom = LocalDate.of(2024, 12, 10),
+                    tom = LocalDate.of(2024, 12, 15),
+                    resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
+                    faktaOgVurdering =
+                        faktaOgVurderingAktivitetLæremidler(
+                            type = AktivitetType.UTDANNING,
+                            harRettTilUtstyrsstipend = vurderingHarRettTilUtstyrsstipend(SvarJaNei.JA),
+                            studienivå = Studienivå.VIDEREGÅENDE,
+                        ),
                 ),
-            ),
-        )
+            )
 
-        val vilkårperioder = Vilkårperioder(
-            målgrupper = målgrupper,
-            aktiviteter = aktivitetererLæremidler,
-        )
+        val vilkårperioder =
+            Vilkårperioder(
+                målgrupper = målgrupper,
+                aktiviteter = aktivitetererLæremidler,
+            )
     }
 }
