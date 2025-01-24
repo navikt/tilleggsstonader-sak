@@ -106,8 +106,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
 
         val tidligereStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeBehandlingId)
         val tidligereVilkårsperioder = vilkårperiodeRepository.findByBehandlingId(forrigeBehandlingId)
-        stønadsperiodeRepository.insertAll(tidligereStønadsperioder.map { it.copy(behandlingId = behandlingId) })
-        vilkårperiodeRepository.insertAll(tidligereVilkårsperioder.map { it.copy(behandlingId = behandlingId) })
+        stønadsperiodeRepository.insertAll(tidligereStønadsperioder.map { it.kopierTilBehandling(behandlingId) })
+        vilkårperiodeRepository.insertAll(tidligereVilkårsperioder.map { it.kopierTilBehandling(behandlingId) })
     }
 
     @Når("opphør behandling={} med revurderFra={}")

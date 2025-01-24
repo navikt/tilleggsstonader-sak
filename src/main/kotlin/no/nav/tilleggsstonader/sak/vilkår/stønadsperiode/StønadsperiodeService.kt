@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GrunnlagsdataService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.StønadsperiodeRevurderFraValidering.validerEndrePeriodeRevurdering
@@ -157,15 +156,7 @@ class StønadsperiodeService(
 
     fun gjenbrukStønadsperioder(forrigeBehandlingId: BehandlingId, nyBehandlingId: BehandlingId) {
         val eksisterendeStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeBehandlingId)
-        val nyeStønadsperioder = eksisterendeStønadsperioder.map {
-            it.copy(
-                id = UUID.randomUUID(),
-                behandlingId = nyBehandlingId,
-                status = StønadsperiodeStatus.UENDRET,
-                sporbar = Sporbar(),
-            )
-        }
-        stønadsperiodeRepository.insertAll(nyeStønadsperioder)
+        stønadsperiodeRepository.insertAll(eksisterendeStønadsperioder.map { it.kopierTilBehandling(nyBehandlingId) })
     }
 
     fun foreslåPerioder(behandlingId: BehandlingId): List<StønadsperiodeDto> {
