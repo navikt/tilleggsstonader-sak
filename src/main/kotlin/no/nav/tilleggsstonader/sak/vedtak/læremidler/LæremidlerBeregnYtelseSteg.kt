@@ -85,7 +85,7 @@ class LæremidlerBeregnYtelseSteg(
         opphørValideringService.validerVilkårsPerioder(saksbehandling)
 
         val innvilgelseLæremidler = forrigeBehandling.data as InnvilgelseLæremidler
-        val kuttedePerioder: List<BeregningsresultatForMåned> = avkortPerioderVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
+        val avkortedePerioder: List<BeregningsresultatForMåned> = avkortPerioderVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
 
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -93,14 +93,14 @@ class LæremidlerBeregnYtelseSteg(
                 type = TypeVedtak.OPPHØR,
                 data = OpphørLæremidler(
                     vedtaksperioder = innvilgelseLæremidler.vedtaksperioder,
-                    beregningsresultat = BeregningsresultatLæremidler(kuttedePerioder),
+                    beregningsresultat = BeregningsresultatLæremidler(avkortedePerioder),
                     årsaker = vedtak.årsakerOpphør,
                     begrunnelse = vedtak.begrunnelse,
                 ),
             ),
         )
 
-        val beregningsresultatLæremidler = BeregningsresultatLæremidler(kuttedePerioder)
+        val beregningsresultatLæremidler = BeregningsresultatLæremidler(avkortedePerioder)
 
         lagreAndeler(saksbehandling, beregningsresultatLæremidler)
     }
