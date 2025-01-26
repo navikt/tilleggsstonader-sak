@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -21,6 +22,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -33,7 +36,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequ
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -72,20 +74,20 @@ class LæremidlerBeregnYtelseSteg(
         brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
-        val forrigeBehandling = vedtakRepository.findByIdOrNull(saksbehandling.forrigeBehandlingId)
-            ?: error("Opphør må ha en forrige behandling")
+        val forrigeVedtak = vedtakRepository.findByIdOrThrow(saksbehandling.forrigeBehandlingId)
+            .withTypeOrThrow<VedtakLæremidler>()
         if (saksbehandling.revurderFra == null) {
             error("revurderFra-dato er påkrevd for opphør")
         }
-        feilHvis(forrigeBehandling.type == TypeVedtak.AVSLAG) {
+        feilHvis(forrigeVedtak.type == TypeVedtak.AVSLAG) {
             "Opphør er et ugyldig vedtaksresultat fordi forrige behandling var et avslag"
         }
 
         opphørValideringService.validerVilkårsPerioder(saksbehandling)
 
-        val avkortetBeregningsresultat: List<BeregningsresultatForMåned> = avkortBeregningsresultatVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
+        val avkortetBeregningsresultat: List<BeregningsresultatForMåned> = avkortBeregningsresultatVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
         val avkortetVedtaksperioder: List<Vedtaksperiode> =
-            avkortVedtaksperiodeVedOpphør(forrigeBehandling, saksbehandling.revurderFra)
+            avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
 
         vedtakRepository.insert(
             GeneriskVedtak(
