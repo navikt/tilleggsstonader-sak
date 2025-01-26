@@ -55,7 +55,11 @@ class LæremidlerBeregnYtelseSteg(
 
     override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakLæremidlerRequest) {
         when (vedtak) {
-            is InnvilgelseLæremidlerRequest -> beregnOgLagreInnvilgelse(vedtak.vedtaksperioder.tilDomene(), saksbehandling)
+            is InnvilgelseLæremidlerRequest -> beregnOgLagreInnvilgelse(
+                vedtak.vedtaksperioder.tilDomene(),
+                saksbehandling
+            )
+
             is AvslagLæremidlerDto -> lagreAvslag(saksbehandling, vedtak)
             is OpphørLæremidlerRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
@@ -79,10 +83,12 @@ class LæremidlerBeregnYtelseSteg(
         }
         val forrigeVedtak = vedtakRepository.findByIdOrThrow(saksbehandling.forrigeBehandlingId)
             .withTypeOrThrow<VedtakLæremidler>()
+            .data
 
         opphørValideringService.validerVilkårsPerioder(saksbehandling)
 
-        val avkortetBeregningsresultat: List<BeregningsresultatForMåned> = avkortBeregningsresultatVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
+        val avkortetBeregningsresultat: List<BeregningsresultatForMåned> =
+            avkortBeregningsresultatVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
         val avkortetVedtaksperioder: List<Vedtaksperiode> =
             avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
 

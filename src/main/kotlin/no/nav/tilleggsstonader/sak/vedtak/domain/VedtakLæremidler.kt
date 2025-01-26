@@ -60,3 +60,6 @@ fun VedtakLæremidler.vedtaksperioder(): List<Vedtaksperiode>? {
         is AvslagLæremidler -> null
     }
 }
+
+fun VedtakLæremidler.vedtaksperioderEllerFeil(): List<Vedtaksperiode> =
+    vedtaksperioder() ?: error("Vedtak(type=${this.type}) inneholder ikke vedtaksperioder")
