@@ -79,9 +79,6 @@ class LæremidlerBeregnYtelseSteg(
         if (saksbehandling.revurderFra == null) {
             error("revurderFra-dato er påkrevd for opphør")
         }
-        feilHvis(forrigeVedtak.type == TypeVedtak.AVSLAG) {
-            "Opphør er et ugyldig vedtaksresultat fordi forrige behandling var et avslag"
-        }
 
         opphørValideringService.validerVilkårsPerioder(saksbehandling)
 
