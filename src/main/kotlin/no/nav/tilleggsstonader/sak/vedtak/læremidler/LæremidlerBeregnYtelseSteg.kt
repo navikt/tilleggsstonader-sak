@@ -74,11 +74,11 @@ class LæremidlerBeregnYtelseSteg(
         brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
+        feilHvis(saksbehandling.revurderFra == null) {
+            "revurderFra-dato er påkrevd for opphør"
+        }
         val forrigeVedtak = vedtakRepository.findByIdOrThrow(saksbehandling.forrigeBehandlingId)
             .withTypeOrThrow<VedtakLæremidler>()
-        if (saksbehandling.revurderFra == null) {
-            error("revurderFra-dato er påkrevd for opphør")
-        }
 
         opphørValideringService.validerVilkårsPerioder(saksbehandling)
 
