@@ -53,6 +53,9 @@ fun VedtakLæremidler.beregningsresultat(): BeregningsresultatLæremidler? {
     }
 }
 
+fun VedtakLæremidler.beregningsresultatEllerFeil(): BeregningsresultatLæremidler =
+    beregningsresultat() ?: error("Vedtak(type=${this.type}) inneholder ikke beregningsresultat")
+
 fun VedtakLæremidler.vedtaksperioder(): List<Vedtaksperiode>? {
     return when (this) {
         is InnvilgelseLæremidler -> this.vedtaksperioder

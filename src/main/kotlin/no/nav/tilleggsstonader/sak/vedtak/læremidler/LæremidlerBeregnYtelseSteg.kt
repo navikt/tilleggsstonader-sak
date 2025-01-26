@@ -57,7 +57,7 @@ class LæremidlerBeregnYtelseSteg(
         when (vedtak) {
             is InnvilgelseLæremidlerRequest -> beregnOgLagreInnvilgelse(
                 vedtak.vedtaksperioder.tilDomene(),
-                saksbehandling
+                saksbehandling,
             )
 
             is AvslagLæremidlerDto -> lagreAvslag(saksbehandling, vedtak)
@@ -83,7 +83,6 @@ class LæremidlerBeregnYtelseSteg(
         }
         val forrigeVedtak = vedtakRepository.findByIdOrThrow(saksbehandling.forrigeBehandlingId)
             .withTypeOrThrow<VedtakLæremidler>()
-            .data
 
         opphørValideringService.validerVilkårsPerioder(saksbehandling)
 
