@@ -19,10 +19,10 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
@@ -82,14 +82,12 @@ class LæremidlerBeregnYtelseSteg(
             "revurderFra-dato er påkrevd for opphør"
         }
         val forrigeVedtak = vedtakRepository.findByIdOrThrow(saksbehandling.forrigeBehandlingId)
-            .withTypeOrThrow<VedtakLæremidler>()
+            .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
 
         opphørValideringService.validerVilkårsPerioder(saksbehandling)
 
-        val avkortetBeregningsresultat: List<BeregningsresultatForMåned> =
-            avkortBeregningsresultatVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
-        val avkortetVedtaksperioder: List<Vedtaksperiode> =
-            avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
+        val avkortetBeregningsresultat = avkortBeregningsresultatVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
+        val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
 
         vedtakRepository.insert(
             GeneriskVedtak(

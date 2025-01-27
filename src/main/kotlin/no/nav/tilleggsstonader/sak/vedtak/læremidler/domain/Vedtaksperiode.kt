@@ -4,8 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.vedtaksperioderEllerFeil
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import java.time.LocalDate
 
 data class Vedtaksperiode(
@@ -21,9 +20,9 @@ data class Vedtaksperiode(
     }
 }
 
-fun avkortVedtaksperiodeVedOpphør(forrigeVedtak: GeneriskVedtak<out VedtakLæremidler>, revurderFra: LocalDate): List<Vedtaksperiode> {
-    return forrigeVedtak
-        .data
-        .vedtaksperioderEllerFeil()
-        .avkortFraOgMed(revurderFra.minusDays(1))
+fun avkortVedtaksperiodeVedOpphør(
+    forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørLæremidler>,
+    revurderFra: LocalDate,
+): List<Vedtaksperiode> {
+    return forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))
 }

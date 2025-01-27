@@ -12,10 +12,15 @@ enum class TypeVedtakLæremidler(override val typeVedtak: TypeVedtak) : TypeVedt
 
 sealed interface VedtakLæremidler : Vedtaksdata
 
+sealed interface InnvilgelseEllerOpphørLæremidler : VedtakLæremidler {
+    val vedtaksperioder: List<Vedtaksperiode>
+    val beregningsresultat: BeregningsresultatLæremidler
+}
+
 data class InnvilgelseLæremidler(
-    val vedtaksperioder: List<Vedtaksperiode>,
-    val beregningsresultat: BeregningsresultatLæremidler,
-) : VedtakLæremidler, Innvilgelse {
+    override val vedtaksperioder: List<Vedtaksperiode>,
+    override val beregningsresultat: BeregningsresultatLæremidler,
+) : InnvilgelseEllerOpphørLæremidler, Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakLæremidler.INNVILGELSE_LÆREMIDLER
 }
 
@@ -32,11 +37,11 @@ data class AvslagLæremidler(
 }
 
 data class OpphørLæremidler(
-    val vedtaksperioder: List<Vedtaksperiode>,
-    val beregningsresultat: BeregningsresultatLæremidler,
+    override val vedtaksperioder: List<Vedtaksperiode>,
+    override val beregningsresultat: BeregningsresultatLæremidler,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
-) : VedtakLæremidler, Opphør {
+) : InnvilgelseEllerOpphørLæremidler, Opphør {
 
     override val type: TypeVedtaksdata = TypeVedtakLæremidler.OPPHØR_LÆREMIDLER
 
@@ -53,9 +58,6 @@ fun VedtakLæremidler.beregningsresultat(): BeregningsresultatLæremidler? {
     }
 }
 
-fun VedtakLæremidler.beregningsresultatEllerFeil(): BeregningsresultatLæremidler =
-    beregningsresultat() ?: error("Vedtak(type=${this.type}) inneholder ikke beregningsresultat")
-
 fun VedtakLæremidler.vedtaksperioder(): List<Vedtaksperiode>? {
     return when (this) {
         is InnvilgelseLæremidler -> this.vedtaksperioder
@@ -63,6 +65,3 @@ fun VedtakLæremidler.vedtaksperioder(): List<Vedtaksperiode>? {
         is AvslagLæremidler -> null
     }
 }
-
-fun VedtakLæremidler.vedtaksperioderEllerFeil(): List<Vedtaksperiode> =
-    vedtaksperioder() ?: error("Vedtak(type=${this.type}) inneholder ikke vedtaksperioder")

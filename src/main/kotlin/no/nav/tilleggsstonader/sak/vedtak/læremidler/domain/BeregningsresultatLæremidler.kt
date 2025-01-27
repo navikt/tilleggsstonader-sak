@@ -4,8 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultatEllerFeil
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
@@ -44,10 +43,13 @@ data class Beregningsgrunnlag(
     val målgruppe: MålgruppeType,
 )
 
-fun avkortBeregningsresultatVedOpphør(forrigeVedtak: GeneriskVedtak<out VedtakLæremidler>, revurderFra: LocalDate): List<BeregningsresultatForMåned> {
+fun avkortBeregningsresultatVedOpphør(
+    forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørLæremidler>,
+    revurderFra: LocalDate,
+): List<BeregningsresultatForMåned> {
     return forrigeVedtak
         .data
-        .beregningsresultatEllerFeil()
+        .beregningsresultat
         .perioder
         .avkortFraOgMed(revurderFra.minusDays(1))
 }
