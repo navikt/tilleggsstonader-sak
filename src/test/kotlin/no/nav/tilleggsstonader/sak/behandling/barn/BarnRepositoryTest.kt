@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
 
 class BarnRepositoryTest : IntegrationTest() {
-
     @Autowired
     lateinit var barnRepository: BarnRepository
 

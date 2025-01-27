@@ -10,8 +10,9 @@ import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
 
 @Repository
-interface FagsakRepository : RepositoryInterface<FagsakDomain, FagsakId>, InsertUpdateRepository<FagsakDomain> {
-
+interface FagsakRepository :
+    RepositoryInterface<FagsakDomain, FagsakId>,
+    InsertUpdateRepository<FagsakDomain> {
     // language=PostgreSQL
     @Query(
         """SELECT DISTINCT f.*, fe.id AS eksternid_id
@@ -21,9 +22,15 @@ interface FagsakRepository : RepositoryInterface<FagsakDomain, FagsakId>, Insert
                     WHERE pi.ident IN (:personIdenter)
                     AND f.stonadstype = :stønadstype""",
     )
-    fun findBySøkerIdent(personIdenter: Set<String>, stønadstype: Stønadstype): FagsakDomain?
+    fun findBySøkerIdent(
+        personIdenter: Set<String>,
+        stønadstype: Stønadstype,
+    ): FagsakDomain?
 
-    fun findByFagsakPersonIdAndStønadstype(fagsakPersonId: FagsakPersonId, stønadstype: Stønadstype): FagsakDomain?
+    fun findByFagsakPersonIdAndStønadstype(
+        fagsakPersonId: FagsakPersonId,
+        stønadstype: Stønadstype,
+    ): FagsakDomain?
 
     // language=PostgreSQL
     @Query(

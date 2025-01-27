@@ -6,7 +6,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class FagsakIdTest {
-
     val id = "96673a99-1d90-4f22-abdf-faee57062432"
 
     @Test

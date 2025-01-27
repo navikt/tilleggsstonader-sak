@@ -17,15 +17,15 @@ import org.springframework.data.repository.findByIdOrNull
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MellomlagringBrevServiceTest {
-
     private val behandlingService = mockk<BehandlingService>()
     private val mellomlagerBrevRepository = mockk<MellomlagerBrevRepository>()
     private val mellomlagerFrittståendeBrevRepository = mockk<MellomlagerFrittståendeBrevRepository>()
-    private val mellomlagringBrevService = MellomlagringBrevService(
-        behandlingService = behandlingService,
-        mellomlagerBrevRepository = mellomlagerBrevRepository,
-        mellomlagerFrittståendeBrevRepository = mellomlagerFrittståendeBrevRepository,
-    )
+    private val mellomlagringBrevService =
+        MellomlagringBrevService(
+            behandlingService = behandlingService,
+            mellomlagerBrevRepository = mellomlagerBrevRepository,
+            mellomlagerFrittståendeBrevRepository = mellomlagerFrittståendeBrevRepository,
+        )
 
     @BeforeAll
     fun setUp() {
@@ -46,24 +46,24 @@ class MellomlagringBrevServiceTest {
             mellomlagringBrevService.hentMellomlagretBrev(
                 behandlingId,
             ),
+        ).isEqualTo(
+            MellomlagreBrevDto(
+                brevmal = mellomlagretBrev.brevmal,
+                brevverdier = mellomlagretBrev.brevverdier,
+            ),
         )
-            .isEqualTo(
-                MellomlagreBrevDto(
-                    brevmal = mellomlagretBrev.brevmal,
-                    brevverdier = mellomlagretBrev.brevverdier,
-                ),
-            )
     }
 
     @Test
     fun `hentMellomlagretFrittståendeSanityBrev skal returnere mellomlagret frittstående brev`() {
         val fagsakId = FagsakId.random()
 
-        val brev = MellomlagretFrittståendeBrev(
-            fagsakId = fagsakId,
-            brevverdier = mellomlagretBrev.brevverdier,
-            brevmal = mellomlagretBrev.brevmal,
-        )
+        val brev =
+            MellomlagretFrittståendeBrev(
+                fagsakId = fagsakId,
+                brevverdier = mellomlagretBrev.brevverdier,
+                brevmal = mellomlagretBrev.brevmal,
+            )
 
         every {
             mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsakId, any())

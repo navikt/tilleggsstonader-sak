@@ -10,15 +10,15 @@ import org.junit.jupiter.api.Test
 /**
  * Denne må fylles på etterhvert som man legger til flere enums for andre stønader
  */
-val alleEnumTyperFaktaOgVurdering: List<Pair<Stønadstype, TypeFaktaOgVurdering>> = listOf(
-    Stønadstype.BARNETILSYN to AktivitetTilsynBarnType.entries,
-    Stønadstype.BARNETILSYN to MålgruppeTilsynBarnType.entries,
-    Stønadstype.LÆREMIDLER to AktivitetLæremidlerType.entries,
-    Stønadstype.LÆREMIDLER to MålgruppeLæremidlerType.entries,
-).flatMap { (stønadstype, enums) -> enums.map { stønadstype to it } }
+val alleEnumTyperFaktaOgVurdering: List<Pair<Stønadstype, TypeFaktaOgVurdering>> =
+    listOf(
+        Stønadstype.BARNETILSYN to AktivitetTilsynBarnType.entries,
+        Stønadstype.BARNETILSYN to MålgruppeTilsynBarnType.entries,
+        Stønadstype.LÆREMIDLER to AktivitetLæremidlerType.entries,
+        Stønadstype.LÆREMIDLER to MålgruppeLæremidlerType.entries,
+    ).flatMap { (stønadstype, enums) -> enums.map { stønadstype to it } }
 
 class TypeFaktaOgVurderingTest {
-
     /**
      * Hvis [when] mangler noe, legg til der der og i [alleEnumTyperFaktaOgVurdering]
      */

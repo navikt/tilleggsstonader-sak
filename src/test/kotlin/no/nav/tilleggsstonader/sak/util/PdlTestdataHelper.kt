@@ -28,7 +28,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergemaalEllerFremtidsfu
 import java.time.LocalDate
 
 object PdlTestdataHelper {
-
     val metadataGjeldende = Metadata(historisk = false)
     val metadataHistorisk = Metadata(historisk = true)
 
@@ -37,14 +36,13 @@ object PdlTestdataHelper {
         mellomnavn: String? = "mellomnavn",
         etternavn: String = "Etternavn",
         historisk: Boolean = false,
-    ): Navn {
-        return Navn(
+    ): Navn =
+        Navn(
             fornavn = fornavn,
             mellomnavn = mellomnavn,
             etternavn = etternavn,
             metadata = Metadata(historisk = historisk),
         )
-    }
 
     fun pdlSøker(
         adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
@@ -62,24 +60,23 @@ object PdlTestdataHelper {
         utflyttingFraNorge: List<UtflyttingFraNorge> = emptyList(),
         vergemaalEllerFremtidsfullmakt: List<VergemaalEllerFremtidsfullmakt> = emptyList(),
         folkeregisteridentifikator: List<Folkeregisteridentifikator> = emptyList(),
-    ) =
-        PdlSøker(
-            adressebeskyttelse = adressebeskyttelse,
-            bostedsadresse = bostedsadresse,
-            dødsfall = dødsfall,
-            forelderBarnRelasjon = forelderBarnRelasjon,
-            folkeregisteridentifikator = folkeregisteridentifikator,
-            fødselsdato = fødselsdato,
-            folkeregisterpersonstatus = folkeregisterpersonstatus,
-            kontaktadresse = kontaktadresse,
-            navn = navn,
-            opphold = opphold,
-            oppholdsadresse = oppholdsadresse,
-            statsborgerskap = statsborgerskap,
-            innflyttingTilNorge = innflyttingTilNorge,
-            utflyttingFraNorge = utflyttingFraNorge,
-            vergemaalEllerFremtidsfullmakt = vergemaalEllerFremtidsfullmakt,
-        )
+    ) = PdlSøker(
+        adressebeskyttelse = adressebeskyttelse,
+        bostedsadresse = bostedsadresse,
+        dødsfall = dødsfall,
+        forelderBarnRelasjon = forelderBarnRelasjon,
+        folkeregisteridentifikator = folkeregisteridentifikator,
+        fødselsdato = fødselsdato,
+        folkeregisterpersonstatus = folkeregisterpersonstatus,
+        kontaktadresse = kontaktadresse,
+        navn = navn,
+        opphold = opphold,
+        oppholdsadresse = oppholdsadresse,
+        statsborgerskap = statsborgerskap,
+        innflyttingTilNorge = innflyttingTilNorge,
+        utflyttingFraNorge = utflyttingFraNorge,
+        vergemaalEllerFremtidsfullmakt = vergemaalEllerFremtidsfullmakt,
+    )
 
     fun pdlBarn(
         adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
@@ -88,15 +85,14 @@ object PdlTestdataHelper {
         forelderBarnRelasjon: List<ForelderBarnRelasjon> = emptyList(),
         fødselsdato: Fødselsdato? = null,
         navn: Navn = lagNavn(),
-    ) =
-        PdlBarn(
-            adressebeskyttelse = adressebeskyttelse,
-            bostedsadresse = bostedsadresse,
-            dødsfall = dødsfall,
-            forelderBarnRelasjon = forelderBarnRelasjon,
-            fødselsdato = listOfNotNull(fødselsdato),
-            navn = listOfNotNull(navn),
-        )
+    ) = PdlBarn(
+        adressebeskyttelse = adressebeskyttelse,
+        bostedsadresse = bostedsadresse,
+        dødsfall = dødsfall,
+        forelderBarnRelasjon = forelderBarnRelasjon,
+        fødselsdato = listOfNotNull(fødselsdato),
+        navn = listOfNotNull(navn),
+    )
 
     fun pdlPersonKort(
         adressebeskyttelse: List<Adressebeskyttelse> = emptyList(),
@@ -108,8 +104,11 @@ object PdlTestdataHelper {
         dødsfall = dødsfall,
     )
 
-    fun fødsel(år: Int = 2000, måned: Int = 1, dag: Int = 1): Fødselsdato =
-        fødsel(LocalDate.of(år, måned, dag))
+    fun fødsel(
+        år: Int = 2000,
+        måned: Int = 1,
+        dag: Int = 1,
+    ): Fødselsdato = fødsel(LocalDate.of(år, måned, dag))
 
     fun fødsel(fødselsdato: LocalDate) =
         Fødselsdato(
@@ -121,18 +120,17 @@ object PdlTestdataHelper {
     fun ukjentBostedsadresse(
         bostedskommune: String = "1234",
         historisk: Boolean = false,
-    ) =
-        Bostedsadresse(
-            angittFlyttedato = null,
-            gyldigFraOgMed = null,
-            gyldigTilOgMed = null,
-            coAdressenavn = null,
-            utenlandskAdresse = null,
-            vegadresse = null,
-            ukjentBosted = UkjentBosted(bostedskommune),
-            matrikkeladresse = null,
-            metadata = Metadata(historisk),
-        )
+    ) = Bostedsadresse(
+        angittFlyttedato = null,
+        gyldigFraOgMed = null,
+        gyldigTilOgMed = null,
+        coAdressenavn = null,
+        utenlandskAdresse = null,
+        vegadresse = null,
+        ukjentBosted = UkjentBosted(bostedskommune),
+        matrikkeladresse = null,
+        metadata = Metadata(historisk),
+    )
 
     fun folkeregisteridentifikator(
         ident: String,

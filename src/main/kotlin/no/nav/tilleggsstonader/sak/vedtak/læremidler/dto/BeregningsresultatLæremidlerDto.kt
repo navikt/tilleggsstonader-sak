@@ -22,39 +22,34 @@ data class BeregningsresultatForPeriodeDto(
     val stønadsbeløp: Int,
     val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
-    fun slåSammen(
-        nestePeriode: BeregningsresultatForPeriodeDto,
-    ): BeregningsresultatForPeriodeDto {
-        return this.copy(
+    fun slåSammen(nestePeriode: BeregningsresultatForPeriodeDto): BeregningsresultatForPeriodeDto =
+        this.copy(
             tom = nestePeriode.tom,
             stønadsbeløp = this.stønadsbeløp + nestePeriode.stønadsbeløp,
             antallMåneder = this.antallMåneder + 1,
         )
-    }
 
-    fun kanSlåsSammen(
-        nestePeriode: BeregningsresultatForPeriodeDto,
-    ): Boolean {
-        return this.studienivå == nestePeriode.studienivå &&
+    fun kanSlåsSammen(nestePeriode: BeregningsresultatForPeriodeDto): Boolean =
+        this.studienivå == nestePeriode.studienivå &&
             this.studieprosent == nestePeriode.studieprosent &&
             this.beløp == nestePeriode.beløp &&
             this.utbetalingsdato == nestePeriode.utbetalingsdato &&
             this.påfølgesAv(nestePeriode)
-    }
 }
 
 fun BeregningsresultatLæremidler.tilDto(): BeregningsresultatLæremidlerDto {
     val perioderDto = perioder.map { it.tilDto() }.sorted()
     return BeregningsresultatLæremidlerDto(
-        perioder = perioderDto.mergeSammenhengende(
-            skalMerges = { v1, v2 -> v1.kanSlåsSammen(v2) },
-            merge = { v1, v2 -> v1.slåSammen(v2) },
-        ),
+        perioder =
+            perioderDto.mergeSammenhengende(
+                skalMerges = { v1, v2 -> v1.kanSlåsSammen(v2) },
+                merge = { v1, v2 -> v1.slåSammen(v2) },
+            ),
     )
 }
 
-fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto {
-    return BeregningsresultatForPeriodeDto(
+fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto =
+    BeregningsresultatForPeriodeDto(
         fom = grunnlag.fom,
         tom = grunnlag.tom,
         antallMåneder = 1,
@@ -64,4 +59,3 @@ fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto {
         stønadsbeløp = beløp,
         utbetalingsdato = grunnlag.utbetalingsdato,
     )
-}

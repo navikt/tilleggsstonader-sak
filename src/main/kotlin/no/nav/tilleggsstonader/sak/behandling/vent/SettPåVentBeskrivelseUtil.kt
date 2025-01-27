@@ -9,7 +9,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 object SettPåVentBeskrivelseUtil {
-
     fun settPåVent(
         oppgave: Oppgave,
         frist: LocalDate,
@@ -40,7 +39,10 @@ object SettPåVentBeskrivelseUtil {
             nåværendeBeskrivelse(oppgave)
     }
 
-    fun taAvVent(oppgave: Oppgave, tidspunkt: LocalDateTime = osloNow()): String {
+    fun taAvVent(
+        oppgave: Oppgave,
+        tidspunkt: LocalDateTime = osloNow(),
+    ): String {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, SikkerhetContext.hentSaksbehandlerEllerSystembruker())
         return utledBeskrivelsePrefix(tidspunkt) +
@@ -49,16 +51,14 @@ object SettPåVentBeskrivelseUtil {
             nåværendeBeskrivelse(oppgave)
     }
 
-    private fun String?.påNyRadEllerTomString(): String =
-        this?.trim()?.takeIf { it.isNotBlank() }?.let { "\n$it" } ?: ""
+    private fun String?.påNyRadEllerTomString(): String = this?.trim()?.takeIf { it.isNotBlank() }?.let { "\n$it" } ?: ""
 
-    private fun nåværendeBeskrivelse(oppgave: Oppgave): String {
-        return if (oppgave.beskrivelse.isNullOrBlank()) {
+    private fun nåværendeBeskrivelse(oppgave: Oppgave): String =
+        if (oppgave.beskrivelse.isNullOrBlank()) {
             ""
         } else {
             "\n\n${oppgave.beskrivelse}"
         }
-    }
 
     private fun utledBeskrivelsePrefix(tidspunkt: LocalDateTime): String {
         val innloggetSaksbehandlerIdent = SikkerhetContext.hentSaksbehandlerEllerSystembruker()

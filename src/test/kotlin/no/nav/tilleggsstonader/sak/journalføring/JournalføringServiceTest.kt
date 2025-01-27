@@ -53,7 +53,6 @@ import org.junit.jupiter.api.Test
 import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottaker as AvsenderMottakerKontrakt
 
 class JournalføringServiceTest {
-
     val behandlingService = mockk<BehandlingService>()
     val fagsakService = mockk<FagsakService>()
     val journalpostService = mockk<JournalpostService>()
@@ -65,40 +64,43 @@ class JournalføringServiceTest {
     val gjennbrukDataRevurderingService = mockk<GjennbrukDataRevurderingService>(relaxed = true)
     val klageService = mockk<KlageService>()
 
-    val journalføringService = JournalføringService(
-        behandlingService,
-        fagsakService,
-        journalpostService,
-        søknadService,
-        taskService,
-        barnService,
-        TransactionHandler(),
-        personService,
-        oppgaveService,
-        gjennbrukDataRevurderingService,
-        klageService,
-    )
+    val journalføringService =
+        JournalføringService(
+            behandlingService,
+            fagsakService,
+            journalpostService,
+            søknadService,
+            taskService,
+            barnService,
+            TransactionHandler(),
+            personService,
+            oppgaveService,
+            gjennbrukDataRevurderingService,
+            klageService,
+        )
 
     val enhet = ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY.enhetNr
     val personIdent = "123456789"
     val fagsak = fagsak(identer = setOf(PersonIdent(personIdent)))
     val journalpostId = "1"
-    val avsenderMottaker = AvsenderMottakerKontrakt(
-        id = personIdent,
-        type = AvsenderMottakerIdType.FNR,
-        navn = "navn",
-        land = "",
-        erLikBruker = true,
-    )
-    val journalpost = Journalpost(
-        journalpostId = journalpostId,
-        journalposttype = Journalposttype.I,
-        journalstatus = Journalstatus.MOTTATT,
-        dokumenter = listOf(DokumentInfo("", brevkode = "1")),
-        bruker = Bruker(personIdent, BrukerIdType.FNR),
-        journalforendeEnhet = "123",
-        avsenderMottaker = avsenderMottaker,
-    )
+    val avsenderMottaker =
+        AvsenderMottakerKontrakt(
+            id = personIdent,
+            type = AvsenderMottakerIdType.FNR,
+            navn = "navn",
+            land = "",
+            erLikBruker = true,
+        )
+    val journalpost =
+        Journalpost(
+            journalpostId = journalpostId,
+            journalposttype = Journalposttype.I,
+            journalstatus = Journalstatus.MOTTATT,
+            dokumenter = listOf(DokumentInfo("", brevkode = "1")),
+            bruker = Bruker(personIdent, BrukerIdType.FNR),
+            journalforendeEnhet = "123",
+            avsenderMottaker = avsenderMottaker,
+        )
 
     val taskSlot = slot<Task>()
     val nyAvsenderSlot = slot<AvsenderMottaker?>()
@@ -116,7 +118,17 @@ class JournalføringServiceTest {
         justRun { oppgaveService.ferdigstillOppgave(any()) }
         every { journalpostService.hentJournalpost(journalpostId) } returns journalpost
         every { journalpostService.hentIdentFraJournalpost(any()) } returns personIdent
-        justRun { journalpostService.oppdaterOgFerdigstillJournalpost(any(), any(), any(), any(), any(), any(), captureNullable(nyAvsenderSlot)) }
+        justRun {
+            journalpostService.oppdaterOgFerdigstillJournalpost(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                captureNullable(nyAvsenderSlot),
+            )
+        }
         every { søknadService.lagreSøknad(any(), any(), any()) } returns mockk()
 
         every { gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(any<Behandling>()) } returns null
@@ -180,14 +192,15 @@ class JournalføringServiceTest {
     fun `skal oppdatere journalpost med avsender fra journalføringsrequest`() {
         val nyAvsender = JournalføringRequest.NyAvsender(true, "navn", personIdent)
 
-        val journalføringRequest = JournalføringRequest(
-            stønadstype = Stønadstype.BARNETILSYN,
-            oppgaveId = "1",
-            journalførendeEnhet = "123",
-            årsak = JournalføringRequest.Journalføringsårsak.PAPIRSØKNAD,
-            aksjon = Journalføringsaksjon.JOURNALFØR_PÅ_FAGSAK,
-            nyAvsender = nyAvsender,
-        )
+        val journalføringRequest =
+            JournalføringRequest(
+                stønadstype = Stønadstype.BARNETILSYN,
+                oppgaveId = "1",
+                journalførendeEnhet = "123",
+                årsak = JournalføringRequest.Journalføringsårsak.PAPIRSØKNAD,
+                aksjon = Journalføringsaksjon.JOURNALFØR_PÅ_FAGSAK,
+                nyAvsender = nyAvsender,
+            )
 
         journalføringService.fullførJournalpost(journalføringRequest, journalpost.copy(avsenderMottaker = null))
 
@@ -198,14 +211,14 @@ class JournalføringServiceTest {
 
     @Nested
     inner class Papirsøknad {
-
-        val requestNyBehandling = JournalføringRequest(
-            stønadstype = Stønadstype.BARNETILSYN,
-            oppgaveId = "1",
-            journalførendeEnhet = "123",
-            årsak = JournalføringRequest.Journalføringsårsak.PAPIRSØKNAD,
-            aksjon = Journalføringsaksjon.OPPRETT_BEHANDLING,
-        )
+        val requestNyBehandling =
+            JournalføringRequest(
+                stønadstype = Stønadstype.BARNETILSYN,
+                oppgaveId = "1",
+                journalførendeEnhet = "123",
+                årsak = JournalføringRequest.Journalføringsårsak.PAPIRSØKNAD,
+                aksjon = Journalføringsaksjon.OPPRETT_BEHANDLING,
+            )
 
         val requestJournalfør = requestNyBehandling.copy(aksjon = Journalføringsaksjon.JOURNALFØR_PÅ_FAGSAK)
 
@@ -240,14 +253,14 @@ class JournalføringServiceTest {
 
     @Nested
     inner class Ettersending {
-
-        val requestOpprettBehandling = JournalføringRequest(
-            stønadstype = Stønadstype.BARNETILSYN,
-            oppgaveId = "1",
-            journalførendeEnhet = "123",
-            årsak = JournalføringRequest.Journalføringsårsak.ETTERSENDING,
-            aksjon = Journalføringsaksjon.OPPRETT_BEHANDLING,
-        )
+        val requestOpprettBehandling =
+            JournalføringRequest(
+                stønadstype = Stønadstype.BARNETILSYN,
+                oppgaveId = "1",
+                journalførendeEnhet = "123",
+                årsak = JournalføringRequest.Journalføringsårsak.ETTERSENDING,
+                aksjon = Journalføringsaksjon.OPPRETT_BEHANDLING,
+            )
         val requestJournalfør = requestOpprettBehandling.copy(aksjon = Journalføringsaksjon.JOURNALFØR_PÅ_FAGSAK)
 
         @Test
@@ -283,7 +296,6 @@ class JournalføringServiceTest {
 
     @Nested
     inner class GjennbrukRevudering {
-
         val forrigeBehandling =
             behandling(
                 fagsak = fagsak,
@@ -297,29 +309,33 @@ class JournalføringServiceTest {
 
         @BeforeEach
         fun setUp() {
-            every { journalpostService.hentJournalpost(journalpostId) } returns journalpost.copy(
-                dokumenter = listOf(
-                    DokumentInfo(
-                        "",
-                        brevkode = DokumentBrevkode.BARNETILSYN.verdi,
-                        dokumentvarianter = listOf(
-                            Dokumentvariant(
-                                variantformat = Dokumentvariantformat.ORIGINAL,
-                                null,
-                                true,
+            every { journalpostService.hentJournalpost(journalpostId) } returns
+                journalpost.copy(
+                    dokumenter =
+                        listOf(
+                            DokumentInfo(
+                                "",
+                                brevkode = DokumentBrevkode.BARNETILSYN.verdi,
+                                dokumentvarianter =
+                                    listOf(
+                                        Dokumentvariant(
+                                            variantformat = Dokumentvariantformat.ORIGINAL,
+                                            null,
+                                            true,
+                                        ),
+                                    ),
                             ),
                         ),
-                    ),
-                ),
-            )
+                )
             every { behandlingService.finnesBehandlingForFagsak(any()) } returns true
             every { behandlingService.opprettBehandling(any(), any(), any(), any()) } returns nyBehandling
             every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(forrigeBehandling)
             every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
             every { barnService.finnBarnPåBehandling(nyBehandling.id) } returns eksisterendeBarn.map { it.tilBehandlingBarn() }
-            every { søknadService.hentSøknadBarnetilsyn(nyBehandling.id) } returns mockk() {
-                every { barn } returns setOf(barn1, barn2)
-            }
+            every { søknadService.hentSøknadBarnetilsyn(nyBehandling.id) } returns
+                mockk {
+                    every { barn } returns setOf(barn1, barn2)
+                }
             every { barnService.opprettBarn(any()) } returns mockk()
         }
 
@@ -349,9 +365,10 @@ class JournalføringServiceTest {
         fun `skal ta med nye barn fra søknad`() {
             val barn3 = SøknadBarn(ident = "nyttBarn", data = mockk())
 
-            every { søknadService.hentSøknadBarnetilsyn(nyBehandling.id) } returns mockk() {
-                every { barn } returns setOf(barn1, barn2, barn3)
-            }
+            every { søknadService.hentSøknadBarnetilsyn(nyBehandling.id) } returns
+                mockk {
+                    every { barn } returns setOf(barn1, barn2, barn3)
+                }
 
             val barnSlot = slot<List<BehandlingBarn>>()
             every { barnService.opprettBarn(capture(barnSlot)) } returns mockk()
@@ -369,10 +386,11 @@ class JournalføringServiceTest {
             assertThat(barnSlot.captured.first().ident).isEqualTo(barn3.ident)
         }
 
-        private fun SøknadBarn.tilBehandlingBarn() = BehandlingBarn(
-            ident = ident,
-            behandlingId = nyBehandling.id,
-        )
+        private fun SøknadBarn.tilBehandlingBarn() =
+            BehandlingBarn(
+                ident = ident,
+                behandlingId = nyBehandling.id,
+            )
     }
 
     private fun verifyOppdaterOgFerdigstilJournalpost(antallKall: Int) {

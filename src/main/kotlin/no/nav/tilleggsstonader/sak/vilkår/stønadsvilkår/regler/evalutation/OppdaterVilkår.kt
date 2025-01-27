@@ -25,7 +25,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.hentVilkårsre
 import java.time.LocalDate
 
 object OppdaterVilkår {
-
     /**
      * Oppdaterer [Vilkår] med nye svar og resultat
      * Validerer att svaren er gyldige
@@ -76,11 +75,12 @@ object OppdaterVilkår {
         oppdatering: LagreVilkårDto,
         vilkårsresultat: RegelResultat,
     ): Vilkår {
-        val oppdaterteDelvilkår = oppdaterDelvilkår(
-            vilkår = vilkår,
-            vilkårsresultat = vilkårsresultat,
-            validerteDelvilkårsett = oppdatering.delvilkårsett,
-        )
+        val oppdaterteDelvilkår =
+            oppdaterDelvilkår(
+                vilkår = vilkår,
+                vilkårsresultat = vilkårsresultat,
+                validerteDelvilkårsett = oppdatering.delvilkårsett,
+            )
         return vilkår.copy(
             resultat = vilkårsresultat.vilkår,
             status = utledStatus(vilkår),
@@ -91,8 +91,11 @@ object OppdaterVilkår {
         )
     }
 
-    private fun utledFom(vilkår: Vilkår, oppdatering: LagreVilkårDto): LocalDate? {
-        return oppdatering.fom?.let {
+    private fun utledFom(
+        vilkår: Vilkår,
+        oppdatering: LagreVilkårDto,
+    ): LocalDate? =
+        oppdatering.fom?.let {
             when (vilkår.type) {
                 VilkårType.PASS_BARN -> {
                     validerErFørsteDagIMåned(it)
@@ -102,10 +105,12 @@ object OppdaterVilkår {
                 else -> error("Har ikke tatt stilling til type dato for ${vilkår.type}")
             }
         }
-    }
 
-    private fun utledTom(vilkår: Vilkår, oppdatering: LagreVilkårDto): LocalDate? {
-        return oppdatering.tom?.let {
+    private fun utledTom(
+        vilkår: Vilkår,
+        oppdatering: LagreVilkårDto,
+    ): LocalDate? =
+        oppdatering.tom?.let {
             when (vilkår.type) {
                 VilkårType.PASS_BARN -> {
                     validerErSisteDagIMåned(it)
@@ -115,14 +120,12 @@ object OppdaterVilkår {
                 else -> error("Har ikke tatt stilling til type dato for ${vilkår.type}")
             }
         }
-    }
 
-    private fun utledStatus(eksisterendeVilkår: Vilkår): VilkårStatus? {
-        return when (eksisterendeVilkår.status) {
+    private fun utledStatus(eksisterendeVilkår: Vilkår): VilkårStatus? =
+        when (eksisterendeVilkår.status) {
             VilkårStatus.UENDRET -> VilkårStatus.ENDRET
             else -> eksisterendeVilkår.status
         }
-    }
 
     private fun validerErFørsteDagIMåned(dato: LocalDate) {
         require(dato.erFørsteDagIMåneden()) { "Dato=$dato er ikke første dag i måneden" }
@@ -134,8 +137,9 @@ object OppdaterVilkår {
 
     private fun validerAttResultatErOppfyltEllerIkkeOppfylt(vilkårsresultat: RegelResultat) {
         if (!vilkårsresultat.vilkår.oppfyltEllerIkkeOppfylt()) {
-            val message = "Mangler fullstendig vilkår for ${vilkårsresultat.vilkårType}. " +
-                "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
+            val message =
+                "Mangler fullstendig vilkår for ${vilkårsresultat.vilkårType}. " +
+                    "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
             throw Feil(message = message, frontendFeilmelding = message)
         }
     }
@@ -153,24 +157,26 @@ object OppdaterVilkår {
         validerteDelvilkårsett: List<DelvilkårDto>,
     ): DelvilkårWrapper {
         val vurderingerPåType = validerteDelvilkårsett.associateBy { it.vurderinger.first().regelId }
-        val delvilkårsett = vilkår.delvilkårsett.map {
-            if (it.resultat == Vilkårsresultat.IKKE_AKTUELL) {
-                it
-            } else {
-                val hovedregel = it.hovedregel
-                val resultat = vilkårsresultat.resultatHovedregel(hovedregel)
-                val svar = vurderingerPåType[hovedregel] ?: throw Feil("Savner svar for hovedregel=$hovedregel")
+        val delvilkårsett =
+            vilkår.delvilkårsett
+                .map {
+                    if (it.resultat == Vilkårsresultat.IKKE_AKTUELL) {
+                        it
+                    } else {
+                        val hovedregel = it.hovedregel
+                        val resultat = vilkårsresultat.resultatHovedregel(hovedregel)
+                        val svar = vurderingerPåType[hovedregel] ?: throw Feil("Savner svar for hovedregel=$hovedregel")
 
-                if (resultat.oppfyltEllerIkkeOppfylt()) {
-                    it.copy(
-                        resultat = resultat,
-                        vurderinger = svar.svarTilDomene(),
-                    )
-                } else {
-                    throw Feil("Håndterer ikke oppdatering av resultat=$resultat ennå")
-                }
-            }
-        }.toList()
+                        if (resultat.oppfyltEllerIkkeOppfylt()) {
+                            it.copy(
+                                resultat = resultat,
+                                vurderinger = svar.svarTilDomene(),
+                            )
+                        } else {
+                            throw Feil("Håndterer ikke oppdatering av resultat=$resultat ennå")
+                        }
+                    }
+                }.toList()
         return vilkår.delvilkårwrapper.copy(delvilkårsett = delvilkårsett)
     }
 

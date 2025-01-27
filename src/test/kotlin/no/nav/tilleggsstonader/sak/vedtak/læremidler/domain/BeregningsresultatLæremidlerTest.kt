@@ -7,31 +7,34 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import kotlin.collections.emptyList
 
 class BeregningsresultatLæremidlerTest {
-    val beregningsresultat = BeregningsresultatLæremidler(
-        perioder = listOf(
-            beregningsresultatForMåned(
-                fom = LocalDate.of(2024, 1, 1),
-                tom = LocalDate.of(2024, 1, 31),
-                utbetalingsdato = LocalDate.of(2024, 1, 1),
-            ),
-            beregningsresultatForMåned(
-                fom = LocalDate.of(2024, 2, 1),
-                tom = LocalDate.of(2024, 2, 29),
-                utbetalingsdato = LocalDate.of(2024, 1, 1),
-            ),
-        ),
-    )
+    val beregningsresultat =
+        BeregningsresultatLæremidler(
+            perioder =
+                listOf(
+                    beregningsresultatForMåned(
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 1, 31),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                    ),
+                    beregningsresultatForMåned(
+                        fom = LocalDate.of(2024, 2, 1),
+                        tom = LocalDate.of(2024, 2, 29),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                    ),
+                ),
+        )
 
     @Test
     fun `filtrerFraOgMed skal filtere vekk perioder før satt dato`() {
-        val forventetResultat = BeregningsresultatLæremidler(
-            perioder = listOf(
-                beregningsresultat.perioder.last(),
-            ),
-        )
+        val forventetResultat =
+            BeregningsresultatLæremidler(
+                perioder =
+                    listOf(
+                        beregningsresultat.perioder.last(),
+                    ),
+            )
         val result = beregningsresultat.filtrerFraOgMed(LocalDate.of(2024, 2, 21))
 
         assertThat(result).isEqualTo(forventetResultat)
@@ -54,16 +57,17 @@ class BeregningsresultatLæremidlerTest {
             listOf<BeregningsresultatForMåned>(
                 BeregningsresultatForMåned(
                     beløp = 875,
-                    grunnlag = Beregningsgrunnlag(
-                        fom = LocalDate.of(2024, 1, 1),
-                        tom = LocalDate.of(2024, 1, 7),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                        studienivå = Studienivå.HØYERE_UTDANNING,
-                        studieprosent = 100,
-                        sats = 875,
-                        satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
-                    ),
+                    grunnlag =
+                        Beregningsgrunnlag(
+                            fom = LocalDate.of(2024, 1, 1),
+                            tom = LocalDate.of(2024, 1, 7),
+                            utbetalingsdato = LocalDate.of(2024, 1, 1),
+                            studienivå = Studienivå.HØYERE_UTDANNING,
+                            studieprosent = 100,
+                            sats = 875,
+                            satsBekreftet = true,
+                            målgruppe = MålgruppeType.AAP,
+                        ),
                 ),
             ),
         )
@@ -71,50 +75,54 @@ class BeregningsresultatLæremidlerTest {
 
     @Test
     fun `perioder før Revurder-fra blir ikke kuttet - tester med lengre periode`() {
-        val innvilgelseLæremidlerMedLangPeriode = InnvilgelseLæremidler(
-            vedtaksperioder = listOf(
-                Vedtaksperiode(
-                    fom = LocalDate.of(2024, 1, 1),
-                    tom = LocalDate.of(2024, 1, 31),
-                ),
-                Vedtaksperiode(
-                    fom = LocalDate.of(2024, 2, 1),
-                    tom = LocalDate.of(2024, 2, 29),
-                ),
-                Vedtaksperiode(
-                    fom = LocalDate.of(2024, 3, 1),
-                    tom = LocalDate.of(2024, 3, 31),
-                ),
-                Vedtaksperiode(
-                    fom = LocalDate.of(2024, 4, 1),
-                    tom = LocalDate.of(2024, 4, 30),
-                ),
-            ),
-            beregningsresultat = BeregningsresultatLæremidler(
-                perioder = listOf(
-                    beregningsresultatForMåned(
-                        fom = LocalDate.of(2024, 1, 1),
-                        tom = LocalDate.of(2024, 1, 31),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+        val innvilgelseLæremidlerMedLangPeriode =
+            InnvilgelseLæremidler(
+                vedtaksperioder =
+                    listOf(
+                        Vedtaksperiode(
+                            fom = LocalDate.of(2024, 1, 1),
+                            tom = LocalDate.of(2024, 1, 31),
+                        ),
+                        Vedtaksperiode(
+                            fom = LocalDate.of(2024, 2, 1),
+                            tom = LocalDate.of(2024, 2, 29),
+                        ),
+                        Vedtaksperiode(
+                            fom = LocalDate.of(2024, 3, 1),
+                            tom = LocalDate.of(2024, 3, 31),
+                        ),
+                        Vedtaksperiode(
+                            fom = LocalDate.of(2024, 4, 1),
+                            tom = LocalDate.of(2024, 4, 30),
+                        ),
                     ),
-                    beregningsresultatForMåned(
-                        fom = LocalDate.of(2024, 2, 1),
-                        tom = LocalDate.of(2024, 2, 29),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                beregningsresultat =
+                    BeregningsresultatLæremidler(
+                        perioder =
+                            listOf(
+                                beregningsresultatForMåned(
+                                    fom = LocalDate.of(2024, 1, 1),
+                                    tom = LocalDate.of(2024, 1, 31),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                ),
+                                beregningsresultatForMåned(
+                                    fom = LocalDate.of(2024, 2, 1),
+                                    tom = LocalDate.of(2024, 2, 29),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                ),
+                                beregningsresultatForMåned(
+                                    fom = LocalDate.of(2024, 3, 1),
+                                    tom = LocalDate.of(2024, 3, 31),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                ),
+                                beregningsresultatForMåned(
+                                    fom = LocalDate.of(2024, 4, 1),
+                                    tom = LocalDate.of(2024, 4, 30),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                ),
+                            ),
                     ),
-                    beregningsresultatForMåned(
-                        fom = LocalDate.of(2024, 3, 1),
-                        tom = LocalDate.of(2024, 3, 31),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                    ),
-                    beregningsresultatForMåned(
-                        fom = LocalDate.of(2024, 4, 1),
-                        tom = LocalDate.of(2024, 4, 30),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                    ),
-                ),
-            ),
-        )
+            )
 
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse(innvilgelseLæremidlerMedLangPeriode)
 
@@ -125,55 +133,59 @@ class BeregningsresultatLæremidlerTest {
             listOf<BeregningsresultatForMåned>(
                 BeregningsresultatForMåned(
                     beløp = 875,
-                    grunnlag = Beregningsgrunnlag(
-                        fom = LocalDate.of(2024, 1, 1),
-                        tom = LocalDate.of(2024, 1, 31),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                        studienivå = Studienivå.HØYERE_UTDANNING,
-                        studieprosent = 100,
-                        sats = 875,
-                        satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
-                    ),
+                    grunnlag =
+                        Beregningsgrunnlag(
+                            fom = LocalDate.of(2024, 1, 1),
+                            tom = LocalDate.of(2024, 1, 31),
+                            utbetalingsdato = LocalDate.of(2024, 1, 1),
+                            studienivå = Studienivå.HØYERE_UTDANNING,
+                            studieprosent = 100,
+                            sats = 875,
+                            satsBekreftet = true,
+                            målgruppe = MålgruppeType.AAP,
+                        ),
                 ),
                 BeregningsresultatForMåned(
                     beløp = 875,
-                    grunnlag = Beregningsgrunnlag(
-                        fom = LocalDate.of(2024, 2, 1),
-                        tom = LocalDate.of(2024, 2, 29),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                        studienivå = Studienivå.HØYERE_UTDANNING,
-                        studieprosent = 100,
-                        sats = 875,
-                        satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
-                    ),
+                    grunnlag =
+                        Beregningsgrunnlag(
+                            fom = LocalDate.of(2024, 2, 1),
+                            tom = LocalDate.of(2024, 2, 29),
+                            utbetalingsdato = LocalDate.of(2024, 1, 1),
+                            studienivå = Studienivå.HØYERE_UTDANNING,
+                            studieprosent = 100,
+                            sats = 875,
+                            satsBekreftet = true,
+                            målgruppe = MålgruppeType.AAP,
+                        ),
                 ),
                 BeregningsresultatForMåned(
                     beløp = 875,
-                    grunnlag = Beregningsgrunnlag(
-                        fom = LocalDate.of(2024, 3, 1),
-                        tom = LocalDate.of(2024, 3, 31),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                        studienivå = Studienivå.HØYERE_UTDANNING,
-                        studieprosent = 100,
-                        sats = 875,
-                        satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
-                    ),
+                    grunnlag =
+                        Beregningsgrunnlag(
+                            fom = LocalDate.of(2024, 3, 1),
+                            tom = LocalDate.of(2024, 3, 31),
+                            utbetalingsdato = LocalDate.of(2024, 1, 1),
+                            studienivå = Studienivå.HØYERE_UTDANNING,
+                            studieprosent = 100,
+                            sats = 875,
+                            satsBekreftet = true,
+                            målgruppe = MålgruppeType.AAP,
+                        ),
                 ),
                 BeregningsresultatForMåned(
                     beløp = 875,
-                    grunnlag = Beregningsgrunnlag(
-                        fom = LocalDate.of(2024, 4, 1),
-                        tom = LocalDate.of(2024, 4, 30),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                        studienivå = Studienivå.HØYERE_UTDANNING,
-                        studieprosent = 100,
-                        sats = 875,
-                        satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
-                    ),
+                    grunnlag =
+                        Beregningsgrunnlag(
+                            fom = LocalDate.of(2024, 4, 1),
+                            tom = LocalDate.of(2024, 4, 30),
+                            utbetalingsdato = LocalDate.of(2024, 1, 1),
+                            studienivå = Studienivå.HØYERE_UTDANNING,
+                            studieprosent = 100,
+                            sats = 875,
+                            satsBekreftet = true,
+                            målgruppe = MålgruppeType.AAP,
+                        ),
                 ),
             ),
         )
@@ -189,16 +201,17 @@ class BeregningsresultatLæremidlerTest {
             listOf<BeregningsresultatForMåned>(
                 BeregningsresultatForMåned(
                     beløp = 875,
-                    grunnlag = Beregningsgrunnlag(
-                        fom = LocalDate.of(2024, 1, 1),
-                        tom = LocalDate.of(2024, 1, 4),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                        studienivå = Studienivå.HØYERE_UTDANNING,
-                        studieprosent = 100,
-                        sats = 875,
-                        satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
-                    ),
+                    grunnlag =
+                        Beregningsgrunnlag(
+                            fom = LocalDate.of(2024, 1, 1),
+                            tom = LocalDate.of(2024, 1, 4),
+                            utbetalingsdato = LocalDate.of(2024, 1, 1),
+                            studienivå = Studienivå.HØYERE_UTDANNING,
+                            studieprosent = 100,
+                            sats = 875,
+                            satsBekreftet = true,
+                            målgruppe = MålgruppeType.AAP,
+                        ),
                 ),
             ),
         )
@@ -206,50 +219,54 @@ class BeregningsresultatLæremidlerTest {
 
     @Test
     fun `perioder midt i Revurder-fra blir kuttet - tester med lengre periode - kutter i maanedsskiftet februar-mars i skuddåret 2024`() {
-        val innvilgelseLæremidlerMedLangPeriode = InnvilgelseLæremidler(
-            vedtaksperioder = listOf(
-                Vedtaksperiode(
-                    fom = LocalDate.of(2024, 1, 1),
-                    tom = LocalDate.of(2024, 1, 31),
-                ),
-                Vedtaksperiode(
-                    fom = LocalDate.of(2024, 2, 1),
-                    tom = LocalDate.of(2024, 2, 29),
-                ),
-                Vedtaksperiode(
-                    fom = LocalDate.of(2024, 3, 1),
-                    tom = LocalDate.of(2024, 3, 31),
-                ),
-                Vedtaksperiode(
-                    fom = LocalDate.of(2024, 4, 1),
-                    tom = LocalDate.of(2024, 4, 30),
-                ),
-            ),
-            beregningsresultat = BeregningsresultatLæremidler(
-                perioder = listOf(
-                    beregningsresultatForMåned(
-                        fom = LocalDate.of(2024, 1, 1),
-                        tom = LocalDate.of(2024, 1, 31),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+        val innvilgelseLæremidlerMedLangPeriode =
+            InnvilgelseLæremidler(
+                vedtaksperioder =
+                    listOf(
+                        Vedtaksperiode(
+                            fom = LocalDate.of(2024, 1, 1),
+                            tom = LocalDate.of(2024, 1, 31),
+                        ),
+                        Vedtaksperiode(
+                            fom = LocalDate.of(2024, 2, 1),
+                            tom = LocalDate.of(2024, 2, 29),
+                        ),
+                        Vedtaksperiode(
+                            fom = LocalDate.of(2024, 3, 1),
+                            tom = LocalDate.of(2024, 3, 31),
+                        ),
+                        Vedtaksperiode(
+                            fom = LocalDate.of(2024, 4, 1),
+                            tom = LocalDate.of(2024, 4, 30),
+                        ),
                     ),
-                    beregningsresultatForMåned(
-                        fom = LocalDate.of(2024, 2, 1),
-                        tom = LocalDate.of(2024, 2, 29),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                beregningsresultat =
+                    BeregningsresultatLæremidler(
+                        perioder =
+                            listOf(
+                                beregningsresultatForMåned(
+                                    fom = LocalDate.of(2024, 1, 1),
+                                    tom = LocalDate.of(2024, 1, 31),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                ),
+                                beregningsresultatForMåned(
+                                    fom = LocalDate.of(2024, 2, 1),
+                                    tom = LocalDate.of(2024, 2, 29),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                ),
+                                beregningsresultatForMåned(
+                                    fom = LocalDate.of(2024, 3, 1),
+                                    tom = LocalDate.of(2024, 3, 31),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                ),
+                                beregningsresultatForMåned(
+                                    fom = LocalDate.of(2024, 4, 1),
+                                    tom = LocalDate.of(2024, 4, 30),
+                                    utbetalingsdato = LocalDate.of(2024, 1, 1),
+                                ),
+                            ),
                     ),
-                    beregningsresultatForMåned(
-                        fom = LocalDate.of(2024, 3, 1),
-                        tom = LocalDate.of(2024, 3, 31),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                    ),
-                    beregningsresultatForMåned(
-                        fom = LocalDate.of(2024, 4, 1),
-                        tom = LocalDate.of(2024, 4, 30),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                    ),
-                ),
-            ),
-        )
+            )
 
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse(innvilgelseLæremidlerMedLangPeriode)
 
@@ -260,29 +277,31 @@ class BeregningsresultatLæremidlerTest {
             listOf<BeregningsresultatForMåned>(
                 BeregningsresultatForMåned(
                     beløp = 875,
-                    grunnlag = Beregningsgrunnlag(
-                        fom = LocalDate.of(2024, 1, 1),
-                        tom = LocalDate.of(2024, 1, 31),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                        studienivå = Studienivå.HØYERE_UTDANNING,
-                        studieprosent = 100,
-                        sats = 875,
-                        satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
-                    ),
+                    grunnlag =
+                        Beregningsgrunnlag(
+                            fom = LocalDate.of(2024, 1, 1),
+                            tom = LocalDate.of(2024, 1, 31),
+                            utbetalingsdato = LocalDate.of(2024, 1, 1),
+                            studienivå = Studienivå.HØYERE_UTDANNING,
+                            studieprosent = 100,
+                            sats = 875,
+                            satsBekreftet = true,
+                            målgruppe = MålgruppeType.AAP,
+                        ),
                 ),
                 BeregningsresultatForMåned(
                     beløp = 875,
-                    grunnlag = Beregningsgrunnlag(
-                        fom = LocalDate.of(2024, 2, 1),
-                        tom = LocalDate.of(2024, 2, 29),
-                        utbetalingsdato = LocalDate.of(2024, 1, 1),
-                        studienivå = Studienivå.HØYERE_UTDANNING,
-                        studieprosent = 100,
-                        sats = 875,
-                        satsBekreftet = true,
-                        målgruppe = MålgruppeType.AAP,
-                    ),
+                    grunnlag =
+                        Beregningsgrunnlag(
+                            fom = LocalDate.of(2024, 2, 1),
+                            tom = LocalDate.of(2024, 2, 29),
+                            utbetalingsdato = LocalDate.of(2024, 1, 1),
+                            studienivå = Studienivå.HØYERE_UTDANNING,
+                            studieprosent = 100,
+                            sats = 875,
+                            satsBekreftet = true,
+                            målgruppe = MålgruppeType.AAP,
+                        ),
                 ),
             ),
         )

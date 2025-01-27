@@ -6,15 +6,11 @@ import org.springframework.stereotype.Component
 
 @Component
 class ByUserIdStrategy : Strategy {
+    override fun getName(): String = "userWithId"
 
-    override fun getName(): String {
-        return "userWithId"
-    }
-
-    override fun isEnabled(map: MutableMap<String, String>): Boolean {
-        return map["userIds"]
+    override fun isEnabled(map: MutableMap<String, String>): Boolean =
+        map["userIds"]
             ?.split(',')
             ?.any { SikkerhetContext.hentSaksbehandler().equals(it, ignoreCase = true) }
             ?: false
-    }
 }

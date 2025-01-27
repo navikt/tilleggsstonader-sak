@@ -19,14 +19,14 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class RevurderFraServiceTest {
-
     private val behandlingRepository = mockk<BehandlingRepository>()
     private val nullstillBehandlingService = mockk<NullstillBehandlingService>(relaxed = true)
 
-    private val service = RevurderFraService(
-        behandlingRepository = behandlingRepository,
-        nullstillBehandlingService = nullstillBehandlingService,
-    )
+    private val service =
+        RevurderFraService(
+            behandlingRepository = behandlingRepository,
+            nullstillBehandlingService = nullstillBehandlingService,
+        )
 
     private val oppdaterBehandlingSlot = slot<Behandling>()
 
@@ -49,7 +49,6 @@ class RevurderFraServiceTest {
 
     @Nested
     inner class Nullstilling {
-
         @Test
         fun `skal nullstille hvis revurderFra ikke er satt fra før`() {
             val behandling = mockBehandling(behandling(type = BehandlingType.REVURDERING))

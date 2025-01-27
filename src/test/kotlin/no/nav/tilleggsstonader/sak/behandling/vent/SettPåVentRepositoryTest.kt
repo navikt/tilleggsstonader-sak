@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class SettPåVentRepositoryTest : IntegrationTest() {
-
     @Autowired
     lateinit var repository: SettPåVentRepository
 
@@ -31,16 +30,16 @@ class SettPåVentRepositoryTest : IntegrationTest() {
 
         repository.insert(settPåVent(behandling))
 
-        val exception = catchException {
-            repository.insert(settPåVent(behandling))
-        }
+        val exception =
+            catchException {
+                repository.insert(settPåVent(behandling))
+            }
         assertThat(exception.cause).hasMessageContaining("duplicate key value violates unique constraint")
     }
 
     fun settPåVent(
         behandling: Behandling,
-        aktiv:
-        Boolean = true,
+        aktiv: Boolean = true,
     ) = SettPåVent(
         behandlingId = behandling.id,
         årsaker = listOf(ÅrsakSettPåVent.ANNET),

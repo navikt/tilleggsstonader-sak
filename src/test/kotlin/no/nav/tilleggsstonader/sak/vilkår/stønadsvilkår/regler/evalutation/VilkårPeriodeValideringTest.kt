@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class VilkårPeriodeValideringTest {
-
     val behandlingId = BehandlingId.random()
     val barnId = BarnId.random()
 
@@ -36,14 +35,15 @@ class VilkårPeriodeValideringTest {
 
     @Test
     fun `skal ikke kaste feil hvis 2 perioder for samme barn ikke overlapper`() {
-        val vilkår = vilkår(
-            behandlingId = behandlingId,
-            type = VilkårType.PASS_BARN,
-            barnId = barnId,
-            fom = fom,
-            tom = tom,
-            utgift = 1,
-        )
+        val vilkår =
+            vilkår(
+                behandlingId = behandlingId,
+                type = VilkårType.PASS_BARN,
+                barnId = barnId,
+                fom = fom,
+                tom = tom,
+                utgift = 1,
+            )
         val vilkår2 = vilkår.copy(fom = fom.plusMonths(1), tom = tom.plusMonths(1))
 
         validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår2))
@@ -51,14 +51,15 @@ class VilkårPeriodeValideringTest {
 
     @Test
     fun `skal kaste feil hvis 2 perioder for samme barn overlapper`() {
-        val vilkår = vilkår(
-            behandlingId = behandlingId,
-            type = VilkårType.PASS_BARN,
-            barnId = barnId,
-            fom = fom,
-            tom = tom,
-            utgift = 1,
-        )
+        val vilkår =
+            vilkår(
+                behandlingId = behandlingId,
+                type = VilkårType.PASS_BARN,
+                barnId = barnId,
+                fom = fom,
+                tom = tom,
+                utgift = 1,
+            )
         assertThatThrownBy {
             validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår))
         }.hasMessageContaining(" overlapper")
@@ -66,14 +67,15 @@ class VilkårPeriodeValideringTest {
 
     @Test
     fun `skal ikke kaste feil hvis 2 perioder for ulike barn ikke overlapper`() {
-        val vilkår = vilkår(
-            behandlingId = behandlingId,
-            type = VilkårType.PASS_BARN,
-            barnId = barnId,
-            fom = fom,
-            tom = tom,
-            utgift = 1,
-        )
+        val vilkår =
+            vilkår(
+                behandlingId = behandlingId,
+                type = VilkårType.PASS_BARN,
+                barnId = barnId,
+                fom = fom,
+                tom = tom,
+                utgift = 1,
+            )
         val vilkår2 = vilkår.copy(barnId = BarnId.random())
 
         validerIkkeOverlappendeVilkår(listOf(vilkår, vilkår2))

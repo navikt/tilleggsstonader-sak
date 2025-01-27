@@ -14,16 +14,19 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import org.springframework.stereotype.Service
 
 @Service
-class BehandlingshistorikkService(private val behandlingshistorikkRepository: BehandlingshistorikkRepository) {
-
+class BehandlingshistorikkService(
+    private val behandlingshistorikkRepository: BehandlingshistorikkRepository,
+) {
     fun finnHendelseshistorikk(saksbehandling: Saksbehandling): List<HendelseshistorikkDto> {
-        val (hendelserOpprettet, andreHendelser) = behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidDesc(
-            saksbehandling.id,
-        ).map {
-            it.tilHendelseshistorikkDto(saksbehandling)
-        }.filter {
-            it.hendelse != Hendelse.UKJENT
-        }.partition { it.hendelse == Hendelse.OPPRETTET }
+        val (hendelserOpprettet, andreHendelser) =
+            behandlingshistorikkRepository
+                .findByBehandlingIdOrderByEndretTidDesc(
+                    saksbehandling.id,
+                ).map {
+                    it.tilHendelseshistorikkDto(saksbehandling)
+                }.filter {
+                    it.hendelse != Hendelse.UKJENT
+                }.partition { it.hendelse == Hendelse.OPPRETTET }
         val sisteOpprettetHendelse = hendelserOpprettet.lastOrNull()
         return if (sisteOpprettetHendelse != null) {
             andreHendelser + sisteOpprettetHendelse
@@ -32,12 +35,13 @@ class BehandlingshistorikkService(private val behandlingshistorikkRepository: Be
         }
     }
 
-    fun finnSisteBehandlingshistorikk(behandlingId: BehandlingId): Behandlingshistorikk {
-        return behandlingshistorikkRepository.findTopByBehandlingIdOrderByEndretTidDesc(behandlingId)
-    }
+    fun finnSisteBehandlingshistorikk(behandlingId: BehandlingId): Behandlingshistorikk =
+        behandlingshistorikkRepository.findTopByBehandlingIdOrderByEndretTidDesc(behandlingId)
 
-    fun finnSisteBehandlingshistorikk(behandlingId: BehandlingId, type: StegType): Behandlingshistorikk? =
-        behandlingshistorikkRepository.findTopByBehandlingIdAndStegOrderByEndretTidDesc(behandlingId, type)
+    fun finnSisteBehandlingshistorikk(
+        behandlingId: BehandlingId,
+        type: StegType,
+    ): Behandlingshistorikk? = behandlingshistorikkRepository.findTopByBehandlingIdAndStegOrderByEndretTidDesc(behandlingId, type)
 
     fun opprettHistorikkInnslag(behandlingshistorikk: Behandlingshistorikk) {
         behandlingshistorikkRepository.insert(behandlingshistorikk)
@@ -57,9 +61,10 @@ class BehandlingshistorikkService(private val behandlingshistorikkRepository: Be
                 behandlingId = behandlingId,
                 steg = stegtype,
                 utfall = utfall,
-                metadata = metadata?.let {
-                    JsonWrapper(objectMapper.writeValueAsString(it))
-                },
+                metadata =
+                    metadata?.let {
+                        JsonWrapper(objectMapper.writeValueAsString(it))
+                    },
             ),
         )
     }

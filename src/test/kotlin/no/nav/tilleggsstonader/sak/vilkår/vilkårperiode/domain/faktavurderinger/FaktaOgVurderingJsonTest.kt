@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import kotlin.reflect.full.findAnnotation
 
 class FaktaOgVurderingJsonTest {
-
     val jsonSubTypes = FaktaOgVurderingJson::class.findAnnotation<JsonSubTypes>()!!
 
     @Test

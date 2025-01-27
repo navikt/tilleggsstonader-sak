@@ -23,7 +23,9 @@ class HarBehandlingUnderArbeidController(
 ) {
     @PostMapping()
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
-    fun harBehandlingUnderArbeid(@RequestBody identStønadstype: IdentStønadstype): Boolean {
+    fun harBehandlingUnderArbeid(
+        @RequestBody identStønadstype: IdentStønadstype,
+    ): Boolean {
         feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }

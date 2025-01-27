@@ -11,24 +11,26 @@ class HarBehandlingUnderArbeidService(
     private val fagsakService: FagsakService,
 ) {
     fun harSøknadUnderBehandling(identStønadstype: IdentStønadstype): Boolean {
-        val behandlinger = fagsakService.hentBehandlingerForPersonOgStønadstype(
-            identStønadstype.ident,
-            identStønadstype.stønadstype,
-        )
+        val behandlinger =
+            fagsakService.hentBehandlingerForPersonOgStønadstype(
+                identStønadstype.ident,
+                identStønadstype.stønadstype,
+            )
         return behandlinger.any { erSøknadUnderBehandling(it.behandlingsårsak, it.status) }
     }
 
     companion object {
+        private val statuserUnderBehandling =
+            listOf(
+                BehandlingStatus.OPPRETTET,
+                BehandlingStatus.UTREDES,
+                BehandlingStatus.FATTER_VEDTAK,
+                BehandlingStatus.SATT_PÅ_VENT,
+            )
 
-        private val statuserUnderBehandling = listOf(
-            BehandlingStatus.OPPRETTET,
-            BehandlingStatus.UTREDES,
-            BehandlingStatus.FATTER_VEDTAK,
-            BehandlingStatus.SATT_PÅ_VENT,
-        )
-
-        fun erSøknadUnderBehandling(årsak: BehandlingÅrsak, status: BehandlingStatus): Boolean {
-            return årsak == BehandlingÅrsak.SØKNAD && status in statuserUnderBehandling
-        }
+        fun erSøknadUnderBehandling(
+            årsak: BehandlingÅrsak,
+            status: BehandlingStatus,
+        ): Boolean = årsak == BehandlingÅrsak.SØKNAD && status in statuserUnderBehandling
     }
 }

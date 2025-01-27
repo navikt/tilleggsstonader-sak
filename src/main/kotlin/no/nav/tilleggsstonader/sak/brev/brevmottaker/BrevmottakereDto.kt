@@ -32,9 +32,10 @@ fun Mottaker.tilOrganisasjonDto(id: UUID): BrevmottakerOrganisasjonDto =
         organisasjonsnavn = organisasjonsNavn.orEmpty(),
     )
 
-fun List<BrevmottakerVedtaksbrev>.tilBrevmottakereDto(): BrevmottakereDto = this
-    .map { it.id to it.mottaker }
-    .let(::brevmottakereDto)
+fun List<BrevmottakerVedtaksbrev>.tilBrevmottakereDto(): BrevmottakereDto =
+    this
+        .map { it.id to it.mottaker }
+        .let(::brevmottakereDto)
 
 private fun brevmottakereDto(mottakere: List<Pair<UUID, Mottaker>>) =
     BrevmottakereDto(
@@ -43,34 +44,40 @@ private fun brevmottakereDto(mottakere: List<Pair<UUID, Mottaker>>) =
     )
 
 @JvmName("tilFrittståendeBrevmottakereDto")
-fun List<BrevmottakerFrittståendeBrev>.tilBrevmottakereDto(): BrevmottakereDto = this
-    .map { it.id to it.mottaker }
-    .let(::brevmottakereDto)
+fun List<BrevmottakerFrittståendeBrev>.tilBrevmottakereDto(): BrevmottakereDto =
+    this
+        .map { it.id to it.mottaker }
+        .let(::brevmottakereDto)
 
-private fun List<Pair<UUID, Mottaker>>.mapOrganisasjoner() = mapNotNull { (id, mottaker) ->
-    if (mottaker.mottakerType == MottakerType.ORGANISASJON) mottaker.tilOrganisasjonDto(id) else null
-}
+private fun List<Pair<UUID, Mottaker>>.mapOrganisasjoner() =
+    mapNotNull { (id, mottaker) ->
+        if (mottaker.mottakerType == MottakerType.ORGANISASJON) mottaker.tilOrganisasjonDto(id) else null
+    }
 
-private fun List<Pair<UUID, Mottaker>>.mapPersoner() = mapNotNull { (id, mottaker) ->
-    if (mottaker.mottakerType == MottakerType.PERSON) mottaker.tilPersonDto(id) else null
-}
+private fun List<Pair<UUID, Mottaker>>.mapPersoner() =
+    mapNotNull { (id, mottaker) ->
+        if (mottaker.mottakerType == MottakerType.PERSON) mottaker.tilPersonDto(id) else null
+    }
 
-fun BrevmottakerDto.tilMottaker() = when (this) {
-    is BrevmottakerOrganisasjonDto -> tilMottaker()
-    is BrevmottakerPersonDto -> tilMottaker()
-}
+fun BrevmottakerDto.tilMottaker() =
+    when (this) {
+        is BrevmottakerOrganisasjonDto -> tilMottaker()
+        is BrevmottakerPersonDto -> tilMottaker()
+    }
 
-private fun BrevmottakerOrganisasjonDto.tilMottaker() = Mottaker(
-    mottakerRolle = MottakerRolle.FULLMEKTIG,
-    mottakerType = MottakerType.ORGANISASJON,
-    ident = organisasjonsnummer,
-    mottakerNavn = navnHosOrganisasjon,
-    organisasjonsNavn = organisasjonsnavn,
-)
+private fun BrevmottakerOrganisasjonDto.tilMottaker() =
+    Mottaker(
+        mottakerRolle = MottakerRolle.FULLMEKTIG,
+        mottakerType = MottakerType.ORGANISASJON,
+        ident = organisasjonsnummer,
+        mottakerNavn = navnHosOrganisasjon,
+        organisasjonsNavn = organisasjonsnavn,
+    )
 
-private fun BrevmottakerPersonDto.tilMottaker() = Mottaker(
-    mottakerRolle = MottakerRolle.valueOf(mottakerRolle.name),
-    mottakerType = MottakerType.PERSON,
-    ident = personIdent,
-    mottakerNavn = navn,
-)
+private fun BrevmottakerPersonDto.tilMottaker() =
+    Mottaker(
+        mottakerRolle = MottakerRolle.valueOf(mottakerRolle.name),
+        mottakerType = MottakerType.PERSON,
+        ident = personIdent,
+        mottakerNavn = navn,
+    )

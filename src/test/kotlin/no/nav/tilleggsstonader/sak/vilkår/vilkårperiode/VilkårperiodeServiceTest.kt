@@ -38,7 +38,6 @@ import java.time.LocalDate.now
 import java.util.UUID
 
 class VilkårperiodeServiceTest : IntegrationTest() {
-
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
 
@@ -67,9 +66,10 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
 
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-            )
+            val målgruppe =
+                målgruppe(
+                    behandlingId = behandling.id,
+                )
 
             val lagretPeriode = vilkårperiodeRepository.insert(målgruppe)
 
@@ -88,9 +88,10 @@ class VilkårperiodeServiceTest : IntegrationTest() {
                 behandling =
                     testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
 
-                val målgruppe = målgruppe(
-                    behandlingId = behandling.id,
-                )
+                val målgruppe =
+                    målgruppe(
+                        behandlingId = behandling.id,
+                    )
 
                 lagretPeriode = vilkårperiodeRepository.insert(målgruppe)
             }
@@ -105,17 +106,19 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             fun setUp() {
                 revurdering = testoppsettService.lagBehandlingOgRevurdering()
 
-                val originalMålgruppe = målgruppe(
-                    behandlingId = revurdering.forrigeBehandlingId!!,
-                )
+                val originalMålgruppe =
+                    målgruppe(
+                        behandlingId = revurdering.forrigeBehandlingId!!,
+                    )
 
                 vilkårperiodeRepository.insert(originalMålgruppe)
 
-                val revurderingMålgruppe = originalMålgruppe.copy(
-                    id = UUID.randomUUID(),
-                    behandlingId = revurdering.id,
-                    forrigeVilkårperiodeId = originalMålgruppe.id,
-                )
+                val revurderingMålgruppe =
+                    originalMålgruppe.copy(
+                        id = UUID.randomUUID(),
+                        behandlingId = revurdering.id,
+                        forrigeVilkårperiodeId = originalMålgruppe.id,
+                    )
 
                 lagretPeriode = vilkårperiodeRepository.insert(revurderingMålgruppe)
             }
@@ -152,11 +155,12 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             fun `kan ikke slette periode hvis periode begynner før revurderFra`() {
                 val behandling = testoppsettService.oppdater(revurdering.copy(revurderFra = now()))
 
-                val aktivitet = aktivitet(
-                    behandlingId = behandling.id,
-                    fom = now().minusMonths(1),
-                    tom = now().plusMonths(1),
-                )
+                val aktivitet =
+                    aktivitet(
+                        behandlingId = behandling.id,
+                        fom = now().minusMonths(1),
+                        tom = now().plusMonths(1),
+                    )
                 val periode = vilkårperiodeRepository.insert(aktivitet)
 
                 assertThatThrownBy {
@@ -175,16 +179,17 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal validere stønadsperioder ved opprettelse av vilkårperiode - ingen stønadsperioder`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val periode = vilkårperiodeService.opprettVilkårperiode(
-                dummyVilkårperiodeMålgruppe(
-                    type = MålgruppeType.AAP,
-                    fom = osloDateNow(),
-                    tom = osloDateNow(),
-                    medlemskap = SvarJaNei.JA_IMPLISITT,
-                    dekkesAvAnnetRegelverk = SvarJaNei.NEI,
-                    behandlingId = behandling.id,
-                ),
-            )
+            val periode =
+                vilkårperiodeService.opprettVilkårperiode(
+                    dummyVilkårperiodeMålgruppe(
+                        type = MålgruppeType.AAP,
+                        fom = osloDateNow(),
+                        tom = osloDateNow(),
+                        medlemskap = SvarJaNei.JA_IMPLISITT,
+                        dekkesAvAnnetRegelverk = SvarJaNei.NEI,
+                        behandlingId = behandling.id,
+                    ),
+                )
 
             val response =
                 vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = periode)
@@ -203,40 +208,44 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             val fom2 = LocalDate.of(2024, 2, 1)
             val tom2 = LocalDate.of(2024, 3, 1)
 
-            val opprettetMålgruppe = vilkårperiodeService.opprettVilkårperiode(
-                dummyVilkårperiodeMålgruppe(
-                    type = MålgruppeType.AAP,
-                    fom = fom1,
-                    tom = tom1,
-                    medlemskap = SvarJaNei.JA_IMPLISITT,
-                    dekkesAvAnnetRegelverk = SvarJaNei.NEI,
-                    behandlingId = behandling.id,
-                ),
-            )
+            val opprettetMålgruppe =
+                vilkårperiodeService.opprettVilkårperiode(
+                    dummyVilkårperiodeMålgruppe(
+                        type = MålgruppeType.AAP,
+                        fom = fom1,
+                        tom = tom1,
+                        medlemskap = SvarJaNei.JA_IMPLISITT,
+                        dekkesAvAnnetRegelverk = SvarJaNei.NEI,
+                        behandlingId = behandling.id,
+                    ),
+                )
 
             assertThat(
-                vilkårperiodeService.validerOgLagResponse(
-                    behandlingId = behandling.id,
-                    periode = opprettetMålgruppe,
-                ).stønadsperiodeStatus,
+                vilkårperiodeService
+                    .validerOgLagResponse(
+                        behandlingId = behandling.id,
+                        periode = opprettetMålgruppe,
+                    ).stønadsperiodeStatus,
             ).isEqualTo(
                 Stønadsperiodestatus.OK,
             )
 
-            val ulønnetTiltak = dummyVilkårperiodeAktivitet(
-                type = AktivitetType.TILTAK,
-                fom = fom1,
-                tom = tom1,
-                svarLønnet = SvarJaNei.NEI,
-                behandlingId = behandling.id,
-                aktivitetsdager = 5,
-            )
+            val ulønnetTiltak =
+                dummyVilkårperiodeAktivitet(
+                    type = AktivitetType.TILTAK,
+                    fom = fom1,
+                    tom = tom1,
+                    svarLønnet = SvarJaNei.NEI,
+                    behandlingId = behandling.id,
+                    aktivitetsdager = 5,
+                )
             val opprettetTiltakPeriode = vilkårperiodeService.opprettVilkårperiode(ulønnetTiltak)
             assertThat(
-                vilkårperiodeService.validerOgLagResponse(
-                    behandlingId = behandling.id,
-                    periode = opprettetTiltakPeriode,
-                ).stønadsperiodeStatus,
+                vilkårperiodeService
+                    .validerOgLagResponse(
+                        behandlingId = behandling.id,
+                        periode = opprettetTiltakPeriode,
+                    ).stønadsperiodeStatus,
             ).isEqualTo(
                 Stønadsperiodestatus.OK,
             )
@@ -249,24 +258,27 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             vilkårperiodeService.validerOgLagResponse(behandlingId = behandling.id, periode = opprettetMålgruppe)
 
             assertThat(
-                vilkårperiodeService.validerOgLagResponse(
-                    behandlingId = behandling.id,
-                    periode = opprettetMålgruppe,
-                ).stønadsperiodeStatus,
+                vilkårperiodeService
+                    .validerOgLagResponse(
+                        behandlingId = behandling.id,
+                        periode = opprettetMålgruppe,
+                    ).stønadsperiodeStatus,
             ).isEqualTo(
                 Stønadsperiodestatus.FEIL,
             )
         }
 
-        private fun nyStønadsperiode(fom: LocalDate = osloDateNow(), tom: LocalDate = osloDateNow()) =
-            StønadsperiodeDto(
-                id = null,
-                fom = fom,
-                tom = tom,
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-                status = StønadsperiodeStatus.NY,
-            )
+        private fun nyStønadsperiode(
+            fom: LocalDate = osloDateNow(),
+            tom: LocalDate = osloDateNow(),
+        ) = StønadsperiodeDto(
+            id = null,
+            fom = fom,
+            tom = tom,
+            målgruppe = MålgruppeType.AAP,
+            aktivitet = AktivitetType.TILTAK,
+            status = StønadsperiodeStatus.NY,
+        )
     }
 
     @Nested
@@ -275,10 +287,11 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal gjenbruke vilkår fra forrige behandling`() {
             val revurdering = testoppsettService.lagBehandlingOgRevurdering()
 
-            val eksisterendeVilkårperioder = listOf(
-                målgruppe(behandlingId = revurdering.forrigeBehandlingId!!),
-                aktivitet(behandlingId = revurdering.forrigeBehandlingId!!),
-            )
+            val eksisterendeVilkårperioder =
+                listOf(
+                    målgruppe(behandlingId = revurdering.forrigeBehandlingId!!),
+                    aktivitet(behandlingId = revurdering.forrigeBehandlingId!!),
+                )
 
             vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
 
@@ -288,23 +301,25 @@ class VilkårperiodeServiceTest : IntegrationTest() {
             assertThat(res).hasSize(2)
 
             // TODO "nullstiller" felter fordi usingRecursiveComparison ikke virker som forventet
-            val nullstilteRes = res.map { oppdatert ->
-                val forrige = eksisterendeVilkårperioder.single { it.id == oppdatert.forrigeVilkårperiodeId!! }
-                oppdatert.copy(
-                    id = forrige.id,
-                    sporbar = forrige.sporbar,
-                    behandlingId = forrige.behandlingId,
-                    forrigeVilkårperiodeId = forrige.forrigeVilkårperiodeId,
-                    status = forrige.status,
-                )
-            }
-            assertThat(nullstilteRes).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
-                "id",
-                "sporbar",
-                "behandlingId",
-                "forrigeVilkårperiodeId",
-                "status",
-            ).containsExactlyInAnyOrderElementsOf(eksisterendeVilkårperioder)
+            val nullstilteRes =
+                res.map { oppdatert ->
+                    val forrige = eksisterendeVilkårperioder.single { it.id == oppdatert.forrigeVilkårperiodeId!! }
+                    oppdatert.copy(
+                        id = forrige.id,
+                        sporbar = forrige.sporbar,
+                        behandlingId = forrige.behandlingId,
+                        forrigeVilkårperiodeId = forrige.forrigeVilkårperiodeId,
+                        status = forrige.status,
+                    )
+                }
+            assertThat(nullstilteRes)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                    "id",
+                    "sporbar",
+                    "behandlingId",
+                    "forrigeVilkårperiodeId",
+                    "status",
+                ).containsExactlyInAnyOrderElementsOf(eksisterendeVilkårperioder)
             assertThat(res.map { it.status }).containsOnly(Vilkårstatus.UENDRET)
         }
 
@@ -312,20 +327,21 @@ class VilkårperiodeServiceTest : IntegrationTest() {
         fun `skal ikke gjenbruke slettede vilkår fra forrige behandling`() {
             val revurdering = testoppsettService.lagBehandlingOgRevurdering()
 
-            val eksisterendeVilkårperioder = listOf(
-                målgruppe(behandlingId = revurdering.forrigeBehandlingId!!),
-                målgruppe(
-                    behandlingId = revurdering.forrigeBehandlingId!!,
-                    resultat = ResultatVilkårperiode.SLETTET,
-                    slettetKommentar = "slettet",
-                ),
-                aktivitet(behandlingId = revurdering.forrigeBehandlingId!!),
-                aktivitet(
-                    behandlingId = revurdering.forrigeBehandlingId!!,
-                    resultat = ResultatVilkårperiode.SLETTET,
-                    slettetKommentar = "slettet",
-                ),
-            )
+            val eksisterendeVilkårperioder =
+                listOf(
+                    målgruppe(behandlingId = revurdering.forrigeBehandlingId!!),
+                    målgruppe(
+                        behandlingId = revurdering.forrigeBehandlingId!!,
+                        resultat = ResultatVilkårperiode.SLETTET,
+                        slettetKommentar = "slettet",
+                    ),
+                    aktivitet(behandlingId = revurdering.forrigeBehandlingId!!),
+                    aktivitet(
+                        behandlingId = revurdering.forrigeBehandlingId!!,
+                        resultat = ResultatVilkårperiode.SLETTET,
+                        slettetKommentar = "slettet",
+                    ),
+                )
 
             vilkårperiodeRepository.insertAll(eksisterendeVilkårperioder)
 

@@ -35,7 +35,6 @@ class OpprettOppgaveConfig(
     private val oppgaveClient: OppgaveClient,
     private val oppgaveService: OppgaveService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private val oppgavetyper =
@@ -46,9 +45,11 @@ class OpprettOppgaveConfig(
         )
 
     init {
-        val oppgaver = oppgaveRepository.findAll()
-            .filterNot { it.erFerdigstilt }
-            .filter { oppgavetyper.contains(it.type) }
+        val oppgaver =
+            oppgaveRepository
+                .findAll()
+                .filterNot { it.erFerdigstilt }
+                .filter { oppgavetyper.contains(it.type) }
         oppgaver.forEach { oppgave ->
             oppgave.behandlingId?.let { behandlingId ->
                 val behandling = behandlingService.hentSaksbehandling(behandlingId)
@@ -89,21 +90,24 @@ class OpprettOppgaveConfig(
         behandling: Saksbehandling,
     ) = if (oppgavetype == Oppgavetype.BehandleSak) behandling.opprettetAv else null
 
-    private fun mapBeskrivelse(oppgavetype: Oppgavetype): String = when (oppgavetype) {
-        Oppgavetype.BehandleSak -> "Behandle sak (opprettet når applikasjonen starter)"
-        Oppgavetype.GodkjenneVedtak -> "Godkjenn vedtak (opprettet når applikasjonen starter)"
-        Oppgavetype.BehandleUnderkjentVedtak -> "Behandle underkjent vedtak (opprettet når applikasjonen starter)"
-        else -> error("Har ikke mappet $oppgavetype")
-    }
+    private fun mapBeskrivelse(oppgavetype: Oppgavetype): String =
+        when (oppgavetype) {
+            Oppgavetype.BehandleSak -> "Behandle sak (opprettet når applikasjonen starter)"
+            Oppgavetype.GodkjenneVedtak -> "Godkjenn vedtak (opprettet når applikasjonen starter)"
+            Oppgavetype.BehandleUnderkjentVedtak -> "Behandle underkjent vedtak (opprettet når applikasjonen starter)"
+            else -> error("Har ikke mappet $oppgavetype")
+        }
 
-    private fun mapTema(stønadstype: Stønadstype): Tema = when (stønadstype) {
-        Stønadstype.BARNETILSYN -> Tema.TSO
-        Stønadstype.LÆREMIDLER -> Tema.TSO
-    }
+    private fun mapTema(stønadstype: Stønadstype): Tema =
+        when (stønadstype) {
+            Stønadstype.BARNETILSYN -> Tema.TSO
+            Stønadstype.LÆREMIDLER -> Tema.TSO
+        }
 
-    private fun mapBehandlingstema(stønadstype: Stønadstype): Behandlingstema = when (stønadstype) {
-        Stønadstype.BARNETILSYN -> Behandlingstema.TilsynBarn
-        Stønadstype.LÆREMIDLER -> Behandlingstema.Læremidler
-        else -> error("Finner ikke behandlingstema for stønadstype $stønadstype")
-    }
+    private fun mapBehandlingstema(stønadstype: Stønadstype): Behandlingstema =
+        when (stønadstype) {
+            Stønadstype.BARNETILSYN -> Behandlingstema.TilsynBarn
+            Stønadstype.LÆREMIDLER -> Behandlingstema.Læremidler
+            else -> error("Finner ikke behandlingstema for stønadstype $stønadstype")
+        }
 }

@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
-enum class RegelId(val beskrivelse: String) {
+enum class RegelId(
+    val beskrivelse: String,
+) {
     SLUTT_NODE("SLUTT_NODE"),
 
     // EKSEMPEL

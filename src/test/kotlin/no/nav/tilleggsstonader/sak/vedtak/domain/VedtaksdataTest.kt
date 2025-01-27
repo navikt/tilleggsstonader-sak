@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test
 /**
  * Denne må fylles på etterhvert som man legger til flere enums for andre stønader
  */
-val alleEnumTypeVedtaksdata: List<Pair<Stønadstype, TypeVedtaksdata>> = listOf(
-    Stønadstype.BARNETILSYN to TypeVedtakTilsynBarn.entries,
-    Stønadstype.LÆREMIDLER to TypeVedtakLæremidler.entries,
-).flatMap { (stønadstype, enums) -> enums.map { stønadstype to it } }
+val alleEnumTypeVedtaksdata: List<Pair<Stønadstype, TypeVedtaksdata>> =
+    listOf(
+        Stønadstype.BARNETILSYN to TypeVedtakTilsynBarn.entries,
+        Stønadstype.LÆREMIDLER to TypeVedtakLæremidler.entries,
+    ).flatMap { (stønadstype, enums) -> enums.map { stønadstype to it } }
 
 class VedtaksdataTest {
-
     /**
      * Hvis [when] mangler noe, legg til der der og i [alleEnumTypeVedtaksdata]
      */

@@ -27,7 +27,10 @@ class KlageController(
     private val eksternVedtakService: EksternKlageVedtakService,
 ) {
     @PostMapping("/fagsak/{fagsakId}")
-    fun opprettKlage(@PathVariable fagsakId: FagsakId, @RequestBody opprettKlageDto: OpprettKlageDto): Ressurs<FagsakId> {
+    fun opprettKlage(
+        @PathVariable fagsakId: FagsakId,
+        @RequestBody opprettKlageDto: OpprettKlageDto,
+    ): Ressurs<FagsakId> {
         tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
         klageService.opprettKlage(fagsakId, opprettKlageDto)
@@ -35,14 +38,18 @@ class KlageController(
     }
 
     @GetMapping("/fagsak-person/{fagsakPersonId}")
-    fun hentKlagebehandlinger(@PathVariable fagsakPersonId: FagsakPersonId): KlagebehandlingerDto {
+    fun hentKlagebehandlinger(
+        @PathVariable fagsakPersonId: FagsakPersonId,
+    ): KlagebehandlingerDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         return klageService.hentBehandlinger(fagsakPersonId)
     }
 
     @GetMapping("/ekstern-fagsak/{eksternFagsakId}/vedtak")
     @ProtectedWithClaims(issuer = "azuread")
-    fun hentVedtak(@PathVariable eksternFagsakId: Long): Ressurs<List<FagsystemVedtak>> {
+    fun hentVedtak(
+        @PathVariable eksternFagsakId: Long,
+    ): Ressurs<List<FagsystemVedtak>> {
         if (!SikkerhetContext.erMaskinTilMaskinToken()) {
             tilgangService.validerTilgangTilEksternFagsak(eksternFagsakId, AuditLoggerEvent.ACCESS)
         }

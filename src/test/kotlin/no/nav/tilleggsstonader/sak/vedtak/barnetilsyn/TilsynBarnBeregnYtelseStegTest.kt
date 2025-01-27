@@ -32,7 +32,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 class TilsynBarnBeregnYtelseStegTest {
-
     private val repository = mockk<VedtakRepository>(relaxed = true)
     private val barnService = mockk<BarnService>()
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>(relaxed = true)
@@ -42,19 +41,21 @@ class TilsynBarnBeregnYtelseStegTest {
     private val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>(relaxed = true)
     private val opphørValideringService = mockk<OpphørValideringService>(relaxed = true)
 
-    val tilsynBarnBeregningService = TilsynBarnBeregningService(
-        stønadsperiodeRepository = stønadsperiodeService,
-        vilkårperiodeRepository = vilkårperiodeRepository,
-        tilsynBarnUtgiftService = tilsynBarnUtgiftService,
-        repository = repository,
-    )
-    val steg = TilsynBarnBeregnYtelseSteg(
-        beregningService = tilsynBarnBeregningService,
-        vedtakRepository = repository,
-        tilkjentytelseService = tilkjentYtelseService,
-        simuleringService = simuleringService,
-        opphørValideringService = opphørValideringService,
-    )
+    val tilsynBarnBeregningService =
+        TilsynBarnBeregningService(
+            stønadsperiodeRepository = stønadsperiodeService,
+            vilkårperiodeRepository = vilkårperiodeRepository,
+            tilsynBarnUtgiftService = tilsynBarnUtgiftService,
+            repository = repository,
+        )
+    val steg =
+        TilsynBarnBeregnYtelseSteg(
+            beregningService = tilsynBarnBeregningService,
+            vedtakRepository = repository,
+            tilkjentytelseService = tilkjentYtelseService,
+            simuleringService = simuleringService,
+            opphørValideringService = opphørValideringService,
+        )
 
     val saksbehandling = saksbehandling()
     val måned = YearMonth.of(2023, 1)
@@ -133,13 +134,14 @@ class TilsynBarnBeregnYtelseStegTest {
                 behandlingId,
                 ResultatVilkårperiode.OPPFYLT,
             )
-        } returns listOf(
-            aktivitet(
-                behandlingId = behandlingId,
-                fom = fom,
-                tom = tom,
-            ),
-        )
+        } returns
+            listOf(
+                aktivitet(
+                    behandlingId = behandlingId,
+                    fom = fom,
+                    tom = tom,
+                ),
+            )
     }
 
     private fun mockStønadsperioder(
@@ -147,12 +149,13 @@ class TilsynBarnBeregnYtelseStegTest {
         tom: LocalDate = LocalDate.of(2023, 1, 31),
         behandlingId: BehandlingId,
     ) {
-        every { stønadsperiodeService.findAllByBehandlingId(behandlingId) } returns listOf(
-            stønadsperiode(
-                behandlingId = behandlingId,
-                fom = fom,
-                tom = tom,
-            ),
-        )
+        every { stønadsperiodeService.findAllByBehandlingId(behandlingId) } returns
+            listOf(
+                stønadsperiode(
+                    behandlingId = behandlingId,
+                    fom = fom,
+                    tom = tom,
+                ),
+            )
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.web.client.exchange
 import java.util.UUID
 
 class StegControllerTest : IntegrationTest() {
-
     @BeforeEach
     fun setUp() {
         headers.setBearerAuth(onBehalfOfToken())
@@ -21,7 +20,10 @@ class StegControllerTest : IntegrationTest() {
 
     @Test
     fun `skal resette steg`() {
-        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES, steg = StegType.BEREGNE_YTELSE))
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling(status = BehandlingStatus.UTREDES, steg = StegType.BEREGNE_YTELSE),
+            )
 
         assertThat(behandling.steg).isEqualTo(StegType.BEREGNE_YTELSE)
 
@@ -30,10 +32,12 @@ class StegControllerTest : IntegrationTest() {
         assertThat(testoppsettService.hentBehandling(behandling.id).steg).isEqualTo(StegType.INNGANGSVILKÅR)
     }
 
-    private fun resetSteg(behandlingId: BehandlingId, stegType: StegType) =
-        restTemplate.exchange<UUID>(
-            localhost("api/steg/behandling/$behandlingId/reset"),
-            HttpMethod.POST,
-            HttpEntity(StegController.ResetStegRequest(stegType), headers),
-        )
+    private fun resetSteg(
+        behandlingId: BehandlingId,
+        stegType: StegType,
+    ) = restTemplate.exchange<UUID>(
+        localhost("api/steg/behandling/$behandlingId/reset"),
+        HttpMethod.POST,
+        HttpEntity(StegController.ResetStegRequest(stegType), headers),
+    )
 }

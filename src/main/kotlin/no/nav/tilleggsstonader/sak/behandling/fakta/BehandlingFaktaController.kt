@@ -17,7 +17,9 @@ class BehandlingFaktaController(
     private val behandlingFaktaService: BehandlingFaktaService,
 ) {
     @GetMapping("{behandlingId}/fakta")
-    fun hentBehandlingFakta(@PathVariable behandlingId: BehandlingId): BehandlingFaktaDto {
+    fun hentBehandlingFakta(
+        @PathVariable behandlingId: BehandlingId,
+    ): BehandlingFaktaDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return behandlingFaktaService.hentFakta(behandlingId)
     }

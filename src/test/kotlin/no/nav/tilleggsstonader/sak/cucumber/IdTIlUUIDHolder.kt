@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 
 object IdTIlUUIDHolder {
-
     val behandlingIdTilUUID = (1..10).associateWith { BehandlingId.random() }
 
     fun behandlingIdFraUUID(id: BehandlingId) = behandlingIdTilUUID.entries.single { it.value == id }.key

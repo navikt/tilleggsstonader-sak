@@ -20,18 +20,18 @@ import org.junit.jupiter.api.Test
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse as AdressebeskyttelsePdl
 
 class PersonopplysningerServiceTest {
-
     private val fagsakPersonService = mockk<FagsakPersonService>()
     private val behandlingService = mockk<BehandlingService>()
     private val personService = mockk<PersonService>()
     private val fullmaktService = mockk<FullmaktService>()
 
-    private val service = PersonopplysningerService(
-        fagsakPersonService = fagsakPersonService,
-        behandlingService = behandlingService,
-        personService = personService,
-        fullmaktService = fullmaktService,
-    )
+    private val service =
+        PersonopplysningerService(
+            fagsakPersonService = fagsakPersonService,
+            behandlingService = behandlingService,
+            personService = personService,
+            fullmaktService = fullmaktService,
+        )
 
     @BeforeEach
     fun setUp() {
@@ -81,7 +81,6 @@ class PersonopplysningerServiceTest {
 
     @Nested
     inner class AdressebeskyttelseMapping {
-
         @Test
         fun `skal mappe status fra pdl til status`() {
             val gradering = AdressebeskyttelseGradering.FORTROLIG

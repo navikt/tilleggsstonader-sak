@@ -20,7 +20,6 @@ class OpphørValideringService(
     private val vilkårsperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
 ) {
-
     fun validerVilkårperioder(saksbehandling: Saksbehandling) {
         val vilkår = vilkårService.hentVilkår(saksbehandling.id)
         val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling.id)
@@ -41,7 +40,9 @@ class OpphørValideringService(
 
         beregningsresultatTilsynBarn.perioder.forEach { periode ->
             periode.beløpsperioder.forEach {
-                brukerfeilHvis(it.dato >= revurderFra) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
+                brukerfeilHvis(
+                    it.dato >= revurderFra,
+                ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
             }
         }
     }
@@ -79,16 +80,14 @@ class OpphørValideringService(
         vilkår.forEach { enkeltVilkår ->
             if (enkeltVilkår.erOppfyltOgEndret()) {
                 val tom = enkeltVilkår.tom ?: error("Til og med dato er påkrevd for endret vilkår")
-                brukerfeilHvis(tom > revurderFraDato) { "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato" }
+                brukerfeilHvis(tom > revurderFraDato) {
+                    "Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato"
+                }
             }
         }
     }
 
-    private fun Vilkårperiode.erOppfyltOgEndret(): Boolean {
-        return (status == Vilkårstatus.ENDRET) && (resultat == ResultatVilkårperiode.OPPFYLT)
-    }
+    private fun Vilkårperiode.erOppfyltOgEndret(): Boolean = (status == Vilkårstatus.ENDRET) && (resultat == ResultatVilkårperiode.OPPFYLT)
 
-    private fun Vilkår.erOppfyltOgEndret(): Boolean {
-        return (status == VilkårStatus.ENDRET) && (resultat == Vilkårsresultat.OPPFYLT)
-    }
+    private fun Vilkår.erOppfyltOgEndret(): Boolean = (status == VilkårStatus.ENDRET) && (resultat == Vilkårsresultat.OPPFYLT)
 }

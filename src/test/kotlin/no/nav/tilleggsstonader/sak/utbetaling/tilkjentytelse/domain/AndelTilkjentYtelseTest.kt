@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import java.time.YearMonth
 
 class AndelTilkjentYtelseTest {
-
     val måned = YearMonth.of(2024, 1)
 
     @Nested
@@ -50,7 +49,6 @@ class AndelTilkjentYtelseTest {
 
     @Nested
     inner class Månedsandel {
-
         @Disabled // har ingen type som bruker måned ennå så denne kaster exception
         @Test
         fun `fom er første dag i måneden og tom er siste dag i måneden`() {
@@ -103,7 +101,6 @@ class AndelTilkjentYtelseTest {
 
     @Nested
     inner class TilsynBarnAndel {
-
         @Test
         fun `skal kaste feil hvis satstype ikke er dag`() {
             assertThatThrownBy {
@@ -119,7 +116,6 @@ class AndelTilkjentYtelseTest {
 
     @Nested
     inner class LæremidlerAndel {
-
         @Test
         fun `skal kaste feil hvis satstype ikke er dag`() {
             assertThatThrownBy {

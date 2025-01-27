@@ -56,19 +56,18 @@ class BehandlingService(
     private val taskService: TaskService,
     private val unleashService: UnleashService,
 ) {
-
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     fun hentAktivIdent(behandlingId: BehandlingId): String = behandlingRepository.finnAktivIdent(behandlingId)
 
-    fun hentEksterneIder(behandlingIder: Set<BehandlingId>) = behandlingIder.takeIf { it.isNotEmpty() }
-        ?.let { behandlingRepository.finnEksterneIder(it) } ?: emptySet()
+    fun hentEksterneIder(behandlingIder: Set<BehandlingId>) =
+        behandlingIder
+            .takeIf { it.isNotEmpty() }
+            ?.let { behandlingRepository.finnEksterneIder(it) } ?: emptySet()
 
-    fun finnSisteIverksatteBehandling(fagsakId: FagsakId) =
-        behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
+    fun finnSisteIverksatteBehandling(fagsakId: FagsakId) = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)
 
-    fun finnesÅpenBehandling(fagsakId: FagsakId) =
-        behandlingRepository.existsByFagsakIdAndStatusIsNot(fagsakId, FERDIGSTILT)
+    fun finnesÅpenBehandling(fagsakId: FagsakId) = behandlingRepository.existsByFagsakIdAndStatusIsNot(fagsakId, FERDIGSTILT)
 
     fun finnesBehandlingSomIkkeErFerdigstiltEllerSattPåVent(fagsakId: FagsakId) =
         behandlingRepository.existsByFagsakIdAndStatusIsNotIn(fagsakId, listOf(FERDIGSTILT, SATT_PÅ_VENT))
@@ -79,15 +78,14 @@ class BehandlingService(
                 it.status == FERDIGSTILT && it.resultat != BehandlingResultat.HENLAGT
             }
 
-    fun hentBehandlingsjournalposter(behandlingId: BehandlingId): List<Behandlingsjournalpost> {
-        return behandlingsjournalpostRepository.findAllByBehandlingId(behandlingId)
-    }
+    fun hentBehandlingsjournalposter(behandlingId: BehandlingId): List<Behandlingsjournalpost> =
+        behandlingsjournalpostRepository.findAllByBehandlingId(behandlingId)
 
-    fun hentBehandlingerForGjenbrukAvVilkår(fagsakPersonId: FagsakPersonId): List<Behandling> {
-        return behandlingRepository.finnBehandlingerForGjenbrukAvVilkår(fagsakPersonId)
+    fun hentBehandlingerForGjenbrukAvVilkår(fagsakPersonId: FagsakPersonId): List<Behandling> =
+        behandlingRepository
+            .finnBehandlingerForGjenbrukAvVilkår(fagsakPersonId)
             .sortertEtterVedtakstidspunktEllerEndretTid()
             .reversed()
-    }
 
     @Transactional
     fun opprettBehandling(
@@ -110,26 +108,28 @@ class BehandlingService(
 
         validerKanOppretteNyBehandling(behandlingType, tidligereBehandlinger)
 
-        val behandling = behandlingRepository.insert(
-            Behandling(
-                fagsakId = fagsakId,
-                forrigeBehandlingId = forrigeBehandling?.id,
-                type = behandlingType,
-                steg = stegType,
-                status = status,
-                resultat = BehandlingResultat.IKKE_SATT,
-                årsak = behandlingsårsak,
-                kravMottatt = kravMottatt,
-                kategori = BehandlingKategori.NASJONAL,
-            ),
-        )
+        val behandling =
+            behandlingRepository.insert(
+                Behandling(
+                    fagsakId = fagsakId,
+                    forrigeBehandlingId = forrigeBehandling?.id,
+                    type = behandlingType,
+                    steg = stegType,
+                    status = status,
+                    resultat = BehandlingResultat.IKKE_SATT,
+                    årsak = behandlingsårsak,
+                    kravMottatt = kravMottatt,
+                    kategori = BehandlingKategori.NASJONAL,
+                ),
+            )
         eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = behandling.id))
 
         behandlingshistorikkService.opprettHistorikkInnslag(
-            behandlingshistorikk = Behandlingshistorikk(
-                behandlingId = behandling.id,
-                steg = stegType,
-            ),
+            behandlingshistorikk =
+                Behandlingshistorikk(
+                    behandlingId = behandling.id,
+                    steg = stegType,
+                ),
         )
 
         return behandling
@@ -139,19 +139,22 @@ class BehandlingService(
 
     fun hentSaksbehandling(behandlingId: BehandlingId): Saksbehandling = behandlingRepository.finnSaksbehandling(behandlingId)
 
-    fun hentSaksbehandling(eksternBehandlingId: Long): Saksbehandling =
-        behandlingRepository.finnSaksbehandling(eksternBehandlingId)
+    fun hentSaksbehandling(eksternBehandlingId: Long): Saksbehandling = behandlingRepository.finnSaksbehandling(eksternBehandlingId)
 
     fun hentEksternBehandlingId(behandlingId: BehandlingId) = eksternBehandlingIdRepository.findByBehandlingId(behandlingId)
 
-    fun hentBehandlingPåEksternId(eksternBehandlingId: Long): Behandling = behandlingRepository.finnMedEksternId(
-        eksternBehandlingId,
-    ) ?: error("Kan ikke finne behandling med eksternId=$eksternBehandlingId")
+    fun hentBehandlingPåEksternId(eksternBehandlingId: Long): Behandling =
+        behandlingRepository.finnMedEksternId(
+            eksternBehandlingId,
+        ) ?: error("Kan ikke finne behandling med eksternId=$eksternBehandlingId")
 
     fun hentBehandlinger(behandlingIder: Set<BehandlingId>): List<Behandling> =
         behandlingRepository.findAllByIdOrThrow(behandlingIder) { it.id }
 
-    fun oppdaterStatusPåBehandling(behandlingId: BehandlingId, status: BehandlingStatus): Behandling {
+    fun oppdaterStatusPåBehandling(
+        behandlingId: BehandlingId,
+        status: BehandlingStatus,
+    ): Behandling {
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer status på behandling $behandlingId " +
@@ -166,7 +169,10 @@ class BehandlingService(
     }
 
     // TODO skal vi sette kategori på behandling?
-    fun oppdaterKategoriPåBehandling(behandlingId: BehandlingId, kategori: BehandlingKategori): Behandling {
+    fun oppdaterKategoriPåBehandling(
+        behandlingId: BehandlingId,
+        kategori: BehandlingKategori,
+    ): Behandling {
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer kategori på behandling $behandlingId " +
@@ -175,7 +181,10 @@ class BehandlingService(
         return behandlingRepository.update(behandling.copy(kategori = kategori))
     }
 
-    fun oppdaterForrigeBehandlingId(behandlingId: BehandlingId, forrigeBehandlingId: BehandlingId): Behandling {
+    fun oppdaterForrigeBehandlingId(
+        behandlingId: BehandlingId,
+        forrigeBehandlingId: BehandlingId,
+    ): Behandling {
         val behandling = hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke endre forrigeBehandlingId når behandlingen er låst"
@@ -187,7 +196,10 @@ class BehandlingService(
         return behandlingRepository.update(behandling.copy(forrigeBehandlingId = forrigeBehandlingId))
     }
 
-    fun oppdaterStegPåBehandling(behandlingId: BehandlingId, steg: StegType): Behandling {
+    fun oppdaterStegPåBehandling(
+        behandlingId: BehandlingId,
+        steg: StegType,
+    ): Behandling {
         val behandling = hentBehandling(behandlingId)
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} endrer steg på behandling $behandlingId " +
@@ -196,18 +208,21 @@ class BehandlingService(
         return behandlingRepository.update(behandling.copy(steg = steg))
     }
 
-    fun oppdaterKravMottatt(behandlingId: BehandlingId, kravMottatt: LocalDate?): Behandling {
-        return behandlingRepository.update(hentBehandling(behandlingId).copy(kravMottatt = kravMottatt))
-    }
+    fun oppdaterKravMottatt(
+        behandlingId: BehandlingId,
+        kravMottatt: LocalDate?,
+    ): Behandling = behandlingRepository.update(hentBehandling(behandlingId).copy(kravMottatt = kravMottatt))
 
-    fun finnesBehandlingForFagsak(fagsakId: FagsakId) =
-        behandlingRepository.existsByFagsakId(fagsakId)
+    fun finnesBehandlingForFagsak(fagsakId: FagsakId) = behandlingRepository.existsByFagsakId(fagsakId)
 
-    fun hentBehandlinger(fagsakId: FagsakId): List<Behandling> {
-        return behandlingRepository.findByFagsakId(fagsakId).sortertEtterVedtakstidspunkt()
-    }
+    fun hentBehandlinger(fagsakId: FagsakId): List<Behandling> =
+        behandlingRepository.findByFagsakId(fagsakId).sortertEtterVedtakstidspunkt()
 
-    fun leggTilBehandlingsjournalpost(journalpostId: String, journalposttype: Journalposttype, behandlingId: BehandlingId) {
+    fun leggTilBehandlingsjournalpost(
+        journalpostId: String,
+        journalposttype: Journalposttype,
+        behandlingId: BehandlingId,
+    ) {
         behandlingsjournalpostRepository.insert(
             Behandlingsjournalpost(
                 behandlingId = behandlingId,
@@ -219,16 +234,20 @@ class BehandlingService(
     }
 
     @Transactional
-    fun henleggBehandling(behandlingId: BehandlingId, henlagt: HenlagtDto): Behandling {
+    fun henleggBehandling(
+        behandlingId: BehandlingId,
+        henlagt: HenlagtDto,
+    ): Behandling {
         val behandling = hentBehandling(behandlingId)
         validerAtBehandlingenKanHenlegges(behandling)
-        val henlagtBehandling = behandling.copy(
-            henlagtÅrsak = henlagt.årsak,
-            resultat = BehandlingResultat.HENLAGT,
-            steg = StegType.BEHANDLING_FERDIGSTILT,
-            status = FERDIGSTILT,
-            vedtakstidspunkt = SporbarUtils.now(),
-        )
+        val henlagtBehandling =
+            behandling.copy(
+                henlagtÅrsak = henlagt.årsak,
+                resultat = BehandlingResultat.HENLAGT,
+                steg = StegType.BEHANDLING_FERDIGSTILT,
+                status = FERDIGSTILT,
+                vedtakstidspunkt = SporbarUtils.now(),
+            )
         behandlingshistorikkService.opprettHistorikkInnslag(
             behandlingId = henlagtBehandling.id,
             stegtype = henlagtBehandling.steg,
@@ -256,7 +275,10 @@ class BehandlingService(
     /**
      * Setter endelig resultat på behandling, setter vedtakstidspunkt på behandling
      */
-    fun oppdaterResultatPåBehandling(behandlingId: BehandlingId, behandlingResultat: BehandlingResultat): Behandling {
+    fun oppdaterResultatPåBehandling(
+        behandlingId: BehandlingId,
+        behandlingResultat: BehandlingResultat,
+    ): Behandling {
         val behandling = hentBehandling(behandlingId)
         feilHvis(behandlingResultat == BehandlingResultat.IKKE_SATT) {
             "Må sette et endelig resultat og ikke $behandlingResultat"
@@ -280,7 +302,6 @@ class BehandlingService(
     /**
      * Brukes i de tilfellene man ikke har generellt behov for behandling, men ønsker kun å sjekke om den er låst
      */
-    fun behandlingErLåstForVidereRedigering(behandlingId: BehandlingId): Boolean {
-        return behandlingRepository.findByIdOrThrow(behandlingId).status.behandlingErLåstForVidereRedigering()
-    }
+    fun behandlingErLåstForVidereRedigering(behandlingId: BehandlingId): Boolean =
+        behandlingRepository.findByIdOrThrow(behandlingId).status.behandlingErLåstForVidereRedigering()
 }

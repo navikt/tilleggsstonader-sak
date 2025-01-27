@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Profile
 @Configuration
 @Profile("mock-iverksett")
 class IverksettClientConfig {
-
     @Bean
     @Primary
     fun iverksettClient(): IverksettClient {
@@ -28,10 +27,10 @@ class IverksettClientConfig {
     }
 
     companion object {
-
-        private val simuleringsresultat = objectMapper.readValue<SimuleringResponseDto>(
-            readFile("mock/iverksett/simuleringsresultat.json"),
-        )
+        private val simuleringsresultat =
+            objectMapper.readValue<SimuleringResponseDto>(
+                readFile("mock/iverksett/simuleringsresultat.json"),
+            )
 
         fun clearMock(iverksettClient: IverksettClient) {
             clearMocks(iverksettClient)

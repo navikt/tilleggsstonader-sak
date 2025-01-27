@@ -29,7 +29,10 @@ data class UtbetalingerDvhV2(
     )
 
     companion object {
-        fun fraDomene(ytelser: List<AndelTilkjentYtelse>, vedtak: Vedtak) = JsonWrapper(
+        fun fraDomene(
+            ytelser: List<AndelTilkjentYtelse>,
+            vedtak: Vedtak,
+        ) = JsonWrapper(
             ytelser.filterNot { it.type == TypeAndel.UGYLDIG }.map { andelTilkjentYtelse ->
 
                 val beregningsgrunnlag = andelTilkjentYtelse.finnGrunnlag(vedtak)
@@ -45,8 +48,8 @@ data class UtbetalingerDvhV2(
             },
         )
 
-        private fun AndelTilkjentYtelse.finnGrunnlag(vedtak: Vedtak): Beregningsgrunnlag? {
-            return when (vedtak.data) {
+        private fun AndelTilkjentYtelse.finnGrunnlag(vedtak: Vedtak): Beregningsgrunnlag? =
+            when (vedtak.data) {
                 is AvslagLæremidler -> null
                 is AvslagTilsynBarn -> null
                 is InnvilgelseLæremidler -> null
@@ -54,21 +57,25 @@ data class UtbetalingerDvhV2(
                 is OpphørTilsynBarn -> vedtak.data.finnGrunnlag(this.fom.toYearMonth())
                 is OpphørLæremidler -> null
             }
-        }
 
         private fun InnvilgelseTilsynBarn.finnGrunnlag(måned: YearMonth): Beregningsgrunnlag =
-            this.beregningsresultat.perioder.find { it.grunnlag.måned == måned }?.grunnlag
+            this.beregningsresultat.perioder
+                .find { it.grunnlag.måned == måned }
+                ?.grunnlag
                 ?: error("Skal ha beregningsgrunnlag hvis andeler eksisterer")
 
         private fun OpphørTilsynBarn.finnGrunnlag(måned: YearMonth): Beregningsgrunnlag =
-            this.beregningsresultat.perioder.find { it.grunnlag.måned == måned }?.grunnlag
+            this.beregningsresultat.perioder
+                .find { it.grunnlag.måned == måned }
+                ?.grunnlag
                 ?: error("Skal ha beregningsgrunnlag hvis andeler eksisterer")
 
         private fun erBeløpBegrensetAvMakssats(beregningsgrunnlag: Beregningsgrunnlag?): Boolean? =
             beregningsgrunnlag?.let {
-                val utgifterSomDekkes = (beregningsgrunnlag.utgifterTotal.toBigDecimal()).multiply(
-                    DEKNINGSGRAD_TILSYN_BARN,
-                )
+                val utgifterSomDekkes =
+                    (beregningsgrunnlag.utgifterTotal.toBigDecimal()).multiply(
+                        DEKNINGSGRAD_TILSYN_BARN,
+                    )
                 utgifterSomDekkes > beregningsgrunnlag.makssats.toBigDecimal()
             }
     }

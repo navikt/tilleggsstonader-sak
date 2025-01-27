@@ -9,10 +9,8 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class BehandlingUtilTest {
-
     @Nested
     inner class SkalNullstilleBehandling {
-
         val behandling = behandling(type = BehandlingType.REVURDERING)
 
         @Test

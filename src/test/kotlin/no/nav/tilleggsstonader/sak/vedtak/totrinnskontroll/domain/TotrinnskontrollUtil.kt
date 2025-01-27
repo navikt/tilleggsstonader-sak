@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 
 object TotrinnskontrollUtil {
-
     fun totrinnskontroll(
         status: TotrinnInternStatus,
         behandlingId: BehandlingId = BehandlingId.random(),

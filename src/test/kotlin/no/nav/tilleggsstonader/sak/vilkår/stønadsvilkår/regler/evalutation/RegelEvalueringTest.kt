@@ -10,7 +10,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class RegelEvalueringTest {
-
     @Test
     fun `utledVilkårResultat - er OPPFYLT når alle vilkår er OPPFYLT`() {
         assertThat(RegelEvaluering.utledVilkårResultat(mapOf(RegelId.HAR_ET_NAVN to Vilkårsresultat.OPPFYLT)))
@@ -32,8 +31,7 @@ internal class RegelEvalueringTest {
                     RegelId.HAR_ET_NAVN2 to Vilkårsresultat.IKKE_OPPFYLT,
                 ),
             ),
-        )
-            .isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+        ).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
     }
 
     @Test
@@ -44,8 +42,7 @@ internal class RegelEvalueringTest {
                     RegelId.HAR_ET_NAVN to Vilkårsresultat.AUTOMATISK_OPPFYLT,
                 ),
             ),
-        )
-            .isEqualTo(Vilkårsresultat.OPPFYLT)
+        ).isEqualTo(Vilkårsresultat.OPPFYLT)
     }
 
     @Test
@@ -72,7 +69,6 @@ internal class RegelEvalueringTest {
                     RegelId.HAR_ET_NAVN3 to Vilkårsresultat.IKKE_TATT_STILLING_TIL,
                 ),
             ),
-        )
-            .isEqualTo(Vilkårsresultat.IKKE_TATT_STILLING_TIL)
+        ).isEqualTo(Vilkårsresultat.IKKE_TATT_STILLING_TIL)
     }
 }

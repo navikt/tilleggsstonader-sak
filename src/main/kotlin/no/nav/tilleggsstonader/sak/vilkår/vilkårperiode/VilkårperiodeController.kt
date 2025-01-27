@@ -28,9 +28,10 @@ class VilkårperiodeController(
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
 ) {
-
     @GetMapping("behandling/{behandlingId}")
-    fun hentVilkårperioder(@PathVariable behandlingId: BehandlingId): VilkårperioderResponse {
+    fun hentVilkårperioder(
+        @PathVariable behandlingId: BehandlingId,
+    ): VilkårperioderResponse {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return vilkårperiodeService.hentVilkårperioderResponse(behandlingId)

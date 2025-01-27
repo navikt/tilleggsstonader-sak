@@ -32,7 +32,6 @@ class TilsynBarnVedtakController(
     private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
 ) {
-
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
@@ -57,7 +56,10 @@ class TilsynBarnVedtakController(
         lagreVedtak(behandlingId, vedtak)
     }
 
-    fun lagreVedtak(behandlingId: BehandlingId, vedtak: VedtakTilsynBarnRequest) {
+    fun lagreVedtak(
+        behandlingId: BehandlingId,
+        vedtak: VedtakTilsynBarnRequest,
+    ) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         vedtakService.håndterSteg(behandlingId, vedtak)
     }
@@ -76,7 +78,9 @@ class TilsynBarnVedtakController(
      * På en måte hadde det vært fint hvis GET returnerer beløpsperioder
      */
     @GetMapping("{behandlingId}")
-    fun hentVedtak(@PathVariable behandlingId: BehandlingId): VedtakResponse? {
+    fun hentVedtak(
+        @PathVariable behandlingId: BehandlingId,
+    ): VedtakResponse? {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
@@ -84,7 +88,9 @@ class TilsynBarnVedtakController(
     }
 
     @GetMapping("/fullstendig-oversikt/{behandlingId}")
-    fun hentFullstendigVedtaksoversikt(@PathVariable behandlingId: BehandlingId): VedtakResponse? {
+    fun hentFullstendigVedtaksoversikt(
+        @PathVariable behandlingId: BehandlingId,
+    ): VedtakResponse? {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return VedtakDtoMapper.toDto(vedtak, null)

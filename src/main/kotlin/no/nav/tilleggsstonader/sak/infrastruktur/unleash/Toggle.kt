@@ -2,7 +2,9 @@ package no.nav.tilleggsstonader.sak.infrastruktur.unleash
 
 import no.nav.tilleggsstonader.libs.unleash.ToggleId
 
-enum class Toggle(override val toggleId: String) : ToggleId {
+enum class Toggle(
+    override val toggleId: String,
+) : ToggleId {
     KAN_OPPRETTE_BEHANDLING("sak.kan-opprette-behandling"),
     KAN_OPPRETTE_REVURDERING("sak.kan-opprette-revurdering"),
 

@@ -64,7 +64,10 @@ class VilkårperiodeService(
         )
     }
 
-    fun validerOgLagResponse(behandlingId: BehandlingId, periode: Vilkårperiode? = null): LagreVilkårperiodeResponse {
+    fun validerOgLagResponse(
+        behandlingId: BehandlingId,
+        periode: Vilkårperiode? = null,
+    ): LagreVilkårperiodeResponse {
         val valideringsresultat = validerStønadsperioder(behandlingId)
 
         return LagreVilkårperiodeResponse(
@@ -108,7 +111,10 @@ class VilkårperiodeService(
     }
 
     @Transactional
-    fun oppdaterVilkårperiode(id: UUID, vilkårperiode: LagreVilkårperiode): Vilkårperiode {
+    fun oppdaterVilkårperiode(
+        id: UUID,
+        vilkårperiode: LagreVilkårperiode,
+    ): Vilkårperiode {
         val eksisterendeVilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
         val behandling = behandlingService.hentSaksbehandling(eksisterendeVilkårperiode.behandlingId)
@@ -119,21 +125,26 @@ class VilkårperiodeService(
             "Kan ikke oppdatere kildeId på en allerede eksisterende vilkårperiode"
         }
 
-        val oppdatert = eksisterendeVilkårperiode.medVilkårOgVurdering(
-            fom = vilkårperiode.fom,
-            tom = vilkårperiode.tom,
-            begrunnelse = vilkårperiode.begrunnelse,
-            faktaOgVurdering = mapFaktaOgSvarDto(
-                stønadstype = behandling.stønadstype,
-                vilkårperiode = vilkårperiode,
-            ),
-        )
+        val oppdatert =
+            eksisterendeVilkårperiode.medVilkårOgVurdering(
+                fom = vilkårperiode.fom,
+                tom = vilkårperiode.tom,
+                begrunnelse = vilkårperiode.begrunnelse,
+                faktaOgVurdering =
+                    mapFaktaOgSvarDto(
+                        stønadstype = behandling.stønadstype,
+                        vilkårperiode = vilkårperiode,
+                    ),
+            )
 
         validerEndrePeriodeRevurdering(behandling, eksisterendeVilkårperiode, oppdatert)
         return vilkårperiodeRepository.update(oppdatert)
     }
 
-    fun slettVilkårperiode(id: UUID, slettVikårperiode: SlettVikårperiode): Vilkårperiode? {
+    fun slettVilkårperiode(
+        id: UUID,
+        slettVikårperiode: SlettVikårperiode,
+    ): Vilkårperiode? {
         val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(id)
 
         validerBehandlingIdErLik(slettVikårperiode.behandlingId, vilkårperiode.behandlingId)
@@ -150,7 +161,10 @@ class VilkårperiodeService(
         }
     }
 
-    fun gjenbrukVilkårperioder(forrigeBehandlingId: BehandlingId, nyBehandlingId: BehandlingId) {
+    fun gjenbrukVilkårperioder(
+        forrigeBehandlingId: BehandlingId,
+        nyBehandlingId: BehandlingId,
+    ) {
         val eksisterendeVilkårperioder =
             vilkårperiodeRepository.findByBehandlingIdAndResultatNot(forrigeBehandlingId, ResultatVilkårperiode.SLETTET)
 
@@ -158,16 +172,23 @@ class VilkårperiodeService(
         vilkårperiodeRepository.insertAll(kopiertePerioderMedReferanse)
     }
 
-    private fun validerKildeIdFinnesIGrunnlaget(behandlingId: BehandlingId, type: VilkårperiodeType, kildeId: String?) {
+    private fun validerKildeIdFinnesIGrunnlaget(
+        behandlingId: BehandlingId,
+        type: VilkårperiodeType,
+        kildeId: String?,
+    ) {
         val kildeId = kildeId ?: return
 
         feilHvis(type is MålgruppeType) {
             "Kan ikke sende inn kildeId på målgruppe, då målgruppeperioder ikke direkt har en id som aktivitet"
         }
 
-        val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)
-            ?: error("Finner ikke grunnlag til behandling=$behandlingId")
-        val idIGrunnlag = grunnlag.grunnlag.aktivitet.aktiviteter.map { it.id }
+        val grunnlag =
+            vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)
+                ?: error("Finner ikke grunnlag til behandling=$behandlingId")
+        val idIGrunnlag =
+            grunnlag.grunnlag.aktivitet.aktiviteter
+                .map { it.id }
         feilHvis(kildeId !in idIGrunnlag) {
             "Aktivitet med id=$kildeId finnes ikke i grunnlag"
         }

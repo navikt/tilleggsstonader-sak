@@ -35,15 +35,20 @@ data class OpphavsvilkårDto(
     val endretTid: LocalDateTime,
 )
 
-data class OppdaterVilkårDto(val id: VilkårId, val behandlingId: BehandlingId)
+data class OppdaterVilkårDto(
+    val id: VilkårId,
+    val behandlingId: BehandlingId,
+)
 
-data class GjenbrukVilkårDto(val behandlingId: BehandlingId, val kopierbehandlingId: BehandlingId)
+data class GjenbrukVilkårDto(
+    val behandlingId: BehandlingId,
+    val kopierbehandlingId: BehandlingId,
+)
 
 data class DelvilkårDto(
     val resultat: Vilkårsresultat,
     val vurderinger: List<VurderingDto>,
 ) {
-
     /**
      * @return regelId for første svaret som er hovedregeln på delvilkåret
      */
@@ -73,11 +78,13 @@ fun Vilkår.tilDto() =
         barnId = this.barnId,
         endretAv = this.sporbar.endret.endretAv,
         endretTid = this.sporbar.endret.endretTid,
-        delvilkårsett = this.delvilkårsett
-            .filter { it.resultat != Vilkårsresultat.IKKE_AKTUELL }
-            .map { it.tilDto() },
+        delvilkårsett =
+            this.delvilkårsett
+                .filter { it.resultat != Vilkårsresultat.IKKE_AKTUELL }
+                .map { it.tilDto() },
         opphavsvilkår = this.opphavsvilkår?.let { OpphavsvilkårDto(it.behandlingId, it.vurderingstidspunkt) },
     )
 
 fun DelvilkårDto.svarTilDomene() = this.vurderinger.map { it.tilDomene() }
+
 fun VurderingDto.tilDomene() = Vurdering(this.regelId, this.svar, this.begrunnelse)

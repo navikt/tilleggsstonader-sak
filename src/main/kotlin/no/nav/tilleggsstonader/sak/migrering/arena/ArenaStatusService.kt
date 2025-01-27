@@ -25,12 +25,10 @@ class ArenaStatusService(
     private val behandlingService: BehandlingService,
     private val søknadRoutingService: SøknadRoutingService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun finnStatus(request: ArenaFinnesPersonRequest): ArenaFinnesPersonResponse {
-        return ArenaFinnesPersonResponse(request.ident, finnesPerson(request))
-    }
+    fun finnStatus(request: ArenaFinnesPersonRequest): ArenaFinnesPersonResponse =
+        ArenaFinnesPersonResponse(request.ident, finnesPerson(request))
 
     private fun finnesPerson(request: ArenaFinnesPersonRequest): Boolean {
         val identer = personService.hentPersonIdenter(request.ident).identer().toSet()
@@ -39,7 +37,9 @@ class ArenaStatusService(
         val eksternFagsakId = fagsak?.eksternId?.id
 
         logger.info("Sjekker om person skal låses i Arena stønadstype=${request.stønadstype} fagsak=$eksternFagsakId")
-        secureLogger.info("Sjekker om person skal låses i Arena stønadstype=${request.stønadstype} ident=${request.ident} fagsak=$eksternFagsakId")
+        secureLogger.info(
+            "Sjekker om person skal låses i Arena stønadstype=${request.stønadstype} ident=${request.ident} fagsak=$eksternFagsakId",
+        )
 
         val logPrefix = "Sjekker om person finnes i ny løsning stønadstype=${request.stønadstype}"
         if (skalKunneOppretteSakIArenaForPerson(fagsak)) {
@@ -70,25 +70,22 @@ class ArenaStatusService(
      * Denne håndterer at gitt stønadstype alltid svarer med at personen finnes i ny løsning.
      * Eks for Barnetilsyn er det ønskelig at personen skal håndteres i ny løsning og at det ikke fattes nye vedtak i Arena
      */
-    private fun skalBehandlesITsSak(stønadstype: Stønadstype): Boolean = when (stønadstype) {
-        Stønadstype.BARNETILSYN -> true
-        else -> false
-    }
+    private fun skalBehandlesITsSak(stønadstype: Stønadstype): Boolean =
+        when (stønadstype) {
+            Stønadstype.BARNETILSYN -> true
+            else -> false
+        }
 
-    private fun harBehandling(
-        fagsak: Fagsak?,
-    ): Boolean {
-        return fagsak
+    private fun harBehandling(fagsak: Fagsak?): Boolean =
+        fagsak
             ?.let { behandlingService.finnesBehandlingForFagsak(it.id) }
             ?: false
-    }
 
     private fun harRouting(
         identer: Set<String>,
         stønadstype: Stønadstype,
-    ): Boolean {
-        return identer.any {
+    ): Boolean =
+        identer.any {
             søknadRoutingService.harLagretRouting(IdentStønadstype(it, stønadstype))
         }
-    }
 }

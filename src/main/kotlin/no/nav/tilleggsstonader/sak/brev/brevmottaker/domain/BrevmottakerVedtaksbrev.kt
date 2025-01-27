@@ -14,10 +14,8 @@ data class BrevmottakerVedtaksbrev(
     val behandlingId: BehandlingId,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val mottaker: Mottaker,
-
     val journalpostId: String? = null,
     val bestillingId: String? = null,
-
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 )

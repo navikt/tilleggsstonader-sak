@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import java.util.UUID
 
 object IverksettDtoMapper {
-
     fun map(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
@@ -34,15 +33,15 @@ object IverksettDtoMapper {
         behandling: Saksbehandling,
         totrinnskontroll: Totrinnskontroll,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-    ): VedtaksdetaljerDto {
-        return VedtaksdetaljerDto(
-            vedtakstidspunkt = behandling.vedtakstidspunkt
-                ?: error("Mangler vedtakstidspunkt behandling=${behandling.id}"),
+    ): VedtaksdetaljerDto =
+        VedtaksdetaljerDto(
+            vedtakstidspunkt =
+                behandling.vedtakstidspunkt
+                    ?: error("Mangler vedtakstidspunkt behandling=${behandling.id}"),
             saksbehandlerId = totrinnskontroll.saksbehandler,
             beslutterId = totrinnskontroll.beslutter ?: error("Mangler beslutter"),
             utbetalinger = mapUtbetalinger(andelerTilkjentYtelse),
         )
-    }
 
     fun mapUtbetalinger(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>) =
         andelerTilkjentYtelse
@@ -53,28 +52,31 @@ object IverksettDtoMapper {
                     satstype = it.satstype.tilSatstype(),
                     fraOgMedDato = it.fom,
                     tilOgMedDato = it.tom,
-                    stønadsdata = StønadsdataDto(
-                        stønadstype = it.type.tilStønadstype(),
-                        brukersNavKontor = null, // TODO denne skal settes for reise?
-                    ),
+                    stønadsdata =
+                        StønadsdataDto(
+                            stønadstype = it.type.tilStønadstype(),
+                            brukersNavKontor = null, // TODO denne skal settes for reise?
+                        ),
                 )
             }
 
-    private fun Satstype.tilSatstype(): SatstypeIverksetting = when (this) {
-        Satstype.DAG -> SatstypeIverksetting.DAGLIG
-        Satstype.MÅNED -> SatstypeIverksetting.MÅNEDLIG
-        Satstype.ENGANGSBELØP -> SatstypeIverksetting.ENGANGS
-        Satstype.UGYLDIG -> error("Ugyldig satstype. Skal ikke iverksettes")
-    }
+    private fun Satstype.tilSatstype(): SatstypeIverksetting =
+        when (this) {
+            Satstype.DAG -> SatstypeIverksetting.DAGLIG
+            Satstype.MÅNED -> SatstypeIverksetting.MÅNEDLIG
+            Satstype.ENGANGSBELØP -> SatstypeIverksetting.ENGANGS
+            Satstype.UGYLDIG -> error("Ugyldig satstype. Skal ikke iverksettes")
+        }
 
-    private fun TypeAndel.tilStønadstype(): StønadstypeIverksetting = when (this) {
-        TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> StønadstypeIverksetting.TILSYN_BARN_ENSLIG_FORSØRGER
-        TypeAndel.TILSYN_BARN_AAP -> StønadstypeIverksetting.TILSYN_BARN_AAP
-        TypeAndel.TILSYN_BARN_ETTERLATTE -> StønadstypeIverksetting.TILSYN_BARN_ETTERLATTE
-        TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER -> StønadstypeIverksetting.LÆREMIDLER_ENSLIG_FORSØRGER
-        TypeAndel.LÆREMIDLER_AAP -> StønadstypeIverksetting.LÆREMIDLER_AAP
-        TypeAndel.LÆREMIDLER_ETTERLATTE -> StønadstypeIverksetting.LÆREMIDLER_ETTERLATTE
+    private fun TypeAndel.tilStønadstype(): StønadstypeIverksetting =
+        when (this) {
+            TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> StønadstypeIverksetting.TILSYN_BARN_ENSLIG_FORSØRGER
+            TypeAndel.TILSYN_BARN_AAP -> StønadstypeIverksetting.TILSYN_BARN_AAP
+            TypeAndel.TILSYN_BARN_ETTERLATTE -> StønadstypeIverksetting.TILSYN_BARN_ETTERLATTE
+            TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER -> StønadstypeIverksetting.LÆREMIDLER_ENSLIG_FORSØRGER
+            TypeAndel.LÆREMIDLER_AAP -> StønadstypeIverksetting.LÆREMIDLER_AAP
+            TypeAndel.LÆREMIDLER_ETTERLATTE -> StønadstypeIverksetting.LÆREMIDLER_ETTERLATTE
 
-        TypeAndel.UGYLDIG -> error("Ugyldig type andel. Skal ikke iverksettes")
-    }
+            TypeAndel.UGYLDIG -> error("Ugyldig type andel. Skal ikke iverksettes")
+        }
 }

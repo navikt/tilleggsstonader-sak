@@ -43,21 +43,14 @@ import kotlin.reflect.KClass
 @EnableJdbcAuditing
 @EnableJdbcRepositories("no.nav.tilleggsstonader.sak", "no.nav.familie.prosessering")
 class DatabaseConfiguration : AbstractJdbcConfiguration() {
+    @Bean
+    fun operations(dataSource: DataSource): NamedParameterJdbcOperations = NamedParameterJdbcTemplate(dataSource)
 
     @Bean
-    fun operations(dataSource: DataSource): NamedParameterJdbcOperations {
-        return NamedParameterJdbcTemplate(dataSource)
-    }
+    fun transactionManager(dataSource: DataSource): PlatformTransactionManager = DataSourceTransactionManager(dataSource)
 
     @Bean
-    fun transactionManager(dataSource: DataSource): PlatformTransactionManager {
-        return DataSourceTransactionManager(dataSource)
-    }
-
-    @Bean
-    fun auditSporbarEndret(): AuditorAware<Endret> {
-        return AuditorAware { Optional.of(Endret()) }
-    }
+    fun auditSporbarEndret(): AuditorAware<Endret> = AuditorAware { Optional.of(Endret()) }
 
     @Bean
     fun verifyIgnoreIfProd(
@@ -77,54 +70,40 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     }
 
     @Bean
-    override fun jdbcCustomConversions(): JdbcCustomConversions {
-        return JdbcCustomConversions(
+    override fun jdbcCustomConversions(): JdbcCustomConversions =
+        JdbcCustomConversions(
             listOf(
                 StringTilPropertiesWrapperConverter(),
                 PropertiesWrapperTilStringConverter(),
-
                 PGobjectTilJsonWrapperConverter(),
                 JsonWrapperTilPGobjectConverter(),
-
                 PGobjectTilDelvilkårConverter(),
                 DelvilkårTilPGobjectConverter(),
-
                 SimuleringResponseWriter(),
                 SimuleringResponseReader(),
-
                 GrunnlagReader(),
                 GrunnlagWriter(),
-
                 ÅrsakerReader(),
                 ÅrsakerWriter(),
-
                 SkjemaBarnetilsynReader(),
                 SkjemaBarnetilsynWriter(),
                 BarnMedBarnepassReader(),
                 BarnMedBarnepassWriter(),
-
                 FilTilBytearrayConverter(),
                 BytearrayTilFilConverter(),
-
                 VedtaksdataReader(),
                 VedtaksdataWriter(),
-
                 TilVilkårperiodeTypeConverter(),
                 VilkårperiodeTypeTilStringConverter(),
-
                 VilkårperioderGrunnlagReader(),
                 VilkårperioderGrunnlagWriter(),
-
                 SkjemaLæremidlerReader(),
                 SkjemaLæremidlerWriter(),
-
                 FaktaOgVurderingReader(),
                 FaktaOgVurderingWriter(),
-
             ) + alleVedtaksstatistikkJsonConverters +
                 alleValueClassConverters,
         )
-    }
 
     @WritingConverter
     abstract class JsonWriter<T> : Converter<T, PGobject> {
@@ -136,23 +115,19 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     }
 
     @ReadingConverter
-    abstract class JsonReader<T : Any>(val clazz: KClass<T>) : Converter<PGobject, T> {
-        override fun convert(pGobject: PGobject): T? {
-            return pGobject.value?.let { objectMapper.readValue(it, clazz.java) }
-        }
+    abstract class JsonReader<T : Any>(
+        val clazz: KClass<T>,
+    ) : Converter<PGobject, T> {
+        override fun convert(pGobject: PGobject): T? = pGobject.value?.let { objectMapper.readValue(it, clazz.java) }
     }
 
     @ReadingConverter
     class PGobjectTilJsonWrapperConverter : Converter<PGobject, JsonWrapper?> {
-
-        override fun convert(pGobject: PGobject): JsonWrapper? {
-            return pGobject.value?.let { JsonWrapper(it) }
-        }
+        override fun convert(pGobject: PGobject): JsonWrapper? = pGobject.value?.let { JsonWrapper(it) }
     }
 
     @WritingConverter
     class JsonWrapperTilPGobjectConverter : Converter<JsonWrapper, PGobject> {
-
         override fun convert(jsonWrapper: JsonWrapper): PGobject =
             PGobject().apply {
                 type = "json"
@@ -162,31 +137,22 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @WritingConverter
     class FilTilBytearrayConverter : Converter<Fil, ByteArray> {
-
-        override fun convert(fil: Fil): ByteArray {
-            return fil.bytes
-        }
+        override fun convert(fil: Fil): ByteArray = fil.bytes
     }
 
     @ReadingConverter
     class BytearrayTilFilConverter : Converter<ByteArray, Fil> {
-
-        override fun convert(bytes: ByteArray): Fil {
-            return Fil(bytes)
-        }
+        override fun convert(bytes: ByteArray): Fil = Fil(bytes)
     }
 
     @ReadingConverter
     class PGobjectTilDelvilkårConverter : Converter<PGobject, DelvilkårWrapper> {
-
-        override fun convert(pGobject: PGobject): DelvilkårWrapper {
-            return DelvilkårWrapper(pGobject.value?.let { objectMapper.readValue(it) } ?: emptyList())
-        }
+        override fun convert(pGobject: PGobject): DelvilkårWrapper =
+            DelvilkårWrapper(pGobject.value?.let { objectMapper.readValue(it) } ?: emptyList())
     }
 
     @WritingConverter
     class DelvilkårTilPGobjectConverter : Converter<DelvilkårWrapper, PGobject> {
-
         override fun convert(data: DelvilkårWrapper): PGobject =
             PGobject().apply {
                 type = "json"
@@ -196,35 +162,37 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @ReadingConverter
     class TilVilkårperiodeTypeConverter : Converter<String, VilkårperiodeType> {
-
-        override fun convert(type: String): VilkårperiodeType {
-            return vilkårperiodetyper[type] ?: error("Finner ikke mapping for $type")
-        }
+        override fun convert(type: String): VilkårperiodeType = vilkårperiodetyper[type] ?: error("Finner ikke mapping for $type")
     }
 
     @WritingConverter
     class VilkårperiodeTypeTilStringConverter : Converter<VilkårperiodeType, String> {
-
         override fun convert(data: VilkårperiodeType): String = data.tilDbType()
     }
 
     class SimuleringResponseWriter : JsonWriter<SimuleringJson>()
+
     class SimuleringResponseReader : JsonReader<SimuleringJson>(SimuleringJson::class)
 
     class GrunnlagWriter : JsonWriter<Grunnlag>()
+
     class GrunnlagReader : JsonReader<Grunnlag>(Grunnlag::class)
 
     class ÅrsakerReader : JsonReader<Årsaker>(Årsaker::class)
+
     class ÅrsakerWriter : JsonWriter<Årsaker>()
 
     // Søknad
     class SkjemaBarnetilsynReader : JsonReader<SkjemaBarnetilsyn>(SkjemaBarnetilsyn::class)
+
     class SkjemaBarnetilsynWriter : JsonWriter<SkjemaBarnetilsyn>()
 
     class BarnMedBarnepassReader : JsonReader<BarnMedBarnepass>(BarnMedBarnepass::class)
+
     class BarnMedBarnepassWriter : JsonWriter<BarnMedBarnepass>()
 
     class VedtaksdataReader : JsonReader<Vedtaksdata>(Vedtaksdata::class)
+
     class VedtaksdataWriter : JsonWriter<Vedtaksdata>()
 
     class VilkårperioderGrunnlagReader : JsonReader<VilkårperioderGrunnlag>(VilkårperioderGrunnlag::class)

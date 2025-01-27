@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import java.util.UUID
 
 class StønadsperiodeDtoTest {
-
     @Test
     fun `skal validere at periode er gyldig`() {
         assertThatThrownBy {

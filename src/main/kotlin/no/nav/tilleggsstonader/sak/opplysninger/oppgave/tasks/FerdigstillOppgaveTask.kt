@@ -20,8 +20,9 @@ import java.util.Properties
     beskrivelse = "Avslutt oppgave i GOSYS",
     maxAntallFeil = 3,
 )
-class FerdigstillOppgaveTask(private val oppgaveService: OppgaveService) : AsyncTaskStep {
-
+class FerdigstillOppgaveTask(
+    private val oppgaveService: OppgaveService,
+) : AsyncTaskStep {
     /**
      * Då payload er unik per task type, så settes unik inn
      */
@@ -40,19 +41,22 @@ class FerdigstillOppgaveTask(private val oppgaveService: OppgaveService) : Async
     }
 
     companion object {
-
-        fun opprettTask(behandlingId: BehandlingId, oppgavetype: Oppgavetype, oppgaveId: Long?): Task {
-            return Task(
+        fun opprettTask(
+            behandlingId: BehandlingId,
+            oppgavetype: Oppgavetype,
+            oppgaveId: Long?,
+        ): Task =
+            Task(
                 type = TYPE,
                 payload = objectMapper.writeValueAsString(FerdigstillOppgaveTaskData(behandlingId, oppgavetype)),
-                properties = Properties().apply {
-                    setProperty("saksbehandler", SikkerhetContext.hentSaksbehandlerEllerSystembruker())
-                    setProperty("behandlingId", behandlingId.toString())
-                    setProperty("oppgavetype", oppgavetype.name)
-                    setProperty("oppgaveId", oppgaveId.toString())
-                },
+                properties =
+                    Properties().apply {
+                        setProperty("saksbehandler", SikkerhetContext.hentSaksbehandlerEllerSystembruker())
+                        setProperty("behandlingId", behandlingId.toString())
+                        setProperty("oppgavetype", oppgavetype.name)
+                        setProperty("oppgaveId", oppgaveId.toString())
+                    },
             )
-        }
 
         const val TYPE = "ferdigstillOppgave"
     }

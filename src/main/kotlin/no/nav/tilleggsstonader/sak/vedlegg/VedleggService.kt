@@ -10,7 +10,10 @@ class VedleggService(
     private val journalpostService: JournalpostService,
     private val fagsakPersonService: FagsakPersonService,
 ) {
-    fun finnVedleggForBruker(fagsakPersonId: FagsakPersonId, vedleggRequest: VedleggRequest): List<DokumentInfoDto> {
+    fun finnVedleggForBruker(
+        fagsakPersonId: FagsakPersonId,
+        vedleggRequest: VedleggRequest,
+    ): List<DokumentInfoDto> {
         val aktivIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
         val journalposter = journalpostService.finnJournalposterForBruker(aktivIdent, vedleggRequest)
 

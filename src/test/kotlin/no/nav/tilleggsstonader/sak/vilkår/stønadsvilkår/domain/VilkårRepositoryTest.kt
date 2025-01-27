@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.temporal.ChronoUnit
 
 internal class VilkårRepositoryTest : IntegrationTest() {
-
     @Autowired
     private lateinit var vilkårRepository: VilkårRepository
 
@@ -32,16 +31,17 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
         val vurderinger = listOf(Vurdering(RegelId.HAR_ET_NAVN, SvarId.JA, "ja"))
-        val vilkår = vilkårRepository.insert(
-            vilkår(
-                behandlingId = behandling.id,
-                type = VilkårType.PASS_BARN,
-                resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-                delvilkår = listOf(Delvilkår(Vilkårsresultat.OPPFYLT, vurderinger)),
-                barnId = null,
-                opphavsvilkår = Opphavsvilkår(behandling.id, SporbarUtils.now()),
-            ),
-        )
+        val vilkår =
+            vilkårRepository.insert(
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.PASS_BARN,
+                    resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+                    delvilkår = listOf(Delvilkår(Vilkårsresultat.OPPFYLT, vurderinger)),
+                    barnId = null,
+                    opphavsvilkår = Opphavsvilkår(behandling.id, SporbarUtils.now()),
+                ),
+            )
 
         Assertions.assertThat(vilkårRepository.findByBehandlingId(BehandlingId.random())).isEmpty()
         Assertions.assertThat(vilkårRepository.findByBehandlingId(behandling.id)).containsOnly(vilkår)
@@ -51,13 +51,14 @@ internal class VilkårRepositoryTest : IntegrationTest() {
     internal fun `vilkårsvurdering uten opphavsvilkår`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
-        val vilkår = vilkårRepository.insert(
-            vilkår(
-                behandlingId = behandling.id,
-                type = VilkårType.PASS_BARN,
-                resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-            ),
-        )
+        val vilkår =
+            vilkårRepository.insert(
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.PASS_BARN,
+                    resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+                ),
+            )
         Assertions.assertThat(vilkårRepository.findByBehandlingId(behandling.id)).containsOnly(vilkår)
     }
 
@@ -66,20 +67,26 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        val vilkår = vilkårRepository.insert(
-            vilkår(
-                behandling.id,
-                VilkårType.PASS_BARN,
-                Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-            ),
-        )
+        val vilkår =
+            vilkårRepository.insert(
+                vilkår(
+                    behandling.id,
+                    VilkårType.PASS_BARN,
+                    Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+                ),
+            )
         val nyttTidspunkt = osloNow().minusDays(1).truncatedTo(ChronoUnit.MILLIS)
 
         vilkårRepository.oppdaterEndretTid(vilkår.id, nyttTidspunkt)
 
-        Assertions.assertThat(vilkårRepository.findByIdOrThrow(vilkår.id).sporbar.endret.endretTid).isEqualTo(
-            nyttTidspunkt,
-        )
+        Assertions
+            .assertThat(
+                vilkårRepository
+                    .findByIdOrThrow(vilkår.id)
+                    .sporbar.endret.endretTid,
+            ).isEqualTo(
+                nyttTidspunkt,
+            )
     }
 
     @Test
@@ -88,9 +95,10 @@ internal class VilkårRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        val vilkår: Vilkår = BrukerContextUtil.testWithBrukerContext(preferredUsername = saksbehandler) {
-            vilkårRepository.insert(vilkår(behandling.id, VilkårType.PASS_BARN, Vilkårsresultat.IKKE_TATT_STILLING_TIL))
-        }
+        val vilkår: Vilkår =
+            BrukerContextUtil.testWithBrukerContext(preferredUsername = saksbehandler) {
+                vilkårRepository.insert(vilkår(behandling.id, VilkårType.PASS_BARN, Vilkårsresultat.IKKE_TATT_STILLING_TIL))
+            }
         Assertions.assertThat(vilkår.sporbar.opprettetAv).isEqualTo(saksbehandler)
         Assertions.assertThat(vilkår.sporbar.endret.endretAv).isEqualTo(saksbehandler)
 

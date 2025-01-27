@@ -21,19 +21,20 @@ class TilsynBeregningUtilTest {
 
     @Nested
     inner class SplitStønadsperioder {
-
         @Nested
         inner class EnStønadsperiode {
             @Test
             fun `stønadsperiode innenfor en måned skal kun gi en måned ut`() {
-                val stønadsperiode = stønadsperiode(
-                    behandlingId = behandlingId,
-                    fom = januar.atDay(3),
-                    tom = januar.atDay(21),
-                )
-                val stønadsperioder = listOf(
-                    stønadsperiode,
-                ).tilSortertStønadsperiodeBeregningsgrunnlag()
+                val stønadsperiode =
+                    stønadsperiode(
+                        behandlingId = behandlingId,
+                        fom = januar.atDay(3),
+                        tom = januar.atDay(21),
+                    )
+                val stønadsperioder =
+                    listOf(
+                        stønadsperiode,
+                    ).tilSortertStønadsperiodeBeregningsgrunnlag()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -43,11 +44,12 @@ class TilsynBeregningUtilTest {
 
             @Test
             fun `skal splitte en stønadsperiode over flere måneder`() {
-                val stønadsperiode = stønadsperiode(
-                    behandlingId = behandlingId,
-                    fom = LocalDate.of(2024, 1, 1),
-                    tom = LocalDate.of(2024, 3, 31),
-                )
+                val stønadsperiode =
+                    stønadsperiode(
+                        behandlingId = behandlingId,
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 3, 31),
+                    )
 
                 val stønadsperioder = listOf(stønadsperiode).tilSortertStønadsperiodeBeregningsgrunnlag()
 
@@ -66,22 +68,25 @@ class TilsynBeregningUtilTest {
         inner class FlereStønadsperioder {
             @Test
             fun `flere stønadsperioder innenfor en måned`() {
-                val stønadsperiode1 = stønadsperiode(
-                    behandlingId = behandlingId,
-                    fom = LocalDate.of(2024, 1, 1),
-                    tom = LocalDate.of(2024, 1, 10),
-                )
+                val stønadsperiode1 =
+                    stønadsperiode(
+                        behandlingId = behandlingId,
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 1, 10),
+                    )
 
-                val stønadsperiode2 = stønadsperiode(
-                    behandlingId = behandlingId,
-                    fom = LocalDate.of(2024, 1, 20),
-                    tom = LocalDate.of(2024, 1, 31),
-                )
+                val stønadsperiode2 =
+                    stønadsperiode(
+                        behandlingId = behandlingId,
+                        fom = LocalDate.of(2024, 1, 20),
+                        tom = LocalDate.of(2024, 1, 31),
+                    )
 
-                val stønadsperioder = listOf(
-                    stønadsperiode1,
-                    stønadsperiode2,
-                ).tilSortertStønadsperiodeBeregningsgrunnlag()
+                val stønadsperioder =
+                    listOf(
+                        stønadsperiode1,
+                        stønadsperiode2,
+                    ).tilSortertStønadsperiodeBeregningsgrunnlag()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -96,21 +101,24 @@ class TilsynBeregningUtilTest {
 
             @Test
             fun `skal splitte flere stønadsperiode over flere måneder`() {
-                val stønadsperiode1 = stønadsperiode(
-                    behandlingId = behandlingId,
-                    fom = januar.atDay(1),
-                    tom = februar.atDay(10),
-                )
-                val stønadsperiode2 = stønadsperiode(
-                    behandlingId = behandlingId,
-                    fom = februar.atDay(11),
-                    tom = mars.atDay(20),
-                )
+                val stønadsperiode1 =
+                    stønadsperiode(
+                        behandlingId = behandlingId,
+                        fom = januar.atDay(1),
+                        tom = februar.atDay(10),
+                    )
+                val stønadsperiode2 =
+                    stønadsperiode(
+                        behandlingId = behandlingId,
+                        fom = februar.atDay(11),
+                        tom = mars.atDay(20),
+                    )
 
-                val stønadsperioder = listOf(
-                    stønadsperiode1,
-                    stønadsperiode2,
-                ).tilSortertStønadsperiodeBeregningsgrunnlag()
+                val stønadsperioder =
+                    listOf(
+                        stønadsperiode1,
+                        stønadsperiode2,
+                    ).tilSortertStønadsperiodeBeregningsgrunnlag()
 
                 val resultat = stønadsperioder.tilÅrMåned()
 
@@ -128,7 +136,10 @@ class TilsynBeregningUtilTest {
 
     // TODO: Test for aktiviteter
 
-    private fun <T> Periode<T>.harVerdier(fom: T, tom: T) where T : Comparable<T>, T : Temporal {
+    private fun <T> Periode<T>.harVerdier(
+        fom: T,
+        tom: T,
+    ) where T : Comparable<T>, T : Temporal {
         assertThat(this.fom).isEqualTo(fom)
         assertThat(this.tom).isEqualTo(tom)
     }

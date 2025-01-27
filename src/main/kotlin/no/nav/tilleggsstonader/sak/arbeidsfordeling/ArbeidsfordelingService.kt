@@ -22,7 +22,6 @@ class ArbeidsfordelingService(
     private val personService: PersonService,
     private val egenAnsattService: EgenAnsattService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
@@ -30,13 +29,20 @@ class ArbeidsfordelingService(
         const val GEOGRAFISK_TILKNYTTING_OSLO = "0301"
     }
 
-    fun hentNavEnhetId(ident: String, oppgavetype: Oppgavetype, tema: Tema = Tema.TSO) = when (oppgavetype) {
+    fun hentNavEnhetId(
+        ident: String,
+        oppgavetype: Oppgavetype,
+        tema: Tema = Tema.TSO,
+    ) = when (oppgavetype) {
         Oppgavetype.VurderHenvendelse -> hentNavEnhetForOppfølging(ident, oppgavetype)?.enhetNr
         else -> hentNavEnhet(ident, tema)?.enhetNr
     }
 
-    fun hentNavEnhet(ident: String, tema: Tema = Tema.TSO): Arbeidsfordelingsenhet? {
-        return cacheManager.getNullable("navEnhet", ident) {
+    fun hentNavEnhet(
+        ident: String,
+        tema: Tema = Tema.TSO,
+    ): Arbeidsfordelingsenhet? =
+        cacheManager.getNullable("navEnhet", ident) {
             val kriterie = lagArbeidsfordelingKritierieForPerson(ident, tema)
             val enheter = arbeidsfordelingClient.finnArbeidsfordelingsenhet(kriterie)
             if (enheter.size != 1) {
@@ -44,18 +50,19 @@ class ArbeidsfordelingService(
             }
             enheter.firstOrNull()
         }
-    }
 
-    fun hentNavEnhetForOppfølging(ident: String, oppgavetype: Oppgavetype, tema: Tema = Tema.TSO): Arbeidsfordelingsenhet? {
-        return cacheManager.getNullable("navEnhetForOppfølging", ident) {
+    fun hentNavEnhetForOppfølging(
+        ident: String,
+        oppgavetype: Oppgavetype,
+        tema: Tema = Tema.TSO,
+    ): Arbeidsfordelingsenhet? =
+        cacheManager.getNullable("navEnhetForOppfølging", ident) {
             arbeidsfordelingClient.finnArbeidsfordelingsenhet(lagArbeidsfordelingKritierieForPerson(ident, tema, oppgavetype)).firstOrNull()
                 ?: error("Fant ikke Nav-enhet for oppgave av type $oppgavetype")
         }
-    }
 
-    fun hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(personIdent: String): String {
-        return hentNavEnhet(personIdent)?.enhetNr ?: MASKINELL_JOURNALFOERENDE_ENHET
-    }
+    fun hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(personIdent: String): String =
+        hentNavEnhet(personIdent)?.enhetNr ?: MASKINELL_JOURNALFOERENDE_ENHET
 
     private fun lagArbeidsfordelingKritierieForPerson(
         personIdent: String,
@@ -64,7 +71,11 @@ class ArbeidsfordelingService(
     ): ArbeidsfordelingKriterie {
         val personinfo = personService.hentSøker(personIdent)
         val geografiskTilknytning = utledGeografiskTilknytningKode(personService.hentGeografiskTilknytning(personIdent))
-        val diskresjonskode = personinfo.adressebeskyttelse.singleOrNull()?.gradering?.tilDiskresjonskode()
+        val diskresjonskode =
+            personinfo.adressebeskyttelse
+                .singleOrNull()
+                ?.gradering
+                ?.tilDiskresjonskode()
 
         return ArbeidsfordelingKriterie(
             tema = arbeidsfordelingstema.name,
@@ -75,8 +86,8 @@ class ArbeidsfordelingService(
         )
     }
 
-    private fun utledGeografiskTilknytningKode(geografiskTilknytning: GeografiskTilknytningDto?): String? {
-        return geografiskTilknytning?.let {
+    private fun utledGeografiskTilknytningKode(geografiskTilknytning: GeografiskTilknytningDto?): String? =
+        geografiskTilknytning?.let {
             when (it.gtType) {
                 GeografiskTilknytningType.BYDEL -> it.gtBydel
                 GeografiskTilknytningType.KOMMUNE -> it.gtKommune
@@ -88,5 +99,4 @@ class ArbeidsfordelingService(
                 }
             }
         }
-    }
 }

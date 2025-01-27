@@ -24,26 +24,27 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 class BehandlingsoversiktServiceTest {
-
     val fagsakService = mockk<FagsakService>()
     val behandlingRepository = mockk<BehandlingRepository>()
     val vedtakRepository = mockk<VedtakRepository>()
 
-    val service = BehandlingsoversiktService(
-        fagsakService = fagsakService,
-        behandlingRepository = behandlingRepository,
-        vedtakRepository = vedtakRepository,
-    )
+    val service =
+        BehandlingsoversiktService(
+            fagsakService = fagsakService,
+            behandlingRepository = behandlingRepository,
+            vedtakRepository = vedtakRepository,
+        )
 
     val fagsak = fagsak()
     val behandling = behandling(fagsak)
 
     @BeforeEach
     fun setUp() {
-        every { fagsakService.finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId) } returns Fagsaker(
-            barnetilsyn = fagsak,
-            læremidler = null,
-        )
+        every { fagsakService.finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId) } returns
+            Fagsaker(
+                barnetilsyn = fagsak,
+                læremidler = null,
+            )
         every { behandlingRepository.findByFagsakId(fagsakId = fagsak.id) } returns listOf(behandling)
         every { fagsakService.erLøpende(fagsak.id) } returns true
         mockVedtakRepository()
@@ -59,7 +60,6 @@ class BehandlingsoversiktServiceTest {
 
     @Nested
     inner class Vedtaksperiode {
-
         @Test
         fun `vedtaksperioden skal mappes til min og max av vedtaksperiode fra beregningsresultatet`() {
             val oversikt = service.hentOversikt(fagsak.fagsakPersonId)
@@ -83,34 +83,38 @@ class BehandlingsoversiktServiceTest {
     }
 
     private fun mockVedtakRepository() {
-        val stønadsperiodeGrunnlag = StønadsperiodeGrunnlag(
-            StønadsperiodeBeregningsgrunnlag(
-                fom = LocalDate.of(2024, 3, 1),
-                tom = LocalDate.of(2024, 3, 13),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-            ),
-            emptyList(),
-            10,
-        )
-        val stønadsperiodeGrunnlag2 = StønadsperiodeGrunnlag(
-            StønadsperiodeBeregningsgrunnlag(
-                fom = LocalDate.of(2024, 3, 2),
-                tom = LocalDate.of(2024, 3, 14),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-            ),
-            emptyList(),
-            10,
-        )
-        val beregningsresultatForMåned = beregningsresultatForMåned(
-            YearMonth.of(2024, 3),
-            stønadsperioder = listOf(stønadsperiodeGrunnlag, stønadsperiodeGrunnlag2),
-        )
+        val stønadsperiodeGrunnlag =
+            StønadsperiodeGrunnlag(
+                StønadsperiodeBeregningsgrunnlag(
+                    fom = LocalDate.of(2024, 3, 1),
+                    tom = LocalDate.of(2024, 3, 13),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                ),
+                emptyList(),
+                10,
+            )
+        val stønadsperiodeGrunnlag2 =
+            StønadsperiodeGrunnlag(
+                StønadsperiodeBeregningsgrunnlag(
+                    fom = LocalDate.of(2024, 3, 2),
+                    tom = LocalDate.of(2024, 3, 14),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                ),
+                emptyList(),
+                10,
+            )
+        val beregningsresultatForMåned =
+            beregningsresultatForMåned(
+                YearMonth.of(2024, 3),
+                stønadsperioder = listOf(stønadsperiodeGrunnlag, stønadsperiodeGrunnlag2),
+            )
         val beregningsresultat = BeregningsresultatTilsynBarn(perioder = listOf(beregningsresultatForMåned))
 
-        every { vedtakRepository.findAllById(any()) } returns listOf(
-            innvilgetVedtak(beregningsresultat = beregningsresultat, behandlingId = behandling.id),
-        )
+        every { vedtakRepository.findAllById(any()) } returns
+            listOf(
+                innvilgetVedtak(beregningsresultat = beregningsresultat, behandlingId = behandling.id),
+            )
     }
 }

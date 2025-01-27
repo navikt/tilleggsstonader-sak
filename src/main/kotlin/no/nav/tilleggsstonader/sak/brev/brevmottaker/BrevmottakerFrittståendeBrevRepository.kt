@@ -9,9 +9,15 @@ import java.util.UUID
 
 @Repository
 interface BrevmottakerFrittståendeBrevRepository :
-    RepositoryInterface<BrevmottakerFrittståendeBrev, UUID>, InsertUpdateRepository<BrevmottakerFrittståendeBrev> {
+    RepositoryInterface<BrevmottakerFrittståendeBrev, UUID>,
+    InsertUpdateRepository<BrevmottakerFrittståendeBrev> {
+    fun existsByFagsakIdAndSporbarOpprettetAvAndBrevIdIsNull(
+        fagsakId: FagsakId,
+        opprettetAv: String,
+    ): Boolean
 
-    fun existsByFagsakIdAndSporbarOpprettetAvAndBrevIdIsNull(fagsakId: FagsakId, opprettetAv: String): Boolean
-
-    fun findByFagsakIdAndSporbarOpprettetAvAndBrevIdIsNull(fagsakId: FagsakId, opprettetAv: String): List<BrevmottakerFrittståendeBrev>
+    fun findByFagsakIdAndSporbarOpprettetAvAndBrevIdIsNull(
+        fagsakId: FagsakId,
+        opprettetAv: String,
+    ): List<BrevmottakerFrittståendeBrev>
 }

@@ -18,20 +18,22 @@ data class RegelResultat(
     val vilkår: Vilkårsresultat,
     val delvilkår: Map<RegelId, Vilkårsresultat>,
 ) {
-
     fun resultatHovedregel(hovedregel: RegelId) =
         delvilkår[hovedregel] ?: throw Feil("Savner resultat for regelId=$hovedregel vilkårType=$vilkårType")
 }
 
 object RegelEvaluering {
-
     /**
      * @return [RegelResultat] med resultat for vilkåret og delvilkår
      */
-    fun utledResultat(vilkårsregel: Vilkårsregel, delvilkårsett: List<DelvilkårDto>): RegelResultat {
-        val delvilkårResultat = delvilkårsett.associate { delvilkår ->
-            delvilkår.hovedregel() to utledResultatForDelvilkår(vilkårsregel, delvilkår)
-        }
+    fun utledResultat(
+        vilkårsregel: Vilkårsregel,
+        delvilkårsett: List<DelvilkårDto>,
+    ): RegelResultat {
+        val delvilkårResultat =
+            delvilkårsett.associate { delvilkår ->
+                delvilkår.hovedregel() to utledResultatForDelvilkår(vilkårsregel, delvilkår)
+            }
         return RegelResultat(
             vilkårType = vilkårsregel.vilkårType,
             vilkår = utledVilkårResultat(delvilkårResultat),
@@ -39,17 +41,22 @@ object RegelEvaluering {
         )
     }
 
-    fun utledVilkårResultat(delvilkårResultat: Map<RegelId, Vilkårsresultat>): Vilkårsresultat {
-        return when {
-            delvilkårResultat.values.all { it == Vilkårsresultat.OPPFYLT || it == Vilkårsresultat.AUTOMATISK_OPPFYLT } -> Vilkårsresultat.OPPFYLT
-            delvilkårResultat.values.all { it == Vilkårsresultat.OPPFYLT || it == Vilkårsresultat.IKKE_OPPFYLT || it == Vilkårsresultat.AUTOMATISK_OPPFYLT } ->
+    fun utledVilkårResultat(delvilkårResultat: Map<RegelId, Vilkårsresultat>): Vilkårsresultat =
+        when {
+            delvilkårResultat.values.all {
+                it == Vilkårsresultat.OPPFYLT || it == Vilkårsresultat.AUTOMATISK_OPPFYLT
+            } -> Vilkårsresultat.OPPFYLT
+            delvilkårResultat.values.all {
+                it == Vilkårsresultat.OPPFYLT ||
+                    it == Vilkårsresultat.IKKE_OPPFYLT ||
+                    it == Vilkårsresultat.AUTOMATISK_OPPFYLT
+            } ->
                 Vilkårsresultat.IKKE_OPPFYLT
             delvilkårResultat.values.any { it == Vilkårsresultat.SKAL_IKKE_VURDERES } -> Vilkårsresultat.SKAL_IKKE_VURDERES
             delvilkårResultat.values.any { it == Vilkårsresultat.IKKE_TATT_STILLING_TIL } ->
                 Vilkårsresultat.IKKE_TATT_STILLING_TIL
             else -> error("Håndterer ikke situasjonen med resultat=${delvilkårResultat.values}")
         }
-    }
 
     /**
      * Dette setter foreløpig resultat, men fortsetter å validere resterende svar slik att man fortsatt har ett gyldig svar

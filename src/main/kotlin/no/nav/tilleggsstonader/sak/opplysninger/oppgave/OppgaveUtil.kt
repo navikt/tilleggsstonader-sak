@@ -10,7 +10,6 @@ import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 
 object OppgaveUtil {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     val ENHET_NR_NAY = "4462" // Tilleggsstønad INN
@@ -31,35 +30,39 @@ object OppgaveUtil {
         }
     }
 
-    fun finnPersonidentForOppgave(oppgave: Oppgave): String? =
-        oppgave.identer?.first { it.gruppe == IdentGruppe.FOLKEREGISTERIDENT }?.ident
+    fun finnPersonidentForOppgave(oppgave: Oppgave): String? = oppgave.identer?.first { it.gruppe == IdentGruppe.FOLKEREGISTERIDENT }?.ident
 
-    fun utledBehandlesAvApplikasjon(oppgavetype: Oppgavetype) = when (oppgavetype) {
-        Oppgavetype.Journalføring,
-        Oppgavetype.BehandleSak,
-        Oppgavetype.BehandleUnderkjentVedtak,
-        Oppgavetype.GodkjenneVedtak,
-        -> "tilleggsstonader-sak"
+    fun utledBehandlesAvApplikasjon(oppgavetype: Oppgavetype) =
+        when (oppgavetype) {
+            Oppgavetype.Journalføring,
+            Oppgavetype.BehandleSak,
+            Oppgavetype.BehandleUnderkjentVedtak,
+            Oppgavetype.GodkjenneVedtak,
+            -> "tilleggsstonader-sak"
 
-        else -> error("Håndterer ikke behandlesAvApplikasjon for $oppgavetype")
-    }
+            else -> error("Håndterer ikke behandlesAvApplikasjon for $oppgavetype")
+        }
 
-    fun skalPlasseresIKlarMappe(oppgavetype: Oppgavetype) = when (oppgavetype) {
-        Oppgavetype.Journalføring,
-        Oppgavetype.BehandleSak,
-        Oppgavetype.BehandleUnderkjentVedtak,
-        Oppgavetype.GodkjenneVedtak,
-        -> true
+    fun skalPlasseresIKlarMappe(oppgavetype: Oppgavetype) =
+        when (oppgavetype) {
+            Oppgavetype.Journalføring,
+            Oppgavetype.BehandleSak,
+            Oppgavetype.BehandleUnderkjentVedtak,
+            Oppgavetype.GodkjenneVedtak,
+            -> true
 
-        else -> error("Håndterer ikke klar-mappe-håndtering for $oppgavetype")
-    }
+            else -> error("Håndterer ikke klar-mappe-håndtering for $oppgavetype")
+        }
 
     /**
      * Skal ikke opprette oppgave når en behandling har feil status for gitt oppgavetype
      * Eks i en behandling som sendes til beslutter, så opprettes det en task for GodkjenneVedtak
      * Hvis saksbehandler angrer send til beslutter før oppgaven er opprettet, så skal man ikke opprette GodkjennVedtak-oppgaven
      */
-    fun skalIkkeOppretteOppgave(saksbehandling: Saksbehandling, oppgavetype: Oppgavetype): Boolean {
+    fun skalIkkeOppretteOppgave(
+        saksbehandling: Saksbehandling,
+        oppgavetype: Oppgavetype,
+    ): Boolean {
         return when (oppgavetype) {
             Oppgavetype.BehandleSak -> saksbehandling.status.behandlingErLåstForVidereRedigering()
             Oppgavetype.GodkjenneVedtak -> saksbehandling.status != BehandlingStatus.FATTER_VEDTAK

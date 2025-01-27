@@ -11,7 +11,9 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave
  * Hvis en ettersending til tilsyn barn kommer der, så skal den vanligvis flyttes manuellt til klar-mappen,
  * for å sen journalføres/behandles i ny saksbehandling.
  */
-enum class OppgaveMappe(vararg val navn: String) {
+enum class OppgaveMappe(
+    vararg val navn: String,
+) {
     KLAR("TS-sak Klar"),
     PÅ_VENT("TS-sak På vent", "TS Sak På vent"),
     ;

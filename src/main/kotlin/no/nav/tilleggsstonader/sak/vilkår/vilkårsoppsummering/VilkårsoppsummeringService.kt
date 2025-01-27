@@ -12,7 +12,6 @@ class VilkårsoppsummeringService(
     private val stønadsperiodeService: StønadsperiodeService,
     private val grunnlagsdataService: GrunnlagsdataService,
 ) {
-
     fun hentVilkårsoppsummering(behandlingId: BehandlingId): VilkårsoppsummeringDto {
         val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
 
@@ -22,7 +21,10 @@ class VilkårsoppsummeringService(
         )
     }
 
-    private fun visVarselForKontantstøtte(behandlingId: BehandlingId, stønadsperioder: List<StønadsperiodeDto>): Boolean {
+    private fun visVarselForKontantstøtte(
+        behandlingId: BehandlingId,
+        stønadsperioder: List<StønadsperiodeDto>,
+    ): Boolean {
         if (stønadsperioder.isEmpty()) {
             return false
         }

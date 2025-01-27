@@ -19,7 +19,6 @@ class OpprettGrunnlagsdataLokalPostgres(
     behandlingRepository: BehandlingRepository,
     grunnlagsdataService: GrunnlagsdataService,
 ) {
-
     init {
         var antallFeilet = 0
         behandlingRepository.findAll().forEach {

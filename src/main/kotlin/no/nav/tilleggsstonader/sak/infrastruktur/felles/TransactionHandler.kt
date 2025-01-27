@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class TransactionHandler {
-
     @Transactional(propagation = Propagation.REQUIRED)
     fun <T> runInTransaction(fn: () -> T) = fn()
 

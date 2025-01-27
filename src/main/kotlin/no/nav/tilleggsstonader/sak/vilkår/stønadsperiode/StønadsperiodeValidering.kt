@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
 
 object StønadsperiodeValidering {
-
     /**
      * Validering av stønadsperioder som kjøres når man endrer vilkårperiode trenger ikke å validere fødselsdatoet.
      * Det er tilstrekkelig at det gjøres vid validering av stønadsperioder.
@@ -63,15 +62,21 @@ object StønadsperiodeValidering {
             "Kombinasjonen av ${stønadsperiode.målgruppe} og ${stønadsperiode.aktivitet} er ikke gyldig"
         }
 
-        val målgrupper = målgruppePerioderPerType[stønadsperiode.målgruppe]?.takeIf { it.isNotEmpty() }
-            ?: brukerfeil("Finner ingen perioder hvor vilkår for ${stønadsperiode.målgruppe} er oppfylt")
-        val aktiviteter = aktivitetPerioderPerType[stønadsperiode.aktivitet]?.takeIf { it.isNotEmpty() }
-            ?: brukerfeil("Finner ingen perioder hvor vilkår for ${stønadsperiode.aktivitet} er oppfylt")
+        val målgrupper =
+            målgruppePerioderPerType[stønadsperiode.målgruppe]?.takeIf { it.isNotEmpty() }
+                ?: brukerfeil("Finner ingen perioder hvor vilkår for ${stønadsperiode.målgruppe} er oppfylt")
+        val aktiviteter =
+            aktivitetPerioderPerType[stønadsperiode.aktivitet]?.takeIf { it.isNotEmpty() }
+                ?: brukerfeil("Finner ingen perioder hvor vilkår for ${stønadsperiode.aktivitet} er oppfylt")
 
         målgrupper.firstOrNull { it.inneholder(stønadsperiode) }
-            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.målgruppe} i perioden ${stønadsperiode.formatertPeriodeNorskFormat()}")
+            ?: brukerfeil(
+                "Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.målgruppe} i perioden ${stønadsperiode.formatertPeriodeNorskFormat()}",
+            )
         aktiviteter.firstOrNull { it.inneholder(stønadsperiode) }
-            ?: brukerfeil("Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.aktivitet} i perioden ${stønadsperiode.formatertPeriodeNorskFormat()}")
+            ?: brukerfeil(
+                "Finnes ingen periode med oppfylte vilkår for ${stønadsperiode.aktivitet} i perioden ${stønadsperiode.formatertPeriodeNorskFormat()}",
+            )
 
         validerStønadsperiodeErInnenfor18og67år(fødselsdato, stønadsperiode)
     }
@@ -84,8 +89,9 @@ object StønadsperiodeValidering {
         vilkårperioder: Vilkårperioder,
         stønadsperioder: List<StønadsperiodeDto>,
     ) {
-        val perioderSomIkkeGirRett = (vilkårperioder.målgrupper + vilkårperioder.aktiviteter)
-            .filter { it.type.girIkkeRettPåStønadsperiode() && it.resultat != ResultatVilkårperiode.SLETTET }
+        val perioderSomIkkeGirRett =
+            (vilkårperioder.målgrupper + vilkårperioder.aktiviteter)
+                .filter { it.type.girIkkeRettPåStønadsperiode() && it.resultat != ResultatVilkårperiode.SLETTET }
         stønadsperioder.forEach { validerIkkeOverlapperMedPeriodeSomIkkeGirRettPåStønad(perioderSomIkkeGirRett, it) }
     }
 
@@ -124,10 +130,13 @@ object StønadsperiodeValidering {
  *  @return En sortert map kategorisert på periodetype med de oppfylte vilkårsperiodene. Periodene slåes sammen dersom
  *  de er sammenhengende, også selv om de har overlapp.
  */
-fun List<Vilkårperiode>.mergeSammenhengendeOppfylteVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> {
-    return this.sorted().filter { it.resultat == ResultatVilkårperiode.OPPFYLT }.groupBy { it.type }
+fun List<Vilkårperiode>.mergeSammenhengendeOppfylteVilkårperioder(): Map<VilkårperiodeType, List<Datoperiode>> =
+    this
+        .sorted()
+        .filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
+        .groupBy { it.type }
         .mapValues {
-            it.value.map { Datoperiode(it.fom, it.tom) }
+            it.value
+                .map { Datoperiode(it.fom, it.tom) }
                 .mergeSammenhengende { a, b -> a.overlapper(b) || a.tom.plusDays(1) == b.fom }
         }
-}

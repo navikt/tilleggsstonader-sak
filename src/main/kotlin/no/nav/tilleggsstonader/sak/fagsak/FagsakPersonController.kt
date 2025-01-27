@@ -24,9 +24,10 @@ class FagsakPersonController(
     private val fagsakPersonService: FagsakPersonService,
     private val fagsakService: FagsakService,
 ) {
-
     @PostMapping
-    fun hentEllerOpprettFagsakPerson(@RequestBody identRequest: IdentRequest): FagsakPersonId {
+    fun hentEllerOpprettFagsakPerson(
+        @RequestBody identRequest: IdentRequest,
+    ): FagsakPersonId {
         tilgangService.validerTilgangTilPersonMedBarn(identRequest.ident, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -34,7 +35,9 @@ class FagsakPersonController(
     }
 
     @GetMapping("{fagsakPersonId}")
-    fun hentFagsakPerson(@PathVariable fagsakPersonId: FagsakPersonId): FagsakPersonDto {
+    fun hentFagsakPerson(
+        @PathVariable fagsakPersonId: FagsakPersonId,
+    ): FagsakPersonDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         val person = fagsakPersonService.hentPerson(fagsakPersonId)
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(person.id)

@@ -41,4 +41,7 @@ data class AdRoller(
     val egenAnsatt: AdRolle,
 )
 
-data class AdRolle(val rolleId: String, val beskrivelse: String)
+data class AdRolle(
+    val rolleId: String,
+    val beskrivelse: String,
+)

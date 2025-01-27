@@ -28,7 +28,6 @@ class DagligIverksettTask(
     private val taskService: TaskService,
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
 ) : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         /**
          * Skal bruke dagens dato som utbetalingsdato.
@@ -49,12 +48,12 @@ class DagligIverksettTask(
     }
 
     companion object {
-
         fun opprettTask(utbetalingsdato: LocalDate): Task {
-            val properties = Properties().apply {
-                setProperty("utbetalingsdato", utbetalingsdato.toString())
-                setProperty(MDCConstants.MDC_CALL_ID, IdUtils.generateId())
-            }
+            val properties =
+                Properties().apply {
+                    setProperty("utbetalingsdato", utbetalingsdato.toString())
+                    setProperty(MDCConstants.MDC_CALL_ID, IdUtils.generateId())
+                }
 
             return Task(TYPE, utbetalingsdato.toString())
                 .copy(metadataWrapper = PropertiesWrapper(properties))

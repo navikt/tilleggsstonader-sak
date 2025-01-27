@@ -7,8 +7,9 @@ import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
 
 @Repository
-interface FagsakPersonRepository : RepositoryInterface<FagsakPerson, FagsakPersonId>, InsertUpdateRepository<FagsakPerson> {
-
+interface FagsakPersonRepository :
+    RepositoryInterface<FagsakPerson, FagsakPersonId>,
+    InsertUpdateRepository<FagsakPerson> {
     @Query(
         """SELECT p.* FROM fagsak_person p WHERE 
                 EXISTS(SELECT 1 FROM person_ident WHERE fagsak_person_id = p.id AND ident IN (:identer))""",

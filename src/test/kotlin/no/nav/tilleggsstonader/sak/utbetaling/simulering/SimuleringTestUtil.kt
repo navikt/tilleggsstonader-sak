@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
 
 object SimuleringTestUtil {
-
     fun simuleringsresultat(
         behandlingId: BehandlingId = BehandlingId.random(),
         data: SimuleringJson? = null,

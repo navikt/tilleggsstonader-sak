@@ -16,32 +16,32 @@ class EksternKlageVedtakService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
 ) {
-
     fun hentVedtak(eksternFagsakId: Long): List<FagsystemVedtak> {
         val fagsak = fagsakService.hentFagsakPåEksternId(eksternFagsakId)
         return hentFerdigstilteBehandlinger(fagsak)
     }
 
-    private fun hentFerdigstilteBehandlinger(fagsak: Fagsak): List<FagsystemVedtak> {
-        return behandlingService.hentBehandlinger(fagsakId = fagsak.id)
+    private fun hentFerdigstilteBehandlinger(fagsak: Fagsak): List<FagsystemVedtak> =
+        behandlingService
+            .hentBehandlinger(fagsakId = fagsak.id)
             .filter { it.erAvsluttet() && it.resultat != BehandlingResultat.HENLAGT }
             .map { tilFagsystemVedtak(it) }
-    }
 
-    private fun tilFagsystemVedtak(behandling: Behandling): FagsystemVedtak {
-        return FagsystemVedtak(
+    private fun tilFagsystemVedtak(behandling: Behandling): FagsystemVedtak =
+        FagsystemVedtak(
             eksternBehandlingId = behandlingService.hentEksternBehandlingId(behandling.id).id.toString(),
             behandlingstype = behandling.type.visningsnavn,
             resultat = behandling.resultat.displayName,
-            vedtakstidspunkt = behandling.vedtakstidspunkt
-                ?: error("Mangler vedtakstidspunkt for behandling=${behandling.id}"),
+            vedtakstidspunkt =
+                behandling.vedtakstidspunkt
+                    ?: error("Mangler vedtakstidspunkt for behandling=${behandling.id}"),
             fagsystemType = FagsystemType.ORDNIÆR,
             regelverk = mapTilRegelverk(behandling.kategori),
         )
-    }
 
-    private fun mapTilRegelverk(kategori: BehandlingKategori) = when (kategori) {
-        BehandlingKategori.EØS -> Regelverk.EØS
-        BehandlingKategori.NASJONAL -> Regelverk.NASJONAL
-    }
+    private fun mapTilRegelverk(kategori: BehandlingKategori) =
+        when (kategori) {
+            BehandlingKategori.EØS -> Regelverk.EØS
+            BehandlingKategori.NASJONAL -> Regelverk.NASJONAL
+        }
 }

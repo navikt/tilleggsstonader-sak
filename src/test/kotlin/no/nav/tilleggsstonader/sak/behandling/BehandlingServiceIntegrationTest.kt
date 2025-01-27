@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 internal class BehandlingServiceIntegrationTest : IntegrationTest() {
-
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
 
@@ -60,9 +59,10 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
     @Test
     internal fun `skal finne siste behandling med avslåtte hvis kun avslått`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = testoppsettService.lagre(
-            behandling(fagsak, resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
-        )
+        val behandling =
+            testoppsettService.lagre(
+                behandling(fagsak, resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
+            )
         val sisteBehandling = behandlingService.finnSisteIverksatteBehandlingMedEventuellAvslått(fagsak.id)
         assertThat(sisteBehandling?.id).isEqualTo(behandling.id)
     }
@@ -70,9 +70,10 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
     @Test
     internal fun `skal finne siste behandling med avslåtte hvis avslått og henlagt`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val avslag = testoppsettService.lagre(
-            behandling(fagsak, resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
-        )
+        val avslag =
+            testoppsettService.lagre(
+                behandling(fagsak, resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
+            )
         testoppsettService.lagre(
             behandling(fagsak, resultat = BehandlingResultat.HENLAGT, status = BehandlingStatus.FERDIGSTILT),
         )
@@ -83,9 +84,10 @@ internal class BehandlingServiceIntegrationTest : IntegrationTest() {
     @Test
     internal fun `skal plukke ut førstegangsbehandling hvis det finnes førstegangsbehandling, avslått og henlagt`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val førstegang = testoppsettService.lagre(
-            behandling(fagsak, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT),
-        )
+        val førstegang =
+            testoppsettService.lagre(
+                behandling(fagsak, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT),
+            )
         testoppsettService.lagre(
             behandling(fagsak, resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
         )

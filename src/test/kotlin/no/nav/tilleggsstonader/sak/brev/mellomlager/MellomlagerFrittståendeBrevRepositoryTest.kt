@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.temporal.ChronoUnit
 
 internal class MellomlagerFrittståendeBrevRepositoryTest : IntegrationTest() {
-
     @Autowired
     private lateinit var repository: MellomlagerFrittståendeBrevRepository
 
@@ -28,12 +27,16 @@ internal class MellomlagerFrittståendeBrevRepositoryTest : IntegrationTest() {
         val mellomlagretBrev = repository.insert(mellomlagretFrittståendeBrev())
 
         val mellomlagretBrevFraDb = repository.findById(mellomlagretBrev.id)
-        assertThat(mellomlagretBrevFraDb).get()
+        assertThat(mellomlagretBrevFraDb)
+            .get()
             .usingRecursiveComparison()
             .ignoringFields("sporbar.endret.endretTid")
             .isEqualTo(mellomlagretBrev)
-        assertThat(mellomlagretBrevFraDb.get().sporbar.endret.endretTid)
-            .isCloseTo(mellomlagretBrev.sporbar.endret.endretTid, within(1, ChronoUnit.SECONDS))
+        assertThat(
+            mellomlagretBrevFraDb
+                .get()
+                .sporbar.endret.endretTid,
+        ).isCloseTo(mellomlagretBrev.sporbar.endret.endretTid, within(1, ChronoUnit.SECONDS))
     }
 
     @Test
@@ -69,9 +72,10 @@ internal class MellomlagerFrittståendeBrevRepositoryTest : IntegrationTest() {
         assertThat(repository.findByFagsakIdAndSporbarOpprettetAv(fagsak.id, saksbehandlerA)).isNull()
     }
 
-    private fun mellomlagretFrittståendeBrev() = MellomlagretFrittståendeBrev(
-        fagsakId = fagsak.id,
-        brevverdier = "{}",
-        brevmal = "",
-    )
+    private fun mellomlagretFrittståendeBrev() =
+        MellomlagretFrittståendeBrev(
+            fagsakId = fagsak.id,
+            brevverdier = "{}",
+            brevmal = "",
+        )
 }

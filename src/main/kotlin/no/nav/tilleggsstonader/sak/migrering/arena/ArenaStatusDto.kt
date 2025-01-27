@@ -11,11 +11,12 @@ data class ArenaFinnesPersonRequest(
 ) {
     @get:JsonIgnore
     val stønadstype: Stønadstype
-        get() = try {
-            Rettighet.fraKodeArena(rettighet).stønadstype
-        } catch (e: IllegalStateException) {
-            throw Feil(e.message ?: "Ukjent feil")
-        }
+        get() =
+            try {
+                Rettighet.fraKodeArena(rettighet).stønadstype
+            } catch (e: IllegalStateException) {
+                throw Feil(e.message ?: "Ukjent feil")
+            }
 }
 
 data class ArenaFinnesPersonResponse(

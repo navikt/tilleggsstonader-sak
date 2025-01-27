@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class JournalpostServiceTest() {
+class JournalpostServiceTest {
     private val journalpostClient = mockk<JournalpostClient>()
     private val personService = mockk<PersonService>()
     private val journalpostService = JournalpostService(journalpostClient, personService)
@@ -43,10 +43,11 @@ class JournalpostServiceTest() {
                 personService.hentPersonIdenter(aktørId)
             } returns PdlIdenter(listOf(PdlIdent(personIdentFraPdl, false)))
 
-            every { journalpostClient.hentJournalpost(any()) } returns journalpost(
-                journalpostId = journalpostId,
-                bruker = Bruker(type = BrukerIdType.AKTOERID, id = aktørId),
-            )
+            every { journalpostClient.hentJournalpost(any()) } returns
+                journalpost(
+                    journalpostId = journalpostId,
+                    bruker = Bruker(type = BrukerIdType.AKTOERID, id = aktørId),
+                )
 
             val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
 
@@ -95,15 +96,17 @@ class JournalpostServiceTest() {
     inner class HentDokument {
         private val bruker = Bruker(id = FnrGenerator.generer(), type = BrukerIdType.FNR)
         private val dokumentInfoId = "dokumentInfoId"
-        private val journalpost = journalpost(
-            bruker = bruker,
-            dokumenter = listOf(
-                dokumentInfo(
-                    dokumentInfoId = dokumentInfoId,
-                    dokumentvarianter = listOf(dokumentvariant(Dokumentvariantformat.FULLVERSJON)),
-                ),
-            ),
-        )
+        private val journalpost =
+            journalpost(
+                bruker = bruker,
+                dokumenter =
+                    listOf(
+                        dokumentInfo(
+                            dokumentInfoId = dokumentInfoId,
+                            dokumentvarianter = listOf(dokumentvariant(Dokumentvariantformat.FULLVERSJON)),
+                        ),
+                    ),
+            )
 
         @Test
         fun `skal ikke hente dokument om ikke dokument med samme id finnes i journalpost`() {
@@ -128,23 +131,25 @@ class JournalpostServiceTest() {
 
     @Nested
     inner class LogiskVedlegg {
-
-        private val dokumentUtenLogiskVedlegg = DokumentInfo(
-            dokumentInfoId = "123",
-            "Dokumenttittel",
-            brevkode = DokumentBrevkode.BARNETILSYN.verdi,
-            dokumentvarianter =
-            listOf(
-                Dokumentvariant(Dokumentvariantformat.ARKIV, saksbehandlerHarTilgang = true),
-            ),
-        )
-        private val dokumentMedLogiskVedlegg = dokumentUtenLogiskVedlegg.copy(
-            dokumentInfoId = "1234",
-            logiskeVedlegg = listOf(
-                LogiskVedlegg(logiskVedleggId = "123", tittel = "Annet Innhold 1"),
-                LogiskVedlegg(logiskVedleggId = "1234", tittel = "Annet Innhold 2"),
-            ),
-        )
+        private val dokumentUtenLogiskVedlegg =
+            DokumentInfo(
+                dokumentInfoId = "123",
+                "Dokumenttittel",
+                brevkode = DokumentBrevkode.BARNETILSYN.verdi,
+                dokumentvarianter =
+                    listOf(
+                        Dokumentvariant(Dokumentvariantformat.ARKIV, saksbehandlerHarTilgang = true),
+                    ),
+            )
+        private val dokumentMedLogiskVedlegg =
+            dokumentUtenLogiskVedlegg.copy(
+                dokumentInfoId = "1234",
+                logiskeVedlegg =
+                    listOf(
+                        LogiskVedlegg(logiskVedleggId = "123", tittel = "Annet Innhold 1"),
+                        LogiskVedlegg(logiskVedleggId = "1234", tittel = "Annet Innhold 2"),
+                    ),
+            )
 
         @BeforeEach
         fun setUp() {
@@ -156,15 +161,18 @@ class JournalpostServiceTest() {
         @Test
         fun `oppdaterOgFerdigstillJournalpost skal oppdatere logisk vedlegg`() {
             journalpostService.oppdaterOgFerdigstillJournalpost(
-                journalpost = journalpost(
-                    dokumenter = listOf(dokumentUtenLogiskVedlegg, dokumentMedLogiskVedlegg),
-                ),
-                dokumenttitler = null,
-                logiskeVedlegg = mapOf(
-                    dokumentMedLogiskVedlegg.dokumentInfoId to listOf(
-                        LogiskVedlegg(logiskVedleggId = "123", tittel = "Endret tittel"),
+                journalpost =
+                    journalpost(
+                        dokumenter = listOf(dokumentUtenLogiskVedlegg, dokumentMedLogiskVedlegg),
                     ),
-                ),
+                dokumenttitler = null,
+                logiskeVedlegg =
+                    mapOf(
+                        dokumentMedLogiskVedlegg.dokumentInfoId to
+                            listOf(
+                                LogiskVedlegg(logiskVedleggId = "123", tittel = "Endret tittel"),
+                            ),
+                    ),
                 journalførendeEnhet = "123",
                 fagsak = fagsak(),
                 saksbehandler = "saksbehandler",
@@ -187,9 +195,10 @@ class JournalpostServiceTest() {
         @Test
         fun `oppdaterOgFerdigstillJournalpost skal ikke oppdatere logisk vedlegg dersom de ikke sendes med`() {
             journalpostService.oppdaterOgFerdigstillJournalpost(
-                journalpost = journalpost(
-                    dokumenter = listOf(dokumentUtenLogiskVedlegg, dokumentMedLogiskVedlegg),
-                ),
+                journalpost =
+                    journalpost(
+                        dokumenter = listOf(dokumentUtenLogiskVedlegg, dokumentMedLogiskVedlegg),
+                    ),
                 dokumenttitler = null,
                 logiskeVedlegg = null,
                 journalførendeEnhet = "123",

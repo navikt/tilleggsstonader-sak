@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class InterntVedtakServiceTest {
-
     private val behandlingService = mockk<BehandlingService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>()
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
@@ -42,17 +41,18 @@ class InterntVedtakServiceTest {
     private val vilkårService = mockk<VilkårService>()
     private val vedtakService = mockk<VedtakService>()
 
-    val service = InterntVedtakService(
-        behandlingService = behandlingService,
-        totrinnskontrollService = totrinnskontrollService,
-        vilkårperiodeService = vilkårperiodeService,
-        stønadsperiodeService = stønadsperiodeService,
-        søknadService = søknadService,
-        grunnlagsdataService = grunnlagsdataService,
-        barnService = barnService,
-        vilkårService = vilkårService,
-        vedtakService = vedtakService,
-    )
+    val service =
+        InterntVedtakService(
+            behandlingService = behandlingService,
+            totrinnskontrollService = totrinnskontrollService,
+            vilkårperiodeService = vilkårperiodeService,
+            stønadsperiodeService = stønadsperiodeService,
+            søknadService = søknadService,
+            grunnlagsdataService = grunnlagsdataService,
+            barnService = barnService,
+            vilkårService = vilkårService,
+            vedtakService = vedtakService,
+        )
 
     @BeforeEach
     fun setUp() {
@@ -104,7 +104,8 @@ class InterntVedtakServiceTest {
             assertThat(interntVedtak.målgrupper).hasSize(2)
 
             val målgruppe =
-                Testdata.TilsynBarn.vilkårperioder.målgrupper.single { it.type == MålgruppeType.AAP }
+                Testdata.TilsynBarn.vilkårperioder.målgrupper
+                    .single { it.type == MålgruppeType.AAP }
 
             with(interntVedtak.målgrupper.single { it.type == MålgruppeType.AAP }) {
                 assertThat(type).isEqualTo(MålgruppeType.AAP)
@@ -126,7 +127,8 @@ class InterntVedtakServiceTest {
             assertThat(interntVedtak.aktiviteter).hasSize(2)
 
             val aktivitet =
-                Testdata.TilsynBarn.vilkårperioder.aktiviteter.single { it.resultat != ResultatVilkårperiode.SLETTET }
+                Testdata.TilsynBarn.vilkårperioder.aktiviteter
+                    .single { it.resultat != ResultatVilkårperiode.SLETTET }
 
             with(interntVedtak.aktiviteter.single { it.resultat != ResultatVilkårperiode.SLETTET }) {
                 assertThat(type).isEqualTo(AktivitetType.TILTAK)
@@ -141,7 +143,8 @@ class InterntVedtakServiceTest {
                 }
             }
             val aktivitetSlettet =
-                Testdata.TilsynBarn.vilkårperioder.aktiviteter.single { it.resultat == ResultatVilkårperiode.SLETTET }
+                Testdata.TilsynBarn.vilkårperioder.aktiviteter
+                    .single { it.resultat == ResultatVilkårperiode.SLETTET }
             with(interntVedtak.aktiviteter.single { it.resultat == ResultatVilkårperiode.SLETTET }) {
                 assertThat(resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
                 assertThat(slettetKommentar).isEqualTo(aktivitetSlettet.slettetKommentar)
@@ -152,7 +155,9 @@ class InterntVedtakServiceTest {
         fun `beregningsfelter skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
-            val forventet = Testdata.TilsynBarn.vedtak.data.beregningsresultat.perioder.single()
+            val forventet =
+                Testdata.TilsynBarn.vedtak.data.beregningsresultat.perioder
+                    .single()
 
             with(interntVedtak.beregningsresultat!!.tilsynBarn!!.single()) {
                 assertThat(månedsbeløp).isEqualTo(forventet.månedsbeløp)
@@ -232,7 +237,11 @@ class InterntVedtakServiceTest {
 
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
-            val forventet = Testdata.Læremidler.beregningsresultat.tilDto().perioder.single()
+            val forventet =
+                Testdata.Læremidler.beregningsresultat
+                    .tilDto()
+                    .perioder
+                    .single()
 
             with(interntVedtak.beregningsresultat!!.læremidler!!.single()) {
                 assertThat(fom).isEqualTo(forventet.fom)

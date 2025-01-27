@@ -20,16 +20,18 @@ data class BeregningsresultatLæremidler(
 data class BeregningsresultatForMåned(
     val beløp: Int,
     val grunnlag: Beregningsgrunnlag,
-) : Periode<LocalDate>, KopierPeriode<BeregningsresultatForMåned> {
+) : Periode<LocalDate>,
+    KopierPeriode<BeregningsresultatForMåned> {
     @get:JsonIgnore
     override val fom: LocalDate get() = grunnlag.fom
 
     @get:JsonIgnore
     override val tom: LocalDate get() = grunnlag.tom
 
-    override fun medPeriode(fom: LocalDate, tom: LocalDate): BeregningsresultatForMåned {
-        return this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
-    }
+    override fun medPeriode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): BeregningsresultatForMåned = this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
 }
 
 data class Beregningsgrunnlag(
@@ -46,10 +48,9 @@ data class Beregningsgrunnlag(
 fun avkortBeregningsresultatVedOpphør(
     forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørLæremidler>,
     revurderFra: LocalDate,
-): List<BeregningsresultatForMåned> {
-    return forrigeVedtak
+): List<BeregningsresultatForMåned> =
+    forrigeVedtak
         .data
         .beregningsresultat
         .perioder
         .avkortFraOgMed(revurderFra.minusDays(1))
-}

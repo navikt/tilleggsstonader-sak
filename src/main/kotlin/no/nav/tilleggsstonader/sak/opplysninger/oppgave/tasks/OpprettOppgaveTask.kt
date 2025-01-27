@@ -30,7 +30,6 @@ class OpprettOppgaveTask(
     private val behandlingService: BehandlingService,
     private val oppgaveService: OppgaveService,
 ) : AsyncTaskStep {
-
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     /**
@@ -47,58 +46,66 @@ class OpprettOppgaveTask(
         val kobling = data.kobling
         val oppgavetype = data.oppgave.oppgavetype
 
-        val koblingPerson: OppgavekoblingPerson = when (kobling) {
-            is OppgavekoblingBehandling -> {
-                val behandling = behandlingService.hentSaksbehandling(kobling.behandlingId)
-                if (skalIkkeOppretteOppgave(behandling, oppgavetype)) {
-                    logger.warn("Opprettet ikke oppgave med oppgavetype=$oppgavetype fordi status=${behandling.status}")
-                    return
+        val koblingPerson: OppgavekoblingPerson =
+            when (kobling) {
+                is OppgavekoblingBehandling -> {
+                    val behandling = behandlingService.hentSaksbehandling(kobling.behandlingId)
+                    if (skalIkkeOppretteOppgave(behandling, oppgavetype)) {
+                        logger.warn("Opprettet ikke oppgave med oppgavetype=$oppgavetype fordi status=${behandling.status}")
+                        return
+                    }
+                    OppgavekoblingPerson(behandling.ident, behandling.stønadstype)
                 }
-                OppgavekoblingPerson(behandling.ident, behandling.stønadstype)
+
+                is OppgavekoblingPerson -> kobling
             }
 
-            is OppgavekoblingPerson -> kobling
-        }
-
-        val oppgaveId = oppgaveService.opprettOppgave(
-            personIdent = koblingPerson.personIdent,
-            stønadstype = koblingPerson.stønadstype,
-            behandlingId = kobling.let { if (it is OppgavekoblingBehandling) it else null }?.behandlingId,
-            oppgave = data.oppgave,
-        )
+        val oppgaveId =
+            oppgaveService.opprettOppgave(
+                personIdent = koblingPerson.personIdent,
+                stønadstype = koblingPerson.stønadstype,
+                behandlingId = kobling.let { if (it is OppgavekoblingBehandling) it else null }?.behandlingId,
+                oppgave = data.oppgave,
+            )
         logger.info("Opprettet oppgave=$oppgaveId for oppgavetype=$oppgavetype")
 
         task.metadata.setProperty("oppgaveId", oppgaveId.toString())
     }
 
     companion object {
+        fun opprettTask(
+            behandlingId: BehandlingId,
+            oppgave: OpprettOppgave,
+        ): Task = opprettTask(OppgavekoblingBehandling(behandlingId), oppgave)
 
-        fun opprettTask(behandlingId: BehandlingId, oppgave: OpprettOppgave): Task {
-            return opprettTask(OppgavekoblingBehandling(behandlingId), oppgave)
-        }
+        fun opprettTask(
+            personIdent: String,
+            stønadstype: Stønadstype,
+            oppgave: OpprettOppgave,
+        ): Task = opprettTask(OppgavekoblingPerson(personIdent, stønadstype), oppgave)
 
-        fun opprettTask(personIdent: String, stønadstype: Stønadstype, oppgave: OpprettOppgave): Task {
-            return opprettTask(OppgavekoblingPerson(personIdent, stønadstype), oppgave)
-        }
-
-        private fun opprettTask(oppgavekobling: Oppgavekobling, oppgave: OpprettOppgave): Task {
-            return Task(
+        private fun opprettTask(
+            oppgavekobling: Oppgavekobling,
+            oppgave: OpprettOppgave,
+        ): Task =
+            Task(
                 type = TYPE,
-                payload = objectMapper.writeValueAsString(
-                    OpprettOppgaveTaskData(
-                        kobling = oppgavekobling,
-                        oppgave = oppgave,
+                payload =
+                    objectMapper.writeValueAsString(
+                        OpprettOppgaveTaskData(
+                            kobling = oppgavekobling,
+                            oppgave = oppgave,
+                        ),
                     ),
-                ),
-                properties = Properties().apply {
-                    setProperty("saksbehandler", SikkerhetContext.hentSaksbehandlerEllerSystembruker())
-                    setProperty("oppgavetype", oppgave.oppgavetype.name)
-                    if (oppgavekobling is OppgavekoblingBehandling) {
-                        setProperty("behandlingId", oppgavekobling.behandlingId.toString())
-                    }
-                },
+                properties =
+                    Properties().apply {
+                        setProperty("saksbehandler", SikkerhetContext.hentSaksbehandlerEllerSystembruker())
+                        setProperty("oppgavetype", oppgave.oppgavetype.name)
+                        if (oppgavekobling is OppgavekoblingBehandling) {
+                            setProperty("behandlingId", oppgavekobling.behandlingId.toString())
+                        }
+                    },
             )
-        }
 
         const val TYPE = "opprettOppgave"
     }

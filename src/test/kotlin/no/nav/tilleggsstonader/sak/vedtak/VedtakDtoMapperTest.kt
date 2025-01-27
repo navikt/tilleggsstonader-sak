@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class VedtakDtoMapperTest {
-
     @Nested
     inner class TilsynBarn {
         @Test
@@ -26,13 +25,15 @@ class VedtakDtoMapperTest {
 
         @Test
         fun `skal mappe avslått vedtak til dto`() {
-            val vedtak = GeneriskVedtak(
-                behandlingId = BehandlingId.random(),
-                data = AvslagTilsynBarn(
-                    begrunnelse = "begrunnelse",
-                    årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
-                ),
-            )
+            val vedtak =
+                GeneriskVedtak(
+                    behandlingId = BehandlingId.random(),
+                    data =
+                        AvslagTilsynBarn(
+                            begrunnelse = "begrunnelse",
+                            årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
+                        ),
+                )
 
             val dto = VedtakDtoMapper.toDto(vedtak, revurderFra = null) as AvslagTilsynBarnDto
 

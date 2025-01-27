@@ -19,37 +19,31 @@ import java.time.YearMonth
 class TilkjentYtelseService(
     private val tilkjentYtelseRepository: TilkjentYtelseRepository,
 ) {
+    fun hentForBehandlingEllerNull(behandlingId: BehandlingId): TilkjentYtelse? = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
 
-    fun hentForBehandlingEllerNull(behandlingId: BehandlingId): TilkjentYtelse? {
-        return tilkjentYtelseRepository.findByBehandlingId(behandlingId)
-    }
-
-    fun hentForBehandling(behandlingId: BehandlingId): TilkjentYtelse {
-        return tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+    fun hentForBehandling(behandlingId: BehandlingId): TilkjentYtelse =
+        tilkjentYtelseRepository.findByBehandlingId(behandlingId)
             ?: error("Fant ikke tilkjent ytelse med behandlingsid $behandlingId")
-    }
 
-    fun hentForBehandlingMedLås(behandlingId: BehandlingId): TilkjentYtelse {
-        return tilkjentYtelseRepository.findByBehandlingIdForUpdate(behandlingId)
+    fun hentForBehandlingMedLås(behandlingId: BehandlingId): TilkjentYtelse =
+        tilkjentYtelseRepository.findByBehandlingIdForUpdate(behandlingId)
             ?: error("Fant ikke tilkjent ytelse med behandlingsid $behandlingId")
-    }
 
     fun opprettTilkjentYtelse(
         saksbehandling: Saksbehandling,
         andeler: List<AndelTilkjentYtelse>,
-    ): TilkjentYtelse {
-        return tilkjentYtelseRepository.insert(
+    ): TilkjentYtelse =
+        tilkjentYtelseRepository.insert(
             TilkjentYtelse(
                 behandlingId = saksbehandling.id,
                 andelerTilkjentYtelse = andeler.toSet(),
             ),
         )
-    }
 
-    fun harLøpendeUtbetaling(behandlingId: BehandlingId): Boolean {
-        return tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+    fun harLøpendeUtbetaling(behandlingId: BehandlingId): Boolean =
+        tilkjentYtelseRepository
+            .findByBehandlingId(behandlingId)
             ?.let { it.andelerTilkjentYtelse.any { andel -> andel.tom.isAfter(osloDateNow()) } } ?: false
-    }
 
     fun slettTilkjentYtelseForBehandling(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.status.behandlingErLåstForVidereRedigering()) {
@@ -79,17 +73,18 @@ class TilkjentYtelseService(
         måned: YearMonth,
     ): AndelTilkjentYtelse {
         val månedForNullutbetaling = minOf(måned, finnMånedFørFørsteAndel(tilkjentYtelse) ?: måned)
-        val nullAndel = AndelTilkjentYtelse(
-            beløp = 0,
-            fom = månedForNullutbetaling.atDay(1),
-            tom = månedForNullutbetaling.atDay(1),
-            satstype = Satstype.UGYLDIG,
-            type = TypeAndel.UGYLDIG,
-            kildeBehandlingId = tilkjentYtelse.behandlingId,
-            iverksetting = iverksetting,
-            statusIverksetting = StatusIverksetting.SENDT,
-            utbetalingsdato = månedForNullutbetaling.atDay(1),
-        )
+        val nullAndel =
+            AndelTilkjentYtelse(
+                beløp = 0,
+                fom = månedForNullutbetaling.atDay(1),
+                tom = månedForNullutbetaling.atDay(1),
+                satstype = Satstype.UGYLDIG,
+                type = TypeAndel.UGYLDIG,
+                kildeBehandlingId = tilkjentYtelse.behandlingId,
+                iverksetting = iverksetting,
+                statusIverksetting = StatusIverksetting.SENDT,
+                utbetalingsdato = månedForNullutbetaling.atDay(1),
+            )
 
         tilkjentYtelseRepository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = tilkjentYtelse.andelerTilkjentYtelse + nullAndel))
         return nullAndel

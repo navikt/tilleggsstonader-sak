@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 
 class BrevmottakereFrittståendeBrevServiceTest : IntegrationTest() {
-
     @Autowired
     lateinit var service: BrevmottakereFrittståendeBrevService
 
@@ -47,7 +46,6 @@ class BrevmottakereFrittståendeBrevServiceTest : IntegrationTest() {
 
     @Nested
     inner class LagreBrevmottakere {
-
         @Test
         fun `skal fjerne tidligere brevmottakere og opprette nytt hvis id er ukjent`() {
             service.hentEllerOpprettBrevmottakere(fagsak.id)
@@ -64,13 +62,14 @@ class BrevmottakereFrittståendeBrevServiceTest : IntegrationTest() {
         @Test
         fun `skal ikke fjerne brevmottakere på allerede sendte brev`() {
             val frittståendeBrev = opprettFrittståendeBrev()
-            val brevmottakerForSendtBrev = repository.insert(
-                BrevmottakerFrittståendeBrev(
-                    fagsakId = fagsak.id,
-                    brevId = frittståendeBrev.id,
-                    mottaker = mottakerPerson("ident2"),
-                ),
-            )
+            val brevmottakerForSendtBrev =
+                repository.insert(
+                    BrevmottakerFrittståendeBrev(
+                        fagsakId = fagsak.id,
+                        brevId = frittståendeBrev.id,
+                        mottaker = mottakerPerson("ident2"),
+                    ),
+                )
 
             service.hentEllerOpprettBrevmottakere(fagsak.id)
             val nyBrevmottaker = BrevmottakerPersonDto(UUID.randomUUID(), "annenIdent", "navn", MottakerRolle.VERGE)
@@ -88,10 +87,11 @@ class BrevmottakereFrittståendeBrevServiceTest : IntegrationTest() {
         fun `oppdaterer brevmottakere hvis id er beholdt`() {
             val brevmottakere = service.hentEllerOpprettBrevmottakere(fagsak.id).single()
 
-            val brevmottakereDto = BrevmottakereDto(
-                personer = listOf(brevmottakere.mottaker.tilPersonDto(brevmottakere.id).copy(navn = "nytt navn")),
-                organisasjoner = emptyList(),
-            )
+            val brevmottakereDto =
+                BrevmottakereDto(
+                    personer = listOf(brevmottakere.mottaker.tilPersonDto(brevmottakere.id).copy(navn = "nytt navn")),
+                    organisasjoner = emptyList(),
+                )
             service.lagreBrevmottakere(fagsak.id, brevmottakereDto)
 
             val alleBrevmottakere = repository.findAll()
@@ -116,13 +116,14 @@ class BrevmottakereFrittståendeBrevServiceTest : IntegrationTest() {
         @Test
         fun `oppretter ny brevmottakere dersom brev allerede er sendt`() {
             val frittståendeBrev = opprettFrittståendeBrev()
-            val brevmottakerForSendtBrev = repository.insert(
-                BrevmottakerFrittståendeBrev(
-                    fagsakId = fagsak.id,
-                    brevId = frittståendeBrev.id,
-                    mottaker = mottakerPerson("ident2"),
-                ),
-            )
+            val brevmottakerForSendtBrev =
+                repository.insert(
+                    BrevmottakerFrittståendeBrev(
+                        fagsakId = fagsak.id,
+                        brevId = frittståendeBrev.id,
+                        mottaker = mottakerPerson("ident2"),
+                    ),
+                )
 
             val brevmottakere = service.hentEllerOpprettBrevmottakere(fagsak.id)
 
@@ -149,12 +150,13 @@ class BrevmottakereFrittståendeBrevServiceTest : IntegrationTest() {
                 ),
             )
 
-            val brevmottakerForSaksbehandler = repository.insert(
-                BrevmottakerFrittståendeBrev(
-                    fagsakId = fagsak.id,
-                    mottaker = mottakerPerson("ident"),
-                ),
-            )
+            val brevmottakerForSaksbehandler =
+                repository.insert(
+                    BrevmottakerFrittståendeBrev(
+                        fagsakId = fagsak.id,
+                        mottaker = mottakerPerson("ident"),
+                    ),
+                )
 
             assertThat(service.hentEllerOpprettBrevmottakere(fagsak.id).map { it.id })
                 .containsExactly(brevmottakerForSaksbehandler.id)

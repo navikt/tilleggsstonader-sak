@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class VilkårperiodeDtoTest {
-
     @Test
     fun `skal validere at periode er gyldig`() {
         assertThatThrownBy {
@@ -40,17 +39,18 @@ class VilkårperiodeDtoTest {
 
     @Nested
     inner class MappingAvVurdering {
-
         @Test
         fun `skal mappe vurdering fra vilkår`() {
-            val målgruppe = målgruppe(
-                begrunnelse = "begrunnelse",
-                faktaOgVurdering = faktaOgVurderingMålgruppe(
-                    type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                    medlemskap = vurderingMedlemskap(svar = SvarJaNei.JA),
-                    dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA),
-                ),
-            ).tilDto()
+            val målgruppe =
+                målgruppe(
+                    begrunnelse = "begrunnelse",
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                            medlemskap = vurderingMedlemskap(svar = SvarJaNei.JA),
+                            dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA),
+                        ),
+                ).tilDto()
 
             val faktaOgVurderinger = (målgruppe.faktaOgVurderinger as MålgruppeFaktaOgVurderingerDto)
 
@@ -67,17 +67,18 @@ class VilkårperiodeDtoTest {
 
     @Nested
     inner class MappingAvFaktaOgVurderinger {
-
         @Test
         fun `mapper ut faktaOgVurderinger for målgruppe`() {
-            val målgruppe = målgruppe(
-                begrunnelse = "Begrunnelse",
-                faktaOgVurdering = faktaOgVurderingMålgruppe(
-                    type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-                    medlemskap = VurderingMedlemskap(svar = SvarJaNei.JA),
-                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA),
-                ),
-            ).tilDto()
+            val målgruppe =
+                målgruppe(
+                    begrunnelse = "Begrunnelse",
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+                            medlemskap = VurderingMedlemskap(svar = SvarJaNei.JA),
+                            dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA),
+                        ),
+                ).tilDto()
 
             assertThat(målgruppe.faktaOgVurderinger).isEqualTo(
                 MålgruppeFaktaOgVurderingerDto(
@@ -89,13 +90,16 @@ class VilkårperiodeDtoTest {
 
         @Test
         fun `mapper ut faktaOgVurderinger for tiltak tilsyn barn`() {
-            val tiltakTilsynBarn = VilkårperiodeTestUtil.aktivitet(
-                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(
-                    type = AktivitetType.TILTAK,
-                    aktivitetsdager = 3,
-                    lønnet = VurderingLønnet(svar = SvarJaNei.NEI),
-                ),
-            ).tilDto()
+            val tiltakTilsynBarn =
+                VilkårperiodeTestUtil
+                    .aktivitet(
+                        faktaOgVurdering =
+                            faktaOgVurderingAktivitetTilsynBarn(
+                                type = AktivitetType.TILTAK,
+                                aktivitetsdager = 3,
+                                lønnet = VurderingLønnet(svar = SvarJaNei.NEI),
+                            ),
+                    ).tilDto()
 
             assertThat(tiltakTilsynBarn.faktaOgVurderinger).isEqualTo(
                 AktivitetBarnetilsynFaktaOgVurderingerDto(
@@ -107,17 +111,22 @@ class VilkårperiodeDtoTest {
 
         @Test
         fun `mapper ut faktaOgVurderinger for utdanning læremidler`() {
-            val utdanningLæremidler = VilkårperiodeTestUtil.aktivitet(
-                faktaOgVurdering = UtdanningLæremidler(
-                    fakta = FaktaAktivitetLæremidler(prosent = 60, studienivå = Studienivå.VIDEREGÅENDE),
-                    vurderinger = VurderingerUtdanningLæremidler(
-                        harUtgifter = VurderingHarUtgifter(SvarJaNei.JA),
-                        harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(
-                            SvarJaNei.NEI,
-                        ),
-                    ),
-                ),
-            ).tilDto()
+            val utdanningLæremidler =
+                VilkårperiodeTestUtil
+                    .aktivitet(
+                        faktaOgVurdering =
+                            UtdanningLæremidler(
+                                fakta = FaktaAktivitetLæremidler(prosent = 60, studienivå = Studienivå.VIDEREGÅENDE),
+                                vurderinger =
+                                    VurderingerUtdanningLæremidler(
+                                        harUtgifter = VurderingHarUtgifter(SvarJaNei.JA),
+                                        harRettTilUtstyrsstipend =
+                                            VurderingHarRettTilUtstyrsstipend(
+                                                SvarJaNei.NEI,
+                                            ),
+                                    ),
+                            ),
+                    ).tilDto()
 
             assertThat(utdanningLæremidler.faktaOgVurderinger).isEqualTo(
                 AktivitetLæremidlerFaktaOgVurderingerDto(

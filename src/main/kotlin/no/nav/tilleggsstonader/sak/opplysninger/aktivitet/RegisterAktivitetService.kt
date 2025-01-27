@@ -22,11 +22,12 @@ class RegisterAktivitetService(
         fagsakPersonId: FagsakPersonId,
         fom: LocalDate = osloDateNow().minusYears(3),
         tom: LocalDate = osloDateNow().plusYears(1),
-    ): RegisterAktiviteterDto = RegisterAktiviteterDto(
-        periodeHentetFra = fom,
-        periodeHentetTil = tom,
-        aktiviteter = hentAktiviteter(fagsakPersonId, fom, tom),
-    )
+    ): RegisterAktiviteterDto =
+        RegisterAktiviteterDto(
+            periodeHentetFra = fom,
+            periodeHentetTil = tom,
+            aktiviteter = hentAktiviteter(fagsakPersonId, fom, tom),
+        )
 
     fun hentAktiviteter(
         fagsakPersonId: FagsakPersonId,
@@ -37,27 +38,31 @@ class RegisterAktivitetService(
         return hentStønadsberettigedeTiltak(ident, fom, tom)
     }
 
-    fun hentAktiviteterForGrunnlagsdata(ident: String, fom: LocalDate, tom: LocalDate): List<AktivitetArenaDto> {
-        return registerAktivitetClient.hentAktiviteter(
-            ident = ident,
-            fom = fom,
-            tom = tom,
-        )
+    fun hentAktiviteterForGrunnlagsdata(
+        ident: String,
+        fom: LocalDate,
+        tom: LocalDate,
+    ): List<AktivitetArenaDto> =
+        registerAktivitetClient
+            .hentAktiviteter(
+                ident = ident,
+                fom = fom,
+                tom = tom,
+            )
             // Det er alltid gruppe=TILTAK når erStønadsberettiget = true (men alle av tiltak er ikke stønadsberettiget)
             .filter { it.erStønadsberettiget == true }
             .sortedByDescending { it.fom }
-    }
 
     private fun hentStønadsberettigedeTiltak(
         ident: String,
         fom: LocalDate,
         tom: LocalDate,
-    ) = registerAktivitetClient.hentAktiviteter(
-        ident = ident,
-        fom = fom,
-        tom = tom,
-    )
-        .filter {
+    ) = registerAktivitetClient
+        .hentAktiviteter(
+            ident = ident,
+            fom = fom,
+            tom = tom,
+        ).filter {
             try {
                 // Ikke alle aktiviteter har fått flagg "stønadsberettiget" i Arena selv om de skulle hatt det, så vi trenger en ekstra sjekk på gruppe
                 // Det er alltid gruppe=TILTAK når erStønadsberettiget = true, men ikke alle tiltak er stønadsberettiget
@@ -67,6 +72,5 @@ class RegisterAktivitetService(
                 secureLogger.error("TypeAktivitet=${it.type} mangler mapping. Vennligst oppdater TypeAktivitet med ny type.")
                 false
             }
-        }
-        .sortedByDescending { it.fom }
+        }.sortedByDescending { it.fom }
 }

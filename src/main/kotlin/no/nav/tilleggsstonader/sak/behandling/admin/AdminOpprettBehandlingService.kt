@@ -34,7 +34,6 @@ class AdminOpprettBehandlingService(
     private val barnService: BarnService,
     private val unleashService: UnleashService,
 ) {
-
     @Transactional
     fun opprettFørstegangsbehandling(
         stønadstype: Stønadstype,
@@ -47,10 +46,11 @@ class AdminOpprettBehandlingService(
         val fagsak = fagsakService.hentEllerOpprettFagsak(ident, stønadstype)
         val behandlingsårsak =
             if (medBrev) BehandlingÅrsak.MANUELT_OPPRETTET else BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV
-        val behandling = behandlingService.opprettBehandling(
-            fagsakId = fagsak.id,
-            behandlingsårsak = behandlingsårsak,
-        )
+        val behandling =
+            behandlingService.opprettBehandling(
+                fagsakId = fagsak.id,
+                behandlingsårsak = behandlingsårsak,
+            )
 
         if (valgteBarn.isNotEmpty()) {
             val behandlingBarn = valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) }
@@ -62,7 +62,11 @@ class AdminOpprettBehandlingService(
         return behandling.id
     }
 
-    private fun validerOpprettelseAvBehandling(stønadstype: Stønadstype, ident: String, barn: Set<String>) {
+    private fun validerOpprettelseAvBehandling(
+        stønadstype: Stønadstype,
+        ident: String,
+        barn: Set<String>,
+    ) {
         brukerfeilHvisIkke(unleashService.isEnabled(Toggle.ADMIN_KAN_OPPRETTE_BEHANDLING)) {
             "Feature toggle for å kunne opprette behandling er slått av"
         }
@@ -80,39 +84,56 @@ class AdminOpprettBehandlingService(
         validerAtDetIkkeFinnesBehandlingFraFør(stønadstype, ident)
     }
 
-    fun hentPerson(stønadstype: Stønadstype, ident: String): PersoninfoDto {
+    fun hentPerson(
+        stønadstype: Stønadstype,
+        ident: String,
+    ): PersoninfoDto {
         validerAtDetIkkeFinnesBehandlingFraFør(stønadstype, ident)
 
         val person = personService.hentPersonMedBarn(ident)
         return PersoninfoDto(
-            navn = person.søker.navn.gjeldende().visningsnavn(),
-            barn = person.barn.map {
-                Barn(
-                    ident = it.key,
-                    navn = it.value.navn.gjeldende().visningsnavn(),
-                )
-            },
+            navn =
+                person.søker.navn
+                    .gjeldende()
+                    .visningsnavn(),
+            barn =
+                person.barn.map {
+                    Barn(
+                        ident = it.key,
+                        navn =
+                            it.value.navn
+                                .gjeldende()
+                                .visningsnavn(),
+                    )
+                },
         )
     }
 
     private fun opprettBehandleSakOppgave(behandling: Behandling) {
-        val task = OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-            OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                behandlingId = behandling.id,
-                saksbehandler = SikkerhetContext.SYSTEM_FORKORTELSE,
-                beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
-            ),
-        )
+        val task =
+            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                    behandlingId = behandling.id,
+                    saksbehandler = SikkerhetContext.SYSTEM_FORKORTELSE,
+                    beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
+                ),
+            )
         taskService.save(task)
     }
 
-    private fun validerAtBarnFinnesPåPerson(person: SøkerMedBarn, barn: Set<String>) {
+    private fun validerAtBarnFinnesPåPerson(
+        person: SøkerMedBarn,
+        barn: Set<String>,
+    ) {
         feilHvis(barn.any { !person.barn.contains(it) }) {
             "Barn finnes ikke på person"
         }
     }
 
-    private fun validerAtDetIkkeFinnesBehandlingFraFør(stønadstype: Stønadstype, ident: String) {
+    private fun validerAtDetIkkeFinnesBehandlingFraFør(
+        stønadstype: Stønadstype,
+        ident: String,
+    ) {
         val personIdenter = personService.hentPersonIdenter(ident)
         val fagsak = fagsakService.finnFagsak(personIdenter.identer(), stønadstype)
         val behandlinger = fagsak?.let { behandlingService.hentBehandlinger(it.id) } ?: emptyList()

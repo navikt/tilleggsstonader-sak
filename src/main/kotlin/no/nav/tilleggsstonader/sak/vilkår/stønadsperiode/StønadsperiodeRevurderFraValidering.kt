@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiod
 import java.time.LocalDate
 
 object StønadsperiodeRevurderFraValidering {
-
     fun validerNyPeriodeRevurdering(
         behandling: Saksbehandling,
         periode: Stønadsperiode,
@@ -63,17 +62,15 @@ object StønadsperiodeRevurderFraValidering {
         eksisterendePeriode: Stønadsperiode,
         oppdatertPeriode: Stønadsperiode,
         revurderFra: LocalDate,
-    ): Boolean {
-        return if (eksisterendePeriode.tom < revurderFra.minusDays(1)) {
+    ): Boolean =
+        if (eksisterendePeriode.tom < revurderFra.minusDays(1)) {
             eksisterendePeriode.tom != oppdatertPeriode.tom
         } else {
             oppdatertPeriode.tom < revurderFra.minusDays(1)
         }
-    }
 
     private fun periodeInfo(
         behandling: Saksbehandling,
         fomVilkårperiode: LocalDate,
-    ) =
-        "periode som begynner(${fomVilkårperiode.norskFormat()}) før revurderingsdato(${behandling.revurderFra?.norskFormat()})"
+    ) = "periode som begynner(${fomVilkårperiode.norskFormat()}) før revurderingsdato(${behandling.revurderFra?.norskFormat()})"
 }

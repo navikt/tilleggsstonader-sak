@@ -11,8 +11,9 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Repository
-interface VilkårRepository : RepositoryInterface<Vilkår, VilkårId>, InsertUpdateRepository<Vilkår> {
-
+interface VilkårRepository :
+    RepositoryInterface<Vilkår, VilkårId>,
+    InsertUpdateRepository<Vilkår> {
     fun findByBehandlingId(behandlingId: BehandlingId): List<Vilkår>
 
     @Modifying
@@ -21,11 +22,17 @@ interface VilkårRepository : RepositoryInterface<Vilkår, VilkårId>, InsertUpd
 
     @Modifying
     @Query("UPDATE vilkar SET endret_tid = :nyttTidspunkt WHERE id = :id")
-    fun oppdaterEndretTid(id: VilkårId, nyttTidspunkt: LocalDateTime)
+    fun oppdaterEndretTid(
+        id: VilkårId,
+        nyttTidspunkt: LocalDateTime,
+    )
 
     @Modifying
     @Query("UPDATE vilkar SET opprettet_av = 'VL', endret_av = 'VL' WHERE id = :id")
     fun settMaskinelltOpprettet(id: VilkårId)
 
-    fun findByTypeAndBehandlingIdIn(vilkårtype: VilkårType, behandlingIds: Collection<UUID>): List<Vilkår>
+    fun findByTypeAndBehandlingIdIn(
+        vilkårtype: VilkårType,
+        behandlingIds: Collection<UUID>,
+    ): List<Vilkår>
 }

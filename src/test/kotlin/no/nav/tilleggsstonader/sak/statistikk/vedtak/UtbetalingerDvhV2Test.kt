@@ -13,37 +13,41 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse as innvilgelseLæremidler
 
 class UtbetalingerDvhV2Test {
-
     @Test
     fun `fraDomene mapper til UtbetalingerDvh for tillsynBarn ikke makssats`() {
-        val innvilgelse = innvilgelseTilsynBarn(
-            InnvilgelseTilsynBarn(
-                beregningsresultat = BeregningsresultatTilsynBarn(
-                    perioder = listOf(
-                        beregningsresultatForMåned(
-                            stønadsperioder = listOf(stønadsperiodeGrunnlag()),
-                            utgifterTotal = 4000,
+        val innvilgelse =
+            innvilgelseTilsynBarn(
+                InnvilgelseTilsynBarn(
+                    beregningsresultat =
+                        BeregningsresultatTilsynBarn(
+                            perioder =
+                                listOf(
+                                    beregningsresultatForMåned(
+                                        stønadsperioder = listOf(stønadsperiodeGrunnlag()),
+                                        utgifterTotal = 4000,
+                                    ),
+                                ),
                         ),
-                    ),
                 ),
-            ),
-        )
+            )
         val andlelerTilkjentYtelse = listOf(andelTilkjentYtelse(fom = LocalDate.of(2024, 1, 1), beløp = 1000))
 
         val resultat = UtbetalingerDvhV2.fraDomene(andlelerTilkjentYtelse, innvilgelse)
 
-        val forventetResultat = UtbetalingerDvhV2.JsonWrapper(
-            utbetalinger = listOf(
-                UtbetalingerDvhV2(
-                    fraOgMed = LocalDate.of(2024, 1, 1),
-                    tilOgMed = LocalDate.of(2024, 1, 1),
-                    type = AndelstypeDvh.TILSYN_BARN_AAP,
-                    beløp = 1000,
-                    makssats = 3000,
-                    beløpErBegrensetAvMakssats = false,
-                ),
-            ),
-        )
+        val forventetResultat =
+            UtbetalingerDvhV2.JsonWrapper(
+                utbetalinger =
+                    listOf(
+                        UtbetalingerDvhV2(
+                            fraOgMed = LocalDate.of(2024, 1, 1),
+                            tilOgMed = LocalDate.of(2024, 1, 1),
+                            type = AndelstypeDvh.TILSYN_BARN_AAP,
+                            beløp = 1000,
+                            makssats = 3000,
+                            beløpErBegrensetAvMakssats = false,
+                        ),
+                    ),
+            )
 
         assertThat(resultat).isEqualTo(forventetResultat)
     }
@@ -56,18 +60,20 @@ class UtbetalingerDvhV2Test {
 
         val resultat = UtbetalingerDvhV2.fraDomene(andlelerTilkjentYtelse, innvilgelse)
 
-        val forventetResultat = UtbetalingerDvhV2.JsonWrapper(
-            utbetalinger = listOf(
-                UtbetalingerDvhV2(
-                    fraOgMed = LocalDate.of(2024, 1, 1),
-                    tilOgMed = LocalDate.of(2024, 1, 1),
-                    type = AndelstypeDvh.TILSYN_BARN_AAP,
-                    beløp = 11554,
-                    makssats = 3000,
-                    beløpErBegrensetAvMakssats = true,
-                ),
-            ),
-        )
+        val forventetResultat =
+            UtbetalingerDvhV2.JsonWrapper(
+                utbetalinger =
+                    listOf(
+                        UtbetalingerDvhV2(
+                            fraOgMed = LocalDate.of(2024, 1, 1),
+                            tilOgMed = LocalDate.of(2024, 1, 1),
+                            type = AndelstypeDvh.TILSYN_BARN_AAP,
+                            beløp = 11554,
+                            makssats = 3000,
+                            beløpErBegrensetAvMakssats = true,
+                        ),
+                    ),
+            )
 
         assertThat(resultat).isEqualTo(forventetResultat)
     }
@@ -79,16 +85,18 @@ class UtbetalingerDvhV2Test {
 
         val resultat = UtbetalingerDvhV2.fraDomene(andlelerTilkjentYtelse, innvilgelse)
 
-        val forventetResultat = UtbetalingerDvhV2.JsonWrapper(
-            utbetalinger = listOf(
-                UtbetalingerDvhV2(
-                    fraOgMed = LocalDate.of(2024, 1, 1),
-                    tilOgMed = LocalDate.of(2024, 1, 1),
-                    type = AndelstypeDvh.TILSYN_BARN_AAP,
-                    beløp = 11554,
-                ),
-            ),
-        )
+        val forventetResultat =
+            UtbetalingerDvhV2.JsonWrapper(
+                utbetalinger =
+                    listOf(
+                        UtbetalingerDvhV2(
+                            fraOgMed = LocalDate.of(2024, 1, 1),
+                            tilOgMed = LocalDate.of(2024, 1, 1),
+                            type = AndelstypeDvh.TILSYN_BARN_AAP,
+                            beløp = 11554,
+                        ),
+                    ),
+            )
 
         assertThat(resultat).isEqualTo(forventetResultat)
     }

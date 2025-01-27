@@ -6,7 +6,6 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class VurderingLønnetTest {
-
     @Test
     fun `hvis svar=NEI så skal resultatet=OPPFYLT`() {
         val vurdering = vurderingLønnet(SvarJaNei.NEI)

@@ -15,26 +15,30 @@ import org.springframework.stereotype.Service
 class KodeverkService(
     private val cachedKodeverkService: CachedKodeverkService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
-    fun hentPoststed(postnummer: String?) = hentKodeverdi("poststed", postnummer) {
-        cachedKodeverkService.hentPoststed().hentGjeldende(it)
-    }
+
+    fun hentPoststed(postnummer: String?) =
+        hentKodeverdi("poststed", postnummer) {
+            cachedKodeverkService.hentPoststed().hentGjeldende(it)
+        }
 
     fun hentLandkode(landkode: String?) =
         hentKodeverdi("landkode", landkode) {
             cachedKodeverkService.hentLandkoder().hentGjeldende(it)
         }
 
-    private fun hentKodeverdi(type: String, kode: String?, hentKodeverdiFunction: Function1<String, String?>): String {
-        return try {
+    private fun hentKodeverdi(
+        type: String,
+        kode: String?,
+        hentKodeverdiFunction: Function1<String, String?>,
+    ): String =
+        try {
             kode?.let(hentKodeverdiFunction) ?: kode ?: ""
         } catch (e: Exception) {
             // Ikke la feil kodeverk stoppe henting av data
             logger.error("Feilet henting av $type til $kode message=${e.message} cause=${e.cause?.message}")
             ""
         }
-    }
 }
 
 @Service

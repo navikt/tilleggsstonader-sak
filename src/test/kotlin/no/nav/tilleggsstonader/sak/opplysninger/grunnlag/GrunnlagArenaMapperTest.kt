@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class GrunnlagArenaMapperTest {
-
     @Nested
     inner class VedtakTom {
         @Test

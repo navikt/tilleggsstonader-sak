@@ -17,14 +17,12 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
 
 class StønadsperiodeRevurderFraValideringTest {
-
     val revurderFra = LocalDate.of(2024, 1, 1)
     val behandling = saksbehandling(revurderFra = null, type = BehandlingType.REVURDERING)
     val behandlingMedRevurderFra = saksbehandling(revurderFra = revurderFra, type = BehandlingType.REVURDERING)
 
     @Nested
     inner class NyPeriode {
-
         @Test
         fun `kan legge inn periode med valgfritt dato dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
@@ -64,7 +62,6 @@ class StønadsperiodeRevurderFraValideringTest {
 
     @Nested
     inner class SlettPeriode {
-
         @Test
         fun `kan slette periode med valgfritt dato dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
@@ -104,7 +101,6 @@ class StønadsperiodeRevurderFraValideringTest {
 
     @Nested
     inner class OppdateringAvPeriode {
-
         @Test
         fun `kan oppdatere periode med valgfritt dato dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
@@ -125,10 +121,11 @@ class StønadsperiodeRevurderFraValideringTest {
 
         @Test
         fun `kan oppdatere tom hvis tom går tom siste dagen før revurder fra`() {
-            val eksisterendePeriode = stønadsperiode(
-                fom = revurderFra.minusMonths(1),
-                tom = revurderFra.plusMonths(1),
-            )
+            val eksisterendePeriode =
+                stønadsperiode(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                )
             assertDoesNotThrow {
                 listOf(revurderFra.minusDays(1), revurderFra, revurderFra.plusDays(1)).forEach { nyttTom ->
                     endringMedRevurderFra(
@@ -141,10 +138,11 @@ class StønadsperiodeRevurderFraValideringTest {
 
         @Test
         fun `kan sende inn stønadsperiode uten endringer dersom den gjelder før revurderFra`() {
-            val eksisterendePeriode = stønadsperiode(
-                fom = revurderFra.minusMonths(1),
-                tom = revurderFra.minusMonths(1),
-            )
+            val eksisterendePeriode =
+                stønadsperiode(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.minusMonths(1),
+                )
             assertDoesNotThrow {
                 endringMedRevurderFra(eksisterendePeriode, eksisterendePeriode)
             }
@@ -152,10 +150,11 @@ class StønadsperiodeRevurderFraValideringTest {
 
         @Test
         fun `kan ikke endre tom til før dagen før revurder fra`() {
-            val eksisterendePeriode = stønadsperiode(
-                fom = revurderFra.minusDays(2),
-                tom = revurderFra.minusDays(1),
-            )
+            val eksisterendePeriode =
+                stønadsperiode(
+                    fom = revurderFra.minusDays(2),
+                    tom = revurderFra.minusDays(1),
+                )
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendePeriode,
@@ -166,10 +165,11 @@ class StønadsperiodeRevurderFraValideringTest {
 
         @Test
         fun `kan ikke oppdatere tom til før dagen før revurder fra`() {
-            val eksisterendePeriode = stønadsperiode(
-                fom = revurderFra.minusMonths(1),
-                tom = revurderFra.plusMonths(1),
-            )
+            val eksisterendePeriode =
+                stønadsperiode(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                )
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendePeriode,
@@ -180,12 +180,13 @@ class StønadsperiodeRevurderFraValideringTest {
 
         @Test
         fun `kan ikke oppdatere data på periode hvis det begynner før revurder-fra`() {
-            val eksisterendePeriode = stønadsperiode(
-                fom = revurderFra.minusMonths(1),
-                tom = revurderFra.plusMonths(1),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-            )
+            val eksisterendePeriode =
+                stønadsperiode(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                )
             listOf<(Stønadsperiode) -> Stønadsperiode>(
                 { it.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD) },
                 { it.copy(aktivitet = AktivitetType.UTDANNING) },
@@ -201,10 +202,11 @@ class StønadsperiodeRevurderFraValideringTest {
 
         @Test
         fun `kan ikke oppdatere tom på vilkår hvis det begynner før revurder-fra`() {
-            val eksisterendePeriode = stønadsperiode(
-                fom = revurderFra.minusMonths(1),
-                tom = revurderFra.minusMonths(1),
-            )
+            val eksisterendePeriode =
+                stønadsperiode(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.minusMonths(1),
+                )
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendePeriode,
@@ -215,10 +217,11 @@ class StønadsperiodeRevurderFraValideringTest {
 
         @Test
         fun `kan ikke endre fom til å begynne før revurderFra`() {
-            val eksisterendePeriode = stønadsperiode(
-                fom = revurderFra,
-                tom = revurderFra.plusMonths(1),
-            )
+            val eksisterendePeriode =
+                stønadsperiode(
+                    fom = revurderFra,
+                    tom = revurderFra.plusMonths(1),
+                )
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendePeriode,
@@ -255,12 +258,11 @@ class StønadsperiodeRevurderFraValideringTest {
         tom: LocalDate = fom.plusMonths(1),
         målgruppe: MålgruppeType = MålgruppeType.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
-    ) =
-        stønadsperiode(
-            behandlingId = BehandlingId.random(),
-            fom = fom,
-            tom = tom,
-            målgruppe = målgruppe,
-            aktivitet = aktivitet,
-        )
+    ) = stønadsperiode(
+        behandlingId = BehandlingId.random(),
+        fom = fom,
+        tom = tom,
+        målgruppe = målgruppe,
+        aktivitet = aktivitet,
+    )
 }

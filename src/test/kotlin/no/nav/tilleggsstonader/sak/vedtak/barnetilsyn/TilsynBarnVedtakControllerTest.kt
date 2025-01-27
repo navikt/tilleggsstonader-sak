@@ -47,22 +47,22 @@ class TilsynBarnVedtakControllerTest(
     @Autowired
     val vilkårRepository: VilkårRepository,
 ) : IntegrationTest() {
-
     val fagsak = fagsak()
     val behandling = behandling(fagsak = fagsak, steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
     val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")
     val stønadsperiode =
         stønadsperiode(behandlingId = behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
     val aktivitet = aktivitet(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
-    val vilkår = vilkår(
-        behandlingId = behandling.id,
-        barnId = barn.id,
-        type = VilkårType.PASS_BARN,
-        resultat = Vilkårsresultat.OPPFYLT,
-        fom = YearMonth.now().atDay(1),
-        tom = YearMonth.now().atEndOfMonth(),
-        utgift = 100,
-    )
+    val vilkår =
+        vilkår(
+            behandlingId = behandling.id,
+            barnId = barn.id,
+            type = VilkårType.PASS_BARN,
+            resultat = Vilkårsresultat.OPPFYLT,
+            fom = YearMonth.now().atDay(1),
+            tom = YearMonth.now().atEndOfMonth(),
+            utgift = 100,
+        )
 
     @BeforeEach
     fun setUp() {
@@ -102,10 +102,11 @@ class TilsynBarnVedtakControllerTest(
 
     @Test
     fun `skal lagre og hente avslag`() {
-        val vedtak = AvslagTilsynBarnDto(
-            årsakerAvslag = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
-            begrunnelse = "begrunnelse",
-        )
+        val vedtak =
+            AvslagTilsynBarnDto(
+                årsakerAvslag = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
+                begrunnelse = "begrunnelse",
+            )
 
         avslåVedtak(behandling, vedtak)
 
@@ -120,16 +121,18 @@ class TilsynBarnVedtakControllerTest(
     fun `skal lagre og hente opphør`() {
         innvilgeVedtak(behandling, innvilgelseDto())
         testoppsettService.ferdigstillBehandling(behandling)
-        val behandlingLagreOpphør = testoppsettService.opprettRevurdering(
-            forrigeBehandling = behandling,
-            revurderFra = LocalDate.now(),
-            fagsak = fagsak,
-        )
+        val behandlingLagreOpphør =
+            testoppsettService.opprettRevurdering(
+                forrigeBehandling = behandling,
+                revurderFra = LocalDate.now(),
+                fagsak = fagsak,
+            )
 
-        val vedtak = OpphørTilsynBarnRequest(
-            årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
-            begrunnelse = "endre utgifter opphør",
-        )
+        val vedtak =
+            OpphørTilsynBarnRequest(
+                årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
+                begrunnelse = "endre utgifter opphør",
+            )
 
         opphørVedtak(behandlingLagreOpphør, vedtak)
 

@@ -10,19 +10,19 @@ import java.time.LocalDate
 data class Vedtaksperiode(
     override val fom: LocalDate,
     override val tom: LocalDate,
-) : Periode<LocalDate>, KopierPeriode<Vedtaksperiode> {
+) : Periode<LocalDate>,
+    KopierPeriode<Vedtaksperiode> {
     init {
         validatePeriode()
     }
 
-    override fun medPeriode(fom: LocalDate, tom: LocalDate): Vedtaksperiode {
-        return this.copy(fom = fom, tom = tom)
-    }
+    override fun medPeriode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
 }
 
 fun avkortVedtaksperiodeVedOpphør(
     forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørLæremidler>,
     revurderFra: LocalDate,
-): List<Vedtaksperiode> {
-    return forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))
-}
+): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(revurderFra.minusDays(1))

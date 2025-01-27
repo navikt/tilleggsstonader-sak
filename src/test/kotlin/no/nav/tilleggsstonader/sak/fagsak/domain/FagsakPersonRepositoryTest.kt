@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 
 internal class FagsakPersonRepositoryTest : IntegrationTest() {
-
     @Autowired
     private lateinit var fagsakPersonRepository: FagsakPersonRepository
 
@@ -65,15 +64,17 @@ internal class FagsakPersonRepositoryTest : IntegrationTest() {
     @Test
     internal fun `hentAktivIdent - skal returnere identen som har siste endretTid`() {
         val sporbarEnDagSiden = Sporbar(endret = Endret(endretTid = osloNow().minusDays(1)))
-        val person = fagsakPersonRepository.insert(
-            FagsakPerson(
-                identer = setOf(
-                    PersonIdent("1", sporbarEnDagSiden),
-                    PersonIdent("2"),
-                    PersonIdent("3", sporbarEnDagSiden),
+        val person =
+            fagsakPersonRepository.insert(
+                FagsakPerson(
+                    identer =
+                        setOf(
+                            PersonIdent("1", sporbarEnDagSiden),
+                            PersonIdent("2"),
+                            PersonIdent("3", sporbarEnDagSiden),
+                        ),
                 ),
-            ),
-        )
+            )
         assertThat(fagsakPersonRepository.hentAktivIdent(person.id)).isEqualTo("2")
     }
 }

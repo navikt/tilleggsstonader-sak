@@ -20,7 +20,6 @@ class RegisterAktivitetController(
     private val registerAktivitetService: RegisterAktivitetService,
     private val behandlingService: BehandlingService,
 ) {
-
     @GetMapping("temp/{fagsakPersonId}")
     fun hentAktiviteter(
         @PathVariable fagsakPersonId: FagsakPersonId,

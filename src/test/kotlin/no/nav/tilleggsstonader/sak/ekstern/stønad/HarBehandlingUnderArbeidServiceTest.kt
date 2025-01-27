@@ -7,13 +7,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class HarBehandlingUnderArbeidServiceTest {
-
-    private val statuserUnderBehandling = listOf(
-        BehandlingStatus.OPPRETTET,
-        BehandlingStatus.UTREDES,
-        BehandlingStatus.FATTER_VEDTAK,
-        BehandlingStatus.SATT_PÅ_VENT,
-    )
+    private val statuserUnderBehandling =
+        listOf(
+            BehandlingStatus.OPPRETTET,
+            BehandlingStatus.UTREDES,
+            BehandlingStatus.FATTER_VEDTAK,
+            BehandlingStatus.SATT_PÅ_VENT,
+        )
 
     @Test
     fun `Skal gi false for alle årsaker utenom SØKNAD`() {

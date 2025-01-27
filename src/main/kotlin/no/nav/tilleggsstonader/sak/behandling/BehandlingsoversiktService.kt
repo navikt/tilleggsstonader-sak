@@ -30,7 +30,6 @@ class BehandlingsoversiktService(
     private val behandlingRepository: BehandlingRepository,
     private val vedtakRepository: VedtakRepository,
 ) {
-
     fun hentOversikt(fagsakPersonId: FagsakPersonId): BehandlingsoversiktDto {
         val fagsak = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
 
@@ -52,26 +51,27 @@ class BehandlingsoversiktService(
             eksternFagsakId = fagsak.eksternId.id,
             stønadstype = fagsak.stønadstype,
             erLøpende = fagsakService.erLøpende(fagsak.id),
-            behandlinger = behandlinger.map {
-                BehandlingDetaljer(
-                    id = it.id,
-                    forrigeBehandlingId = it.forrigeBehandlingId,
-                    fagsakId = it.fagsakId,
-                    steg = it.steg,
-                    kategori = it.kategori,
-                    type = it.type,
-                    status = it.status,
-                    sistEndret = it.sporbar.endret.endretTid,
-                    resultat = it.resultat,
-                    opprettet = it.sporbar.opprettetTid,
-                    opprettetAv = it.sporbar.opprettetAv,
-                    behandlingsårsak = it.årsak,
-                    vedtaksdato = it.vedtakstidspunkt,
-                    henlagtÅrsak = it.henlagtÅrsak,
-                    revurderFra = it.revurderFra,
-                    vedtaksperiode = vedtaksperioder[it.id],
-                )
-            },
+            behandlinger =
+                behandlinger.map {
+                    BehandlingDetaljer(
+                        id = it.id,
+                        forrigeBehandlingId = it.forrigeBehandlingId,
+                        fagsakId = it.fagsakId,
+                        steg = it.steg,
+                        kategori = it.kategori,
+                        type = it.type,
+                        status = it.status,
+                        sistEndret = it.sporbar.endret.endretTid,
+                        resultat = it.resultat,
+                        opprettet = it.sporbar.opprettetTid,
+                        opprettetAv = it.sporbar.opprettetAv,
+                        behandlingsårsak = it.årsak,
+                        vedtaksdato = it.vedtakstidspunkt,
+                        henlagtÅrsak = it.henlagtÅrsak,
+                        revurderFra = it.revurderFra,
+                        vedtaksperiode = vedtaksperioder[it.id],
+                    )
+                },
         )
     }
 
@@ -80,13 +80,13 @@ class BehandlingsoversiktService(
      * Ønsket om å vise vedtaksperiode i behandlingsoversikten føles ikke helt landet.
      * Man burde kanskje haft en vedtaksperiode på behandling eller direkt på vedtaket for å enkelt hente ut informasjonen
      */
-    private fun hentVedtaksperioder(
-        behandlinger: List<Behandling>,
-    ): Map<BehandlingId, Vedtaksperiode?> {
-        val revurderFraPåBehandlingId = behandlinger
-            .filter { it.resultat != BehandlingResultat.HENLAGT }
-            .associate { it.id to it.revurderFra }
-        return vedtakRepository.findAllById(behandlinger.map { it.id })
+    private fun hentVedtaksperioder(behandlinger: List<Behandling>): Map<BehandlingId, Vedtaksperiode?> {
+        val revurderFraPåBehandlingId =
+            behandlinger
+                .filter { it.resultat != BehandlingResultat.HENLAGT }
+                .associate { it.id to it.revurderFra }
+        return vedtakRepository
+            .findAllById(behandlinger.map { it.id })
             .associateBy { it.behandlingId }
             .mapValues { (behandlingId, vedtak) ->
                 utledVedstaksperiodeForBehandling(vedtak, revurderFraPåBehandlingId[behandlingId])
@@ -106,8 +106,8 @@ class BehandlingsoversiktService(
     private fun utledVedstaksperiodeForBehandling(
         vedtak: Vedtak,
         revurdererFra: LocalDate?,
-    ): Vedtaksperiode? {
-        return when (vedtak.data) {
+    ): Vedtaksperiode? =
+        when (vedtak.data) {
             is InnvilgelseTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
             is OpphørTilsynBarn -> vedtak.data.beregningsresultat.vedtaksperiode(revurdererFra)
             is InnvilgelseLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
@@ -115,7 +115,6 @@ class BehandlingsoversiktService(
             is AvslagLæremidler -> null
             is OpphørLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
         }
-    }
 
     private fun BeregningsresultatTilsynBarn.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
         val stønadsperioder = perioder.flatMap { it.grunnlag.stønadsperioderGrunnlag }.map { it.stønadsperiode }

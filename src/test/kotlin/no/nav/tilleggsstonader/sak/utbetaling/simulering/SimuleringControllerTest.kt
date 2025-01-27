@@ -29,7 +29,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.exchange
 
 internal class SimuleringControllerTest : IntegrationTest() {
-
     @Autowired
     private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
@@ -82,26 +81,25 @@ internal class SimuleringControllerTest : IntegrationTest() {
         assertThat(simuleringsresultat.ingenEndringIUtbetaling).isTrue()
     }
 
-    private fun opprettFagsak(personIdent: String) =
-        testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(personIdent))))
+    private fun opprettFagsak(personIdent: String) = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(personIdent))))
 
-    private fun opprettBehandling(fagsak: Fagsak) = testoppsettService.lagre(
-        behandling(
-            fagsak,
-            type = BehandlingType.REVURDERING,
-            resultat = BehandlingResultat.INNVILGET,
-            status = BehandlingStatus.UTREDES,
-            steg = StegType.SIMULERING,
-        ),
-    )
+    private fun opprettBehandling(fagsak: Fagsak) =
+        testoppsettService.lagre(
+            behandling(
+                fagsak,
+                type = BehandlingType.REVURDERING,
+                resultat = BehandlingResultat.INNVILGET,
+                status = BehandlingStatus.UTREDES,
+                steg = StegType.SIMULERING,
+            ),
+        )
 
-    private fun simulerForBehandling(behandlingId: BehandlingId): ResponseEntity<SimuleringDto> {
-        return restTemplate.exchange(
+    private fun simulerForBehandling(behandlingId: BehandlingId): ResponseEntity<SimuleringDto> =
+        restTemplate.exchange(
             localhost("/api/simulering/$behandlingId"),
             HttpMethod.GET,
             HttpEntity<BehandlingDto>(headers),
         )
-    }
 
     private fun opprettVedtak(behandlingId: BehandlingId) {
         vedtakRepository.insert(

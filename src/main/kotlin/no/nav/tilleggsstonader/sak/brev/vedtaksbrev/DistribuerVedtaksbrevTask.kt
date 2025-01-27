@@ -31,7 +31,6 @@ class DistribuerVedtaksbrevTask(
     private val brevSteg: BrevSteg,
     private val transactionHandler: TransactionHandler,
 ) : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         val behandlingId = BehandlingId.fromString(task.payload)
 
@@ -52,15 +51,17 @@ class DistribuerVedtaksbrevTask(
         stegService.håndterSteg(behandlingId, brevSteg)
     }
 
-    private fun distribuerTilBrevmottaker(it: BrevmottakerVedtaksbrev) = journalpostClient.distribuerJournalpost(
-        DistribuerJournalpostRequest(
-            journalpostId = it.journalpostId
-                ?: error("Ugyldig tilstand. Mangler journalpostId for brev som skal distribueres"),
-            bestillendeFagsystem = Fagsystem.TILLEGGSSTONADER,
-            dokumentProdApp = "TILLEGGSSTONADER-SAK",
-            distribusjonstype = Distribusjonstype.VEDTAK,
-        ),
-    )
+    private fun distribuerTilBrevmottaker(it: BrevmottakerVedtaksbrev) =
+        journalpostClient.distribuerJournalpost(
+            DistribuerJournalpostRequest(
+                journalpostId =
+                    it.journalpostId
+                        ?: error("Ugyldig tilstand. Mangler journalpostId for brev som skal distribueres"),
+                bestillendeFagsystem = Fagsystem.TILLEGGSSTONADER,
+                dokumentProdApp = "TILLEGGSSTONADER-SAK",
+                distribusjonstype = Distribusjonstype.VEDTAK,
+            ),
+        )
 
     private fun validerHarBrevmottakere(brevmottakere: List<BrevmottakerVedtaksbrev>) {
         feilHvis(brevmottakere.isEmpty()) {
@@ -69,14 +70,14 @@ class DistribuerVedtaksbrevTask(
     }
 
     companion object {
-
         fun opprettTask(behandlingId: BehandlingId): Task =
             Task(
                 type = TYPE,
                 payload = behandlingId.toString(),
-                properties = Properties().apply {
-                    setProperty("behandlingId", behandlingId.toString())
-                },
+                properties =
+                    Properties().apply {
+                        setProperty("behandlingId", behandlingId.toString())
+                    },
             )
 
         const val TYPE = "distribuerVedtaksbrev"

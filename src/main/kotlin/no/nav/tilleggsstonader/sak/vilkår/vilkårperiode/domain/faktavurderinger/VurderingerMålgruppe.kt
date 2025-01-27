@@ -12,19 +12,22 @@ sealed interface DekketAvAnnetRegelverkVurdering : VurderingerMålgruppe {
 
 data class VurderingAAP(
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering {
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering {
     override val medlemskap: VurderingMedlemskap = VurderingMedlemskap.IMPLISITT
 }
 
 data class VurderingUføretrygd(
     override val medlemskap: VurderingMedlemskap,
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering
 
 data class VurderingNedsattArbeidsevne(
     override val medlemskap: VurderingMedlemskap,
     override val dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk,
-) : MedlemskapVurdering, DekketAvAnnetRegelverkVurdering
+) : MedlemskapVurdering,
+    DekketAvAnnetRegelverkVurdering
 
 data class VurderingOmstillingsstønad(
     override val medlemskap: VurderingMedlemskap,

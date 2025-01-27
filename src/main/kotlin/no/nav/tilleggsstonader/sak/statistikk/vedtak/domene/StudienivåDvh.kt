@@ -8,9 +8,10 @@ enum class StudienivåDvh {
     ;
 
     companion object {
-        fun fraDomene(studienivå: Studienivå) = when (studienivå) {
-            Studienivå.VIDEREGÅENDE -> VIDEREGÅENDE
-            Studienivå.HØYERE_UTDANNING -> HØYERE_UTDANNING
-        }
+        fun fraDomene(studienivå: Studienivå) =
+            when (studienivå) {
+                Studienivå.VIDEREGÅENDE -> VIDEREGÅENDE
+                Studienivå.HØYERE_UTDANNING -> HØYERE_UTDANNING
+            }
     }
 }

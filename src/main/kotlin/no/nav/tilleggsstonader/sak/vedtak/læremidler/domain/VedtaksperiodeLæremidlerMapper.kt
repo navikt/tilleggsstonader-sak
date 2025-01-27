@@ -8,23 +8,19 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 object VedtaksperiodeLæremidlerMapper {
-
-    fun mapTilVedtaksperiode(
-        beregningsresultatForMåned: List<BeregningsresultatForMåned>,
-    ): List<VedtaksperiodeLæremidler> {
-        return beregningsresultatForMåned
+    fun mapTilVedtaksperiode(beregningsresultatForMåned: List<BeregningsresultatForMåned>): List<VedtaksperiodeLæremidler> =
+        beregningsresultatForMåned
             .map { VedtaksperiodeLæremidler(it.grunnlag) }
             .sorted()
             .mergeSammenhengende { s1, s2 -> s1.erLikOgPåfølgesAv(s2) }
-    }
 
     data class VedtaksperiodeLæremidler(
         override val fom: LocalDate,
         override val tom: LocalDate,
         val målgruppe: MålgruppeType,
         val studienivå: Studienivå,
-    ) : Periode<LocalDate>, Mergeable<LocalDate, VedtaksperiodeLæremidler> {
-
+    ) : Periode<LocalDate>,
+        Mergeable<LocalDate, VedtaksperiodeLæremidler> {
         init {
             validatePeriode()
         }
@@ -40,13 +36,12 @@ object VedtaksperiodeLæremidlerMapper {
         /**
          * Ettersom stønadsperiode ikke overlapper er det tilstrekkelig å kun merge TOM
          */
-        override fun merge(other: VedtaksperiodeLæremidler): VedtaksperiodeLæremidler {
-            return this.copy(tom = other.tom)
-        }
+        override fun merge(other: VedtaksperiodeLæremidler): VedtaksperiodeLæremidler = this.copy(tom = other.tom)
 
         fun erLikOgPåfølgesAv(other: VedtaksperiodeLæremidler): Boolean {
-            val erLik = this.målgruppe == other.målgruppe &&
-                this.studienivå == other.studienivå
+            val erLik =
+                this.målgruppe == other.målgruppe &&
+                    this.studienivå == other.studienivå
             return erLik && this.påfølgesAv(other)
         }
     }

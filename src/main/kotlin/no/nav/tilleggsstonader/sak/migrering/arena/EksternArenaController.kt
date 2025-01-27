@@ -22,10 +22,11 @@ import org.springframework.web.bind.annotation.RestController
 class EksternArenaController(
     private val arenaStatusService: ArenaStatusService,
 ) {
-
     @PostMapping
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
-    fun hentStatusTilArena(@RequestBody request: ArenaFinnesPersonRequest): ArenaFinnesPersonResponse {
+    fun hentStatusTilArena(
+        @RequestBody request: ArenaFinnesPersonRequest,
+    ): ArenaFinnesPersonResponse {
         feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.ARENA), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }

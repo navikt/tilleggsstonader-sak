@@ -23,7 +23,6 @@ import java.time.Month
 import java.time.temporal.ChronoUnit
 
 class VedtaksstatistikkTest : IntegrationTest() {
-
     @Autowired
     lateinit var vedtakstatistikkRepository: VedtaksstatistikkRepository
 
@@ -40,12 +39,13 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     @Test
     fun `kan skrive og lese vedtaksstatistikk med flere aktiviteter`() {
-        val flereAktiviteter = AktiviteterDvh.JsonWrapper(
-            listOf(
-                AktiviteterDvh(type = AktivitetTypeDvh.REELL_ARBEIDSSØKER, resultat = ResultatVilkårperiodeDvh.OPPFYLT),
-                AktiviteterDvh(type = AktivitetTypeDvh.UTDANNING, resultat = ResultatVilkårperiodeDvh.IKKE_OPPFYLT),
-            ),
-        )
+        val flereAktiviteter =
+            AktiviteterDvh.JsonWrapper(
+                listOf(
+                    AktiviteterDvh(type = AktivitetTypeDvh.REELL_ARBEIDSSØKER, resultat = ResultatVilkårperiodeDvh.OPPFYLT),
+                    AktiviteterDvh(type = AktivitetTypeDvh.UTDANNING, resultat = ResultatVilkårperiodeDvh.IKKE_OPPFYLT),
+                ),
+            )
 
         vedtakstatistikkRepository.insert(vedtaksstatistikk().copy(aktiviteter = flereAktiviteter))
 
@@ -56,19 +56,21 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     @Test
     fun `kan skrive og lese vedtaksstatistikk med ikke-tom vilkårsvurdering`() {
-        val nøstetVilkårsvurdering = VilkårsvurderingerDvh.JsonWrapper(
-            listOf(
-                VilkårsvurderingerDvh(
-                    resultat = VilkårsresultatDvh.OPPFYLT,
-                    vilkår = listOf(
-                        DelvilkårDvh(
-                            resultat = Vilkårsresultat.OPPFYLT,
-                            vurderinger = listOf(RegelId.HAR_FULLFØRT_FJERDEKLASSE, RegelId.UNNTAK_ALDER),
-                        ),
+        val nøstetVilkårsvurdering =
+            VilkårsvurderingerDvh.JsonWrapper(
+                listOf(
+                    VilkårsvurderingerDvh(
+                        resultat = VilkårsresultatDvh.OPPFYLT,
+                        vilkår =
+                            listOf(
+                                DelvilkårDvh(
+                                    resultat = Vilkårsresultat.OPPFYLT,
+                                    vurderinger = listOf(RegelId.HAR_FULLFØRT_FJERDEKLASSE, RegelId.UNNTAK_ALDER),
+                                ),
+                            ),
                     ),
                 ),
-            ),
-        )
+            )
 
         vedtakstatistikkRepository.insert(vedtaksstatistikk().copy(vilkårsvurderinger = nøstetVilkårsvurdering))
 
@@ -79,12 +81,13 @@ class VedtaksstatistikkTest : IntegrationTest() {
 
     @Test
     fun `målgrupper kan hentes ut og blir parset til riktig type`() {
-        val målgrupper = MålgrupperDvh.JsonWrapper(
-            listOf(
-                MålgrupperDvh(type = MålgruppeTypeDvh.DAGPENGER, resultat = ResultatVilkårperiodeDvh.OPPFYLT),
-                MålgrupperDvh(type = MålgruppeTypeDvh.AAP, resultat = ResultatVilkårperiodeDvh.IKKE_OPPFYLT),
-            ),
-        )
+        val målgrupper =
+            MålgrupperDvh.JsonWrapper(
+                listOf(
+                    MålgrupperDvh(type = MålgruppeTypeDvh.DAGPENGER, resultat = ResultatVilkårperiodeDvh.OPPFYLT),
+                    MålgrupperDvh(type = MålgruppeTypeDvh.AAP, resultat = ResultatVilkårperiodeDvh.IKKE_OPPFYLT),
+                ),
+            )
 
         vedtakstatistikkRepository.insert(vedtaksstatistikk().copy(målgrupper = målgrupper))
 
@@ -120,13 +123,14 @@ class VedtaksstatistikkTest : IntegrationTest() {
     @Test
     fun `skal oppdatere endret_tid automatisk hvis man kjører en update`() {
         val datoIgår = LocalDate.now().minusDays(1)
-        val obj = vedtakstatistikkRepository.insert(vedtaksstatistikk()).let {
-            jdbcTemplate.update(
-                "UPDATE vedtaksstatistikk SET opprettet_tid=:ny_tid, endret_tid=:ny_tid",
-                mapOf("ny_tid" to datoIgår.atTime(8, 0)),
-            )
-            vedtakstatistikkRepository.findByIdOrThrow(it.id)
-        }
+        val obj =
+            vedtakstatistikkRepository.insert(vedtaksstatistikk()).let {
+                jdbcTemplate.update(
+                    "UPDATE vedtaksstatistikk SET opprettet_tid=:ny_tid, endret_tid=:ny_tid",
+                    mapOf("ny_tid" to datoIgår.atTime(8, 0)),
+                )
+                vedtakstatistikkRepository.findByIdOrThrow(it.id)
+            }
 
         // endretTid er tagget med @LastModifiedDate og oppdateres automatisk
         vedtakstatistikkRepository.update(obj)
@@ -140,30 +144,32 @@ class VedtaksstatistikkTest : IntegrationTest() {
         assertThat(oppdatert.endretTid.toLocalDate()).isEqualTo(LocalDate.now())
     }
 
-    private fun vedtaksstatistikk() = Vedtaksstatistikk(
-        id = id.id,
-        fagsakId = fagsakId,
-        behandlingId = id,
-        eksternFagsakId = 1722,
-        eksternBehandlingId = 4005,
-        relatertBehandlingId = null,
-        adressebeskyttelse = AdressebeskyttelseDvh.UGRADERT,
-        tidspunktVedtak = LocalDateTime.of(2024, Month.MAY, 7, 20, 30),
-        målgrupper = MålgrupperDvh.JsonWrapper(målgrupper = listOf()),
-        aktiviteter = AktiviteterDvh.JsonWrapper(aktivitet = listOf()),
-        vilkårsvurderinger = VilkårsvurderingerDvh.JsonWrapper(
-            vilkårsvurderinger = listOf(),
-        ),
-        person = "Pelle",
-        barn = BarnDvh.JsonWrapper(barn = listOf()),
-        behandlingType = BehandlingTypeDvh.FØRSTEGANGSBEHANDLING,
-        behandlingÅrsak = BehandlingÅrsakDvh.MANUELT_OPPRETTET,
-        vedtakResultat = VedtakResultatDvh.INNVILGET,
-        vedtaksperioder = VedtaksperioderDvh.JsonWrapper(vedtaksperioder = listOf()),
-        utbetalinger = UtbetalingerDvh.JsonWrapper(utbetalinger = listOf()),
-        stønadstype = StønadstypeDvh.BARNETILSYN,
-        kravMottatt = null,
-        årsakerAvslag = null,
-        årsakerOpphør = null,
-    )
+    private fun vedtaksstatistikk() =
+        Vedtaksstatistikk(
+            id = id.id,
+            fagsakId = fagsakId,
+            behandlingId = id,
+            eksternFagsakId = 1722,
+            eksternBehandlingId = 4005,
+            relatertBehandlingId = null,
+            adressebeskyttelse = AdressebeskyttelseDvh.UGRADERT,
+            tidspunktVedtak = LocalDateTime.of(2024, Month.MAY, 7, 20, 30),
+            målgrupper = MålgrupperDvh.JsonWrapper(målgrupper = listOf()),
+            aktiviteter = AktiviteterDvh.JsonWrapper(aktivitet = listOf()),
+            vilkårsvurderinger =
+                VilkårsvurderingerDvh.JsonWrapper(
+                    vilkårsvurderinger = listOf(),
+                ),
+            person = "Pelle",
+            barn = BarnDvh.JsonWrapper(barn = listOf()),
+            behandlingType = BehandlingTypeDvh.FØRSTEGANGSBEHANDLING,
+            behandlingÅrsak = BehandlingÅrsakDvh.MANUELT_OPPRETTET,
+            vedtakResultat = VedtakResultatDvh.INNVILGET,
+            vedtaksperioder = VedtaksperioderDvh.JsonWrapper(vedtaksperioder = listOf()),
+            utbetalinger = UtbetalingerDvh.JsonWrapper(utbetalinger = listOf()),
+            stønadstype = StønadstypeDvh.BARNETILSYN,
+            kravMottatt = null,
+            årsakerAvslag = null,
+            årsakerOpphør = null,
+        )
 }

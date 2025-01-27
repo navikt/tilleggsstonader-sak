@@ -12,7 +12,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.web.client.exchange
 
 class EksternArenaControllerTest : IntegrationTest() {
-
     @BeforeEach
     fun setUp() {
         headers.setBearerAuth(clientCredential(EksternApplikasjon.ARENA.namespaceAppNavn, true))
@@ -26,23 +25,29 @@ class EksternArenaControllerTest : IntegrationTest() {
 
     @Test
     fun `skal kaste feil hvis man sender inn rettighet som ikke er mappet`() {
-        val exception = ProblemDetailUtil.catchProblemDetailException {
-            hentStatus("ident", Rettighet.REISE)
-        }
+        val exception =
+            ProblemDetailUtil.catchProblemDetailException {
+                hentStatus("ident", Rettighet.REISE)
+            }
 
         assertThat(exception.detail.detail)
             .isEqualTo("Har ikke lagt inn mapping av stønadstype for REISE")
     }
 
-    private fun hentStatus(ident: String, rettighet: Rettighet): ArenaFinnesPersonResponse {
-        val request = mapOf(
-            "ident" to ident,
-            "rettighet" to rettighet.kodeArena,
-        )
-        return restTemplate.exchange<ArenaFinnesPersonResponse>(
-            localhost("api/ekstern/arena/status"),
-            HttpMethod.POST,
-            HttpEntity(request, headers),
-        ).body!!
+    private fun hentStatus(
+        ident: String,
+        rettighet: Rettighet,
+    ): ArenaFinnesPersonResponse {
+        val request =
+            mapOf(
+                "ident" to ident,
+                "rettighet" to rettighet.kodeArena,
+            )
+        return restTemplate
+            .exchange<ArenaFinnesPersonResponse>(
+                localhost("api/ekstern/arena/status"),
+                HttpMethod.POST,
+                HttpEntity(request, headers),
+            ).body!!
     }
 }

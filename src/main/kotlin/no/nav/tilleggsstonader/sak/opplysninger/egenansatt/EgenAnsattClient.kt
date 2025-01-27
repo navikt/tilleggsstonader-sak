@@ -16,24 +16,40 @@ class EgenAnsattClient(
     @Value("\${clients.egen_ansatt.uri}") private val uri: URI,
     @Qualifier("azureClientCredential") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
-
-    private val egenAnsattUri: URI = UriComponentsBuilder.fromUri(uri).pathSegment("skjermet").build().toUri()
-    private val egenAnsattBulkUri: URI = UriComponentsBuilder.fromUri(uri).pathSegment("skjermetBulk").build().toUri()
+    private val egenAnsattUri: URI =
+        UriComponentsBuilder
+            .fromUri(uri)
+            .pathSegment("skjermet")
+            .build()
+            .toUri()
+    private val egenAnsattBulkUri: URI =
+        UriComponentsBuilder
+            .fromUri(uri)
+            .pathSegment("skjermetBulk")
+            .build()
+            .toUri()
 
     fun erEgenAnsatt(personIdent: String): Boolean =
-        restTemplate.exchange<Boolean>(
-            egenAnsattUri,
-            HttpMethod.POST,
-            HttpEntity(SkjermetDataRequestDTO(personIdent)),
-        ).body ?: error("Mangler body")
+        restTemplate
+            .exchange<Boolean>(
+                egenAnsattUri,
+                HttpMethod.POST,
+                HttpEntity(SkjermetDataRequestDTO(personIdent)),
+            ).body ?: error("Mangler body")
 
     fun erEgenAnsatt(personidenter: Set<String>): Map<String, Boolean> =
-        restTemplate.exchange<Map<String, Boolean>>(
-            egenAnsattBulkUri,
-            HttpMethod.POST,
-            HttpEntity(SkjermetDataBolkRequestDTO(personidenter)),
-        ).body ?: error("Mangler body")
+        restTemplate
+            .exchange<Map<String, Boolean>>(
+                egenAnsattBulkUri,
+                HttpMethod.POST,
+                HttpEntity(SkjermetDataBolkRequestDTO(personidenter)),
+            ).body ?: error("Mangler body")
 }
 
-data class SkjermetDataRequestDTO(val personident: String)
-data class SkjermetDataBolkRequestDTO(val personidenter: Set<String>)
+data class SkjermetDataRequestDTO(
+    val personident: String,
+)
+
+data class SkjermetDataBolkRequestDTO(
+    val personidenter: Set<String>,
+)

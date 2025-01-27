@@ -33,7 +33,6 @@ class SendTilBeslutterSteg(
     private val oppgaveService: OppgaveService,
     private val totrinnskontrollService: TotrinnskontrollService,
 ) : BehandlingSteg<Void?> {
-
     // TODO valider at man har opprettet vedtaksbrev?
     override fun validerSteg(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.steg != stegType()) {
@@ -49,7 +48,10 @@ class SendTilBeslutterSteg(
         validerOppgaver(saksbehandling)
     }
 
-    override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
+    override fun utførSteg(
+        saksbehandling: Saksbehandling,
+        data: Void?,
+    ) {
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FATTER_VEDTAK)
         ferdigstillOppgave(saksbehandling)
         totrinnskontrollService.sendtilBeslutter(saksbehandling)
@@ -60,21 +62,23 @@ class SendTilBeslutterSteg(
         taskService.save(
             OpprettOppgaveTask.opprettTask(
                 behandlingId = saksbehandling.id,
-                oppgave = OpprettOppgave(
-                    oppgavetype = Oppgavetype.GodkjenneVedtak,
-                    beskrivelse = "Sendt til godkjenning av ${SikkerhetContext.hentSaksbehandlerNavn(true)}.",
-                ),
+                oppgave =
+                    OpprettOppgave(
+                        oppgavetype = Oppgavetype.GodkjenneVedtak,
+                        beskrivelse = "Sendt til godkjenning av ${SikkerhetContext.hentSaksbehandlerNavn(true)}.",
+                    ),
             ),
         )
     }
 
     private fun ferdigstillOppgave(saksbehandling: Saksbehandling) {
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(saksbehandling.id)
-        val oppgavetype = if (totrinnskontroll?.status == TotrinnInternStatus.UNDERKJENT) {
-            Oppgavetype.BehandleUnderkjentVedtak
-        } else {
-            Oppgavetype.BehandleSak
-        }
+        val oppgavetype =
+            if (totrinnskontroll?.status == TotrinnInternStatus.UNDERKJENT) {
+                Oppgavetype.BehandleUnderkjentVedtak
+            } else {
+                Oppgavetype.BehandleSak
+            }
 
         taskService.save(
             FerdigstillOppgaveTask.opprettTask(

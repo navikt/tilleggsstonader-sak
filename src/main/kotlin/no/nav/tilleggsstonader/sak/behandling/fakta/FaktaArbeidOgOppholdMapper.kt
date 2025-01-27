@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service
 class FaktaArbeidOgOppholdMapper(
     private val kodeverkService: KodeverkService,
 ) {
-
     fun mapArbeidOgOpphold(arbeidOgOpphold: ArbeidOgOpphold?): FaktaArbeidOgOpphold? {
         if (arbeidOgOpphold == null) return null
 
@@ -25,14 +24,13 @@ class FaktaArbeidOgOppholdMapper(
         )
     }
 
-    private fun mapOpphold(opphold: OppholdUtenforNorge): FaktaOppholdUtenforNorge {
-        return FaktaOppholdUtenforNorge(
+    private fun mapOpphold(opphold: OppholdUtenforNorge): FaktaOppholdUtenforNorge =
+        FaktaOppholdUtenforNorge(
             land = opphold.land.mapLandkode(),
             årsak = opphold.årsak,
             fom = opphold.fom,
             tom = opphold.tom,
         )
-    }
 
     private fun String.mapLandkode(): String = kodeverkService.hentLandkode(this)
 }

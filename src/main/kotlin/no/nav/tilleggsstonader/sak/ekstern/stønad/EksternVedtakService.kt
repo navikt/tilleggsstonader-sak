@@ -17,22 +17,22 @@ class EksternVedtakService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
 ) {
-
     /**
      * Henter foreløpig kun informasjon om det finnes et vedtak i ny løsning og/eller i arena
      * Når vi legger inn informasjon om hvilke perioder det gjelder,
      * så må vi slå sammen beregningsresultat tvers flere behandlinger pga revurderFra som ikke tar med perioder før måneden som det revurderes fra
      */
-    fun hentVedtaksinformasjonTilsynBarn(request: IdentRequest): VedtaksinformasjonTilsynBarnDto {
-        return VedtaksinformasjonTilsynBarnDto(
+    fun hentVedtaksinformasjonTilsynBarn(request: IdentRequest): VedtaksinformasjonTilsynBarnDto =
+        VedtaksinformasjonTilsynBarnDto(
             harInnvilgetVedtak = harVedtak(request) || harVedtakIArena(request),
         )
-    }
 
     private fun harVedtak(request: IdentRequest): Boolean {
         val identer = personService.hentPersonIdenter(request.ident).identer()
-        val sisteIverksatteBehandling = fagsakService.finnFagsak(identer, stønadstype = Stønadstype.BARNETILSYN)
-            ?.let { behandlingService.finnSisteIverksatteBehandling(it.id) }
+        val sisteIverksatteBehandling =
+            fagsakService
+                .finnFagsak(identer, stønadstype = Stønadstype.BARNETILSYN)
+                ?.let { behandlingService.finnSisteIverksatteBehandling(it.id) }
         return sisteIverksatteBehandling != null
     }
 

@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.opplysninger.pdl
 import org.apache.commons.lang3.StringUtils
 
 object PdlConfig {
-
     const val PATH_GRAPHQL = "graphql"
 
     val personBolkKortQuery = graphqlQuery("/pdl/person_kort_bolk.graphql")
@@ -22,11 +21,11 @@ object PdlConfig {
 
     val hentGeografiskTilknytningQuery = graphqlQuery("/pdl/geografisk_tilknytning.graphql")
 
-    private fun graphqlQuery(path: String) = PdlConfig::class.java.getResource(path)!!
-        .readText()
-        .graphqlCompatible()
+    private fun graphqlQuery(path: String) =
+        PdlConfig::class.java
+            .getResource(path)!!
+            .readText()
+            .graphqlCompatible()
 
-    private fun String.graphqlCompatible(): String {
-        return StringUtils.normalizeSpace(this.replace("\n", ""))
-    }
+    private fun String.graphqlCompatible(): String = StringUtils.normalizeSpace(this.replace("\n", ""))
 }

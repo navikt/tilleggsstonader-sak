@@ -33,10 +33,12 @@ sealed interface VedtaksdataJson
  * Den finner riktig enum ut fra hvilken
  */
 class TypeVedtaksdataDeserializer : JsonDeserializer<TypeVedtaksdata>() {
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): TypeVedtaksdata {
-        return typerVedtaksdata[p.text] ?: error("Finner ikke mapping for ${p.text}")
-    }
+    override fun deserialize(
+        p: JsonParser,
+        ctxt: DeserializationContext,
+    ): TypeVedtaksdata = typerVedtaksdata[p.text] ?: error("Finner ikke mapping for ${p.text}")
 }
+
 val typerVedtaksdata: Map<String, TypeVedtaksdata> =
     listOf(
         TypeVedtakTilsynBarn.entries,

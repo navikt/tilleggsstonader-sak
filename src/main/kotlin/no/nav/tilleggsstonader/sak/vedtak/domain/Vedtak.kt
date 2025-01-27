@@ -15,7 +15,6 @@ data class GeneriskVedtak<T : Vedtaksdata>(
     val behandlingId: BehandlingId,
     val data: T,
     val type: TypeVedtak = data.type.typeVedtak,
-
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 ) {

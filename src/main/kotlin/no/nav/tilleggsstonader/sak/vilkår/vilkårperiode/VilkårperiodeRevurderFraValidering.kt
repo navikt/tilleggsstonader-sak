@@ -12,7 +12,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 object VilkårperiodeRevurderFraValidering {
-
     fun validerNyPeriodeRevurdering(
         behandling: Saksbehandling,
         fom: LocalDate,
@@ -84,6 +83,5 @@ object VilkårperiodeRevurderFraValidering {
     private fun periodeInfo(
         behandling: Saksbehandling,
         fomVilkårperiode: LocalDate,
-    ) =
-        "periode som begynner(${fomVilkårperiode.norskFormat()}) før revurderingsdato(${behandling.revurderFra?.norskFormat()})"
+    ) = "periode som begynner(${fomVilkårperiode.norskFormat()}) før revurderingsdato(${behandling.revurderFra?.norskFormat()})"
 }

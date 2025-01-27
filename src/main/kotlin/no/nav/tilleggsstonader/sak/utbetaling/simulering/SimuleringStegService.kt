@@ -16,7 +16,6 @@ class SimuleringStegService(
     private val simuleringService: SimuleringService,
     private val tilgangService: TilgangService,
 ) {
-
     @Transactional
     fun hentEllerOpprettSimuleringsresultat(saksbehandling: Saksbehandling): SimuleringDto? {
         if (saksbehandling.status.behandlingErLåstForVidereRedigering() ||

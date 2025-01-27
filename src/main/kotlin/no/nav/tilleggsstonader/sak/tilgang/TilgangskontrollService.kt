@@ -21,7 +21,6 @@ class TilgangskontrollService(
     private val personService: PersonService,
     rolleConfig: RolleConfig,
 ) {
-
     private val adRoller = rolleConfig.rollerMedBeskrivelse
 
     @Cacheable(
@@ -29,9 +28,17 @@ class TilgangskontrollService(
         key = "#jwtToken.subject.concat(#personIdent)",
         condition = "#personIdent != null && #jwtToken.subject != null",
     )
-    fun sjekkTilgang(personIdent: String, jwtToken: JwtToken): Tilgang {
-        val adressebeskyttelse = personService.hentPersonKortBolk(listOf(personIdent)).values.single()
-            .adressebeskyttelse.gradering()
+    fun sjekkTilgang(
+        personIdent: String,
+        jwtToken: JwtToken,
+    ): Tilgang {
+        val adressebeskyttelse =
+            personService
+                .hentPersonKortBolk(listOf(personIdent))
+                .values
+                .single()
+                .adressebeskyttelse
+                .gradering()
         return hentTilgang(adressebeskyttelse, jwtToken, personIdent) { egenAnsattService.erEgenAnsatt(personIdent) }
     }
 
@@ -40,7 +47,10 @@ class TilgangskontrollService(
         key = "#jwtToken.subject.concat(#personIdent)",
         condition = "#jwtToken.subject != null",
     )
-    fun sjekkTilgangTilPersonMedRelasjoner(personIdent: String, jwtToken: JwtToken): Tilgang {
+    fun sjekkTilgangTilPersonMedRelasjoner(
+        personIdent: String,
+        jwtToken: JwtToken,
+    ): Tilgang {
         val personMedRelasjoner = hentPersonMedRelasjoner(personIdent)
         secureLogger.info("Sjekker tilgang til {}", personMedRelasjoner)
 
@@ -66,13 +76,14 @@ class TilgangskontrollService(
         personIdent: String,
         egenAnsattSjekk: () -> Boolean,
     ): Tilgang {
-        val tilgang = when (adressebeskyttelsegradering) {
-            AdressebeskyttelseGradering.FORTROLIG -> hentTilgangForRolle(adRoller.kode7, jwtToken, personIdent)
-            AdressebeskyttelseGradering.STRENGT_FORTROLIG, AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND ->
-                hentTilgangForRolle(adRoller.kode6, jwtToken, personIdent)
+        val tilgang =
+            when (adressebeskyttelsegradering) {
+                AdressebeskyttelseGradering.FORTROLIG -> hentTilgangForRolle(adRoller.kode7, jwtToken, personIdent)
+                AdressebeskyttelseGradering.STRENGT_FORTROLIG, AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND ->
+                    hentTilgangForRolle(adRoller.kode6, jwtToken, personIdent)
 
-            else -> Tilgang(harTilgang = true)
-        }
+                else -> Tilgang(harTilgang = true)
+            }
         if (!tilgang.harTilgang) {
             return tilgang
         }
@@ -91,7 +102,11 @@ class TilgangskontrollService(
         return egenAnsattService.erEgenAnsatt(relevanteIdenter).any { it.value }
     }
 
-    private fun hentTilgangForRolle(adRolle: AdRolle?, jwtToken: JwtToken, personIdent: String): Tilgang {
+    private fun hentTilgangForRolle(
+        adRolle: AdRolle?,
+        jwtToken: JwtToken,
+        personIdent: String,
+    ): Tilgang {
         val grupper = jwtToken.jwtTokenClaims.getAsList("groups")
         if (grupper.any { it == adRolle?.rolleId }) {
             return Tilgang(true)

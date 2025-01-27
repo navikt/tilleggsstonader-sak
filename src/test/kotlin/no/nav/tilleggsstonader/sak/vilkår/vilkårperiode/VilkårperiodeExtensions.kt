@@ -8,16 +8,21 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.Vurdering
 
 object VilkårperiodeExtensions {
-
     val Vilkårperiode.medlemskap: Vurdering
-        get() = this.faktaOgVurdering.vurderinger
-            .takeIfVurderingOrThrow<MedlemskapVurdering>().medlemskap
+        get() =
+            this.faktaOgVurdering.vurderinger
+                .takeIfVurderingOrThrow<MedlemskapVurdering>()
+                .medlemskap
 
     val Vilkårperiode.dekketAvAnnetRegelverk: Vurdering
-        get() = this.faktaOgVurdering.vurderinger
-            .takeIfVurderingOrThrow<DekketAvAnnetRegelverkVurdering>().dekketAvAnnetRegelverk
+        get() =
+            this.faktaOgVurdering.vurderinger
+                .takeIfVurderingOrThrow<DekketAvAnnetRegelverkVurdering>()
+                .dekketAvAnnetRegelverk
 
     val Vilkårperiode.lønnet: Vurdering
-        get() = this.faktaOgVurdering.vurderinger
-            .takeIfVurderingOrThrow<LønnetVurdering>().lønnet
+        get() =
+            this.faktaOgVurdering.vurderinger
+                .takeIfVurderingOrThrow<LønnetVurdering>()
+                .lønnet
 }

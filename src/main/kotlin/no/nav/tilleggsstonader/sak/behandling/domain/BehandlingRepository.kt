@@ -13,11 +13,15 @@ import org.springframework.stereotype.Repository
  * TODO: Alle metoder burde gåes igjennom senere
  */
 @Repository
-interface BehandlingRepository : RepositoryInterface<Behandling, BehandlingId>, InsertUpdateRepository<Behandling> {
-
+interface BehandlingRepository :
+    RepositoryInterface<Behandling, BehandlingId>,
+    InsertUpdateRepository<Behandling> {
     fun findByFagsakId(fagsakId: FagsakId): List<Behandling>
 
-    fun findByFagsakIdAndStatus(fagsakId: FagsakId, status: BehandlingStatus): List<Behandling>
+    fun findByFagsakIdAndStatus(
+        fagsakId: FagsakId,
+        status: BehandlingStatus,
+    ): List<Behandling>
 
     fun existsByFagsakId(fagsakId: FagsakId): Boolean
 
@@ -146,9 +150,15 @@ interface BehandlingRepository : RepositoryInterface<Behandling, BehandlingId>, 
     )
     fun finnBehandlingerForGjenbrukAvVilkår(fagsakPersonId: FagsakPersonId): List<Behandling>
 
-    fun existsByFagsakIdAndStatusIsNot(fagsakId: FagsakId, behandlingStatus: BehandlingStatus): Boolean
+    fun existsByFagsakIdAndStatusIsNot(
+        fagsakId: FagsakId,
+        behandlingStatus: BehandlingStatus,
+    ): Boolean
 
-    fun existsByFagsakIdAndStatusIsNotIn(fagsakId: FagsakId, behandlingStatus: List<BehandlingStatus>): Boolean
+    fun existsByFagsakIdAndStatusIsNotIn(
+        fagsakId: FagsakId,
+        behandlingStatus: List<BehandlingStatus>,
+    ): Boolean
 
     // language=PostgreSQL
     @Query(
@@ -177,7 +187,10 @@ interface BehandlingRepository : RepositoryInterface<Behandling, BehandlingId>, 
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     ): List<Pair<String, BehandlingId>>
 
-    fun findAllByStatusAndResultatIn(status: BehandlingStatus, resultat: List<BehandlingResultat>): List<Behandling>
+    fun findAllByStatusAndResultatIn(
+        status: BehandlingStatus,
+        resultat: List<BehandlingResultat>,
+    ): List<Behandling>
 
     @Query(
         """

@@ -15,7 +15,6 @@ import java.time.LocalDate
 import java.util.UUID
 
 class DagligIverksettBehandlingTaskTest {
-
     private val behandlingService = mockk<BehandlingService>()
     private val iverksettService = mockk<IverksettService>(relaxed = true)
     private val taskStep = DagligIverksettBehandlingTask(behandlingService, iverksettService)

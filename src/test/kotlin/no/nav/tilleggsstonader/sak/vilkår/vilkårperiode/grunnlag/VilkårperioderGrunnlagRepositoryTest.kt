@@ -47,15 +47,17 @@ internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
         val grunnlagJson =
             VilkårperioderGrunnlag(
                 aktivitet = grunnlagAktivitet(),
-                ytelse = GrunnlagYtelse(
-                    perioder = listOf(
-                        PeriodeGrunnlagYtelse(
-                            type = TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                            fom = LocalDate.now(),
-                            tom = LocalDate.now().plusDays(1),
-                        ),
+                ytelse =
+                    GrunnlagYtelse(
+                        perioder =
+                            listOf(
+                                PeriodeGrunnlagYtelse(
+                                    type = TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(1),
+                                ),
+                            ),
                     ),
-                ),
                 hentetInformasjon = hentetInformasjon(),
             )
 
@@ -68,43 +70,51 @@ internal class VilkårperioderGrunnlagRepositoryTest : IntegrationTest() {
 
         val lagretGrunnlag = vilkårperioderGrunnlagRepository.findByIdOrThrow(behandling.id)
         assertThat(lagretGrunnlag.behandlingId).isEqualTo(behandling.id)
-        assertThat(lagretGrunnlag.grunnlag.ytelse.perioder.first().subtype).isNull()
+        assertThat(
+            lagretGrunnlag.grunnlag.ytelse.perioder
+                .first()
+                .subtype,
+        ).isNull()
     }
 
-    private fun grunnlagYtelse() = GrunnlagYtelse(
-        perioder =
-        listOf(
-            PeriodeGrunnlagYtelse(
-                type = TypeYtelsePeriode.AAP,
-                fom = LocalDate.now(),
-                tom = LocalDate.now().plusDays(1),
-            ),
-        ),
-    )
+    private fun grunnlagYtelse() =
+        GrunnlagYtelse(
+            perioder =
+                listOf(
+                    PeriodeGrunnlagYtelse(
+                        type = TypeYtelsePeriode.AAP,
+                        fom = LocalDate.now(),
+                        tom = LocalDate.now().plusDays(1),
+                    ),
+                ),
+        )
 
-    private fun grunnlagAktivitet() = GrunnlagAktivitet(
-        aktiviteter = listOf(
-            periodeGrunnlagAktivitet(
-                id = "123",
-                fom = LocalDate.now(),
-                tom = LocalDate.now().plusMonths(1),
-                type = "TYPE",
-                typeNavn = "Type navn",
-                status = StatusAktivitet.AKTUELL,
-                statusArena = "AKTUL",
-                antallDagerPerUke = 5,
-                prosentDeltakelse = 100.toBigDecimal(),
-                erStønadsberettiget = true,
-                erUtdanning = false,
-                arrangør = "Arrangør",
-                kilde = Kilde.ARENA,
-            ),
-        ),
-    )
+    private fun grunnlagAktivitet() =
+        GrunnlagAktivitet(
+            aktiviteter =
+                listOf(
+                    periodeGrunnlagAktivitet(
+                        id = "123",
+                        fom = LocalDate.now(),
+                        tom = LocalDate.now().plusMonths(1),
+                        type = "TYPE",
+                        typeNavn = "Type navn",
+                        status = StatusAktivitet.AKTUELL,
+                        statusArena = "AKTUL",
+                        antallDagerPerUke = 5,
+                        prosentDeltakelse = 100.toBigDecimal(),
+                        erStønadsberettiget = true,
+                        erUtdanning = false,
+                        arrangør = "Arrangør",
+                        kilde = Kilde.ARENA,
+                    ),
+                ),
+        )
 
-    private fun hentetInformasjon() = HentetInformasjon(
-        fom = LocalDate.now().minusMonths(3),
-        tom = LocalDate.now().plusYears(1),
-        tidspunktHentet = LocalDateTime.now(),
-    )
+    private fun hentetInformasjon() =
+        HentetInformasjon(
+            fom = LocalDate.now().minusMonths(3),
+            tom = LocalDate.now().plusYears(1),
+            tidspunktHentet = LocalDateTime.now(),
+        )
 }

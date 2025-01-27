@@ -14,7 +14,6 @@ private const val NAV_IDENT = "navIdent"
  * Legger til navIdent fra token i filter for å kunne se hvem som ev. fått feil sånn at vi kan kontakte saksbehandleren
  */
 class NAVIdentFilter : HttpFilter() {
-
     override fun doFilter(
         request: HttpServletRequest,
         response: HttpServletResponse,

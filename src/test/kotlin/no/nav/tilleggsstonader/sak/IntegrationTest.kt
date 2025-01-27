@@ -59,10 +59,8 @@ import org.springframework.web.client.RestTemplate
 // Slett denne når RestTemplateConfiguration er tatt i bruk?
 @Configuration
 class DefaultRestTemplateConfiguration {
-
     @Bean
-    fun restTemplate(restTemplateBuilder: RestTemplateBuilder) =
-        restTemplateBuilder.build()
+    fun restTemplate(restTemplateBuilder: RestTemplateBuilder) = restTemplateBuilder.build()
 }
 
 @ExtendWith(SpringExtension::class)
@@ -88,7 +86,6 @@ class DefaultRestTemplateConfiguration {
 )
 @EnableMockOAuth2Server
 abstract class IntegrationTest {
-
     @Autowired
     protected lateinit var restTemplate: RestTemplate
     protected val headers = HttpHeaders()
@@ -128,12 +125,9 @@ abstract class IntegrationTest {
         listOf(
             TaskLogg::class,
             Task::class,
-
             SøknadRouting::class,
-
             BrevmottakerFrittståendeBrev::class,
             FrittståendeBrev::class,
-
             Grunnlagsdata::class,
             Vedtak::class,
             Simuleringsresultat::class,
@@ -142,12 +136,9 @@ abstract class IntegrationTest {
             Stønadsperiode::class,
             Vilkår::class,
             BehandlingBarn::class,
-
             SøknadBehandling::class,
             SøknadBarnetilsyn::class,
-
             SettPåVent::class,
-
             OppgaveDomain::class,
             Totrinnskontroll::class,
             Vedtaksbrev::class,
@@ -163,7 +154,6 @@ abstract class IntegrationTest {
             FagsakDomain::class,
             PersonIdent::class,
             FagsakPerson::class,
-
             Vedtaksstatistikk::class,
         ).forEach { jdbcAggregateOperations.deleteAll(it.java) }
     }
@@ -173,28 +163,23 @@ abstract class IntegrationTest {
 
     private fun clearCaches() {
         cacheManagers.forEach {
-            it.cacheNames.mapNotNull { cacheName -> it.getCache(cacheName) }
+            it.cacheNames
+                .mapNotNull { cacheName -> it.getCache(cacheName) }
                 .forEach { cache -> cache.clear() }
         }
     }
 
-    protected fun localhost(path: String): String {
-        return "$LOCALHOST$port/$path"
-    }
+    protected fun localhost(path: String): String = "$LOCALHOST$port/$path"
 
     protected fun onBehalfOfToken(
         role: String = rolleConfig.beslutterRolle,
         saksbehandler: String = "julenissen",
-    ): String {
-        return TokenUtil.onBehalfOfToken(mockOAuth2Server, role, saksbehandler)
-    }
+    ): String = TokenUtil.onBehalfOfToken(mockOAuth2Server, role, saksbehandler)
 
     protected fun clientCredential(
         clientId: String,
         accessAsApplication: Boolean,
-    ): String {
-        return TokenUtil.clientToken(mockOAuth2Server, clientId, accessAsApplication)
-    }
+    ): String = TokenUtil.clientToken(mockOAuth2Server, clientId, accessAsApplication)
 
     companion object {
         private const val LOCALHOST = "http://localhost:"

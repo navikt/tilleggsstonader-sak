@@ -5,7 +5,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class SøknadTilsynBarnSendInnFyllUtTest {
-
     @Test
     fun `skal kunne parsea informasjon om søker og barn fra søknad med 2 barn`() {
         val data = FileUtil.readFile("fyllut-sendinn/søknad-2-barn.xml").toByteArray()

@@ -18,9 +18,10 @@ class VilkårsoppsummeringController(
     private val tilgangService: TilgangService,
     private val vilkårsoppsummeringService: VilkårsoppsummeringService,
 ) {
-
     @GetMapping("{behandlingId}")
-    fun hentVilkårsoppsummering(@PathVariable behandlingId: BehandlingId): VilkårsoppsummeringDto {
+    fun hentVilkårsoppsummering(
+        @PathVariable behandlingId: BehandlingId,
+    ): VilkårsoppsummeringDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return vilkårsoppsummeringService.hentVilkårsoppsummering(behandlingId)

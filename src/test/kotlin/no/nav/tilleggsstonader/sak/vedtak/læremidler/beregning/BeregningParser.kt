@@ -18,34 +18,41 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
-fun mapAktiviteter(behandlingId: BehandlingId, dataTable: DataTable) = dataTable.mapRad { rad ->
+fun mapAktiviteter(
+    behandlingId: BehandlingId,
+    dataTable: DataTable,
+) = dataTable.mapRad { rad ->
     aktivitet(
         behandlingId = behandlingId,
         fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
         tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-        faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(
-            type = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
-                ?: AktivitetType.TILTAK,
-            prosent = parseInt(BeregningNøkler.STUDIEPROSENT, rad),
-            studienivå = parseValgfriEnum<Studienivå>(BeregningNøkler.STUDIENIVÅ, rad)
-                ?: Studienivå.HØYERE_UTDANNING,
-
-        ),
+        faktaOgVurdering =
+            faktaOgVurderingAktivitetLæremidler(
+                type =
+                    parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
+                        ?: AktivitetType.TILTAK,
+                prosent = parseInt(BeregningNøkler.STUDIEPROSENT, rad),
+                studienivå =
+                    parseValgfriEnum<Studienivå>(BeregningNøkler.STUDIENIVÅ, rad)
+                        ?: Studienivå.HØYERE_UTDANNING,
+            ),
     )
 }
 
-fun mapBeregningsresultat(dataTable: DataTable) = dataTable.mapRad { rad ->
-    BeregningsresultatForMåned(
-        beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
-        grunnlag = Beregningsgrunnlag(
-            fom = parseDato(DomenenøkkelFelles.FOM, rad),
-            tom = parseDato(DomenenøkkelFelles.TOM, rad),
-            studienivå = parseValgfriEnum<Studienivå>(BeregningNøkler.STUDIENIVÅ, rad) ?: Studienivå.HØYERE_UTDANNING,
-            studieprosent = parseInt(BeregningNøkler.STUDIEPROSENT, rad),
-            sats = parseBigDecimal(BeregningNøkler.SATS, rad).toInt(),
-            satsBekreftet = parseValgfriBoolean(BeregningNøkler.BEKREFTET_SATS, rad) ?: true,
-            utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),
-            målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
-        ),
-    )
-}
+fun mapBeregningsresultat(dataTable: DataTable) =
+    dataTable.mapRad { rad ->
+        BeregningsresultatForMåned(
+            beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
+            grunnlag =
+                Beregningsgrunnlag(
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    studienivå = parseValgfriEnum<Studienivå>(BeregningNøkler.STUDIENIVÅ, rad) ?: Studienivå.HØYERE_UTDANNING,
+                    studieprosent = parseInt(BeregningNøkler.STUDIEPROSENT, rad),
+                    sats = parseBigDecimal(BeregningNøkler.SATS, rad).toInt(),
+                    satsBekreftet = parseValgfriBoolean(BeregningNøkler.BEKREFTET_SATS, rad) ?: true,
+                    utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),
+                    målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+                ),
+        )
+    }

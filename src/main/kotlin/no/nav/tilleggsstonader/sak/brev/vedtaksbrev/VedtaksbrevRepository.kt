@@ -6,4 +6,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryI
 import org.springframework.stereotype.Repository
 
 @Repository
-interface VedtaksbrevRepository : RepositoryInterface<Vedtaksbrev, BehandlingId>, InsertUpdateRepository<Vedtaksbrev>
+interface VedtaksbrevRepository :
+    RepositoryInterface<Vedtaksbrev, BehandlingId>,
+    InsertUpdateRepository<Vedtaksbrev>

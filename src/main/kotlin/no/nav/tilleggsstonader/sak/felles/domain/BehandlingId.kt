@@ -6,16 +6,14 @@ import java.util.UUID
 value class BehandlingId(
     val id: UUID,
 ) {
-
     /**
      * Vurder å finne de som bruker tostring og erstatt med noe annet?
      */
-    override fun toString(): String {
-        return id.toString()
-    }
+    override fun toString(): String = id.toString()
 
     companion object {
         fun random() = BehandlingId(UUID.randomUUID())
+
         fun fromString(id: String) = BehandlingId(UUID.fromString(id))
     }
 }

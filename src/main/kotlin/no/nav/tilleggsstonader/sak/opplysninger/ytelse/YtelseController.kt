@@ -16,7 +16,6 @@ class YtelseController(
     private val tilgangService: TilgangService,
     private val aktivitetService: YtelseService,
 ) {
-
     @GetMapping("{fagsakPersonId}")
     fun hentYtelser(
         @PathVariable fagsakPersonId: FagsakPersonId,

@@ -6,4 +6,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryI
 import org.springframework.stereotype.Repository
 
 @Repository
-interface GrunnlagsdataRepository : RepositoryInterface<Grunnlagsdata, BehandlingId>, InsertUpdateRepository<Grunnlagsdata>
+interface GrunnlagsdataRepository :
+    RepositoryInterface<Grunnlagsdata, BehandlingId>,
+    InsertUpdateRepository<Grunnlagsdata>

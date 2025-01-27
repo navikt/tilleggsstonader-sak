@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class EksternVedtakServiceTest : IntegrationTest() {
-
     @Autowired
     lateinit var arenaClient: ArenaClient
 
@@ -76,15 +75,17 @@ class EksternVedtakServiceTest : IntegrationTest() {
     }
 
     private fun mockArena(harInnvilgetVedtak: Boolean) {
-        every { arenaClient.hentStatus(any()) } returns ArenaStatusDto(
-            sak = mockk(),
-            vedtak = VedtakStatus(
-                harVedtak = false,
-                harInnvilgetVedtak = harInnvilgetVedtak,
-                harAktivtVedtak = false,
-                harVedtakUtenUtfall = false,
-                vedtakTom = null,
-            ),
-        )
+        every { arenaClient.hentStatus(any()) } returns
+            ArenaStatusDto(
+                sak = mockk(),
+                vedtak =
+                    VedtakStatus(
+                        harVedtak = false,
+                        harInnvilgetVedtak = harInnvilgetVedtak,
+                        harAktivtVedtak = false,
+                        harVedtakUtenUtfall = false,
+                        vedtakTom = null,
+                    ),
+            )
     }
 }

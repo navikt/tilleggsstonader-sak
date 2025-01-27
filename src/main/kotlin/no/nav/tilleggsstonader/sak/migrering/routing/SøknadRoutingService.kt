@@ -22,10 +22,12 @@ class SøknadRoutingService(
     private val arenaService: ArenaService,
     private val unleashService: UnleashService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun sjekkRoutingForPerson(request: IdentStønadstype, sjekkSkalRuteAlleSøkere: Boolean = true): SøknadRoutingResponse {
+    fun sjekkRoutingForPerson(
+        request: IdentStønadstype,
+        sjekkSkalRuteAlleSøkere: Boolean = true,
+    ): SøknadRoutingResponse {
         val skalBehandlesINyLøsning = skalBehandlesINyLøsning(request, sjekkSkalRuteAlleSøkere)
         logger.info("routing - stønadstype=${request.stønadstype} skalBehandlesINyLøsning=$skalBehandlesINyLøsning")
         return SøknadRoutingResponse(skalBehandlesINyLøsning = skalBehandlesINyLøsning)
@@ -36,7 +38,10 @@ class SøknadRoutingService(
         return søknadRouting != null
     }
 
-    private fun skalBehandlesINyLøsning(request: IdentStønadstype, sjekkSkalRuteAlleSøkere: Boolean): Boolean {
+    private fun skalBehandlesINyLøsning(
+        request: IdentStønadstype,
+        sjekkSkalRuteAlleSøkere: Boolean,
+    ): Boolean {
         if (harLagretRouting(request)) {
             logger.info("routing - stønadstype=${request.stønadstype} harLagretRouting=true")
             return true
@@ -68,21 +73,21 @@ class SøknadRoutingService(
      * Ønsker å sette at alle skal rutes til ny løsning, uten å sjekke status i Arena då det tar unødvendig lang tid
      */
     private fun skalRuteAlleSøkereTilNyLøsning(stønadstype: Stønadstype): Boolean {
-        val skalRutes = when (stønadstype) {
-            Stønadstype.BARNETILSYN -> true
-            Stønadstype.LÆREMIDLER -> true
-        }
+        val skalRutes =
+            when (stønadstype) {
+                Stønadstype.BARNETILSYN -> true
+                Stønadstype.LÆREMIDLER -> true
+            }
         logger.info("routing - stønadstype=$stønadstype skalRuteAlleSøkere=true")
         return skalRutes
     }
 
-    private fun skalStoppesPgaFeatureToggle(stønadstype: Stønadstype): Boolean {
-        return when (stønadstype) {
+    private fun skalStoppesPgaFeatureToggle(stønadstype: Stønadstype): Boolean =
+        when (stønadstype) {
             Stønadstype.BARNETILSYN -> false // tilsyn barn skal ikke stoppes med feature toggle
             Stønadstype.LÆREMIDLER -> maksAntallErNådd(stønadstype)
             else -> error("Støtter ennå ikke stønadstype=$stønadstype")
         }
-    }
 
     private fun maksAntallErNådd(stønadstype: Stønadstype): Boolean {
         val maksAntall = maksAntall(stønadstype)
@@ -94,21 +99,26 @@ class SøknadRoutingService(
     private fun maksAntall(stønadstype: Stønadstype) =
         unleashService.getVariantWithNameOrDefault(stønadstype.maksAntallToggle(), "antall", 0)
 
-    private fun Stønadstype.maksAntallToggle() = when (this) {
-        Stønadstype.LÆREMIDLER -> Toggle.SØKNAD_ROUTING_LÆREMIDLER
-        else -> error("Har ikke maksAntalLToggle for stønadstype=$this")
-    }
+    private fun Stønadstype.maksAntallToggle() =
+        when (this) {
+            Stønadstype.LÆREMIDLER -> Toggle.SØKNAD_ROUTING_LÆREMIDLER
+            else -> error("Har ikke maksAntalLToggle for stønadstype=$this")
+        }
 
-    private fun harGyldigStateIArena(stønadstype: Stønadstype, arenaStatus: ArenaStatusDto): Boolean {
+    private fun harGyldigStateIArena(
+        stønadstype: Stønadstype,
+        arenaStatus: ArenaStatusDto,
+    ): Boolean {
         val harAktivtVedtak = arenaStatus.vedtak.harAktivtVedtak
         val harVedtakUtenUtfall = arenaStatus.vedtak.harVedtakUtenUtfall
         val harVedtak = arenaStatus.vedtak.harVedtak
         val harAktivSakUtenVedtak = arenaStatus.sak.harAktivSakUtenVedtak
 
-        val harGyldigStatus = when (stønadstype) {
-            Stønadstype.BARNETILSYN -> !harAktivtVedtak
-            Stønadstype.LÆREMIDLER -> !harAktivtVedtak
-        }
+        val harGyldigStatus =
+            when (stønadstype) {
+                Stønadstype.BARNETILSYN -> !harAktivtVedtak
+                Stønadstype.LÆREMIDLER -> !harAktivtVedtak
+            }
 
         logger.info(
             "routing - stønadstype=$stønadstype harGyldigStatusArena=$harGyldigStatus - " +
@@ -121,7 +131,10 @@ class SøknadRoutingService(
         return harGyldigStatus
     }
 
-    private fun lagreRouting(request: IdentStønadstype, detaljer: Any) {
+    private fun lagreRouting(
+        request: IdentStønadstype,
+        detaljer: Any,
+    ) {
         søknadRoutingRepository.insert(
             SøknadRouting(
                 ident = request.ident,
@@ -131,14 +144,13 @@ class SøknadRoutingService(
         )
     }
 
-    private fun harBehandling(
-        request: IdentStønadstype,
-    ): Boolean {
+    private fun harBehandling(request: IdentStønadstype): Boolean {
         val harBehandling = (
-            fagsakService.finnFagsak(setOf(request.ident), request.stønadstype)
+            fagsakService
+                .finnFagsak(setOf(request.ident), request.stønadstype)
                 ?.let { behandlingService.hentBehandlinger(it.id).isNotEmpty() }
                 ?: false
-            )
+        )
         logger.info("routing - stønadstype=${request.stønadstype} harBehandling=$harBehandling")
         return harBehandling
     }

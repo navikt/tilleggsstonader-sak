@@ -8,8 +8,10 @@ data class InnvilgelseLæremidlerResponse(
     val beregningsresultat: BeregningsresultatLæremidlerDto,
     val gjelderFraOgMed: LocalDate,
     val gjelderTilOgMed: LocalDate,
-) : VedtakLæremidlerResponse, VedtakLæremidlerDto(TypeVedtak.INNVILGELSE)
+) : VedtakLæremidlerDto(TypeVedtak.INNVILGELSE),
+    VedtakLæremidlerResponse
 
 data class InnvilgelseLæremidlerRequest(
     val vedtaksperioder: List<VedtaksperiodeDto>,
-) : VedtakLæremidlerRequest, VedtakLæremidlerDto(TypeVedtak.INNVILGELSE)
+) : VedtakLæremidlerDto(TypeVedtak.INNVILGELSE),
+    VedtakLæremidlerRequest

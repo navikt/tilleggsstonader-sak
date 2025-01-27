@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Postering as P
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDetaljer as SimuleringDetaljerKontrakt
 
 class SimuleringKontraktTilDomeneMapperTest {
-
     val oppsummeringFom = LocalDate.of(2023, 1, 1)
     val oppsummeringTom = LocalDate.of(2023, 1, 2)
     val periodeFom = LocalDate.of(2023, 1, 3)
@@ -71,39 +70,44 @@ class SimuleringKontraktTilDomeneMapperTest {
     }
 
     private fun opprettSimuleringResponseDto(): SimuleringResponseDto {
-        val oppsummeringDto = OppsummeringForPeriodeKontrakt(
-            fom = oppsummeringFom,
-            tom = oppsummeringTom,
-            tidligereUtbetalt = 1000,
-            nyUtbetaling = 500,
-            totalEtterbetaling = 1500,
-            totalFeilutbetaling = 40,
-        )
-        val periodeDto = PeriodeKontrakt(
-            fom = periodeFom,
-            tom = periodeTom,
-            posteringer = listOf(
-                PosteringKontrakt(
-                    fagområde = FagområdeKontrakt.TILLEGGSSTØNADER,
-                    sakId = "1234",
-                    fom = posteringFom,
-                    tom = posteringTom,
-                    beløp = 1000,
-                    type = PosteringType.TREKK,
-                    klassekode = "someKlassekode",
-                ),
-            ),
-        )
-        val detaljerDto = SimuleringDetaljerKontrakt(
-            gjelderId = "abc123",
-            datoBeregnet = datoBeregnet,
-            totalBeløp = 5000,
-            perioder = listOf(periodeDto),
-        )
-        val simuleringResponseDto = SimuleringResponseDto(
-            oppsummeringer = listOf(oppsummeringDto),
-            detaljer = detaljerDto,
-        )
+        val oppsummeringDto =
+            OppsummeringForPeriodeKontrakt(
+                fom = oppsummeringFom,
+                tom = oppsummeringTom,
+                tidligereUtbetalt = 1000,
+                nyUtbetaling = 500,
+                totalEtterbetaling = 1500,
+                totalFeilutbetaling = 40,
+            )
+        val periodeDto =
+            PeriodeKontrakt(
+                fom = periodeFom,
+                tom = periodeTom,
+                posteringer =
+                    listOf(
+                        PosteringKontrakt(
+                            fagområde = FagområdeKontrakt.TILLEGGSSTØNADER,
+                            sakId = "1234",
+                            fom = posteringFom,
+                            tom = posteringTom,
+                            beløp = 1000,
+                            type = PosteringType.TREKK,
+                            klassekode = "someKlassekode",
+                        ),
+                    ),
+            )
+        val detaljerDto =
+            SimuleringDetaljerKontrakt(
+                gjelderId = "abc123",
+                datoBeregnet = datoBeregnet,
+                totalBeløp = 5000,
+                perioder = listOf(periodeDto),
+            )
+        val simuleringResponseDto =
+            SimuleringResponseDto(
+                oppsummeringer = listOf(oppsummeringDto),
+                detaljer = detaljerDto,
+            )
         return simuleringResponseDto
     }
 }

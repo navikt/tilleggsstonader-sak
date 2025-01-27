@@ -24,9 +24,10 @@ class SøkController(
     private val personService: PersonService,
     private val tilgangService: TilgangService,
 ) {
-
     @PostMapping("", "/person")
-    fun søkPerson(@RequestBody personIdentRequest: PersonIdentDto): Søkeresultat {
+    fun søkPerson(
+        @RequestBody personIdentRequest: PersonIdentDto,
+    ): Søkeresultat {
         validerPersonIdent(personIdentRequest)
         val personIdenter = hentOgValiderAtIdentEksisterer(personIdentRequest)
         tilgangService.validerTilgangTilPersonMedBarn(personIdentRequest.personIdent, AuditLoggerEvent.ACCESS)
@@ -34,7 +35,9 @@ class SøkController(
     }
 
     @GetMapping("/person/fagsak-ekstern/{eksternFagsakId}")
-    fun søkPerson(@PathVariable eksternFagsakId: Long): Søkeresultat {
+    fun søkPerson(
+        @PathVariable eksternFagsakId: Long,
+    ): Søkeresultat {
         val søkeresultat = søkService.søkPersonForEksternFagsak(eksternFagsakId)
         søkeresultat.fagsakPersonId?.let {
             tilgangService.validerTilgangTilFagsakPerson(it, AuditLoggerEvent.ACCESS)
@@ -44,7 +47,9 @@ class SøkController(
 
     // brukes til brev, burde vi flytte den til brev?
     @PostMapping("/person/uten-fagsak")
-    fun søkPersonUtenFagsak(@RequestBody personIdentRequest: PersonIdentDto): SøkeresultatUtenFagsak {
+    fun søkPersonUtenFagsak(
+        @RequestBody personIdentRequest: PersonIdentDto,
+    ): SøkeresultatUtenFagsak {
         validerPersonIdent(personIdentRequest)
         tilgangService.validerTilgangTilPerson(personIdentRequest.personIdent, AuditLoggerEvent.ACCESS)
 

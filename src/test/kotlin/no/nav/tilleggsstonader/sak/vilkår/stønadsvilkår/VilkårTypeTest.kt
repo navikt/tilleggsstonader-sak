@@ -6,10 +6,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class VilkårTypeTest {
-
-    private val vilkårForBarnetilsyn = listOf(
-        VilkårType.PASS_BARN,
-    )
+    private val vilkårForBarnetilsyn =
+        listOf(
+            VilkårType.PASS_BARN,
+        )
 
     @Test
     internal fun `skal hente ut vilkår for barnetilsyn`() {

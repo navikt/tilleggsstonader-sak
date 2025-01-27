@@ -16,7 +16,10 @@ class BehandlingKafkaProducer(
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
-    fun sendBehandling(behandlingDVH: BehandlingDVH, stønadstype: Stønadstype) {
+    fun sendBehandling(
+        behandlingDVH: BehandlingDVH,
+        stønadstype: Stønadstype,
+    ) {
         logger.info("Sending to Kafka topic: $topic")
         secureLogger.debug("Sending to Kafka topic: {}\nBehandlingstatistikk: {}", topic, behandlingDVH)
         runCatching {
@@ -27,7 +30,8 @@ class BehandlingKafkaProducer(
                 behandlingDVH.toJson(),
             )
             logger.info(
-                "Behandlingstatistikk for behandling=${behandlingDVH.behandlingId} " + "behandlingStatus=${behandlingDVH.behandlingStatus} sent til Kafka",
+                "Behandlingstatistikk for behandling=${behandlingDVH.behandlingId} " +
+                    "behandlingStatus=${behandlingDVH.behandlingStatus} sent til Kafka",
             )
         }.onFailure {
             val errorMessage = "Could not send behandling to Kafka. Check secure logs for more information."

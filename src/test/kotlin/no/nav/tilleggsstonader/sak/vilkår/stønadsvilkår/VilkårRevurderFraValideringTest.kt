@@ -26,7 +26,6 @@ class VilkårRevurderFraValideringTest {
 
     @Nested
     inner class NyPeriode {
-
         @Test
         fun `kan legge inn periode med valgfritt dato dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
@@ -66,7 +65,6 @@ class VilkårRevurderFraValideringTest {
 
     @Nested
     inner class SlettPeriode {
-
         @Test
         fun `kan slette periode med valgfritt dato dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
@@ -106,7 +104,6 @@ class VilkårRevurderFraValideringTest {
 
     @Nested
     inner class OppdateringAvPeriode {
-
         @Test
         fun `kan oppdatere periode dersom revurder-fra ikke er satt`() {
             assertDoesNotThrow {
@@ -127,10 +124,11 @@ class VilkårRevurderFraValideringTest {
 
         @Test
         fun `kan oppdatere periodens tom-dato til og med dagen før revurder fra`() {
-            val eksisterendePeriode = vilkår(
-                fom = revurderFra.minusMonths(1),
-                tom = revurderFra.plusMonths(1),
-            )
+            val eksisterendePeriode =
+                vilkår(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                )
             assertDoesNotThrow {
                 listOf(revurderFra.minusMonths(1), revurderFra, revurderFra.plusMonths(1)).forEach { nyttTom ->
                     endringMedRevurderFra(
@@ -143,15 +141,18 @@ class VilkårRevurderFraValideringTest {
 
         @Test
         fun `kan oppdatere begrunnelsen på en vurdering`() {
-            val eksisterendePeriode = vilkår(
-                fom = revurderFra.minusMonths(1),
-                tom = revurderFra.plusMonths(1),
-            )
-            val oppdaterteVurderingerMedNyBegrunnelse = eksisterendePeriode.delvilkårwrapper.copy(
-                delvilkårsett = eksisterendePeriode.delvilkårsett.map {
-                    it.copy(vurderinger = it.vurderinger.map { it.copy(begrunnelse = "ny begrunnelse") })
-                },
-            )
+            val eksisterendePeriode =
+                vilkår(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                )
+            val oppdaterteVurderingerMedNyBegrunnelse =
+                eksisterendePeriode.delvilkårwrapper.copy(
+                    delvilkårsett =
+                        eksisterendePeriode.delvilkårsett.map {
+                            it.copy(vurderinger = it.vurderinger.map { it.copy(begrunnelse = "ny begrunnelse") })
+                        },
+                )
             assertDoesNotThrow {
                 endringMedRevurderFra(
                     eksisterendePeriode,
@@ -162,10 +163,11 @@ class VilkårRevurderFraValideringTest {
 
         @Test
         fun `kan ikke oppdatere tom til 2 dager før revurder fra, då fjerner man data som gjelder dagen før revurderingsdatoet`() {
-            val eksisterendePeriode = vilkår(
-                fom = revurderFra.minusMonths(4),
-                tom = revurderFra.plusMonths(1),
-            )
+            val eksisterendePeriode =
+                vilkår(
+                    fom = revurderFra.minusMonths(4),
+                    tom = revurderFra.plusMonths(1),
+                )
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendePeriode,
@@ -176,10 +178,11 @@ class VilkårRevurderFraValideringTest {
 
         @Test
         fun `kan ikke oppdatere data på periode hvis det begynner før revurder-fra`() {
-            val eksisterendePeriode = vilkår(
-                fom = revurderFra.minusMonths(1),
-                tom = revurderFra.plusMonths(1),
-            )
+            val eksisterendePeriode =
+                vilkår(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                )
             listOf<(Vilkår) -> Vilkår>(
                 { it.copy(delvilkårwrapper = DelvilkårWrapper(ikkeOppfylteDelvilkårPassBarn())) },
                 { it.copy(resultat = Vilkårsresultat.IKKE_OPPFYLT) },
@@ -196,10 +199,11 @@ class VilkårRevurderFraValideringTest {
 
         @Test
         fun `kan ikke endre fom til å begynne før revurderFra`() {
-            val eksisterendePeriode = vilkår(
-                fom = revurderFra,
-                tom = revurderFra.plusMonths(1),
-            )
+            val eksisterendePeriode =
+                vilkår(
+                    fom = revurderFra,
+                    tom = revurderFra.plusMonths(1),
+                )
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendePeriode,
@@ -237,14 +241,13 @@ class VilkårRevurderFraValideringTest {
         delvilkår: List<Delvilkår> = oppfylteDelvilkårPassBarn(),
         utgift: Int? = 1,
         resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
-    ) =
-        vilkår(
-            behandlingId = behandling.id,
-            type = VilkårType.PASS_BARN,
-            fom = fom.atDay(1),
-            tom = tom.atEndOfMonth(),
-            delvilkår = delvilkår,
-            utgift = utgift,
-            resultat = resultat,
-        )
+    ) = vilkår(
+        behandlingId = behandling.id,
+        type = VilkårType.PASS_BARN,
+        fom = fom.atDay(1),
+        tom = tom.atEndOfMonth(),
+        delvilkår = delvilkår,
+        utgift = utgift,
+        resultat = resultat,
+    )
 }

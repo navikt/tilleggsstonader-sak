@@ -25,13 +25,15 @@ data class DokumentInfoDto(
     val utsendingsinfo: Utsendingsinfo?,
 )
 
-data class LogiskVedleggDto(val tittel: String)
+data class LogiskVedleggDto(
+    val tittel: String,
+)
 
 fun tilDokumentInfoDto(
     dokumentInfo: DokumentInfo,
     journalpost: Journalpost,
-): DokumentInfoDto {
-    return DokumentInfoDto(
+): DokumentInfoDto =
+    DokumentInfoDto(
         dokumentInfoId = dokumentInfo.dokumentInfoId,
         filnavn = dokumentInfo.dokumentvarianter?.find { it.variantformat == Dokumentvariantformat.ARKIV }?.filnavn,
         tittel = dokumentInfo.tittel ?: "Tittel mangler",
@@ -43,6 +45,6 @@ fun tilDokumentInfoDto(
         avsenderMottaker = journalpost.avsenderMottaker,
         utsendingsinfo = journalpost.utsendingsinfo,
         tema = journalpost.tema,
-        harSaksbehandlerTilgang = dokumentInfo.dokumentvarianter?.find { it.variantformat == Dokumentvariantformat.ARKIV }?.saksbehandlerHarTilgang ?: false,
+        harSaksbehandlerTilgang =
+            dokumentInfo.dokumentvarianter?.find { it.variantformat == Dokumentvariantformat.ARKIV }?.saksbehandlerHarTilgang ?: false,
     )
-}

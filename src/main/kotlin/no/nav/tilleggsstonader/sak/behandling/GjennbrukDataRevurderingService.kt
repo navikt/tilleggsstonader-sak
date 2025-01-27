@@ -22,9 +22,11 @@ class GjennbrukDataRevurderingService(
     private val stønadsperiodeService: StønadsperiodeService,
     private val vilkårService: VilkårService,
 ) {
-
     @Transactional
-    fun gjenbrukData(behandling: Behandling, behandlingIdForGjenbruk: BehandlingId) {
+    fun gjenbrukData(
+        behandling: Behandling,
+        behandlingIdForGjenbruk: BehandlingId,
+    ) {
         val barnIder: Map<TidligereBarnId, NyttBarnId> =
             barnService.gjenbrukBarn(forrigeBehandlingId = behandlingIdForGjenbruk, nyBehandlingId = behandling.id)
 
@@ -56,15 +58,13 @@ class GjennbrukDataRevurderingService(
         )
     }
 
-    fun finnBehandlingIdForGjenbruk(behandling: Behandling): BehandlingId? {
-        return behandling.forrigeBehandlingId
+    fun finnBehandlingIdForGjenbruk(behandling: Behandling): BehandlingId? =
+        behandling.forrigeBehandlingId
             ?: finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(behandling.fagsakId)
-    }
 
-    fun finnBehandlingIdForGjenbruk(fagsakId: FagsakId): BehandlingId? {
-        return behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
+    fun finnBehandlingIdForGjenbruk(fagsakId: FagsakId): BehandlingId? =
+        behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
             ?: finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId)
-    }
 
     /**
      * Returnerer en map som mapper tidligere barnId til nytt barnId
@@ -76,16 +76,18 @@ class GjennbrukDataRevurderingService(
         val nyeBarn = barnService.finnBarnPåBehandling(nyBehandlingId).associateBy { it.ident }
         val tidligereBarn = barnService.finnBarnPåBehandling(forrigeBehandlingId)
         return tidligereBarn.associate {
-            val nyttBarnId = nyeBarn[it.ident]
-                ?: error("Finner ikke barn som er lik ${it.id} i nyBehandling=$nyBehandlingId")
+            val nyttBarnId =
+                nyeBarn[it.ident]
+                    ?: error("Finner ikke barn som er lik ${it.id} i nyBehandling=$nyBehandlingId")
             it.id to nyttBarnId.id
         }
     }
 
-    private fun finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId: FagsakId): BehandlingId? {
-        return behandlingService.hentBehandlinger(fagsakId).lastOrNull {
-            it.status == BehandlingStatus.FERDIGSTILT &&
-                it.resultat != BehandlingResultat.HENLAGT
-        }?.id
-    }
+    private fun finnSisteFerdigstilteBehandlingSomIkkeErHenlagt(fagsakId: FagsakId): BehandlingId? =
+        behandlingService
+            .hentBehandlinger(fagsakId)
+            .lastOrNull {
+                it.status == BehandlingStatus.FERDIGSTILT &&
+                    it.resultat != BehandlingResultat.HENLAGT
+            }?.id
 }

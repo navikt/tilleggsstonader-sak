@@ -13,31 +13,32 @@ import java.time.LocalDate
 import java.util.UUID
 
 class VedtaksperiodeUtilTest {
-
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
     var stønadsperioder: List<StønadsperiodeBeregningsgrunnlag> = emptyList()
 
     @BeforeEach
     fun `Set up`() {
-        vedtaksperioder = listOf(
-            Vedtaksperiode(
-                fom = LocalDate.of(2024, 1, 1),
-                tom = LocalDate.of(2024, 1, 31),
-            ),
-            Vedtaksperiode(
-                fom = LocalDate.of(2024, 2, 1),
-                tom = LocalDate.of(2024, 2, 28),
-            ),
-        )
+        vedtaksperioder =
+            listOf(
+                Vedtaksperiode(
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 1, 31),
+                ),
+                Vedtaksperiode(
+                    fom = LocalDate.of(2024, 2, 1),
+                    tom = LocalDate.of(2024, 2, 28),
+                ),
+            )
 
         val behandlingId = BehandlingId(UUID.randomUUID())
-        stønadsperioder = listOf(
-            stønadsperiode(
-                behandlingId = behandlingId,
-                fom = LocalDate.of(2024, 1, 1),
-                tom = LocalDate.of(2024, 2, 28),
-            ).tilStønadsperiodeBeregningsgrunnlag(),
-        )
+        stønadsperioder =
+            listOf(
+                stønadsperiode(
+                    behandlingId = behandlingId,
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 2, 28),
+                ).tilStønadsperiodeBeregningsgrunnlag(),
+            )
     }
 
     @Test
@@ -49,16 +50,17 @@ class VedtaksperiodeUtilTest {
 
     @Test
     fun `Overlappende vedtaksperioder kaster feil`() {
-        vedtaksperioder = listOf(
-            Vedtaksperiode(
-                fom = LocalDate.of(2024, 1, 1),
-                tom = LocalDate.of(2024, 1, 31),
-            ),
-            Vedtaksperiode(
-                fom = LocalDate.of(2024, 1, 31),
-                tom = LocalDate.of(2024, 2, 28),
-            ),
-        )
+        vedtaksperioder =
+            listOf(
+                Vedtaksperiode(
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 1, 31),
+                ),
+                Vedtaksperiode(
+                    fom = LocalDate.of(2024, 1, 31),
+                    tom = LocalDate.of(2024, 2, 28),
+                ),
+            )
 
         assertThatThrownBy {
             validerVedtaksperioder(vedtaksperioder, stønadsperioder)
@@ -67,16 +69,17 @@ class VedtaksperiodeUtilTest {
 
     @Test
     fun `Flere vedtaksperioder i samme kalendermåned men forskjellig løpende måned`() {
-        vedtaksperioder = listOf(
-            Vedtaksperiode(
-                fom = LocalDate.of(2024, 1, 15),
-                tom = LocalDate.of(2024, 2, 14),
-            ),
-            Vedtaksperiode(
-                fom = LocalDate.of(2024, 2, 15),
-                tom = LocalDate.of(2024, 2, 28),
-            ),
-        )
+        vedtaksperioder =
+            listOf(
+                Vedtaksperiode(
+                    fom = LocalDate.of(2024, 1, 15),
+                    tom = LocalDate.of(2024, 2, 14),
+                ),
+                Vedtaksperiode(
+                    fom = LocalDate.of(2024, 2, 15),
+                    tom = LocalDate.of(2024, 2, 28),
+                ),
+            )
 
         assertDoesNotThrow {
             validerVedtaksperioder(vedtaksperioder, stønadsperioder)
@@ -86,13 +89,14 @@ class VedtaksperiodeUtilTest {
     @Test
     fun `Vedtaksperiode ikke innenfor en stønadsperiode kaster feil`() {
         val behandlingId = BehandlingId(UUID.randomUUID())
-        stønadsperioder = listOf(
-            stønadsperiode(
-                behandlingId = behandlingId,
-                fom = LocalDate.of(2024, 1, 2),
-                tom = LocalDate.of(2024, 1, 31),
-            ).tilStønadsperiodeBeregningsgrunnlag(),
-        )
+        stønadsperioder =
+            listOf(
+                stønadsperiode(
+                    behandlingId = behandlingId,
+                    fom = LocalDate.of(2024, 1, 2),
+                    tom = LocalDate.of(2024, 1, 31),
+                ).tilStønadsperiodeBeregningsgrunnlag(),
+            )
 
         assertThatThrownBy {
             validerVedtaksperioder(vedtaksperioder, stønadsperioder)

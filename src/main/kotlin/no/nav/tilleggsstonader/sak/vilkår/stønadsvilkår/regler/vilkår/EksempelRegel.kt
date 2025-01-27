@@ -7,13 +7,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 
-class EksempelRegel : Vilkårsregel(
-    vilkårType = VilkårType.EKSEMPEL,
-    regler = setOf(HAR_ET_NAVN),
-) {
-
+class EksempelRegel :
+    Vilkårsregel(
+        vilkårType = VilkårType.EKSEMPEL,
+        regler = setOf(HAR_ET_NAVN),
+    ) {
     companion object {
-
         private val HAR_ET_NAVN =
             RegelSteg(
                 regelId = RegelId.HAR_ET_NAVN,

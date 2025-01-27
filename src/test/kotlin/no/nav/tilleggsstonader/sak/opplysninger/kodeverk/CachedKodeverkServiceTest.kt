@@ -9,7 +9,6 @@ import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.jvm.javaMethod
 
 internal class CachedKodeverkServiceTest {
-
     // for å unngå at en metode som ikke @Cacheable kaller på en metode som er @Cacheable
     @Test
     internal fun `alle public metoder må være cacheable`() {
@@ -19,7 +18,6 @@ internal class CachedKodeverkServiceTest {
     @Test
     internal fun `alle public metoder må være cacheable testklasse`() {
         open class CachedKlasse {
-
             @Cacheable
             open fun med() = true
 
@@ -27,7 +25,6 @@ internal class CachedKodeverkServiceTest {
         }
 
         open class CachedKlasseMedPrivat {
-
             @Cacheable
             open fun med() = true
 
@@ -37,7 +34,8 @@ internal class CachedKodeverkServiceTest {
         assertThat(sjekkAllePublicErCacheable(CachedKlasseMedPrivat::class)).isTrue()
     }
 
-    private fun sjekkAllePublicErCacheable(kClass: KClass<*>) = kClass.declaredMemberFunctions
-        .filter { Modifier.isPublic(it.javaMethod!!.modifiers) }
-        .none { it.annotations.none { innerIt -> innerIt.annotationClass == Cacheable::class } }
+    private fun sjekkAllePublicErCacheable(kClass: KClass<*>) =
+        kClass.declaredMemberFunctions
+            .filter { Modifier.isPublic(it.javaMethod!!.modifiers) }
+            .none { it.annotations.none { innerIt -> innerIt.annotationClass == Cacheable::class } }
 }

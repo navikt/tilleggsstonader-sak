@@ -11,11 +11,15 @@ sealed interface FaktaOgVurderingLæremidler : FaktaOgVurdering {
     override val type: TypeFaktaOgVurderingLæremidler
 }
 
-sealed interface MålgruppeLæremidler : MålgruppeFaktaOgVurdering, FaktaOgVurderingLæremidler {
+sealed interface MålgruppeLæremidler :
+    MålgruppeFaktaOgVurdering,
+    FaktaOgVurderingLæremidler {
     override val type: MålgruppeLæremidlerType
 }
 
-sealed interface AktivitetLæremidler : AktivitetFaktaOgVurdering, FaktaOgVurderingLæremidler {
+sealed interface AktivitetLæremidler :
+    AktivitetFaktaOgVurdering,
+    FaktaOgVurderingLæremidler {
     override val type: AktivitetLæremidlerType
 }
 
@@ -70,6 +74,7 @@ data class TiltakLæremidler(
     override val vurderinger: VurderingTiltakLæremidler,
 ) : AktivitetLæremidler {
     override val type: AktivitetLæremidlerType = AktivitetLæremidlerType.TILTAK_LÆREMIDLER
+
     override fun utledResultat(): ResultatVilkårperiode {
         if (vurderinger.harUtgifter.resultat == IKKE_OPPFYLT) {
             return ResultatVilkårperiode.IKKE_OPPFYLT
@@ -88,6 +93,7 @@ data class UtdanningLæremidler(
     override val vurderinger: VurderingerUtdanningLæremidler,
 ) : AktivitetLæremidler {
     override val type: AktivitetLæremidlerType = AktivitetLæremidlerType.UTDANNING_LÆREMIDLER
+
     override fun utledResultat(): ResultatVilkårperiode {
         if (vurderinger.harUtgifter.resultat == IKKE_OPPFYLT) {
             return ResultatVilkårperiode.IKKE_OPPFYLT
@@ -110,17 +116,21 @@ data object IngenAktivitetLæremidler : AktivitetLæremidler {
 data class VurderingTiltakLæremidler(
     override val harUtgifter: VurderingHarUtgifter,
     override val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend,
-) : HarUtgifterVurdering, HarRettTilUtstyrsstipendVurdering
+) : HarUtgifterVurdering,
+    HarRettTilUtstyrsstipendVurdering
 
 data class VurderingerUtdanningLæremidler(
     override val harUtgifter: VurderingHarUtgifter,
     override val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend,
-) : HarUtgifterVurdering, HarRettTilUtstyrsstipendVurdering
+) : HarUtgifterVurdering,
+    HarRettTilUtstyrsstipendVurdering
 
 data class FaktaAktivitetLæremidler(
     override val prosent: Int,
     override val studienivå: Studienivå?,
-) : Fakta, FaktaProsent, FaktaStudienivå {
+) : Fakta,
+    FaktaProsent,
+    FaktaStudienivå {
     init {
         require(prosent in 1..100) { "Prosent må være mellom 1 og 100" }
     }
@@ -130,8 +140,8 @@ sealed interface TypeFaktaOgVurderingLæremidler : TypeFaktaOgVurdering
 
 enum class AktivitetLæremidlerType(
     override val vilkårperiodeType: AktivitetType,
-) : TypeAktivitetOgVurdering, TypeFaktaOgVurderingLæremidler {
-
+) : TypeAktivitetOgVurdering,
+    TypeFaktaOgVurderingLæremidler {
     UTDANNING_LÆREMIDLER(AktivitetType.UTDANNING),
     TILTAK_LÆREMIDLER(AktivitetType.TILTAK),
     INGEN_AKTIVITET_LÆREMIDLER(AktivitetType.INGEN_AKTIVITET),
@@ -139,8 +149,8 @@ enum class AktivitetLæremidlerType(
 
 enum class MålgruppeLæremidlerType(
     override val vilkårperiodeType: MålgruppeType,
-) : TypeMålgruppeOgVurdering, TypeFaktaOgVurderingLæremidler {
-
+) : TypeMålgruppeOgVurdering,
+    TypeFaktaOgVurderingLæremidler {
     AAP_LÆREMIDLER(MålgruppeType.AAP),
     OMSTILLINGSSTØNAD_LÆREMIDLER(MålgruppeType.OMSTILLINGSSTØNAD),
     OVERGANGSSTØNAD_LÆREMIDLER(MålgruppeType.OVERGANGSSTØNAD),

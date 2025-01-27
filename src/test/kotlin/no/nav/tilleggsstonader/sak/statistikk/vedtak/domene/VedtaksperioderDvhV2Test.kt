@@ -30,64 +30,73 @@ class VedtaksperioderDvhV2Test {
 
     @Test
     fun `fraDomene kan mappe for InnvilgelseTilsynBarn`() {
-        val resultat = VedtaksperioderDvhV2.fraDomene(
-            innvilgelseTilsynBarn(),
-            barn = barn1,
-        ).vedtaksperioder
+        val resultat =
+            VedtaksperioderDvhV2
+                .fraDomene(
+                    innvilgelseTilsynBarn(),
+                    barn = barn1,
+                ).vedtaksperioder
 
-        val forventetResultat = listOf(
-            VedtaksperioderDvhV2(
-                fom = fom,
-                tom = tom,
-                målgruppe = MålgruppeTypeDvh.AAP,
-                lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
-                aktivitet = AktivitetTypeDvh.TILTAK,
-                antallBarn = 1,
-                barn = BarnDvh.JsonWrapper(barn1.map { BarnDvh(it.ident) }),
-            ),
-        )
+        val forventetResultat =
+            listOf(
+                VedtaksperioderDvhV2(
+                    fom = fom,
+                    tom = tom,
+                    målgruppe = MålgruppeTypeDvh.AAP,
+                    lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
+                    aktivitet = AktivitetTypeDvh.TILTAK,
+                    antallBarn = 1,
+                    barn = BarnDvh.JsonWrapper(barn1.map { BarnDvh(it.ident) }),
+                ),
+            )
 
         assertThat(resultat).isEqualTo(forventetResultat)
     }
 
     @Test
     fun `fraDomene kan mappe for InnvilgelseLæremidler`() {
-        val resultat = VedtaksperioderDvhV2.fraDomene(
-            vedtak = innvilgelseLæremidler(),
-            barn = emptyList(),
-        )
+        val resultat =
+            VedtaksperioderDvhV2.fraDomene(
+                vedtak = innvilgelseLæremidler(),
+                barn = emptyList(),
+            )
 
-        val forventetResultat = VedtaksperioderDvhV2.JsonWrapper(
-            vedtaksperioder = listOf(
-                VedtaksperioderDvhV2(
-                    fom = LocalDate.of(2024, 1, 1),
-                    tom = LocalDate.of(2024, 1, 7),
-                    målgruppe = MålgruppeTypeDvh.AAP,
-                    lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
-                    studienivå = StudienivåDvh.HØYERE_UTDANNING,
-                ),
-            ),
-        )
+        val forventetResultat =
+            VedtaksperioderDvhV2.JsonWrapper(
+                vedtaksperioder =
+                    listOf(
+                        VedtaksperioderDvhV2(
+                            fom = LocalDate.of(2024, 1, 1),
+                            tom = LocalDate.of(2024, 1, 7),
+                            målgruppe = MålgruppeTypeDvh.AAP,
+                            lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
+                            studienivå = StudienivåDvh.HØYERE_UTDANNING,
+                        ),
+                    ),
+            )
 
         assertThat(resultat).isEqualTo(forventetResultat)
     }
 
     @Test
     fun `Avslag skal ikke ha vedtaksperioder`() {
-        val avslag = GeneriskVedtak(
-            behandlingId = behandling().id,
-            type = TypeVedtak.AVSLAG,
-            data = AvslagLæremidler(
-                årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
-                begrunnelse = "Begrunelse for avslag",
-            ),
-        )
+        val avslag =
+            GeneriskVedtak(
+                behandlingId = behandling().id,
+                type = TypeVedtak.AVSLAG,
+                data =
+                    AvslagLæremidler(
+                        årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
+                        begrunnelse = "Begrunelse for avslag",
+                    ),
+            )
 
         val resultat = VedtaksperioderDvhV2.fraDomene(vedtak = avslag, barn = emptyList())
 
-        val forventetResultat = VedtaksperioderDvhV2.JsonWrapper(
-            vedtaksperioder = emptyList(),
-        )
+        val forventetResultat =
+            VedtaksperioderDvhV2.JsonWrapper(
+                vedtaksperioder = emptyList(),
+            )
 
         assertThat(resultat).isEqualTo(forventetResultat)
     }

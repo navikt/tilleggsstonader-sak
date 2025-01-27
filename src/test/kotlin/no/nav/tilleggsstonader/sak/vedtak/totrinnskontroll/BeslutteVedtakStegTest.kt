@@ -48,7 +48,6 @@ import java.util.Properties
 import java.util.UUID
 
 class BeslutteVedtakStegTest {
-
     private val taskService = mockk<TaskService>()
     private val fagsakService = mockk<FagsakService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
@@ -58,32 +57,35 @@ class BeslutteVedtakStegTest {
     private val behandlingService = mockk<BehandlingService>()
     private val iverksettService = mockk<IverksettService>(relaxed = true)
 
-    private val beslutteVedtakSteg = BeslutteVedtakSteg(
-        taskService = taskService,
-        fagsakService = fagsakService,
-        oppgaveService = oppgaveService,
-        totrinnskontrollService = totrinnskontrollService,
-        behandlingService = behandlingService,
-        vedtaksresultatService = vedtaksresultatService,
-        brevService = brevService,
-        iverksettService = iverksettService,
-    )
+    private val beslutteVedtakSteg =
+        BeslutteVedtakSteg(
+            taskService = taskService,
+            fagsakService = fagsakService,
+            oppgaveService = oppgaveService,
+            totrinnskontrollService = totrinnskontrollService,
+            behandlingService = behandlingService,
+            vedtaksresultatService = vedtaksresultatService,
+            brevService = brevService,
+            iverksettService = iverksettService,
+        )
 
     private val innloggetBeslutter = "sign2"
 
-    private val fagsak = fagsak(
-        stønadstype = Stønadstype.BARNETILSYN,
-        identer = setOf(PersonIdent(ident = "12345678901")),
-    )
+    private val fagsak =
+        fagsak(
+            stønadstype = Stønadstype.BARNETILSYN,
+            identer = setOf(PersonIdent(ident = "12345678901")),
+        )
     private val behandlingId = BehandlingId.random()
 
-    private val oppgave = OppgaveDomain(
-        id = UUID.randomUUID(),
-        behandlingId = behandlingId,
-        gsakOppgaveId = 123L,
-        type = Oppgavetype.BehandleSak,
-        erFerdigstilt = false,
-    )
+    private val oppgave =
+        OppgaveDomain(
+            id = UUID.randomUUID(),
+            behandlingId = behandlingId,
+            gsakOppgaveId = 123L,
+            type = Oppgavetype.BehandleSak,
+            erFerdigstilt = false,
+        )
     private lateinit var taskSlot: MutableList<Task>
 
     @BeforeEach
@@ -130,11 +132,12 @@ class BeslutteVedtakStegTest {
 
     @Test
     internal fun `skal opprette opprettBehandleUnderkjentVedtakOppgave etter beslutte vedtak hvis underkjent`() {
-        val nesteSteg = utførTotrinnskontroll(
-            godkjent = false,
-            begrunnelse = "begrunnelse",
-            årsakerUnderkjent = listOf(ÅrsakUnderkjent.VEDTAKSBREV),
-        )
+        val nesteSteg =
+            utførTotrinnskontroll(
+                godkjent = false,
+                begrunnelse = "begrunnelse",
+                årsakerUnderkjent = listOf(ÅrsakUnderkjent.VEDTAKSBREV),
+            )
 
         val taskData = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot[1].payload)
 
@@ -148,10 +151,11 @@ class BeslutteVedtakStegTest {
 
     @Test
     fun `skal ikke sende brev dersom behandlingsårsak er korrigering uten brev`() {
-        val nesteSteg = utførTotrinnskontroll(
-            godkjent = true,
-            saksbehandling = saksbehandling(årsak = BehandlingÅrsak.KORRIGERING_UTEN_BREV),
-        )
+        val nesteSteg =
+            utførTotrinnskontroll(
+                godkjent = true,
+                saksbehandling = saksbehandling(årsak = BehandlingÅrsak.KORRIGERING_UTEN_BREV),
+            )
 
         assertThat(nesteSteg).isEqualTo(StegType.FERDIGSTILLE_BEHANDLING)
         assertHarOpprettetTaskerAvType(FerdigstillOppgaveTask.TYPE, FerdigstillBehandlingTask.TYPE)
@@ -180,12 +184,11 @@ class BeslutteVedtakStegTest {
         saksbehandling: Saksbehandling = opprettSaksbehandling(),
         begrunnelse: String? = null,
         årsakerUnderkjent: List<ÅrsakUnderkjent> = emptyList(),
-    ): StegType {
-        return beslutteVedtakSteg.utførOgReturnerNesteSteg(
+    ): StegType =
+        beslutteVedtakSteg.utførOgReturnerNesteSteg(
             saksbehandling,
             BeslutteVedtakDto(godkjent = godkjent, begrunnelse = begrunnelse, årsakerUnderkjent = årsakerUnderkjent),
         )
-    }
 
     private fun opprettSaksbehandling(årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD) =
         saksbehandling(

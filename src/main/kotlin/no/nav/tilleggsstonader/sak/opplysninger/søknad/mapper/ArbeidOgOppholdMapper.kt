@@ -20,10 +20,11 @@ object ArbeidOgOppholdMapper {
         )
     }
 
-    private fun mapOpphold(opphold: OppholdUtenforNorgeKontrakter) = OppholdUtenforNorge(
-        land = opphold.land.verdi,
-        årsak = opphold.årsak.verdier.map { it.verdi },
-        fom = opphold.fom.verdi,
-        tom = opphold.tom.verdi,
-    )
+    private fun mapOpphold(opphold: OppholdUtenforNorgeKontrakter) =
+        OppholdUtenforNorge(
+            land = opphold.land.verdi,
+            årsak = opphold.årsak.verdier.map { it.verdi },
+            fom = opphold.fom.verdi,
+            tom = opphold.tom.verdi,
+        )
 }

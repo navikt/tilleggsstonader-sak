@@ -10,17 +10,29 @@ import kotlin.io.path.isDirectory
 
 object FileUtil {
     fun readFile(filnavn: String): String =
-        FileUtil::class.java.classLoader.getResource(filnavn)?.readText()
+        FileUtil::class.java.classLoader
+            .getResource(filnavn)
+            ?.readText()
             ?: error("Finner ikke fil: $filnavn")
 
     fun listFiles(path: String): List<Path> {
-        val uri = FileUtil::class.java.classLoader.getResource(path)!!.toURI()
+        val uri =
+            FileUtil::class.java.classLoader
+                .getResource(path)!!
+                .toURI()
         return Files.list(Paths.get(uri)).map { it.fileName }.toList()
     }
 
     fun listDir(path: String): List<Path> {
-        val uri = FileUtil::class.java.classLoader.getResource(path)!!.toURI()
-        return Files.list(Paths.get(uri)).filter { it.isDirectory() }.map { it.fileName }.toList()
+        val uri =
+            FileUtil::class.java.classLoader
+                .getResource(path)!!
+                .toURI()
+        return Files
+            .list(Paths.get(uri))
+            .filter { it.isDirectory() }
+            .map { it.fileName }
+            .toList()
     }
 
     /**
@@ -32,21 +44,33 @@ object FileUtil {
      */
     const val SKAL_SKRIVE_TIL_FIL = false
 
-    fun assertFileIsEqual(filnavn: String, data: Any) {
+    fun assertFileIsEqual(
+        filnavn: String,
+        data: Any,
+    ) {
         val json = ObjectMapperProvider.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data)
         assertFileIsEqual(filnavn, json)
     }
 
-    fun assertFileIsEqual(filnavn: String, data: String) {
+    fun assertFileIsEqual(
+        filnavn: String,
+        data: String,
+    ) {
         skrivTilFil(filnavn, data)
         assertThat(data).isEqualTo(readFile(filnavn))
     }
 
-    fun skrivTilFil(filnavn: String, data: String) {
+    fun skrivTilFil(
+        filnavn: String,
+        data: String,
+    ) {
         skrivTilFil(filnavn, data.toByteArray())
     }
 
-    fun skrivTilFil(filnavn: String, data: ByteArray) {
+    fun skrivTilFil(
+        filnavn: String,
+        data: ByteArray,
+    ) {
         if (!SKAL_SKRIVE_TIL_FIL) {
             return
         }

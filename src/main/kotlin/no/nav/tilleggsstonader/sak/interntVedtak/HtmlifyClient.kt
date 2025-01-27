@@ -15,12 +15,10 @@ class HtmlifyClient(
     private val uri: URI,
     @Qualifier("utenAuth") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
-
-    fun generateHtml(interntVedtak: InterntVedtak): String {
-        return postForEntity<String>(
+    fun generateHtml(interntVedtak: InterntVedtak): String =
+        postForEntity<String>(
             UriComponentsBuilder.fromUri(uri).pathSegment("api", "internt-vedtak").toUriString(),
             interntVedtak,
             httpHeaders = HttpHeaders(),
         )
-    }
 }

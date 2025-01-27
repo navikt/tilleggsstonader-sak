@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class SøknadServiceTest : IntegrationTest() {
-
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
 
@@ -59,9 +58,10 @@ class SøknadServiceTest : IntegrationTest() {
     fun `skal kunne lagre komplett søknad for barnetilsyn`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
-        val skjema = søknadskjemaBarnetilsyn(
-            barnMedBarnepass = listOf(barnMedBarnepass(ident = "barn1", navn = "navn1")),
-        )
+        val skjema =
+            søknadskjemaBarnetilsyn(
+                barnMedBarnepass = listOf(barnMedBarnepass(ident = "barn1", navn = "navn1")),
+            )
         val søknad = søknadService.lagreSøknad(behandling.id, lagJournalpost("journalpostId"), skjema)
 
         require(søknad is SøknadBarnetilsyn)
@@ -78,9 +78,7 @@ class SøknadServiceTest : IntegrationTest() {
         return søknadService.hentSøknadBarnetilsyn(revurdering.id)
     }
 
-    private fun lagreSøknad(
-        behandling: Behandling,
-    ): SøknadBarnetilsyn {
+    private fun lagreSøknad(behandling: Behandling): SøknadBarnetilsyn {
         søknadService.lagreSøknad(behandling.id, lagJournalpost(), søknadskjemaBarnetilsyn())
         return søknadService.hentSøknadBarnetilsyn(behandling.id)!!
     }

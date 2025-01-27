@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface BehandlingsjournalpostRepository :
-    RepositoryInterface<Behandlingsjournalpost, BehandlingId>, InsertUpdateRepository<Behandlingsjournalpost> {
-
+    RepositoryInterface<Behandlingsjournalpost, BehandlingId>,
+    InsertUpdateRepository<Behandlingsjournalpost> {
     fun findAllByBehandlingId(behandlingId: BehandlingId): List<Behandlingsjournalpost>
 }
 

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 
 class SøknadRoutingRepositoryTest : IntegrationTest() {
-
     @Autowired
     lateinit var søknadRoutingRepository: SøknadRoutingRepository
 
@@ -20,11 +19,12 @@ class SøknadRoutingRepositoryTest : IntegrationTest() {
 
     private val stønadstype = Stønadstype.BARNETILSYN
 
-    private val routing = SøknadRouting(
-        ident = ident,
-        type = stønadstype,
-        detaljer = JsonWrapper(objectMapper.writeValueAsString("""{"noe": true}""")),
-    )
+    private val routing =
+        SøknadRouting(
+            ident = ident,
+            type = stønadstype,
+            detaljer = JsonWrapper(objectMapper.writeValueAsString("""{"noe": true}""")),
+        )
 
     @Test
     fun `skal lagre og hente søknadrouting`() {
@@ -35,7 +35,6 @@ class SøknadRoutingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FindByIdentAndType {
-
         @Test
         fun `skal ikke finne noe hvis det ikke finnes noe i databasen`() {
             assertThat(søknadRoutingRepository.findByIdentAndType("annenIdent", stønadstype)).isNull()
@@ -51,7 +50,6 @@ class SøknadRoutingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class CountByType {
-
         @Test
         fun `skal returnere antall routing av gitt type`() {
             assertThat(søknadRoutingRepository.countByType(stønadstype)).isEqualTo(0)

@@ -7,14 +7,14 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class SøknadsskjemaUtilTest {
-
     @Test
     fun `Skal kunne parse søknad av type BARNETILSYN`() {
         val skjema = SøknadUtil.søknadskjemaBarnetilsyn()
-        val parsetSkjema = SøknadsskjemaUtil.parseSøknadsskjema(
-            Stønadstype.BARNETILSYN,
-            data = objectMapper.writeValueAsBytes(skjema),
-        )
+        val parsetSkjema =
+            SøknadsskjemaUtil.parseSøknadsskjema(
+                Stønadstype.BARNETILSYN,
+                data = objectMapper.writeValueAsBytes(skjema),
+            )
 
         assertThat(parsetSkjema).isEqualTo(skjema)
     }
@@ -22,10 +22,11 @@ class SøknadsskjemaUtilTest {
     @Test
     fun `Skal kunne parse søknad av type LÆREMIDLER`() {
         val skjema = SøknadUtil.søknadskjemaLæremidler()
-        val parsetSkjema = SøknadsskjemaUtil.parseSøknadsskjema(
-            Stønadstype.LÆREMIDLER,
-            data = objectMapper.writeValueAsBytes(skjema),
-        )
+        val parsetSkjema =
+            SøknadsskjemaUtil.parseSøknadsskjema(
+                Stønadstype.LÆREMIDLER,
+                data = objectMapper.writeValueAsBytes(skjema),
+            )
 
         assertThat(parsetSkjema).isEqualTo(skjema)
     }

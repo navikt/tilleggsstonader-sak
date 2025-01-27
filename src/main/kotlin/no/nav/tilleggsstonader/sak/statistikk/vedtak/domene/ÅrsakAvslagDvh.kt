@@ -17,22 +17,22 @@ enum class ÅrsakAvslagDvh {
     )
 
     companion object {
-        fun fraDomene(årsaker: List<ÅrsakAvslag>?): JsonWrapper? {
-            return årsaker?.let {
+        fun fraDomene(årsaker: List<ÅrsakAvslag>?): JsonWrapper? =
+            årsaker?.let {
                 JsonWrapper(
                     årsaker.map { typeFraDomene(it) },
                 )
             }
-        }
 
-        private fun typeFraDomene(årsak: ÅrsakAvslag) = when (årsak) {
-            ÅrsakAvslag.INGEN_AKTIVITET -> INGEN_AKTIVITET
-            ÅrsakAvslag.IKKE_I_MÅLGRUPPE -> IKKE_I_MÅLGRUPPE
-            ÅrsakAvslag.INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE -> INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE
-            ÅrsakAvslag.MANGELFULL_DOKUMENTASJON -> MANGELFULL_DOKUMENTASJON
-            ÅrsakAvslag.HAR_IKKE_UTGIFTER -> HAR_IKKE_UTGIFTER
-            ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND -> RETT_TIL_UTSTYRSSTIPEND
-            ÅrsakAvslag.ANNET -> ANNET
-        }
+        private fun typeFraDomene(årsak: ÅrsakAvslag) =
+            when (årsak) {
+                ÅrsakAvslag.INGEN_AKTIVITET -> INGEN_AKTIVITET
+                ÅrsakAvslag.IKKE_I_MÅLGRUPPE -> IKKE_I_MÅLGRUPPE
+                ÅrsakAvslag.INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE -> INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE
+                ÅrsakAvslag.MANGELFULL_DOKUMENTASJON -> MANGELFULL_DOKUMENTASJON
+                ÅrsakAvslag.HAR_IKKE_UTGIFTER -> HAR_IKKE_UTGIFTER
+                ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND -> RETT_TIL_UTSTYRSSTIPEND
+                ÅrsakAvslag.ANNET -> ANNET
+            }
     }
 }

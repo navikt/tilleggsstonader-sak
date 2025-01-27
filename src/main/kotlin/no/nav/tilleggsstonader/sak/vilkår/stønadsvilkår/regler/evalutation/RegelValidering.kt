@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 
 object RegelValidering {
-
     fun validerVilkår(
         vilkårsregel: Vilkårsregel,
         oppdatertDelvilkårsett: List<DelvilkårDto>,
@@ -32,8 +31,10 @@ object RegelValidering {
     /**
      * Validerer att begrunnelse er ifylt hvis [SvarRegel.begrunnelseType]=[BegrunnelseType.PÅKREVD]
      */
-    fun manglerPåkrevdBegrunnelse(svarRegel: SvarRegel, vurdering: VurderingDto): Boolean =
-        svarRegel.begrunnelseType == BegrunnelseType.PÅKREVD && vurdering.begrunnelse?.trim().isNullOrEmpty()
+    fun manglerPåkrevdBegrunnelse(
+        svarRegel: SvarRegel,
+        vurdering: VurderingDto,
+    ): Boolean = svarRegel.begrunnelseType == BegrunnelseType.PÅKREVD && vurdering.begrunnelse?.trim().isNullOrEmpty()
 
     /**
      * Kaster feil hvis
@@ -100,12 +101,11 @@ object RegelValidering {
         }
     }
 
-    private fun aktuelleDelvilkår(tidligereDelvilkårsett: List<Delvilkår>): Set<RegelId> {
-        return tidligereDelvilkårsett
+    private fun aktuelleDelvilkår(tidligereDelvilkårsett: List<Delvilkår>): Set<RegelId> =
+        tidligereDelvilkårsett
             .filter { it.resultat != Vilkårsresultat.IKKE_AKTUELL }
             .map { it.hovedregel }
             .toSet()
-    }
 
     /**
      * Valider att begrunnelse i svaret savnes hvis [SvarRegel.begrunnelseType]=[BegrunnelseType.UTEN]

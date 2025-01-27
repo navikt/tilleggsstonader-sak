@@ -20,9 +20,12 @@ import java.time.LocalDate
     JsonSubTypes.Type(OpphørLæremidlerRequest::class, name = "OPPHØR"),
     failOnRepeatedNames = true,
 )
-sealed class VedtakLæremidlerDto(open val type: TypeVedtak)
+sealed class VedtakLæremidlerDto(
+    open val type: TypeVedtak,
+)
 
 sealed interface VedtakLæremidlerRequest : VedtakRequest
+
 sealed interface VedtakLæremidlerResponse : VedtakResponse
 
 data class VedtaksperiodeDto(

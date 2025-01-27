@@ -14,14 +14,14 @@ class EregClient(
     @Value("\${clients.ereg.uri}")
     private val uri: URI,
     @Qualifier("utenAuth") restTemplate: RestTemplate,
-) :
-    AbstractRestClient(restTemplate) {
-
+) : AbstractRestClient(restTemplate) {
     fun hentOrganisasjoner(organisasjonsnummer: String): OrganisasjonDto? {
-        val uriBuilder = UriComponentsBuilder.fromUri(eregUri)
-            .pathSegment(organisasjonsnummer)
-            .build()
-            .toUriString()
+        val uriBuilder =
+            UriComponentsBuilder
+                .fromUri(eregUri)
+                .pathSegment(organisasjonsnummer)
+                .build()
+                .toUriString()
 
         return try {
             getForEntity<OrganisasjonDto>(uriBuilder)
@@ -30,8 +30,10 @@ class EregClient(
         }
     }
 
-    private val eregUri = UriComponentsBuilder.fromUri(uri)
-        .pathSegment("v1/organisasjon")
-        .build()
-        .toUri()
+    private val eregUri =
+        UriComponentsBuilder
+            .fromUri(uri)
+            .pathSegment("v1/organisasjon")
+            .build()
+            .toUri()
 }

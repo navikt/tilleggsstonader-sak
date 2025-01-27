@@ -12,7 +12,6 @@ import java.util.UUID
 class MålgruppeOgAktivitetTest {
     @Nested
     inner class Sortering {
-
         @Test
         fun `prioritet på målgruppe trumfer`() {
             val aap = målgruppeOgAktivitet(målgruppe = MålgruppeType.AAP)
@@ -55,29 +54,31 @@ class MålgruppeOgAktivitetTest {
 
         @Test
         fun `skal først sortere etter studienivå, prosent og målgruppe`() {
-            val forventetTreff = målgruppeOgAktivitet(
-                prosent = 61,
-                studienivå = Studienivå.HØYERE_UTDANNING,
-                målgruppe = MålgruppeType.AAP,
-            )
-            val aktiviteter = listOf(
-                målgruppeOgAktivitet(
-                    prosent = 100,
-                    studienivå = Studienivå.VIDEREGÅENDE,
-                    målgruppe = MålgruppeType.AAP,
-                ),
-                målgruppeOgAktivitet(
-                    prosent = 51,
-                    studienivå = Studienivå.HØYERE_UTDANNING,
-                    målgruppe = MålgruppeType.AAP,
-                ),
+            val forventetTreff =
                 målgruppeOgAktivitet(
                     prosent = 61,
                     studienivå = Studienivå.HØYERE_UTDANNING,
-                    målgruppe = MålgruppeType.OVERGANGSSTØNAD,
-                ),
-                forventetTreff,
-            )
+                    målgruppe = MålgruppeType.AAP,
+                )
+            val aktiviteter =
+                listOf(
+                    målgruppeOgAktivitet(
+                        prosent = 100,
+                        studienivå = Studienivå.VIDEREGÅENDE,
+                        målgruppe = MålgruppeType.AAP,
+                    ),
+                    målgruppeOgAktivitet(
+                        prosent = 51,
+                        studienivå = Studienivå.HØYERE_UTDANNING,
+                        målgruppe = MålgruppeType.AAP,
+                    ),
+                    målgruppeOgAktivitet(
+                        prosent = 61,
+                        studienivå = Studienivå.HØYERE_UTDANNING,
+                        målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                    ),
+                    forventetTreff,
+                )
             aktiviteter.assertSortIsEqualTo(forventetTreff)
         }
 
@@ -94,13 +95,14 @@ class MålgruppeOgAktivitetTest {
         prosent: Int = 100,
     ) = MålgruppeOgAktivitet(
         målgruppe = målgruppe,
-        aktivitet = AktivitetLæremidlerBeregningGrunnlag(
-            id = UUID.randomUUID(),
-            fom = LocalDate.now(),
-            tom = LocalDate.now(),
-            type = aktivitet,
-            studienivå = studienivå,
-            prosent = prosent,
-        ),
+        aktivitet =
+            AktivitetLæremidlerBeregningGrunnlag(
+                id = UUID.randomUUID(),
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                type = aktivitet,
+                studienivå = studienivå,
+                prosent = prosent,
+            ),
     )
 }

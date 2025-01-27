@@ -34,7 +34,6 @@ class FagsakService(
     private val personService: PersonService,
     private val behandlingService: BehandlingService,
 ) {
-
     @Transactional
     fun hentEllerOpprettFagsak(
         personIdent: String,
@@ -44,13 +43,17 @@ class FagsakService(
         val gjeldendePersonIdent = personIdenter.gjeldende()
         val person = fagsakPersonService.hentEllerOpprettPerson(personIdenter.identer(), gjeldendePersonIdent.ident)
         val oppdatertPerson = oppdatertPerson(person, gjeldendePersonIdent)
-        val fagsak = fagsakRepository.findByFagsakPersonIdAndStønadstype(oppdatertPerson.id, stønadstype)
-            ?: opprettFagsak(stønadstype, oppdatertPerson)
+        val fagsak =
+            fagsakRepository.findByFagsakPersonIdAndStønadstype(oppdatertPerson.id, stønadstype)
+                ?: opprettFagsak(stønadstype, oppdatertPerson)
 
         return fagsak.tilFagsakMedPerson(oppdatertPerson.identer)
     }
 
-    fun hentBehandlingerForPersonOgStønadstype(personIdent: String, stønadstype: Stønadstype): List<BehandlingDto> =
+    fun hentBehandlingerForPersonOgStønadstype(
+        personIdent: String,
+        stønadstype: Stønadstype,
+    ): List<BehandlingDto> =
         finnFagsak(setOf(personIdent), stønadstype)?.let { fagsak ->
             behandlingService.hentBehandlinger(fagsak.id).map {
                 it.tilDto(fagsak.stønadstype, fagsak.fagsakPersonId)
@@ -59,25 +62,27 @@ class FagsakService(
 
     fun harFagsak(personIdenter: Set<String>) = fagsakRepository.findBySøkerIdent(personIdenter).isNotEmpty()
 
-    fun finnFagsak(personIdenter: Set<String>, stønadstype: Stønadstype): Fagsak? =
-        fagsakRepository.findBySøkerIdent(personIdenter, stønadstype)?.tilFagsakMedPerson()
+    fun finnFagsak(
+        personIdenter: Set<String>,
+        stønadstype: Stønadstype,
+    ): Fagsak? = fagsakRepository.findBySøkerIdent(personIdenter, stønadstype)?.tilFagsakMedPerson()
 
     fun finnFagsaker(personIdenter: Set<String>): List<Fagsak> =
         fagsakRepository.findBySøkerIdent(personIdenter).map { it.tilFagsakMedPerson() }
 
     fun finnFagsakerForFagsakPersonId(fagsakPersonId: FagsakPersonId): Fagsaker {
-        val fagsaker = fagsakRepository.findByFagsakPersonId(fagsakPersonId)
-            .map { it.tilFagsakMedPerson() }
-            .associateBy { it.stønadstype }
+        val fagsaker =
+            fagsakRepository
+                .findByFagsakPersonId(fagsakPersonId)
+                .map { it.tilFagsakMedPerson() }
+                .associateBy { it.stønadstype }
         return Fagsaker(
             barnetilsyn = fagsaker[Stønadstype.BARNETILSYN],
             læremidler = fagsaker[Stønadstype.LÆREMIDLER],
         )
     }
 
-    fun erLøpende(fagsakId: FagsakId): Boolean {
-        return fagsakRepository.harLøpendeUtbetaling(fagsakId)
-    }
+    fun erLøpende(fagsakId: FagsakId): Boolean = fagsakRepository.harLøpendeUtbetaling(fagsakId)
 
     fun hentFagsak(fagsakId: FagsakId): Fagsak = fagsakRepository.findByIdOrThrow(fagsakId).tilFagsakMedPerson()
 
@@ -108,10 +113,9 @@ class FagsakService(
         gjeldendePersonIdent: PdlIdent,
     ) = fagsakPersonService.oppdaterIdent(person, gjeldendePersonIdent.ident)
 
-    fun hentFagsakForBehandling(behandlingId: BehandlingId): Fagsak {
-        return fagsakRepository.finnFagsakTilBehandling(behandlingId)?.tilFagsakMedPerson()
+    fun hentFagsakForBehandling(behandlingId: BehandlingId): Fagsak =
+        fagsakRepository.finnFagsakTilBehandling(behandlingId)?.tilFagsakMedPerson()
             ?: throw Feil("Finner ikke fagsak til behandlingId=$behandlingId")
-    }
 
     fun hentEksternId(fagsakId: FagsakId): Long = eksternFagsakIdRepository.findByFagsakId(fagsakId).id
 
@@ -119,23 +123,27 @@ class FagsakService(
         hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId)
             ?: error("Finner ikke fagsak til eksternFagsakId=$eksternFagsakId")
 
-    fun hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId: Long): Fagsak? {
-        return fagsakRepository.finnMedEksternId(eksternFagsakId)?.tilFagsakMedPerson()
-    }
+    fun hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId: Long): Fagsak? =
+        fagsakRepository.finnMedEksternId(eksternFagsakId)?.tilFagsakMedPerson()
 
     fun hentAktivIdent(fagsakId: FagsakId): String = fagsakRepository.finnAktivIdent(fagsakId)
 
-    fun hentMetadata(fagsakIder: Collection<FagsakId>): Map<FagsakId, FagsakMetadata> {
-        return fagsakRepository.hentFagsakMetadata(fagsakIder.toSet()).associateBy { it.id }
-    }
+    fun hentMetadata(fagsakIder: Collection<FagsakId>): Map<FagsakId, FagsakMetadata> =
+        fagsakRepository.hentFagsakMetadata(fagsakIder.toSet()).associateBy {
+            it.id
+        }
 
-    private fun opprettFagsak(stønadstype: Stønadstype, fagsakPerson: FagsakPerson): FagsakDomain {
-        val fagsak = fagsakRepository.insert(
-            FagsakDomain(
-                stønadstype = stønadstype,
-                fagsakPersonId = fagsakPerson.id,
-            ),
-        )
+    private fun opprettFagsak(
+        stønadstype: Stønadstype,
+        fagsakPerson: FagsakPerson,
+    ): FagsakDomain {
+        val fagsak =
+            fagsakRepository.insert(
+                FagsakDomain(
+                    stønadstype = stønadstype,
+                    fagsakPersonId = fagsakPerson.id,
+                ),
+            )
         eksternFagsakIdRepository.insert(EksternFagsakId(fagsakId = fagsak.id))
         return fagsak
     }

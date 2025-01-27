@@ -5,9 +5,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.Stønadsperiod
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import java.util.UUID
 
-class StønadsperiodeRepositoryFake : StønadsperiodeRepository, DummyRepository<Stønadsperiode, UUID>({ it.id }) {
-
-    override fun findAllByBehandlingId(behandlingId: BehandlingId): List<Stønadsperiode> {
-        return findAll().filter { it.behandlingId == behandlingId }
-    }
+class StønadsperiodeRepositoryFake :
+    DummyRepository<Stønadsperiode, UUID>({ it.id }),
+    StønadsperiodeRepository {
+    override fun findAllByBehandlingId(behandlingId: BehandlingId): List<Stønadsperiode> =
+        findAll().filter { it.behandlingId == behandlingId }
 }

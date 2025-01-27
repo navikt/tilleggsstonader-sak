@@ -25,7 +25,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class VedtakRepositoryJsonTest : IntegrationTest() {
-
     @Autowired
     lateinit var namedParameterJdbcTemplate: NamedParameterJdbcTemplate
 
@@ -76,7 +75,10 @@ class VedtakRepositoryJsonTest : IntegrationTest() {
         }
     }
 
-    private fun opprettVedtak(type: TypeVedtak, json: String) {
+    private fun opprettVedtak(
+        type: TypeVedtak,
+        json: String,
+    ) {
         namedParameterJdbcTemplate.update(
             insertQuery.trimIndent(),
             mapOf(
@@ -112,14 +114,15 @@ class VedtakRepositoryJsonTest : IntegrationTest() {
         )
     """
 
-    private fun forventetType(type: TypeVedtaksdata): Class<out Vedtaksdata> = when (type) {
-        TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN -> InnvilgelseTilsynBarn::class
-        TypeVedtakTilsynBarn.AVSLAG_TILSYN_BARN -> AvslagTilsynBarn::class
-        TypeVedtakTilsynBarn.OPPHØR_TILSYN_BARN -> OpphørTilsynBarn::class
-        TypeVedtakLæremidler.INNVILGELSE_LÆREMIDLER -> InnvilgelseLæremidler::class
-        TypeVedtakLæremidler.AVSLAG_LÆREMIDLER -> AvslagLæremidler::class
-        TypeVedtakLæremidler.OPPHØR_LÆREMIDLER -> OpphørLæremidler::class
-    }.java
+    private fun forventetType(type: TypeVedtaksdata): Class<out Vedtaksdata> =
+        when (type) {
+            TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN -> InnvilgelseTilsynBarn::class
+            TypeVedtakTilsynBarn.AVSLAG_TILSYN_BARN -> AvslagTilsynBarn::class
+            TypeVedtakTilsynBarn.OPPHØR_TILSYN_BARN -> OpphørTilsynBarn::class
+            TypeVedtakLæremidler.INNVILGELSE_LÆREMIDLER -> InnvilgelseLæremidler::class
+            TypeVedtakLæremidler.AVSLAG_LÆREMIDLER -> AvslagLæremidler::class
+            TypeVedtakLæremidler.OPPHØR_LÆREMIDLER -> OpphørLæremidler::class
+        }.java
 
     companion object {
         @JvmStatic

@@ -23,7 +23,6 @@ import java.util.Properties
 class BehandlingsstatistikkTask(
     private val behandlingsstatistikkService: BehandlingsstatistikkService,
 ) : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         val (behandlingId, hendelse, hendelseTidspunkt, gjeldendeSaksbehandler, oppgaveId, behandlingMetode) =
             objectMapper.readValue<BehandlingsstatistikkTaskPayload>(task.payload)
@@ -39,7 +38,6 @@ class BehandlingsstatistikkTask(
     }
 
     companion object {
-
         fun opprettMottattTask(
             behandlingId: BehandlingId,
             hendelseTidspunkt: LocalDateTime = osloNow(),
@@ -73,9 +71,7 @@ class BehandlingsstatistikkTask(
                 hendelseTidspunkt = osloNow(),
             )
 
-        fun opprettBesluttetTask(
-            behandlingId: BehandlingId,
-        ): Task =
+        fun opprettBesluttetTask(behandlingId: BehandlingId): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.BESLUTTET,
@@ -99,23 +95,25 @@ class BehandlingsstatistikkTask(
         ): Task =
             Task(
                 type = TYPE,
-                payload = objectMapper.writeValueAsString(
-                    BehandlingsstatistikkTaskPayload(
-                        behandlingId,
-                        hendelse,
-                        hendelseTidspunkt,
-                        gjeldendeSaksbehandler,
-                        oppgaveId,
-                        behandlingMetode,
+                payload =
+                    objectMapper.writeValueAsString(
+                        BehandlingsstatistikkTaskPayload(
+                            behandlingId,
+                            hendelse,
+                            hendelseTidspunkt,
+                            gjeldendeSaksbehandler,
+                            oppgaveId,
+                            behandlingMetode,
+                        ),
                     ),
-                ),
-                properties = Properties().apply {
-                    this["saksbehandler"] = gjeldendeSaksbehandler ?: ""
-                    this["behandlingId"] = behandlingId.toString()
-                    this["hendelse"] = hendelse.name
-                    this["hendelseTidspunkt"] = hendelseTidspunkt.toString()
-                    this["oppgaveId"] = oppgaveId?.toString() ?: ""
-                },
+                properties =
+                    Properties().apply {
+                        this["saksbehandler"] = gjeldendeSaksbehandler ?: ""
+                        this["behandlingId"] = behandlingId.toString()
+                        this["hendelse"] = hendelse.name
+                        this["hendelseTidspunkt"] = hendelseTidspunkt.toString()
+                        this["oppgaveId"] = oppgaveId?.toString() ?: ""
+                    },
             )
 
         const val TYPE = "behandlingsstatistikkTask"

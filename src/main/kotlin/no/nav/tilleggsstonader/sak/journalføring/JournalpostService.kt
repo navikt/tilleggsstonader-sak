@@ -25,9 +25,15 @@ import no.nav.tilleggsstonader.sak.vedlegg.VedleggRequest
 import org.springframework.stereotype.Service
 
 @Service
-class JournalpostService(private val journalpostClient: JournalpostClient, private val personService: PersonService) {
-    fun finnJournalposterForBruker(personIdent: String, vedleggRequest: VedleggRequest): List<Journalpost> {
-        return journalpostClient.finnJournalposterForBruker(
+class JournalpostService(
+    private val journalpostClient: JournalpostClient,
+    private val personService: PersonService,
+) {
+    fun finnJournalposterForBruker(
+        personIdent: String,
+        vedleggRequest: VedleggRequest,
+    ): List<Journalpost> =
+        journalpostClient.finnJournalposterForBruker(
             JournalposterForBrukerRequest(
                 brukerId = Bruker(id = personIdent, type = BrukerIdType.FNR),
                 tema = vedleggRequest.tema ?: emptyList(),
@@ -36,18 +42,13 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
                 antall = 200,
             ),
         )
-    }
 
-    fun hentJournalpost(journalpostId: String): Journalpost {
-        return journalpostClient.hentJournalpost(journalpostId)
-    }
+    fun hentJournalpost(journalpostId: String): Journalpost = journalpostClient.hentJournalpost(journalpostId)
 
     fun opprettJournalpost(
         arkiverDokumentRequest: ArkiverDokumentRequest,
         saksbehandler: String? = null,
-    ): ArkiverDokumentResponse {
-        return journalpostClient.opprettJournalpost(arkiverDokumentRequest, saksbehandler)
-    }
+    ): ArkiverDokumentResponse = journalpostClient.opprettJournalpost(arkiverDokumentRequest, saksbehandler)
 
     /**
      * Oppdaterer journalposten med fagsak og dokumenttitler, og ferdigstiller journalføringen.
@@ -100,16 +101,20 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
         journalpostClient.oppdaterJournalpost(oppdatertJournalpost, journalpost.journalpostId, saksbehandler)
     }
 
-    private fun oppdaterLogiskeVedlegg(journalpost: Journalpost, logiskeVedlegg: Map<String, List<LogiskVedlegg>>?) {
+    private fun oppdaterLogiskeVedlegg(
+        journalpost: Journalpost,
+        logiskeVedlegg: Map<String, List<LogiskVedlegg>>?,
+    ) {
         if (logiskeVedlegg == null) return
 
         journalpost.dokumenter?.forEach { dokument ->
             val eksisterendeLogiskeVedlegg = dokument.logiskeVedlegg ?: emptyList()
             val logiskeVedleggForDokument = logiskeVedlegg[dokument.dokumentInfoId] ?: emptyList()
             val harIdentiskInnhold =
-                eksisterendeLogiskeVedlegg.size == logiskeVedleggForDokument.size && eksisterendeLogiskeVedlegg.containsAll(
-                    logiskeVedleggForDokument,
-                )
+                eksisterendeLogiskeVedlegg.size == logiskeVedleggForDokument.size &&
+                    eksisterendeLogiskeVedlegg.containsAll(
+                        logiskeVedleggForDokument,
+                    )
             if (!harIdentiskInnhold) {
                 journalpostClient.oppdaterLogiskeVedlegg(
                     dokument.dokumentInfoId,
@@ -119,14 +124,18 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
         }
     }
 
-    fun hentSøknadFraJournalpost(søknadJournalpost: Journalpost, stønadstype: Stønadstype): Søknadsskjema<out Skjema> {
+    fun hentSøknadFraJournalpost(
+        søknadJournalpost: Journalpost,
+        stønadstype: Stønadstype,
+    ): Søknadsskjema<out Skjema> {
         val dokumentinfo =
             JournalføringHelper.plukkUtOriginaldokument(søknadJournalpost, DokumentBrevkode.fraStønadstype(stønadstype))
-        val data = journalpostClient.hentDokument(
-            journalpostId = søknadJournalpost.journalpostId,
-            dokumentInfoId = dokumentinfo.dokumentInfoId,
-            Dokumentvariantformat.ORIGINAL,
-        )
+        val data =
+            journalpostClient.hentDokument(
+                journalpostId = søknadJournalpost.journalpostId,
+                dokumentInfoId = dokumentinfo.dokumentInfoId,
+                Dokumentvariantformat.ORIGINAL,
+            )
         return SøknadsskjemaUtil.parseSøknadsskjema(stønadstype, data)
     }
 
@@ -136,27 +145,31 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
         return Pair(journalpost, personIdent)
     }
 
-    fun hentIdentFraJournalpost(
-        journalpost: Journalpost,
-    ) = journalpost.bruker?.let {
-        when (it.type) {
-            BrukerIdType.FNR -> it.id
-            BrukerIdType.AKTOERID -> personService.hentPersonIdenter(it.id).gjeldende().ident
-            BrukerIdType.ORGNR -> error("Kan ikke hente journalpost=${journalpost.journalpostId} for orgnr")
-        }
-    } ?: error("Kan ikke hente journalpost=${journalpost.journalpostId} uten bruker")
+    fun hentIdentFraJournalpost(journalpost: Journalpost) =
+        journalpost.bruker?.let {
+            when (it.type) {
+                BrukerIdType.FNR -> it.id
+                BrukerIdType.AKTOERID -> personService.hentPersonIdenter(it.id).gjeldende().ident
+                BrukerIdType.ORGNR -> error("Kan ikke hente journalpost=${journalpost.journalpostId} for orgnr")
+            }
+        } ?: error("Kan ikke hente journalpost=${journalpost.journalpostId} uten bruker")
 
     fun hentBrukersNavn(
         journalpost: Journalpost,
         personIdent: String,
-    ): String {
-        return journalpost.avsenderMottaker
-            ?.takeIf { it.erLikBruker }?.navn
+    ): String =
+        journalpost.avsenderMottaker
+            ?.takeIf { it.erLikBruker }
+            ?.navn
             ?: hentNavnFraPdl(personIdent)
-    }
 
     private fun hentNavnFraPdl(personIdent: String) =
-        personService.hentPersonKortBolk(listOf(personIdent)).getValue(personIdent).navn.gjeldende().visningsnavn()
+        personService
+            .hentPersonKortBolk(listOf(personIdent))
+            .getValue(personIdent)
+            .navn
+            .gjeldende()
+            .visningsnavn()
 
     fun hentDokument(
         journalpost: Journalpost,
@@ -184,9 +197,8 @@ class JournalpostService(private val journalpostClient: JournalpostClient, priva
     }
 }
 
-private fun DokumentBrevkode.Companion.fraStønadstype(stønadstype: Stønadstype): DokumentBrevkode {
-    return when (stønadstype) {
+private fun DokumentBrevkode.Companion.fraStønadstype(stønadstype: Stønadstype): DokumentBrevkode =
+    when (stønadstype) {
         Stønadstype.BARNETILSYN -> DokumentBrevkode.BARNETILSYN
         Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
     }
-}

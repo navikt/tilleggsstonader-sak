@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.dto.StønadsperiodeDt
 import java.time.LocalDate
 
 object VilkårsoppsummeringUtil {
-
     fun harBarnUnder2ÅrIStønadsperiode(
         barn: List<GrunnlagBarn>,
         stønadsperioder: List<StønadsperiodeDto>,

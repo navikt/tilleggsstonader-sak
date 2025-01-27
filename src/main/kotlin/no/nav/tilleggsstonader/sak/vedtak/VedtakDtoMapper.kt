@@ -23,8 +23,10 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import java.time.LocalDate
 
 object VedtakDtoMapper {
-
-    fun toDto(vedtak: Vedtak, revurderFra: LocalDate?): VedtakResponse {
+    fun toDto(
+        vedtak: Vedtak,
+        revurderFra: LocalDate?,
+    ): VedtakResponse {
         val data = vedtak.data
         return when (data) {
             is VedtakTilsynBarn -> mapVedtakTilsynBarn(data, revurderFra)
@@ -35,40 +37,50 @@ object VedtakDtoMapper {
     private fun mapVedtakTilsynBarn(
         data: VedtakTilsynBarn,
         revurderFra: LocalDate?,
-    ): VedtakTilsynBarnResponse = when (data) {
-        is InnvilgelseTilsynBarn -> InnvilgelseTilsynBarnResponse(
-            beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-        )
-
-        is OpphørTilsynBarn -> OpphørTilsynBarnResponse(
-            beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
-            årsakerOpphør = data.årsaker,
-            begrunnelse = data.begrunnelse,
-        )
-
-        is AvslagTilsynBarn -> AvslagTilsynBarnDto(
-            årsakerAvslag = data.årsaker,
-            begrunnelse = data.begrunnelse,
-        )
-    }
-
-    private fun mapVedtakLæremidler(data: VedtakLæremidler, revurderFra: LocalDate?): VedtakLæremidlerResponse =
+    ): VedtakTilsynBarnResponse =
         when (data) {
-            is InnvilgelseLæremidler -> InnvilgelseLæremidlerResponse(
-                vedtaksperioder = data.vedtaksperioder.tilDto(),
-                beregningsresultat = data.beregningsresultat.tilDto(),
-                gjelderFraOgMed = data.vedtaksperioder.minOf { it.fom },
-                gjelderTilOgMed = data.vedtaksperioder.maxOf { it.tom },
-            )
-            is AvslagLæremidler -> AvslagLæremidlerDto(
-                årsakerAvslag = data.årsaker,
-                begrunnelse = data.begrunnelse,
-            )
+            is InnvilgelseTilsynBarn ->
+                InnvilgelseTilsynBarnResponse(
+                    beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
+                )
 
-            is OpphørLæremidler -> OpphørLæremidlerResponse(
-                årsakerOpphør = data.årsaker,
-                begrunnelse = data.begrunnelse,
-                vedtaksperioder = data.vedtaksperioder.tilDto(),
-            )
+            is OpphørTilsynBarn ->
+                OpphørTilsynBarnResponse(
+                    beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
+                    årsakerOpphør = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                )
+
+            is AvslagTilsynBarn ->
+                AvslagTilsynBarnDto(
+                    årsakerAvslag = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                )
+        }
+
+    private fun mapVedtakLæremidler(
+        data: VedtakLæremidler,
+        revurderFra: LocalDate?,
+    ): VedtakLæremidlerResponse =
+        when (data) {
+            is InnvilgelseLæremidler ->
+                InnvilgelseLæremidlerResponse(
+                    vedtaksperioder = data.vedtaksperioder.tilDto(),
+                    beregningsresultat = data.beregningsresultat.tilDto(),
+                    gjelderFraOgMed = data.vedtaksperioder.minOf { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.maxOf { it.tom },
+                )
+            is AvslagLæremidler ->
+                AvslagLæremidlerDto(
+                    årsakerAvslag = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                )
+
+            is OpphørLæremidler ->
+                OpphørLæremidlerResponse(
+                    årsakerOpphør = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                    vedtaksperioder = data.vedtaksperioder.tilDto(),
+                )
         }
 }

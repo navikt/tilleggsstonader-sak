@@ -26,9 +26,8 @@ class StønadsperiodeService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val grunnlagsdataService: GrunnlagsdataService,
 ) {
-    fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeDto> {
-        return stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
-    }
+    fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeDto> =
+        stønadsperiodeRepository.findAllByBehandlingId(behandlingId).tilSortertDto()
 
     @Transactional
     fun lagreStønadsperioder(
@@ -75,27 +74,30 @@ class StønadsperiodeService(
     ): List<Stønadsperiode> {
         val stønadsperioderPåId =
             stønadsperioder.mapNotNull { periode -> periode.id?.let { id -> id to periode } }.toMap()
-        val perioderTilOppdatering = tidligereStønadsperioder.mapNotNull { tidligereStønadsperiode ->
-            stønadsperioderPåId[tidligereStønadsperiode.id]?.let {
-                tidligereStønadsperiode.copy(
-                    fom = it.fom,
-                    tom = it.tom,
-                    målgruppe = it.målgruppe,
-                    aktivitet = it.aktivitet,
-                ).medNyStatus(tidligereStønadsperiode)
-                    .apply {
-                        validerEndrePeriodeRevurdering(behandling, tidligereStønadsperiode, this)
-                    }
+        val perioderTilOppdatering =
+            tidligereStønadsperioder.mapNotNull { tidligereStønadsperiode ->
+                stønadsperioderPåId[tidligereStønadsperiode.id]?.let {
+                    tidligereStønadsperiode
+                        .copy(
+                            fom = it.fom,
+                            tom = it.tom,
+                            målgruppe = it.målgruppe,
+                            aktivitet = it.aktivitet,
+                        ).medNyStatus(tidligereStønadsperiode)
+                        .apply {
+                            validerEndrePeriodeRevurdering(behandling, tidligereStønadsperiode, this)
+                        }
+                }
             }
-        }
         return stønadsperiodeRepository.updateAll(perioderTilOppdatering)
     }
 
     private fun Stønadsperiode.medNyStatus(tidligereStønadsperiode: Stønadsperiode): Stønadsperiode {
-        val nyStatus = when (tidligereStønadsperiode.status) {
-            StønadsperiodeStatus.UENDRET -> utledStatusBasertPåEndring(this, tidligereStønadsperiode)
-            else -> this.status
-        }
+        val nyStatus =
+            when (tidligereStønadsperiode.status) {
+                StønadsperiodeStatus.UENDRET -> utledStatusBasertPåEndring(this, tidligereStønadsperiode)
+                else -> this.status
+            }
         return this.copy(status = nyStatus)
     }
 
@@ -120,20 +122,21 @@ class StønadsperiodeService(
         tidligereStønadsperiode: List<Stønadsperiode>,
     ): List<Stønadsperiode> {
         val tidligereStønadsperiodeIder = tidligereStønadsperiode.map { it.id }.toSet()
-        val nyeStønadsperioder = stønadsperioder.filterNot { tidligereStønadsperiodeIder.contains(it.id) }.map {
-            feilHvis(it.id != null) {
-                "Kan ikke oppdatere stønadsperiode=${it.id} som ikke finnes fra før"
+        val nyeStønadsperioder =
+            stønadsperioder.filterNot { tidligereStønadsperiodeIder.contains(it.id) }.map {
+                feilHvis(it.id != null) {
+                    "Kan ikke oppdatere stønadsperiode=${it.id} som ikke finnes fra før"
+                }
+                Stønadsperiode(
+                    id = UUID.randomUUID(),
+                    behandlingId = behandling.id,
+                    fom = it.fom,
+                    tom = it.tom,
+                    målgruppe = it.målgruppe,
+                    aktivitet = it.aktivitet,
+                    status = StønadsperiodeStatus.NY,
+                )
             }
-            Stønadsperiode(
-                id = UUID.randomUUID(),
-                behandlingId = behandling.id,
-                fom = it.fom,
-                tom = it.tom,
-                målgruppe = it.målgruppe,
-                aktivitet = it.aktivitet,
-                status = StønadsperiodeStatus.NY,
-            )
-        }
         nyeStønadsperioder.forEach {
             validerNyPeriodeRevurdering(behandling, it)
         }
@@ -146,15 +149,24 @@ class StønadsperiodeService(
         validerStønadsperioder(behandlingId, stønadsperioder)
     }
 
-    fun validerStønadsperioder(behandlingId: BehandlingId, stønadsperioder: List<StønadsperiodeDto>) {
+    fun validerStønadsperioder(
+        behandlingId: BehandlingId,
+        stønadsperioder: List<StønadsperiodeDto>,
+    ) {
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
-        val fødselsdato = grunnlagsdataService.hentGrunnlagsdata(behandlingId).grunnlag.fødsel
-            ?.fødselsdatoEller1JanForFødselsår()
+        val fødselsdato =
+            grunnlagsdataService
+                .hentGrunnlagsdata(behandlingId)
+                .grunnlag.fødsel
+                ?.fødselsdatoEller1JanForFødselsår()
 
         StønadsperiodeValidering.valider(stønadsperioder, vilkårperioder, fødselsdato)
     }
 
-    fun gjenbrukStønadsperioder(forrigeBehandlingId: BehandlingId, nyBehandlingId: BehandlingId) {
+    fun gjenbrukStønadsperioder(
+        forrigeBehandlingId: BehandlingId,
+        nyBehandlingId: BehandlingId,
+    ) {
         val eksisterendeStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeBehandlingId)
         stønadsperiodeRepository.insertAll(eksisterendeStønadsperioder.map { it.kopierTilBehandling(nyBehandlingId) })
     }

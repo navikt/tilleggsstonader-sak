@@ -26,51 +26,55 @@ class SøknadService(
     private val søknadBarnetilsynRepository: SøknadBarnetilsynRepository,
     private val søknadLæremidlerRepository: SøknadLæremidlerRepository,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentSøknadMetadata(behandlingId: BehandlingId): SøknadMetadata? {
-        return søknadMetadataRepository.finnForBehandling(behandlingId)
-    }
+    fun hentSøknadMetadata(behandlingId: BehandlingId): SøknadMetadata? = søknadMetadataRepository.finnForBehandling(behandlingId)
 
-    fun hentSøknadBarnetilsyn(behandlingId: BehandlingId): SøknadBarnetilsyn? {
-        return søknadBehandlingRepository.findByIdOrNull(behandlingId)
+    fun hentSøknadBarnetilsyn(behandlingId: BehandlingId): SøknadBarnetilsyn? =
+        søknadBehandlingRepository
+            .findByIdOrNull(behandlingId)
             ?.let { søknadBarnetilsynRepository.findByIdOrThrow(it.søknadId) }
-    }
 
-    fun hentSøknadLæremidler(behandlingId: BehandlingId): SøknadLæremidler? {
-        return søknadBehandlingRepository.findByIdOrNull(behandlingId)
+    fun hentSøknadLæremidler(behandlingId: BehandlingId): SøknadLæremidler? =
+        søknadBehandlingRepository
+            .findByIdOrNull(behandlingId)
             ?.let { søknadLæremidlerRepository.findByIdOrThrow(it.søknadId) }
-    }
 
     fun lagreSøknad(
         behandlingId: BehandlingId,
         journalpost: Journalpost,
         skjema: Søknadsskjema<out Skjema>,
     ): Søknad<*> {
-        val søknad = when (skjema.skjema) {
-            is SøknadsskjemaBarnetilsyn -> SøknadsskjemaBarnetilsynMapper.map(
-                skjema.mottattTidspunkt,
-                skjema.språk,
-                journalpost,
-                skjema.skjema as SøknadsskjemaBarnetilsyn,
-            )
-            is SøknadsskjemaLæremidler -> SøknadskjemaLæremidlerMapper.map(
-                skjema.mottattTidspunkt,
-                skjema.språk,
-                journalpost,
-                skjema.skjema as SøknadsskjemaLæremidler,
-            )
-        }
-        val lagretSøknad = when (søknad) {
-            is SøknadBarnetilsyn -> søknadBarnetilsynRepository.insert(søknad)
-            is SøknadLæremidler -> søknadLæremidlerRepository.insert(søknad)
-        }
+        val søknad =
+            when (skjema.skjema) {
+                is SøknadsskjemaBarnetilsyn ->
+                    SøknadsskjemaBarnetilsynMapper.map(
+                        skjema.mottattTidspunkt,
+                        skjema.språk,
+                        journalpost,
+                        skjema.skjema as SøknadsskjemaBarnetilsyn,
+                    )
+                is SøknadsskjemaLæremidler ->
+                    SøknadskjemaLæremidlerMapper.map(
+                        skjema.mottattTidspunkt,
+                        skjema.språk,
+                        journalpost,
+                        skjema.skjema as SøknadsskjemaLæremidler,
+                    )
+            }
+        val lagretSøknad =
+            when (søknad) {
+                is SøknadBarnetilsyn -> søknadBarnetilsynRepository.insert(søknad)
+                is SøknadLæremidler -> søknadLæremidlerRepository.insert(søknad)
+            }
         søknadBehandlingRepository.insert(SøknadBehandling(behandlingId, søknad.id))
         return lagretSøknad
     }
 
-    fun kopierSøknad(forrigeBehandlingId: BehandlingId, nyBehandlingId: BehandlingId) {
+    fun kopierSøknad(
+        forrigeBehandlingId: BehandlingId,
+        nyBehandlingId: BehandlingId,
+    ) {
         val søknad = søknadBehandlingRepository.findByIdOrNull(forrigeBehandlingId)
         if (søknad == null) {
             logger.info("Finner ingen søknad på forrige behandling=$forrigeBehandlingId")

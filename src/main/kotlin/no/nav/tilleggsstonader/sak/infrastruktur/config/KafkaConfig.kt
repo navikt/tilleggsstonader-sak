@@ -8,9 +8,9 @@ import org.springframework.kafka.support.LoggingProducerListener
 @EnableKafka
 @Configuration
 class KafkaConfig {
-
     @Bean
-    fun loggingProducerListener() = LoggingProducerListener<Any, Any>().apply {
-        setIncludeContents(false)
-    }
+    fun loggingProducerListener() =
+        LoggingProducerListener<Any, Any>().apply {
+            setIncludeContents(false)
+        }
 }

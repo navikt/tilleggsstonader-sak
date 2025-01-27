@@ -16,14 +16,14 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class InngangsvilkårStegTest {
-
     val behandlingService = mockk<BehandlingService>()
     val stønadsperiodeService = mockk<StønadsperiodeService>()
 
-    val steg = InngangsvilkårSteg(
-        behandlingService = behandlingService,
-        stønadsperiodeService = stønadsperiodeService,
-    )
+    val steg =
+        InngangsvilkårSteg(
+            behandlingService = behandlingService,
+            stønadsperiodeService = stønadsperiodeService,
+        )
 
     @BeforeEach
     fun setUp() {
@@ -33,7 +33,6 @@ class InngangsvilkårStegTest {
 
     @Nested
     inner class TilsynBarn {
-
         @Test
         fun `Neste steg - skal innom vilkår`() {
             val behandling = saksbehandling()
@@ -45,7 +44,6 @@ class InngangsvilkårStegTest {
 
     @Nested
     inner class Læremidler {
-
         @Test
         fun `Neste steg - har ikke noen vilkår og kan hoppe direkte til beregne ytelse`() {
             val behandling = saksbehandling(fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER))

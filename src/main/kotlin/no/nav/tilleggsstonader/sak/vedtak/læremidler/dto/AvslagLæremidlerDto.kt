@@ -6,4 +6,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 data class AvslagLæremidlerDto(
     val årsakerAvslag: List<ÅrsakAvslag>,
     val begrunnelse: String,
-) : VedtakLæremidlerRequest, VedtakLæremidlerResponse, VedtakLæremidlerDto(TypeVedtak.AVSLAG)
+) : VedtakLæremidlerDto(TypeVedtak.AVSLAG),
+    VedtakLæremidlerRequest,
+    VedtakLæremidlerResponse

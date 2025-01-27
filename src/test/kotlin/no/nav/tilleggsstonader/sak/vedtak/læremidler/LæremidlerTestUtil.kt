@@ -18,32 +18,36 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
 object LæremidlerTestUtil {
-
-    val defaultVedtaksperioder = listOf(
-        Vedtaksperiode(
-            fom = LocalDate.of(2024, 1, 1),
-            tom = LocalDate.of(2024, 1, 7),
-        ),
-    )
-    val defaultBeregningsresultat = BeregningsresultatLæremidler(
-        perioder = listOf(
-            beregningsresultatForMåned(
+    val defaultVedtaksperioder =
+        listOf(
+            Vedtaksperiode(
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 1, 7),
-                utbetalingsdato = LocalDate.of(2024, 1, 1),
             ),
-        ),
-    )
-    val defaultInnvilgelseLæremidler = InnvilgelseLæremidler(
-        vedtaksperioder = defaultVedtaksperioder,
-        beregningsresultat = defaultBeregningsresultat,
-    )
+        )
+    val defaultBeregningsresultat =
+        BeregningsresultatLæremidler(
+            perioder =
+                listOf(
+                    beregningsresultatForMåned(
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 1, 7),
+                        utbetalingsdato = LocalDate.of(2024, 1, 1),
+                    ),
+                ),
+        )
+    val defaultInnvilgelseLæremidler =
+        InnvilgelseLæremidler(
+            vedtaksperioder = defaultVedtaksperioder,
+            beregningsresultat = defaultBeregningsresultat,
+        )
 
-    fun innvilgelse(data: InnvilgelseLæremidler = defaultInnvilgelseLæremidler) = GeneriskVedtak(
-        behandlingId = BehandlingId.random(),
-        type = TypeVedtak.INNVILGELSE,
-        data = data,
-    )
+    fun innvilgelse(data: InnvilgelseLæremidler = defaultInnvilgelseLæremidler) =
+        GeneriskVedtak(
+            behandlingId = BehandlingId.random(),
+            type = TypeVedtak.INNVILGELSE,
+            data = data,
+        )
 
     fun innvilgelse(
         vedtaksperioder: List<Vedtaksperiode> = defaultVedtaksperioder,
@@ -51,10 +55,11 @@ object LæremidlerTestUtil {
     ) = GeneriskVedtak(
         behandlingId = BehandlingId.random(),
         type = TypeVedtak.INNVILGELSE,
-        data = InnvilgelseLæremidler(
-            vedtaksperioder = vedtaksperioder,
-            beregningsresultat = beregningsresultat,
-        ),
+        data =
+            InnvilgelseLæremidler(
+                vedtaksperioder = vedtaksperioder,
+                beregningsresultat = beregningsresultat,
+            ),
     )
 
     fun avslag(
@@ -63,10 +68,11 @@ object LæremidlerTestUtil {
     ) = GeneriskVedtak(
         behandlingId = BehandlingId.random(),
         type = TypeVedtak.AVSLAG,
-        data = AvslagLæremidler(
-            årsaker = årsaker,
-            begrunnelse = begrunnelse,
-        ),
+        data =
+            AvslagLæremidler(
+                årsaker = årsaker,
+                begrunnelse = begrunnelse,
+            ),
     )
 
     fun opphør(
@@ -77,33 +83,34 @@ object LæremidlerTestUtil {
     ) = GeneriskVedtak(
         behandlingId = BehandlingId.random(),
         type = TypeVedtak.OPPHØR,
-        data = OpphørLæremidler(
-            vedtaksperioder = vedtaksperioder,
-            beregningsresultat = beregningsresultat,
-            årsaker = årsaker,
-            begrunnelse = begrunnelse,
-        ),
+        data =
+            OpphørLæremidler(
+                vedtaksperioder = vedtaksperioder,
+                beregningsresultat = beregningsresultat,
+                årsaker = årsaker,
+                begrunnelse = begrunnelse,
+            ),
     )
 
     fun beregningsresultatForMåned(
         fom: LocalDate,
         tom: LocalDate,
         utbetalingsdato: LocalDate = fom,
-    ): BeregningsresultatForMåned {
-        return BeregningsresultatForMåned(
+    ): BeregningsresultatForMåned =
+        BeregningsresultatForMåned(
             beløp = 875,
-            grunnlag = Beregningsgrunnlag(
-                fom = fom,
-                tom = tom,
-                utbetalingsdato = utbetalingsdato,
-                studienivå = Studienivå.HØYERE_UTDANNING,
-                studieprosent = 100,
-                sats = 875,
-                satsBekreftet = true,
-                målgruppe = MålgruppeType.AAP,
-            ),
+            grunnlag =
+                Beregningsgrunnlag(
+                    fom = fom,
+                    tom = tom,
+                    utbetalingsdato = utbetalingsdato,
+                    studienivå = Studienivå.HØYERE_UTDANNING,
+                    studieprosent = 100,
+                    sats = 875,
+                    satsBekreftet = true,
+                    målgruppe = MålgruppeType.AAP,
+                ),
         )
-    }
 
     fun beregningsresultatForPeriodeDto(
         fom: LocalDate,
@@ -111,8 +118,8 @@ object LæremidlerTestUtil {
         antallMåneder: Int = 1,
         stønadsbeløp: Int = 875,
         utbetalingsdato: LocalDate = fom,
-    ): BeregningsresultatForPeriodeDto {
-        return BeregningsresultatForPeriodeDto(
+    ): BeregningsresultatForPeriodeDto =
+        BeregningsresultatForPeriodeDto(
             fom = fom,
             tom = tom,
             antallMåneder = antallMåneder,
@@ -122,5 +129,4 @@ object LæremidlerTestUtil {
             stønadsbeløp = stønadsbeløp,
             utbetalingsdato = utbetalingsdato,
         )
-    }
 }

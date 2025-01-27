@@ -4,13 +4,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class TypeVedtaksdataTest {
-
     @Test
     fun `typerVedtaksdata må inneholde unike navn`() {
-        val alleEnums = listOf(
-            TypeVedtakTilsynBarn.entries,
-            TypeVedtakLæremidler.entries,
-        ).flatten()
+        val alleEnums =
+            listOf(
+                TypeVedtakTilsynBarn.entries,
+                TypeVedtakLæremidler.entries,
+            ).flatten()
         assertThat(typerVedtaksdata.keys)
             .hasSize(alleEnums.size)
     }

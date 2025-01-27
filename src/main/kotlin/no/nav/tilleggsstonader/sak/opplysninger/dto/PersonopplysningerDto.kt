@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.dto
 
+import no.nav.tilleggsstonader.sak.opplysninger.dto.Folkeregisterpersonstatus.entries
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Navn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import java.time.LocalDate
@@ -19,11 +20,23 @@ data class StatsborgerskapDto(
     val gyldigTilOgMedDato: LocalDate?,
 )
 
-data class UtflyttingDto(val tilflyttingsland: String?, val dato: LocalDate?, val tilflyttingssted: String? = null)
+data class UtflyttingDto(
+    val tilflyttingsland: String?,
+    val dato: LocalDate?,
+    val tilflyttingssted: String? = null,
+)
 
-data class InnflyttingDto(val fraflyttingsland: String?, val dato: LocalDate?, val fraflyttingssted: String? = null)
+data class InnflyttingDto(
+    val fraflyttingsland: String?,
+    val dato: LocalDate?,
+    val fraflyttingssted: String? = null,
+)
 
-data class OppholdstillatelseDto(val oppholdstillatelse: OppholdType, val fraDato: LocalDate?, val tilDato: LocalDate?)
+data class OppholdstillatelseDto(
+    val oppholdstillatelse: OppholdType,
+    val fraDato: LocalDate?,
+    val tilDato: LocalDate?,
+)
 
 enum class OppholdType {
     PERMANENT,
@@ -63,7 +76,9 @@ data class AdresseDto(
     val erGjeldende: Boolean = false,
 )
 
-enum class AdresseType(val rekkefølge: Int) {
+enum class AdresseType(
+    val rekkefølge: Int,
+) {
     BOSTEDADRESSE(1),
     OPPHOLDSADRESSE(2),
     KONTAKTADRESSE(3),
@@ -71,7 +86,6 @@ enum class AdresseType(val rekkefølge: Int) {
 }
 
 enum class Adressebeskyttelse {
-
     STRENGT_FORTROLIG,
     STRENGT_FORTROLIG_UTLAND,
     FORTROLIG,
@@ -84,8 +98,10 @@ enum class Adressebeskyttelse {
 }
 
 @Suppress("unused")
-enum class Folkeregisterpersonstatus(private val pdlStatus: String, val visningsnavn: String) {
-
+enum class Folkeregisterpersonstatus(
+    private val pdlStatus: String,
+    val visningsnavn: String,
+) {
     BOSATT("bosatt", "Bosatt"),
     UTFLYTTET("utflyttet", "Utflyttet"),
     FORSVUNNET("forsvunnet", "Forsvunnet"),
@@ -98,8 +114,8 @@ enum class Folkeregisterpersonstatus(private val pdlStatus: String, val visnings
     ;
 
     companion object {
-
         private val map = entries.associateBy(Folkeregisterpersonstatus::pdlStatus)
+
         fun fraPdl(status: no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatus) =
             map.getOrDefault(status.status, UKJENT)
     }
@@ -111,9 +127,7 @@ data class NavnDto(
     val etternavn: String,
     val visningsnavn: String,
 ) {
-
     companion object {
-
         fun fraNavn(navn: Navn): NavnDto = NavnDto(navn.fornavn, navn.mellomnavn, navn.etternavn, navn.visningsnavn())
     }
 }

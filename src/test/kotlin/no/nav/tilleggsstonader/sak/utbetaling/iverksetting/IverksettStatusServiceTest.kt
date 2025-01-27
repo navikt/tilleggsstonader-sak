@@ -27,7 +27,6 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 
 class IverksettStatusServiceTest : IntegrationTest() {
-
     @Autowired
     lateinit var iverksettClient: IverksettClient
 
@@ -54,11 +53,12 @@ class IverksettStatusServiceTest : IntegrationTest() {
 
     @Test
     fun `skal oppdatere iverksatte andeler med status OK`() {
-        val iverksattAndel = andelTilkjentYtelse(
-            kildeBehandlingId = behandling.id,
-            statusIverksetting = StatusIverksetting.SENDT,
-            iverksetting = Iverksetting(behandling.id.id, osloNow()),
-        )
+        val iverksattAndel =
+            andelTilkjentYtelse(
+                kildeBehandlingId = behandling.id,
+                statusIverksetting = StatusIverksetting.SENDT,
+                iverksetting = Iverksetting(behandling.id.id, osloNow()),
+            )
         val andelIkkeSendt = andelTilkjentYtelse(kildeBehandlingId = behandling.id)
         val tilkjentYtelse = opprettTilkjentYtelse(behandling, iverksattAndel, andelIkkeSendt)
 

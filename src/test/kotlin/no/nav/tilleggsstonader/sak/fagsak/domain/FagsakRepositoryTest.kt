@@ -31,7 +31,6 @@ import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDateTime
 
 class FagsakRepositoryTest : IntegrationTest() {
-
     @Autowired
     private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
@@ -50,18 +49,20 @@ class FagsakRepositoryTest : IntegrationTest() {
     @Test
     fun `harLøpendeUtbetaling returnerer true for fagsak med ferdigstilt behandling med aktiv utbetaling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("321"))))
-        val behandling = testoppsettService.lagre(
-            behandling(
-                fagsak,
-                resultat = BehandlingResultat.INNVILGET,
-                status = BehandlingStatus.FERDIGSTILT,
-            ),
-        )
-        val andel = andelTilkjentYtelse(
-            behandling.id,
-            fom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
-            tom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
-        )
+        val behandling =
+            testoppsettService.lagre(
+                behandling(
+                    fagsak,
+                    resultat = BehandlingResultat.INNVILGET,
+                    status = BehandlingStatus.FERDIGSTILT,
+                ),
+            )
+        val andel =
+            andelTilkjentYtelse(
+                behandling.id,
+                fom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                tom = osloDateNow().datoEllerNesteMandagHvisLørdagEllerSøndag(),
+            )
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andeler = arrayOf(andel)))
 
         val harLøpendeUtbetaling = fagsakRepository.harLøpendeUtbetaling(fagsak.id)
@@ -92,13 +93,14 @@ class FagsakRepositoryTest : IntegrationTest() {
     @Test
     fun `harLøpendeUtbetaling returnerer false for fagsak med ferdigstilt behandling med inaktiv utbetaling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("321"))))
-        val behandling = testoppsettService.lagre(
-            behandling(
-                fagsak,
-                resultat = BehandlingResultat.INNVILGET,
-                status = BehandlingStatus.FERDIGSTILT,
-            ),
-        )
+        val behandling =
+            testoppsettService.lagre(
+                behandling(
+                    fagsak,
+                    resultat = BehandlingResultat.INNVILGET,
+                    status = BehandlingStatus.FERDIGSTILT,
+                ),
+            )
         tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id))
 
         val harLøpendeUtbetaling = fagsakRepository.harLøpendeUtbetaling(fagsak.id)
@@ -120,8 +122,7 @@ class FagsakRepositoryTest : IntegrationTest() {
                         stønadstype = it,
                     ),
                 )
-            }
-                .hasRootCauseInstanceOf(PSQLException::class.java)
+            }.hasRootCauseInstanceOf(PSQLException::class.java)
                 .has(
                     hasCauseMessageContaining(
                         "ERROR: duplicate key value violates " +
@@ -156,8 +157,9 @@ class FagsakRepositoryTest : IntegrationTest() {
 
         assertThat(fagsakHentetFinnesIkke).isNull()
 
-        val fagsak = fagsakRepository.findBySøkerIdent(setOf("12345678901"), Stønadstype.BARNETILSYN)
-            ?: error("Finner ikke fagsak")
+        val fagsak =
+            fagsakRepository.findBySøkerIdent(setOf("12345678901"), Stønadstype.BARNETILSYN)
+                ?: error("Finner ikke fagsak")
         val person = fagsakPersonRepository.findByIdOrThrow(fagsak.fagsakPersonId)
 
         assertThat(person.identer.map { it.ident }).contains("12345678901")
@@ -200,8 +202,9 @@ class FagsakRepositoryTest : IntegrationTest() {
     @Test
     internal fun finnMedEksternId() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val findByEksternId = fagsakRepository.finnMedEksternId(fagsak.eksternId.id)
-            ?: error("Fagsak med ekstern id ${fagsak.eksternId} finnes ikke")
+        val findByEksternId =
+            fagsakRepository.finnMedEksternId(fagsak.eksternId.id)
+                ?: error("Fagsak med ekstern id ${fagsak.eksternId} finnes ikke")
 
         assertThat(findByEksternId).isEqualTo(fagsak.tilFagsakDomain())
     }
@@ -274,18 +277,19 @@ class FagsakRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class HentFagsakMetadata {
-
         @Test
         fun `en fagsak med 2 identer skal hente site opprettede`() {
-            val sporbar1ÅrSiden = Sporbar(
-                opprettetTid = LocalDateTime.now().minusYears(1),
-                endret = Endret(endretTid = LocalDateTime.now().minusYears(1)),
-            )
-            val identer = setOf(
-                PersonIdent("1", sporbar1ÅrSiden),
-                PersonIdent("2"),
-                PersonIdent("3", sporbar1ÅrSiden),
-            )
+            val sporbar1ÅrSiden =
+                Sporbar(
+                    opprettetTid = LocalDateTime.now().minusYears(1),
+                    endret = Endret(endretTid = LocalDateTime.now().minusYears(1)),
+                )
+            val identer =
+                setOf(
+                    PersonIdent("1", sporbar1ÅrSiden),
+                    PersonIdent("2"),
+                    PersonIdent("3", sporbar1ÅrSiden),
+                )
             val fagsak = testoppsettService.lagreFagsak(fagsak(identer))
 
             val metadata = fagsakRepository.hentFagsakMetadata(fagsakIder = setOf(fagsak.id))
@@ -312,7 +316,11 @@ class FagsakRepositoryTest : IntegrationTest() {
         }
     }
 
-    private fun opprettFagsakMedFlereIdenter(ident: String = "1", ident2: String = "2", ident3: String = "3"): Fagsak {
+    private fun opprettFagsakMedFlereIdenter(
+        ident: String = "1",
+        ident2: String = "2",
+        ident3: String = "3",
+    ): Fagsak {
         val endret2DagerSiden = Sporbar(endret = Endret(endretTid = osloNow().plusDays(2)))
         return fagsak(
             setOf(

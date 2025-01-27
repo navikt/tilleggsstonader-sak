@@ -18,15 +18,18 @@ class PersonopplysningController(
     private val tilgangService: TilgangService,
     private val personopplysningerService: PersonopplysningerService,
 ) {
-
     @GetMapping("{behandlingId}")
-    fun hentPersonopplysninger(@PathVariable behandlingId: BehandlingId): PersonopplysningerDto {
+    fun hentPersonopplysninger(
+        @PathVariable behandlingId: BehandlingId,
+    ): PersonopplysningerDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return personopplysningerService.hentPersonopplysninger(behandlingId)
     }
 
     @GetMapping("fagsak-person/{fagsakPersonId}")
-    fun hentPersonopplysningerForPerson(@PathVariable fagsakPersonId: FagsakPersonId): PersonopplysningerDto {
+    fun hentPersonopplysningerForPerson(
+        @PathVariable fagsakPersonId: FagsakPersonId,
+    ): PersonopplysningerDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         return personopplysningerService.hentPersonopplysningerForFagsakPerson(fagsakPersonId)
     }

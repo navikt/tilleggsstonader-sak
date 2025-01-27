@@ -19,11 +19,12 @@ data class AktivitetLæremidlerBeregningGrunnlag(
     override val tom: LocalDate,
     val prosent: Int,
     val studienivå: Studienivå,
-) : Periode<LocalDate>, KopierPeriode<AktivitetLæremidlerBeregningGrunnlag> {
-
-    override fun medPeriode(fom: LocalDate, tom: LocalDate): AktivitetLæremidlerBeregningGrunnlag {
-        return this.copy(fom = fom, tom = tom)
-    }
+) : Periode<LocalDate>,
+    KopierPeriode<AktivitetLæremidlerBeregningGrunnlag> {
+    override fun medPeriode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): AktivitetLæremidlerBeregningGrunnlag = this.copy(fom = fom, tom = tom)
 }
 
 fun List<Vilkårperiode>.tilAktiviteter(): List<AktivitetLæremidlerBeregningGrunnlag> =

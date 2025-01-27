@@ -100,11 +100,12 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         fun `skal lagre kildeId på aktivitet`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
             val hentetInformasjon = HentetInformasjon(fom = now(), tom = now(), tidspunktHentet = LocalDateTime.now())
-            val grunnlag = VilkårperioderGrunnlag(
-                aktivitet = GrunnlagAktivitet(aktiviteter = listOf(periodeGrunnlagAktivitet("123"))),
-                ytelse = GrunnlagYtelse(emptyList()),
-                hentetInformasjon = hentetInformasjon,
-            )
+            val grunnlag =
+                VilkårperioderGrunnlag(
+                    aktivitet = GrunnlagAktivitet(aktiviteter = listOf(periodeGrunnlagAktivitet("123"))),
+                    ytelse = GrunnlagYtelse(emptyList()),
+                    hentetInformasjon = hentetInformasjon,
+                )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
             aktivitetService.opprettVilkårperiode(
                 dummyVilkårperiodeAktivitet(
@@ -122,11 +123,12 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
             val hentetInformasjon =
                 HentetInformasjon(fom = now(), tom = now(), tidspunktHentet = LocalDateTime.now())
-            val grunnlag = VilkårperioderGrunnlag(
-                aktivitet = GrunnlagAktivitet(emptyList()),
-                ytelse = GrunnlagYtelse(emptyList()),
-                hentetInformasjon = hentetInformasjon,
-            )
+            val grunnlag =
+                VilkårperioderGrunnlag(
+                    aktivitet = GrunnlagAktivitet(emptyList()),
+                    ytelse = GrunnlagYtelse(emptyList()),
+                    hentetInformasjon = hentetInformasjon,
+                )
             vilkårperioderGrunnlagRepository.insert(VilkårperioderGrunnlagDomain(behandling.id, grunnlag))
 
             val opprettAktivitet = dummyVilkårperiodeAktivitet(behandlingId = behandling.id, kildeId = "finnesIkke")
@@ -185,9 +187,10 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
 
         @Test
         fun `kan ikke opprette aktivitet hvis periode begynner før revurderFra`() {
-            val behandling = testoppsettService.oppdater(
-                testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
-            )
+            val behandling =
+                testoppsettService.oppdater(
+                    testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
+                )
 
             assertThatThrownBy {
                 aktivitetService.opprettVilkårperiode(
@@ -214,10 +217,11 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                             behandlingId = behandling.id,
                             fom = now(),
                             tom = now(),
-                            faktaOgSvar = FaktaOgSvarAktivitetLæremidlerDto(
-                                prosent = 50,
-                                svarHarUtgifter = SvarJaNei.JA,
-                            ),
+                            faktaOgSvar =
+                                FaktaOgSvarAktivitetLæremidlerDto(
+                                    prosent = 50,
+                                    svarHarUtgifter = SvarJaNei.JA,
+                                ),
                         ),
                     )
                 }.hasMessageContaining("Reell arbeidssøker er ikke en gyldig aktivitet for læremidler")
@@ -228,27 +232,35 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
                 val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.LÆREMIDLER))
                 val behandling = testoppsettService.lagre(behandling(fagsak))
 
-                val persistertAktivitet = vilkårperiodeService.opprettVilkårperiode(
-                    LagreVilkårperiode(
-                        type = AktivitetType.TILTAK,
-                        behandlingId = behandling.id,
-                        fom = now(),
-                        tom = now(),
-                        faktaOgSvar = FaktaOgSvarAktivitetLæremidlerDto(
-                            prosent = 50,
-                            studienivå = Studienivå.HØYERE_UTDANNING,
-                            svarHarUtgifter = SvarJaNei.JA,
-                            svarHarRettTilUtstyrsstipend = SvarJaNei.NEI,
+                val persistertAktivitet =
+                    vilkårperiodeService.opprettVilkårperiode(
+                        LagreVilkårperiode(
+                            type = AktivitetType.TILTAK,
+                            behandlingId = behandling.id,
+                            fom = now(),
+                            tom = now(),
+                            faktaOgSvar =
+                                FaktaOgSvarAktivitetLæremidlerDto(
+                                    prosent = 50,
+                                    studienivå = Studienivå.HØYERE_UTDANNING,
+                                    svarHarUtgifter = SvarJaNei.JA,
+                                    svarHarRettTilUtstyrsstipend = SvarJaNei.NEI,
+                                ),
                         ),
-                    ),
-                )
+                    )
 
                 val studienivå =
-                    persistertAktivitet.faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetLæremidler>()?.studienivå
+                    persistertAktivitet.faktaOgVurdering.fakta
+                        .takeIfFakta<FaktaAktivitetLæremidler>()
+                        ?.studienivå
                 val harUtgifter =
-                    persistertAktivitet.faktaOgVurdering.vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter
+                    persistertAktivitet.faktaOgVurdering.vurderinger
+                        .takeIfVurderinger<HarUtgifterVurdering>()
+                        ?.harUtgifter
                 val harRettTilUtstyrsstipend =
-                    persistertAktivitet.faktaOgVurdering.vurderinger.takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()?.harRettTilUtstyrsstipend
+                    persistertAktivitet.faktaOgVurdering.vurderinger
+                        .takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()
+                        ?.harRettTilUtstyrsstipend
 
                 assertThat(studienivå).isEqualTo(Studienivå.HØYERE_UTDANNING)
                 assertThat(harUtgifter?.svar).isEqualTo(SvarJaNei.JA)
@@ -262,19 +274,21 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         @Test
         fun `skal oppdatere alle felter på aktivitet`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val eksisterendeAktivitet = aktivitetService.opprettVilkårperiode(
-                dummyVilkårperiodeAktivitet(
-                    behandlingId = behandling.id,
-                ),
-            )
+            val eksisterendeAktivitet =
+                aktivitetService.opprettVilkårperiode(
+                    dummyVilkårperiodeAktivitet(
+                        behandlingId = behandling.id,
+                    ),
+                )
 
             val nyDato = LocalDate.parse("2020-01-01")
-            val oppdatering = eksisterendeAktivitet.tilOppdatering(
-                nyFom = nyDato,
-                nyTom = nyDato,
-                nyBegrunnelse = "Oppdatert begrunnelse",
-                svarLønnet = SvarJaNei.NEI,
-            )
+            val oppdatering =
+                eksisterendeAktivitet.tilOppdatering(
+                    nyFom = nyDato,
+                    nyTom = nyDato,
+                    nyBegrunnelse = "Oppdatert begrunnelse",
+                    svarLønnet = SvarJaNei.NEI,
+                )
 
             aktivitetService.oppdaterVilkårperiode(eksisterendeAktivitet.id, oppdatering)
             val oppdatertAktivitet = vilkårperiodeService.hentVilkårperioder(behandling.id).aktiviteter.single()
@@ -290,9 +304,10 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         @Test
         fun `endring av aktiviteter opprettet i denne behandlingen skal beholde status NY`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val aktivitet = aktivitetService.opprettVilkårperiode(
-                dummyVilkårperiodeAktivitet(behandlingId = behandling.id),
-            )
+            val aktivitet =
+                aktivitetService.opprettVilkårperiode(
+                    dummyVilkårperiodeAktivitet(behandlingId = behandling.id),
+                )
             val oppdatering = aktivitet.tilOppdatering()
             val oppdatertAktivitet = aktivitetService.oppdaterVilkårperiode(aktivitet.id, oppdatering)
             assertThat(aktivitet.status).isEqualTo(Vilkårstatus.NY)
@@ -302,17 +317,19 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         @Test
         fun `endring av ativiteter opprettet fra tidligere behandling skal få status ENDRET`() {
             val revurdering = testoppsettService.lagBehandlingOgRevurdering()
-            val opprinneligAktivitet = vilkårperiodeRepository.insert(
-                aktivitet(
-                    behandlingId = revurdering.forrigeBehandlingId!!,
-                ),
-            )
+            val opprinneligAktivitet =
+                vilkårperiodeRepository.insert(
+                    aktivitet(
+                        behandlingId = revurdering.forrigeBehandlingId!!,
+                    ),
+                )
             vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
             val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
-            val oppdatertPeriode = aktivitetService.oppdaterVilkårperiode(
-                id = vilkårperiode.id,
-                vilkårperiode = vilkårperiode.tilOppdatering(),
-            )
+            val oppdatertPeriode =
+                aktivitetService.oppdaterVilkårperiode(
+                    id = vilkårperiode.id,
+                    vilkårperiode = vilkårperiode.tilOppdatering(),
+                )
             assertThat(opprinneligAktivitet.status).isEqualTo(Vilkårstatus.NY)
             assertThat(vilkårperiode.status).isEqualTo(Vilkårstatus.UENDRET)
             assertThat(oppdatertPeriode.status).isEqualTo(Vilkårstatus.ENDRET)
@@ -321,17 +338,19 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         @Test
         fun `skal feile dersom manglende begrunnelse når lønnet endres til ja`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val tiltak = aktivitetService.opprettVilkårperiode(
-                dummyVilkårperiodeAktivitet(
-                    behandlingId = behandling.id,
-                    svarLønnet = SvarJaNei.NEI,
-                ),
-            )
+            val tiltak =
+                aktivitetService.opprettVilkårperiode(
+                    dummyVilkårperiodeAktivitet(
+                        behandlingId = behandling.id,
+                        svarLønnet = SvarJaNei.NEI,
+                    ),
+                )
 
-            val oppdatering = tiltak.tilOppdatering(
-                nyBegrunnelse = "",
-                svarLønnet = SvarJaNei.JA,
-            )
+            val oppdatering =
+                tiltak.tilOppdatering(
+                    nyBegrunnelse = "",
+                    svarLønnet = SvarJaNei.JA,
+                )
 
             assertThatThrownBy {
                 aktivitetService.oppdaterVilkårperiode(tiltak.id, oppdatering)
@@ -340,12 +359,14 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
 
         @Test
         fun `skal ikke kunne oppdatere kommentar hvis behandlingen ikke er under behandling`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(status = BehandlingStatus.FERDIGSTILT),
-            )
-            val aktivitet = vilkårperiodeRepository.insert(
-                aktivitet(behandlingId = behandling.id),
-            )
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(status = BehandlingStatus.FERDIGSTILT),
+                )
+            val aktivitet =
+                vilkårperiodeRepository.insert(
+                    aktivitet(behandlingId = behandling.id),
+                )
             assertThatThrownBy {
                 aktivitetService.oppdaterVilkårperiode(
                     id = aktivitet.id,
@@ -357,9 +378,10 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         @Test
         fun `skal ikke kunne oppdatere aktivitetstypen`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val aktivitet = vilkårperiodeRepository.insert(
-                aktivitet(behandlingId = behandling.id),
-            )
+            val aktivitet =
+                vilkårperiodeRepository.insert(
+                    aktivitet(behandlingId = behandling.id),
+                )
             assertThat(aktivitet.type).isEqualTo(AktivitetType.TILTAK)
             assertThatThrownBy {
                 aktivitetService.oppdaterVilkårperiode(
@@ -372,12 +394,14 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
         @Test
         fun `skal ikke kunne oppdatere behandlings-IDen`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val annenBehandling = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")))).let {
-                testoppsettService.lagre(behandling(it))
-            }
-            val aktivitet = vilkårperiodeRepository.insert(
-                aktivitet(behandlingId = behandling.id),
-            )
+            val annenBehandling =
+                testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")))).let {
+                    testoppsettService.lagre(behandling(it))
+                }
+            val aktivitet =
+                vilkårperiodeRepository.insert(
+                    aktivitet(behandlingId = behandling.id),
+                )
             val endretBehandlingId = aktivitet.tilOppdatering().copy(behandlingId = annenBehandling.id)
             assertThatThrownBy {
                 aktivitetService.oppdaterVilkårperiode(
@@ -389,16 +413,18 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
 
         @Test
         fun `kan ikke oppdatere periode hvis periode begynner før revurderFra`() {
-            val behandling = testoppsettService.oppdater(
-                testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
-            )
-            val aktivitet = vilkårperiodeRepository.insert(
-                aktivitet(
-                    behandlingId = behandling.id,
-                    fom = now().minusMonths(1),
-                    tom = now().plusMonths(1),
-                ),
-            )
+            val behandling =
+                testoppsettService.oppdater(
+                    testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
+                )
+            val aktivitet =
+                vilkårperiodeRepository.insert(
+                    aktivitet(
+                        behandlingId = behandling.id,
+                        fom = now().minusMonths(1),
+                        tom = now().plusMonths(1),
+                    ),
+                )
             assertThatThrownBy {
                 aktivitetService.oppdaterVilkårperiode(
                     id = aktivitet.id,
@@ -413,15 +439,21 @@ class VilkårperiodeAktivitetServiceTest : IntegrationTest() {
             aktivitetsdager: Int? = null,
             svarLønnet: SvarJaNei? = null,
             nyBegrunnelse: String? = null,
-        ): LagreVilkårperiode = dummyVilkårperiodeAktivitet(
-            behandlingId = behandlingId,
-            type = type as AktivitetType,
-            fom = nyFom ?: fom,
-            tom = nyTom ?: tom,
-            aktivitetsdager = aktivitetsdager
-                ?: faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
-            svarLønnet = svarLønnet ?: faktaOgVurdering.vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.svar,
-            begrunnelse = nyBegrunnelse ?: begrunnelse,
-        )
+        ): LagreVilkårperiode =
+            dummyVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                type = type as AktivitetType,
+                fom = nyFom ?: fom,
+                tom = nyTom ?: tom,
+                aktivitetsdager =
+                    aktivitetsdager
+                        ?: faktaOgVurdering.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
+                svarLønnet =
+                    svarLønnet ?: faktaOgVurdering.vurderinger
+                        .takeIfVurderinger<LønnetVurdering>()
+                        ?.lønnet
+                        ?.svar,
+                begrunnelse = nyBegrunnelse ?: begrunnelse,
+            )
     }
 }

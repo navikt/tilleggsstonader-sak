@@ -8,8 +8,9 @@ data class BarnDvh(
     )
 
     companion object {
-        fun fraDomene(barn: List<String>) = JsonWrapper(
-            barn = barn.map { BarnDvh(it) },
-        )
+        fun fraDomene(barn: List<String>) =
+            JsonWrapper(
+                barn = barn.map { BarnDvh(it) },
+            )
     }
 }

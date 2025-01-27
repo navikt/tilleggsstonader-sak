@@ -15,13 +15,12 @@ class YtelseClient(
     @Value("\${clients.integrasjoner.uri}") private val baseUrl: URI,
     @Qualifier("azureClientCredential") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
+    val uri =
+        UriComponentsBuilder
+            .fromUri(baseUrl)
+            .pathSegment("api", "ytelse", "finn")
+            .encode()
+            .toUriString()
 
-    val uri = UriComponentsBuilder.fromUri(baseUrl)
-        .pathSegment("api", "ytelse", "finn")
-        .encode()
-        .toUriString()
-
-    fun hentYtelser(request: YtelsePerioderRequest): YtelsePerioderDto {
-        return postForEntity(uri, request)
-    }
+    fun hentYtelser(request: YtelsePerioderRequest): YtelsePerioderDto = postForEntity(uri, request)
 }

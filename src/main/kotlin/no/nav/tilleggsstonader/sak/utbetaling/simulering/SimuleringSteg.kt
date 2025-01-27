@@ -12,8 +12,10 @@ class SimuleringSteg(
     val simuleringService: SimuleringService,
     val vedtaksresultatService: VedtaksresultatService,
 ) : BehandlingSteg<Void?> {
-
-    override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
+    override fun utførSteg(
+        saksbehandling: Saksbehandling,
+        data: Void?,
+    ) {
         val resultat = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
 
         if (skalUtFøreSimulering(resultat)) {

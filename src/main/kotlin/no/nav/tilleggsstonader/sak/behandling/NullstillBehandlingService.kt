@@ -33,7 +33,6 @@ class NullstillBehandlingService(
     private val mellomlagerBrevRepository: MellomlagerBrevRepository,
     private val vedtaksbrevRepository: VedtaksbrevRepository,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
@@ -83,8 +82,9 @@ class NullstillBehandlingService(
     }
 
     private fun gjenbrukData(behandling: Behandling) {
-        val behandlingIdForGjenbruk = gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
-            ?: error("Kan ikke nullstille behandling som ikke har behandlingIdForGjenbruk")
+        val behandlingIdForGjenbruk =
+            gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
+                ?: error("Kan ikke nullstille behandling som ikke har behandlingIdForGjenbruk")
         val barnMap = gjennbrukDataRevurderingService.finnNyttIdForBarn(behandling.id, behandlingIdForGjenbruk)
         gjennbrukDataRevurderingService.gjenbrukData(behandling, behandlingIdForGjenbruk, barnMap)
     }

@@ -24,20 +24,22 @@ class YtelseService(
 ) {
     fun hentYtelser(fagsakPersonId: FagsakPersonId): YtelserRegisterDto {
         val ident = fagsakPersonService.hentAktivIdent(fagsakPersonId)
-        val typer = listOf(
-            TypeYtelsePeriode.AAP,
-            TypeYtelsePeriode.ENSLIG_FORSØRGER,
-            TypeYtelsePeriode.OMSTILLINGSSTØNAD,
-        )
+        val typer =
+            listOf(
+                TypeYtelsePeriode.AAP,
+                TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                TypeYtelsePeriode.OMSTILLINGSSTØNAD,
+            )
 
-        return ytelseClient.hentYtelser(
-            YtelsePerioderRequest(
-                ident = ident,
-                fom = osloDateNow().minusYears(3),
-                tom = osloDateNow().plusYears(1),
-                typer = typer,
-            ),
-        ).tilDto()
+        return ytelseClient
+            .hentYtelser(
+                YtelsePerioderRequest(
+                    ident = ident,
+                    fom = osloDateNow().minusYears(3),
+                    tom = osloDateNow().plusYears(1),
+                    typer = typer,
+                ),
+            ).tilDto()
     }
 
     fun hentYtelseForGrunnlag(
@@ -48,14 +50,15 @@ class YtelseService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val typer = finnRelevanteYtelsesTyper(behandling.stønadstype)
 
-        val ytelsePerioder = ytelseClient.hentYtelser(
-            YtelsePerioderRequest(
-                ident = behandling.ident,
-                fom = fom,
-                tom = tom,
-                typer = typer,
-            ),
-        )
+        val ytelsePerioder =
+            ytelseClient.hentYtelser(
+                YtelsePerioderRequest(
+                    ident = behandling.ident,
+                    fom = fom,
+                    tom = tom,
+                    typer = typer,
+                ),
+            )
 
         validerResultat(ytelsePerioder.hentetInformasjon)
 

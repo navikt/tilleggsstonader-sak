@@ -6,10 +6,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class LæremidlerBeregnBeløpUtilTest {
-
     @Nested
     inner class BeregnBeløp {
-
         @Test
         fun `finn beløp for stuieprosent 100 prosent`() {
             val beløp = beregnBeløp(875, 100)

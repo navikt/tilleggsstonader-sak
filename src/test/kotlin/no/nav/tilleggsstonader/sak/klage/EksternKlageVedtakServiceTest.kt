@@ -20,14 +20,14 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class EksternKlageVedtakServiceTest {
-
     private val fagsakService = mockk<FagsakService>()
     private val behandlingService = mockk<BehandlingService>()
 
-    private val service = EksternKlageVedtakService(
-        fagsakService = fagsakService,
-        behandlingService = behandlingService,
-    )
+    private val service =
+        EksternKlageVedtakService(
+            fagsakService = fagsakService,
+            behandlingService = behandlingService,
+        )
 
     private val fagsakId = FagsakId.random()
     private val fagsak = fagsak(id = fagsakId)
@@ -38,10 +38,11 @@ class EksternKlageVedtakServiceTest {
     @BeforeEach
     internal fun setUp() {
         every { fagsakService.hentFagsakPåEksternId(eksternFagsakId) } returns fagsak
-        every { behandlingService.hentEksternBehandlingId(any<BehandlingId>()) } returns EksternBehandlingId(
-            eksternBehandlingId.toLong(),
-            BehandlingId.random(),
-        )
+        every { behandlingService.hentEksternBehandlingId(any<BehandlingId>()) } returns
+            EksternBehandlingId(
+                eksternBehandlingId.toLong(),
+                BehandlingId.random(),
+            )
     }
 
     @Test
@@ -62,12 +63,13 @@ class EksternKlageVedtakServiceTest {
 
     @Test
     internal fun `skal ikke returnere henlagte behandlinger`() {
-        val henlagtBehandling = behandling(
-            fagsak = fagsak,
-            type = BehandlingType.REVURDERING,
-            status = BehandlingStatus.FERDIGSTILT,
-            resultat = BehandlingResultat.HENLAGT,
-        )
+        val henlagtBehandling =
+            behandling(
+                fagsak = fagsak,
+                type = BehandlingType.REVURDERING,
+                status = BehandlingStatus.FERDIGSTILT,
+                resultat = BehandlingResultat.HENLAGT,
+            )
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(henlagtBehandling)
 
         assertThat(service.hentVedtak(eksternFagsakId)).isEmpty()
@@ -75,22 +77,24 @@ class EksternKlageVedtakServiceTest {
 
     @Test
     internal fun `skal ikke returnere behandlinger under behandling`() {
-        val henlagtBehandling = behandling(
-            fagsak = fagsak,
-            type = BehandlingType.REVURDERING,
-            status = BehandlingStatus.UTREDES,
-            resultat = BehandlingResultat.IKKE_SATT,
-        )
+        val henlagtBehandling =
+            behandling(
+                fagsak = fagsak,
+                type = BehandlingType.REVURDERING,
+                status = BehandlingStatus.UTREDES,
+                resultat = BehandlingResultat.IKKE_SATT,
+            )
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(henlagtBehandling)
 
         assertThat(service.hentVedtak(eksternFagsakId)).isEmpty()
     }
 
-    private fun ferdigstiltBehandling(vedtakstidspunkt: LocalDateTime?): Behandling = behandling(
-        fagsak,
-        vedtakstidspunkt = vedtakstidspunkt,
-        resultat = BehandlingResultat.AVSLÅTT,
-        type = BehandlingType.FØRSTEGANGSBEHANDLING,
-        status = BehandlingStatus.FERDIGSTILT,
-    )
+    private fun ferdigstiltBehandling(vedtakstidspunkt: LocalDateTime?): Behandling =
+        behandling(
+            fagsak,
+            vedtakstidspunkt = vedtakstidspunkt,
+            resultat = BehandlingResultat.AVSLÅTT,
+            type = BehandlingType.FØRSTEGANGSBEHANDLING,
+            status = BehandlingStatus.FERDIGSTILT,
+        )
 }

@@ -19,9 +19,10 @@ class ArenaVedtakController(
     private val arenaService: ArenaService,
     private val tilgangService: TilgangService,
 ) {
-
     @GetMapping("{fagsakPersonId}")
-    fun hentVedtak(@PathVariable fagsakPersonId: FagsakPersonId): ArenaSakOgVedtakDto {
+    fun hentVedtak(
+        @PathVariable fagsakPersonId: FagsakPersonId,
+    ): ArenaSakOgVedtakDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         return arenaService.hentVedtak(fagsakPersonId)
     }

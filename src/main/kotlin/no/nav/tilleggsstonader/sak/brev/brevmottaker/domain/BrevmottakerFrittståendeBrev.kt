@@ -15,10 +15,8 @@ data class BrevmottakerFrittståendeBrev(
     val brevId: UUID? = null,
     val journalpostId: String? = null,
     val bestillingId: String? = null,
-
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val mottaker: Mottaker,
-
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 )

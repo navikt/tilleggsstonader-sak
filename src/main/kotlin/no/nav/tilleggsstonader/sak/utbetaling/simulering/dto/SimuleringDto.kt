@@ -28,13 +28,16 @@ data class OppsummeringForPeriodeDto(
     val totalFeilutbetaling: Int,
 )
 
-fun Simuleringsresultat.tilDto(): SimuleringDto {
-    return SimuleringDto(
-        perioder = this.data?.oppsummeringer?.map { it.tilDto() }?.summerPerMåned(),
+fun Simuleringsresultat.tilDto(): SimuleringDto =
+    SimuleringDto(
+        perioder =
+            this.data
+                ?.oppsummeringer
+                ?.map { it.tilDto() }
+                ?.summerPerMåned(),
         ingenEndringIUtbetaling = this.ingenEndringIUtbetaling,
         oppsummering = lagSimuleringOppsummering(this),
     )
-}
 
 private fun OppsummeringForPeriode.tilDto(): OppsummeringForPeriodeDto {
     val måned = YearMonth.from(fom)
@@ -60,7 +63,8 @@ private fun List<OppsummeringForPeriodeDto>.summerPerMåned() =
                     totalFeilutbetaling = acc.totalFeilutbetaling + periode.totalFeilutbetaling,
                 )
             }
-        }.values.toList()
+        }.values
+        .toList()
 
 private fun lagSimuleringOppsummering(simulering: Simuleringsresultat): SimuleringOppsummering? {
     if (simulering.data == null) {

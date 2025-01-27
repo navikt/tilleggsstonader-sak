@@ -20,9 +20,10 @@ class BrevmottakereController(
     private val brevmottakereService: BrevmottakereService,
     private val brevmottakereFrittståendeBrevService: BrevmottakereFrittståendeBrevService,
 ) {
-
     @GetMapping("/{behandlingId}")
-    fun hentBrevmottakere(@PathVariable behandlingId: BehandlingId): BrevmottakereDto {
+    fun hentBrevmottakere(
+        @PathVariable behandlingId: BehandlingId,
+    ): BrevmottakereDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
 
         return brevmottakereService.hentEllerOpprettBrevmottakere(behandlingId)
@@ -40,7 +41,9 @@ class BrevmottakereController(
     }
 
     @GetMapping("fagsak/{fagsakId}")
-    fun hentBrevmottakere(@PathVariable fagsakId: FagsakId): BrevmottakereDto {
+    fun hentBrevmottakere(
+        @PathVariable fagsakId: FagsakId,
+    ): BrevmottakereDto {
         tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
 
         return brevmottakereFrittståendeBrevService.hentEllerOpprettBrevmottakere(fagsakId).tilBrevmottakereDto()

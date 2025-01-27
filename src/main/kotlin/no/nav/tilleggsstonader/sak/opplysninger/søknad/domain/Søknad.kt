@@ -65,7 +65,6 @@ data class SøknadBarnetilsyn(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     override val sporbar: Sporbar = Sporbar(),
     override val data: SkjemaBarnetilsyn,
-
     @MappedCollection(idColumn = "soknad_id")
     val barn: Set<SøknadBarn>,
 ) : Søknad<SkjemaBarnetilsyn>
@@ -94,12 +93,14 @@ data class SkjemaLæremidler(
     val utdanning: UtdanningAvsnitt,
     val dokumentasjon: List<Dokumentasjon>,
 )
+
 data class UtdanningAvsnitt(
     val aktiviteter: List<ValgtAktivitet>?,
     val annenUtdanning: AnnenUtdanningType?,
     val harRettTilUtstyrsstipend: HarRettTilUtstyrsstipendDto?,
     val harFunksjonsnedsettelse: JaNei,
 )
+
 data class HovedytelseAvsnitt(
     val hovedytelse: List<Hovedytelse>,
     val arbeidOgOpphold: ArbeidOgOpphold?,
@@ -132,7 +133,10 @@ data class AktivitetAvsnitt(
 /**
  * ID kan også være ANNET
  */
-data class ValgtAktivitet(val id: String, val label: String) {
+data class ValgtAktivitet(
+    val id: String,
+    val label: String,
+) {
     fun erAnnet() = id == "ANNET"
 }
 
@@ -143,4 +147,6 @@ data class Dokumentasjon(
     val identBarn: String? = null,
 )
 
-data class Dokument(val dokumentInfoId: String)
+data class Dokument(
+    val dokumentInfoId: String,
+)

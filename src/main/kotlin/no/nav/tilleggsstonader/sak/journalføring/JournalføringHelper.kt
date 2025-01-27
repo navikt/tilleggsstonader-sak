@@ -52,27 +52,31 @@ object JournalføringHelper {
         nyAvsender: AvsenderMottaker?,
     ) = OppdaterJournalpostRequest(
         avsenderMottaker = nyAvsender,
-        bruker = journalpost.bruker?.let {
-            DokarkivBruker(idType = BrukerIdType.valueOf(it.type.toString()), id = it.id)
-        },
+        bruker =
+            journalpost.bruker?.let {
+                DokarkivBruker(idType = BrukerIdType.valueOf(it.type.toString()), id = it.id)
+            },
         tema = journalpost.tema?.let { Tema.valueOf(it) },
         tittel = journalpost.tittel,
         journalfoerendeEnhet = journalpost.journalforendeEnhet,
-        sak = Sak(
-            fagsakId = eksternFagsakId.toString(),
-            fagsaksystem = Fagsystem.TILLEGGSSTONADER,
-            sakstype = "FAGSAK",
-        ),
-        dokumenter = dokumenttitler?.let {
-            journalpost.dokumenter?.map { dokumentInfo ->
-                DokumentInfo(
-                    dokumentInfoId = dokumentInfo.dokumentInfoId,
-                    tittel = dokumenttitler[dokumentInfo.dokumentInfoId]
-                        ?: dokumentInfo.tittel,
-                    brevkode = dokumentInfo.brevkode,
-                )
-            }
-        },
+        sak =
+            Sak(
+                fagsakId = eksternFagsakId.toString(),
+                fagsaksystem = Fagsystem.TILLEGGSSTONADER,
+                sakstype = "FAGSAK",
+            ),
+        dokumenter =
+            dokumenttitler?.let {
+                journalpost.dokumenter?.map { dokumentInfo ->
+                    DokumentInfo(
+                        dokumentInfoId = dokumentInfo.dokumentInfoId,
+                        tittel =
+                            dokumenttitler[dokumentInfo.dokumentInfoId]
+                                ?: dokumentInfo.tittel,
+                        brevkode = dokumentInfo.brevkode,
+                    )
+                }
+            },
     )
 
     /**

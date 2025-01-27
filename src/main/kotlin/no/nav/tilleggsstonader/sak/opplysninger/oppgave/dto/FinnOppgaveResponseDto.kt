@@ -56,7 +56,6 @@ data class OppgaveDto(
     val endretTidspunkt: String?,
     val prioritet: OppgavePrioritet?,
     val status: StatusEnum?,
-
     /**
      * Ekstra felter
      */
@@ -101,7 +100,6 @@ data class OppgaveDto(
         endretTidspunkt = oppgave.endretTidspunkt,
         prioritet = oppgave.prioritet,
         status = oppgave.status,
-
         navn = navn,
         behandlingId = oppgaveMetadata?.behandlingId,
         sendtTilTotrinnskontrollAv = oppgaveMetadata?.sendtTilTotrinnskontrollAv,

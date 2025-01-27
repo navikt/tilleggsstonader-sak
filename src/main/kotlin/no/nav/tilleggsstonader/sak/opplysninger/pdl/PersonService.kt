@@ -21,10 +21,7 @@ class PersonService(
     private val pdlClient: PdlClient,
     private val cacheManager: CacheManager,
 ) {
-
-    fun hentSøker(ident: String): PdlSøker {
-        return cacheManager.getValue("personService_hentsoker", ident) { pdlClient.hentSøker(ident) }
-    }
+    fun hentSøker(ident: String): PdlSøker = cacheManager.getValue("personService_hentsoker", ident) { pdlClient.hentSøker(ident) }
 
     fun hentPersonUtenBarn(ident: String): SøkerMedBarn {
         val søker = hentSøker(ident)
@@ -33,9 +30,10 @@ class PersonService(
 
     fun hentPersonMedBarn(ident: String): SøkerMedBarn {
         val søker = hentSøker(ident)
-        val barnIdentifikatorer = søker.forelderBarnRelasjon
-            .filter { it.relatertPersonsRolle == Familierelasjonsrolle.BARN }
-            .mapNotNull { it.relatertPersonsIdent }
+        val barnIdentifikatorer =
+            søker.forelderBarnRelasjon
+                .filter { it.relatertPersonsRolle == Familierelasjonsrolle.BARN }
+                .mapNotNull { it.relatertPersonsIdent }
         return SøkerMedBarn(ident, søker, hentBarn(barnIdentifikatorer))
     }
 
@@ -44,31 +42,27 @@ class PersonService(
             pdlClient.hentBarn(it.toList())
         }
 
-    fun hentAndreForeldre(personIdenter: List<String>): Map<String, PdlAnnenForelder> {
-        return pdlClient.hentAndreForeldre(personIdenter)
-    }
+    fun hentAndreForeldre(personIdenter: List<String>): Map<String, PdlAnnenForelder> = pdlClient.hentAndreForeldre(personIdenter)
 
     @Cacheable("personidenter")
-    fun hentPersonIdenter(ident: String): PdlIdenter =
-        pdlClient.hentPersonidenter(ident = ident)
+    fun hentPersonIdenter(ident: String): PdlIdenter = pdlClient.hentPersonidenter(ident = ident)
 
-    fun hentIdenterBolk(identer: List<String>): Map<String, PdlIdent> =
-        pdlClient.hentIdenterBolk(identer)
+    fun hentIdenterBolk(identer: List<String>): Map<String, PdlIdent> = pdlClient.hentIdenterBolk(identer)
 
     /**
      * PDL gjør ingen tilgangskontroll i bolkoppslag, så bruker av denne metode må ha gjort tilgangskontroll
      */
-    fun hentPersonKortBolk(identer: List<String>): Map<String, PdlPersonKort> {
-        return cacheManager.getCachedOrLoad("pdl-person-kort-bulk", identer.distinct()) { identerUtenCache ->
+    fun hentPersonKortBolk(identer: List<String>): Map<String, PdlPersonKort> =
+        cacheManager.getCachedOrLoad("pdl-person-kort-bulk", identer.distinct()) { identerUtenCache ->
             identerUtenCache.chunked(50).map { pdlClient.hentPersonKortBolk(it) }.reduce { acc, it -> acc + it }
         }
-    }
 
     fun hentAktørId(ident: String): String = hentAktørIder(ident).gjeldende().ident
 
-    fun hentAktørIder(ident: String): PdlIdenter = cacheManager.getValue("pdl-aktørId", ident) {
-        pdlClient.hentAktørIder(ident)
-    }
+    fun hentAktørIder(ident: String): PdlIdenter =
+        cacheManager.getValue("pdl-aktørId", ident) {
+            pdlClient.hentAktørIder(ident)
+        }
 
     fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto? = pdlClient.hentGeografiskTilknytning(ident)
 
@@ -76,6 +70,11 @@ class PersonService(
         val person = hentPersonKortBolk(listOf(personIdent))
         return person.visningsnavnFor(personIdent)
     }
+
     private fun Map<String, PdlPersonKort>.visningsnavnFor(personIdent: String) =
-        personIdent.let { this[it] }?.navn?.gjeldende()?.visningsnavn() ?: "Mangler navn"
+        personIdent
+            .let { this[it] }
+            ?.navn
+            ?.gjeldende()
+            ?.visningsnavn() ?: "Mangler navn"
 }

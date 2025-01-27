@@ -36,7 +36,10 @@ data class BehandlingDto(
     val revurderFra: LocalDate?,
 )
 
-fun Behandling.tilDto(stønadstype: Stønadstype, fagsakPersonId: FagsakPersonId): BehandlingDto =
+fun Behandling.tilDto(
+    stønadstype: Stønadstype,
+    fagsakPersonId: FagsakPersonId,
+): BehandlingDto =
     BehandlingDto(
         id = this.id,
         forrigeBehandlingId = this.forrigeBehandlingId,

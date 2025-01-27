@@ -16,7 +16,9 @@ object VedtaksperiodeUtil {
     ) {
         val overlappendePeriode = vedtaksperioder.førsteOverlappendePeriode()
         if (overlappendePeriode != null) {
-            brukerfeil("Periode=${overlappendePeriode.first.formatertPeriodeNorskFormat()} og ${overlappendePeriode.second.formatertPeriodeNorskFormat()} overlapper.")
+            brukerfeil(
+                "Periode=${overlappendePeriode.first.formatertPeriodeNorskFormat()} og ${overlappendePeriode.second.formatertPeriodeNorskFormat()} overlapper.",
+            )
         }
 
         brukerfeilHvis(vedtaksperioder.ingenOmfattesAvStønadsperioder(stønadsperioder)) {
@@ -29,10 +31,11 @@ object VedtaksperiodeUtil {
      * Alle må omfattes av stønadsperiode
      */
     private fun List<Vedtaksperiode>.ingenOmfattesAvStønadsperioder(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>): Boolean {
-        val sammenslåtteStønadsperioder = stønadsperioder
-            .sorted()
-            .map { Datoperiode(fom = it.fom, tom = it.tom) }
-            .mergeSammenhengende({ s1, s2 -> s1.påfølgesAv(s2) }, { s1, s2 -> Datoperiode(fom = s1.fom, tom = s2.tom) })
+        val sammenslåtteStønadsperioder =
+            stønadsperioder
+                .sorted()
+                .map { Datoperiode(fom = it.fom, tom = it.tom) }
+                .mergeSammenhengende({ s1, s2 -> s1.påfølgesAv(s2) }, { s1, s2 -> Datoperiode(fom = s1.fom, tom = s2.tom) })
         return any { vedtaksperiode ->
             sammenslåtteStønadsperioder.none { it.inneholder(vedtaksperiode) }
         }

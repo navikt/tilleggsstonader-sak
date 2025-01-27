@@ -10,10 +10,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
 class VedtakUtilTest {
-
     @Nested
     inner class WithTypeOrThrow {
-
         @Test
         fun `innvilgelse er av type InnvilgelseEllerOpphørLæremidler`() {
             val innvilgelse = innvilgelse()

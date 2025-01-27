@@ -6,13 +6,11 @@ import java.util.UUID
 value class FagsakPersonId(
     val id: UUID,
 ) {
-
-    override fun toString(): String {
-        return id.toString()
-    }
+    override fun toString(): String = id.toString()
 
     companion object {
         fun random() = FagsakPersonId(UUID.randomUUID())
+
         fun fromString(id: String) = FagsakPersonId(UUID.fromString(id))
     }
 }

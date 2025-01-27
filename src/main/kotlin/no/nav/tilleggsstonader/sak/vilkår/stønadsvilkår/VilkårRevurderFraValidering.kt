@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import java.time.LocalDate
 
 object VilkårRevurderFraValidering {
-
     fun validerNyPeriodeRevurdering(
         behandling: Saksbehandling,
         periode: Vilkår,
@@ -63,13 +62,13 @@ object VilkårRevurderFraValidering {
         oppdatertPeriode: Vilkår,
     ) = eksisterendePeriode.delvilkårsett.ignorerBegrunnelse() != oppdatertPeriode.delvilkårsett.ignorerBegrunnelse()
 
-    private fun List<Delvilkår>.ignorerBegrunnelse() = this.map { delvilkår ->
-        delvilkår.copy(vurderinger = delvilkår.vurderinger.map { it.copy(begrunnelse = null) })
-    }
+    private fun List<Delvilkår>.ignorerBegrunnelse() =
+        this.map { delvilkår ->
+            delvilkår.copy(vurderinger = delvilkår.vurderinger.map { it.copy(begrunnelse = null) })
+        }
 
     private fun periodeInfo(
         behandling: Saksbehandling,
         fomVilkårperiode: LocalDate?,
-    ) =
-        "periode som begynner(${fomVilkårperiode?.norskFormat()}) før revurderingsdato(${behandling.revurderFra?.norskFormat()})"
+    ) = "periode som begynner(${fomVilkårperiode?.norskFormat()}) før revurderingsdato(${behandling.revurderFra?.norskFormat()})"
 }

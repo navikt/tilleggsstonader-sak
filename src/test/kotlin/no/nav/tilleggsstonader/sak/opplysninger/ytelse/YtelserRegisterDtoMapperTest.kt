@@ -14,22 +14,23 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate.now
 
 class YtelserRegisterDtoMapperTest {
-
     @Test
     fun `skal sortere perioder etter tom desc`() {
-        val aapPeriode1 = periodeAAP(
-            fom = now(),
-            tom = now(),
-        )
+        val aapPeriode1 =
+            periodeAAP(
+                fom = now(),
+                tom = now(),
+            )
         val aapPeriode2 = periodeAAP(fom = now().plusDays(1), tom = now().plusYears(1))
 
         val aapNullTom1 = periodeAAP(fom = now().plusDays(1), tom = null)
         val aapNullTom2 = periodeAAP(fom = now().plusDays(2), tom = null)
 
         val efPeriode = periodeEnsligForsørger(fom = now().plusDays(10), tom = now().plusDays(10))
-        val perioder = ytelsePerioderDto(
-            perioder = listOf(aapNullTom2, aapPeriode1, aapNullTom1, aapPeriode2, efPeriode),
-        ).tilDto().perioder
+        val perioder =
+            ytelsePerioderDto(
+                perioder = listOf(aapNullTom2, aapPeriode1, aapNullTom1, aapPeriode2, efPeriode),
+            ).tilDto().perioder
 
         assertThat(perioder).containsExactly(
             YtelsePeriodeRegisterDto(TypeYtelsePeriode.AAP, fom = aapNullTom2.fom, tom = aapNullTom2.tom),
@@ -42,7 +43,6 @@ class YtelserRegisterDtoMapperTest {
 
     @Nested
     inner class HentetInformasjon {
-
         @Test
         fun `skal mappe status fra aap`() {
             val hentetInformasjon = listOf(hentetInformasjonAAP(status = StatusHentetInformasjon.FEILET))
@@ -65,12 +65,14 @@ class YtelserRegisterDtoMapperTest {
 
         @Test
         fun `skal håndtere flere systemer`() {
-            val hentetInformasjon = ytelsePerioderDto(
-                hentetInformasjon = listOf(
-                    hentetInformasjonEnsligForsørger(status = StatusHentetInformasjon.FEILET),
-                    hentetInformasjonAAP(status = StatusHentetInformasjon.OK),
-                ),
-            ).tilDto().hentetInformasjon
+            val hentetInformasjon =
+                ytelsePerioderDto(
+                    hentetInformasjon =
+                        listOf(
+                            hentetInformasjonEnsligForsørger(status = StatusHentetInformasjon.FEILET),
+                            hentetInformasjonAAP(status = StatusHentetInformasjon.OK),
+                        ),
+                ).tilDto().hentetInformasjon
 
             assertThat(hentetInformasjon).containsExactlyInAnyOrder(
                 HentetInformasjonDto(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, status = StatusHentetInformasjon.FEILET),

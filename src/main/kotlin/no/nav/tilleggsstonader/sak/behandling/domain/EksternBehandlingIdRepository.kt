@@ -9,6 +9,5 @@ import org.springframework.stereotype.Repository
 interface EksternBehandlingIdRepository :
     RepositoryInterface<EksternBehandlingId, Long>,
     InsertUpdateRepository<EksternBehandlingId> {
-
     fun findByBehandlingId(behandlingId: BehandlingId): EksternBehandlingId
 }

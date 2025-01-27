@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Profile
 @Configuration
 @Profile("mock-register-aktivitet")
 class RegisterAktivitetClientConfig {
-
     @Bean
     @Primary
     fun registerAktivitetClient(): RegisterAktivitetClient {

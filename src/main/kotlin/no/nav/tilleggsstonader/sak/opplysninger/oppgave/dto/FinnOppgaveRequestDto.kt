@@ -33,29 +33,31 @@ data class FinnOppgaveRequestDto(
     val order: Sorteringsrekkefølge = Sorteringsrekkefølge.ASC,
     val oppgaverPåVent: Boolean = false,
 ) {
-
     fun tilFinnOppgaveRequest(
         aktørid: String? = null,
         klarmappe: MappeDto,
         ventemappe: MappeDto,
-    ): FinnOppgaveRequest {
-        return FinnOppgaveRequest(
+    ): FinnOppgaveRequest =
+        FinnOppgaveRequest(
             tema = Tema.TSO,
-            behandlingstema = if (this.behandlingstema != null) {
-                Behandlingstema.entries.find { it.value == this.behandlingstema }
-            } else {
-                null
-            },
-            behandlingstype = if (this.behandlingstype != null) {
-                Behandlingstype.entries.find { it.value == this.behandlingstype }
-            } else {
-                null
-            },
-            oppgavetype = if (this.oppgavetype != null) {
-                Oppgavetype.entries.find { it.value == this.oppgavetype }
-            } else {
-                null
-            },
+            behandlingstema =
+                if (this.behandlingstema != null) {
+                    Behandlingstema.entries.find { it.value == this.behandlingstema }
+                } else {
+                    null
+                },
+            behandlingstype =
+                if (this.behandlingstype != null) {
+                    Behandlingstype.entries.find { it.value == this.behandlingstype }
+                } else {
+                    null
+                },
+            oppgavetype =
+                if (this.oppgavetype != null) {
+                    Oppgavetype.entries.find { it.value == this.oppgavetype }
+                } else {
+                    null
+                },
             enhet = this.enhet,
             erUtenMappe = false,
             saksbehandler = this.saksbehandler,
@@ -75,5 +77,4 @@ data class FinnOppgaveRequestDto(
             sorteringsrekkefolge = order,
             sorteringsfelt = orderBy,
         )
-    }
 }

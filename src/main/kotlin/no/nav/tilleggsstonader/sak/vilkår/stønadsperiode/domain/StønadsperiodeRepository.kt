@@ -7,7 +7,8 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface StønadsperiodeRepository : RepositoryInterface<Stønadsperiode, UUID>, InsertUpdateRepository<Stønadsperiode> {
-
+interface StønadsperiodeRepository :
+    RepositoryInterface<Stønadsperiode, UUID>,
+    InsertUpdateRepository<Stønadsperiode> {
     fun findAllByBehandlingId(behandlingId: BehandlingId): List<Stønadsperiode>
 }

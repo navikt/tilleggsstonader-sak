@@ -23,25 +23,26 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 internal class OppdaterVilkårTest {
-
     val behandlingId = BehandlingId.random()
-    val vilkår = vilkår(
-        behandlingId = behandlingId,
-        type = VilkårType.PASS_BARN,
-        delvilkår = oppfylteDelvilkårPassBarn(),
-    )
+    val vilkår =
+        vilkår(
+            behandlingId = behandlingId,
+            type = VilkårType.PASS_BARN,
+            delvilkår = oppfylteDelvilkårPassBarn(),
+        )
 
     @Nested
     inner class ValideringAvBeløp {
-        val opprettVilkårDto = OpprettVilkårDto(
-            vilkårType = VilkårType.PASS_BARN,
-            barnId = BarnId.random(),
-            behandlingId = behandlingId,
-            delvilkårsett = oppfylteDelvilkårPassBarnDto(),
-            fom = LocalDate.now(),
-            tom = LocalDate.now().plusDays(1),
-            utgift = 1,
-        )
+        val opprettVilkårDto =
+            OpprettVilkårDto(
+                vilkårType = VilkårType.PASS_BARN,
+                barnId = BarnId.random(),
+                behandlingId = behandlingId,
+                delvilkårsett = oppfylteDelvilkårPassBarnDto(),
+                fom = LocalDate.now(),
+                tom = LocalDate.now().plusDays(1),
+                utgift = 1,
+            )
 
         @Test
         fun `skal validere at man har med beløp for vilkår for pass av barn`() {
@@ -79,11 +80,12 @@ internal class OppdaterVilkårTest {
     @Nested
     inner class StatusPåVilkår {
         val behandling = behandling()
-        val regelResultat = RegelResultat(
-            vilkårType = VilkårType.PASS_BARN,
-            vilkår = Vilkårsresultat.OPPFYLT,
-            delvilkår = emptyMap(),
-        )
+        val regelResultat =
+            RegelResultat(
+                vilkårType = VilkårType.PASS_BARN,
+                vilkår = Vilkårsresultat.OPPFYLT,
+                delvilkår = emptyMap(),
+            )
 
         @Test
         fun `Nye vilkår skal ha status ny etter oppdatering`() {
@@ -118,13 +120,14 @@ internal class OppdaterVilkårTest {
             assertThat(oppdaterVilkår.status).isEqualTo(VilkårStatus.ENDRET)
         }
 
-        private fun innsendtOppdatering(originaltVilkår: Vilkår) = SvarPåVilkårDto(
-            id = originaltVilkår.id,
-            behandlingId = behandling.id,
-            delvilkårsett = oppfylteDelvilkårPassBarnDto(),
-            fom = originaltVilkår.fom,
-            tom = originaltVilkår.tom,
-            utgift = 100,
-        )
+        private fun innsendtOppdatering(originaltVilkår: Vilkår) =
+            SvarPåVilkårDto(
+                id = originaltVilkår.id,
+                behandlingId = behandling.id,
+                delvilkårsett = oppfylteDelvilkårPassBarnDto(),
+                fom = originaltVilkår.fom,
+                tom = originaltVilkår.tom,
+                utgift = 100,
+            )
     }
 }

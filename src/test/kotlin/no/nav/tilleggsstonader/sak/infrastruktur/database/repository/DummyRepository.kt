@@ -10,25 +10,17 @@ import java.util.Optional
  */
 open class DummyRepository<T : Any, ID : Any>(
     val getId: (T) -> ID,
-) : RepositoryInterface<T, ID>, InsertUpdateRepository<T> {
-
+) : RepositoryInterface<T, ID>,
+    InsertUpdateRepository<T> {
     private val storage = mutableMapOf<ID, T>()
 
-    override fun findById(id: ID): Optional<T> {
-        return Optional.ofNullable(storage[id])
-    }
+    override fun findById(id: ID): Optional<T> = Optional.ofNullable(storage[id])
 
-    override fun existsById(id: ID): Boolean {
-        return storage.containsKey(id)
-    }
+    override fun existsById(id: ID): Boolean = storage.containsKey(id)
 
-    override fun findAll(): Iterable<T> {
-        return storage.values
-    }
+    override fun findAll(): Iterable<T> = storage.values
 
-    override fun count(): Long {
-        return storage.size.toLong()
-    }
+    override fun count(): Long = storage.size.toLong()
 
     override fun deleteAll() {
         storage.clear()
@@ -50,9 +42,7 @@ open class DummyRepository<T : Any, ID : Any>(
         storage.remove(id)
     }
 
-    override fun findAllById(ids: Iterable<ID>): Iterable<T> {
-        return ids.mapNotNull { storage[it] }
-    }
+    override fun findAllById(ids: Iterable<ID>): Iterable<T> = ids.mapNotNull { storage[it] }
 
     override fun insert(t: T): T {
         val id = getId(t)
@@ -63,9 +53,7 @@ open class DummyRepository<T : Any, ID : Any>(
         return t
     }
 
-    override fun insertAll(list: List<T>): List<T> {
-        return list.map { insert(it) }
-    }
+    override fun insertAll(list: List<T>): List<T> = list.map { insert(it) }
 
     override fun update(t: T): T {
         val id = getId(t)
@@ -76,7 +64,5 @@ open class DummyRepository<T : Any, ID : Any>(
         return t
     }
 
-    override fun updateAll(list: List<T>): List<T> {
-        return list.map { update(it) }
-    }
+    override fun updateAll(list: List<T>): List<T> = list.map { update(it) }
 }

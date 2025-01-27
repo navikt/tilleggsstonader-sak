@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import kotlin.io.path.name
 
 internal class VilkårsregelTest {
-
     /*
      * Denne testen feiler hvis regel-treet endrer seg.
      * Var det meningen? I så fall kan du fikse det ved å sette SKAL_SKRIVE_TIL_FIL = true i FileUtil.kt.

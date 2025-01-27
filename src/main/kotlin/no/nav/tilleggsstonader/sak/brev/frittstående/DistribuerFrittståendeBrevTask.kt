@@ -26,40 +26,46 @@ class DistribuerFrittståendeBrevTask(
     private val journalpostClient: JournalpostClient,
     private val brevmottakereFrittståendeBrevService: BrevmottakereFrittståendeBrevService,
 ) : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         val payload = objectMapper.readValue(task.payload, DistribuerFrittståendeBrevPayload::class.java)
 
-        val bestillingId = journalpostClient.distribuerJournalpost(
-            DistribuerJournalpostRequest(
-                journalpostId = payload.journalpostId,
-                bestillendeFagsystem = Fagsystem.TILLEGGSSTONADER,
-                dokumentProdApp = "TILLEGGSSTONADER-SAK",
-                distribusjonstype = Distribusjonstype.VIKTIG,
-            ),
-        )
-        brevmottakereFrittståendeBrevService.hentBrevmottakere(payload.mottakerId)
+        val bestillingId =
+            journalpostClient.distribuerJournalpost(
+                DistribuerJournalpostRequest(
+                    journalpostId = payload.journalpostId,
+                    bestillendeFagsystem = Fagsystem.TILLEGGSSTONADER,
+                    dokumentProdApp = "TILLEGGSSTONADER-SAK",
+                    distribusjonstype = Distribusjonstype.VIKTIG,
+                ),
+            )
+        brevmottakereFrittståendeBrevService
+            .hentBrevmottakere(payload.mottakerId)
             .copy(bestillingId = bestillingId)
             .let { brevmottakereFrittståendeBrevService.oppdaterBrevmottaker(it) }
     }
 
     companion object {
-
-        fun opprettTask(fagsakId: FagsakId, journalpostId: String, mottakerId: UUID): Task =
+        fun opprettTask(
+            fagsakId: FagsakId,
+            journalpostId: String,
+            mottakerId: UUID,
+        ): Task =
             Task(
                 type = TYPE,
-                payload = objectMapper.writeValueAsString(
-                    DistribuerFrittståendeBrevPayload(
-                        fagsakId = fagsakId,
-                        journalpostId = journalpostId,
-                        mottakerId = mottakerId,
+                payload =
+                    objectMapper.writeValueAsString(
+                        DistribuerFrittståendeBrevPayload(
+                            fagsakId = fagsakId,
+                            journalpostId = journalpostId,
+                            mottakerId = mottakerId,
+                        ),
                     ),
-                ),
-                properties = Properties().apply {
-                    setProperty("fagsakId", fagsakId.toString())
-                    setProperty("journalpostId", journalpostId)
-                    setProperty("mottakerId", mottakerId.toString())
-                },
+                properties =
+                    Properties().apply {
+                        setProperty("fagsakId", fagsakId.toString())
+                        setProperty("journalpostId", journalpostId)
+                        setProperty("mottakerId", mottakerId.toString())
+                    },
             )
 
         const val TYPE = "distribuerFrittståendeBrev"

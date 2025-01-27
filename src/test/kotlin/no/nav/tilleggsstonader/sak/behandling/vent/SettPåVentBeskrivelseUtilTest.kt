@@ -12,7 +12,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class SettPåVentBeskrivelseUtilTest {
-
     private val tidspunkt = LocalDateTime.of(2024, 3, 5, 18, 0)
 
     @BeforeEach
@@ -27,14 +26,14 @@ class SettPåVentBeskrivelseUtilTest {
 
     @Nested
     inner class SettPåVent {
-
         @Test
         fun `skal oppdatere beskrivelse med ny info og beholde eksisterende beskrivelse`() {
-            val beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(
-                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", tilordnetRessurs = "a100"),
-                LocalDate.of(2023, 1, 1),
-                tidspunkt,
-            )
+            val beskrivelse =
+                SettPåVentBeskrivelseUtil.settPåVent(
+                    Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", tilordnetRessurs = "a100"),
+                    LocalDate.of(2023, 1, 1),
+                    tidspunkt,
+                )
             assertThat(beskrivelse).isEqualTo(
                 """
                 --- 05.03.2024 18:00 a100 (a100) ---
@@ -49,14 +48,14 @@ class SettPåVentBeskrivelseUtilTest {
 
     @Nested
     inner class OppdaterSettPåVent {
-
         @Test
         fun `skal oppdatere beskrivelse med ny info og appende beskrivelse fra forrige oppgave`() {
-            val beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
-                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse"),
-                LocalDate.of(2023, 1, 1),
-                tidspunkt,
-            )
+            val beskrivelse =
+                SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
+                    Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse"),
+                    LocalDate.of(2023, 1, 1),
+                    tidspunkt,
+                )
             assertThat(beskrivelse).isEqualTo(
                 """
                 --- 05.03.2024 18:00 a100 (a100) ---
@@ -70,11 +69,12 @@ class SettPåVentBeskrivelseUtilTest {
         @Test
         fun `uendret frist`() {
             val frist = LocalDate.of(2023, 1, 1)
-            val beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
-                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", fristFerdigstillelse = frist),
-                frist,
-                tidspunkt,
-            )
+            val beskrivelse =
+                SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
+                    Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", fristFerdigstillelse = frist),
+                    frist,
+                    tidspunkt,
+                )
             assertThat(beskrivelse).isEqualTo(
                 """
                 tidligere beskrivelse
@@ -84,11 +84,12 @@ class SettPåVentBeskrivelseUtilTest {
 
         @Test
         fun `skal fjerne saksbehandler på oppgaven når man oppdaterer sett på vent`() {
-            val beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
-                Oppgave(id = 0, versjon = 0, tilordnetRessurs = "a100"),
-                LocalDate.of(2023, 1, 1),
-                tidspunkt,
-            )
+            val beskrivelse =
+                SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
+                    Oppgave(id = 0, versjon = 0, tilordnetRessurs = "a100"),
+                    LocalDate.of(2023, 1, 1),
+                    tidspunkt,
+                )
             assertThat(beskrivelse).isEqualTo(
                 """
                 --- 05.03.2024 18:00 a100 (a100) ---
@@ -101,13 +102,13 @@ class SettPåVentBeskrivelseUtilTest {
 
     @Nested
     inner class TaAvVent {
-
         @Test
         fun `skal oppdatere beskrivelse med ny info og appende beskrivelse fra forrige oppgave`() {
-            val beskrivelse = SettPåVentBeskrivelseUtil.taAvVent(
-                Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", tilordnetRessurs = null),
-                tidspunkt,
-            )
+            val beskrivelse =
+                SettPåVentBeskrivelseUtil.taAvVent(
+                    Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", tilordnetRessurs = null),
+                    tidspunkt,
+                )
             assertThat(beskrivelse).isEqualTo(
                 """
                 --- 05.03.2024 18:00 a100 (a100) ---

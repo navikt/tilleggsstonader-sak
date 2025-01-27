@@ -7,10 +7,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBa
 /**
  * Singleton for å holde på alle regler
  */
-class Vilkårsregler private constructor(val vilkårsregler: Map<VilkårType, Vilkårsregel>) {
-
+class Vilkårsregler private constructor(
+    val vilkårsregler: Map<VilkårType, Vilkårsregel>,
+) {
     companion object {
-
         val ALLE_VILKÅRSREGLER = Vilkårsregler(alleVilkårsregler.associateBy { it.vilkårType })
     }
 }
@@ -20,22 +20,26 @@ private val alleVilkårsregler: List<Vilkårsregel> =
 
 fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
     when (stønadstype) {
-        Stønadstype.BARNETILSYN -> listOf(
-            PassBarnRegel(),
-        )
+        Stønadstype.BARNETILSYN ->
+            listOf(
+                PassBarnRegel(),
+            )
         Stønadstype.LÆREMIDLER -> emptyList()
     }
 
 private val vilkårstyperPerStønad: Map<Stønadstype, Set<VilkårType>> =
     Stønadstype.entries.associateWith { vilkårsreglerForStønad(it).map { it.vilkårType }.toSet() }
 
-fun finnesVilkårTypeForStønadstype(stønadstype: Stønadstype, vilkårType: VilkårType): Boolean {
-    val vilkårstyper = vilkårstyperPerStønad[stønadstype]
-        ?: error("Finner ikke vilkårstyper for stønadstype=$stønadstype")
+fun finnesVilkårTypeForStønadstype(
+    stønadstype: Stønadstype,
+    vilkårType: VilkårType,
+): Boolean {
+    val vilkårstyper =
+        vilkårstyperPerStønad[stønadstype]
+            ?: error("Finner ikke vilkårstyper for stønadstype=$stønadstype")
     return vilkårstyper.contains(vilkårType)
 }
 
-fun hentVilkårsregel(vilkårType: VilkårType): Vilkårsregel {
-    return Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler[vilkårType]
+fun hentVilkårsregel(vilkårType: VilkårType): Vilkårsregel =
+    Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler[vilkårType]
         ?: error("Finner ikke vilkårsregler for vilkårType=$vilkårType")
-}

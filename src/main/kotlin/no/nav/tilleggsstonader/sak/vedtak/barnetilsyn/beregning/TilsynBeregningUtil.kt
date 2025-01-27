@@ -26,8 +26,8 @@ object TilsynBeregningUtil {
      * listOf(StønadsperiodeDto(fom = 01.01.24, tom=10.01.24), StønadsperiodeDto(fom = 20.01.24, tom=31.01.24)) deles opp i 2 innenfor samme måned:
      * jan -> listOf(StønadsperiodeDto(fom = 01.01.24, tom = 10.01.24), StønadsperiodeDto(fom = 20.01.24, tom = 31.01.24))
      */
-    fun List<StønadsperiodeBeregningsgrunnlag>.tilÅrMåned(): Map<YearMonth, List<StønadsperiodeBeregningsgrunnlag>> {
-        return this
+    fun List<StønadsperiodeBeregningsgrunnlag>.tilÅrMåned(): Map<YearMonth, List<StønadsperiodeBeregningsgrunnlag>> =
+        this
             .flatMap { stønadsperiode ->
                 stønadsperiode.splitPerMåned { måned, periode ->
                     periode.copy(
@@ -35,27 +35,25 @@ object TilsynBeregningUtil {
                         tom = minOf(periode.tom, måned.atEndOfMonth()),
                     )
                 }
-            }
-            .groupBy({ it.first }, { it.second })
+            }.groupBy({ it.first }, { it.second })
             .mapValues { it.value.sorted() }
-    }
 
     /**
      * Splitter opp utgifter slik at de blir fordelt per måned og grupperer de etter måned.
      * Resultatet gir en map med måned som key og en liste av utgifter.
      * Listen med utgifter består av utgiften knyttet til et barn for gitt måned.
      */
-    fun Map<BarnId, List<UtgiftBeregning>>.tilÅrMåned(): Map<YearMonth, List<UtgiftBarn>> {
-        return this.entries.flatMap { (barnId, utgifter) ->
-            utgifter.flatMap { utgift -> utgift.splitPerMåned { _, periode -> UtgiftBarn(barnId, periode.utgift) } }
-        }.groupBy({ it.first }, { it.second })
-    }
+    fun Map<BarnId, List<UtgiftBeregning>>.tilÅrMåned(): Map<YearMonth, List<UtgiftBarn>> =
+        this.entries
+            .flatMap { (barnId, utgifter) ->
+                utgifter.flatMap { utgift -> utgift.splitPerMåned { _, periode -> UtgiftBarn(barnId, periode.utgift) } }
+            }.groupBy({ it.first }, { it.second })
 
     /**
      * Deler opp aktiviteter i atomiske deler (mnd) og grupperer aktivitetene per AktivitetType.
      */
-    fun List<Aktivitet>.tilAktiviteterPerMånedPerType(): Map<YearMonth, Map<AktivitetType, List<Aktivitet>>> {
-        return this
+    fun List<Aktivitet>.tilAktiviteterPerMånedPerType(): Map<YearMonth, Map<AktivitetType, List<Aktivitet>>> =
+        this
             .flatMap { stønadsperiode ->
                 stønadsperiode.splitPerMåned { måned, periode ->
                     periode.copy(
@@ -63,22 +61,20 @@ object TilsynBeregningUtil {
                         tom = minOf(periode.tom, måned.atEndOfMonth()),
                     )
                 }
-            }
-            .groupBy({ it.first }, { it.second }).mapValues { it.value.groupBy { it.type } }
-    }
+            }.groupBy({ it.first }, { it.second })
+            .mapValues { it.value.groupBy { it.type } }
 
     /**
      * Metoden finner mandagen i nærmeste arbeidsuke
      * Dersom datoen er man-fre vil metoden returnere mandag samme uke
      * Er datoen lør eller søn returneres mandagen uken etter
      */
-    private fun LocalDate.nærmesteRelevateMandag(): LocalDate {
-        return if (this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY) {
+    private fun LocalDate.nærmesteRelevateMandag(): LocalDate =
+        if (this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY) {
             this.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
         } else {
             this.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
         }
-    }
 
     /**
      * Splitter en periode opp i uker (kun hverdager inkludert)
@@ -107,30 +103,30 @@ object TilsynBeregningUtil {
      * Splitter en stønadsperiode opp i uker (kun hverdager inkludert)
      * Antall dager i uken er oppad begrenset til antall dager i stønadsperioden som er innenfor uken
      */
-    fun StønadsperiodeBeregningsgrunnlag.tilUke(): Map<Uke, PeriodeMedDager> {
-        return this.splitPerUke { fom, tom ->
+    fun StønadsperiodeBeregningsgrunnlag.tilUke(): Map<Uke, PeriodeMedDager> =
+        this.splitPerUke { fom, tom ->
             antallDagerIPeriodeInklusiv(fom, tom)
         }
-    }
 
     /**
      * Splitter en liste av aktiviteter opp i uker (kun hverdager inkludert)
      * Antall dager i uken er oppad begrenset til det lavest av antall aktivitetsdager eller antall
      * dager i aktivitetsperioden som er innenfor uken
      */
-    fun List<Aktivitet>.tilDagerPerUke(): Map<Uke, List<PeriodeMedDager>> {
-        return this.map { aktivitet ->
-            aktivitet.splitPerUke { fom, tom ->
-                min(aktivitet.aktivitetsdager, antallDagerIPeriodeInklusiv(fom, tom))
-            }
-        }.flatMap { it.entries }
+    fun List<Aktivitet>.tilDagerPerUke(): Map<Uke, List<PeriodeMedDager>> =
+        this
+            .map { aktivitet ->
+                aktivitet.splitPerUke { fom, tom ->
+                    min(aktivitet.aktivitetsdager, antallDagerIPeriodeInklusiv(fom, tom))
+                }
+            }.flatMap { it.entries }
             .groupBy({ it.key }, { it.value })
             .mapValues { it.value.sorted() }
-    }
 
-    private fun antallDagerIPeriodeInklusiv(fom: LocalDate, tom: LocalDate): Int {
-        return ChronoUnit.DAYS.between(fom, tom).toInt() + 1
-    }
+    private fun antallDagerIPeriodeInklusiv(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): Int = ChronoUnit.DAYS.between(fom, tom).toInt() + 1
 }
 
 data class Uke(

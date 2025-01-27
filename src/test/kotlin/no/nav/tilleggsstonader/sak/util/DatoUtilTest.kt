@@ -8,7 +8,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 class DatoUtilTest {
-
     @Test
     fun `antallÅrSiden skal returnere 0 hvis vi sender inn dagens dato`() {
         assertThat(antallÅrSiden(osloDateNow())).isEqualTo(0)
@@ -49,7 +48,6 @@ class DatoUtilTest {
 
     @Nested
     inner class FørsteDagIMpneden {
-
         @Test
         fun `erFørsteDagIMåneden skal sjekke om dagen er siste dag i måneden`() {
             assertThat(LocalDate.of(2024, 1, 1).erFørsteDagIMåneden()).isTrue
@@ -62,7 +60,6 @@ class DatoUtilTest {
 
     @Nested
     inner class FørsteDagIMåneden {
-
         @Test
         fun `tilFørsteDagIMåneden skal endre dato til første dagen i måneden for inneværende måned`() {
             val førsteJan2024 = LocalDate.of(2024, 1, 1)
@@ -75,7 +72,6 @@ class DatoUtilTest {
 
     @Nested
     inner class SisteDagIMåneden {
-
         @Test
         fun `erSisteDagIMåneden skal sjekke om dagen er siste dag i måneden`() {
             assertThat(LocalDate.of(2024, 1, 31).erSisteDagIMåneden()).isTrue
@@ -93,7 +89,6 @@ class DatoUtilTest {
 
     @Nested
     inner class TilSisteDagenIÅret {
-
         @Test
         fun `tilSisteDagenIÅret skal gi siste dagen i året`() {
             assertThat(LocalDate.of(2024, 1, 12).tilSisteDagenIÅret()).isEqualTo(LocalDate.of(2024, 12, 31))

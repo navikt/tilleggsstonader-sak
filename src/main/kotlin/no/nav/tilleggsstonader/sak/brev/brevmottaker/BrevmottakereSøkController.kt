@@ -24,7 +24,6 @@ class BrevmottakereSøkController(
     private val personService: PersonService,
     private val eregService: EregService,
 ) {
-
     @PostMapping("person")
     fun søkPerson(
         @RequestBody personIdentDto: PersonIdentDto,
@@ -47,12 +46,17 @@ class BrevmottakereSøkController(
     }
 
     companion object {
-
         private val ORGNR_REGEX = """\d{9}""".toRegex()
         private val FNR_REGEX = """\d{11}""".toRegex()
     }
 
-    data class PersonTreffDto(val ident: String, val navn: String)
+    data class PersonTreffDto(
+        val ident: String,
+        val navn: String,
+    )
 
-    data class IOrganisasjonDto(val navn: String?, val organisasjonsnummer: String)
+    data class IOrganisasjonDto(
+        val navn: String?,
+        val organisasjonsnummer: String,
+    )
 }

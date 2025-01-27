@@ -9,9 +9,7 @@ class EgenAnsattService(
     private val egenAnsattClient: EgenAnsattClient,
     private val cacheManager: CacheManager,
 ) {
-
-    fun erEgenAnsatt(personIdent: String): Boolean =
-        erEgenAnsatt(setOf(personIdent)).values.single()
+    fun erEgenAnsatt(personIdent: String): Boolean = erEgenAnsatt(setOf(personIdent)).values.single()
 
     fun erEgenAnsatt(personIdenter: Set<String>): Map<String, Boolean> =
         cacheManager.getCachedOrLoad("erEgenAnsattBolk", personIdenter) {

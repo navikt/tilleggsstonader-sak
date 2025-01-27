@@ -15,39 +15,54 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.DokumentasjonMapp
 import java.time.LocalDateTime
 
 object SøknadsskjemaBarnetilsynMapper {
-    fun map(mottattTidspunkt: LocalDateTime, språk: Språkkode, journalpost: Journalpost, skjema: SøknadsskjemaBarnetilsyn): SøknadBarnetilsyn {
-        return SøknadBarnetilsyn(
+    fun map(
+        mottattTidspunkt: LocalDateTime,
+        språk: Språkkode,
+        journalpost: Journalpost,
+        skjema: SøknadsskjemaBarnetilsyn,
+    ): SøknadBarnetilsyn =
+        SøknadBarnetilsyn(
             journalpostId = journalpost.journalpostId,
             mottattTidspunkt = mottattTidspunkt,
             språk = språk,
             data = mapSkjemaBarnetilsyn(skjema, journalpost),
             barn = mapBarn(skjema),
         )
-    }
 
-    private fun mapSkjemaBarnetilsyn(skjema: SøknadsskjemaBarnetilsyn, journalpost: Journalpost) =
-        SkjemaBarnetilsyn(
-            hovedytelse = HovedytelseAvsnitt(
-                hovedytelse = skjema.hovedytelse.hovedytelse.verdier.map { it.verdi },
+    private fun mapSkjemaBarnetilsyn(
+        skjema: SøknadsskjemaBarnetilsyn,
+        journalpost: Journalpost,
+    ) = SkjemaBarnetilsyn(
+        hovedytelse =
+            HovedytelseAvsnitt(
+                hovedytelse =
+                    skjema.hovedytelse.hovedytelse.verdier
+                        .map { it.verdi },
                 arbeidOgOpphold = mapArbeidOgOpphold(skjema.hovedytelse.arbeidOgOpphold),
             ),
-            aktivitet = AktivitetAvsnitt(
-                aktiviteter = skjema.aktivitet.aktiviteter?.verdier?.map { ValgtAktivitet(id = it.verdi, label = it.label) },
+        aktivitet =
+            AktivitetAvsnitt(
+                aktiviteter =
+                    skjema.aktivitet.aktiviteter
+                        ?.verdier
+                        ?.map { ValgtAktivitet(id = it.verdi, label = it.label) },
                 annenAktivitet = skjema.aktivitet.annenAktivitet?.verdi,
                 lønnetAktivitet = skjema.aktivitet.lønnetAktivitet?.verdi,
             ),
-            dokumentasjon = mapDokumentasjon(skjema, journalpost),
-        )
+        dokumentasjon = mapDokumentasjon(skjema, journalpost),
+    )
 
     private fun mapBarn(skjema: SøknadsskjemaBarnetilsyn) =
-        skjema.barn.barnMedBarnepass.map {
-            SøknadBarn(
-                ident = it.ident.verdi,
-                data = BarnMedBarnepass(
-                    type = it.type.verdi,
-                    startetIFemte = it.startetIFemte?.verdi,
-                    årsak = it.årsak?.verdi,
-                ),
-            )
-        }.toSet()
+        skjema.barn.barnMedBarnepass
+            .map {
+                SøknadBarn(
+                    ident = it.ident.verdi,
+                    data =
+                        BarnMedBarnepass(
+                            type = it.type.verdi,
+                            startetIFemte = it.startetIFemte?.verdi,
+                            årsak = it.årsak?.verdi,
+                        ),
+                )
+            }.toSet()
 }

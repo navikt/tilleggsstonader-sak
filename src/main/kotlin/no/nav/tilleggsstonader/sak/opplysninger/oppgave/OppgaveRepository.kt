@@ -9,9 +9,13 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface OppgaveRepository : RepositoryInterface<OppgaveDomain, UUID>, InsertUpdateRepository<OppgaveDomain> {
-
-    fun findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandlingId: BehandlingId, oppgavetype: Oppgavetype): OppgaveDomain?
+interface OppgaveRepository :
+    RepositoryInterface<OppgaveDomain, UUID>,
+    InsertUpdateRepository<OppgaveDomain> {
+    fun findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(
+        behandlingId: BehandlingId,
+        oppgavetype: Oppgavetype,
+    ): OppgaveDomain?
 
     fun findByType(oppgavetype: Oppgavetype): List<OppgaveDomain>
 
@@ -20,11 +24,19 @@ interface OppgaveRepository : RepositoryInterface<OppgaveDomain, UUID>, InsertUp
         oppgavetype: Oppgavetype,
     ): List<OppgaveDomain>?
 
-    fun findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(behandlingId: BehandlingId, oppgavetype: Set<Oppgavetype>): OppgaveDomain?
+    fun findByBehandlingIdAndErFerdigstiltIsFalseAndTypeIn(
+        behandlingId: BehandlingId,
+        oppgavetype: Set<Oppgavetype>,
+    ): OppgaveDomain?
 
     fun findByGsakOppgaveId(gsakOppgaveId: Long): OppgaveDomain?
+
     fun findTopByBehandlingIdOrderBySporbarOpprettetTidDesc(behandlingId: BehandlingId): OppgaveDomain?
-    fun findTopByBehandlingIdAndTypeOrderBySporbarOpprettetTidDesc(behandlingId: BehandlingId, type: Oppgavetype): OppgaveDomain?
+
+    fun findTopByBehandlingIdAndTypeOrderBySporbarOpprettetTidDesc(
+        behandlingId: BehandlingId,
+        type: Oppgavetype,
+    ): OppgaveDomain?
 
     @Query(
         """

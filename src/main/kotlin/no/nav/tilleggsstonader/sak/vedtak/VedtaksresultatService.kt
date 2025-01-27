@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service
 class VedtaksresultatService(
     private val vedtakRepository: VedtakRepository,
 ) {
-
-    fun hentVedtaksresultat(saksbehandling: Saksbehandling): TypeVedtak {
-        return vedtakRepository.findByIdOrNull(saksbehandling.id)?.type
+    fun hentVedtaksresultat(saksbehandling: Saksbehandling): TypeVedtak =
+        vedtakRepository.findByIdOrNull(saksbehandling.id)?.type
             ?: error("Finner ikke vedtaksresultat for behandling=$saksbehandling")
-    }
 }

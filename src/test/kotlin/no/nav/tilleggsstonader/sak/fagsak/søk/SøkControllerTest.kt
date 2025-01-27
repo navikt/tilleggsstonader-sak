@@ -23,7 +23,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.exchange
 
 internal class SøkControllerTest : IntegrationTest() {
-
     @Autowired
     lateinit var arenaClient: ArenaClient
 
@@ -94,7 +93,6 @@ internal class SøkControllerTest : IntegrationTest() {
 
     @Nested
     inner class SøkPersonForEksternFagsak {
-
         @Test
         internal fun `skal finne person hvis fagsaken eksisterer`() {
             val personIdent = "123"
@@ -120,20 +118,18 @@ internal class SøkControllerTest : IntegrationTest() {
                 .isEqualTo("Finner ikke fagsak for eksternFagsakId=100")
         }
 
-        private fun søkPerson(eksternFagsakId: Long): ResponseEntity<Søkeresultat> {
-            return restTemplate.exchange(
+        private fun søkPerson(eksternFagsakId: Long): ResponseEntity<Søkeresultat> =
+            restTemplate.exchange(
                 localhost("/api/sok/person/fagsak-ekstern/$eksternFagsakId"),
                 HttpMethod.GET,
                 HttpEntity<Any>(headers),
             )
-        }
     }
 
-    private fun søkPerson(personIdent: String): ResponseEntity<Søkeresultat> {
-        return restTemplate.exchange(
+    private fun søkPerson(personIdent: String): ResponseEntity<Søkeresultat> =
+        restTemplate.exchange(
             localhost("/api/sok"),
             HttpMethod.POST,
             HttpEntity(PersonIdentDto(personIdent = personIdent), headers),
         )
-    }
 }

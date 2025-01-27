@@ -7,7 +7,6 @@ enum class MålgruppeType(
     private val prioritet: Int?,
     val gyldigeAktiviter: Set<AktivitetType>,
 ) : VilkårperiodeType {
-
     AAP(
         prioritet = 0,
         gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),

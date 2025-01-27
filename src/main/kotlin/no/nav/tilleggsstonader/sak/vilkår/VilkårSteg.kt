@@ -18,7 +18,10 @@ class VilkårSteg(
     private val behandlingService: BehandlingService,
     private val vilkårService: VilkårService,
 ) : BehandlingSteg<Void?> {
-    override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
+    override fun utførSteg(
+        saksbehandling: Saksbehandling,
+        data: Void?,
+    ) {
         if (saksbehandling.status != BehandlingStatus.UTREDES) {
             behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.UTREDES)
         }
@@ -34,14 +37,16 @@ class VilkårSteg(
         validerIkkeOverlappendeVilkår(vilkår)
 
         val manglerVerdierPåOppfylteVilkår =
-            vilkår.filter { it.resultat == Vilkårsresultat.OPPFYLT }
+            vilkår
+                .filter { it.resultat == Vilkårsresultat.OPPFYLT }
                 .any { it.fom == null || it.tom == null || it.utgift == null }
         brukerfeilHvis(manglerVerdierPåOppfylteVilkår) {
             "Mangler fom, tom eller utgift på et eller flere vilkår. " +
                 "Vennligst ta stilling til hvilken periode vilkåret gjelder for."
         }
         val manglerVerdierPåIkkeOppfylteVilkår =
-            vilkår.filter { it.resultat == Vilkårsresultat.IKKE_OPPFYLT }
+            vilkår
+                .filter { it.resultat == Vilkårsresultat.IKKE_OPPFYLT }
                 .any { it.fom == null || it.tom == null }
         brukerfeilHvis(manglerVerdierPåIkkeOppfylteVilkår) {
             "Mangler fom eller tom på et eller flere vilkår. " +

@@ -5,7 +5,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class StønadstypeGjelderBarnKtTest {
-
     @Test
     fun `barnetilsyn har barn koblet til seg`() {
         assertThat(Stønadstype.BARNETILSYN.gjelderBarn()).isTrue

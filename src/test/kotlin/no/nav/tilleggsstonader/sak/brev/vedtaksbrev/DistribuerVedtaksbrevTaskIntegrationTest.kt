@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class DistribuerVedtaksbrevTaskIntegrationTest : IntegrationTest() {
-
     @Autowired
     private lateinit var taskWorker: TaskWorker
 
@@ -39,10 +38,11 @@ class DistribuerVedtaksbrevTaskIntegrationTest : IntegrationTest() {
                 ),
                 BrevmottakerVedtaksbrev(
                     behandlingId = behandling.id,
-                    mottaker = mottakerPerson(
-                        mottakerRolle = MottakerRolle.VERGE,
-                        ident = "identAnnenMottaker",
-                    ),
+                    mottaker =
+                        mottakerPerson(
+                            mottakerRolle = MottakerRolle.VERGE,
+                            ident = "identAnnenMottaker",
+                        ),
                     journalpostId = JournalpostClientConfig.journalpostIdMedFeil,
                     bestillingId = null,
                 ),

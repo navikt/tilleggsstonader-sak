@@ -16,42 +16,45 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class TilkjentYtelseServiceTest {
-
     private val tilkjentYtelseRepository = mockk<TilkjentYtelseRepository>()
-    private val tilkjentYtelseService = TilkjentYtelseService(
-        tilkjentYtelseRepository,
-    )
+    private val tilkjentYtelseService =
+        TilkjentYtelseService(
+            tilkjentYtelseRepository,
+        )
 
     private val fagsak = fagsak(setOf(PersonIdent("321")))
     private val behandling = behandling(fagsak = fagsak)
 
     @Nested
     inner class HarLøpendeUtbetaling {
-
         @Test
         internal fun `skal returnere true hvis det finnes andel med sluttdato etter idag`() {
-            val andelTilkjentYtelse = andelTilkjentYtelse(
-                kildeBehandlingId = BehandlingId.random(),
-                beløp = 1,
-                fom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
-                tom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
-            )
-            val tilkjentYtelse = tilkjentYtelse(behandling.id)
-                .copy(andelerTilkjentYtelse = setOf(andelTilkjentYtelse))
+            val andelTilkjentYtelse =
+                andelTilkjentYtelse(
+                    kildeBehandlingId = BehandlingId.random(),
+                    beløp = 1,
+                    fom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    tom = osloDateNow().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                )
+            val tilkjentYtelse =
+                tilkjentYtelse(behandling.id)
+                    .copy(andelerTilkjentYtelse = setOf(andelTilkjentYtelse))
             every { tilkjentYtelseRepository.findByBehandlingId(any()) } returns tilkjentYtelse
             assertThat(tilkjentYtelseService.harLøpendeUtbetaling(behandling.id)).isTrue
         }
 
         @Test
         internal fun `skal returnere false hvis det finnes andel med sluttdato før idag`() {
-            val andelTilkjentYtelse = andelTilkjentYtelse(
-                kildeBehandlingId = BehandlingId.random(),
-                beløp = 1,
-                fom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
-                tom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
-            )
-            val tilkjentYtelse = tilkjentYtelse(behandling.id)
-                .copy(andelerTilkjentYtelse = setOf(andelTilkjentYtelse))
+            val andelTilkjentYtelse =
+                andelTilkjentYtelse(
+                    kildeBehandlingId = BehandlingId.random(),
+                    beløp = 1,
+                    fom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    tom = osloDateNow().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                )
+            val tilkjentYtelse =
+                tilkjentYtelse(behandling.id)
+                    .copy(andelerTilkjentYtelse = setOf(andelTilkjentYtelse))
             every { tilkjentYtelseRepository.findByBehandlingId(any()) } returns tilkjentYtelse
             assertThat(tilkjentYtelseService.harLøpendeUtbetaling(behandling.id)).isFalse
         }
