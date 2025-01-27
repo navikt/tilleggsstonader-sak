@@ -4,7 +4,6 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
-import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
@@ -22,6 +21,10 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDato
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.StønadsperiodeRepositoryFake
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYtelseRepositoryFake
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -29,10 +32,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.util.RepositoryMockUtil.mockStønadsperiodeRepository
-import no.nav.tilleggsstonader.sak.util.RepositoryMockUtil.mockTilkjentYtelseRepository
-import no.nav.tilleggsstonader.sak.util.RepositoryMockUtil.mockVedtakRepository
-import no.nav.tilleggsstonader.sak.util.RepositoryMockUtil.mockVilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
@@ -57,10 +56,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
 
     val logger = LoggerFactory.getLogger(javaClass)
 
-    val vilkårperiodeRepository = mockVilkårperiodeRepository()
-    val stønadsperiodeRepository = mockStønadsperiodeRepository()
-    val vedtakRepository = mockVedtakRepository()
-    val tilkjentYtelseRepository = mockTilkjentYtelseRepository()
+    val vilkårperiodeRepository = VilkårperiodeRepositoryFake()
+    val stønadsperiodeRepository = StønadsperiodeRepositoryFake()
+    val vedtakRepository = VedtakRepositoryFake()
+    val tilkjentYtelseRepository = TilkjentYtelseRepositoryFake()
 
     val simuleringService = mockk<SimuleringService>().apply {
         justRun { slettSimuleringForBehandling(any()) }
@@ -79,17 +78,13 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     @Gitt("følgende aktiviteter for læremidler behandling={}")
     fun `følgende aktiviteter`(behandlingIdTall: Int, dataTable: DataTable) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        every {
-            vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, any())
-        } returns mapAktiviteter(behandlingId, dataTable)
+        vilkårperiodeRepository.insertAll(mapAktiviteter(behandlingId, dataTable))
     }
 
     @Gitt("følgende stønadsperioder for læremidler behandling={}")
     fun `følgende stønadsperioder`(behandlingIdTall: Int, dataTable: DataTable) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
-        every {
-            stønadsperiodeRepository.findAllByBehandlingId(any())
-        } returns mapStønadsperioder(behandlingId, dataTable)
+        stønadsperiodeRepository.insertAll(mapStønadsperioder(behandlingId, dataTable))
     }
 
     @Når("innvilger vedtaksperioder for behandling={}")
@@ -111,8 +106,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
 
         val tidligereStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeBehandlingId)
         val tidligereVilkårsperioder = vilkårperiodeRepository.findByBehandlingId(forrigeBehandlingId)
-        stønadsperiodeRepository.insertAll(tidligereStønadsperioder.map { it.copy(behandlingId = behandlingId) })
-        vilkårperiodeRepository.insertAll(tidligereVilkårsperioder.map { it.copy(behandlingId = behandlingId) })
+        stønadsperiodeRepository.insertAll(tidligereStønadsperioder.map { it.kopierTilBehandling(behandlingId) })
+        vilkårperiodeRepository.insertAll(tidligereVilkårsperioder.map { it.kopierTilBehandling(behandlingId) })
     }
 
     @Når("opphør behandling={} med revurderFra={}")

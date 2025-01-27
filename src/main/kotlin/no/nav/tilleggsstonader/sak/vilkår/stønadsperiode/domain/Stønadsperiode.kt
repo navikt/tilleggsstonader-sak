@@ -25,7 +25,17 @@ data class Stønadsperiode(
 
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
-)
+) {
+
+    fun kopierTilBehandling(nyBehandlingId: BehandlingId): Stønadsperiode {
+        return copy(
+            id = UUID.randomUUID(),
+            behandlingId = nyBehandlingId,
+            status = StønadsperiodeStatus.UENDRET,
+            sporbar = Sporbar(),
+        )
+    }
+}
 
 enum class StønadsperiodeStatus {
     NY,
