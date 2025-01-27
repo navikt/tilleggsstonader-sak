@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import java.time.LocalDate
@@ -51,6 +52,7 @@ data class UtbetalingerDvhV2(
                 is InnvilgelseLæremidler -> null
                 is InnvilgelseTilsynBarn -> vedtak.data.finnGrunnlag(this.fom.toYearMonth())
                 is OpphørTilsynBarn -> vedtak.data.finnGrunnlag(this.fom.toYearMonth())
+                is OpphørLæremidler -> null
             }
         }
 

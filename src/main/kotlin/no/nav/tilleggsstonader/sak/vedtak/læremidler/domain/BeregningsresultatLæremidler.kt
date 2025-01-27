@@ -1,6 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
-
+import com.fasterxml.jackson.annotation.JsonIgnore
+import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 
@@ -16,15 +20,36 @@ data class BeregningsresultatLæremidler(
 data class BeregningsresultatForMåned(
     val beløp: Int,
     val grunnlag: Beregningsgrunnlag,
-)
+) : Periode<LocalDate>, KopierPeriode<BeregningsresultatForMåned> {
+    @get:JsonIgnore
+    override val fom: LocalDate get() = grunnlag.fom
+
+    @get:JsonIgnore
+    override val tom: LocalDate get() = grunnlag.tom
+
+    override fun medPeriode(fom: LocalDate, tom: LocalDate): BeregningsresultatForMåned {
+        return this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
+    }
+}
 
 data class Beregningsgrunnlag(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
+    val fom: LocalDate,
+    val tom: LocalDate,
     val utbetalingsdato: LocalDate,
     val studienivå: Studienivå,
     val studieprosent: Int,
     val sats: Int,
     val satsBekreftet: Boolean,
     val målgruppe: MålgruppeType,
-) : Periode<LocalDate>
+)
+
+fun avkortBeregningsresultatVedOpphør(
+    forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørLæremidler>,
+    revurderFra: LocalDate,
+): List<BeregningsresultatForMåned> {
+    return forrigeVedtak
+        .data
+        .beregningsresultat
+        .perioder
+        .avkortFraOgMed(revurderFra.minusDays(1))
+}

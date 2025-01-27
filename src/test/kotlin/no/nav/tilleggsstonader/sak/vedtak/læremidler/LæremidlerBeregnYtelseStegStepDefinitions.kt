@@ -35,16 +35,19 @@ import no.nav.tilleggsstonader.sak.util.RepositoryMockUtil.mockVedtakRepository
 import no.nav.tilleggsstonader.sak.util.RepositoryMockUtil.mockVilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.domain.vedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapBeregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeDto
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
@@ -67,7 +70,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             vilkårperiodeRepository = vilkårperiodeRepository,
             stønadsperiodeRepository = stønadsperiodeRepository,
         ),
-        opphørValideringService = mockk(),
+        opphørValideringService = mockk<OpphørValideringService>(relaxed = true),
         vedtakRepository = vedtakRepository,
         tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
         simuleringService = simuleringService,
@@ -99,6 +102,30 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             )
         }
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
+    }
+
+    @Når("kopierer perioder fra forrige behandling for behandling={}")
+    fun `kopierer perioder`(behandlingIdTall: Int) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val forrigeBehandlingId = forrigeBehandlingId(behandlingId) ?: error("Forventer å finne forrigeBehandlingId")
+
+        val tidligereStønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(forrigeBehandlingId)
+        val tidligereVilkårsperioder = vilkårperiodeRepository.findByBehandlingId(forrigeBehandlingId)
+        stønadsperiodeRepository.insertAll(tidligereStønadsperioder.map { it.copy(behandlingId = behandlingId) })
+        vilkårperiodeRepository.insertAll(tidligereVilkårsperioder.map { it.copy(behandlingId = behandlingId) })
+    }
+
+    @Når("opphør behandling={} med revurderFra={}")
+    fun `opphør med revurderFra`(behandlingIdTall: Int, revurderFraStr: String) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val revurderFra = parseDato(revurderFraStr)
+        steg.utførSteg(
+            dummyBehandling(behandlingId, revurderFra = revurderFra),
+            OpphørLæremidlerRequest(
+                årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
+                begrunnelse = "begrunnelse",
+            ),
+        )
     }
 
     @Så("forvent beregningsresultatet for behandling={}")

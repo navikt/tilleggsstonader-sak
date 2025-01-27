@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBereg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
@@ -52,15 +53,13 @@ class LæremidlerVedtakController(
         lagreVedtak(behandlingId, vedtak)
     }
 
-    /*
     @PostMapping("{behandlingId}/opphor")
     fun opphør(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: OpphørTilsynBarnDto,
+        @RequestBody vedtak: OpphørLæremidlerRequest,
     ) {
         lagreVedtak(behandlingId, vedtak)
     }
-     */
 
     fun lagreVedtak(behandlingId: BehandlingId, vedtak: VedtakLæremidlerRequest) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)

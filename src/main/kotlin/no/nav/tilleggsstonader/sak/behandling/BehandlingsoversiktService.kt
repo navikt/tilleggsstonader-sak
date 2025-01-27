@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import org.springframework.stereotype.Service
@@ -112,6 +113,7 @@ class BehandlingsoversiktService(
             is InnvilgelseLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
             is AvslagTilsynBarn -> null
             is AvslagLæremidler -> null
+            is OpphørLæremidler -> TODO()
         }
     }
 

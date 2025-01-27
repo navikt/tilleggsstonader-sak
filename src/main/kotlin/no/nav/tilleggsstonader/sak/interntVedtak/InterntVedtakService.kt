@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
@@ -209,6 +210,11 @@ class InterntVedtakService(
         is AvslagLæremidler -> VedtakAvslagInternt(
             årsakerAvslag = vedtak.årsaker,
             avslagBegrunnelse = vedtak.begrunnelse,
+        )
+
+        is OpphørLæremidler -> VedtakOpphørInternt(
+            årsakerOpphør = vedtak.årsaker,
+            opphørBegrunnelse = vedtak.begrunnelse,
         )
     }
 

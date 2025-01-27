@@ -21,7 +21,7 @@ class OpphørValideringService(
     private val vilkårService: VilkårService,
 ) {
 
-    fun validerPerioder(saksbehandling: Saksbehandling) {
+    fun validerVilkårperioder(saksbehandling: Saksbehandling) {
         val vilkår = vilkårService.hentVilkår(saksbehandling.id)
         val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling.id)
 
@@ -38,6 +38,7 @@ class OpphørValideringService(
         revurderFra: LocalDate?,
     ) {
         brukerfeilHvis(revurderFra == null) { "Revurder fra dato er påkrevd for opphør" }
+
         beregningsresultatTilsynBarn.perioder.forEach { periode ->
             periode.beløpsperioder.forEach {
                 brukerfeilHvis(it.dato >= revurderFra) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
