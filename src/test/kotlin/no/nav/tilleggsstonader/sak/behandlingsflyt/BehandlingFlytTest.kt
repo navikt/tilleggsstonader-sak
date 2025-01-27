@@ -58,7 +58,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Pageable
 import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDate
-import java.time.YearMonth
 
 class BehandlingFlytTest(
     @Autowired val barnService: BarnService,
@@ -312,8 +311,8 @@ class BehandlingFlytTest(
                 barnId = barn.id,
                 behandlingId = behandlingId,
                 delvilkårsett = oppfylteDelvilkårPassBarnDto(),
-                fom = YearMonth.now().atDay(1),
-                tom = YearMonth.now().atEndOfMonth(),
+                fom = LocalDate.of(2024, 1, 1),
+                tom = LocalDate.of(2024, 1, 31),
                 utgift = 1000,
             ),
         )
