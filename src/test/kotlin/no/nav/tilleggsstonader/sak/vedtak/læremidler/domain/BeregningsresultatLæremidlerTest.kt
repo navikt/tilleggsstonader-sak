@@ -51,10 +51,10 @@ class BeregningsresultatLæremidlerTest {
     fun `perioder før Revurder-fra blir ikke fjernet`() {
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse()
         val revurderFra = LocalDate.of(2024, 1, 20)
-        val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra)
+        val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra).perioder
 
         assertThat(kuttePerioderVedOpphør).isEqualTo(
-            listOf<BeregningsresultatForMåned>(
+            listOf(
                 BeregningsresultatForMåned(
                     beløp = 875,
                     grunnlag =
@@ -127,7 +127,7 @@ class BeregningsresultatLæremidlerTest {
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse(innvilgelseLæremidlerMedLangPeriode)
 
         val revurderFra = LocalDate.of(2024, 6, 1)
-        val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra)
+        val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra).perioder
 
         assertThat(kuttePerioderVedOpphør).isEqualTo(
             listOf<BeregningsresultatForMåned>(
@@ -195,7 +195,7 @@ class BeregningsresultatLæremidlerTest {
     fun `perioder midt i Revurder-fra blir kuttet`() {
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse()
         val revurderFra = LocalDate.of(2024, 1, 5)
-        val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra)
+        val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra).perioder
 
         assertThat(kuttePerioderVedOpphør).isEqualTo(
             listOf<BeregningsresultatForMåned>(
@@ -271,7 +271,7 @@ class BeregningsresultatLæremidlerTest {
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse(innvilgelseLæremidlerMedLangPeriode)
 
         val revurderFra = LocalDate.of(2024, 3, 1)
-        val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra)
+        val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra).perioder
 
         assertThat(kuttePerioderVedOpphør).isEqualTo(
             listOf<BeregningsresultatForMåned>(
@@ -311,7 +311,7 @@ class BeregningsresultatLæremidlerTest {
     fun `perioder etter Revurder-fra blir fjernet`() {
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse()
         val revurderFra = LocalDate.of(2023, 12, 1)
-        val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra)
+        val kuttePerioderVedOpphør = avkortBeregningsresultatVedOpphør(forrigeVedtak, revurderFra).perioder
 
         assertThat(kuttePerioderVedOpphør).isEqualTo(emptyList<BeregningsresultatForMåned>())
     }
