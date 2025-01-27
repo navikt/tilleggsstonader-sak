@@ -18,7 +18,7 @@ plugins {
     application
 
     kotlin("jvm") version "2.0.21"
-    id("com.diffplug.spotless") version "6.25.0"
+    id("com.diffplug.spotless") version "7.0.2"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
@@ -42,7 +42,7 @@ apply(plugin = "com.diffplug.spotless")
 
 spotless {
     kotlin {
-        ktlint("0.50.0")
+        ktlint("1.5.0")
     }
 }
 
@@ -84,7 +84,7 @@ dependencies {
     // For auditlogger. August, 2014, men det er den som blir brukt på NAV
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
 
-    //Kafka
+    // Kafka
     implementation("org.springframework.kafka:spring-kafka")
 
     // Test
