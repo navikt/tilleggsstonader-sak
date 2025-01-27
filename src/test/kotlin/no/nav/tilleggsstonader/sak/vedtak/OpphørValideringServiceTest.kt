@@ -5,16 +5,18 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.util.tilSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakBeregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThatCode
@@ -23,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.YearMonth
 
 class OpphørValideringServiceTest {
 
@@ -30,9 +33,13 @@ class OpphørValideringServiceTest {
     private val vilkårService = mockk<VilkårService>()
     private val tilsynBarnBeregningService = mockk<TilsynBarnBeregningService>()
 
+    val måned = YearMonth.of(2025, 1)
+    val fom = måned.atDay(1)
+    val tom = måned.atEndOfMonth()
+
     val saksbehandling =
         saksbehandling(
-            revurderFra = osloDateNow().plusMonths(1).plusDays(1),
+            revurderFra = LocalDate.of(2025, 2, 1),
             type = BehandlingType.REVURDERING,
         )
     val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)
@@ -41,9 +48,20 @@ class OpphørValideringServiceTest {
         type = VilkårType.PASS_BARN,
         resultat = Vilkårsresultat.OPPFYLT,
         status = VilkårStatus.UENDRET,
+        fom = fom,
+        tom = tom,
     )
-    val målgruppe = VilkårperiodeTestUtil.målgruppe(status = Vilkårstatus.ENDRET)
-    val aktivitet = VilkårperiodeTestUtil.aktivitet(status = Vilkårstatus.ENDRET)
+    val målgruppe = VilkårperiodeTestUtil.målgruppe(status = Vilkårstatus.ENDRET, fom = fom, tom = tom)
+    val aktivitet = VilkårperiodeTestUtil.aktivitet(status = Vilkårstatus.ENDRET, fom = fom, tom = tom)
+
+    val beregningsresultat = BeregningsresultatTilsynBarn(
+        listOf(
+            beregningsresultatForMåned(
+                måned = måned,
+                beløpsperioder = listOf(Beløpsperiode(dato = fom, 10, MålgruppeType.AAP)),
+            ),
+        ),
+    )
 
     @BeforeEach
     fun setUp() {
@@ -52,7 +70,7 @@ class OpphørValideringServiceTest {
             målgrupper = listOf(målgruppe),
             aktiviteter = listOf(aktivitet),
         )
-        every { tilsynBarnBeregningService.beregn(any(), any()) } returns vedtakBeregningsresultat
+        every { tilsynBarnBeregningService.beregn(any(), any()) } returns beregningsresultat
     }
 
     @Nested
@@ -62,7 +80,7 @@ class OpphørValideringServiceTest {
         fun `Kaster ikke feil ved korrekt data`() {
             assertThatCode {
                 opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
-                    beregningsresultatTilsynBarn = vedtakBeregningsresultat,
+                    beregningsresultatTilsynBarn = beregningsresultat,
                     revurderFra = saksbehandling.revurderFra,
                 )
             }.doesNotThrowAnyException()
@@ -70,11 +88,11 @@ class OpphørValideringServiceTest {
 
         @Test
         fun `Kaster feil ved utbetaling etter opphørdato`() {
-            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = LocalDate.of(2024, 1, 1))
+            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = måned.atDay(1))
 
             assertThatThrownBy {
                 opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(
-                    beregningsresultatTilsynBarn = vedtakBeregningsresultat,
+                    beregningsresultatTilsynBarn = beregningsresultat,
                     revurderFra = saksbehandlingRevurdertFraTilbakeITid.revurderFra,
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato")
@@ -139,7 +157,11 @@ class OpphørValideringServiceTest {
         fun `Kaster feil ved aktivitet flyttet til etter opphørt dato`() {
             every { vilkårperiodeService.hentVilkårperioder(saksbehandling.id) } returns Vilkårperioder(
                 målgrupper = listOf(målgruppe),
-                aktiviteter = listOf(aktivitet.copy(tom = osloDateNow().plusMonths(2), status = Vilkårstatus.ENDRET)),
+                aktiviteter = listOf(
+                    aktivitet.copy(
+                        tom = måned.plusMonths(1).atEndOfMonth(), status = Vilkårstatus.ENDRET,
+                    ),
+                ),
             )
 
             assertThatThrownBy {
@@ -152,7 +174,7 @@ class OpphørValideringServiceTest {
             every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(
                 vilkår.copy(
                     status = VilkårStatus.ENDRET,
-                    tom = osloDateNow().plusMonths(1).tilSisteDagIMåneden(),
+                    tom = måned.plusMonths(1).atEndOfMonth(),
                 ),
             )
 
