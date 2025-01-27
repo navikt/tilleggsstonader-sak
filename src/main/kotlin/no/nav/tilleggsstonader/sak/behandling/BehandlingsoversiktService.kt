@@ -113,7 +113,7 @@ class BehandlingsoversiktService(
             is InnvilgelseLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
             is AvslagTilsynBarn -> null
             is AvslagLæremidler -> null
-            is OpphørLæremidler -> TODO()
+            is OpphørLæremidler -> vedtak.data.vedtaksperiode(revurdererFra)
         }
     }
 
@@ -125,6 +125,12 @@ class BehandlingsoversiktService(
     }
 
     private fun InnvilgelseLæremidler.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
+        val minFom = vedtaksperioder.minOfOrNull { it.fom }
+        val maksTom = vedtaksperioder.maxOfOrNull { it.tom }
+        return Vedtaksperiode(fom = max(minFom, revurdererFra), tom = max(maksTom, revurdererFra))
+    }
+
+    private fun OpphørLæremidler.vedtaksperiode(revurdererFra: LocalDate?): Vedtaksperiode {
         val minFom = vedtaksperioder.minOfOrNull { it.fom }
         val maksTom = vedtaksperioder.maxOfOrNull { it.tom }
         return Vedtaksperiode(fom = max(minFom, revurdererFra), tom = max(maksTom, revurdererFra))
