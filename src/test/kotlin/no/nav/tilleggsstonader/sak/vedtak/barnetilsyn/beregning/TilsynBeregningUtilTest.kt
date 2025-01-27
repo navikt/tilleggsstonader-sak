@@ -143,45 +143,48 @@ class TilsynBeregningUtilTest {
 
     @Nested
     inner class OverlappMellomStønadsperioderOgUtgifter {
-
-        val stønadsperioder = listOf(
-            StønadsperiodeBeregningsgrunnlag(
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 2, 28),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-            ),
-        )
+        val stønadsperioder =
+            listOf(
+                StønadsperiodeBeregningsgrunnlag(
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 2, 28),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                ),
+            )
 
         val barn1 = BarnId.random()
         val barn2 = BarnId.random()
 
-        val utgifter = mapOf(
-            barn1 to listOf(
-                UtgiftBeregning(
-                    fom = YearMonth.of(2025, 1),
-                    tom = YearMonth.of(2025, 1),
-                    utgift = 1000,
-                ),
-                UtgiftBeregning(
-                    fom = YearMonth.of(2025, 2),
-                    tom = YearMonth.of(2025, 2),
-                    utgift = 1000,
-                ),
-            ),
-            barn2 to listOf(
-                UtgiftBeregning(
-                    fom = YearMonth.of(2025, 1),
-                    tom = YearMonth.of(2025, 1),
-                    utgift = 1000,
-                ),
-                UtgiftBeregning(
-                    fom = YearMonth.of(2025, 2),
-                    tom = YearMonth.of(2025, 2),
-                    utgift = 1000,
-                ),
-            ),
-        )
+        val utgifter =
+            mapOf(
+                barn1 to
+                    listOf(
+                        UtgiftBeregning(
+                            fom = YearMonth.of(2025, 1),
+                            tom = YearMonth.of(2025, 1),
+                            utgift = 1000,
+                        ),
+                        UtgiftBeregning(
+                            fom = YearMonth.of(2025, 2),
+                            tom = YearMonth.of(2025, 2),
+                            utgift = 1000,
+                        ),
+                    ),
+                barn2 to
+                    listOf(
+                        UtgiftBeregning(
+                            fom = YearMonth.of(2025, 1),
+                            tom = YearMonth.of(2025, 1),
+                            utgift = 1000,
+                        ),
+                        UtgiftBeregning(
+                            fom = YearMonth.of(2025, 2),
+                            tom = YearMonth.of(2025, 2),
+                            utgift = 1000,
+                        ),
+                    ),
+            )
 
         @Test
         fun `skal retunere true når flere barn overlapper`() {
@@ -190,40 +193,44 @@ class TilsynBeregningUtilTest {
 
         @Test
         fun `skal retunere true når kun ett barn overlapper`() {
-            val utgifter = mapOf(
-                barn1 to listOf(
-                    UtgiftBeregning(
-                        fom = YearMonth.of(2025, 1),
-                        tom = YearMonth.of(2025, 1),
-                        utgift = 1000,
-                    ),
-                    UtgiftBeregning(
-                        fom = YearMonth.of(2025, 2),
-                        tom = YearMonth.of(2025, 2),
-                        utgift = 1000,
-                    ),
-                ),
-                barn2 to listOf(
-                    UtgiftBeregning(
-                        fom = YearMonth.of(2025, 3),
-                        tom = YearMonth.of(2025, 3),
-                        utgift = 1000,
-                    ),
-                ),
-            )
+            val utgifter =
+                mapOf(
+                    barn1 to
+                        listOf(
+                            UtgiftBeregning(
+                                fom = YearMonth.of(2025, 1),
+                                tom = YearMonth.of(2025, 1),
+                                utgift = 1000,
+                            ),
+                            UtgiftBeregning(
+                                fom = YearMonth.of(2025, 2),
+                                tom = YearMonth.of(2025, 2),
+                                utgift = 1000,
+                            ),
+                        ),
+                    barn2 to
+                        listOf(
+                            UtgiftBeregning(
+                                fom = YearMonth.of(2025, 3),
+                                tom = YearMonth.of(2025, 3),
+                                utgift = 1000,
+                            ),
+                        ),
+                )
             assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isTrue
         }
 
         @Test
         fun `skal retunere false når ikke overlapp`() {
-            val stønadsperioder = listOf(
-                StønadsperiodeBeregningsgrunnlag(
-                    fom = LocalDate.of(2025, 3, 1),
-                    tom = LocalDate.of(2025, 3, 31),
-                    målgruppe = MålgruppeType.AAP,
-                    aktivitet = AktivitetType.TILTAK,
-                ),
-            )
+            val stønadsperioder =
+                listOf(
+                    StønadsperiodeBeregningsgrunnlag(
+                        fom = LocalDate.of(2025, 3, 1),
+                        tom = LocalDate.of(2025, 3, 31),
+                        målgruppe = MålgruppeType.AAP,
+                        aktivitet = AktivitetType.TILTAK,
+                    ),
+                )
 
             assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isFalse
         }

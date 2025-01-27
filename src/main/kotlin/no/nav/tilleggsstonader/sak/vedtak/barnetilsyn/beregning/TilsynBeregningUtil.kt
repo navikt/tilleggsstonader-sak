@@ -143,7 +143,6 @@ object TilsynBeregningUtil {
             }
         }
     }
-
 }
 
 data class Uke(
