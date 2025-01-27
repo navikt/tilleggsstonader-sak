@@ -6,12 +6,14 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.erOverlappMellomStønadsperioderOgUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilUke
@@ -312,6 +314,21 @@ class TilsynBarnBeregningService(
         validerStønadsperioder(stønadsperioder)
         validerAktiviteter(aktiviteter)
         validerUtgifter(utgifter)
+        validerStønadsperioderOverlapperUtgifter(stønadsperioder, utgifter)
+    }
+
+    private fun validerStønadsperioderOverlapperUtgifter(
+        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+        utgifter: Map<BarnId, List<UtgiftBeregning>>,
+    ) {
+        brukerfeilHvisIkke(
+            erOverlappMellomStønadsperioderOgUtgifter(
+                stønadsperioder = stønadsperioder,
+                utgifter = utgifter,
+            ),
+        ) {
+            "Kan ikke innvilge når det ikke finne noen overlapp mellom målgruppe, aktivitet og utgifter"
+        }
     }
 
     private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>) {

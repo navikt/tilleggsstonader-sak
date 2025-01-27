@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
@@ -127,6 +128,22 @@ object TilsynBeregningUtil {
         fom: LocalDate,
         tom: LocalDate,
     ): Int = ChronoUnit.DAYS.between(fom, tom).toInt() + 1
+
+    fun erOverlappMellomStønadsperioderOgUtgifter(
+        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+        utgifter: Map<BarnId, List<UtgiftBeregning>>,
+    ): Boolean {
+        val utgiftPerioder =
+            utgifter.values.flatMap {
+                it.map { Datoperiode(fom = it.fom.atDay(1), tom = it.tom.atEndOfMonth()) }
+            }
+        return utgiftPerioder.any { utgifterPeriode ->
+            stønadsperioder.any { stønadsperiode ->
+                stønadsperiode.overlapper(utgifterPeriode)
+            }
+        }
+    }
+
 }
 
 data class Uke(
