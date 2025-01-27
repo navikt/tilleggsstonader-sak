@@ -86,7 +86,7 @@ class OpphørValideringServiceTest {
 
         @Test
         fun `validerPerioder kaster ikke feil ved korrekt data`() {
-            assertThatCode { opphørValideringService.validerVilkårsPerioder(saksbehandling = saksbehandling) }
+            assertThatCode { opphørValideringService.validerVilkårperioder(saksbehandling = saksbehandling) }
                 .doesNotThrowAnyException()
         }
 
@@ -95,7 +95,7 @@ class OpphørValideringServiceTest {
             every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår.copy(status = VilkårStatus.NY))
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårsPerioder(saksbehandling)
+                opphørValideringService.validerVilkårperioder(saksbehandling)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye utgifter som er oppfylt")
         }
 
@@ -107,7 +107,7 @@ class OpphørValideringServiceTest {
             )
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårsPerioder(saksbehandling)
+                opphørValideringService.validerVilkårperioder(saksbehandling)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye målgrupper som er oppfylt")
         }
 
@@ -119,7 +119,7 @@ class OpphørValideringServiceTest {
             )
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårsPerioder(saksbehandling)
+                opphørValideringService.validerVilkårperioder(saksbehandling)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er nye aktiviteter som er oppfylt")
         }
 
@@ -131,7 +131,7 @@ class OpphørValideringServiceTest {
             )
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårsPerioder(saksbehandling)
+                opphørValideringService.validerVilkårperioder(saksbehandling)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret målgruppe er etter revurder fra dato")
         }
 
@@ -143,7 +143,7 @@ class OpphørValideringServiceTest {
             )
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårsPerioder(saksbehandling)
+                opphørValideringService.validerVilkårperioder(saksbehandling)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret aktivitet er etter revurder fra dato")
         }
 
@@ -157,7 +157,7 @@ class OpphørValideringServiceTest {
             )
 
             assertThatThrownBy {
-                opphørValideringService.validerVilkårsPerioder(saksbehandling)
+                opphørValideringService.validerVilkårperioder(saksbehandling)
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter revurder fra dato")
         }
     }

@@ -84,7 +84,7 @@ class LæremidlerBeregnYtelseSteg(
         val forrigeVedtak = vedtakRepository.findByIdOrThrow(saksbehandling.forrigeBehandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
 
-        opphørValideringService.validerVilkårsPerioder(saksbehandling)
+        opphørValideringService.validerVilkårperioder(saksbehandling)
 
         val avkortetBeregningsresultat = avkortBeregningsresultatVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
         val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
