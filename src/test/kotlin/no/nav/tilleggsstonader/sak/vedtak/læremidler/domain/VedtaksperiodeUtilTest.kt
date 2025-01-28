@@ -4,6 +4,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.vedtaksperioderInnenforLøpendeMåned
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -94,5 +97,65 @@ class VedtaksperiodeUtilTest {
                 validerVedtaksperioder(vedtaksperioder, stønadsperioder)
             }.hasMessageContaining("Vedtaksperiode er ikke innenfor en overlappsperiode")
         }
+    }
+
+    @Nested
+    inner class VedtaksperioderInnenforLøpendeMåned {
+
+        @Test
+        fun `skal ikke avkorte vedtaksperiode hvis den omslutes av beregningsgrunnlag`() {
+            val vedtaksperioder = vedtaksperioderInnenforLøpendeMåned(
+                listOf(Vedtaksperiode(fom = LocalDate.of(2024, 1, 5), tom = LocalDate.of(2024, 1, 10))),
+                lagBeregningsgrunnlag(fom = LocalDate.of(2024, 1, 1), tom = LocalDate.of(2024, 1, 31)),
+            )
+
+            assertThat(vedtaksperioder).containsExactly(
+                Vedtaksperiode(fom = LocalDate.of(2024, 1, 5), tom = LocalDate.of(2024, 1, 10)),
+            )
+        }
+
+        @Test
+        fun `skal avkorte vedtaksperiode hvis den er lengre enn beregningsgrunnlag`() {
+            val vedtaksperioder = vedtaksperioderInnenforLøpendeMåned(
+                listOf(Vedtaksperiode(fom = LocalDate.of(2024, 1, 1), tom = LocalDate.of(2024, 2, 29))),
+                lagBeregningsgrunnlag(fom = LocalDate.of(2024, 1, 15), tom = LocalDate.of(2024, 2, 14)),
+            )
+
+            assertThat(vedtaksperioder).containsExactly(
+                Vedtaksperiode(fom = LocalDate.of(2024, 1, 15), tom = LocalDate.of(2024, 2, 14)),
+            )
+        }
+
+        @Test
+        fun `skal returnere alle perioder innenfor et beregningsgrunnlag`() {
+            val vedtaksperioder = vedtaksperioderInnenforLøpendeMåned(
+                listOf(
+                    Vedtaksperiode(fom = LocalDate.of(2024, 1, 1), tom = LocalDate.of(2024, 1, 1)),
+                    Vedtaksperiode(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 2)),
+                    Vedtaksperiode(fom = LocalDate.of(2024, 1, 3), tom = LocalDate.of(2024, 1, 3)),
+                    Vedtaksperiode(fom = LocalDate.of(2024, 1, 4), tom = LocalDate.of(2024, 1, 4)),
+                ),
+                lagBeregningsgrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 3)),
+            )
+
+            assertThat(vedtaksperioder).containsExactly(
+                Vedtaksperiode(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 2)),
+                Vedtaksperiode(fom = LocalDate.of(2024, 1, 3), tom = LocalDate.of(2024, 1, 3)),
+            )
+        }
+
+        private fun lagBeregningsgrunnlag(fom: LocalDate, tom: LocalDate) = BeregningsresultatForMåned(
+            10,
+            grunnlag = Beregningsgrunnlag(
+                fom = fom,
+                tom = tom,
+                utbetalingsdato = fom,
+                studienivå = Studienivå.HØYERE_UTDANNING,
+                studieprosent = 100,
+                sats = 100,
+                satsBekreftet = true,
+                målgruppe = MålgruppeType.AAP,
+            ),
+        )
     }
 }
