@@ -41,9 +41,14 @@ interface OppgaveRepository :
     @Query(
         """
         SELECT gsak_oppgave_id, o.behandling_id, 
-        t.saksbehandler AS sendt_til_totrinnskontroll_av 
+        t.saksbehandler AS sendt_til_totrinnskontroll_av,
+        CASE 
+            WHEN v.type = 'OPPHØR' THEN TRUE 
+            ELSE FALSE 
+        END AS er_opphor
         FROM oppgave o
         LEFT JOIN totrinnskontroll t ON t.behandling_id = o.behandling_id AND t.status = 'KAN_FATTE_VEDTAK'
+        LEFT JOIN vedtak v ON o.behandling_id = v.behandling_id 
         WHERE gsak_oppgave_id IN (:oppgaveIder)
         AND o.behandling_id IS NOT NULL
         """,

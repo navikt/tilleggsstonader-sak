@@ -31,4 +31,5 @@ data class OppgaveMetadata(
     val gsakOppgaveId: Long,
     val behandlingId: UUID,
     val sendtTilTotrinnskontrollAv: String? = null,
+    val erOpphor: Boolean? = false,
 )
