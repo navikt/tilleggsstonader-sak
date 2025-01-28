@@ -4,9 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.splitFraRevurderFra
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -142,6 +144,24 @@ object TilsynBeregningUtil {
                 stønadsperiode.overlapper(utgifterPeriode)
             }
         }
+    }
+
+    fun List<StønadsperiodeBeregningsgrunnlag>.brukPerioderFraOgMedRevurderFra(
+        revurderFra: LocalDate?,
+    ): List<StønadsperiodeBeregningsgrunnlag> =
+        revurderFra?.let {
+            this.splitFraRevurderFra(revurderFra).filter { it.fom >= revurderFra }
+        } ?: this
+
+    fun Map<BarnId, List<UtgiftBeregning>>.brukPerioderFraOgMedRevurderFraMåned(
+        revurderFra: LocalDate?,
+    ): Map<BarnId, List<UtgiftBeregning>> {
+        val revurderFraMåned = revurderFra?.toYearMonth() ?: return this
+
+        return this
+            .mapValues { (_, utgifter) ->
+                utgifter.splitFraRevurderFra(revurderFra).filter { it.fom >= revurderFraMåned }
+            }.filterValues { it.isNotEmpty() }
     }
 }
 

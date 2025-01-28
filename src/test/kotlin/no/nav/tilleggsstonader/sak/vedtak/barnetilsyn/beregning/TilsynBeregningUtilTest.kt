@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFra
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.erOverlappMellomStønadsperioderOgUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
@@ -142,7 +144,7 @@ class TilsynBeregningUtilTest {
     // TODO: Test for aktiviteter
 
     @Nested
-    inner class OverlappMellomStønadsperioderOgUtgifter {
+    inner class ValideringAvStønadsperioderOgUtgifter {
         val stønadsperioder =
             listOf(
                 StønadsperiodeBeregningsgrunnlag(
@@ -168,6 +170,12 @@ class TilsynBeregningUtilTest {
                 tom = YearMonth.of(2025, 2),
                 utgift = 1000,
             )
+        val utgiftJanuarTilFebruar =
+            UtgiftBeregning(
+                fom = YearMonth.of(2025, 1),
+                tom = YearMonth.of(2025, 2),
+                utgift = 1000,
+            )
         val utgiftMars =
             UtgiftBeregning(
                 fom = YearMonth.of(2025, 3),
@@ -184,46 +192,105 @@ class TilsynBeregningUtilTest {
                     ),
                 barn2 to
                     listOf(
-                        utgiftJanuar,
-                        utgiftFebruar,
+                        utgiftJanuarTilFebruar,
                     ),
             )
 
-        @Test
-        fun `skal retunere true når flere barn overlapper`() {
-            assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isTrue
+        @Nested
+        inner class OverlappMellomStønadsperioderOgUtgifter {
+            @Test
+            fun `skal retunere true når flere barn overlapper`() {
+                assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isTrue
+            }
+
+            @Test
+            fun `skal retunere true når kun ett barn overlapper`() {
+                val utgifter =
+                    mapOf(
+                        barn1 to
+                            listOf(
+                                utgiftJanuar,
+                                utgiftFebruar,
+                            ),
+                        barn2 to
+                            listOf(
+                                utgiftMars,
+                            ),
+                    )
+                assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isTrue
+            }
+
+            @Test
+            fun `skal retunere false når ikke overlapp`() {
+                val stønadsperioder =
+                    listOf(
+                        StønadsperiodeBeregningsgrunnlag(
+                            fom = LocalDate.of(2025, 3, 1),
+                            tom = LocalDate.of(2025, 3, 31),
+                            målgruppe = MålgruppeType.AAP,
+                            aktivitet = AktivitetType.TILTAK,
+                        ),
+                    )
+
+                assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isFalse
+            }
         }
 
-        @Test
-        fun `skal retunere true når kun ett barn overlapper`() {
-            val utgifter =
-                mapOf(
-                    barn1 to
-                        listOf(
-                            utgiftJanuar,
-                            utgiftFebruar,
+        @Nested
+        inner class BrukPerioderFraOgMedRevurderFra {
+            @Test
+            fun `skal returnere orginal liste uten revurder fra`() {
+                assertThat(stønadsperioder.brukPerioderFraOgMedRevurderFra(null)).isEqualTo(stønadsperioder)
+            }
+
+            @Test
+            fun `skal returnere perioder etter revurder fra`() {
+                val revurderFra = LocalDate.of(2025, 2, 1)
+
+                val forventedeStønadsperioder =
+                    listOf(
+                        StønadsperiodeBeregningsgrunnlag(
+                            fom = LocalDate.of(2025, 2, 1),
+                            tom = LocalDate.of(2025, 2, 28),
+                            målgruppe = MålgruppeType.AAP,
+                            aktivitet = AktivitetType.TILTAK,
                         ),
-                    barn2 to
-                        listOf(
-                            utgiftMars,
-                        ),
-                )
-            assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isTrue
+                    )
+
+                assertThat(
+                    stønadsperioder
+                        .brukPerioderFraOgMedRevurderFra(revurderFra),
+                ).isEqualTo(forventedeStønadsperioder)
+            }
         }
 
-        @Test
-        fun `skal retunere false når ikke overlapp`() {
-            val stønadsperioder =
-                listOf(
-                    StønadsperiodeBeregningsgrunnlag(
-                        fom = LocalDate.of(2025, 3, 1),
-                        tom = LocalDate.of(2025, 3, 31),
-                        målgruppe = MålgruppeType.AAP,
-                        aktivitet = AktivitetType.TILTAK,
-                    ),
-                )
+        @Nested
+        inner class BrukPerioderFraOgMedRevurderFraMåned {
+            @Test
+            fun `skal returnere orginal map uten revurder fra`() {
+                assertThat(utgifter.brukPerioderFraOgMedRevurderFraMåned(null)).isEqualTo(utgifter)
+            }
 
-            assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isFalse
+            @Test
+            fun `skal returnere perioder etter revurder fra`() {
+                val revurderFra = LocalDate.of(2025, 2, 1)
+
+                val forventedeUtgifter =
+                    mapOf(
+                        barn1 to
+                            listOf(
+                                utgiftFebruar,
+                            ),
+                        barn2 to
+                            listOf(
+                                utgiftFebruar,
+                            ),
+                    )
+                assertThat(
+                    utgifter
+                        .brukPerioderFraOgMedRevurderFraMåned(revurderFra),
+                ).isEqualTo(forventedeUtgifter)
+            }
         }
     }
 
