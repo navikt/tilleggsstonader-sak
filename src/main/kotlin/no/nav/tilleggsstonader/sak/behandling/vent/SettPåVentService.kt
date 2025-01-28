@@ -60,12 +60,13 @@ class SettPåVentService(
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 
         val oppgave = hentOppgave(behandlingId)
-        val settPåVent = SettPåVent(
-            behandlingId = behandlingId,
-            oppgaveId = oppgave.id,
-            årsaker = dto.årsaker,
-            kommentar = dto.kommentar,
-        )
+        val settPåVent =
+            SettPåVent(
+                behandlingId = behandlingId,
+                oppgaveId = oppgave.id,
+                årsaker = dto.årsaker,
+                kommentar = dto.kommentar,
+            )
         settPåVentRepository.insert(settPåVent)
 
         val oppdatertOppgave = settOppgavePåVent(oppgave, settPåVent, dto.frist)
@@ -98,7 +99,7 @@ class SettPåVentService(
         }
         val settPåVent = finnAktivSattPåVent(behandlingId)
 
-        if (harEndretÅrsaker(settPåVent, dto)) {
+        if (harEndretÅrsaker(settPåVent, dto) || harEndretKommentar(settPåVent, dto)) {
             opprettHistorikkInnslag(
                 behandling,
                 StegUtfall.SATT_PÅ_VENT,
@@ -106,10 +107,11 @@ class SettPåVentService(
                 kommentar = dto.kommentar,
             )
         }
+
         val oppdatertSettPåVent =
             settPåVentRepository.update(settPåVent.copy(årsaker = dto.årsaker, kommentar = dto.kommentar))
 
-        val oppgaveResponse = oppdaterOppgave(settPåVent, dto)
+        val oppgaveResponse = oppdaterOppgave(oppdatertSettPåVent, dto)
 
         val endret = utledEndretInformasjon(oppdatertSettPåVent)
 
@@ -134,6 +136,11 @@ class SettPåVentService(
             .takeIf {
                 ChronoUnit.SECONDS.between(it.opprettetTid, it.endret.endretTid) > 5
             }?.endret
+
+    private fun harEndretKommentar(
+        settPåVent: SettPåVent,
+        dto: OppdaterSettPåVentDto,
+    ) = settPåVent.kommentar != dto.kommentar
 
     private fun harEndretÅrsaker(
         settPåVent: SettPåVent,
@@ -173,17 +180,17 @@ class SettPåVentService(
         settPåVent: SettPåVent,
         frist: LocalDate,
     ): OppdatertOppgaveResponse {
-
         val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
         val mappe = oppgaveService.finnMappe(enhet, OppgaveMappe.PÅ_VENT)
-        val oppdatertOppgave = Oppgave(
-            id = oppgave.id,
-            versjon = oppgave.versjon,
-            tilordnetRessurs = "",
-            fristFerdigstillelse = frist,
-            beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, settPåVent, frist),
-            mappeId = Optional.of(mappe.id),
-        )
+        val oppdatertOppgave =
+            Oppgave(
+                id = oppgave.id,
+                versjon = oppgave.versjon,
+                tilordnetRessurs = "",
+                fristFerdigstillelse = frist,
+                beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, settPåVent, frist),
+                mappeId = Optional.of(mappe.id),
+            )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
     }
 
@@ -197,7 +204,7 @@ class SettPåVentService(
                 id = settPåVent.oppgaveId,
                 versjon = dto.oppgaveVersjon,
                 fristFerdigstillelse = dto.frist,
-                beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(oppgave, dto.frist),
+                beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(oppgave, settPåVent, dto.frist),
                 tilordnetRessurs = "",
             )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)

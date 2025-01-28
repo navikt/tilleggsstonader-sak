@@ -19,14 +19,15 @@ object SettPåVentBeskrivelseUtil {
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
         val kommentarRad = "Kommentar: ${settPåVent.kommentar}"
         return utledBeskrivelsePrefix(tidspunkt) +
-                utledOppgavefristBeskrivelse(oppgave, frist).påNyRadEllerTomString() +
-                tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
-                kommentarRad.påNyRadEllerTomString() +
-                nåværendeBeskrivelse(oppgave)
+            utledOppgavefristBeskrivelse(oppgave, frist).påNyRadEllerTomString() +
+            tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+            kommentarRad.påNyRadEllerTomString() +
+            nåværendeBeskrivelse(oppgave)
     }
 
     fun oppdaterSettPåVent(
         oppgave: Oppgave,
+        settPåVent: SettPåVent,
         frist: LocalDate,
         tidspunkt: LocalDateTime = osloNow(),
     ): String {
@@ -36,10 +37,12 @@ object SettPåVentBeskrivelseUtil {
         }
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
+        val kommentarRad = "Kommentar: ${settPåVent.kommentar}"
         return utledBeskrivelsePrefix(tidspunkt) +
-                fristBeskrivelse.påNyRadEllerTomString() +
-                tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
-                nåværendeBeskrivelse(oppgave)
+            fristBeskrivelse.påNyRadEllerTomString() +
+            tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+            kommentarRad.påNyRadEllerTomString() +
+            nåværendeBeskrivelse(oppgave)
     }
 
     fun taAvVent(
@@ -49,9 +52,9 @@ object SettPåVentBeskrivelseUtil {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, SikkerhetContext.hentSaksbehandlerEllerSystembruker())
         return utledBeskrivelsePrefix(tidspunkt) +
-                "\nTatt av vent" +
-                tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
-                nåværendeBeskrivelse(oppgave)
+            "\nTatt av vent" +
+            tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+            nåværendeBeskrivelse(oppgave)
     }
 
     private fun String?.påNyRadEllerTomString(): String = this?.trim()?.takeIf { it.isNotBlank() }?.let { "\n$it" } ?: ""
