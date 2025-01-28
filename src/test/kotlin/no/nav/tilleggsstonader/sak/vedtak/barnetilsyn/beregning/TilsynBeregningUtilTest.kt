@@ -156,33 +156,36 @@ class TilsynBeregningUtilTest {
         val barn1 = BarnId.random()
         val barn2 = BarnId.random()
 
+        val utgiftJanuar =
+            UtgiftBeregning(
+                fom = YearMonth.of(2025, 1),
+                tom = YearMonth.of(2025, 1),
+                utgift = 1000,
+            )
+        val utgiftFebruar =
+            UtgiftBeregning(
+                fom = YearMonth.of(2025, 2),
+                tom = YearMonth.of(2025, 2),
+                utgift = 1000,
+            )
+        val utgiftMars =
+            UtgiftBeregning(
+                fom = YearMonth.of(2025, 3),
+                tom = YearMonth.of(2025, 3),
+                utgift = 1000,
+            )
+
         val utgifter =
             mapOf(
                 barn1 to
                     listOf(
-                        UtgiftBeregning(
-                            fom = YearMonth.of(2025, 1),
-                            tom = YearMonth.of(2025, 1),
-                            utgift = 1000,
-                        ),
-                        UtgiftBeregning(
-                            fom = YearMonth.of(2025, 2),
-                            tom = YearMonth.of(2025, 2),
-                            utgift = 1000,
-                        ),
+                        utgiftJanuar,
+                        utgiftFebruar,
                     ),
                 barn2 to
                     listOf(
-                        UtgiftBeregning(
-                            fom = YearMonth.of(2025, 1),
-                            tom = YearMonth.of(2025, 1),
-                            utgift = 1000,
-                        ),
-                        UtgiftBeregning(
-                            fom = YearMonth.of(2025, 2),
-                            tom = YearMonth.of(2025, 2),
-                            utgift = 1000,
-                        ),
+                        utgiftJanuar,
+                        utgiftFebruar,
                     ),
             )
 
@@ -197,24 +200,12 @@ class TilsynBeregningUtilTest {
                 mapOf(
                     barn1 to
                         listOf(
-                            UtgiftBeregning(
-                                fom = YearMonth.of(2025, 1),
-                                tom = YearMonth.of(2025, 1),
-                                utgift = 1000,
-                            ),
-                            UtgiftBeregning(
-                                fom = YearMonth.of(2025, 2),
-                                tom = YearMonth.of(2025, 2),
-                                utgift = 1000,
-                            ),
+                            utgiftJanuar,
+                            utgiftFebruar,
                         ),
                     barn2 to
                         listOf(
-                            UtgiftBeregning(
-                                fom = YearMonth.of(2025, 3),
-                                tom = YearMonth.of(2025, 3),
-                                utgift = 1000,
-                            ),
+                            utgiftMars,
                         ),
                 )
             assertThat(erOverlappMellomStønadsperioderOgUtgifter(stønadsperioder, utgifter)).isTrue
