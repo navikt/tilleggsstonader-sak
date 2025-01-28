@@ -18,8 +18,7 @@ Egenskap: Beregning - med revurderFra
 
     Når beregner med revurderFra=2024-02-15
 
-    Så forvent følgende beregningsresultat
-      | Måned | Dagsats | Antall dager | Utgift | Månedsbeløp |
+    Så forvent følgende feil: Kan ikke innvilge når det ikke finnes noen overlapp mellom målgruppe, aktivitet og utgifter etter revurder fra dato
 
 
   Scenario: Skal ta med alle perioder som starter etter revurderFra

@@ -331,25 +331,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest(
             assertHarPerioderForJanuarTilMars(revurdering.id)
         }
 
-        /**
-         * Inget reellt tilfelle, men verifiserer at man ikke gjenbruker perioder før revurder-fra-datoet
-         * I en revurdering er det egentlige ikke mulig å legge til perioder før revurder-fra
-         */
-        @Test
-        fun `skal ikke ta med perioder før revurder-fra`() {
-            innvilgPerioderForJanuarOgFebruar(behandling.id)
-            assertHarPerioderForJanuarOgFebruar(behandling.id)
-
-            testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
-            val revurdering = opprettRevurdering(revurderFra = april.atDay(15))
-
-            innvilgPerioderForMars(revurdering)
-
-            // Har ikke med periodene for mars som ble lagt inn i revurderingen
-            // Men har kopiert perioder for januar og februar fra forrige behandlingen
-            assertHarPerioderForJanuarOgFebruar(revurdering.id)
-        }
-
         private fun opprettRevurdering(revurderFra: LocalDate?) =
             testoppsettService
                 .lagre(
