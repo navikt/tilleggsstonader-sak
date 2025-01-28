@@ -22,6 +22,7 @@ class SettPåVentBeskrivelseUtilTest {
             oppgaveId = 1L,
             årsaker = listOf(ÅrsakSettPåVent.DOKUMENTASJON_FRA_BRUKER),
             kommentar = "En kommentar",
+            taAvVentKommentar = "Tatt av vent-kommentar",
         )
 
     @BeforeEach
@@ -111,6 +112,7 @@ class SettPåVentBeskrivelseUtilTest {
                 --- 05.03.2024 18:00 a100 (a100) ---
                 Oppgave endret frist fra <ingen> til 01.01.2023
                 Oppgave flyttet fra saksbehandler a100 til <ingen>
+                Kommentar: En kommentar
                 """.trimIndent(),
             )
         }
@@ -123,6 +125,7 @@ class SettPåVentBeskrivelseUtilTest {
             val beskrivelse =
                 SettPåVentBeskrivelseUtil.taAvVent(
                     Oppgave(id = 0, versjon = 0, beskrivelse = "tidligere beskrivelse", tilordnetRessurs = null),
+                    settPåVent,
                     tidspunkt,
                 )
             assertThat(beskrivelse).isEqualTo(
@@ -130,6 +133,7 @@ class SettPåVentBeskrivelseUtilTest {
                 --- 05.03.2024 18:00 a100 (a100) ---
                 Tatt av vent
                 Oppgave flyttet fra saksbehandler <ingen> til a100
+                Kommentar: Tatt av vent-kommentar
                 
                 tidligere beskrivelse
                 """.trimIndent(),

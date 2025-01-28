@@ -47,13 +47,16 @@ object SettPåVentBeskrivelseUtil {
 
     fun taAvVent(
         oppgave: Oppgave,
+        settPåVent: SettPåVent,
         tidspunkt: LocalDateTime = osloNow(),
     ): String {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, SikkerhetContext.hentSaksbehandlerEllerSystembruker())
+        val kommentarRad = "Kommentar: ${settPåVent.taAvVentKommentar}"
         return utledBeskrivelsePrefix(tidspunkt) +
             "\nTatt av vent" +
             tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+            kommentarRad.påNyRadEllerTomString() +
             nåværendeBeskrivelse(oppgave)
     }
 

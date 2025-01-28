@@ -164,11 +164,11 @@ class SettPåVentService(
         }
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.UTREDES)
 
-        val settPåVent = finnAktivSattPåVent(behandlingId)
-        settPåVentRepository.update(settPåVent.copy(aktiv = false, taAvVentKommentar = taAvVentDto?.kommentar))
+        val settPåVent = finnAktivSattPåVent(behandlingId).copy(aktiv = false, taAvVentKommentar = taAvVentDto?.kommentar)
+        settPåVentRepository.update(settPåVent)
 
         opprettHistorikkInnslagTaAvVent(behandling, taAvVentDto?.kommentar)
-        taOppgaveAvVent(settPåVent.oppgaveId, skalTilordnesRessurs = taAvVentDto?.skalTilordnesRessurs ?: true)
+        taOppgaveAvVent(settPåVent.oppgaveId, settPåVent, skalTilordnesRessurs = taAvVentDto?.skalTilordnesRessurs ?: true)
     }
 
     private fun finnAktivSattPåVent(behandlingId: BehandlingId) =
@@ -212,6 +212,7 @@ class SettPåVentService(
 
     private fun taOppgaveAvVent(
         oppgaveId: Long,
+        settPåVent: SettPåVent,
         skalTilordnesRessurs: Boolean,
     ) {
         val oppgave = oppgaveService.hentOppgave(oppgaveId)
@@ -230,7 +231,7 @@ class SettPåVentService(
                 versjon = oppgave.versjon,
                 tilordnetRessurs = tilordnetRessurs,
                 fristFerdigstillelse = osloDateNow(),
-                beskrivelse = SettPåVentBeskrivelseUtil.taAvVent(oppgave),
+                beskrivelse = SettPåVentBeskrivelseUtil.taAvVent(oppgave, settPåVent),
                 mappeId = Optional.ofNullable(mappeId),
             ),
         )
