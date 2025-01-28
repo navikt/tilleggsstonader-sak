@@ -38,13 +38,15 @@ class TilsynBarnBeregnYtelseSteg(
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<VedtakTilsynBarnRequest>(
-    stønadstype = Stønadstype.BARNETILSYN,
-    vedtakRepository = vedtakRepository,
-    tilkjentytelseService = tilkjentytelseService,
-    simuleringService = simuleringService,
-) {
-
-    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakTilsynBarnRequest) {
+        stønadstype = Stønadstype.BARNETILSYN,
+        vedtakRepository = vedtakRepository,
+        tilkjentytelseService = tilkjentytelseService,
+        simuleringService = simuleringService,
+    ) {
+    override fun lagreVedtak(
+        saksbehandling: Saksbehandling,
+        vedtak: VedtakTilsynBarnRequest,
+    ) {
         when (vedtak) {
             is InnvilgelseTilsynBarnRequest -> beregnOgLagreInnvilgelse(saksbehandling)
             is AvslagTilsynBarnDto -> lagreAvslag(saksbehandling, vedtak)
@@ -58,12 +60,15 @@ class TilsynBarnBeregnYtelseSteg(
         lagreAndeler(saksbehandling, beregningsresultat)
     }
 
-    private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørTilsynBarnRequest) {
+    private fun beregnOgLagreOpphør(
+        saksbehandling: Saksbehandling,
+        vedtak: OpphørTilsynBarnRequest,
+    ) {
         brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
 
-        opphørValideringService.validerPerioder(saksbehandling)
+        opphørValideringService.validerVilkårperioder(saksbehandling)
 
         val beregningsresultat = beregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
         opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(beregningsresultat, saksbehandling.revurderFra)
@@ -71,12 +76,12 @@ class TilsynBarnBeregnYtelseSteg(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.OPPHØR,
-                data = OpphørTilsynBarn(
-                    beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
-                    årsaker = vedtak.årsakerOpphør,
-                    begrunnelse = vedtak.begrunnelse,
-                ),
-
+                data =
+                    OpphørTilsynBarn(
+                        beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
+                        årsaker = vedtak.årsakerOpphør,
+                        begrunnelse = vedtak.begrunnelse,
+                    ),
             ),
         )
 
@@ -91,10 +96,11 @@ class TilsynBarnBeregnYtelseSteg(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.AVSLAG,
-                data = AvslagTilsynBarn(
-                    årsaker = vedtak.årsakerAvslag,
-                    begrunnelse = vedtak.begrunnelse,
-                ),
+                data =
+                    AvslagTilsynBarn(
+                        årsaker = vedtak.årsakerAvslag,
+                        begrunnelse = vedtak.begrunnelse,
+                    ),
             ),
         )
     }
@@ -103,26 +109,30 @@ class TilsynBarnBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         beregningsresultat: BeregningsresultatTilsynBarn,
     ) {
-        val andelerTilkjentYtelse = beregningsresultat.perioder.flatMap {
-            it.beløpsperioder.map { beløpsperiode ->
-                val satstype = Satstype.DAG
-                val ukedag = beløpsperiode.dato.dayOfWeek
-                feilHvis(ukedag == DayOfWeek.SATURDAY || ukedag == DayOfWeek.SUNDAY) {
-                    "Skal ikke opprette perioder som begynner på en helgdag for satstype=$satstype"
+        val andelerTilkjentYtelse =
+            beregningsresultat.perioder.flatMap {
+                it.beløpsperioder.map { beløpsperiode ->
+                    val satstype = Satstype.DAG
+                    val ukedag = beløpsperiode.dato.dayOfWeek
+                    feilHvis(ukedag == DayOfWeek.SATURDAY || ukedag == DayOfWeek.SUNDAY) {
+                        "Skal ikke opprette perioder som begynner på en helgdag for satstype=$satstype"
+                    }
+                    val førsteDagIMåneden =
+                        beløpsperiode.dato
+                            .toYearMonth()
+                            .atDay(1)
+                            .datoEllerNesteMandagHvisLørdagEllerSøndag()
+                    AndelTilkjentYtelse(
+                        beløp = beløpsperiode.beløp,
+                        fom = beløpsperiode.dato,
+                        tom = beløpsperiode.dato,
+                        satstype = satstype,
+                        type = beløpsperiode.målgruppe.tilTypeAndel(),
+                        kildeBehandlingId = saksbehandling.id,
+                        utbetalingsdato = førsteDagIMåneden,
+                    )
                 }
-                val førsteDagIMåneden =
-                    beløpsperiode.dato.toYearMonth().atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag()
-                AndelTilkjentYtelse(
-                    beløp = beløpsperiode.beløp,
-                    fom = beløpsperiode.dato,
-                    tom = beløpsperiode.dato,
-                    satstype = satstype,
-                    type = beløpsperiode.målgruppe.tilTypeAndel(),
-                    kildeBehandlingId = saksbehandling.id,
-                    utbetalingsdato = førsteDagIMåneden,
-                )
             }
-        }
 
         tilkjentytelseService.opprettTilkjentYtelse(saksbehandling, andelerTilkjentYtelse)
     }
@@ -130,22 +140,21 @@ class TilsynBarnBeregnYtelseSteg(
     private fun lagInnvilgetVedtak(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatTilsynBarn,
-    ): Vedtak {
-        return GeneriskVedtak(
+    ): Vedtak =
+        GeneriskVedtak(
             behandlingId = behandling.id,
             type = TypeVedtak.INNVILGELSE,
-            data = InnvilgelseTilsynBarn(
-                beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
-            ),
+            data =
+                InnvilgelseTilsynBarn(
+                    beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
+                ),
         )
-    }
 
-    private fun MålgruppeType.tilTypeAndel(): TypeAndel {
-        return when (this) {
+    private fun MålgruppeType.tilTypeAndel(): TypeAndel =
+        when (this) {
             MålgruppeType.AAP, MålgruppeType.UFØRETRYGD, MålgruppeType.NEDSATT_ARBEIDSEVNE -> TypeAndel.TILSYN_BARN_AAP
             MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER
             MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.TILSYN_BARN_ETTERLATTE
             else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
         }
-    }
 }

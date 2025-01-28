@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.arena.VedtakStatus
 import java.time.LocalDate
 
 object ArenaStatusDtoUtil {
-
     fun arenaStatusDto(
         vedtakStatus: VedtakStatus = vedtakStatus(),
         sakStatus: SakStatus = SakStatus(false),

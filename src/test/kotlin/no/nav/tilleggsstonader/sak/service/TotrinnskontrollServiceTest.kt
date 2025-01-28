@@ -35,7 +35,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
 internal class TotrinnskontrollServiceTest {
-
     private val behandlingshistorikkService = mockk<BehandlingshistorikkService>(relaxed = true)
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val tilgangService = mockk<TilgangService>()
@@ -79,13 +78,14 @@ internal class TotrinnskontrollServiceTest {
 
     @Test
     internal fun `skal returnere saksbehandler som sendte behandling til besluttning`() {
-        val response = testWithBrukerContext(beslutter) {
-            totrinnskontrollService
-                .lagreTotrinnskontrollOgReturnerSaksbehandler(
-                    saksbehandling(status = BehandlingStatus.UTREDES),
-                    BeslutteVedtakDto(true, ""),
-                )
-        }
+        val response =
+            testWithBrukerContext(beslutter) {
+                totrinnskontrollService
+                    .lagreTotrinnskontrollOgReturnerSaksbehandler(
+                        saksbehandling(status = BehandlingStatus.UTREDES),
+                        BeslutteVedtakDto(true, ""),
+                    )
+            }
         assertThat(response).isEqualTo(saksbehandler)
     }
 
@@ -194,8 +194,12 @@ internal class TotrinnskontrollServiceTest {
         assertThat(totrinnskontroll.totrinnskontroll?.begrunnelse).isEqualTo("begrunnelse underkjent")
     }
 
+    /*
+     * skal returnere KAN_FATTE_VEDTAK når behandlingen FATTER_VEDTAK og saksbehandler er utreder og ikke er den som
+     * sendte behandlingen til fatte vedtak
+     */
     @Test
-    internal fun `skal returnere KAN_FATTE_VEDTAK når behandlingen FATTER_VEDTAK og saksbehandler er utreder og ikke er den som sendte behandlingen til fatte vedtak`() {
+    internal fun `skal returnere KAN_FATTE_VEDTAK i gitt situasjon`() {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FATTER_VEDTAK)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
             totrinnskontroll(
@@ -209,15 +213,20 @@ internal class TotrinnskontrollServiceTest {
         assertThat(totrinnskontroll.totrinnskontroll).isNull()
     }
 
+    /*
+     * skal returnere IKKE_AUTORISERT når behandlingen FATTER_VEDTAK og saksbehandler er utreder, men er den som
+     * sendte behandlingen til fatte vedtak
+     */
     @Test
-    internal fun `skal returnere IKKE_AUTORISERT når behandlingen FATTER_VEDTAK og saksbehandler er utreder, men er den som sendte behandlingen til fatte vedtak`() {
+    internal fun `skal returnere IKKE_AUTORISERT i gitt situasjon`() {
         every { behandlingService.hentBehandling(any()) } returns behandling(BehandlingStatus.FATTER_VEDTAK)
         every { totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(any()) } returns
             totrinnskontroll(opprettetAv = beslutter)
 
-        val totrinnskontroll = testWithBrukerContext(beslutter) {
-            totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
-        }
+        val totrinnskontroll =
+            testWithBrukerContext(beslutter) {
+                totrinnskontrollService.hentTotrinnskontrollStatus(BEHANDLING_ID)
+            }
 
         assertThat(totrinnskontroll.totrinnskontroll).isNotNull
         assertThat(totrinnskontroll.status).isEqualTo(TotrinnkontrollStatus.IKKE_AUTORISERT)
@@ -248,14 +257,14 @@ internal class TotrinnskontrollServiceTest {
                 status = TotrinnInternStatus.GODKJENT,
             )
 
-        Assertions.assertThat(
-            Assertions.catchThrowable {
-                totrinnskontrollService.hentTotrinnskontrollStatus(
-                    BEHANDLING_ID,
-                )
-            },
-        )
-            .hasMessageContaining("Skal ikke kunne være annen status enn UNDERKJENT")
+        Assertions
+            .assertThat(
+                Assertions.catchThrowable {
+                    totrinnskontrollService.hentTotrinnskontrollStatus(
+                        BEHANDLING_ID,
+                    )
+                },
+            ).hasMessageContaining("Skal ikke kunne være annen status enn UNDERKJENT")
     }
 
     @Test
@@ -295,38 +304,35 @@ internal class TotrinnskontrollServiceTest {
     private fun totrinnskontroll(
         opprettetAv: String,
         status: TotrinnInternStatus = TotrinnInternStatus.KAN_FATTE_VEDTAK,
-    ) =
-        Totrinnskontroll(
-            behandlingId = BehandlingId.random(),
-            sporbar = Sporbar(opprettetAv),
-            status = status,
-            saksbehandler = opprettetAv,
-        )
+    ) = Totrinnskontroll(
+        behandlingId = BehandlingId.random(),
+        sporbar = Sporbar(opprettetAv),
+        status = status,
+        saksbehandler = opprettetAv,
+    )
 
     private fun totrinnskontrollMedbeslutterAArsakogBegrunnelse(
         opprettetAv: String,
         beslutter: String,
-
-    ) =
-        Totrinnskontroll(
-            behandlingId = BehandlingId.random(),
-            sporbar = Sporbar(opprettetAv),
-            status = TotrinnInternStatus.UNDERKJENT,
-            saksbehandler = opprettetAv,
-            beslutter = beslutter,
-            årsakerUnderkjent = Årsaker(
+    ) = Totrinnskontroll(
+        behandlingId = BehandlingId.random(),
+        sporbar = Sporbar(opprettetAv),
+        status = TotrinnInternStatus.UNDERKJENT,
+        saksbehandler = opprettetAv,
+        beslutter = beslutter,
+        årsakerUnderkjent =
+            Årsaker(
                 listOf(
                     ÅrsakUnderkjent.VEDTAKSBREV,
                     ÅrsakUnderkjent.VEDTAK_OG_BEREGNING,
                 ),
             ),
-            begrunnelse = "begrunnelse underkjent",
-        )
+        begrunnelse = "begrunnelse underkjent",
+    )
 
     private fun behandling(status: BehandlingStatus) = behandling(fagsak, status, steg = StegType.BESLUTTE_VEDTAK)
 
     companion object {
-
         private val BEHANDLING_ID = BehandlingId.random()
         private val fagsak = fagsak()
     }

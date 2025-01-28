@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 
 internal class BehandlingshistorikkServiceTest : IntegrationTest() {
-
     @Autowired
     private lateinit var behandlingshistorikkService: BehandlingshistorikkService
 

@@ -9,26 +9,21 @@ data class PdlResponse<T>(
     val errors: List<PdlError>?,
     val extensions: PdlExtensions?,
 ) {
+    fun harFeil(): Boolean = errors != null && errors.isNotEmpty()
 
-    fun harFeil(): Boolean {
-        return errors != null && errors.isNotEmpty()
-    }
-    fun harAdvarsel(): Boolean {
-        return !extensions?.warnings.isNullOrEmpty()
-    }
-    fun errorMessages(): String {
-        return errors?.joinToString { it -> it.message } ?: ""
-    }
+    fun harAdvarsel(): Boolean = !extensions?.warnings.isNullOrEmpty()
+
+    fun errorMessages(): String = errors?.joinToString { it -> it.message } ?: ""
 }
 
-data class PdlBolkResponse<T>(val data: PersonBolk<T>?, val errors: List<PdlError>?, val extensions: PdlExtensions?) {
+data class PdlBolkResponse<T>(
+    val data: PersonBolk<T>?,
+    val errors: List<PdlError>?,
+    val extensions: PdlExtensions?,
+) {
+    fun errorMessages(): String = errors?.joinToString { it -> it.message } ?: ""
 
-    fun errorMessages(): String {
-        return errors?.joinToString { it -> it.message } ?: ""
-    }
-    fun harAdvarsel(): Boolean {
-        return !extensions?.warnings.isNullOrEmpty()
-    }
+    fun harAdvarsel(): Boolean = !extensions?.warnings.isNullOrEmpty()
 }
 
 data class PdlError(
@@ -36,20 +31,38 @@ data class PdlError(
     val extensions: PdlErrorExtensions?,
 )
 
-data class PdlErrorExtensions(val code: String?) {
-
+data class PdlErrorExtensions(
+    val code: String?,
+) {
     fun notFound() = code == "not_found"
 }
-data class PdlExtensions(val warnings: List<PdlWarning>?)
-data class PdlWarning(val details: Any?, val id: String?, val message: String?, val query: String?)
 
-data class PdlSøkerData(val person: PdlSøker?)
+data class PdlExtensions(
+    val warnings: List<PdlWarning>?,
+)
 
-data class PersonDataBolk<T>(val ident: String, val code: String, val person: T?)
-data class PersonBolk<T>(val personBolk: List<PersonDataBolk<T>>)
+data class PdlWarning(
+    val details: Any?,
+    val id: String?,
+    val message: String?,
+    val query: String?,
+)
+
+data class PdlSøkerData(
+    val person: PdlSøker?,
+)
+
+data class PersonDataBolk<T>(
+    val ident: String,
+    val code: String,
+    val person: T?,
+)
+
+data class PersonBolk<T>(
+    val personBolk: List<PersonDataBolk<T>>,
+)
 
 interface PdlPerson {
-
     val fødselsdato: List<Fødselsdato>
     val bostedsadresse: List<Bostedsadresse>
 }
@@ -58,10 +71,7 @@ data class PdlIdentBolkResponse(
     val data: IdentBolk?,
     val errors: List<PdlError>?,
 ) {
-
-    fun errorMessages(): String {
-        return errors?.joinToString { it -> it.message } ?: ""
-    }
+    fun errorMessages(): String = errors?.joinToString { it -> it.message } ?: ""
 }
 
 data class PdlIdenterBolk(
@@ -69,20 +79,27 @@ data class PdlIdenterBolk(
     val ident: String,
     val identer: List<PdlIdent>?,
 ) {
-
     fun gjeldende(): PdlIdent = this.identer?.first { !it.historisk } ?: PdlIdent(ident, false)
 }
 
-data class IdentBolk(val hentIdenterBolk: List<PdlIdenterBolk>)
+data class IdentBolk(
+    val hentIdenterBolk: List<PdlIdenterBolk>,
+)
 
-data class PdlIdent(val ident: String, val historisk: Boolean)
+data class PdlIdent(
+    val ident: String,
+    val historisk: Boolean,
+)
 
-data class PdlIdenter(val identer: List<PdlIdent>) {
-
+data class PdlIdenter(
+    val identer: List<PdlIdent>,
+) {
     fun gjeldende(): PdlIdent = this.identer.first { !it.historisk }
 }
 
-data class PdlHentIdenter(val hentIdenter: PdlIdenter?)
+data class PdlHentIdenter(
+    val hentIdenter: PdlIdenter?,
+)
 
 data class PdlPersonKort(
     val adressebeskyttelse: List<Adressebeskyttelse>,
@@ -107,7 +124,6 @@ data class PdlSøker(
     val utflyttingFraNorge: List<UtflyttingFraNorge>,
     val vergemaalEllerFremtidsfullmakt: List<VergemaalEllerFremtidsfullmakt>,
 ) : PdlPerson {
-
     fun alleIdenter(): Set<String> = folkeregisteridentifikator.map { it.ident }.toSet()
 }
 
@@ -129,7 +145,9 @@ data class PdlAnnenForelder(
     val navn: List<Navn>,
 ) : PdlPerson
 
-data class Metadata(val historisk: Boolean)
+data class Metadata(
+    val historisk: Boolean,
+)
 
 data class Folkeregistermetadata(
     val gyldighetstidspunkt: LocalDateTime?,
@@ -159,7 +177,6 @@ data class Bostedsadresse(
     val matrikkeladresse: Matrikkeladresse?,
     val metadata: Metadata,
 ) {
-
     val matrikkelId get() = matrikkeladresse?.matrikkelId ?: vegadresse?.matrikkelId
 
     val bruksenhetsnummer get() = matrikkeladresse?.bruksenhetsnummer ?: vegadresse?.bruksenhetsnummer
@@ -189,7 +206,6 @@ data class Kontaktadresse(
 
 @Suppress("unused")
 enum class KontaktadresseType {
-
     @JsonProperty("Innland")
     INNLAND,
 
@@ -221,12 +237,17 @@ data class Vegadresse(
     val matrikkelId: Long?,
 )
 
-data class UkjentBosted(val bostedskommune: String?)
+data class UkjentBosted(
+    val bostedskommune: String?,
+)
 
-data class Adressebeskyttelse(val gradering: AdressebeskyttelseGradering, val metadata: Metadata) {
-
-    fun erStrengtFortrolig(): Boolean = this.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG ||
-        this.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+data class Adressebeskyttelse(
+    val gradering: AdressebeskyttelseGradering,
+    val metadata: Metadata,
+) {
+    fun erStrengtFortrolig(): Boolean =
+        this.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG ||
+            this.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
 }
 
 enum class AdressebeskyttelseGradering {
@@ -236,12 +257,13 @@ enum class AdressebeskyttelseGradering {
     UGRADERT,
 }
 
-fun AdressebeskyttelseGradering.tilDiskresjonskode(): String? = when (this) {
-    AdressebeskyttelseGradering.STRENGT_FORTROLIG -> "SPSF" // Kode 6
-    AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND -> "SPSF" // Kode 19
-    AdressebeskyttelseGradering.FORTROLIG -> "SPFO" // Kode 7
-    AdressebeskyttelseGradering.UGRADERT -> null
-}
+fun AdressebeskyttelseGradering.tilDiskresjonskode(): String? =
+    when (this) {
+        AdressebeskyttelseGradering.STRENGT_FORTROLIG -> "SPSF" // Kode 6
+        AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND -> "SPSF" // Kode 19
+        AdressebeskyttelseGradering.FORTROLIG -> "SPFO" // Kode 7
+        AdressebeskyttelseGradering.UGRADERT -> null
+    }
 
 /**
  * @param [fødselsår] skal finnes på alle brukere, men er definiert som nullable i skjema
@@ -252,7 +274,9 @@ data class Fødselsdato(
     val metadata: Metadata,
 )
 
-data class Dødsfall(@JsonProperty("doedsdato") val dødsdato: LocalDate?)
+data class Dødsfall(
+    @JsonProperty("doedsdato") val dødsdato: LocalDate?,
+)
 
 data class ForelderBarnRelasjon(
     val relatertPersonsIdent: String?,
@@ -286,7 +310,9 @@ data class Personnavn(
     val mellomnavn: String?,
 )
 
-data class Tolk(@JsonProperty("spraak") val språk: String?)
+data class Tolk(
+    @JsonProperty("spraak") val språk: String?,
+)
 
 data class Statsborgerskap(
     val land: String,

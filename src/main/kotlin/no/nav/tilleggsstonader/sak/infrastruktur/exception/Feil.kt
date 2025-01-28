@@ -89,4 +89,7 @@ inline fun brukerfeilHvisIkke(
     brukerfeilHvis(!boolean, httpStatus, sensitivFeilmelding) { lazyMessage() }
 }
 
-class ManglerTilgang(val melding: String, val frontendFeilmelding: String) : RuntimeException(melding)
+class ManglerTilgang(
+    val melding: String,
+    val frontendFeilmelding: String,
+) : RuntimeException(melding)

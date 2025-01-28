@@ -30,7 +30,6 @@ class HåndterSøknadService(
     private val behandlingService: BehandlingService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
-
     @Transactional
     fun håndterSøknad(request: HåndterSøknadRequest) {
         val personIdent = request.personIdent
@@ -50,7 +49,10 @@ class HåndterSøknadService(
         }
     }
 
-    fun kanAutomatiskJournalføre(personIdent: String, stønadstype: Stønadstype): Boolean {
+    fun kanAutomatiskJournalføre(
+        personIdent: String,
+        stønadstype: Stønadstype,
+    ): Boolean {
         val allePersonIdenter = personService.hentPersonIdenter(personIdent).identer()
         val fagsak = fagsakService.finnFagsak(allePersonIdenter, stønadstype)
 
@@ -62,9 +64,7 @@ class HåndterSøknadService(
         }
     }
 
-    private fun harÅpenBehandling(behandlinger: List<Behandling>): Boolean {
-        return behandlinger.any { !it.erAvsluttet() }
-    }
+    private fun harÅpenBehandling(behandlinger: List<Behandling>): Boolean = behandlinger.any { !it.erAvsluttet() }
 
     private fun håndterSøknadSomIkkeKanAutomatiskJournalføres(request: HåndterSøknadRequest) {
         val journalpost = journalpostService.hentJournalpost(request.journalpostId)
@@ -72,12 +72,13 @@ class HåndterSøknadService(
             OpprettOppgaveTask.opprettTask(
                 personIdent = request.personIdent,
                 stønadstype = request.stønadstype,
-                oppgave = OpprettOppgave(
-                    oppgavetype = Oppgavetype.Journalføring,
-                    enhetsnummer = journalpost.journalforendeEnhet?.takeIf { it != MASKINELL_JOURNALFOERENDE_ENHET },
-                    beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost),
-                    journalpostId = journalpost.journalpostId,
-                ),
+                oppgave =
+                    OpprettOppgave(
+                        oppgavetype = Oppgavetype.Journalføring,
+                        enhetsnummer = journalpost.journalforendeEnhet?.takeIf { it != MASKINELL_JOURNALFOERENDE_ENHET },
+                        beskrivelse = lagOppgavebeskrivelseForJournalføringsoppgave(journalpost),
+                        journalpostId = journalpost.journalpostId,
+                    ),
             ),
         )
     }

@@ -44,7 +44,6 @@ class TestoppsettService(
     private val grunnlagsdataService: GrunnlagsdataService,
     private val repository: VedtakRepository,
 ) {
-
     fun hentBehandling(behandlingId: BehandlingId) = behandlingRepository.findByIdOrThrow(behandlingId)
 
     fun hentSaksbehandling(behandlingId: BehandlingId) = behandlingRepository.finnSaksbehandling(behandlingId)
@@ -74,7 +73,10 @@ class TestoppsettService(
         behandling.forEach(this::lagre)
     }
 
-    fun lagre(behandling: Behandling, opprettGrunnlagsdata: Boolean = true): Behandling {
+    fun lagre(
+        behandling: Behandling,
+        opprettGrunnlagsdata: Boolean = true,
+    ): Behandling {
         val dbBehandling = behandlingRepository.insert(behandling)
         eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = dbBehandling.id))
 
@@ -85,9 +87,7 @@ class TestoppsettService(
         return dbBehandling
     }
 
-    fun oppdater(behandling: Behandling): Behandling {
-        return behandlingRepository.update(behandling)
-    }
+    fun oppdater(behandling: Behandling): Behandling = behandlingRepository.update(behandling)
 
     fun opprettGrunnlagsdata(behandlingId: BehandlingId) {
         grunnlagsdataService.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId)
@@ -95,14 +95,15 @@ class TestoppsettService(
 
     fun lagreFagsak(fagsak: Fagsak): Fagsak {
         val person = hentEllerOpprettPerson(fagsak)
-        val fagsak = fagsakRepository.insert(
-            FagsakDomain(
-                id = fagsak.id,
-                fagsakPersonId = person.id,
-                stønadstype = fagsak.stønadstype,
-                sporbar = fagsak.sporbar,
-            ),
-        )
+        val fagsak =
+            fagsakRepository.insert(
+                FagsakDomain(
+                    id = fagsak.id,
+                    fagsakPersonId = person.id,
+                    stønadstype = fagsak.stønadstype,
+                    sporbar = fagsak.sporbar,
+                ),
+            )
         val eksternFagsakId = eksternFagsakIdRepository.insert(EksternFagsakId(fagsakId = fagsak.id))
         return fagsak.tilFagsakMedPerson(person.identer, eksternFagsakId)
     }
@@ -111,33 +112,36 @@ class TestoppsettService(
         behandling: Behandling,
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
     ): GeneriskVedtak<InnvilgelseTilsynBarn> {
-        val vedtak = innvilgetVedtak(
-            behandlingId = behandling.id,
-            beregningsresultat = beregningsresultat,
-        )
+        val vedtak =
+            innvilgetVedtak(
+                behandlingId = behandling.id,
+                beregningsresultat = beregningsresultat,
+            )
         repository.insert(vedtak)
         return vedtak
     }
 
-    fun ferdigstillBehandling(behandling: Behandling): Behandling = oppdater(
-        behandling.copy(status = BehandlingStatus.FERDIGSTILT),
-    )
+    fun ferdigstillBehandling(behandling: Behandling): Behandling =
+        oppdater(
+            behandling.copy(status = BehandlingStatus.FERDIGSTILT),
+        )
 
     fun opprettRevurdering(
         revurderFra: LocalDate?,
         forrigeBehandling: Behandling,
         fagsak: Fagsak,
         steg: StegType = StegType.BEREGNE_YTELSE,
-    ): Behandling = lagre(
-        behandling(
-            fagsak = fagsak,
-            type = BehandlingType.REVURDERING,
-            revurderFra = revurderFra,
-            forrigeBehandlingId = forrigeBehandling.id,
-            status = BehandlingStatus.UTREDES,
-            steg = steg,
-        ),
-    )
+    ): Behandling =
+        lagre(
+            behandling(
+                fagsak = fagsak,
+                type = BehandlingType.REVURDERING,
+                revurderFra = revurderFra,
+                forrigeBehandlingId = forrigeBehandling.id,
+                status = BehandlingStatus.UTREDES,
+                steg = steg,
+            ),
+        )
 
     fun lagBehandlingOgRevurdering(): Behandling {
         val fagsak = fagsak()
@@ -154,21 +158,22 @@ class TestoppsettService(
         return lagre(revurdering)
     }
 
-    private fun hentEllerOpprettPerson(fagsak: Fagsak): FagsakPerson {
-        return fagsakPersonRepository.findByIdOrNull(fagsak.fagsakPersonId)
+    private fun hentEllerOpprettPerson(fagsak: Fagsak): FagsakPerson =
+        fagsakPersonRepository.findByIdOrNull(fagsak.fagsakPersonId)
             ?: hentPersonFraIdenter(fagsak)
             ?: opprettPerson(fagsak)
-    }
 
     private fun hentPersonFraIdenter(fagsak: Fagsak): FagsakPerson? =
-        fagsak.personIdenter.map { it.ident }
+        fagsak.personIdenter
+            .map { it.ident }
             .takeIf { it.isNotEmpty() }
             ?.let { fagsakPersonRepository.findByIdent(it) }
 
-    private fun opprettPerson(fagsak: Fagsak) = fagsakPersonRepository.insert(
-        FagsakPerson(
-            fagsak.fagsakPersonId,
-            identer = fagsak.personIdenter,
-        ),
-    )
+    private fun opprettPerson(fagsak: Fagsak) =
+        fagsakPersonRepository.insert(
+            FagsakPerson(
+                fagsak.fagsakPersonId,
+                identer = fagsak.personIdenter,
+            ),
+        )
 }

@@ -20,7 +20,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.web.client.exchange
 
 class LæremidlerVedtakControllerTest : IntegrationTest() {
-
     val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER)
     val behandling = behandling(fagsak = fagsak, steg = StegType.BEREGNE_YTELSE, status = BehandlingStatus.UTREDES)
 
@@ -33,10 +32,11 @@ class LæremidlerVedtakControllerTest : IntegrationTest() {
 
     @Test
     fun `skal lagre og hente avslag`() {
-        val vedtak = AvslagLæremidlerDto(
-            årsakerAvslag = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
-            begrunnelse = "begrunnelse",
-        )
+        val vedtak =
+            AvslagLæremidlerDto(
+                årsakerAvslag = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
+                begrunnelse = "begrunnelse",
+            )
 
         avslåVedtak(behandling, vedtak)
 

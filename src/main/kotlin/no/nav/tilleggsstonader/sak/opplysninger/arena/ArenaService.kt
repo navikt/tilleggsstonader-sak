@@ -19,9 +19,11 @@ class ArenaService(
     private val personService: PersonService,
     private val fagsakPersonService: FagsakPersonService,
 ) {
-
     @Cacheable("arena-status-ident")
-    fun hentStatus(ident: String, stønadstype: Stønadstype): ArenaStatusDto {
+    fun hentStatus(
+        ident: String,
+        stønadstype: Stønadstype,
+    ): ArenaStatusDto {
         val identer = personService.hentPersonIdenter(ident).identer()
         return arenaClient.hentStatus(IdenterStønadstype(identer, stønadstype))
     }

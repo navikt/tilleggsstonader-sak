@@ -16,9 +16,10 @@ class AdminOpprettBehandlingController(
     private val adminOpprettBehandlingService: AdminOpprettBehandlingService,
     private val tilgangService: TilgangService,
 ) {
-
     @PostMapping("hent-person")
-    fun hentPerson(@RequestBody request: AdminOpprettFørstegangsbehandlingHentPersonDto): PersoninfoDto {
+    fun hentPerson(
+        @RequestBody request: AdminOpprettFørstegangsbehandlingHentPersonDto,
+    ): PersoninfoDto {
         tilgangService.validerHarSaksbehandlerrolle()
         tilgangService.validerTilgangTilPersonMedBarn(request.ident, AuditLoggerEvent.ACCESS)
 
@@ -26,7 +27,9 @@ class AdminOpprettBehandlingController(
     }
 
     @PostMapping("opprett-foerstegangsbehandling")
-    fun opprettFørstegangsbehandling(@RequestBody request: AdminOpprettFørstegangsbehandlingDto): BehandlingId {
+    fun opprettFørstegangsbehandling(
+        @RequestBody request: AdminOpprettFørstegangsbehandlingDto,
+    ): BehandlingId {
         tilgangService.validerHarSaksbehandlerrolle()
         tilgangService.validerTilgangTilPersonMedBarn(request.ident, AuditLoggerEvent.CREATE)
 

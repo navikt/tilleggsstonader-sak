@@ -61,15 +61,18 @@ class StegServiceTest(
     @Autowired
     val ferdigstillBehandlingSteg: FerdigstillBehandlingSteg,
 ) : IntegrationTest() {
+    val stegForBeslutter =
+        object : BehandlingSteg<String> {
+            override fun utførSteg(
+                saksbehandling: Saksbehandling,
+                data: String,
+            ) {
+                val behandling = behandlingRepository.findByIdOrThrow(saksbehandling.id)
+                behandlingRepository.update(behandling.copy(status = BehandlingStatus.IVERKSETTER_VEDTAK))
+            }
 
-    val stegForBeslutter = object : BehandlingSteg<String> {
-        override fun utførSteg(saksbehandling: Saksbehandling, data: String) {
-            val behandling = behandlingRepository.findByIdOrThrow(saksbehandling.id)
-            behandlingRepository.update(behandling.copy(status = BehandlingStatus.IVERKSETTER_VEDTAK))
+            override fun stegType(): StegType = StegType.BESLUTTE_VEDTAK
         }
-
-        override fun stegType(): StegType = StegType.BESLUTTE_VEDTAK
-    }
 
     @AfterEach
     override fun tearDown() {
@@ -79,12 +82,13 @@ class StegServiceTest(
 
     @Test
     internal fun `skal legge inn historikkinnslag for beregn ytelse selv om behandlingen står på send til beslutter`() {
-        val behandling = testoppsettService.opprettBehandlingMedFagsak(
-            behandling(
-                status = BehandlingStatus.UTREDES,
-                steg = StegType.SEND_TIL_BESLUTTER,
-            ),
-        )
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling(
+                    status = BehandlingStatus.UTREDES,
+                    steg = StegType.SEND_TIL_BESLUTTER,
+                ),
+            )
         val barn = lagBarn(behandling)
         opprettVilkårBarnetilsyn(behandlingId = behandling.id, barn = barn)
         val vedtakTilsynBarn = opprettVedtakTilsynBarn()
@@ -97,30 +101,32 @@ class StegServiceTest(
 
     @Nested
     inner class Validering {
-
         @Test
         fun `saksbehandler har ikke tilgang til steg som gjelder beslutter`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(steg = StegType.BESLUTTE_VEDTAK, status = BehandlingStatus.FATTER_VEDTAK),
-            )
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(steg = StegType.BESLUTTE_VEDTAK, status = BehandlingStatus.FATTER_VEDTAK),
+                )
             mockBrukerContext("Saksbehandler123", listOf(rolleConfig.saksbehandlerRolle))
 
-            val exception = catchThrowableOfType<Feil> {
-                stegService.håndterSteg(
-                    saksbehandling(behandling = behandling),
-                    stegForBeslutter,
-                    "",
-                )
-            }
+            val exception =
+                catchThrowableOfType<Feil> {
+                    stegService.håndterSteg(
+                        saksbehandling(behandling = behandling),
+                        stegForBeslutter,
+                        "",
+                    )
+                }
             assertThat(exception)
                 .hasMessage("Saksbehandler123 kan ikke utføre steg 'Beslutte vedtak' pga manglende rolle.")
         }
 
         @Test
         fun `beslutter har tilgang til steg som gjelder beslutter`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(steg = StegType.BESLUTTE_VEDTAK, status = BehandlingStatus.FATTER_VEDTAK),
-            )
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(steg = StegType.BESLUTTE_VEDTAK, status = BehandlingStatus.FATTER_VEDTAK),
+                )
             mockBrukerContext("Saksbehandler123", listOf(rolleConfig.beslutterRolle))
 
             assertDoesNotThrow {
@@ -134,39 +140,44 @@ class StegServiceTest(
 
         @Test
         internal fun `skal ikke kunne beregne ytelse dersom behandling er ferdigstilt`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(steg = StegType.BEHANDLING_FERDIGSTILT),
-            )
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(steg = StegType.BEHANDLING_FERDIGSTILT),
+                )
             val barn = lagBarn(behandling)
             val vedtakTilsynBarn = opprettVedtakTilsynBarn()
-            val exception = catchThrowableOfType<Feil> {
-                stegService.håndterSteg(
-                    saksbehandling(behandling = behandling),
-                    tilsynBarnBeregnYtelseSteg,
-                    vedtakTilsynBarn,
-                )
-            }
+            val exception =
+                catchThrowableOfType<Feil> {
+                    stegService.håndterSteg(
+                        saksbehandling(behandling = behandling),
+                        tilsynBarnBeregnYtelseSteg,
+                        vedtakTilsynBarn,
+                    )
+                }
             assertThat(exception).hasMessage("Kan ikke utføre 'Beregne ytelse' når behandlingstatus er Opprettet")
         }
 
         @Test
         internal fun `skal ikke kunne gå videre fra inngangsvilkår dersom revurder fra-dato mangler i revurdering`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(steg = StegType.BEHANDLING_FERDIGSTILT, status = BehandlingStatus.FERDIGSTILT),
-            )
-            val revurdering = testoppsettService.opprettRevurdering(
-                revurderFra = null,
-                forrigeBehandling = behandling,
-                fagsak = fagsak(id = behandling.fagsakId),
-                steg = StegType.INNGANGSVILKÅR,
-            )
-
-            val exception = catchThrowableOfType<ApiFeil> {
-                stegService.håndterSteg(
-                    saksbehandling(behandling = revurdering),
-                    inngangsvilkårSteg,
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(steg = StegType.BEHANDLING_FERDIGSTILT, status = BehandlingStatus.FERDIGSTILT),
                 )
-            }
+            val revurdering =
+                testoppsettService.opprettRevurdering(
+                    revurderFra = null,
+                    forrigeBehandling = behandling,
+                    fagsak = fagsak(id = behandling.fagsakId),
+                    steg = StegType.INNGANGSVILKÅR,
+                )
+
+            val exception =
+                catchThrowableOfType<ApiFeil> {
+                    stegService.håndterSteg(
+                        saksbehandling(behandling = revurdering),
+                        inngangsvilkårSteg,
+                    )
+                }
             assertThat(exception).hasMessage("Du må sette revurder fra-dato før du kan gå videre")
         }
 
@@ -177,54 +188,61 @@ class StegServiceTest(
 
             mockBrukerContext("navIdent")
             val beslutteVedtakDto = BeslutteVedtakDto(true, "")
-            val feil = catchThrowableOfType<ApiFeil> {
-                // TODO
-                // stegService.håndterBeslutteVedtak(saksbehandling(behandling =  behandling), beslutteVedtakDto)
-            }
+            val feil =
+                catchThrowableOfType<ApiFeil> {
+                    // TODO
+                    // stegService.håndterBeslutteVedtak(saksbehandling(behandling =  behandling), beslutteVedtakDto)
+                }
             assertThat(feil.message).isEqualTo("Behandlingen er allerede besluttet. Status på behandling er 'Iverksetter vedtak'")
         }
     }
 
     @Nested
     inner class Reset {
-
         @Test
         fun `kan ikke resette når behandlingen ikke har status utredes`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(
-                    status = BehandlingStatus.IVERKSETTER_VEDTAK,
-                    steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV,
-                ),
-            )
-            val exception = catchIllegalStateException {
-                stegService.resetSteg(behandling.id, steg = StegType.BEREGNE_YTELSE)
-            }
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.IVERKSETTER_VEDTAK,
+                        steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV,
+                    ),
+                )
+            val exception =
+                catchIllegalStateException {
+                    stegService.resetSteg(behandling.id, steg = StegType.BEREGNE_YTELSE)
+                }
             assertThat(exception).hasMessageContaining("Kan ikke resette steg når status=IVERKSETTER_VEDTAK ")
         }
 
         @Test
         internal fun `kast feil når man resetter med et steg etter behandlingen sitt steg`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(
-                    status = BehandlingStatus.UTREDES,
-                    steg = StegType.VILKÅR,
-                ),
-            )
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.UTREDES,
+                        steg = StegType.VILKÅR,
+                    ),
+                )
 
-            val exception = catchIllegalStateException {
-                stegService.resetSteg(behandling.id, steg = StegType.BEREGNE_YTELSE)
-            }
-            assertThat(exception).hasMessageContaining("Kan ikke resette behandling til steg=BEREGNE_YTELSE når behandling allerede er på VILKÅR")
+            val exception =
+                catchIllegalStateException {
+                    stegService.resetSteg(behandling.id, steg = StegType.BEREGNE_YTELSE)
+                }
+            assertThat(
+                exception,
+            ).hasMessageContaining("Kan ikke resette behandling til steg=BEREGNE_YTELSE når behandling allerede er på VILKÅR")
         }
 
         @Test
         internal fun `steg på behandlingen beholdes når man resetter på samme steg`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(
-                    status = BehandlingStatus.UTREDES,
-                    steg = StegType.BEREGNE_YTELSE,
-                ),
-            )
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.UTREDES,
+                        steg = StegType.BEREGNE_YTELSE,
+                    ),
+                )
 
             stegService.resetSteg(behandling.id, steg = StegType.BEREGNE_YTELSE)
             assertThat(behandlingRepository.findByIdOrThrow(behandling.id).steg).isEqualTo(StegType.BEREGNE_YTELSE)
@@ -232,12 +250,13 @@ class StegServiceTest(
 
         @Test
         internal fun `steg på behandlingen oppdateres når man resetter med et tidligere steg`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(
-                    status = BehandlingStatus.UTREDES,
-                    steg = StegType.BEREGNE_YTELSE,
-                ),
-            )
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.UTREDES,
+                        steg = StegType.BEREGNE_YTELSE,
+                    ),
+                )
 
             stegService.resetSteg(behandling.id, steg = StegType.VILKÅR)
             assertThat(behandlingRepository.findByIdOrThrow(behandling.id).steg).isEqualTo(StegType.VILKÅR)
@@ -246,26 +265,28 @@ class StegServiceTest(
 
     @Nested
     inner class StegFlyt {
-
         @Test
         fun `skal endre steg til ferdigstilt etter ferdigstilling`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(
-                    status = BehandlingStatus.IVERKSETTER_VEDTAK,
-                    steg = StegType.FERDIGSTILLE_BEHANDLING,
-                ),
-            )
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.IVERKSETTER_VEDTAK,
+                        steg = StegType.FERDIGSTILLE_BEHANDLING,
+                    ),
+                )
             val oppdatertBehandling = stegService.håndterSteg(behandlingId = behandling.id, ferdigstillBehandlingSteg)
             assertThat(oppdatertBehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
             assertThat(oppdatertBehandling.status).isEqualTo(BehandlingStatus.FERDIGSTILT)
         }
     }
 
-    private fun lagBarn(behandling: Behandling): BehandlingBarn {
-        return barnRepository.insert(BehandlingBarn(behandlingId = behandling.id, ident = "123"))
-    }
+    private fun lagBarn(behandling: Behandling): BehandlingBarn =
+        barnRepository.insert(BehandlingBarn(behandlingId = behandling.id, ident = "123"))
 
-    private fun opprettVilkårBarnetilsyn(behandlingId: BehandlingId, barn: BehandlingBarn) {
+    private fun opprettVilkårBarnetilsyn(
+        behandlingId: BehandlingId,
+        barn: BehandlingBarn,
+    ) {
         val fom = LocalDate.of(2023, 1, 1)
         val tom = LocalDate.of(2023, 1, 31)
         stønadsperiodeRepository.insert(stønadsperiode(behandlingId = behandlingId, fom = fom, tom = tom))
@@ -282,9 +303,7 @@ class StegServiceTest(
         )
     }
 
-    private fun opprettVedtakTilsynBarn(): InnvilgelseTilsynBarnRequest {
-        return InnvilgelseTilsynBarnRequest
-    }
+    private fun opprettVedtakTilsynBarn(): InnvilgelseTilsynBarnRequest = InnvilgelseTilsynBarnRequest
 
     private fun behandlingSomIverksettes(): Behandling {
         val nyBehandling =

@@ -13,20 +13,22 @@ class ArbeidsfordelingClient(
     @Value("\${clients.norg2.uri}")
     private val uri: URI,
     @Qualifier("utenAuth") restTemplate: RestTemplate,
-) :
-    AbstractRestClient(restTemplate) {
-
+) : AbstractRestClient(restTemplate) {
     fun finnArbeidsfordelingsenhet(arbeidsfordelingskriterie: ArbeidsfordelingKriterie): List<Arbeidsfordelingsenhet> {
-        val bestMatchUri = UriComponentsBuilder.fromUri(arbeidsfordelingUri)
-            .pathSegment("enheter/bestmatch")
-            .build()
-            .toUriString()
+        val bestMatchUri =
+            UriComponentsBuilder
+                .fromUri(arbeidsfordelingUri)
+                .pathSegment("enheter/bestmatch")
+                .build()
+                .toUriString()
 
         return postForEntity(bestMatchUri, arbeidsfordelingskriterie)
     }
 
-    private val arbeidsfordelingUri = UriComponentsBuilder.fromUri(uri)
-        .pathSegment("api/v1/arbeidsfordeling")
-        .build()
-        .toUri()
+    private val arbeidsfordelingUri =
+        UriComponentsBuilder
+            .fromUri(uri)
+            .pathSegment("api/v1/arbeidsfordeling")
+            .build()
+            .toUri()
 }

@@ -12,10 +12,11 @@ fun søknadBarnTilBehandlingBarn(
         it.tilBehandlingBarn(behandlingId)
     }
 
-fun SøknadBarn.tilBehandlingBarn(behandlingId: BehandlingId) = BehandlingBarn(
-    behandlingId = behandlingId,
-    ident = this.ident,
-)
+fun SøknadBarn.tilBehandlingBarn(behandlingId: BehandlingId) =
+    BehandlingBarn(
+        behandlingId = behandlingId,
+        ident = this.ident,
+    )
 /*
 fun BarnMedIdent.tilBehandlingBarn(behandlingId: UUID) = BehandlingBarn(
     behandlingId = behandlingId,

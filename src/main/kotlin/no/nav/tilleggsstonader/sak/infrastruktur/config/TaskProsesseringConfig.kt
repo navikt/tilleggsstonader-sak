@@ -14,18 +14,19 @@ import org.springframework.context.annotation.Configuration
 class TaskProsesseringConfig(
     private val rolleConfig: RolleConfig,
 ) {
-
     @Bean
-    fun prosesseringInfoProvider() = object : ProsesseringInfoProvider {
-        override fun hentBrukernavn(): String = try {
-            SpringTokenValidationContextHolder().getTokenValidationContext().getClaims("azuread")
-                .getStringClaim("preferred_username")
-        } catch (e: Exception) {
-            throw Feil("Mangler preferred_username på request")
-        }
+    fun prosesseringInfoProvider() =
+        object : ProsesseringInfoProvider {
+            override fun hentBrukernavn(): String =
+                try {
+                    SpringTokenValidationContextHolder()
+                        .getTokenValidationContext()
+                        .getClaims("azuread")
+                        .getStringClaim("preferred_username")
+                } catch (e: Exception) {
+                    throw Feil("Mangler preferred_username på request")
+                }
 
-        override fun harTilgang(): Boolean {
-            return SikkerhetContext.hentGrupperFraToken().contains(rolleConfig.prosessering)
+            override fun harTilgang(): Boolean = SikkerhetContext.hentGrupperFraToken().contains(rolleConfig.prosessering)
         }
-    }
 }

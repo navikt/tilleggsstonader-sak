@@ -7,7 +7,6 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 object VilkårperioderGrunnlagTestUtil {
-
     fun periodeGrunnlagAktivitet(
         id: String = "123",
         fom: LocalDate = osloDateNow(),

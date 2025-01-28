@@ -17,16 +17,17 @@ internal class StønadsperiodeRepositoryTest : IntegrationTest() {
     @Test
     internal fun `skal kunne lagre og hente stønadsperiode`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
-        val stønadsperiode = stønadsperiodeRepository.insert(
-            Stønadsperiode(
-                fom = osloDateNow(),
-                tom = osloDateNow().plusDays(5),
-                behandlingId = behandling.id,
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-                status = StønadsperiodeStatus.NY,
-            ),
-        )
+        val stønadsperiode =
+            stønadsperiodeRepository.insert(
+                Stønadsperiode(
+                    fom = osloDateNow(),
+                    tom = osloDateNow().plusDays(5),
+                    behandlingId = behandling.id,
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                    status = StønadsperiodeStatus.NY,
+                ),
+            )
 
         assertThat(stønadsperiodeRepository.findByIdOrThrow(stønadsperiode.id)).isEqualTo(stønadsperiode)
     }
@@ -35,27 +36,29 @@ internal class StønadsperiodeRepositoryTest : IntegrationTest() {
     internal fun `skal finne alle stønadsperioder for behandling`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
 
-        val stønadsperiode1 = stønadsperiodeRepository.insert(
-            Stønadsperiode(
-                fom = osloDateNow(),
-                tom = osloDateNow().plusDays(5),
-                behandlingId = behandling.id,
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-                status = StønadsperiodeStatus.NY,
-            ),
-        )
+        val stønadsperiode1 =
+            stønadsperiodeRepository.insert(
+                Stønadsperiode(
+                    fom = osloDateNow(),
+                    tom = osloDateNow().plusDays(5),
+                    behandlingId = behandling.id,
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                    status = StønadsperiodeStatus.NY,
+                ),
+            )
 
-        val stønadsperiode2 = stønadsperiodeRepository.insert(
-            Stønadsperiode(
-                fom = osloDateNow(),
-                tom = osloDateNow().plusDays(5),
-                behandlingId = behandling.id,
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-                status = StønadsperiodeStatus.NY,
-            ),
-        )
+        val stønadsperiode2 =
+            stønadsperiodeRepository.insert(
+                Stønadsperiode(
+                    fom = osloDateNow(),
+                    tom = osloDateNow().plusDays(5),
+                    behandlingId = behandling.id,
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                    status = StønadsperiodeStatus.NY,
+                ),
+            )
 
         assertThat(stønadsperiodeRepository.findAllByBehandlingId(behandling.id))
             .containsExactlyInAnyOrder(stønadsperiode1, stønadsperiode2)

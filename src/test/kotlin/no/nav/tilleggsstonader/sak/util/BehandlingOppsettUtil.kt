@@ -11,63 +11,69 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 
 object BehandlingOppsettUtil {
-
     private val fagsak = fagsak(setOf(PersonIdent("1")))
 
-    val henlagtFørstegangsbehandling = behandling(fagsak)
-        .copy(
-            type = BehandlingType.FØRSTEGANGSBEHANDLING,
-            status = BehandlingStatus.FERDIGSTILT,
-            resultat = BehandlingResultat.HENLAGT,
-            vedtakstidspunkt = SporbarUtils.now(),
-            sporbar = Sporbar(opprettetTid = osloNow().minusDays(4)),
-        )
+    val henlagtFørstegangsbehandling =
+        behandling(fagsak)
+            .copy(
+                type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                status = BehandlingStatus.FERDIGSTILT,
+                resultat = BehandlingResultat.HENLAGT,
+                vedtakstidspunkt = SporbarUtils.now(),
+                sporbar = Sporbar(opprettetTid = osloNow().minusDays(4)),
+            )
 
-    val iverksattFørstegangsbehandling = behandling(fagsak)
-        .copy(
-            type = BehandlingType.FØRSTEGANGSBEHANDLING,
-            status = BehandlingStatus.FERDIGSTILT,
-            resultat = BehandlingResultat.INNVILGET,
-            vedtakstidspunkt = SporbarUtils.now(),
-            sporbar = Sporbar(opprettetTid = osloNow().minusDays(3)),
-        )
+    val iverksattFørstegangsbehandling =
+        behandling(fagsak)
+            .copy(
+                type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                status = BehandlingStatus.FERDIGSTILT,
+                resultat = BehandlingResultat.INNVILGET,
+                vedtakstidspunkt = SporbarUtils.now(),
+                sporbar = Sporbar(opprettetTid = osloNow().minusDays(3)),
+            )
 
-    val henlagtRevurdering = behandling(fagsak)
-        .copy(
-            type = BehandlingType.REVURDERING,
-            status = BehandlingStatus.FERDIGSTILT,
-            resultat = BehandlingResultat.HENLAGT,
-            vedtakstidspunkt = SporbarUtils.now(),
-            sporbar = Sporbar(opprettetTid = osloNow().minusDays(1)),
-        )
+    val henlagtRevurdering =
+        behandling(fagsak)
+            .copy(
+                type = BehandlingType.REVURDERING,
+                status = BehandlingStatus.FERDIGSTILT,
+                resultat = BehandlingResultat.HENLAGT,
+                vedtakstidspunkt = SporbarUtils.now(),
+                sporbar = Sporbar(opprettetTid = osloNow().minusDays(1)),
+            )
 
-    private val revurderingUnderArbeid = behandling(fagsak)
-        .copy(
-            type = BehandlingType.REVURDERING,
-            status = IVERKSETTER_VEDTAK,
-            resultat = BehandlingResultat.INNVILGET,
-            vedtakstidspunkt = SporbarUtils.now(),
-        )
+    private val revurderingUnderArbeid =
+        behandling(fagsak)
+            .copy(
+                type = BehandlingType.REVURDERING,
+                status = IVERKSETTER_VEDTAK,
+                resultat = BehandlingResultat.INNVILGET,
+                vedtakstidspunkt = SporbarUtils.now(),
+            )
 
-    val iverksattRevurdering = behandling(fagsak)
-        .copy(
-            type = BehandlingType.REVURDERING,
-            status = BehandlingStatus.FERDIGSTILT,
-            resultat = BehandlingResultat.INNVILGET,
-            vedtakstidspunkt = SporbarUtils.now(),
-        )
+    val iverksattRevurdering =
+        behandling(fagsak)
+            .copy(
+                type = BehandlingType.REVURDERING,
+                status = BehandlingStatus.FERDIGSTILT,
+                resultat = BehandlingResultat.INNVILGET,
+                vedtakstidspunkt = SporbarUtils.now(),
+            )
 
-    val revurdering = behandling(fagsak)
-        .copy(
-            type = BehandlingType.REVURDERING,
-            status = UTREDES,
-            resultat = BehandlingResultat.IKKE_SATT,
-        )
+    val revurdering =
+        behandling(fagsak)
+            .copy(
+                type = BehandlingType.REVURDERING,
+                status = UTREDES,
+                resultat = BehandlingResultat.IKKE_SATT,
+            )
 
-    fun lagBehandlingerForSisteIverksatte() = listOf(
-        henlagtFørstegangsbehandling,
-        iverksattFørstegangsbehandling,
-        henlagtRevurdering,
-        revurderingUnderArbeid,
-    )
+    fun lagBehandlingerForSisteIverksatte() =
+        listOf(
+            henlagtFørstegangsbehandling,
+            iverksattFørstegangsbehandling,
+            henlagtRevurdering,
+            revurderingUnderArbeid,
+        )
 }

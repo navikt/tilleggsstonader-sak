@@ -7,4 +7,5 @@ import java.util.UUID
 
 @Repository
 interface FrittståendeBrevRepository :
-    RepositoryInterface<FrittståendeBrev, UUID>, InsertUpdateRepository<FrittståendeBrev>
+    RepositoryInterface<FrittståendeBrev, UUID>,
+    InsertUpdateRepository<FrittståendeBrev>

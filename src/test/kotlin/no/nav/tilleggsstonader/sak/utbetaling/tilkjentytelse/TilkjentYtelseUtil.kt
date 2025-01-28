@@ -10,16 +10,14 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import java.time.LocalDate
 
 object TilkjentYtelseUtil {
-
     fun tilkjentYtelse(
         behandlingId: BehandlingId,
         vararg andeler: AndelTilkjentYtelse = arrayOf(andelTilkjentYtelse(kildeBehandlingId = behandlingId)),
-    ): TilkjentYtelse {
-        return TilkjentYtelse(
+    ): TilkjentYtelse =
+        TilkjentYtelse(
             behandlingId = behandlingId,
             andelerTilkjentYtelse = andeler.toSet(),
         )
-    }
 
     fun andelTilkjentYtelse(
         kildeBehandlingId: BehandlingId = BehandlingId.random(),

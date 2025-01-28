@@ -17,10 +17,11 @@ import org.springframework.web.bind.annotation.RestController
 class SøknadRoutingController(
     private val søknadRoutingService: SøknadRoutingService,
 ) {
-
     @PostMapping()
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
-    fun sjekkRoutingForPerson(@RequestBody request: IdentStønadstype): SøknadRoutingResponse {
+    fun sjekkRoutingForPerson(
+        @RequestBody request: IdentStønadstype,
+    ): SøknadRoutingResponse {
         feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }

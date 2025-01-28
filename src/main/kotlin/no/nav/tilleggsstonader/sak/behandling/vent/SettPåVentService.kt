@@ -29,7 +29,6 @@ class SettPåVentService(
     private val taskService: TaskService,
     private val settPåVentRepository: SettPåVentRepository,
 ) {
-
     fun hentStatusSettPåVent(behandlingId: BehandlingId): StatusPåVentDto {
         val settPåVent = finnAktivSattPåVent(behandlingId)
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
@@ -49,7 +48,10 @@ class SettPåVentService(
     }
 
     @Transactional
-    fun settPåVent(behandlingId: BehandlingId, dto: SettPåVentDto): StatusPåVentDto {
+    fun settPåVent(
+        behandlingId: BehandlingId,
+        dto: SettPåVentDto,
+    ): StatusPåVentDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke sette behandling på vent når status=${behandling.status}"
@@ -86,7 +88,10 @@ class SettPåVentService(
     }
 
     @Transactional
-    fun oppdaterSettPåVent(behandlingId: BehandlingId, dto: OppdaterSettPåVentDto): StatusPåVentDto {
+    fun oppdaterSettPåVent(
+        behandlingId: BehandlingId,
+        dto: OppdaterSettPåVentDto,
+    ): StatusPåVentDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
             "Status på behandlingen må være ${BehandlingStatus.SATT_PÅ_VENT} for å kunne oppdatere"
@@ -125,9 +130,10 @@ class SettPåVentService(
      * Pga at opprettetTid og endretTid ikke helt er den samme er vi nøtt for å sjekke om den har blitt endret innen noen sekunder
      */
     private fun utledEndretInformasjon(oppdatertSettPåVent: SettPåVent) =
-        oppdatertSettPåVent.sporbar.takeIf {
-            ChronoUnit.SECONDS.between(it.opprettetTid, it.endret.endretTid) > 5
-        }?.endret
+        oppdatertSettPåVent.sporbar
+            .takeIf {
+                ChronoUnit.SECONDS.between(it.opprettetTid, it.endret.endretTid) > 5
+            }?.endret
 
     private fun harEndretÅrsaker(
         settPåVent: SettPåVent,
@@ -141,7 +147,10 @@ class SettPåVentService(
     }
 
     @Transactional
-    fun taAvVent(behandlingId: BehandlingId, taAvVentDto: TaAvVentDto?) {
+    fun taAvVent(
+        behandlingId: BehandlingId,
+        taAvVentDto: TaAvVentDto?,
+    ) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
             "Kan ikke ta behandling av vent når status=${behandling.status}"
@@ -183,23 +192,28 @@ class SettPåVentService(
         dto: OppdaterSettPåVentDto,
     ): OppdatertOppgaveResponse {
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
-        val oppdatertOppgave = Oppgave(
-            id = settPåVent.oppgaveId,
-            versjon = dto.oppgaveVersjon,
-            fristFerdigstillelse = dto.frist,
-            beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(oppgave, dto.frist),
-            tilordnetRessurs = "",
-        )
+        val oppdatertOppgave =
+            Oppgave(
+                id = settPåVent.oppgaveId,
+                versjon = dto.oppgaveVersjon,
+                fristFerdigstillelse = dto.frist,
+                beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(oppgave, dto.frist),
+                tilordnetRessurs = "",
+            )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
     }
 
-    private fun taOppgaveAvVent(oppgaveId: Long, skalTilordnesRessurs: Boolean) {
+    private fun taOppgaveAvVent(
+        oppgaveId: Long,
+        skalTilordnesRessurs: Boolean,
+    ) {
         val oppgave = oppgaveService.hentOppgave(oppgaveId)
-        val tilordnetRessurs = if (SikkerhetContext.erSaksbehandler() && skalTilordnesRessurs) {
-            SikkerhetContext.hentSaksbehandler()
-        } else {
-            ""
-        }
+        val tilordnetRessurs =
+            if (SikkerhetContext.erSaksbehandler() && skalTilordnesRessurs) {
+                SikkerhetContext.hentSaksbehandler()
+            } else {
+                ""
+            }
 
         val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
         val mappeId = oppgaveService.finnMappe(enhet, OppgaveMappe.KLAR).id
@@ -221,9 +235,10 @@ class SettPåVentService(
         kommentar: String?,
         årsaker: List<ÅrsakSettPåVent>,
     ) {
-        val metadata: MutableMap<String, Any> = mutableMapOf(
-            "årsaker" to årsaker,
-        )
+        val metadata: MutableMap<String, Any> =
+            mutableMapOf(
+                "årsaker" to årsaker,
+            )
         kommentar?.let { metadata["kommentarSettPåVent"] = it }
 
         behandlingshistorikkService.opprettHistorikkInnslag(

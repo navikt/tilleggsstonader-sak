@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile
 @Configuration
 @Profile("mock-arbeidsfordeling")
 class ArbeidsfordelingClientConfig {
-
     @Bean
     @Primary
     fun arbedisfordelingClient(): ArbeidsfordelingClient {

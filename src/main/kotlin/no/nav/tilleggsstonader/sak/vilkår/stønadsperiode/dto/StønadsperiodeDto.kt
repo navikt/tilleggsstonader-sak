@@ -21,13 +21,14 @@ data class StønadsperiodeDto(
     }
 }
 
-fun Stønadsperiode.tilDto() = StønadsperiodeDto(
-    id = this.id,
-    fom = this.fom,
-    tom = this.tom,
-    målgruppe = this.målgruppe,
-    aktivitet = this.aktivitet,
-    status = this.status,
-)
+fun Stønadsperiode.tilDto() =
+    StønadsperiodeDto(
+        id = this.id,
+        fom = this.fom,
+        tom = this.tom,
+        målgruppe = this.målgruppe,
+        aktivitet = this.aktivitet,
+        status = this.status,
+    )
 
 fun List<Stønadsperiode>.tilSortertDto() = this.map { it.tilDto() }.sortedBy { it.fom }

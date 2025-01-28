@@ -18,35 +18,38 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class GjennbrukDataRevurderingServiceTest {
-
     val behandlingService = mockk<BehandlingService>()
     val barnService = mockk<BarnService>()
     val vilkårperiodeService = mockk<VilkårperiodeService>()
     val stønadsperiodeService = mockk<StønadsperiodeService>()
     val vilkårService = mockk<VilkårService>()
 
-    val service = GjennbrukDataRevurderingService(
-        behandlingService = behandlingService,
-        barnService = barnService,
-        vilkårperiodeService = vilkårperiodeService,
-        stønadsperiodeService = stønadsperiodeService,
-        vilkårService = vilkårService,
-    )
+    val service =
+        GjennbrukDataRevurderingService(
+            behandlingService = behandlingService,
+            barnService = barnService,
+            vilkårperiodeService = vilkårperiodeService,
+            stønadsperiodeService = stønadsperiodeService,
+            vilkårService = vilkårService,
+        )
 
     val fagsakId = FagsakId.random()
     val iverksattFerdigstiltBehandling = behandling()
-    val henlagtBehandling = behandling(
-        status = BehandlingStatus.FERDIGSTILT,
-        resultat = BehandlingResultat.HENLAGT,
-    )
-    val avslåttBehandling = behandling(
-        status = BehandlingStatus.FERDIGSTILT,
-        resultat = BehandlingResultat.AVSLÅTT,
-    )
-    val opphørtBehandling = behandling(
-        status = BehandlingStatus.FERDIGSTILT,
-        resultat = BehandlingResultat.OPPHØRT,
-    )
+    val henlagtBehandling =
+        behandling(
+            status = BehandlingStatus.FERDIGSTILT,
+            resultat = BehandlingResultat.HENLAGT,
+        )
+    val avslåttBehandling =
+        behandling(
+            status = BehandlingStatus.FERDIGSTILT,
+            resultat = BehandlingResultat.AVSLÅTT,
+        )
+    val opphørtBehandling =
+        behandling(
+            status = BehandlingStatus.FERDIGSTILT,
+            resultat = BehandlingResultat.OPPHØRT,
+        )
 
     @BeforeEach
     fun setUp() {
@@ -56,7 +59,6 @@ class GjennbrukDataRevurderingServiceTest {
 
     @Nested
     inner class FinnBehandlingIdForGjenbrukFraBehandling {
-
         @Test
         fun `skal bruke forrige behandlingId hvis den finnes på behandling som man sender inn`() {
             val behandling = behandling(forrigeBehandlingId = BehandlingId.random())
@@ -79,7 +81,6 @@ class GjennbrukDataRevurderingServiceTest {
 
     @Nested
     inner class FinnBehandlingIdForGjenbrukFraFagsakId {
-
         @Test
         fun `skal finne siste iverksatte behandling hvis den finnes`() {
             every { behandlingService.finnSisteIverksatteBehandling(any()) } returns iverksattFerdigstiltBehandling
@@ -89,22 +90,24 @@ class GjennbrukDataRevurderingServiceTest {
 
         @Test
         fun `skal bruke siste behandling som er avslått hvis det finnes henlagte behandlinger før den avslåtte`() {
-            every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(
-                henlagtBehandling,
-                avslåttBehandling,
-                henlagtBehandling,
-            )
+            every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns
+                listOf(
+                    henlagtBehandling,
+                    avslåttBehandling,
+                    henlagtBehandling,
+                )
 
             assertThat(service.finnBehandlingIdForGjenbruk(fagsakId)).isEqualTo(avslåttBehandling.id)
         }
 
         @Test
         fun `skal bruke siste behandling som er opphørt hvis det finnes henlagte behandlinger før den opphørte`() {
-            every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(
-                henlagtBehandling,
-                opphørtBehandling,
-                henlagtBehandling,
-            )
+            every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns
+                listOf(
+                    henlagtBehandling,
+                    opphørtBehandling,
+                    henlagtBehandling,
+                )
 
             assertThat(service.finnBehandlingIdForGjenbruk(fagsakId)).isEqualTo(opphørtBehandling.id)
         }

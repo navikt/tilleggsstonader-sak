@@ -15,15 +15,16 @@ class FullmaktClient(
     @Value("\${clients.integrasjoner.uri}") private val baseUrl: URI,
     @Qualifier("azureClientCredential") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
+    private val uriFullmektige =
+        UriComponentsBuilder
+            .fromUri(baseUrl)
+            .pathSegment("api", "fullmakt", "fullmektige")
+            .encode()
+            .toUriString()
 
-    private val uriFullmektige = UriComponentsBuilder.fromUri(baseUrl)
-        .pathSegment("api", "fullmakt", "fullmektige")
-        .encode().toUriString()
-
-    fun hentFullmektige(fullmaktsgiversIdent: String): List<FullmektigDto> {
-        return postForEntity(
+    fun hentFullmektige(fullmaktsgiversIdent: String): List<FullmektigDto> =
+        postForEntity(
             uri = uriFullmektige,
             payload = IdentRequest(fullmaktsgiversIdent),
         )
-    }
 }

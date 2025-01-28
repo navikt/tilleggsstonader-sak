@@ -6,8 +6,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
-class EregService(private val eregClient: EregClient) {
-
+class EregService(
+    private val eregClient: EregClient,
+) {
     @Cacheable("hentOrganisasjon", cacheManager = "shortCache")
     fun hentOrganisasjon(organisasjonsnummer: String): OrganisasjonDto {
         val organisasjon = eregClient.hentOrganisasjoner(organisasjonsnummer)

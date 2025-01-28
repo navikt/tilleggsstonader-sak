@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
 object VedtakUtil {
-
     inline fun <reified T : Vedtaksdata> GeneriskVedtak<*>.takeIfType(): GeneriskVedtak<T>? {
         @Suppress("UNCHECKED_CAST")
         return this.takeIf { it.data is T } as GeneriskVedtak<T>?

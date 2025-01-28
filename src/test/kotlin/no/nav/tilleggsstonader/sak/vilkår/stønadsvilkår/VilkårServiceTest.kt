@@ -63,30 +63,32 @@ import java.time.Year
 import java.time.YearMonth
 
 internal class VilkårServiceTest {
-
     private val behandlingService = mockk<BehandlingService>()
     private val vilkårRepository = mockk<VilkårRepository>()
     private val barnService = mockk<BarnService>()
     private val behandlingFaktaService = mockk<BehandlingFaktaService>()
     private val fagsakService = mockk<FagsakService>()
 
-    private val vilkårService = VilkårService(
-        behandlingService = behandlingService,
-        vilkårRepository = vilkårRepository,
-        behandlingFaktaService = behandlingFaktaService,
-        barnService = barnService,
-        fagsakService = fagsakService,
-    )
+    private val vilkårService =
+        VilkårService(
+            behandlingService = behandlingService,
+            vilkårRepository = vilkårRepository,
+            behandlingFaktaService = behandlingFaktaService,
+            barnService = barnService,
+            fagsakService = fagsakService,
+        )
 
     private val barnUnder9år = FnrGenerator.generer(Year.now().minusYears(1).value, 5, 19)
     private val barnOver10år = FnrGenerator.generer(Year.now().minusYears(11).value, 1, 13)
 
-    private val søknadskjemaBarnetilsyn = SøknadUtil.søknadskjemaBarnetilsyn(
-        barnMedBarnepass = listOf(
-            barnMedBarnepass(ident = barnUnder9år),
-            barnMedBarnepass(ident = barnOver10år),
-        ),
-    )
+    private val søknadskjemaBarnetilsyn =
+        SøknadUtil.søknadskjemaBarnetilsyn(
+            barnMedBarnepass =
+                listOf(
+                    barnMedBarnepass(ident = barnUnder9år),
+                    barnMedBarnepass(ident = barnOver10år),
+                ),
+        )
 
     val sokandBarnMedBarnepass = BarnMedBarnepass(type = TypeBarnepass.BARNEHAGE_SFO_AKS, null, null)
     val soknadBarn1 = SøknadBarn(ident = barnUnder9år, data = sokandBarnMedBarnepass)
@@ -94,12 +96,13 @@ internal class VilkårServiceTest {
 
     private val barn = søknadBarnTilBehandlingBarn(listOf(soknadBarn1, soknadBarn2))
     private val fagsak = fagsak()
-    private val behandling = behandling(
-        fagsak = fagsak,
-        status = BehandlingStatus.OPPRETTET,
-        steg = StegType.VILKÅR,
-        årsak = BehandlingÅrsak.PAPIRSØKNAD,
-    )
+    private val behandling =
+        behandling(
+            fagsak = fagsak,
+            status = BehandlingStatus.OPPRETTET,
+            steg = StegType.VILKÅR,
+            årsak = BehandlingÅrsak.PAPIRSØKNAD,
+        )
     private val behandlingId = behandling.id
 
     @BeforeEach
@@ -162,13 +165,14 @@ internal class VilkårServiceTest {
     @Disabled
     @Test
     internal fun `skal ikke opprette vilkår hvis behandling er låst for videre vurdering`() {
-        val eksisterendeVilkårsett = listOf(
-            vilkår(
-                behandlingId = behandlingId,
-                type = VilkårType.PASS_BARN,
-                resultat = OPPFYLT,
-            ),
-        )
+        val eksisterendeVilkårsett =
+            listOf(
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.PASS_BARN,
+                    resultat = OPPFYLT,
+                ),
+            )
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns eksisterendeVilkårsett
 
         val vilkårsett = vilkårService.hentVilkårsvurdering(behandlingId).vilkårsett
@@ -180,13 +184,14 @@ internal class VilkårServiceTest {
 
     @Test
     internal fun `Skal returnere ikke oppfylt hvis vilkårsett ikke inneholder alle vilkår`() {
-        val vilkårsett = listOf(
-            vilkår(
-                resultat = OPPFYLT,
-                type = VilkårType.EKSEMPEL,
-                behandlingId = behandlingId,
-            ),
-        )
+        val vilkårsett =
+            listOf(
+                vilkår(
+                    resultat = OPPFYLT,
+                    type = VilkårType.EKSEMPEL,
+                    behandlingId = behandlingId,
+                ),
+            )
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns vilkårsett
         val erAlleVilkårOppfylt = vilkårService.erAlleVilkårOppfylt(behandlingId)
         assertThat(erAlleVilkårOppfylt).isFalse
@@ -294,7 +299,6 @@ internal class VilkårServiceTest {
 
     @Nested
     inner class SlettVilkår {
-
         @Test
         internal fun `skal kunne slette vilkår opprettet i denne behandlingen`() {
             val vilkår = vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN)
@@ -307,11 +311,12 @@ internal class VilkårServiceTest {
 
         @Test
         internal fun `skal ikke kunne slette vilkår opprettet i tidligere behandling`() {
-            val vilkår = vilkår(
-                behandlingId = behandlingId,
-                type = VilkårType.PASS_BARN,
-                opphavsvilkår = Opphavsvilkår(BehandlingId.random(), LocalDateTime.now()),
-            )
+            val vilkår =
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.PASS_BARN,
+                    opphavsvilkår = Opphavsvilkår(BehandlingId.random(), LocalDateTime.now()),
+                )
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
             assertThatThrownBy {
@@ -322,18 +327,20 @@ internal class VilkårServiceTest {
 
     @Test
     internal fun `skal ikke oppdatere vilkår hvis behandlingen er låst for videre behandling`() {
-        val behandling = behandling(
-            fagsak(),
-            BehandlingStatus.FERDIGSTILT,
-            StegType.VILKÅR,
-        )
+        val behandling =
+            behandling(
+                fagsak(),
+                BehandlingStatus.FERDIGSTILT,
+                StegType.VILKÅR,
+            )
         mockHentBehandling(behandling)
 
-        val vilkår = vilkår(
-            behandlingId,
-            type = VilkårType.PASS_BARN,
-            resultat = IKKE_TATT_STILLING_TIL,
-        )
+        val vilkår =
+            vilkår(
+                behandlingId,
+                type = VilkårType.PASS_BARN,
+                resultat = IKKE_TATT_STILLING_TIL,
+            )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
         assertThat(
@@ -356,17 +363,19 @@ internal class VilkårServiceTest {
 
     @Test
     internal fun `skal ikke oppdatere vilkår hvis behandlingen ikke er i steg VILKÅR`() {
-        val behandling = behandling(
-            fagsak(),
-            BehandlingStatus.UTREDES,
-            StegType.INNGANGSVILKÅR,
-        )
+        val behandling =
+            behandling(
+                fagsak(),
+                BehandlingStatus.UTREDES,
+                StegType.INNGANGSVILKÅR,
+            )
         mockHentBehandling(behandling)
-        val vilkår = vilkår(
-            behandlingId,
-            type = VilkårType.PASS_BARN,
-            resultat = IKKE_TATT_STILLING_TIL,
-        )
+        val vilkår =
+            vilkår(
+                behandlingId,
+                type = VilkårType.PASS_BARN,
+                resultat = IKKE_TATT_STILLING_TIL,
+            )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
         assertThat(
@@ -389,7 +398,6 @@ internal class VilkårServiceTest {
 
     @Nested
     inner class EndringHvisStønadsperiodeBegynnerFørRevurderFra {
-
         val fom = YearMonth.now().minusMonths(1)
         val tom = YearMonth.now().plusMonths(1)
         val revurderFra = LocalDate.now()
@@ -401,15 +409,16 @@ internal class VilkårServiceTest {
 
         @Test
         fun `kan ikke opprette periode hvis revurderFra begynner før periode`() {
-            val opprettOppfyltDelvilkår = OpprettVilkårDto(
-                vilkårType = VilkårType.PASS_BARN,
-                barnId = barn.first().id,
-                behandlingId = behandling.id,
-                delvilkårsett = oppfylteDelvilkårPassBarnDto(),
-                fom = fom.atDay(1),
-                tom = tom.atEndOfMonth(),
-                utgift = 1,
-            )
+            val opprettOppfyltDelvilkår =
+                OpprettVilkårDto(
+                    vilkårType = VilkårType.PASS_BARN,
+                    barnId = barn.first().id,
+                    behandlingId = behandling.id,
+                    delvilkårsett = oppfylteDelvilkårPassBarnDto(),
+                    fom = fom.atDay(1),
+                    tom = tom.atEndOfMonth(),
+                    utgift = 1,
+                )
 
             assertThatThrownBy {
                 vilkårService.opprettNyttVilkår(opprettOppfyltDelvilkår)
@@ -418,23 +427,25 @@ internal class VilkårServiceTest {
 
         @Test
         fun `kan ikke oppdatere periode hvis revurderFra begynner før periode`() {
-            val vilkår = vilkår(
-                behandlingId = behandlingId,
-                type = VilkårType.PASS_BARN,
-                fom = fom.atDay(1),
-                tom = tom.atEndOfMonth(),
-                delvilkår = ikkeOppfylteDelvilkårPassBarn(),
-            )
+            val vilkår =
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.PASS_BARN,
+                    fom = fom.atDay(1),
+                    tom = tom.atEndOfMonth(),
+                    delvilkår = ikkeOppfylteDelvilkårPassBarn(),
+                )
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
-            val svarPåVilkårDto = SvarPåVilkårDto(
-                id = vilkår.id,
-                behandlingId = behandling.id,
-                delvilkårsett = oppfylteDelvilkårPassBarnDto(),
-                fom = LocalDate.of(2024, 1, 1),
-                tom = LocalDate.of(2024, 1, 31),
-                utgift = 1,
-            )
+            val svarPåVilkårDto =
+                SvarPåVilkårDto(
+                    id = vilkår.id,
+                    behandlingId = behandling.id,
+                    delvilkårsett = oppfylteDelvilkårPassBarnDto(),
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 1, 31),
+                    utgift = 1,
+                )
             assertThatThrownBy {
                 vilkårService.oppdaterVilkår(svarPåVilkårDto)
             }.hasMessageContaining("Ugyldig endring på periode")
@@ -442,12 +453,13 @@ internal class VilkårServiceTest {
 
         @Test
         fun `kan ikke slette periode hvis revurderFra begynner før periode`() {
-            val vilkår = vilkår(
-                behandlingId = behandlingId,
-                type = VilkårType.PASS_BARN,
-                fom = fom.atDay(1),
-                tom = tom.atEndOfMonth(),
-            )
+            val vilkår =
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.PASS_BARN,
+                    fom = fom.atDay(1),
+                    tom = tom.atEndOfMonth(),
+                )
             every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
 
             assertThatThrownBy {
@@ -459,8 +471,8 @@ internal class VilkårServiceTest {
     private fun lagVilkårsett(
         behandlingId: BehandlingId,
         resultat: Vilkårsresultat = OPPFYLT,
-    ): List<Vilkår> {
-        return VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN).map {
+    ): List<Vilkår> =
+        VilkårType.hentVilkårForStønad(Stønadstype.BARNETILSYN).map {
             vilkår(
                 behandlingId = behandlingId,
                 resultat = resultat,
@@ -468,33 +480,26 @@ internal class VilkårServiceTest {
                 delvilkår = listOf(),
             )
         }
-    }
 
-    private fun List<Vilkår>.finnVilkårAvType(
-        vilkårType: VilkårType,
-    ): List<Vilkår> {
-        return this.filter { it.type == vilkårType }
-    }
+    private fun List<Vilkår>.finnVilkårAvType(vilkårType: VilkårType): List<Vilkår> = this.filter { it.type == vilkårType }
 
-    private fun List<Vilkår>.inneholderKunResultat(
-        resultat: Vilkårsresultat = IKKE_TATT_STILLING_TIL,
-    ) {
+    private fun List<Vilkår>.inneholderKunResultat(resultat: Vilkårsresultat = IKKE_TATT_STILLING_TIL) {
         assertThat(
             this.map { it.resultat }.toSet(),
         ).containsOnly(resultat)
     }
 
-    private fun List<Vilkår>.finnVurderingResultaterForBarn(barnId: BarnId): List<Vilkårsresultat>? {
-        return this.find { vilkår -> vilkår.barnId == barnId }?.delvilkårsett?.map { delvilkår -> delvilkår.resultat }
-    }
+    private fun List<Vilkår>.finnVurderingResultaterForBarn(barnId: BarnId): List<Vilkårsresultat>? =
+        this.find { vilkår -> vilkår.barnId == barnId }?.delvilkårsett?.map { delvilkår -> delvilkår.resultat }
 
     private fun initiererVilkår(lagretVilkår: CapturingSlot<Vilkår>): Vilkår {
-        val vilkår = vilkår(
-            behandlingId = behandlingId,
-            resultat = Vilkårsresultat.IKKE_OPPFYLT,
-            delvilkår = ikkeOppfylteDelvilkårPassBarn(),
-            type = VilkårType.PASS_BARN,
-        )
+        val vilkår =
+            vilkår(
+                behandlingId = behandlingId,
+                resultat = Vilkårsresultat.IKKE_OPPFYLT,
+                delvilkår = ikkeOppfylteDelvilkårPassBarn(),
+                type = VilkårType.PASS_BARN,
+            )
         every { vilkårRepository.findByIdOrNull(vilkår.id) } returns vilkår
         every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(vilkår)
         every { vilkårRepository.update(capture(lagretVilkår)) } answers { it.invocation.args.first() as Vilkår }

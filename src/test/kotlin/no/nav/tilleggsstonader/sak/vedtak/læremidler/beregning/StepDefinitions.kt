@@ -37,8 +37,8 @@ enum class BeregningNøkler(
     BEKREFTET_SATS("Bekreftet sats"),
 }
 
+@Suppress("unused", "ktlint:standard:function-naming")
 class StepDefinitions {
-
     val logger = LoggerFactory.getLogger(javaClass)
 
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
@@ -58,12 +58,13 @@ class StepDefinitions {
 
     @Gitt("følgende vedtaksperioder for læremidler")
     fun `følgende beregningsperiode for læremidler`(dataTable: DataTable) {
-        vedtaksPerioder = dataTable.mapRad { rad ->
-            Vedtaksperiode(
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-            )
-        }
+        vedtaksPerioder =
+            dataTable.mapRad { rad ->
+                Vedtaksperiode(
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                )
+            }
     }
 
     @Gitt("følgende aktiviteter for læremidler")
@@ -139,13 +140,14 @@ class StepDefinitions {
 
     @Så("forvent følgende utbetalingsperioder")
     fun `forvent følgende utbetalingsperioder`(dataTable: DataTable) {
-        val forventedePerioder = dataTable.mapRad { rad ->
-            LøpendeMåned(
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),
-            )
-        }
+        val forventedePerioder =
+            dataTable.mapRad { rad ->
+                LøpendeMåned(
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    utbetalingsdato = parseDato(BeregningNøkler.UTBETALINGSDATO, rad),
+                )
+            }
         assertThat(vedtaksperioderSplittet).containsExactlyElementsOf(forventedePerioder)
     }
 }

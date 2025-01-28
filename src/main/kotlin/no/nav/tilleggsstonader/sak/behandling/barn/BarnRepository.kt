@@ -7,7 +7,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryI
 import org.springframework.stereotype.Repository
 
 @Repository
-interface BarnRepository : RepositoryInterface<BehandlingBarn, BarnId>, InsertUpdateRepository<BehandlingBarn> {
-
+interface BarnRepository :
+    RepositoryInterface<BehandlingBarn, BarnId>,
+    InsertUpdateRepository<BehandlingBarn> {
     fun findByBehandlingId(behandlingId: BehandlingId): List<BehandlingBarn>
 }

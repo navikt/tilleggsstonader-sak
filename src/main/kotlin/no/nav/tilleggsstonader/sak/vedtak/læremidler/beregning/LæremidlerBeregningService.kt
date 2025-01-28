@@ -29,7 +29,10 @@ class LæremidlerBeregningService(
      * Programmet kaster feil dersom antagelsene ikke stemmer
      */
 
-    fun beregn(vedtaksperioder: List<Vedtaksperiode>, behandlingId: BehandlingId): BeregningsresultatLæremidler {
+    fun beregn(
+        vedtaksperioder: List<Vedtaksperiode>,
+        behandlingId: BehandlingId,
+    ): BeregningsresultatLæremidler {
         val stønadsperioder = hentStønadsperioder(behandlingId)
 
         validerVedtaksperioder(vedtaksperioder, stønadsperioder)
@@ -41,14 +44,15 @@ class LæremidlerBeregningService(
     }
 
     private fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeBeregningsgrunnlag> =
-        stønadsperiodeRepository.findAllByBehandlingId(behandlingId)
+        stønadsperiodeRepository
+            .findAllByBehandlingId(behandlingId)
             .tilSortertStønadsperiodeBeregningsgrunnlag()
             .slåSammenSammenhengende()
 
-    private fun finnAktiviteter(behandlingId: BehandlingId): List<AktivitetLæremidlerBeregningGrunnlag> {
-        return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
+    private fun finnAktiviteter(behandlingId: BehandlingId): List<AktivitetLæremidlerBeregningGrunnlag> =
+        vilkårperiodeRepository
+            .findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
             .tilAktiviteter()
-    }
 
     private fun beregnLæremidlerPerMåned(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -61,19 +65,18 @@ class LæremidlerBeregningService(
             .map { it.tilUtbetalingPeriode(stønadsperioder, aktiviteter) }
             .beregn()
 
-    private fun List<UtbetalingPeriode>.beregn(): List<BeregningsresultatForMåned> = this
-        .map { utbetalingPeriode ->
-            val grunnlagsdata = lagBeregningsGrunnlag(periode = utbetalingPeriode)
+    private fun List<UtbetalingPeriode>.beregn(): List<BeregningsresultatForMåned> =
+        this
+            .map { utbetalingPeriode ->
+                val grunnlagsdata = lagBeregningsGrunnlag(periode = utbetalingPeriode)
 
-            BeregningsresultatForMåned(
-                beløp = beregnBeløp(grunnlagsdata.sats, grunnlagsdata.studieprosent),
-                grunnlag = grunnlagsdata,
-            )
-        }
+                BeregningsresultatForMåned(
+                    beløp = beregnBeløp(grunnlagsdata.sats, grunnlagsdata.studieprosent),
+                    grunnlag = grunnlagsdata,
+                )
+            }
 
-    private fun lagBeregningsGrunnlag(
-        periode: UtbetalingPeriode,
-    ): Beregningsgrunnlag {
+    private fun lagBeregningsGrunnlag(periode: UtbetalingPeriode): Beregningsgrunnlag {
         val sats = finnSatsForPeriode(periode)
 
         return Beregningsgrunnlag(

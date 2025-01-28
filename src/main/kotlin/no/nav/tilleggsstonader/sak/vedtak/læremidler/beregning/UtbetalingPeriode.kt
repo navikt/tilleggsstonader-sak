@@ -34,7 +34,6 @@ data class UtbetalingPeriode(
     val prosent: Int,
     val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
-
     init {
         validatePeriode()
         require(tom <= fom.sisteDagenILøpendeMåned()) {
@@ -61,7 +60,6 @@ data class LøpendeMåned(
     override val tom: LocalDate,
     val utbetalingsdato: LocalDate,
 ) : Periode<LocalDate> {
-
     /**
      * backing property for vedtaksperioder.
      * Inneholder de vedtaksperioder som er innvilget innenfor en UtbetalingPeriode
@@ -94,9 +92,10 @@ data class LøpendeMåned(
         require(vedtaksperioder.isNotEmpty()) {
             "Kan ikke lage UtbetalingPeriode når vedtaksperioder er tom"
         }
-        val sorterteMålgruppeOgAktivitet = vedtaksperioder
-            .flatMap { vedtaksperiode -> vedtaksperiode.finnRelevantMålgruppeOgAktivitet(stønadsperioder, aktiviteter) }
-            .sorted()
+        val sorterteMålgruppeOgAktivitet =
+            vedtaksperioder
+                .flatMap { vedtaksperiode -> vedtaksperiode.finnRelevantMålgruppeOgAktivitet(stønadsperioder, aktiviteter) }
+                .sorted()
 
         return UtbetalingPeriode(this, sorterteMålgruppeOgAktivitet.first())
     }
@@ -104,7 +103,8 @@ data class LøpendeMåned(
     private fun VedtaksperiodeInnenforLøpendeMåned.finnRelevantMålgruppeOgAktivitet(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
-    ) = this.finnSnittAvRelevanteStønadsperioder(stønadsperioder)
+    ) = this
+        .finnSnittAvRelevanteStønadsperioder(stønadsperioder)
         .flatMap { stønadsperiode ->
             this
                 .finnSnittAvRelevanteAktiviteter(aktiviteter, stønadsperiode)
@@ -115,10 +115,11 @@ data class LøpendeMåned(
         aktiviteter: List<AktivitetLæremidlerBeregningGrunnlag>,
         stønadsperiode: StønadsperiodeBeregningsgrunnlag,
     ): List<AktivitetLæremidlerBeregningGrunnlag> {
-        val relevanteAktiviteter = aktiviteter
-            .filter { it.type == stønadsperiode.aktivitet }
-            .mapNotNull { it.beregnSnitt(stønadsperiode) }
-            .mapNotNull { it.beregnSnitt(this) }
+        val relevanteAktiviteter =
+            aktiviteter
+                .filter { it.type == stønadsperiode.aktivitet }
+                .mapNotNull { it.beregnSnitt(stønadsperiode) }
+                .mapNotNull { it.beregnSnitt(this) }
 
         brukerfeilHvis(relevanteAktiviteter.isEmpty()) {
             "Det finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som varer i hele perioden ${this.formatertPeriodeNorskFormat()}}"
@@ -135,8 +136,9 @@ data class LøpendeMåned(
     private fun VedtaksperiodeInnenforLøpendeMåned.finnSnittAvRelevanteStønadsperioder(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
     ): List<StønadsperiodeBeregningsgrunnlag> {
-        val relevanteStønadsperioderForPeriode = stønadsperioder
-            .mapNotNull { it.beregnSnitt(this) }
+        val relevanteStønadsperioderForPeriode =
+            stønadsperioder
+                .mapNotNull { it.beregnSnitt(this) }
 
         feilHvis(relevanteStønadsperioderForPeriode.isEmpty()) {
             "Det finnes ingen periode med overlapp mellom målgruppe og aktivitet for perioden ${this.formatertPeriodeNorskFormat()}"
@@ -150,14 +152,12 @@ data class MålgruppeOgAktivitet(
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetLæremidlerBeregningGrunnlag,
 ) : Comparable<MålgruppeOgAktivitet> {
-
-    override fun compareTo(other: MålgruppeOgAktivitet): Int {
-        return COMPARE_BY.compare(this, other)
-    }
+    override fun compareTo(other: MålgruppeOgAktivitet): Int = COMPARE_BY.compare(this, other)
 
     companion object {
-        val COMPARE_BY = compareBy<MålgruppeOgAktivitet> { it.aktivitet.studienivå.prioritet }
-            .thenByDescending { it.aktivitet.prosent }
-            .thenBy { it.målgruppe.prioritet() }
+        val COMPARE_BY =
+            compareBy<MålgruppeOgAktivitet> { it.aktivitet.studienivå.prioritet }
+                .thenByDescending { it.aktivitet.prosent }
+                .thenBy { it.målgruppe.prioritet() }
     }
 }

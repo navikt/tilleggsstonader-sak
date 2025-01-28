@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class KodeverkServiceIntegrationTest : IntegrationTest() {
-
     @Autowired
     lateinit var kodeverkService: KodeverkService
 

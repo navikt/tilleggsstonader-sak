@@ -22,18 +22,18 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class AngreSendTilBeslutterServiceTest {
-
     private val oppgaveService = mockk<OppgaveService>()
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
 
-    val service = AngreSendTilBeslutterService(
-        oppgaveService = oppgaveService,
-        behandlingService = behandlingService,
-        behandlingshistorikkService = mockk(relaxed = true),
-        taskService = mockk(relaxed = true),
-        totrinnskontrollService = totrinnskontrollService,
-    )
+    val service =
+        AngreSendTilBeslutterService(
+            oppgaveService = oppgaveService,
+            behandlingService = behandlingService,
+            behandlingshistorikkService = mockk(relaxed = true),
+            taskService = mockk(relaxed = true),
+            totrinnskontrollService = totrinnskontrollService,
+        )
 
     val behandling = saksbehandling(steg = StegType.BESLUTTE_VEDTAK, status = BehandlingStatus.FATTER_VEDTAK)
     val saksbehandler1 = "saksbehandler1"
@@ -70,7 +70,6 @@ class AngreSendTilBeslutterServiceTest {
 
     @Nested
     inner class Validering {
-
         @Test
         fun `saksbehandler som angrer må være den som sendt til beslutter`() {
             BrukerContextUtil.mockBrukerContext(saksbehandler2)
@@ -121,11 +120,12 @@ class AngreSendTilBeslutterServiceTest {
 
         @Test
         fun `skal kaste feil hvis saksbehandler ikke tilordnetRessurs på oppgaven`() {
-            every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns Oppgave(
-                id = 123,
-                versjon = 0,
-                tilordnetRessurs = saksbehandler2,
-            )
+            every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns
+                Oppgave(
+                    id = 123,
+                    versjon = 0,
+                    tilordnetRessurs = saksbehandler2,
+                )
 
             assertThat(
                 catchThrowableOfType<ApiFeil> {

@@ -30,8 +30,10 @@ import java.time.LocalDate
 import java.time.LocalDate.now
 import java.util.UUID
 
-class StønadsperiodeServiceTest : IntegrationTest() {
+const val SAKSBEHANDLER_VL = "VL"
+const val SAKSBEHANDLER_B = "B"
 
+class StønadsperiodeServiceTest : IntegrationTest() {
     @Autowired
     lateinit var stønadsperiodeService: StønadsperiodeService
 
@@ -41,18 +43,14 @@ class StønadsperiodeServiceTest : IntegrationTest() {
     @Autowired
     lateinit var vilkårperiodeService: VilkårperiodeService
 
-    val SAKSHEH_A = "VL"
-    val SAKSHEH_B = "B"
-
-    val FOM = LocalDate.of(2023, 1, 1)
-    val TOM = LocalDate.of(2023, 1, 31)
+    val førsteJanuar: LocalDate = LocalDate.of(2023, 1, 1)
+    val sisteJanuar: LocalDate = LocalDate.of(2023, 1, 31)
 
     val enMånedSiden: LocalDate = now().minusMonths(1)
     val enMånedFram: LocalDate = now().plusMonths(1)
 
     @Nested
     inner class LagreStønadsperioder {
-
         @Test
         fun `skal feile hvis man prøver å opprette en støndsperiode med id`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
@@ -71,21 +69,26 @@ class StønadsperiodeServiceTest : IntegrationTest() {
             opprettVilkårperiode(målgruppe(behandlingId = behandling.id))
             opprettVilkårperiode(aktivitet(behandlingId = behandling.id))
 
-            val lagredeStønadsperioder = testWithBrukerContext(SAKSHEH_A) {
-                stønadsperiodeService.lagreStønadsperioder(
-                    behandling.id,
-                    listOf(
-                        stønadsperiodeDto(fom = FOM, tom = FOM),
-                        stønadsperiodeDto(fom = FOM.plusDays(1), tom = FOM.plusDays(1)),
-                    ),
-                )
-            }
+            val lagredeStønadsperioder =
+                testWithBrukerContext(SAKSBEHANDLER_VL) {
+                    stønadsperiodeService.lagreStønadsperioder(
+                        behandling.id,
+                        listOf(
+                            stønadsperiodeDto(fom = førsteJanuar, tom = førsteJanuar),
+                            stønadsperiodeDto(fom = førsteJanuar.plusDays(1), tom = førsteJanuar.plusDays(1)),
+                        ),
+                    )
+                }
             val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandling.id)
 
             assertThat(lagredeStønadsperioder).hasSize(2)
             assertThat(lagredeStønadsperioder).containsExactlyInAnyOrderElementsOf(stønadsperioder.tilSortertDto())
-            assertThat(stønadsperioder.first().sporbar.opprettetAv).isEqualTo(SAKSHEH_A)
-            assertThat(stønadsperioder.first().sporbar.endret.endretAv).isEqualTo(SAKSHEH_A)
+            assertThat(stønadsperioder.first().sporbar.opprettetAv).isEqualTo(SAKSBEHANDLER_VL)
+            assertThat(
+                stønadsperioder
+                    .first()
+                    .sporbar.endret.endretAv,
+            ).isEqualTo(SAKSBEHANDLER_VL)
         }
 
         @Test
@@ -108,30 +111,34 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 ),
             )
 
-            val periode = stønadsperiodeService.lagreStønadsperioder(
-                behandling.id,
-                listOf(stønadsperiodeDto(fom = FOM, tom = FOM)),
-            ).single()
-            val oppdatertPeriode = periode.copy(
-                fom = FOM.plusDays(1),
-                tom = FOM.plusDays(10),
-                målgruppe = MålgruppeType.OVERGANGSSTØNAD,
-                aktivitet = AktivitetType.UTDANNING,
-            )
-            val oppdatertePerioder = testWithBrukerContext(SAKSHEH_B, groups = listOf(rolleConfig.saksbehandlerRolle)) {
-                stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(oppdatertPeriode))
-            }
+            val periode =
+                stønadsperiodeService
+                    .lagreStønadsperioder(
+                        behandling.id,
+                        listOf(stønadsperiodeDto(fom = førsteJanuar, tom = førsteJanuar)),
+                    ).single()
+            val oppdatertPeriode =
+                periode.copy(
+                    fom = førsteJanuar.plusDays(1),
+                    tom = førsteJanuar.plusDays(10),
+                    målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                    aktivitet = AktivitetType.UTDANNING,
+                )
+            val oppdatertePerioder =
+                testWithBrukerContext(SAKSBEHANDLER_B, groups = listOf(rolleConfig.saksbehandlerRolle)) {
+                    stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(oppdatertPeriode))
+                }
             assertThat(oppdatertePerioder).hasSize(1)
 
             with(stønadsperiodeRepository.findAllByBehandlingId(behandling.id).single()) {
-                assertThat(fom).isEqualTo(FOM.plusDays(1))
-                assertThat(tom).isEqualTo(FOM.plusDays(10))
+                assertThat(fom).isEqualTo(førsteJanuar.plusDays(1))
+                assertThat(tom).isEqualTo(førsteJanuar.plusDays(10))
                 assertThat(målgruppe).isEqualTo(MålgruppeType.OVERGANGSSTØNAD)
                 assertThat(aktivitet).isEqualTo(AktivitetType.UTDANNING)
                 assertThat(status).isEqualTo(StønadsperiodeStatus.NY)
 
-                assertThat(sporbar.opprettetAv).isEqualTo(SAKSHEH_A)
-                assertThat(sporbar.endret.endretAv).isEqualTo(SAKSHEH_B)
+                assertThat(sporbar.opprettetAv).isEqualTo(SAKSBEHANDLER_VL)
+                assertThat(sporbar.endret.endretAv).isEqualTo(SAKSBEHANDLER_B)
             }
         }
 
@@ -143,7 +150,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
             stønadsperiodeService.lagreStønadsperioder(
                 behandling.id,
-                listOf(stønadsperiodeDto(fom = FOM, tom = FOM)),
+                listOf(stønadsperiodeDto(fom = førsteJanuar, tom = førsteJanuar)),
             )
             stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf())
             val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
@@ -171,29 +178,32 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 ),
             )
 
-            val stønadsperioder = stønadsperiodeService.lagreStønadsperioder(
-                behandling.id,
-                listOf(
-                    stønadsperiodeDto(fom = FOM, tom = FOM),
-                    stønadsperiodeDto(fom = TOM, tom = TOM),
-                ),
-            )
-            val førsteStønadsperiode = stønadsperioder.single { it.fom == FOM }
-            val stønadsperiodeSomBlirSlettet = stønadsperioder.single { it.fom == TOM }
-
-            val oppdatertPeriode = førsteStønadsperiode.copy(
-                fom = FOM.plusDays(1),
-                tom = FOM.plusDays(1),
-                målgruppe = MålgruppeType.OVERGANGSSTØNAD,
-                aktivitet = AktivitetType.UTDANNING,
-            )
-            val nyPeriode = stønadsperiodeDto(fom = FOM.plusDays(10), tom = FOM.plusDays(10))
-            val stønadsperioder2 = testWithBrukerContext(SAKSHEH_B, groups = listOf(rolleConfig.saksbehandlerRolle)) {
+            val stønadsperioder =
                 stønadsperiodeService.lagreStønadsperioder(
                     behandling.id,
-                    listOf(oppdatertPeriode, nyPeriode),
+                    listOf(
+                        stønadsperiodeDto(fom = førsteJanuar, tom = førsteJanuar),
+                        stønadsperiodeDto(fom = sisteJanuar, tom = sisteJanuar),
+                    ),
                 )
-            }
+            val førsteStønadsperiode = stønadsperioder.single { it.fom == førsteJanuar }
+            val stønadsperiodeSomBlirSlettet = stønadsperioder.single { it.fom == sisteJanuar }
+
+            val oppdatertPeriode =
+                førsteStønadsperiode.copy(
+                    fom = førsteJanuar.plusDays(1),
+                    tom = førsteJanuar.plusDays(1),
+                    målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                    aktivitet = AktivitetType.UTDANNING,
+                )
+            val nyPeriode = stønadsperiodeDto(fom = førsteJanuar.plusDays(10), tom = førsteJanuar.plusDays(10))
+            val stønadsperioder2 =
+                testWithBrukerContext(SAKSBEHANDLER_B, groups = listOf(rolleConfig.saksbehandlerRolle)) {
+                    stønadsperiodeService.lagreStønadsperioder(
+                        behandling.id,
+                        listOf(oppdatertPeriode, nyPeriode),
+                    )
+                }
 
             val stønadsperioderFraDb = stønadsperiodeRepository.findAllByBehandlingId(behandling.id)
             assertThat(stønadsperioderFraDb.tilSortertDto())
@@ -209,8 +219,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 assertThat(målgruppe).isEqualTo(oppdatertPeriode.målgruppe)
                 assertThat(aktivitet).isEqualTo(oppdatertPeriode.aktivitet)
 
-                assertThat(sporbar.opprettetAv).isEqualTo(SAKSHEH_A)
-                assertThat(sporbar.endret.endretAv).isEqualTo(SAKSHEH_B)
+                assertThat(sporbar.opprettetAv).isEqualTo(SAKSBEHANDLER_VL)
+                assertThat(sporbar.endret.endretAv).isEqualTo(SAKSBEHANDLER_B)
             }
 
             // Ny
@@ -219,8 +229,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                 assertThat(tom).isEqualTo(nyPeriode.tom)
                 assertThat(målgruppe).isEqualTo(nyPeriode.målgruppe)
                 assertThat(aktivitet).isEqualTo(nyPeriode.aktivitet)
-                assertThat(sporbar.opprettetAv).isEqualTo(SAKSHEH_B)
-                assertThat(sporbar.endret.endretAv).isEqualTo(SAKSHEH_B)
+                assertThat(sporbar.opprettetAv).isEqualTo(SAKSBEHANDLER_B)
+                assertThat(sporbar.endret.endretAv).isEqualTo(SAKSBEHANDLER_B)
             }
         }
 
@@ -237,17 +247,17 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
     @Nested
     inner class EndringHvisStønadsperiodeBegynnerFørRevurderFra {
-
         val behandling = behandling(type = BehandlingType.REVURDERING)
 
-        val eksisterendeStønadsperiode = stønadsperiode(
-            behandlingId = behandling.id,
-            fom = enMånedSiden,
-            tom = enMånedFram,
-            målgruppe = MålgruppeType.AAP,
-            aktivitet = AktivitetType.TILTAK,
-            status = StønadsperiodeStatus.UENDRET,
-        )
+        val eksisterendeStønadsperiode =
+            stønadsperiode(
+                behandlingId = behandling.id,
+                fom = enMånedSiden,
+                tom = enMånedFram,
+                målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.TILTAK,
+                status = StønadsperiodeStatus.UENDRET,
+            )
 
         @BeforeEach
         fun setUp() {
@@ -307,10 +317,11 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
             @Test
             fun `ingen endring på eksisterende periode skal ha status UENDRET`() {
-                val res = stønadsperiodeService.lagreStønadsperioder(
-                    behandling.id,
-                    listOf(eksisterendeStønadsperiode.tilDto()),
-                )
+                val res =
+                    stønadsperiodeService.lagreStønadsperioder(
+                        behandling.id,
+                        listOf(eksisterendeStønadsperiode.tilDto()),
+                    )
 
                 assertThat(res).hasSize(1)
                 assertThat(res[0].status).isEqualTo(StønadsperiodeStatus.UENDRET)
@@ -318,10 +329,11 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
             @Test
             fun `oppdatering av eksisterende periode skal gi status ENDRET`() {
-                val res = stønadsperiodeService.lagreStønadsperioder(
-                    behandling.id,
-                    listOf(eksisterendeStønadsperiode.tilDto()),
-                )
+                val res =
+                    stønadsperiodeService.lagreStønadsperioder(
+                        behandling.id,
+                        listOf(eksisterendeStønadsperiode.tilDto()),
+                    )
 
                 assertThat(res).hasSize(1)
                 assertThat(res.single().status).isEqualTo(StønadsperiodeStatus.UENDRET)
@@ -329,13 +341,14 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
             @Test
             fun `ny periode skal få status NY`() {
-                val nyPeriode = StønadsperiodeDto(
-                    fom = now().plusDays(1),
-                    tom = now().plusMonths(1),
-                    målgruppe = MålgruppeType.AAP,
-                    aktivitet = AktivitetType.TILTAK,
-                    status = null,
-                )
+                val nyPeriode =
+                    StønadsperiodeDto(
+                        fom = now().plusDays(1),
+                        tom = now().plusMonths(1),
+                        målgruppe = MålgruppeType.AAP,
+                        aktivitet = AktivitetType.TILTAK,
+                        status = null,
+                    )
                 val res = stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyPeriode))
 
                 assertThat(res).hasSize(1)
@@ -350,22 +363,23 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         fun `skal gjenbruke stønadsperioder fra forrige behandlingen`() {
             val revurdering = testoppsettService.lagBehandlingOgRevurdering()
 
-            val eksisterendeStønadsperidoder = listOf(
-                stønadsperiode(
-                    behandlingId = revurdering.forrigeBehandlingId!!,
-                    fom = LocalDate.of(2024, 1, 1),
-                    tom = LocalDate.of(2024, 1, 31),
-                    målgruppe = MålgruppeType.AAP,
-                    aktivitet = AktivitetType.TILTAK,
-                ),
-                stønadsperiode(
-                    behandlingId = revurdering.forrigeBehandlingId,
-                    fom = LocalDate.of(2024, 2, 1),
-                    tom = LocalDate.of(2024, 1, 10),
-                    målgruppe = MålgruppeType.OVERGANGSSTØNAD,
-                    aktivitet = AktivitetType.UTDANNING,
-                ),
-            )
+            val eksisterendeStønadsperidoder =
+                listOf(
+                    stønadsperiode(
+                        behandlingId = revurdering.forrigeBehandlingId!!,
+                        fom = LocalDate.of(2024, 1, 1),
+                        tom = LocalDate.of(2024, 1, 31),
+                        målgruppe = MålgruppeType.AAP,
+                        aktivitet = AktivitetType.TILTAK,
+                    ),
+                    stønadsperiode(
+                        behandlingId = revurdering.forrigeBehandlingId,
+                        fom = LocalDate.of(2024, 2, 1),
+                        tom = LocalDate.of(2024, 1, 10),
+                        målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                        aktivitet = AktivitetType.UTDANNING,
+                    ),
+                )
             stønadsperiodeRepository.insertAll(eksisterendeStønadsperidoder)
 
             stønadsperiodeService.gjenbrukStønadsperioder(
@@ -383,8 +397,7 @@ class StønadsperiodeServiceTest : IntegrationTest() {
                     "sporbar",
                     "behandlingId",
                     "status",
-                )
-                .containsExactlyInAnyOrderElementsOf(eksisterendeStønadsperidoder)
+                ).containsExactlyInAnyOrderElementsOf(eksisterendeStønadsperidoder)
 
             assertThat(stønadsperioder.map { it.status }).containsOnly(StønadsperiodeStatus.UENDRET)
         }
@@ -392,17 +405,17 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
     @Nested
     inner class StatusStønadsperioder {
-
         val behandling = behandling(type = BehandlingType.REVURDERING, revurderFra = enMånedSiden)
 
-        val eksisterendeStønadsperiode = stønadsperiode(
-            behandlingId = behandling.id,
-            fom = enMånedSiden,
-            tom = enMånedFram,
-            målgruppe = MålgruppeType.AAP,
-            aktivitet = AktivitetType.TILTAK,
-            status = StønadsperiodeStatus.UENDRET,
-        )
+        val eksisterendeStønadsperiode =
+            stønadsperiode(
+                behandlingId = behandling.id,
+                fom = enMånedSiden,
+                tom = enMånedFram,
+                målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.TILTAK,
+                status = StønadsperiodeStatus.UENDRET,
+            )
 
         @BeforeEach
         fun setUp() {
@@ -414,10 +427,11 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `ingen endring på eksisterende periode skal ha status UENDRET`() {
-            val res = stønadsperiodeService.lagreStønadsperioder(
-                behandling.id,
-                listOf(eksisterendeStønadsperiode.tilDto()),
-            )
+            val res =
+                stønadsperiodeService.lagreStønadsperioder(
+                    behandling.id,
+                    listOf(eksisterendeStønadsperiode.tilDto()),
+                )
 
             assertThat(res).hasSize(1)
             assertThat(res[0].status).isEqualTo(StønadsperiodeStatus.UENDRET)
@@ -425,10 +439,11 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `oppdatering av eksisterende periode skal gi status ENDRET`() {
-            val res = stønadsperiodeService.lagreStønadsperioder(
-                behandling.id,
-                listOf(eksisterendeStønadsperiode.tilDto()),
-            )
+            val res =
+                stønadsperiodeService.lagreStønadsperioder(
+                    behandling.id,
+                    listOf(eksisterendeStønadsperiode.tilDto()),
+                )
 
             assertThat(res).hasSize(1)
             assertThat(res.single().status).isEqualTo(StønadsperiodeStatus.UENDRET)
@@ -436,13 +451,14 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
         @Test
         fun `ny periode skal få status NY`() {
-            val nyPeriode = StønadsperiodeDto(
-                fom = now().plusDays(1),
-                tom = now().plusMonths(1),
-                målgruppe = MålgruppeType.AAP,
-                aktivitet = AktivitetType.TILTAK,
-                status = null,
-            )
+            val nyPeriode =
+                StønadsperiodeDto(
+                    fom = now().plusDays(1),
+                    tom = now().plusMonths(1),
+                    målgruppe = MålgruppeType.AAP,
+                    aktivitet = AktivitetType.TILTAK,
+                    status = null,
+                )
             val res = stønadsperiodeService.lagreStønadsperioder(behandling.id, listOf(nyPeriode))
 
             assertThat(res).hasSize(1)
@@ -452,8 +468,8 @@ class StønadsperiodeServiceTest : IntegrationTest() {
 
     private fun målgruppe(
         type: MålgruppeType = MålgruppeType.AAP,
-        fom: LocalDate = this.FOM,
-        tom: LocalDate = this.TOM,
+        fom: LocalDate = this.førsteJanuar,
+        tom: LocalDate = this.sisteJanuar,
         medlemskap: SvarJaNei? = null,
         dekkesAvAnnetRegelverk: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: BehandlingId = BehandlingId.random(),
@@ -461,17 +477,18 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         type = type,
         fom = fom,
         tom = tom,
-        faktaOgSvar = FaktaOgSvarMålgruppeDto(
-            svarMedlemskap = medlemskap,
-            svarUtgifterDekketAvAnnetRegelverk = dekkesAvAnnetRegelverk,
-        ),
+        faktaOgSvar =
+            FaktaOgSvarMålgruppeDto(
+                svarMedlemskap = medlemskap,
+                svarUtgifterDekketAvAnnetRegelverk = dekkesAvAnnetRegelverk,
+            ),
         behandlingId = behandlingId,
     )
 
     private fun aktivitet(
         type: AktivitetType = AktivitetType.TILTAK,
-        fom: LocalDate = this.FOM,
-        tom: LocalDate = this.TOM,
+        fom: LocalDate = this.førsteJanuar,
+        tom: LocalDate = this.sisteJanuar,
         lønnet: SvarJaNei? = SvarJaNei.NEI,
         behandlingId: BehandlingId = BehandlingId.random(),
         aktivitetsdager: Int = 5,
@@ -479,17 +496,18 @@ class StønadsperiodeServiceTest : IntegrationTest() {
         type = type,
         fom = fom,
         tom = tom,
-        faktaOgSvar = FaktaOgSvarAktivitetBarnetilsynDto(
-            aktivitetsdager = aktivitetsdager,
-            svarLønnet = lønnet,
-        ),
+        faktaOgSvar =
+            FaktaOgSvarAktivitetBarnetilsynDto(
+                aktivitetsdager = aktivitetsdager,
+                svarLønnet = lønnet,
+            ),
         behandlingId = behandlingId,
     )
 
     private fun stønadsperiodeDto(
         id: UUID? = null,
-        fom: LocalDate = this.FOM,
-        tom: LocalDate = this.TOM,
+        fom: LocalDate = this.førsteJanuar,
+        tom: LocalDate = this.sisteJanuar,
         målgruppeType: MålgruppeType = MålgruppeType.AAP,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
         status: StønadsperiodeStatus = StønadsperiodeStatus.NY,

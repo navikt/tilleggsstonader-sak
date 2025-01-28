@@ -17,7 +17,5 @@ data class BehandlingBarn(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 ) {
-
-    fun erMatchendeBarn(annetBarn: BehandlingBarn): Boolean =
-        this.ident == annetBarn.ident
+    fun erMatchendeBarn(annetBarn: BehandlingBarn): Boolean = this.ident == annetBarn.ident
 }

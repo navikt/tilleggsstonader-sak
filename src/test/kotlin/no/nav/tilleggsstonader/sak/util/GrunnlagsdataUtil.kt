@@ -47,11 +47,10 @@ object GrunnlagsdataUtil {
         fornavn: String = "Fornavn",
         mellomnavn: String? = "mellomnavn",
         etternavn: String = "Etternavn",
-    ): Navn {
-        return Navn(
+    ): Navn =
+        Navn(
             fornavn = fornavn,
             mellomnavn = mellomnavn,
             etternavn = etternavn,
         )
-    }
 }

@@ -8,21 +8,16 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import java.time.LocalDate
 
 object YtelsePerioderUtil {
-
     fun ytelsePerioderDto(
         perioder: List<YtelsePeriode> = listOf(periodeAAP(), periodeEnsligForsørger()),
         hentetInformasjon: List<HentetInformasjon> = listOf(hentetInformasjonAAP(), hentetInformasjonEnsligForsørger()),
-    ): YtelsePerioderDto {
-        return YtelsePerioderDto(perioder = perioder, hentetInformasjon = hentetInformasjon)
-    }
+    ): YtelsePerioderDto = YtelsePerioderDto(perioder = perioder, hentetInformasjon = hentetInformasjon)
 
-    fun hentetInformasjonAAP(
-        status: StatusHentetInformasjon = StatusHentetInformasjon.OK,
-    ) = HentetInformasjon(type = TypeYtelsePeriode.AAP, status = status)
+    fun hentetInformasjonAAP(status: StatusHentetInformasjon = StatusHentetInformasjon.OK) =
+        HentetInformasjon(type = TypeYtelsePeriode.AAP, status = status)
 
-    fun hentetInformasjonEnsligForsørger(
-        status: StatusHentetInformasjon = StatusHentetInformasjon.OK,
-    ) = HentetInformasjon(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, status = status)
+    fun hentetInformasjonEnsligForsørger(status: StatusHentetInformasjon = StatusHentetInformasjon.OK) =
+        HentetInformasjon(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, status = status)
 
     fun periodeAAP(
         fom: LocalDate = LocalDate.now(),

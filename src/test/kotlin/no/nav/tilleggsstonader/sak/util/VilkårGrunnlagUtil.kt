@@ -11,16 +11,16 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import java.time.LocalDate
 
 object VilkårGrunnlagUtil {
-    fun mockVilkårGrunnlagDto(
-        barn: List<FaktaBarn> = emptyList(),
-    ) =
+    fun mockVilkårGrunnlagDto(barn: List<FaktaBarn> = emptyList()) =
         BehandlingFaktaTilsynBarnDto(
-            hovedytelse = FaktaHovedytelse(
-                søknadsgrunnlag = null,
-            ),
-            aktivitet = FaktaAktivtet(
-                søknadsgrunnlag = null,
-            ),
+            hovedytelse =
+                FaktaHovedytelse(
+                    søknadsgrunnlag = null,
+                ),
+            aktivitet =
+                FaktaAktivtet(
+                    søknadsgrunnlag = null,
+                ),
             barn = barn,
             dokumentasjon = null,
             søknadMottattTidspunkt = null,
@@ -43,8 +43,9 @@ object VilkårGrunnlagUtil {
         barnId = barnId,
         registergrunnlag = registergrunnlag,
         søknadgrunnlag = søknadgrunnlag,
-        vilkårFakta = VilkårFaktaBarn(
-            harFullførtFjerdetrinn = null,
-        ),
+        vilkårFakta =
+            VilkårFaktaBarn(
+                harFullførtFjerdetrinn = null,
+            ),
     )
 }

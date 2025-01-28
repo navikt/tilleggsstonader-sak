@@ -8,8 +8,10 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface BrevmottakerVedtaksbrevRepository : RepositoryInterface<BrevmottakerVedtaksbrev, UUID>, InsertUpdateRepository<BrevmottakerVedtaksbrev> {
-
+interface BrevmottakerVedtaksbrevRepository :
+    RepositoryInterface<BrevmottakerVedtaksbrev, UUID>,
+    InsertUpdateRepository<BrevmottakerVedtaksbrev> {
     fun existsByBehandlingId(behandlingId: BehandlingId): Boolean
+
     fun findByBehandlingId(behandlingId: BehandlingId): List<BrevmottakerVedtaksbrev>
 }

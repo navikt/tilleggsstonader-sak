@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class PassBarnRegelUtilTest {
-
-    fun datoer(år: Int) = listOf(
-        LocalDate.of(år, 1, 1),
-        LocalDate.of(år, 5, 1),
-        LocalDate.of(år, 10, 1),
-    )
+    fun datoer(år: Int) =
+        listOf(
+            LocalDate.of(år, 1, 1),
+            LocalDate.of(år, 5, 1),
+            LocalDate.of(år, 10, 1),
+        )
 
     val fødselsdatoer = datoer(2013) // liste over ulike fødselsdatoer 2013
 

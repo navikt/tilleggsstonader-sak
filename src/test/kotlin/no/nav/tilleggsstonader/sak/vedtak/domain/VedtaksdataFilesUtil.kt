@@ -6,20 +6,22 @@ import no.nav.tilleggsstonader.sak.util.FileUtil
 import kotlin.io.path.name
 
 object VedtaksdataFilesUtil {
-
-    val jsonFiler = FileUtil.listDir("vedtak").flatMap { dir ->
-        val dirPath = "vedtak/${dir.fileName.fileName}"
-        FileUtil.listFiles(dirPath)
-            .map { JsonFil(dirPath, it.fileName.name) }
-    }
+    val jsonFiler =
+        FileUtil.listDir("vedtak").flatMap { dir ->
+            val dirPath = "vedtak/${dir.fileName.fileName}"
+            FileUtil
+                .listFiles(dirPath)
+                .map { JsonFil(dirPath, it.fileName.name) }
+        }
 
     /**
      * Brukes også som dir-name for json-filer
      */
-    fun Stønadstype.tilTypeVedtaksdataSuffix() = when (this) {
-        Stønadstype.BARNETILSYN -> "TILSYN_BARN"
-        else -> name
-    }
+    fun Stønadstype.tilTypeVedtaksdataSuffix() =
+        when (this) {
+            Stønadstype.BARNETILSYN -> "TILSYN_BARN"
+            else -> name
+        }
 
     /**
      * @param dirPath vedtak/TILSYN_BARN
@@ -29,7 +31,6 @@ object VedtaksdataFilesUtil {
         val dirPath: String,
         val fileName: String,
     ) {
-
         /**
          * Ex vedtak/TILSYN_BARN/INNVILGELSE_TILSYN_BARN.json
          */
@@ -46,8 +47,6 @@ object VedtaksdataFilesUtil {
                 .second
         }
 
-        override fun toString(): String {
-            return fileName
-        }
+        override fun toString(): String = fileName
     }
 }

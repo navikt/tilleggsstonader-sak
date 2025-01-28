@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 internal class BehandlingsjournalpostRepositoryTest : IntegrationTest() {
-
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
 
@@ -35,15 +34,16 @@ internal class BehandlingsjournalpostRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling1 = testoppsettService.lagre(behandling(fagsak))
         behandlingsjournalpostRepository.insert(Behandlingsjournalpost(behandling1.id, "1", Journalposttype.U))
-        val throwable = catchThrowable {
-            behandlingsjournalpostRepository.insert(
-                Behandlingsjournalpost(
-                    behandling1.id,
-                    "1",
-                    Journalposttype.U,
-                ),
-            )
-        }
+        val throwable =
+            catchThrowable {
+                behandlingsjournalpostRepository.insert(
+                    Behandlingsjournalpost(
+                        behandling1.id,
+                        "1",
+                        Journalposttype.U,
+                    ),
+                )
+            }
         assertThat(getRootCause(throwable)).hasMessageContaining("duplicate key value violates unique constraint")
     }
 }

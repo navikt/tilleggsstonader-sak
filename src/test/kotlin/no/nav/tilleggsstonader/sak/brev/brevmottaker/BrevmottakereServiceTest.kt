@@ -19,10 +19,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.BAD_REQUEST
-import java.util.*
+import java.util.UUID
 
 class BrevmottakereServiceTest {
-
     private val brevmottakereRepository = mockk<BrevmottakerVedtaksbrevRepository>()
     private val behandlingService = mockk<BehandlingService>()
 
@@ -89,9 +88,10 @@ class BrevmottakereServiceTest {
 
         every { behandlingService.hentBehandling(any()) } returns behandling()
 
-        val feil = catchThrowableOfType<ApiFeil> {
-            brevmottakereService.lagreBrevmottakere(BehandlingId.random(), brevmottakereDto)
-        }
+        val feil =
+            catchThrowableOfType<ApiFeil> {
+                brevmottakereService.lagreBrevmottakere(BehandlingId.random(), brevmottakereDto)
+            }
         assertThat(feil.message).contains("Vedtaksbrevet må ha minst 1 mottaker")
         assertThat(feil.httpStatus).isEqualTo(BAD_REQUEST)
     }
@@ -109,9 +109,10 @@ class BrevmottakereServiceTest {
 
         every { behandlingService.hentBehandling(any()) } returns behandling()
 
-        val feil = catchThrowableOfType<ApiFeil> {
-            brevmottakereService.lagreBrevmottakere(BehandlingId.random(), brevmottakereDto)
-        }
+        val feil =
+            catchThrowableOfType<ApiFeil> {
+                brevmottakereService.lagreBrevmottakere(BehandlingId.random(), brevmottakereDto)
+            }
         assertThat(feil.message).contains("Vedtaksbrevet kan ikke ha mer enn 2 mottakere")
         assertThat(feil.httpStatus).isEqualTo(BAD_REQUEST)
     }
@@ -135,15 +136,16 @@ class BrevmottakereServiceTest {
 
         every { behandlingService.hentBehandling(any()) } returns behandling()
 
-        val feil = catchThrowableOfType<ApiFeil> {
-            brevmottakereService.lagreBrevmottakere(BehandlingId.random(), brevmottakereDto)
-        }
+        val feil =
+            catchThrowableOfType<ApiFeil> {
+                brevmottakereService.lagreBrevmottakere(BehandlingId.random(), brevmottakereDto)
+            }
         assertThat(feil.message).contains("En person kan bare legges til en gang som brevmottaker")
         assertThat(feil.httpStatus).isEqualTo(BAD_REQUEST)
     }
 
     @Test
-    fun `lagreBrevmottakere skal kaste feilmelding dersom man legger inn 2 organisasjoner som brevmottakere med samme organisasjonsnummer`() {
+    fun `lagreBrevmottakere skal kaste feilmelding ved duplisert organisasjonsnummer`() {
         val organisasjonsnummer = "45645646456"
 
         val brevmottakerOrganisasjonDtoMedSammeOrgnr1 =
@@ -160,9 +162,10 @@ class BrevmottakereServiceTest {
 
         every { behandlingService.hentBehandling(any()) } returns behandling()
 
-        val feil = catchThrowableOfType<ApiFeil> {
-            brevmottakereService.lagreBrevmottakere(BehandlingId.random(), brevmottakereDto)
-        }
+        val feil =
+            catchThrowableOfType<ApiFeil> {
+                brevmottakereService.lagreBrevmottakere(BehandlingId.random(), brevmottakereDto)
+            }
         assertThat(feil.message).contains("En organisasjon kan bare legges til en gang som brevmottaker")
         assertThat(feil.httpStatus).isEqualTo(BAD_REQUEST)
     }
@@ -174,33 +177,36 @@ class BrevmottakereServiceTest {
         val ident = "123123123"
         val mottakernavn = "Test Testersen"
 
-        val brevmottakerTestObjekt = BrevmottakerVedtaksbrev(
-            id = id,
-            behandlingId = behandlingID,
-            mottaker = Mottaker(
-                mottakerRolle = no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle.BRUKER,
-                mottakerType = MottakerType.PERSON,
-                ident = ident,
-                mottakerNavn = mottakernavn,
-                organisasjonsNavn = null,
-            ),
+        val brevmottakerTestObjekt =
+            BrevmottakerVedtaksbrev(
+                id = id,
+                behandlingId = behandlingID,
+                mottaker =
+                    Mottaker(
+                        mottakerRolle = no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle.BRUKER,
+                        mottakerType = MottakerType.PERSON,
+                        ident = ident,
+                        mottakerNavn = mottakernavn,
+                        organisasjonsNavn = null,
+                    ),
+                journalpostId = null,
+                bestillingId = null,
+                sporbar = Sporbar(),
+            )
 
-            journalpostId = null,
-            bestillingId = null,
-            sporbar = Sporbar(),
-        )
-
-        val brevmottakereDtoFasit = BrevmottakereDto(
-            personer = listOf(
-                BrevmottakerPersonDto(
-                    id = id,
-                    personIdent = ident,
-                    navn = mottakernavn,
-                    mottakerRolle = MottakerRolle.BRUKER,
-                ),
-            ),
-            organisasjoner = emptyList(),
-        )
+        val brevmottakereDtoFasit =
+            BrevmottakereDto(
+                personer =
+                    listOf(
+                        BrevmottakerPersonDto(
+                            id = id,
+                            personIdent = ident,
+                            navn = mottakernavn,
+                            mottakerRolle = MottakerRolle.BRUKER,
+                        ),
+                    ),
+                organisasjoner = emptyList(),
+            )
 
         every { brevmottakereRepository.existsByBehandlingId(behandlingID) } returns true
         every { brevmottakereRepository.findByBehandlingId(behandlingID) } returns listOf(brevmottakerTestObjekt)

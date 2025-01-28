@@ -54,7 +54,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 internal class OppgaveServiceTest {
-
     private val oppgaveClient = mockk<OppgaveClient>()
     private val arbeidsfordelingService = mockk<ArbeidsfordelingService>()
     private val fagsakService = mockk<FagsakService>()
@@ -83,13 +82,14 @@ internal class OppgaveServiceTest {
         every { oppgaveRepository.insert(capture(opprettOppgaveDomainSlot)) } returns lagTestOppgave()
         every { oppgaveRepository.update(any()) } answers { firstArg() }
         every { oppgaveRepository.finnOppgaveMetadata(any()) } returns emptyList()
-        every { oppgaveClient.finnMapper(any(), any()) } returns FinnMappeResponseDto(
-            2,
-            listOf(
-                MappeDto(OppgaveClientConfig.MAPPE_ID_KLAR, OppgaveMappe.KLAR.navn.first(), "4462"),
-                MappeDto(OppgaveClientConfig.MAPPE_ID_PÅ_VENT, OppgaveMappe.PÅ_VENT.navn.first(), "4462"),
-            ),
-        )
+        every { oppgaveClient.finnMapper(any(), any()) } returns
+            FinnMappeResponseDto(
+                2,
+                listOf(
+                    MappeDto(OppgaveClientConfig.MAPPE_ID_KLAR, OppgaveMappe.KLAR.navn.first(), "4462"),
+                    MappeDto(OppgaveClientConfig.MAPPE_ID_PÅ_VENT, OppgaveMappe.PÅ_VENT.navn.first(), "4462"),
+                ),
+            )
         mockkObject(OppgaveUtil)
         every { OppgaveUtil.utledBehandlesAvApplikasjon(any<Oppgavetype>()) } answers { callOriginal() }
         every { OppgaveUtil.skalPlasseresIKlarMappe(any<Oppgavetype>()) } answers { callOriginal() }
@@ -154,7 +154,6 @@ internal class OppgaveServiceTest {
 
     @Nested
     inner class OpprettOppgaveIMappe {
-
         @Test
         fun `Skal opprette behandle-sak-oppgave i Klar-mappe`() {
             val slot = slot<OpprettOppgaveRequest>()
@@ -220,8 +219,7 @@ internal class OppgaveServiceTest {
                 BEHANDLING_ID,
                 Oppgavetype.BehandleSak,
             )
-        }
-            .hasMessage("Finner ikke oppgave for behandling $BEHANDLING_ID type=BehandleSak")
+        }.hasMessage("Finner ikke oppgave for behandling $BEHANDLING_ID type=BehandleSak")
             .isInstanceOf(java.lang.IllegalStateException::class.java)
     }
 
@@ -292,18 +290,19 @@ internal class OppgaveServiceTest {
 
     @Test
     fun `Skal sette frist for oppgave`() {
-        val frister = listOf<Pair<LocalDateTime, LocalDate>>(
-            Pair(torsdag.morgen(), fredagFrist),
-            Pair(torsdag.kveld(), mandagFrist),
-            Pair(fredag.morgen(), mandagFrist),
-            Pair(fredag.kveld(), tirsdagFrist),
-            Pair(lørdag.morgen(), tirsdagFrist),
-            Pair(lørdag.kveld(), tirsdagFrist),
-            Pair(søndag.morgen(), tirsdagFrist),
-            Pair(søndag.kveld(), tirsdagFrist),
-            Pair(mandag.morgen(), tirsdagFrist),
-            Pair(mandag.kveld(), onsdagFrist),
-        )
+        val frister =
+            listOf<Pair<LocalDateTime, LocalDate>>(
+                Pair(torsdag.morgen(), fredagFrist),
+                Pair(torsdag.kveld(), mandagFrist),
+                Pair(fredag.morgen(), mandagFrist),
+                Pair(fredag.kveld(), tirsdagFrist),
+                Pair(lørdag.morgen(), tirsdagFrist),
+                Pair(lørdag.kveld(), tirsdagFrist),
+                Pair(søndag.morgen(), tirsdagFrist),
+                Pair(søndag.kveld(), tirsdagFrist),
+                Pair(mandag.morgen(), tirsdagFrist),
+                Pair(mandag.kveld(), onsdagFrist),
+            )
 
         frister.forEach {
             assertThat(oppgaveService.lagFristForOppgave(it.first)).isEqualTo(it.second)
@@ -318,17 +317,18 @@ internal class OppgaveServiceTest {
         every { personService.hentPersonKortBolk(any()) } answers {
             firstArg<List<String>>().associateWith { pdlPersonKort(navn = lagNavn(fornavn = "fornavn$it")) }
         }
-        every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(
-            2,
-            listOf(
-                lagEksternTestOppgave().copy(
-                    id = oppgaveIdMedNavn,
-                    identer = listOf(OppgaveIdentV2("1", gruppe = IdentGruppe.FOLKEREGISTERIDENT)),
+        every { oppgaveClient.hentOppgaver(any()) } returns
+            FinnOppgaveResponseDto(
+                2,
+                listOf(
+                    lagEksternTestOppgave().copy(
+                        id = oppgaveIdMedNavn,
+                        identer = listOf(OppgaveIdentV2("1", gruppe = IdentGruppe.FOLKEREGISTERIDENT)),
+                    ),
+                    lagEksternTestOppgave().copy(id = 2, identer = listOf(OppgaveIdentV2("2", gruppe = IdentGruppe.ORGNR))),
+                    lagEksternTestOppgave().copy(id = 3),
                 ),
-                lagEksternTestOppgave().copy(id = 2, identer = listOf(OppgaveIdentV2("2", gruppe = IdentGruppe.ORGNR))),
-                lagEksternTestOppgave().copy(id = 3),
-            ),
-        )
+            )
         val oppgaver =
             oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = "01010172272", enhet = ENHET_NR_NAY)).oppgaver
 
@@ -342,13 +342,14 @@ internal class OppgaveServiceTest {
         val oppgaveIdMedBehandling = 1L
         val behandlingId = BehandlingId.random()
 
-        every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(
-            2,
-            listOf(
-                lagEksternTestOppgave().copy(id = oppgaveIdMedBehandling),
-                lagEksternTestOppgave().copy(id = 2),
-            ),
-        )
+        every { oppgaveClient.hentOppgaver(any()) } returns
+            FinnOppgaveResponseDto(
+                2,
+                listOf(
+                    lagEksternTestOppgave().copy(id = oppgaveIdMedBehandling),
+                    lagEksternTestOppgave().copy(id = 2),
+                ),
+            )
         every { oppgaveRepository.finnOppgaveMetadata(any()) } answers {
             firstArg<List<Long>>()
                 .filter { it == oppgaveIdMedBehandling }
@@ -366,10 +367,11 @@ internal class OppgaveServiceTest {
         val oppgaveIdMedBehandling = 1L
         val behandlingIdKlage = UUID.randomUUID()
 
-        every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(
-            1,
-            listOf(lagEksternTestOppgave().copy(id = oppgaveIdMedBehandling, behandlingstype = Behandlingstype.Klage.value)),
-        )
+        every { oppgaveClient.hentOppgaver(any()) } returns
+            FinnOppgaveResponseDto(
+                1,
+                listOf(lagEksternTestOppgave().copy(id = oppgaveIdMedBehandling, behandlingstype = Behandlingstype.Klage.value)),
+            )
         every { klageService.hentBehandlingIderForOppgaveIder(any()) } returns mapOf(oppgaveIdMedBehandling to behandlingIdKlage)
 
         val oppgaver = oppgaveService.hentOppgaver(FinnOppgaveRequestDto(ident = null, enhet = ENHET_NR_NAY)).oppgaver
@@ -412,36 +414,30 @@ internal class OppgaveServiceTest {
         }
     }
 
-    private fun lagTestFagsak(): Fagsak {
-        return fagsak(
+    private fun lagTestFagsak(): Fagsak =
+        fagsak(
             id = FAGSAK_ID,
             stønadstype = Stønadstype.BARNETILSYN,
             eksternId = EksternFagsakId(FAGSAK_EKSTERN_ID, FAGSAK_ID),
             identer = setOf(PersonIdent(ident = FNR)),
         )
-    }
 
-    private fun lagTestOppgave(): OppgaveDomain {
-        return OppgaveDomain(
+    private fun lagTestOppgave(): OppgaveDomain =
+        OppgaveDomain(
             behandlingId = BEHANDLING_ID,
             type = Oppgavetype.BehandleSak,
             gsakOppgaveId = GSAK_OPPGAVE_ID,
         )
-    }
 
-    private fun lagEksternTestOppgave(): Oppgave {
-        return Oppgave(id = GSAK_OPPGAVE_ID, versjon = 0)
-    }
+    private fun lagEksternTestOppgave(): Oppgave = Oppgave(id = GSAK_OPPGAVE_ID, versjon = 0)
 
-    private fun lagFinnOppgaveResponseDto(): FinnOppgaveResponseDto {
-        return FinnOppgaveResponseDto(
+    private fun lagFinnOppgaveResponseDto(): FinnOppgaveResponseDto =
+        FinnOppgaveResponseDto(
             antallTreffTotalt = 1,
             oppgaver = listOf(lagEksternTestOppgave()),
         )
-    }
 
     companion object {
-
         private val FAGSAK_ID = FagsakId.fromString("1242f220-cad3-4640-95c1-190ec814c91e")
         private const val FAGSAK_EKSTERN_ID = 98765L
         private const val GSAK_OPPGAVE_ID = 12345L
@@ -452,13 +448,9 @@ internal class OppgaveServiceTest {
     }
 }
 
-private fun LocalDateTime.kveld(): LocalDateTime {
-    return this.withHour(20)
-}
+private fun LocalDateTime.kveld(): LocalDateTime = this.withHour(20)
 
-private fun LocalDateTime.morgen(): LocalDateTime {
-    return this.withHour(8)
-}
+private fun LocalDateTime.morgen(): LocalDateTime = this.withHour(8)
 
 private val torsdag = LocalDateTime.of(2021, 4, 1, 12, 0)
 private val fredag = LocalDateTime.of(2021, 4, 2, 12, 0)

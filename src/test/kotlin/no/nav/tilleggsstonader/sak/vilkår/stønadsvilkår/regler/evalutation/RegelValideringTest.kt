@@ -11,7 +11,6 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 internal class RegelValideringTest {
-
     @Test
     fun `sender in en tom liste med svar - skal kaste exception`() {
         val regel = VilkårsregelEnHovedregel()
@@ -48,8 +47,7 @@ internal class RegelValideringTest {
         }.hasMessage(
             "Mangler svar på ett spørsmål som ikke er siste besvarte spørsmålet vilkårType=EKSEMPEL " +
                 "regelId=HAR_ET_NAVN",
-        )
-            .isInstanceOf(Feil::class.java)
+        ).isInstanceOf(Feil::class.java)
     }
 
     @Test
@@ -93,8 +91,7 @@ internal class RegelValideringTest {
         }.hasMessage(
             "Begrunnelse for vilkårType=EKSEMPEL regelId=HAR_ET_NAVN " +
                 "svarId=JA skal ikke ha begrunnelse",
-        )
-            .isInstanceOf(Feil::class.java)
+        ).isInstanceOf(Feil::class.java)
     }
 
     @Test
@@ -109,8 +106,7 @@ internal class RegelValideringTest {
         }.hasMessage(
             "Begrunnelse for vilkårType=EKSEMPEL regelId=HAR_ET_NAVN " +
                 "svarId=JA skal ikke ha begrunnelse",
-        )
-            .isInstanceOf(Feil::class.java)
+        ).isInstanceOf(Feil::class.java)
     }
 
     private fun valider(

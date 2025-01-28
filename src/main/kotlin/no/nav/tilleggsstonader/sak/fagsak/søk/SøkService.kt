@@ -26,10 +26,10 @@ class SøkService(
     private val fagsakService: FagsakService,
     private val arenaService: ArenaService,
 ) {
-
     fun søkPersonForEksternFagsak(eksternFagsakId: Long): Søkeresultat {
-        val fagsak = fagsakService.hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId)
-            ?: throw ApiFeil("Finner ikke fagsak for eksternFagsakId=$eksternFagsakId", HttpStatus.BAD_REQUEST)
+        val fagsak =
+            fagsakService.hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId)
+                ?: throw ApiFeil("Finner ikke fagsak for eksternFagsakId=$eksternFagsakId", HttpStatus.BAD_REQUEST)
         val fagsakPerson = fagsakPersonService.hentPerson(fagsak.fagsakPersonId)
         return tilSøkeresultat(fagsakPerson.hentAktivIdent(), fagsakPerson)
     }
@@ -64,12 +64,11 @@ class SøkService(
         )
     }
 
-    fun søkPersonUtenFagsak(personIdent: String): SøkeresultatUtenFagsak {
-        return personService.hentPersonKortBolk(listOf(personIdent))[personIdent]?.let {
+    fun søkPersonUtenFagsak(personIdent: String): SøkeresultatUtenFagsak =
+        personService.hentPersonKortBolk(listOf(personIdent))[personIdent]?.let {
             SøkeresultatUtenFagsak(
                 personIdent = personIdent,
                 navn = it.navn.gjeldende().visningsnavn(),
             )
         } ?: throw ApiFeil("Finner ingen personer for søket", HttpStatus.BAD_REQUEST)
-    }
 }

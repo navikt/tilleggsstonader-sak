@@ -19,17 +19,22 @@ abstract class BeregnYtelseSteg<DTO : Any>(
     open val tilkjentytelseService: TilkjentYtelseService,
     open val simuleringService: SimuleringService,
 ) : BehandlingSteg<DTO> {
-
     val logger = LoggerFactory.getLogger(javaClass)
 
-    override fun utførSteg(saksbehandling: Saksbehandling, data: DTO) {
+    override fun utførSteg(
+        saksbehandling: Saksbehandling,
+        data: DTO,
+    ) {
         logger.info("Lagrer vedtak for behandling=${saksbehandling.id} vedtak=${data::class.simpleName}")
         validerStønadstype(saksbehandling)
         nullstillEksisterendeVedtakPåBehandling(saksbehandling)
         lagreVedtak(saksbehandling, data)
     }
 
-    protected abstract fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: DTO)
+    protected abstract fun lagreVedtak(
+        saksbehandling: Saksbehandling,
+        vedtak: DTO,
+    )
 
     private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
         vedtakRepository.deleteById(saksbehandling.id)

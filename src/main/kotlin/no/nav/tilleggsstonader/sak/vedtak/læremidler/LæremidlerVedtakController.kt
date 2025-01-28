@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBereg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
@@ -35,7 +36,6 @@ class LæremidlerVedtakController(
     private val stegService: StegService,
     private val steg: LæremidlerBeregnYtelseSteg,
 ) {
-
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
@@ -52,17 +52,18 @@ class LæremidlerVedtakController(
         lagreVedtak(behandlingId, vedtak)
     }
 
-    /*
     @PostMapping("{behandlingId}/opphor")
     fun opphør(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: OpphørTilsynBarnDto,
+        @RequestBody vedtak: OpphørLæremidlerRequest,
     ) {
         lagreVedtak(behandlingId, vedtak)
     }
-     */
 
-    fun lagreVedtak(behandlingId: BehandlingId, vedtak: VedtakLæremidlerRequest) {
+    fun lagreVedtak(
+        behandlingId: BehandlingId,
+        vedtak: VedtakLæremidlerRequest,
+    ) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         stegService.håndterSteg(behandlingId, steg, vedtak)
     }
@@ -71,16 +72,16 @@ class LæremidlerVedtakController(
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtaksperioder: List<VedtaksperiodeDto>,
-    ): BeregningsresultatLæremidlerDto {
-        return beregningService.beregn(vedtaksperioder.tilDomene(), behandlingId).tilDto()
-    }
+    ): BeregningsresultatLæremidlerDto = beregningService.beregn(vedtaksperioder.tilDomene(), behandlingId).tilDto()
 
     /**
      * TODO Post og Get burde kanskje håndtere 2 ulike objekt?
      * På en måte hadde det vært fint hvis GET returnerer beløpsperioder
      */
     @GetMapping("{behandlingId}")
-    fun hentVedtak(@PathVariable behandlingId: BehandlingId): VedtakResponse? {
+    fun hentVedtak(
+        @PathVariable behandlingId: BehandlingId,
+    ): VedtakResponse? {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val revurderFra = behandlingService.hentSaksbehandling(behandlingId).revurderFra
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null

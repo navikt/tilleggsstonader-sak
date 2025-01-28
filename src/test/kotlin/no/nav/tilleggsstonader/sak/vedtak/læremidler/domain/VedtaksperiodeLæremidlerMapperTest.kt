@@ -8,30 +8,32 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class VedtaksperiodeLæremidlerMapperTest {
+    val førsteJanuar: LocalDate = LocalDate.of(2024, 1, 1)
+    val sisteJanuar: LocalDate = LocalDate.of(2024, 1, 2)
 
-    val FØRSTE_JAN: LocalDate = LocalDate.of(2024, 1, 1)
-    val ANDRE_JAN: LocalDate = LocalDate.of(2024, 1, 2)
+    val beregningsresultatPeriode1 =
+        beregningsresultatForMåned(
+            fom = førsteJanuar,
+            tom = førsteJanuar,
+            utbetalingsdato = førsteJanuar,
+        )
 
-    val beregningsresultatPeriode1 = beregningsresultatForMåned(
-        fom = FØRSTE_JAN,
-        tom = FØRSTE_JAN,
-        utbetalingsdato = FØRSTE_JAN,
-    )
-
-    val beregningsresultatPeriode2 = beregningsresultatForMåned(
-        fom = ANDRE_JAN,
-        tom = ANDRE_JAN,
-        utbetalingsdato = ANDRE_JAN,
-    )
+    val beregningsresultatPeriode2 =
+        beregningsresultatForMåned(
+            fom = sisteJanuar,
+            tom = sisteJanuar,
+            utbetalingsdato = sisteJanuar,
+        )
 
     @Test
     fun `skal slå sammen perioder hvis de er like og sammenhengende`() {
         val vedtaksperioder =
             VedtaksperiodeLæremidlerMapper.mapTilVedtaksperiode(
-                beregningsresultatForMåned = listOf(
-                    beregningsresultatPeriode1,
-                    beregningsresultatPeriode2,
-                ),
+                beregningsresultatForMåned =
+                    listOf(
+                        beregningsresultatPeriode1,
+                        beregningsresultatPeriode2,
+                    ),
             )
 
         assertThat(vedtaksperioder).containsExactly(
@@ -46,42 +48,53 @@ class VedtaksperiodeLæremidlerMapperTest {
 
     @Test
     fun `skal ikke slå sammen perioder hvis de ikke har samme målgruppe`() {
-        val vedtaksperioder = VedtaksperiodeLæremidlerMapper.mapTilVedtaksperiode(
-            beregningsresultatForMåned = listOf(
-                beregningsresultatPeriode1,
-                beregningsresultatPeriode2.copy(grunnlag = beregningsresultatPeriode2.grunnlag.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD)),
-            ),
-        )
+        val vedtaksperioder =
+            VedtaksperiodeLæremidlerMapper.mapTilVedtaksperiode(
+                beregningsresultatForMåned =
+                    listOf(
+                        beregningsresultatPeriode1,
+                        beregningsresultatPeriode2.copy(
+                            grunnlag = beregningsresultatPeriode2.grunnlag.copy(målgruppe = MålgruppeType.OVERGANGSSTØNAD),
+                        ),
+                    ),
+            )
 
         assertThat(vedtaksperioder).hasSize(2)
     }
 
     @Test
     fun `skal ikke slå sammen perioder hvis de ikke har samme studienivå`() {
-        val vedtaksperioder = VedtaksperiodeLæremidlerMapper.mapTilVedtaksperiode(
-            beregningsresultatForMåned = listOf(
-                beregningsresultatPeriode1,
-                beregningsresultatPeriode2.copy(grunnlag = beregningsresultatPeriode2.grunnlag.copy(studienivå = Studienivå.VIDEREGÅENDE)),
-            ),
-        )
+        val vedtaksperioder =
+            VedtaksperiodeLæremidlerMapper.mapTilVedtaksperiode(
+                beregningsresultatForMåned =
+                    listOf(
+                        beregningsresultatPeriode1,
+                        beregningsresultatPeriode2.copy(
+                            grunnlag = beregningsresultatPeriode2.grunnlag.copy(studienivå = Studienivå.VIDEREGÅENDE),
+                        ),
+                    ),
+            )
 
         assertThat(vedtaksperioder).hasSize(2)
     }
 
     @Test
     fun `skal ikke slå sammen perioder hvis de ikke er sammenhengende`() {
-        val FJERDE_JAN: LocalDate = LocalDate.of(2024, 1, 4)
-        val vedtaksperioder = VedtaksperiodeLæremidlerMapper.mapTilVedtaksperiode(
-            beregningsresultatForMåned = listOf(
-                beregningsresultatPeriode1,
-                beregningsresultatPeriode2.copy(
-                    grunnlag = beregningsresultatPeriode2.grunnlag.copy(
-                        fom = FJERDE_JAN,
-                        tom = FJERDE_JAN,
+        val fjerdeJanuar: LocalDate = LocalDate.of(2024, 1, 4)
+        val vedtaksperioder =
+            VedtaksperiodeLæremidlerMapper.mapTilVedtaksperiode(
+                beregningsresultatForMåned =
+                    listOf(
+                        beregningsresultatPeriode1,
+                        beregningsresultatPeriode2.copy(
+                            grunnlag =
+                                beregningsresultatPeriode2.grunnlag.copy(
+                                    fom = fjerdeJanuar,
+                                    tom = fjerdeJanuar,
+                                ),
+                        ),
                     ),
-                ),
-            ),
-        )
+            )
 
         assertThat(vedtaksperioder).hasSize(2)
     }

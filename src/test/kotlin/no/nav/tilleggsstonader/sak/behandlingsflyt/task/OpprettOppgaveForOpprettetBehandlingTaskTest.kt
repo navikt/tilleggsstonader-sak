@@ -16,7 +16,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 
 internal class OpprettOppgaveForOpprettetBehandlingTaskTest {
-
     val behandlingService = mockk<BehandlingService>()
     val oppgaveService = mockk<OppgaveService>()
     val taskService = mockk<TaskService>()
@@ -64,7 +63,9 @@ internal class OpprettOppgaveForOpprettetBehandlingTaskTest {
         mode = EnumSource.Mode.EXCLUDE,
     )
     @ParameterizedTest
-    internal fun `Skal ikke opprette oppgave hvis behandlingen ikke har status opprettet eller utredes`(behandlingStatus: BehandlingStatus) {
+    internal fun `Skal ikke opprette oppgave hvis behandlingen ikke har status opprettet eller utredes`(
+        behandlingStatus: BehandlingStatus,
+    ) {
         val behandling = mockBehandling(behandlingStatus)
 
         opprettOppgaveForOpprettetBehandlingTask.doTask(

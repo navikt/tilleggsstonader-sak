@@ -19,9 +19,11 @@ class BrevmottakereService(
     private val brevmottakereRepository: BrevmottakerVedtaksbrevRepository,
     private val behandlingService: BehandlingService,
 ) {
-
     @Transactional
-    fun lagreBrevmottakere(behandlingId: BehandlingId, brevmottakereDto: BrevmottakereDto) {
+    fun lagreBrevmottakere(
+        behandlingId: BehandlingId,
+        brevmottakereDto: BrevmottakereDto,
+    ) {
         validerBehandlingKanRedigeres(behandlingId)
         validerAntallBrevmottakere(brevmottakereDto)
         validerUnikeBrevmottakere(brevmottakereDto)
@@ -32,8 +34,8 @@ class BrevmottakereService(
     }
 
     @Transactional
-    fun hentEllerOpprettBrevmottakere(behandlingId: BehandlingId): BrevmottakereDto {
-        return if (brevmottakereRepository.existsByBehandlingId(behandlingId)) {
+    fun hentEllerOpprettBrevmottakere(behandlingId: BehandlingId): BrevmottakereDto =
+        if (brevmottakereRepository.existsByBehandlingId(behandlingId)) {
             brevmottakereRepository.findByBehandlingId(behandlingId).tilBrevmottakereDto()
         } else {
             validerBehandlingKanRedigeres(behandlingId)
@@ -42,14 +44,14 @@ class BrevmottakereService(
 
             listOf(brevmottaker).tilBrevmottakereDto()
         }
-    }
 
     private fun fjernMottakereIkkeIDto(
         brevmottakereDto: BrevmottakereDto,
         behandlingId: BehandlingId,
     ) {
         val nyeBrevmottakere = brevmottakereDto.personer.map { it.id } + brevmottakereDto.organisasjoner.map { it.id }
-        brevmottakereRepository.findByBehandlingId(behandlingId)
+        brevmottakereRepository
+            .findByBehandlingId(behandlingId)
             .filter { it.id !in nyeBrevmottakere }
             .forEach { brevmottakereRepository.deleteById(it.id) }
     }
@@ -73,7 +75,10 @@ class BrevmottakereService(
         }
     }
 
-    private fun opprettNyBrevmottaker(behandlingId: BehandlingId, it: BrevmottakerDto) {
+    private fun opprettNyBrevmottaker(
+        behandlingId: BehandlingId,
+        it: BrevmottakerDto,
+    ) {
         brevmottakereRepository.insert(
             BrevmottakerVedtaksbrev(
                 id = it.id,
@@ -83,21 +88,26 @@ class BrevmottakereService(
         )
     }
 
-    private fun oppdaterBrevmottaker(brevmottaker: BrevmottakerVedtaksbrev, it: BrevmottakerDto) {
+    private fun oppdaterBrevmottaker(
+        brevmottaker: BrevmottakerVedtaksbrev,
+        it: BrevmottakerDto,
+    ) {
         brevmottakereRepository.update(brevmottaker.copy(mottaker = it.tilMottaker()))
     }
 
     private fun opprettInitiellBrevmottakerForBehandling(behandlingId: BehandlingId): BrevmottakerVedtaksbrev {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
-        val brevmottaker = BrevmottakerVedtaksbrev(
-            behandlingId = behandlingId,
-            mottaker = Mottaker(
-                ident = saksbehandling.ident,
-                mottakerRolle = MottakerRolle.BRUKER,
-                mottakerType = MottakerType.PERSON,
-            ),
-        )
+        val brevmottaker =
+            BrevmottakerVedtaksbrev(
+                behandlingId = behandlingId,
+                mottaker =
+                    Mottaker(
+                        ident = saksbehandling.ident,
+                        mottakerRolle = MottakerRolle.BRUKER,
+                        mottakerType = MottakerType.PERSON,
+                    ),
+            )
         return brevmottakereRepository.insert(brevmottaker)
     }
 }

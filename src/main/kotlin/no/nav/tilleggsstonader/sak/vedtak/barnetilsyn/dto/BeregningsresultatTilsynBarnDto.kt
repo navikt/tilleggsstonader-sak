@@ -45,15 +45,16 @@ data class BeregningsgrunnlagDto(
  * Beregningsresultat inneholder perioder for nytt vedtak inklusive perioder som er kopiert fra forrige behandling
  * Men det er i de fleste tilfeller kun interessant å vise perioder fra og med revurderFra
  */
-fun BeregningsresultatTilsynBarn.tilDto(
-    revurderFra: LocalDate?,
-): BeregningsresultatTilsynBarnDto {
-    val filtrertPerioder = this.perioder
-        .filterNot { it.grunnlag.måned < (revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN) }
+fun BeregningsresultatTilsynBarn.tilDto(revurderFra: LocalDate?): BeregningsresultatTilsynBarnDto {
+    val filtrertPerioder =
+        this.perioder
+            .filterNot { it.grunnlag.måned < (revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN) }
 
-    val vedtaksperioder = VedtaksperiodeTilsynBarnMapper.mapTilVedtaksperiode(this.perioder)
-        .filtrerStønadsperioderFra(revurderFra)
-        .map { it.tilDto() }
+    val vedtaksperioder =
+        VedtaksperiodeTilsynBarnMapper
+            .mapTilVedtaksperiode(this.perioder)
+            .filtrerStønadsperioderFra(revurderFra)
+            .map { it.tilDto() }
 
     return BeregningsresultatTilsynBarnDto(
         perioder = filtrertPerioder.map { it.tilDto(revurderFra) },
@@ -63,13 +64,14 @@ fun BeregningsresultatTilsynBarn.tilDto(
     )
 }
 
-private fun VedtaksperiodeTilsynBarn.tilDto() = VedtaksperiodeDto(
-    fom = fom,
-    tom = tom,
-    målgruppe = målgruppe,
-    aktivitet = aktivitet,
-    antallBarn = antallBarn,
-)
+private fun VedtaksperiodeTilsynBarn.tilDto() =
+    VedtaksperiodeDto(
+        fom = fom,
+        tom = tom,
+        målgruppe = målgruppe,
+        aktivitet = aktivitet,
+        antallBarn = antallBarn,
+    )
 
 private fun BeregningsresultatForMåned.tilDto(revurderFra: LocalDate?): BeregningsresultatForMånedDto {
     val filtrerteBeløpsperioder = this.beløpsperioder.filtrerBeløpsperioderFra(revurderFra)
@@ -91,24 +93,24 @@ private fun Beregningsgrunnlag.tilDto() =
 /**
  * Skal kun ha med beløpsperioder som er lik eller etter revurderFra
  */
-private fun List<Beløpsperiode>.filtrerBeløpsperioderFra(revurderFra: LocalDate?) = mapNotNull {
-    when {
-        revurderFra == null -> it
-        it.dato < revurderFra -> null
-        else -> it
+private fun List<Beløpsperiode>.filtrerBeløpsperioderFra(revurderFra: LocalDate?) =
+    mapNotNull {
+        when {
+            revurderFra == null -> it
+            it.dato < revurderFra -> null
+            else -> it
+        }
     }
-}
 
 /**
  * Skal kun ha med stønadsperioder som er etter [revurderFra]
  * Dersom stønadsperioden overlapper med [revurderFra] så skal den avkortes fra og med revurderFra-dato
  */
-private fun List<VedtaksperiodeTilsynBarn>.filtrerStønadsperioderFra(
-    revurderFra: LocalDate?,
-): List<VedtaksperiodeTilsynBarn> = mapNotNull {
-    when {
-        revurderFra == null -> it
-        it.tom < revurderFra -> null
-        else -> it.copy(fom = maxOf(it.fom, revurderFra))
+private fun List<VedtaksperiodeTilsynBarn>.filtrerStønadsperioderFra(revurderFra: LocalDate?): List<VedtaksperiodeTilsynBarn> =
+    mapNotNull {
+        when {
+            revurderFra == null -> it
+            it.tom < revurderFra -> null
+            else -> it.copy(fom = maxOf(it.fom, revurderFra))
+        }
     }
-}

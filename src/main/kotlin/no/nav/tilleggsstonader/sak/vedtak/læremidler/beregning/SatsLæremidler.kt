@@ -23,38 +23,42 @@ data class SatsLæremidler(
 
 private val MAX = LocalDate.of(2099, 12, 31)
 
-private val bekreftedeSatser = listOf(
-    SatsLæremidler(
-        fom = LocalDate.of(2025, 1, 1),
-        tom = LocalDate.of(2025, 12, 31),
-        beløp = mapOf(Studienivå.VIDEREGÅENDE to 451, Studienivå.HØYERE_UTDANNING to 901),
-    ),
-    SatsLæremidler(
-        fom = LocalDate.of(2024, 1, 1),
-        tom = LocalDate.of(2024, 12, 31),
-        beløp = mapOf(Studienivå.VIDEREGÅENDE to 438, Studienivå.HØYERE_UTDANNING to 875),
-    ),
-    SatsLæremidler(
-        fom = LocalDate.of(2023, 1, 1),
-        tom = LocalDate.of(2023, 12, 31),
-        beløp = mapOf(Studienivå.VIDEREGÅENDE to 411, Studienivå.HØYERE_UTDANNING to 822),
-    ),
-)
+private val bekreftedeSatser =
+    listOf(
+        SatsLæremidler(
+            fom = LocalDate.of(2025, 1, 1),
+            tom = LocalDate.of(2025, 12, 31),
+            beløp = mapOf(Studienivå.VIDEREGÅENDE to 451, Studienivå.HØYERE_UTDANNING to 901),
+        ),
+        SatsLæremidler(
+            fom = LocalDate.of(2024, 1, 1),
+            tom = LocalDate.of(2024, 12, 31),
+            beløp = mapOf(Studienivå.VIDEREGÅENDE to 438, Studienivå.HØYERE_UTDANNING to 875),
+        ),
+        SatsLæremidler(
+            fom = LocalDate.of(2023, 1, 1),
+            tom = LocalDate.of(2023, 12, 31),
+            beløp = mapOf(Studienivå.VIDEREGÅENDE to 411, Studienivå.HØYERE_UTDANNING to 822),
+        ),
+    )
 
-val satser: List<SatsLæremidler> = listOf(
-    bekreftedeSatser.first().let {
-        it.copy(
-            fom = it.tom.plusDays(1),
-            tom = MAX,
-            bekreftet = false,
-        )
-    },
-) + bekreftedeSatser
+val satser: List<SatsLæremidler> =
+    listOf(
+        bekreftedeSatser.first().let {
+            it.copy(
+                fom = it.tom.plusDays(1),
+                tom = MAX,
+                bekreftet = false,
+            )
+        },
+    ) + bekreftedeSatser
 
-fun finnSatsForPeriode(periode: Periode<LocalDate>): SatsLæremidler {
-    return satser.find { it.inneholder(periode) } ?: error("Finner ikke satser for $periode")
-}
+fun finnSatsForPeriode(periode: Periode<LocalDate>): SatsLæremidler =
+    satser.find {
+        it.inneholder(periode)
+    } ?: error("Finner ikke satser for $periode")
 
-fun finnSatsForStudienivå(sats: SatsLæremidler, studienivå: Studienivå): Int {
-    return sats.beløp[studienivå] ?: error("Finner ikke studienivå=$studienivå for sats=$sats")
-}
+fun finnSatsForStudienivå(
+    sats: SatsLæremidler,
+    studienivå: Studienivå,
+): Int = sats.beløp[studienivå] ?: error("Finner ikke studienivå=$studienivå for sats=$sats")

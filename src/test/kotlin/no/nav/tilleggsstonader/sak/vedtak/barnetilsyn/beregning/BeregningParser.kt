@@ -35,27 +35,36 @@ enum class BeregningNøkler(
     BELØP("Beløp"),
 }
 
-fun mapStønadsperioder(behandlingId: BehandlingId, dataTable: DataTable) = dataTable.mapRad { rad ->
+fun mapStønadsperioder(
+    behandlingId: BehandlingId,
+    dataTable: DataTable,
+) = dataTable.mapRad { rad ->
     Stønadsperiode(
         behandlingId = behandlingId,
         fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
         tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
         målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
-        aktivitet = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
-            ?: AktivitetType.TILTAK,
+        aktivitet =
+            parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
+                ?: AktivitetType.TILTAK,
         status = StønadsperiodeStatus.NY,
     )
 }
 
-fun mapAktiviteter(behandlingId: BehandlingId, dataTable: DataTable) = dataTable.mapRad { rad ->
+fun mapAktiviteter(
+    behandlingId: BehandlingId,
+    dataTable: DataTable,
+) = dataTable.mapRad { rad ->
     aktivitet(
         behandlingId = behandlingId,
         fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
         tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(
-            type = parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
-                ?: AktivitetType.TILTAK,
-            aktivitetsdager = parseInt(BeregningNøkler.AKTIVITETSDAGER, rad),
-        ),
+        faktaOgVurdering =
+            faktaOgVurderingAktivitetTilsynBarn(
+                type =
+                    parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
+                        ?: AktivitetType.TILTAK,
+                aktivitetsdager = parseInt(BeregningNøkler.AKTIVITETSDAGER, rad),
+            ),
     )
 }

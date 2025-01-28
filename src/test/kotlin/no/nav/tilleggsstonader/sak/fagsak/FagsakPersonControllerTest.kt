@@ -13,7 +13,6 @@ import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 
 internal class FagsakPersonControllerTest : IntegrationTest() {
-
     @Autowired
     private lateinit var fagsakPersonController: FagsakPersonController
 

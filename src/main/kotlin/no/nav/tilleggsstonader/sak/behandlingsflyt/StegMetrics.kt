@@ -18,19 +18,22 @@ class StegMetrics(
         oppdaterMetrikk(stegType, stegFeiletMetrics)
     }
 
-    private fun oppdaterMetrikk(stegType: StegType, metrikk: Map<StegType, Counter>) {
+    private fun oppdaterMetrikk(
+        stegType: StegType,
+        metrikk: Map<StegType, Counter>,
+    ) {
         metrikk[stegType]?.increment()
     }
 
-    private fun initStegMetrikker(type: String): Map<StegType, Counter> {
-        return behandlingSteg.associate {
-            it.stegType() to Metrics.counter(
-                "behandling.steg.$type",
-                "steg",
-                it.stegType().name,
-                "beskrivelse",
-                "${it.stegType().rekkefølge} ${it.stegType().displayName()}",
-            )
+    private fun initStegMetrikker(type: String): Map<StegType, Counter> =
+        behandlingSteg.associate {
+            it.stegType() to
+                Metrics.counter(
+                    "behandling.steg.$type",
+                    "steg",
+                    it.stegType().name,
+                    "beskrivelse",
+                    "${it.stegType().rekkefølge} ${it.stegType().displayName()}",
+                )
         }
-    }
 }

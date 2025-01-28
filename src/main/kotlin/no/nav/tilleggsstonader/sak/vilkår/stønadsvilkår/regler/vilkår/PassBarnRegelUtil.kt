@@ -5,7 +5,6 @@ import java.time.LocalDate
 import java.time.Month
 
 object PassBarnRegelUtil {
-
     /**
      * Et barn født i 2013 har ikke avsluttet 3'e trinn før juni det året man fyller 10
      *
@@ -17,11 +16,13 @@ object PassBarnRegelUtil {
      * ...
      * 2023 fyller 10 år - fullfører 4 trinn i juni
      */
-    fun harFullførtFjerdetrinn(fødselsdato: LocalDate, datoForBeregning: LocalDate = osloDateNow()): Boolean {
-        return if (datoForBeregning.month >= Month.JUNE) {
+    fun harFullførtFjerdetrinn(
+        fødselsdato: LocalDate,
+        datoForBeregning: LocalDate = osloDateNow(),
+    ): Boolean =
+        if (datoForBeregning.month >= Month.JUNE) {
             datoForBeregning.year - fødselsdato.year > 9
         } else {
             datoForBeregning.year - fødselsdato.year > 10
         }
-    }
 }

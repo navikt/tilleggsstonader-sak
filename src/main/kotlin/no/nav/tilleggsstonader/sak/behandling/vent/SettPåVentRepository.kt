@@ -8,7 +8,7 @@ import java.util.UUID
 
 @Repository
 interface SettPåVentRepository :
-    RepositoryInterface<SettPåVent, UUID>, InsertUpdateRepository<SettPåVent> {
-
+    RepositoryInterface<SettPåVent, UUID>,
+    InsertUpdateRepository<SettPåVent> {
     fun findByBehandlingIdAndAktivIsTrue(behandlingId: BehandlingId): SettPåVent?
 }

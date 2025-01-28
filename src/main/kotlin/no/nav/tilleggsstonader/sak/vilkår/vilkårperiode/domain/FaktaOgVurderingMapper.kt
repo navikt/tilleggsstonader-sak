@@ -53,14 +53,16 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiod
 fun mapFaktaOgSvarDto(
     vilkårperiode: LagreVilkårperiode,
     stønadstype: Stønadstype,
-): FaktaOgVurdering {
-    return when (vilkårperiode.type) {
+): FaktaOgVurdering =
+    when (vilkårperiode.type) {
         is AktivitetType -> mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode)
         is MålgruppeType -> mapMålgruppe(stønadstype = stønadstype, målgruppe = vilkårperiode)
     }
-}
 
-private fun mapAktiviteter(stønadstype: Stønadstype, aktivitet: LagreVilkårperiode): AktivitetFaktaOgVurdering {
+private fun mapAktiviteter(
+    stønadstype: Stønadstype,
+    aktivitet: LagreVilkårperiode,
+): AktivitetFaktaOgVurdering {
     val type = aktivitet.type
     require(type is AktivitetType)
 
@@ -78,7 +80,10 @@ private fun mapAktiviteter(stønadstype: Stønadstype, aktivitet: LagreVilkårpe
     }
 }
 
-private fun mapMålgruppe(stønadstype: Stønadstype, målgruppe: LagreVilkårperiode): MålgruppeFaktaOgVurdering {
+private fun mapMålgruppe(
+    stønadstype: Stønadstype,
+    målgruppe: LagreVilkårperiode,
+): MålgruppeFaktaOgVurdering {
     val type = målgruppe.type
     require(type is MålgruppeType)
 
@@ -99,8 +104,8 @@ private fun mapMålgruppe(stønadstype: Stønadstype, målgruppe: LagreVilkårpe
 private fun mapAktiviteterBarnetilsyn(
     aktivitetType: AktivitetType,
     faktaOgSvar: FaktaOgSvarAktivitetBarnetilsynDto,
-): AktivitetTilsynBarn {
-    return when (aktivitetType) {
+): AktivitetTilsynBarn =
+    when (aktivitetType) {
         AktivitetType.TILTAK -> {
             TiltakTilsynBarn(
                 fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
@@ -108,13 +113,15 @@ private fun mapAktiviteterBarnetilsyn(
             )
         }
 
-        AktivitetType.UTDANNING -> UtdanningTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
-        )
+        AktivitetType.UTDANNING ->
+            UtdanningTilsynBarn(
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
+            )
 
-        AktivitetType.REELL_ARBEIDSSØKER -> ReellArbeidsøkerTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
-        )
+        AktivitetType.REELL_ARBEIDSSØKER ->
+            ReellArbeidsøkerTilsynBarn(
+                fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
+            )
 
         AktivitetType.INGEN_AKTIVITET -> {
             feilHvis(faktaOgSvar.aktivitetsdager != null) {
@@ -123,53 +130,58 @@ private fun mapAktiviteterBarnetilsyn(
             IngenAktivitetTilsynBarn
         }
     }
-}
 
 fun mapAktiviteterLæremidler(
     type: AktivitetType,
     faktaOgSvar: FaktaOgSvarAktivitetLæremidlerDto,
-): AktivitetLæremidler {
-    return when (type) {
-        AktivitetType.TILTAK -> TiltakLæremidler(
-            fakta = FaktaAktivitetLæremidler(
-                prosent = faktaOgSvar.prosent!!,
-                studienivå = faktaOgSvar.studienivå,
-            ),
-            vurderinger = VurderingTiltakLæremidler(
-                harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
-                harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(faktaOgSvar.svarHarRettTilUtstyrsstipend),
-            ),
-        )
+): AktivitetLæremidler =
+    when (type) {
+        AktivitetType.TILTAK ->
+            TiltakLæremidler(
+                fakta =
+                    FaktaAktivitetLæremidler(
+                        prosent = faktaOgSvar.prosent!!,
+                        studienivå = faktaOgSvar.studienivå,
+                    ),
+                vurderinger =
+                    VurderingTiltakLæremidler(
+                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
+                        harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(faktaOgSvar.svarHarRettTilUtstyrsstipend),
+                    ),
+            )
 
-        AktivitetType.UTDANNING -> UtdanningLæremidler(
-            fakta = FaktaAktivitetLæremidler(
-                prosent = faktaOgSvar.prosent!!,
-                studienivå = faktaOgSvar.studienivå,
-            ),
-            vurderinger = VurderingerUtdanningLæremidler(
-                harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
-                harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(faktaOgSvar.svarHarRettTilUtstyrsstipend),
-            ),
-        )
+        AktivitetType.UTDANNING ->
+            UtdanningLæremidler(
+                fakta =
+                    FaktaAktivitetLæremidler(
+                        prosent = faktaOgSvar.prosent!!,
+                        studienivå = faktaOgSvar.studienivå,
+                    ),
+                vurderinger =
+                    VurderingerUtdanningLæremidler(
+                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
+                        harRettTilUtstyrsstipend = VurderingHarRettTilUtstyrsstipend(faktaOgSvar.svarHarRettTilUtstyrsstipend),
+                    ),
+            )
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetLæremidler
 
         AktivitetType.REELL_ARBEIDSSØKER -> brukerfeil("Reell arbeidssøker er ikke en gyldig aktivitet for læremidler")
     }
-}
 
 private fun mapMålgruppeBarnetilsyn(
     type: MålgruppeType,
     faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
-): MålgruppeTilsynBarn {
-    return when (type) {
+): MålgruppeTilsynBarn =
+    when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
         MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
         MålgruppeType.OMSTILLINGSSTØNAD -> {
             OmstillingsstønadTilsynBarn(
-                vurderinger = VurderingOmstillingsstønad(
-                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                ),
+                vurderinger =
+                    VurderingOmstillingsstønad(
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                    ),
             )
         }
 
@@ -179,46 +191,49 @@ private fun mapMålgruppeBarnetilsyn(
 
         MålgruppeType.AAP -> {
             AAPTilsynBarn(
-                vurderinger = VurderingAAP(
-                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
-                ),
+                vurderinger =
+                    VurderingAAP(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    ),
             )
         }
 
         MålgruppeType.UFØRETRYGD -> {
             UføretrygdTilsynBarn(
-                vurderinger = VurderingUføretrygd(
-                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
-                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                ),
+                vurderinger =
+                    VurderingUføretrygd(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                    ),
             )
         }
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
             NedsattArbeidsevneTilsynBarn(
-                vurderinger = VurderingNedsattArbeidsevne(
-                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
-                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                ),
+                vurderinger =
+                    VurderingNedsattArbeidsevne(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                    ),
             )
         }
 
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
     }
-}
 
 private fun mapMålgruppeLæremidler(
     type: MålgruppeType,
     faktaOgVurderinger: FaktaOgSvarMålgruppeDto,
-): MålgruppeLæremidler {
-    return when (type) {
+): MålgruppeLæremidler =
+    when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeLæremidler
         MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerLæremidler
         MålgruppeType.OMSTILLINGSSTØNAD -> {
             OmstillingsstønadLæremidler(
-                vurderinger = VurderingOmstillingsstønad(
-                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                ),
+                vurderinger =
+                    VurderingOmstillingsstønad(
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                    ),
             )
         }
 
@@ -228,30 +243,32 @@ private fun mapMålgruppeLæremidler(
 
         MålgruppeType.AAP -> {
             AAPLæremidler(
-                vurderinger = VurderingAAP(
-                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
-                ),
+                vurderinger =
+                    VurderingAAP(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                    ),
             )
         }
 
         MålgruppeType.UFØRETRYGD -> {
             UføretrygdLæremidler(
-                vurderinger = VurderingUføretrygd(
-                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
-                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                ),
+                vurderinger =
+                    VurderingUføretrygd(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                    ),
             )
         }
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
             NedsattArbeidsevneLæremidler(
-                vurderinger = VurderingNedsattArbeidsevne(
-                    dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
-                    medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
-                ),
+                vurderinger =
+                    VurderingNedsattArbeidsevne(
+                        dekketAvAnnetRegelverk = VurderingDekketAvAnnetRegelverk(faktaOgVurderinger.svarUtgifterDekketAvAnnetRegelverk),
+                        medlemskap = VurderingMedlemskap(faktaOgVurderinger.svarMedlemskap),
+                    ),
             )
         }
 
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
     }
-}

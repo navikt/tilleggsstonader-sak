@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 internal class OppgaveRepositoryTest : IntegrationTest() {
-
     @Autowired
     private lateinit var oppgaveRepository: OppgaveRepository
 
@@ -46,15 +45,13 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
                 BehandlingId.random(),
                 Oppgavetype.BehandleSak,
             ),
-        )
-            .isNull()
+        ).isNull()
         assertThat(
             oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(
                 behandling.id,
                 Oppgavetype.BehandleSak,
             ),
-        )
-            .isNull()
+        ).isNull()
         assertThat(oppgaveRepository.findByBehandlingIdAndTypeAndErFerdigstiltIsFalse(behandling.id, oppgave.type))
             .isNull()
 
@@ -135,9 +132,10 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
         )
 
         assertThat(
-            oppgaveRepository.findByType(
-                Oppgavetype.InnhentDokumentasjon,
-            ).size,
+            oppgaveRepository
+                .findByType(
+                    Oppgavetype.InnhentDokumentasjon,
+                ).size,
         ).isEqualTo(1)
     }
 
@@ -151,7 +149,6 @@ internal class OppgaveRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FinnOppgaveMetadata {
-
         val fagsak1 = fagsak()
         val fagsak2 = fagsak(identer = setOf(PersonIdent("2")))
         val behandling1 = behandling(fagsak1)

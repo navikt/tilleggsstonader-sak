@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class RegisterAktivitetServiceTest {
-
     val registerAktivitetClient = mockk<RegisterAktivitetClient>()
     val fagsakPersonService = mockk<FagsakPersonService>()
 
@@ -31,10 +30,11 @@ class RegisterAktivitetServiceTest {
     inner class HentAktiviteter {
         @Test
         fun `henting av aktiviteter skal filtrere vekk typer som ikke er av typen tiltak`() {
-            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
-                aktivitetArenaDto(type = TypeAktivitet.AMO.name, erStønadsberettiget = false),
-                aktivitetArenaDto(type = TypeAktivitet.AILOK.name, erStønadsberettiget = false),
-            )
+            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns
+                listOf(
+                    aktivitetArenaDto(type = TypeAktivitet.AMO.name, erStønadsberettiget = false),
+                    aktivitetArenaDto(type = TypeAktivitet.AILOK.name, erStønadsberettiget = false),
+                )
 
             val aktivteter = service.hentAktiviteter(personId)
             assertThat(aktivteter).hasSize(1)
@@ -43,10 +43,11 @@ class RegisterAktivitetServiceTest {
 
         @Test
         fun `skal ignorere typer som ikke er mappet`() {
-            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
-                aktivitetArenaDto(type = "FINNER_IKKE", erStønadsberettiget = false),
-                aktivitetArenaDto(type = TypeAktivitet.ARBRRHBAG.name, erStønadsberettiget = false),
-            )
+            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns
+                listOf(
+                    aktivitetArenaDto(type = "FINNER_IKKE", erStønadsberettiget = false),
+                    aktivitetArenaDto(type = TypeAktivitet.ARBRRHBAG.name, erStønadsberettiget = false),
+                )
 
             val aktivteter = service.hentAktiviteter(personId)
             assertThat(aktivteter).hasSize(1)
@@ -59,9 +60,10 @@ class RegisterAktivitetServiceTest {
          */
         @Test
         fun `i tilfelle erStønadsberettiget er true så skal de aktivitetene være med, de settes kun til true for tiltak`() {
-            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
-                aktivitetArenaDto(type = "FINNER_IKKE", erStønadsberettiget = true),
-            )
+            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns
+                listOf(
+                    aktivitetArenaDto(type = "FINNER_IKKE", erStønadsberettiget = true),
+                )
 
             val aktivteter = service.hentAktiviteter(personId)
             assertThat(aktivteter).hasSize(1)
@@ -71,12 +73,12 @@ class RegisterAktivitetServiceTest {
 
     @Nested
     inner class HentAktiviteterForGrunnlagsdata {
-
         @Test
         fun `skal gi aktiviteter som er stønadsberettighet`() {
-            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
-                aktivitetArenaDto(type = TypeAktivitet.ENKELAMO.name, erStønadsberettiget = true),
-            )
+            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns
+                listOf(
+                    aktivitetArenaDto(type = TypeAktivitet.ENKELAMO.name, erStønadsberettiget = true),
+                )
 
             val aktivteter = service.hentAktiviteterForGrunnlagsdata(ident, LocalDate.now(), LocalDate.now())
 
@@ -85,9 +87,10 @@ class RegisterAktivitetServiceTest {
 
         @Test
         fun `skal ikke gi aktiviteter som ikke er stønadsberettighet`() {
-            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns listOf(
-                aktivitetArenaDto(type = TypeAktivitet.EKSPEBIST.name, erStønadsberettiget = false),
-            )
+            every { registerAktivitetClient.hentAktiviteter(any(), any(), any()) } returns
+                listOf(
+                    aktivitetArenaDto(type = TypeAktivitet.EKSPEBIST.name, erStønadsberettiget = false),
+                )
 
             val aktivteter = service.hentAktiviteterForGrunnlagsdata(ident, LocalDate.now(), LocalDate.now())
 

@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnl
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilStønadsperiodeBeregningsgrunnlag
 import org.assertj.core.api.Assertions.assertThat
 
+@Suppress("ktlint:standard:function-naming", "unused")
 class BeregningUtilsStepDefinitons {
     val behandlingId = BehandlingId.random()
 
@@ -65,7 +66,11 @@ class BeregningUtilsStepDefinitons {
     }
 
     @Så("forvent følgende aktiviteter for uke med fom={} og tom={}")
-    fun `forvent følgende aktiviteter for uke`(fom: String, tom: String, dataTable: DataTable) {
+    fun `forvent følgende aktiviteter for uke`(
+        fom: String,
+        tom: String,
+        dataTable: DataTable,
+    ) {
         val uke = Uke(parseDato(fom), parseDato(tom))
         val forventedePerioder = parsePeriodeMedDager(dataTable)
 
@@ -73,22 +78,20 @@ class BeregningUtilsStepDefinitons {
             .containsExactlyElementsOf(forventedePerioder)
     }
 
-    private fun parseUke(dataTable: DataTable): List<Uke> {
-        return dataTable.mapRad { rad ->
+    private fun parseUke(dataTable: DataTable): List<Uke> =
+        dataTable.mapRad { rad ->
             Uke(
                 fom = parseDato(BeregningNøkler.FOM_UKE, rad),
                 tom = parseDato(BeregningNøkler.TOM_UKE, rad),
             )
         }
-    }
 
-    private fun parsePeriodeMedDager(dataTable: DataTable): List<PeriodeMedDager> {
-        return dataTable.mapRad { rad ->
+    private fun parsePeriodeMedDager(dataTable: DataTable): List<PeriodeMedDager> =
+        dataTable.mapRad { rad ->
             PeriodeMedDager(
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 antallDager = parseInt(BeregningNøkler.ANTALL_DAGER, rad),
             )
         }
-    }
 }

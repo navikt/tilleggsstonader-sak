@@ -32,7 +32,6 @@ class OpprettOppgaveForOpprettetBehandlingTask(
     private val oppgaveService: OppgaveService,
     private val taskService: TaskService,
 ) : AsyncTaskStep {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     data class OpprettOppgaveTaskData(
@@ -64,15 +63,17 @@ class OpprettOppgaveForOpprettetBehandlingTask(
         if (behandling.status == BehandlingStatus.OPPRETTET || behandling.status == BehandlingStatus.UTREDES) {
             val tilordnetNavIdent =
                 if (data.saksbehandler == SikkerhetContext.SYSTEM_FORKORTELSE) null else data.saksbehandler
-            val oppgaveId = oppgaveService.opprettOppgave(
-                behandlingId = data.behandlingId,
-                oppgave = OpprettOppgave(
-                    oppgavetype = Oppgavetype.BehandleSak,
-                    tilordnetNavIdent = tilordnetNavIdent,
-                    beskrivelse = data.beskrivelse,
-                    prioritet = data.prioritet,
-                ),
-            )
+            val oppgaveId =
+                oppgaveService.opprettOppgave(
+                    behandlingId = data.behandlingId,
+                    oppgave =
+                        OpprettOppgave(
+                            oppgavetype = Oppgavetype.BehandleSak,
+                            tilordnetNavIdent = tilordnetNavIdent,
+                            beskrivelse = data.beskrivelse,
+                            prioritet = data.prioritet,
+                        ),
+                )
             task.metadata.setProperty("oppgaveId", oppgaveId.toString())
             return oppgaveId
         } else {
@@ -82,19 +83,18 @@ class OpprettOppgaveForOpprettetBehandlingTask(
     }
 
     companion object {
-
-        fun opprettTask(data: OpprettOppgaveTaskData): Task {
-            return Task(
+        fun opprettTask(data: OpprettOppgaveTaskData): Task =
+            Task(
                 type = TYPE,
                 payload = objectMapper.writeValueAsString(data),
-                properties = Properties().apply {
-                    if (data.saksbehandler != null) {
-                        setProperty("saksbehandler", data.saksbehandler)
-                    }
-                    setProperty("behandlingId", data.behandlingId.toString())
-                },
+                properties =
+                    Properties().apply {
+                        if (data.saksbehandler != null) {
+                            setProperty("saksbehandler", data.saksbehandler)
+                        }
+                        setProperty("behandlingId", data.behandlingId.toString())
+                    },
             )
-        }
 
         const val TYPE = "opprettOppgaveForOpprettetBehandling"
     }

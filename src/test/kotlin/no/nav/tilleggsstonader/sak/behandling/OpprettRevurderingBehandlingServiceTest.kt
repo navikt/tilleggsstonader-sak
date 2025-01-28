@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
 class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
-
     @Autowired
     lateinit var service: OpprettRevurderingBehandlingService
 
@@ -60,7 +59,6 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
     @Nested
     inner class OpprettBehandling {
-
         @Test
         fun `skal feile hvis forrige behandlingen ikke er ferdigstilt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
@@ -71,14 +69,15 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
         }
 
         @Test
-        fun `ny behandling skal peke til forrige innvilgede behandlingen fordi iverksetting skal peke til forrige iverksatte behandlingen`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(
-                    status = BehandlingStatus.FERDIGSTILT,
-                    resultat = BehandlingResultat.INNVILGET,
-                ),
-                opprettGrunnlagsdata = false,
-            )
+        fun `ny behandling skal peke til forrige innvilgede behandling fordi iverksetting skal peke til forrige iverksatte behandling`() {
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.INNVILGET,
+                    ),
+                    opprettGrunnlagsdata = false,
+                )
 
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
@@ -89,38 +88,49 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             assertThat(nyBehandling.forrigeBehandlingId).isEqualTo(behandling.id)
         }
 
+        /**
+         * ny behandling skal ikke peke til forrige henlagde behandling,
+         * fordi iverksetting skal peke til forrige iverksatte behandling.
+         */
         @Test
-        fun `ny behandling skal ikke peke til forrige henlagde behandlingen fordi iverksetting skal peke til forrige iverksatte behandlingen`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(
-                    status = BehandlingStatus.FERDIGSTILT,
-                    resultat = BehandlingResultat.HENLAGT,
-                ),
-                opprettGrunnlagsdata = false,
-            )
+        fun `ny behandling skal ikke peke riktig`() {
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.HENLAGT,
+                    ),
+                    opprettGrunnlagsdata = false,
+                )
 
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
-            val request = opprettBehandlingDto(
-                fagsakId = behandling.fagsakId,
-                årsak = BehandlingÅrsak.SØKNAD,
-                valgteBarn = setOf(PdlClientConfig.barnFnr),
-            )
+            val request =
+                opprettBehandlingDto(
+                    fagsakId = behandling.fagsakId,
+                    årsak = BehandlingÅrsak.SØKNAD,
+                    valgteBarn = setOf(PdlClientConfig.BARN_FNR),
+                )
             val nyBehandlingId = service.opprettBehandling(request)
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeBehandlingId).isNull()
         }
 
+        /*
+         * ny behandling skal ikke peke til forrige avslåtte behandling fordi iverksetting skal peke til forrige
+         * iverksatte behandling.
+         */
         @Test
-        fun `ny behandling skal ikke peke til forrige avslåtte behandlingen fordi iverksetting skal peke til forrige iverksatte behandlingen`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(
-                    status = BehandlingStatus.FERDIGSTILT,
-                    resultat = BehandlingResultat.AVSLÅTT,
-                ),
-                opprettGrunnlagsdata = false,
-            )
+        fun `ny behandling skal ikke peke til forrige avslåtte behandling`() {
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.AVSLÅTT,
+                    ),
+                    opprettGrunnlagsdata = false,
+                )
 
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
@@ -135,28 +145,30 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
     @Nested
     inner class GjenbrukDataFraForrigeBehandling {
         var tidligereBehandling: Behandling? = null
-        val barnIdent = PdlClientConfig.barnFnr
+        val barnIdent = PdlClientConfig.BARN_FNR
         val fom = LocalDate.of(2024, 1, 1)
         val tom = LocalDate.of(2024, 1, 31)
 
         @BeforeEach
         fun setUp() {
-            tidligereBehandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(
-                    status = BehandlingStatus.FERDIGSTILT,
-                    resultat = BehandlingResultat.INNVILGET,
-                ),
-                opprettGrunnlagsdata = false,
-            )
-
-            val barn = barnService.opprettBarn(
-                listOf(
-                    behandlingBarn(
-                        behandlingId = tidligereBehandling!!.id,
-                        personIdent = barnIdent,
+            tidligereBehandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.INNVILGET,
                     ),
-                ),
-            )
+                    opprettGrunnlagsdata = false,
+                )
+
+            val barn =
+                barnService.opprettBarn(
+                    listOf(
+                        behandlingBarn(
+                            behandlingId = tidligereBehandling!!.id,
+                            personIdent = barnIdent,
+                        ),
+                    ),
+                )
 
             vilkårperiodeRepository.insertAll(
                 listOf(
@@ -214,24 +226,26 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
     @Nested
     inner class HåndteringAvBarn {
-        val behandling = behandling(
-            status = BehandlingStatus.FERDIGSTILT,
-            resultat = BehandlingResultat.INNVILGET,
-        )
+        val behandling =
+            behandling(
+                status = BehandlingStatus.FERDIGSTILT,
+                resultat = BehandlingResultat.INNVILGET,
+            )
 
-        val eksisterendeBarn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.barnFnr)
+        val eksisterendeBarn = behandlingBarn(behandlingId = behandling.id, personIdent = PdlClientConfig.BARN_FNR)
 
         @BeforeEach
         fun setUp() {
             testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = false)
             val barn = barnService.opprettBarn(listOf(eksisterendeBarn))
-            val vilkår = barn.map {
-                vilkår(
-                    behandlingId = behandling.id,
-                    barnId = it.id,
-                    type = VilkårType.PASS_BARN,
-                )
-            }
+            val vilkår =
+                barn.map {
+                    vilkår(
+                        behandlingId = behandling.id,
+                        barnId = it.id,
+                        type = VilkårType.PASS_BARN,
+                    )
+                }
             vilkårRepository.insertAll(vilkår)
         }
 
@@ -243,48 +257,51 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
             assertThat(barnTilRevurdering.barn.single { it.ident == eksisterendeBarn.ident }.finnesPåForrigeBehandling)
                 .isTrue()
 
-            assertThat(barnTilRevurdering.barn.single { it.ident == PdlClientConfig.barn2Fnr }.finnesPåForrigeBehandling)
+            assertThat(barnTilRevurdering.barn.single { it.ident == PdlClientConfig.BARN2_FNR }.finnesPåForrigeBehandling)
                 .isFalse()
         }
 
         @Test
         fun `skal opprette behandling med nytt barn`() {
-            val request = opprettBehandlingDto(
-                fagsakId = behandling.fagsakId,
-                årsak = BehandlingÅrsak.SØKNAD,
-                valgteBarn = setOf(PdlClientConfig.barn2Fnr),
-            )
+            val request =
+                opprettBehandlingDto(
+                    fagsakId = behandling.fagsakId,
+                    årsak = BehandlingÅrsak.SØKNAD,
+                    valgteBarn = setOf(PdlClientConfig.BARN2_FNR),
+                )
             val behandlingIdRevurdering = service.opprettBehandling(request)
 
             with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
                 assertThat(this).hasSize(2)
                 assertThat(this.map { it.ident })
-                    .containsExactlyInAnyOrder(PdlClientConfig.barnFnr, PdlClientConfig.barn2Fnr)
+                    .containsExactlyInAnyOrder(PdlClientConfig.BARN_FNR, PdlClientConfig.BARN2_FNR)
             }
         }
 
         @Test
         fun `hvis man ikke sender inn noen barn skal man kun beholde barn fra forrige behandling`() {
-            val request = opprettBehandlingDto(
-                fagsakId = behandling.fagsakId,
-                årsak = BehandlingÅrsak.SØKNAD,
-                valgteBarn = setOf(),
-            )
+            val request =
+                opprettBehandlingDto(
+                    fagsakId = behandling.fagsakId,
+                    årsak = BehandlingÅrsak.SØKNAD,
+                    valgteBarn = setOf(),
+                )
             val behandlingIdRevurdering = service.opprettBehandling(request)
 
             with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
                 assertThat(this).hasSize(1)
-                assertThat(this.map { it.ident }).containsExactlyInAnyOrder(PdlClientConfig.barnFnr)
+                assertThat(this.map { it.ident }).containsExactlyInAnyOrder(PdlClientConfig.BARN_FNR)
             }
         }
 
         @Test
         fun `skal feile hvis man sender inn barn på årsak nye opplysninger`() {
-            val request = opprettBehandlingDto(
-                fagsakId = behandling.fagsakId,
-                årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
-                valgteBarn = setOf(PdlClientConfig.barn2Fnr),
-            )
+            val request =
+                opprettBehandlingDto(
+                    fagsakId = behandling.fagsakId,
+                    årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
+                    valgteBarn = setOf(PdlClientConfig.BARN2_FNR),
+                )
 
             assertThatThrownBy {
                 service.opprettBehandling(request)
@@ -293,11 +310,12 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
         @Test
         fun `skal feile hvis man prøver å sende inn barn som ikke finnes på personen`() {
-            val request = opprettBehandlingDto(
-                fagsakId = behandling.fagsakId,
-                årsak = BehandlingÅrsak.SØKNAD,
-                valgteBarn = setOf("ukjent ident"),
-            )
+            val request =
+                opprettBehandlingDto(
+                    fagsakId = behandling.fagsakId,
+                    årsak = BehandlingÅrsak.SØKNAD,
+                    valgteBarn = setOf("ukjent ident"),
+                )
 
             assertThatThrownBy {
                 service.opprettBehandling(request)
@@ -306,11 +324,12 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
         @Test
         fun `skal feile hvis man prøver å sende inn barn som allerede finnes på behandlingen`() {
-            val request = opprettBehandlingDto(
-                fagsakId = behandling.fagsakId,
-                årsak = BehandlingÅrsak.SØKNAD,
-                valgteBarn = setOf(PdlClientConfig.barnFnr),
-            )
+            val request =
+                opprettBehandlingDto(
+                    fagsakId = behandling.fagsakId,
+                    årsak = BehandlingÅrsak.SØKNAD,
+                    valgteBarn = setOf(PdlClientConfig.BARN_FNR),
+                )
 
             assertThatThrownBy {
                 service.opprettBehandling(request)
@@ -320,25 +339,28 @@ class OpprettRevurderingBehandlingServiceTest : IntegrationTest() {
 
     @Nested
     inner class HåndteringAvBarnFørsteBehandlingErHenlagt {
-
-        val behandling = behandling(
-            status = BehandlingStatus.FERDIGSTILT,
-            resultat = BehandlingResultat.HENLAGT,
-        )
+        val behandling =
+            behandling(
+                status = BehandlingStatus.FERDIGSTILT,
+                resultat = BehandlingResultat.HENLAGT,
+            )
 
         @Test
         fun `må minumum velge 1 barn i tilfelle første behandling er henlagt`() {
-            val request = opprettBehandlingDto(
-                fagsakId = behandling.fagsakId,
-                årsak = BehandlingÅrsak.SØKNAD,
-                valgteBarn = setOf(),
-            )
+            val request =
+                opprettBehandlingDto(
+                    fagsakId = behandling.fagsakId,
+                    årsak = BehandlingÅrsak.SØKNAD,
+                    valgteBarn = setOf(),
+                )
 
             testoppsettService.opprettBehandlingMedFagsak(behandling, opprettGrunnlagsdata = false)
 
             assertThatThrownBy {
                 service.opprettBehandling(request)
-            }.hasMessage("Behandling må opprettes med minimum 1 barn. Dersom alle tidligere behandlinger er henlagt, må ny behandling opprettes som søknad eller papirsøknad.")
+            }.hasMessage(
+                "Behandling må opprettes med minimum 1 barn. Dersom alle tidligere behandlinger er henlagt, må ny behandling opprettes som søknad eller papirsøknad.",
+            )
         }
     }
 

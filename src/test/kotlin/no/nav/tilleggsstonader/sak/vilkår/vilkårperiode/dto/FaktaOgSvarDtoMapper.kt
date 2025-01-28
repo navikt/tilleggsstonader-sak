@@ -15,26 +15,36 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 
-fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto {
-    return when (this) {
-        is MålgruppeFaktaOgVurdering -> FaktaOgSvarMålgruppeDto(
-            svarMedlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.svar,
-            svarUtgifterDekketAvAnnetRegelverk = vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.svar,
-        )
+fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
+    when (this) {
+        is MålgruppeFaktaOgVurdering ->
+            FaktaOgSvarMålgruppeDto(
+                svarMedlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.svar,
+                svarUtgifterDekketAvAnnetRegelverk =
+                    vurderinger
+                        .takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
+                        ?.dekketAvAnnetRegelverk
+                        ?.svar,
+            )
 
         is AktivitetFaktaOgVurdering -> {
             when (this) {
-                is FaktaOgVurderingTilsynBarn -> FaktaOgSvarAktivitetBarnetilsynDto(
-                    aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
-                    svarLønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.svar,
-                )
+                is FaktaOgVurderingTilsynBarn ->
+                    FaktaOgSvarAktivitetBarnetilsynDto(
+                        aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
+                        svarLønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.svar,
+                    )
 
-                is FaktaOgVurderingLæremidler -> FaktaOgSvarAktivitetLæremidlerDto(
-                    prosent = fakta.takeIfFakta<FaktaProsent>()?.prosent,
-                    svarHarUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.svar,
-                    svarHarRettTilUtstyrsstipend = vurderinger.takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()?.harRettTilUtstyrsstipend?.svar,
-                )
+                is FaktaOgVurderingLæremidler ->
+                    FaktaOgSvarAktivitetLæremidlerDto(
+                        prosent = fakta.takeIfFakta<FaktaProsent>()?.prosent,
+                        svarHarUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.svar,
+                        svarHarRettTilUtstyrsstipend =
+                            vurderinger
+                                .takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()
+                                ?.harRettTilUtstyrsstipend
+                                ?.svar,
+                    )
             }
         }
     }
-}

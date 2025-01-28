@@ -42,7 +42,6 @@ class JournalførVedtaksbrevTask(
     private val brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository,
     private val transactionHandler: TransactionHandler,
 ) : AsyncTaskStep {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun doTask(task: Task) {
@@ -65,25 +64,28 @@ class JournalførVedtaksbrevTask(
         saksbehandling: Saksbehandling,
         brevmottaker: BrevmottakerVedtaksbrev,
     ) {
-        val dokument = Dokument(
-            dokument = vedtaksbrev.beslutterPdf?.bytes ?: error("Mangler beslutterpdf"),
-            filtype = Filtype.PDFA,
-            dokumenttype = utledDokumenttype(saksbehandling),
-            tittel = utledBrevtittel(saksbehandling),
-        )
+        val dokument =
+            Dokument(
+                dokument = vedtaksbrev.beslutterPdf?.bytes ?: error("Mangler beslutterpdf"),
+                filtype = Filtype.PDFA,
+                dokumenttype = utledDokumenttype(saksbehandling),
+                tittel = utledBrevtittel(saksbehandling),
+            )
 
         val eksternReferanseId = "${saksbehandling.eksternId}-vedtaksbrev-${brevmottaker.id}"
 
-        val arkviverDokumentRequest = ArkiverDokumentRequest(
-            fnr = saksbehandling.ident,
-            forsøkFerdigstill = true,
-            hoveddokumentvarianter = listOf(dokument),
-            fagsakId = saksbehandling.eksternFagsakId.toString(),
-            journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(saksbehandling.ident)?.enhetNr
-                ?: error("Fant ikke arbeidsfordelingsenhet"),
-            eksternReferanseId = eksternReferanseId,
-            avsenderMottaker = brevmottaker.mottaker.tilAvsenderMottaker(),
-        )
+        val arkviverDokumentRequest =
+            ArkiverDokumentRequest(
+                fnr = saksbehandling.ident,
+                forsøkFerdigstill = true,
+                hoveddokumentvarianter = listOf(dokument),
+                fagsakId = saksbehandling.eksternFagsakId.toString(),
+                journalførendeEnhet =
+                    arbeidsfordelingService.hentNavEnhet(saksbehandling.ident)?.enhetNr
+                        ?: error("Fant ikke arbeidsfordelingsenhet"),
+                eksternReferanseId = eksternReferanseId,
+                avsenderMottaker = brevmottaker.mottaker.tilAvsenderMottaker(),
+            )
 
         val arkiverDokumentResponse = opprettJournalpost(arkviverDokumentRequest, saksbehandling, eksternReferanseId)
         brevmottakerVedtaksbrevRepository.update(brevmottaker.copy(journalpostId = arkiverDokumentResponse.journalpostId))
@@ -94,26 +96,28 @@ class JournalførVedtaksbrevTask(
         saksbehandling: Saksbehandling,
         eksternReferanseId: String,
     ): ArkiverDokumentResponse {
-        val response = try {
-            journalpostService.opprettJournalpost(arkviverDokumentRequest)
-        } catch (e: ArkiverDokumentConflictException) {
-            logger.warn(
-                "Konflikt ved arkivering av dokument. Vedtaksbrevet har sannsynligvis allerede blitt arkivert" +
-                    " for behandlingId=${saksbehandling.id} med eksternReferanseId=$eksternReferanseId",
-            )
-            e.response
-        }
+        val response =
+            try {
+                journalpostService.opprettJournalpost(arkviverDokumentRequest)
+            } catch (e: ArkiverDokumentConflictException) {
+                logger.warn(
+                    "Konflikt ved arkivering av dokument. Vedtaksbrevet har sannsynligvis allerede blitt arkivert" +
+                        " for behandlingId=${saksbehandling.id} med eksternReferanseId=$eksternReferanseId",
+                )
+                e.response
+            }
         feilHvisIkke(response.ferdigstilt) {
             "Journalposten ble ikke ferdigstilt og kan derfor ikke distribueres"
         }
         return response
     }
 
-    private fun utledBrevtittel(saksbehandling: Saksbehandling) = when (saksbehandling.stønadstype) {
-        Stønadstype.BARNETILSYN -> "Vedtak om stønad til tilsyn barn" // TODO
-        Stønadstype.LÆREMIDLER -> "Vedtak om stønad til læremidler" // TODO
-        else -> error("Utledning av brevtype er ikke implementert for ${saksbehandling.stønadstype}")
-    }
+    private fun utledBrevtittel(saksbehandling: Saksbehandling) =
+        when (saksbehandling.stønadstype) {
+            Stønadstype.BARNETILSYN -> "Vedtak om stønad til tilsyn barn" // TODO
+            Stønadstype.LÆREMIDLER -> "Vedtak om stønad til læremidler" // TODO
+            else -> error("Utledning av brevtype er ikke implementert for ${saksbehandling.stønadstype}")
+        }
 
     private fun utledDokumenttype(saksbehandling: Saksbehandling) =
         when (saksbehandling.stønadstype) {
@@ -127,14 +131,14 @@ class JournalførVedtaksbrevTask(
     }
 
     companion object {
-
         fun opprettTask(behandlingId: BehandlingId): Task =
             Task(
                 type = TYPE,
                 payload = behandlingId.toString(),
-                properties = Properties().apply {
-                    setProperty("behandlingId", behandlingId.toString())
-                },
+                properties =
+                    Properties().apply {
+                        setProperty("behandlingId", behandlingId.toString())
+                    },
             )
 
         const val TYPE = "journalførVedtaksbrev"

@@ -10,6 +10,8 @@ import java.util.UUID
 interface MellomlagerFrittståendeBrevRepository :
     RepositoryInterface<MellomlagretFrittståendeBrev, UUID>,
     InsertUpdateRepository<MellomlagretFrittståendeBrev> {
-
-    fun findByFagsakIdAndSporbarOpprettetAv(fagsakId: FagsakId, sporbarOpprettetAv: String): MellomlagretFrittståendeBrev?
+    fun findByFagsakIdAndSporbarOpprettetAv(
+        fagsakId: FagsakId,
+        sporbarOpprettetAv: String,
+    ): MellomlagretFrittståendeBrev?
 }

@@ -5,13 +5,20 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import kotlin.jvm.optionals.getOrNull
 
 object UnleashUtil {
-    fun UnleashService.getVariantWithNameOrDefault(toggle: Toggle, name: String, defaultValue: Int): Int {
+    fun UnleashService.getVariantWithNameOrDefault(
+        toggle: Toggle,
+        name: String,
+        defaultValue: Int,
+    ): Int {
         val variant = getVariant(toggle)
         return if (variant.isEnabled) {
             feilHvis(variant.name != name) {
                 "Fant variant med annet navn for $toggle forventet=$name faktisk=${variant.name}"
             }
-            variant.payload.getOrNull()?.value?.toInt() ?: defaultValue
+            variant.payload
+                .getOrNull()
+                ?.value
+                ?.toInt() ?: defaultValue
         } else {
             defaultValue
         }

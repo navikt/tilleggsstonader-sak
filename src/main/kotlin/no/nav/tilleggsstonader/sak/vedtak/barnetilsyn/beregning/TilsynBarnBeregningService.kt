@@ -50,8 +50,10 @@ class TilsynBarnBeregningService(
     private val tilsynBarnUtgiftService: TilsynBarnUtgiftService,
     private val repository: VedtakRepository,
 ) {
-
-    fun beregn(behandling: Saksbehandling, typeVedtak: TypeVedtak): BeregningsresultatTilsynBarn {
+    fun beregn(
+        behandling: Saksbehandling,
+        typeVedtak: TypeVedtak,
+    ): BeregningsresultatTilsynBarn {
         feilHvis(typeVedtak == TypeVedtak.AVSLAG) {
             "Skal ikke beregne for avslag"
         }
@@ -64,36 +66,43 @@ class TilsynBarnBeregningService(
      * Dersom behandling er en revurdering beregnes perioder fra og med måneden for revurderFra
      * Ellers beregnes perioder for hele perioden som man har stønadsperioder og utgifter
      */
-    private fun beregnAktuellePerioder(behandling: Saksbehandling, typeVedtak: TypeVedtak): List<BeregningsresultatForMåned> {
+    private fun beregnAktuellePerioder(
+        behandling: Saksbehandling,
+        typeVedtak: TypeVedtak,
+    ): List<BeregningsresultatForMåned> {
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
-        val stønadsperioder = stønadsperiodeRepository.findAllByBehandlingId(behandling.id)
-            .tilSortertStønadsperiodeBeregningsgrunnlag()
-            .splitFraRevurderFra(behandling.revurderFra)
+        val stønadsperioder =
+            stønadsperiodeRepository
+                .findAllByBehandlingId(behandling.id)
+                .tilSortertStønadsperiodeBeregningsgrunnlag()
+                .splitFraRevurderFra(behandling.revurderFra)
 
         val aktiviteter = finnAktiviteter(behandling.id)
 
         validerPerioderForInnvilgelse(stønadsperioder, aktiviteter, utgifterPerBarn, typeVedtak)
 
-        val beregningsgrunnlag = lagBeregningsgrunnlagPerMåned(stønadsperioder, aktiviteter, utgifterPerBarn)
-            .brukPerioderFraOgMedRevurderFra(behandling.revurderFra)
+        val beregningsgrunnlag =
+            lagBeregningsgrunnlagPerMåned(stønadsperioder, aktiviteter, utgifterPerBarn)
+                .brukPerioderFraOgMedRevurderFra(behandling.revurderFra)
         return beregn(beregningsgrunnlag)
     }
 
-    private fun finnRelevantePerioderFraForrigeVedtak(behandling: Saksbehandling): List<BeregningsresultatForMåned> {
-        return behandling.forrigeBehandlingId?.let { forrigeBehandlingId ->
-            val beregningsresultat = repository.findByIdOrThrow(forrigeBehandlingId)
-                .withTypeOrThrow<VedtakTilsynBarn>()
-                .data
-                .beregningsresultat()
-                ?: error("Finner ikke beregningsresultat på vedtak for behandling=$forrigeBehandlingId")
+    private fun finnRelevantePerioderFraForrigeVedtak(behandling: Saksbehandling): List<BeregningsresultatForMåned> =
+        behandling.forrigeBehandlingId?.let { forrigeBehandlingId ->
+            val beregningsresultat =
+                repository
+                    .findByIdOrThrow(forrigeBehandlingId)
+                    .withTypeOrThrow<VedtakTilsynBarn>()
+                    .data
+                    .beregningsresultat()
+                    ?: error("Finner ikke beregningsresultat på vedtak for behandling=$forrigeBehandlingId")
             val revurderFraMåned = behandling.revurderFra?.toYearMonth() ?: YEAR_MONTH_MIN
 
             beregningsresultat.perioder.filter { it.grunnlag.måned < revurderFraMåned }
         } ?: emptyList()
-    }
 
-    private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<BeregningsresultatForMåned> {
-        return beregningsgrunnlag.map {
+    private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<BeregningsresultatForMåned> =
+        beregningsgrunnlag.map {
             val dagsats = beregnDagsats(it)
             val beløpsperioder = lagBeløpsperioder(dagsats, it)
 
@@ -104,10 +113,12 @@ class TilsynBarnBeregningService(
                 beløpsperioder = beløpsperioder,
             )
         }
-    }
 
-    private fun lagBeløpsperioder(dagsats: BigDecimal, it: Beregningsgrunnlag): List<Beløpsperiode> {
-        return it.stønadsperioderGrunnlag.map {
+    private fun lagBeløpsperioder(
+        dagsats: BigDecimal,
+        it: Beregningsgrunnlag,
+    ): List<Beløpsperiode> =
+        it.stønadsperioderGrunnlag.map {
             // Datoer som treffer helger må endres til neste mandag fordi andeler med type dagsats betales ikke ut i helger
             val dato = it.stønadsperiode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
             Beløpsperiode(
@@ -116,12 +127,14 @@ class TilsynBarnBeregningService(
                 målgruppe = it.stønadsperiode.målgruppe,
             )
         }
-    }
 
-    private fun beregnBeløp(dagsats: BigDecimal, antallDager: Int) =
-        dagsats.multiply(antallDager.toBigDecimal())
-            .setScale(0, RoundingMode.HALF_UP)
-            .toInt()
+    private fun beregnBeløp(
+        dagsats: BigDecimal,
+        antallDager: Int,
+    ) = dagsats
+        .multiply(antallDager.toBigDecimal())
+        .setScale(0, RoundingMode.HALF_UP)
+        .toInt()
 
     /**
      * Divide trenger en scale som gir antall desimaler på resultatet fra divideringen
@@ -130,9 +143,11 @@ class TilsynBarnBeregningService(
      */
     private fun beregnDagsats(grunnlag: Beregningsgrunnlag): BigDecimal {
         val utgifter = grunnlag.utgifterTotal.toBigDecimal()
-        val utgifterSomDekkes = utgifter.multiply(DEKNINGSGRAD_TILSYN_BARN)
-            .setScale(0, RoundingMode.HALF_UP)
-            .toInt()
+        val utgifterSomDekkes =
+            utgifter
+                .multiply(DEKNINGSGRAD_TILSYN_BARN)
+                .setScale(0, RoundingMode.HALF_UP)
+                .toInt()
         val satsjusterteUtgifter = minOf(utgifterSomDekkes, grunnlag.makssats).toBigDecimal()
         return satsjusterteUtgifter
             .divide(SNITT_ANTALL_VIRKEDAGER_PER_MÅNED, 2, RoundingMode.HALF_UP)
@@ -186,25 +201,29 @@ class TilsynBarnBeregningService(
     private fun finnAktiviteterForStønadsperiode(
         stønadsperiode: StønadsperiodeBeregningsgrunnlag,
         aktiviteter: Map<AktivitetType, List<Aktivitet>>,
-    ): List<Aktivitet> {
-        return aktiviteter[stønadsperiode.aktivitet]?.filter { it.overlapper(stønadsperiode) }
-            ?: error("Finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som passer med stønadsperiode med fom=${stønadsperiode.fom} og tom=${stønadsperiode.tom}")
-    }
+    ): List<Aktivitet> =
+        aktiviteter[stønadsperiode.aktivitet]?.filter { it.overlapper(stønadsperiode) }
+            ?: error(
+                "Finnes ingen aktiviteter av type ${stønadsperiode.aktivitet} som passer med stønadsperiode med fom=${stønadsperiode.fom} og tom=${stønadsperiode.tom}",
+            )
 
     private fun antallDager(
         stønadsperiode: StønadsperiodeBeregningsgrunnlag,
         aktiviteterPerType: Map<AktivitetType, Map<Uke, List<PeriodeMedDager>>>,
     ): Int {
         val stønadsperioderUker = stønadsperiode.tilUke()
-        val aktiviteterPerUke = aktiviteterPerType[stønadsperiode.aktivitet]
-            ?: error("Finner ikke aktiviteter for ${stønadsperiode.aktivitet}")
+        val aktiviteterPerUke =
+            aktiviteterPerType[stønadsperiode.aktivitet]
+                ?: error("Finner ikke aktiviteter for ${stønadsperiode.aktivitet}")
 
-        return stønadsperioderUker.map { (uke, periode) ->
-            val aktiviteterForUke = aktiviteterPerUke[uke]
-                ?: error("Ingen aktivitet i uke fom=${uke.fom} og tom=${uke.tom}")
+        return stønadsperioderUker
+            .map { (uke, periode) ->
+                val aktiviteterForUke =
+                    aktiviteterPerUke[uke]
+                        ?: error("Ingen aktivitet i uke fom=${uke.fom} og tom=${uke.tom}")
 
-            beregnAntallAktivitetsdagerForUke(periode, aktiviteterForUke)
-        }.sum()
+                beregnAntallAktivitetsdagerForUke(periode, aktiviteterForUke)
+            }.sum()
     }
 
     /**
@@ -215,8 +234,8 @@ class TilsynBarnBeregningService(
     private fun beregnAntallAktivitetsdagerForUke(
         stønadsperiode: PeriodeMedDager,
         aktiviteter: List<PeriodeMedDager>,
-    ): Int {
-        return aktiviteter.filter { it.overlapper(stønadsperiode) }.fold(0) { acc, aktivitet ->
+    ): Int =
+        aktiviteter.filter { it.overlapper(stønadsperiode) }.fold(0) { acc, aktivitet ->
             // Tilgjengelige dager i uke i overlapp mellom stønadsperiode og aktivitet
             val antallTilgjengeligeDager = minOf(stønadsperiode.antallDager, aktivitet.antallDager)
 
@@ -224,7 +243,6 @@ class TilsynBarnBeregningService(
 
             acc + antallTilgjengeligeDager
         }
-    }
 
     /**
      * Skal ikke kunne bruke en dager fra aktivitet eller stønadsperiode flere ganger.
@@ -250,9 +268,7 @@ class TilsynBarnBeregningService(
      * For at beregningen då skal bli riktig må man ha med grunnlaget til hele måneden og beregne det på nytt, sånn at man får en ny periode som er
      * 1-14 aug, 500kr, 15-30 aug 700kr.
      */
-    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedRevurderFra(
-        revurderFra: LocalDate?,
-    ): List<Beregningsgrunnlag> {
+    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedRevurderFra(revurderFra: LocalDate?): List<Beregningsgrunnlag> {
         val revurderFraMåned = revurderFra?.toYearMonth() ?: return this
 
         return this.filter { it.måned >= revurderFraMåned }
@@ -263,7 +279,9 @@ class TilsynBarnBeregningService(
      * Eks for revurderFra=15.1 så får man 1.1 - 14.1 og 15.1 - 31.1
      * Dette for å kunne filtrere vekk perioder som begynner før revurderFra og beregne beløp som skal utbetales i gitt måned
      */
-    private fun List<StønadsperiodeBeregningsgrunnlag>.splitFraRevurderFra(revurderFra: LocalDate?): List<StønadsperiodeBeregningsgrunnlag> {
+    private fun List<StønadsperiodeBeregningsgrunnlag>.splitFraRevurderFra(
+        revurderFra: LocalDate?,
+    ): List<StønadsperiodeBeregningsgrunnlag> {
         if (revurderFra == null) return this
         return this.flatMap {
             if (it.fom < revurderFra && revurderFra <= it.tom) {
@@ -277,10 +295,10 @@ class TilsynBarnBeregningService(
         }
     }
 
-    private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> {
-        return vilkårperiodeRepository.findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
+    private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> =
+        vilkårperiodeRepository
+            .findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
             .tilAktiviteter()
-    }
 
     private fun validerPerioderForInnvilgelse(
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,

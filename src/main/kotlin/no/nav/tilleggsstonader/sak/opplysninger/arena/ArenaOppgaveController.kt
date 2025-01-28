@@ -19,9 +19,10 @@ class ArenaOppgaveController(
     private val arenaService: ArenaService,
     private val tilgangService: TilgangService,
 ) {
-
     @GetMapping("{fagsakPersonId}")
-    fun hentOppgaver(@PathVariable fagsakPersonId: FagsakPersonId): List<ArenaOppgaveDto> {
+    fun hentOppgaver(
+        @PathVariable fagsakPersonId: FagsakPersonId,
+    ): List<ArenaOppgaveDto> {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
         return arenaService.hentOppgaver(fagsakPersonId)
     }

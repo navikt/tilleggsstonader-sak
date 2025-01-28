@@ -19,7 +19,6 @@ class BrevMellomlagerController(
     private val tilgangService: TilgangService,
     private val mellomlagringBrevService: MellomlagringBrevService,
 ) {
-
     @PostMapping("/{behandlingId}")
     fun mellomlagreBrevverdier(
         @PathVariable behandlingId: BehandlingId,

@@ -11,7 +11,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class PdlPersonUtilTest {
-
     @Test
     internal fun `skal formetere navn med og uten mellomnavn`() {
         val navn = Navn("fornavn", null, "etternavn", metadata = Metadata(historisk = false))
@@ -31,11 +30,12 @@ internal class PdlPersonUtilTest {
     @Test
     internal fun `skal finne riktig gjeldende bostedsadresse`() {
         val gjeldendeAdresse = vegadresse("Gjeldende gate", "12", false)
-        val historiskeAdresser: List<Bostedsadresse> = listOf(
-            vegadresse("Historisk gate", "15", true),
-            vegadresse("Historisk gate", "13", true),
-            vegadresse("Historisk gate", "1", true),
-        )
+        val historiskeAdresser: List<Bostedsadresse> =
+            listOf(
+                vegadresse("Historisk gate", "15", true),
+                vegadresse("Historisk gate", "13", true),
+                vegadresse("Historisk gate", "1", true),
+            )
         val adresser: List<Bostedsadresse> = historiskeAdresser + gjeldendeAdresse
 
         assertThat(adresser.gjeldende()!!.vegadresse!!.adressenavn).isEqualTo(gjeldendeAdresse.vegadresse!!.adressenavn)
@@ -47,11 +47,12 @@ internal class PdlPersonUtilTest {
     @Test
     internal fun `skal finne riktig gjeldende oppholdsadresse`() {
         val gjeldendeAdresse = oppholdsadresse("Gjeldende gate", "12", false)
-        val historiskeAdresser: List<Oppholdsadresse> = listOf(
-            oppholdsadresse("Historisk gate", "15", true),
-            oppholdsadresse("Historisk gate", "13", true),
-            oppholdsadresse("Historisk gate", "1", true),
-        )
+        val historiskeAdresser: List<Oppholdsadresse> =
+            listOf(
+                oppholdsadresse("Historisk gate", "15", true),
+                oppholdsadresse("Historisk gate", "13", true),
+                oppholdsadresse("Historisk gate", "1", true),
+            )
 
         val adresser = historiskeAdresser + gjeldendeAdresse
 
@@ -61,8 +62,12 @@ internal class PdlPersonUtilTest {
         assertThat(historiskeAdresser.gjeldende()).isNull()
     }
 
-    private fun vegadresse(gate: String, nr: String, historisk: Boolean): Bostedsadresse {
-        return Bostedsadresse(
+    private fun vegadresse(
+        gate: String,
+        nr: String,
+        historisk: Boolean,
+    ): Bostedsadresse =
+        Bostedsadresse(
             null,
             null,
             null,
@@ -73,10 +78,13 @@ internal class PdlPersonUtilTest {
             null,
             Metadata(historisk),
         )
-    }
 
-    private fun oppholdsadresse(gate: String, nr: String, historisk: Boolean): Oppholdsadresse {
-        return Oppholdsadresse(
+    private fun oppholdsadresse(
+        gate: String,
+        nr: String,
+        historisk: Boolean,
+    ): Oppholdsadresse =
+        Oppholdsadresse(
             null,
             null,
             null,
@@ -85,5 +93,4 @@ internal class PdlPersonUtilTest {
             null,
             Metadata(historisk),
         )
-    }
 }

@@ -32,7 +32,6 @@ class IverksettService(
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
     private val taskService: TaskService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     /**
@@ -61,13 +60,14 @@ class IverksettService(
         val totrinnskontroll = hentTotrinnskontroll(behandlingId)
 
         val iverksettingId = behandlingId.id
-        val dto = IverksettDtoMapper.map(
-            behandling = behandling,
-            andelerTilkjentYtelse = andeler,
-            totrinnskontroll = totrinnskontroll,
-            iverksettingId = iverksettingId,
-            forrigeIverksetting = forrigeIverksetting(behandling, tilkjentYtelse),
-        )
+        val dto =
+            IverksettDtoMapper.map(
+                behandling = behandling,
+                andelerTilkjentYtelse = andeler,
+                totrinnskontroll = totrinnskontroll,
+                iverksettingId = iverksettingId,
+                forrigeIverksetting = forrigeIverksetting(behandling, tilkjentYtelse),
+            )
         opprettHentStatusFraIverksettingTask(behandling, iverksettingId)
         iverksettClient.iverksett(dto)
     }
@@ -97,7 +97,11 @@ class IverksettService(
      * Når man iverksetter samme behandling neste gang skal man bruke inneværende måned for å iverksette aktuell måned
      */
     @Transactional
-    fun iverksett(behandlingId: BehandlingId, iverksettingId: UUID, utbetalingsdato: LocalDate) {
+    fun iverksett(
+        behandlingId: BehandlingId,
+        iverksettingId: UUID,
+        utbetalingsdato: LocalDate,
+    ) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         if (!behandling.resultat.skalIverksettes) {
             logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
@@ -112,13 +116,14 @@ class IverksettService(
         feilHvis(andelerTilkjentYtelse.isEmpty()) {
             "Iverksetting forventer å finne andeler for iverksetting av behandling=$behandlingId utbetalingsdato=$utbetalingsdato"
         }
-        val dto = IverksettDtoMapper.map(
-            behandling = behandling,
-            andelerTilkjentYtelse = andelerTilkjentYtelse,
-            totrinnskontroll = totrinnskontroll,
-            iverksettingId = iverksettingId,
-            forrigeIverksetting = forrigeIverksetting(behandling, tilkjentYtelse),
-        )
+        val dto =
+            IverksettDtoMapper.map(
+                behandling = behandling,
+                andelerTilkjentYtelse = andelerTilkjentYtelse,
+                totrinnskontroll = totrinnskontroll,
+                iverksettingId = iverksettingId,
+                forrigeIverksetting = forrigeIverksetting(behandling, tilkjentYtelse),
+            )
         opprettHentStatusFraIverksettingTask(behandling, iverksettingId)
         iverksettClient.iverksett(dto)
     }
@@ -145,9 +150,10 @@ class IverksettService(
             "Andeler fra forrige behandling er sendt til iverksetting men ikke kvittert OK. Prøv igjen senere."
         }
 
-        val uaktuelleAndeler = andelerTilkjentYtelse
-            .filter { it.statusIverksetting == StatusIverksetting.UBEHANDLET }
-            .map { it.copy(statusIverksetting = StatusIverksetting.UAKTUELL) }
+        val uaktuelleAndeler =
+            andelerTilkjentYtelse
+                .filter { it.statusIverksetting == StatusIverksetting.UBEHANDLET }
+                .map { it.copy(statusIverksetting = StatusIverksetting.UAKTUELL) }
 
         andelTilkjentYtelseRepository.updateAll(uaktuelleAndeler)
     }
@@ -164,23 +170,24 @@ class IverksettService(
         utbetalingsdato: LocalDate,
     ): List<AndelTilkjentYtelse> {
         val iverksetting = Iverksetting(iverksettingId, osloNow())
-        val aktuelleAndeler = tilkjentYtelse.andelerTilkjentYtelse
-            .filter { it.utbetalingsdato <= utbetalingsdato }
-            .filter { it.statusIverksetting != StatusIverksetting.VENTER_PÅ_SATS_ENDRING }
-            .map {
-                if (it.statusIverksetting == StatusIverksetting.UBEHANDLET) {
-                    it.copy(
-                        statusIverksetting = StatusIverksetting.SENDT,
-                        iverksetting = iverksetting,
-                    )
-                } else {
-                    feilHvisIkke(it.statusIverksetting.erOk()) {
-                        "Kan ikke iverksette behandling=${tilkjentYtelse.behandlingId} iverksetting=$iverksettingId " +
-                            "når det finnes tidligere andeler med annen status enn OK/UBEHANDLET"
+        val aktuelleAndeler =
+            tilkjentYtelse.andelerTilkjentYtelse
+                .filter { it.utbetalingsdato <= utbetalingsdato }
+                .filter { it.statusIverksetting != StatusIverksetting.VENTER_PÅ_SATS_ENDRING }
+                .map {
+                    if (it.statusIverksetting == StatusIverksetting.UBEHANDLET) {
+                        it.copy(
+                            statusIverksetting = StatusIverksetting.SENDT,
+                            iverksetting = iverksetting,
+                        )
+                    } else {
+                        feilHvisIkke(it.statusIverksetting.erOk()) {
+                            "Kan ikke iverksette behandling=${tilkjentYtelse.behandlingId} iverksetting=$iverksettingId " +
+                                "når det finnes tidligere andeler med annen status enn OK/UBEHANDLET"
+                        }
+                        it
                     }
-                    it
                 }
-            }
 
         oppdaterAndeler(aktuelleAndeler, iverksetting)
         return aktuelleAndeler
@@ -198,15 +205,19 @@ class IverksettService(
     }
 
     private fun hentTotrinnskontroll(behandlingId: BehandlingId): Totrinnskontroll {
-        val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandlingId)
-            ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
+        val totrinnskontroll =
+            totrinnskontrollService.hentTotrinnskontroll(behandlingId)
+                ?: error("Finner ikke totrinnskontroll for behandling=$behandlingId")
         feilHvis(totrinnskontroll.status != TotrinnInternStatus.GODKJENT) {
             "Totrinnskontroll må være godkjent for å kunne iverksette"
         }
         return totrinnskontroll
     }
 
-    private fun opprettHentStatusFraIverksettingTask(behandling: Saksbehandling, iverksettingId: UUID) {
+    private fun opprettHentStatusFraIverksettingTask(
+        behandling: Saksbehandling,
+        iverksettingId: UUID,
+    ) {
         taskService.save(
             HentStatusFraIverksettingTask.opprettTask(
                 eksternFagsakId = behandling.eksternFagsakId,
@@ -227,10 +238,9 @@ class IverksettService(
     fun forrigeIverksetting(
         behandling: Saksbehandling,
         tilkjentYtelse: TilkjentYtelse,
-    ): ForrigeIverksettingDto? {
-        return tilkjentYtelse.forrigeIverksetting(behandling.id)
+    ): ForrigeIverksettingDto? =
+        tilkjentYtelse.forrigeIverksetting(behandling.id)
             ?: forrigeIverksettingForrigeBehandling(behandling)
-    }
 
     private fun forrigeIverksettingForrigeBehandling(behandling: Saksbehandling): ForrigeIverksettingDto? {
         val forrigeBehandlingId = behandling.forrigeBehandlingId

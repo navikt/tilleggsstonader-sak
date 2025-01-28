@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class FaktaOgVurderingAktivitetLæremidlerTest {
-
     @Test
     fun `resultatet skal ikke være oppfylt hvis ikke aktivitetstypen gir rett på stønaden`() {
         listOf(IngenAktivitetLæremidler).forEach { faktaOgVurdering ->
@@ -43,13 +42,15 @@ class FaktaOgVurderingAktivitetLæremidlerTest {
         fun `hvis bruker ikke har utgifter skal resultatet alltid bli IKKE_OPPFYLT`() {
             for (studienivå in StudienivåSvar.allePermutasjoner) {
                 for (harRettTilUtstyrsstipendSvar in HarRettTilUtstyrsstipendSvar.alleSvar) {
-                    val inngangsvilkår = UtdanningLæremidler(
-                        fakta = studienivå,
-                        vurderinger = VurderingerUtdanningLæremidler(
-                            harUtgifter = HarUtgifterSvar.nei,
-                            harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
-                        ),
-                    )
+                    val inngangsvilkår =
+                        UtdanningLæremidler(
+                            fakta = studienivå,
+                            vurderinger =
+                                VurderingerUtdanningLæremidler(
+                                    harUtgifter = HarUtgifterSvar.nei,
+                                    harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
+                                ),
+                        )
                     assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
                 }
             }
@@ -58,38 +59,44 @@ class FaktaOgVurderingAktivitetLæremidlerTest {
         @Test
         fun `hvis bruker har utgifter tar høyere utdanning, så skal resultatet bli OPPFYLT`() {
             for (harRettTilUtstyrsstipendSvar in HarRettTilUtstyrsstipendSvar.alleSvar) {
-                val inngangsvilkår = UtdanningLæremidler(
-                    fakta = StudienivåSvar.høyereUtdanning,
-                    vurderinger = VurderingerUtdanningLæremidler(
-                        harUtgifter = HarUtgifterSvar.ja,
-                        harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
-                    ),
-                )
+                val inngangsvilkår =
+                    UtdanningLæremidler(
+                        fakta = StudienivåSvar.høyereUtdanning,
+                        vurderinger =
+                            VurderingerUtdanningLæremidler(
+                                harUtgifter = HarUtgifterSvar.ja,
+                                harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
+                            ),
+                    )
                 assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
             }
         }
 
         @Test
         fun `hvis bruker har utgifter og går på videregående skole uten rett til utstrysstipend, så skal resultatet bli OPPFYLT`() {
-            val inngangsvilkår = UtdanningLæremidler(
-                fakta = StudienivåSvar.videregående,
-                vurderinger = VurderingerUtdanningLæremidler(
-                    harUtgifter = HarUtgifterSvar.ja,
-                    harRettTilUtstyrsstipend = HarRettTilUtstyrsstipendSvar.nei,
-                ),
-            )
+            val inngangsvilkår =
+                UtdanningLæremidler(
+                    fakta = StudienivåSvar.videregående,
+                    vurderinger =
+                        VurderingerUtdanningLæremidler(
+                            harUtgifter = HarUtgifterSvar.ja,
+                            harRettTilUtstyrsstipend = HarRettTilUtstyrsstipendSvar.nei,
+                        ),
+                )
             assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
         }
 
         @Test
         fun `hvis bruker har utgifter og går på videregående, men har rett til utstrysstipend, så skal resultatet bli IKKE_OPPFYLT`() {
-            val inngangsvilkår = UtdanningLæremidler(
-                fakta = StudienivåSvar.videregående,
-                vurderinger = VurderingerUtdanningLæremidler(
-                    harUtgifter = HarUtgifterSvar.ja,
-                    harRettTilUtstyrsstipend = HarRettTilUtstyrsstipendSvar.ja,
-                ),
-            )
+            val inngangsvilkår =
+                UtdanningLæremidler(
+                    fakta = StudienivåSvar.videregående,
+                    vurderinger =
+                        VurderingerUtdanningLæremidler(
+                            harUtgifter = HarUtgifterSvar.ja,
+                            harRettTilUtstyrsstipend = HarRettTilUtstyrsstipendSvar.ja,
+                        ),
+                )
             assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
         }
 
@@ -97,13 +104,15 @@ class FaktaOgVurderingAktivitetLæremidlerTest {
         fun `hvis bruker ikke har vurdert utgifter skal resultatet alltid bli IKKE_VURDERT`() {
             for (studienivå in StudienivåSvar.allePermutasjoner) {
                 for (harRettTilUtstyrsstipendSvar in HarRettTilUtstyrsstipendSvar.alleSvar) {
-                    val inngangsvilkår = UtdanningLæremidler(
-                        fakta = studienivå,
-                        vurderinger = VurderingerUtdanningLæremidler(
-                            harUtgifter = HarUtgifterSvar.ikkeVurdert,
-                            harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
-                        ),
-                    )
+                    val inngangsvilkår =
+                        UtdanningLæremidler(
+                            fakta = studienivå,
+                            vurderinger =
+                                VurderingerUtdanningLæremidler(
+                                    harUtgifter = HarUtgifterSvar.ikkeVurdert,
+                                    harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
+                                ),
+                        )
                     assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
                 }
             }
@@ -116,13 +125,15 @@ class FaktaOgVurderingAktivitetLæremidlerTest {
         fun `hvis bruker ikke har utgifter skal resultatet alltid bli IKKE_OPPFYLT`() {
             for (studienivå in StudienivåSvar.allePermutasjoner) {
                 for (harRettTilUtstyrsstipendSvar in HarRettTilUtstyrsstipendSvar.alleSvar) {
-                    val inngangsvilkår = TiltakLæremidler(
-                        fakta = studienivå,
-                        vurderinger = VurderingTiltakLæremidler(
-                            harUtgifter = HarUtgifterSvar.nei,
-                            harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
-                        ),
-                    )
+                    val inngangsvilkår =
+                        TiltakLæremidler(
+                            fakta = studienivå,
+                            vurderinger =
+                                VurderingTiltakLæremidler(
+                                    harUtgifter = HarUtgifterSvar.nei,
+                                    harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
+                                ),
+                        )
                     assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
                 }
             }
@@ -131,38 +142,44 @@ class FaktaOgVurderingAktivitetLæremidlerTest {
         @Test
         fun `hvis bruker har utgifter tar høyere utdanning, så skal resultatet bli OPPFYLT`() {
             for (harRettTilUtstyrsstipendSvar in HarRettTilUtstyrsstipendSvar.alleSvar) {
-                val inngangsvilkår = TiltakLæremidler(
-                    fakta = StudienivåSvar.høyereUtdanning,
-                    vurderinger = VurderingTiltakLæremidler(
-                        harUtgifter = HarUtgifterSvar.ja,
-                        harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
-                    ),
-                )
+                val inngangsvilkår =
+                    TiltakLæremidler(
+                        fakta = StudienivåSvar.høyereUtdanning,
+                        vurderinger =
+                            VurderingTiltakLæremidler(
+                                harUtgifter = HarUtgifterSvar.ja,
+                                harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
+                            ),
+                    )
                 assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
             }
         }
 
         @Test
         fun `hvis bruker har utgifter og går på videregående skole uten rett til utstrysstipend, så skal resultatet bli OPPFYLT`() {
-            val inngangsvilkår = TiltakLæremidler(
-                fakta = StudienivåSvar.videregående,
-                vurderinger = VurderingTiltakLæremidler(
-                    harUtgifter = HarUtgifterSvar.ja,
-                    harRettTilUtstyrsstipend = HarRettTilUtstyrsstipendSvar.nei,
-                ),
-            )
+            val inngangsvilkår =
+                TiltakLæremidler(
+                    fakta = StudienivåSvar.videregående,
+                    vurderinger =
+                        VurderingTiltakLæremidler(
+                            harUtgifter = HarUtgifterSvar.ja,
+                            harRettTilUtstyrsstipend = HarRettTilUtstyrsstipendSvar.nei,
+                        ),
+                )
             assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
         }
 
         @Test
         fun `hvis bruker har utgifter og går på videregående, men har rett til utstrysstipend, så skal resultatet bli IKKE_OPPFYLT`() {
-            val inngangsvilkår = TiltakLæremidler(
-                fakta = StudienivåSvar.videregående,
-                vurderinger = VurderingTiltakLæremidler(
-                    harUtgifter = HarUtgifterSvar.ja,
-                    harRettTilUtstyrsstipend = HarRettTilUtstyrsstipendSvar.ja,
-                ),
-            )
+            val inngangsvilkår =
+                TiltakLæremidler(
+                    fakta = StudienivåSvar.videregående,
+                    vurderinger =
+                        VurderingTiltakLæremidler(
+                            harUtgifter = HarUtgifterSvar.ja,
+                            harRettTilUtstyrsstipend = HarRettTilUtstyrsstipendSvar.ja,
+                        ),
+                )
             assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
         }
 
@@ -170,13 +187,15 @@ class FaktaOgVurderingAktivitetLæremidlerTest {
         fun `hvis bruker ikke har vurdert utgifter skal resultatet alltid bli IKKE_VURDERT`() {
             for (studienivå in StudienivåSvar.allePermutasjoner) {
                 for (harRettTilUtstyrsstipendSvar in HarRettTilUtstyrsstipendSvar.alleSvar) {
-                    val inngangsvilkår = TiltakLæremidler(
-                        fakta = studienivå,
-                        vurderinger = VurderingTiltakLæremidler(
-                            harUtgifter = HarUtgifterSvar.ikkeVurdert,
-                            harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
-                        ),
-                    )
+                    val inngangsvilkår =
+                        TiltakLæremidler(
+                            fakta = studienivå,
+                            vurderinger =
+                                VurderingTiltakLæremidler(
+                                    harUtgifter = HarUtgifterSvar.ikkeVurdert,
+                                    harRettTilUtstyrsstipend = harRettTilUtstyrsstipendSvar,
+                                ),
+                        )
                     assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
                 }
             }

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class VedtakTilsynBarnTest {
-
     @Nested
     inner class AvslåttVedtak {
         @Test
@@ -17,8 +16,7 @@ class VedtakTilsynBarnTest {
                     årsaker = emptyList(),
                     begrunnelse = "begrunnelse",
                 )
-            }
-                .hasMessage("Må velge minst en årsak for avslag")
+            }.hasMessage("Må velge minst en årsak for avslag")
         }
 
         @Test
@@ -28,8 +26,7 @@ class VedtakTilsynBarnTest {
                     årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
                     begrunnelse = "",
                 )
-            }
-                .hasMessage("Avslag må begrunnes")
+            }.hasMessage("Avslag må begrunnes")
         }
 
         /**
@@ -54,8 +51,7 @@ class VedtakTilsynBarnTest {
                     årsaker = emptyList(),
                     begrunnelse = "begrunnelse",
                 )
-            }
-                .hasMessage("Må velge minst en årsak for opphør")
+            }.hasMessage("Må velge minst en årsak for opphør")
         }
 
         @Test
@@ -66,8 +62,7 @@ class VedtakTilsynBarnTest {
                     årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
                     begrunnelse = "",
                 )
-            }
-                .hasMessage("Opphør må begrunnes")
+            }.hasMessage("Opphør må begrunnes")
         }
 
         /**

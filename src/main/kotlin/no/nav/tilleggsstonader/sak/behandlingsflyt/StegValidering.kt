@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import org.slf4j.LoggerFactory
 
 object StegValidering {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun validerHarTilgang(

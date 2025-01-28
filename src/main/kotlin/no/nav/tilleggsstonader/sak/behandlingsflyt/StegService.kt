@@ -27,13 +27,15 @@ class StegService(
     private val rolleConfig: RolleConfig,
     private val behandlingSteg: List<BehandlingSteg<*>>,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private val metrics = StegMetrics(behandlingSteg)
 
     @Transactional
-    fun resetSteg(behandlingId: BehandlingId, steg: StegType) {
+    fun resetSteg(
+        behandlingId: BehandlingId,
+        steg: StegType,
+    ) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         if (behandling.status != BehandlingStatus.UTREDES) {
             error("Kan ikke resette steg når status=${behandling.status} behandling=$behandlingId")
@@ -53,16 +55,18 @@ class StegService(
     fun håndterSteg(
         behandlingId: BehandlingId,
         behandlingSteg: BehandlingSteg<Void?>,
-    ): Behandling {
-        return håndterSteg(
+    ): Behandling =
+        håndterSteg(
             behandlingService.hentSaksbehandling(behandlingId),
             behandlingSteg,
             null,
         )
-    }
 
     @Transactional
-    fun håndterSteg(behandlingId: BehandlingId, steg: StegType): Behandling {
+    fun håndterSteg(
+        behandlingId: BehandlingId,
+        steg: StegType,
+    ): Behandling {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
         feilHvis(behandling.steg != steg) {
@@ -77,9 +81,7 @@ class StegService(
         }
     }
 
-    private fun håndterInngangsvilkår(
-        behandlingId: BehandlingId,
-    ): Behandling {
+    private fun håndterInngangsvilkår(behandlingId: BehandlingId): Behandling {
         val inngangsvilkårSteg: InngangsvilkårSteg = behandlingSteg.filterIsInstance<InngangsvilkårSteg>().single()
 
         return håndterSteg(behandlingId, inngangsvilkårSteg)
@@ -100,21 +102,18 @@ class StegService(
         behandlingId: BehandlingId,
         behandlingSteg: BehandlingSteg<T>,
         data: T,
-    ): Behandling {
-        return håndterSteg(
+    ): Behandling =
+        håndterSteg(
             behandlingService.hentSaksbehandling(behandlingId),
             behandlingSteg,
             data,
         )
-    }
 
     @Transactional
     fun håndterSteg(
         saksbehandling: Saksbehandling,
         behandlingSteg: BehandlingSteg<Void?>,
-    ): Behandling {
-        return håndterSteg(saksbehandling, behandlingSteg, null)
-    }
+    ): Behandling = håndterSteg(saksbehandling, behandlingSteg, null)
 
     @Transactional
     fun <T> håndterSteg(
@@ -173,7 +172,10 @@ class StegService(
         }
     }
 
-    private fun validerNesteSteg(nesteSteg: StegType, saksbehandling: Saksbehandling) {
+    private fun validerNesteSteg(
+        nesteSteg: StegType,
+        saksbehandling: Saksbehandling,
+    ) {
         if (!nesteSteg.erGyldigIKombinasjonMedStatus(behandlingService.hentBehandling(saksbehandling.id).status)) {
             error(
                 "Steg '${nesteSteg.displayName()}' kan ikke settes " +

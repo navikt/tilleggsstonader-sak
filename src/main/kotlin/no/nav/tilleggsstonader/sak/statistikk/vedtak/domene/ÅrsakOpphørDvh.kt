@@ -14,19 +14,19 @@ enum class ÅrsakOpphørDvh {
     )
 
     companion object {
-        fun fraDomene(årsaker: List<ÅrsakOpphør>?): JsonWrapper? {
-            return årsaker?.let {
+        fun fraDomene(årsaker: List<ÅrsakOpphør>?): JsonWrapper? =
+            årsaker?.let {
                 JsonWrapper(
                     årsaker.map { typeFraDomene(it) },
                 )
             }
-        }
 
-        private fun typeFraDomene(årsak: ÅrsakOpphør) = when (årsak) {
-            ÅrsakOpphør.ENDRING_AKTIVITET -> ENDRING_AKTIVITET
-            ÅrsakOpphør.ENDRING_MÅLGRUPPE -> ENDRING_MÅLGRUPPE
-            ÅrsakOpphør.ENDRING_UTGIFTER -> ENDRING_UTGIFTER
-            ÅrsakOpphør.ANNET -> ANNET
-        }
+        private fun typeFraDomene(årsak: ÅrsakOpphør) =
+            when (årsak) {
+                ÅrsakOpphør.ENDRING_AKTIVITET -> ENDRING_AKTIVITET
+                ÅrsakOpphør.ENDRING_MÅLGRUPPE -> ENDRING_MÅLGRUPPE
+                ÅrsakOpphør.ENDRING_UTGIFTER -> ENDRING_UTGIFTER
+                ÅrsakOpphør.ANNET -> ANNET
+            }
     }
 }

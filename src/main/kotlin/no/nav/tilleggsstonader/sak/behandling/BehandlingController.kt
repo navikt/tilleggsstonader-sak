@@ -41,9 +41,10 @@ class BehandlingController(
     private val henleggService: HenleggService,
     private val tilgangService: TilgangService,
 ) {
-
     @GetMapping("{behandlingId}")
-    fun hentBehandling(@PathVariable behandlingId: BehandlingId): BehandlingDto {
+    fun hentBehandling(
+        @PathVariable behandlingId: BehandlingId,
+    ): BehandlingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         if (saksbehandling.status == BehandlingStatus.OPPRETTET) {
@@ -56,21 +57,27 @@ class BehandlingController(
     }
 
     @GetMapping("fagsak-person/{fagsakPersonId}")
-    fun hentBehandlingsoversikt(@PathVariable fagsakPersonId: FagsakPersonId): BehandlingsoversiktDto {
+    fun hentBehandlingsoversikt(
+        @PathVariable fagsakPersonId: FagsakPersonId,
+    ): BehandlingsoversiktDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
 
         return behandlingsoversiktService.hentOversikt(fagsakPersonId)
     }
 
     @GetMapping("barn-til-revurdering/{fagsakId}")
-    fun hentBarnTilRevurdering(@PathVariable fagsakId: FagsakId): BarnTilRevurderingDto {
+    fun hentBarnTilRevurdering(
+        @PathVariable fagsakId: FagsakId,
+    ): BarnTilRevurderingDto {
         tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
         tilgangService.validerHarSaksbehandlerrolle()
         return opprettRevurderingBehandlingService.hentBarnTilRevurdering(fagsakId)
     }
 
     @PostMapping
-    fun opprettBehandling(@RequestBody request: OpprettBehandlingDto): BehandlingId {
+    fun opprettBehandling(
+        @RequestBody request: OpprettBehandlingDto,
+    ): BehandlingId {
         tilgangService.validerTilgangTilFagsak(request.fagsakId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
@@ -78,7 +85,9 @@ class BehandlingController(
     }
 
     @PostMapping("person")
-    fun hentBehandlingerForPersonOgStønadstype(@RequestBody identStønadstype: IdentStønadstype): List<BehandlingDto> {
+    fun hentBehandlingerForPersonOgStønadstype(
+        @RequestBody identStønadstype: IdentStønadstype,
+    ): List<BehandlingDto> {
         tilgangService.validerTilgangTilPersonMedBarn(identStønadstype.ident, AuditLoggerEvent.ACCESS)
 
         return fagsakService.hentBehandlingerForPersonOgStønadstype(
@@ -88,7 +97,10 @@ class BehandlingController(
     }
 
     @PostMapping("{behandlingId}/henlegg")
-    fun henleggBehandling(@PathVariable behandlingId: BehandlingId, @RequestBody henlagt: HenlagtDto): BehandlingDto {
+    fun henleggBehandling(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody henlagt: HenlagtDto,
+    ): BehandlingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         val henlagtBehandling = henleggService.henleggBehandling(behandlingId, henlagt)
@@ -97,14 +109,19 @@ class BehandlingController(
     }
 
     @GetMapping("/ekstern/{eksternBehandlingId}")
-    fun hentBehandling(@PathVariable eksternBehandlingId: Long): BehandlingDto {
+    fun hentBehandling(
+        @PathVariable eksternBehandlingId: Long,
+    ): BehandlingDto {
         val saksbehandling = behandlingService.hentSaksbehandling(eksternBehandlingId)
         tilgangService.validerTilgangTilPersonMedBarn(saksbehandling.ident, AuditLoggerEvent.ACCESS)
         return saksbehandling.tilDto()
     }
 
     @PostMapping("{behandlingId}/revurder-fra/{revurderFra}")
-    fun oppdaterRevurderFra(@PathVariable behandlingId: BehandlingId, @PathVariable revurderFra: LocalDate): BehandlingDto {
+    fun oppdaterRevurderFra(
+        @PathVariable behandlingId: BehandlingId,
+        @PathVariable revurderFra: LocalDate,
+    ): BehandlingDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         return revurderFraService.oppdaterRevurderFra(behandlingId, revurderFra).tilDto()
     }

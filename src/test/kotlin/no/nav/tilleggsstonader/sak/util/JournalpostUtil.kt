@@ -12,13 +12,12 @@ object JournalpostUtil {
     fun lagJournalpost(
         id: String = UUID.randomUUID().toString(),
         dokumenter: List<DokumentInfo> = emptyList(),
-    ) =
-        Journalpost(
-            journalpostId = id,
-            journalposttype = Journalposttype.I,
-            journalstatus = Journalstatus.FERDIGSTILT,
-            dokumenter = dokumenter,
-        )
+    ) = Journalpost(
+        journalpostId = id,
+        journalposttype = Journalposttype.I,
+        journalstatus = Journalstatus.FERDIGSTILT,
+        dokumenter = dokumenter,
+    )
 
     fun lagDokument(
         dokumentInfoId: String = UUID.randomUUID().toString(),

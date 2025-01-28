@@ -11,16 +11,18 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
-class RoutingMetricService(private val søknadRoutingRepository: SøknadRoutingRepository) {
-
+class RoutingMetricService(
+    private val søknadRoutingRepository: SøknadRoutingRepository,
+) {
     private val antallRoutingsGauge = MultiGauge.builder("routing_antall").register(Metrics.globalRegistry)
 
     @Scheduled(initialDelay = MetricUtil.FREKVENS_30_SEC, fixedDelay = MetricUtil.FREKVENS_30_MIN)
     fun antallRoutings() {
-        val rows = Stønadstype.entries.map {
-            val antall = søknadRoutingRepository.countByType(it)
-            MultiGauge.Row.of(Tags.of(Tag.of("ytelse", it.name)), antall)
-        }
+        val rows =
+            Stønadstype.entries.map {
+                val antall = søknadRoutingRepository.countByType(it)
+                MultiGauge.Row.of(Tags.of(Tag.of("ytelse", it.name)), antall)
+            }
         antallRoutingsGauge.register(rows, true)
     }
 }

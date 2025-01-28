@@ -27,7 +27,6 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnkontrollSt
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.TotrinnskontrollDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @Service
 class TotrinnskontrollService(
@@ -47,7 +46,7 @@ class TotrinnskontrollService(
                 (
                     eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET &&
                         eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
-                    ),
+                ),
             ) {
                 "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=${eksisterandeTotrinnskontroll.status}"
             }
@@ -93,7 +92,6 @@ class TotrinnskontrollService(
             throw Feil(
                 message = "Status for totrinnskontoll er ikke korrekt, status =  ${sisteTotrinnskontroll.status} ",
                 frontendFeilmelding = "Status for totrinnskontoll er ikke korrekt, vennligst last side på nytt ",
-
             )
         }
 
@@ -135,11 +133,11 @@ class TotrinnskontrollService(
         return totrinnskontrollSaksbehandler.saksbehandler
     }
 
-    fun hentBeslutter(behandlingId: BehandlingId): String? {
-        return totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
+    fun hentBeslutter(behandlingId: BehandlingId): String? =
+        totrinnskontrollRepository
+            .findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
             ?.beslutter
             ?.takeIf { NAVIDENT_REGEX.matches(it) }
-    }
 
     fun hentTotrinnskontroll(behandlingId: BehandlingId): Totrinnskontroll? =
         totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
@@ -233,16 +231,16 @@ class TotrinnskontrollService(
             }
 
             TotrinnInternStatus.ANGRET -> StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
-            else -> error(
-                "Skal ikke kunne være annen status enn UNDERKJENT når " +
-                    "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",
-            )
+            else ->
+                error(
+                    "Skal ikke kunne være annen status enn UNDERKJENT når " +
+                        "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",
+                )
         }
     }
 
-    private fun beslutterErLikBehandler(beslutteTotrinnskontroll: Totrinnskontroll): Boolean {
-        return SikkerhetContext.hentSaksbehandler() == beslutteTotrinnskontroll.saksbehandler
-    }
+    private fun beslutterErLikBehandler(beslutteTotrinnskontroll: Totrinnskontroll): Boolean =
+        SikkerhetContext.hentSaksbehandler() == beslutteTotrinnskontroll.saksbehandler
 
     private fun oppdaterStatusPåTotrinnskontroll(
         status: TotrinnInternStatus,

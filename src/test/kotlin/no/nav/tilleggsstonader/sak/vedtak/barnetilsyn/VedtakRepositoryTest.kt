@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class VedtakRepositoryTest : IntegrationTest() {
-
     @Autowired
     lateinit var vedtakRepository: VedtakRepository
 
@@ -26,9 +25,10 @@ class VedtakRepositoryTest : IntegrationTest() {
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = behandling.id,
-                data = InnvilgelseTilsynBarn(
-                    beregningsresultat = beregningsresultat,
-                ),
+                data =
+                    InnvilgelseTilsynBarn(
+                        beregningsresultat = beregningsresultat,
+                    ),
             ),
         )
 

@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeM
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 
+@Suppress("ktlint:standard:function-naming", "unused")
 class ForeslåStønadsperioderStepDefinitions {
     var aktiviteter: List<VilkårperiodeAktivitet> = emptyList()
     var målgrupper: List<VilkårperiodeMålgruppe> = emptyList()
@@ -29,40 +30,44 @@ class ForeslåStønadsperioderStepDefinitions {
 
     @Gitt("følgende vilkårsperioder med aktiviteter")
     fun `følgende vilkårsperioder med aktiviteter`(dataTable: DataTable) {
-        aktiviteter = dataTable.mapRad { rad ->
-            aktivitet(
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(
-                    type = AktivitetType.valueOf(rad["type"]!!),
-                ),
-
-            )
-        }
+        aktiviteter =
+            dataTable.mapRad { rad ->
+                aktivitet(
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    faktaOgVurdering =
+                        faktaOgVurderingAktivitetTilsynBarn(
+                            type = AktivitetType.valueOf(rad["type"]!!),
+                        ),
+                )
+            }
     }
 
     @Gitt("følgende vilkårsperioder med målgrupper")
     fun `følgende vilkårsperioder med målgrupper`(dataTable: DataTable) {
-        målgrupper = dataTable.mapRad { rad ->
-            målgruppe(
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                faktaOgVurdering = faktaOgVurderingMålgruppe(
-                    type = MålgruppeType.valueOf(rad["type"]!!),
-                ),
-            )
-        }
+        målgrupper =
+            dataTable.mapRad { rad ->
+                målgruppe(
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    faktaOgVurdering =
+                        faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.valueOf(rad["type"]!!),
+                        ),
+                )
+            }
     }
 
     @Når("forslag til stønadsperioder lages")
     fun `forslag til stønadsperioder lages`() {
         try {
-            resultat = ForeslåStønadsperiode.finnStønadsperioder(
-                Vilkårperioder(
-                    målgrupper = målgrupper,
-                    aktiviteter = aktiviteter,
-                ),
-            )
+            resultat =
+                ForeslåStønadsperiode.finnStønadsperioder(
+                    Vilkårperioder(
+                        målgrupper = målgrupper,
+                        aktiviteter = aktiviteter,
+                    ),
+                )
         } catch (e: ApiFeil) {
             feil = e
         }
@@ -76,16 +81,17 @@ class ForeslåStønadsperioderStepDefinitions {
 
     @Så("forvent følgende stønadsperioder")
     fun `forvent følgende beregningsresultat`(dataTable: DataTable) {
-        val forventetStønadsperioder = dataTable.mapRad { rad ->
-            StønadsperiodeDto(
-                id = null,
-                fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
-                tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
-                målgruppe = MålgruppeType.valueOf(rad["målgruppe"]!!),
-                aktivitet = AktivitetType.valueOf(rad["aktivitet"]!!),
-                status = null,
-            )
-        }
+        val forventetStønadsperioder =
+            dataTable.mapRad { rad ->
+                StønadsperiodeDto(
+                    id = null,
+                    fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
+                    tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
+                    målgruppe = MålgruppeType.valueOf(rad["målgruppe"]!!),
+                    aktivitet = AktivitetType.valueOf(rad["aktivitet"]!!),
+                    status = null,
+                )
+            }
 
         assertThat(resultat).isEqualTo(forventetStønadsperioder)
     }

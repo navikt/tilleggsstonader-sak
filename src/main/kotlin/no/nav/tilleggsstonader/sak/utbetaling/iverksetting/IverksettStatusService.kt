@@ -18,17 +18,22 @@ class IverksettStatusService(
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun hentStatusOgOppdaterAndeler(eksternFagsakId: Long, behandlingId: BehandlingId, eksternBehandlingId: Long, iverksettingId: UUID) {
+    fun hentStatusOgOppdaterAndeler(
+        eksternFagsakId: Long,
+        behandlingId: BehandlingId,
+        eksternBehandlingId: Long,
+        iverksettingId: UUID,
+    ) {
         val status = iverksettClient.hentStatus(eksternFagsakId, eksternBehandlingId, iverksettingId)
-        val statusIverksetting = when (status) {
-            IverksettStatus.OK -> StatusIverksetting.OK
-            IverksettStatus.OK_UTEN_UTBETALING -> StatusIverksetting.OK_UTEN_UTBETALING
-            else -> throw TaskExceptionUtenStackTrace("Status fra oppdrag er ikke ok, status=$status")
-        }
+        val statusIverksetting =
+            when (status) {
+                IverksettStatus.OK -> StatusIverksetting.OK
+                IverksettStatus.OK_UTEN_UTBETALING -> StatusIverksetting.OK_UTEN_UTBETALING
+                else -> throw TaskExceptionUtenStackTrace("Status fra oppdrag er ikke ok, status=$status")
+            }
 
         val andeler = hentAndelerForIverksettingId(behandlingId, iverksettingId)
         logger.info("Oppdaterer ${andeler.size} andeler med iverksettingId=$iverksettingId")

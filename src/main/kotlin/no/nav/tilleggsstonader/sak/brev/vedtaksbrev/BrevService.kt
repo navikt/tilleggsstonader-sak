@@ -28,8 +28,10 @@ class BrevService(
     private val familieDokumentClient: FamilieDokumentClient,
     private val tilgangService: TilgangService,
 ) {
-
-    fun lagSaksbehandlerBrev(saksbehandling: Saksbehandling, html: String): ByteArray {
+    fun lagSaksbehandlerBrev(
+        saksbehandling: Saksbehandling,
+        html: String,
+    ): ByteArray {
         validerRedigerbarBehandling(saksbehandling)
 
         val saksbehandlersignatur = SikkerhetContext.hentSaksbehandlerNavn(strict = true)
@@ -58,12 +60,13 @@ class BrevService(
         saksbehandlersignatur: String,
         saksbehandlerHtml: String,
     ): Vedtaksbrev {
-        val vedtaksbrev = Vedtaksbrev(
-            behandlingId = behandlingId,
-            saksbehandlerHtml = saksbehandlerHtml,
-            saksbehandlersignatur = saksbehandlersignatur,
-            saksbehandlerIdent = SikkerhetContext.hentSaksbehandler(),
-        )
+        val vedtaksbrev =
+            Vedtaksbrev(
+                behandlingId = behandlingId,
+                saksbehandlerHtml = saksbehandlerHtml,
+                saksbehandlersignatur = saksbehandlersignatur,
+                saksbehandlerIdent = SikkerhetContext.hentSaksbehandler(),
+            )
 
         return when (vedtaksbrevRepository.existsById(behandlingId)) {
             true -> vedtaksbrevRepository.update(vedtaksbrev)
@@ -74,11 +77,12 @@ class BrevService(
     fun forhåndsvisBeslutterBrev(saksbehandling: Saksbehandling): ByteArray {
         val vedtaksbrev = vedtaksbrevRepository.findByIdOrThrow(saksbehandling.id)
 
-        val beslutterSignatur = if (tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)) {
-            SikkerhetContext.hentSaksbehandlerNavn(strict = true)
-        } else {
-            ""
-        }
+        val beslutterSignatur =
+            if (tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)) {
+                SikkerhetContext.hentSaksbehandlerNavn(strict = true)
+            } else {
+                ""
+            }
 
         return lagBeslutterPdfMedSignatur(vedtaksbrev.saksbehandlerHtml, beslutterSignatur).bytes
     }
@@ -91,12 +95,13 @@ class BrevService(
 
         validerKanLageBeslutterbrev(saksbehandling, vedtaksbrev)
         val beslutterPdf = lagBeslutterPdfMedSignatur(saksbehandlerHtml, beslutterSignatur)
-        val besluttervedtaksbrev = vedtaksbrev.copy(
-            besluttersignatur = beslutterSignatur,
-            beslutterIdent = beslutterIdent,
-            beslutterPdf = beslutterPdf,
-            besluttetTid = osloNow(),
-        )
+        val besluttervedtaksbrev =
+            vedtaksbrev.copy(
+                besluttersignatur = beslutterSignatur,
+                beslutterIdent = beslutterIdent,
+                beslutterPdf = beslutterPdf,
+                besluttetTid = osloNow(),
+            )
         vedtaksbrevRepository.update(besluttervedtaksbrev)
         return Fil(bytes = beslutterPdf.bytes)
     }
@@ -131,14 +136,18 @@ class BrevService(
         saksbehandlerHtml: String,
         beslutterSignatur: String,
     ): Fil {
-        val htmlMedBeslutterSignatur = settInnBeslutterSignaturOgVedtaksdato(
-            html = saksbehandlerHtml,
-            beslutterSignatur = beslutterSignatur,
-        )
+        val htmlMedBeslutterSignatur =
+            settInnBeslutterSignaturOgVedtaksdato(
+                html = saksbehandlerHtml,
+                beslutterSignatur = beslutterSignatur,
+            )
         return Fil(familieDokumentClient.genererPdf(htmlMedBeslutterSignatur))
     }
 
-    private fun settInnSaksbehandlerSignatur(html: String, saksbehandlerSignatur: String): String {
+    private fun settInnSaksbehandlerSignatur(
+        html: String,
+        saksbehandlerSignatur: String,
+    ): String {
         feilHvisIkke(html.contains(SAKSBEHANDLER_SIGNATUR_PLACEHOLDER)) {
             "Brev-HTML mangler placeholder for saksbehandlersignatur"
         }
@@ -146,7 +155,10 @@ class BrevService(
         return html.replace(SAKSBEHANDLER_SIGNATUR_PLACEHOLDER, saksbehandlerSignatur)
     }
 
-    private fun settInnBeslutterSignaturOgVedtaksdato(html: String, beslutterSignatur: String): String {
+    private fun settInnBeslutterSignaturOgVedtaksdato(
+        html: String,
+        beslutterSignatur: String,
+    ): String {
         feilHvis(!html.contains(BESLUTTER_SIGNATUR_PLACEHOLDER)) {
             "Brev-HTML mangler placeholder for besluttersignatur"
         }

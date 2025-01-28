@@ -8,8 +8,9 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface TilkjentYtelseRepository : RepositoryInterface<TilkjentYtelse, UUID>, InsertUpdateRepository<TilkjentYtelse> {
-
+interface TilkjentYtelseRepository :
+    RepositoryInterface<TilkjentYtelse, UUID>,
+    InsertUpdateRepository<TilkjentYtelse> {
     fun findByBehandlingId(behandlingId: BehandlingId): TilkjentYtelse?
 
     @Query("SELECT * FROM tilkjent_ytelse WHERE behandling_id = :behandlingId FOR UPDATE OF tilkjent_ytelse")

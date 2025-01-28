@@ -43,7 +43,6 @@ class BeslutteVedtakSteg(
     private val brevService: BrevService,
     private val iverksettService: IverksettService,
 ) : BehandlingSteg<BeslutteVedtakDto> {
-
     override fun validerSteg(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.steg.kommerEtter(stegType())) {
             "Behandlingen er allerede besluttet. Status på behandling er '${saksbehandling.status.visningsnavn()}'"
@@ -53,7 +52,10 @@ class BeslutteVedtakSteg(
         }
     }
 
-    override fun utførOgReturnerNesteSteg(saksbehandling: Saksbehandling, data: BeslutteVedtakDto): StegType {
+    override fun utførOgReturnerNesteSteg(
+        saksbehandling: Saksbehandling,
+        data: BeslutteVedtakDto,
+    ): StegType {
         fagsakService.fagsakMedOppdatertPersonIdent(saksbehandling.fagsakId)
         val saksbehandler = totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(saksbehandling, data)
         val oppgaveId = ferdigstillOppgave(saksbehandling)
@@ -90,7 +92,10 @@ class BeslutteVedtakSteg(
         )
     }
 
-    private fun opprettBehandleUnderkjentVedtakOppgave(saksbehandling: Saksbehandling, navIdent: String) {
+    private fun opprettBehandleUnderkjentVedtakOppgave(
+        saksbehandling: Saksbehandling,
+        navIdent: String,
+    ) {
         taskService.save(
             OpprettOppgaveTask.opprettTask(
                 behandlingId = saksbehandling.id,
@@ -116,7 +121,10 @@ class BeslutteVedtakSteg(
         }
     }
 
-    override fun utførSteg(saksbehandling: Saksbehandling, data: BeslutteVedtakDto) {
+    override fun utførSteg(
+        saksbehandling: Saksbehandling,
+        data: BeslutteVedtakDto,
+    ) {
         error("Bruker utførOgReturnerNesteSteg i stedet for utførSteg")
     }
 

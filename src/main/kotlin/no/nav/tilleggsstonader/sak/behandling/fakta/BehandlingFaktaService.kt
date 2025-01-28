@@ -30,10 +30,7 @@ class BehandlingFaktaService(
     private val faktaArbeidOgOppholdMapper: FaktaArbeidOgOppholdMapper,
     private val fagsakService: FagsakService,
 ) {
-
-    fun hentFakta(
-        behandlingId: BehandlingId,
-    ): BehandlingFaktaDto {
+    fun hentFakta(behandlingId: BehandlingId): BehandlingFaktaDto {
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
         return when (stønadstype) {
             Stønadstype.BARNETILSYN -> hentFaktaDTOForBarneTilsyn(behandlingId)
@@ -42,9 +39,7 @@ class BehandlingFaktaService(
         }
     }
 
-    fun hentFaktaDTOForBarneTilsyn(
-        behandlingId: BehandlingId,
-    ): BehandlingFaktaTilsynBarnDto {
+    fun hentFaktaDTOForBarneTilsyn(behandlingId: BehandlingId): BehandlingFaktaTilsynBarnDto {
         val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
         val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaTilsynBarnDto(
@@ -57,9 +52,7 @@ class BehandlingFaktaService(
         )
     }
 
-    fun hentFaktaDTOForLæremidler(
-        behandlingId: BehandlingId,
-    ): BehandlingFaktaLæremidlerDto {
+    fun hentFaktaDTOForLæremidler(behandlingId: BehandlingId): BehandlingFaktaLæremidlerDto {
         val søknad = søknadService.hentSøknadLæremidler(behandlingId)
         val grunnlagsdata = grunnlagsdataService.hentGrunnlagsdata(behandlingId)
         val fødselsdato = grunnlagsdata.grunnlag.fødsel?.fødselsdatoEller1JanForFødselsår()
@@ -73,52 +66,55 @@ class BehandlingFaktaService(
         )
     }
 
-    private fun arenaFakta(grunnlagsdata: Grunnlagsdata): ArenaFakta? {
-        return grunnlagsdata.grunnlag.arena?.let {
+    private fun arenaFakta(grunnlagsdata: Grunnlagsdata): ArenaFakta? =
+        grunnlagsdata.grunnlag.arena?.let {
             ArenaFakta(
                 vedtakTom = it.vedtakTom,
             )
         }
-    }
 
     private fun mapAktivitet(søknad: SøknadBarnetilsyn?) =
         FaktaAktivtet(
-            søknadsgrunnlag = søknad?.let {
-                SøknadsgrunnlagAktivitet(
-                    aktiviteter = it.data.aktivitet.aktiviteter?.map { it.label },
-                    annenAktivitet = it.data.aktivitet.annenAktivitet,
-                    lønnetAktivitet = it.data.aktivitet.lønnetAktivitet,
-                )
-            },
+            søknadsgrunnlag =
+                søknad?.let {
+                    SøknadsgrunnlagAktivitet(
+                        aktiviteter =
+                            it.data.aktivitet.aktiviteter
+                                ?.map { it.label },
+                        annenAktivitet = it.data.aktivitet.annenAktivitet,
+                        lønnetAktivitet = it.data.aktivitet.lønnetAktivitet,
+                    )
+                },
         )
 
     private fun mapHovedytelse(hovedytelseAvsnitt: HovedytelseAvsnitt?) =
         FaktaHovedytelse(
             søknadsgrunnlag =
-            hovedytelseAvsnitt?.let {
-                SøknadsgrunnlagHovedytelse(
-                    hovedytelse = it.hovedytelse,
-                    arbeidOgOpphold = faktaArbeidOgOppholdMapper.mapArbeidOgOpphold(hovedytelseAvsnitt.arbeidOgOpphold),
-                )
-            },
+                hovedytelseAvsnitt?.let {
+                    SøknadsgrunnlagHovedytelse(
+                        hovedytelse = it.hovedytelse,
+                        arbeidOgOpphold = faktaArbeidOgOppholdMapper.mapArbeidOgOpphold(hovedytelseAvsnitt.arbeidOgOpphold),
+                    )
+                },
         )
 
     private fun mapUtdanning(utdanningAvsnitt: UtdanningAvsnitt?) =
         FaktaUtdanning(
             søknadsgrunnlag =
-            utdanningAvsnitt?.let {
-                SøknadsgrunnlagUtdanning(
-                    aktiviteter = it.aktiviteter?.map { it.label },
-                    annenUtdanning = it.annenUtdanning,
-                    harRettTilUtstyrsstipend = it.harRettTilUtstyrsstipend?.let {
-                        HarRettTilUtstyrsstipendDto(
-                            erLærlingEllerLiknende = it.erLærlingEllerLiknende,
-                            harTidligereFullførtVgs = it.harTidligereFullførtVgs,
-                        )
-                    },
-                    harFunksjonsnedsettelse = it.harFunksjonsnedsettelse,
-                )
-            },
+                utdanningAvsnitt?.let {
+                    SøknadsgrunnlagUtdanning(
+                        aktiviteter = it.aktiviteter?.map { it.label },
+                        annenUtdanning = it.annenUtdanning,
+                        harRettTilUtstyrsstipend =
+                            it.harRettTilUtstyrsstipend?.let {
+                                HarRettTilUtstyrsstipendDto(
+                                    erLærlingEllerLiknende = it.erLærlingEllerLiknende,
+                                    harTidligereFullførtVgs = it.harTidligereFullførtVgs,
+                                )
+                            },
+                        harFunksjonsnedsettelse = it.harFunksjonsnedsettelse,
+                    )
+                },
         )
 
     private fun mapBarn(
@@ -133,29 +129,33 @@ class BehandlingFaktaService(
         val grunnlagsdataBarn = grunnlagsdata.grunnlag.barn.associateBy { it.ident }
 
         return barnService.finnBarnPåBehandling(behandlingId).map { behandlingBarn ->
-            val barnGrunnlagsdata = grunnlagsdataBarn[behandlingBarn.ident]
-                ?: error("Finner ikke barn med ident=${behandlingBarn.ident} på behandling=$behandlingId")
+            val barnGrunnlagsdata =
+                grunnlagsdataBarn[behandlingBarn.ident]
+                    ?: error("Finner ikke barn med ident=${behandlingBarn.ident} på behandling=$behandlingId")
 
-            val søknadgrunnlag = søknadBarnPåIdent[behandlingBarn.ident]?.let { søknadBarn ->
-                SøknadsgrunnlagBarn(
-                    type = søknadBarn.data.type,
-                    startetIFemte = søknadBarn.data.startetIFemte,
-                    årsak = søknadBarn.data.årsak,
-                )
-            }
+            val søknadgrunnlag =
+                søknadBarnPåIdent[behandlingBarn.ident]?.let { søknadBarn ->
+                    SøknadsgrunnlagBarn(
+                        type = søknadBarn.data.type,
+                        startetIFemte = søknadBarn.data.startetIFemte,
+                        årsak = søknadBarn.data.årsak,
+                    )
+                }
             FaktaBarn(
                 ident = behandlingBarn.ident,
                 barnId = behandlingBarn.id,
-                registergrunnlag = RegistergrunnlagBarn(
-                    navn = barnGrunnlagsdata.navn.visningsnavn(),
-                    fødselsdato = barnGrunnlagsdata.fødselsdato,
-                    alder = barnGrunnlagsdata.alder,
-                    dødsdato = barnGrunnlagsdata.dødsdato,
-                ),
+                registergrunnlag =
+                    RegistergrunnlagBarn(
+                        navn = barnGrunnlagsdata.navn.visningsnavn(),
+                        fødselsdato = barnGrunnlagsdata.fødselsdato,
+                        alder = barnGrunnlagsdata.alder,
+                        dødsdato = barnGrunnlagsdata.dødsdato,
+                    ),
                 søknadgrunnlag = søknadgrunnlag,
-                vilkårFakta = VilkårFaktaBarn(
-                    harFullførtFjerdetrinn = utledHarFullførtFjerdetrinn(barnGrunnlagsdata, søknadgrunnlag),
-                ),
+                vilkårFakta =
+                    VilkårFaktaBarn(
+                        harFullførtFjerdetrinn = utledHarFullførtFjerdetrinn(barnGrunnlagsdata, søknadgrunnlag),
+                    ),
             )
         }
     }
@@ -180,14 +180,15 @@ class BehandlingFaktaService(
         grunnlagsdata: Grunnlagsdata,
     ): FaktaDokumentasjon {
         val navn = grunnlagsdata.grunnlag.barn.associate { it.ident to it.navn.fornavn }
-        val dokumentasjon = dokumentasjonListe.map { dokumentasjon ->
-            val navnBarn = dokumentasjon.identBarn?.let { navn[it] }?.let { " - $it" } ?: ""
-            Dokumentasjon(
-                type = dokumentasjon.type.tittel + navnBarn,
-                dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
-                identBarn = dokumentasjon.identBarn,
-            )
-        }
+        val dokumentasjon =
+            dokumentasjonListe.map { dokumentasjon ->
+                val navnBarn = dokumentasjon.identBarn?.let { navn[it] }?.let { " - $it" } ?: ""
+                Dokumentasjon(
+                    type = dokumentasjon.type.tittel + navnBarn,
+                    dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
+                    identBarn = dokumentasjon.identBarn,
+                )
+            }
         return FaktaDokumentasjon(journalpostId, dokumentasjon)
     }
 
@@ -195,7 +196,10 @@ class BehandlingFaktaService(
         grunnlagsdata: Grunnlagsdata,
         søknadBarnPåIdent: Map<String, SøknadBarn>,
     ) {
-        val identerIGrunnlagsdata = grunnlagsdata.grunnlag.barn.map { it.ident }.toSet()
+        val identerIGrunnlagsdata =
+            grunnlagsdata.grunnlag.barn
+                .map { it.ident }
+                .toSet()
         val identerSomManglerGrunnlagsdata = søknadBarnPåIdent.keys.filterNot { identerIGrunnlagsdata.contains(it) }
         if (identerSomManglerGrunnlagsdata.isNotEmpty()) {
             val kommaseparerteIdenter = identerSomManglerGrunnlagsdata.joinToString(",")

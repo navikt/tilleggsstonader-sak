@@ -19,18 +19,18 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class ArenaStatusServiceTest {
-
     private val personService = mockk<PersonService>()
     private val fagsakService = mockk<FagsakService>()
     private val behandlingService = mockk<BehandlingService>()
     private val søknadRoutingService = mockk<SøknadRoutingService>()
 
-    val arenaStatusService = ArenaStatusService(
-        personService = personService,
-        fagsakService = fagsakService,
-        behandlingService = behandlingService,
-        søknadRoutingService = søknadRoutingService,
-    )
+    val arenaStatusService =
+        ArenaStatusService(
+            personService = personService,
+            fagsakService = fagsakService,
+            behandlingService = behandlingService,
+            søknadRoutingService = søknadRoutingService,
+        )
 
     val ident = "ident"
     val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER, identer = setOf(PersonIdent(ident)))

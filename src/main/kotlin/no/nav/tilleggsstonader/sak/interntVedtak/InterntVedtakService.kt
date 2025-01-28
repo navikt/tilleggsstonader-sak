@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
@@ -42,7 +43,6 @@ class InterntVedtakService(
     private val vilkårService: VilkårService,
     private val vedtakService: VedtakService,
 ) {
-
     fun lagInterntVedtak(behandlingId: BehandlingId): InterntVedtak {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
@@ -66,20 +66,26 @@ class InterntVedtakService(
     private fun mapBeregningsresultatForStønadstype(
         vedtak: Vedtak?,
         behandling: Saksbehandling,
-    ): BeregningsresultatInterntVedtakDto? = vedtak?.data?.let { data ->
-        when (data) {
-            is InnvilgelseTilsynBarn -> BeregningsresultatInterntVedtakDto(
-                tilsynBarn = data.beregningsresultat.tilDto(behandling.revurderFra).perioder,
-            )
+    ): BeregningsresultatInterntVedtakDto? =
+        vedtak?.data?.let { data ->
+            when (data) {
+                is InnvilgelseTilsynBarn ->
+                    BeregningsresultatInterntVedtakDto(
+                        tilsynBarn = data.beregningsresultat.tilDto(behandling.revurderFra).perioder,
+                    )
 
-            is InnvilgelseLæremidler -> BeregningsresultatInterntVedtakDto(
-                læremidler = data.beregningsresultat.filtrerFraOgMed(behandling.revurderFra)
-                    .tilDto().perioder,
-            )
+                is InnvilgelseLæremidler ->
+                    BeregningsresultatInterntVedtakDto(
+                        læremidler =
+                            data.beregningsresultat
+                                .filtrerFraOgMed(behandling.revurderFra)
+                                .tilDto()
+                                .perioder,
+                    )
 
-            else -> null
+                else -> null
+            }
         }
-    }
 
     private fun mapBarnPåBarnId(
         behandlingId: BehandlingId,
@@ -93,9 +99,7 @@ class InterntVedtakService(
         }
     }
 
-    private fun mapBehandlingsinformasjon(
-        behandling: Saksbehandling,
-    ): Behandlinginfo {
+    private fun mapBehandlingsinformasjon(behandling: Saksbehandling): Behandlinginfo {
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(behandling.id)
         val saksbehandler = totrinnskontroll?.saksbehandler ?: behandling.endretAv
         return Behandlinginfo(
@@ -113,9 +117,7 @@ class InterntVedtakService(
         )
     }
 
-    private fun mapSøknadsinformasjon(
-        behandling: Saksbehandling,
-    ): Søknadsinformasjon? {
+    private fun mapSøknadsinformasjon(behandling: Saksbehandling): Søknadsinformasjon? {
         val søknad = søknadService.hentSøknadMetadata(behandling.id)
         return søknad?.let {
             Søknadsinformasjon(
@@ -124,8 +126,8 @@ class InterntVedtakService(
         }
     }
 
-    private fun mapVilkårperioder(vilkårperioder: List<Vilkårperiode>): List<VilkårperiodeInterntVedtak> {
-        return vilkårperioder.map {
+    private fun mapVilkårperioder(vilkårperioder: List<Vilkårperiode>): List<VilkårperiodeInterntVedtak> =
+        vilkårperioder.map {
             VilkårperiodeInterntVedtak(
                 type = it.type,
                 fom = it.fom,
@@ -137,7 +139,6 @@ class InterntVedtakService(
                 slettetKommentar = it.slettetKommentar,
             )
         }
-    }
 
     private fun mapStønadsperioder(behandlingId: BehandlingId): List<Stønadsperiode> {
         val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandlingId)
@@ -151,8 +152,12 @@ class InterntVedtakService(
         }
     }
 
-    private fun mapVilkår(behandlingId: BehandlingId, behandlingBarn: Map<BarnId, GrunnlagBarn>): List<VilkårInternt> {
-        return vilkårService.hentVilkårsett(behandlingId)
+    private fun mapVilkår(
+        behandlingId: BehandlingId,
+        behandlingBarn: Map<BarnId, GrunnlagBarn>,
+    ): List<VilkårInternt> =
+        vilkårService
+            .hentVilkårsett(behandlingId)
             .map { vilkår ->
                 VilkårInternt(
                     type = vilkår.vilkårType,
@@ -163,54 +168,61 @@ class InterntVedtakService(
                     tom = vilkår.tom,
                     utgift = vilkår.utgift,
                 )
-            }
-            .sortedWith(compareBy<VilkårInternt> { it.type }.thenBy { it.fødselsdatoBarn }.thenBy { it.fom })
-    }
+            }.sortedWith(compareBy<VilkårInternt> { it.type }.thenBy { it.fødselsdatoBarn }.thenBy { it.fom })
 
     private fun mapDelvilkår(delvilkår: DelvilkårDto) =
         DelvilkårInternt(
             resultat = delvilkår.resultat,
-            vurderinger = delvilkår.vurderinger.map { vurdering ->
-                VurderingInternt(
-                    regel = vurdering.regelId.beskrivelse,
-                    svar = vurdering.svar?.beskrivelse,
-                    begrunnelse = vurdering.begrunnelse,
-                )
-            },
+            vurderinger =
+                delvilkår.vurderinger.map { vurdering ->
+                    VurderingInternt(
+                        regel = vurdering.regelId.beskrivelse,
+                        svar = vurdering.svar?.beskrivelse,
+                        begrunnelse = vurdering.begrunnelse,
+                    )
+                },
         )
 
-    private fun mapVedtak(vedtak: Vedtak?): VedtakInternt? {
-        return vedtak?.let {
+    private fun mapVedtak(vedtak: Vedtak?): VedtakInternt? =
+        vedtak?.let {
             when (vedtak.data) {
                 is VedtakTilsynBarn -> mapVedtakTilsynBarn(vedtak.data)
 
                 is VedtakLæremidler -> mapVedtakLæremidler(vedtak.data)
             }
         }
-    }
 
-    private fun mapVedtakTilsynBarn(
-        vedtak: VedtakTilsynBarn,
-    ) = when (vedtak) {
-        is InnvilgelseTilsynBarn -> VedtakInnvilgelseInternt
-        is AvslagTilsynBarn -> VedtakAvslagInternt(
-            årsakerAvslag = vedtak.årsaker,
-            avslagBegrunnelse = vedtak.begrunnelse,
-        )
+    private fun mapVedtakTilsynBarn(vedtak: VedtakTilsynBarn) =
+        when (vedtak) {
+            is InnvilgelseTilsynBarn -> VedtakInnvilgelseInternt
+            is AvslagTilsynBarn ->
+                VedtakAvslagInternt(
+                    årsakerAvslag = vedtak.årsaker,
+                    avslagBegrunnelse = vedtak.begrunnelse,
+                )
 
-        is OpphørTilsynBarn -> VedtakOpphørInternt(
-            årsakerOpphør = vedtak.årsaker,
-            opphørBegrunnelse = vedtak.begrunnelse,
-        )
-    }
+            is OpphørTilsynBarn ->
+                VedtakOpphørInternt(
+                    årsakerOpphør = vedtak.årsaker,
+                    opphørBegrunnelse = vedtak.begrunnelse,
+                )
+        }
 
-    private fun mapVedtakLæremidler(vedtak: VedtakLæremidler) = when (vedtak) {
-        is InnvilgelseLæremidler -> VedtakInnvilgelseInternt
-        is AvslagLæremidler -> VedtakAvslagInternt(
-            årsakerAvslag = vedtak.årsaker,
-            avslagBegrunnelse = vedtak.begrunnelse,
-        )
-    }
+    private fun mapVedtakLæremidler(vedtak: VedtakLæremidler) =
+        when (vedtak) {
+            is InnvilgelseLæremidler -> VedtakInnvilgelseInternt
+            is AvslagLæremidler ->
+                VedtakAvslagInternt(
+                    årsakerAvslag = vedtak.årsaker,
+                    avslagBegrunnelse = vedtak.begrunnelse,
+                )
+
+            is OpphørLæremidler ->
+                VedtakOpphørInternt(
+                    årsakerOpphør = vedtak.årsaker,
+                    opphørBegrunnelse = vedtak.begrunnelse,
+                )
+        }
 
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {
         val barn = this[barnId] ?: error("Finner ikke barn=$barnId")

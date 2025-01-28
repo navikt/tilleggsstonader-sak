@@ -45,7 +45,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 internal class HåndterSøknadServiceTest {
-
     val behandlingService: BehandlingService = mockk()
     val fagsakService: FagsakService = mockk()
     val personService: PersonService = mockk()
@@ -56,15 +55,16 @@ internal class HåndterSøknadServiceTest {
     val barnService: BarnService = mockk()
     val journalføringService: JournalføringService = mockk()
 
-    val håndterSøknadService = HåndterSøknadService(
-        personService = personService,
-        journalpostService = journalpostService,
-        taskService = taskService,
-        journalføringService = journalføringService,
-        fagsakService = fagsakService,
-        behandlingService = behandlingService,
-        arbeidsfordelingService = arbeidsfordelingService,
-    )
+    val håndterSøknadService =
+        HåndterSøknadService(
+            personService = personService,
+            journalpostService = journalpostService,
+            taskService = taskService,
+            journalføringService = journalføringService,
+            fagsakService = fagsakService,
+            behandlingService = behandlingService,
+            arbeidsfordelingService = arbeidsfordelingService,
+        )
 
     val enhet = ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY.enhetNr
     val personIdent = "123456789"
@@ -72,36 +72,40 @@ internal class HåndterSøknadServiceTest {
     val tidligerePersonIdent = "9123456789"
     val fagsak = fagsak()
     val journalpostId = "1"
-    val journalpost = Journalpost(
-        journalpostId = journalpostId,
-        journalposttype = Journalposttype.I,
-        journalstatus = Journalstatus.MOTTATT,
-        dokumenter = listOf(DokumentInfo("", brevkode = "1")),
-        bruker = Bruker(personIdent, BrukerIdType.FNR),
-        journalforendeEnhet = "123",
-    )
+    val journalpost =
+        Journalpost(
+            journalpostId = journalpostId,
+            journalposttype = Journalposttype.I,
+            journalstatus = Journalstatus.MOTTATT,
+            dokumenter = listOf(DokumentInfo("", brevkode = "1")),
+            bruker = Bruker(personIdent, BrukerIdType.FNR),
+            journalforendeEnhet = "123",
+        )
 
     val taskSlot = slot<Task>()
 
     @BeforeEach
     internal fun setUp() {
         taskSlot.clear()
-        every { personService.hentPersonIdenter(any()) } returns PdlIdenter(
-            identer = listOf(
-                PdlIdent(personIdent, false),
-                PdlIdent(tidligerePersonIdent, false),
-            ),
-        )
+        every { personService.hentPersonIdenter(any()) } returns
+            PdlIdenter(
+                identer =
+                    listOf(
+                        PdlIdent(personIdent, false),
+                        PdlIdent(tidligerePersonIdent, false),
+                    ),
+            )
         every { fagsakService.hentEllerOpprettFagsak(any(), any()) } returns fagsak
         every { arbeidsfordelingService.hentNavEnhetIdEllerBrukMaskinellEnhetHvisNull(any()) } returns enhet
         every { fagsakService.finnFagsak(any(), any()) } returns fagsak
-        every { søknadService.hentSøknadBarnetilsyn(any()) } returns SøknadBarnetilsyn(
-            journalpostId = "",
-            mottattTidspunkt = LocalDateTime.MIN,
-            data = mockk(),
-            barn = setOf(SøknadBarn(ident = "ident", data = mockk())),
-            språk = Språkkode.NB,
-        )
+        every { søknadService.hentSøknadBarnetilsyn(any()) } returns
+            SøknadBarnetilsyn(
+                journalpostId = "",
+                mottattTidspunkt = LocalDateTime.MIN,
+                data = mockk(),
+                barn = setOf(SøknadBarn(ident = "ident", data = mockk())),
+                språk = Språkkode.NB,
+            )
         every { barnService.opprettBarn(any()) } returns mockk()
         every { personService.hentAktørIder(any()) } returns PdlIdenter(listOf(PdlIdent(aktørId, false)))
         every { taskService.save(capture(taskSlot)) } returns mockk()
@@ -126,12 +130,13 @@ internal class HåndterSøknadServiceTest {
 
     @Test
     internal fun `kan opprette behandling hvis alle behandlinger i ny løsning er henlagt`() {
-        every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(
-            behandling(
-                resultat = BehandlingResultat.HENLAGT,
-                status = BehandlingStatus.FERDIGSTILT,
-            ),
-        )
+        every { behandlingService.hentBehandlinger(fagsak.id) } returns
+            listOf(
+                behandling(
+                    resultat = BehandlingResultat.HENLAGT,
+                    status = BehandlingStatus.FERDIGSTILT,
+                ),
+            )
         val kanOppretteBehandling =
             håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isTrue
@@ -139,13 +144,14 @@ internal class HåndterSøknadServiceTest {
 
     @Test
     internal fun `kan opprette behandling hvis det finnes innslag i ny løsning der alle er ferdigstilt`() {
-        every { behandlingService.hentBehandlinger(fagsak.id) } returns listOf(
-            behandling(
-                resultat = BehandlingResultat.INNVILGET,
-                status = BehandlingStatus.FERDIGSTILT,
-            ),
-            behandling(resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
-        )
+        every { behandlingService.hentBehandlinger(fagsak.id) } returns
+            listOf(
+                behandling(
+                    resultat = BehandlingResultat.INNVILGET,
+                    status = BehandlingStatus.FERDIGSTILT,
+                ),
+                behandling(resultat = BehandlingResultat.AVSLÅTT, status = BehandlingStatus.FERDIGSTILT),
+            )
         val kanOppretteBehandling =
             håndterSøknadService.kanAutomatiskJournalføre(personIdent, Stønadstype.BARNETILSYN)
         assertThat(kanOppretteBehandling).isTrue

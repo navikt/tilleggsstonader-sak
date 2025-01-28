@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile
 @Configuration
 @Profile("mock-htmlify")
 class HtmlifyClientConfig {
-
     @Bean
     @Primary
     fun htmlifyClient(): HtmlifyClient {

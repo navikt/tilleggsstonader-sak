@@ -24,7 +24,10 @@ class JournalpostController(
     private val journalføringService: JournalføringService,
 ) {
     @GetMapping("/{journalpostId}/dokument-pdf/{dokumentInfoId}", produces = [MediaType.APPLICATION_PDF_VALUE])
-    fun hentDokumentSomPdf(@PathVariable journalpostId: String, @PathVariable dokumentInfoId: String): ByteArray {
+    fun hentDokumentSomPdf(
+        @PathVariable journalpostId: String,
+        @PathVariable dokumentInfoId: String,
+    ): ByteArray {
         val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
 
         tilgangService.validerTilgangTilPersonMedBarn(personIdent, AuditLoggerEvent.ACCESS)
@@ -33,7 +36,9 @@ class JournalpostController(
     }
 
     @GetMapping("/{journalpostId}")
-    fun hentJournalPost(@PathVariable journalpostId: String): JournalpostResponse {
+    fun hentJournalPost(
+        @PathVariable journalpostId: String,
+    ): JournalpostResponse {
         val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
         tilgangService.validerTilgangTilPersonMedBarn(personIdent, AuditLoggerEvent.ACCESS)
         return JournalpostResponse(

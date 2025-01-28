@@ -19,7 +19,6 @@ class ArenaClient(
     @Value("\${clients.arena.uri}") private val arenaUri: URI,
     @Qualifier("azureClientCredential") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
-
     val statusUri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "status").toUriString()
 
     val vedtakUri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "vedtak").toUriString()
@@ -28,15 +27,11 @@ class ArenaClient(
 
     val oppgaverUri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "oppgave").toUriString()
 
-    fun hentStatus(request: IdenterStønadstype): ArenaStatusDto =
-        postForEntity(statusUri, request)
+    fun hentStatus(request: IdenterStønadstype): ArenaStatusDto = postForEntity(statusUri, request)
 
-    fun hentVedtak(request: IdenterRequest): ArenaSakOgVedtakDto =
-        postForEntity(vedtakUri, request)
+    fun hentVedtak(request: IdenterRequest): ArenaSakOgVedtakDto = postForEntity(vedtakUri, request)
 
-    fun harSaker(request: IdenterRequest): ArenaStatusHarSakerDto =
-        postForEntity(statusHarSakerUri, request)
+    fun harSaker(request: IdenterRequest): ArenaStatusHarSakerDto = postForEntity(statusHarSakerUri, request)
 
-    fun hentOppgaver(request: IdenterRequest): List<ArenaOppgaveDto> =
-        postForEntity(oppgaverUri, request)
+    fun hentOppgaver(request: IdenterRequest): List<ArenaOppgaveDto> = postForEntity(oppgaverUri, request)
 }

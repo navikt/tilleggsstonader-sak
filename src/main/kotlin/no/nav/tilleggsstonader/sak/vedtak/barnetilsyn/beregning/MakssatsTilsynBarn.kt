@@ -62,9 +62,13 @@ val satser: List<MakssatsTilsynBarn> =
         ),
     )
 
-fun finnMakssats(måned: YearMonth, antallBarn: Int): Int {
-    val sats = satser.find { måned in it.fom..it.tom }
-        ?: error("Finner ikke satser for $måned")
+fun finnMakssats(
+    måned: YearMonth,
+    antallBarn: Int,
+): Int {
+    val sats =
+        satser.find { måned in it.fom..it.tom }
+            ?: error("Finner ikke satser for $måned")
     return when {
         antallBarn == 1 -> sats.beløp[1]
         antallBarn == 2 -> sats.beløp[2]

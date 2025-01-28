@@ -23,7 +23,9 @@ class FullmaktController(
     private val fullmaktService: FullmaktService,
 ) {
     @PostMapping("/fullmektige")
-    fun hentFullmektige(@RequestBody fullmaktsgiver: IdentRequest): List<FullmektigDto> {
+    fun hentFullmektige(
+        @RequestBody fullmaktsgiver: IdentRequest,
+    ): List<FullmektigDto> {
         tilgangService.validerTilgangTilPerson(fullmaktsgiver.ident, AuditLoggerEvent.ACCESS)
 
         return fullmaktService.hentFullmektige(fullmaktsgiver.ident)

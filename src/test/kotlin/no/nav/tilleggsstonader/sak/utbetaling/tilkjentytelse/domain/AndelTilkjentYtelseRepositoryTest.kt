@@ -21,7 +21,6 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
-
     @Autowired
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
@@ -34,18 +33,20 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
     @Test
     fun `skal kunne oppdatere en enkelt andel`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-        val andel1 = andelTilkjentYtelse(
-            kildeBehandlingId = behandling.id,
-            beløp = 100,
-            fom = LocalDate.of(2023, 1, 2),
-            tom = LocalDate.of(2023, 1, 2),
-        )
-        val andel2 = andelTilkjentYtelse(
-            kildeBehandlingId = behandling.id,
-            beløp = 200,
-            fom = LocalDate.of(2023, 1, 2),
-            tom = LocalDate.of(2023, 1, 2),
-        )
+        val andel1 =
+            andelTilkjentYtelse(
+                kildeBehandlingId = behandling.id,
+                beløp = 100,
+                fom = LocalDate.of(2023, 1, 2),
+                tom = LocalDate.of(2023, 1, 2),
+            )
+        val andel2 =
+            andelTilkjentYtelse(
+                kildeBehandlingId = behandling.id,
+                beløp = 200,
+                fom = LocalDate.of(2023, 1, 2),
+                tom = LocalDate.of(2023, 1, 2),
+            )
         tilkjentYtelseRepository.insert(
             TilkjentYtelse(
                 behandlingId = behandling.id,
@@ -53,10 +54,11 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
             ),
         )
 
-        val iverksattAndel2 = andel2.copy(
-            statusIverksetting = StatusIverksetting.SENDT,
-            iverksetting = Iverksetting(UUID.randomUUID(), SporbarUtils.now()),
-        )
+        val iverksattAndel2 =
+            andel2.copy(
+                statusIverksetting = StatusIverksetting.SENDT,
+                iverksetting = Iverksetting(UUID.randomUUID(), SporbarUtils.now()),
+            )
         andelTilkjentYtelseRepository.update(iverksattAndel2)
 
         val tyFraDb = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
@@ -74,12 +76,13 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
     @Test
     fun `skal oppdatere endret tidspunkt vid oppdateringer`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-        val andel1 = andelTilkjentYtelse(
-            kildeBehandlingId = behandling.id,
-            beløp = 100,
-            fom = LocalDate.of(2023, 1, 2),
-            tom = LocalDate.of(2023, 1, 2),
-        )
+        val andel1 =
+            andelTilkjentYtelse(
+                kildeBehandlingId = behandling.id,
+                beløp = 100,
+                fom = LocalDate.of(2023, 1, 2),
+                tom = LocalDate.of(2023, 1, 2),
+            )
         tilkjentYtelseRepository.insert(
             TilkjentYtelse(
                 behandlingId = behandling.id,
@@ -102,7 +105,6 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FinnBehandlingerForIverksetting {
-
         @Test
         fun `skal ikke finne andeler for en behandling som ikke er iverksatt`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
@@ -126,20 +128,22 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
 
         @Test
         fun `skal finne behandlinger med andeler som ikke har blitt iverksatt`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(
-                behandling(
-                    status = BehandlingStatus.FERDIGSTILT,
-                    resultat = BehandlingResultat.INNVILGET,
-                ),
-            )
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.INNVILGET,
+                    ),
+                )
             val fagsak2 = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("16"))))
-            val behandling2 = testoppsettService.lagre(
-                behandling(
-                    fagsak2,
-                    status = BehandlingStatus.FERDIGSTILT,
-                    resultat = BehandlingResultat.OPPHØRT,
-                ),
-            )
+            val behandling2 =
+                testoppsettService.lagre(
+                    behandling(
+                        fagsak2,
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.OPPHØRT,
+                    ),
+                )
 
             opprettTilkjentYtelseMedEnAndel(behandling)
             opprettTilkjentYtelseMedEnAndel(behandling2)
@@ -153,13 +157,14 @@ class AndelTilkjentYtelseRepositoryTest : IntegrationTest() {
             behandling: Behandling,
             statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
         ) {
-            val andel1 = andelTilkjentYtelse(
-                kildeBehandlingId = behandling.id,
-                beløp = 100,
-                fom = LocalDate.of(2023, 1, 2),
-                tom = LocalDate.of(2023, 1, 2),
-                statusIverksetting = statusIverksetting,
-            )
+            val andel1 =
+                andelTilkjentYtelse(
+                    kildeBehandlingId = behandling.id,
+                    beløp = 100,
+                    fom = LocalDate.of(2023, 1, 2),
+                    tom = LocalDate.of(2023, 1, 2),
+                    statusIverksetting = statusIverksetting,
+                )
             tilkjentYtelseRepository.insert(
                 TilkjentYtelse(
                     behandlingId = behandling.id,

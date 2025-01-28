@@ -22,7 +22,6 @@ import java.util.UUID
 class HentStatusFraIverksettingTask(
     private val iverksettStatusService: IverksettStatusService,
 ) : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         val taskData = objectMapper.readValue<TaskData>(task.payload)
         iverksettStatusService.hentStatusOgOppdaterAndeler(
@@ -34,28 +33,29 @@ class HentStatusFraIverksettingTask(
     }
 
     companion object {
-
         fun opprettTask(
             eksternFagsakId: Long,
             behandlingId: BehandlingId,
             eksternBehandlingId: Long,
             iverksettingId: UUID,
         ): Task {
-            val taskData = TaskData(
-                eksternFagsakId = eksternFagsakId,
-                behandlingId = behandlingId,
-                eksternBehandlingId = eksternBehandlingId,
-                iverksettingId = iverksettingId,
-            )
+            val taskData =
+                TaskData(
+                    eksternFagsakId = eksternFagsakId,
+                    behandlingId = behandlingId,
+                    eksternBehandlingId = eksternBehandlingId,
+                    iverksettingId = iverksettingId,
+                )
             return Task(
                 type = TYPE,
                 payload = objectMapper.writeValueAsString(taskData),
-                properties = Properties().apply {
-                    setProperty("eksternFagsakId", eksternFagsakId.toString())
-                    setProperty("behandlingId", behandlingId.toString())
-                    setProperty("eksternBehandlingId", eksternBehandlingId.toString())
-                    setProperty("iverksettingId", iverksettingId.toString())
-                },
+                properties =
+                    Properties().apply {
+                        setProperty("eksternFagsakId", eksternFagsakId.toString())
+                        setProperty("behandlingId", behandlingId.toString())
+                        setProperty("eksternBehandlingId", eksternBehandlingId.toString())
+                        setProperty("iverksettingId", iverksettingId.toString())
+                    },
             ).copy(triggerTid = osloNow().plusSeconds(31))
         }
 

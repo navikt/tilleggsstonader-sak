@@ -15,7 +15,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 object VilkårTestUtils {
-
     fun opprettVilkårsvurderinger(
         behandling: Behandling,
         barn: List<BehandlingBarn>,
@@ -43,6 +42,5 @@ object VilkårTestUtils {
         )
     }
 
-    fun List<String>.tilBehandlingBarn(behandling: Behandling) =
-        this.map { behandlingBarn(behandlingId = behandling.id, personIdent = it) }
+    fun List<String>.tilBehandlingBarn(behandling: Behandling) = this.map { behandlingBarn(behandlingId = behandling.id, personIdent = it) }
 }

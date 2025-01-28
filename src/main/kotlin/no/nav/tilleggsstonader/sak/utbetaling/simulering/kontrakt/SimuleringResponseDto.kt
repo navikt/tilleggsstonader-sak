@@ -39,7 +39,9 @@ data class Postering(
     val klassekode: String,
 )
 
-enum class Fagområde(val kode: String) {
+enum class Fagområde(
+    val kode: String,
+) {
     TILLEGGSSTØNADER("TILLST"),
     TILLEGGSSTØNADER_ARENA("TSTARENA"),
     TILLEGGSSTØNADER_ARENA_MANUELL_POSTERING("MTSTAREN"),

@@ -21,14 +21,12 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
 
 class VilkårperiodeRevurderFraValideringTest {
-
     val revurderFra = LocalDate.of(2024, 1, 1)
     val behandlingUtenRevurderFra = saksbehandling(revurderFra = null, type = BehandlingType.REVURDERING)
     val behandlingMedRevurderFra = saksbehandling(revurderFra = revurderFra, type = BehandlingType.REVURDERING)
 
     @Nested
     inner class NyPeriode {
-
         @Test
         fun `kan ikke gjøre endringer på periode dato dersom revurder-fra ikke er satt`() {
             assertThatThrownBy {
@@ -63,7 +61,6 @@ class VilkårperiodeRevurderFraValideringTest {
 
     @Nested
     inner class SlettPeriode {
-
         @Test
         fun `kan ikke slette periode med valgfritt dato dersom revurder-fra ikke er satt`() {
             assertThatThrownBy {
@@ -99,16 +96,17 @@ class VilkårperiodeRevurderFraValideringTest {
 
     @Nested
     inner class OppdateringAvPeriode {
-
         @Test
         fun `kan oppdatere periode hvis revurder-fra er satt`() {
             assertDoesNotThrow {
-                val eksisterendeVilkårperiode = aktivitet(
-                    fom = revurderFra.plusDays(1),
-                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(
-                        aktivitetsdager = 1,
-                    ),
-                )
+                val eksisterendeVilkårperiode =
+                    aktivitet(
+                        fom = revurderFra.plusDays(1),
+                        faktaOgVurdering =
+                            faktaOgVurderingAktivitetTilsynBarn(
+                                aktivitetsdager = 1,
+                            ),
+                    )
                 endringMedRevurderFra(
                     eksisterendeVilkårperiode,
                     eksisterendeVilkårperiode.medAktivitetsdager(aktivitetsdager = 2),
@@ -118,10 +116,11 @@ class VilkårperiodeRevurderFraValideringTest {
 
         @Test
         fun `kan oppdatere periodens tom-dato til og med dagen før revurder fra`() {
-            val eksisterendeVilkårperiode = aktivitet(
-                fom = revurderFra.minusMonths(1),
-                tom = revurderFra.plusMonths(1),
-            )
+            val eksisterendeVilkårperiode =
+                aktivitet(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                )
             assertDoesNotThrow {
                 listOf(revurderFra.minusDays(1), revurderFra, revurderFra.plusDays(1)).forEach { nyttTom ->
                     endringMedRevurderFra(
@@ -134,10 +133,11 @@ class VilkårperiodeRevurderFraValideringTest {
 
         @Test
         fun `kan ikke oppdatere tom til 2 dager før revurder fra, då fjerner man data som gjelder dagen før revurderingsdatoet`() {
-            val eksisterendeVilkårperiode = aktivitet(
-                fom = revurderFra.minusMonths(1),
-                tom = revurderFra.plusMonths(1),
-            )
+            val eksisterendeVilkårperiode =
+                aktivitet(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                )
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendeVilkårperiode,
@@ -148,15 +148,17 @@ class VilkårperiodeRevurderFraValideringTest {
 
         @Test
         fun `kan ikke oppdatere data på periode hvis det begynner før revurder-fra`() {
-            val eksisterendeVilkårperiode = aktivitet(
-                fom = revurderFra.minusMonths(1),
-                tom = revurderFra.plusMonths(1),
-                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(
-                    aktivitetsdager = 3,
-                    lønnet = vurderingLønnet(SvarJaNei.NEI),
-                ),
-                resultat = ResultatVilkårperiode.OPPFYLT,
-            )
+            val eksisterendeVilkårperiode =
+                aktivitet(
+                    fom = revurderFra.minusMonths(1),
+                    tom = revurderFra.plusMonths(1),
+                    faktaOgVurdering =
+                        faktaOgVurderingAktivitetTilsynBarn(
+                            aktivitetsdager = 3,
+                            lønnet = vurderingLønnet(SvarJaNei.NEI),
+                        ),
+                    resultat = ResultatVilkårperiode.OPPFYLT,
+                )
             listOf<(Vilkårperiode) -> Vilkårperiode>(
                 { it.medAktivitetsdager(aktivitetsdager = 2) },
                 { it.copy(resultat = ResultatVilkårperiode.IKKE_OPPFYLT) },
@@ -173,10 +175,11 @@ class VilkårperiodeRevurderFraValideringTest {
 
         @Test
         fun `kan ikke endre fom til å begynne før revurderFra`() {
-            val eksisterendeVilkårperiode = aktivitet(
-                fom = revurderFra,
-                tom = revurderFra.plusMonths(1),
-            )
+            val eksisterendeVilkårperiode =
+                aktivitet(
+                    fom = revurderFra,
+                    tom = revurderFra.plusMonths(1),
+                )
             assertThatThrownBy {
                 endringMedRevurderFra(
                     eksisterendeVilkårperiode,

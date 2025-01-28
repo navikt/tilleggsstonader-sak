@@ -15,15 +15,13 @@ import java.time.YearMonth
 class TilsynBarnUtgiftService(
     private val vilkårService: VilkårService,
 ) {
-    fun hentUtgifterTilBeregning(behandlingId: BehandlingId): Map<BarnId, List<UtgiftBeregning>> {
-        return vilkårService.hentOppfyltePassBarnVilkår(behandlingId)
+    fun hentUtgifterTilBeregning(behandlingId: BehandlingId): Map<BarnId, List<UtgiftBeregning>> =
+        vilkårService
+            .hentOppfyltePassBarnVilkår(behandlingId)
             .groupBy { it.barnId ?: error("Vilkår=${it.id} type=${it.type} for tilsyn barn mangler barnId") }
             .mapValues { (_, values) -> values.map { mapUtgiftBeregning(it) } }
-    }
 
-    private fun mapUtgiftBeregning(
-        it: Vilkår,
-    ): UtgiftBeregning {
+    private fun mapUtgiftBeregning(it: Vilkår): UtgiftBeregning {
         val fom = it.fom
         val tom = it.tom
         val utgift = it.utgift

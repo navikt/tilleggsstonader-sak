@@ -40,7 +40,6 @@ class JournalførFrittståendeBrevTask(
     private val frittståendeBrevService: FrittståendeBrevService,
     private val brevmottakereFrittståendeBrevService: BrevmottakereFrittståendeBrevService,
 ) : AsyncTaskStep {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun doTask(task: Task) {
@@ -62,24 +61,27 @@ class JournalførFrittståendeBrevTask(
         brevmottaker: BrevmottakerFrittståendeBrev,
     ): ArkiverDokumentResponse {
         val fagsak = fagsakService.hentFagsak(brev.fagsakId)
-        val dokument = Dokument(
-            dokument = brev.pdf.bytes,
-            filtype = Filtype.PDFA,
-            dokumenttype = utledDokumenttype(fagsak.stønadstype),
-            tittel = brev.tittel,
-        )
+        val dokument =
+            Dokument(
+                dokument = brev.pdf.bytes,
+                filtype = Filtype.PDFA,
+                dokumenttype = utledDokumenttype(fagsak.stønadstype),
+                tittel = brev.tittel,
+            )
 
         val eksternReferanseId = "frittstaende-brev-${brevmottaker.id}"
-        val arkiverDokumentRequest = ArkiverDokumentRequest(
-            fnr = fagsak.hentAktivIdent(),
-            forsøkFerdigstill = true,
-            hoveddokumentvarianter = listOf(dokument),
-            fagsakId = fagsak.eksternId.id.toString(),
-            journalførendeEnhet = arbeidsfordelingService.hentNavEnhet(fagsak.hentAktivIdent())?.enhetNr
-                ?: error("Fant ikke arbeidsfordelingsenhet"),
-            eksternReferanseId = eksternReferanseId,
-            avsenderMottaker = brevmottaker.mottaker.tilAvsenderMottaker(),
-        )
+        val arkiverDokumentRequest =
+            ArkiverDokumentRequest(
+                fnr = fagsak.hentAktivIdent(),
+                forsøkFerdigstill = true,
+                hoveddokumentvarianter = listOf(dokument),
+                fagsakId = fagsak.eksternId.id.toString(),
+                journalførendeEnhet =
+                    arbeidsfordelingService.hentNavEnhet(fagsak.hentAktivIdent())?.enhetNr
+                        ?: error("Fant ikke arbeidsfordelingsenhet"),
+                eksternReferanseId = eksternReferanseId,
+                avsenderMottaker = brevmottaker.mottaker.tilAvsenderMottaker(),
+            )
 
         return opprettJournalpost(arkiverDokumentRequest, brevmottaker, brev)
     }
@@ -89,15 +91,16 @@ class JournalførFrittståendeBrevTask(
         brevmottaker: BrevmottakerFrittståendeBrev,
         brev: FrittståendeBrev,
     ): ArkiverDokumentResponse {
-        val response = try {
-            journalpostService.opprettJournalpost(arkviverDokumentRequest)
-        } catch (e: ArkiverDokumentConflictException) {
-            logger.warn(
-                "Konflikt ved arkivering av dokument. Brevet=${brev.id} og mottaker=${brevmottaker.id}" +
-                    " har allerede blitt journalført med eksternReferanseId=${arkviverDokumentRequest.eksternReferanseId}",
-            )
-            e.response
-        }
+        val response =
+            try {
+                journalpostService.opprettJournalpost(arkviverDokumentRequest)
+            } catch (e: ArkiverDokumentConflictException) {
+                logger.warn(
+                    "Konflikt ved arkivering av dokument. Brevet=${brev.id} og mottaker=${brevmottaker.id}" +
+                        " har allerede blitt journalført med eksternReferanseId=${arkviverDokumentRequest.eksternReferanseId}",
+                )
+                e.response
+            }
         feilHvisIkke(response.ferdigstilt) {
             "Journalposten ble ikke ferdigstilt og kan derfor ikke distribueres"
         }
@@ -112,16 +115,20 @@ class JournalførFrittståendeBrevTask(
         }
 
     companion object {
-
-        fun opprettTask(fagsakId: FagsakId, brevId: UUID, mottakerId: UUID): Task =
+        fun opprettTask(
+            fagsakId: FagsakId,
+            brevId: UUID,
+            mottakerId: UUID,
+        ): Task =
             Task(
                 type = TYPE,
                 payload = mottakerId.toString(),
-                properties = Properties().apply {
-                    setProperty("fagsakId", fagsakId.toString())
-                    setProperty("brevId", brevId.toString())
-                    setProperty("mottakerId", mottakerId.toString())
-                },
+                properties =
+                    Properties().apply {
+                        setProperty("fagsakId", fagsakId.toString())
+                        setProperty("brevId", brevId.toString())
+                        setProperty("mottakerId", mottakerId.toString())
+                    },
             )
 
         const val TYPE = "journalførFrittståendeBrev"

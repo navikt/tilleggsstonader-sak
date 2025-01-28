@@ -26,6 +26,7 @@ sealed interface BehandlingFaktaDto {
     val dokumentasjon: FaktaDokumentasjon?
     val arena: ArenaFakta?
 }
+
 data class BehandlingFaktaTilsynBarnDto(
     override val søknadMottattTidspunkt: LocalDateTime?,
     override val hovedytelse: FaktaHovedytelse,
@@ -47,6 +48,7 @@ data class BehandlingFaktaLæremidlerDto(
 data class FaktaHovedytelse(
     val søknadsgrunnlag: SøknadsgrunnlagHovedytelse?,
 )
+
 data class FaktaUtdanning(
     val søknadsgrunnlag: SøknadsgrunnlagUtdanning?,
 )
@@ -123,7 +125,9 @@ data class Dokumentasjon(
     val identBarn: String? = null,
 )
 
-data class Dokument(val dokumentInfoId: String)
+data class Dokument(
+    val dokumentInfoId: String,
+)
 
 data class RegistergrunnlagBarn(
     val navn: String,

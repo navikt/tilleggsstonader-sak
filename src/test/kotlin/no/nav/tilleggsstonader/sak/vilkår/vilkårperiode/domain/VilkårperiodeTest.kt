@@ -12,10 +12,8 @@ import org.junit.jupiter.api.Test
 import java.util.UUID
 
 class VilkårperiodeTest {
-
     @Nested
     inner class ValideringTypeDetaljer {
-
         @Test
         fun `målgruppe gyldig kombinasjon`() {
             målgruppe()
@@ -43,7 +41,6 @@ class VilkårperiodeTest {
 
     @Nested
     inner class ValideringSlettet {
-
         @Test
         fun `kan ha kommentar når resultat er slettet`() {
             målgruppe()
@@ -81,7 +78,6 @@ class VilkårperiodeTest {
 
     @Nested
     inner class GjenbrukUtledForrigeVilkårPeriodeId {
-
         private val behandlingId = BehandlingId.random()
 
         @Test

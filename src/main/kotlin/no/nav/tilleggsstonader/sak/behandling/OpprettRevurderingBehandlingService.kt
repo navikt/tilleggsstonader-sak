@@ -40,7 +40,6 @@ class OpprettRevurderingBehandlingService(
     val personService: PersonService,
     val fagsakService: FagsakService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
@@ -51,11 +50,12 @@ class OpprettRevurderingBehandlingService(
         logger.info("Oppretter revurdering for fagsak=${request.fagsakId}")
 
         val fagsakId = request.fagsakId
-        val behandling = behandlingService.opprettBehandling(
-            fagsakId = fagsakId,
-            behandlingsårsak = request.årsak,
-            kravMottatt = null, // TODO flytt til request
-        )
+        val behandling =
+            behandlingService.opprettBehandling(
+                fagsakId = fagsakId,
+                behandlingsårsak = request.årsak,
+                kravMottatt = null, // TODO flytt til request
+            )
 
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
 
@@ -77,7 +77,10 @@ class OpprettRevurderingBehandlingService(
         return behandling.id
     }
 
-    private fun validerValgteBarn(request: OpprettBehandlingDto, behandlingIdForGjenbruk: BehandlingId?) {
+    private fun validerValgteBarn(
+        request: OpprettBehandlingDto,
+        behandlingIdForGjenbruk: BehandlingId?,
+    ) {
         val stønadstype: Stønadstype by lazy { fagsakService.hentFagsak(request.fagsakId).stønadstype }
         feilHvis(request.valgteBarn.isNotEmpty() && stønadstype != Stønadstype.BARNETILSYN) {
             "Kan ikke sende inn barn til $stønadstype"
@@ -116,9 +119,10 @@ class OpprettRevurderingBehandlingService(
     ): BarnTilRevurderingDto {
         val ident = fagsakService.hentAktivIdent(fagsakId)
         val barnPåSøker = personService.hentPersonMedBarn(ident).barn
-        val eksisterendeBarn = forrigeBehandlingId
-            ?.let { barnService.finnBarnPåBehandling(forrigeBehandlingId).associateBy { it.ident } }
-            ?: emptyMap()
+        val eksisterendeBarn =
+            forrigeBehandlingId
+                ?.let { barnService.finnBarnPåBehandling(forrigeBehandlingId).associateBy { it.ident } }
+                ?: emptyMap()
 
         return BarnTilRevurderingDto(
             barn = mapEksisterendeBarn(eksisterendeBarn, barnPåSøker) + mapValgbareBarn(barnPåSøker, eksisterendeBarn),

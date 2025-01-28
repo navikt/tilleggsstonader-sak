@@ -24,7 +24,6 @@ import java.net.URI
 import java.util.UUID
 
 class IverksettClientTest {
-
     @Test
     fun `skal ignorere CONFLICT`() {
         wiremockServerItem.stubFor(
@@ -40,9 +39,10 @@ class IverksettClientTest {
         wiremockServerItem.stubFor(
             post(anyUrl()).willReturn(aResponse().withStatus(HttpStatus.BAD_REQUEST.value())),
         )
-        val exception = catchThrowableOfType<HttpClientErrorException.BadRequest> {
-            client.iverksett(iverksettDto())
-        }
+        val exception =
+            catchThrowableOfType<HttpClientErrorException.BadRequest> {
+                client.iverksett(iverksettDto())
+            }
         assertThat(exception).isNotNull()
     }
 
@@ -61,7 +61,6 @@ class IverksettClientTest {
     }
 
     companion object {
-
         private val restTemplate: RestTemplate = RestTemplateBuilder().build()
         lateinit var client: IverksettClient
         lateinit var wiremockServerItem: WireMockServer

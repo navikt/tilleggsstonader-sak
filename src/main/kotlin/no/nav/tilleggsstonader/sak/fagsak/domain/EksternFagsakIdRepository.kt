@@ -6,7 +6,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryI
 import org.springframework.stereotype.Repository
 
 @Repository
-interface EksternFagsakIdRepository : RepositoryInterface<EksternFagsakId, Long>, InsertUpdateRepository<EksternFagsakId> {
-
+interface EksternFagsakIdRepository :
+    RepositoryInterface<EksternFagsakId, Long>,
+    InsertUpdateRepository<EksternFagsakId> {
     fun findByFagsakId(fagsakId: FagsakId): EksternFagsakId
 }

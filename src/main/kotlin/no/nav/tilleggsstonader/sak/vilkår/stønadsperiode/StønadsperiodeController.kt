@@ -21,9 +21,10 @@ class StønadsperiodeController(
     private val stønadsperiodeService: StønadsperiodeService,
     private val tilgangService: TilgangService,
 ) {
-
     @GetMapping("{behandlingId}")
-    fun hentStønadsperioder(@PathVariable behandlingId: BehandlingId): List<StønadsperiodeDto> {
+    fun hentStønadsperioder(
+        @PathVariable behandlingId: BehandlingId,
+    ): List<StønadsperiodeDto> {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return stønadsperiodeService.hentStønadsperioder(behandlingId)
     }

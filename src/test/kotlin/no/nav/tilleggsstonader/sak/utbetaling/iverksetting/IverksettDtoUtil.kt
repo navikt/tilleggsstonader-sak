@@ -7,7 +7,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 object IverksettDtoUtil {
-
     fun iverksettDto(
         sakId: String = "fagsakId",
         behandlingId: BehandlingId = BehandlingId.random(),
@@ -49,9 +48,10 @@ object IverksettDtoUtil {
         satstype = satstype,
         fraOgMedDato = fraOgMedDato,
         tilOgMedDato = tilOgMedDato,
-        stønadsdata = StønadsdataDto(
-            stønadstype = stønadstype,
-            brukersNavKontor = brukersNavKontor,
-        ),
+        stønadsdata =
+            StønadsdataDto(
+                stønadstype = stønadstype,
+                brukersNavKontor = brukersNavKontor,
+            ),
     )
 }

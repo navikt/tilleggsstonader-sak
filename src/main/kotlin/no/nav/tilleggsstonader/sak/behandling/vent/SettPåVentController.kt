@@ -20,22 +20,29 @@ class SettPåVentController(
     private val tilgangService: TilgangService,
     private val settPåVentService: SettPåVentService,
 ) {
-
     @GetMapping("{behandlingId}")
-    fun hentStatusSettPåVent(@PathVariable behandlingId: BehandlingId): StatusPåVentDto {
+    fun hentStatusSettPåVent(
+        @PathVariable behandlingId: BehandlingId,
+    ): StatusPåVentDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
         return settPåVentService.hentStatusSettPåVent(behandlingId)
     }
 
     @PostMapping("{behandlingId}")
-    fun settPåVent(@PathVariable behandlingId: BehandlingId, @RequestBody dto: SettPåVentDto): StatusPåVentDto {
+    fun settPåVent(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody dto: SettPåVentDto,
+    ): StatusPåVentDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return settPåVentService.settPåVent(behandlingId, dto)
     }
 
     @PutMapping("{behandlingId}")
-    fun oppdaterSettPåVent(@PathVariable behandlingId: BehandlingId, @RequestBody dto: OppdaterSettPåVentDto): StatusPåVentDto {
+    fun oppdaterSettPåVent(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody dto: OppdaterSettPåVentDto,
+    ): StatusPåVentDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         return settPåVentService.oppdaterSettPåVent(behandlingId, dto)
@@ -43,7 +50,10 @@ class SettPåVentController(
 
     // TODO: Fjern at dto er nullable
     @DeleteMapping("{behandlingId}")
-    fun taAvVent(@PathVariable behandlingId: BehandlingId, @RequestBody taAvVentDto: TaAvVentDto?) {
+    fun taAvVent(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody taAvVentDto: TaAvVentDto?,
+    ) {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
         settPåVentService.taAvVent(behandlingId, taAvVentDto)

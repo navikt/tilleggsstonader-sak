@@ -1,3 +1,5 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.felles
 
-class PersonIdentDto(val personIdent: String)
+class PersonIdentDto(
+    val personIdent: String,
+)

@@ -10,6 +10,5 @@ import java.util.UUID
 interface TotrinnskontrollRepository :
     RepositoryInterface<Totrinnskontroll, UUID>,
     InsertUpdateRepository<Totrinnskontroll> {
-
     fun findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId: BehandlingId): Totrinnskontroll?
 }

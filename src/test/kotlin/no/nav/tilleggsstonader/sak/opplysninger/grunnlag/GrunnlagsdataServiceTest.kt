@@ -23,32 +23,34 @@ import org.junit.jupiter.api.Test
 import java.util.Optional
 
 class GrunnlagsdataServiceTest {
-
     val behandlingService = mockk<BehandlingService>()
     val barnService = mockk<BarnService>()
     val personService = mockk<PersonService>()
     val grunnlagsdataRepository = mockk<GrunnlagsdataRepository>()
     val arenaService = mockk<ArenaService>()
 
-    val service = GrunnlagsdataService(
-        behandlingService = behandlingService,
-        barnService = barnService,
-        personService = personService,
-        grunnlagsdataRepository = grunnlagsdataRepository,
-        arenaService = arenaService,
-    )
+    val service =
+        GrunnlagsdataService(
+            behandlingService = behandlingService,
+            barnService = barnService,
+            personService = personService,
+            grunnlagsdataRepository = grunnlagsdataRepository,
+            arenaService = arenaService,
+        )
 
     val behandling = saksbehandling()
     val identBarn1 = "identBarn1"
 
-    val pdlBarn = mapOf(
-        identBarn1 to pdlBarn(fødselsdato = fødsel()),
-    )
-    val søkerMedBarn = SøkerMedBarn(
-        søkerIdent = behandling.ident,
-        søker = pdlSøker(),
-        barn = pdlBarn,
-    )
+    val pdlBarn =
+        mapOf(
+            identBarn1 to pdlBarn(fødselsdato = fødsel()),
+        )
+    val søkerMedBarn =
+        SøkerMedBarn(
+            søkerIdent = behandling.ident,
+            søker = pdlSøker(),
+            barn = pdlBarn,
+        )
 
     @BeforeEach
     fun setUp() {
@@ -70,7 +72,6 @@ class GrunnlagsdataServiceTest {
 
     @Nested
     inner class HentEllerOpprett {
-
         @Test
         fun `skal opprette grunnlag hvis det ikke finnes fra før`() {
             service.opprettGrunnlagsdataHvisDetIkkeEksisterer(behandling.id)
@@ -93,7 +94,6 @@ class GrunnlagsdataServiceTest {
 
     @Nested
     inner class OpprettGrunnlagBarn {
-
         @Test
         fun `skal opprette grunnlag til behandlingBarn`() {
             every { barnService.finnBarnPåBehandling(behandling.id) } returns listOf(behandlingBarn(personIdent = identBarn1))

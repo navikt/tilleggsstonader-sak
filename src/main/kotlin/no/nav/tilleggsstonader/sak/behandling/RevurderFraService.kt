@@ -15,9 +15,11 @@ class RevurderFraService(
     private val behandlingRepository: BehandlingRepository,
     private val nullstillBehandlingService: NullstillBehandlingService,
 ) {
-
     @Transactional
-    fun oppdaterRevurderFra(behandlingId: BehandlingId, revurderFra: LocalDate?): Saksbehandling {
+    fun oppdaterRevurderFra(
+        behandlingId: BehandlingId,
+        revurderFra: LocalDate?,
+    ): Saksbehandling {
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
 
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {

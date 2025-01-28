@@ -10,8 +10,8 @@ import java.util.UUID
 
 @Repository
 interface AndelTilkjentYtelseRepository :
-    RepositoryInterface<AndelTilkjentYtelse, UUID>, InsertUpdateRepository<AndelTilkjentYtelse> {
-
+    RepositoryInterface<AndelTilkjentYtelse, UUID>,
+    InsertUpdateRepository<AndelTilkjentYtelse> {
     @Query(
         """
         SELECT DISTINCT ty.behandling_id from andel_tilkjent_ytelse aty

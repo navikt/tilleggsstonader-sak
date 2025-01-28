@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service
 class BrevSteg(
     val taskService: TaskService,
 ) : BehandlingSteg<Void?> {
-
-    override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
+    override fun utførSteg(
+        saksbehandling: Saksbehandling,
+        data: Void?,
+    ) {
         taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
     }
 

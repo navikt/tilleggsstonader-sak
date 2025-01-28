@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class SimuleringStegTest {
-
     val simuleringService = mockk<SimuleringService>()
     val vedtaksresultatService = mockk<VedtaksresultatService>()
 
@@ -23,17 +22,16 @@ class SimuleringStegTest {
         every { simuleringService.hentOgLagreSimuleringsresultat(any()) } returns mockk()
     }
 
-    private fun mockVedtakMedType(type: TypeVedtak) =
-        every { vedtaksresultatService.hentVedtaksresultat(any()) } returns type
+    private fun mockVedtakMedType(type: TypeVedtak) = every { vedtaksresultatService.hentVedtaksresultat(any()) } returns type
 
     @Nested
     inner class Revurdering {
-
         @Test
         fun `skal utføre simulering for innvilget revurdering`() {
-            val saksbehandling = saksbehandling(
-                type = BehandlingType.REVURDERING,
-            )
+            val saksbehandling =
+                saksbehandling(
+                    type = BehandlingType.REVURDERING,
+                )
             mockVedtakMedType(TypeVedtak.INNVILGELSE)
 
             simuleringSteg.utførSteg(saksbehandling, null)
@@ -43,9 +41,10 @@ class SimuleringStegTest {
 
         @Test
         fun `skal ikke utføre simulering for avslått revurdering`() {
-            val saksbehandling = saksbehandling(
-                type = BehandlingType.REVURDERING,
-            )
+            val saksbehandling =
+                saksbehandling(
+                    type = BehandlingType.REVURDERING,
+                )
             mockVedtakMedType(TypeVedtak.AVSLAG)
 
             simuleringSteg.utførSteg(saksbehandling, null)
@@ -56,12 +55,12 @@ class SimuleringStegTest {
 
     @Nested
     inner class Førstegangsbehandling {
-
         @Test
         fun `skal utføre simulering for innvilget førstegangsbehandling`() {
-            val saksbehandling = saksbehandling(
-                type = BehandlingType.FØRSTEGANGSBEHANDLING,
-            )
+            val saksbehandling =
+                saksbehandling(
+                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                )
             mockVedtakMedType(TypeVedtak.INNVILGELSE)
 
             simuleringSteg.utførSteg(saksbehandling, null)
@@ -71,9 +70,10 @@ class SimuleringStegTest {
 
         @Test
         fun `skal ikke utføre simulering for avslått førstegangsbehandling`() {
-            val saksbehandling = saksbehandling(
-                type = BehandlingType.FØRSTEGANGSBEHANDLING,
-            )
+            val saksbehandling =
+                saksbehandling(
+                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                )
             mockVedtakMedType(TypeVedtak.AVSLAG)
 
             simuleringSteg.utførSteg(saksbehandling, null)

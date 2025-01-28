@@ -8,26 +8,27 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class BeregningsresultatLæremidlerDtoTest {
-
     @Test
     fun `skal mappe til dto`() {
-        val dto = BeregningsresultatLæremidler(
-            perioder = listOf(
-                beregningsresultatForMåned(
-                    LocalDate.of(2024, 1, 1),
-                    LocalDate.of(2024, 1, 31),
-                ),
-                beregningsresultatForMåned(
-                    LocalDate.of(2024, 2, 1),
-                    LocalDate.of(2024, 2, 29),
-                    utbetalingsdato = LocalDate.of(2024, 1, 1),
-                ),
-                beregningsresultatForMåned(
-                    LocalDate.of(2024, 5, 1),
-                    LocalDate.of(2024, 5, 31),
-                ),
-            ),
-        ).tilDto()
+        val dto =
+            BeregningsresultatLæremidler(
+                perioder =
+                    listOf(
+                        beregningsresultatForMåned(
+                            LocalDate.of(2024, 1, 1),
+                            LocalDate.of(2024, 1, 31),
+                        ),
+                        beregningsresultatForMåned(
+                            LocalDate.of(2024, 2, 1),
+                            LocalDate.of(2024, 2, 29),
+                            utbetalingsdato = LocalDate.of(2024, 1, 1),
+                        ),
+                        beregningsresultatForMåned(
+                            LocalDate.of(2024, 5, 1),
+                            LocalDate.of(2024, 5, 31),
+                        ),
+                    ),
+            ).tilDto()
 
         assertThat(dto.perioder).containsExactlyInAnyOrder(
             beregningsresultatForPeriodeDto(

@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt
 
-enum class PosteringType(val kode: String) {
+enum class PosteringType(
+    val kode: String,
+) {
     YTELSE("YTEL"),
     FEILUTBETALING("FEIL"),
     FORSKUDSSKATT("SKAT"),
@@ -10,11 +12,9 @@ enum class PosteringType(val kode: String) {
     ;
 
     companion object {
-
         private val kodeMap = PosteringType.values().associateBy { it.kode }
 
-        fun fraKode(kode: String): PosteringType {
-            return kodeMap[kode] ?: throw IllegalArgumentException("PosteringType finnes ikke for kode $kode")
-        }
+        fun fraKode(kode: String): PosteringType =
+            kodeMap[kode] ?: throw IllegalArgumentException("PosteringType finnes ikke for kode $kode")
     }
 }

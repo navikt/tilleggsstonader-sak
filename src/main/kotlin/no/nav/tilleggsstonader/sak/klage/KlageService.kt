@@ -42,7 +42,10 @@ class KlageService(
         )
     }
 
-    fun opprettKlage(fagsakId: FagsakId, opprettKlageDto: OpprettKlageDto) {
+    fun opprettKlage(
+        fagsakId: FagsakId,
+        opprettKlageDto: OpprettKlageDto,
+    ) {
         val klageMottatt = opprettKlageDto.mottattDato
 
         brukerfeilHvis(klageMottatt.isAfter(LocalDate.now())) {
@@ -52,11 +55,12 @@ class KlageService(
         opprettKlage(fagsakService.hentFagsak(fagsakId), opprettKlageDto.mottattDato)
     }
 
-    fun hentBehandlingIderForOppgaveIder(oppgaveIder: List<Long>): Map<Long, UUID> {
-        return klageClient.hentBehandlingerForOppgaveIder(oppgaveIder)
-    }
+    fun hentBehandlingIderForOppgaveIder(oppgaveIder: List<Long>): Map<Long, UUID> = klageClient.hentBehandlingerForOppgaveIder(oppgaveIder)
 
-    private fun opprettKlage(fagsak: Fagsak, klageMottatt: LocalDate) {
+    private fun opprettKlage(
+        fagsak: Fagsak,
+        klageMottatt: LocalDate,
+    ) {
         val aktivIdent = fagsak.hentAktivIdent()
         val enhetId = arbeidsfordelingService.hentNavEnhet(aktivIdent)?.enhetNr
         brukerfeilHvis(enhetId == null) {
@@ -78,7 +82,12 @@ class KlageService(
         val erOversendtTilKlageinstans = klagebehandling.resultat == BehandlingResultat.IKKE_MEDHOLD
         val vedtaksdato =
             if (erOversendtTilKlageinstans) {
-                klagebehandling.klageinstansResultat.singleOrNull { klageinnstansResultat -> klageinnstansResultat.type == BehandlingEventType.KLAGEBEHANDLING_AVSLUTTET || klageinnstansResultat.type == BehandlingEventType.BEHANDLING_FEILREGISTRERT }?.mottattEllerAvsluttetTidspunkt
+                klagebehandling.klageinstansResultat
+                    .singleOrNull { klageinnstansResultat ->
+                        klageinnstansResultat.type ==
+                            BehandlingEventType.KLAGEBEHANDLING_AVSLUTTET ||
+                            klageinnstansResultat.type == BehandlingEventType.BEHANDLING_FEILREGISTRERT
+                    }?.mottattEllerAvsluttetTidspunkt
             } else {
                 klagebehandling.vedtaksdato
             }

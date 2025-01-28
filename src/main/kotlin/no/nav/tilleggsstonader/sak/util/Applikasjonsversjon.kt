@@ -1,9 +1,8 @@
 package no.nav.tilleggsstonader.sak.util
 
-import java.util.*
+import java.util.Properties
 
 object Applikasjonsversjon {
-
     val versjon: String
 
     init {

@@ -36,7 +36,6 @@ data class Vilkår(
     val fom: LocalDate? = null,
     val tom: LocalDate? = null,
     val utgift: Int? = null,
-
     val barnId: BarnId? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
@@ -59,7 +58,10 @@ data class Vilkår(
         }
     }
 
-    private fun validerDataForType(fom: LocalDate, tom: LocalDate) {
+    private fun validerDataForType(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
         when (type) {
             VilkårType.PASS_BARN -> {
                 validerFørsteOgSisteDagIValgtMåned(fom, tom)
@@ -80,7 +82,10 @@ data class Vilkår(
         }
     }
 
-    private fun validerFørsteOgSisteDagIValgtMåned(fom: LocalDate, tom: LocalDate) {
+    private fun validerFørsteOgSisteDagIValgtMåned(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
         require(fom.erFørsteDagIMåneden()) {
             "For vilkår=$type skal FOM være første dagen i måneden"
         }
@@ -96,8 +101,11 @@ data class Vilkår(
         return true
     }
 
-    fun kopierTilBehandling(nyBehandlingId: BehandlingId, barnIdINyBehandling: BarnId?): Vilkår {
-        return copy(
+    fun kopierTilBehandling(
+        nyBehandlingId: BehandlingId,
+        barnIdINyBehandling: BarnId?,
+    ): Vilkår =
+        copy(
             id = VilkårId.random(),
             status = VilkårStatus.UENDRET,
             behandlingId = nyBehandlingId,
@@ -105,7 +113,6 @@ data class Vilkår(
             barnId = barnIdINyBehandling,
             opphavsvilkår = opphavsvilkårForKopiertVilkår(),
         )
-    }
 
     /**
      * Brukes når man skal gjenbruke denne vilkårsvurderingen i en annan vilkårsvurdering
@@ -113,8 +120,8 @@ data class Vilkår(
      * Men dersom det har blitt endret eller nytt i denne behandlingen skal man peke til at det ble vurdert i denne behandlingen
      * Liknende som [no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode.forrigeVilkårPeriodeIdForKopiertVilkår]
      */
-    private fun opphavsvilkårForKopiertVilkår(): Opphavsvilkår {
-        return when (status) {
+    private fun opphavsvilkårForKopiertVilkår(): Opphavsvilkår =
+        when (status) {
             VilkårStatus.SLETTET -> error("Skal ikke kopiere vilkår som er slettet")
             VilkårStatus.UENDRET -> opphavsvilkår ?: error("Forventer at vilkår med status=$status har opphavsvilkår")
 
@@ -123,13 +130,16 @@ data class Vilkår(
             VilkårStatus.ENDRET,
             -> Opphavsvilkår(behandlingId, sporbar.endret.endretTid)
         }
-    }
 }
 
-fun List<Vilkår>.utledVurderinger(vilkårType: VilkårType, regelId: RegelId) =
-    this.filter { it.type == vilkårType }.flatMap { it.delvilkårsett }
-        .flatMap { it.vurderinger }
-        .filter { it.regelId == regelId }
+fun List<Vilkår>.utledVurderinger(
+    vilkårType: VilkårType,
+    regelId: RegelId,
+) = this
+    .filter { it.type == vilkårType }
+    .flatMap { it.delvilkårsett }
+    .flatMap { it.vurderinger }
+    .filter { it.regelId == regelId }
 
 /**
  * Inneholder informasjon fra hvilken behandling dette vilkår ble gjenrukt fra
@@ -145,13 +155,14 @@ data class Opphavsvilkår(
 )
 
 // Ingen støtte for å ha en liste direkt i entiteten, wrapper+converter virker
-data class DelvilkårWrapper(val delvilkårsett: List<Delvilkår>)
+data class DelvilkårWrapper(
+    val delvilkårsett: List<Delvilkår>,
+)
 
 data class Delvilkår(
     val resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
     val vurderinger: List<Vurdering>,
 ) {
-
     // regelId for første svaret er det samme som hovedregel
     val hovedregel = vurderinger.first().regelId
 }
@@ -164,7 +175,9 @@ data class Vurdering(
 
 fun List<Vurdering>.harSvar(svarId: SvarId) = this.any { it.svar == svarId }
 
-enum class Vilkårsresultat(val beskrivelse: String) {
+enum class Vilkårsresultat(
+    val beskrivelse: String,
+) {
     OPPFYLT("Vilkåret er oppfylt når alle delvilkår er oppfylte"),
     AUTOMATISK_OPPFYLT("Delvilkår er oppfylt med automatisk beregning"),
     IKKE_OPPFYLT("Vilkåret er ikke oppfylt hvis alle delvilkår er oppfylt eller ikke oppfylt, men minimum 1 ikke oppfylt"),
@@ -174,13 +187,17 @@ enum class Vilkårsresultat(val beskrivelse: String) {
     ;
 
     fun oppfyltEllerIkkeOppfylt() = this == OPPFYLT || this == IKKE_OPPFYLT
+
     fun erIkkeDelvilkårsresultat() = this != AUTOMATISK_OPPFYLT
 }
 
 /**
  * @param gjelderStønader er for stønadsspesifike regler
  */
-enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Stønadstype>) {
+enum class VilkårType(
+    val beskrivelse: String,
+    val gjelderStønader: List<Stønadstype>,
+) {
     EKSEMPEL("Eksempel", listOf()),
     EKSEMPEL2("Eksempel 2", listOf()),
 
@@ -191,10 +208,10 @@ enum class VilkårType(val beskrivelse: String, val gjelderStønader: List<Støn
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN
 
     companion object {
-
-        fun hentVilkårForStønad(stønadstype: Stønadstype): List<VilkårType> = entries.filter {
-            it.gjelderStønader.contains(stønadstype)
-        }
+        fun hentVilkårForStønad(stønadstype: Stønadstype): List<VilkårType> =
+            entries.filter {
+                it.gjelderStønader.contains(stønadstype)
+            }
     }
 }
 

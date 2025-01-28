@@ -8,16 +8,14 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 
 object VilkårsresultatUtil {
-
-    fun utledVilkårsresultat(vilkår: List<Vilkår>): List<Vilkårsresultat> {
-        return vilkår.groupBy { it.type }.map {
+    fun utledVilkårsresultat(vilkår: List<Vilkår>): List<Vilkårsresultat> =
+        vilkår.groupBy { it.type }.map {
             if (it.key.gjelderFlereBarn()) {
                 utledResultatForVilkårSomGjelderFlereBarn(it.value)
             } else {
                 it.value.single().resultat
             }
         }
-    }
 
     fun erAlleVilkårOppfylt(
         vilkårsett: List<Vilkår>,
@@ -32,13 +30,12 @@ object VilkårsresultatUtil {
     /**
      * Et vilkår skal anses som vurdert dersom det er oppfylt eller saksbehandler har valgt å ikke vurdere det
      */
-    fun erAlleVilkårTattStillingTil(vilkårsresultat: List<Vilkårsresultat>): Boolean {
-        return if (vilkårsresultat.all { it == Vilkårsresultat.OPPFYLT || it == Vilkårsresultat.SKAL_IKKE_VURDERES }) {
+    fun erAlleVilkårTattStillingTil(vilkårsresultat: List<Vilkårsresultat>): Boolean =
+        if (vilkårsresultat.all { it == Vilkårsresultat.OPPFYLT || it == Vilkårsresultat.SKAL_IKKE_VURDERES }) {
             true
         } else {
             harNoenIkkeOppfyltOgRestenIkkeOppfyltEllerOppfyltEllerSkalIkkevurderes(vilkårsresultat)
         }
-    }
 
     /**
      * [Vilkårsresultat.IKKE_OPPFYLT] er gyldig i kombinasjon med andre som er
@@ -58,7 +55,8 @@ object VilkårsresultatUtil {
         }
         return when {
             value.any { it.resultat == Vilkårsresultat.OPPFYLT } -> Vilkårsresultat.OPPFYLT
-            value.all { it.barnId == null && it.resultat == Vilkårsresultat.IKKE_TATT_STILLING_TIL } -> Vilkårsresultat.SKAL_IKKE_VURDERES // Dersom man ikke har barn på behandlingen så er ikke disse vilkårene aktuelle å vurdere
+            value.all { it.barnId == null && it.resultat == Vilkårsresultat.IKKE_TATT_STILLING_TIL } ->
+                Vilkårsresultat.SKAL_IKKE_VURDERES // Dersom man ikke har barn på behandlingen så er ikke disse vilkårene aktuelle å vurdere
             value.any { it.resultat == Vilkårsresultat.IKKE_TATT_STILLING_TIL } -> Vilkårsresultat.IKKE_TATT_STILLING_TIL
             value.all { it.resultat == Vilkårsresultat.SKAL_IKKE_VURDERES } -> Vilkårsresultat.SKAL_IKKE_VURDERES
             value.any { it.resultat == Vilkårsresultat.IKKE_OPPFYLT } &&

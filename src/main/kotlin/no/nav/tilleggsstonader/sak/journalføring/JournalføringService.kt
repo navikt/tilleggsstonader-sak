@@ -54,7 +54,6 @@ class JournalføringService(
     private val gjennbrukDataRevurderingService: GjennbrukDataRevurderingService,
     private val klageService: KlageService,
 ) {
-
     @Transactional
     fun fullførJournalpost(
         journalføringRequest: JournalføringRequest,
@@ -119,11 +118,12 @@ class JournalføringService(
 
         validerKanOppretteBehandling(journalpost, fagsak, behandlingÅrsak, gjelderKlage = false)
 
-        val behandling = opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
-            fagsak = fagsak,
-            journalpost = journalpost,
-            behandlingÅrsak = behandlingÅrsak,
-        )
+        val behandling =
+            opprettBehandlingOgPopulerGrunnlagsdataForJournalpost(
+                fagsak = fagsak,
+                journalpost = journalpost,
+                behandlingÅrsak = behandlingÅrsak,
+            )
 
         val behandlingIdForGjenbruk = gjennbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling)
 
@@ -179,7 +179,10 @@ class JournalføringService(
         )
     }
 
-    private fun journalførUtenNyBehandling(journalføringRequest: JournalføringRequest, journalpost: Journalpost) {
+    private fun journalførUtenNyBehandling(
+        journalføringRequest: JournalføringRequest,
+        journalpost: Journalpost,
+    ) {
         val fagsak =
             hentEllerOpprettFagsakIEgenTransaksjon(
                 journalpostService.hentIdentFraJournalpost(journalpost),
@@ -227,10 +230,11 @@ class JournalføringService(
         journalpost: Journalpost,
         behandlingÅrsak: BehandlingÅrsak,
     ): Behandling {
-        val behandling = behandlingService.opprettBehandling(
-            fagsakId = fagsak.id,
-            behandlingsårsak = behandlingÅrsak,
-        )
+        val behandling =
+            behandlingService.opprettBehandling(
+                fagsakId = fagsak.id,
+                behandlingsårsak = behandlingÅrsak,
+            )
 
         behandlingService.leggTilBehandlingsjournalpost(journalpost.journalpostId, Journalposttype.I, behandling.id)
 
@@ -251,13 +255,17 @@ class JournalføringService(
     private fun lagreBarn(behandling: Behandling) {
         val eksisterendeBarn = barnService.finnBarnPåBehandling(behandling.id)
 
-        val nyeBarn = søknadService.hentSøknadBarnetilsyn(behandling.id)?.barn
-            ?.filterNot { barn -> eksisterendeBarn.any { it.ident == barn.ident } }?.map {
-                BehandlingBarn(
-                    behandlingId = behandling.id,
-                    ident = it.ident,
-                )
-            } ?: emptyList()
+        val nyeBarn =
+            søknadService
+                .hentSøknadBarnetilsyn(behandling.id)
+                ?.barn
+                ?.filterNot { barn -> eksisterendeBarn.any { it.ident == barn.ident } }
+                ?.map {
+                    BehandlingBarn(
+                        behandlingId = behandling.id,
+                        ident = it.ident,
+                    )
+                } ?: emptyList()
 
         feilHvis(nyeBarn.isEmpty() && eksisterendeBarn.isEmpty()) {
             "Kan ikke opprette behandling uten barn"
@@ -266,7 +274,11 @@ class JournalføringService(
         barnService.opprettBarn(nyeBarn)
     }
 
-    private fun lagreSøknad(journalpost: Journalpost, behandlingId: BehandlingId, stønadstype: Stønadstype) {
+    private fun lagreSøknad(
+        journalpost: Journalpost,
+        behandlingId: BehandlingId,
+        stønadstype: Stønadstype,
+    ) {
         val søknad = journalpostService.hentSøknadFraJournalpost(journalpost, stønadstype)
         søknadService.lagreSøknad(behandlingId, journalpost, søknad)
     }
@@ -328,16 +340,19 @@ class JournalføringService(
         allePersonIdenter: Set<String>,
         gjeldendePersonIdent: String,
         journalpostBruker: Bruker,
-    ): Boolean = when (journalpostBruker.type) {
-        BrukerIdType.FNR -> allePersonIdenter.contains(journalpostBruker.id)
-        BrukerIdType.AKTOERID -> hentAktørIderForPerson(gjeldendePersonIdent).contains(journalpostBruker.id)
-        BrukerIdType.ORGNR -> false
-    }
+    ): Boolean =
+        when (journalpostBruker.type) {
+            BrukerIdType.FNR -> allePersonIdenter.contains(journalpostBruker.id)
+            BrukerIdType.AKTOERID -> hentAktørIderForPerson(gjeldendePersonIdent).contains(journalpostBruker.id)
+            BrukerIdType.ORGNR -> false
+        }
 
-    private fun hentAktørIderForPerson(personIdent: String) =
-        personService.hentAktørIder(personIdent).identer()
+    private fun hentAktørIderForPerson(personIdent: String) = personService.hentAktørIder(personIdent).identer()
 
-    private fun validerGyldigAvsender(journalpost: Journalpost, request: JournalføringRequest) {
+    private fun validerGyldigAvsender(
+        journalpost: Journalpost,
+        request: JournalføringRequest,
+    ) {
         if (journalpost.manglerAvsenderMottaker()) {
             brukerfeilHvis(request.nyAvsender == null) {
                 "Kan ikke journalføre uten avsender"

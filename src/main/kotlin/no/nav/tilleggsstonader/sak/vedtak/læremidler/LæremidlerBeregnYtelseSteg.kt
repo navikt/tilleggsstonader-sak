@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
@@ -17,14 +19,20 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortBeregningsresultatVedOpphør
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortVedtaksperiodeVedOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -39,21 +47,31 @@ class LæremidlerBeregnYtelseSteg(
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<VedtakLæremidlerRequest>(
-    stønadstype = Stønadstype.LÆREMIDLER,
-    vedtakRepository = vedtakRepository,
-    tilkjentytelseService = tilkjentytelseService,
-    simuleringService = simuleringService,
-) {
-
-    override fun lagreVedtak(saksbehandling: Saksbehandling, vedtak: VedtakLæremidlerRequest) {
+        stønadstype = Stønadstype.LÆREMIDLER,
+        vedtakRepository = vedtakRepository,
+        tilkjentytelseService = tilkjentytelseService,
+        simuleringService = simuleringService,
+    ) {
+    override fun lagreVedtak(
+        saksbehandling: Saksbehandling,
+        vedtak: VedtakLæremidlerRequest,
+    ) {
         when (vedtak) {
-            is InnvilgelseLæremidlerRequest -> beregnOgLagreInnvilgelse(vedtak.vedtaksperioder.tilDomene(), saksbehandling)
+            is InnvilgelseLæremidlerRequest ->
+                beregnOgLagreInnvilgelse(
+                    vedtak.vedtaksperioder.tilDomene(),
+                    saksbehandling,
+                )
+
             is AvslagLæremidlerDto -> lagreAvslag(saksbehandling, vedtak)
-            // is OpphørLæremidlerDto -> beregnOgLagreOpphør(saksbehandling, vedtak)
+            is OpphørLæremidlerRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
     }
 
-    private fun beregnOgLagreInnvilgelse(vedtaksperioder: List<Vedtaksperiode>, saksbehandling: Saksbehandling) {
+    private fun beregnOgLagreInnvilgelse(
+        vedtaksperioder: List<Vedtaksperiode>,
+        saksbehandling: Saksbehandling,
+    ) {
         feilHvis(saksbehandling.forrigeBehandlingId != null) {
             "Har foreløpig ikke støtte for innvilgelse av revurdering"
         }
@@ -62,32 +80,44 @@ class LæremidlerBeregnYtelseSteg(
         lagreAndeler(saksbehandling, beregningsresultat)
     }
 
-    /*
-    private fun beregnOgLagreOpphør(saksbehandling: Saksbehandling, vedtak: OpphørLæremidlerDto) {
+    private fun beregnOgLagreOpphør(
+        saksbehandling: Saksbehandling,
+        vedtak: OpphørLæremidlerRequest,
+    ) {
         brukerfeilHvis(saksbehandling.forrigeBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
+        feilHvis(saksbehandling.revurderFra == null) {
+            "revurderFra-dato er påkrevd for opphør"
+        }
+        val forrigeVedtak =
+            vedtakRepository
+                .findByIdOrThrow(saksbehandling.forrigeBehandlingId)
+                .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
 
-        opphørValideringService.validerPerioder(saksbehandling)
+        opphørValideringService.validerVilkårperioder(saksbehandling)
 
-        val beregningsresultat = tilsynBarnBeregningService.beregn(saksbehandling, TypeVedtak.OPPHØR)
-        opphørValideringService.validerIngenUtbetalingEtterRevurderFraDato(beregningsresultat, saksbehandling.revurderFra)
+        val avkortetBeregningsresultat = avkortBeregningsresultatVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
+        val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, saksbehandling.revurderFra)
+
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.OPPHØR,
-                data = OpphørLæremidler(
-                    beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
-                    årsaker = vedtak.årsakerOpphør,
-                    begrunnelse = vedtak.begrunnelse,
-                ),
-
-                ),
+                data =
+                    OpphørLæremidler(
+                        vedtaksperioder = avkortetVedtaksperioder,
+                        beregningsresultat = BeregningsresultatLæremidler(avkortetBeregningsresultat),
+                        årsaker = vedtak.årsakerOpphør,
+                        begrunnelse = vedtak.begrunnelse,
+                    ),
+            ),
         )
 
-        lagreAndeler(saksbehandling, beregningsresultat)
+        val beregningsresultatLæremidler = BeregningsresultatLæremidler(avkortetBeregningsresultat)
+
+        lagreAndeler(saksbehandling, beregningsresultatLæremidler)
     }
-     */
 
     private fun lagreAvslag(
         saksbehandling: Saksbehandling,
@@ -97,10 +127,11 @@ class LæremidlerBeregnYtelseSteg(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.AVSLAG,
-                data = AvslagLæremidler(
-                    årsaker = vedtak.årsakerAvslag,
-                    begrunnelse = vedtak.begrunnelse,
-                ),
+                data =
+                    AvslagLæremidler(
+                        årsaker = vedtak.årsakerAvslag,
+                        begrunnelse = vedtak.begrunnelse,
+                    ),
             ),
         )
     }
@@ -109,19 +140,21 @@ class LæremidlerBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         beregningsresultat: BeregningsresultatLæremidler,
     ) {
-        val andeler = beregningsresultat.perioder.groupBy { it.grunnlag.utbetalingsdato }
-            .entries
-            .sortedBy { (utbetalingsdato, _) -> utbetalingsdato }
-            .flatMap { (utbetalingsdato, perioder) ->
-                val førstePerioden = perioder.first()
-                val satsBekreftet = førstePerioden.grunnlag.satsBekreftet
+        val andeler =
+            beregningsresultat.perioder
+                .groupBy { it.grunnlag.utbetalingsdato }
+                .entries
+                .sortedBy { (utbetalingsdato, _) -> utbetalingsdato }
+                .flatMap { (utbetalingsdato, perioder) ->
+                    val førstePerioden = perioder.first()
+                    val satsBekreftet = førstePerioden.grunnlag.satsBekreftet
 
-                feilHvisIkke(perioder.all { it.grunnlag.satsBekreftet == satsBekreftet }) {
-                    "Alle perioder for et utbetalingsdato må være bekreftet eller ikke bekreftet"
+                    feilHvisIkke(perioder.all { it.grunnlag.satsBekreftet == satsBekreftet }) {
+                        "Alle perioder for et utbetalingsdato må være bekreftet eller ikke bekreftet"
+                    }
+
+                    mapTilAndeler(perioder, saksbehandling, utbetalingsdato, satsBekreftet)
                 }
-
-                mapTilAndeler(perioder, saksbehandling, utbetalingsdato, satsBekreftet)
-            }
         tilkjentytelseService.opprettTilkjentYtelse(saksbehandling, andeler)
     }
 
@@ -155,16 +188,16 @@ class LæremidlerBeregnYtelseSteg(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
         beregningsresultat: BeregningsresultatLæremidler,
-    ): Vedtak {
-        return GeneriskVedtak(
+    ): Vedtak =
+        GeneriskVedtak(
             behandlingId = behandlingId,
             type = TypeVedtak.INNVILGELSE,
-            data = InnvilgelseLæremidler(
-                vedtaksperioder = vedtaksperioder,
-                beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
-            ),
+            data =
+                InnvilgelseLæremidler(
+                    vedtaksperioder = vedtaksperioder,
+                    beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
+                ),
         )
-    }
 
     /**
      * Hvis utbetalingsmåneden er fremover i tid og det er nytt år så skal det ventes på satsendring før iverksetting.
@@ -177,12 +210,11 @@ class LæremidlerBeregnYtelseSteg(
         return StatusIverksetting.UBEHANDLET
     }
 
-    private fun MålgruppeType.tilTypeAndel(): TypeAndel {
-        return when (this) {
+    private fun MålgruppeType.tilTypeAndel(): TypeAndel =
+        when (this) {
             MålgruppeType.AAP, MålgruppeType.UFØRETRYGD, MålgruppeType.NEDSATT_ARBEIDSEVNE -> TypeAndel.LÆREMIDLER_AAP
             MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER
             MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.LÆREMIDLER_ETTERLATTE
             else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
         }
-    }
 }

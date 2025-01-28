@@ -22,14 +22,16 @@ import org.springframework.web.bind.annotation.RestController
 class EksternVedtakController(
     private val eksternVedtakService: EksternVedtakService,
 ) {
-
     @PostMapping("tilsyn-barn")
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
-    fun hentVedtaksinformasjon(@RequestBody request: IdentRequest): VedtaksinformasjonTilsynBarnDto {
-        val gyldigKlient = SikkerhetContext.kallKommerFra(
-            EksternApplikasjon.BIDRAG_GRUNNLAG,
-            EksternApplikasjon.BIDRAG_GRUNNLAG_FEATURE,
-        )
+    fun hentVedtaksinformasjon(
+        @RequestBody request: IdentRequest,
+    ): VedtaksinformasjonTilsynBarnDto {
+        val gyldigKlient =
+            SikkerhetContext.kallKommerFra(
+                EksternApplikasjon.BIDRAG_GRUNNLAG,
+                EksternApplikasjon.BIDRAG_GRUNNLAG_FEATURE,
+            )
         feilHvisIkke(gyldigKlient, HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }

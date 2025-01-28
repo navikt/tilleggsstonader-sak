@@ -12,22 +12,19 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.Periode as Per
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDetaljer as SimuleringDetaljerKontrakt
 
 object SimuleringKontraktTilDomeneMapper {
-
-    fun map(dto: SimuleringResponseDto): SimuleringJson {
-        return SimuleringJson(
+    fun map(dto: SimuleringResponseDto): SimuleringJson =
+        SimuleringJson(
             oppsummeringer = mapOppsummering(dto.oppsummeringer),
             detaljer = mapDetaljer(dto.detaljer),
         )
-    }
 
-    private fun mapDetaljer(detaljer: SimuleringDetaljerKontrakt): SimuleringDetaljer {
-        return SimuleringDetaljer(
+    private fun mapDetaljer(detaljer: SimuleringDetaljerKontrakt): SimuleringDetaljer =
+        SimuleringDetaljer(
             gjelderId = detaljer.gjelderId,
             datoBeregnet = detaljer.datoBeregnet,
             totalBeløp = detaljer.totalBeløp,
             perioder = mapPerioder(detaljer),
         )
-    }
 
     private fun mapPerioder(detaljer: SimuleringDetaljerKontrakt) =
         detaljer.perioder.map {
@@ -51,8 +48,8 @@ object SimuleringKontraktTilDomeneMapper {
             )
         }
 
-    private fun mapOppsummering(oppsummeringer: List<OppsummeringForPeriodeKontrakt>): List<OppsummeringForPeriode> {
-        return oppsummeringer.map {
+    private fun mapOppsummering(oppsummeringer: List<OppsummeringForPeriodeKontrakt>): List<OppsummeringForPeriode> =
+        oppsummeringer.map {
             OppsummeringForPeriode(
                 fom = it.fom,
                 tom = it.tom,
@@ -62,5 +59,4 @@ object SimuleringKontraktTilDomeneMapper {
                 totalFeilutbetaling = it.totalFeilutbetaling,
             )
         }
-    }
 }

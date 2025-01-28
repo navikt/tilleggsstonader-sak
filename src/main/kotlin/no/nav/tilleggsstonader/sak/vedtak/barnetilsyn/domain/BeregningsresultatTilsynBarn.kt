@@ -67,8 +67,8 @@ data class Aktivitet(
     val aktivitetsdager: Int,
 ) : Periode<LocalDate>
 
-fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
-    return this
+fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> =
+    this
         .ofType<AktivitetTilsynBarn>()
         .map {
             val fakta = it.faktaOgVurdering.fakta
@@ -80,4 +80,3 @@ fun List<Vilkårperiode>.tilAktiviteter(): List<Aktivitet> {
                 aktivitetsdager = fakta.takeIfFaktaOrThrow<FaktaAktivitetsdager>().aktivitetsdager,
             )
         }
-}

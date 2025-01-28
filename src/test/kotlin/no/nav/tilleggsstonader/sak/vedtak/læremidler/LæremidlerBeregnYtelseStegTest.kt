@@ -36,7 +36,6 @@ class LæremidlerBeregnYtelseStegTest(
     @Autowired
     val vilkårperiodeRepository: VilkårperiodeRepository,
 ) : IntegrationTest() {
-
     val fagsak = fagsak(stønadstype = Stønadstype.LÆREMIDLER)
     val behandling = behandling(fagsak = fagsak)
 
@@ -61,8 +60,11 @@ class LæremidlerBeregnYtelseStegTest(
         val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
         steg.utførSteg(saksbehandling, innvilgelse)
 
-        val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
-            .andelerTilkjentYtelse.sortedBy { it.fom }
+        val andeler =
+            tilkjentYtelseRepository
+                .findByBehandlingId(behandling.id)!!
+                .andelerTilkjentYtelse
+                .sortedBy { it.fom }
 
         with(andeler[0]) {
             assertThat(this.fom).isEqualTo(datoUtbetalingDel1)
@@ -95,8 +97,11 @@ class LæremidlerBeregnYtelseStegTest(
         val vedtaksperiode = VedtaksperiodeDto(fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31))
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
-        val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
-            .andelerTilkjentYtelse.sortedBy { it.fom }
+        val andeler =
+            tilkjentYtelseRepository
+                .findByBehandlingId(behandling.id)!!
+                .andelerTilkjentYtelse
+                .sortedBy { it.fom }
         with(andeler.single()) {
             assertThat(this.fom).isEqualTo(mandagEtterFom)
             assertThat(this.tom).isEqualTo(mandagEtterFom)
@@ -114,26 +119,29 @@ class LæremidlerBeregnYtelseStegTest(
         val førsteFeb = LocalDate.of(2025, 2, 1)
         val sisteFeb = LocalDate.of(2025, 2, 28)
 
-        val stønadsperiode = stønadsperiode(
-            behandlingId = behandling.id,
-            fom = førsteJan,
-            tom = sisteJan,
-            målgruppe = MålgruppeType.AAP,
-            aktivitet = AktivitetType.UTDANNING,
-        )
-        val stønadsperiode2 = stønadsperiode(
-            behandlingId = behandling.id,
-            fom = førsteFeb,
-            tom = sisteFeb,
-            målgruppe = MålgruppeType.OVERGANGSSTØNAD,
-            aktivitet = AktivitetType.UTDANNING,
-        )
-        val aktivitet = aktivitet(
-            behandlingId = behandling.id,
-            fom = førsteJan,
-            tom = sisteFeb,
-            faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(type = AktivitetType.UTDANNING),
-        )
+        val stønadsperiode =
+            stønadsperiode(
+                behandlingId = behandling.id,
+                fom = førsteJan,
+                tom = sisteJan,
+                målgruppe = MålgruppeType.AAP,
+                aktivitet = AktivitetType.UTDANNING,
+            )
+        val stønadsperiode2 =
+            stønadsperiode(
+                behandlingId = behandling.id,
+                fom = førsteFeb,
+                tom = sisteFeb,
+                målgruppe = MålgruppeType.OVERGANGSSTØNAD,
+                aktivitet = AktivitetType.UTDANNING,
+            )
+        val aktivitet =
+            aktivitet(
+                behandlingId = behandling.id,
+                fom = førsteJan,
+                tom = sisteFeb,
+                faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(type = AktivitetType.UTDANNING),
+            )
         stønadsperiodeRepository.insertAll(listOf(stønadsperiode, stønadsperiode2))
         vilkårperiodeRepository.insert(aktivitet)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
@@ -170,24 +178,27 @@ class LæremidlerBeregnYtelseStegTest(
         val førsteFeb = LocalDate.of(2025, 2, 1)
         val sisteFeb = LocalDate.of(2025, 2, 28)
 
-        val stønadsperiode = stønadsperiode(
-            behandlingId = behandling.id,
-            fom = førsteJan,
-            tom = sisteJan,
-            målgruppe = MålgruppeType.AAP,
-        )
-        val stønadsperiode2 = stønadsperiode(
-            behandlingId = behandling.id,
-            fom = førsteFeb,
-            tom = sisteFeb,
-            målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
-        )
-        val aktivitet = aktivitet(
-            behandlingId = behandling.id,
-            fom = førsteJan,
-            tom = sisteFeb,
-            faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
-        )
+        val stønadsperiode =
+            stønadsperiode(
+                behandlingId = behandling.id,
+                fom = førsteJan,
+                tom = sisteJan,
+                målgruppe = MålgruppeType.AAP,
+            )
+        val stønadsperiode2 =
+            stønadsperiode(
+                behandlingId = behandling.id,
+                fom = førsteFeb,
+                tom = sisteFeb,
+                målgruppe = MålgruppeType.NEDSATT_ARBEIDSEVNE,
+            )
+        val aktivitet =
+            aktivitet(
+                behandlingId = behandling.id,
+                fom = førsteJan,
+                tom = sisteFeb,
+                faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
+            )
         stønadsperiodeRepository.insertAll(listOf(stønadsperiode, stønadsperiode2))
         vilkårperiodeRepository.insert(aktivitet)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
@@ -207,18 +218,23 @@ class LæremidlerBeregnYtelseStegTest(
         }
     }
 
-    fun lagreAktivitetOgStønadsperiode(fom: LocalDate, tom: LocalDate) {
-        val stønadsperiode = stønadsperiode(
-            behandlingId = behandling.id,
-            fom = fom,
-            tom = tom,
-        )
-        val aktivitet = aktivitet(
-            behandlingId = behandling.id,
-            fom = fom,
-            tom = tom,
-            faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
-        )
+    fun lagreAktivitetOgStønadsperiode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        val stønadsperiode =
+            stønadsperiode(
+                behandlingId = behandling.id,
+                fom = fom,
+                tom = tom,
+            )
+        val aktivitet =
+            aktivitet(
+                behandlingId = behandling.id,
+                fom = fom,
+                tom = tom,
+                faktaOgVurdering = faktaOgVurderingAktivitetLæremidler(),
+            )
         stønadsperiodeRepository.insert(stønadsperiode)
         vilkårperiodeRepository.insert(aktivitet)
     }

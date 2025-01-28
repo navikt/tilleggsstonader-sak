@@ -8,10 +8,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class FaktaOgVurderingTilsynBarnTest {
-
     @Nested
     inner class ResultatForTypeInngangsvilkår {
-
         @Test
         fun `resultatet skal ikke være oppfylt hvis ikke typen målgruppen gir rett på stønaden`() {
             listOf(IngenMålgruppeTilsynBarn, SykepengerTilsynBarn).forEach { faktaOgVurdering ->
@@ -29,7 +27,6 @@ class FaktaOgVurderingTilsynBarnTest {
 
     @Nested
     inner class ResultatForInngangsvilkårMedVurderinger {
-
         val medlemskapIkkeVurdert = vurderingMedlemskap(svar = null)
         val medlemskapIkkeOppfylt = vurderingMedlemskap(svar = SvarJaNei.NEI)
         val medlemskapOppfylt = vurderingMedlemskap()
@@ -40,48 +37,56 @@ class FaktaOgVurderingTilsynBarnTest {
 
         @Test
         fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og en er oppfylt`() {
-            val inngangsvilkår = NedsattArbeidsevneTilsynBarn(
-                vurderinger = VurderingNedsattArbeidsevne(
-                    medlemskap = medlemskapIkkeVurdert,
-                    dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                ),
-            )
+            val inngangsvilkår =
+                NedsattArbeidsevneTilsynBarn(
+                    vurderinger =
+                        VurderingNedsattArbeidsevne(
+                            medlemskap = medlemskapIkkeVurdert,
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                        ),
+                )
 
             assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
         }
 
         @Test
         fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og en er ikke oppfylt`() {
-            val inngangsvilkår = NedsattArbeidsevneTilsynBarn(
-                vurderinger = VurderingNedsattArbeidsevne(
-                    medlemskap = medlemskapIkkeOppfylt,
-                    dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
-                ),
-            )
+            val inngangsvilkår =
+                NedsattArbeidsevneTilsynBarn(
+                    vurderinger =
+                        VurderingNedsattArbeidsevne(
+                            medlemskap = medlemskapIkkeOppfylt,
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
+                        ),
+                )
 
             assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
         }
 
         @Test
         fun `resultat er IKKE_OPPFYKT hvis en vurdering er oppfylt og en er ikke oppfylt`() {
-            val inngangsvilkår = NedsattArbeidsevneTilsynBarn(
-                vurderinger = VurderingNedsattArbeidsevne(
-                    medlemskap = medlemskapOppfylt,
-                    dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
-                ),
-            )
+            val inngangsvilkår =
+                NedsattArbeidsevneTilsynBarn(
+                    vurderinger =
+                        VurderingNedsattArbeidsevne(
+                            medlemskap = medlemskapOppfylt,
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
+                        ),
+                )
 
             assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
         }
 
         @Test
         fun `resultat er OPPFYLT hvis alle vurderinger har resultat oppfylt`() {
-            val inngangsvilkår = NedsattArbeidsevneTilsynBarn(
-                vurderinger = VurderingNedsattArbeidsevne(
-                    medlemskap = medlemskapOppfylt,
-                    dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
-                ),
-            )
+            val inngangsvilkår =
+                NedsattArbeidsevneTilsynBarn(
+                    vurderinger =
+                        VurderingNedsattArbeidsevne(
+                            medlemskap = medlemskapOppfylt,
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                        ),
+                )
 
             assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
         }

@@ -30,7 +30,6 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 
 class JournalpostControllerTest : IntegrationTest() {
-
     val ident = "12345678910"
     val saksbehandler = "ole"
     val enhet = "enhet"
@@ -69,17 +68,18 @@ class JournalpostControllerTest : IntegrationTest() {
 
     @Test
     fun `fullfør journalpost - skal ferdigstille journalpost, og opprette behandling og oppgave`() {
-        val journalpostId = fullførJournalpost(
-            "1",
-            JournalføringRequest(
-                stønadstype = Stønadstype.BARNETILSYN,
-                aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
-                årsak = JournalføringRequest.Journalføringsårsak.DIGITAL_SØKNAD,
-                oppgaveId = "123",
-                journalførendeEnhet = enhet,
-                logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
-            ),
-        )
+        val journalpostId =
+            fullførJournalpost(
+                "1",
+                JournalføringRequest(
+                    stønadstype = Stønadstype.BARNETILSYN,
+                    aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
+                    årsak = JournalføringRequest.Journalføringsårsak.DIGITAL_SØKNAD,
+                    oppgaveId = "123",
+                    journalførendeEnhet = enhet,
+                    logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
+                ),
+            )
 
         assertThat(journalpostId).isEqualTo("1")
 
@@ -116,17 +116,18 @@ class JournalpostControllerTest : IntegrationTest() {
 
     @Test
     fun `fullfør journalpost - skal ferdigstille journalpost, og opprette klage`() {
-        val journalpostId = fullførJournalpost(
-            "1",
-            JournalføringRequest(
-                stønadstype = Stønadstype.BARNETILSYN,
-                aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
-                årsak = JournalføringRequest.Journalføringsårsak.KLAGE,
-                oppgaveId = "123",
-                journalførendeEnhet = enhet,
-                logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
-            ),
-        )
+        val journalpostId =
+            fullførJournalpost(
+                "1",
+                JournalføringRequest(
+                    stønadstype = Stønadstype.BARNETILSYN,
+                    aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
+                    årsak = JournalføringRequest.Journalføringsårsak.KLAGE,
+                    oppgaveId = "123",
+                    journalførendeEnhet = enhet,
+                    logiskeVedlegg = mapOf("1" to listOf(LogiskVedlegg("1", "ny tittel"))),
+                ),
+            )
 
         assertThat(journalpostId).isEqualTo("1")
 
@@ -159,11 +160,15 @@ class JournalpostControllerTest : IntegrationTest() {
         verify(exactly = 1) { oppgaveClient.ferdigstillOppgave("123".toLong()) }
     }
 
-    private fun fullførJournalpost(journalpostId: String, request: JournalføringRequest): String =
-        restTemplate.exchange(
-            localhost("api/journalpost/$journalpostId/fullfor"),
-            HttpMethod.POST,
-            HttpEntity(request, headers),
-            String::class.java,
-        ).body!!
+    private fun fullførJournalpost(
+        journalpostId: String,
+        request: JournalføringRequest,
+    ): String =
+        restTemplate
+            .exchange(
+                localhost("api/journalpost/$journalpostId/fullfor"),
+                HttpMethod.POST,
+                HttpEntity(request, headers),
+                String::class.java,
+            ).body!!
 }

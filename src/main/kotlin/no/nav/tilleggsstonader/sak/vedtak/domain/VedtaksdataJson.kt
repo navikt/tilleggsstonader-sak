@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
     JsonSubTypes.Type(AvslagTilsynBarn::class, name = "AVSLAG_TILSYN_BARN"),
     JsonSubTypes.Type(InnvilgelseLæremidler::class, name = "INNVILGELSE_LÆREMIDLER"),
     JsonSubTypes.Type(AvslagLæremidler::class, name = "AVSLAG_LÆREMIDLER"),
+    JsonSubTypes.Type(OpphørLæremidler::class, name = "OPPHØR_LÆREMIDLER"),
     failOnRepeatedNames = true,
 )
 sealed interface VedtaksdataJson
@@ -32,10 +33,12 @@ sealed interface VedtaksdataJson
  * Den finner riktig enum ut fra hvilken
  */
 class TypeVedtaksdataDeserializer : JsonDeserializer<TypeVedtaksdata>() {
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): TypeVedtaksdata {
-        return typerVedtaksdata[p.text] ?: error("Finner ikke mapping for ${p.text}")
-    }
+    override fun deserialize(
+        p: JsonParser,
+        ctxt: DeserializationContext,
+    ): TypeVedtaksdata = typerVedtaksdata[p.text] ?: error("Finner ikke mapping for ${p.text}")
 }
+
 val typerVedtaksdata: Map<String, TypeVedtaksdata> =
     listOf(
         TypeVedtakTilsynBarn.entries,

@@ -7,26 +7,30 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 
-private val xmlMapper = XmlMapper()
-    .registerKotlinModule()
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+private val xmlMapper =
+    XmlMapper()
+        .registerKotlinModule()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
 object SøknadTilsynBarnSendInnFyllUtUtil {
-
     fun parseInfoFraSøknad(data: ByteArray): Søknadsinformasjon {
         val søknad = xmlMapper.readValue<Tilleggsstoenadsskjema>(data)
         validerHarMinimumEtBarn(søknad)
 
-        val identerBarn = søknad.rettighetstype.tilsynsutgifter
-            .flatMap { it.tilsynsutgifterBarn }
-            .flatMap { it.barn }
-            .map { it.personidentifikator.replace(" ", "").trim() }
-            .toSet()
+        val identerBarn =
+            søknad.rettighetstype.tilsynsutgifter
+                .flatMap { it.tilsynsutgifterBarn }
+                .flatMap { it.barn }
+                .map { it.personidentifikator.replace(" ", "").trim() }
+                .toSet()
         return Søknadsinformasjon(ident = søknad.personidentifikator, identerBarn = identerBarn)
     }
 
     private fun validerHarMinimumEtBarn(søknad: Tilleggsstoenadsskjema) {
-        val barn = søknad.rettighetstype.tilsynsutgifter.flatMap { it.tilsynsutgifterBarn }.flatMap { it.barn }
+        val barn =
+            søknad.rettighetstype.tilsynsutgifter
+                .flatMap { it.tilsynsutgifterBarn }
+                .flatMap { it.barn }
         brukerfeilHvis(barn.isEmpty()) {
             "Søknaden inneholder ikke noen barn"
         }
@@ -42,7 +46,6 @@ private data class Tilleggsstoenadsskjema(
     val personidentifikator: String,
     val rettighetstype: Rettighetstype,
 ) {
-
     data class Rettighetstype(
         @JacksonXmlElementWrapper(useWrapping = false)
         val tilsynsutgifter: List<Tilsynsutgift>,

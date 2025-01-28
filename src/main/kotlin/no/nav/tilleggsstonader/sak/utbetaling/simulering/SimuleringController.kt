@@ -21,9 +21,10 @@ class SimuleringController(
     private val behandlingService: BehandlingService,
     private val simuleringStegService: SimuleringStegService,
 ) {
-
     @GetMapping("/{behandlingId}")
-    fun simulerForBehandling(@PathVariable behandlingId: BehandlingId): SimuleringDto? {
+    fun simulerForBehandling(
+        @PathVariable behandlingId: BehandlingId,
+    ): SimuleringDto? {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
 
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)

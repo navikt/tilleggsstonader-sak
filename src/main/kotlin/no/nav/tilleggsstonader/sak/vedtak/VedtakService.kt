@@ -20,21 +20,23 @@ class VedtakService(
     private val tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
     private val læremidlerBeregnYtelseSteg: LæremidlerBeregnYtelseSteg,
 ) {
-
-    fun hentVedtak(behandlingId: BehandlingId): Vedtak? {
-        return repository.findByIdOrNull(behandlingId)
-    }
+    fun hentVedtak(behandlingId: BehandlingId): Vedtak? = repository.findByIdOrNull(behandlingId)
 
     @JvmName("hentTypetVedtak")
-    final inline fun <reified T : Vedtaksdata> hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<T>? {
-        return hentVedtak(behandlingId)?.withTypeOrThrow<T>()
-    }
+    final inline fun <reified T : Vedtaksdata> hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<T>? =
+        hentVedtak(behandlingId)?.withTypeOrThrow<T>()
 
-    fun håndterSteg(behandling: BehandlingId, data: VedtakTilsynBarnRequest) {
+    fun håndterSteg(
+        behandling: BehandlingId,
+        data: VedtakTilsynBarnRequest,
+    ) {
         stegService.håndterSteg(behandling, tilsynBarnBeregnYtelseSteg, data)
     }
 
-    fun håndterSteg(behandling: BehandlingId, data: VedtakLæremidlerRequest) {
+    fun håndterSteg(
+        behandling: BehandlingId,
+        data: VedtakLæremidlerRequest,
+    ) {
         stegService.håndterSteg(behandling, læremidlerBeregnYtelseSteg, data)
     }
 }

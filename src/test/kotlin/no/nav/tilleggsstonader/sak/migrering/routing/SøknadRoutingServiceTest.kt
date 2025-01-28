@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class SøknadRoutingServiceTest {
-
     val søknadRoutingRepository = mockk<SøknadRoutingRepository>()
     val fagsakService = mockk<FagsakService>()
     val behandlingService = mockk<BehandlingService>()
@@ -41,13 +40,14 @@ class SøknadRoutingServiceTest {
     val personService = mockk<PersonService>()
     val unleashService = mockUnleashService()
 
-    private val service = SøknadRoutingService(
-        søknadRoutingRepository,
-        fagsakService,
-        behandlingService,
-        arenaService,
-        unleashService,
-    )
+    private val service =
+        SøknadRoutingService(
+            søknadRoutingRepository,
+            fagsakService,
+            behandlingService,
+            arenaService,
+            unleashService,
+        )
 
     private val ident = "1"
     private val stønadstype = Stønadstype.BARNETILSYN
@@ -94,7 +94,6 @@ class SøknadRoutingServiceTest {
 
     @Nested
     inner class HarBehandling {
-
         @Test
         fun `skal sjekke om det finnes behandling hvis det ikke innslag i databasen`() {
             assertThat(skalBehandlesINyLøsning()).isFalse
@@ -127,7 +126,6 @@ class SøknadRoutingServiceTest {
 
     @Nested
     inner class ArenaStatus {
-
         @Test
         fun `skal sjekke arenstatus hvis det ikke finnes innslag i databasen eller behandlinger`() {
             assertThat(skalBehandlesINyLøsning()).isFalse
@@ -198,7 +196,6 @@ class SøknadRoutingServiceTest {
 
     @Nested
     inner class Toggle {
-
         @Test
         fun `skal behandles i ny løsning dersom maks antall ikke er nådd`() {
             unleashService.mockGetVariant(SØKNAD_ROUTING_LÆREMIDLER, søknadRoutingVariant(10))
@@ -242,7 +239,6 @@ class SøknadRoutingServiceTest {
 
     @Nested
     inner class SkalRuteAlleUtenÅSjekkeFeatureToggle {
-
         @Test
         fun `skal rute alle til ny løsning`() {
             val resultat = skalBehandlesINyLøsning(sjekkSkalRuteAlleSøkere = true)
@@ -261,32 +257,37 @@ class SøknadRoutingServiceTest {
         }
     }
 
-    private fun arenaStatusAktivtVedtak() = ArenaStatusDto(
-        SakStatus(harAktivSakUtenVedtak = true),
-        vedtakStatus(harVedtak = true, harAktivtVedtak = true, harVedtakUtenUtfall = false),
-    )
+    private fun arenaStatusAktivtVedtak() =
+        ArenaStatusDto(
+            SakStatus(harAktivSakUtenVedtak = true),
+            vedtakStatus(harVedtak = true, harAktivtVedtak = true, harVedtakUtenUtfall = false),
+        )
 
-    private fun arenaStatusKanRoutes() = ArenaStatusDto(
-        SakStatus(harAktivSakUtenVedtak = false),
-        vedtakStatus(harVedtak = false, harAktivtVedtak = false, harVedtakUtenUtfall = false),
-    )
+    private fun arenaStatusKanRoutes() =
+        ArenaStatusDto(
+            SakStatus(harAktivSakUtenVedtak = false),
+            vedtakStatus(harVedtak = false, harAktivtVedtak = false, harVedtakUtenUtfall = false),
+        )
 
-    private fun arenaStatusUtenAktivtVedtak() = ArenaStatusDto(
-        SakStatus(harAktivSakUtenVedtak = false),
-        vedtakStatus(harVedtak = true, harAktivtVedtak = false, harVedtakUtenUtfall = false),
-    )
+    private fun arenaStatusUtenAktivtVedtak() =
+        ArenaStatusDto(
+            SakStatus(harAktivSakUtenVedtak = false),
+            vedtakStatus(harVedtak = true, harAktivtVedtak = false, harVedtakUtenUtfall = false),
+        )
 
-    private fun arenaStatusVedtakUtenUtfall() = ArenaStatusDto(
-        SakStatus(harAktivSakUtenVedtak = false),
-        vedtakStatus(harVedtak = true, harAktivtVedtak = false, harVedtakUtenUtfall = true),
-    )
+    private fun arenaStatusVedtakUtenUtfall() =
+        ArenaStatusDto(
+            SakStatus(harAktivSakUtenVedtak = false),
+            vedtakStatus(harVedtak = true, harAktivtVedtak = false, harVedtakUtenUtfall = true),
+        )
 
     private fun skalBehandlesINyLøsning(
         request: IdentStønadstype = IdentStønadstype(ident, stønadstype),
         sjekkSkalRuteAlleSøkere: Boolean = false,
-    ) =
-        service.sjekkRoutingForPerson(request, sjekkSkalRuteAlleSøkere).skalBehandlesINyLøsning
+    ) = service.sjekkRoutingForPerson(request, sjekkSkalRuteAlleSøkere).skalBehandlesINyLøsning
 
-    private fun søknadRoutingVariant(antall: Int = 1000, enabled: Boolean = true): Variant =
-        Variant("antall", antall.toString(), enabled)
+    private fun søknadRoutingVariant(
+        antall: Int = 1000,
+        enabled: Boolean = true,
+    ): Variant = Variant("antall", antall.toString(), enabled)
 }

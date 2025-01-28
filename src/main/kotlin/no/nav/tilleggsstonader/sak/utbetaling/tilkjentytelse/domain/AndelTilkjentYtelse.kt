@@ -45,7 +45,6 @@ data class AndelTilkjentYtelse(
     val endretTid: LocalDateTime = SporbarUtils.now(),
     val utbetalingsdato: LocalDate,
 ) {
-
     init {
         feilHvis(YearMonth.from(fom) != YearMonth.from(tom)) {
             "Forventer at fom($fom) og tom($tom) er i den samme måneden"

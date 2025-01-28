@@ -45,7 +45,6 @@ import java.time.LocalDateTime
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class BehandlingServiceTest {
-
     private val behandlingRepository: BehandlingRepository = mockk()
     private val behandlingshistorikkService: BehandlingshistorikkService = mockk(relaxed = true)
     private val taskService: TaskService = mockk(relaxed = true)
@@ -98,7 +97,6 @@ internal class BehandlingServiceTest {
 
     @Nested
     inner class HenleggBehandling {
-
         @Test
         internal fun `skal kunne henlegge behandling som er førstegangsbehandling`() {
             val behandling =
@@ -112,7 +110,10 @@ internal class BehandlingServiceTest {
             henleggOgForventOk(behandling, FEILREGISTRERT)
         }
 
-        private fun henleggOgForventOk(behandling: Behandling, henlagtÅrsak: HenlagtÅrsak) {
+        private fun henleggOgForventOk(
+            behandling: Behandling,
+            henlagtÅrsak: HenlagtÅrsak,
+        ) {
             every {
                 behandlingRepository.findByIdOrThrow(any())
             } returns behandling
@@ -137,11 +138,12 @@ internal class BehandlingServiceTest {
 
         @Test
         internal fun `skal ikke kunne henlegge behandling som er iverksatt`() {
-            val behandling = behandling(
-                fagsak(),
-                type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                status = BehandlingStatus.IVERKSETTER_VEDTAK,
-            )
+            val behandling =
+                behandling(
+                    fagsak(),
+                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    status = BehandlingStatus.IVERKSETTER_VEDTAK,
+                )
             henleggOgForventApiFeilmelding(behandling, TRUKKET_TILBAKE)
         }
 
@@ -152,14 +154,18 @@ internal class BehandlingServiceTest {
             henleggOgForventApiFeilmelding(behandling, TRUKKET_TILBAKE)
         }
 
-        private fun henleggOgForventApiFeilmelding(behandling: Behandling, henlagtÅrsak: HenlagtÅrsak) {
+        private fun henleggOgForventApiFeilmelding(
+            behandling: Behandling,
+            henlagtÅrsak: HenlagtÅrsak,
+        ) {
             every {
                 behandlingRepository.findByIdOrThrow(any())
             } returns behandling
 
-            val feil: ApiFeil = assertThrows {
-                behandlingService.henleggBehandling(behandling.id, HenlagtDto(henlagtÅrsak))
-            }
+            val feil: ApiFeil =
+                assertThrows {
+                    behandlingService.henleggBehandling(behandling.id, HenlagtDto(henlagtÅrsak))
+                }
 
             assertThat(feil.httpStatus).isEqualTo(HttpStatus.BAD_REQUEST)
         }
@@ -167,7 +173,6 @@ internal class BehandlingServiceTest {
 
     @Nested
     inner class OppdaterResultatPåBehandling {
-
         private val behandling = behandling()
 
         @Test
@@ -198,7 +203,6 @@ internal class BehandlingServiceTest {
 
     @Nested
     inner class HentBehandlinger {
-
         @Test
         internal fun `skal sortere behandlinger etter vedtakstidspunkt og til sist uten vedtakstidspunkt`() {
             val tiDagerSiden = osloNow().minusDays(10)
@@ -221,28 +225,29 @@ internal class BehandlingServiceTest {
             opprettetTid: LocalDateTime,
             endretTid: LocalDateTime,
         ) = behandling(vedtakstidspunkt = vedtakstidspunkt).copy(
-            sporbar = Sporbar(
-                opprettetTid = opprettetTid,
-                endret = Endret(endretTid = endretTid),
-            ),
+            sporbar =
+                Sporbar(
+                    opprettetTid = opprettetTid,
+                    endret = Endret(endretTid = endretTid),
+                ),
         )
     }
 
     @Nested
     inner class UtledNesteBehandlingstype {
-
         @Test
         internal fun `skal returnere revurdering hvis det finnes en førstegangsbehandling`() {
             val fagsak = fagsak()
             every {
                 behandlingRepository.findByFagsakId(fagsak.id)
-            } returns listOf(
-                behandling(
-                    fagsak,
-                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                    resultat = BehandlingResultat.INNVILGET,
-                ),
-            )
+            } returns
+                listOf(
+                    behandling(
+                        fagsak,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                        resultat = BehandlingResultat.INNVILGET,
+                    ),
+                )
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
         }
@@ -262,13 +267,14 @@ internal class BehandlingServiceTest {
             val fagsak = fagsak()
             every {
                 behandlingRepository.findByFagsakId(fagsak.id)
-            } returns listOf(
-                behandling(
-                    fagsak,
-                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                    resultat = BehandlingResultat.HENLAGT,
-                ),
-            )
+            } returns
+                listOf(
+                    behandling(
+                        fagsak,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                        resultat = BehandlingResultat.HENLAGT,
+                    ),
+                )
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
@@ -278,14 +284,15 @@ internal class BehandlingServiceTest {
             val fagsak = fagsak()
             every {
                 behandlingRepository.findByFagsakId(fagsak.id)
-            } returns listOf(
-                behandling(
-                    fagsak,
-                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
-                    status = BehandlingStatus.UTREDES,
-                    resultat = BehandlingResultat.IKKE_SATT,
-                ),
-            )
+            } returns
+                listOf(
+                    behandling(
+                        fagsak,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                        status = BehandlingStatus.UTREDES,
+                        resultat = BehandlingResultat.IKKE_SATT,
+                    ),
+                )
 
             assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
         }

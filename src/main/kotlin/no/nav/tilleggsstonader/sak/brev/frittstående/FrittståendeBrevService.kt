@@ -23,10 +23,7 @@ class FrittståendeBrevService(
     private val frittståendeBrevRepository: FrittståendeBrevRepository,
     private val brevmottakereFrittståendeBrevService: BrevmottakereFrittståendeBrevService,
 ) {
-
-    fun lagFrittståendeSanitybrev(
-        request: GenererPdfRequest,
-    ): ByteArray {
+    fun lagFrittståendeSanitybrev(request: GenererPdfRequest): ByteArray {
         val signatur = SikkerhetContext.hentSaksbehandlerNavn(strict = true)
 
         val htmlMedSignatur = BrevUtil.settInnSaksbehandlerSignaturOgDato(request.html, signatur)
@@ -44,13 +41,14 @@ class FrittståendeBrevService(
             "Kan ikke sende frittstående brev uten tittel"
         }
 
-        val frittståendeBrev = frittståendeBrevRepository.insert(
-            FrittståendeBrev(
-                fagsakId = fagsakId,
-                pdf = Fil(request.pdf),
-                tittel = request.tittel,
-            ),
-        )
+        val frittståendeBrev =
+            frittståendeBrevRepository.insert(
+                FrittståendeBrev(
+                    fagsakId = fagsakId,
+                    pdf = Fil(request.pdf),
+                    tittel = request.tittel,
+                ),
+            )
         val brevmottakere = oppdaterBrevmottakereMedBrevId(frittståendeBrev)
 
         brevmottakere.forEach {
@@ -60,12 +58,10 @@ class FrittståendeBrevService(
         mellomlagringBrevService.slettMellomlagretFrittståendeBrev(fagsakId, saksbehandler)
     }
 
-    private fun oppdaterBrevmottakereMedBrevId(
-        frittståendeBrev: FrittståendeBrev,
-    ) = brevmottakereFrittståendeBrevService.hentEllerOpprettBrevmottakere(frittståendeBrev.fagsakId)
-        .map { brevmottakereFrittståendeBrevService.oppdaterBrevmottaker(it.copy(brevId = frittståendeBrev.id)) }
+    private fun oppdaterBrevmottakereMedBrevId(frittståendeBrev: FrittståendeBrev) =
+        brevmottakereFrittståendeBrevService
+            .hentEllerOpprettBrevmottakere(frittståendeBrev.fagsakId)
+            .map { brevmottakereFrittståendeBrevService.oppdaterBrevmottaker(it.copy(brevId = frittståendeBrev.id)) }
 
-    fun hentFrittståendeBrev(id: UUID): FrittståendeBrev {
-        return frittståendeBrevRepository.findByIdOrThrow(id)
-    }
+    fun hentFrittståendeBrev(id: UUID): FrittståendeBrev = frittståendeBrevRepository.findByIdOrThrow(id)
 }

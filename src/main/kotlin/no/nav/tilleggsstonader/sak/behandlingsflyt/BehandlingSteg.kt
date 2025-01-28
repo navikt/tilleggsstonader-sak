@@ -6,21 +6,26 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 
 interface BehandlingSteg<T> {
-
     fun validerSteg(saksbehandling: Saksbehandling) {}
 
     /**
      * Hvis man trenger å overridea vanlige flytet og returnere en annen stegtype kan man overridea denne metoden,
      * hvis ikke kalles utførSteg uten å returnere en stegType
      */
-    fun utførOgReturnerNesteSteg(saksbehandling: Saksbehandling, data: T): StegType {
+    fun utførOgReturnerNesteSteg(
+        saksbehandling: Saksbehandling,
+        data: T,
+    ): StegType {
         utførSteg(saksbehandling, data)
         return nesteSteg(stønadstype = saksbehandling.stønadstype)
     }
 
     fun nesteSteg(stønadstype: Stønadstype) = stegType().hentNesteSteg(stønadstype)
 
-    fun utførSteg(saksbehandling: Saksbehandling, data: T)
+    fun utførSteg(
+        saksbehandling: Saksbehandling,
+        data: T,
+    )
 
     fun stegType(): StegType
 
@@ -88,25 +93,25 @@ enum class StegType(
     ),
     ;
 
-    fun displayName(): String {
-        return this.name.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() }
-    }
+    fun displayName(): String =
+        this.name
+            .replace('_', ' ')
+            .lowercase()
+            .replaceFirstChar { it.uppercase() }
 
-    fun kommerEtter(steg: StegType): Boolean {
-        return this.rekkefølge > steg.rekkefølge
-    }
+    fun kommerEtter(steg: StegType): Boolean = this.rekkefølge > steg.rekkefølge
 
-    fun erGyldigIKombinasjonMedStatus(behandlingStatus: BehandlingStatus): Boolean {
-        return this.gyldigIKombinasjonMedStatus.contains(behandlingStatus)
-    }
+    fun erGyldigIKombinasjonMedStatus(behandlingStatus: BehandlingStatus): Boolean =
+        this.gyldigIKombinasjonMedStatus.contains(behandlingStatus)
 
-    fun hentNesteSteg(stønadstype: Stønadstype): StegType {
-        return when (this) {
+    fun hentNesteSteg(stønadstype: Stønadstype): StegType =
+        when (this) {
             REVURDERING_ÅRSAK -> INNGANGSVILKÅR
-            INNGANGSVILKÅR -> when (stønadstype) {
-                Stønadstype.LÆREMIDLER -> BEREGNE_YTELSE
-                else -> VILKÅR
-            }
+            INNGANGSVILKÅR ->
+                when (stønadstype) {
+                    Stønadstype.LÆREMIDLER -> BEREGNE_YTELSE
+                    else -> VILKÅR
+                }
             VILKÅR -> BEREGNE_YTELSE
             BEREGNE_YTELSE -> SIMULERING
             SIMULERING -> SEND_TIL_BESLUTTER
@@ -116,5 +121,4 @@ enum class StegType(
             FERDIGSTILLE_BEHANDLING -> BEHANDLING_FERDIGSTILT
             BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
         }
-    }
 }

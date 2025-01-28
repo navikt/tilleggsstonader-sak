@@ -18,17 +18,20 @@ class TilgangController(
     private val egenAnsattService: EgenAnsattService,
 ) {
     @PostMapping("/person/erEgenAnsatt")
-    fun erEgenAnsatt(@RequestBody identRequest: IdentRequest): EgenAnsattResponse {
-        return EgenAnsattResponse(erEgenAnsatt = egenAnsattService.erEgenAnsatt(identRequest.ident))
-    }
+    fun erEgenAnsatt(
+        @RequestBody identRequest: IdentRequest,
+    ): EgenAnsattResponse = EgenAnsattResponse(erEgenAnsatt = egenAnsattService.erEgenAnsatt(identRequest.ident))
 
     @PostMapping("person/sjekkTilgangTilPersonMedRelasjoner")
-    fun sjekkTilgangTilPersonMedRelasjoner(@RequestBody identRequest: IdentRequest): Tilgang {
-        return tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
+    fun sjekkTilgangTilPersonMedRelasjoner(
+        @RequestBody identRequest: IdentRequest,
+    ): Tilgang =
+        tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner(
             personIdent = identRequest.ident,
             jwtToken = SikkerhetContext.hentToken(),
         )
-    }
 }
 
-data class EgenAnsattResponse(val erEgenAnsatt: Boolean)
+data class EgenAnsattResponse(
+    val erEgenAnsatt: Boolean,
+)

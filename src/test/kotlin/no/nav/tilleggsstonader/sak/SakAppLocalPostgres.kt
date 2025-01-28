@@ -10,8 +10,7 @@ fun main(args: Array<String>) {
         .profiles(
             "opprett-oppgave",
             "opprett-grunnlagsdata",
-        )
-        .properties(Properties().medDatabase())
+        ).properties(Properties().medDatabase())
         .run(*args)
 }
 

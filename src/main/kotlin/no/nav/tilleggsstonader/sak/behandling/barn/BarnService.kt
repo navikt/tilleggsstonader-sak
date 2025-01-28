@@ -10,21 +10,20 @@ import org.springframework.transaction.annotation.Transactional
 class BarnService(
     private val barnRepository: BarnRepository,
 ) {
-
     @Transactional
-    fun opprettBarn(barn: List<BehandlingBarn>): List<BehandlingBarn> =
-        barnRepository.insertAll(barn)
+    fun opprettBarn(barn: List<BehandlingBarn>): List<BehandlingBarn> = barnRepository.insertAll(barn)
 
-    fun finnBarnPåBehandling(behandlingId: BehandlingId): List<BehandlingBarn> =
-        barnRepository.findByBehandlingId(behandlingId)
+    fun finnBarnPåBehandling(behandlingId: BehandlingId): List<BehandlingBarn> = barnRepository.findByBehandlingId(behandlingId)
 
     @Transactional
     fun gjenbrukBarn(
         forrigeBehandlingId: BehandlingId,
         nyBehandlingId: BehandlingId,
     ): Map<TidligereBarnId, NyttBarnId> {
-        val nyeBarnPåGammelId = barnRepository.findByBehandlingId(forrigeBehandlingId)
-            .associate { it.id to it.copy(id = BarnId.random(), behandlingId = nyBehandlingId, sporbar = Sporbar()) }
+        val nyeBarnPåGammelId =
+            barnRepository
+                .findByBehandlingId(forrigeBehandlingId)
+                .associate { it.id to it.copy(id = BarnId.random(), behandlingId = nyBehandlingId, sporbar = Sporbar()) }
         barnRepository.insertAll(nyeBarnPåGammelId.values.toList())
         return nyeBarnPåGammelId.map { it.key to it.value.id }.toMap()
     }

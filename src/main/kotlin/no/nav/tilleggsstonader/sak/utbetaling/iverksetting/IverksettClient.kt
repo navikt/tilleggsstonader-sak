@@ -19,12 +19,14 @@ class IverksettClient(
     @Value("\${clients.iverksetting.uri}") private val uri: URI,
     @Qualifier("azure") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private val iverksettingUrl = UriComponentsBuilder.fromUri(uri)
-        .pathSegment("api", "iverksetting", "v2")
-        .encode().toUriString()
+    private val iverksettingUrl =
+        UriComponentsBuilder
+            .fromUri(uri)
+            .pathSegment("api", "iverksetting", "v2")
+            .encode()
+            .toUriString()
 
     fun iverksett(dto: IverksettDto) {
         try {
@@ -38,22 +40,32 @@ class IverksettClient(
         }
     }
 
-    fun hentStatus(eksternFagsakId: Long, eksternBehandlingId: Long, iverksettingId: UUID): IverksettStatus {
-        val url = UriComponentsBuilder.fromUri(uri)
-            .pathSegment("api", "iverksetting", "{sakId}", "{behandlingId}", "{iverksettingId}", "status")
-            .encode().toUriString()
-        val uriVariables = mapOf(
-            "sakId" to eksternFagsakId,
-            "behandlingId" to eksternBehandlingId,
-            "iverksettingId" to iverksettingId,
-        )
+    fun hentStatus(
+        eksternFagsakId: Long,
+        eksternBehandlingId: Long,
+        iverksettingId: UUID,
+    ): IverksettStatus {
+        val url =
+            UriComponentsBuilder
+                .fromUri(uri)
+                .pathSegment("api", "iverksetting", "{sakId}", "{behandlingId}", "{iverksettingId}", "status")
+                .encode()
+                .toUriString()
+        val uriVariables =
+            mapOf(
+                "sakId" to eksternFagsakId,
+                "behandlingId" to eksternBehandlingId,
+                "iverksettingId" to iverksettingId,
+            )
         return getForEntity<IverksettStatus>(url, uriVariables = uriVariables)
     }
 
     fun simuler(simuleringRequest: SimuleringRequestDto): SimuleringResponseDto? {
-        val url = UriComponentsBuilder.fromUri(uri)
-            .pathSegment("api", "simulering", "v2")
-            .toUriString()
+        val url =
+            UriComponentsBuilder
+                .fromUri(uri)
+                .pathSegment("api", "simulering", "v2")
+                .toUriString()
 
         return postForEntityNullable<SimuleringResponseDto>(url, simuleringRequest)
     }

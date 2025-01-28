@@ -89,16 +89,17 @@ data class UtbetalingerDvh(
     )
 
     companion object {
-        fun fraDomene(ytelser: List<AndelTilkjentYtelse>) = JsonWrapper(
-            ytelser.filterNot { it.type == TypeAndel.UGYLDIG }.map {
-                UtbetalingerDvh(
-                    fraOgMed = it.fom,
-                    tilOgMed = it.tom,
-                    type = AndelstypeDvh.fraDomene(it.type),
-                    beløp = it.beløp,
-                )
-            },
-        )
+        fun fraDomene(ytelser: List<AndelTilkjentYtelse>) =
+            JsonWrapper(
+                ytelser.filterNot { it.type == TypeAndel.UGYLDIG }.map {
+                    UtbetalingerDvh(
+                        fraOgMed = it.fom,
+                        tilOgMed = it.tom,
+                        type = AndelstypeDvh.fraDomene(it.type),
+                        beløp = it.beløp,
+                    )
+                },
+            )
     }
 }
 
@@ -113,15 +114,16 @@ enum class AndelstypeDvh {
     ;
 
     companion object {
-        fun fraDomene(typeAndel: TypeAndel) = when (typeAndel) {
-            TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> TILSYN_BARN_ENSLIG_FORSØRGER
-            TypeAndel.TILSYN_BARN_AAP -> TILSYN_BARN_AAP
-            TypeAndel.TILSYN_BARN_ETTERLATTE -> TILSYN_BARN_ETTERLATTE
-            TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER -> LÆREMIDLER_ENSLIG_FORSØRGER
-            TypeAndel.LÆREMIDLER_AAP -> LÆREMIDLER_AAP
-            TypeAndel.LÆREMIDLER_ETTERLATTE -> LÆREMIDLER_ETTERLATTE
-            TypeAndel.UGYLDIG -> throw Error("Trenger ikke statistikk på ugyldige betalinger")
-        }
+        fun fraDomene(typeAndel: TypeAndel) =
+            when (typeAndel) {
+                TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> TILSYN_BARN_ENSLIG_FORSØRGER
+                TypeAndel.TILSYN_BARN_AAP -> TILSYN_BARN_AAP
+                TypeAndel.TILSYN_BARN_ETTERLATTE -> TILSYN_BARN_ETTERLATTE
+                TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER -> LÆREMIDLER_ENSLIG_FORSØRGER
+                TypeAndel.LÆREMIDLER_AAP -> LÆREMIDLER_AAP
+                TypeAndel.LÆREMIDLER_ETTERLATTE -> LÆREMIDLER_ETTERLATTE
+                TypeAndel.UGYLDIG -> throw Error("Trenger ikke statistikk på ugyldige betalinger")
+            }
     }
 }
 
@@ -136,11 +138,12 @@ data class VedtaksperioderDvh(
     companion object {
         // TODO: Map fra faktiske vedtaksperioder når vi har det (også relatert til revurdering)
 
-        fun fraDomene(ytelser: List<StønadsperiodeDto>) = JsonWrapper(
-            ytelser.map {
-                VedtaksperioderDvh(fraOgMed = it.fom, tilOgMed = it.tom)
-            },
-        )
+        fun fraDomene(ytelser: List<StønadsperiodeDto>) =
+            JsonWrapper(
+                ytelser.map {
+                    VedtaksperioderDvh(fraOgMed = it.fom, tilOgMed = it.tom)
+                },
+            )
     }
 }
 
@@ -152,11 +155,12 @@ data class BarnDvh(
     )
 
     companion object {
-        fun fraDomene(behandlingBarn: List<BehandlingBarn>) = JsonWrapper(
-            behandlingBarn.map {
-                BarnDvh(fnr = it.ident)
-            },
-        )
+        fun fraDomene(behandlingBarn: List<BehandlingBarn>) =
+            JsonWrapper(
+                behandlingBarn.map {
+                    BarnDvh(fnr = it.ident)
+                },
+            )
     }
 }
 
@@ -169,8 +173,8 @@ data class AktiviteterDvh(
     )
 
     companion object {
-        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): JsonWrapper {
-            return JsonWrapper(
+        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): JsonWrapper =
+            JsonWrapper(
                 vilkårsperioder
                     .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
                     .map {
@@ -180,7 +184,6 @@ data class AktiviteterDvh(
                         )
                     },
             )
-        }
     }
 }
 
@@ -193,8 +196,8 @@ data class MålgrupperDvh(
     )
 
     companion object {
-        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): JsonWrapper {
-            return JsonWrapper(
+        fun fraDomene(vilkårsperioder: List<Vilkårperiode>): JsonWrapper =
+            JsonWrapper(
                 vilkårsperioder
                     .filterNot { ResultatVilkårperiode.SLETTET == it.resultat }
                     .map {
@@ -204,7 +207,6 @@ data class MålgrupperDvh(
                         )
                     },
             )
-        }
     }
 }
 
@@ -215,13 +217,14 @@ enum class ResultatVilkårperiodeDvh {
     ;
 
     companion object {
-        fun fraDomene(resultat: ResultatVilkårperiode) = when (resultat) {
-            ResultatVilkårperiode.OPPFYLT -> OPPFYLT
-            ResultatVilkårperiode.IKKE_OPPFYLT -> IKKE_OPPFYLT
-            ResultatVilkårperiode.IKKE_VURDERT -> IKKE_TATT_STILLING_TIL
-            ResultatVilkårperiode.SLETTET ->
-                throw IllegalArgumentException("Slettede vedtak er ikke relevant, og skal ha blitt filtrert bort.")
-        }
+        fun fraDomene(resultat: ResultatVilkårperiode) =
+            when (resultat) {
+                ResultatVilkårperiode.OPPFYLT -> OPPFYLT
+                ResultatVilkårperiode.IKKE_OPPFYLT -> IKKE_OPPFYLT
+                ResultatVilkårperiode.IKKE_VURDERT -> IKKE_TATT_STILLING_TIL
+                ResultatVilkårperiode.SLETTET ->
+                    throw IllegalArgumentException("Slettede vedtak er ikke relevant, og skal ha blitt filtrert bort.")
+            }
     }
 }
 
@@ -235,15 +238,16 @@ enum class VilkårsresultatDvh {
     ;
 
     companion object {
-        fun fraDomene(resultat: Vilkårsresultat) = when (resultat) {
-            Vilkårsresultat.OPPFYLT -> OPPFYLT
-            Vilkårsresultat.AUTOMATISK_OPPFYLT -> AUTOMATISK_OPPFYLT
-            Vilkårsresultat.IKKE_OPPFYLT -> IKKE_OPPFYLT
-            Vilkårsresultat.IKKE_AKTUELL -> IKKE_AKTUELL
-            Vilkårsresultat.IKKE_TATT_STILLING_TIL -> IKKE_TATT_STILLING_TIL
-            Vilkårsresultat.SKAL_IKKE_VURDERES -> SKAL_IKKE_VURDERES
-            // TODO: Vurder om vi trenger alle disse
-        }
+        fun fraDomene(resultat: Vilkårsresultat) =
+            when (resultat) {
+                Vilkårsresultat.OPPFYLT -> OPPFYLT
+                Vilkårsresultat.AUTOMATISK_OPPFYLT -> AUTOMATISK_OPPFYLT
+                Vilkårsresultat.IKKE_OPPFYLT -> IKKE_OPPFYLT
+                Vilkårsresultat.IKKE_AKTUELL -> IKKE_AKTUELL
+                Vilkårsresultat.IKKE_TATT_STILLING_TIL -> IKKE_TATT_STILLING_TIL
+                Vilkårsresultat.SKAL_IKKE_VURDERES -> SKAL_IKKE_VURDERES
+                // TODO: Vurder om vi trenger alle disse
+            }
     }
 }
 
@@ -255,17 +259,19 @@ enum class AktivitetTypeDvh {
     ;
 
     companion object {
-        fun fraDomene(vilkårsperiodeType: VilkårperiodeType) = when (vilkårsperiodeType) {
-            is AktivitetType -> fraDomene(aktivitetType = vilkårsperiodeType)
-            is MålgruppeType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type aktivitet.")
-        }
+        fun fraDomene(vilkårsperiodeType: VilkårperiodeType) =
+            when (vilkårsperiodeType) {
+                is AktivitetType -> fraDomene(aktivitetType = vilkårsperiodeType)
+                is MålgruppeType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type aktivitet.")
+            }
 
-        fun fraDomene(aktivitetType: AktivitetType) = when (aktivitetType) {
-            AktivitetType.TILTAK -> TILTAK
-            AktivitetType.UTDANNING -> UTDANNING
-            AktivitetType.REELL_ARBEIDSSØKER -> REELL_ARBEIDSSØKER
-            AktivitetType.INGEN_AKTIVITET -> INGEN_AKTIVITET
-        }
+        fun fraDomene(aktivitetType: AktivitetType) =
+            when (aktivitetType) {
+                AktivitetType.TILTAK -> TILTAK
+                AktivitetType.UTDANNING -> UTDANNING
+                AktivitetType.REELL_ARBEIDSSØKER -> REELL_ARBEIDSSØKER
+                AktivitetType.INGEN_AKTIVITET -> INGEN_AKTIVITET
+            }
     }
 }
 
@@ -281,21 +287,23 @@ enum class MålgruppeTypeDvh {
     ;
 
     companion object {
-        fun fraDomene(vilkårsperiodeType: VilkårperiodeType) = when (vilkårsperiodeType) {
-            is MålgruppeType -> fraDomene(målgruppeType = vilkårsperiodeType)
-            is AktivitetType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type målgruppe.")
-        }
+        fun fraDomene(vilkårsperiodeType: VilkårperiodeType) =
+            when (vilkårsperiodeType) {
+                is MålgruppeType -> fraDomene(målgruppeType = vilkårsperiodeType)
+                is AktivitetType -> throw IllegalArgumentException("$vilkårsperiodeType er ikke en gyldig type målgruppe.")
+            }
 
-        fun fraDomene(målgruppeType: MålgruppeType) = when (målgruppeType) {
-            MålgruppeType.AAP -> AAP
-            MålgruppeType.DAGPENGER -> DAGPENGER
-            MålgruppeType.OMSTILLINGSSTØNAD -> OMSTILLINGSSTØNAD
-            MålgruppeType.OVERGANGSSTØNAD -> OVERGANGSSTØNAD
-            MålgruppeType.NEDSATT_ARBEIDSEVNE -> NEDSATT_ARBEIDSEVNE
-            MålgruppeType.UFØRETRYGD -> UFØRETRYGD
-            MålgruppeType.INGEN_MÅLGRUPPE -> INGEN_MÅLGRUPPE
-            MålgruppeType.SYKEPENGER_100_PROSENT -> SYKEPENGER_100_PROSENT
-        }
+        fun fraDomene(målgruppeType: MålgruppeType) =
+            when (målgruppeType) {
+                MålgruppeType.AAP -> AAP
+                MålgruppeType.DAGPENGER -> DAGPENGER
+                MålgruppeType.OMSTILLINGSSTØNAD -> OMSTILLINGSSTØNAD
+                MålgruppeType.OVERGANGSSTØNAD -> OVERGANGSSTØNAD
+                MålgruppeType.NEDSATT_ARBEIDSEVNE -> NEDSATT_ARBEIDSEVNE
+                MålgruppeType.UFØRETRYGD -> UFØRETRYGD
+                MålgruppeType.INGEN_MÅLGRUPPE -> INGEN_MÅLGRUPPE
+                MålgruppeType.SYKEPENGER_100_PROSENT -> SYKEPENGER_100_PROSENT
+            }
     }
 }
 
@@ -308,14 +316,15 @@ data class VilkårsvurderingerDvh(
     )
 
     companion object {
-        fun fraDomene(vilkår: List<VilkårDto>) = JsonWrapper(
-            vilkår.map {
-                VilkårsvurderingerDvh(
-                    resultat = VilkårsresultatDvh.fraDomene(it.resultat),
-                    vilkår = DelvilkårDvh.fraDomene(it.delvilkårsett),
-                )
-            },
-        )
+        fun fraDomene(vilkår: List<VilkårDto>) =
+            JsonWrapper(
+                vilkår.map {
+                    VilkårsvurderingerDvh(
+                        resultat = VilkårsresultatDvh.fraDomene(it.resultat),
+                        vilkår = DelvilkårDvh.fraDomene(it.delvilkårsett),
+                    )
+                },
+            )
     }
 }
 
@@ -324,13 +333,12 @@ data class DelvilkårDvh(
     val vurderinger: List<RegelId>, // Anti corruption layer
 ) {
     companion object {
-        fun fraDomene(delvilkår: List<DelvilkårDto>): List<DelvilkårDvh> {
-            return delvilkår.map {
+        fun fraDomene(delvilkår: List<DelvilkårDto>): List<DelvilkårDvh> =
+            delvilkår.map {
                 DelvilkårDvh(
                     resultat = it.resultat,
                     vurderinger = it.vurderinger.map { vurdering -> vurdering.regelId },
                 )
             }
-        }
     }
 }

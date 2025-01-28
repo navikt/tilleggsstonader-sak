@@ -47,7 +47,6 @@ import java.time.LocalDate
 import java.util.UUID
 
 object VilkårperiodeTestUtil {
-
     fun målgruppe(
         behandlingId: BehandlingId = BehandlingId.random(),
         fom: LocalDate = osloDateNow(),
@@ -58,8 +57,8 @@ object VilkårperiodeTestUtil {
         slettetKommentar: String? = null,
         forrigeVilkårperiodeId: UUID? = null,
         status: Vilkårstatus = Vilkårstatus.NY,
-    ): GeneriskVilkårperiode<MålgruppeFaktaOgVurdering> {
-        return GeneriskVilkårperiode(
+    ): GeneriskVilkårperiode<MålgruppeFaktaOgVurdering> =
+        GeneriskVilkårperiode(
             behandlingId = behandlingId,
             resultat = resultat,
             slettetKommentar = slettetKommentar,
@@ -71,47 +70,55 @@ object VilkårperiodeTestUtil {
             begrunnelse = begrunnelse,
             faktaOgVurdering = faktaOgVurdering,
         )
-    }
 
     fun faktaOgVurderingMålgruppe(
         type: MålgruppeType = MålgruppeType.AAP,
         medlemskap: VurderingMedlemskap = vurderingMedlemskap(),
         dekketAvAnnetRegelverk: VurderingDekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(),
-    ): MålgruppeFaktaOgVurdering = when (type) {
-        MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
-        MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
-        MålgruppeType.OMSTILLINGSSTØNAD -> OmstillingsstønadTilsynBarn(
-            vurderinger = VurderingOmstillingsstønad(
-                medlemskap = medlemskap,
-            ),
+    ): MålgruppeFaktaOgVurdering =
+        when (type) {
+            MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
+            MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
+            MålgruppeType.OMSTILLINGSSTØNAD ->
+                OmstillingsstønadTilsynBarn(
+                    vurderinger =
+                        VurderingOmstillingsstønad(
+                            medlemskap = medlemskap,
+                        ),
+                )
+
+            MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadTilsynBarn
+            MålgruppeType.AAP ->
+                AAPTilsynBarn(
+                    vurderinger = VurderingAAP(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk),
+                )
+
+            MålgruppeType.UFØRETRYGD ->
+                UføretrygdTilsynBarn(
+                    vurderinger =
+                        VurderingUføretrygd(
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
+                            medlemskap = medlemskap,
+                        ),
+                )
+
+            MålgruppeType.NEDSATT_ARBEIDSEVNE ->
+                NedsattArbeidsevneTilsynBarn(
+                    vurderinger =
+                        VurderingNedsattArbeidsevne(
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
+                            medlemskap = medlemskap,
+                        ),
+                )
+
+            MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
+        }
+
+    fun faktaOgVurderingerMålgruppeDto() =
+        FaktaOgSvarMålgruppeDto(
+            svarMedlemskap = null,
+            svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.NEI,
         )
-
-        MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadTilsynBarn
-        MålgruppeType.AAP -> AAPTilsynBarn(
-            vurderinger = VurderingAAP(dekketAvAnnetRegelverk = dekketAvAnnetRegelverk),
-        )
-
-        MålgruppeType.UFØRETRYGD -> UføretrygdTilsynBarn(
-            vurderinger = VurderingUføretrygd(
-                dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
-                medlemskap = medlemskap,
-            ),
-        )
-
-        MålgruppeType.NEDSATT_ARBEIDSEVNE -> NedsattArbeidsevneTilsynBarn(
-            vurderinger = VurderingNedsattArbeidsevne(
-                dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
-                medlemskap = medlemskap,
-            ),
-        )
-
-        MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
-    }
-
-    fun faktaOgVurderingerMålgruppeDto() = FaktaOgSvarMålgruppeDto(
-        svarMedlemskap = null,
-        svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.NEI,
-    )
 
     fun aktivitet(
         behandlingId: BehandlingId = BehandlingId.random(),
@@ -138,24 +145,29 @@ object VilkårperiodeTestUtil {
         type: AktivitetType = AktivitetType.TILTAK,
         aktivitetsdager: Int? = 5,
         lønnet: VurderingLønnet = vurderingLønnet(),
-    ): AktivitetFaktaOgVurdering = when (type) {
-        AktivitetType.TILTAK -> TiltakTilsynBarn(
-            vurderinger = VurderingTiltakTilsynBarn(
-                lønnet = lønnet,
-            ),
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
-        )
+    ): AktivitetFaktaOgVurdering =
+        when (type) {
+            AktivitetType.TILTAK ->
+                TiltakTilsynBarn(
+                    vurderinger =
+                        VurderingTiltakTilsynBarn(
+                            lønnet = lønnet,
+                        ),
+                    fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
+                )
 
-        AktivitetType.UTDANNING -> UtdanningTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
-        )
+            AktivitetType.UTDANNING ->
+                UtdanningTilsynBarn(
+                    fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
+                )
 
-        AktivitetType.REELL_ARBEIDSSØKER -> ReellArbeidsøkerTilsynBarn(
-            fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
-        )
+            AktivitetType.REELL_ARBEIDSSØKER ->
+                ReellArbeidsøkerTilsynBarn(
+                    fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
+                )
 
-        AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
-    }
+            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
+        }
 
     fun faktaOgVurderingAktivitetLæremidler(
         type: AktivitetType = AktivitetType.TILTAK,
@@ -163,48 +175,43 @@ object VilkårperiodeTestUtil {
         studienivå: Studienivå = Studienivå.HØYERE_UTDANNING,
         harUtgifter: VurderingHarUtgifter = vurderingHarUtgifter(),
         harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend = vurderingHarRettTilUtstyrsstipend(),
-    ): AktivitetFaktaOgVurdering = when (type) {
-        AktivitetType.TILTAK -> TiltakLæremidler(
-            vurderinger = VurderingTiltakLæremidler(
-                harUtgifter = harUtgifter,
-                harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
-            ),
-            fakta = FaktaAktivitetLæremidler(prosent, studienivå),
-        )
+    ): AktivitetFaktaOgVurdering =
+        when (type) {
+            AktivitetType.TILTAK ->
+                TiltakLæremidler(
+                    vurderinger =
+                        VurderingTiltakLæremidler(
+                            harUtgifter = harUtgifter,
+                            harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
+                        ),
+                    fakta = FaktaAktivitetLæremidler(prosent, studienivå),
+                )
 
-        AktivitetType.UTDANNING -> UtdanningLæremidler(
-            fakta = FaktaAktivitetLæremidler(prosent, studienivå),
-            vurderinger = VurderingerUtdanningLæremidler(
-                harUtgifter = harUtgifter,
-                harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
-            ),
-        )
+            AktivitetType.UTDANNING ->
+                UtdanningLæremidler(
+                    fakta = FaktaAktivitetLæremidler(prosent, studienivå),
+                    vurderinger =
+                        VurderingerUtdanningLæremidler(
+                            harUtgifter = harUtgifter,
+                            harRettTilUtstyrsstipend = harRettTilUtstyrsstipend,
+                        ),
+                )
 
-        AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
-        else -> {
-            throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for læremidler")
+            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
+            else -> {
+                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for læremidler")
+            }
         }
-    }
 
-    fun vurderingLønnet(
-        svar: SvarJaNei? = SvarJaNei.NEI,
-    ) = VurderingLønnet(svar = svar)
+    fun vurderingLønnet(svar: SvarJaNei? = SvarJaNei.NEI) = VurderingLønnet(svar = svar)
 
-    fun vurderingHarRettTilUtstyrsstipend(
-        svar: SvarJaNei? = SvarJaNei.NEI,
-    ) = VurderingHarRettTilUtstyrsstipend(svar = svar)
+    fun vurderingHarRettTilUtstyrsstipend(svar: SvarJaNei? = SvarJaNei.NEI) = VurderingHarRettTilUtstyrsstipend(svar = svar)
 
-    fun vurderingMedlemskap(
-        svar: SvarJaNei? = SvarJaNei.JA_IMPLISITT,
-    ) = VurderingMedlemskap(svar = svar)
+    fun vurderingMedlemskap(svar: SvarJaNei? = SvarJaNei.JA_IMPLISITT) = VurderingMedlemskap(svar = svar)
 
-    fun vurderingDekketAvAnnetRegelverk(
-        svar: SvarJaNei? = SvarJaNei.NEI,
-    ) = VurderingDekketAvAnnetRegelverk(svar = svar)
+    fun vurderingDekketAvAnnetRegelverk(svar: SvarJaNei? = SvarJaNei.NEI) = VurderingDekketAvAnnetRegelverk(svar = svar)
 
-    fun vurderingHarUtgifter(
-        svar: SvarJaNei? = SvarJaNei.JA,
-    ) = VurderingHarUtgifter(svar = svar)
+    fun vurderingHarUtgifter(svar: SvarJaNei? = SvarJaNei.JA) = VurderingHarUtgifter(svar = svar)
 
     fun dummyVilkårperiodeMålgruppe(
         type: MålgruppeType = MålgruppeType.OMSTILLINGSSTØNAD,
@@ -218,10 +225,11 @@ object VilkårperiodeTestUtil {
         type = type,
         fom = fom,
         tom = tom,
-        faktaOgSvar = FaktaOgSvarMålgruppeDto(
-            svarMedlemskap = medlemskap,
-            svarUtgifterDekketAvAnnetRegelverk = dekkesAvAnnetRegelverk,
-        ),
+        faktaOgSvar =
+            FaktaOgSvarMålgruppeDto(
+                svarMedlemskap = medlemskap,
+                svarUtgifterDekketAvAnnetRegelverk = dekkesAvAnnetRegelverk,
+            ),
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,
     )
@@ -239,46 +247,48 @@ object VilkårperiodeTestUtil {
         type = type,
         fom = fom,
         tom = tom,
-        faktaOgSvar = FaktaOgSvarAktivitetBarnetilsynDto(
-            svarLønnet = svarLønnet,
-            aktivitetsdager = aktivitetsdager,
-        ),
+        faktaOgSvar =
+            FaktaOgSvarAktivitetBarnetilsynDto(
+                svarLønnet = svarLønnet,
+                aktivitetsdager = aktivitetsdager,
+            ),
         kildeId = kildeId,
         begrunnelse = begrunnelse,
         behandlingId = behandlingId,
     )
 
-    fun Vilkårperiode.medAktivitetsdager(
-        aktivitetsdager: Int,
-    ): Vilkårperiode {
+    fun Vilkårperiode.medAktivitetsdager(aktivitetsdager: Int): Vilkårperiode {
         val fakta = faktaOgVurdering.fakta
         require(fakta is FaktaAktivitetTilsynBarn)
         val nyFakta = fakta.copy(aktivitetsdager = aktivitetsdager)
 
         return when (faktaOgVurdering) {
-            is TiltakTilsynBarn -> withTypeOrThrow<TiltakTilsynBarn>()
-                .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
+            is TiltakTilsynBarn ->
+                withTypeOrThrow<TiltakTilsynBarn>()
+                    .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
 
-            is UtdanningTilsynBarn -> withTypeOrThrow<UtdanningTilsynBarn>()
-                .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
+            is UtdanningTilsynBarn ->
+                withTypeOrThrow<UtdanningTilsynBarn>()
+                    .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
 
-            is ReellArbeidsøkerTilsynBarn -> withTypeOrThrow<ReellArbeidsøkerTilsynBarn>()
-                .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
+            is ReellArbeidsøkerTilsynBarn ->
+                withTypeOrThrow<ReellArbeidsøkerTilsynBarn>()
+                    .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
 
             else -> error("Har ikke aktivitetsdager på type ${faktaOgVurdering::class}")
         }
     }
 
-    fun Vilkårperiode.medLønnet(
-        lønnet: VurderingLønnet,
-    ): Vilkårperiode {
+    fun Vilkårperiode.medLønnet(lønnet: VurderingLønnet): Vilkårperiode {
         val faktaOgVurdering1 = this.faktaOgVurdering
         return when (faktaOgVurdering1) {
-            is TiltakTilsynBarn -> withTypeOrThrow<TiltakTilsynBarn>().copy(
-                faktaOgVurdering = faktaOgVurdering1.copy(
-                    vurderinger = faktaOgVurdering1.vurderinger.copy(lønnet = lønnet),
-                ),
-            )
+            is TiltakTilsynBarn ->
+                withTypeOrThrow<TiltakTilsynBarn>().copy(
+                    faktaOgVurdering =
+                        faktaOgVurdering1.copy(
+                            vurderinger = faktaOgVurdering1.vurderinger.copy(lønnet = lønnet),
+                        ),
+                )
 
             else -> error("Har ikke mappet ${faktaOgVurdering1::class.simpleName}")
         }

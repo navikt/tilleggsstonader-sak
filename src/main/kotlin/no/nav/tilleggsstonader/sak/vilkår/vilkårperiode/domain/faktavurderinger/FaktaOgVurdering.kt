@@ -22,6 +22,7 @@ sealed interface FaktaOgVurdering : FaktaOgVurderingJson {
 }
 
 sealed interface MålgruppeFaktaOgVurdering : FaktaOgVurdering
+
 sealed interface AktivitetFaktaOgVurdering : FaktaOgVurdering
 
 /**
@@ -45,6 +46,7 @@ sealed interface TypeAktivitetOgVurdering : TypeFaktaOgVurdering {
  * Fakta, som kan inneholde ulike fakta, eks aktivitetsdager
  */
 sealed interface Fakta
+
 data object IngenFakta : Fakta
 
 /**

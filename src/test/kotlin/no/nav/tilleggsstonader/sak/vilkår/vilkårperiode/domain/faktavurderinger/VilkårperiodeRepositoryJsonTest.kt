@@ -25,7 +25,6 @@ import java.time.LocalDate
 import java.util.UUID
 
 class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
-
     @Autowired
     lateinit var namedParameterJdbcTemplate: NamedParameterJdbcTemplate
 
@@ -75,7 +74,11 @@ class VilkårperiodeRepositoryJsonTest : IntegrationTest() {
         }
     }
 
-    private fun opprettVilkårperiode(id: UUID, type: VilkårperiodeType, json: String) {
+    private fun opprettVilkårperiode(
+        id: UUID,
+        type: VilkårperiodeType,
+        json: String,
+    ) {
         namedParameterJdbcTemplate.update(
             insertQuery.trimIndent(),
             mapOf(

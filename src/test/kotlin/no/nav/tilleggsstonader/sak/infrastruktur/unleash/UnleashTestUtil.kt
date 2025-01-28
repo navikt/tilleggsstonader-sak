@@ -17,21 +17,30 @@ fun mockUnleashService(isEnabled: Boolean = true): UnleashService {
     return mockk
 }
 
-fun resetMock(mockk: UnleashService, isEnabled: Boolean = true) {
+fun resetMock(
+    mockk: UnleashService,
+    isEnabled: Boolean = true,
+) {
     clearMocks(mockk)
     every { mockk.isEnabled(any()) } returns isEnabled
     every { mockk.isEnabled(any(), any<Boolean>()) } returns isEnabled
     justRun { mockk.destroy() }
 }
 
-fun UnleashService.mockIsEnabled(toggle: Toggle, value: Boolean = false): UnleashService {
+fun UnleashService.mockIsEnabled(
+    toggle: Toggle,
+    value: Boolean = false,
+): UnleashService {
     val service = this
     every { service.isEnabled(toggle) } returns value
     every { service.isEnabled(toggle, any<Boolean>()) } returns value
     return this
 }
 
-fun UnleashService.mockGetVariant(toggle: Toggle, variant: Variant): UnleashService {
+fun UnleashService.mockGetVariant(
+    toggle: Toggle,
+    variant: Variant,
+): UnleashService {
     val service = this
     every { service.getVariant(toggle) } returns variant
     every { service.getVariant(toggle, any()) } returns variant

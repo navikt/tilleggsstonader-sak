@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.http.HttpStatus
 
 object OpprettBehandlingUtil {
-
     /**
      * @param behandlingType for ny behandling
      */
@@ -21,9 +20,10 @@ object OpprettBehandlingUtil {
         behandlingType: BehandlingType,
         tidligereBehandlinger: List<Behandling>,
     ) {
-        val sisteBehandling = tidligereBehandlinger
-            .filter { it.resultat != BehandlingResultat.HENLAGT }
-            .sisteFerdigstilteBehandling()
+        val sisteBehandling =
+            tidligereBehandlinger
+                .filter { it.resultat != BehandlingResultat.HENLAGT }
+                .sisteFerdigstilteBehandling()
 
         validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger)
 

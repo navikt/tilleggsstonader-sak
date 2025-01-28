@@ -31,7 +31,6 @@ import org.springframework.web.client.exchange
 import java.time.LocalDateTime
 
 internal class BehandlingshistorikkControllerTest : IntegrationTest() {
-
     @Autowired
     private lateinit var behandlingRepository: BehandlingRepository
 
@@ -123,8 +122,12 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         assertThat(respons.body!!.map { it.endretAvNavn }).containsExactly("7", "5", "4", "1")
     }
 
+    /*
+     * hentHistorikk skal returnere alle hendelser dersom en behandling blir underkjent i totrinnskontroll,
+     * deretter sendt til beslutter på nytt og deretter godkjent
+     */
     @Test
-    internal fun `skal returnere alle hendelser dersom en behandling blir underkjent i totrinnskontroll, deretter sendt til beslutter på nytt og deretter godkjent`() {
+    internal fun `skal returnere alle hendelser dersom en behandling blir sendt til beslutter på nytt og deretter godkjent`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent(""))))
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
@@ -190,11 +193,10 @@ internal class BehandlingshistorikkControllerTest : IntegrationTest() {
         )
     }
 
-    private fun hentHistorikk(id: BehandlingId): ResponseEntity<List<HendelseshistorikkDto>> {
-        return restTemplate.exchange(
+    private fun hentHistorikk(id: BehandlingId): ResponseEntity<List<HendelseshistorikkDto>> =
+        restTemplate.exchange(
             localhost("/api/behandlingshistorikk/$id"),
             HttpMethod.GET,
             HttpEntity(null, headers),
         )
-    }
 }

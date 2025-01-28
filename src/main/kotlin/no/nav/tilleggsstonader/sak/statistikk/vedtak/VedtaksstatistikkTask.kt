@@ -37,7 +37,6 @@ class VedtaksstatistikkTask(
     }
 
     companion object {
-
         fun opprettVedtaksstatistikkTask(
             behandlingId: BehandlingId,
             fagsakId: FagsakId,
@@ -46,19 +45,21 @@ class VedtaksstatistikkTask(
         ): Task =
             Task(
                 type = TYPE,
-                payload = objectMapper.writeValueAsString(
-                    VedtaksstatistikkTaskPayload(
-                        behandlingId = behandlingId,
-                        fagsakId = fagsakId,
-                        hendelseTidspunkt = hendelseTidspunkt,
+                payload =
+                    objectMapper.writeValueAsString(
+                        VedtaksstatistikkTaskPayload(
+                            behandlingId = behandlingId,
+                            fagsakId = fagsakId,
+                            hendelseTidspunkt = hendelseTidspunkt,
+                        ),
                     ),
-                ),
-                properties = Properties().apply {
-                    this["behandlingId"] = behandlingId.toString()
-                    this["fagsakId"] = fagsakId.toString()
-                    this["hendelseTidspunkt"] = hendelseTidspunkt.toString()
-                    this["stønadstype"] = stønadstype.toString()
-                },
+                properties =
+                    Properties().apply {
+                        this["behandlingId"] = behandlingId.toString()
+                        this["fagsakId"] = fagsakId.toString()
+                        this["hendelseTidspunkt"] = hendelseTidspunkt.toString()
+                        this["stønadstype"] = stønadstype.toString()
+                    },
             )
 
         const val TYPE = "vedtaksstatistikkTask"

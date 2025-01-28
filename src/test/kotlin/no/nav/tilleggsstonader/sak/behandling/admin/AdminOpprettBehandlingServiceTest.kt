@@ -25,21 +25,21 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class AdminOpprettBehandlingServiceTest {
-
     val personService = mockk<PersonService>()
     val fagsakService = mockk<FagsakService>()
     val behandlingService = mockk<BehandlingService>()
     val taskService = mockk<TaskService>(relaxed = true)
     val barnService = mockk<BarnService>()
 
-    val service = AdminOpprettBehandlingService(
-        personService = personService,
-        fagsakService = fagsakService,
-        behandlingService = behandlingService,
-        taskService = taskService,
-        barnService = barnService,
-        unleashService = mockUnleashService(),
-    )
+    val service =
+        AdminOpprettBehandlingService(
+            personService = personService,
+            fagsakService = fagsakService,
+            behandlingService = behandlingService,
+            taskService = taskService,
+            barnService = barnService,
+            unleashService = mockUnleashService(),
+        )
 
     val ident = "13518741815"
     val identBarn = "02501961038"

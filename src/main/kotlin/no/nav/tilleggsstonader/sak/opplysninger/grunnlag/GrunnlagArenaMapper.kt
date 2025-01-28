@@ -5,10 +5,10 @@ import no.nav.tilleggsstonader.sak.util.isEqualOrAfter
 import java.time.LocalDate
 
 object GrunnlagArenaMapper {
-
-    fun mapFaktaArena(status: ArenaStatusDto): GrunnlagArena = with(status.vedtak) {
-        GrunnlagArena(
-            vedtakTom = vedtakTom?.takeIf { it.isEqualOrAfter(LocalDate.now().minusMonths(3)) },
-        )
-    }
+    fun mapFaktaArena(status: ArenaStatusDto): GrunnlagArena =
+        with(status.vedtak) {
+            GrunnlagArena(
+                vedtakTom = vedtakTom?.takeIf { it.isEqualOrAfter(LocalDate.now().minusMonths(3)) },
+            )
+        }
 }

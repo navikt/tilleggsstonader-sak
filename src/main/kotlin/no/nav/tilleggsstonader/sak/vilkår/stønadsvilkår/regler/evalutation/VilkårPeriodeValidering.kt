@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 
 object VilkårPeriodeValidering {
-
     /**
      * Validerer at vilkår for av samme type/barn ikke overlapper
      * 2 ulike barn med samme periode kan overlappe

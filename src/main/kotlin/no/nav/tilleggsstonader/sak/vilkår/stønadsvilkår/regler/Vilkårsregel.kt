@@ -24,7 +24,6 @@ abstract class Vilkårsregel(
     val vilkårType: VilkårType,
     val regler: Map<RegelId, RegelSteg>,
 ) {
-
     @get:JsonIgnore
     val hovedregler: Set<RegelId> = regler.filter { it.value.erHovedregel }.keys.toSet()
 
@@ -32,28 +31,25 @@ abstract class Vilkårsregel(
         metadata: HovedregelMetadata,
         resultat: Vilkårsresultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
         barnId: BarnId? = null,
-    ): List<Delvilkår> {
-        return hovedregler.map {
+    ): List<Delvilkår> =
+        hovedregler.map {
             Delvilkår(
                 resultat,
                 vurderinger = listOf(Vurdering(it)),
             )
         }
-    }
 
     constructor(vilkårType: VilkårType, regler: Set<RegelSteg>) :
         this(vilkårType, regler.associateBy { it.regelId })
 
-    fun regel(regelId: RegelId): RegelSteg {
-        return regler[regelId] ?: throw Feil("Finner ikke regelId=$regelId for vilkårType=$vilkårType")
-    }
+    fun regel(regelId: RegelId): RegelSteg = regler[regelId] ?: throw Feil("Finner ikke regelId=$regelId for vilkårType=$vilkårType")
 
     protected fun automatiskVurdertDelvilkår(
         regelId: RegelId,
         svarId: SvarId,
         begrunnelse: String,
-    ): Delvilkår {
-        return Delvilkår(
+    ): Delvilkår =
+        Delvilkår(
             resultat = Vilkårsresultat.AUTOMATISK_OPPFYLT,
             listOf(
                 Vurdering(
@@ -63,14 +59,15 @@ abstract class Vilkårsregel(
                 ),
             ),
         )
-    }
 
-    protected fun ubesvartDelvilkår(regelId: RegelId) = Delvilkår(
-        resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-        vurderinger = listOf(
-            Vurdering(
-                regelId = regelId,
-            ),
-        ),
-    )
+    protected fun ubesvartDelvilkår(regelId: RegelId) =
+        Delvilkår(
+            resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
+            vurderinger =
+                listOf(
+                    Vurdering(
+                        regelId = regelId,
+                    ),
+                ),
+        )
 }

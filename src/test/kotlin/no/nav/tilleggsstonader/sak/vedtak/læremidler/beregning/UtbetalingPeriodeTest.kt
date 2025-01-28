@@ -11,43 +11,46 @@ import java.time.LocalDate
 import java.util.UUID
 
 class UtbetalingPeriodeTest {
+    private val førsteJanuar = LocalDate.of(2025, 1, 1)
+    private val sisteJanuar = LocalDate.of(2025, 1, 31)
 
-    private val JAN_FØRSTE = LocalDate.of(2025, 1, 1)
-    private val JAN_SISTE = LocalDate.of(2025, 1, 31)
+    val grunnlagForUtbetalingPeriode =
+        LøpendeMåned(
+            fom = førsteJanuar,
+            tom = sisteJanuar,
+            utbetalingsdato = førsteJanuar,
+        )
 
-    val grunnlagForUtbetalingPeriode = LøpendeMåned(
-        fom = JAN_FØRSTE,
-        tom = JAN_SISTE,
-        utbetalingsdato = JAN_FØRSTE,
-    )
+    val stønadsperiode =
+        stønadsperiode(
+            behandlingId = BehandlingId.random(),
+            fom = førsteJanuar,
+            tom = sisteJanuar,
+        ).tilStønadsperiodeBeregningsgrunnlag()
 
-    val stønadsperiode = stønadsperiode(
-        behandlingId = BehandlingId.random(),
-        fom = JAN_FØRSTE,
-        tom = JAN_SISTE,
-    ).tilStønadsperiodeBeregningsgrunnlag()
-
-    val aktivitet = AktivitetLæremidlerBeregningGrunnlag(
-        id = UUID.randomUUID(),
-        type = AktivitetType.TILTAK,
-        fom = JAN_FØRSTE,
-        tom = JAN_SISTE,
-        prosent = 100,
-        studienivå = Studienivå.HØYERE_UTDANNING,
-    )
+    val aktivitet =
+        AktivitetLæremidlerBeregningGrunnlag(
+            id = UUID.randomUUID(),
+            type = AktivitetType.TILTAK,
+            fom = førsteJanuar,
+            tom = sisteJanuar,
+            prosent = 100,
+            studienivå = Studienivå.HØYERE_UTDANNING,
+        )
 
     @Test
     fun `skal bruke tom fra siste vedtaksperiode for en utbetalingsperiode`() {
         val jan5 = LocalDate.of(2025, 1, 5)
 
-        val vedtaksperiode = VedtaksperiodeInnenforLøpendeMåned(fom = JAN_FØRSTE, tom = jan5)
+        val vedtaksperiode = VedtaksperiodeInnenforLøpendeMåned(fom = førsteJanuar, tom = jan5)
 
-        val utbetalingPeriode = UtbetalingPeriode(
-            løpendeMåned = grunnlagForUtbetalingPeriode.medVedtaksperiode(vedtaksperiode),
-            målgruppeOgAktivitet = MålgruppeOgAktivitet(stønadsperiode.målgruppe, aktivitet),
-        )
+        val utbetalingPeriode =
+            UtbetalingPeriode(
+                løpendeMåned = grunnlagForUtbetalingPeriode.medVedtaksperiode(vedtaksperiode),
+                målgruppeOgAktivitet = MålgruppeOgAktivitet(stønadsperiode.målgruppe, aktivitet),
+            )
 
-        assertThat(utbetalingPeriode.fom).isEqualTo(JAN_FØRSTE)
+        assertThat(utbetalingPeriode.fom).isEqualTo(førsteJanuar)
         assertThat(utbetalingPeriode.tom).isEqualTo(jan5)
     }
 }

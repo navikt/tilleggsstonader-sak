@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class SøknadMetadataRepositoryTest : IntegrationTest() {
-
     @Autowired
     lateinit var søknadBehandlingRepository: SøknadBehandlingRepository
 

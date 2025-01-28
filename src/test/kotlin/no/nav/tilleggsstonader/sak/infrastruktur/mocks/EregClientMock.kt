@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile
 
 @Configuration
 class EregClientMock {
-
     @Profile("mock-ereg")
     @Bean
     @Primary
@@ -22,8 +21,9 @@ class EregClientMock {
         return mockk
     }
 
-    private fun lagResponse() = OrganisasjonDto(
-        organisasjonsnummer = "990983666",
-        navn = Navn(navnelinje1 = "Julenissens Gavefabrikk AS"),
-    )
+    private fun lagResponse() =
+        OrganisasjonDto(
+            organisasjonsnummer = "990983666",
+            navn = Navn(navnelinje1 = "Julenissens Gavefabrikk AS"),
+        )
 }

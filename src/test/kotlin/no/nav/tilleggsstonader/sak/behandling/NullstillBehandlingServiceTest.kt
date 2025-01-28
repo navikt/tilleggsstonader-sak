@@ -44,7 +44,6 @@ import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 
 class NullstillBehandlingServiceTest : IntegrationTest() {
-
     @Autowired
     lateinit var nullstillBehandlingService: NullstillBehandlingService
 
@@ -194,7 +193,6 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
 
     @Nested
     inner class SlettVilkårperiodegrunnlag {
-
         @Test
         fun `skal ikke kunne slette for ferdigstilt behandling`() {
             assertThatThrownBy {
@@ -215,13 +213,14 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
     private fun assertVilkårPeriodeErGjenbrukt(vilkårperiode: Vilkårperiode) {
         with(vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()) {
             // TODO "nullstiller" felter fordi usingRecursiveComparison ikke virker som forventet
-            val oppdatertVilkårMedNullstilteFelter = this.copy(
-                id = vilkårperiode.id,
-                sporbar = vilkårperiode.sporbar,
-                behandlingId = vilkårperiode.behandlingId,
-                forrigeVilkårperiodeId = vilkårperiode.forrigeVilkårperiodeId,
-                status = vilkårperiode.status,
-            )
+            val oppdatertVilkårMedNullstilteFelter =
+                this.copy(
+                    id = vilkårperiode.id,
+                    sporbar = vilkårperiode.sporbar,
+                    behandlingId = vilkårperiode.behandlingId,
+                    forrigeVilkårperiodeId = vilkårperiode.forrigeVilkårperiodeId,
+                    status = vilkårperiode.status,
+                )
             assertThat(oppdatertVilkårMedNullstilteFelter)
                 .usingRecursiveComparison()
                 .ignoringFields("id", "sporbar", "behandlingId", "forrigeVilkårperiodeId", "status")
@@ -234,12 +233,13 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
     private fun assertStønadsperiodeErGjenbrukt(stønadsperiode: Stønadsperiode) {
         with(stønadsperiodeRepository.findAllByBehandlingId(revurdering.id).single()) {
             // TODO "nullstiller" felter fordi usingRecursiveComparison ikke virker som forventet
-            val oppdatertVilkårMedNullstilteFelter = this.copy(
-                id = stønadsperiode.id,
-                sporbar = stønadsperiode.sporbar,
-                behandlingId = stønadsperiode.behandlingId,
-                status = stønadsperiode.status,
-            )
+            val oppdatertVilkårMedNullstilteFelter =
+                this.copy(
+                    id = stønadsperiode.id,
+                    sporbar = stønadsperiode.sporbar,
+                    behandlingId = stønadsperiode.behandlingId,
+                    status = stønadsperiode.status,
+                )
             assertThat(oppdatertVilkårMedNullstilteFelter)
                 .usingRecursiveComparison()
                 .ignoringFields("id", "sporbar", "behandlingId", "status")
@@ -251,14 +251,15 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
     private fun assertVilkårErGjenbrukt(vilkår: Vilkår) {
         with(vilkårRepository.findByBehandlingId(revurdering.id).single()) {
             // TODO "nullstiller" felter fordi usingRecursiveComparison ikke virker som forventet
-            val oppdatertVilkårMedNullstilteFelter = this.copy(
-                id = vilkår.id,
-                sporbar = vilkår.sporbar,
-                behandlingId = vilkår.behandlingId,
-                barnId = vilkår.barnId,
-                opphavsvilkår = vilkår.opphavsvilkår,
-                status = vilkår.status,
-            )
+            val oppdatertVilkårMedNullstilteFelter =
+                this.copy(
+                    id = vilkår.id,
+                    sporbar = vilkår.sporbar,
+                    behandlingId = vilkår.behandlingId,
+                    barnId = vilkår.barnId,
+                    opphavsvilkår = vilkår.opphavsvilkår,
+                    status = vilkår.status,
+                )
             assertThat(oppdatertVilkårMedNullstilteFelter)
                 .usingRecursiveComparison()
                 .ignoringFields("id", "sporbar", "behandlingId", "barnId", "opphavsvilkår", "status")
@@ -291,7 +292,10 @@ class NullstillBehandlingServiceTest : IntegrationTest() {
         )
     }
 
-    private fun opprettVilkår(behandlingId: BehandlingId, barnId: BarnId) {
+    private fun opprettVilkår(
+        behandlingId: BehandlingId,
+        barnId: BarnId,
+    ) {
         vilkårRepository.insert(vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN, barnId = barnId))
     }
 }

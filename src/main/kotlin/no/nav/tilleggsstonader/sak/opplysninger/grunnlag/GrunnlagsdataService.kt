@@ -22,12 +22,9 @@ class GrunnlagsdataService(
     private val grunnlagsdataRepository: GrunnlagsdataRepository,
     private val arenaService: ArenaService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentGrunnlagsdata(behandlingId: BehandlingId): Grunnlagsdata {
-        return grunnlagsdataRepository.findByIdOrThrow(behandlingId)
-    }
+    fun hentGrunnlagsdata(behandlingId: BehandlingId): Grunnlagsdata = grunnlagsdataRepository.findByIdOrThrow(behandlingId)
 
     fun opprettGrunnlagsdataHvisDetIkkeEksisterer(behandlingId: BehandlingId) {
         if (!grunnlagsdataRepository.existsById(behandlingId)) {
@@ -41,10 +38,11 @@ class GrunnlagsdataService(
         logger.info("Oppretter grunnlagsdata for behandling=$behandlingId status=${behandling.status}")
 
         val grunnlag = hentGrunnlagFraRegister(behandling)
-        val grunnlagsdata = Grunnlagsdata(
-            behandlingId = behandlingId,
-            grunnlag = grunnlag,
-        )
+        val grunnlagsdata =
+            Grunnlagsdata(
+                behandlingId = behandlingId,
+                grunnlag = grunnlag,
+            )
         grunnlagsdataRepository.insert(grunnlagsdata)
         return grunnlagsdata
     }
@@ -52,7 +50,10 @@ class GrunnlagsdataService(
     private fun hentGrunnlagFraRegister(behandling: Saksbehandling): Grunnlag {
         val person = hentPerson(behandling)
         return Grunnlag(
-            navn = person.søker.navn.gjeldende().tilNavn(),
+            navn =
+                person.søker.navn
+                    .gjeldende()
+                    .tilNavn(),
             fødsel = mapFødsel(person),
             barn = mapBarn(behandling, person),
             arena = hentGrunnlagArena(behandling),
@@ -89,8 +90,9 @@ class GrunnlagsdataService(
         return barn.tilGrunnlagsdataBarn()
     }
 
-    private fun hentPerson(behandling: Saksbehandling) = when (behandling.stønadstype.gjelderBarn()) {
-        true -> personService.hentPersonMedBarn(behandling.ident)
-        false -> personService.hentPersonUtenBarn(behandling.ident)
-    }
+    private fun hentPerson(behandling: Saksbehandling) =
+        when (behandling.stønadstype.gjelderBarn()) {
+            true -> personService.hentPersonMedBarn(behandling.ident)
+            false -> personService.hentPersonUtenBarn(behandling.ident)
+        }
 }

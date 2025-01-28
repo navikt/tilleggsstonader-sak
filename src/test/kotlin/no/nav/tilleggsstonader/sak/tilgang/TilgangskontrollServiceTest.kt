@@ -21,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class TilgangskontrollServiceTest {
-
     private val egenAnsattService = mockk<EgenAnsattService>()
     private val personService = mockk<PersonService>()
     private val kode7Id = "6"
@@ -31,20 +30,22 @@ internal class TilgangskontrollServiceTest {
     private val søkerIdent = "søker"
     private val barnIdent = "barn1"
 
-    private val tilgangConfig = RolleConfig(
-        veilederRolle = "",
-        saksbehandlerRolle = "",
-        beslutterRolle = "",
-        kode7 = kode7Id,
-        kode6 = kode6Id,
-        egenAnsatt = egenAnsattId,
-        prosessering = "",
-    )
-    private val tilgangskontrollService = TilgangskontrollService(
-        egenAnsattService,
-        personService,
-        tilgangConfig,
-    )
+    private val tilgangConfig =
+        RolleConfig(
+            veilederRolle = "",
+            saksbehandlerRolle = "",
+            beslutterRolle = "",
+            kode7 = kode7Id,
+            kode6 = kode6Id,
+            egenAnsatt = egenAnsattId,
+            prosessering = "",
+        )
+    private val tilgangskontrollService =
+        TilgangskontrollService(
+            egenAnsattService,
+            personService,
+            tilgangConfig,
+        )
 
     private val jwtToken = mockk<JwtToken>(relaxed = true)
     private val jwtTokenClaims = mockk<JwtTokenClaims>()
@@ -147,17 +148,20 @@ internal class TilgangskontrollServiceTest {
 
     private fun sjekkTilgangTilPerson() = tilgangskontrollService.sjekkTilgang("", jwtToken).harTilgang
 
-    private fun sjekkTilgangTilPersonMedRelasjoner() =
-        tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner("", jwtToken).harTilgang
+    private fun sjekkTilgangTilPersonMedRelasjoner() = tilgangskontrollService.sjekkTilgangTilPersonMedRelasjoner("", jwtToken).harTilgang
 
-    private fun mockHentPersonMedAdressebeskyttelse(adressebeskyttelse: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT) {
+    private fun mockHentPersonMedAdressebeskyttelse(
+        adressebeskyttelse: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT,
+    ) {
         every { personService.hentPersonKortBolk(any()) } answers {
             mapOf(
-                firstArg<List<String>>().single() to pdlPersonKort(
-                    adressebeskyttelse = adressebeskyttelse(
-                        adressebeskyttelse,
+                firstArg<List<String>>().single() to
+                    pdlPersonKort(
+                        adressebeskyttelse =
+                            adressebeskyttelse(
+                                adressebeskyttelse,
+                            ),
                     ),
-                ),
             )
         }
     }
@@ -166,14 +170,17 @@ internal class TilgangskontrollServiceTest {
         graderingSøker: AdressebeskyttelseGradering? = null,
         graderingBarn: AdressebeskyttelseGradering? = null,
     ): SøkerMedBarn {
-        val barnliste = mapOf(
-            barnIdent to pdlBarn(
-                adressebeskyttelse = adressebeskyttelse(graderingBarn),
-            ),
-        )
-        val søker = pdlSøker(
-            adressebeskyttelse = adressebeskyttelse(graderingSøker),
-        )
+        val barnliste =
+            mapOf(
+                barnIdent to
+                    pdlBarn(
+                        adressebeskyttelse = adressebeskyttelse(graderingBarn),
+                    ),
+            )
+        val søker =
+            pdlSøker(
+                adressebeskyttelse = adressebeskyttelse(graderingSøker),
+            )
         return SøkerMedBarn(
             søkerIdent = søkerIdent,
             søker = søker,

@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 internal class TilkjentYtelseRepositoryTest : IntegrationTest() {
-
     @Autowired
     private lateinit var repository: TilkjentYtelseRepository
 
@@ -76,23 +75,25 @@ internal class TilkjentYtelseRepositoryTest : IntegrationTest() {
         val beløpJob1 = 1
         val beløpJob2 = 2
 
-        val job1 = executor.submit {
-            transactionHandler.runInNewTransaction {
-                val tilkjentYtelse = repository.findByBehandlingIdForUpdate(behandling.id)!!
-                latch.countDown() // sier ifra at job1 startet
-                Thread.sleep(500)
-                val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = beløpJob1)
-                repository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = setOf(andel)))
+        val job1 =
+            executor.submit {
+                transactionHandler.runInNewTransaction {
+                    val tilkjentYtelse = repository.findByBehandlingIdForUpdate(behandling.id)!!
+                    latch.countDown() // sier ifra at job1 startet
+                    Thread.sleep(500)
+                    val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = beløpJob1)
+                    repository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = setOf(andel)))
+                }
             }
-        }
-        val job2 = executor.submit {
-            latch.await() // venter på at job1 har startet
-            transactionHandler.runInNewTransaction {
-                val tilkjentYtelse = repository.findByBehandlingIdForUpdate(behandling.id)!!
-                val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = beløpJob2)
-                repository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = setOf(andel)))
+        val job2 =
+            executor.submit {
+                latch.await() // venter på at job1 har startet
+                transactionHandler.runInNewTransaction {
+                    val tilkjentYtelse = repository.findByBehandlingIdForUpdate(behandling.id)!!
+                    val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = beløpJob2)
+                    repository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = setOf(andel)))
+                }
             }
-        }
 
         job1.get()
         job2.get()

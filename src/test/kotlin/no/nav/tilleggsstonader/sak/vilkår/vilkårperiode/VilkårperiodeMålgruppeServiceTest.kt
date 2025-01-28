@@ -43,15 +43,15 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
 
     @Nested
     inner class OpprettVilkårperiode {
-
         @Test
         fun `skal kunne opprette ny målgruppe`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val målgruppeSomSkalOpprettes = dummyVilkårperiodeMålgruppe(
-                medlemskap = SvarJaNei.NEI,
-                begrunnelse = "begrunnelse målgruppe",
-                behandlingId = behandling.id,
-            )
+            val målgruppeSomSkalOpprettes =
+                dummyVilkårperiodeMålgruppe(
+                    medlemskap = SvarJaNei.NEI,
+                    begrunnelse = "begrunnelse målgruppe",
+                    behandlingId = behandling.id,
+                )
             val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(målgruppeSomSkalOpprettes)
 
             assertThat(vilkårperiode.type).isEqualTo(målgruppeSomSkalOpprettes.type)
@@ -69,11 +69,12 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         @Test
         fun `skal kaste feil hvis målgruppe er ugyldig for stønadstype`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val opprettVilkårperiode = dummyVilkårperiodeMålgruppe(
-                type = MålgruppeType.DAGPENGER,
-                medlemskap = SvarJaNei.NEI,
-                behandlingId = behandling.id,
-            )
+            val opprettVilkårperiode =
+                dummyVilkårperiodeMålgruppe(
+                    type = MålgruppeType.DAGPENGER,
+                    medlemskap = SvarJaNei.NEI,
+                    behandlingId = behandling.id,
+                )
 
             assertThatThrownBy {
                 vilkårperiodeService.opprettVilkårperiode(opprettVilkårperiode)
@@ -153,9 +154,10 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
 
         @Test
         fun `kan ikke opprette målgruppe hvis den begynner før revurderFra`() {
-            val behandling = testoppsettService.oppdater(
-                testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
-            )
+            val behandling =
+                testoppsettService.oppdater(
+                    testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
+                )
 
             assertThatThrownBy {
                 vilkårperiodeService.opprettVilkårperiode(
@@ -172,28 +174,30 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
 
     @Nested
     inner class OppdaterMålgruppe {
-
         @Test
         fun `skal oppdatere alle felter på målgruppe`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val eksisterendeMålgruppe = vilkårperiodeService.opprettVilkårperiode(
-                dummyVilkårperiodeMålgruppe(
-                    medlemskap = null,
-                    behandlingId = behandling.id,
-                ),
-            )
+            val eksisterendeMålgruppe =
+                vilkårperiodeService.opprettVilkårperiode(
+                    dummyVilkårperiodeMålgruppe(
+                        medlemskap = null,
+                        behandlingId = behandling.id,
+                    ),
+                )
 
             val nyDato = LocalDate.of(2020, 1, 1)
-            val oppdatering = eksisterendeMålgruppe.tilOppdatering().copy(
-                fom = nyDato,
-                tom = nyDato,
-                begrunnelse = "Oppdatert begrunnelse",
-                faktaOgSvar = FaktaOgSvarMålgruppeDto(
-                    svarMedlemskap = SvarJaNei.JA,
-                    svarUtgifterDekketAvAnnetRegelverk = null,
-                ),
-            )
+            val oppdatering =
+                eksisterendeMålgruppe.tilOppdatering().copy(
+                    fom = nyDato,
+                    tom = nyDato,
+                    begrunnelse = "Oppdatert begrunnelse",
+                    faktaOgSvar =
+                        FaktaOgSvarMålgruppeDto(
+                            svarMedlemskap = SvarJaNei.JA,
+                            svarUtgifterDekketAvAnnetRegelverk = null,
+                        ),
+                )
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(eksisterendeMålgruppe.id, oppdatering)
 
             assertThat(eksisterendeMålgruppe.resultat).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
@@ -210,21 +214,24 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         fun `skal oppdatere felter for periode som er lagt til av system`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(
-                dummyVilkårperiodeMålgruppe(
-                    begrunnelse = "Begrunnelse",
-                    medlemskap = SvarJaNei.JA,
-                    behandlingId = behandling.id,
-                ),
-            )
+            val vilkårperiode =
+                vilkårperiodeService.opprettVilkårperiode(
+                    dummyVilkårperiodeMålgruppe(
+                        begrunnelse = "Begrunnelse",
+                        medlemskap = SvarJaNei.JA,
+                        behandlingId = behandling.id,
+                    ),
+                )
 
-            val oppdatering = vilkårperiode.tilOppdatering().copy(
-                begrunnelse = "Oppdatert begrunnelse",
-                faktaOgSvar = FaktaOgSvarMålgruppeDto(
-                    svarMedlemskap = SvarJaNei.NEI,
-                    svarUtgifterDekketAvAnnetRegelverk = null,
-                ),
-            )
+            val oppdatering =
+                vilkårperiode.tilOppdatering().copy(
+                    begrunnelse = "Oppdatert begrunnelse",
+                    faktaOgSvar =
+                        FaktaOgSvarMålgruppeDto(
+                            svarMedlemskap = SvarJaNei.NEI,
+                            svarUtgifterDekketAvAnnetRegelverk = null,
+                        ),
+                )
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
 
             assertThat(vilkårperiode.resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
@@ -241,12 +248,13 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         fun `endring av vilkårperioder opprettet i denne behandlingen skal beholde status NY`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(
-                dummyVilkårperiodeMålgruppe(
-                    medlemskap = null,
-                    behandlingId = behandling.id,
-                ),
-            )
+            val vilkårperiode =
+                vilkårperiodeService.opprettVilkårperiode(
+                    dummyVilkårperiodeMålgruppe(
+                        medlemskap = null,
+                        behandlingId = behandling.id,
+                    ),
+                )
             val oppdatering = vilkårperiode.tilOppdatering()
             val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
             assertThat(vilkårperiode.status).isEqualTo(Vilkårstatus.NY)
@@ -257,19 +265,21 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         fun `endring av vilkårperioder opprettet kopiert fra tidligere behandling skal få status ENDRET`() {
             val revurdering = testoppsettService.lagBehandlingOgRevurdering()
 
-            val opprinneligVilkårperiode = vilkårperiodeRepository.insert(
-                målgruppe(
-                    behandlingId = revurdering.forrigeBehandlingId!!,
-                ),
-            )
+            val opprinneligVilkårperiode =
+                vilkårperiodeRepository.insert(
+                    målgruppe(
+                        behandlingId = revurdering.forrigeBehandlingId!!,
+                    ),
+                )
 
             vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeBehandlingId!!, revurdering.id)
 
             val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(revurdering.id).single()
-            val oppdatertPeriode = vilkårperiodeService.oppdaterVilkårperiode(
-                vilkårperiode.id,
-                vilkårperiode.tilOppdatering(),
-            )
+            val oppdatertPeriode =
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    vilkårperiode.id,
+                    vilkårperiode.tilOppdatering(),
+                )
 
             assertThat(opprinneligVilkårperiode.status).isEqualTo(Vilkårstatus.NY)
             assertThat(vilkårperiode.status).isEqualTo(Vilkårstatus.UENDRET)
@@ -280,21 +290,24 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
         fun `skal feile dersom manglende begrunnelse når dekket av annet regelverk endres til ja`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-            val vilkårperiode = vilkårperiodeService.opprettVilkårperiode(
-                dummyVilkårperiodeMålgruppe(
-                    type = MålgruppeType.UFØRETRYGD,
-                    dekkesAvAnnetRegelverk = SvarJaNei.NEI,
-                    behandlingId = behandling.id,
-                ),
-            )
+            val vilkårperiode =
+                vilkårperiodeService.opprettVilkårperiode(
+                    dummyVilkårperiodeMålgruppe(
+                        type = MålgruppeType.UFØRETRYGD,
+                        dekkesAvAnnetRegelverk = SvarJaNei.NEI,
+                        behandlingId = behandling.id,
+                    ),
+                )
 
-            val oppdatering = vilkårperiode.tilOppdatering().copy(
-                begrunnelse = "",
-                faktaOgSvar = FaktaOgSvarMålgruppeDto(
-                    svarMedlemskap = null,
-                    svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.JA,
-                ),
-            )
+            val oppdatering =
+                vilkårperiode.tilOppdatering().copy(
+                    begrunnelse = "",
+                    faktaOgSvar =
+                        FaktaOgSvarMålgruppeDto(
+                            svarMedlemskap = null,
+                            svarUtgifterDekketAvAnnetRegelverk = SvarJaNei.JA,
+                        ),
+                )
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(vilkårperiode.id, oppdatering)
             }.hasMessageContaining("Mangler begrunnelse for utgifter dekt av annet regelverk")
@@ -318,22 +331,25 @@ class VilkårperiodeMålgruppeServiceTest : IntegrationTest() {
 
         @Test
         fun `kan ikke oppdatere målgruppe hvis periode begynner før revurderFra`() {
-            val behandling = testoppsettService.oppdater(
-                testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
-            )
+            val behandling =
+                testoppsettService.oppdater(
+                    testoppsettService.lagBehandlingOgRevurdering().copy(revurderFra = now()),
+                )
 
-            val målgruppe = målgruppe(
-                behandlingId = behandling.id,
-                faktaOgVurdering = faktaOgVurderingMålgruppe(medlemskap = VurderingMedlemskap(svar = SvarJaNei.NEI)),
-                fom = now().minusMonths(1),
-                tom = now().plusMonths(1),
-            )
+            val målgruppe =
+                målgruppe(
+                    behandlingId = behandling.id,
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(medlemskap = VurderingMedlemskap(svar = SvarJaNei.NEI)),
+                    fom = now().minusMonths(1),
+                    tom = now().plusMonths(1),
+                )
             val periode = vilkårperiodeRepository.insert(målgruppe)
 
             assertThatThrownBy {
                 vilkårperiodeService.oppdaterVilkårperiode(
                     periode.id,
-                    periode.tilOppdatering()
+                    periode
+                        .tilOppdatering()
                         .copy(faktaOgSvar = FaktaOgSvarMålgruppeDto(svarMedlemskap = SvarJaNei.JA)),
                 )
             }.hasMessageContaining("Ugyldig endring på periode")

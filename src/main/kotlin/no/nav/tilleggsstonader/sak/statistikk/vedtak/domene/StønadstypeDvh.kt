@@ -8,11 +8,10 @@ enum class StønadstypeDvh {
     ;
 
     companion object {
-        fun fraDomene(stønadstype: Stønadstype): StønadstypeDvh {
-            return when (stønadstype) {
+        fun fraDomene(stønadstype: Stønadstype): StønadstypeDvh =
+            when (stønadstype) {
                 Stønadstype.BARNETILSYN -> BARNETILSYN
                 Stønadstype.LÆREMIDLER -> LÆREMIDLER
             }
-        }
     }
 }

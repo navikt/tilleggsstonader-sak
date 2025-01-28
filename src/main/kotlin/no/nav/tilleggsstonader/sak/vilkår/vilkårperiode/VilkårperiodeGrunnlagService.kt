@@ -43,11 +43,13 @@ class VilkårperiodeGrunnlagService(
     private val søknadService: SøknadService,
     private val tilgangService: TilgangService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun oppdaterGrunnlag(behandlingId: BehandlingId, hentGrunnlagFom: LocalDate? = null) {
+    fun oppdaterGrunnlag(
+        behandlingId: BehandlingId,
+        hentGrunnlagFom: LocalDate? = null,
+    ) {
         val behandling = behandlingService.hentBehandling(behandlingId)
         feilHvis(behandling.status.behandlingErLåstForVidereRedigering()) {
             "Kan ikke oppdatere grunnlag når behandlingen er låst"
@@ -111,10 +113,12 @@ class VilkårperiodeGrunnlagService(
         if (behandling.revurderFra != null) {
             return behandling.revurderFra
         }
-        val mottattTidspunkt = søknadService.hentSøknadMetadata(behandling.id)?.mottattTidspunkt
-            ?: behandling.opprettetTid
+        val mottattTidspunkt =
+            søknadService.hentSøknadMetadata(behandling.id)?.mottattTidspunkt
+                ?: behandling.opprettetTid
 
-        return mottattTidspunkt.toLocalDate()
+        return mottattTidspunkt
+            .toLocalDate()
             .minusMonths(behandling.stønadstype.antallMånederBakITiden())
             .tilFørsteDagIMåneden()
     }
@@ -122,53 +126,56 @@ class VilkårperiodeGrunnlagService(
     /**
      * Ulike stønader har ulikt behov for antall måneder bak i tiden som skal hentes
      */
-    private fun Stønadstype.antallMånederBakITiden(): Long = when (this) {
-        Stønadstype.BARNETILSYN -> 3
-        Stønadstype.LÆREMIDLER -> 6
-    }
+    private fun Stønadstype.antallMånederBakITiden(): Long =
+        when (this) {
+            Stønadstype.BARNETILSYN -> 3
+            Stønadstype.LÆREMIDLER -> 6
+        }
 
     private fun hentGrunnlagsdata(
         behandlingId: BehandlingId,
         fom: LocalDate,
         tom: LocalDate,
-    ): VilkårperioderGrunnlag {
-        return VilkårperioderGrunnlag(
+    ): VilkårperioderGrunnlag =
+        VilkårperioderGrunnlag(
             aktivitet = hentGrunnlagAktvititet(behandlingId, fom, tom),
             ytelse = hentGrunnlagYtelse(behandlingId, fom, tom),
-            hentetInformasjon = HentetInformasjon(
-                fom = fom,
-                tom = tom,
-                tidspunktHentet = LocalDateTime.now(),
-            ),
+            hentetInformasjon =
+                HentetInformasjon(
+                    fom = fom,
+                    tom = tom,
+                    tidspunktHentet = LocalDateTime.now(),
+                ),
         )
-    }
 
     private fun hentGrunnlagAktvititet(
         behandlingId: BehandlingId,
         fom: LocalDate,
         tom: LocalDate,
     ) = GrunnlagAktivitet(
-        aktiviteter = registerAktivitetService.hentAktiviteterForGrunnlagsdata(
-            ident = behandlingService.hentSaksbehandling(behandlingId).ident,
-            fom = fom,
-            tom = tom,
-        ).map {
-            RegisterAktivitet(
-                id = it.id,
-                fom = it.fom,
-                tom = it.tom,
-                type = it.type,
-                typeNavn = it.typeNavn,
-                status = it.status,
-                statusArena = it.statusArena,
-                antallDagerPerUke = it.antallDagerPerUke,
-                prosentDeltakelse = it.prosentDeltakelse,
-                erStønadsberettiget = it.erStønadsberettiget,
-                erUtdanning = it.erUtdanning,
-                arrangør = it.arrangør,
-                kilde = it.kilde,
-            )
-        },
+        aktiviteter =
+            registerAktivitetService
+                .hentAktiviteterForGrunnlagsdata(
+                    ident = behandlingService.hentSaksbehandling(behandlingId).ident,
+                    fom = fom,
+                    tom = tom,
+                ).map {
+                    RegisterAktivitet(
+                        id = it.id,
+                        fom = it.fom,
+                        tom = it.tom,
+                        type = it.type,
+                        typeNavn = it.typeNavn,
+                        status = it.status,
+                        statusArena = it.statusArena,
+                        antallDagerPerUke = it.antallDagerPerUke,
+                        prosentDeltakelse = it.prosentDeltakelse,
+                        erStønadsberettiget = it.erStønadsberettiget,
+                        erUtdanning = it.erUtdanning,
+                        arrangør = it.arrangør,
+                        kilde = it.kilde,
+                    )
+                },
     )
 
     private fun hentGrunnlagYtelse(
@@ -179,17 +186,17 @@ class VilkårperiodeGrunnlagService(
         val ytelserFraRegister = ytelseService.hentYtelseForGrunnlag(behandlingId = behandlingId, fom = fom, tom = tom)
 
         return GrunnlagYtelse(
-            perioder = ytelserFraRegister.perioder
-                .filter { it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN }
-                .map {
-                    PeriodeGrunnlagYtelse(
-                        type = it.type,
-                        fom = it.fom,
-                        tom = it.tom,
-                        subtype = it.tilYtelseSubtype(),
-                    )
-                }
-                .slåSammenOverlappendeEllerPåfølgende(),
+            perioder =
+                ytelserFraRegister.perioder
+                    .filter { it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN }
+                    .map {
+                        PeriodeGrunnlagYtelse(
+                            type = it.type,
+                            fom = it.fom,
+                            tom = it.tom,
+                            subtype = it.tilYtelseSubtype(),
+                        )
+                    }.slåSammenOverlappendeEllerPåfølgende(),
         )
     }
 }

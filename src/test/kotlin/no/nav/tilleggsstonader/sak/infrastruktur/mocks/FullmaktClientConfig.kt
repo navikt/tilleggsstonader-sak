@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile
 @Configuration
 @Profile("mock-fullmakt")
 class FullmaktClientConfig {
-
     @Bean
     @Primary
     fun fullmaktClient(): FullmaktClient {

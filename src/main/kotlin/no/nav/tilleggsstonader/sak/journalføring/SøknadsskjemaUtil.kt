@@ -9,10 +9,12 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 
 object SøknadsskjemaUtil {
-    fun parseSøknadsskjema(stønadstype: Stønadstype, data: ByteArray): Søknadsskjema<out Skjema> {
-        return when (stønadstype) {
+    fun parseSøknadsskjema(
+        stønadstype: Stønadstype,
+        data: ByteArray,
+    ): Søknadsskjema<out Skjema> =
+        when (stønadstype) {
             Stønadstype.BARNETILSYN -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaBarnetilsyn>>(data)
             Stønadstype.LÆREMIDLER -> objectMapper.readValue<Søknadsskjema<SøknadsskjemaLæremidler>>(data)
         }
-    }
 }

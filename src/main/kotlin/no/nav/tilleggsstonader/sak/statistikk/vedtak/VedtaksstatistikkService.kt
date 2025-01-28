@@ -41,10 +41,13 @@ class VedtaksstatistikkService(
     private val stønadsperiodeService: StønadsperiodeService,
     private val vedtakService: VedtakService,
     private val barnRepository: BarnRepository,
-
 ) {
     @Deprecated(message = "Slettes når team Spenn og Familie har tatt i bruk VedtaksstatstikkV2")
-    fun lagreVedtaksstatistikk(behandlingId: BehandlingId, fagsakId: FagsakId, hendelseTidspunkt: LocalDateTime) {
+    fun lagreVedtaksstatistikk(
+        behandlingId: BehandlingId,
+        fagsakId: FagsakId,
+        hendelseTidspunkt: LocalDateTime,
+    ) {
         val personIdent = behandlingService.hentAktivIdent(behandlingId)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
         val vilkårsvurderinger = vilkårService.hentVilkårsett(behandlingId)
@@ -80,12 +83,17 @@ class VedtaksstatistikkService(
         )
     }
 
-    fun lagreVedtaksstatistikkV2(behandlingId: BehandlingId, fagsakId: FagsakId) {
+    fun lagreVedtaksstatistikkV2(
+        behandlingId: BehandlingId,
+        fagsakId: FagsakId,
+    ) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val vedtak = vedtakService.hentVedtak(behandlingId)
-            ?: throw IllegalStateException("Kan ikke sende vedtaksstatistikk uten vedtak")
-        val vedtakstidspunkt = behandling.vedtakstidspunkt
-            ?: throw IllegalStateException("Behandlingen må ha et vedtakstidspunkt for å sende vedtaksstatistikk")
+        val vedtak =
+            vedtakService.hentVedtak(behandlingId)
+                ?: throw IllegalStateException("Kan ikke sende vedtaksstatistikk uten vedtak")
+        val vedtakstidspunkt =
+            behandling.vedtakstidspunkt
+                ?: throw IllegalStateException("Behandlingen må ha et vedtakstidspunkt for å sende vedtaksstatistikk")
         val søkerIdent = behandlingService.hentAktivIdent(behandlingId)
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
         val barn = barnRepository.findByBehandlingId(behandlingId)
@@ -112,13 +120,20 @@ class VedtaksstatistikkService(
         )
     }
 
-    private fun hentAdressebeskyttelse(personIdent: String) = AdressebeskyttelseDvh.fraDomene(
-        personService.hentPersonKortBolk(
-            listOf(personIdent),
-        ).values.single().adressebeskyttelse.gradering(),
-    )
+    private fun hentAdressebeskyttelse(personIdent: String) =
+        AdressebeskyttelseDvh.fraDomene(
+            personService
+                .hentPersonKortBolk(
+                    listOf(personIdent),
+                ).values
+                .single()
+                .adressebeskyttelse
+                .gradering(),
+        )
 
-    private fun hentRelatertBehandlingId(behandling: Saksbehandling) = behandling.forrigeBehandlingId?.let {
-        behandlingService.hentEksternBehandlingId(it)
-    }?.id
+    private fun hentRelatertBehandlingId(behandling: Saksbehandling) =
+        behandling.forrigeBehandlingId
+            ?.let {
+                behandlingService.hentEksternBehandlingId(it)
+            }?.id
 }

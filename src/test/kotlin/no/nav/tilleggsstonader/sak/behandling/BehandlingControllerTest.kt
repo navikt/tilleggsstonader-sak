@@ -25,7 +25,6 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.exchange
 
 internal class BehandlingControllerTest : IntegrationTest() {
-
     @BeforeEach
     fun setUp() {
         headers.setBearerAuth(onBehalfOfToken())
@@ -93,19 +92,20 @@ internal class BehandlingControllerTest : IntegrationTest() {
         }
     }
 
-    private fun hentBehandling(id: BehandlingId): ResponseEntity<BehandlingDto> {
-        return restTemplate.exchange(
+    private fun hentBehandling(id: BehandlingId): ResponseEntity<BehandlingDto> =
+        restTemplate.exchange(
             localhost("/api/behandling/$id"),
             HttpMethod.GET,
             HttpEntity<BehandlingDto>(headers),
         )
-    }
 
-    private fun henlegg(id: BehandlingId, henlagt: HenlagtDto): ResponseEntity<BehandlingDto> {
-        return restTemplate.exchange<BehandlingDto>(
+    private fun henlegg(
+        id: BehandlingId,
+        henlagt: HenlagtDto,
+    ): ResponseEntity<BehandlingDto> =
+        restTemplate.exchange<BehandlingDto>(
             localhost("/api/behandling/$id/henlegg"),
             HttpMethod.POST,
             HttpEntity(henlagt, headers),
         )
-    }
 }

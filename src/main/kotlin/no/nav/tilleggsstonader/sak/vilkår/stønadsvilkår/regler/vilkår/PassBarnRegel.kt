@@ -21,16 +21,17 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
 import java.time.LocalDate
 
-class PassBarnRegel : Vilkårsregel(
-    vilkårType = VilkårType.PASS_BARN,
-    regler = setOf(
-        UTGIFTER_DOKUMENTERT,
-        ANNEN_FORELDER_MOTTAR_STØTTE,
-        HAR_FULLFØRT_FJERDEKLASSE,
-        UNNTAK_ALDER,
-    ),
-) {
-
+class PassBarnRegel :
+    Vilkårsregel(
+        vilkårType = VilkårType.PASS_BARN,
+        regler =
+            setOf(
+                UTGIFTER_DOKUMENTERT,
+                ANNEN_FORELDER_MOTTAR_STØTTE,
+                HAR_FULLFØRT_FJERDEKLASSE,
+                UNNTAK_ALDER,
+            ),
+    ) {
     // TODO då man ikke lengre initierer delvilkår fra backend med periodisering av vilkår burde denne fjernes?
     override fun initiereDelvilkår(
         metadata: HovedregelMetadata,
@@ -51,26 +52,27 @@ class PassBarnRegel : Vilkårsregel(
     }
 
     companion object {
-
         private val UNNTAK_ALDER =
             RegelSteg(
                 regelId = RegelId.UNNTAK_ALDER,
                 erHovedregel = false,
-                svarMapping = mapOf(
-                    SvarId.TRENGER_MER_TILSYN_ENN_JEVNALDRENDE to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
-                    SvarId.FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
-                    SvarId.NEI to IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
-                ),
+                svarMapping =
+                    mapOf(
+                        SvarId.TRENGER_MER_TILSYN_ENN_JEVNALDRENDE to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                        SvarId.FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                        SvarId.NEI to IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                    ),
             )
 
         private val HAR_FULLFØRT_FJERDEKLASSE =
             RegelSteg(
                 regelId = RegelId.HAR_FULLFØRT_FJERDEKLASSE,
                 erHovedregel = true,
-                svarMapping = jaNeiSvarRegel(
-                    hvisJa = NesteRegel(UNNTAK_ALDER.regelId),
-                    hvisNei = OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
-                ),
+                svarMapping =
+                    jaNeiSvarRegel(
+                        hvisJa = NesteRegel(UNNTAK_ALDER.regelId),
+                        hvisNei = OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                    ),
             )
 
         private val UTGIFTER_DOKUMENTERT =

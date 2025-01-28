@@ -4,7 +4,8 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 
 data class InnvilgelseTilsynBarnResponse(
     val beregningsresultat: BeregningsresultatTilsynBarnDto,
-) : VedtakTilsynBarnResponse, VedtakTilsynBarnDto(TypeVedtak.INNVILGELSE)
+) : VedtakTilsynBarnDto(TypeVedtak.INNVILGELSE),
+    VedtakTilsynBarnResponse
 
 data object InnvilgelseTilsynBarnRequest :
     VedtakTilsynBarnRequest, VedtakTilsynBarnDto(TypeVedtak.INNVILGELSE)

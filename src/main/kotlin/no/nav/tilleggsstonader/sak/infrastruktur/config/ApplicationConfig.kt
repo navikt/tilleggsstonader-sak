@@ -24,8 +24,8 @@ import org.springframework.scheduling.annotation.EnableScheduling
 )
 @EnableScheduling
 class ApplicationConfig {
-
     private val logger = LoggerFactory.getLogger(javaClass)
+
     init {
         logger.info("Starter versjon=${Applikasjonsversjon.versjon}")
     }

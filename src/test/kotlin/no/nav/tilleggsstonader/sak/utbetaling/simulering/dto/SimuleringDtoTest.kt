@@ -11,7 +11,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 class SimuleringDtoTest {
-
     /**
      * Perioder fra simulering er ikke gruppert per måned
      * Hvis vi har en stønadsperiode for 2.1-14.1 og 25.1-31.1
@@ -40,36 +39,39 @@ class SimuleringDtoTest {
             )
     }
 
-    val simuleringsresultat = Simuleringsresultat(
-        BehandlingId.random(),
-        data = SimuleringJson(
-            oppsummeringer = listOf(
-                OppsummeringForPeriode(
-                    fom = LocalDate.of(2024, 1, 2),
-                    tom = LocalDate.of(2024, 1, 2),
-                    tidligereUtbetalt = 10,
-                    nyUtbetaling = 20,
-                    totalEtterbetaling = 30,
-                    totalFeilutbetaling = 40,
+    val simuleringsresultat =
+        Simuleringsresultat(
+            BehandlingId.random(),
+            data =
+                SimuleringJson(
+                    oppsummeringer =
+                        listOf(
+                            OppsummeringForPeriode(
+                                fom = LocalDate.of(2024, 1, 2),
+                                tom = LocalDate.of(2024, 1, 2),
+                                tidligereUtbetalt = 10,
+                                nyUtbetaling = 20,
+                                totalEtterbetaling = 30,
+                                totalFeilutbetaling = 40,
+                            ),
+                            OppsummeringForPeriode(
+                                fom = LocalDate.of(2024, 1, 25),
+                                tom = LocalDate.of(2024, 1, 25),
+                                tidligereUtbetalt = 1,
+                                nyUtbetaling = 2,
+                                totalEtterbetaling = 3,
+                                totalFeilutbetaling = 4,
+                            ),
+                            OppsummeringForPeriode(
+                                fom = LocalDate.of(2024, 2, 5),
+                                tom = LocalDate.of(2024, 2, 5),
+                                tidligereUtbetalt = 101,
+                                nyUtbetaling = 202,
+                                totalEtterbetaling = 303,
+                                totalFeilutbetaling = 404,
+                            ),
+                        ),
+                    detaljer = SimuleringDetaljer("", LocalDate.now(), 100, emptyList()),
                 ),
-                OppsummeringForPeriode(
-                    fom = LocalDate.of(2024, 1, 25),
-                    tom = LocalDate.of(2024, 1, 25),
-                    tidligereUtbetalt = 1,
-                    nyUtbetaling = 2,
-                    totalEtterbetaling = 3,
-                    totalFeilutbetaling = 4,
-                ),
-                OppsummeringForPeriode(
-                    fom = LocalDate.of(2024, 2, 5),
-                    tom = LocalDate.of(2024, 2, 5),
-                    tidligereUtbetalt = 101,
-                    nyUtbetaling = 202,
-                    totalEtterbetaling = 303,
-                    totalFeilutbetaling = 404,
-                ),
-            ),
-            detaljer = SimuleringDetaljer("", LocalDate.now(), 100, emptyList()),
-        ),
-    )
+        )
 }

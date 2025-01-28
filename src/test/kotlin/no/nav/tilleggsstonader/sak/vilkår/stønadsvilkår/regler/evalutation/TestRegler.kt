@@ -16,12 +16,14 @@ class VilkårsregelEnHovedregel :
             RegelSteg(
                 regelId = RegelId.HAR_ET_NAVN,
                 erHovedregel = true,
-                svarMapping = jaNeiSvarRegel(
-                    hvisNei = NesteRegel(
-                        RegelId.HAR_ET_NAVN2,
-                        BegrunnelseType.PÅKREVD,
+                svarMapping =
+                    jaNeiSvarRegel(
+                        hvisNei =
+                            NesteRegel(
+                                RegelId.HAR_ET_NAVN2,
+                                BegrunnelseType.PÅKREVD,
+                            ),
                     ),
-                ),
             ),
             RegelSteg(
                 regelId = RegelId.HAR_ET_NAVN2,

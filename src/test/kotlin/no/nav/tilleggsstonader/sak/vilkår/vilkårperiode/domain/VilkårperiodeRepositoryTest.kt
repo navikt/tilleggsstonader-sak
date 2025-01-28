@@ -44,9 +44,10 @@ internal class VilkårperiodeRepositoryTest : IntegrationTest() {
                 vilkårperiodeRepository.insert(
                     målgruppe(
                         behandlingId = behandling.id,
-                        faktaOgVurdering = faktaOgVurderingMålgruppe(
-                            type = MålgruppeType.UFØRETRYGD,
-                        ),
+                        faktaOgVurdering =
+                            faktaOgVurderingMålgruppe(
+                                type = MålgruppeType.UFØRETRYGD,
+                            ),
                     ),
                 )
 

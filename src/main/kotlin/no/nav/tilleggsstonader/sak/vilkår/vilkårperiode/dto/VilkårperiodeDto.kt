@@ -76,7 +76,8 @@ fun Vilkårperiode.tilDto() =
 
 // Returnerer ikke vurdering hvis resultatet er IKKE_AKTUELT
 fun Vurdering.tilDto() =
-    this.takeIf { resultat != ResultatDelvilkårperiode.IKKE_AKTUELT }
+    this
+        .takeIf { resultat != ResultatDelvilkårperiode.IKKE_AKTUELT }
         ?.let {
             VurderingDto(svar = svar, resultat = resultat)
         }
@@ -106,30 +107,40 @@ data class AktivitetLæremidlerFaktaOgVurderingerDto(
     val harRettTilUtstyrsstipend: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
-fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto {
-    return when (this) {
-        is MålgruppeFaktaOgVurdering -> MålgruppeFaktaOgVurderingerDto(
-            medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
-            utgifterDekketAvAnnetRegelverk = vurderinger.takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()?.dekketAvAnnetRegelverk?.tilDto(),
-        )
+fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
+    when (this) {
+        is MålgruppeFaktaOgVurdering ->
+            MålgruppeFaktaOgVurderingerDto(
+                medlemskap = vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.medlemskap?.tilDto(),
+                utgifterDekketAvAnnetRegelverk =
+                    vurderinger
+                        .takeIfVurderinger<DekketAvAnnetRegelverkVurdering>()
+                        ?.dekketAvAnnetRegelverk
+                        ?.tilDto(),
+            )
 
         is AktivitetFaktaOgVurdering -> {
             when (this) {
-                is FaktaOgVurderingTilsynBarn -> AktivitetBarnetilsynFaktaOgVurderingerDto(
-                    aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
-                    lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
-                )
+                is FaktaOgVurderingTilsynBarn ->
+                    AktivitetBarnetilsynFaktaOgVurderingerDto(
+                        aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
+                        lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
+                    )
 
-                is FaktaOgVurderingLæremidler -> AktivitetLæremidlerFaktaOgVurderingerDto(
-                    prosent = fakta.takeIfFakta<FaktaProsent>()?.prosent,
-                    studienivå = fakta.takeIfFakta<FaktaStudienivå>()?.studienivå,
-                    harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
-                    harRettTilUtstyrsstipend = vurderinger.takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()?.harRettTilUtstyrsstipend?.tilDto(),
-                )
+                is FaktaOgVurderingLæremidler ->
+                    AktivitetLæremidlerFaktaOgVurderingerDto(
+                        prosent = fakta.takeIfFakta<FaktaProsent>()?.prosent,
+                        studienivå = fakta.takeIfFakta<FaktaStudienivå>()?.studienivå,
+                        harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
+                        harRettTilUtstyrsstipend =
+                            vurderinger
+                                .takeIfVurderinger<HarRettTilUtstyrsstipendVurdering>()
+                                ?.harRettTilUtstyrsstipend
+                                ?.tilDto(),
+                    )
             }
         }
     }
-}
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
@@ -167,7 +178,8 @@ data class VilkårperioderResponse(
     val grunnlag: VilkårperioderGrunnlagDto?,
 )
 
-fun Vilkårperioder.tilDto() = VilkårperioderDto(
-    målgrupper = målgrupper.map(Vilkårperiode::tilDto),
-    aktiviteter = aktiviteter.map(Vilkårperiode::tilDto),
-)
+fun Vilkårperioder.tilDto() =
+    VilkårperioderDto(
+        målgrupper = målgrupper.map(Vilkårperiode::tilDto),
+        aktiviteter = aktiviteter.map(Vilkårperiode::tilDto),
+    )

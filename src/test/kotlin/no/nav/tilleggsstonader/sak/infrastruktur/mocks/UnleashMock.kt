@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Profile
 @Profile("mock-featuretoggle")
 @Configuration
 class UnleashMock {
-
     private val logger = LoggerFactory.getLogger(UnleashMock::class.java)
 
     @Bean

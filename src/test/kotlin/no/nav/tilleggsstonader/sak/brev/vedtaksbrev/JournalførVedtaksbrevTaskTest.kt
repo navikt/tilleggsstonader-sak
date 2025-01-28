@@ -28,10 +28,10 @@ import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.http.HttpTimeoutException
-import java.util.*
+import java.util.Properties
+import java.util.UUID
 
 class JournalførVedtaksbrevTaskTest {
-
     val taskService = mockk<TaskService>()
 
     val behandlingService = mockk<BehandlingService>()
@@ -40,15 +40,16 @@ class JournalførVedtaksbrevTaskTest {
     val journalpostService = mockk<JournalpostService>()
     val brevmottakerVedtaksbrevRepository = mockk<BrevmottakerVedtaksbrevRepository>()
 
-    private val journalførVedtaksbrevTask = JournalførVedtaksbrevTask(
-        taskService,
-        behandlingService,
-        brevService,
-        arbeidsfordelingService,
-        journalpostService,
-        brevmottakerVedtaksbrevRepository,
-        TransactionHandler(),
-    )
+    private val journalførVedtaksbrevTask =
+        JournalførVedtaksbrevTask(
+            taskService,
+            behandlingService,
+            brevService,
+            arbeidsfordelingService,
+            journalpostService,
+            brevmottakerVedtaksbrevRepository,
+            TransactionHandler(),
+        )
 
     val saksbehandling = saksbehandling()
     val task = Task(JournalførVedtaksbrevTask.TYPE, saksbehandling.id.toString(), Properties())
@@ -58,12 +59,13 @@ class JournalførVedtaksbrevTaskTest {
         every { brevService.hentBesluttetBrev(saksbehandling.id) } returns vedtaksbrev(behandlingId = saksbehandling.id)
         every { arbeidsfordelingService.hentNavEnhet(any()) } returns ArbeidsfordelingTestUtil.ENHET_NASJONAL_NAY
         every { brevmottakerVedtaksbrevRepository.insert(any()) } returns mockk()
-        every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
-            BrevmottakerVedtaksbrev(
-                behandlingId = saksbehandling.id,
-                mottaker = mottakerPerson(ident = saksbehandling.ident),
-            ),
-        )
+        every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns
+            listOf(
+                BrevmottakerVedtaksbrev(
+                    behandlingId = saksbehandling.id,
+                    mottaker = mottakerPerson(ident = saksbehandling.ident),
+                ),
+            )
         every { behandlingService.hentSaksbehandling(saksbehandling.id) } returns saksbehandling
     }
 
@@ -73,18 +75,20 @@ class JournalførVedtaksbrevTaskTest {
 
         every { journalpostService.opprettJournalpost(any()) } throws feil
 
-        Assertions.assertThatThrownBy {
-            journalførVedtaksbrevTask.doTask(task)
-        }.isInstanceOf(HttpTimeoutException::class.java)
+        Assertions
+            .assertThatThrownBy {
+                journalførVedtaksbrevTask.doTask(task)
+            }.isInstanceOf(HttpTimeoutException::class.java)
     }
 
     @Test
     internal fun `skal ikke feile dersom kall mot dokarkiv feiler, og feilen er 409 Conflict`() {
         val exception = ArkiverDokumentConflictException(ArkiverDokumentResponse("journalpostID", true, null))
-        val brevmottaker = BrevmottakerVedtaksbrev(
-            behandlingId = saksbehandling.id,
-            mottaker = mottakerPerson(ident = saksbehandling.ident),
-        )
+        val brevmottaker =
+            BrevmottakerVedtaksbrev(
+                behandlingId = saksbehandling.id,
+                mottaker = mottakerPerson(ident = saksbehandling.ident),
+            )
         every { brevmottakerVedtaksbrevRepository.update(any()) } returns brevmottaker
         every { journalpostService.opprettJournalpost(any()) } throws exception
 
@@ -108,11 +112,12 @@ class JournalførVedtaksbrevTaskTest {
     @Test
     internal fun `dersom det finnes én brevmottaker skal opprettJournalpost og brevmottakerRepository-update kjøres én gang hver`() {
         val brevmottaker = mockk<BrevmottakerVedtaksbrev>()
-        every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse(
-            "journalpostID",
-            true,
-            null,
-        )
+        every { journalpostService.opprettJournalpost(any()) } returns
+            ArkiverDokumentResponse(
+                "journalpostID",
+                true,
+                null,
+            )
         every { brevmottakerVedtaksbrevRepository.update(any()) } returns brevmottaker
 
         journalførVedtaksbrevTask.doTask(task)
@@ -123,25 +128,29 @@ class JournalførVedtaksbrevTaskTest {
 
     @Test
     internal fun `dersom det finnes to brevmottakere skal opprettJournalpost og brevmottakerRepository-update kjøres to ganger hver`() {
-        val brevmottakerDuplikat = BrevmottakerVedtaksbrev(
-            behandlingId = saksbehandling.id,
-            mottaker = Mottaker(
-                mottakerRolle = MottakerRolle.BRUKER,
-                mottakerType = MottakerType.PERSON,
-                ident = saksbehandling.ident,
-            ),
-        )
-        every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
-            brevmottakerDuplikat,
-            brevmottakerDuplikat,
-        )
+        val brevmottakerDuplikat =
+            BrevmottakerVedtaksbrev(
+                behandlingId = saksbehandling.id,
+                mottaker =
+                    Mottaker(
+                        mottakerRolle = MottakerRolle.BRUKER,
+                        mottakerType = MottakerType.PERSON,
+                        ident = saksbehandling.ident,
+                    ),
+            )
+        every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns
+            listOf(
+                brevmottakerDuplikat,
+                brevmottakerDuplikat,
+            )
 
         val brevmottaker = mockk<BrevmottakerVedtaksbrev>()
-        every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse(
-            journalpostId = "mocket JournalpostId",
-            ferdigstilt = true,
-            dokumenter = null,
-        )
+        every { journalpostService.opprettJournalpost(any()) } returns
+            ArkiverDokumentResponse(
+                journalpostId = "mocket JournalpostId",
+                ferdigstilt = true,
+                dokumenter = null,
+            )
         every { brevmottakerVedtaksbrevRepository.update(any()) } returns brevmottaker
 
         journalførVedtaksbrevTask.doTask(task)
@@ -153,16 +162,19 @@ class JournalførVedtaksbrevTaskTest {
     @Test
     internal fun `kaster feil hvis dokument fra arkiv ikke er ferdigstilt`() {
         val brevmottaker = mockk<BrevmottakerVedtaksbrev>()
-        every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse(
-            journalpostId = "mocket JournalpostId",
-            ferdigstilt = false,
-            dokumenter = null,
-        )
+        every { journalpostService.opprettJournalpost(any()) } returns
+            ArkiverDokumentResponse(
+                journalpostId = "mocket JournalpostId",
+                ferdigstilt = false,
+                dokumenter = null,
+            )
         every { brevmottakerVedtaksbrevRepository.update(any()) } returns brevmottaker
 
-        Assertions.assertThatThrownBy {
-            journalførVedtaksbrevTask.doTask(task)
-        }.isInstanceOf(Feil::class.java).message()
+        Assertions
+            .assertThatThrownBy {
+                journalførVedtaksbrevTask.doTask(task)
+            }.isInstanceOf(Feil::class.java)
+            .message()
             .isEqualTo("Journalposten ble ikke ferdigstilt og kan derfor ikke distribueres")
     }
 
@@ -172,28 +184,32 @@ class JournalførVedtaksbrevTaskTest {
 
         val brevmottakerUUID = UUID.randomUUID()
 
-        val brevmottakerUtenJournalføringsId = BrevmottakerVedtaksbrev(
-            id = brevmottakerUUID,
-            behandlingId = saksbehandling.id,
-            mottaker = mottakerPerson(ident = saksbehandling.ident),
-        )
+        val brevmottakerUtenJournalføringsId =
+            BrevmottakerVedtaksbrev(
+                id = brevmottakerUUID,
+                behandlingId = saksbehandling.id,
+                mottaker = mottakerPerson(ident = saksbehandling.ident),
+            )
 
-        val brevmottakerMedJournalføringsId = BrevmottakerVedtaksbrev(
-            behandlingId = saksbehandling.id,
-            mottaker = mottakerPerson(ident = saksbehandling.ident),
-            journalpostId = "eksisterende journalpost id",
-        )
-        every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns listOf(
-            brevmottakerUtenJournalføringsId,
-            brevmottakerMedJournalføringsId,
-        )
+        val brevmottakerMedJournalføringsId =
+            BrevmottakerVedtaksbrev(
+                behandlingId = saksbehandling.id,
+                mottaker = mottakerPerson(ident = saksbehandling.ident),
+                journalpostId = "eksisterende journalpost id",
+            )
+        every { brevmottakerVedtaksbrevRepository.findByBehandlingId(saksbehandling.id) } returns
+            listOf(
+                brevmottakerUtenJournalføringsId,
+                brevmottakerMedJournalføringsId,
+            )
 
         val brevmottaker = mockk<BrevmottakerVedtaksbrev>()
-        every { journalpostService.opprettJournalpost(any()) } returns ArkiverDokumentResponse(
-            journalpostId = "mocket JournalpostId",
-            ferdigstilt = true,
-            dokumenter = null,
-        )
+        every { journalpostService.opprettJournalpost(any()) } returns
+            ArkiverDokumentResponse(
+                journalpostId = "mocket JournalpostId",
+                ferdigstilt = true,
+                dokumenter = null,
+            )
         every { brevmottakerVedtaksbrevRepository.update(any()) } returns brevmottaker
 
         journalførVedtaksbrevTask.doTask(task)
@@ -201,6 +217,10 @@ class JournalførVedtaksbrevTaskTest {
         verify(exactly = 1) { journalpostService.opprettJournalpost(capture(arkiverDokumentRequestSlot)) }
         verify(exactly = 1) { brevmottakerVedtaksbrevRepository.update(any()) }
 
-        assertThat(arkiverDokumentRequestSlot.captured.avsenderMottaker?.id!!.equals(brevmottakerUUID))
+        assertThat(
+            arkiverDokumentRequestSlot.captured.avsenderMottaker
+                ?.id!!
+                .equals(brevmottakerUUID),
+        )
     }
 }

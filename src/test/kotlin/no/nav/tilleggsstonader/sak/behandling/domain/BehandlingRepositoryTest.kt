@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
 import no.nav.tilleggsstonader.libs.utils.osloNow
 import no.nav.tilleggsstonader.sak.IntegrationTest
@@ -17,7 +16,6 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -57,8 +55,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         assertThatThrownBy {
             testoppsettService.lagre(behandling(fagsak, forrigeBehandlingId = BehandlingId.random()))
-        }
-            .isInstanceOf(DbActionExecutionException::class.java)
+        }.isInstanceOf(DbActionExecutionException::class.java)
     }
 
     @Test
@@ -71,7 +68,7 @@ class BehandlingRepositoryTest : IntegrationTest() {
     }
 
     /*
-    Har ikke oppgave ennå
+    TODO Har ikke oppgave ennå
     @Test
     fun `hentUferdigeBehandlingerFørDato skal bare hente behandlinger før en gitt dato`() {
         val enMånedSiden = osloNow().minusMonths(1)
@@ -93,10 +90,8 @@ class BehandlingRepositoryTest : IntegrationTest() {
         ).size()
             .isEqualTo(1)
     }
-     */
 
-    /*
-    Har ikke oppgave ennå
+    TODO Har ikke oppgave ennå
     @Test
     fun `hentUferdigeBehandlingerFørDato skal ikke hente behandling dersom oppgave er endret etter frist`() {
         val enMånedSiden = osloNow().minusMonths(1)
@@ -132,43 +127,47 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FinnSaksbehandling {
-        val fagsak = testoppsettService
-            .lagreFagsak(
-                fagsak(
-                    setOf(
-                        PersonIdent(ident = "1"),
-                        PersonIdent(
-                            ident = "2",
-                            sporbar = Sporbar(endret = Endret(endretTid = osloNow().plusDays(2))),
+        val fagsak =
+            testoppsettService
+                .lagreFagsak(
+                    fagsak(
+                        setOf(
+                            PersonIdent(ident = "1"),
+                            PersonIdent(
+                                ident = "2",
+                                sporbar = Sporbar(endret = Endret(endretTid = osloNow().plusDays(2))),
+                            ),
+                            PersonIdent(ident = "3"),
                         ),
-                        PersonIdent(ident = "3"),
                     ),
+                )
+        val behandling =
+            testoppsettService.lagre(
+                behandling(
+                    fagsak,
+                    status = OPPRETTET,
+                    resultat = INNVILGET,
+                    revurderFra = LocalDate.of(2023, 1, 1),
+                    type = BehandlingType.REVURDERING,
+                    årsak = BehandlingÅrsak.SØKNAD,
+                    henlagtÅrsak = HenlagtÅrsak.FEILREGISTRERT,
+                    vedtakstidspunkt = SporbarUtils.now(),
+                    kravMottatt = LocalDate.now(),
                 ),
             )
-        val behandling = testoppsettService.lagre(
-            behandling(
-                fagsak,
-                status = OPPRETTET,
-                resultat = INNVILGET,
-                revurderFra = LocalDate.of(2023, 1, 1),
-                type = BehandlingType.REVURDERING,
-                årsak = BehandlingÅrsak.SØKNAD,
-                henlagtÅrsak = HenlagtÅrsak.FEILREGISTRERT,
-                vedtakstidspunkt = SporbarUtils.now(),
-                kravMottatt = LocalDate.now(),
-            ),
-        )
 
         @Test
         fun `finnSaksbehandling returnerer korrekt konstruert saksbehandling`() {
-            behandlingRepository.finnSaksbehandling(behandling.id)
+            behandlingRepository
+                .finnSaksbehandling(behandling.id)
                 .assertFelterErLike(behandling, fagsak)
         }
 
         @Test
         fun `finnSaksbehandling med eksternBehandlingId skal mappe ok`() {
             val eksternBehandlingId = eksternBehandlingIdRepository.findByBehandlingId(behandling.id).id
-            behandlingRepository.finnSaksbehandling(eksternBehandlingId)
+            behandlingRepository
+                .finnSaksbehandling(eksternBehandlingId)
                 .assertFelterErLike(behandling, fagsak)
         }
     }
@@ -214,18 +213,19 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Test
     fun `finnFnrForBehandlingId(sql) skal finne gjeldende fnr for behandlingsid`() {
-        val fagsak = testoppsettService.lagreFagsak(
-            fagsak(
-                setOf(
-                    PersonIdent(ident = "1"),
-                    PersonIdent(
-                        ident = "2",
-                        sporbar = Sporbar(endret = Endret(endretTid = osloNow().plusDays(2))),
+        val fagsak =
+            testoppsettService.lagreFagsak(
+                fagsak(
+                    setOf(
+                        PersonIdent(ident = "1"),
+                        PersonIdent(
+                            ident = "2",
+                            sporbar = Sporbar(endret = Endret(endretTid = osloNow().plusDays(2))),
+                        ),
+                        PersonIdent(ident = "3"),
                     ),
-                    PersonIdent(ident = "3"),
                 ),
-            ),
-        )
+            )
         val behandling = testoppsettService.lagre(behandling(fagsak))
         val fnr = behandlingRepository.finnAktivIdent(behandling.id)
         assertThat(fnr).isEqualTo("2")
@@ -284,7 +284,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
     @Test
     fun `finnEksterneIder - send inn én behandlingId som finnes, forvent én eksternId `() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = testoppsettService.lagre(behandling(fagsak))
         val annenFagsak = testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1"))))
         val annenBehandling = testoppsettService.lagre(behandling(annenFagsak))
         val annenEksternBehandlingId = eksternBehandlingIdRepository.findByBehandlingId(annenBehandling.id)
@@ -320,7 +319,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class ExistsByFagsak {
-
         @Test
         fun `inner ikke når det ikke finnes noen behandlinger`() {
             assertThat(behandlingRepository.existsByFagsakId(FagsakId.random())).isFalse
@@ -355,7 +353,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class Maks1UtredesPerFagsak {
-
         @Test
         fun `skal ikke kunne ha flere behandlinger på samma fagsak med annen status enn ferdigstilt`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak())
@@ -364,9 +361,10 @@ class BehandlingRepositoryTest : IntegrationTest() {
             testoppsettService.lagre(behandling(fagsak, status = FERDIGSTILT))
 
             listOf(UTREDES, OPPRETTET, FATTER_VEDTAK, IVERKSETTER_VEDTAK).forEach { status ->
-                val cause = assertThatThrownBy {
-                    testoppsettService.lagre(behandling(fagsak, status = status))
-                }.cause()
+                val cause =
+                    assertThatThrownBy {
+                        testoppsettService.lagre(behandling(fagsak, status = status))
+                    }.cause()
                 cause.isInstanceOf(DuplicateKeyException::class.java)
                 cause.hasMessageContaining("duplicate key value violates unique constraint \"idx_behandlinger_i_arbeid\"")
             }
@@ -389,9 +387,10 @@ class BehandlingRepositoryTest : IntegrationTest() {
             val påVent = testoppsettService.lagre(behandling(fagsak, status = SATT_PÅ_VENT))
             testoppsettService.lagre(behandling(fagsak, status = IVERKSETTER_VEDTAK))
 
-            val cause = assertThatThrownBy {
-                behandlingRepository.update(påVent.copy(status = UTREDES))
-            }.cause()
+            val cause =
+                assertThatThrownBy {
+                    behandlingRepository.update(påVent.copy(status = UTREDES))
+                }.cause()
             cause.isInstanceOf(DuplicateKeyException::class.java)
             cause.hasMessageContaining("duplicate key value violates unique constraint \"idx_behandlinger_i_arbeid\"")
         }
@@ -407,7 +406,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class ExistsByFagsakIdAndStatusIsNot {
-
         @Test
         fun `returnerer true hvis behandling med annen status finnes og false om behandling med annen status ikke finnes`() {
             val fagsak = testoppsettService.lagreFagsak(fagsak(fagsakpersoner("1")))
@@ -470,7 +468,6 @@ class BehandlingRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class Vedtakstidspunkt {
-
         private val fagsak = fagsak()
 
         @BeforeEach
@@ -513,35 +510,5 @@ class BehandlingRepositoryTest : IntegrationTest() {
                 )
             }.has(hasCauseMessageContaining("behandling_resultat_vedtakstidspunkt_check"))
         }
-    }
-
-    private fun lagreBehandling(
-        behandlingId: BehandlingId,
-        status: BehandlingStatus,
-        resultat: BehandlingResultat,
-        fagsak: Fagsak,
-    ): Behandling {
-        return testoppsettService.lagre(
-            behandling(
-                id = behandlingId,
-                status = status,
-                resultat = resultat,
-                fagsak = fagsak,
-            ),
-        )
-    }
-
-    private fun lagreFagsak(
-        fagsakId: FagsakId,
-        stønadstype: Stønadstype,
-        fagsakPersonId: FagsakPersonId,
-    ): Fagsak {
-        return testoppsettService.lagreFagsak(
-            fagsak(
-                id = fagsakId,
-                stønadstype = stønadstype,
-                fagsakPersonId = fagsakPersonId,
-            ),
-        )
     }
 }

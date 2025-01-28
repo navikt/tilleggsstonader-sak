@@ -26,7 +26,6 @@ class InterntVedtakTask(
     private val journalpostService: JournalpostService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
 ) : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         val behandlingId = BehandlingId.fromString(task.payload)
         val interntVedtak = interntVedtakService.lagInterntVedtak(behandlingId)
@@ -35,7 +34,10 @@ class InterntVedtakTask(
         arkiver(interntVedtak.behandling, pdf)
     }
 
-    private fun arkiver(behandlingInfo: Behandlinginfo, pdf: ByteArray) {
+    private fun arkiver(
+        behandlingInfo: Behandlinginfo,
+        pdf: ByteArray,
+    ) {
         val behandlingId = behandlingInfo.behandlingId
         val stønadstype = behandlingInfo.stønadstype
         val enhet =
@@ -44,15 +46,16 @@ class InterntVedtakTask(
             ArkiverDokumentRequest(
                 fnr = behandlingInfo.ident,
                 forsøkFerdigstill = true,
-                hoveddokumentvarianter = listOf(
-                    Dokument(
-                        dokument = pdf,
-                        filtype = Filtype.PDFA,
-                        filnavn = null,
-                        tittel = "Internt vedtak $stønadstype",
-                        dokumenttype = stønadstype.dokumentTypeInterntVedtak(),
+                hoveddokumentvarianter =
+                    listOf(
+                        Dokument(
+                            dokument = pdf,
+                            filtype = Filtype.PDFA,
+                            filnavn = null,
+                            tittel = "Internt vedtak $stønadstype",
+                            dokumenttype = stønadstype.dokumentTypeInterntVedtak(),
+                        ),
                     ),
-                ),
                 fagsakId = behandlingInfo.eksternFagsakId.toString(),
                 avsenderMottaker = null,
                 journalførendeEnhet = enhet,
@@ -64,11 +67,10 @@ class InterntVedtakTask(
     companion object {
         const val TYPE = "lagInterntVedtak"
 
-        fun lagTask(behandlingId: BehandlingId): Task {
-            return Task(
+        fun lagTask(behandlingId: BehandlingId): Task =
+            Task(
                 type = TYPE,
                 payload = behandlingId.toString(),
             )
-        }
     }
 }

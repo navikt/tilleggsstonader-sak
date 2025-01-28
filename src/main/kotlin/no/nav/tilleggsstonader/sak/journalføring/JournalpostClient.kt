@@ -29,16 +29,28 @@ class JournalpostClient(
     @Value("\${clients.integrasjoner.uri}") private val integrasjonerBaseUrl: URI,
     @Qualifier("azure") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private val journalpostUri =
-        UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/journalpost").build().toUri()
+        UriComponentsBuilder
+            .fromUri(integrasjonerBaseUrl)
+            .pathSegment("api/journalpost")
+            .build()
+            .toUri()
 
     private val dokarkivUri =
-        UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/arkiv").build().toUri()
+        UriComponentsBuilder
+            .fromUri(integrasjonerBaseUrl)
+            .pathSegment("api/arkiv")
+            .build()
+            .toUri()
 
-    private val dokdistUri = UriComponentsBuilder.fromUri(integrasjonerBaseUrl).pathSegment("api/dist").build().toUri()
+    private val dokdistUri =
+        UriComponentsBuilder
+            .fromUri(integrasjonerBaseUrl)
+            .pathSegment("api/dist")
+            .build()
+            .toUri()
 
     fun finnJournalposterForBruker(journalposterForBrukerRequest: JournalposterForBrukerRequest): List<Journalpost> {
         val uri = URI.create("$journalpostUri").toString()
@@ -47,8 +59,12 @@ class JournalpostClient(
     }
 
     fun hentJournalpost(journalpostId: String): Journalpost {
-        val uri = UriComponentsBuilder.fromUri(journalpostUri).queryParam("journalpostId", "{journalpostId}").encode()
-            .toUriString()
+        val uri =
+            UriComponentsBuilder
+                .fromUri(journalpostUri)
+                .queryParam("journalpostId", "{journalpostId}")
+                .encode()
+                .toUriString()
 
         return getForEntity<Journalpost>(uri, uriVariables = journalpostIdUriVariables(journalpostId))
     }
@@ -72,7 +88,12 @@ class JournalpostClient(
         journalpostId: String,
         saksbehandler: String?,
     ): OppdaterJournalpostResponse {
-        val uri = UriComponentsBuilder.fromUri(dokarkivUri).pathSegment("{journalpostId}").encode().toUriString()
+        val uri =
+            UriComponentsBuilder
+                .fromUri(dokarkivUri)
+                .pathSegment("{journalpostId}")
+                .encode()
+                .toUriString()
         return putForEntity<OppdaterJournalpostResponse>(
             uri,
             oppdaterJournalpostRequest,
@@ -86,8 +107,13 @@ class JournalpostClient(
         journalførendeEnhet: String,
         saksbehandler: String?,
     ): OppdaterJournalpostResponse {
-        val uri = UriComponentsBuilder.fromUri(dokarkivUri).pathSegment("{journalpostId}", "ferdigstill")
-            .queryParam("journalfoerendeEnhet", "{journalfoerendeEnhet}").encode().toUriString()
+        val uri =
+            UriComponentsBuilder
+                .fromUri(dokarkivUri)
+                .pathSegment("{journalpostId}", "ferdigstill")
+                .queryParam("journalfoerendeEnhet", "{journalfoerendeEnhet}")
+                .encode()
+                .toUriString()
 
         return putForEntity<OppdaterJournalpostResponse>(
             uri,
@@ -97,7 +123,10 @@ class JournalpostClient(
         )
     }
 
-    fun distribuerJournalpost(request: DistribuerJournalpostRequest, saksbehandler: String? = null): String {
+    fun distribuerJournalpost(
+        request: DistribuerJournalpostRequest,
+        saksbehandler: String? = null,
+    ): String {
         try {
             return postForEntity<String>(
                 dokdistUri.toString(),
@@ -118,9 +147,13 @@ class JournalpostClient(
         dokumentVariantformat: Dokumentvariantformat,
     ): ByteArray {
         // TODO: kastApiFeilDersomUtviklerMedVeilederrolle() for å ikke gi tilgang til dokumenter med feil tema i prod
-        val uri = UriComponentsBuilder.fromUri(journalpostUri)
-            .pathSegment("hentdokument", "{journalpostId}", "{dokumentInfoId}")
-            .queryParam("variantFormat", dokumentVariantformat).encode().toUriString()
+        val uri =
+            UriComponentsBuilder
+                .fromUri(journalpostUri)
+                .pathSegment("hentdokument", "{journalpostId}", "{dokumentInfoId}")
+                .queryParam("variantFormat", dokumentVariantformat)
+                .encode()
+                .toUriString()
 
         return getForEntity<ByteArray>(
             uri,
@@ -128,9 +161,16 @@ class JournalpostClient(
         )
     }
 
-    fun oppdaterLogiskeVedlegg(dokumentInfoId: String, request: BulkOppdaterLogiskVedleggRequest): String {
-        val uri = UriComponentsBuilder.fromUri(dokarkivUri).pathSegment("dokument", "{dokumentInfoId}", "logiskVedlegg")
-            .encode().toUriString()
+    fun oppdaterLogiskeVedlegg(
+        dokumentInfoId: String,
+        request: BulkOppdaterLogiskVedleggRequest,
+    ): String {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(dokarkivUri)
+                .pathSegment("dokument", "{dokumentInfoId}", "logiskVedlegg")
+                .encode()
+                .toUriString()
 
         return putForEntity<String>(
             uri,
@@ -147,20 +187,20 @@ class JournalpostClient(
         return httpHeaders
     }
 
-    private fun journalpostIdUriVariables(journalpostId: String): Map<String, String> =
-        mapOf("journalpostId" to journalpostId)
+    private fun journalpostIdUriVariables(journalpostId: String): Map<String, String> = mapOf("journalpostId" to journalpostId)
 
     private fun journalførendeEnhetUriVariables(journalførendeEnhet: String): Map<String, String> =
         mapOf("journalfoerendeEnhet" to journalførendeEnhet)
 
     private fun håndterConflictArkiverDokument(e: HttpClientErrorException.Conflict) {
-        val response: ArkiverDokumentResponse = try {
-            objectMapper.readValue<ArkiverDokumentResponse>(e.responseBodyAsString)
-        } catch (ex: Exception) {
-            secureLogger.warn("Klarte ikke å parsea body=${e.responseBodyAsString}", ex)
-            // kaster opprinnelig exception
-            throw e
-        }
+        val response: ArkiverDokumentResponse =
+            try {
+                objectMapper.readValue<ArkiverDokumentResponse>(e.responseBodyAsString)
+            } catch (ex: Exception) {
+                secureLogger.warn("Klarte ikke å parsea body=${e.responseBodyAsString}", ex)
+                // kaster opprinnelig exception
+                throw e
+            }
         throw ArkiverDokumentConflictException(response)
     }
 

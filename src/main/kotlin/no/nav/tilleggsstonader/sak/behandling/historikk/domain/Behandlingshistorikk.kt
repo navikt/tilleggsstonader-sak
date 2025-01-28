@@ -29,8 +29,8 @@ data class Behandlingshistorikk(
     val endretTid: LocalDateTime = osloNow().truncatedTo(ChronoUnit.MILLIS),
 )
 
-fun Behandlingshistorikk.tilDto(): BehandlingshistorikkDto {
-    return BehandlingshistorikkDto(
+fun Behandlingshistorikk.tilDto(): BehandlingshistorikkDto =
+    BehandlingshistorikkDto(
         behandlingId = this.behandlingId,
         steg = this.steg,
         endretAvNavn = this.opprettetAvNavn,
@@ -39,17 +39,17 @@ fun Behandlingshistorikk.tilDto(): BehandlingshistorikkDto {
         utfall = this.utfall,
         metadata = this.metadata.tilJson(),
     )
-}
 
 fun Behandlingshistorikk.tilHendelseshistorikkDto(saksbehandling: Saksbehandling): HendelseshistorikkDto {
     val hendelse: Hendelse = mapUtfallTilHendelse() ?: mapStegTilHendelse(saksbehandling)
 
-    val metadata = this.metadata.tilJson()?.toMutableMap()?.apply {
-        if (saksbehandling.status.iverksetterEllerFerdigstilt() && hendelse.sattEllerTattAvVent()) {
-            this.remove("kommentarSettPåVent")
-            this.remove("kommentar")
+    val metadata =
+        this.metadata.tilJson()?.toMutableMap()?.apply {
+            if (saksbehandling.status.iverksetterEllerFerdigstilt() && hendelse.sattEllerTattAvVent()) {
+                this.remove("kommentarSettPåVent")
+                this.remove("kommentar")
+            }
         }
-    }
     return HendelseshistorikkDto(
         behandlingId = this.behandlingId,
         hendelse = hendelse,
@@ -77,33 +77,28 @@ private fun Behandlingshistorikk.mapStegTilHendelse(saksbehandling: Saksbehandli
         else -> Hendelse.UKJENT
     }
 
-fun mapFraFerdigstiltTilHendelse(resultat: BehandlingResultat): Hendelse {
-    return when (resultat) {
+fun mapFraFerdigstiltTilHendelse(resultat: BehandlingResultat): Hendelse =
+    when (resultat) {
         BehandlingResultat.HENLAGT -> Hendelse.HENLAGT
         else -> Hendelse.UKJENT
     }
-}
 
-fun mapFraFerdigstilleTilHendelse(resultat: BehandlingResultat): Hendelse {
-    return when (resultat) {
+fun mapFraFerdigstilleTilHendelse(resultat: BehandlingResultat): Hendelse =
+    when (resultat) {
         BehandlingResultat.INNVILGET, BehandlingResultat.OPPHØRT -> Hendelse.VEDTAK_IVERKSATT
         BehandlingResultat.AVSLÅTT -> Hendelse.VEDTAK_AVSLÅTT
         else -> Hendelse.UKJENT
     }
-}
 
-fun mapFraBeslutteTilHendelse(utfall: StegUtfall?): Hendelse {
-    return when (utfall) {
+fun mapFraBeslutteTilHendelse(utfall: StegUtfall?): Hendelse =
+    when (utfall) {
         StegUtfall.BESLUTTE_VEDTAK_GODKJENT -> Hendelse.VEDTAK_GODKJENT
         StegUtfall.BESLUTTE_VEDTAK_UNDERKJENT -> Hendelse.VEDTAK_UNDERKJENT
         StegUtfall.HENLAGT -> Hendelse.HENLAGT
         else -> Hendelse.UKJENT
     }
-}
 
-fun JsonWrapper?.tilJson(): Map<String, Any>? {
-    return this?.json?.let { objectMapper.readValue(it) }
-}
+fun JsonWrapper?.tilJson(): Map<String, Any>? = this?.json?.let { objectMapper.readValue(it) }
 
 enum class StegUtfall {
     UTREDNING_PÅBEGYNT,

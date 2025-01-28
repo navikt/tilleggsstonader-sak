@@ -20,15 +20,12 @@ class PersonopplysningerService(
     private val personService: PersonService,
     private val fullmaktService: FullmaktService,
 ) {
-
     // TODO denne burde hente fra grunnlag?
-    fun hentPersonopplysninger(behandlingId: BehandlingId): PersonopplysningerDto {
-        return hentPersonopplysninger(behandlingService.hentAktivIdent(behandlingId))
-    }
+    fun hentPersonopplysninger(behandlingId: BehandlingId): PersonopplysningerDto =
+        hentPersonopplysninger(behandlingService.hentAktivIdent(behandlingId))
 
-    fun hentPersonopplysningerForFagsakPerson(fagsakPersonId: FagsakPersonId): PersonopplysningerDto {
-        return hentPersonopplysninger(fagsakPersonService.hentAktivIdent(fagsakPersonId))
-    }
+    fun hentPersonopplysningerForFagsakPerson(fagsakPersonId: FagsakPersonId): PersonopplysningerDto =
+        hentPersonopplysninger(fagsakPersonService.hentAktivIdent(fagsakPersonId))
 
     private fun hentPersonopplysninger(ident: String): PersonopplysningerDto {
         val pdlSøker = personService.hentSøker(ident)
@@ -36,8 +33,10 @@ class PersonopplysningerService(
         return PersonopplysningerDto(
             personIdent = ident,
             navn = pdlSøker.navn.gjeldende().let { NavnDto.fraNavn(it) },
-            harVergemål = pdlSøker.vergemaalEllerFremtidsfullmakt
-                .any { it.type != "stadfestetFremtidsfullmakt" }, // fremtidsfullmakt gjelder frem i tiden
+            harVergemål =
+                pdlSøker.vergemaalEllerFremtidsfullmakt
+                    .any { it.type != "stadfestetFremtidsfullmakt" },
+            // fremtidsfullmakt gjelder frem i tiden
             harFullmektig = harFullmektig,
             adressebeskyttelse = Adressebeskyttelse.fraPdl(pdlSøker.adressebeskyttelse.gradering()),
         )

@@ -16,10 +16,12 @@ class FerdigstillBehandlingSteg(
     private val behandlingService: BehandlingService,
     private val taskService: TaskService,
 ) : BehandlingSteg<Void?> {
-
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
+    override fun utførSteg(
+        saksbehandling: Saksbehandling,
+        data: Void?,
+    ) {
         logger.info("Ferdigstiller behandling=${saksbehandling.id}")
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FERDIGSTILT)
 
@@ -36,7 +38,5 @@ class FerdigstillBehandlingSteg(
         )
     }
 
-    override fun stegType(): StegType {
-        return StegType.FERDIGSTILLE_BEHANDLING
-    }
+    override fun stegType(): StegType = StegType.FERDIGSTILLE_BEHANDLING
 }

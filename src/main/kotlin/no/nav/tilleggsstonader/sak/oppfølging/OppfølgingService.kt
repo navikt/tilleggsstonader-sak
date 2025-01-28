@@ -24,7 +24,6 @@ class OppfølgingService(
     private val registerAktivitetService: RegisterAktivitetService,
     private val fagsakService: FagsakService,
 ) {
-
     val logger = LoggerFactory.getLogger(javaClass)
 
     /**
@@ -42,44 +41,52 @@ class OppfølgingService(
         val behandlingerMedMuligLøpendePerioder = behandlingRepository.finnGjeldendeIverksatteBehandlinger()
         val fagsakMetadata = fagsakService.hentMetadata(behandlingerMedMuligLøpendePerioder.map { it.fagsakId })
 
-        return behandlingerMedMuligLøpendePerioder.chunked(5).flatMap { chunk ->
-            chunk.map { behandling ->
-                val fagsak = fagsakMetadata[behandling.fagsakId] ?: error("Finner ikke fagsak for ${behandling.id}")
-                hentOppfølgningFn(behandling, fagsak)
-            }.parallelt()
-        }.mapNotNull { it }
+        return behandlingerMedMuligLøpendePerioder
+            .chunked(5)
+            .flatMap { chunk ->
+                chunk
+                    .map { behandling ->
+                        val fagsak = fagsakMetadata[behandling.fagsakId] ?: error("Finner ikke fagsak for ${behandling.id}")
+                        hentOppfølgningFn(behandling, fagsak)
+                    }.parallelt()
+            }.mapNotNull { it }
     }
 
     /**
      * Svarer med en lambda for å kunne parallellisere en chunk i [hentBehandlingerForOppfølging]
      */
-    private fun hentOppfølgningFn(behandling: Behandling, fagsak: FagsakMetadata): () -> BehandlingForOppfølgingDto? = {
-        val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
+    private fun hentOppfølgningFn(
+        behandling: Behandling,
+        fagsak: FagsakMetadata,
+    ): () -> BehandlingForOppfølgingDto? =
+        {
+            val stønadsperioder = stønadsperiodeService.hentStønadsperioder(behandling.id)
 
-        val registerAktiviteter = registerAktivitetService.hentAktiviteterForGrunnlagsdata(
-            fagsak.ident,
-            stønadsperioder.minOf { it.fom },
-            stønadsperioder.maxOf { it.tom },
-        )
-        val stønadsperioderSomMåSjekkes =
-            stønadsperioder.filter { stønadsperiodeMåKontrolleres(it, registerAktiviteter) }
+            val registerAktiviteter =
+                registerAktivitetService.hentAktiviteterForGrunnlagsdata(
+                    fagsak.ident,
+                    stønadsperioder.minOf { it.fom },
+                    stønadsperioder.maxOf { it.tom },
+                )
+            val stønadsperioderSomMåSjekkes =
+                stønadsperioder.filter { stønadsperiodeMåKontrolleres(it, registerAktiviteter) }
 
-        if (stønadsperioderSomMåSjekkes.isNotEmpty()) {
-            BehandlingForOppfølgingDto(
-                behandling = tilBehandlingsinformasjon(behandling, fagsak),
-                stønadsperioderForKontroll = stønadsperioderSomMåSjekkes,
-                registerAktiviteter = registerAktiviteter.tilDto(),
-            )
-        } else {
-            null
+            if (stønadsperioderSomMåSjekkes.isNotEmpty()) {
+                BehandlingForOppfølgingDto(
+                    behandling = tilBehandlingsinformasjon(behandling, fagsak),
+                    stønadsperioderForKontroll = stønadsperioderSomMåSjekkes,
+                    registerAktiviteter = registerAktiviteter.tilDto(),
+                )
+            } else {
+                null
+            }
         }
-    }
 
     private fun stønadsperiodeMåKontrolleres(
         stønadsperiode: StønadsperiodeDto,
         registerAktivitet: List<AktivitetArenaDto>,
-    ): Boolean {
-        return when (stønadsperiode.aktivitet) {
+    ): Boolean =
+        when (stønadsperiode.aktivitet) {
             AktivitetType.REELL_ARBEIDSSØKER -> false
             AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
             AktivitetType.TILTAK -> {
@@ -95,7 +102,6 @@ class OppfølgingService(
                 utdanning.none { it.inneholder(stønadsperiode) }
             }
         }
-    }
 
     private fun perioderErSammenhengende(
         a: ArenaAktivitetPeriode,
@@ -105,8 +111,13 @@ class OppfølgingService(
     private fun finnOverlappendePerioder(
         registeraktiviteter: List<AktivitetArenaDto>,
         stønadsperiode: StønadsperiodeDto,
-    ) = registeraktiviteter.asSequence().filter { tiltakHarRelevantStatus(it) }.mapNotNull { mapTilPeriode(it) }
-        .filter { it.overlapper(stønadsperiode) }.sorted().toList()
+    ) = registeraktiviteter
+        .asSequence()
+        .filter { tiltakHarRelevantStatus(it) }
+        .mapNotNull { mapTilPeriode(it) }
+        .filter { it.overlapper(stønadsperiode) }
+        .sorted()
+        .toList()
         .mergeSammenhengende { a, b -> a.overlapper(b) || perioderErSammenhengende(a, b) }
 
     private fun mapTilPeriode(aktivitet: AktivitetArenaDto): ArenaAktivitetPeriode? {
@@ -134,22 +145,24 @@ class OppfølgingService(
         vedtakstidspunkt = behandling.vedtakstidspunkt ?: error("Behandling=${behandling.id} mangler vedtakstidspunkt"),
     )
 
-    private fun List<AktivitetArenaDto>.tilDto() = map {
-        RegisterAktivitetDto(
-            id = it.id,
-            fom = it.fom,
-            tom = it.tom,
-            typeNavn = it.typeNavn,
-            status = it.status,
-            erUtdanning = it.erUtdanning,
-        )
-    }
+    private fun List<AktivitetArenaDto>.tilDto() =
+        map {
+            RegisterAktivitetDto(
+                id = it.id,
+                fom = it.fom,
+                tom = it.tom,
+                typeNavn = it.typeNavn,
+                status = it.status,
+                erUtdanning = it.erUtdanning,
+            )
+        }
 }
 
-data class ArenaAktivitetPeriode(override val fom: LocalDate, override val tom: LocalDate) :
-    Periode<LocalDate>,
+data class ArenaAktivitetPeriode(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+) : Periode<LocalDate>,
     Mergeable<LocalDate, ArenaAktivitetPeriode> {
-    override fun merge(other: ArenaAktivitetPeriode): ArenaAktivitetPeriode {
-        return ArenaAktivitetPeriode(minOf(fom, other.fom), maxOf(tom, other.tom))
-    }
+    override fun merge(other: ArenaAktivitetPeriode): ArenaAktivitetPeriode =
+        ArenaAktivitetPeriode(minOf(fom, other.fom), maxOf(tom, other.tom))
 }

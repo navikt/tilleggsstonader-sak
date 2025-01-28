@@ -27,7 +27,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class TestControllerTest : IntegrationTest() {
-
     val json = """{"tekst":"abc","dato":"2023-01-01","tidspunkt":"2023-01-01T12:00:03"}"""
     val feilJson =
         """{"type":"about:blank","title":"Internal Server Error","status":500,"detail":"Ukjent feil","instance":"/api/test/error"}"""
@@ -41,11 +40,12 @@ class TestControllerTest : IntegrationTest() {
 
     @Test
     fun `skal kunne sende inn object`() {
-        val json = TestObject(
-            tekst = "abc",
-            dato = LocalDate.of(2023, 1, 1),
-            tidspunkt = LocalDateTime.of(2023, 1, 1, 12, 0, 3),
-        )
+        val json =
+            TestObject(
+                tekst = "abc",
+                dato = LocalDate.of(2023, 1, 1),
+                tidspunkt = LocalDateTime.of(2023, 1, 1, 12, 0, 3),
+            )
 
         val response = restTemplate.postForEntity<TestObject>(localhost("api/test"), json)
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -54,15 +54,17 @@ class TestControllerTest : IntegrationTest() {
 
     @Test
     fun `skal kunne sende inn object med json header`() {
-        val json = TestObject(
-            tekst = "abc",
-            dato = LocalDate.of(2023, 1, 1),
-            tidspunkt = LocalDateTime.of(2023, 1, 1, 12, 0, 3),
-        )
-        val jsonHeaders = HttpHeaders().apply {
-            contentType = APPLICATION_JSON
-            accept = listOf(APPLICATION_JSON)
-        }
+        val json =
+            TestObject(
+                tekst = "abc",
+                dato = LocalDate.of(2023, 1, 1),
+                tidspunkt = LocalDateTime.of(2023, 1, 1, 12, 0, 3),
+            )
+        val jsonHeaders =
+            HttpHeaders().apply {
+                contentType = APPLICATION_JSON
+                accept = listOf(APPLICATION_JSON)
+            }
 
         val response = restTemplate.postForEntity<TestObject>(localhost("api/test"), HttpEntity(json, jsonHeaders))
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -92,17 +94,17 @@ class TestControllerTest : IntegrationTest() {
 
     @Nested
     inner class EndepunktMedTokenValidering {
-
         @Test
         fun `autorisert token, men mangler saksbehandler-relatert rolle`() {
             listOf(rolleConfig.kode6, rolleConfig.kode7, rolleConfig.egenAnsatt).forEach {
-                val response = catchException {
-                    restTemplate.exchange<TestObject>(
-                        localhost("api/test/azuread"),
-                        HttpMethod.GET,
-                        HttpEntity(null, headers.apply { setBearerAuth(onBehalfOfToken(it)) }),
-                    )
-                }
+                val response =
+                    catchException {
+                        restTemplate.exchange<TestObject>(
+                            localhost("api/test/azuread"),
+                            HttpMethod.GET,
+                            HttpEntity(null, headers.apply { setBearerAuth(onBehalfOfToken(it)) }),
+                        )
+                    }
                 assertThat(response).isInstanceOf(HttpClientErrorException.Forbidden::class.java)
                 assertManglerTilgang(response as HttpClientErrorException.Forbidden)
             }
@@ -111,11 +113,12 @@ class TestControllerTest : IntegrationTest() {
         @Test
         fun `autorisert token med saksbehandler-relatert rolle kan gjøre kall`() {
             listOf(rolleConfig.saksbehandlerRolle, rolleConfig.beslutterRolle, rolleConfig.veilederRolle).forEach {
-                val response = restTemplate.exchange<TestObject>(
-                    localhost("api/test/azuread"),
-                    HttpMethod.GET,
-                    HttpEntity(null, headers.apply { setBearerAuth(onBehalfOfToken(it)) }),
-                )
+                val response =
+                    restTemplate.exchange<TestObject>(
+                        localhost("api/test/azuread"),
+                        HttpMethod.GET,
+                        HttpEntity(null, headers.apply { setBearerAuth(onBehalfOfToken(it)) }),
+                    )
                 assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
                 assertThat(response.body).isNotNull
             }
@@ -132,7 +135,9 @@ class TestControllerTest : IntegrationTest() {
         assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
         assertThat(response.responseHeaders?.contentType).isEqualTo(APPLICATION_PROBLEM_JSON)
         assertThat(response.responseBodyAsString)
-            .isEqualTo("""{"type":"about:blank","title":"Forbidden","status":403,"detail":"Du mangler tilgang til denne saksbehandlingsløsningen","instance":"/api/test/azuread"}""")
+            .isEqualTo(
+                """{"type":"about:blank","title":"Forbidden","status":403,"detail":"Du mangler tilgang til denne saksbehandlingsløsningen","instance":"/api/test/azuread"}""",
+            )
     }
 }
 
@@ -140,20 +145,18 @@ class TestControllerTest : IntegrationTest() {
 @RequestMapping("/api/test")
 @Unprotected
 class TestController {
-
     @GetMapping
-    fun get(): TestObject {
-        return TestObject(
+    fun get(): TestObject =
+        TestObject(
             tekst = "abc",
             dato = LocalDate.of(2023, 1, 1),
             tidspunkt = LocalDateTime.of(2023, 1, 1, 12, 0, 3),
         )
-    }
 
     @PostMapping
-    fun post(@RequestBody testObject: TestObject): TestObject {
-        return testObject
-    }
+    fun post(
+        @RequestBody testObject: TestObject,
+    ): TestObject = testObject
 
     @GetMapping("error")
     fun error() {
@@ -162,9 +165,7 @@ class TestController {
 
     @GetMapping("azuread")
     @ProtectedWithClaims(issuer = "azuread")
-    fun getMedAzureAd(): TestObject {
-        return get()
-    }
+    fun getMedAzureAd(): TestObject = get()
 }
 
 data class TestObject(

@@ -8,4 +8,7 @@ data class Søkeresultat(
     val fagsakPersonId: FagsakPersonId?,
 )
 
-data class SøkeresultatUtenFagsak(val personIdent: String, val navn: String)
+data class SøkeresultatUtenFagsak(
+    val personIdent: String,
+    val navn: String,
+)

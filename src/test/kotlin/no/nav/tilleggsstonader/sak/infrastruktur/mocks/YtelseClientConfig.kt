@@ -19,7 +19,6 @@ import java.time.LocalDate
 @Configuration
 @Profile("mock-ytelse-client")
 class YtelseClientConfig {
-
     @Bean
     @Primary
     fun ytelseClient(): YtelseClient {
@@ -28,31 +27,35 @@ class YtelseClientConfig {
         every { client.hentYtelser(any()) } answers {
             val request = firstArg<YtelsePerioderRequest>()
 
-            val perioder = request.typer.map { type ->
-                val ensligForsørgerStønadstype =
-                    if (type == TypeYtelsePeriode.ENSLIG_FORSØRGER) {
-                        EnsligForsørgerStønadstype.OVERGANGSSTØNAD
-                    } else {
-                        null
-                    }
-                YtelsePeriode(
-                    type = type,
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now(),
-                    ensligForsørgerStønadstype = ensligForsørgerStønadstype,
-                )
-            }.toMutableList()
+            val perioder =
+                request.typer
+                    .map { type ->
+                        val ensligForsørgerStønadstype =
+                            if (type == TypeYtelsePeriode.ENSLIG_FORSØRGER) {
+                                EnsligForsørgerStønadstype.OVERGANGSSTØNAD
+                            } else {
+                                null
+                            }
+                        YtelsePeriode(
+                            type = type,
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now(),
+                            ensligForsørgerStønadstype = ensligForsørgerStønadstype,
+                        )
+                    }.toMutableList()
             if (request.typer.contains(TypeYtelsePeriode.AAP)) {
-                perioder += YtelsePeriode(
-                    type = TypeYtelsePeriode.AAP,
-                    fom = LocalDate.now().plusDays(1),
-                    tom = LocalDate.now().plusDays(1),
-                    aapErFerdigAvklart = true,
-                )
+                perioder +=
+                    YtelsePeriode(
+                        type = TypeYtelsePeriode.AAP,
+                        fom = LocalDate.now().plusDays(1),
+                        tom = LocalDate.now().plusDays(1),
+                        aapErFerdigAvklart = true,
+                    )
             }
-            val hentetInformasjon = request.typer.map {
-                HentetInformasjon(type = it, status = StatusHentetInformasjon.OK)
-            }
+            val hentetInformasjon =
+                request.typer.map {
+                    HentetInformasjon(type = it, status = StatusHentetInformasjon.OK)
+                }
             YtelsePerioderDto(perioder = perioder, hentetInformasjon = hentetInformasjon)
         }
 

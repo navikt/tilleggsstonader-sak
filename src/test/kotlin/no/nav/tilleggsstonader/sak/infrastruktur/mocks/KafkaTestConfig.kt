@@ -13,7 +13,6 @@ import java.util.concurrent.CompletableFuture
 @Configuration
 @Profile("mock-kafka")
 class KafkaTestConfig {
-
     @Bean
     @Primary
     fun kafkaTemplate(): KafkaTemplate<String, String> {

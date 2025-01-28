@@ -21,7 +21,6 @@ import org.springframework.data.repository.findByIdOrNull
 import java.time.temporal.ChronoUnit
 
 class BrevmottakerFrittståendeBrevRepositoryTest : IntegrationTest() {
-
     @Autowired
     private lateinit var repository: BrevmottakerFrittståendeBrevRepository
 
@@ -38,13 +37,14 @@ class BrevmottakerFrittståendeBrevRepositoryTest : IntegrationTest() {
     @Test
     fun `lagre og hent brevmottaker`() {
         val frittståendeBrev = lagFrittståendeBrev()
-        val brevmottaker = BrevmottakerFrittståendeBrev(
-            fagsakId = fagsak.id,
-            mottaker = mottakerPerson(ident = fagsak.hentAktivIdent()),
-            journalpostId = "123",
-            brevId = frittståendeBrev.id,
-            bestillingId = "bestillingId",
-        )
+        val brevmottaker =
+            BrevmottakerFrittståendeBrev(
+                fagsakId = fagsak.id,
+                mottaker = mottakerPerson(ident = fagsak.hentAktivIdent()),
+                journalpostId = "123",
+                brevId = frittståendeBrev.id,
+                bestillingId = "bestillingId",
+            )
 
         repository.insert(brevmottaker)
 
@@ -62,21 +62,25 @@ class BrevmottakerFrittståendeBrevRepositoryTest : IntegrationTest() {
 
     @Test
     fun `skal ikke kunne lagre to journalpostResultat på samme fagsak med samme mottaker`() {
-        val brevmottaker1 = BrevmottakerFrittståendeBrev(
-            fagsakId = fagsak.id,
-            mottaker = mottakerPerson(
-                ident = "ident",
-                mottakerRolle = MottakerRolle.VERGE,
-            ),
-        )
+        val brevmottaker1 =
+            BrevmottakerFrittståendeBrev(
+                fagsakId = fagsak.id,
+                mottaker =
+                    mottakerPerson(
+                        ident = "ident",
+                        mottakerRolle = MottakerRolle.VERGE,
+                    ),
+            )
 
-        val brevmottaker2 = BrevmottakerFrittståendeBrev(
-            fagsakId = fagsak.id,
-            mottaker = mottakerPerson(
-                ident = "ident",
-                mottakerRolle = MottakerRolle.VERGE,
-            ),
-        )
+        val brevmottaker2 =
+            BrevmottakerFrittståendeBrev(
+                fagsakId = fagsak.id,
+                mottaker =
+                    mottakerPerson(
+                        ident = "ident",
+                        mottakerRolle = MottakerRolle.VERGE,
+                    ),
+            )
 
         repository.insert(brevmottaker1)
         assertThatThrownBy {
@@ -86,18 +90,21 @@ class BrevmottakerFrittståendeBrevRepositoryTest : IntegrationTest() {
 
     @Test
     fun `skal kunne lagre to journalpostResultat på samme fagsak med forskjellige mottakere`() {
-        val brevmottaker = BrevmottakerFrittståendeBrev(
-            fagsakId = fagsak.id,
-            mottaker = mottakerPerson(ident = fagsak.hentAktivIdent()),
-        )
+        val brevmottaker =
+            BrevmottakerFrittståendeBrev(
+                fagsakId = fagsak.id,
+                mottaker = mottakerPerson(ident = fagsak.hentAktivIdent()),
+            )
 
-        val brevmottakerAnnenMottaker = BrevmottakerFrittståendeBrev(
-            fagsakId = fagsak.id,
-            mottaker = mottakerPerson(
-                ident = "ident",
-                mottakerRolle = MottakerRolle.VERGE,
-            ),
-        )
+        val brevmottakerAnnenMottaker =
+            BrevmottakerFrittståendeBrev(
+                fagsakId = fagsak.id,
+                mottaker =
+                    mottakerPerson(
+                        ident = "ident",
+                        mottakerRolle = MottakerRolle.VERGE,
+                    ),
+            )
 
         repository.insert(brevmottaker)
         repository.insert(brevmottakerAnnenMottaker)
@@ -106,29 +113,31 @@ class BrevmottakerFrittståendeBrevRepositoryTest : IntegrationTest() {
         val hentetResultatAnnenMottaker = repository.findByIdOrNull(brevmottakerAnnenMottaker.id)
 
         assertThat(hentetResultat).isNotNull
-        assertThat(hentetResultat).usingRecursiveComparison()
+        assertThat(hentetResultat)
+            .usingRecursiveComparison()
             .ignoringFields("opprettetTid", "sporbar.endret.endretTid")
             .isEqualTo(brevmottaker)
 
         assertThat(hentetResultat).isNotNull
-        assertThat(hentetResultatAnnenMottaker).usingRecursiveComparison()
+        assertThat(hentetResultatAnnenMottaker)
+            .usingRecursiveComparison()
             .ignoringFields("opprettetTid", "sporbar.endret.endretTid")
             .isEqualTo(brevmottakerAnnenMottaker)
     }
 
     @Nested
     inner class ExistsByFagsakIdAndSporbarOpprettetAvAndBrevIdIsNull {
-
         @Test
         fun `skal ikke finne brev når brevId er satt`() {
             val frittståendeBrev = lagFrittståendeBrev()
-            val brev = repository.insert(
-                BrevmottakerFrittståendeBrev(
-                    fagsakId = fagsak.id,
-                    mottaker = mottakerPerson(ident = fagsak.hentAktivIdent()),
-                    brevId = frittståendeBrev.id,
-                ),
-            )
+            val brev =
+                repository.insert(
+                    BrevmottakerFrittståendeBrev(
+                        fagsakId = fagsak.id,
+                        mottaker = mottakerPerson(ident = fagsak.hentAktivIdent()),
+                        brevId = frittståendeBrev.id,
+                    ),
+                )
             val exists =
                 repository.existsByFagsakIdAndSporbarOpprettetAvAndBrevIdIsNull(fagsak.id, brev.sporbar.opprettetAv)
             assertThat(exists).isFalse
@@ -137,29 +146,30 @@ class BrevmottakerFrittståendeBrevRepositoryTest : IntegrationTest() {
 
     @Nested
     inner class FindByFagsakIdAndSporbarOpprettetAvAndBrevIdIsNull {
-
         @Test
         fun `skal ikke finne brev når brevId er satt`() {
             val frittståendeBrev = lagFrittståendeBrev()
-            val brev = repository.insert(
-                BrevmottakerFrittståendeBrev(
-                    fagsakId = fagsak.id,
-                    mottaker = mottakerPerson(ident = fagsak.hentAktivIdent()),
-                    brevId = frittståendeBrev.id,
-                ),
-            )
+            val brev =
+                repository.insert(
+                    BrevmottakerFrittståendeBrev(
+                        fagsakId = fagsak.id,
+                        mottaker = mottakerPerson(ident = fagsak.hentAktivIdent()),
+                        brevId = frittståendeBrev.id,
+                    ),
+                )
             val brevmottakere =
                 repository.findByFagsakIdAndSporbarOpprettetAvAndBrevIdIsNull(fagsak.id, brev.sporbar.opprettetAv)
             assertThat(brevmottakere).isEmpty()
         }
     }
 
-    private fun lagFrittståendeBrev() = frittståendeBrevRepository.insert(
-        FrittståendeBrev(
-            fagsakId = fagsak.id,
-            pdf = Fil("123".toByteArray()),
-            tittel = "",
-            saksbehandlerIdent = "id",
-        ),
-    )
+    private fun lagFrittståendeBrev() =
+        frittståendeBrevRepository.insert(
+            FrittståendeBrev(
+                fagsakId = fagsak.id,
+                pdf = Fil("123".toByteArray()),
+                tittel = "",
+                saksbehandlerIdent = "id",
+            ),
+        )
 }

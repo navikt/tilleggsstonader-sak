@@ -17,26 +17,30 @@ data class StønadsperiodeBeregningsgrunnlag(
     override val tom: LocalDate,
     val målgruppe: MålgruppeType,
     val aktivitet: AktivitetType,
-) : Periode<LocalDate>, KopierPeriode<StønadsperiodeBeregningsgrunnlag> {
+) : Periode<LocalDate>,
+    KopierPeriode<StønadsperiodeBeregningsgrunnlag> {
     init {
         validatePeriode()
     }
 
-    override fun medPeriode(fom: LocalDate, tom: LocalDate): StønadsperiodeBeregningsgrunnlag {
-        return this.copy(fom = fom, tom = tom)
-    }
+    override fun medPeriode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): StønadsperiodeBeregningsgrunnlag = this.copy(fom = fom, tom = tom)
 }
 
-fun Stønadsperiode.tilStønadsperiodeBeregningsgrunnlag() = StønadsperiodeBeregningsgrunnlag(
-    fom = this.fom,
-    tom = this.tom,
-    målgruppe = this.målgruppe,
-    aktivitet = this.aktivitet,
-)
+fun Stønadsperiode.tilStønadsperiodeBeregningsgrunnlag() =
+    StønadsperiodeBeregningsgrunnlag(
+        fom = this.fom,
+        tom = this.tom,
+        målgruppe = this.målgruppe,
+        aktivitet = this.aktivitet,
+    )
 
-fun List<Stønadsperiode>.tilSortertStønadsperiodeBeregningsgrunnlag() = this
-    .map { it.tilStønadsperiodeBeregningsgrunnlag() }
-    .sorted()
+fun List<Stønadsperiode>.tilSortertStønadsperiodeBeregningsgrunnlag() =
+    this
+        .map { it.tilStønadsperiodeBeregningsgrunnlag() }
+        .sorted()
 
 fun List<StønadsperiodeBeregningsgrunnlag>.slåSammenSammenhengende(): List<StønadsperiodeBeregningsgrunnlag> =
     this.mergeSammenhengende(

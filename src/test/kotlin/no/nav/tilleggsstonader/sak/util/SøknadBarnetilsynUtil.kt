@@ -25,24 +25,22 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 object SøknadBarnetilsynUtil {
-
     fun søknadBarnetilsyn(
         data: SkjemaBarnetilsyn = lagSkjemaBarnetilsyn(),
-        barn: Set<SøknadBarn> = setOf(
-            lagSøknadBarn(),
-        ),
-
+        barn: Set<SøknadBarn> =
+            setOf(
+                lagSøknadBarn(),
+            ),
         journalpostId: String = "testId",
         språk: Språkkode = Språkkode.NB,
         mottattTidspunkt: LocalDateTime = LocalDate.of(2023, 1, 1).atStartOfDay().truncatedTo(ChronoUnit.MILLIS),
-    ) =
-        SøknadBarnetilsyn(
-            journalpostId = journalpostId,
-            språk = språk,
-            mottattTidspunkt = mottattTidspunkt,
-            data = data,
-            barn = barn,
-        )
+    ) = SøknadBarnetilsyn(
+        journalpostId = journalpostId,
+        språk = språk,
+        mottattTidspunkt = mottattTidspunkt,
+        data = data,
+        barn = barn,
+    )
 
     fun lagSøknadBarn(
         ident: String = "1",
@@ -72,15 +70,15 @@ object SøknadBarnetilsynUtil {
         dokumentasjon = dokumentasjon,
     )
 
-    fun lagDokumentasjon(
-        identBarn: String? = null,
-    ): Dokumentasjon = Dokumentasjon(
-        type = Vedleggstype.UTGIFTER_PASS_PRIVAT,
-        dokumenter = listOf(
-            Dokument("688ad1dc-e35e-4ab8-a534-17c6e691463f"),
-        ),
-        identBarn = identBarn,
-    )
+    fun lagDokumentasjon(identBarn: String? = null): Dokumentasjon =
+        Dokumentasjon(
+            type = Vedleggstype.UTGIFTER_PASS_PRIVAT,
+            dokumenter =
+                listOf(
+                    Dokument("688ad1dc-e35e-4ab8-a534-17c6e691463f"),
+                ),
+            identBarn = identBarn,
+        )
 
     fun lagAktivitet(
         aktiviteter: List<ValgtAktivitet> = emptyList(),
@@ -92,28 +90,29 @@ object SøknadBarnetilsynUtil {
         lønnetAktivitet = lønnetAktivitet,
     )
 
-    private fun lagHovedytelse(
-        vararg hovedytelse: Hovedytelse = arrayOf(Hovedytelse.AAP),
-    ) = HovedytelseAvsnitt(
-        hovedytelse = hovedytelse.toList(),
-        arbeidOgOpphold = arbeidOgOpphold(),
-    )
+    private fun lagHovedytelse(vararg hovedytelse: Hovedytelse = arrayOf(Hovedytelse.AAP)) =
+        HovedytelseAvsnitt(
+            hovedytelse = hovedytelse.toList(),
+            arbeidOgOpphold = arbeidOgOpphold(),
+        )
 
-    private fun arbeidOgOpphold() = ArbeidOgOpphold(
-        jobberIAnnetLand = JaNei.JA,
-        jobbAnnetLand = "SWE",
-        harPengestøtteAnnetLand = listOf(TypePengestøtte.SYKEPENGER),
-        pengestøtteAnnetLand = "FIN",
-        harOppholdUtenforNorgeSiste12mnd = JaNei.JA,
-        oppholdUtenforNorgeSiste12mnd = listOf(oppholdUtenforNorge()),
-        harOppholdUtenforNorgeNeste12mnd = JaNei.JA,
-        oppholdUtenforNorgeNeste12mnd = listOf(oppholdUtenforNorge()),
-    )
+    private fun arbeidOgOpphold() =
+        ArbeidOgOpphold(
+            jobberIAnnetLand = JaNei.JA,
+            jobbAnnetLand = "SWE",
+            harPengestøtteAnnetLand = listOf(TypePengestøtte.SYKEPENGER),
+            pengestøtteAnnetLand = "FIN",
+            harOppholdUtenforNorgeSiste12mnd = JaNei.JA,
+            oppholdUtenforNorgeSiste12mnd = listOf(oppholdUtenforNorge()),
+            harOppholdUtenforNorgeNeste12mnd = JaNei.JA,
+            oppholdUtenforNorgeNeste12mnd = listOf(oppholdUtenforNorge()),
+        )
 
-    private fun oppholdUtenforNorge() = OppholdUtenforNorge(
-        land = "SWE",
-        årsak = listOf(ÅrsakOppholdUtenforNorge.JOBB),
-        fom = LocalDate.of(2024, 1, 1),
-        tom = LocalDate.of(2024, 1, 1),
-    )
+    private fun oppholdUtenforNorge() =
+        OppholdUtenforNorge(
+            land = "SWE",
+            årsak = listOf(ÅrsakOppholdUtenforNorge.JOBB),
+            fom = LocalDate.of(2024, 1, 1),
+            tom = LocalDate.of(2024, 1, 1),
+        )
 }

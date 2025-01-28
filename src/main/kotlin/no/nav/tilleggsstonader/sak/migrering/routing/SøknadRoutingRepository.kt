@@ -12,9 +12,13 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Repository
-interface SøknadRoutingRepository : RepositoryInterface<SøknadRouting, UUID>, InsertUpdateRepository<SøknadRouting> {
-
-    fun findByIdentAndType(ident: String, type: Stønadstype): SøknadRouting?
+interface SøknadRoutingRepository :
+    RepositoryInterface<SøknadRouting, UUID>,
+    InsertUpdateRepository<SøknadRouting> {
+    fun findByIdentAndType(
+        ident: String,
+        type: Stønadstype,
+    ): SøknadRouting?
 
     fun countByType(type: Stønadstype): Int
 }

@@ -9,7 +9,10 @@ object BrevUtil {
     const val BESLUTTER_SIGNATUR_PLACEHOLDER = "BESLUTTER_SIGNATUR"
     const val BREVDATO_PLACEHOLDER = "BREVDATO_PLACEHOLDER"
 
-    fun settInnSaksbehandlerSignaturOgDato(html: String, saksbehandlerSignatur: String): String {
+    fun settInnSaksbehandlerSignaturOgDato(
+        html: String,
+        saksbehandlerSignatur: String,
+    ): String {
         feilHvisIkke(html.contains(SAKSBEHANDLER_SIGNATUR_PLACEHOLDER)) {
             "Brev-HTML mangler placeholder for saksbehandlersignatur"
         }

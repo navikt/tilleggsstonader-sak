@@ -12,7 +12,6 @@ import java.time.LocalDate
 import java.time.LocalDate.now
 
 class VilkårsoppsummeringUtilTest {
-
     /*
     | fødsel
     # 2 år
@@ -25,7 +24,6 @@ class VilkårsoppsummeringUtilTest {
      */
     @Nested
     inner class StønadsperiodeBarnUnder2ÅrTest {
-
         @Test
         fun `barn uten fødselsdato er under 2 år`() {
             assertThat(
@@ -104,7 +102,9 @@ class VilkårsoppsummeringUtilTest {
 
         private fun barn(localDate: LocalDate?) = lagGrunnlagsdataBarn(fødselsdato = localDate)
 
-        private fun stønadsperiode(fom: LocalDate, tom: LocalDate) =
-            stønadsperiode(BehandlingId.random(), fom = fom, tom = tom).tilDto()
+        private fun stønadsperiode(
+            fom: LocalDate,
+            tom: LocalDate,
+        ) = stønadsperiode(BehandlingId.random(), fom = fom, tom = tom).tilDto()
     }
 }

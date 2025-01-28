@@ -7,11 +7,15 @@ sealed interface FaktaOgVurderingTilsynBarn : FaktaOgVurdering {
     override val type: TypeFaktaOgVurderingTilsynBarn
 }
 
-sealed interface MålgruppeTilsynBarn : MålgruppeFaktaOgVurdering, FaktaOgVurderingTilsynBarn {
+sealed interface MålgruppeTilsynBarn :
+    MålgruppeFaktaOgVurdering,
+    FaktaOgVurderingTilsynBarn {
     override val type: MålgruppeTilsynBarnType
 }
 
-sealed interface AktivitetTilsynBarn : AktivitetFaktaOgVurdering, FaktaOgVurderingTilsynBarn {
+sealed interface AktivitetTilsynBarn :
+    AktivitetFaktaOgVurdering,
+    FaktaOgVurderingTilsynBarn {
     override val type: AktivitetTilsynBarnType
 }
 
@@ -94,7 +98,8 @@ data class VurderingTiltakTilsynBarn(
 
 data class FaktaAktivitetTilsynBarn(
     override val aktivitetsdager: Int,
-) : Fakta, FaktaAktivitetsdager {
+) : Fakta,
+    FaktaAktivitetsdager {
     init {
         require(aktivitetsdager in 1..5) { "Aktivitetsdager må være mellom 1 og 5" }
     }
@@ -104,8 +109,8 @@ sealed interface TypeFaktaOgVurderingTilsynBarn : TypeFaktaOgVurdering
 
 enum class AktivitetTilsynBarnType(
     override val vilkårperiodeType: AktivitetType,
-) : TypeAktivitetOgVurdering, TypeFaktaOgVurderingTilsynBarn {
-
+) : TypeAktivitetOgVurdering,
+    TypeFaktaOgVurderingTilsynBarn {
     UTDANNING_TILSYN_BARN(AktivitetType.UTDANNING),
     TILTAK_TILSYN_BARN(AktivitetType.TILTAK),
     REELL_ARBEIDSSØKER_TILSYN_BARN(AktivitetType.REELL_ARBEIDSSØKER),
@@ -114,8 +119,8 @@ enum class AktivitetTilsynBarnType(
 
 enum class MålgruppeTilsynBarnType(
     override val vilkårperiodeType: MålgruppeType,
-) : TypeMålgruppeOgVurdering, TypeFaktaOgVurderingTilsynBarn {
-
+) : TypeMålgruppeOgVurdering,
+    TypeFaktaOgVurderingTilsynBarn {
     AAP_TILSYN_BARN(MålgruppeType.AAP),
     OMSTILLINGSSTØNAD_TILSYN_BARN(MålgruppeType.OMSTILLINGSSTØNAD),
     OVERGANGSSTØNAD_TILSYN_BARN(MålgruppeType.OVERGANGSSTØNAD),

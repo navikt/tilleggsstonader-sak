@@ -19,7 +19,6 @@ class FrittståendeBrevController(
     private val frittståendeBrevService: FrittståendeBrevService,
     private val tilgangService: TilgangService,
 ) {
-
     @PostMapping
     fun forhåndsvisFrittsåendeSanitybrev(
         @RequestBody request: GenererPdfRequest,

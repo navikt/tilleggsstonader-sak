@@ -48,19 +48,19 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergeEllerFullmektig
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.VergemaalEllerFremtidsfullmakt
 
 object PdlTestdata {
-
     private val metadataGjeldende = Metadata(false)
 
-    val vegadresse = Vegadresse(
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        1L,
-    )
+    val vegadresse =
+        Vegadresse(
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            1L,
+        )
 
     private val matrikkeladresse = Matrikkeladresse(1L, "", "", "")
     private val utenlandskAdresse = UtenlandskAdresse("", "", "", "", "", "", "")
@@ -72,19 +72,20 @@ object PdlTestdata {
     private val adressebeskyttelse =
         listOf(Adressebeskyttelse(AdressebeskyttelseGradering.FORTROLIG, metadataGjeldende))
 
-    private val bostedsadresse = listOf(
-        Bostedsadresse(
-            osloDateNow().minusDays(10),
-            osloDateNow(),
-            osloDateNow(),
-            "",
-            utenlandskAdresse,
-            vegadresse,
-            UkjentBosted(""),
-            matrikkeladresse,
-            metadataGjeldende,
-        ),
-    )
+    private val bostedsadresse =
+        listOf(
+            Bostedsadresse(
+                osloDateNow().minusDays(10),
+                osloDateNow(),
+                osloDateNow(),
+                "",
+                utenlandskAdresse,
+                vegadresse,
+                UkjentBosted(""),
+                matrikkeladresse,
+                metadataGjeldende,
+            ),
+        )
 
     private val dødsfall = listOf(Dødsfall(osloDateNow()))
 
@@ -95,17 +96,18 @@ object PdlTestdata {
 
     private val opphold = listOf(Opphold(Oppholdstillatelse.MIDLERTIDIG, osloDateNow(), osloDateNow()))
 
-    private val oppholdsadresse = listOf(
-        Oppholdsadresse(
-            osloDateNow(),
-            null,
-            "",
-            utenlandskAdresse,
-            vegadresse,
-            "",
-            metadataGjeldende,
-        ),
-    )
+    private val oppholdsadresse =
+        listOf(
+            Oppholdsadresse(
+                osloDateNow(),
+                null,
+                "",
+                utenlandskAdresse,
+                vegadresse,
+                "",
+                metadataGjeldende,
+            ),
+        )
 
     private val statsborgerskap = listOf(Statsborgerskap("", osloDateNow(), osloDateNow()))
 
@@ -115,13 +117,14 @@ object PdlTestdata {
 
     val søkerIdentifikator = "1"
 
-    val folkeregisteridentifikatorSøker = listOf(
-        Folkeregisteridentifikator(
-            søkerIdentifikator,
-            FolkeregisteridentifikatorStatus.I_BRUK,
-            metadataGjeldende,
-        ),
-    )
+    val folkeregisteridentifikatorSøker =
+        listOf(
+            Folkeregisteridentifikator(
+                søkerIdentifikator,
+                FolkeregisteridentifikatorStatus.I_BRUK,
+                metadataGjeldende,
+            ),
+        )
 
     val pdlSøkerData =
         PdlSøkerData(
@@ -188,13 +191,14 @@ object PdlTestdata {
 
     val ennenForelderIdentifikator = "2"
 
-    val folkeregisteridentifikatorAnnenForelder = listOf(
-        Folkeregisteridentifikator(
-            ennenForelderIdentifikator,
-            FolkeregisteridentifikatorStatus.I_BRUK,
-            metadataGjeldende,
-        ),
-    )
+    val folkeregisteridentifikatorAnnenForelder =
+        listOf(
+            Folkeregisteridentifikator(
+                ennenForelderIdentifikator,
+                FolkeregisteridentifikatorStatus.I_BRUK,
+                metadataGjeldende,
+            ),
+        )
 
     val pdlAnnenForelderData =
         PersonBolk(
@@ -214,34 +218,37 @@ object PdlTestdata {
             ),
         )
 
-    val pdlPersonKortBolk = PersonBolk(
-        listOf(
-            PersonDataBolk(
-                "11111122222",
-                "ok",
-                PdlPersonKort(
-                    adressebeskyttelse,
-                    navn,
-                    dødsfall,
-                ),
-            ),
-        ),
-    )
-
-    val pdlPersonSøk = PersonSøk(
-        PersonSøkResultat(
-            hits = listOf(
-                PersonSøkTreff(
-                    PdlPersonFraSøk(
-                        listOf(FolkeregisteridentifikatorFraSøk("123456789")),
-                        bostedsadresse,
+    val pdlPersonKortBolk =
+        PersonBolk(
+            listOf(
+                PersonDataBolk(
+                    "11111122222",
+                    "ok",
+                    PdlPersonKort(
+                        adressebeskyttelse,
                         navn,
+                        dødsfall,
                     ),
                 ),
             ),
-            totalHits = 1,
-            pageNumber = 1,
-            totalPages = 1,
-        ),
-    )
+        )
+
+    val pdlPersonSøk =
+        PersonSøk(
+            PersonSøkResultat(
+                hits =
+                    listOf(
+                        PersonSøkTreff(
+                            PdlPersonFraSøk(
+                                listOf(FolkeregisteridentifikatorFraSøk("123456789")),
+                                bostedsadresse,
+                                navn,
+                            ),
+                        ),
+                    ),
+                totalHits = 1,
+                pageNumber = 1,
+                totalPages = 1,
+            ),
+        )
 }

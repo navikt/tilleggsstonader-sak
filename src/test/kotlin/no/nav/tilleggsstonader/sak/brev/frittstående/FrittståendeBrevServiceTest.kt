@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 internal class FrittståendeBrevServiceTest : IntegrationTest() {
-
     @Autowired
     lateinit var frittståendeBrevService: FrittståendeBrevService
 
@@ -85,8 +84,12 @@ internal class FrittståendeBrevServiceTest : IntegrationTest() {
         assertThat(tasks.map { it.payload }.firstOrNull { it.contains(mottaker2.id.toString()) }).isNotNull
     }
 
+    /*
+     * skal oppdatere brevmottaker med brevId når man sender frittstående brev sånn at brevmottakeren senere ikke
+     * lengre vises for saksbehandler for nytt brev
+     */
     @Test
-    fun `skal oppdatere brevmottaker med brevId når man sender frittstående brev sånn at brevmottakeren senere ikke lengre vises for saksbehandler for nytt brev`() {
+    fun `skal oppdatere brevmottaker med brevId når man sender frittstående brev`() {
         val mottaker1 =
             brevmottakerFrittståendeBrevRepository.insert(brevmottakerFrittståendeBrev(mottakerPerson(ident = "ident1")))
 
@@ -116,10 +119,15 @@ internal class FrittståendeBrevServiceTest : IntegrationTest() {
     }
 
     private fun opprettMellomlagretBrevForAnnenSaksbehandler(): MellomlagretFrittståendeBrev {
-        val mellomlagretBrev = MellomlagretFrittståendeBrev(fagsakId = fagsak.id, brevmal = "", brevverdier = "", sporbar = Sporbar(opprettetAv = "annen"))
+        val mellomlagretBrev =
+            MellomlagretFrittståendeBrev(
+                fagsakId = fagsak.id,
+                brevmal = "",
+                brevverdier = "",
+                sporbar = Sporbar(opprettetAv = "annen"),
+            )
         return mellomlagerFrittståendeBrevRepository.insert(mellomlagretBrev)
     }
 
-    private fun brevmottakerFrittståendeBrev(mottaker: Mottaker) =
-        BrevmottakerFrittståendeBrev(fagsakId = fagsak.id, mottaker = mottaker)
+    private fun brevmottakerFrittståendeBrev(mottaker: Mottaker) = BrevmottakerFrittståendeBrev(fagsakId = fagsak.id, mottaker = mottaker)
 }

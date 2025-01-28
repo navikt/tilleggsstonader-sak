@@ -31,14 +31,15 @@ class OppgaveController(
     private val tilgangService: TilgangService,
     private val fagsakPersonService: FagsakPersonService,
 ) {
-
     @PostMapping("/soek")
-    fun hentOppgaver(@RequestBody finnOppgaveRequest: FinnOppgaveRequestDto): FinnOppgaveResponseDto {
-        return oppgaveService.hentOppgaver(finnOppgaveRequest)
-    }
+    fun hentOppgaver(
+        @RequestBody finnOppgaveRequest: FinnOppgaveRequestDto,
+    ): FinnOppgaveResponseDto = oppgaveService.hentOppgaver(finnOppgaveRequest)
 
     @GetMapping("/soek/person/{fagsakPersonId}")
-    fun hentOppgaverForPerson(@PathVariable fagsakPersonId: FagsakPersonId): FinnOppgaveResponseDto {
+    fun hentOppgaverForPerson(
+        @PathVariable fagsakPersonId: FagsakPersonId,
+    ): FinnOppgaveResponseDto {
         val personIdent = fagsakPersonService.hentAktivIdent(fagsakPersonId)
         tilgangService.validerTilgangTilPerson(personIdent, AuditLoggerEvent.ACCESS)
 

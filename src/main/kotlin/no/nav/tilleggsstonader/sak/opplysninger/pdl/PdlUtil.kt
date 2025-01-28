@@ -12,9 +12,10 @@ import org.springframework.http.HttpHeaders
 val logger: Logger = LoggerFactory.getLogger(PdlClient::class.java)
 
 object PdlUtil {
-    val httpHeaders = HttpHeaders().apply {
-        add("behandlingsnummer", "B289")
-    }
+    val httpHeaders =
+        HttpHeaders().apply {
+            add("behandlingsnummer", "B289")
+        }
 }
 
 inline fun <reified DATA : Any, reified RESULT : Any> feilsjekkOgReturnerData(
@@ -51,7 +52,10 @@ inline fun <reified RESULT : Any> feilsjekkOgReturnerData(pdlResponse: PdlBolkRe
         throw PdlRequestException("Data er null fra PDL -  ${RESULT::class}. Se secure logg for detaljer.")
     }
 
-    val feil = pdlResponse.data.personBolk.filter { it.code != "ok" }.associate { it.ident to it.code }
+    val feil =
+        pdlResponse.data.personBolk
+            .filter { it.code != "ok" }
+            .associate { it.ident to it.code }
     if (feil.isNotEmpty()) {
         secureLogger.error("Feil ved henting av ${RESULT::class} fra PDL: $feil")
         throw PdlRequestException("Feil ved henting av ${RESULT::class} fra PDL. Se secure logg for detaljer.")
@@ -69,7 +73,10 @@ fun feilmeldOgReturnerData(pdlResponse: PdlIdentBolkResponse): Map<String, PdlId
         throw PdlRequestException("Data er null fra PDL -  ${PdlIdentBolkResponse::class}. Se secure logg for detaljer.")
     }
 
-    val feil = pdlResponse.data.hentIdenterBolk.filter { it.code != "ok" }.associate { it.ident to it.code }
+    val feil =
+        pdlResponse.data.hentIdenterBolk
+            .filter { it.code != "ok" }
+            .associate { it.ident to it.code }
     if (feil.isNotEmpty()) {
         // Logg feil og gå vider. Ved feil returneres nåværende ident.
         logger.error("Feil ved henting av ${PdlIdentBolkResponse::class}. Nåværende ident returnert.")

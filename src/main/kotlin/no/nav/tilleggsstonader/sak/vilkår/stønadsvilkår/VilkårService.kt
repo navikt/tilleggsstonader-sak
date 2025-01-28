@@ -53,7 +53,6 @@ class VilkårService(
     private val behandlingFaktaService: BehandlingFaktaService,
     private val fagsakService: FagsakService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
@@ -100,15 +99,17 @@ class VilkårService(
         vilkår: Vilkår,
         lagreVilkårDto: LagreVilkårDto,
     ): Vilkår {
-        val vurderingsresultat = OppdaterVilkår.validerVilkårOgBeregnResultat(
-            vilkår = vilkår,
-            oppdatering = lagreVilkårDto,
-        )
-        val oppdatertVilkår = OppdaterVilkår.oppdaterVilkår(
-            vilkår = vilkår,
-            oppdatering = lagreVilkårDto,
-            vilkårsresultat = vurderingsresultat,
-        )
+        val vurderingsresultat =
+            OppdaterVilkår.validerVilkårOgBeregnResultat(
+                vilkår = vilkår,
+                oppdatering = lagreVilkårDto,
+            )
+        val oppdatertVilkår =
+            OppdaterVilkår.oppdaterVilkår(
+                vilkår = vilkår,
+                oppdatering = lagreVilkårDto,
+                vilkårsresultat = vurderingsresultat,
+            )
         return oppdatertVilkår
     }
 
@@ -147,23 +148,28 @@ class VilkårService(
         vilkår: Vilkår,
     ): VilkårDto {
         val metadata = hentHovedregelMetadata(behandlingId)
-        val nyeDelvilkår = hentVilkårsregel(vilkår.type).initiereDelvilkår(
-            metadata,
-            Vilkårsresultat.SKAL_IKKE_VURDERES,
-        )
+        val nyeDelvilkår =
+            hentVilkårsregel(vilkår.type).initiereDelvilkår(
+                metadata,
+                Vilkårsresultat.SKAL_IKKE_VURDERES,
+            )
         val delvilkårWrapper = DelvilkårWrapper(nyeDelvilkår)
-        return vilkårRepository.update(
-            vilkår.copy(
-                resultat = Vilkårsresultat.SKAL_IKKE_VURDERES,
-                delvilkårwrapper = delvilkårWrapper,
-                opphavsvilkår = null,
-            ),
-        ).tilDto()
+        return vilkårRepository
+            .update(
+                vilkår.copy(
+                    resultat = Vilkårsresultat.SKAL_IKKE_VURDERES,
+                    delvilkårwrapper = delvilkårWrapper,
+                    opphavsvilkår = null,
+                ),
+            ).tilDto()
     }
 
     private fun hentHovedregelMetadata(behandlingId: BehandlingId) = hentGrunnlagOgMetadata(behandlingId).second
 
-    private fun validerBehandlingOgVilkårType(behandlingId: BehandlingId, vilkårType: VilkårType) {
+    private fun validerBehandlingOgVilkårType(
+        behandlingId: BehandlingId,
+        vilkårType: VilkårType,
+    ) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
         validerBehandling(behandling)
@@ -178,7 +184,10 @@ class VilkårService(
         validerLåstForVidereRedigering(behandling)
     }
 
-    private fun validerBarnFinnesPåBehandling(metadata: HovedregelMetadata, opprettVilkårDto: OpprettVilkårDto) {
+    private fun validerBarnFinnesPåBehandling(
+        metadata: HovedregelMetadata,
+        opprettVilkårDto: OpprettVilkårDto,
+    ) {
         val barnIderPåBehandling = metadata.barn.map { it.id }.toSet()
         feilHvisIkke(barnIderPåBehandling.contains(opprettVilkårDto.barnId)) {
             "Finner ikke barn på behandling"
@@ -195,7 +204,10 @@ class VilkårService(
      * Tilgangskontroll sjekker att man har tilgang til behandlingId som blir sendt inn, men det er mulig å sende inn
      * en annen behandlingId enn den som er på vilkåret
      */
-    private fun validerBehandlingIdErLikIRequestOgIVilkåret(behandlingId: BehandlingId, requestBehandlingId: BehandlingId) {
+    private fun validerBehandlingIdErLikIRequestOgIVilkåret(
+        behandlingId: BehandlingId,
+        requestBehandlingId: BehandlingId,
+    ) {
         if (behandlingId != requestBehandlingId) {
             throw Feil(
                 "BehandlingId=$requestBehandlingId er ikke lik vilkårets sin behandlingId=$behandlingId",
@@ -223,9 +235,7 @@ class VilkårService(
         return vilkårsett.map { it.tilDto() }
     }
 
-    fun hentVilkår(behandlingId: BehandlingId): List<Vilkår> {
-        return vilkårRepository.findByBehandlingId(behandlingId)
-    }
+    fun hentVilkår(behandlingId: BehandlingId): List<Vilkår> = vilkårRepository.findByBehandlingId(behandlingId)
 
     @Transactional
     fun oppdaterGrunnlagsdataOgHentEllerOpprettVurderinger(behandlingId: BehandlingId): VilkårsvurderingDto {
@@ -243,10 +253,10 @@ class VilkårService(
     private fun hentVilkår(
         behandlingId: BehandlingId,
         metadata: HovedregelMetadata,
-    ): List<Vilkår> {
-        return vilkårRepository.findByBehandlingId(behandlingId)
+    ): List<Vilkår> =
+        vilkårRepository
+            .findByBehandlingId(behandlingId)
             .sortedWith(compareBy({ it.fom }, { it.tom }))
-    }
 
     /*private fun finnEndringerIGrunnlagsdata(behandlingId: UUID): List<GrunnlagsdataEndring> {
         val oppdaterteGrunnlagsdata = grunnlagsdataService.hentFraRegister(behandlingId)
@@ -265,11 +275,12 @@ class VilkårService(
         val tidligereVurderinger =
             vilkårRepository.findByBehandlingId(forrigeBehandlingId).associateBy { it.id }
 
-        val kopiAvVurderinger = lagKopiAvTidligereVurderinger(
-            tidligereVurderinger,
-            nyBehandling.id,
-            barnIdMap,
-        )
+        val kopiAvVurderinger =
+            lagKopiAvTidligereVurderinger(
+                tidligereVurderinger,
+                nyBehandling.id,
+                barnIdMap,
+            )
 
         vilkårRepository.insertAll(kopiAvVurderinger)
     }
@@ -284,7 +295,10 @@ class VilkårService(
             vilkår.kopierTilBehandling(nyBehandlingsId, barnIdINyBehandling)
         }
 
-    private fun finnBarnId(barnId: BarnId?, barnIdMap: Map<BarnId, BarnId>): BarnId? =
+    private fun finnBarnId(
+        barnId: BarnId?,
+        barnIdMap: Map<BarnId, BarnId>,
+    ): BarnId? =
         barnId?.let {
             barnIdMap[it]
                 ?: error("Fant ikke barn=$it på gjeldende behandling med barnIdMapping=$barnIdMap")
@@ -296,13 +310,12 @@ class VilkårService(
         return VilkårsresultatUtil.erAlleVilkårOppfylt(lagretVilkårsett, stønadstype)
     }
 
-    fun hentOppfyltePassBarnVilkår(behandlingId: BehandlingId): List<Vilkår> {
-        return hentPassBarnVilkår(behandlingId)
+    fun hentOppfyltePassBarnVilkår(behandlingId: BehandlingId): List<Vilkår> =
+        hentPassBarnVilkår(behandlingId)
             .filter { it.resultat == Vilkårsresultat.OPPFYLT }
-    }
 
-    fun hentPassBarnVilkår(behandlingId: BehandlingId): List<Vilkår> {
-        return vilkårRepository.findByBehandlingId(behandlingId)
+    fun hentPassBarnVilkår(behandlingId: BehandlingId): List<Vilkår> =
+        vilkårRepository
+            .findByBehandlingId(behandlingId)
             .filter { it.type == VilkårType.PASS_BARN }
-    }
 }

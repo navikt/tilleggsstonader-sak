@@ -22,9 +22,11 @@ class BrevController(
     private val behandlingService: BehandlingService,
     private val brevService: BrevService,
 ) {
-
     @PostMapping("/{behandlingId}")
-    fun genererPdf(@RequestBody request: GenererPdfRequest, @PathVariable behandlingId: BehandlingId): ByteArray {
+    fun genererPdf(
+        @RequestBody request: GenererPdfRequest,
+        @PathVariable behandlingId: BehandlingId,
+    ): ByteArray {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
         tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.UPDATE)
@@ -34,14 +36,18 @@ class BrevController(
     }
 
     @GetMapping("/{behandlingId}")
-    fun hentBrev(@PathVariable behandlingId: BehandlingId): ByteArray {
+    fun hentBrev(
+        @PathVariable behandlingId: BehandlingId,
+    ): ByteArray {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
 
         return Base64.getEncoder().encode(brevService.hentBeslutterbrevEllerRekonstruerSaksbehandlerBrev(behandlingId))
     }
 
     @GetMapping("/beslutter/{behandlingId}")
-    fun forhåndsvisBeslutterbrev(@PathVariable behandlingId: BehandlingId): ByteArray {
+    fun forhåndsvisBeslutterbrev(
+        @PathVariable behandlingId: BehandlingId,
+    ): ByteArray {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         tilgangService.validerTilgangTilBehandling(saksbehandling, AuditLoggerEvent.ACCESS)
 

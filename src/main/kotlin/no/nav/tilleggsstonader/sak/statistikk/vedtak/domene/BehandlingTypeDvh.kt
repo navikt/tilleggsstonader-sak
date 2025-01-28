@@ -8,9 +8,10 @@ enum class BehandlingTypeDvh {
     ;
 
     companion object {
-        fun fraDomene(type: BehandlingType) = when (type) {
-            BehandlingType.FØRSTEGANGSBEHANDLING -> FØRSTEGANGSBEHANDLING
-            BehandlingType.REVURDERING -> REVURDERING
-        }
+        fun fraDomene(type: BehandlingType) =
+            when (type) {
+                BehandlingType.FØRSTEGANGSBEHANDLING -> FØRSTEGANGSBEHANDLING
+                BehandlingType.REVURDERING -> REVURDERING
+            }
     }
 }

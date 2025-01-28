@@ -8,21 +8,23 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodet
 import kotlin.io.path.name
 
 object FaktaVurderingerJsonFilesUtil {
-
-    val jsonFiler = FileUtil.listDir("vilkår/vilkårperiode").flatMap { dir ->
-        val dirPath = "vilkår/vilkårperiode/${dir.fileName.fileName}"
-        FileUtil.listFiles(dirPath)
-            .map { JsonFil(dirPath, it.fileName.name) }
-    }
+    val jsonFiler =
+        FileUtil.listDir("vilkår/vilkårperiode").flatMap { dir ->
+            val dirPath = "vilkår/vilkårperiode/${dir.fileName.fileName}"
+            FileUtil
+                .listFiles(dirPath)
+                .map { JsonFil(dirPath, it.fileName.name) }
+        }
 
     /**
      * Brukes også som dir-name for json-filer
      */
-    fun Stønadstype.tilTypeFaktaOgVurderingSuffix() = when (this) {
-        Stønadstype.BARNETILSYN -> "TILSYN_BARN"
-        Stønadstype.LÆREMIDLER -> "LÆREMIDLER"
-        else -> name
-    }
+    fun Stønadstype.tilTypeFaktaOgVurderingSuffix() =
+        when (this) {
+            Stønadstype.BARNETILSYN -> "TILSYN_BARN"
+            Stønadstype.LÆREMIDLER -> "LÆREMIDLER"
+            else -> name
+        }
 
     /**
      * @param dirPath vilkår/vilkårperiode/TILSYN_BARN
@@ -32,7 +34,6 @@ object FaktaVurderingerJsonFilesUtil {
         val dirPath: String,
         val fileName: String,
     ) {
-
         /**
          * Ex vilkår/vilkårperiode/TILSYN_BARN/UTDANNING_TILSYN_BARN.json
          */
@@ -56,8 +57,6 @@ object FaktaVurderingerJsonFilesUtil {
                 .second
         }
 
-        override fun toString(): String {
-            return fileName
-        }
+        override fun toString(): String = fileName
     }
 }

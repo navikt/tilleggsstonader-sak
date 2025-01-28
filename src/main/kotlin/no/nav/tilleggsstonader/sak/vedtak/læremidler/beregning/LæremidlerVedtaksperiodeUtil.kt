@@ -9,14 +9,14 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import java.time.LocalDate
 
 object LæremidlerVedtaksperiodeUtil {
-
     /**
      * Vedtaksperiode deles i ulike år då nytt år betyr ny termine og ikke skal utbetales direkte
      * For å innvilge høst og vår i 2 ulike perioder og der vårterminen får en ny sats
      */
-    fun List<Vedtaksperiode>.splitVedtaksperiodePerÅr(): List<VedtaksperiodeInnenforÅr> = this
-        .map { it.splitPerÅr { fom, tom -> VedtaksperiodeInnenforÅr(fom, tom) } }
-        .flatten()
+    fun List<Vedtaksperiode>.splitVedtaksperiodePerÅr(): List<VedtaksperiodeInnenforÅr> =
+        this
+            .map { it.splitPerÅr { fom, tom -> VedtaksperiodeInnenforÅr(fom, tom) } }
+            .flatten()
 
     /**
      * Splitter en periode i løpende måneder. Løpende måned er fra dagens dato og en måned frem i tiden.
@@ -29,14 +29,15 @@ object LæremidlerVedtaksperiodeUtil {
         val perioder = mutableListOf<VAL>()
         var gjeldendeFom = fom
         while (gjeldendeFom <= tom) {
-            val nyTom = if (skalKutteSistePeriode) {
-                minOf(
-                    gjeldendeFom.sisteDagenILøpendeMåned(),
-                    tom,
-                )
-            } else {
-                gjeldendeFom.sisteDagenILøpendeMåned()
-            }
+            val nyTom =
+                if (skalKutteSistePeriode) {
+                    minOf(
+                        gjeldendeFom.sisteDagenILøpendeMåned(),
+                        tom,
+                    )
+                } else {
+                    gjeldendeFom.sisteDagenILøpendeMåned()
+                }
 
             val nyPeriode = medNyPeriode(gjeldendeFom, nyTom)
             if (nyPeriode.harDatoerIUkedager()) {
@@ -48,11 +49,12 @@ object LæremidlerVedtaksperiodeUtil {
         return perioder
     }
 
-    fun LocalDate.sisteDagenILøpendeMåned(): LocalDate =
-        this.plusMonths(1).minusDays(1)
+    fun LocalDate.sisteDagenILøpendeMåned(): LocalDate = this.plusMonths(1).minusDays(1)
 
-    private fun <P : Periode<LocalDate>> P.harDatoerIUkedager(): Boolean = this.alleDatoer()
-        .any { dato -> !dato.lørdagEllerSøndag() }
+    private fun <P : Periode<LocalDate>> P.harDatoerIUkedager(): Boolean =
+        this
+            .alleDatoer()
+            .any { dato -> !dato.lørdagEllerSøndag() }
 }
 
 data class VedtaksperiodeInnenforÅr(

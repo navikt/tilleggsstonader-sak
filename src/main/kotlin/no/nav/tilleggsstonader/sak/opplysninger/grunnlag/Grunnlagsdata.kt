@@ -39,11 +39,10 @@ data class Navn(
     val mellomnavn: String?,
     val etternavn: String,
 ) {
-    fun visningsnavn(): String {
-        return if (mellomnavn == null) {
+    fun visningsnavn(): String =
+        if (mellomnavn == null) {
             "$fornavn $etternavn"
         } else {
             "$fornavn $mellomnavn $etternavn"
         }
-    }
 }

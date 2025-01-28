@@ -12,7 +12,6 @@ import org.springframework.data.repository.findByIdOrNull
 import java.time.temporal.ChronoUnit
 
 internal class BrevRepositoryTest : IntegrationTest() {
-
     @Autowired
     private lateinit var vedtaksbrevRepository: VedtaksbrevRepository
 
@@ -24,15 +23,16 @@ internal class BrevRepositoryTest : IntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
 
-        val vedtaksbrev = Vedtaksbrev(
-            behandlingId = behandling.id,
-            saksbehandlerHtml = "noe html",
-            saksbehandlersignatur = "Sakliga Behandlersen",
-            besluttersignatur = "Beslutter",
-            beslutterPdf = null,
-            saksbehandlerIdent = "123",
-            beslutterIdent = "321",
-        )
+        val vedtaksbrev =
+            Vedtaksbrev(
+                behandlingId = behandling.id,
+                saksbehandlerHtml = "noe html",
+                saksbehandlersignatur = "Sakliga Behandlersen",
+                besluttersignatur = "Beslutter",
+                beslutterPdf = null,
+                saksbehandlerIdent = "123",
+                beslutterIdent = "321",
+            )
 
         vedtaksbrevRepository.insert(vedtaksbrev)
 

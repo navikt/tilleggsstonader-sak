@@ -45,7 +45,6 @@ import org.springframework.data.repository.findByIdOrNull
 import java.util.Properties
 
 class SendTilBeslutterStegTest {
-
     private val taskService = mockk<TaskService>()
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val vedtaksbrevRepository = mockk<VedtaksbrevRepository>()
@@ -65,30 +64,33 @@ class SendTilBeslutterStegTest {
             totrinnskontrollService,
         )
 
-    private val fagsak = fagsak(
-        stønadstype = Stønadstype.BARNETILSYN,
-        identer = setOf(PersonIdent(ident = "12345678901")),
-    )
+    private val fagsak =
+        fagsak(
+            stønadstype = Stønadstype.BARNETILSYN,
+            identer = setOf(PersonIdent(ident = "12345678901")),
+        )
     private val saksbehandlerNavn = "saksbehandlernavn"
-    private val vedtaksbrev = Vedtaksbrev(
-        behandlingId = BehandlingId.random(),
-        saksbehandlersignatur = saksbehandlerNavn,
-        beslutterPdf = null,
-        saksbehandlerIdent = saksbehandlerNavn,
-        saksbehandlerHtml = "",
-    )
+    private val vedtaksbrev =
+        Vedtaksbrev(
+            behandlingId = BehandlingId.random(),
+            saksbehandlersignatur = saksbehandlerNavn,
+            beslutterPdf = null,
+            saksbehandlerIdent = saksbehandlerNavn,
+            saksbehandlerHtml = "",
+        )
 
-    private val behandling = saksbehandling(
-        fagsak,
-        behandling(
-            fagsak = fagsak,
-            type = BehandlingType.FØRSTEGANGSBEHANDLING,
-            status = BehandlingStatus.UTREDES,
-            steg = beslutteVedtakSteg.stegType(),
-            resultat = BehandlingResultat.IKKE_SATT,
-            årsak = BehandlingÅrsak.SØKNAD,
-        ),
-    )
+    private val behandling =
+        saksbehandling(
+            fagsak,
+            behandling(
+                fagsak = fagsak,
+                type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                status = BehandlingStatus.UTREDES,
+                steg = beslutteVedtakSteg.stegType(),
+                resultat = BehandlingResultat.IKKE_SATT,
+                årsak = BehandlingÅrsak.SØKNAD,
+            ),
+        )
 
     private val revurdering =
         behandling.copy(type = BehandlingType.REVURDERING, resultat = INNVILGET)

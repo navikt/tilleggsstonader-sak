@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20241112093526_694e258"
 val tilleggsstønaderLibsVersion = "2025.01.21-10.26.933160d62458"
-val tilleggsstønaderKontrakterVersion = "2025.01.16-08.34.10d3c882ca46"
+val tilleggsstønaderKontrakterVersion = "2025.01.24-07.46.4cb66d85aaca"
 val tokenSupportVersion = "5.0.11"
 val wiremockVersion = "3.9.2"
 val mockkVersion = "1.13.12"
@@ -18,7 +18,7 @@ plugins {
     application
 
     kotlin("jvm") version "2.0.21"
-    id("com.diffplug.spotless") version "6.25.0"
+    id("com.diffplug.spotless") version "7.0.2"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
 
@@ -42,7 +42,7 @@ apply(plugin = "com.diffplug.spotless")
 
 spotless {
     kotlin {
-        ktlint("0.50.0")
+        ktlint("1.5.0")
     }
 }
 
@@ -84,7 +84,7 @@ dependencies {
     // For auditlogger. August, 2014, men det er den som blir brukt på NAV
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
 
-    //Kafka
+    // Kafka
     implementation("org.springframework.kafka:spring-kafka")
 
     // Test

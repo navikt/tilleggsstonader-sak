@@ -26,12 +26,9 @@ class SimuleringService(
     private val tilgangService: TilgangService,
     private val iverksettService: IverksettService,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun hentLagretSimulering(behandlingId: BehandlingId): Simuleringsresultat? {
-        return simuleringsresultatRepository.findByIdOrNull(behandlingId)
-    }
+    fun hentLagretSimulering(behandlingId: BehandlingId): Simuleringsresultat? = simuleringsresultatRepository.findByIdOrNull(behandlingId)
 
     fun slettSimuleringForBehandling(saksbehandling: Saksbehandling) {
         val behandlingId = saksbehandling.id

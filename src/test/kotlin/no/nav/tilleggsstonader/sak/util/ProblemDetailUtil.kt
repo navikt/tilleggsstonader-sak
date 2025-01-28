@@ -8,18 +8,15 @@ import org.springframework.http.ProblemDetail
 import org.springframework.web.client.RestClientResponseException
 
 object ProblemDetailUtil {
-
-    fun catchProblemDetailException(fn: () -> Unit): ProblemDetailException {
-        return catchThrowableOfType<ProblemDetailException> {
+    fun catchProblemDetailException(fn: () -> Unit): ProblemDetailException =
+        catchThrowableOfType<ProblemDetailException> {
             execWithErrorHandler(fn)
         }
-    }
 
-    fun catchHttpException(fn: () -> Unit): RestClientResponseException {
-        return catchThrowableOfType<RestClientResponseException> {
+    fun catchHttpException(fn: () -> Unit): RestClientResponseException =
+        catchThrowableOfType<RestClientResponseException> {
             execWithErrorHandler(fn)
         }
-    }
 
     fun <T> execWithErrorHandler(fn: () -> T): T {
         try {

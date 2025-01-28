@@ -5,10 +5,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class StudienivåTest {
-
     @Nested
     inner class Prioritet {
-
         @Test
         fun `må ha unike prioriteter`() {
             val prioriteter = Studienivå.entries.map { it.prioritet }

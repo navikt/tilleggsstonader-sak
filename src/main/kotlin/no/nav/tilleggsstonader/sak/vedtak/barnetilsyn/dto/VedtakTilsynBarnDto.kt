@@ -18,7 +18,10 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
     JsonSubTypes.Type(OpphørTilsynBarnRequest::class, name = "OPPHØR"),
     failOnRepeatedNames = true,
 )
-sealed class VedtakTilsynBarnDto(open val type: TypeVedtak)
+sealed class VedtakTilsynBarnDto(
+    open val type: TypeVedtak,
+)
 
 sealed interface VedtakTilsynBarnRequest : VedtakRequest
+
 sealed interface VedtakTilsynBarnResponse : VedtakResponse

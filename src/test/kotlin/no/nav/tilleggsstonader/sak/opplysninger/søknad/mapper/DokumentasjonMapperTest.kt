@@ -14,23 +14,25 @@ import java.util.UUID
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument as DokumentDomain
 
 class DokumentasjonMapperTest {
-
     val vedlegg1 = Dokument(UUID.fromString("6782bb66-4d5e-491e-a8a5-dff8a35b0982"), "tittel")
     val vedlegg2 = Dokument(UUID.fromString("dab1e324-0a27-4fd1-ad67-c4e962b2b7c2"), "tittel")
 
-    val dokumentasjon = listOf(
-        lagDokumentasjon(vedlegg = listOf(vedlegg1)),
-        lagDokumentasjon(vedlegg = listOf(vedlegg2), barnId = "barnId"),
-    )
+    val dokumentasjon =
+        listOf(
+            lagDokumentasjon(vedlegg = listOf(vedlegg1)),
+            lagDokumentasjon(vedlegg = listOf(vedlegg2), barnId = "barnId"),
+        )
 
     val skjema = søknadskjemaBarnetilsyn(dokumentasjon = dokumentasjon).skjema
 
-    val journalpost = lagJournalpost(
-        dokumenter = listOf(
-            lagDokument("vedlegg1", vedlegg1.id.toString()),
-            lagDokument("vedlegg2", vedlegg2.id.toString()),
-        ),
-    )
+    val journalpost =
+        lagJournalpost(
+            dokumenter =
+                listOf(
+                    lagDokument("vedlegg1", vedlegg1.id.toString()),
+                    lagDokument("vedlegg2", vedlegg2.id.toString()),
+                ),
+        )
 
     @Test
     fun `skal mappe vedlegg fra søknaden til vedlegg fra journalposten`() {

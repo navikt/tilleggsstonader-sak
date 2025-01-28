@@ -10,19 +10,19 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 internal class VilkårTest {
-
     private val behandlingIdFørstegangsbehandling = BehandlingId.random()
     private val behandlingIdRevurdering = BehandlingId.random()
 
     @Test
     internal fun `opprettOpphavsvilkår - et vilkår som ikke er gjenbrukt skal peke til behandlingen`() {
-        val vilkår = Vilkår(
-            behandlingId = behandlingIdFørstegangsbehandling,
-            delvilkårwrapper = DelvilkårWrapper(emptyList()),
-            type = VilkårType.EKSEMPEL,
-            status = VilkårStatus.NY,
-            opphavsvilkår = null,
-        )
+        val vilkår =
+            Vilkår(
+                behandlingId = behandlingIdFørstegangsbehandling,
+                delvilkårwrapper = DelvilkårWrapper(emptyList()),
+                type = VilkårType.EKSEMPEL,
+                status = VilkårStatus.NY,
+                opphavsvilkår = null,
+            )
         val nyttOpphavsvilkår = vilkår.kopierTilBehandling(BehandlingId.random(), BarnId.random()).opphavsvilkår!!
         assertThat(nyttOpphavsvilkår).isEqualTo(
             Opphavsvilkår(
@@ -32,16 +32,21 @@ internal class VilkårTest {
         )
     }
 
+    /*
+     * opprettOpphavsvilkår - skal bruke opphavsvilkår hvis den finnes og ikke lage en ny, for å peke til den
+     * opprinnelige behandlingen`
+     */
     @Test
-    internal fun `opprettOpphavsvilkår - skal bruke opphavsvilkår hvis den finnes og ikke lage en ny, for å peke til den opprinnelige behandlingen`() {
+    internal fun `opprettOpphavsvilkår skal bruke opphavsvilkår hvis den finnes`() {
         val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, osloNow())
-        val vilkår = Vilkår(
-            behandlingId = behandlingIdRevurdering,
-            delvilkårwrapper = DelvilkårWrapper(emptyList()),
-            type = VilkårType.EKSEMPEL,
-            opphavsvilkår = opphavsvilkår,
-            status = VilkårStatus.UENDRET,
-        )
+        val vilkår =
+            Vilkår(
+                behandlingId = behandlingIdRevurdering,
+                delvilkårwrapper = DelvilkårWrapper(emptyList()),
+                type = VilkårType.EKSEMPEL,
+                opphavsvilkår = opphavsvilkår,
+                status = VilkårStatus.UENDRET,
+            )
         val nyttOpphavsvilkår = vilkår.kopierTilBehandling(BehandlingId.random(), BarnId.random()).opphavsvilkår
         assertThat(nyttOpphavsvilkår).isEqualTo(opphavsvilkår)
     }
@@ -49,13 +54,14 @@ internal class VilkårTest {
     @Test
     internal fun `opprettOpphavsvilkår - skal ikke bruke opphavsvilkår hvis den finnes og vilkåret er endret`() {
         val opphavsvilkår = Opphavsvilkår(behandlingIdFørstegangsbehandling, osloNow())
-        val vilkår = Vilkår(
-            behandlingId = behandlingIdRevurdering,
-            delvilkårwrapper = DelvilkårWrapper(emptyList()),
-            type = VilkårType.EKSEMPEL,
-            opphavsvilkår = opphavsvilkår,
-            status = VilkårStatus.ENDRET,
-        )
+        val vilkår =
+            Vilkår(
+                behandlingId = behandlingIdRevurdering,
+                delvilkårwrapper = DelvilkårWrapper(emptyList()),
+                type = VilkårType.EKSEMPEL,
+                opphavsvilkår = opphavsvilkår,
+                status = VilkårStatus.ENDRET,
+            )
         val nyttOpphavsvilkår = vilkår.kopierTilBehandling(BehandlingId.random(), BarnId.random()).opphavsvilkår!!
         assertThat(nyttOpphavsvilkår.vurderingstidspunkt).isEqualTo(vilkår.sporbar.endret.endretTid)
         assertThat(nyttOpphavsvilkår.behandlingId).isEqualTo(vilkår.behandlingId)

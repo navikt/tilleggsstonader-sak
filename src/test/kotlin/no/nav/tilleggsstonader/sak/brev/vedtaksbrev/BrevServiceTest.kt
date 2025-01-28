@@ -35,7 +35,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.BAD_REQUEST
 
 internal class BrevServiceTest {
-
     private val fagsak = fagsak(setOf(PersonIdent("12345678910")))
     private val behandling = behandling(fagsak)
 
@@ -45,7 +44,7 @@ internal class BrevServiceTest {
 
     private val brevService = BrevService(vedtaksbrevRepository, familieDokumentClient, tilgangService)
 
-    private val vedtaksbrev: Vedtaksbrev = lagVedtaksbrev("malnavn")
+    private val vedtaksbrev: Vedtaksbrev = lagVedtaksbrev()
     private val beslutterNavn = "456"
     private val pdfHtmlSlot = slot<String>()
 
@@ -66,14 +65,15 @@ internal class BrevServiceTest {
     internal fun `lagBeslutterBrev - skal kaste feil hvis behandlingen ikke har riktig steg`() {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev
 
-        val feil = catchThrowableOfType<Feil> {
-            brevService.lagEndeligBeslutterbrev(
-                saksbehandling(
-                    fagsak,
-                    behandlingForBeslutter.copy(steg = StegType.VILKÅR),
-                ),
-            )
-        }
+        val feil =
+            catchThrowableOfType<Feil> {
+                brevService.lagEndeligBeslutterbrev(
+                    saksbehandling(
+                        fagsak,
+                        behandlingForBeslutter.copy(steg = StegType.VILKÅR),
+                    ),
+                )
+            }
         assertThat(feil.message).contains("Behandling er i feil steg")
         assertThat(feil.httpStatus).isEqualTo(BAD_REQUEST)
     }
@@ -82,28 +82,30 @@ internal class BrevServiceTest {
     internal fun `lagBeslutterBrev - skal kaste feil hvis behandlingen ikke har riktig status`() {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev
 
-        val feilFerdigstilt = catchThrowableOfType<Feil> {
-            brevService.lagEndeligBeslutterbrev(
-                saksbehandling(
-                    fagsak,
-                    behandlingForBeslutter.copy(
-                        status =
-                        BehandlingStatus.FERDIGSTILT,
+        val feilFerdigstilt =
+            catchThrowableOfType<Feil> {
+                brevService.lagEndeligBeslutterbrev(
+                    saksbehandling(
+                        fagsak,
+                        behandlingForBeslutter.copy(
+                            status =
+                                BehandlingStatus.FERDIGSTILT,
+                        ),
                     ),
-                ),
-            )
-        }
+                )
+            }
         assertThat(feilFerdigstilt.httpStatus).isEqualTo(BAD_REQUEST)
         assertThat(feilFerdigstilt.message).contains("Behandling er i feil steg")
 
-        val feilUtredes = catchThrowableOfType<Feil> {
-            brevService.lagEndeligBeslutterbrev(
-                saksbehandling(
-                    fagsak,
-                    behandling.copy(status = BehandlingStatus.UTREDES),
-                ),
-            )
-        }
+        val feilUtredes =
+            catchThrowableOfType<Feil> {
+                brevService.lagEndeligBeslutterbrev(
+                    saksbehandling(
+                        fagsak,
+                        behandling.copy(status = BehandlingStatus.UTREDES),
+                    ),
+                )
+            }
         assertThat(feilUtredes.httpStatus).isEqualTo(BAD_REQUEST)
         assertThat(feilUtredes.message).contains("Behandling er i feil steg")
     }
@@ -112,14 +114,15 @@ internal class BrevServiceTest {
     internal fun `skal kaste feil når det finnes beslutterpdf i forveien`() {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(beslutterPdf = Fil("123".toByteArray()))
 
-        val feil = catchThrowableOfType<Feil> {
-            brevService.lagEndeligBeslutterbrev(
-                saksbehandling(
-                    fagsak,
-                    behandlingForBeslutter,
-                ),
-            )
-        }
+        val feil =
+            catchThrowableOfType<Feil> {
+                brevService.lagEndeligBeslutterbrev(
+                    saksbehandling(
+                        fagsak,
+                        behandlingForBeslutter,
+                    ),
+                )
+            }
         assertThat(feil.message).isEqualTo("Det finnes allerede et beslutterbrev")
     }
 
@@ -146,7 +149,7 @@ internal class BrevServiceTest {
                         fagsak,
                         behandlingForBeslutter.copy(
                             status =
-                            BehandlingStatus.FERDIGSTILT,
+                                BehandlingStatus.FERDIGSTILT,
                         ),
                     ),
                     "html",
@@ -163,33 +166,39 @@ internal class BrevServiceTest {
         }.hasMessage("Fant ikke besluttet pdf")
     }
 
-    private val behandlingForBeslutter = behandling(
-        fagsak,
-        status = BehandlingStatus.FATTER_VEDTAK,
-        steg = StegType.BESLUTTE_VEDTAK,
-    )
+    private val behandlingForBeslutter =
+        behandling(
+            fagsak,
+            status = BehandlingStatus.FATTER_VEDTAK,
+            steg = StegType.BESLUTTE_VEDTAK,
+        )
 
-    private val behandlingForSaksbehandler = behandling(
-        fagsak,
-        status = BehandlingStatus.UTREDES,
-        steg = StegType.SEND_TIL_BESLUTTER,
-    )
+    private val behandlingForSaksbehandler =
+        behandling(
+            fagsak,
+            status = BehandlingStatus.UTREDES,
+            steg = StegType.SEND_TIL_BESLUTTER,
+        )
 
-    private fun lagVedtaksbrev(brevmal: String, saksbehandlerIdent: String = "123") = Vedtaksbrev(
-        behandlingId = behandling.id,
-        saksbehandlerHtml = "Brev med $BESLUTTER_SIGNATUR_PLACEHOLDER og $BREVDATO_PLACEHOLDER",
-        saksbehandlersignatur = "Saksbehandler Signatur",
-        besluttersignatur = null,
-        beslutterPdf = null,
-        saksbehandlerIdent = saksbehandlerIdent,
-        beslutterIdent = null,
-    )
+    private fun lagVedtaksbrev(saksbehandlerIdent: String = "123") =
+        Vedtaksbrev(
+            behandlingId = behandling.id,
+            saksbehandlerHtml = "Brev med $BESLUTTER_SIGNATUR_PLACEHOLDER og $BREVDATO_PLACEHOLDER",
+            saksbehandlersignatur = "Saksbehandler Signatur",
+            besluttersignatur = null,
+            beslutterPdf = null,
+            saksbehandlerIdent = saksbehandlerIdent,
+            beslutterIdent = null,
+        )
 
     @Nested
     inner class ForhåndsvisBeslutterBrev {
-
+        /*
+         * skal generere brev med tom besluttersignatur hvis man ikke har beslutterrolle - man skal kunne se
+         * brevet som saksbehandler opprettet
+         */
         @Test
-        fun `skal generere brev med tom besluttersignatur hvis man ikke har beslutterrolle - man skal kunne se brevet som saksbehandler opprettet`() {
+        fun `skal generere brev med tom besluttersignatur hvis man ikke har beslutterrolle`() {
             every { tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER) } returns false
             every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev
 
@@ -215,12 +224,13 @@ internal class BrevServiceTest {
 
     @Test
     fun `skal kaste feil hvis saksbehandlerHtml ikke inneholder placeholder for saksbehandlersignatur`() {
-        val feilmelding = catchThrowableOfType<Feil> {
-            brevService.lagSaksbehandlerBrev(
-                saksbehandling(fagsak, behandlingForSaksbehandler),
-                "html uten placeholder",
-            )
-        }.message
+        val feilmelding =
+            catchThrowableOfType<Feil> {
+                brevService.lagSaksbehandlerBrev(
+                    saksbehandling(fagsak, behandlingForSaksbehandler),
+                    "html uten placeholder",
+                )
+            }.message
         assertThat(feilmelding).isEqualTo("Brev-HTML mangler placeholder for saksbehandlersignatur")
     }
 
@@ -228,15 +238,24 @@ internal class BrevServiceTest {
     fun `skal kaste feil hvis saksbehandlerHtml ikke inneholder placeholder for besluttersignatur`() {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(saksbehandlerHtml = "html uten placeholder")
 
-        val feilmelding = catchThrowableOfType<Feil> {
-            brevService.forhåndsvisBeslutterBrev(saksbehandling(fagsak, behandlingForBeslutter))
-        }.message
+        val feilmelding =
+            catchThrowableOfType<Feil> {
+                brevService.forhåndsvisBeslutterBrev(saksbehandling(fagsak, behandlingForBeslutter))
+            }.message
         assertThat(feilmelding).isEqualTo("Brev-HTML mangler placeholder for besluttersignatur")
     }
 
     @Test
     fun `Skal erstatte placeholder med besluttersignatur`() {
-        every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(saksbehandlerHtml = "html med placeholder $BESLUTTER_SIGNATUR_PLACEHOLDER, vedtaksdato $BREVDATO_PLACEHOLDER og en liten avslutning")
+        every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns
+            vedtaksbrev.copy(
+                saksbehandlerHtml =
+                    """
+                    html med placeholder $BESLUTTER_SIGNATUR_PLACEHOLDER, 
+                    vedtaksdato $BREVDATO_PLACEHOLDER 
+                    og en liten avslutning
+                    """.trimIndent(),
+            )
         every { vedtaksbrevRepository.update(any()) } returns vedtaksbrev
 
         brevService.forhåndsvisBeslutterBrev(saksbehandling(fagsak, behandlingForBeslutter))
@@ -244,7 +263,13 @@ internal class BrevServiceTest {
         val vedtaksdato = osloDateNow().norskFormat()
 
         assertThat(pdfHtmlSlot.captured)
-            .isEqualTo("html med placeholder $beslutterNavn, vedtaksdato $vedtaksdato og en liten avslutning")
+            .isEqualTo(
+                """
+                html med placeholder $beslutterNavn, 
+                vedtaksdato $vedtaksdato 
+                og en liten avslutning
+                """.trimIndent(),
+            )
     }
 
     @Test

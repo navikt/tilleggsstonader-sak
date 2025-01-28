@@ -11,12 +11,14 @@ import java.util.UUID
 interface BehandlingshistorikkRepository :
     RepositoryInterface<Behandlingshistorikk, UUID>,
     InsertUpdateRepository<Behandlingshistorikk> {
-
     fun findByBehandlingIdOrderByEndretTidDesc(behandlingId: BehandlingId): List<Behandlingshistorikk>
 
     fun findByBehandlingIdOrderByEndretTidAsc(behandlingId: BehandlingId): List<Behandlingshistorikk>
 
     fun findTopByBehandlingIdOrderByEndretTidDesc(behandlingId: BehandlingId): Behandlingshistorikk
 
-    fun findTopByBehandlingIdAndStegOrderByEndretTidDesc(behandlingId: BehandlingId, steg: StegType): Behandlingshistorikk?
+    fun findTopByBehandlingIdAndStegOrderByEndretTidDesc(
+        behandlingId: BehandlingId,
+        steg: StegType,
+    ): Behandlingshistorikk?
 }

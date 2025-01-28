@@ -37,7 +37,6 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 
 class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
-
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
 
@@ -90,16 +89,21 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         val idStønadsberettiget = "1"
         every {
             registerAktivitetClient.hentAktiviteter(any(), any(), any())
-        } returns listOf(
-            ArenaKontraktUtil.aktivitetArenaDto(id = idStønadsberettiget, erStønadsberettiget = true),
-            ArenaKontraktUtil.aktivitetArenaDto(id = "2", erStønadsberettiget = false),
-        )
+        } returns
+            listOf(
+                ArenaKontraktUtil.aktivitetArenaDto(id = idStønadsberettiget, erStønadsberettiget = true),
+                ArenaKontraktUtil.aktivitetArenaDto(id = "2", erStønadsberettiget = false),
+            )
 
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
         vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
 
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
-        assertThat(grunnlag!!.grunnlag.aktivitet.aktiviteter.map { it.id }).hasSize(1)
+        assertThat(
+            grunnlag!!
+                .grunnlag.aktivitet.aktiviteter
+                .map { it.id },
+        ).hasSize(1)
             .contains(idStønadsberettiget)
     }
 
@@ -107,11 +111,12 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
     fun `veileder skal ikke hentes då det opprettes grunnlag når behandlingStatus=OPPRETTET`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-        val exception = catchThrowableOfType<ApiFeil> {
-            BrukerContextUtil.testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
-                vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+        val exception =
+            catchThrowableOfType<ApiFeil> {
+                BrukerContextUtil.testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
+                    vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+                }
             }
-        }
         assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
     }
 
@@ -120,11 +125,12 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         val behandling =
             testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
 
-        val exception = catchThrowableOfType<ApiFeil> {
-            BrukerContextUtil.testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
-                vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+        val exception =
+            catchThrowableOfType<ApiFeil> {
+                BrukerContextUtil.testWithBrukerContext(groups = listOf(rolleConfig.veilederRolle)) {
+                    vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
+                }
             }
-        }
         assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
     }
 
@@ -142,20 +148,22 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         val nesteDag = LocalDate.now().plusDays(1) // for å få 2 ulike AAP-perioder
         every {
             ytelseClient.hentYtelser(any())
-        } returns YtelsePerioderDto(
-            perioder = listOf(
-                YtelsePeriode(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now(), aapErFerdigAvklart = false),
-                YtelsePeriode(TypeYtelsePeriode.AAP, nesteDag, nesteDag, aapErFerdigAvklart = true),
-                YtelsePeriode(
-                    TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                    LocalDate.now(),
-                    LocalDate.now(),
-                    aapErFerdigAvklart = null,
-                    ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
-                ),
-            ),
-            hentetInformasjon = emptyList(),
-        )
+        } returns
+            YtelsePerioderDto(
+                perioder =
+                    listOf(
+                        YtelsePeriode(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now(), aapErFerdigAvklart = false),
+                        YtelsePeriode(TypeYtelsePeriode.AAP, nesteDag, nesteDag, aapErFerdigAvklart = true),
+                        YtelsePeriode(
+                            TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                            LocalDate.now(),
+                            LocalDate.now(),
+                            aapErFerdigAvklart = null,
+                            ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
+                        ),
+                    ),
+                hentetInformasjon = emptyList(),
+            )
 
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
         vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
@@ -183,33 +191,35 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
     fun `skal ikke ta med EF perioder med barnetilsyn som grunnlag`() {
         every {
             ytelseClient.hentYtelser(any())
-        } returns YtelsePerioderDto(
-            perioder = listOf(
-                YtelsePeriode(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now(), aapErFerdigAvklart = false),
-                YtelsePeriode(
-                    TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                    LocalDate.now(),
-                    LocalDate.now(),
-                    aapErFerdigAvklart = null,
-                    EnsligForsørgerStønadstype.BARNETILSYN,
-                ),
-                YtelsePeriode(
-                    TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                    LocalDate.now(),
-                    LocalDate.now(),
-                    aapErFerdigAvklart = null,
-                    EnsligForsørgerStønadstype.SKOLEPENGER,
-                ),
-                YtelsePeriode(
-                    TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                    LocalDate.now(),
-                    LocalDate.now(),
-                    aapErFerdigAvklart = null,
-                    EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
-                ),
-            ),
-            hentetInformasjon = emptyList(),
-        )
+        } returns
+            YtelsePerioderDto(
+                perioder =
+                    listOf(
+                        YtelsePeriode(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now(), aapErFerdigAvklart = false),
+                        YtelsePeriode(
+                            TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                            LocalDate.now(),
+                            LocalDate.now(),
+                            aapErFerdigAvklart = null,
+                            EnsligForsørgerStønadstype.BARNETILSYN,
+                        ),
+                        YtelsePeriode(
+                            TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                            LocalDate.now(),
+                            LocalDate.now(),
+                            aapErFerdigAvklart = null,
+                            EnsligForsørgerStønadstype.SKOLEPENGER,
+                        ),
+                        YtelsePeriode(
+                            TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                            LocalDate.now(),
+                            LocalDate.now(),
+                            aapErFerdigAvklart = null,
+                            EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
+                        ),
+                    ),
+                hentetInformasjon = emptyList(),
+            )
 
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
         vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id)
@@ -235,7 +245,6 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
 
     @Nested
     inner class OppdaterGrunnlag {
-
         @Test
         fun `skal kunne oppdatere grunnlaget når en behandling redigerbar og i riktig steg`() {
             every {
@@ -303,7 +312,8 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
         fun `skal ikke kunne oppdatere dataen når behandlingen har feil steg`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(steg = StegType.VILKÅR))
             val feil =
-                org.junit.jupiter.api.assertThrows<Feil> { vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id) }
+                org.junit.jupiter.api
+                    .assertThrows<Feil> { vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id) }
             assertThat(feil.frontendFeilmelding)
                 .isEqualTo("Kan ikke oppdatere grunnlag når behandlingen er i annet steg enn vilkår.")
         }
@@ -313,7 +323,8 @@ class VilkårperiodeGrunnlagServiceTest : IntegrationTest() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.FERDIGSTILT))
             val feil =
-                org.junit.jupiter.api.assertThrows<Feil> { vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id) }
+                org.junit.jupiter.api
+                    .assertThrows<Feil> { vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id) }
             assertThat(feil.frontendFeilmelding)
                 .isEqualTo("Kan ikke oppdatere grunnlag når behandlingen er låst")
         }

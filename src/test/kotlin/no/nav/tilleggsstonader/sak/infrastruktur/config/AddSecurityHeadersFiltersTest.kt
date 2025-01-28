@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.getForEntity
 
 class AddSecurityHeadersFiltersTest : IntegrationTest() {
-
     @Test
     internal fun `ping svarer med pong`() {
         val response = restTemplate.getForEntity<String>(localhost("api/ping"))
@@ -39,7 +38,6 @@ class AddSecurityHeadersFiltersTest : IntegrationTest() {
 @RequestMapping("/api/ping")
 @Unprotected
 class PingController {
-
     @GetMapping
     fun get() = "pong"
 }

@@ -23,7 +23,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.web.client.exchange
 
 class StønadsperiodeControllerTest : IntegrationTest() {
-
     @Autowired
     lateinit var vilkårperiodeService: VilkårperiodeService
 
@@ -72,36 +71,40 @@ class StønadsperiodeControllerTest : IntegrationTest() {
                 type = AktivitetType.TILTAK,
                 fom = dagensDato,
                 tom = dagensDato,
-                faktaOgSvar = FaktaOgSvarAktivitetBarnetilsynDto(
-                    svarLønnet = SvarJaNei.NEI,
-                    aktivitetsdager = 5,
-                ),
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetBarnetilsynDto(
+                        svarLønnet = SvarJaNei.NEI,
+                        aktivitetsdager = 5,
+                    ),
                 behandlingId = behandling.id,
             ),
         )
 
     private fun hentStønadsperioder(behandling: Behandling) =
-        restTemplate.exchange<List<StønadsperiodeDto>>(
-            localhost("api/stonadsperiode/${behandling.id}"),
-            HttpMethod.GET,
-            HttpEntity(null, headers),
-        ).body!!
+        restTemplate
+            .exchange<List<StønadsperiodeDto>>(
+                localhost("api/stonadsperiode/${behandling.id}"),
+                HttpMethod.GET,
+                HttpEntity(null, headers),
+            ).body!!
 
     private fun lagreStønadsperioder(
         behandling: Behandling,
         nyeStønadsperioder: List<StønadsperiodeDto>,
-    ) = restTemplate.exchange<List<StønadsperiodeDto>>(
-        localhost("api/stonadsperiode/${behandling.id}"),
-        HttpMethod.POST,
-        HttpEntity(nyeStønadsperioder, headers),
-    ).body!!
+    ) = restTemplate
+        .exchange<List<StønadsperiodeDto>>(
+            localhost("api/stonadsperiode/${behandling.id}"),
+            HttpMethod.POST,
+            HttpEntity(nyeStønadsperioder, headers),
+        ).body!!
 
-    private fun nyStønadsperiode() = StønadsperiodeDto(
-        id = null,
-        fom = dagensDato,
-        tom = dagensDato,
-        målgruppe = MålgruppeType.AAP,
-        aktivitet = AktivitetType.TILTAK,
-        status = StønadsperiodeStatus.NY,
-    )
+    private fun nyStønadsperiode() =
+        StønadsperiodeDto(
+            id = null,
+            fom = dagensDato,
+            tom = dagensDato,
+            målgruppe = MålgruppeType.AAP,
+            aktivitet = AktivitetType.TILTAK,
+            status = StønadsperiodeStatus.NY,
+        )
 }

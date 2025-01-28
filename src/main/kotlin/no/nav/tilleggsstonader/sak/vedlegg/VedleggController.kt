@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/vedlegg")
 @ProtectedWithClaims(issuer = "azuread")
-class VedleggController(private val tilgangService: TilgangService, private val vedleggService: VedleggService) {
+class VedleggController(
+    private val tilgangService: TilgangService,
+    private val vedleggService: VedleggService,
+) {
     @PostMapping("/fagsak-person/{fagsakPersonId}")
     fun finnVedleggForBruker(
         @PathVariable fagsakPersonId: FagsakPersonId,

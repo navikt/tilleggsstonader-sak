@@ -19,42 +19,51 @@ import java.util.UUID
 class KlageClient(
     @Qualifier("azure") restTemplate: RestTemplate,
     @Value("\${clients.klage.uri}") private val klageUri: URI,
-) :
-    AbstractRestClient(restTemplate) {
-
+) : AbstractRestClient(restTemplate) {
     private val opprettKlage =
-        UriComponentsBuilder.fromUri(klageUri).pathSegment("api/ekstern/behandling/opprett").build().toUriString()
+        UriComponentsBuilder
+            .fromUri(klageUri)
+            .pathSegment("api/ekstern/behandling/opprett")
+            .build()
+            .toUriString()
 
     private val hentKlagebehandlinger =
-        UriComponentsBuilder.fromUri(klageUri).pathSegment(
-            "api/ekstern/behandling/${Fagsystem.TILLEGGSSTONADER}",
-        ).build().toUri()
+        UriComponentsBuilder
+            .fromUri(klageUri)
+            .pathSegment(
+                "api/ekstern/behandling/${Fagsystem.TILLEGGSSTONADER}",
+            ).build()
+            .toUri()
 
     fun opprettKlage(opprettKlagebehandlingRequest: OpprettKlagebehandlingRequest) {
         postForEntityNullable<Void>(opprettKlage, opprettKlagebehandlingRequest)
     }
 
     fun hentKlagebehandlinger(eksternIder: Set<Long>): Map<Long, List<KlagebehandlingDto>> {
-        val uri = UriComponentsBuilder.fromUri(hentKlagebehandlinger)
-            .queryParam("eksternFagsakId", eksternIder.joinToString(","))
-            .build()
-            .toUriString()
+        val uri =
+            UriComponentsBuilder
+                .fromUri(hentKlagebehandlinger)
+                .queryParam("eksternFagsakId", eksternIder.joinToString(","))
+                .build()
+                .toUriString()
 
         return getForEntity<Ressurs<Map<Long, List<KlagebehandlingDto>>>>(uri).getDataOrThrow()
     }
 
     fun hentBehandlingerForOppgaveIder(oppgaveIder: List<Long>): Map<Long, UUID> {
-        val uri = UriComponentsBuilder.fromUri(klageUri)
-            .pathSegment("api/ekstern/behandling/finn-oppgaver")
-            .build().toUriString()
+        val uri =
+            UriComponentsBuilder
+                .fromUri(klageUri)
+                .pathSegment("api/ekstern/behandling/finn-oppgaver")
+                .build()
+                .toUriString()
         val request = OppgaverBehandlingerRequest(oppgaveIder)
         return postForEntity<Ressurs<OppgaverBehandlingerResponse>>(uri, request).getDataOrThrow().oppgaver
     }
 }
 
-private fun <T> Ressurs<T>.getDataOrThrow(): T {
-    return when (this.status) {
+private fun <T> Ressurs<T>.getDataOrThrow(): T =
+    when (this.status) {
         Ressurs.Status.SUKSESS -> data ?: error("Data er null")
         else -> error(melding)
     }
-}

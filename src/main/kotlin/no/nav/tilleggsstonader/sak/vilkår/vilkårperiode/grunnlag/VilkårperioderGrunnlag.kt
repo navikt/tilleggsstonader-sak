@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.PeriodeGrunnlagYtelse.YtelseSubtype.AAP_FERDIG_AVKLART
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
@@ -63,7 +64,6 @@ data class PeriodeGrunnlagYtelse(
     val tom: LocalDate?,
     val subtype: YtelseSubtype? = null,
 ) {
-
     init {
         feilHvis(subtype != null && subtype.gyldigSammenMed != type) {
             "Ugyldig kombinasjon av type=$type og subtype=$subtype"
@@ -76,7 +76,9 @@ data class PeriodeGrunnlagYtelse(
      * @param AAP_FERDIG_AVKLART brukes når AAP-periode har status ferdig avklart.
      * Den skal ikke være valgbart då det er en AAP-periode som ikke gir rett på stønad
      */
-    enum class YtelseSubtype(val gyldigSammenMed: TypeYtelsePeriode) {
+    enum class YtelseSubtype(
+        val gyldigSammenMed: TypeYtelsePeriode,
+    ) {
         AAP_FERDIG_AVKLART(TypeYtelsePeriode.AAP),
         OVERGANGSSTØNAD(TypeYtelsePeriode.ENSLIG_FORSØRGER),
         SKOLEPENGER(TypeYtelsePeriode.ENSLIG_FORSØRGER),
@@ -89,8 +91,8 @@ data class HentetInformasjon(
     val tidspunktHentet: LocalDateTime,
 )
 
-fun YtelsePeriodeKontrakter.tilYtelseSubtype(): PeriodeGrunnlagYtelse.YtelseSubtype? {
-    return when (this.type) {
+fun YtelsePeriodeKontrakter.tilYtelseSubtype(): PeriodeGrunnlagYtelse.YtelseSubtype? =
+    when (this.type) {
         TypeYtelsePeriode.ENSLIG_FORSØRGER -> {
             when (this.ensligForsørgerStønadstype) {
                 EnsligForsørgerStønadstypeKontrakter.OVERGANGSSTØNAD -> PeriodeGrunnlagYtelse.YtelseSubtype.OVERGANGSSTØNAD
@@ -108,4 +110,3 @@ fun YtelsePeriodeKontrakter.tilYtelseSubtype(): PeriodeGrunnlagYtelse.YtelseSubt
 
         else -> null
     }
-}

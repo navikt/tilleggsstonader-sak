@@ -29,7 +29,6 @@ class AngreSendTilBeslutterService(
     private val taskService: TaskService,
     private val totrinnskontrollService: TotrinnskontrollService,
 ) {
-
     @Transactional
     fun angreSendTilBeslutter(behandlingId: BehandlingId) {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
@@ -108,20 +107,19 @@ class AngreSendTilBeslutterService(
         }
     }
 
-    private fun validerOppgave(
-        saksbehandling: Saksbehandling,
-    ) {
+    private fun validerOppgave(saksbehandling: Saksbehandling) {
         brukerfeilHvis(oppgaveService.hentBehandleSakOppgaveSomIkkeErFerdigstilt(saksbehandling.id) != null) {
             "Systemet har ikke rukket å ferdigstille forrige behandle sak oppgave. Prøv igjen om litt."
         }
 
-        val oppgave = oppgaveService.hentOppgaveSomIkkeErFerdigstilt(
-            behandlingId = saksbehandling.id,
-            oppgavetype = Oppgavetype.GodkjenneVedtak,
-        ) ?: throw ApiFeil(
-            feil = "Systemet har ikke rukket å opprette Godkjenne Vedtak oppgaven enda. Prøv igjen om litt.",
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
-        )
+        val oppgave =
+            oppgaveService.hentOppgaveSomIkkeErFerdigstilt(
+                behandlingId = saksbehandling.id,
+                oppgavetype = Oppgavetype.GodkjenneVedtak,
+            ) ?: throw ApiFeil(
+                feil = "Systemet har ikke rukket å opprette Godkjenne Vedtak oppgaven enda. Prøv igjen om litt.",
+                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
+            )
 
         val tilordnetRessurs = oppgaveService.hentOppgave(oppgave.gsakOppgaveId).tilordnetRessurs
         brukerfeilHvis(tilordnetRessurs != null && tilordnetRessurs != SikkerhetContext.hentSaksbehandler()) {

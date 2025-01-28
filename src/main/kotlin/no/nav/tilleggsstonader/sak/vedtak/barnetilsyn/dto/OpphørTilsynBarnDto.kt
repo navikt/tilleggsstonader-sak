@@ -7,9 +7,11 @@ data class OpphørTilsynBarnResponse(
     val beregningsresultat: BeregningsresultatTilsynBarnDto,
     val årsakerOpphør: List<ÅrsakOpphør>,
     val begrunnelse: String,
-) : VedtakTilsynBarnResponse, VedtakTilsynBarnDto(TypeVedtak.OPPHØR)
+) : VedtakTilsynBarnDto(TypeVedtak.OPPHØR),
+    VedtakTilsynBarnResponse
 
 data class OpphørTilsynBarnRequest(
     val årsakerOpphør: List<ÅrsakOpphør>,
     val begrunnelse: String,
-) : VedtakTilsynBarnRequest, VedtakTilsynBarnDto(TypeVedtak.OPPHØR)
+) : VedtakTilsynBarnDto(TypeVedtak.OPPHØR),
+    VedtakTilsynBarnRequest

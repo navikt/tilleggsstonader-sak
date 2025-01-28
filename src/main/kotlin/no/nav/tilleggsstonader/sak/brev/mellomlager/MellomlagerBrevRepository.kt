@@ -6,4 +6,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryI
 import org.springframework.stereotype.Repository
 
 @Repository
-interface MellomlagerBrevRepository : RepositoryInterface<MellomlagretBrev, BehandlingId>, InsertUpdateRepository<MellomlagretBrev>
+interface MellomlagerBrevRepository :
+    RepositoryInterface<MellomlagretBrev, BehandlingId>,
+    InsertUpdateRepository<MellomlagretBrev>

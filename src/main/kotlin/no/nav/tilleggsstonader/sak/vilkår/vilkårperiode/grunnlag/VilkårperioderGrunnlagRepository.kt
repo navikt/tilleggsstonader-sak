@@ -6,7 +6,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryI
 import org.springframework.stereotype.Repository
 
 @Repository
-interface VilkårperioderGrunnlagRepository : RepositoryInterface<VilkårperioderGrunnlagDomain, BehandlingId>, InsertUpdateRepository<VilkårperioderGrunnlagDomain> {
-
+interface VilkårperioderGrunnlagRepository :
+    RepositoryInterface<VilkårperioderGrunnlagDomain, BehandlingId>,
+    InsertUpdateRepository<VilkårperioderGrunnlagDomain> {
     fun findByBehandlingId(behandlingId: BehandlingId): VilkårperioderGrunnlagDomain?
 }

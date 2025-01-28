@@ -15,7 +15,6 @@ class InngangsvilkårSteg(
     private val behandlingService: BehandlingService,
     private val stønadsperiodeService: StønadsperiodeService,
 ) : BehandlingSteg<Void?> {
-
     override fun validerSteg(saksbehandling: Saksbehandling) {
         stønadsperiodeService.validerStønadsperioder(saksbehandling.id)
         brukerfeilHvis(saksbehandling.type == BehandlingType.REVURDERING && saksbehandling.revurderFra == null) {
@@ -23,7 +22,10 @@ class InngangsvilkårSteg(
         }
     }
 
-    override fun utførSteg(saksbehandling: Saksbehandling, data: Void?) {
+    override fun utførSteg(
+        saksbehandling: Saksbehandling,
+        data: Void?,
+    ) {
         if (saksbehandling.status != BehandlingStatus.UTREDES) {
             behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.UTREDES)
         }

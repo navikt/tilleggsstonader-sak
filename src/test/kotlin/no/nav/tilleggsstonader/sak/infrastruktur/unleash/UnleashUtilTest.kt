@@ -9,12 +9,10 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class UnleashUtilTest {
-
     val unleashService = mockUnleashService()
 
     @Nested
     inner class GetVariantWithNameOrDefaultInt {
-
         @Test
         fun `skal returnere default value hvis enabled = false`() {
             every { unleashService.getVariant(any()) } returns Variant.DISABLED_VARIANT
@@ -53,7 +51,10 @@ class UnleashUtilTest {
             }
         }
 
-        fun mockVariant(name: String = variantName, verdi: String? = null) {
+        fun mockVariant(
+            name: String = variantName,
+            verdi: String? = null,
+        ) {
             every { unleashService.getVariant(toggle) } returns Variant(name, verdi, true)
         }
 

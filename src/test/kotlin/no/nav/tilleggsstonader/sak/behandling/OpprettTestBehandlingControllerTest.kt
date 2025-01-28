@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 
 class OpprettTestBehandlingControllerTest : IntegrationTest() {
-
     @Autowired
     lateinit var controller: OpprettTestBehandlingController
 
