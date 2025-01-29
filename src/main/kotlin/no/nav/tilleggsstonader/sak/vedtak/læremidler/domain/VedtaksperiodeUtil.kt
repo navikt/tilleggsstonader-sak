@@ -14,13 +14,23 @@ object VedtaksperiodeUtil {
         vedtaksperioder: List<Vedtaksperiode>,
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
     ) {
+        validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
+        validerVedtaksperiodeOmfattesAvStønadsperioder(vedtaksperioder, stønadsperioder)
+    }
+
+    private fun validerIngenOverlappendeVedtaksperioder(vedtaksperioder: List<Vedtaksperiode>) {
         val overlappendePeriode = vedtaksperioder.førsteOverlappendePeriode()
         if (overlappendePeriode != null) {
             brukerfeil(
                 "Periode=${overlappendePeriode.first.formatertPeriodeNorskFormat()} og ${overlappendePeriode.second.formatertPeriodeNorskFormat()} overlapper.",
             )
         }
+    }
 
+    private fun validerVedtaksperiodeOmfattesAvStønadsperioder(
+        vedtaksperioder: List<Vedtaksperiode>,
+        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+    ) {
         brukerfeilHvis(vedtaksperioder.ingenOmfattesAvStønadsperioder(stønadsperioder)) {
             "Vedtaksperiode er ikke innenfor en overlappsperiode"
         }
@@ -35,7 +45,10 @@ object VedtaksperiodeUtil {
             stønadsperioder
                 .sorted()
                 .map { Datoperiode(fom = it.fom, tom = it.tom) }
-                .mergeSammenhengende({ s1, s2 -> s1.påfølgesAv(s2) }, { s1, s2 -> Datoperiode(fom = s1.fom, tom = s2.tom) })
+                .mergeSammenhengende(
+                    { s1, s2 -> s1.påfølgesAv(s2) },
+                    { s1, s2 -> Datoperiode(fom = s1.fom, tom = s2.tom) },
+                )
         return any { vedtaksperiode ->
             sammenslåtteStønadsperioder.none { it.inneholder(vedtaksperiode) }
         }
