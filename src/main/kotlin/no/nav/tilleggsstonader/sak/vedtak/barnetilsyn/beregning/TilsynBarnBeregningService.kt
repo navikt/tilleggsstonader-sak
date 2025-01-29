@@ -6,12 +6,16 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFra
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.brukPerioderFraOgMedRevurderFraMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.erOverlappMellomStønadsperioderOgUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilDagerPerUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBeregningUtil.tilUke
@@ -27,6 +31,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnl
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.domain.splitFraRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -79,7 +84,7 @@ class TilsynBarnBeregningService(
 
         val aktiviteter = finnAktiviteter(behandling.id)
 
-        validerPerioderForInnvilgelse(stønadsperioder, aktiviteter, utgifterPerBarn, typeVedtak)
+        validerPerioderForInnvilgelse(stønadsperioder, aktiviteter, utgifterPerBarn, typeVedtak, behandling.revurderFra)
 
         val beregningsgrunnlag =
             lagBeregningsgrunnlagPerMåned(stønadsperioder, aktiviteter, utgifterPerBarn)
@@ -274,27 +279,6 @@ class TilsynBarnBeregningService(
         return this.filter { it.måned >= revurderFraMåned }
     }
 
-    /**
-     * Dersom man har en lang stønadsperiode for 1.1 - 31.1 så skal den splittes opp fra revurderFra sånn at man får 2 perioder
-     * Eks for revurderFra=15.1 så får man 1.1 - 14.1 og 15.1 - 31.1
-     * Dette for å kunne filtrere vekk perioder som begynner før revurderFra og beregne beløp som skal utbetales i gitt måned
-     */
-    private fun List<StønadsperiodeBeregningsgrunnlag>.splitFraRevurderFra(
-        revurderFra: LocalDate?,
-    ): List<StønadsperiodeBeregningsgrunnlag> {
-        if (revurderFra == null) return this
-        return this.flatMap {
-            if (it.fom < revurderFra && revurderFra <= it.tom) {
-                listOf(
-                    it.copy(tom = revurderFra.minusDays(1)),
-                    it.copy(fom = revurderFra),
-                )
-            } else {
-                listOf(it)
-            }
-        }
-    }
-
     private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> =
         vilkårperiodeRepository
             .findByBehandlingIdAndResultat(behandlingId, ResultatVilkårperiode.OPPFYLT)
@@ -305,6 +289,7 @@ class TilsynBarnBeregningService(
         aktiviteter: List<Aktivitet>,
         utgifter: Map<BarnId, List<UtgiftBeregning>>,
         typeVedtak: TypeVedtak,
+        revurderFra: LocalDate?,
     ) {
         if (typeVedtak == TypeVedtak.OPPHØR) {
             return
@@ -312,6 +297,26 @@ class TilsynBarnBeregningService(
         validerStønadsperioder(stønadsperioder)
         validerAktiviteter(aktiviteter)
         validerUtgifter(utgifter)
+        validerStønadsperioderOverlapperUtgifterEtterRevurderFra(stønadsperioder, utgifter, revurderFra)
+    }
+
+    private fun validerStønadsperioderOverlapperUtgifterEtterRevurderFra(
+        stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+        utgifter: Map<BarnId, List<UtgiftBeregning>>,
+        revurderFra: LocalDate?,
+    ) {
+        brukerfeilHvisIkke(
+            erOverlappMellomStønadsperioderOgUtgifter(
+                stønadsperioder = stønadsperioder.brukPerioderFraOgMedRevurderFra(revurderFra),
+                utgifter = utgifter.brukPerioderFraOgMedRevurderFraMåned(revurderFra),
+            ),
+        ) {
+            if (revurderFra != null) {
+                "Kan ikke innvilge når det ikke finnes noen overlapp mellom målgruppe, aktivitet og utgifter etter revurder fra dato"
+            } else {
+                "Kan ikke innvilge når det ikke finnes noen overlapp mellom målgruppe, aktivitet og utgifter"
+            }
+        }
     }
 
     private fun validerStønadsperioder(stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>) {
