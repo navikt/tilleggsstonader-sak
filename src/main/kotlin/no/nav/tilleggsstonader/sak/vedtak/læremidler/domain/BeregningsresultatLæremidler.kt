@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
+
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.periode.AvkortResult
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
@@ -32,6 +34,9 @@ data class BeregningsresultatForMåned(
         fom: LocalDate,
         tom: LocalDate,
     ): BeregningsresultatForMåned = this.copy(grunnlag = this.grunnlag.copy(fom = fom, tom = tom))
+
+    fun medKorrigertUtbetalingsdato(utbetalingsdato: LocalDate): BeregningsresultatForMåned =
+        this.copy(grunnlag = grunnlag.copy(utbetalingsdato = utbetalingsdato))
 }
 
 data class Beregningsgrunnlag(
@@ -48,9 +53,11 @@ data class Beregningsgrunnlag(
 fun avkortBeregningsresultatVedOpphør(
     forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørLæremidler>,
     revurderFra: LocalDate,
-): List<BeregningsresultatForMåned> =
+): AvkortResult<BeregningsresultatForMåned> =
     forrigeVedtak
         .data
         .beregningsresultat
         .perioder
-        .avkortFraOgMed(revurderFra.minusDays(1))
+        .avkortFraOgMed(revurderFra.minusDays(1)) { periode, nyttTom ->
+            periode.copy(grunnlag = periode.grunnlag.copy(tom = nyttTom))
+        }

@@ -153,7 +153,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             try {
                 assertThat(beregningsresultat.perioder[index]).isEqualTo(periode)
             } catch (e: Throwable) {
-                val actual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(periode)
+                val actual =
+                    objectMapper
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(beregningsresultat.perioder[index])
                 logger.error("Feilet validering av rad ${index + 1} $actual")
                 throw e
             }
@@ -193,7 +196,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
 
         andeler.map { ForenkletAndel(it) }.forEachIndexed { index, andel ->
             try {
-                assertThat(forventedeAndeler[index]).isEqualTo(andel)
+                assertThat(andel).isEqualTo(forventedeAndeler[index])
             } catch (e: Throwable) {
                 val actual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(andel)
                 logger.error("Feilet validering av rad ${index + 1} $actual")
