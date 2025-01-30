@@ -24,7 +24,7 @@ object LæremidlerBeregnUtil {
                     val håndterNyUtbetalingsperiode = vedtaksperiode.håndterNyUtbetalingsperiode(acc)
                     acc + håndterNyUtbetalingsperiode
                 }
-            }.toList()
+            }.filter { it.harDatoerIUkedager() }
 
     /**
      * Legger til periode som overlapper med forrige utbetalingsperiode
