@@ -164,11 +164,10 @@ Egenskap: Opphør av læremidler
     Så forvent beregningsresultatet for behandling=2
       | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
       | 01.01.2025 | 31.01.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
-      | 01.02.2025 | 02.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
 
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
-      | 01.01.2025 | 902   | LÆREMIDLER_AAP | 01.01.2025      |
+      | 01.01.2025 | 451   | LÆREMIDLER_AAP | 01.01.2025      |
 
     Så forvent vedtaksperioder for behandling=2
       | Fom        | Tom        |

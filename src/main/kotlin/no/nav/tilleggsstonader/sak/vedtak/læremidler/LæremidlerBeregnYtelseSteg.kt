@@ -178,8 +178,8 @@ class LæremidlerBeregnYtelseSteg(
             vedtaksperioderInnenforLøpendeMåned(avkortetVedtaksperioder, beregningsresultatTilReberegning)
 
         val reberegnedePerioder = beregningService.beregn(vedtaksperioderSomOmregnes, behandling.id).perioder
-        feilHvisIkke(reberegnedePerioder.size == 1) {
-            "Forventet reberegnet resulat gir en måned tilbake, faktiskAntall=${reberegnedePerioder.size}"
+        feilHvisIkke(reberegnedePerioder.size <= 1) {
+            "Når vi reberegner vedtaksperioder innenfor en måned burde vi få maks 1 reberegnet periode, faktiskAntall=${reberegnedePerioder.size}"
         }
 
         return reberegnedePerioder.map {
