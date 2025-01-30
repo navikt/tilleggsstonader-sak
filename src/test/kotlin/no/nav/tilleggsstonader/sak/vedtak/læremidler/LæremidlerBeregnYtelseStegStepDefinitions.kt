@@ -112,6 +112,26 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
     }
 
+    @Når("innvilger vedtaksperioder for behandling={} med revurderFra={}")
+    fun `innvilger vedtaksperioder for behandling={} med revurderFra={}`(
+        behandlingIdTall: Int,
+        revurderFraStr: String,
+        dataTable: DataTable,
+    ) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+        val revurderFra = parseDato(revurderFraStr)
+        val forrigeBehandlingId = forrigeBehandlingId(behandlingId) ?: error("Forventer å finne forrigeBehandlingId")
+
+        val vedtaksperioder =
+            dataTable.mapRad { rad ->
+                VedtaksperiodeDto(
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                )
+            }
+        steg.utførSteg(dummyBehandling(forrigeBehandlingId, revurderFra), InnvilgelseLæremidlerRequest(vedtaksperioder))
+    }
+
     @Når("kopierer perioder fra forrige behandling for behandling={}")
     fun `kopierer perioder`(behandlingIdTall: Int) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
