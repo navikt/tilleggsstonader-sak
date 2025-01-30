@@ -13,4 +13,5 @@ enum class Toggle(
     HENT_BEHANDLINGER_FOR_OPPFØLGING("sak.hent-behandlinger-for-oppfoelging"),
 
     SØKNAD_ROUTING_LÆREMIDLER("sak.soknad-routing.laremidler"),
+    PÅ_VENT_KOMMENTAR("sak.pa-vent-oppgave-kommentar"),
 }

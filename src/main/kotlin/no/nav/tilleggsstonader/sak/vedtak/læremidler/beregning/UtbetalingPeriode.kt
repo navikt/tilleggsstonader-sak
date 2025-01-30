@@ -1,11 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
+import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -81,6 +83,8 @@ data class LøpendeMåned(
         _vedtaksperioder.add(vedtaksperiode)
         return this
     }
+
+    fun harDatoerIUkedager(): Boolean = vedtaksperioder.any { it.alleDatoer().any { !it.lørdagEllerSøndag() } }
 
     /**
      * Finner hvilken stønadsperiode og aktivitet som skal brukes for den aktuelle utbetalingsperioden

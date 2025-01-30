@@ -6,6 +6,25 @@ Egenskap: Beregning - med revurderFra
   Scenario: Skal ikke ta med perioder som slutter før måneden for revurderFra
     Gitt følgende støndsperioder
       | Fom        | Tom        | Aktivitet | Målgruppe |
+      | 02.01.2024 | 21.02.2024 | TILTAK    | AAP       |
+
+    Gitt følgende aktiviteter
+      | Fom        | Tom        | Aktivitet | Aktivitetsdager |
+      | 02.01.2024 | 21.02.2024 | TILTAK    | 3               |
+
+    Gitt følgende utgifter for barn med id: 1
+      | Fom     | Tom     | Utgift |
+      | 01.2024 | 02.2024 | 1000   |
+
+    Når beregner med revurderFra=2024-02-15
+
+      Så forvent følgende beregningsresultat
+      | Måned   | Dagsats | Antall dager | Utgift | Månedsbeløp |
+      | 02.2024 | 29.53   | 11            | 1000   | 325         |
+
+  Scenario: Skal ikke kunne innvilge når det ikke finnes noen overlapp mellom målgruppe, aktivitet og utgifter etter revurder fra dato
+    Gitt følgende støndsperioder
+      | Fom        | Tom        | Aktivitet | Målgruppe |
       | 02.01.2024 | 21.01.2024 | TILTAK    | AAP       |
 
     Gitt følgende aktiviteter
@@ -18,8 +37,7 @@ Egenskap: Beregning - med revurderFra
 
     Når beregner med revurderFra=2024-02-15
 
-    Så forvent følgende beregningsresultat
-      | Måned | Dagsats | Antall dager | Utgift | Månedsbeløp |
+    Så forvent følgende feil: Kan ikke innvilge når det ikke finnes noen overlapp mellom målgruppe, aktivitet og utgifter etter revurder fra dato
 
 
   Scenario: Skal ta med alle perioder som starter etter revurderFra

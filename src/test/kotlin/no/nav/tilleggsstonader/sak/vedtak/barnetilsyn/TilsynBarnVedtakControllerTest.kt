@@ -35,7 +35,6 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.exchange
 import java.time.LocalDate
-import java.time.YearMonth
 
 class TilsynBarnVedtakControllerTest(
     @Autowired
@@ -59,8 +58,8 @@ class TilsynBarnVedtakControllerTest(
             barnId = barn.id,
             type = VilkårType.PASS_BARN,
             resultat = Vilkårsresultat.OPPFYLT,
-            fom = YearMonth.now().atDay(1),
-            tom = YearMonth.now().atEndOfMonth(),
+            fom = LocalDate.of(2023, 1, 1),
+            tom = LocalDate.of(2023, 1, 31),
             utgift = 100,
         )
 
