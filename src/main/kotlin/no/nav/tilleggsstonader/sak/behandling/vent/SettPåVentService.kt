@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.osloDateNow
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -12,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
@@ -28,6 +30,7 @@ class SettPåVentService(
     private val oppgaveService: OppgaveService,
     private val taskService: TaskService,
     private val settPåVentRepository: SettPåVentRepository,
+    private val unleashService: UnleashService,
 ) {
     fun hentStatusSettPåVent(behandlingId: BehandlingId): StatusPåVentDto {
         val settPåVent = finnAktivSattPåVent(behandlingId)
@@ -182,13 +185,14 @@ class SettPåVentService(
     ): OppdatertOppgaveResponse {
         val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
         val mappe = oppgaveService.finnMappe(enhet, OppgaveMappe.PÅ_VENT)
+        val inkluderKommentar = unleashService.isEnabled(Toggle.PÅ_VENT_KOMMENTAR)
         val oppdatertOppgave =
             Oppgave(
                 id = oppgave.id,
                 versjon = oppgave.versjon,
                 tilordnetRessurs = "",
                 fristFerdigstillelse = frist,
-                beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, settPåVent, frist),
+                beskrivelse = SettPåVentBeskrivelseUtil.settPåVent(oppgave, settPåVent, frist, inkluderKommentar = inkluderKommentar),
                 mappeId = Optional.of(mappe.id),
             )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
@@ -199,12 +203,19 @@ class SettPåVentService(
         dto: OppdaterSettPåVentDto,
     ): OppdatertOppgaveResponse {
         val oppgave = oppgaveService.hentOppgave(settPåVent.oppgaveId)
+        val inkluderKommentar = unleashService.isEnabled(Toggle.PÅ_VENT_KOMMENTAR)
         val oppdatertOppgave =
             Oppgave(
                 id = settPåVent.oppgaveId,
                 versjon = dto.oppgaveVersjon,
                 fristFerdigstillelse = dto.frist,
-                beskrivelse = SettPåVentBeskrivelseUtil.oppdaterSettPåVent(oppgave, settPåVent, dto.frist),
+                beskrivelse =
+                    SettPåVentBeskrivelseUtil.oppdaterSettPåVent(
+                        oppgave,
+                        settPåVent,
+                        dto.frist,
+                        inkluderKommentar = inkluderKommentar,
+                    ),
                 tilordnetRessurs = "",
             )
         return oppgaveService.oppdaterOppgave(oppdatertOppgave)
@@ -225,13 +236,14 @@ class SettPåVentService(
 
         val enhet = oppgave.tildeltEnhetsnr ?: error("Oppgave=${oppgave.id} mangler enhetsnummer")
         val mappeId = oppgaveService.finnMappe(enhet, OppgaveMappe.KLAR).id
+        val inkluderKommentar = unleashService.isEnabled(Toggle.PÅ_VENT_KOMMENTAR)
         oppgaveService.oppdaterOppgave(
             Oppgave(
                 id = oppgave.id,
                 versjon = oppgave.versjon,
                 tilordnetRessurs = tilordnetRessurs,
                 fristFerdigstillelse = osloDateNow(),
-                beskrivelse = SettPåVentBeskrivelseUtil.taAvVent(oppgave, settPåVent),
+                beskrivelse = SettPåVentBeskrivelseUtil.taAvVent(oppgave, settPåVent, inkluderKommentar = inkluderKommentar),
                 mappeId = Optional.ofNullable(mappeId),
             ),
         )

@@ -85,7 +85,7 @@ class SettPåVentServiceTest : IntegrationTest() {
                 }
 
                 with(oppgaveService.hentOppgave(oppgaveId!!)) {
-                    assertThat(beskrivelse).doesNotContain("ny beskrivelse")
+                    assertThat(beskrivelse).contains("ny beskrivelse")
                     assertThat(fristFerdigstillelse).isEqualTo(settPåVentDto.frist)
                     assertThat(tilordnetRessurs).isNull()
                     assertThat(mappeId?.getOrNull()).isEqualTo(MAPPE_ID_PÅ_VENT)
