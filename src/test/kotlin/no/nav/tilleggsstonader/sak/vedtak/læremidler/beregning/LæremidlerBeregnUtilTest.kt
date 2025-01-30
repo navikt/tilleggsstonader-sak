@@ -37,6 +37,19 @@ class LæremidlerBeregnUtilTest {
     }
 
     @Nested
+    inner class Helg {
+        @Test
+        fun `skal lage løpende måned for vedtaksperiode som kun er under en helg`() {
+            val vedtaksperioder =
+                listOf(
+                    Vedtaksperiode(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 2, 2)),
+                )
+            val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
+            assertThat(perioder).isEmpty()
+        }
+    }
+
+    @Nested
     inner class FlereVedtaksperioderSammeMåned {
         @Test
         fun `skal håndtere en vedtaksperiode som løper innenfor en løpende måned`() {

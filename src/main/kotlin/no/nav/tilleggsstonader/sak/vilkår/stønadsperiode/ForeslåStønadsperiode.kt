@@ -33,7 +33,7 @@ object ForeslåStønadsperiode {
         brukerfeilHvis(
             sammenslåtteVilkårsperioder.aktiviteter.size > 1 || sammenslåtteVilkårsperioder.målgrupper.size > 1,
         ) {
-            "Foreløpig håndterer vi kun tilfellet der målgruppe og aktivitet har ett sammenhengende overlapp."
+            "Foreløpig klarer vi bare å foreslå perioder når målgruppe og aktivitet har ett sammenhengende overlapp. Du må i stedet legge inn periodene manuelt."
         }
 
         val stønadsperiode =

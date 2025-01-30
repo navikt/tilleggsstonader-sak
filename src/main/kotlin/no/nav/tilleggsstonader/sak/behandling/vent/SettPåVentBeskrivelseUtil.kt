@@ -11,21 +11,27 @@ import java.time.LocalDateTime
 object SettPåVentBeskrivelseUtil {
     fun settPåVent(
         oppgave: Oppgave,
+        settPåVent: SettPåVent,
         frist: LocalDate,
         tidspunkt: LocalDateTime = osloNow(),
+        inkluderKommentar: Boolean,
     ): String {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
+        val kommentarRad = "Kommentar: ${settPåVent.kommentar}".takeIf { inkluderKommentar }
         return utledBeskrivelsePrefix(tidspunkt) +
             utledOppgavefristBeskrivelse(oppgave, frist).påNyRadEllerTomString() +
             tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+            kommentarRad.påNyRadEllerTomString() +
             nåværendeBeskrivelse(oppgave)
     }
 
     fun oppdaterSettPåVent(
         oppgave: Oppgave,
+        settPåVent: SettPåVent,
         frist: LocalDate,
         tidspunkt: LocalDateTime = osloNow(),
+        inkluderKommentar: Boolean,
     ): String {
         val fristBeskrivelse = utledOppgavefristBeskrivelse(oppgave, frist)
         if (fristBeskrivelse.isEmpty()) {
@@ -33,21 +39,27 @@ object SettPåVentBeskrivelseUtil {
         }
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, "")
+        val kommentarRad = "Kommentar: ${settPåVent.kommentar}".takeIf { inkluderKommentar }
         return utledBeskrivelsePrefix(tidspunkt) +
             fristBeskrivelse.påNyRadEllerTomString() +
             tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+            kommentarRad.påNyRadEllerTomString() +
             nåværendeBeskrivelse(oppgave)
     }
 
     fun taAvVent(
         oppgave: Oppgave,
+        settPåVent: SettPåVent,
         tidspunkt: LocalDateTime = osloNow(),
+        inkluderKommentar: Boolean,
     ): String {
         val tilordnetSaksbehandlerBeskrivelse =
             utledTilordnetSaksbehandlerBeskrivelse(oppgave, SikkerhetContext.hentSaksbehandlerEllerSystembruker())
+        val kommentarRad = "Kommentar: ${settPåVent.taAvVentKommentar}".takeIf { inkluderKommentar }
         return utledBeskrivelsePrefix(tidspunkt) +
             "\nTatt av vent" +
             tilordnetSaksbehandlerBeskrivelse.påNyRadEllerTomString() +
+            kommentarRad.påNyRadEllerTomString() +
             nåværendeBeskrivelse(oppgave)
     }
 
