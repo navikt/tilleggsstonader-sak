@@ -27,6 +27,7 @@ data class Saksbehandling(
     val vedtakstidspunkt: LocalDateTime?,
     @Column("henlagt_arsak")
     val henlagtÅrsak: HenlagtÅrsak? = null,
+    val henlagtBegrunnelse: String? = null,
     val ident: String,
     val fagsakId: FagsakId,
     val fagsakPersonId: FagsakPersonId,

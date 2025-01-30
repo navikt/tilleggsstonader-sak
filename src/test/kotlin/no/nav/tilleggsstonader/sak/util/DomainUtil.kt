@@ -157,6 +157,7 @@ fun saksbehandling(
         resultat = behandling.resultat,
         vedtakstidspunkt = behandling.vedtakstidspunkt,
         henlagtÅrsak = behandling.henlagtÅrsak,
+        henlagtBegrunnelse = behandling.henlagtBegrunnelse,
         ident = fagsak.hentAktivIdent(),
         fagsakId = fagsak.id,
         fagsakPersonId = fagsak.fagsakPersonId,
