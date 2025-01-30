@@ -1,13 +1,17 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitPerLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitVedtaksperiodePerÅr
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenEndringerFørRevurderFra
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
 class LæremidlerVedtaksperiodeUtilTest {
@@ -205,6 +209,155 @@ class LæremidlerVedtaksperiodeUtilTest {
                 assertThat(LocalDate.of(2024, 1, 29).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 2, 28))
                 assertThat(LocalDate.of(2024, 1, 30).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 2, 28))
                 assertThat(LocalDate.of(2024, 1, 31).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 2, 28))
+            }
+        }
+    }
+
+    @Nested
+    inner class ValiderIngenEndringerFørRevurderFra {
+        val vedtaksperiodeJanFeb =
+            Vedtaksperiode(
+                fom = LocalDate.of(2025, 1, 1),
+                tom = LocalDate.of(2025, 2, 28),
+            )
+
+        val vedtaksperiodeMars =
+            Vedtaksperiode(
+                fom = LocalDate.of(2025, 3, 1),
+                tom = LocalDate.of(2025, 3, 31),
+            )
+
+        val vedtaksperiodeApril =
+            Vedtaksperiode(
+                fom = LocalDate.of(2025, 4, 1),
+                tom = LocalDate.of(2025, 4, 30),
+            )
+
+        val vedtaksperioderJanFeb = listOf(vedtaksperiodeJanFeb)
+        val vedtaksperioderJanMars = listOf(vedtaksperiodeJanFeb, vedtaksperiodeMars)
+        val førsteMars: LocalDate = LocalDate.of(2025, 3, 1)
+        val femtendeMars: LocalDate = LocalDate.of(2025, 3, 15)
+        val førsteApril: LocalDate = LocalDate.of(2025, 4, 1)
+
+        @Test
+        fun `kaster ikke feil ved ingen revurder fra og ingen gamle perioder (førstegangsbehandling)`() {
+            assertDoesNotThrow { validerIngenEndringerFørRevurderFra(vedtaksperioderJanMars, emptyList(), null) }
+        }
+
+        @Test
+        fun `kaster ikke feil ved ny periode som starter etter revurder fra`() {
+            assertDoesNotThrow {
+                validerIngenEndringerFørRevurderFra(
+                    vedtaksperioderJanMars,
+                    vedtaksperioderJanFeb,
+                    førsteMars,
+                )
+            }
+        }
+
+        @Test
+        fun `kaster feil ved ny periode med fom før revurder fra`() {
+            assertThrows<ApiFeil> {
+                validerIngenEndringerFørRevurderFra(
+                    vedtaksperioderJanMars,
+                    vedtaksperioderJanFeb,
+                    femtendeMars,
+                )
+            }
+        }
+
+        @Test
+        fun `kaster feil ved ny periode med fom og tom før revuder fra`() {
+            assertThrows<ApiFeil> {
+                validerIngenEndringerFørRevurderFra(
+                    vedtaksperioderJanMars,
+                    vedtaksperioderJanFeb,
+                    førsteApril,
+                )
+            }
+        }
+
+        @Test
+        fun `kaster feil ved ny lik som er lik eksisterende periode lagt til før revuder fra`() {
+            val nyeVedtaksperioder =
+                listOf(
+                    vedtaksperiodeJanFeb,
+                    vedtaksperiodeJanFeb,
+                )
+
+            assertThrows<ApiFeil> {
+                validerIngenEndringerFørRevurderFra(
+                    nyeVedtaksperioder,
+                    vedtaksperioderJanFeb,
+                    førsteMars,
+                )
+            }
+        }
+
+        @Test
+        fun `kaster feil ved tom flyttet til før revurder fra`() {
+            val nyeVedtaksperioder =
+                listOf(
+                    vedtaksperiodeJanFeb,
+                    vedtaksperiodeMars.copy(tom = LocalDate.of(2025, 3, 10)),
+                )
+
+            assertThrows<ApiFeil> {
+                validerIngenEndringerFørRevurderFra(
+                    nyeVedtaksperioder,
+                    vedtaksperioderJanMars,
+                    femtendeMars,
+                )
+            }
+        }
+
+        @Test
+        fun `kaster feil ved fom og tom flyttet til før revurder fra`() {
+            val gamleVedtaksperioder =
+                listOf(
+                    vedtaksperiodeJanFeb,
+                    vedtaksperiodeApril,
+                )
+
+            assertThrows<ApiFeil> {
+                validerIngenEndringerFørRevurderFra(
+                    vedtaksperioderJanMars,
+                    gamleVedtaksperioder,
+                    førsteApril,
+                )
+            }
+        }
+
+        @Test
+        fun `kaster ikke feil ved slettet perioder etter revurder fra`() {
+            assertDoesNotThrow {
+                validerIngenEndringerFørRevurderFra(
+                    vedtaksperioderJanFeb,
+                    vedtaksperioderJanMars,
+                    førsteMars,
+                )
+            }
+        }
+
+        @Test
+        fun `kaster feil ved slettet periode med fom før revurder fra`() {
+            assertThrows<ApiFeil> {
+                validerIngenEndringerFørRevurderFra(
+                    vedtaksperioderJanFeb,
+                    vedtaksperioderJanMars,
+                    femtendeMars,
+                )
+            }
+        }
+
+        @Test
+        fun `kaster feil ved slettet periode med fom og tom før revurder fra`() {
+            assertThrows<ApiFeil> {
+                validerIngenEndringerFørRevurderFra(
+                    vedtaksperioderJanFeb,
+                    vedtaksperioderJanMars,
+                    førsteApril,
+                )
             }
         }
     }

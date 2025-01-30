@@ -9,14 +9,34 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import java.time.LocalDate
 
 object VedtaksperiodeUtil {
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
+        vedtaksperioderForrigeBehandling: List<Vedtaksperiode>?,
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
+        revurderFra: LocalDate?,
     ) {
         validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
         validerVedtaksperiodeOmfattesAvStønadsperioder(vedtaksperioder, stønadsperioder)
+        validerIngenEndringerFørRevurderFra(vedtaksperioder, vedtaksperioderForrigeBehandling, revurderFra)
+    }
+
+    fun validerIngenEndringerFørRevurderFra(
+        vedtaksperioder: List<Vedtaksperiode>,
+        vedtaksperioderForrigeBehandling: List<Vedtaksperiode>?,
+        revurderFra: LocalDate?,
+    ) {
+        if (revurderFra == null || vedtaksperioderForrigeBehandling.isNullOrEmpty()) return
+
+        val vedtaksperioderFørRevuderFra = vedtaksperioder.filter { it.fom < revurderFra }
+        val vedtaksperioderForrigeBehandlingFørRevurderFra =
+            vedtaksperioderForrigeBehandling.filter { it.fom < revurderFra }
+
+        brukerfeilHvis(vedtaksperioderForrigeBehandlingFørRevurderFra != vedtaksperioderFørRevuderFra) {
+            "Endringer i vedtaksperioder før revurderFra er ikke tillatt"
+        }
     }
 
     private fun validerIngenOverlappendeVedtaksperioder(vedtaksperioder: List<Vedtaksperiode>) {

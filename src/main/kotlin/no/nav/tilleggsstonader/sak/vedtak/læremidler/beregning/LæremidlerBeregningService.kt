@@ -1,7 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidlerUtils.finnVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.slåSammenSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnBeløpUtil.beregnBeløp
@@ -20,6 +24,8 @@ import org.springframework.stereotype.Service
 class LæremidlerBeregningService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val stønadsperiodeRepository: StønadsperiodeRepository,
+    private val behandlingRepository: BehandlingRepository,
+    private val vedtaksRepository: VedtakRepository,
 ) {
     /**
      * Beregning av læremidler har foreløpig noen begrensninger.
@@ -34,14 +40,26 @@ class LæremidlerBeregningService(
         behandlingId: BehandlingId,
     ): BeregningsresultatLæremidler {
         val stønadsperioder = hentStønadsperioder(behandlingId)
+        val behandling = behandlingRepository.finnSaksbehandling(behandlingId)
+        val vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(behandling)
 
-        validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+        validerVedtaksperioder(
+            vedtaksperioder,
+            vedtaksperioderForrigeBehandling,
+            stønadsperioder,
+            behandling.revurderFra,
+        )
 
         val aktiviteter = finnAktiviteter(behandlingId)
         val beregningsresultatForMåned = beregnLæremidlerPerMåned(vedtaksperioder, stønadsperioder, aktiviteter)
 
         return BeregningsresultatLæremidler(beregningsresultatForMåned)
     }
+
+    private fun hentForrigeVedtaksperioder(behandling: Saksbehandling?): List<Vedtaksperiode>? =
+        behandling?.forrigeBehandlingId?.let {
+            vedtaksRepository.findByBehandlingId(behandling.forrigeBehandlingId).finnVedtaksperioder()
+        }
 
     private fun hentStønadsperioder(behandlingId: BehandlingId): List<StønadsperiodeBeregningsgrunnlag> =
         stønadsperiodeRepository

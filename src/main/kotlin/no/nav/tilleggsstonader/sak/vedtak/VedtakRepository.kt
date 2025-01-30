@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface VedtakRepository :
     RepositoryInterface<Vedtak, BehandlingId>,
-    InsertUpdateRepository<Vedtak>
+    InsertUpdateRepository<Vedtak> {
+    fun findByBehandlingId(behandlingId: BehandlingId): Vedtak
+}
