@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDato
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.BehandlingRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.StønadsperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYtelseRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
@@ -60,6 +61,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val stønadsperiodeRepository = StønadsperiodeRepositoryFake()
     val vedtakRepository = VedtakRepositoryFake()
     val tilkjentYtelseRepository = TilkjentYtelseRepositoryFake()
+    val behandlingRepository = BehandlingRepositoryFake()
 
     val simuleringService =
         mockk<SimuleringService>().apply {
@@ -71,6 +73,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 LæremidlerBeregningService(
                     vilkårperiodeRepository = vilkårperiodeRepository,
                     stønadsperiodeRepository = stønadsperiodeRepository,
+                    behandlingRepository = behandlingRepository,
+                    vedtaksRepository = vedtakRepository,
                 ),
             opphørValideringService = mockk<OpphørValideringService>(relaxed = true),
             vedtakRepository = vedtakRepository,

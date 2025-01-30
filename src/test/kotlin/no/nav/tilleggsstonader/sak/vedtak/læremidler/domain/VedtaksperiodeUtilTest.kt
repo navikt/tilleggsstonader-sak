@@ -42,7 +42,12 @@ class VedtaksperiodeUtilTest {
             val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertDoesNotThrow {
-                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+                validerVedtaksperioder(
+                vedtaksperioder = vedtaksperioder,
+                vedtaksperioderForrigeBehandling = null,
+                stønadsperioder = stønadsperioder,
+                revurderFra = null,
+            )
             }
         }
 
@@ -56,7 +61,12 @@ class VedtaksperiodeUtilTest {
             val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertThatThrownBy {
-                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+                validerVedtaksperioder(
+                vedtaksperioder = vedtaksperioder,
+                vedtaksperioderForrigeBehandling = null,
+                stønadsperioder = stønadsperioder,
+                revurderFra = null,
+            )
             }.hasMessageContaining("overlapper")
         }
 
@@ -76,7 +86,12 @@ class VedtaksperiodeUtilTest {
             val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertDoesNotThrow {
-                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+                validerVedtaksperioder(
+                vedtaksperioder = vedtaksperioder,
+                vedtaksperioderForrigeBehandling = null,
+                stønadsperioder = stønadsperioder,
+                revurderFra = null,
+            )
             }
         }
 
@@ -94,7 +109,12 @@ class VedtaksperiodeUtilTest {
                 )
 
             assertThatThrownBy {
-                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
+                validerVedtaksperioder(
+                vedtaksperioder = vedtaksperioder,
+                vedtaksperioderForrigeBehandling = null,
+                stønadsperioder = stønadsperioder,
+                revurderFra = null,
+            )
             }.hasMessageContaining("Vedtaksperiode er ikke innenfor en overlappsperiode")
         }
     }
