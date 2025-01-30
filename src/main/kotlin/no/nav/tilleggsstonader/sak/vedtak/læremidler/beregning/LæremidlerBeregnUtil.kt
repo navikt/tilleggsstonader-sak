@@ -1,9 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
-import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.sisteDagIÅret
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.util.lørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitPerLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.splitVedtaksperiodePerÅr
@@ -26,8 +24,7 @@ object LæremidlerBeregnUtil {
                     val håndterNyUtbetalingsperiode = vedtaksperiode.håndterNyUtbetalingsperiode(acc)
                     acc + håndterNyUtbetalingsperiode
                 }
-            }.filter { it.vedtaksperioder.any { it.alleDatoer().any { !it.lørdagEllerSøndag() } } }
-            .toList()
+            }.filter { it.harDatoerIUkedager() }
 
     /**
      * Legger til periode som overlapper med forrige utbetalingsperiode
