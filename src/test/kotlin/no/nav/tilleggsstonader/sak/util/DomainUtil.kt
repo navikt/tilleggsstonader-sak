@@ -85,6 +85,7 @@ fun behandling(
     forrigeBehandlingId: BehandlingId? = null,
     årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
     henlagtÅrsak: HenlagtÅrsak? = HenlagtÅrsak.FEILREGISTRERT,
+    henlagtBegrunnelse: String? = "Registrert feil",
     vedtakstidspunkt: LocalDateTime? = null,
     kravMottatt: LocalDate? = null,
     revurderFra: LocalDate? = null,
@@ -101,6 +102,7 @@ fun behandling(
         sporbar = Sporbar(opprettetTid = opprettetTid),
         årsak = årsak,
         henlagtÅrsak = henlagtÅrsak,
+        henlagtBegrunnelse = henlagtBegrunnelse,
         vedtakstidspunkt =
             vedtakstidspunkt
                 ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
