@@ -6,6 +6,4 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 
 class VedtakRepositoryFake :
     DummyRepository<Vedtak, BehandlingId>({ it.behandlingId }),
-    VedtakRepository {
-    override fun findByBehandlingId(behandlingId: BehandlingId): Vedtak = findAll().single { it.behandlingId == behandlingId }
-}
+    VedtakRepository

@@ -14,13 +14,10 @@ import java.time.LocalDate
 object VedtaksperiodeUtil {
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
-        vedtaksperioderForrigeBehandling: List<Vedtaksperiode>?,
         stønadsperioder: List<StønadsperiodeBeregningsgrunnlag>,
-        revurderFra: LocalDate?,
     ) {
         validerIngenOverlappendeVedtaksperioder(vedtaksperioder)
         validerVedtaksperiodeOmfattesAvStønadsperioder(vedtaksperioder, stønadsperioder)
-        validerIngenEndringerFørRevurderFra(vedtaksperioder, vedtaksperioderForrigeBehandling, revurderFra)
     }
 
     fun validerIngenEndringerFørRevurderFra(

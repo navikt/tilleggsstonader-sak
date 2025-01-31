@@ -18,17 +18,21 @@ import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.domain.vedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.validerIngenEndringerFørRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeUtil.vedtaksperioderInnenforLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortBeregningsresultatVedOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.avkortVedtaksperiodeVedOpphør
@@ -38,6 +42,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequ
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -45,6 +50,7 @@ import java.time.LocalDate
 class LæremidlerBeregnYtelseSteg(
     private val beregningService: LæremidlerBeregningService,
     private val opphørValideringService: OpphørValideringService,
+    @Lazy private val vedtakService: VedtakService,
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -77,6 +83,13 @@ class LæremidlerBeregnYtelseSteg(
         feilHvis(saksbehandling.forrigeBehandlingId != null) {
             "Har foreløpig ikke støtte for innvilgelse av revurdering"
         }
+        val vedtaksperioderForrigeBehandling = hentForrigeVedtaksperioder(saksbehandling)
+        validerIngenEndringerFørRevurderFra(
+            vedtaksperioder = vedtaksperioder,
+            vedtaksperioderForrigeBehandling = vedtaksperioderForrigeBehandling,
+            revurderFra = saksbehandling.revurderFra,
+        )
+
         val beregningsresultat = beregningService.beregn(vedtaksperioder, saksbehandling.id)
         vedtakRepository.insert(lagInnvilgetVedtak(saksbehandling.id, vedtaksperioder, beregningsresultat))
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -284,5 +297,10 @@ class LæremidlerBeregnYtelseSteg(
             MålgruppeType.OVERGANGSSTØNAD -> TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER
             MålgruppeType.OMSTILLINGSSTØNAD -> TypeAndel.LÆREMIDLER_ETTERLATTE
             else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
+        }
+
+    private fun hentForrigeVedtaksperioder(behandling: Saksbehandling?): List<Vedtaksperiode>? =
+        behandling?.forrigeBehandlingId?.let {
+            vedtakService.hentVedtak<VedtakLæremidler>(it)?.data?.vedtaksperioder()
         }
 }

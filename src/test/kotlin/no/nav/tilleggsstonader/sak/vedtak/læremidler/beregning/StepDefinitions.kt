@@ -7,14 +7,11 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilSortertStønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
@@ -46,16 +43,8 @@ class StepDefinitions {
 
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
-    val behandlingRepository = mockk<BehandlingRepository>()
-    val vedtaksRepository = mockk<VedtakRepository>()
 
-    val læremidlerBeregningService =
-        LæremidlerBeregningService(
-            vilkårperiodeRepository = vilkårperiodeRepository,
-            stønadsperiodeRepository = stønadsperiodeRepository,
-            behandlingRepository = behandlingRepository,
-            vedtaksRepository = vedtaksRepository,
-        )
+    val læremidlerBeregningService = LæremidlerBeregningService(vilkårperiodeRepository, stønadsperiodeRepository)
 
     val behandlingId = BehandlingId(UUID.randomUUID())
 
@@ -96,9 +85,6 @@ class StepDefinitions {
 
     @Når("beregner stønad for læremidler")
     fun `beregner stønad for læremidler`() {
-        every {
-            behandlingRepository.finnSaksbehandling(any<BehandlingId>())
-        } returns saksbehandling()
         try {
             resultat = læremidlerBeregningService.beregn(vedtaksPerioder, behandlingId)
         } catch (e: Exception) {
@@ -116,9 +102,7 @@ class StepDefinitions {
         try {
             validerVedtaksperioder(
                 vedtaksperioder = vedtaksPerioder,
-                vedtaksperioderForrigeBehandling = null,
                 stønadsperioder = stønadsperioder.tilSortertStønadsperiodeBeregningsgrunnlag(),
-                revurderFra = null,
             )
         } catch (feil: Exception) {
             valideringException = feil

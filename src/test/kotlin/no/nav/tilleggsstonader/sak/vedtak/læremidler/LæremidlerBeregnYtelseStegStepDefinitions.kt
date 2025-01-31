@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDato
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.BehandlingRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.StønadsperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYtelseRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
@@ -36,6 +35,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
@@ -61,7 +61,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val stønadsperiodeRepository = StønadsperiodeRepositoryFake()
     val vedtakRepository = VedtakRepositoryFake()
     val tilkjentYtelseRepository = TilkjentYtelseRepositoryFake()
-    val behandlingRepository = BehandlingRepositoryFake()
+    val vedtakService = mockk<VedtakService>()
 
     val simuleringService =
         mockk<SimuleringService>().apply {
@@ -73,13 +73,12 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 LæremidlerBeregningService(
                     vilkårperiodeRepository = vilkårperiodeRepository,
                     stønadsperiodeRepository = stønadsperiodeRepository,
-                    behandlingRepository = behandlingRepository,
-                    vedtaksRepository = vedtakRepository,
                 ),
             opphørValideringService = mockk<OpphørValideringService>(relaxed = true),
             vedtakRepository = vedtakRepository,
             tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
+            vedtakService = vedtakService,
         )
 
     @Gitt("følgende aktiviteter for læremidler behandling={}")
