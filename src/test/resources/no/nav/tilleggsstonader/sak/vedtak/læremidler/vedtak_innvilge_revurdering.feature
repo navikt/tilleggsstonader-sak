@@ -34,7 +34,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
     Så forvent andeler for behandling=2
       | Fom        | Beløp | Type           | Utbetalingsdato |
       | 01.01.2025 | 451   | LÆREMIDLER_AAP | 01.01.2025      |
-      | 01.02.2025 | 451   | LÆREMIDLER_AAP | 03.02.2025      |
+      | 03.02.2025 | 451   | LÆREMIDLER_AAP | 03.02.2025      |
 
   Scenario: Jan-mars. Endrer 100 til 50% fra februar.
   Resultat: Beholder utbetalingsdato for februar og mars til januar, då det var då den opprinnelige utbetalingen ble utført
