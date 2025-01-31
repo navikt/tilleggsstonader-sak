@@ -98,7 +98,7 @@ class OpphørValideringServiceLæremidlerTest {
         }
 
         @Test
-        fun `Kaster feil ved utbetaling etter opphørdato - Læremidler`() {
+        fun `Kaster feil ved utbetaling etter opphørdato`() {
             val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = måned.atDay(1))
 
             assertThatThrownBy {
