@@ -37,6 +37,7 @@ data class Behandling(
     val resultat: BehandlingResultat,
     @Column("henlagt_arsak")
     val henlagtÅrsak: HenlagtÅrsak? = null,
+    val henlagtBegrunnelse: String? = null,
     val vedtakstidspunkt: LocalDateTime? = null,
     val revurderFra: LocalDate? = null,
 ) {
