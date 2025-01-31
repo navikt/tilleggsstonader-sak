@@ -35,10 +35,7 @@ class LæremidlerBeregningService(
     ): BeregningsresultatLæremidler {
         val stønadsperioder = hentStønadsperioder(behandlingId)
 
-        validerVedtaksperioder(
-            vedtaksperioder = vedtaksperioder,
-            stønadsperioder = stønadsperioder,
-        )
+        validerVedtaksperioder(vedtaksperioder, stønadsperioder)
 
         val aktiviteter = finnAktiviteter(behandlingId)
         val beregningsresultatForMåned = beregnLæremidlerPerMåned(vedtaksperioder, stønadsperioder, aktiviteter)

@@ -43,7 +43,6 @@ class StepDefinitions {
 
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val stønadsperiodeRepository = mockk<StønadsperiodeRepository>()
-
     val læremidlerBeregningService = LæremidlerBeregningService(vilkårperiodeRepository, stønadsperiodeRepository)
 
     val behandlingId = BehandlingId(UUID.randomUUID())
@@ -100,10 +99,7 @@ class StepDefinitions {
     @Når("validerer vedtaksperiode for læremidler")
     fun `validerer vedtaksperiode for læremidler`() {
         try {
-            validerVedtaksperioder(
-                vedtaksperioder = vedtaksPerioder,
-                stønadsperioder = stønadsperioder.tilSortertStønadsperiodeBeregningsgrunnlag(),
-            )
+            validerVedtaksperioder(vedtaksPerioder, stønadsperioder.tilSortertStønadsperiodeBeregningsgrunnlag())
         } catch (feil: Exception) {
             valideringException = feil
         }

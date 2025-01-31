@@ -42,10 +42,7 @@ class VedtaksperiodeUtilTest {
             val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertDoesNotThrow {
-                validerVedtaksperioder(
-                vedtaksperioder = vedtaksperioder,
-                stønadsperioder = stønadsperioder,
-            )
+                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
             }
         }
 
@@ -59,10 +56,7 @@ class VedtaksperiodeUtilTest {
             val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertThatThrownBy {
-                validerVedtaksperioder(
-                vedtaksperioder = vedtaksperioder,
-                stønadsperioder = stønadsperioder,
-            )
+                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
             }.hasMessageContaining("overlapper")
         }
 
@@ -82,10 +76,7 @@ class VedtaksperiodeUtilTest {
             val stønadsperioder = listOf(stønadsperiodeJanTilFeb)
 
             assertDoesNotThrow {
-                validerVedtaksperioder(
-                vedtaksperioder = vedtaksperioder,
-                stønadsperioder = stønadsperioder,
-            )
+                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
             }
         }
 
@@ -103,10 +94,7 @@ class VedtaksperiodeUtilTest {
                 )
 
             assertThatThrownBy {
-                validerVedtaksperioder(
-                vedtaksperioder = vedtaksperioder,
-                stønadsperioder = stønadsperioder,
-            )
+                validerVedtaksperioder(vedtaksperioder, stønadsperioder)
             }.hasMessageContaining("Vedtaksperiode er ikke innenfor en overlappsperiode")
         }
     }
