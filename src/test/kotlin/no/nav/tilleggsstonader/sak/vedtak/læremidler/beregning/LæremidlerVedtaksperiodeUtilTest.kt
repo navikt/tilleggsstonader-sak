@@ -250,120 +250,129 @@ class LæremidlerVedtaksperiodeUtilTest {
             }
         }
 
-        @Test
-        fun `kaster ikke feil ved ny periode som starter etter revurder fra`() {
-            assertDoesNotThrow {
-                validerIngenEndringerFørRevurderFra(
-                    vedtaksperioder = vedtaksperioderJanMars,
-                    vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
-                    revurderFra = førsteMars,
-                )
+        @Nested
+        inner class NyPeriode {
+            @Test
+            fun `kaster ikke feil ved ny periode som starter etter revurder fra`() {
+                assertDoesNotThrow {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = vedtaksperioderJanMars,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                        revurderFra = førsteMars,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil ved ny periode med fom før revurder fra`() {
+                assertThrows<ApiFeil> {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = vedtaksperioderJanMars,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                        revurderFra = femtendeMars,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil ved ny periode med fom og tom før revuder fra`() {
+                assertThrows<ApiFeil> {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = vedtaksperioderJanMars,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                        revurderFra = førsteApril,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil ved ny lik som er lik eksisterende periode lagt til før revuder fra`() {
+                val nyeVedtaksperioder =
+                    listOf(
+                        vedtaksperiodeJanFeb,
+                        vedtaksperiodeJanFeb,
+                    )
+
+                assertThrows<ApiFeil> {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = nyeVedtaksperioder,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                        revurderFra = førsteMars,
+                    )
+                }
             }
         }
 
-        @Test
-        fun `kaster feil ved ny periode med fom før revurder fra`() {
-            assertThrows<ApiFeil> {
-                validerIngenEndringerFørRevurderFra(
-                    vedtaksperioder = vedtaksperioderJanMars,
-                    vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
-                    revurderFra = femtendeMars,
-                )
+        @Nested
+        inner class EndretPeriode {
+            @Test
+            fun `kaster feil ved tom flyttet til før revurder fra`() {
+                val nyeVedtaksperioder =
+                    listOf(
+                        vedtaksperiodeJanFeb,
+                        vedtaksperiodeMars.copy(tom = LocalDate.of(2025, 3, 10)),
+                    )
+
+                assertThrows<ApiFeil> {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = nyeVedtaksperioder,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                        revurderFra = femtendeMars,
+                    )
+                }
+            }
+
+            @Test
+            fun `kaster feil ved fom og tom flyttet til før revurder fra`() {
+                val gamleVedtaksperioder =
+                    listOf(
+                        vedtaksperiodeJanFeb,
+                        vedtaksperiodeApril,
+                    )
+
+                assertThrows<ApiFeil> {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = vedtaksperioderJanMars,
+                        vedtaksperioderForrigeBehandling = gamleVedtaksperioder,
+                        revurderFra = førsteApril,
+                    )
+                }
             }
         }
 
-        @Test
-        fun `kaster feil ved ny periode med fom og tom før revuder fra`() {
-            assertThrows<ApiFeil> {
-                validerIngenEndringerFørRevurderFra(
-                    vedtaksperioder = vedtaksperioderJanMars,
-                    vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
-                    revurderFra = førsteApril,
-                )
+        @Nested
+        inner class SlettetPeriode {
+            @Test
+            fun `kaster ikke feil ved slettet perioder etter revurder fra`() {
+                assertDoesNotThrow {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = vedtaksperioderJanFeb,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                        revurderFra = førsteMars,
+                    )
+                }
             }
-        }
 
-        @Test
-        fun `kaster feil ved ny lik som er lik eksisterende periode lagt til før revuder fra`() {
-            val nyeVedtaksperioder =
-                listOf(
-                    vedtaksperiodeJanFeb,
-                    vedtaksperiodeJanFeb,
-                )
-
-            assertThrows<ApiFeil> {
-                validerIngenEndringerFørRevurderFra(
-                    vedtaksperioder = nyeVedtaksperioder,
-                    vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
-                    revurderFra = førsteMars,
-                )
+            @Test
+            fun `kaster feil ved slettet periode med fom før revurder fra`() {
+                assertThrows<ApiFeil> {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = vedtaksperioderJanFeb,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                        revurderFra = femtendeMars,
+                    )
+                }
             }
-        }
 
-        @Test
-        fun `kaster feil ved tom flyttet til før revurder fra`() {
-            val nyeVedtaksperioder =
-                listOf(
-                    vedtaksperiodeJanFeb,
-                    vedtaksperiodeMars.copy(tom = LocalDate.of(2025, 3, 10)),
-                )
-
-            assertThrows<ApiFeil> {
-                validerIngenEndringerFørRevurderFra(
-                    vedtaksperioder = nyeVedtaksperioder,
-                    vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
-                    revurderFra = femtendeMars,
-                )
-            }
-        }
-
-        @Test
-        fun `kaster feil ved fom og tom flyttet til før revurder fra`() {
-            val gamleVedtaksperioder =
-                listOf(
-                    vedtaksperiodeJanFeb,
-                    vedtaksperiodeApril,
-                )
-
-            assertThrows<ApiFeil> {
-                validerIngenEndringerFørRevurderFra(
-                    vedtaksperioder = vedtaksperioderJanMars,
-                    vedtaksperioderForrigeBehandling = gamleVedtaksperioder,
-                    revurderFra = førsteApril,
-                )
-            }
-        }
-
-        @Test
-        fun `kaster ikke feil ved slettet perioder etter revurder fra`() {
-            assertDoesNotThrow {
-                validerIngenEndringerFørRevurderFra(
-                    vedtaksperioder = vedtaksperioderJanFeb,
-                    vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
-                    revurderFra = førsteMars,
-                )
-            }
-        }
-
-        @Test
-        fun `kaster feil ved slettet periode med fom før revurder fra`() {
-            assertThrows<ApiFeil> {
-                validerIngenEndringerFørRevurderFra(
-                    vedtaksperioder = vedtaksperioderJanFeb,
-                    vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
-                    revurderFra = femtendeMars,
-                )
-            }
-        }
-
-        @Test
-        fun `kaster feil ved slettet periode med fom og tom før revurder fra`() {
-            assertThrows<ApiFeil> {
-                validerIngenEndringerFørRevurderFra(
-                    vedtaksperioder = vedtaksperioderJanFeb,
-                    vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
-                    revurderFra = førsteApril,
-                )
+            @Test
+            fun `kaster feil ved slettet periode med fom og tom før revurder fra`() {
+                assertThrows<ApiFeil> {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = vedtaksperioderJanFeb,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                        revurderFra = førsteApril,
+                    )
+                }
             }
         }
     }
