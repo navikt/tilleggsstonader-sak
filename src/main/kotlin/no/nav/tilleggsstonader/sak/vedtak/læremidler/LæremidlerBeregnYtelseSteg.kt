@@ -50,6 +50,7 @@ import java.time.LocalDate
 class LæremidlerBeregnYtelseSteg(
     private val beregningService: LæremidlerBeregningService,
     private val opphørValideringService: OpphørValideringService,
+    // Lazy for å unngå sirkulær avhengighet i Spring
     @Lazy private val vedtakService: VedtakService,
     vedtakRepository: VedtakRepository,
     tilkjentytelseService: TilkjentYtelseService,
