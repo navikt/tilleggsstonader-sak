@@ -286,7 +286,7 @@ class LæremidlerVedtaksperiodeUtilTest {
             }
 
             @Test
-            fun `kaster feil ved ny lik som er lik eksisterende periode lagt til før revuder fra`() {
+            fun `kaster feil ved ny periode som er lik eksisterende periode lagt til før revuder fra`() {
                 val nyeVedtaksperioder =
                     listOf(
                         vedtaksperiodeJanFeb,
@@ -301,10 +301,38 @@ class LæremidlerVedtaksperiodeUtilTest {
                     )
                 }
             }
+
+            @Test
+            fun `kaster feil ved nye perioder før revurder fra etter opphør med ingen eksisterende vedtaksperioder`() {
+                assertThrows<ApiFeil> {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = vedtaksperioderJanMars,
+                        vedtaksperioderForrigeBehandling = emptyList(),
+                        revurderFra = førsteMars,
+                    )
+                }
+            }
         }
 
         @Nested
         inner class EndretPeriode {
+            @Test
+            fun `kaster ikke feil ved fom før revurder fra og tom etter revurder fra, der tom flyttet fremover i tid`() {
+                val nyeVedtaksperioder =
+                    listOf(
+                        vedtaksperiodeJanFeb,
+                        vedtaksperiodeMars.copy(tom = LocalDate.of(2025, 4, 10)),
+                    )
+
+                assertDoesNotThrow {
+                    validerIngenEndringerFørRevurderFra(
+                        vedtaksperioder = nyeVedtaksperioder,
+                        vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                        revurderFra = femtendeMars,
+                    )
+                }
+            }
+
             @Test
             fun `kaster feil ved tom flyttet til før revurder fra`() {
                 val nyeVedtaksperioder =

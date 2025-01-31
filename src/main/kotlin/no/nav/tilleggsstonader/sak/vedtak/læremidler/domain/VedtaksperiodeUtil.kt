@@ -25,14 +25,32 @@ object VedtaksperiodeUtil {
         vedtaksperioderForrigeBehandling: List<Vedtaksperiode>?,
         revurderFra: LocalDate?,
     ) {
-        if (revurderFra == null || vedtaksperioderForrigeBehandling.isNullOrEmpty()) return
+        if (revurderFra == null) return
 
-        val vedtaksperioderFørRevuderFra = vedtaksperioder.filter { it.fom < revurderFra }
+        val vedtaksperioderFørRevurderFra = vedtaksperioder.filter { it.fom < revurderFra }
         val vedtaksperioderForrigeBehandlingFørRevurderFra =
-            vedtaksperioderForrigeBehandling.filter { it.fom < revurderFra }
+            vedtaksperioderForrigeBehandling?.filter { it.fom < revurderFra }
 
-        brukerfeilHvis(vedtaksperioderForrigeBehandlingFørRevurderFra != vedtaksperioderFørRevuderFra) {
-            "Endringer i vedtaksperioder før revurderFra er ikke tillatt"
+        if (vedtaksperioderForrigeBehandlingFørRevurderFra.isNullOrEmpty()) {
+            brukerfeilHvis(vedtaksperioder.any { it.fom < revurderFra }) {
+                "Det er ikke tillat å legge til nye perioder før revurder fra dato"
+            }
+        } else {
+            val vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom =
+                vedtaksperioderForrigeBehandlingFørRevurderFra.map { vedtaksperiodeForrigeBehandling ->
+                    val tilhørendeNyVedtaksperiode =
+                        vedtaksperioder.find { it.fom == vedtaksperiodeForrigeBehandling.fom }
+                    if (tilhørendeNyVedtaksperiode != null &&
+                        tilhørendeNyVedtaksperiode.tom > vedtaksperiodeForrigeBehandling.tom
+                    ) {
+                        vedtaksperiodeForrigeBehandling.copy(tom = tilhørendeNyVedtaksperiode.tom)
+                    } else {
+                        vedtaksperiodeForrigeBehandling
+                    }
+                }
+            brukerfeilHvis(vedtaksperioderForrigeBehandlingFørRevurderFraMedOppdatertTom != vedtaksperioderFørRevurderFra) {
+                "Det er ikke tillat å endre perioder fra før revurder fra dato"
+            }
         }
     }
 
