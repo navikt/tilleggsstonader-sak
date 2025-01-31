@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
+import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
@@ -53,4 +54,16 @@ object VedtaksperiodeUtil {
             sammenslåtteStønadsperioder.none { it.inneholder(vedtaksperiode) }
         }
     }
+
+    /**
+     * Finner
+     */
+    fun vedtaksperioderInnenforLøpendeMåned(
+        vedtaksperioder: List<Vedtaksperiode>,
+        beregningsresultatTilReberegning: BeregningsresultatForMåned,
+    ): List<Vedtaksperiode> =
+        vedtaksperioder
+            .mapNotNull { vedtaksperiode ->
+                vedtaksperiode.beregnSnitt(beregningsresultatTilReberegning)
+            }
 }
