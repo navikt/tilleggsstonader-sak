@@ -21,7 +21,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når innvilger vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
       | Fom        | Tom        |
       | 01.01.2025 | 31.01.2025 |
       | 01.02.2025 | 28.02.2025 |
@@ -65,7 +65,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Målgruppe | Aktivitet |
       | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
 
-    Når innvilger vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
       | Fom        | Tom        |
       | 01.01.2025 | 31.03.2025 |
 
@@ -97,7 +97,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
 
     Når kopierer perioder fra forrige behandling for behandling=2
 
-    Når innvilger vedtaksperioder for behandling=2 med revurderFra=20.02.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=20.02.2025
       | Fom        | Tom        |
       | 01.01.2025 | 10.02.2025 |
       # Ny vedtaksperiode
@@ -137,7 +137,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.12.2024 | 31.01.2025 | AAP             | UTDANNING |
       | 01.02.2024 | 31.03.2025 | OVERGANGSSTØNAD | UTDANNING |
 
-    Når innvilger vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
       | Fom        | Tom        |
       | 01.01.2025 | 28.02.2025 |
 
@@ -171,7 +171,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
     Når kopierer perioder fra forrige behandling for behandling=2
 
     # Legger til ny vedtaksperiode etter nyttår
-    Når innvilger vedtaksperioder for behandling=2 med revurderFra=01.01.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.01.2025
       | Fom        | Tom        |
       | 20.12.2024 | 31.12.2024 |
       | 01.01.2025 | 31.01.2025 |
@@ -212,7 +212,7 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Tom        | Målgruppe | Aktivitet |
       | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
 
-    Når innvilger vedtaksperioder for behandling=2 med revurderFra=01.01.2025
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.01.2025
       | Fom        | Tom        |
       | 20.12.2024 | 31.01.2025 |
 
