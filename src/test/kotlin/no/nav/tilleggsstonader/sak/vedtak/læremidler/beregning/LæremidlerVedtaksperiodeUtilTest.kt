@@ -241,16 +241,22 @@ class LæremidlerVedtaksperiodeUtilTest {
 
         @Test
         fun `kaster ikke feil ved ingen revurder fra og ingen gamle perioder (førstegangsbehandling)`() {
-            assertDoesNotThrow { validerIngenEndringerFørRevurderFra(vedtaksperioderJanMars, emptyList(), null) }
+            assertDoesNotThrow {
+                validerIngenEndringerFørRevurderFra(
+                    vedtaksperioder = vedtaksperioderJanMars,
+                    vedtaksperioderForrigeBehandling = emptyList(),
+                    revurderFra = null,
+                )
+            }
         }
 
         @Test
         fun `kaster ikke feil ved ny periode som starter etter revurder fra`() {
             assertDoesNotThrow {
                 validerIngenEndringerFørRevurderFra(
-                    vedtaksperioderJanMars,
-                    vedtaksperioderJanFeb,
-                    førsteMars,
+                    vedtaksperioder = vedtaksperioderJanMars,
+                    vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                    revurderFra = førsteMars,
                 )
             }
         }
@@ -259,9 +265,9 @@ class LæremidlerVedtaksperiodeUtilTest {
         fun `kaster feil ved ny periode med fom før revurder fra`() {
             assertThrows<ApiFeil> {
                 validerIngenEndringerFørRevurderFra(
-                    vedtaksperioderJanMars,
-                    vedtaksperioderJanFeb,
-                    femtendeMars,
+                    vedtaksperioder = vedtaksperioderJanMars,
+                    vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                    revurderFra = femtendeMars,
                 )
             }
         }
@@ -270,9 +276,9 @@ class LæremidlerVedtaksperiodeUtilTest {
         fun `kaster feil ved ny periode med fom og tom før revuder fra`() {
             assertThrows<ApiFeil> {
                 validerIngenEndringerFørRevurderFra(
-                    vedtaksperioderJanMars,
-                    vedtaksperioderJanFeb,
-                    førsteApril,
+                    vedtaksperioder = vedtaksperioderJanMars,
+                    vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                    revurderFra = førsteApril,
                 )
             }
         }
@@ -287,9 +293,9 @@ class LæremidlerVedtaksperiodeUtilTest {
 
             assertThrows<ApiFeil> {
                 validerIngenEndringerFørRevurderFra(
-                    nyeVedtaksperioder,
-                    vedtaksperioderJanFeb,
-                    førsteMars,
+                    vedtaksperioder = nyeVedtaksperioder,
+                    vedtaksperioderForrigeBehandling = vedtaksperioderJanFeb,
+                    revurderFra = førsteMars,
                 )
             }
         }
@@ -304,9 +310,9 @@ class LæremidlerVedtaksperiodeUtilTest {
 
             assertThrows<ApiFeil> {
                 validerIngenEndringerFørRevurderFra(
-                    nyeVedtaksperioder,
-                    vedtaksperioderJanMars,
-                    femtendeMars,
+                    vedtaksperioder = nyeVedtaksperioder,
+                    vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                    revurderFra = femtendeMars,
                 )
             }
         }
@@ -321,9 +327,9 @@ class LæremidlerVedtaksperiodeUtilTest {
 
             assertThrows<ApiFeil> {
                 validerIngenEndringerFørRevurderFra(
-                    vedtaksperioderJanMars,
-                    gamleVedtaksperioder,
-                    førsteApril,
+                    vedtaksperioder = vedtaksperioderJanMars,
+                    vedtaksperioderForrigeBehandling = gamleVedtaksperioder,
+                    revurderFra = førsteApril,
                 )
             }
         }
@@ -332,9 +338,9 @@ class LæremidlerVedtaksperiodeUtilTest {
         fun `kaster ikke feil ved slettet perioder etter revurder fra`() {
             assertDoesNotThrow {
                 validerIngenEndringerFørRevurderFra(
-                    vedtaksperioderJanFeb,
-                    vedtaksperioderJanMars,
-                    førsteMars,
+                    vedtaksperioder = vedtaksperioderJanFeb,
+                    vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                    revurderFra = førsteMars,
                 )
             }
         }
@@ -343,9 +349,9 @@ class LæremidlerVedtaksperiodeUtilTest {
         fun `kaster feil ved slettet periode med fom før revurder fra`() {
             assertThrows<ApiFeil> {
                 validerIngenEndringerFørRevurderFra(
-                    vedtaksperioderJanFeb,
-                    vedtaksperioderJanMars,
-                    femtendeMars,
+                    vedtaksperioder = vedtaksperioderJanFeb,
+                    vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                    revurderFra = femtendeMars,
                 )
             }
         }
@@ -354,9 +360,9 @@ class LæremidlerVedtaksperiodeUtilTest {
         fun `kaster feil ved slettet periode med fom og tom før revurder fra`() {
             assertThrows<ApiFeil> {
                 validerIngenEndringerFørRevurderFra(
-                    vedtaksperioderJanFeb,
-                    vedtaksperioderJanMars,
-                    førsteApril,
+                    vedtaksperioder = vedtaksperioderJanFeb,
+                    vedtaksperioderForrigeBehandling = vedtaksperioderJanMars,
+                    revurderFra = førsteApril,
                 )
             }
         }
