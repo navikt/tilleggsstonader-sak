@@ -110,7 +110,7 @@ class LæremidlerBeregnYtelseSteg(
             )
 
         opphørValideringService.validerIngenUtbetalingEtterRevurderFraDatoLæremidler(
-            beregningsresultatForMånedListe = avkortetBeregningsresultat,
+            beregningsresultatForMånedListe = avkortetBeregningsresultat.perioder,
             revurderFra = saksbehandling.revurderFra,
         )
 
