@@ -61,6 +61,36 @@ class OpphørValideringService(
         }
     }
 
+    fun validerBeregningsresultatErAvkortetVedOpphør(
+        avkortetBeregningsresultat: List<BeregningsresultatForMåned>,
+        forrigeBeregningsresultatForMåned: List<BeregningsresultatForMåned>,
+    ) {
+        val senesteTomIAvkortetResultat =
+            avkortetBeregningsresultat.reduce { beregningsgrunnlagMedSisteTom, current ->
+                if (current.tom >
+                    beregningsgrunnlagMedSisteTom.tom
+                ) {
+                    current
+                } else {
+                    beregningsgrunnlagMedSisteTom
+                }
+            }
+        val senesteTomIForrigeBeregning =
+            forrigeBeregningsresultatForMåned.reduce { beregningsgrunnlagMedSisteTom, current ->
+                if (current.tom >
+                    beregningsgrunnlagMedSisteTom.tom
+                ) {
+                    current
+                } else {
+                    beregningsgrunnlagMedSisteTom
+                }
+            }
+
+        brukerfeilHvis(
+            senesteTomIForrigeBeregning >= senesteTomIAvkortetResultat,
+        ) { "Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet" }
+    }
+
     private fun validerIngenNyeOppfylteVilkårEllerVilkårperioder(
         vilkår: List<Vilkår>,
         vilkårperioder: Vilkårperioder,
