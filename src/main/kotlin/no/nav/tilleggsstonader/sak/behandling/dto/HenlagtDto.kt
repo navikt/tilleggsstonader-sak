@@ -4,4 +4,5 @@ import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 
 data class HenlagtDto(
     val årsak: HenlagtÅrsak,
+    val begrunnelse: String? = null,
 )

@@ -43,22 +43,26 @@ internal class BehandlingControllerTest : IntegrationTest() {
     internal fun `Skal henlegge behandling`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
         val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
-        val respons = henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT))
+        val henlagtBegrunnelse = "Registert feil"
+        val respons = henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(respons.body!!.resultat).isEqualTo(BehandlingResultat.HENLAGT)
         assertThat(respons.body!!.henlagtÅrsak).isEqualTo(HenlagtÅrsak.FEILREGISTRERT)
+        assertThat(respons.body!!.henlagtBegrunnelse).isEqualTo(henlagtBegrunnelse)
     }
 
     @Test
     internal fun `Skal henlegge FØRSTEGANGSBEHANDLING`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(identer = setOf(PersonIdent("12345678901"))))
         val behandling = testoppsettService.lagre(behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING))
-        val respons = henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT))
+        val henlagtBegrunnelse = "Registert feil"
+        val respons = henlegg(behandling.id, HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT, begrunnelse = henlagtBegrunnelse))
 
         assertThat(respons.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(respons.body!!.resultat).isEqualTo(BehandlingResultat.HENLAGT)
         assertThat(respons.body!!.henlagtÅrsak).isEqualTo(HenlagtÅrsak.FEILREGISTRERT)
+        assertThat(respons.body!!.henlagtBegrunnelse).isEqualTo(henlagtBegrunnelse)
     }
 
     @Nested
