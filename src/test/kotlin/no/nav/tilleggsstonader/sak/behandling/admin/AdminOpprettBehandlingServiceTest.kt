@@ -17,10 +17,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.dto.SøkerMedBarn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
+import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -60,6 +62,12 @@ class AdminOpprettBehandlingServiceTest {
         every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns emptyList()
         every { behandlingService.opprettBehandling(fagsak.id, any(), any(), any(), any()) } returns behandling
         every { barnService.opprettBarn(capture(opprettedeBarnSlot)) } answers { firstArg() }
+        BrukerContextUtil.mockBrukerContext()
+    }
+
+    @AfterEach
+    fun tearDown() {
+        BrukerContextUtil.clearBrukerContext()
     }
 
     @Test
