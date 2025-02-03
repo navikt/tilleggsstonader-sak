@@ -343,7 +343,7 @@ class IverksettServiceTest : IntegrationTest() {
             val andel1 =
                 andelTilkjentYtelse(
                     kildeBehandlingId = behandling.id,
-                    fom = nåværendeMåned.atDay(1),
+                    fom = nåværendeMåned.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 )
             val andel2 =
                 andelTilkjentYtelse(
