@@ -87,7 +87,7 @@ class OpphørValideringService(
             }
 
         brukerfeilHvis(
-            senesteTomIForrigeBeregning >= senesteTomIAvkortetResultat,
+            senesteTomIAvkortetResultat >= senesteTomIForrigeBeregning,
         ) { "Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet" }
     }
 

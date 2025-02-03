@@ -74,6 +74,26 @@ class OpphørValideringServiceLæremidlerTest {
             ),
         )
 
+    val forrigeBeregningsresultatFremITid =
+        BeregningsresultatLæremidler(
+            listOf(
+                BeregningsresultatForMåned(
+                    beløp = 100,
+                    grunnlag =
+                        Beregningsgrunnlag(
+                            fom = fom.plusMonths(1),
+                            tom = tom.plusMonths(1),
+                            utbetalingsdato = fom,
+                            studienivå = Studienivå.HØYERE_UTDANNING,
+                            studieprosent = 100,
+                            sats = 100,
+                            satsBekreftet = true,
+                            målgruppe = MålgruppeType.AAP,
+                        ),
+                ),
+            ),
+        )
+
     @BeforeEach
     fun setUp() {
         every { vilkårService.hentVilkår(saksbehandling.id) } returns listOf(vilkår)
@@ -107,6 +127,29 @@ class OpphørValideringServiceLæremidlerTest {
                     revurderFra = saksbehandlingRevurdertFraTilbakeITid.revurderFra,
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato")
+        }
+
+        @Nested
+        inner class `Valider beregningsresultat er avkortet ved opphør` {
+            @Test
+            fun `Kaster ikke feil når forrige behandling sin tom er frem i tid`() {
+                assertThatCode {
+                    opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
+                        beregningsresultat.perioder,
+                        forrigeBeregningsresultatForMåned = forrigeBeregningsresultatFremITid.perioder,
+                    )
+                }.doesNotThrowAnyException()
+            }
+
+            @Test
+            fun `Kaster feil når nytt beregeningsresultat ikke er avkortet`() {
+                assertThatThrownBy {
+                    opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
+                        beregningsresultat.perioder,
+                        beregningsresultat.perioder,
+                    )
+                }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet")
+            }
         }
     }
 }
