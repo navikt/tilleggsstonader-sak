@@ -80,8 +80,8 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.01.2025 | 903   | LÆREMIDLER_AAP | 01.01.2025      |
 
   Scenario: Legger til en ny vedtaksperiode innenfor en tidligere løpende måned
-    Har 01jan-10feb, legger til vedtaksperiode 20feb-31mars
-    Resultat: perioden i januar påvirker ikke noe, og den nye løpende måneden for mars blir utbetalt i mars
+  Har 01jan-10feb, legger til vedtaksperiode 20feb-31mars
+  Resultat: perioden i januar påvirker ikke noe, og den nye løpende måneden for mars blir utbetalt i mars
 
     Gitt følgende aktiviteter for læremidler behandling=1
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
@@ -225,3 +225,37 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Beløp | Type           | Utbetalingsdato |
       | 20.12.2024 | 438   | LÆREMIDLER_AAP | 20.12.2024      |
       | 01.01.2025 | 226   | LÆREMIDLER_AAP | 01.01.2025      |
+
+  Scenario: Avkorter og setter ny vedtaksperiode
+    På grunn av at man splitter vedtaksperioden blir det et nytt utbetalingsdato på andelene
+    Dette burde egentlige ikke gjøres av saksbehandler, då det ev. kan bli tilbakekreving for januar og etterbetaling i januar
+
+    Gitt følgende aktiviteter for læremidler behandling=1
+      | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
+      | 01.12.2024 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 50            |
+
+    Gitt følgende stønadsperioder for læremidler behandling=1
+      | Fom        | Tom        | Målgruppe | Aktivitet |
+      | 01.12.2024 | 31.03.2025 | AAP       | TILTAK    |
+
+    Når innvilger vedtaksperioder for behandling=1
+      | Fom        | Tom        |
+      | 01.01.2025 | 31.03.2025 |
+
+    Gitt kopierer perioder fra forrige behandling for behandling=2
+
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+      | Fom        | Tom        |
+      | 01.01.2025 | 31.01.2025 |
+      | 01.02.2025 | 31.03.2025 |
+
+    Så forvent beregningsresultatet for behandling=2
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | 01.02.2025 | 28.02.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 03.02.2025      |
+      | 01.03.2025 | 31.03.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 03.02.2025      |
+
+    Så forvent andeler for behandling=2
+      | Fom        | Beløp | Type           | Utbetalingsdato |
+      | 01.01.2025 | 226   | LÆREMIDLER_AAP | 01.01.2025      |
+      | 03.02.2025 | 452   | LÆREMIDLER_AAP | 03.02.2025      |
