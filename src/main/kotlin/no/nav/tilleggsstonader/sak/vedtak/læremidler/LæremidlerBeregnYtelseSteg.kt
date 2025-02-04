@@ -105,8 +105,9 @@ class LæremidlerBeregnYtelseSteg(
             forrigeBeregningsresultat
                 .perioder
                 .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < revurderFra }
-        val nyePerioder = beregningsresultat.perioder
-            .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= revurderFra }
+        val nyePerioder =
+            beregningsresultat.perioder
+                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= revurderFra }
 
         return BeregningsresultatLæremidler(perioder = perioderFraForrigeVedtakSomSkalBeholdes + nyePerioder)
     }

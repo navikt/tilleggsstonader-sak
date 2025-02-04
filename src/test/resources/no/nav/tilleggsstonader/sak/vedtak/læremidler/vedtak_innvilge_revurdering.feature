@@ -227,8 +227,8 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | 01.01.2025 | 226   | LÆREMIDLER_AAP | 01.01.2025      |
 
   Scenario: Avkorter og setter ny vedtaksperiode
-    På grunn av at man splitter vedtaksperioden blir det et nytt utbetalingsdato på andelene
-    Dette burde egentlige ikke gjøres av saksbehandler, då det ev. kan bli tilbakekreving for januar og etterbetaling i januar
+  På grunn av at man splitter vedtaksperioden blir det et nytt utbetalingsdato på andelene
+  Dette burde egentlige ikke gjøres av saksbehandler, då det ev. kan bli tilbakekreving for januar og etterbetaling i januar
 
     Gitt følgende aktiviteter for læremidler behandling=1
       | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
@@ -259,3 +259,75 @@ Egenskap: Innvilgelse av læremidler - revurdering
       | Fom        | Beløp | Type           | Utbetalingsdato |
       | 01.01.2025 | 226   | LÆREMIDLER_AAP | 01.01.2025      |
       | 03.02.2025 | 452   | LÆREMIDLER_AAP | 03.02.2025      |
+
+  Scenario: Verifiserer at beregningsresultat før revurder ikke blir reberegnet
+
+    Gitt lagrer andeler behandling=1
+      | Fom        | Beløp | Type           | Utbetalingsdato |
+      | 01.01.2025 | 300   | LÆREMIDLER_AAP | 01.01.2025      |
+
+    # Legger inn 100 i beløp for å verifisere at perioder før revurder ikke blir reberegnet
+    Gitt lagrer beregningsresultatet behandling=1
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 100   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | 01.02.2025 | 28.02.2025 | 100   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | 01.03.2025 | 31.03.2025 | 100   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+
+    Gitt følgende aktiviteter for læremidler behandling=2
+      | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
+      | 01.01.2025 | 31.01.2025 | TILTAK    | VIDEREGÅENDE | 50            |
+      | 01.02.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
+
+    Gitt følgende stønadsperioder for læremidler behandling=2
+      | Fom        | Tom        | Målgruppe | Aktivitet |
+      | 01.01.2025 | 31.03.2025 | AAP       | TILTAK    |
+
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=01.02.2025
+      | Fom        | Tom        |
+      | 01.01.2025 | 31.03.2025 |
+
+    Så forvent beregningsresultatet for behandling=2
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 100   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
+      | 01.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
+
+    Så forvent andeler for behandling=2
+      | Fom        | Beløp | Type           | Utbetalingsdato |
+      | 01.01.2025 | 1002  | LÆREMIDLER_AAP | 01.01.2025      |
+
+  Scenario: Verifiserer at periode som løper i revurder fra blir reberegnet
+
+    Gitt lagrer andeler behandling=1
+      | Fom        | Beløp | Type           | Utbetalingsdato |
+      | 01.01.2025 | 300   | LÆREMIDLER_AAP | 01.01.2025      |
+
+    # Legger inn 100 i beløp for å verifisere at perioder før revurder ikke blir reberegnet
+    Gitt lagrer beregningsresultatet behandling=1
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 100   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | 01.02.2025 | 28.02.2025 | 100   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | 01.03.2025 | 31.03.2025 | 100   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+
+    Gitt følgende aktiviteter for læremidler behandling=2
+      | Fom        | Tom        | Aktivitet | Studienivå   | Studieprosent |
+      | 01.01.2025 | 31.01.2025 | TILTAK    | VIDEREGÅENDE | 50            |
+      | 01.02.2025 | 31.03.2025 | TILTAK    | VIDEREGÅENDE | 100           |
+
+    Gitt følgende stønadsperioder for læremidler behandling=2
+      | Fom        | Tom        | Målgruppe | Aktivitet |
+      | 01.01.2025 | 31.03.2025 | AAP       | TILTAK    |
+
+    Når innvilger revurdering med vedtaksperioder for behandling=2 med revurderFra=31.01.2025
+      | Fom        | Tom        |
+      | 01.01.2025 | 31.03.2025 |
+
+    Så forvent beregningsresultatet for behandling=2
+      | Fom        | Tom        | Beløp | Studienivå   | Studieprosent | Sats | Målgruppe | Utbetalingsdato |
+      | 01.01.2025 | 31.01.2025 | 226   | VIDEREGÅENDE | 50            | 451  | AAP       | 01.01.2025      |
+      | 01.02.2025 | 28.02.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
+      | 01.03.2025 | 31.03.2025 | 451   | VIDEREGÅENDE | 100           | 451  | AAP       | 01.01.2025      |
+
+    Så forvent andeler for behandling=2
+      | Fom        | Beløp | Type           | Utbetalingsdato |
+      | 01.01.2025 | 1128  | LÆREMIDLER_AAP | 01.01.2025      |

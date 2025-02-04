@@ -31,11 +31,14 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.beregningsresultat
@@ -44,6 +47,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapAktiviteter
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.mapBeregningsresultat
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
@@ -142,6 +146,50 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         vilkårperiodeRepository.insertAll(tidligereVilkårsperioder.map { it.kopierTilBehandling(behandlingId) })
     }
 
+    @Gitt("lagrer beregningsresultatet behandling={}")
+    fun `lagrer beregningsresultat`(
+        behandlingIdTall: Int,
+        dataTable: DataTable,
+    ) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+
+        val perioderBeregningsresultat = mapBeregningsresultat(dataTable)
+        val vedtaksperiode =
+            Vedtaksperiode(
+                fom = perioderBeregningsresultat.minOf { it.fom },
+                tom = perioderBeregningsresultat.maxOf { it.tom },
+            )
+        val vedtak =
+            InnvilgelseLæremidler(
+                vedtaksperioder = listOf(vedtaksperiode),
+                beregningsresultat = BeregningsresultatLæremidler(perioderBeregningsresultat),
+            )
+        vedtakRepository.insert(GeneriskVedtak(behandlingId = behandlingId, vedtak))
+    }
+
+    @Gitt("lagrer andeler behandling={}")
+    fun `lagrer andeler`(
+        behandlingIdTall: Int,
+        dataTable: DataTable,
+    ) {
+        val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
+
+        val andeler =
+            mapAndeler(dataTable)
+                .map {
+                    AndelTilkjentYtelse(
+                        beløp = it.beløp,
+                        fom = it.fom,
+                        tom = it.tom,
+                        satstype = it.satstype,
+                        type = it.type,
+                        kildeBehandlingId = behandlingId,
+                        utbetalingsdato = it.utbetalingsdato,
+                    )
+                }.toSet()
+        tilkjentYtelseRepository.insert(TilkjentYtelse(behandlingId = behandlingId, andelerTilkjentYtelse = andeler))
+    }
+
     @Når("opphør behandling={} med revurderFra={}")
     fun `opphør med revurderFra`(
         behandlingIdTall: Int,
@@ -190,22 +238,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     ) {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
 
-        val forventedeAndeler =
-            dataTable.mapRad { rad ->
-                ForenkletAndel(
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad) ?: parseDato(DomenenøkkelFelles.FOM, rad),
-                    beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
-                    satstype = parseValgfriEnum<Satstype>(DomenenøkkelAndelTilkjentYtelse.SATS, rad) ?: Satstype.DAG,
-                    type = parseEnum(DomenenøkkelAndelTilkjentYtelse.TYPE, rad),
-                    utbetalingsdato = parseDato(DomenenøkkelAndelTilkjentYtelse.UTBETALINGSDATO, rad),
-                    statusIverksetting =
-                        parseValgfriEnum<StatusIverksetting>(
-                            domenebegrep = DomenenøkkelAndelTilkjentYtelse.STATUS_IVERKSETTING,
-                            rad = rad,
-                        ) ?: StatusIverksetting.UBEHANDLET,
-                )
-            }
+        val forventedeAndeler = mapAndeler(dataTable)
 
         val andeler =
             tilkjentYtelseRepository
@@ -279,6 +312,23 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             statusIverksetting = andel.statusIverksetting,
         )
     }
+
+    private fun mapAndeler(dataTable: DataTable) =
+        dataTable.mapRad { rad ->
+            ForenkletAndel(
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseValgfriDato(DomenenøkkelFelles.TOM, rad) ?: parseDato(DomenenøkkelFelles.FOM, rad),
+                beløp = parseInt(DomenenøkkelFelles.BELØP, rad),
+                satstype = parseValgfriEnum<Satstype>(DomenenøkkelAndelTilkjentYtelse.SATS, rad) ?: Satstype.DAG,
+                type = parseEnum(DomenenøkkelAndelTilkjentYtelse.TYPE, rad),
+                utbetalingsdato = parseDato(DomenenøkkelAndelTilkjentYtelse.UTBETALINGSDATO, rad),
+                statusIverksetting =
+                    parseValgfriEnum<StatusIverksetting>(
+                        domenebegrep = DomenenøkkelAndelTilkjentYtelse.STATUS_IVERKSETTING,
+                        rad = rad,
+                    ) ?: StatusIverksetting.UBEHANDLET,
+            )
+        }
 
     private fun dummyBehandling(
         behandlingId: BehandlingId,
