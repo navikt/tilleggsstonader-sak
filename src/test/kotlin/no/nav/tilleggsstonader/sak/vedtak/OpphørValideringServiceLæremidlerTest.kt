@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -24,45 +23,33 @@ class OpphørValideringServiceLæremidlerTest {
 
     val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)
 
-    val beregningsresultat =
-        BeregningsresultatLæremidler(
-            listOf(
-                BeregningsresultatForMåned(
-                    beløp = 100,
-                    grunnlag =
-                        Beregningsgrunnlag(
-                            fom = fom,
-                            tom = tom,
-                            utbetalingsdato = fom,
-                            studienivå = Studienivå.HØYERE_UTDANNING,
-                            studieprosent = 100,
-                            sats = 100,
-                            satsBekreftet = true,
-                            målgruppe = MålgruppeType.AAP,
-                        ),
-                ),
-            ),
-        )
+    val beregningsgrunnlag = Beregningsgrunnlag(
+        fom = fom,
+        tom = tom,
+        utbetalingsdato = fom,
+        studienivå = Studienivå.HØYERE_UTDANNING,
+        studieprosent = 100,
+        sats = 100,
+        satsBekreftet = true,
+        målgruppe = MålgruppeType.AAP,
+    )
 
-    val forrigeBeregningsresultatFremITid =
-        BeregningsresultatLæremidler(
-            listOf(
+    val beregningsresultatForJanuar: List<BeregningsresultatForMåned>  =  listOf(
                 BeregningsresultatForMåned(
                     beløp = 100,
-                    grunnlag =
-                        Beregningsgrunnlag(
-                            fom = fom.plusMonths(1),
-                            tom = tom.plusMonths(1),
-                            utbetalingsdato = fom,
-                            studienivå = Studienivå.HØYERE_UTDANNING,
-                            studieprosent = 100,
-                            sats = 100,
-                            satsBekreftet = true,
-                            målgruppe = MålgruppeType.AAP,
-                        ),
+                    grunnlag = beregningsgrunnlag
                 ),
-            ),
-        )
+            )
+
+    val beregningsresultatForFebruar: List<BeregningsresultatForMåned>  =  listOf(
+                BeregningsresultatForMåned(
+                    beløp = 100,
+                    grunnlag = beregningsgrunnlag.copy(
+                        fom = fom.plusMonths(1),
+                        tom = tom.plusMonths(1),
+                    )
+                ),
+            )
 
     @Nested
     inner class `Valider beregningsresultat er avkortet ved opphør` {
@@ -70,8 +57,8 @@ class OpphørValideringServiceLæremidlerTest {
         fun `Kaster ikke feil når forrige behandling sin tom er frem i tid`() {
             assertThatCode {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-                    avkortetBeregningsresultat = beregningsresultat.perioder,
-                    forrigeBeregningsresultatForMåned = forrigeBeregningsresultatFremITid.perioder,
+                    avkortetBeregningsresultat = beregningsresultatForJanuar,
+                    forrigeBeregningsresultatForMåned = beregningsresultatForFebruar,
                 )
             }.doesNotThrowAnyException()
         }
@@ -80,8 +67,8 @@ class OpphørValideringServiceLæremidlerTest {
         fun `Kaster feil når nytt beregeningsresultat ikke er avkortet`() {
             assertThatThrownBy {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-                    avkortetBeregningsresultat = beregningsresultat.perioder,
-                    forrigeBeregningsresultatForMåned = beregningsresultat.perioder,
+                    avkortetBeregningsresultat = beregningsresultatForJanuar,
+                    forrigeBeregningsresultatForMåned = beregningsresultatForJanuar,
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet")
         }
