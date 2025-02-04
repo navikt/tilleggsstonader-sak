@@ -49,11 +49,11 @@ class OpphørValideringService(
     }
 
     fun validerBeregningsresultatErAvkortetVedOpphør(
-        avkortetBeregningsresultat: List<BeregningsresultatForMåned>,
+        beregningsresultatEtterOpphør: List<BeregningsresultatForMåned>,
         forrigeBeregningsresultatForMåned: List<BeregningsresultatForMåned>,
     ) {
-        val senesteTomIAvkortetResultat =
-            avkortetBeregningsresultat.reduce { beregningsgrunnlagMedSisteTom, current ->
+        val senesteTomIOpphør =
+            beregningsresultatEtterOpphør.reduce { beregningsgrunnlagMedSisteTom, current ->
                 if (current.tom >
                     beregningsgrunnlagMedSisteTom.tom
                 ) {
@@ -74,7 +74,7 @@ class OpphørValideringService(
             }
 
         brukerfeilHvis(
-            senesteTomIAvkortetResultat >= senesteTomIForrigeBeregning,
+            senesteTomIOpphør >= senesteTomIForrigeBeregning,
         ) { "Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet" }
     }
 

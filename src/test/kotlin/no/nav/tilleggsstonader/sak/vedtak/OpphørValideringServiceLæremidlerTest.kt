@@ -67,7 +67,7 @@ class OpphørValideringServiceLæremidlerTest {
         fun `Kaster ikke feil når forrige behandling sin tom er frem i tid`() {
             assertThatCode {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-                    avkortetBeregningsresultat = avkortetBeregningsresultat.perioder,
+                    beregningsresultatEtterOpphør = avkortetBeregningsresultat.perioder,
                     forrigeBeregningsresultatForMåned = forrigeBeregningsresultat.perioder,
                 )
             }.doesNotThrowAnyException()
@@ -77,7 +77,7 @@ class OpphørValideringServiceLæremidlerTest {
         fun `Kaster feil når nytt beregeningsresultat ikke er avkortet`() {
             assertThatThrownBy {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-                    avkortetBeregningsresultat = forrigeBeregningsresultat.perioder,
+                    beregningsresultatEtterOpphør = forrigeBeregningsresultat.perioder,
                     forrigeBeregningsresultatForMåned = forrigeBeregningsresultat.perioder,
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet")
