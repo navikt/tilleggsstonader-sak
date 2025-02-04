@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -34,22 +35,31 @@ class OpphørValideringServiceLæremidlerTest {
         målgruppe = MålgruppeType.AAP,
     )
 
-    val beregningsresultatForJanuar: List<BeregningsresultatForMåned>  =  listOf(
-                BeregningsresultatForMåned(
-                    beløp = 100,
-                    grunnlag = beregningsgrunnlag
-                ),
-            )
+    val beregningsresultatForJanuar = BeregningsresultatForMåned(
+        beløp = 100,
+        grunnlag = beregningsgrunnlag
+    )
 
-    val beregningsresultatForFebruar: List<BeregningsresultatForMåned>  =  listOf(
-                BeregningsresultatForMåned(
-                    beløp = 100,
-                    grunnlag = beregningsgrunnlag.copy(
-                        fom = fom.plusMonths(1),
-                        tom = tom.plusMonths(1),
-                    )
-                ),
-            )
+    val beregningsresultatForFebruar = BeregningsresultatForMåned(
+        beløp = 100,
+        grunnlag = beregningsgrunnlag.copy(
+            fom = fom.plusMonths(1),
+            tom = tom.plusMonths(1),
+        )
+    )
+
+    val avkortetBeregningsresultat = BeregningsresultatLæremidler(
+        perioder = listOf(
+            beregningsresultatForJanuar,
+        )
+    )
+
+    val forrigeBeregningsresultat = BeregningsresultatLæremidler(
+        perioder = listOf(
+            beregningsresultatForJanuar,
+            beregningsresultatForFebruar
+        )
+    )
 
     @Nested
     inner class `Valider beregningsresultat er avkortet ved opphør` {
@@ -57,8 +67,8 @@ class OpphørValideringServiceLæremidlerTest {
         fun `Kaster ikke feil når forrige behandling sin tom er frem i tid`() {
             assertThatCode {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-                    avkortetBeregningsresultat = beregningsresultatForJanuar,
-                    forrigeBeregningsresultatForMåned = beregningsresultatForFebruar,
+                    avkortetBeregningsresultat = avkortetBeregningsresultat.perioder,
+                    forrigeBeregningsresultatForMåned = forrigeBeregningsresultat.perioder,
                 )
             }.doesNotThrowAnyException()
         }
@@ -67,8 +77,8 @@ class OpphørValideringServiceLæremidlerTest {
         fun `Kaster feil når nytt beregeningsresultat ikke er avkortet`() {
             assertThatThrownBy {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-                    avkortetBeregningsresultat = beregningsresultatForJanuar,
-                    forrigeBeregningsresultatForMåned = beregningsresultatForJanuar,
+                    avkortetBeregningsresultat = forrigeBeregningsresultat.perioder,
+                    forrigeBeregningsresultatForMåned = forrigeBeregningsresultat.perioder,
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet")
         }
