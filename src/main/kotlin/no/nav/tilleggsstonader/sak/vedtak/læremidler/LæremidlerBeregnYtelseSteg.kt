@@ -114,11 +114,6 @@ class LæremidlerBeregnYtelseSteg(
                 avkortetVedtaksperioder = avkortetVedtaksperioder,
             )
 
-        opphørValideringService.validerIngenUtbetalingEtterRevurderFraDatoLæremidler(
-            beregningsresultatForMånedListe = avkortetBeregningsresultat.perioder,
-            revurderFra = saksbehandling.revurderFra,
-        )
-
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,

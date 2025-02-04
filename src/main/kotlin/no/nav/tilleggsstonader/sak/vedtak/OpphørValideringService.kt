@@ -48,19 +48,6 @@ class OpphørValideringService(
         }
     }
 
-    fun validerIngenUtbetalingEtterRevurderFraDatoLæremidler(
-        beregningsresultatForMånedListe: List<BeregningsresultatForMåned>,
-        revurderFra: LocalDate?,
-    ) {
-        brukerfeilHvis(revurderFra == null) { "Revurder fra dato er påkrevd for opphør" }
-
-        beregningsresultatForMånedListe.forEach { periode ->
-            brukerfeilHvis(
-                periode.grunnlag.tom >= revurderFra,
-            ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
-        }
-    }
-
     fun validerBeregningsresultatErAvkortetVedOpphør(
         avkortetBeregningsresultat: List<BeregningsresultatForMåned>,
         forrigeBeregningsresultatForMåned: List<BeregningsresultatForMåned>,

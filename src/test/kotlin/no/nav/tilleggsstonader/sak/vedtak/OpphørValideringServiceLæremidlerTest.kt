@@ -106,50 +106,25 @@ class OpphørValideringServiceLæremidlerTest {
     }
 
     @Nested
-    inner class `Valider ingen utbetaling etter opphør - Læremidler` {
+    inner class `Valider beregningsresultat er avkortet ved opphør` {
         @Test
-        fun `Kaster ikke feil ved korrekt data`() {
+        fun `Kaster ikke feil når forrige behandling sin tom er frem i tid`() {
             assertThatCode {
-                opphørValideringService.validerIngenUtbetalingEtterRevurderFraDatoLæremidler(
-                    beregningsresultatForMånedListe = beregningsresultat.perioder,
-                    revurderFra = saksbehandling.revurderFra,
+                opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
+                    beregningsresultat.perioder,
+                    forrigeBeregningsresultatForMåned = forrigeBeregningsresultatFremITid.perioder,
                 )
             }.doesNotThrowAnyException()
         }
 
         @Test
-        fun `Kaster feil ved utbetaling etter opphørdato`() {
-            val saksbehandlingRevurdertFraTilbakeITid = saksbehandling.copy(revurderFra = måned.atDay(1))
-
+        fun `Kaster feil når nytt beregeningsresultat ikke er avkortet`() {
             assertThatThrownBy {
-                opphørValideringService.validerIngenUtbetalingEtterRevurderFraDatoLæremidler(
-                    beregningsresultatForMånedListe = beregningsresultat.perioder,
-                    revurderFra = saksbehandlingRevurdertFraTilbakeITid.revurderFra,
+                opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
+                    beregningsresultat.perioder,
+                    beregningsresultat.perioder,
                 )
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato")
-        }
-
-        @Nested
-        inner class `Valider beregningsresultat er avkortet ved opphør` {
-            @Test
-            fun `Kaster ikke feil når forrige behandling sin tom er frem i tid`() {
-                assertThatCode {
-                    opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-                        beregningsresultat.perioder,
-                        forrigeBeregningsresultatForMåned = forrigeBeregningsresultatFremITid.perioder,
-                    )
-                }.doesNotThrowAnyException()
-            }
-
-            @Test
-            fun `Kaster feil når nytt beregeningsresultat ikke er avkortet`() {
-                assertThatThrownBy {
-                    opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-                        beregningsresultat.perioder,
-                        beregningsresultat.perioder,
-                    )
-                }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet")
-            }
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet")
         }
     }
 }
