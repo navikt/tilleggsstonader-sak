@@ -43,8 +43,8 @@ Egenskap: Beregning - En vedtaksperiode med full aktivitet
       | 01.2023 | 29.53   | 8            | 1000   | 236        |
 
     Så V2 - forvent følgende vedtaksperiodeGrunnlag for: 01.2023
-      | Fom        | Tom        | Målgruppe       | Aktivitet |
-      | 02.01.2023 | 11.01.2023 | OVERGANGSSTØNAD | UTDANNING |
+      | Fom        | Tom        | Målgruppe       | Aktivitet | Antall dager |
+      | 02.01.2023 | 11.01.2023 | OVERGANGSSTØNAD | UTDANNING | 8            |
 
   Scenario: Vedtaksperiode og utgift over flere måneder - start og slutt midt i måned
     # Mål: Beregning skal dele opp stønadsperiode som går over flere måneder uten å endre fom og tom
@@ -69,9 +69,9 @@ Egenskap: Beregning - En vedtaksperiode med full aktivitet
       | 05.2023 | 29.53   | 20           | 1000   | 591         |
 
     Så V2 - forvent følgende vedtaksperiodeGrunnlag for: 04.2023
-      | Fom        | Tom        | Målgruppe       | Aktivitet |
-      | 10.04.2023 | 30.04.2023 | OVERGANGSSTØNAD | UTDANNING |
+      | Fom        | Tom        | Målgruppe       | Aktivitet | Antall dager |
+      | 10.04.2023 | 30.04.2023 | OVERGANGSSTØNAD | UTDANNING | 15           |
 
     Så V2 - forvent følgende vedtaksperiodeGrunnlag for: 05.2023
-      | Fom        | Tom        | Målgruppe       | Aktivitet |
-      | 01.05.2023 | 26.05.2023 | OVERGANGSSTØNAD | UTDANNING |
+      | Fom        | Tom        | Målgruppe       | Aktivitet | Antall dager |
+      | 01.05.2023 | 26.05.2023 | OVERGANGSSTØNAD | UTDANNING | 20           |

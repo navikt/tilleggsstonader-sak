@@ -72,12 +72,12 @@ Egenskap: Beregning - Utgifter
       | 02.2023 | 29.53   | 20           | 1000   | 591         |
 
     Så V2 - forvent følgende vedtaksperiodeGrunnlag for: 01.2023
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.01.2023 | 31.01.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe       | Antall dager |
+      | 01.01.2023 | 31.01.2023 | UTDANNING | OVERGANGSSTØNAD | 22           |
 
     Så V2 - forvent følgende vedtaksperiodeGrunnlag for: 02.2023
-      | Fom        | Tom        | Aktivitet | Målgruppe       |
-      | 01.02.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD |
+      | Fom        | Tom        | Aktivitet | Målgruppe       | Antall dager |
+      | 01.02.2023 | 28.02.2023 | UTDANNING | OVERGANGSSTØNAD | 20           |
 
   Scenario: Skal avrunde månedsbeløpet
 

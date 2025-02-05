@@ -23,8 +23,8 @@ Egenskap: Beregning - Håndtering av helgdager
       | 01.2023 | 29.53   | 22           | 1000   | 650         |
 
     Så V2 - forvent følgende vedtaksperiodeGrunnlag for: 01.2023
-      | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
-      | 01.01.2023 | 31.01.2023 | AAP       | UTDANNING | 1                  | 22           |
+      | Fom        | Tom        | Målgruppe | Aktivitet | Antall dager |
+      | 01.01.2023 | 31.01.2023 | AAP       | UTDANNING | 22           |
 
     Så V2 - forvent følgende beløpsperioder for: 01.2023
       | Dato       | Beløp | Målgruppe |
@@ -51,8 +51,8 @@ Egenskap: Beregning - Håndtering av helgdager
       | 04.2023 | 29.53   | 20           | 1000   | 591         |
 
     Så V2 - forvent følgende vedtaksperiodeGrunnlag for: 04.2023
-      | Fom        | Tom        | Målgruppe | Aktivitet | Antall aktiviteter | Antall dager |
-      | 01.04.2023 | 30.04.2023 | AAP       | UTDANNING | 1                  | 20           |
+      | Fom        | Tom        | Målgruppe | Aktivitet | Antall dager |
+      | 01.04.2023 | 30.04.2023 | AAP       | UTDANNING | 20           |
 
     Så V2 - forvent følgende beløpsperioder for: 04.2023
       | Dato       | Beløp | Målgruppe |

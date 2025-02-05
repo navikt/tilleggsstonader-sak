@@ -190,6 +190,9 @@ class BeregningV2StepDefinition {
             try {
                 assertThat(resultat.fom).`as` { "fom" }.isEqualTo(forventetResultat.fom)
                 assertThat(resultat.tom).`as` { "tom" }.isEqualTo(forventetResultat.tom)
+                assertThat(resultat.antallAktivitetsDager)
+                    .`as` { "antallAktivitetsDager" }
+                    .isEqualTo(forventetResultat.antallAktivitetsDager)
             } catch (e: Throwable) {
                 logger.error("Feilet validering av rad ${index + 1}")
                 throw e
@@ -254,7 +257,7 @@ fun mapVedtaksperiodeGrunnlag(dataTable: DataTable) =
                 parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
                     ?: AktivitetType.TILTAK,
             aktiviteter = emptyList(),
-            antallAktivitetsDager = 0,
+            antallAktivitetsDager = parseInt(BeregningNøkler.ANTALL_DAGER, rad),
         )
     }
 
