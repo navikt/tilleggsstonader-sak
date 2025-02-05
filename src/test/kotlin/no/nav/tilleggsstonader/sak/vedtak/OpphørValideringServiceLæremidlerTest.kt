@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -21,6 +22,9 @@ class OpphørValideringServiceLæremidlerTest {
     val måned = YearMonth.of(2025, 1)
     val fom = måned.atDay(1)
     val tom = måned.atEndOfMonth()
+
+    val vedtaksperiodeJanuar = Vedtaksperiode(fom, tom)
+    val vedtaksperiodeFebruar = Vedtaksperiode(fom.plusMonths(1), tom.plusMonths(1))
 
     val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)
 
@@ -89,6 +93,29 @@ class OpphørValideringServiceLæremidlerTest {
                     forrigeBeregningsresultatForMåned = beregningsresultat.perioder,
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet")
+        }
+    }
+
+    @Nested
+    inner class `Valider at vedtaksperioden er avkortet ved opphør` {
+        @Test
+        fun `Kaster ikke feil når vedtaksperioden er avkortet`() {
+            assertThatCode {
+                opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+                    vedtaksperioderEtterOpphør = listOf(vedtaksperiodeJanuar),
+                    forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
+                )
+            }.doesNotThrowAnyException()
+        }
+
+        @Test
+        fun `Kaster feil når vedtaksperioden ikke er avkortet`() {
+            assertThatThrownBy {
+                opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+                    vedtaksperioderEtterOpphør = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
+                    forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
+                )
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen vedtaksperioder har blitt avkortet")
         }
     }
 }
