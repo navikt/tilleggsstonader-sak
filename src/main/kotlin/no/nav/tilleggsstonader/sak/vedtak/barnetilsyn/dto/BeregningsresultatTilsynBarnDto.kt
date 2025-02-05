@@ -16,7 +16,7 @@ import java.time.YearMonth
 
 data class BeregningsresultatTilsynBarnDto(
     val perioder: List<BeregningsresultatForMånedDto>,
-    val vedtaksperioder: List<VedtaksperiodeDto>,
+    val vedtaksperioder: List<VedtaksperiodeTilsynBarnDto>,
     val gjelderFraOgMed: LocalDate?,
     val gjelderTilOgMed: LocalDate?,
 )
@@ -27,7 +27,7 @@ data class BeregningsresultatForMånedDto(
     val grunnlag: BeregningsgrunnlagDto,
 )
 
-data class VedtaksperiodeDto(
+data class VedtaksperiodeTilsynBarnDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val målgruppe: MålgruppeType,
@@ -65,7 +65,7 @@ fun BeregningsresultatTilsynBarn.tilDto(revurderFra: LocalDate?): Beregningsresu
 }
 
 private fun VedtaksperiodeTilsynBarn.tilDto() =
-    VedtaksperiodeDto(
+    VedtaksperiodeTilsynBarnDto(
         fom = fom,
         tom = tom,
         målgruppe = målgruppe,
