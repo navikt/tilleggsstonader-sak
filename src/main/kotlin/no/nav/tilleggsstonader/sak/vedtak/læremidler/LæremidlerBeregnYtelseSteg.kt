@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -109,7 +110,31 @@ class LæremidlerBeregnYtelseSteg(
             beregningsresultat.perioder
                 .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= revurderFra }
 
-        return BeregningsresultatLæremidler(perioder = perioderFraForrigeVedtakSomSkalBeholdes + nyePerioder)
+        val nyePerioderMedKorrigertUtbetalingsdato = korrigerUtbetalingsdato(nyePerioder, forrigeBeregningsresultat)
+
+        return BeregningsresultatLæremidler(
+            perioder = perioderFraForrigeVedtakSomSkalBeholdes + nyePerioderMedKorrigertUtbetalingsdato,
+        )
+    }
+
+    private fun korrigerUtbetalingsdato(
+        nyePerioder: List<BeregningsresultatForMåned>,
+        forrigeBeregningsresultat: BeregningsresultatLæremidler,
+    ): List<BeregningsresultatForMåned> {
+        val utbetalingsdatoPerMåned =
+            forrigeBeregningsresultat
+                .perioder
+                .associate { it.grunnlag.fom.toYearMonth() to it.grunnlag.utbetalingsdato }
+
+        return nyePerioder
+            .map {
+                val utbetalingsdato = utbetalingsdatoPerMåned[it.fom.toYearMonth()]
+                if (utbetalingsdato != null) {
+                    it.medKorrigertUtbetalingsdato(utbetalingsdato)
+                } else {
+                    it
+                }
+            }
     }
 
     private fun hentVedtak(forrigeBehandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørLæremidler> =
