@@ -52,20 +52,20 @@ class OpphørValideringServiceLæremidlerTest {
                 ),
         )
 
-    val avkortetBeregningsresultat =
-        BeregningsresultatLæremidler(
-            perioder =
-                listOf(
-                    beregningsresultatForJanuar,
-                ),
-        )
-
-    val forrigeBeregningsresultat =
+    val beregningsresultat =
         BeregningsresultatLæremidler(
             perioder =
                 listOf(
                     beregningsresultatForJanuar,
                     beregningsresultatForFebruar,
+                ),
+        )
+
+    val avkortetBeregningsresultat =
+        BeregningsresultatLæremidler(
+            perioder =
+                listOf(
+                    beregningsresultatForJanuar,
                 ),
         )
 
@@ -76,7 +76,7 @@ class OpphørValideringServiceLæremidlerTest {
             assertThatCode {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
                     beregningsresultatEtterOpphør = avkortetBeregningsresultat.perioder,
-                    forrigeBeregningsresultatForMåned = forrigeBeregningsresultat.perioder,
+                    forrigeBeregningsresultatForMåned = beregningsresultat.perioder,
                 )
             }.doesNotThrowAnyException()
         }
@@ -85,8 +85,8 @@ class OpphørValideringServiceLæremidlerTest {
         fun `Kaster feil når nytt beregeningsresultat ikke er avkortet`() {
             assertThatThrownBy {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-                    beregningsresultatEtterOpphør = forrigeBeregningsresultat.perioder,
-                    forrigeBeregningsresultatForMåned = forrigeBeregningsresultat.perioder,
+                    beregningsresultatEtterOpphør = beregningsresultat.perioder,
+                    forrigeBeregningsresultatForMåned = beregningsresultat.perioder,
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet")
         }
