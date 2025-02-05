@@ -62,7 +62,7 @@ class GrunnlagsdataService(
 
     private fun hentGrunnlagArena(behandling: Saksbehandling): GrunnlagArena {
         val statusArena = arenaService.hentStatus(behandling.ident, behandling.stønadstype)
-        return GrunnlagArenaMapper.mapFaktaArena(statusArena)
+        return GrunnlagArenaMapper.mapFaktaArena(statusArena, behandling.stønadstype)
     }
 
     private fun mapFødsel(person: SøkerMedBarn): Fødsel {
