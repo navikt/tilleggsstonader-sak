@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -76,6 +77,36 @@ class OpphørValideringService(
         brukerfeilHvis(
             senesteTomIOpphør >= senesteTomIForrigeBeregning,
         ) { "Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet" }
+    }
+
+    fun validerVedtaksperioderAvkortetVedOpphør(
+        vedtaksperioderEtterOpphør: List<Vedtaksperiode>,
+        forrigeBehandlingsVedtaksperioder: List<Vedtaksperiode>,
+    ) {
+        val senesteTomINyeVedtaksperioder =
+            vedtaksperioderEtterOpphør.reduce { vedtaksperioderSisteTom, current ->
+                if (current.tom >
+                    vedtaksperioderSisteTom.tom
+                ) {
+                    current
+                } else {
+                    vedtaksperioderSisteTom
+                }
+            }
+        val senesteTomIForrigeVedtaksperioder =
+            forrigeBehandlingsVedtaksperioder.reduce { vedtaksperioderSisteTom, current ->
+                if (current.tom >
+                    vedtaksperioderSisteTom.tom
+                ) {
+                    current
+                } else {
+                    vedtaksperioderSisteTom
+                }
+            }
+
+        brukerfeilHvis(
+            senesteTomINyeVedtaksperioder >= senesteTomIForrigeVedtaksperioder,
+        ) { "Opphør er et ugyldig vedtaksresultat fordi ingen vedtaksperioder har blitt avkortet" }
     }
 
     private fun validerIngenNyeOppfylteVilkårEllerVilkårperioder(
