@@ -17,11 +17,13 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
+import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV2.TilsynBarnBeregningServiceV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -164,7 +166,52 @@ class BeregningV2StepDefinition {
 
         assertThat(perioder).hasSize(forventetBeregningsresultat.size)
     }
+
+    @Så("V2 - forvent følgende vedtaksperiodeGrunnlag for: {}")
+    fun `forvent følgende vedtaksperiodeGrunnlag`(
+        månedStr: String,
+        dataTable: DataTable,
+    ) {
+        assertThat(exception).isNull()
+        val måned = parseÅrMåned(månedStr)
+        val forventetVedtaksperiodeGrunnlag = mapVedtaksperiodeGrunnlag(dataTable)
+
+        val perioder =
+            beregningsresultat!!
+                .perioder
+                .find { it.grunnlag.måned == måned }
+                ?.grunnlag
+                ?.vedtaksperioderGrunnlag
+                ?: error("Finner ikke beregningsresultat for $måned")
+
+        perioder.forEachIndexed { index, resultat ->
+            val forventetResultat = forventetVedtaksperiodeGrunnlag[index]
+            try {
+                assertThat(resultat.fom).`as` { "fom" }.isEqualTo(forventetResultat.fom)
+                assertThat(resultat.tom).`as` { "tom" }.isEqualTo(forventetResultat.tom)
+            } catch (e: Throwable) {
+                logger.error("Feilet validering av rad ${index + 1}")
+                throw e
+            }
+        }
+
+        assertThat(perioder).hasSize(forventetVedtaksperiodeGrunnlag.size)
+    }
 }
+
+fun mapVedtaksperiodeGrunnlag(dataTable: DataTable) =
+    dataTable.mapRad { rad ->
+        VedtaksperiodeGrunnlag(
+            fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
+            tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
+            målgruppeType = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+            aktivitetType =
+                parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
+                    ?: AktivitetType.TILTAK,
+            aktiviteter = emptyList(),
+            antallAktivitetsDager = 0,
+        )
+    }
 
 fun mapVedtaksperioder(dataTable: DataTable) =
     dataTable.mapRad { rad ->
