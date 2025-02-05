@@ -24,42 +24,50 @@ class OpphørValideringServiceLæremidlerTest {
 
     val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)
 
-    val beregningsgrunnlag = Beregningsgrunnlag(
-        fom = fom,
-        tom = tom,
-        utbetalingsdato = fom,
-        studienivå = Studienivå.HØYERE_UTDANNING,
-        studieprosent = 100,
-        sats = 100,
-        satsBekreftet = true,
-        målgruppe = MålgruppeType.AAP,
-    )
-
-    val beregningsresultatForJanuar = BeregningsresultatForMåned(
-        beløp = 100,
-        grunnlag = beregningsgrunnlag
-    )
-
-    val beregningsresultatForFebruar = BeregningsresultatForMåned(
-        beløp = 100,
-        grunnlag = beregningsgrunnlag.copy(
-            fom = fom.plusMonths(1),
-            tom = tom.plusMonths(1),
+    val beregningsgrunnlag =
+        Beregningsgrunnlag(
+            fom = fom,
+            tom = tom,
+            utbetalingsdato = fom,
+            studienivå = Studienivå.HØYERE_UTDANNING,
+            studieprosent = 100,
+            sats = 100,
+            satsBekreftet = true,
+            målgruppe = MålgruppeType.AAP,
         )
-    )
 
-    val avkortetBeregningsresultat = BeregningsresultatLæremidler(
-        perioder = listOf(
-            beregningsresultatForJanuar,
+    val beregningsresultatForJanuar =
+        BeregningsresultatForMåned(
+            beløp = 100,
+            grunnlag = beregningsgrunnlag,
         )
-    )
 
-    val forrigeBeregningsresultat = BeregningsresultatLæremidler(
-        perioder = listOf(
-            beregningsresultatForJanuar,
-            beregningsresultatForFebruar
+    val beregningsresultatForFebruar =
+        BeregningsresultatForMåned(
+            beløp = 100,
+            grunnlag =
+                beregningsgrunnlag.copy(
+                    fom = fom.plusMonths(1),
+                    tom = tom.plusMonths(1),
+                ),
         )
-    )
+
+    val avkortetBeregningsresultat =
+        BeregningsresultatLæremidler(
+            perioder =
+                listOf(
+                    beregningsresultatForJanuar,
+                ),
+        )
+
+    val forrigeBeregningsresultat =
+        BeregningsresultatLæremidler(
+            perioder =
+                listOf(
+                    beregningsresultatForJanuar,
+                    beregningsresultatForFebruar,
+                ),
+        )
 
     @Nested
     inner class `Valider beregningsresultat er avkortet ved opphør` {
