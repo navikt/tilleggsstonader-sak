@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV2.TilsynBarnBeregningServiceV2
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
@@ -197,7 +198,46 @@ class BeregningV2StepDefinition {
 
         assertThat(perioder).hasSize(forventetVedtaksperiodeGrunnlag.size)
     }
+
+    @Så("V2 - forvent følgende beløpsperioder for: {}")
+    fun `forvent følgende beløpsperioder`(
+        månedStr: String,
+        dataTable: DataTable,
+    ) {
+        assertThat(exception).isNull()
+        val måned = parseÅrMåned(månedStr)
+        val forventedeBeløpsperioder = parseForventedeBeløpsperioder(dataTable)
+
+        val beløpsperioder =
+            beregningsresultat!!
+                .perioder
+                .find { it.grunnlag.måned == måned }
+                ?.beløpsperioder
+                ?: error("Finner ikke beregningsresultat for $måned")
+
+        beløpsperioder.forEachIndexed { index, resultat ->
+            val forventetResultat = forventedeBeløpsperioder[index]
+            try {
+                assertThat(resultat.dato).isEqualTo(forventetResultat.dato)
+                assertThat(resultat.beløp).isEqualTo(forventetResultat.beløp)
+                assertThat(resultat.målgruppe).isEqualTo(forventetResultat.målgruppe)
+            } catch (e: Throwable) {
+                logger.error("Feilet validering av rad ${index + 1}")
+                throw e
+            }
+        }
+        assertThat(beløpsperioder).hasSize(forventedeBeløpsperioder.size)
+    }
 }
+
+fun parseForventedeBeløpsperioder(dataTable: DataTable): List<Beløpsperiode> =
+    dataTable.mapRad { rad ->
+        Beløpsperiode(
+            dato = parseÅrMånedEllerDato(BeregningNøkler.DATO, rad).datoEllerFørsteDagenIMåneden(),
+            målgruppe = parseValgfriEnum<MålgruppeType>(BeregningNøkler.MÅLGRUPPE, rad) ?: MålgruppeType.AAP,
+            beløp = parseInt(BeregningNøkler.BELØP, rad),
+        )
+    }
 
 fun mapVedtaksperiodeGrunnlag(dataTable: DataTable) =
     dataTable.mapRad { rad ->
