@@ -72,7 +72,10 @@ class LæremidlerVedtakController(
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
-    ): BeregningsresultatLæremidlerDto = beregningService.beregn(vedtaksperioder.tilDomene(), behandlingId).tilDto()
+    ): BeregningsresultatLæremidlerDto {
+        val revurderFra = behandlingService.hentBehandling(behandlingId).revurderFra
+        return beregningService.beregn(vedtaksperioder.tilDomene(), behandlingId).tilDto(revurderFra = revurderFra)
+    }
 
     /**
      * TODO Post og Get burde kanskje håndtere 2 ulike objekt?

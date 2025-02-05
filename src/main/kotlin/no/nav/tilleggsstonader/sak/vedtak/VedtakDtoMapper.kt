@@ -66,7 +66,7 @@ object VedtakDtoMapper {
             is InnvilgelseLæremidler ->
                 InnvilgelseLæremidlerResponse(
                     vedtaksperioder = data.vedtaksperioder.tilDto(),
-                    beregningsresultat = data.beregningsresultat.tilDto(),
+                    beregningsresultat = data.beregningsresultat.tilDto(revurderFra = revurderFra),
                     gjelderFraOgMed = data.vedtaksperioder.minOf { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.maxOf { it.tom },
                 )
