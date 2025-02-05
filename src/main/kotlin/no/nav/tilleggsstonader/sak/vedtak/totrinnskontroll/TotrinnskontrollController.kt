@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.StatusTotrinnskontrollDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -36,9 +37,10 @@ class TotrinnskontrollController(
     @PostMapping("/{behandlingId}/send-til-beslutter")
     fun sendTilBeslutter(
         @PathVariable behandlingId: BehandlingId,
+        @RequestBody request: SendTilBeslutterRequest,
     ): StatusTotrinnskontrollDto {
         tilgangService.validerTilgangTilBehandling(behandlingId, AuditLoggerEvent.ACCESS)
-        stegService.håndterSteg(behandlingId, sendTilBeslutterSteg)
+        stegService.håndterSteg(behandlingId, sendTilBeslutterSteg, request)
         return totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)
     }
 

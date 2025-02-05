@@ -37,7 +37,10 @@ class TotrinnskontrollService(
     private val totrinnskontrollRepository: TotrinnskontrollRepository,
 ) {
     @Transactional
-    fun sendtilBeslutter(saksbehandling: Saksbehandling) {
+    fun sendtilBeslutter(
+        saksbehandling: Saksbehandling,
+        kommentarTilBeslutter: String?,
+    ) {
         val eksisterandeTotrinnskontroll =
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(saksbehandling.id)
 
@@ -50,12 +53,18 @@ class TotrinnskontrollService(
             ) {
                 "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=${eksisterandeTotrinnskontroll.status}"
             }
+        } else {
+            feilHvis(kommentarTilBeslutter != null) {
+                "Kan ikke legge ved kommentar til beslutter dersom behandlingen ikke er tidligere underkjent"
+            }
         }
+
         totrinnskontrollRepository.insert(
             Totrinnskontroll(
                 behandlingId = saksbehandling.id,
                 saksbehandler = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
                 status = TotrinnInternStatus.KAN_FATTE_VEDTAK,
+                begrunnelse = kommentarTilBeslutter,
             ),
         )
 
@@ -231,6 +240,7 @@ class TotrinnskontrollService(
             }
 
             TotrinnInternStatus.ANGRET -> StatusTotrinnskontrollDto(TotrinnkontrollStatus.UAKTUELT)
+
             else ->
                 error(
                     "Skal ikke kunne være annen status enn UNDERKJENT når " +
