@@ -228,6 +228,11 @@ class BeregningV2StepDefinition {
         }
         assertThat(beløpsperioder).hasSize(forventedeBeløpsperioder.size)
     }
+
+    @Så("V2 - forvent følgende feil: {}")
+    fun `forvent følgende feil`(forventetFeil: String) {
+        assertThat(exception!!).hasMessageContaining(forventetFeil)
+    }
 }
 
 fun parseForventedeBeløpsperioder(dataTable: DataTable): List<Beløpsperiode> =
