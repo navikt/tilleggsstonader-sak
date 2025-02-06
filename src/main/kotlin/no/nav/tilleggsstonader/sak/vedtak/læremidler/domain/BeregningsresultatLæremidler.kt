@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.AvkortResult
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
+import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -14,8 +15,10 @@ data class BeregningsresultatLæremidler(
     val perioder: List<BeregningsresultatForMåned>,
 ) {
     fun filtrerFraOgMed(dato: LocalDate?): BeregningsresultatLæremidler {
-        if (dato == null) return this
-        return BeregningsresultatLæremidler(perioder.filter { it.grunnlag.tom >= dato })
+        if (dato == null) {
+            return this
+        }
+        return BeregningsresultatLæremidler(perioder.avkortPerioderFør(dato))
     }
 }
 

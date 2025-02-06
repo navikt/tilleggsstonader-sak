@@ -37,14 +37,19 @@ data class BeregningsresultatForPeriodeDto(
             this.påfølgesAv(nestePeriode)
 }
 
-fun BeregningsresultatLæremidler.tilDto(): BeregningsresultatLæremidlerDto {
-    val perioderDto = perioder.map { it.tilDto() }.sorted()
+fun BeregningsresultatLæremidler.tilDto(revurderFra: LocalDate?): BeregningsresultatLæremidlerDto {
+    val perioderDto =
+        this
+            .filtrerFraOgMed(revurderFra)
+            .perioder
+            .map { it.tilDto() }
     return BeregningsresultatLæremidlerDto(
         perioder =
-            perioderDto.mergeSammenhengende(
-                skalMerges = { v1, v2 -> v1.kanSlåsSammen(v2) },
-                merge = { v1, v2 -> v1.slåSammen(v2) },
-            ),
+            perioderDto
+                .mergeSammenhengende(
+                    skalMerges = { v1, v2 -> v1.kanSlåsSammen(v2) },
+                    merge = { v1, v2 -> v1.slåSammen(v2) },
+                ),
     )
 }
 

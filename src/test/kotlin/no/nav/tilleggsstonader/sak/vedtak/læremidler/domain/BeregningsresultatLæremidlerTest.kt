@@ -28,14 +28,27 @@ class BeregningsresultatLæremidlerTest {
 
     @Test
     fun `filtrerFraOgMed skal filtere vekk perioder før satt dato`() {
-        val forventetResultat =
-            BeregningsresultatLæremidler(
-                perioder =
-                    listOf(
-                        beregningsresultat.perioder.last(),
-                    ),
+        val januar =
+            beregningsresultatForMåned(
+                fom = LocalDate.of(2025, 1, 1),
+                tom = LocalDate.of(2025, 1, 31),
             )
-        val result = beregningsresultat.filtrerFraOgMed(LocalDate.of(2024, 2, 21))
+        val februar =
+            beregningsresultatForMåned(
+                fom = LocalDate.of(2025, 2, 1),
+                tom = LocalDate.of(2025, 2, 28),
+            )
+        val mars =
+            beregningsresultatForMåned(
+                fom = LocalDate.of(2025, 3, 1),
+                tom = LocalDate.of(2025, 3, 31),
+            )
+        val result =
+            BeregningsresultatLæremidler(perioder = listOf(januar, februar, mars))
+                .filtrerFraOgMed(LocalDate.of(2025, 2, 15))
+
+        val avkortetFebruar = februar.copy(grunnlag = februar.grunnlag.copy(fom = LocalDate.of(2025, 2, 15)))
+        val forventetResultat = BeregningsresultatLæremidler(perioder = listOf(avkortetFebruar, mars))
 
         assertThat(result).isEqualTo(forventetResultat)
     }
