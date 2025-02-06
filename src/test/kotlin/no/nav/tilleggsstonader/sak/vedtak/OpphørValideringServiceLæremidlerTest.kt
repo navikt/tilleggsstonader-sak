@@ -76,7 +76,7 @@ class OpphørValideringServiceLæremidlerTest {
     @Nested
     inner class `Valider beregningsresultat er avkortet ved opphør` {
         @Test
-        fun `Kaster ikke feil når forrige behandling sin tom er frem i tid`() {
+        fun `Kaster ikke feil når beregningsresultatet i forrige behandling avkortes`() {
             assertThatCode {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
                     beregningsresultatEtterOpphør = avkortetBeregningsresultat.perioder,
@@ -92,7 +92,7 @@ class OpphørValideringServiceLæremidlerTest {
                     beregningsresultatEtterOpphør = beregningsresultat.perioder,
                     forrigeBeregningsresultat = beregningsresultat.perioder,
                 )
-            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet")
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen utbetalinger blir avkortet")
         }
     }
 
