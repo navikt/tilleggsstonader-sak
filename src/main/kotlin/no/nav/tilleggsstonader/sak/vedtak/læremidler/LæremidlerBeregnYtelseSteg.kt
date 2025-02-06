@@ -168,8 +168,8 @@ class LæremidlerBeregnYtelseSteg(
         )
 
         opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
-            vedtaksperioderEtterOpphør = avkortetVedtaksperioder,
             forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
+            revurderFraDato = saksbehandling.revurderFra,
         )
 
         val beregningsresultat =

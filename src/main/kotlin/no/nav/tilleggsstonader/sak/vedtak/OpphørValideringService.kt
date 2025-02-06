@@ -61,14 +61,13 @@ class OpphørValideringService(
     }
 
     fun validerVedtaksperioderAvkortetVedOpphør(
-        vedtaksperioderEtterOpphør: List<Vedtaksperiode>,
         forrigeBehandlingsVedtaksperioder: List<Vedtaksperiode>,
+        revurderFraDato: LocalDate
     ) {
-        val senesteTomINyeVedtaksperioder = vedtaksperioderEtterOpphør.maxOf { it.tom }
         val senesteTomIForrigeVedtaksperioder = forrigeBehandlingsVedtaksperioder.maxOf { it.tom }
 
         brukerfeilHvis(
-            senesteTomINyeVedtaksperioder >= senesteTomIForrigeVedtaksperioder,
+            revurderFraDato >= senesteTomIForrigeVedtaksperioder,
         ) { "Opphør er et ugyldig vedtaksresultat fordi ingen vedtaksperioder har blitt avkortet" }
     }
 

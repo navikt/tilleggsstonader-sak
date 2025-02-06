@@ -94,8 +94,8 @@ class OpphørValideringServiceLæremidlerTest {
         fun `Kaster ikke feil når vedtaksperioden er avkortet`() {
             assertThatCode {
                 opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
-                    vedtaksperioderEtterOpphør = listOf(vedtaksperiodeJanuar),
                     forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
+                    revurderFraDato = tom.minusDays(1),
                 )
             }.doesNotThrowAnyException()
         }
@@ -104,8 +104,8 @@ class OpphørValideringServiceLæremidlerTest {
         fun `Kaster feil når vedtaksperioden ikke er avkortet`() {
             assertThatThrownBy {
                 opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
-                    vedtaksperioderEtterOpphør = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
                     forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
+                    revurderFraDato = tom.plusMonths(1),
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen vedtaksperioder har blitt avkortet")
         }
