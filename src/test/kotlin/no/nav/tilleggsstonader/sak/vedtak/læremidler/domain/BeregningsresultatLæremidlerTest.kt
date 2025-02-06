@@ -3,10 +3,12 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.*
 
 class BeregningsresultatLæremidlerTest {
     val beregningsresultat =
@@ -80,20 +82,28 @@ class BeregningsresultatLæremidlerTest {
                 vedtaksperioder =
                     listOf(
                         Vedtaksperiode(
+                            id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 31),
+                            status = VedtaksperiodeStatus.NY,
                         ),
                         Vedtaksperiode(
+                            id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 2, 1),
                             tom = LocalDate.of(2024, 2, 29),
+                            status = VedtaksperiodeStatus.NY,
                         ),
                         Vedtaksperiode(
+                            id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 3, 1),
                             tom = LocalDate.of(2024, 3, 31),
+                            status = VedtaksperiodeStatus.NY,
                         ),
                         Vedtaksperiode(
+                            id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 4, 1),
                             tom = LocalDate.of(2024, 4, 30),
+                            status = VedtaksperiodeStatus.NY,
                         ),
                     ),
                 beregningsresultat =
@@ -224,20 +234,28 @@ class BeregningsresultatLæremidlerTest {
                 vedtaksperioder =
                     listOf(
                         Vedtaksperiode(
+                            id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 31),
+                            status = VedtaksperiodeStatus.NY,
                         ),
                         Vedtaksperiode(
+                            id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 2, 1),
                             tom = LocalDate.of(2024, 2, 29),
+                            status = VedtaksperiodeStatus.NY,
                         ),
                         Vedtaksperiode(
+                            id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 3, 1),
                             tom = LocalDate.of(2024, 3, 31),
+                            status = VedtaksperiodeStatus.NY,
                         ),
                         Vedtaksperiode(
+                            id = UUID.randomUUID(),
                             fom = LocalDate.of(2024, 4, 1),
                             tom = LocalDate.of(2024, 4, 30),
+                            status = VedtaksperiodeStatus.NY,
                         ),
                     ),
                 beregningsresultat =

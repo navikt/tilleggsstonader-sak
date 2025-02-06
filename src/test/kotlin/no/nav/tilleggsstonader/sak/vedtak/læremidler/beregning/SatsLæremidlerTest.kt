@@ -4,15 +4,17 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.*
 
 class SatsLæremidlerTest {
     @Test
     fun `høyere utdanning 2024`() {
-        val periode = Vedtaksperiode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 2, 1))
+        val periode = Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 1, 1), LocalDate.of(2024, 2, 1),VedtaksperiodeStatus.NY)
         val sats =
             finnSatsForStudienivå(
                 finnSatsForPeriode(periode),
@@ -23,7 +25,7 @@ class SatsLæremidlerTest {
 
     @Test
     fun `høyere utdanning 2023`() {
-        val periode = Vedtaksperiode(LocalDate.of(2023, 3, 1), LocalDate.of(2023, 5, 1))
+        val periode = Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2023, 3, 1), LocalDate.of(2023, 5, 1),VedtaksperiodeStatus.NY)
         val sats =
             finnSatsForStudienivå(
                 finnSatsForPeriode(periode),
@@ -34,7 +36,7 @@ class SatsLæremidlerTest {
 
     @Test
     fun `videregående utdanning 2024`() {
-        val periode = Vedtaksperiode(LocalDate.of(2024, 11, 1), LocalDate.of(2024, 12, 1))
+        val periode = Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 11, 1), LocalDate.of(2024, 12, 1), VedtaksperiodeStatus.NY)
         val sats =
             finnSatsForStudienivå(
                 finnSatsForPeriode(periode),
@@ -45,7 +47,7 @@ class SatsLæremidlerTest {
 
     @Test
     fun `videregående utdanning 2023`() {
-        val periode = Vedtaksperiode(LocalDate.of(2023, 10, 1), LocalDate.of(2023, 12, 1))
+        val periode = Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2023, 10, 1), LocalDate.of(2023, 12, 1), VedtaksperiodeStatus.NY)
         val sats =
             finnSatsForStudienivå(
                 finnSatsForPeriode(periode),

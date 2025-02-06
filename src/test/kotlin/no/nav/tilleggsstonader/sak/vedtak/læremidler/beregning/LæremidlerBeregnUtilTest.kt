@@ -2,10 +2,12 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning
 
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.grupperVedtaksperioderPerLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.*
 
 class LæremidlerBeregnUtilTest {
     private val førsteJan2024 = LocalDate.of(2024, 1, 1)
@@ -15,7 +17,7 @@ class LæremidlerBeregnUtilTest {
     fun `skal håndtere vedtaksperiode som løper over 2 år`() {
         val vedtaksperioder =
             listOf(
-                Vedtaksperiode(LocalDate.of(2024, 12, 5), LocalDate.of(2025, 1, 4)),
+                Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 12, 5), LocalDate.of(2025, 1, 4), status = VedtaksperiodeStatus.NY),
             )
         val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
         assertThat(perioder).hasSize(2)
@@ -42,7 +44,7 @@ class LæremidlerBeregnUtilTest {
         fun `skal lage løpende måned for vedtaksperiode som kun er under en helg`() {
             val vedtaksperioder =
                 listOf(
-                    Vedtaksperiode(LocalDate.of(2025, 2, 1), LocalDate.of(2025, 2, 2)),
+                    Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2025, 2, 1), LocalDate.of(2025, 2, 2), status = VedtaksperiodeStatus.NY),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
             assertThat(perioder).isEmpty()
@@ -55,7 +57,7 @@ class LæremidlerBeregnUtilTest {
         fun `skal håndtere en vedtaksperiode som løper innenfor en løpende måned`() {
             val vedtaksperioder =
                 listOf(
-                    Vedtaksperiode(LocalDate.of(2024, 1, 5), LocalDate.of(2024, 1, 15)),
+                    Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 1, 5), LocalDate.of(2024, 1, 15), VedtaksperiodeStatus.NY),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
             assertThat(perioder).hasSize(1)
@@ -72,8 +74,8 @@ class LæremidlerBeregnUtilTest {
         fun `skal håndtere to vedtaksperiode som løper i ulike løpende måneder`() {
             val vedtaksperioder =
                 listOf(
-                    Vedtaksperiode(LocalDate.of(2024, 1, 5), LocalDate.of(2024, 1, 15)),
-                    Vedtaksperiode(LocalDate.of(2024, 2, 7), LocalDate.of(2024, 3, 2)),
+                    Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 1, 5), LocalDate.of(2024, 1, 15), VedtaksperiodeStatus.NY),
+                    Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 2, 7), LocalDate.of(2024, 3, 2), VedtaksperiodeStatus.NY),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
             assertThat(perioder).hasSize(2)
@@ -97,8 +99,8 @@ class LæremidlerBeregnUtilTest {
         fun `skal gruppere alle perioder som gjelder januar i januar`() {
             val vedtaksperioder =
                 listOf(
-                    Vedtaksperiode(førsteJan2024, LocalDate.of(2024, 1, 5)),
-                    Vedtaksperiode(LocalDate.of(2024, 1, 7), LocalDate.of(2024, 1, 7)),
+                    Vedtaksperiode(id = UUID.randomUUID(),førsteJan2024, LocalDate.of(2024, 1, 5), VedtaksperiodeStatus.NY),
+                    Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 1, 7), LocalDate.of(2024, 1, 7),VedtaksperiodeStatus.NY),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
             assertThat(perioder).hasSize(1)
@@ -115,8 +117,8 @@ class LæremidlerBeregnUtilTest {
         fun `skal gruppere alle perioder som gjelder fra med 5 januar til 4 februar`() {
             val vedtaksperioder =
                 listOf(
-                    Vedtaksperiode(LocalDate.of(2024, 1, 5), LocalDate.of(2024, 1, 5)),
-                    Vedtaksperiode(LocalDate.of(2024, 2, 1), LocalDate.of(2024, 2, 4)),
+                    Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 1, 5), LocalDate.of(2024, 1, 5), VedtaksperiodeStatus.NY),
+                    Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 2, 1), LocalDate.of(2024, 2, 4), VedtaksperiodeStatus.NY),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
             assertThat(perioder).hasSize(1)
@@ -133,8 +135,8 @@ class LæremidlerBeregnUtilTest {
         fun `skal gruppere alle perioder som gjelder fra med 5 januar til 4 februar der periode 2 er siste dagen i forrige periode`() {
             val vedtaksperioder =
                 listOf(
-                    Vedtaksperiode(LocalDate.of(2024, 1, 5), LocalDate.of(2024, 1, 5)),
-                    Vedtaksperiode(LocalDate.of(2024, 2, 4), LocalDate.of(2024, 2, 4)),
+                    Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 1, 5), LocalDate.of(2024, 1, 5), VedtaksperiodeStatus.NY),
+                    Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 2, 4), LocalDate.of(2024, 2, 4), VedtaksperiodeStatus.NY),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
             assertThat(perioder).hasSize(1)
@@ -151,8 +153,8 @@ class LæremidlerBeregnUtilTest {
         fun `skal splitte periode 2 som løper over 2 vedtaksperioder`() {
             val vedtaksperioder =
                 listOf(
-                    Vedtaksperiode(LocalDate.of(2024, 1, 5), LocalDate.of(2024, 1, 5)),
-                    Vedtaksperiode(LocalDate.of(2024, 2, 1), LocalDate.of(2024, 2, 28)),
+                    Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 1, 5), LocalDate.of(2024, 1, 5), VedtaksperiodeStatus.NY),
+                    Vedtaksperiode(id = UUID.randomUUID(),LocalDate.of(2024, 2, 1), LocalDate.of(2024, 2, 28), VedtaksperiodeStatus.NY),
                 )
             val perioder = vedtaksperioder.grupperVedtaksperioderPerLøpendeMåned()
             assertThat(perioder).hasSize(2)

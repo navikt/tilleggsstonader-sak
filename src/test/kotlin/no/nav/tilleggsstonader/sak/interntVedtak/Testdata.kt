@@ -30,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnskontrollUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeStatus
@@ -264,7 +265,15 @@ object Testdata {
 
         val grunnlagsdata = GrunnlagsdataUtil.grunnlagsdataDomain(grunnlag = lagGrunnlagsdata(barn = emptyList()))
 
-        val vedtaksperioder = listOf(Vedtaksperiode(fom = LocalDate.of(2024, 1, 1), tom = LocalDate.of(2024, 3, 31)))
+        val vedtaksperioder =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2024, 1, 1),
+                    tom = LocalDate.of(2024, 3, 31),
+                    status = VedtaksperiodeStatus.NY,
+                ),
+            )
         val beregningsresultat =
             BeregningsresultatLæremidler(
                 perioder =
