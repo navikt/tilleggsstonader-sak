@@ -51,9 +51,10 @@ object BeregingsgrunnlagUtilsV2 {
     fun lagVedtaksperiodeGrunnlag(
         vedtaksperioder: List<VedtaksperiodeDto>,
         aktiviteterForMåned: Map<AktivitetType, List<Aktivitet>>,
-    ): List<VedtaksperiodeGrunnlag> =
-        vedtaksperioder.map { vedtaksperiode ->
-            val aktiviteterPerUkePerAktivitet = aktiviteterForMåned.map { it.key to it.value.tilDagerPerUke() }.toMap()
+    ): List<VedtaksperiodeGrunnlag> {
+        val aktiviteterPerUkePerAktivitet = aktiviteterForMåned.map { it.key to it.value.tilDagerPerUke() }.toMap()
+
+        return vedtaksperioder.map { vedtaksperiode ->
             val aktivitetsDager =
                 finnAntallAktivitestdagerIVedtaksperioden(
                     vedtaksperiode = vedtaksperiode,
@@ -66,6 +67,7 @@ object BeregingsgrunnlagUtilsV2 {
                 antallAktivitetsDager = aktivitetsDager,
             )
         }
+    }
 
     // Logikk kopiert fra V1, men oppdatert typer
     private fun finnAntallAktivitestdagerIVedtaksperioden(
