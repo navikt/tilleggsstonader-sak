@@ -23,6 +23,9 @@ class OpphørValideringServiceLæremidlerTest {
     val fom = måned.atDay(1)
     val tom = måned.atEndOfMonth()
 
+    val førsteMars = YearMonth.of(2025, 3).atDay(1)
+    val førsteFebruar = YearMonth.of(2025, 2).atDay(1)
+
     val vedtaksperiodeJanuar = Vedtaksperiode(fom, tom)
     val vedtaksperiodeFebruar = Vedtaksperiode(fom.plusMonths(1), tom.plusMonths(1))
 
@@ -68,7 +71,7 @@ class OpphørValideringServiceLæremidlerTest {
     @Nested
     inner class `Valider beregningsresultat er avkortet ved opphør` {
         @Test
-        fun `Kaster ikke feil når beregningsresultatet i forrige behandling avkortes`() {
+        fun `Kaster ikke feil når beregningsresultat i forrige behandling avkortes`() {
             assertThatCode {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
                     forrigeBeregningsresultat = beregningsresultat.perioder,
@@ -78,11 +81,11 @@ class OpphørValideringServiceLæremidlerTest {
         }
 
         @Test
-        fun `Kaster feil når nytt beregeningsresultat ikke er avkortet`() {
+        fun `Kaster feil når nytt beregningsresultat ikke er avkortet`() {
             assertThatThrownBy {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
                     forrigeBeregningsresultat = beregningsresultat.perioder,
-                    revurderFraDato = tom.plusMonths(1),
+                    revurderFraDato = førsteMars,
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen utbetalinger blir avkortet")
         }
@@ -105,7 +108,7 @@ class OpphørValideringServiceLæremidlerTest {
             assertThatThrownBy {
                 opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
                     forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
-                    revurderFraDato = tom.plusMonths(1),
+                    revurderFraDato = førsteMars,
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen vedtaksperioder har blitt avkortet")
         }

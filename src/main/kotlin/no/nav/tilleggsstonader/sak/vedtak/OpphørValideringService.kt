@@ -56,18 +56,18 @@ class OpphørValideringService(
         val senesteTomIForrigeBeregning = forrigeBeregningsresultat.maxOf { it.tom }
 
         brukerfeilHvis(
-            revurderFraDato >= senesteTomIForrigeBeregning,
+            senesteTomIForrigeBeregning < revurderFraDato,
         ) { "Opphør er et ugyldig vedtaksresultat fordi ingen utbetalinger blir avkortet" }
     }
 
     fun validerVedtaksperioderAvkortetVedOpphør(
         forrigeBehandlingsVedtaksperioder: List<Vedtaksperiode>,
-        revurderFraDato: LocalDate
+        revurderFraDato: LocalDate,
     ) {
         val senesteTomIForrigeVedtaksperioder = forrigeBehandlingsVedtaksperioder.maxOf { it.tom }
 
         brukerfeilHvis(
-            revurderFraDato >= senesteTomIForrigeVedtaksperioder,
+            senesteTomIForrigeVedtaksperioder < revurderFraDato
         ) { "Opphør er et ugyldig vedtaksresultat fordi ingen vedtaksperioder har blitt avkortet" }
     }
 
