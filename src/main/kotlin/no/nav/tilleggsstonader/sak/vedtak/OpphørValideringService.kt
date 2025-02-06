@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vedtak
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -45,6 +47,30 @@ class OpphørValideringService(
                 ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter revurder fra dato" }
             }
         }
+    }
+
+    fun validerBeregningsresultatErAvkortetVedOpphør(
+        beregningsresultatEtterOpphør: List<BeregningsresultatForMåned>,
+        forrigeBeregningsresultat: List<BeregningsresultatForMåned>,
+    ) {
+        val senesteTomIOpphør = beregningsresultatEtterOpphør.maxOf { it.tom }
+        val senesteTomIForrigeBeregning = forrigeBeregningsresultat.maxOf { it.tom }
+
+        brukerfeilHvis(
+            senesteTomIOpphør >= senesteTomIForrigeBeregning,
+        ) { "Opphør er et ugyldig vedtaksresultat fordi ingen utbetalinger blir avkortet" }
+    }
+
+    fun validerVedtaksperioderAvkortetVedOpphør(
+        vedtaksperioderEtterOpphør: List<Vedtaksperiode>,
+        forrigeBehandlingsVedtaksperioder: List<Vedtaksperiode>,
+    ) {
+        val senesteTomINyeVedtaksperioder = vedtaksperioderEtterOpphør.maxOf { it.tom }
+        val senesteTomIForrigeVedtaksperioder = forrigeBehandlingsVedtaksperioder.maxOf { it.tom }
+
+        brukerfeilHvis(
+            senesteTomINyeVedtaksperioder >= senesteTomIForrigeVedtaksperioder,
+        ) { "Opphør er et ugyldig vedtaksresultat fordi ingen vedtaksperioder har blitt avkortet" }
     }
 
     private fun validerIngenNyeOppfylteVilkårEllerVilkårperioder(
