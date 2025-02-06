@@ -53,7 +53,6 @@ class OpphørValideringService(
         beregningsresultatEtterOpphør: List<BeregningsresultatForMåned>,
         forrigeBeregningsresultat: List<BeregningsresultatForMåned>,
     ) {
-
         val senesteTomIOpphør = beregningsresultatEtterOpphør.maxOf { it.tom }
         val senesteTomIForrigeBeregning = forrigeBeregningsresultat.maxOf { it.tom }
 
@@ -66,7 +65,6 @@ class OpphørValideringService(
         vedtaksperioderEtterOpphør: List<Vedtaksperiode>,
         forrigeBehandlingsVedtaksperioder: List<Vedtaksperiode>,
     ) {
-
         val senesteTomINyeVedtaksperioder = vedtaksperioderEtterOpphør.maxOf { it.tom }
         val senesteTomIForrigeVedtaksperioder = forrigeBehandlingsVedtaksperioder.maxOf { it.tom }
 
