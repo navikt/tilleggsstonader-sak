@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.util.*
 
 class LæremidlerBeregnYtelseStegTest(
     @Autowired
@@ -56,7 +58,7 @@ class LæremidlerBeregnYtelseStegTest(
         lagreAktivitetOgStønadsperiode(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(fom = fom, tom = tom)
+        val vedtaksperiode = VedtaksperiodeDto(id = UUID.randomUUID(), fom = fom, tom = tom, status = VedtaksperiodeStatus.NY)
         val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
         steg.utførSteg(saksbehandling, innvilgelse)
 
@@ -94,7 +96,7 @@ class LæremidlerBeregnYtelseStegTest(
         lagreAktivitetOgStønadsperiode(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31))
+        val vedtaksperiode = VedtaksperiodeDto(id = UUID.randomUUID(),fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31), status = VedtaksperiodeStatus.NY)
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler =
@@ -114,6 +116,7 @@ class LæremidlerBeregnYtelseStegTest(
 
     @Test
     fun `en vedtaksperiode med 2 ulike målgrupper skal bli 2 ulike andeler med ulike typer som betales ut samtidig`() {
+        val vedtaksperiodeId = UUID.randomUUID()
         val førsteJan = LocalDate.of(2025, 1, 1)
         val sisteJan = LocalDate.of(2025, 1, 31)
         val førsteFeb = LocalDate.of(2025, 2, 1)
@@ -146,7 +149,7 @@ class LæremidlerBeregnYtelseStegTest(
         vilkårperiodeRepository.insert(aktivitet)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(fom = førsteJan, tom = sisteFeb)
+        val vedtaksperiode = VedtaksperiodeDto(vedtaksperiodeId,fom = førsteJan, tom = sisteFeb, VedtaksperiodeStatus.NY)
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
@@ -173,6 +176,7 @@ class LæremidlerBeregnYtelseStegTest(
 
     @Test
     fun `en vedtaksperiode med 2 ulike målgrupper men samme type andel skal bli 1 andel`() {
+        val vedtaksperiodeStatus = UUID.randomUUID()
         val førsteJan = LocalDate.of(2025, 1, 1)
         val sisteJan = LocalDate.of(2025, 1, 31)
         val førsteFeb = LocalDate.of(2025, 2, 1)
@@ -203,7 +207,7 @@ class LæremidlerBeregnYtelseStegTest(
         vilkårperiodeRepository.insert(aktivitet)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(fom = førsteJan, tom = sisteFeb)
+        val vedtaksperiode = VedtaksperiodeDto(vedtaksperiodeStatus,fom = førsteJan, tom = sisteFeb, status = VedtaksperiodeStatus.NY)
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
@@ -217,6 +221,22 @@ class LæremidlerBeregnYtelseStegTest(
             assertThat(utbetalingsdato).isEqualTo(førsteJan)
         }
     }
+    @Test
+    fun `skal finne ut vedtaksperioder som er endret `() {
+        val vedtaksperiodeid1 = UUID.randomUUID()
+        val vedtaksperiodeid2 = UUID.randomUUID()
+        val vedtaksperiode1 = VedtaksperiodeDto(vedtaksperiodeid1,fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31), status = VedtaksperiodeStatus.NY)
+        val vedtaksperiode2 = VedtaksperiodeDto(vedtaksperiodeid2,fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31), status = VedtaksperiodeStatus.NY)
+
+    }
+
+
+
+
+
+
+
+
 
     fun lagreAktivitetOgStønadsperiode(
         fom: LocalDate,

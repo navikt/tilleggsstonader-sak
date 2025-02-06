@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
@@ -48,9 +49,11 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
+import java.util.*
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class LæremidlerBeregnYtelseStegStepDefinitions {
@@ -60,6 +63,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val stønadsperiodeRepository = StønadsperiodeRepositoryFake()
     val vedtakRepository = VedtakRepositoryFake()
     val tilkjentYtelseRepository = TilkjentYtelseRepositoryFake()
+    val repository = VedtakRepositoryFake()
 
     val simuleringService =
         mockk<SimuleringService>().apply {
@@ -76,6 +80,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             vedtakRepository = vedtakRepository,
             tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
+            repository = repository,
         )
 
     @Gitt("følgende aktiviteter for læremidler behandling={}")
@@ -105,8 +110,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val vedtaksperioder =
             dataTable.mapRad { rad ->
                 VedtaksperiodeDto(
+                    id = UUID.randomUUID(),
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    status = VedtaksperiodeStatus.NY
                 )
             }
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
@@ -218,8 +225,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val forventedeVedtaksperioder =
             dataTable.mapRad { rad ->
                 Vedtaksperiode(
+                    id = UUID.randomUUID(),
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    status = VedtaksperiodeStatus.NY
                 )
             }
 
