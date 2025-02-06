@@ -139,7 +139,7 @@ class LæremidlerBeregnYtelseSteg(
 
         opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
             beregningsresultatEtterOpphør = avkortetBeregningsresultat.perioder,
-            forrigeBeregningsresultatForMåned = forrigeVedtak.data.beregningsresultat.perioder,
+            forrigeBeregningsresultat = forrigeVedtak.data.beregningsresultat.perioder,
         )
 
         opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(

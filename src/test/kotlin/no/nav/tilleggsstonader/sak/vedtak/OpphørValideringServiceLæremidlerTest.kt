@@ -80,7 +80,7 @@ class OpphørValideringServiceLæremidlerTest {
             assertThatCode {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
                     beregningsresultatEtterOpphør = avkortetBeregningsresultat.perioder,
-                    forrigeBeregningsresultatForMåned = beregningsresultat.perioder,
+                    forrigeBeregningsresultat = beregningsresultat.perioder,
                 )
             }.doesNotThrowAnyException()
         }
@@ -90,7 +90,7 @@ class OpphørValideringServiceLæremidlerTest {
             assertThatThrownBy {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
                     beregningsresultatEtterOpphør = beregningsresultat.perioder,
-                    forrigeBeregningsresultatForMåned = beregningsresultat.perioder,
+                    forrigeBeregningsresultat = beregningsresultat.perioder,
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet")
         }

@@ -51,11 +51,11 @@ class OpphørValideringService(
 
     fun validerBeregningsresultatErAvkortetVedOpphør(
         beregningsresultatEtterOpphør: List<BeregningsresultatForMåned>,
-        forrigeBeregningsresultatForMåned: List<BeregningsresultatForMåned>,
+        forrigeBeregningsresultat: List<BeregningsresultatForMåned>,
     ) {
 
         val senesteTomIOpphør = beregningsresultatEtterOpphør.maxOf { it.tom }
-        val senesteTomIForrigeBeregning = forrigeBeregningsresultatForMåned.maxOf { it.tom }
+        val senesteTomIForrigeBeregning = forrigeBeregningsresultat.maxOf { it.tom }
 
         brukerfeilHvis(
             senesteTomIOpphør >= senesteTomIForrigeBeregning,
