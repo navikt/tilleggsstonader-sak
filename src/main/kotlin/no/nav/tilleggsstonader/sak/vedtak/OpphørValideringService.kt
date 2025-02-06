@@ -53,56 +53,22 @@ class OpphørValideringService(
         beregningsresultatEtterOpphør: List<BeregningsresultatForMåned>,
         forrigeBeregningsresultatForMåned: List<BeregningsresultatForMåned>,
     ) {
-        val senesteTomIOpphør =
-            beregningsresultatEtterOpphør.reduce { beregningsgrunnlagMedSisteTom, current ->
-                if (current.tom >
-                    beregningsgrunnlagMedSisteTom.tom
-                ) {
-                    current
-                } else {
-                    beregningsgrunnlagMedSisteTom
-                }
-            }
-        val senesteTomIForrigeBeregning =
-            forrigeBeregningsresultatForMåned.reduce { beregningsgrunnlagMedSisteTom, current ->
-                if (current.tom >
-                    beregningsgrunnlagMedSisteTom.tom
-                ) {
-                    current
-                } else {
-                    beregningsgrunnlagMedSisteTom
-                }
-            }
+
+        val senesteTomIOpphør = beregningsresultatEtterOpphør.maxOf { it.tom }
+        val senesteTomIForrigeBeregning = forrigeBeregningsresultatForMåned.maxOf { it.tom }
 
         brukerfeilHvis(
             senesteTomIOpphør >= senesteTomIForrigeBeregning,
-        ) { "Opphør er et ugyldig vedtaksresultat fordi ingen beregningsresultat eller utbetalingsperioder blir avkortet" }
+        ) { "Opphør er et ugyldig vedtaksresultat fordi ingen utbetalinger blir avkortet" }
     }
 
     fun validerVedtaksperioderAvkortetVedOpphør(
         vedtaksperioderEtterOpphør: List<Vedtaksperiode>,
         forrigeBehandlingsVedtaksperioder: List<Vedtaksperiode>,
     ) {
-        val senesteTomINyeVedtaksperioder =
-            vedtaksperioderEtterOpphør.reduce { vedtaksperioderSisteTom, current ->
-                if (current.tom >
-                    vedtaksperioderSisteTom.tom
-                ) {
-                    current
-                } else {
-                    vedtaksperioderSisteTom
-                }
-            }
-        val senesteTomIForrigeVedtaksperioder =
-            forrigeBehandlingsVedtaksperioder.reduce { vedtaksperioderSisteTom, current ->
-                if (current.tom >
-                    vedtaksperioderSisteTom.tom
-                ) {
-                    current
-                } else {
-                    vedtaksperioderSisteTom
-                }
-            }
+
+        val senesteTomINyeVedtaksperioder = vedtaksperioderEtterOpphør.maxOf { it.tom }
+        val senesteTomIForrigeVedtaksperioder = forrigeBehandlingsVedtaksperioder.maxOf { it.tom }
 
         brukerfeilHvis(
             senesteTomINyeVedtaksperioder >= senesteTomIForrigeVedtaksperioder,
