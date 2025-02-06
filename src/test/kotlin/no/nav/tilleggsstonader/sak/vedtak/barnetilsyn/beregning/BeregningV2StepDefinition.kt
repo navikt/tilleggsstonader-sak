@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV2.TilsynBarnBeregningServiceV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
@@ -76,6 +77,17 @@ class BeregningV2StepDefinition {
                 ResultatVilkårperiode.OPPFYLT,
             )
         } returns mapAktiviteter(behandlingId, dataTable)
+    }
+
+    @Gitt("V2 - beregningsperioder fra forrige behandling")
+    fun `perioder fra forrige behandling`(dataTable: DataTable) {
+        val perioder =
+            dataTable.mapRad {
+                val måned = parseÅrMåned(BeregningNøkler.MÅNED, it)
+                beregningsresultatForMåned(måned)
+            }
+        every { vedtakRepository.findByIdOrThrow(any()) } returns
+            innvilgetVedtak(beregningsresultat = BeregningsresultatTilsynBarn(perioder = perioder))
     }
 
     @Gitt("V2 - følgende utgifter for barn med id: {}")
