@@ -84,7 +84,7 @@ object TilsynBeregningUtil {
      * Tar inn en funksjon for å beregne hvor mange dager man ønsker å telle i uken
      * enten alle eller begrense til antall aktivitetsdager
      */
-    private fun <P : Periode<LocalDate>> P.splitPerUke(antallDager: (fom: LocalDate, tom: LocalDate) -> Int): Map<Uke, PeriodeMedDager> {
+    fun <P : Periode<LocalDate>> P.splitPerUke(antallDager: (fom: LocalDate, tom: LocalDate) -> Int): Map<Uke, PeriodeMedDager> {
         val periode = mutableMapOf<Uke, PeriodeMedDager>()
         var startOfWeek = this.fom.nærmesteRelevateMandag()
 
@@ -126,7 +126,7 @@ object TilsynBeregningUtil {
             .groupBy({ it.key }, { it.value })
             .mapValues { it.value.sorted() }
 
-    private fun antallDagerIPeriodeInklusiv(
+    fun antallDagerIPeriodeInklusiv(
         fom: LocalDate,
         tom: LocalDate,
     ): Int = ChronoUnit.DAYS.between(fom, tom).toInt() + 1

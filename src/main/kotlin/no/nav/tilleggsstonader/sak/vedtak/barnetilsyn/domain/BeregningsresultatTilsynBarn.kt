@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
@@ -43,10 +44,29 @@ data class Beregningsgrunnlag(
     val måned: YearMonth,
     val makssats: Int,
     val stønadsperioderGrunnlag: List<StønadsperiodeGrunnlag>,
+    val vedtaksperioderGrunnlag: List<VedtaksperiodeGrunnlag> = emptyList(), // Etterhvert bør ikke denne ha en default verdi
     val utgifter: List<UtgiftBarn>,
     val utgifterTotal: Int,
     val antallBarn: Int,
 )
+
+data class VedtaksperiodeGrunnlag(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val målgruppeType: MålgruppeType,
+    val aktivitetType: AktivitetType,
+    val aktiviteter: List<Aktivitet>,
+    val antallAktivitetsDager: Int,
+) : Periode<LocalDate> {
+    constructor(vedtaksperiodeDto: VedtaksperiodeDto, aktiviteter: List<Aktivitet>, antallAktivitetsDager: Int) : this(
+        fom = vedtaksperiodeDto.fom,
+        tom = vedtaksperiodeDto.tom,
+        målgruppeType = vedtaksperiodeDto.målgruppeType,
+        aktivitetType = vedtaksperiodeDto.aktivitetType,
+        aktiviteter = aktiviteter,
+        antallAktivitetsDager = antallAktivitetsDager,
+    )
+}
 
 data class StønadsperiodeGrunnlag(
     val stønadsperiode: StønadsperiodeBeregningsgrunnlag,

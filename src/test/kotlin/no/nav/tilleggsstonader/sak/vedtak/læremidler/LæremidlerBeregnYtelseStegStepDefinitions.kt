@@ -51,7 +51,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatL
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
@@ -108,7 +108,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val behandlingId = behandlingIdTilUUID.getValue(behandlingIdTall)
         val vedtaksperioder =
             dataTable.mapRad { rad ->
-                VedtaksperiodeDto(
+                VedtaksperiodeLæremidlerDto(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 )
@@ -127,7 +127,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
 
         val vedtaksperioder =
             dataTable.mapRad { rad ->
-                VedtaksperiodeDto(
+                VedtaksperiodeLæremidlerDto(
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 )

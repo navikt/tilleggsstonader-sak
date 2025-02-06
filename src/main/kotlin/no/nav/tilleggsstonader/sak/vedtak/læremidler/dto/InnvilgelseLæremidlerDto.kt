@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import java.time.LocalDate
 
 data class InnvilgelseLæremidlerResponse(
-    val vedtaksperioder: List<VedtaksperiodeDto>,
+    val vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
     val beregningsresultat: BeregningsresultatLæremidlerDto,
     val gjelderFraOgMed: LocalDate,
     val gjelderTilOgMed: LocalDate,
@@ -12,6 +12,6 @@ data class InnvilgelseLæremidlerResponse(
     VedtakLæremidlerResponse
 
 data class InnvilgelseLæremidlerRequest(
-    val vedtaksperioder: List<VedtaksperiodeDto>,
+    val vedtaksperioder: List<VedtaksperiodeLæremidlerDto>,
 ) : VedtakLæremidlerDto(TypeVedtak.INNVILGELSE),
     VedtakLæremidlerRequest

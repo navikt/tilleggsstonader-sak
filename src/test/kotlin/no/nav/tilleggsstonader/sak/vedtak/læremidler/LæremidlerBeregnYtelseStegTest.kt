@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.stønadsperiode
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
@@ -56,7 +56,7 @@ class LæremidlerBeregnYtelseStegTest(
         lagreAktivitetOgStønadsperiode(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(fom = fom, tom = tom)
+        val vedtaksperiode = VedtaksperiodeLæremidlerDto(fom = fom, tom = tom)
         val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
         steg.utførSteg(saksbehandling, innvilgelse)
 
@@ -94,7 +94,7 @@ class LæremidlerBeregnYtelseStegTest(
         lagreAktivitetOgStønadsperiode(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31))
+        val vedtaksperiode = VedtaksperiodeLæremidlerDto(fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31))
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler =
@@ -146,7 +146,7 @@ class LæremidlerBeregnYtelseStegTest(
         vilkårperiodeRepository.insert(aktivitet)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(fom = førsteJan, tom = sisteFeb)
+        val vedtaksperiode = VedtaksperiodeLæremidlerDto(fom = førsteJan, tom = sisteFeb)
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
@@ -203,7 +203,7 @@ class LæremidlerBeregnYtelseStegTest(
         vilkårperiodeRepository.insert(aktivitet)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(fom = førsteJan, tom = sisteFeb)
+        val vedtaksperiode = VedtaksperiodeLæremidlerDto(fom = førsteJan, tom = sisteFeb)
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse

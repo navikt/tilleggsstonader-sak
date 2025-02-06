@@ -28,11 +28,11 @@ sealed interface VedtakLæremidlerRequest : VedtakRequest
 
 sealed interface VedtakLæremidlerResponse : VedtakResponse
 
-data class VedtaksperiodeDto(
+data class VedtaksperiodeLæremidlerDto(
     val fom: LocalDate,
     val tom: LocalDate,
 )
 
-fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeDto(fom = it.fom, tom = it.tom) }
+fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeLæremidlerDto(fom = it.fom, tom = it.tom) }
 
-fun List<VedtaksperiodeDto>.tilDomene() = this.map { Vedtaksperiode(fom = it.fom, tom = it.tom) }
+fun List<VedtaksperiodeLæremidlerDto>.tilDomene() = this.map { Vedtaksperiode(fom = it.fom, tom = it.tom) }
