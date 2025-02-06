@@ -50,14 +50,13 @@ class OpphørValideringService(
     }
 
     fun validerBeregningsresultatErAvkortetVedOpphør(
-        beregningsresultatEtterOpphør: List<BeregningsresultatForMåned>,
         forrigeBeregningsresultat: List<BeregningsresultatForMåned>,
+        revurderFraDato: LocalDate,
     ) {
-        val senesteTomIOpphør = beregningsresultatEtterOpphør.maxOf { it.tom }
         val senesteTomIForrigeBeregning = forrigeBeregningsresultat.maxOf { it.tom }
 
         brukerfeilHvis(
-            senesteTomIOpphør >= senesteTomIForrigeBeregning,
+            revurderFraDato >= senesteTomIForrigeBeregning,
         ) { "Opphør er et ugyldig vedtaksresultat fordi ingen utbetalinger blir avkortet" }
     }
 

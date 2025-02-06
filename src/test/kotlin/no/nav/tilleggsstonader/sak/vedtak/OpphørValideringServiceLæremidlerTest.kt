@@ -65,22 +65,14 @@ class OpphørValideringServiceLæremidlerTest {
                 ),
         )
 
-    val avkortetBeregningsresultat =
-        BeregningsresultatLæremidler(
-            perioder =
-                listOf(
-                    beregningsresultatForJanuar,
-                ),
-        )
-
     @Nested
     inner class `Valider beregningsresultat er avkortet ved opphør` {
         @Test
         fun `Kaster ikke feil når beregningsresultatet i forrige behandling avkortes`() {
             assertThatCode {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-                    beregningsresultatEtterOpphør = avkortetBeregningsresultat.perioder,
                     forrigeBeregningsresultat = beregningsresultat.perioder,
+                    revurderFraDato = tom.minusDays(1),
                 )
             }.doesNotThrowAnyException()
         }
@@ -89,8 +81,8 @@ class OpphørValideringServiceLæremidlerTest {
         fun `Kaster feil når nytt beregeningsresultat ikke er avkortet`() {
             assertThatThrownBy {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
-                    beregningsresultatEtterOpphør = beregningsresultat.perioder,
                     forrigeBeregningsresultat = beregningsresultat.perioder,
+                    revurderFraDato = tom.plusMonths(1),
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi ingen utbetalinger blir avkortet")
         }
