@@ -7,7 +7,8 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.barnIder
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
@@ -20,7 +21,8 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMåned
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV2.TilsynBarnBeregningServiceV2
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
@@ -85,16 +87,30 @@ class BeregningV2StepDefinition {
 
     @Når("V2 - beregner")
     fun beregner() {
-        beregn(saksbehandling(id = behandlingId))
+        beregn(behandling(id = behandlingId))
     }
 
-    private fun beregn(behandling: Saksbehandling) {
+    @Når("V2 - beregner med revurderFra={}")
+    fun `beregner med revurder fra`(revurderFraStr: String) {
+        val revurderFra = parseDato(revurderFraStr)
+        beregn(
+            behandling(
+                id = behandlingId,
+                type = BehandlingType.REVURDERING,
+                revurderFra = revurderFra,
+                forrigeBehandlingId = BehandlingId.random(),
+            ),
+        )
+    }
+
+    private fun beregn(behandling: Behandling) {
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
             beregningsresultat =
                 beregningService.beregn(
                     vedtaksperioder = vedtaksperioder,
-                    behandlingId = behandlingId,
+                    behandling = behandling,
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 )
         } catch (e: Exception) {
             exception = e
