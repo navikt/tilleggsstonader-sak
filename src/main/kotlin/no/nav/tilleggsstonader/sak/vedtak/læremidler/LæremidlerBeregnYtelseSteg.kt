@@ -26,9 +26,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremid
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.domain.vedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.VedtaksperiodeStatusMapper.settStatusPåVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerVedtaksperiodeUtil.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
@@ -41,7 +40,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.springframework.stereotype.Service
@@ -80,52 +78,24 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         saksbehandling: Saksbehandling,
     ) {
-        //        feilHvis(saksbehandling.forrigeBehandlingId != null) {
-        //            "Har foreløpig ikke støtte for innvilgelse av revurdering"
-        //        }
+        val vedtaksperioderMedStatus =
+            when (saksbehandling.type) {
+                BehandlingType.FØRSTEGANGSBEHANDLING ->
+                    settStatusPåVedtaksperioder(
+                        vedtaksperioder = vedtaksperioder,
+                        vedtaksperioderForrigeBehandling = emptyList(),
+                    )
 
-        // Hvis førstegangsbehandling
-        if (saksbehandling.type == BehandlingType.FØRSTEGANGSBEHANDLING) {
-            lagreVedtak(vedtaksperioder, saksbehandling)
-        } else {
-            if (saksbehandling.type == BehandlingType.REVURDERING && saksbehandling.forrigeBehandlingId != null) {
-                val forrigeBehandlingId = saksbehandling.forrigeBehandlingId
-                val vedtaksDataForForrigeBehandling = hentVedtak(forrigeBehandlingId).data as VedtakLæremidler
-                val vedtaksperioderForForrigeBehandling = vedtaksDataForForrigeBehandling.vedtaksperioder()
-                val vedtaksperiodeIdforidForForrigeBehandling =
-                    vedtaksperioderForForrigeBehandling?.map { it.id }.orEmpty()
+                BehandlingType.REVURDERING -> {
+                    val forrigeBehandlingId = saksbehandling.forrigeBehandlingId
+                    feilHvis(forrigeBehandlingId == null) { "Mangler behandlingen som skal revurderes" }
+                    val vedtaksperioderForrigeBehandling = hentVedtak(forrigeBehandlingId).data.vedtaksperioder
 
-                val nyeVedtakPerioder = vedtaksperioder.filterNot { it.id in vedtaksperiodeIdforidForForrigeBehandling }
-
-                val endretdeVedtakPerioder =
-                    vedtaksperioder.filter { vedtaksperiode ->
-                        vedtaksperiode.id in vedtaksperiodeIdforidForForrigeBehandling &&
-                            vedtaksperioderForForrigeBehandling
-                                ?.find { it.id == vedtaksperiode.id }
-                                ?.let { it.fom != vedtaksperiode.fom || it.tom != vedtaksperiode.tom } == true
-                    }
-                val endretVedtakPerioderMedEndretStatus =
-                    endretdeVedtakPerioder.map {
-                        it.copy(status = VedtaksperiodeStatus.ENDRET)
-                    }
-
-                val uendretVedtaksperioder =
-                    vedtaksperioder.filter { vedtaksperiode ->
-                        vedtaksperiode.id in vedtaksperiodeIdforidForForrigeBehandling &&
-                            vedtaksperioderForForrigeBehandling
-                                ?.find { it.id == vedtaksperiode.id }
-                                ?.let { it.fom == vedtaksperiode.fom && it.tom == vedtaksperiode.tom } == true
-                    }
-                val uendretVedtakPerioderMedEndretStatus =
-                    uendretVedtaksperioder.map {
-                        it.copy(status = VedtaksperiodeStatus.UENDRET)
-                    }
-
-                val oppdatertVedtaksperioderMedStatus =
-                    nyeVedtakPerioder + endretVedtakPerioderMedEndretStatus + uendretVedtakPerioderMedEndretStatus
-                lagreVedtak(oppdatertVedtaksperioderMedStatus, saksbehandling)
+                    settStatusPåVedtaksperioder(vedtaksperioder, vedtaksperioderForrigeBehandling)
+                }
             }
-        }
+
+        lagreVedtak(vedtaksperioderMedStatus, saksbehandling)
     }
 
     private fun hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørLæremidler> =
