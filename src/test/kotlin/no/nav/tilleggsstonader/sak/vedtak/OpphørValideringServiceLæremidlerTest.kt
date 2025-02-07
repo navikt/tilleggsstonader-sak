@@ -19,23 +19,26 @@ class OpphørValideringServiceLæremidlerTest {
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
     private val vilkårService = mockk<VilkårService>()
 
-    val måned = YearMonth.of(2025, 1)
-    val fom = måned.atDay(1)
-    val tom = måned.atEndOfMonth()
+    val februar = YearMonth.of(2025, 2)
+
+    val førsteJanuar = YearMonth.of(2025, 1).atDay(1)
+    val sisteJanuar = YearMonth.of(2025, 1).atEndOfMonth()
+
+    val førsteFebruar = YearMonth.of(2025, 2).atDay(1)
+    val sisteFebruar = YearMonth.of(2025, 2).atEndOfMonth()
+
+    val vedtaksperiodeJanuar = Vedtaksperiode(førsteJanuar, sisteJanuar)
+    val vedtaksperiodeFebruar = Vedtaksperiode(førsteFebruar, sisteFebruar)
 
     val førsteMars = YearMonth.of(2025, 3).atDay(1)
-    val førsteFebruar = YearMonth.of(2025, 2).atDay(1)
-
-    val vedtaksperiodeJanuar = Vedtaksperiode(fom, tom)
-    val vedtaksperiodeFebruar = Vedtaksperiode(fom.plusMonths(1), tom.plusMonths(1))
 
     val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)
 
     val beregningsgrunnlag =
         Beregningsgrunnlag(
-            fom = fom,
-            tom = tom,
-            utbetalingsdato = fom,
+            fom = førsteJanuar,
+            tom = sisteJanuar,
+            utbetalingsdato = førsteJanuar,
             studienivå = Studienivå.HØYERE_UTDANNING,
             studieprosent = 100,
             sats = 100,
@@ -54,8 +57,8 @@ class OpphørValideringServiceLæremidlerTest {
             beløp = 100,
             grunnlag =
                 beregningsgrunnlag.copy(
-                    fom = fom.plusMonths(1),
-                    tom = tom.plusMonths(1),
+                    fom = førsteFebruar,
+                    tom = sisteFebruar,
                 ),
         )
 
@@ -75,7 +78,7 @@ class OpphørValideringServiceLæremidlerTest {
             assertThatCode {
                 opphørValideringService.validerBeregningsresultatErAvkortetVedOpphør(
                     forrigeBeregningsresultat = beregningsresultat.perioder,
-                    revurderFraDato = tom.minusDays(1),
+                    revurderFraDato = sisteFebruar,
                 )
             }.doesNotThrowAnyException()
         }
@@ -98,7 +101,7 @@ class OpphørValideringServiceLæremidlerTest {
             assertThatCode {
                 opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
                     forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
-                    revurderFraDato = tom.minusDays(1),
+                    revurderFraDato = sisteFebruar
                 )
             }.doesNotThrowAnyException()
         }
