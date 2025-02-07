@@ -101,7 +101,7 @@ class OpphørValideringServiceLæremidlerTest {
             assertThatCode {
                 opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
                     forrigeBehandlingsVedtaksperioder = listOf(vedtaksperiodeJanuar, vedtaksperiodeFebruar),
-                    revurderFraDato = sisteFebruar
+                    revurderFraDato = sisteFebruar,
                 )
             }.doesNotThrowAnyException()
         }
