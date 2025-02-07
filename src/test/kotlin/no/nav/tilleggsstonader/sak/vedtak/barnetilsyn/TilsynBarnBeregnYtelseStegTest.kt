@@ -19,8 +19,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilg
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnBeregningFellesService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBarnUtgiftService
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBarnBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsperiode.domain.StønadsperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode

@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.brukPerioderFraOgMedRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.brukPerioderFraOgMedRevurderFraMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import java.time.LocalDate
 

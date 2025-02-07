@@ -5,8 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.util.toYearMonth
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.UtgiftBeregning
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.splitFraRevurderFra
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn

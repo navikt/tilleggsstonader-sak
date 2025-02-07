@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBere
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.tilUke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.Uke
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.finnMakssats
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
