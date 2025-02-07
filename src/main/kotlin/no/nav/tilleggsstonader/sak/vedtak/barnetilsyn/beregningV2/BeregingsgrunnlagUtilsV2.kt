@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV2
 
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.BeregningsgrunnlagUtils
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.BeregningsgrunnlagUtilsFelles
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.PeriodeMedDager
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBeregningUtil.tilDagerPerUke
@@ -69,7 +69,7 @@ object BeregingsgrunnlagUtilsV2 {
         }
     }
 
-    // TODO denne finnes også i TilsynBarnBerenging service som `antallDager`. Kan vi generalisere disse så vi kun trenger en av de?
+    // TODO denne finnes også i V1 service som `antallDager`. Kan vi generalisere disse så vi kun trenger en av de?
     private fun finnAntallAktivitestdagerIVedtaksperioden(
         vedtaksperiode: VedtaksperiodeDto,
         aktiviteterPerType: Map<AktivitetType, Map<Uke, List<PeriodeMedDager>>>,
@@ -85,7 +85,7 @@ object BeregingsgrunnlagUtilsV2 {
                     aktiviteterPerUke[uke]
                         ?: error("Ingen aktivitet i uke fom=${uke.fom} og tom=${uke.tom}")
 
-                BeregningsgrunnlagUtils.beregnAntallAktivitetsdagerForUke(periode, aktiviteterForUke)
+                BeregningsgrunnlagUtilsFelles.beregnAntallAktivitetsdagerForUke(periode, aktiviteterForUke)
             }.sum()
     }
 }
