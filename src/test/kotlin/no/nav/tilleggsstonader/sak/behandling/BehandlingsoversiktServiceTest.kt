@@ -77,8 +77,8 @@ class BehandlingsoversiktServiceTest {
             val oversikt = service.hentOversikt(fagsak.fagsakPersonId)
 
             val behandling = oversikt.tilsynBarn!!.behandlinger.single()
-            assertThat(behandling.vedtaksperiode?.fom).isEqualTo(LocalDate.of(2024, 4, 1))
-            assertThat(behandling.vedtaksperiode?.tom).isEqualTo(LocalDate.of(2024, 4, 1))
+            assertThat(behandling.vedtaksperiode?.fom).isNull()
+            assertThat(behandling.vedtaksperiode?.tom).isNull()
         }
     }
 
