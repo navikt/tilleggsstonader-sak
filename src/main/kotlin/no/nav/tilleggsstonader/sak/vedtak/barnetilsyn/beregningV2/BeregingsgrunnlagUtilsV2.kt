@@ -2,18 +2,18 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV2
 
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.BeregningsgrunnlagUtilsFelles
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.PeriodeMedDager
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.tilAktiviteterPerMånedPerType
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.tilDagerPerUke
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.tilUke
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.TilsynBeregningUtilsFelles.tilÅrMåned
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.Uke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles.finnMakssats
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.PeriodeMedDager
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBeregningUtil.tilAktiviteterPerMånedPerType
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBeregningUtil.tilDagerPerUke
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.TilsynBeregningUtil.tilÅrMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.Uke
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilÅrMåned
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.YearMonth
 

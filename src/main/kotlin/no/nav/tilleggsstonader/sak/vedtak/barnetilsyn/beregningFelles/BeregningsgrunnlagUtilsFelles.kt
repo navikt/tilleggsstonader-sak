@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningFelles
 
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregningV1.PeriodeMedDager
-
 object BeregningsgrunnlagUtilsFelles {
     /**
      * Beregner antall dager per uke som kan brukes
