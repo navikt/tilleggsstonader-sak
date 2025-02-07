@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Vedtaksperiode
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -33,7 +33,7 @@ data class VedtaksperiodeDto(
     val id: UUID,
     val fom: LocalDate,
     val tom: LocalDate,
-    val status: VedtaksperiodeStatus
+    val status: VedtaksperiodeStatus,
 )
 
 enum class VedtaksperiodeStatus {
@@ -43,8 +43,6 @@ enum class VedtaksperiodeStatus {
     SLETTET,
 }
 
-fun List<Vedtaksperiode>.tilDto() =
-    this.map { VedtaksperiodeDto(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
+fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeDto(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
 
-fun List<VedtaksperiodeDto>.tilDomene() =
-    this.map { Vedtaksperiode(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }
+fun List<VedtaksperiodeDto>.tilDomene() = this.map { Vedtaksperiode(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }

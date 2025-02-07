@@ -10,7 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 class LæremidlerVedtaksperiodeUtilTest {
     private val førsteJan2024 = LocalDate.of(2024, 1, 1)
@@ -26,7 +26,7 @@ class LæremidlerVedtaksperiodeUtilTest {
     inner class SplitVedtaksperiodePerÅr {
         @Test
         fun `skal ikke splitte periode som er innenfor samme år`() {
-            val periode = Vedtaksperiode(id = UUID.randomUUID(),førsteJan2024, sisteDes2024, VedtaksperiodeStatus.NY)
+            val periode = Vedtaksperiode(id = UUID.randomUUID(), førsteJan2024, sisteDes2024, VedtaksperiodeStatus.NY)
 
             assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
                 VedtaksperiodeInnenforÅr(førsteJan2024, sisteDes2024),
@@ -35,7 +35,8 @@ class LæremidlerVedtaksperiodeUtilTest {
 
         @Test
         fun `skal splitte periode som løper over 2 år`() {
-            val periode = Vedtaksperiode(id = UUID.randomUUID(),sisteDes2024, sisteDes2024.plusDays(1), VedtaksperiodeStatus.NY)
+            val periode =
+                Vedtaksperiode(id = UUID.randomUUID(), sisteDes2024, sisteDes2024.plusDays(1), VedtaksperiodeStatus.NY)
 
             assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
                 VedtaksperiodeInnenforÅr(sisteDes2024, sisteDes2024),
@@ -45,7 +46,8 @@ class LæremidlerVedtaksperiodeUtilTest {
 
         @Test
         fun `skal splitte periode som løper over 3 år`() {
-            val periode = Vedtaksperiode(id = UUID.randomUUID(),sisteDes2024, LocalDate.of(2026, 2, 3), VedtaksperiodeStatus.NY)
+            val periode =
+                Vedtaksperiode(id = UUID.randomUUID(), sisteDes2024, LocalDate.of(2026, 2, 3), VedtaksperiodeStatus.NY)
 
             assertThat(listOf(periode).splitVedtaksperiodePerÅr()).containsExactly(
                 VedtaksperiodeInnenforÅr(sisteDes2024, sisteDes2024),

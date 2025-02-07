@@ -35,7 +35,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.mapStønadsperioder
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
@@ -53,7 +52,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class LæremidlerBeregnYtelseStegStepDefinitions {
@@ -80,7 +79,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             tilkjentytelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
         )
-    val VedtaksperiodeId = UUID.randomUUID()
+    val vedtaksperiodeId: UUID = UUID.randomUUID()
 
     @Gitt("følgende aktiviteter for læremidler behandling={}")
     fun `følgende aktiviteter`(
@@ -109,10 +108,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val vedtaksperioder =
             dataTable.mapRad { rad ->
                 VedtaksperiodeDto(
-                    id = VedtaksperiodeId,
+                    id = vedtaksperiodeId,
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    status = VedtaksperiodeStatus.NY
+                    status = VedtaksperiodeStatus.NY,
                 )
             }
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
@@ -224,10 +223,10 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val forventedeVedtaksperioder =
             dataTable.mapRad { rad ->
                 Vedtaksperiode(
-                    id = VedtaksperiodeId,
+                    id = vedtaksperiodeId,
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    status = VedtaksperiodeStatus.NY
+                    status = VedtaksperiodeStatus.NY,
                 )
             }
 

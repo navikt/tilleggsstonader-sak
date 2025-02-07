@@ -7,13 +7,13 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 data class Vedtaksperiode(
     val id: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val status: VedtaksperiodeStatus
+    val status: VedtaksperiodeStatus,
 ) : Periode<LocalDate>,
     KopierPeriode<Vedtaksperiode> {
     init {

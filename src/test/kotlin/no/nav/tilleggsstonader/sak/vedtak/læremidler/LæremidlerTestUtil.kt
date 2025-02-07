@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForP
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtaksperiodeStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 object LæremidlerTestUtil {
     val defaultVedtaksperioder =
@@ -26,7 +26,7 @@ object LæremidlerTestUtil {
                 id = UUID.randomUUID(),
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 1, 7),
-                status = VedtaksperiodeStatus.NY
+                status = VedtaksperiodeStatus.NY,
             ),
         )
     val defaultBeregningsresultat =

@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 class LæremidlerBeregnYtelseStegTest(
     @Autowired
@@ -58,7 +58,8 @@ class LæremidlerBeregnYtelseStegTest(
         lagreAktivitetOgStønadsperiode(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(id = UUID.randomUUID(), fom = fom, tom = tom, status = VedtaksperiodeStatus.NY)
+        val vedtaksperiode =
+            VedtaksperiodeDto(id = UUID.randomUUID(), fom = fom, tom = tom, status = VedtaksperiodeStatus.NY)
         val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
         steg.utførSteg(saksbehandling, innvilgelse)
 
@@ -96,7 +97,13 @@ class LæremidlerBeregnYtelseStegTest(
         lagreAktivitetOgStønadsperiode(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(id = UUID.randomUUID(),fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31), status = VedtaksperiodeStatus.NY)
+        val vedtaksperiode =
+            VedtaksperiodeDto(
+                id = UUID.randomUUID(),
+                fom = LocalDate.of(2024, 12, 1),
+                tom = LocalDate.of(2024, 12, 31),
+                status = VedtaksperiodeStatus.NY,
+            )
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler =
@@ -149,7 +156,8 @@ class LæremidlerBeregnYtelseStegTest(
         vilkårperiodeRepository.insert(aktivitet)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(vedtaksperiodeId,fom = førsteJan, tom = sisteFeb, VedtaksperiodeStatus.NY)
+        val vedtaksperiode =
+            VedtaksperiodeDto(vedtaksperiodeId, fom = førsteJan, tom = sisteFeb, VedtaksperiodeStatus.NY)
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
@@ -207,7 +215,8 @@ class LæremidlerBeregnYtelseStegTest(
         vilkårperiodeRepository.insert(aktivitet)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = VedtaksperiodeDto(vedtaksperiodeStatus,fom = førsteJan, tom = sisteFeb, status = VedtaksperiodeStatus.NY)
+        val vedtaksperiode =
+            VedtaksperiodeDto(vedtaksperiodeStatus, fom = førsteJan, tom = sisteFeb, status = VedtaksperiodeStatus.NY)
         steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode)))
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
@@ -221,30 +230,41 @@ class LæremidlerBeregnYtelseStegTest(
             assertThat(utbetalingsdato).isEqualTo(førsteJan)
         }
     }
+
     @Test
     fun `skal lagre vedtak for førstegangsbehandling`() {
         val vedtaksperiodeid1 = UUID.randomUUID()
         val vedtaksperiodeid2 = UUID.randomUUID()
-        val vedtaksperiode1 = VedtaksperiodeDto(vedtaksperiodeid1,fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31), status = VedtaksperiodeStatus.NY)
-        val vedtaksperiode2 = VedtaksperiodeDto(vedtaksperiodeid2,fom = LocalDate.of(2024, 12, 1), tom = LocalDate.of(2024, 12, 31), status = VedtaksperiodeStatus.NY)
+        val vedtaksperiode1 =
+            VedtaksperiodeDto(
+                vedtaksperiodeid1,
+                fom = LocalDate.of(2024, 12, 1),
+                tom = LocalDate.of(2024, 12, 31),
+                status = VedtaksperiodeStatus.NY,
+            )
+        val vedtaksperiode2 =
+            VedtaksperiodeDto(
+                vedtaksperiodeid2,
+                fom = LocalDate.of(2024, 12, 1),
+                tom = LocalDate.of(2024, 12, 31),
+                status = VedtaksperiodeStatus.NY,
+            )
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
-        println("3######################################" +saksbehandling)
-        //steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode1, vedtaksperiode2)))
-        //val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
-
+        println("3######################################" + saksbehandling)
+        // steg.utførSteg(saksbehandling, InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode1, vedtaksperiode2)))
+        // val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
     }
+
     @Test
     fun `skal ikke lagre vedtak hvis revurdering ikke har forrige behandling`() {
-
     }
+
     @Test
     fun `skal lagre nye vedtaksperioder ved revurdering`() {
-
     }
 
     @Test
     fun `skal oppdatere endrede vedtaksperioder ved revurdering`() {
-
     }
 
     fun lagreAktivitetOgStønadsperiode(
