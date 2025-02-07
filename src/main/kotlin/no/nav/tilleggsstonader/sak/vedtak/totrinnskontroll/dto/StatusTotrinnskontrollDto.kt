@@ -42,4 +42,3 @@ enum class ÅrsakUnderkjent {
 data class SendTilBeslutterRequest(
     val kommentarTilBeslutter: String? = null,
 )
-

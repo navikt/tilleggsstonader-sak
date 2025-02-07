@@ -48,9 +48,9 @@ class TotrinnskontrollService(
         if (eksisterandeTotrinnskontroll != null) {
             feilHvis(
                 (
-                        eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET &&
-                                eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
-                        ),
+                    eksisterandeTotrinnskontroll.status != TotrinnInternStatus.ANGRET &&
+                        eksisterandeTotrinnskontroll.status != TotrinnInternStatus.UNDERKJENT
+                ),
             ) {
                 "Kan ikke sende til beslutter da det eksisterer en totrinnskontroll med status=${eksisterandeTotrinnskontroll.status}"
             }
@@ -194,9 +194,9 @@ class TotrinnskontrollService(
 
     private fun behandlingErGodkjentEllerOpprettet(behandlingStatus: BehandlingStatus) =
         behandlingStatus == BehandlingStatus.FERDIGSTILT ||
-                behandlingStatus == BehandlingStatus.IVERKSETTER_VEDTAK ||
-                behandlingStatus == BehandlingStatus.SATT_PÅ_VENT ||
-                behandlingStatus == BehandlingStatus.OPPRETTET
+            behandlingStatus == BehandlingStatus.IVERKSETTER_VEDTAK ||
+            behandlingStatus == BehandlingStatus.SATT_PÅ_VENT ||
+            behandlingStatus == BehandlingStatus.OPPRETTET
 
     private fun finnStatusForVedtakSomSkalFattes(behandling: Behandling): StatusTotrinnskontrollDto {
         val behandlingId = behandling.id
@@ -211,22 +211,23 @@ class TotrinnskontrollService(
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId)
                 ?: error("mangler totrinnskontroll på behandling id=$behandlingId")
 
-        val totrinnskontrollDto = TotrinnskontrollDto(
-            opprettetAv =totrinnskontroll.saksbehandler,
-            opprettetTid =totrinnskontroll.sporbar.opprettetTid,
-            begrunnelse = totrinnskontroll.begrunnelse
-        )
+        val totrinnskontrollDto =
+            TotrinnskontrollDto(
+                opprettetAv = totrinnskontroll.saksbehandler,
+                opprettetTid = totrinnskontroll.sporbar.opprettetTid,
+                begrunnelse = totrinnskontroll.begrunnelse,
+            )
 
         return if (beslutterErLikBehandler(totrinnskontroll) || !tilgangService.harTilgangTilRolle(BehandlerRolle.BESLUTTER)
         ) {
             StatusTotrinnskontrollDto(
                 TotrinnkontrollStatus.IKKE_AUTORISERT,
-                totrinnskontrollDto
+                totrinnskontrollDto,
             )
         } else {
             StatusTotrinnskontrollDto(
                 TotrinnkontrollStatus.KAN_FATTE_VEDTAK,
-                totrinnskontrollDto
+                totrinnskontrollDto,
             )
         }
     }
@@ -262,7 +263,7 @@ class TotrinnskontrollService(
             else ->
                 error(
                     "Skal ikke kunne være annen status enn UNDERKJENT når " +
-                            "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",
+                        "behandligStatus!=${BehandlingStatus.FATTER_VEDTAK}",
                 )
         }
     }
@@ -277,8 +278,8 @@ class TotrinnskontrollService(
         // generisk metode for å logge endringene som er utført
         secureLogger.info(
             "${SikkerhetContext.hentSaksbehandlerEllerSystembruker()} " +
-                    "endrer på totrinnskontroll knyttet til behandlingId $gjeldeneTotrinnskontroll.id" +
-                    "til $status",
+                "endrer på totrinnskontroll knyttet til behandlingId $gjeldeneTotrinnskontroll.id" +
+                "til $status",
         )
         return totrinnskontrollRepository.update(gjeldeneTotrinnskontroll.copy(status = status))
     }
