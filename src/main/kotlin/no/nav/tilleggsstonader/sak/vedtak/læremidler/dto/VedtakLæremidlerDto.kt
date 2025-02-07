@@ -40,7 +40,6 @@ enum class VedtaksperiodeStatus {
     NY,
     ENDRET,
     UENDRET,
-    SLETTET,
 }
 
 fun List<Vedtaksperiode>.tilDto() = this.map { VedtaksperiodeLæremidlerDto(id = it.id, fom = it.fom, tom = it.tom, status = it.status) }

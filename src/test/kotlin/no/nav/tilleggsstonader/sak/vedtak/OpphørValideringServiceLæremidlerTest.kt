@@ -26,12 +26,12 @@ class OpphørValideringServiceLæremidlerTest {
     val tom = måned.atEndOfMonth()
 
     val vedtaksperiodeJanuar =
-        Vedtaksperiode(fom = fom, tom = tom, status = VedtaksperiodeStatus.UENDRET, id = UUID.randomUUID())
+        Vedtaksperiode(fom = fom, tom = tom, status = VedtaksperiodeStatus.NY, id = UUID.randomUUID())
     val vedtaksperiodeFebruar =
         Vedtaksperiode(
             fom = fom.plusMonths(1),
             tom = tom.plusMonths(1),
-            status = VedtaksperiodeStatus.SLETTET,
+            status = VedtaksperiodeStatus.NY,
             id = UUID.randomUUID(),
         )
 
