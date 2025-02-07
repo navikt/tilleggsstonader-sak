@@ -67,7 +67,7 @@ class OpphørValideringService(
         val senesteTomIForrigeVedtaksperioder = forrigeBehandlingsVedtaksperioder.maxOf { it.tom }
 
         brukerfeilHvis(
-            senesteTomIForrigeVedtaksperioder < revurderFraDato
+            senesteTomIForrigeVedtaksperioder < revurderFraDato,
         ) { "Opphør er et ugyldig vedtaksresultat fordi ingen vedtaksperioder har blitt avkortet" }
     }
 
