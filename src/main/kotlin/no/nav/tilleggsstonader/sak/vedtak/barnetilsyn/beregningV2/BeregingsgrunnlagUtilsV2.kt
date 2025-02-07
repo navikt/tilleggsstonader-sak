@@ -69,7 +69,7 @@ object BeregingsgrunnlagUtilsV2 {
         }
     }
 
-    // Logikk kopiert fra V1, men oppdatert typer
+    // TODO denne finnes også i TilsynBarnBerenging service som `antallDager`. Kan vi generalisere disse så vi kun trenger en av de?
     private fun finnAntallAktivitestdagerIVedtaksperioden(
         vedtaksperiode: VedtaksperiodeDto,
         aktiviteterPerType: Map<AktivitetType, Map<Uke, List<PeriodeMedDager>>>,

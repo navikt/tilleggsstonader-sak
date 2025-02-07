@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.splitPerMåned
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.StønadsperiodeBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -134,6 +135,21 @@ object TilsynBeregningUtil {
         revurderFra?.let {
             this.splitFraRevurderFra(revurderFra).filter { it.fom >= revurderFra }
         } ?: this
+
+    /**
+     * Dersom man har satt revurderFra så skal man kun beregne perioder fra og med den måneden
+     * Hvis vi eks innvilget 1000kr for 1-31 august, så mappes hele beløpet til 1 august.
+     * Dvs det lages en andel som har fom-tom 1-1 aug
+     * Når man revurderer fra midten på måneden og eks skal endre målgruppe eller aktivitetsdager,
+     * så har man allerede utbetalt 500kr for 1-14 august, men hele beløpet er ført på 1 aug.
+     * For at beregningen då skal bli riktig må man ha med grunnlaget til hele måneden og beregne det på nytt, sånn at man får en ny periode som er
+     * 1-14 aug, 500kr, 15-30 aug 700kr.
+     */
+    fun List<Beregningsgrunnlag>.brukBeregningsgrunnlagFraOgMedRevurderFra(revurderFra: LocalDate?): List<Beregningsgrunnlag> {
+        val revurderFraMåned = revurderFra?.toYearMonth() ?: return this
+
+        return this.filter { it.måned >= revurderFraMåned }
+    }
 
     fun Map<BarnId, List<UtgiftBeregning>>.brukPerioderFraOgMedRevurderFraMåned(
         revurderFra: LocalDate?,

@@ -7,8 +7,8 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.IdTIlUUIDHolder.barnIder
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
@@ -22,7 +22,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
@@ -45,11 +45,15 @@ class BeregningV2StepDefinition {
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val vedtakRepository = mockk<VedtakRepository>()
+    val tilsynBarnBeregningFellesService =
+        TilsynBarnBeregningFellesService(
+            vilkårperiodeRepository = vilkårperiodeRepository,
+            vedtakRepository = vedtakRepository,
+        )
     val beregningService =
         TilsynBarnBeregningServiceV2(
             tilsynBarnUtgiftService = tilsynBarnUtgiftService,
-            vilkårperiodeRepository = vilkårperiodeRepository,
-            vedtakRepository = vedtakRepository,
+            tilsynBarnBeregningFellesService = tilsynBarnBeregningFellesService,
         )
 
     var exception: Exception? = null
@@ -109,14 +113,14 @@ class BeregningV2StepDefinition {
 
     @Når("V2 - beregner")
     fun beregner() {
-        beregn(behandling(id = behandlingId))
+        beregn(saksbehandling(id = behandlingId))
     }
 
     @Når("V2 - beregner med revurderFra={}")
     fun `beregner med revurder fra`(revurderFraStr: String) {
         val revurderFra = parseDato(revurderFraStr)
         beregn(
-            behandling(
+            saksbehandling(
                 id = behandlingId,
                 type = BehandlingType.REVURDERING,
                 revurderFra = revurderFra,
@@ -125,7 +129,7 @@ class BeregningV2StepDefinition {
         )
     }
 
-    private fun beregn(behandling: Behandling) {
+    private fun beregn(behandling: Saksbehandling) {
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
         try {
             beregningsresultat =

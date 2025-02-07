@@ -50,12 +50,18 @@ class StepDefinitions {
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
     val repository = mockk<VedtakRepository>(relaxed = true)
+
+    val tilsynBarnBeregningFellesService =
+        TilsynBarnBeregningFellesService(
+            vilkårperiodeRepository = vilkårperiodeRepository,
+            vedtakRepository = repository,
+        )
+
     val service =
         TilsynBarnBeregningService(
             stønadsperiodeRepository = stønadsperiodeRepository,
-            vilkårperiodeRepository = vilkårperiodeRepository,
             tilsynBarnUtgiftService = tilsynBarnUtgiftService,
-            repository = repository,
+            tilsynBarnBeregningFellesService = tilsynBarnBeregningFellesService,
         )
 
     var exception: Exception? = null
